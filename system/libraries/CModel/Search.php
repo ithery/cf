@@ -44,7 +44,7 @@ class CModel_Search {
 
     public function perform($query, $user = null, $page = null, $perPage = null) {
         $searchResults = new CModel_Search_SearchResultCollection();
-        CF::collect($this->getSearchAspects())
+        c::collect($this->getSearchAspects())
                 ->each(function (CModel_Search_SearchAspect $aspect) use ($query, $user, $page, $perPage, $searchResults) {
                     $searchResults->addResults($aspect->getType(), $aspect->getResults($query, $user, $page, $perPage));
                 });

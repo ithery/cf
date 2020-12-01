@@ -89,7 +89,7 @@ trait CModel_HasSlug_HasSlugTrait {
             $slugSourceString = call_user_func($this->slugOptions->generateSlugFrom, $this);
             return substr($slugSourceString, 0, $this->slugOptions->maximumLength);
         }
-        $slugSourceString = CF::collect($this->slugOptions->generateSlugFrom)
+        $slugSourceString = c::collect($this->slugOptions->generateSlugFrom)
                 ->map(function ( $fieldName) {
                     return carr::get($this, $fieldName, '');
                 })

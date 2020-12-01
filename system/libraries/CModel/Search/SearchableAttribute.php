@@ -29,7 +29,7 @@ class CModel_Search_SearchableAttribute {
     }
 
     public static function createMany(array $attributes) {
-        return CF::collect($attributes)
+        return c::collect($attributes)
                         ->map(function ($attribute) {
                             return new self($attribute);
                         })

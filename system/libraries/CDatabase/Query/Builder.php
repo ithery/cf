@@ -539,7 +539,7 @@ class CDatabase_Query_Builder {
 
         $this->columns = $original;
 
-        return CF::collect($results);
+        return c::collect($results);
     }
 
     /**

@@ -541,7 +541,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     protected function aliasedPivotColumns() {
         $defaults = [$this->foreignPivotKey, $this->relatedPivotKey];
 
-        return CF::collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
+        return c::collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
                     return $this->table . '.' . $column . ' as pivot_' . $column;
                 })->unique()->all();
     }
