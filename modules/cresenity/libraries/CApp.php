@@ -425,106 +425,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $childList;
     }
 
-    public static function exceptionHandler($exception, $message = NULL, $file = NULL, $line = NULL) {
-
-
-        if ($exception instanceof \Pheanstalk\Exception\ServerException) {
-            return;
-        }
-        try {
-            $app = CApp::instance();
-            $org = $app->org();
-
-            // PHP errors have 5 args, always
-            $PHP_ERROR = (func_num_args() === 5);
-
-            // Test to see if errors should be displayed
-            if ($PHP_ERROR AND ( error_reporting() & $exception) === 0)
-                return;
-
-            // Error handling will use exactly 5 args, every time
-            if ($PHP_ERROR) {
-                $code = $exception;
-                $type = 'PHP Error';
-            } else {
-                $code = $exception->getCode();
-                $type = get_class($exception);
-                $message = $exception->getMessage();
-                $file = $exception->getFile();
-                $line = $exception->getLine();
-            }
-
-            if (is_numeric($code)) {
-                $codes = CF::lang('errors');
-
-                if (!empty($codes[$code])) {
-                    list($level, $error, $description) = $codes[$code];
-                } else {
-                    $level = 1;
-                    $error = $PHP_ERROR ? 'Unknown Error' : get_class($exception);
-                    $description = '';
-                }
-            } else {
-                // Custom error message, this will never be logged
-                $level = 5;
-                $error = $code;
-                $description = '';
-            }
-
-            // Remove the DOCROOT from the path, as a security precaution
-            $file = str_replace('\\', '/', realpath($file));
-            $file = preg_replace('|^' . preg_quote(DOCROOT) . '|', '', $file);
-
-
-            if ($PHP_ERROR) {
-                $description = CF::lang('errors.' . E_RECOVERABLE_ERROR);
-                $description = is_array($description) ? $description[2] : '';
-            }
-
-
-            // Test if display_errors is on
-            $trace = false;
-            $traceArray = false;
-            if ($line != FALSE) {
-                // Remove the first entry of debug_backtrace(), it is the exception_handler call
-                $traceArray = $PHP_ERROR ? array_slice(debug_backtrace(), 1) : $exception->getTrace();
-
-                // Beautify backtrace
-                $trace = CF::backtrace($traceArray);
-            }
-
-            if (!($exception instanceof CF_404_Exception)) {
-                $v = CView::factory('cmail/error_mail');
-                $v->error = $error;
-                $v->description = $description;
-                $v->file = $file;
-                $v->line = $line;
-                $v->trace = $trace;
-                $v->message = $message;
-                $html = $v->render();
-                $configCollector = CConfig::instance('collector');
-                if ($configCollector->get('exception')) {
-                    if ($PHP_ERROR) {
-                        CCollector::error($exception, $message, $file, $line, '');
-                    } else {
-                        CCollector::exception($exception);
-                    }
-                } else {
-                    cmail::error_mail($html);
-                }
-            }
-
-
-            if ($PHP_ERROR) {
-                CF::exception_handler($exception, $message, $file, $line, '');
-            } else {
-                CF::exception_handler($exception, $message, $file, $line);
-            }
-        } catch (Exception $e) {
-            CF::exception_handler($exception, $message, $file, $line);
-        }
-    }
-
     /**
      * Get the collection of items as JSON.
      *
@@ -560,7 +460,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $data["message"] = $messageOrig;
         $data["ajaxData"] = $this->ajaxData;
         $data['html'] = mb_convert_encoding($data['html'], 'UTF-8', 'UTF-8');
-        return json_encode($data,$options);
+        return json_encode($data, $options);
     }
 
     //override function json

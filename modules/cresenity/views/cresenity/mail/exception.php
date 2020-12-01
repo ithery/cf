@@ -74,7 +74,7 @@ $role = $app->role();
                                         <h3><?php echo chtml::specialchars($error) ?></h3>
                                         <p><?php echo chtml::specialchars($description) ?></p>
                                         <?php if (!empty($line) AND ! empty($file)): ?>
-                                            <p><?php echo CF::lang('core.error_file_line', $file, $line) ?></p>
+                                            <p><?php echo CF::lang('core.error_file_line', ['file' => $file, 'line' => $line]) ?></p>
                                         <?php endif ?>
                                         <p>
                                             <code class="block"><?php echo $message ?></code>
