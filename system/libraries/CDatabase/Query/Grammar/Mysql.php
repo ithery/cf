@@ -75,19 +75,67 @@ class CDatabase_Query_Grammar_Mysql extends CDatabase_Query_Grammar {
     }
 
     /**
-     * Compile the columns for an update statement.
+     * Compile an update statement into SQL.
      *
      * @param  CDatabase_Query_Builder  $query
      * @param  array  $values
      * @return string
      */
-    protected function compileUpdateColumns(CDatabase_Query_Builder $query, array $values) {
-        return c::collect($values)->map(function ($value, $key) {
-                    if ($this->isJsonSelector($key)) {
-                        return $this->compileJsonUpdateColumn($key, $value);
-                    }
+    public function compileUpdate(CDatabase_Query_Builder $query, $values) {
+        $table = $this->wrapTable($query->from);
 
-                    return $this->wrap($key) . ' = ' . $this->parameter($value);
+        // Each one of the columns in the update statements needs to be wrapped in the
+        // keyword identifiers, also a place-holder needs to be created for each of
+        // the values in the list of bindings so we can make the sets statements.
+        $columns = $this->compileUpdateColumns($values);
+
+        // If the query has any "join" clauses, we will setup the joins on the builder
+        // and compile them so we can attach them to this update, as update queries
+        // can get join statements to attach to other tables when they're needed.
+        $joins = '';
+
+        if (isset($query->joins)) {
+            $joins = ' ' . $this->compileJoins($query, $query->joins);
+        }
+
+        // Of course, update queries may also be constrained by where clauses so we'll
+        // need to compile the where clauses and attach it to the query so only the
+        // intended records are updated by the SQL statements we generate to run.
+        $where = $this->compileWheres($query);
+
+        $sql = rtrim("update {$table}{$joins} set $columns $where");
+
+        // If the query has an order by clause we will compile it since MySQL supports
+        // order bys on update statements. We'll compile them using the typical way
+        // of compiling order bys. Then they will be appended to the SQL queries.
+        if (!empty($query->orders)) {
+            $sql .= ' ' . $this->compileOrders($query, $query->orders);
+        }
+
+        // Updates on MySQL also supports "limits", which allow you to easily update a
+        // single record very easily. This is not supported by all database engines
+        // so we have customized this update compiler here in order to add it in.
+        if (isset($query->limit)) {
+            $sql .= ' ' . $this->compileLimit($query, $query->limit);
+        }
+
+        return rtrim($sql);
+    }
+
+    /**
+     * Compile all of the columns for an update statement.
+     *
+     * @param  array  $values
+     * @return string
+     */
+    protected function compileUpdateColumns($values) {
+        $collection = new CCollection($values);
+        return $collection->map(function ($value, $key) {
+                    if ($this->isJsonSelector($key)) {
+                        return $this->compileJsonUpdateColumn($key, new JsonExpression($value));
+                    } else {
+                        return $this->wrap($key) . ' = ' . $this->parameter($value);
+                    }
                 })->implode(', ');
     }
 
