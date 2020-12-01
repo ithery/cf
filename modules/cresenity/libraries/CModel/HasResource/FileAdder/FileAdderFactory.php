@@ -36,7 +36,7 @@ class CModel_HasResource_FileAdder_FileAdderFactory {
     }
 
     public static function createMultipleFromRequest(CModel $subject, array $keys = []) {
-        return CF::collect($keys)->map(function ( $key) use ($subject) {
+        return c::collect($keys)->map(function ( $key) use ($subject) {
                             if (!CHTTP::request()->hasFile($key)) {
                                 throw RequestDoesNotHaveFile::create($key);
                             }

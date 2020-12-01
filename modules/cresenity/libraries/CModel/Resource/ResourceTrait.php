@@ -167,7 +167,7 @@ trait CModel_Resource_ResourceTrait {
     }
 
     public function getGeneratedConversions() {
-        return CF::collect($this->getCustomProperty('generated_conversions', []));
+        return c::collect($this->getCustomProperty('generated_conversions', []));
     }
 
     /**
@@ -226,7 +226,7 @@ trait CModel_Resource_ResourceTrait {
             unset($attributes['conversion']);
             $extraAttributes = array_merge($attributes, $extraAttributes);
         }
-        $attributeString = CF::collect($extraAttributes)
+        $attributeString = c::collect($extraAttributes)
                         ->map(function ($value, $name) {
                             return $name . '="' . $value . '"';
                         })->implode(' ');

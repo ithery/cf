@@ -278,7 +278,7 @@ trait CModel_HasResource_HasResourceTrait {
      */
     public function updateResource(array $newResourceArray, $collectionName = 'default') {
         $this->removeResourceItemsNotPresentInArray($newResourceArray, $collectionName);
-        return CF::collect($newResourceArray)
+        return c::collect($newResourceArray)
                         ->map(function (array $newResourceItem) use ($collectionName) {
                             static $orderColumn = 1;
                             $resourceClass = config('resourcelibrary.resource_model');
@@ -332,9 +332,9 @@ trait CModel_HasResource_HasResourceTrait {
      */
     public function clearResourceCollectionExcept($collectionName = 'default', $excludedResource = []) {
         if ($excludedResource instanceof CApp_Model_Interface_ResourceInterface) {
-            $excludedResource = CF::collect()->push($excludedResource);
+            $excludedResource = c::collect()->push($excludedResource);
         }
-        $excludedResource = CF::collect($excludedResource);
+        $excludedResource = c::collect($excludedResource);
 
         if ($excludedResource->isEmpty()) {
             return $this->clearResourceCollection($collectionName);
@@ -418,7 +418,7 @@ trait CModel_HasResource_HasResourceTrait {
      * @return mixed
      */
     public function loadResource($collectionName) {
-        $collection = $this->exists ? $this->resource : CF::collect($this->unAttachedResourceLibraryItems)->pluck('resource');
+        $collection = $this->exists ? $this->resource : c::collect($this->unAttachedResourceLibraryItems)->pluck('resource');
         $values = $collection
                 ->filter(function (CApp_Model_Interface_ResourceInterface $resourceItem) use ($collectionName) {
                     if ($collectionName == '') {
@@ -477,12 +477,12 @@ trait CModel_HasResource_HasResourceTrait {
 
     public function registerAllResourceConversions(CApp_Model_Interface_ResourceInterface $resource = null) {
         $this->registerResourceCollections();
-        CF::collect($this->resourceCollections)->each(function (CResources_ResourceCollection $resourceCollection) use ($resource) {
+        c::collect($this->resourceCollections)->each(function (CResources_ResourceCollection $resourceCollection) use ($resource) {
             $actualResourceConversions = $this->resourceConversions;
             $this->resourceConversions = [];
             call_user_func_array($resourceCollection->resourceConversionRegistrations, array($resource));
 
-            $preparedResourceConversions = CF::collect($this->resourceConversions)
+            $preparedResourceConversions = c::collect($this->resourceConversions)
                     ->each(function (CResources_Conversion $conversion) use ($resourceCollection) {
                         $conversion->performOnCollections($resourceCollection->name);
                     })
