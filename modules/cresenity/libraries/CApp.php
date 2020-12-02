@@ -447,7 +447,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $asset = CManager::asset();
         $js = $this->js();
 
-        if ($asset->isUseRequireJs()) {
+        
+        if ($this->isUseRequireJs()) {
             $js = $asset->renderJsRequire($js);
         } else {
             $js = $asset->renderJsRequire($js, 'cresenity.cf.require');

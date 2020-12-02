@@ -131,9 +131,7 @@ class CManager_Asset {
     }
 
     public function varJs() {
-        $varJs = "
-            window.capp = " . json_encode(CApp::variables()) . ";
-            ";
+        $varJs = "window.capp = " . json_encode(CApp::variables()) . ";";
         return $varJs;
     }
 
@@ -164,7 +162,6 @@ class CManager_Asset {
         if ($bar->isEnabled()) {
             $js .= $bar->getJavascriptReplaceCode();
         }
-
 
         return $js_before . $js . PHP_EOL . ";" . PHP_EOL;
     }
@@ -327,7 +324,7 @@ class CManager_Asset {
         $compiler = new CManager_Asset_Compiler($files, $options);
         return $compiler->compile();
     }
-    
+
     public function compileJs($files) {
         $options = [];
         $options['type'] = 'js';
