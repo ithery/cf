@@ -2,7 +2,7 @@
 
 defined('SYSPATH') OR die('No direct script access.');
 
-class {ControllerClass} extends CController {
+class {ControllerClass} extends {prefix}Controller {
     
     /**
      * default route controller 

@@ -1,10 +1,7 @@
 <?php
 
-/**
- * Description of theme
- *
- * @author Hery
- */
+defined('SYSPATH') OR die('No direct script access.');
+
 return [
     "client_modules" => [
         "layout-helpers",
