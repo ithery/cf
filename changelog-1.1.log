@@ -1,0 +1,11 @@
+
+- nav in folder config now deprecated, please move to folder nav and CApp will 
+  look file for nav.php as default
+- support blade view, give the views extension with blade.php and it will work
+- support new feature with CComponent, you can create from views with 
+  blade syntax, or CApp with method addComponent. documentation is like 
+  laravel livewire
+- CF::collect moved to c::collect and other helper in CF too will moved in c helpers
+- c helpers is now more powerful
+  - c::view(), will return CView_Factory and c::view('view.name') will return object of view
+  - c::request() will return like CHTTP::request and c::request('key') will return CHTTP::request->get('key')
