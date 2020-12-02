@@ -2,12 +2,11 @@
 
 defined('SYSPATH') OR die('No direct script access.');
 
-class {ControllerClass} extends CController {
+class {prefix}Controller extends CController  {
     
-    /**
-     * default route controller 
-     */
-    public function index() {
-        //TODO:do something awesome on controller index
+    public function __construct() {
+        parent::__construct();
+        //do something here
     }
+
 }

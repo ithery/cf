@@ -2,12 +2,8 @@
 
 defined('SYSPATH') OR die('No direct script access.');
 
-class {ControllerClass} extends CController {
+class {prefix} {
     
-    /**
-     * default route controller 
-     */
-    public function index() {
-        //TODO:do something awesome on controller index
-    }
+    use CBase_Trait_BaseTrait;
+    
 }

@@ -2,12 +2,45 @@
 
 defined('SYSPATH') OR die('No direct script access.');
 
-class {ControllerClass} extends CController {
+class {prefix}Model extends CModel {
     
+    use CModel_SoftDelete_SoftDeleteTrait,
+        CModel_Activity_ActivityTrait;
+
     /**
-     * default route controller 
+     * create search model for searching multiple models
+     * example:
+     * <code>
+     * $modelSearch = {prefix}Model::createSearch();
+     * $modelSearch->registerModel(
+     *      {prefix}Model_Post::class, //class implements CModel_SearchableInterface
+     *      ['title', 'content'], //field to search
+     *      function($q) use($someInformation) { 
+     *          //callback for filtering spesific
+     * });
+     * </code>
+     * @return \CModel_Search
      */
-    public function index() {
-        //TODO:do something awesome on controller index
+    public static function createSearch() {
+        return new CModel_Search();
+    }
+
+    /**
+     * Create search result for CModel_Search, the model which will register 
+     * to searchable must implement CModel_SearchableInterface::getSearchResult
+     * example:
+     * <code>
+     * public function getSearchResult() {
+     *   return {prefix}Model::createSearchResult($this, $this->title);
+     * }
+     * </code>
+     * @see CModel_SearchableInterface
+     * @param string $model
+     * @param string $title
+     * @param string $url
+     * @return CModel_Search_SearchResult
+     */
+    public static function createSearchResult($model, $title, $url = null) {
+        return new CModel_Search_SearchResult($model,$title,$url);
     }
 }
