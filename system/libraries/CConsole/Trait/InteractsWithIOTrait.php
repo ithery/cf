@@ -209,7 +209,7 @@ trait CConsole_Trait_InteractsWithIOTrait {
     public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = []) {
         $table = new Table($this->output);
 
-        if ($rows instanceof Arrayable) {
+        if ($rows instanceof CInterface_Arrayable) {
             $rows = $rows->toArray();
         }
 
@@ -275,8 +275,8 @@ trait CConsole_Trait_InteractsWithIOTrait {
     public function line($string, $style = null, $verbosity = null) {
         $styled = $style ? "<$style>$string</$style>" : $string;
 
-        
-        
+
+
         $this->output->writeln($styled, $this->parseVerbosity($verbosity));
     }
 
