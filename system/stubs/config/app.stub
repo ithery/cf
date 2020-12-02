@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
-return array(
+defined('SYSPATH') OR die('No direct script access.');
+
+return [
     /**
      * Your app name, it will used for display app identifier when running on framework
      */
-    "title" => "CRESENITY",
+    "title" => {title},
     /**
      * Base path of the web site. If this includes a domain, eg: localhost/cresenity/
      * then a full URL will be used, eg: http://localhost/cresenity/. If it only includes
@@ -22,7 +23,7 @@ return array(
      * The application prefix used by code, this is determine how the app
      * will look in libraries folder structure
      */
-    'prefix' => '',
+    'prefix' => {prefix},
     /**
      * The application locale determines the default locale that will be used
      * by the translation service provider. You are free to set this value
@@ -61,23 +62,5 @@ return array(
      *
      */
     'debug' => !IN_PRODUCTION,
-    "lang" => "id", //deprecated
-    "app_id" => 1,
-    "install" => false,
-    "sidebar" => true,
-    "signup" => false,
-    "theme" => "",
-    "admin_email" => "contact@cresenitytech.com",
-    "set_timezone" => true, //deprecated
-    "default_timezone" => 'Asia/Jakarta', //deprecated
-    "multilang" => true,
-    "top_menu_cashier" => false,
-    "update_last_request" => true,
-    "ip_address" => "192.168.1.19",
-    "code_test" => false,
-    "require_js" => true,
-    "merge_js" => false,
-    "minify_js" => false,
-    "merge_css" => false,
-    "minify_css" => false,
-);
+            
+];
