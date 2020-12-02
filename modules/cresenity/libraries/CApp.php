@@ -10,6 +10,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     use CTrait_Compat_App,
         CTrait_Macroable,
         CTrait_RequestInfoTrait,
+        CApp_Concern_Navigation,
         CApp_Trait_App_Breadcrumb,
         CApp_Trait_App_Variables,
         CApp_Trait_App_View,
@@ -447,7 +448,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $asset = CManager::asset();
         $js = $this->js();
 
-        
+
         if ($this->isUseRequireJs()) {
             $js = $asset->renderJsRequire($js);
         } else {
