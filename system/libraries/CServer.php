@@ -127,4 +127,9 @@ class CServer {
         return new CServer_Service_Beanstalkd($options);
     }
 
+    public static function IsNpmInstalled() {
+        exec('npm -v', $output, $exitCode);
+        return $exitCode === 0;
+    }
+
 }
