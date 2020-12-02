@@ -13,9 +13,4 @@ class CApp_Element extends CObservable {
         parent::__construct($id);
     }
 
-    public function js($indent = 0) {
-        $js = parent::js($indent);
-        return $js;
-    }
-
 }
