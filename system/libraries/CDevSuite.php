@@ -383,4 +383,8 @@ class CDevSuite {
         return CDevSuite::configuration()->read()['tld'];
     }
 
+    public static function isInstalled() {
+        return static::filesystem()->isDir(static::homePath());
+    }
+
 }
