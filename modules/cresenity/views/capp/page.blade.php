@@ -25,7 +25,7 @@ $org = $app->org();
         <link rel="shortcut icon" href="<?php echo curl::base(); ?>media/img/favico.png">
 
         <link href="<?php echo curl::base(); ?>ccore/css/<?php echo $css_hash; ?>" rel="stylesheet">
-		<?php echo $additional_head;?>
+        <?php echo $additional_head; ?>
     </head>
     <body>
         <?php echo $custom_header; ?>
@@ -113,21 +113,21 @@ $org = $app->org();
                                 </li>
                             <?php endif; ?>
                             <?php if (ccfg::get("change_theme")): ?>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    <?php echo clang::__('Theme'); ?> <b class="caret"></b>
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <?php 
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                                        <?php echo clang::__('Theme'); ?> <b class="caret"></b>
+                                    </a>
+                                    <ul class="dropdown-menu">
+                                        <?php
                                         $theme_list = ctheme::get_theme_list();
                                         foreach ($theme_list as $k => $v) {
                                             if ($k != ctheme::get_current_theme()) {
-                                                echo '<li><a href="' .curl::base() .'cresenity/change_theme/' .$k .'">' .$v .'</a></li>';
+                                                echo '<li><a href="' . curl::base() . 'cresenity/change_theme/' . $k . '">' . $v . '</a></li>';
                                             }
                                         }
-                                    ?>
-                                </ul>
-                            </li>
+                                        ?>
+                                    </ul>
+                                </li>
                             <?php endif; ?>
                             <li class="dropdown">
 
@@ -228,4 +228,57 @@ $org = $app->org();
                         echo '<div class="row-fluid"><div class="span12">' . $msg . '</div></div>';
                     }
                     ?>
+
+
+                    <?php echo $content; ?>
+
+                    <?php defined('SYSPATH') OR die('No direct access allowed.'); ?>
+
+
+                </div>
+            </div>
+        </div>
+        <div class="footer">
+            <div class="footer-inner">
+                <div class="container">
+                    <div class="row">
+                        <div class="span12">
+                            &copy; 2017 <a href="http://ittron.co.id">Ittron Global Technology</a>.
+                        </div> <!-- /span12 -->
+                    </div> <!-- /row -->
+                </div> <!-- /container -->
+            </div> <!-- /footer-inner -->
+        </div> <!-- /footer -->
+
+        <script src="<?php echo curl::base(); ?>media/js/require.js"></script>
+        <!-- Load javascript here -->
+
+        <?php echo $end_client_script; ?>
+
+        <script language="javascript">
+
+<?php
+echo $js;
+echo $ready_client_script;
+?>
+
+            if (window) {
+                window.onload = function () {
+<?php echo $load_client_script; ?>
+                }
+            }
+<?php echo $custom_js ?>
+        </script>
+        <?php echo $custom_footer; ?>
+    </body>
+</html>
+<?php
+if (ccfg::get("log_request")) {
+    $user = CApp::instance()->user();
+    if ($user != null) {
+
+        clog::request($user->user_id);
+    }
+}
+?>
 				

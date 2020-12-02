@@ -8,8 +8,11 @@
 Class Controller_Home extends CController {
 
     public function index() {
-
-        return c::response()->view('welcome');
+        $app = CApp::instance();
+        $app->setLoginRequired(false);
+        $app->setView('welcome');
+        
+        return $app;
     }
 
     public function upload() {

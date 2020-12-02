@@ -9,9 +9,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 trait CApp_Trait_App_View {
 
-    private $viewName = 'cpage';
+    private $viewName = 'capp/page';
+    private $viewLoginName = 'capp/login';
     private $view;
-    private $viewLoginName = 'ccore/login';
     protected static $viewCallback;
 
     public function setView($view) {

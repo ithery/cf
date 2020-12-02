@@ -9,7 +9,6 @@
 /*/files/
 
 
-*/config/app.php
 */config/app_setting.php
 */config/database.php
 */config/resources.php

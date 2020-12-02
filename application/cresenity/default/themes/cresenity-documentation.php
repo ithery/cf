@@ -1,16 +1,14 @@
 <?php
 
-
 return array(
     "client_modules" => [
         'jquery',
+        'bootstrap',
         'fontawesome-5'
     ],
-    "js"=> [
-        
-    ],    
-    
+    "js" => [
+    ],
     "css" => [
-        'cresenity-documentation.css?'.uniqid(),
+        'cresenity-documentation.css?' . uniqid(),
     ],
 );

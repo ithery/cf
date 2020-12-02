@@ -12,16 +12,13 @@ Class Controller_Documentation extends CController {
     public function index() {
         return $this->page();
     }
-    
-    public function page($slug=null) {
+
+    public function page($slug = null) {
         $app = CApp::instance();
         $app->setLoginRequired(false);
-        $app->setTheme('cfdocs');
-        
+        $app->setTheme('cresenity-documentation');
         $app->setView('documentation');
-        
         return $app;
-        
     }
 
 }

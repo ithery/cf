@@ -90,6 +90,7 @@ trait CApp_Trait_App_Bootstrap {
         if (!static::$registerBladeBooted) {
 
 
+            CView::blade()->directive('CApp', [CApp_Blade_Directive::class, 'directive']);
             CView::blade()->directive('CAppStyles', [CApp_Blade_Directive::class, 'styles']);
             CView::blade()->directive('CAppScripts', [CApp_Blade_Directive::class, 'scripts']);
             CView::blade()->directive('CAppPageTitle', [CApp_Blade_Directive::class, 'pageTitle']);

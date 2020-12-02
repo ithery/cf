@@ -29,4 +29,8 @@ class CApp_Blade_Directive {
     public function content($expression) {
         return '{!! CApp::instance()->renderContent('.$expression.') !!}';
     }
+    
+    public function directive($expression) {
+        die($expression);
+    }
 }
