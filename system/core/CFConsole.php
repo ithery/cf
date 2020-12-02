@@ -21,8 +21,6 @@ class CFConsole {
         CConsole_Command_StatusCommand::class,
         CConsole_Command_ServeCommand::class,
         CConsole_Command_ComposerCommand::class,
-        CConsole_Command_App_AppPresetCommand::class,
-        CConsole_Command_App_AppCodeCommand::class,
         CConsole_Command_DevSuite_DevSuiteInstallCommand::class,
         CConsole_Command_DevSuite_DevSuiteStartCommand::class,
         CConsole_Command_DevSuite_DevSuiteUninstallCommand::class,
@@ -38,6 +36,10 @@ class CFConsole {
         CConsole_Command_DevSuite_DevSuiteRestartCommand::class,
         CConsole_Command_DevSuite_DevSuiteStopCommand::class,
         CConsole_Command_Make_MakeControllerCommand::class,
+        CConsole_Command_Make_MakeConfigCommand::class,
+        CConsole_Command_App_AppCreateCommand::class,
+        CConsole_Command_App_AppPresetCommand::class,
+        CConsole_Command_App_AppCodeCommand::class,
     ];
 
     public static function execute() {
