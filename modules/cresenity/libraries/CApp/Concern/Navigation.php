@@ -15,7 +15,7 @@ trait CApp_Concern_Navigation {
 
     public function resolveNav($nav) {
         if (is_string($nav)) {
-            $fileNav = CF::getFile('nav', $nav);
+            $fileNav = CF::getFile('navs', $nav);
             if ($fileNav != null) {
                 $nav = include $fileNav;
             }
