@@ -77,7 +77,7 @@ HTML;
             $viewData = array();
             $this->content = $this->element->html();
             $this->js = $this->element->js();
-
+            
             $viewData['content'] = $this->content;
             $viewData['header_body'] = $this->header_body;
             $viewData['headerBody'] = $this->header_body;
