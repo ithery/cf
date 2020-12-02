@@ -101,13 +101,43 @@ class CComponent_ImplicitlyBoundMethod extends CContainer_BoundMethod {
     }
 
     public static function getParameterClassName($parameter) {
-        $type = $parameter->getType();
+        if (method_exists($parameter, 'getType')) {
+            $type = $parameter->getType();
+            return ($type && !$type->isBuiltin()) ? $type->getName() : null;
+        }
 
-        return ($type && !$type->isBuiltin()) ? $type->getName() : null;
+
+        return !static::getParameterIsBuiltIn($parameter) ? static::getParameterTypeName($parameter) : null;
     }
 
     public static function implementsInterface($parameter) {
-        return (new ReflectionClass($parameter->getType()->getName()))->implementsInterface(ImplicitlyBindable::class);
+        $typeName = static::getParameterTypeName($parameter);
+
+        return (new ReflectionClass($typeName))->implementsInterface(ImplicitlyBindable::class);
+    }
+
+    public static function getParameterTypeName($parameter) {
+        if (method_exists($parameter, 'getType')) {
+            return $parameter->getType()->getName();
+        }
+        return static::getParameterTypeNameForPhp56($parameter);
+    }
+
+    public static function getParameterIsBuiltIn($parameter) {
+        if (method_exists($parameter, 'getType')) {
+            return $parameter->getType()->isBuiltin();
+        }
+        return static::getParameterTypeIsBuiltInForPhp56($parameter);
+    }
+
+    public static function getParameterTypeNameForPhp56($parameter) {
+        $type = gettype($parameter);
+        return $type;
+    }
+
+    public static function getParameterTypeIsBuiltInForPhp56($parameter) {
+        $builtInType = ['boolean', 'integer', 'double', 'string', 'array', 'object', 'NULL', 'resource', 'resource (closed)', 'unknown type'];
+        return in_array(static::getParameterTypeNameForPhp56($parameter), $builtInType);
     }
 
 }
