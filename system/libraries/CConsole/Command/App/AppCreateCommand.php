@@ -32,7 +32,7 @@ class CConsole_Command_App_AppPresetCommand extends CConsole_Command {
         }
         $homeController = $dir.'home.php';
         if(!CFile::exists($homeController)) {
-            
+            $this->call('make:controller home');
         }
     }
 
