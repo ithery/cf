@@ -35,6 +35,8 @@ class CFConsole {
         CConsole_Command_DevSuite_DevSuiteStartCommand::class,
         CConsole_Command_DevSuite_DevSuiteRestartCommand::class,
         CConsole_Command_DevSuite_DevSuiteStopCommand::class,
+        CConsole_Command_DevSuite_DevSuiteDbListCommand::class,
+        CConsole_Command_DevSuite_DevSuiteDbCreateCommand::class,
         CConsole_Command_Make_MakeControllerCommand::class,
         CConsole_Command_Make_MakeConfigCommand::class,
         CConsole_Command_Make_MakeNavCommand::class,

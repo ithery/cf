@@ -79,6 +79,12 @@ class CDevSuite {
      */
     protected static $dnsMasq;
 
+    /**
+     *
+     * @var CDevSuite_Db
+     */
+    protected static $db;
+
     public static function bootstrap() {
         CDevSuite_Bootstrap::instance()->bootstrap();
     }
@@ -113,6 +119,17 @@ class CDevSuite {
     public static function scriptsPath() {
         $path = DOCROOT . 'system' . DS . 'data' . DS . 'devsuite' . DS . 'scripts' . DS;
         return str_replace('\\', '/', $path);
+    }
+
+    /**
+     * 
+     * @return CDevSuite_Db
+     */
+    public static function db() {
+        if (static::$db == null) {
+            static::$db = new CDevSuite_Db();
+        }
+        return static::$db;
     }
 
     public static function configuration() {
