@@ -20,7 +20,13 @@ class CConsole_Command_Make_MakeConfigCommand extends CConsole_Command {
         $configPath = c::fixPath(CF::appDir()) . 'default' . DS . 'config' . DS;
         $configFile = $configPath . $config . EXT;
         $stubFile = CF::findFile('stubs', 'config/' . $config, false, 'stub');
-
+        if (!CFile::isDirectory($configPath)) {
+            CFile::makeDirectory($configPath);
+        }
+        if (file_exists($configFile)) {
+            $this->info('Config ' . $config . ' already created, no changes');
+            return CConsole::SUCCESS_EXIT;
+        }
         if (!$stubFile) {
             $this->error('config not available');
             return CConsole::FAILURE_EXIT;

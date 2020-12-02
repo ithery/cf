@@ -22,6 +22,9 @@ class CConsole_Command_Make_MakeControllerCommand extends CConsole_Command {
         $controllers = explode('.', $controller);
         $controllerPath = c::fixPath(CF::appDir()) . 'default' . DS . 'controllers' . DS;
         $controllerClass = 'Controller';
+        if (!CFile::isDirectory($controllerPath)) {
+            CFile::makeDirectory($controllerPath);
+        }
 
 
         $file = array_pop($controllers);
@@ -35,7 +38,7 @@ class CConsole_Command_Make_MakeControllerCommand extends CConsole_Command {
         $controllerFile = $controllerPath . $file . EXT;
 
         if (file_exists($controllerFile)) {
-            $this->info('Controller ' . $controller . ' already created');
+            $this->info('Controller ' . $controller . ' already created, no changes');
             return CConsole::SUCCESS_EXIT;
         }
         $controllerClass .= '_' . ucfirst($file);
