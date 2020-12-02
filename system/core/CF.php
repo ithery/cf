@@ -715,7 +715,7 @@ final class CF {
      * @return  string   if the file is found
      * @return  FALSE    if the file is not found
      */
-    public static function findFile($directory, $filename, $required = FALSE, $ext = FALSE) {
+    public static function findFile($directory, $filename, $required = false, $ext = false, $reload = false) {
         // NOTE: This test MUST be not be a strict comparison (===), or empty
         // extensions will be allowed!
         if ($ext == '') {
@@ -729,8 +729,9 @@ final class CF {
         // Search path
         $search = $directory . '/' . $filename . $ext;
 
-        if (isset(self::$internal_cache['find_file_paths'][$search]))
+        if (isset(self::$internal_cache['find_file_paths'][$search]) && !$reload) {
             return self::$internal_cache['find_file_paths'][$search];
+        }
 
         // Load include paths
         $paths = self::paths();
@@ -763,11 +764,8 @@ final class CF {
 
         if ($found === NULL) {
             if ($required === TRUE) {
-                // Directory i18n key
-                $directory = 'core.' . inflector::singular($directory);
-
                 // If the file is required, throw an exception
-                $lang = clang::__('core.resource_not_found', [':directory' => self::lang($directory), ':filename' => $filename]);
+                $lang = static::lang('core.resource_not_found', [':directory' => $directory, ':filename' => $filename]);
                 throw new CException($lang);
             } else {
                 // Nothing was found, return FALSE

@@ -5,44 +5,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 class CConfig implements CInterface_Arrayable {
 
     protected static $instances = array();
-    protected $group = 'app';
-    protected $configs = array();
-
-    protected function __construct($group) {
-        $files = CF::findFile('config', $group);
-
-        //add backward compatibility
-        //TODO: remove folder config in DOCROOT
-        if (!is_array($files)) {
-            $files = array();
-        }
-        if (file_exists(DOCROOT . 'config' . DS . $group . EXT)) {
-            $files[] = DOCROOT . 'config' . DS . $group . EXT;
-        }
-        //reverse ordering to set priority
-        if ($files == null) {
-            $files = array();
-        }
-        $this->group = $group;
-
-        foreach ($files as $file) {
-
-
-            $cfg = include $file;
-            if (!is_array($cfg)) {
-                //backward compatibility with older config
-                if (isset($config)) {
-                    $cfg = $config;
-                    unset($config);
-                }
-            }
-            if (!is_array($cfg)) {
-                //there is an invalid format
-                throw new CException("Invalid config format in :file", array(':file' => $file));
-            }
-            $this->configs = carr::merge($this->configs, $cfg);
-        }
-    }
+    protected $group;
+    protected $configs;
 
     /**
      * 
@@ -62,6 +26,11 @@ class CConfig implements CInterface_Arrayable {
         return CConfig::$instances[$group];
     }
 
+    protected function __construct($group) {
+        $this->group = $group;
+        $this->refresh();
+    }
+
     public function get($path = null, $default = null) {
         if ($path === null) {
             return $this->configs;
@@ -72,6 +41,39 @@ class CConfig implements CInterface_Arrayable {
     public function set($path, $value) {
         carr::set_path($this->configs, $path, $value);
         return $this;
+    }
+
+    public function refresh() {
+        $this->configs = [];
+        $files = CF::findFile('config', $this->group, $required = false, $ext = false, $refresh = true);
+
+
+        //add backward compatibility
+        //TODO: remove folder config in DOCROOT
+        if (!is_array($files)) {
+            $files = array();
+        }
+        if (file_exists(DOCROOT . 'config' . DS . $this->group . EXT)) {
+            $files[] = DOCROOT . 'config' . DS . $this->group . EXT;
+        }
+
+        foreach ($files as $file) {
+
+
+            $cfg = include $file;
+            if (!is_array($cfg)) {
+                //backward compatibility with older config
+                if (isset($config)) {
+                    $cfg = $config;
+                    unset($config);
+                }
+            }
+            if (!is_array($cfg)) {
+                //there is an invalid format
+                throw new CException("Invalid config format in :file", array(':file' => $file));
+            }
+            $this->configs = carr::merge($this->configs, $cfg);
+        }
     }
 
     /**
@@ -162,6 +164,5 @@ class CConfig implements CInterface_Arrayable {
     public function toArray() {
         return $this->configs;
     }
-
 
 }
