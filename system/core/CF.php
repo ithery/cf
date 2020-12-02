@@ -855,6 +855,7 @@ final class CF {
      */
     public static function appCode($domain = null) {
         $data = self::data($domain);
+        json_encode($data);
         return isset($data['app_code']) ? $data['app_code'] : null;
     }
 

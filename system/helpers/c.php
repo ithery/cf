@@ -12,6 +12,16 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class c {
 
+    /**
+     * 
+     * @param string $str
+     * @return string
+     */
+    public static function fixPath($str) {
+        $str = str_replace(['/', '\\'], DS, $str);
+        return rtrim($str, DS) . DS;
+    }
+
     public static function urShift($a, $b) {
         if ($b == 0) {
             return $a;
