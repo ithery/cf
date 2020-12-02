@@ -2,7 +2,6 @@
 
 return array(
     "client_modules" => array(
-        'json2',
         'excanvas',
         'canvas-to-blob',
         'load-image',
@@ -10,7 +9,6 @@ return array(
         'bootstrap',
         'font-awesome',
         'jquery-ui-1.12.1.custom',
-        'jquery.dialog2',
         'slimscroll',
         'fileupload',
         'wysihtml5',
@@ -18,12 +16,9 @@ return array(
         'bootbox',
         'form',
         'controls',
-        'event',
         'effects',
         'validation',
         'easing',
-        'chosen',
-        'uniform',
         'select2',
         'modernizr',
     ),
@@ -35,8 +30,6 @@ return array(
         "cresenity-legacy/cresenity.colors.css",
         "cresenity-legacy/cresenity.main.css",
         "cresenity-legacy/cresenity.responsive.css",
-        "cresenity-legacy/cresenity.pos.css",
-        "cresenity-legacy/cresenity.retail.css",
         "cresenity-legacy/cresenity.widget.css",
         "cresenity-legacy/cresenity.table.css",
         "cresenity-legacy/cresenity.css",
