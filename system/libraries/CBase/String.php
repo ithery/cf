@@ -307,7 +307,7 @@ class CBase_String {
             return new static;
         }
 
-        return new static($matches[1] ?? $matches[0]);
+        return new static(isset($matches[1]) ? $matches[1] : $matches[0]);
     }
 
     /**
@@ -320,10 +320,10 @@ class CBase_String {
         preg_match_all($pattern, $this->value, $matches);
 
         if (empty($matches[0])) {
-            return collect();
+            return c::collect();
         }
 
-        return collect($matches[1] ?? $matches[0]);
+        return c::collect(isset($matches[1]) ? $matches[1] : $matches[0]);
     }
 
     /**
