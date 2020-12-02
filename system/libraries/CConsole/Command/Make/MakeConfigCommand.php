@@ -15,6 +15,7 @@ class CConsole_Command_Make_MakeConfigCommand extends CConsole_Command {
     protected $signature = 'make:config {config} {--value=}';
 
     public function handle() {
+        CConsole::domainRequired($this);
         $config = $this->argument('config');
         $configPath = c::fixPath(CF::appDir()) . 'default' . DS . 'config' . DS;
         $configFile = $configPath . $config . EXT;

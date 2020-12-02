@@ -15,7 +15,7 @@ class CConsole_Command_Daemon_DaemonListCommand extends CConsole_Command {
     protected $signature = 'daemon:list';
 
     public function handle() {
-
+        CConsole::domainRequired($this);
         $daemonManager = CManager::daemon();
         $tableData = [];
         if ($daemonManager->haveGroup()) {

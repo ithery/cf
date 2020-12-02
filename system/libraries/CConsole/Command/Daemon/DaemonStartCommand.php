@@ -15,6 +15,7 @@ class CConsole_Command_Daemon_DaemonStartCommand extends CConsole_Command {
     protected $signature = 'daemon:start {class}';
 
     public function handle() {
+        CConsole::domainRequired($this);
         $class = $this->argument('class');
 
         $errCode = 0;

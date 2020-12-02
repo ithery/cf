@@ -15,6 +15,7 @@ class CConsole_Command_Daemon_DaemonStatusCommand extends CConsole_Command {
     protected $signature = 'daemon:status {class}';
 
     public function handle() {
+        CConsole::domainRequired($this);
         $class = $this->argument('class');
 
         if (!class_exists($class)) {

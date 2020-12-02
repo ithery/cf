@@ -15,6 +15,7 @@ class CConsole_Command_Daemon_DaemonStopCommand extends CConsole_Command {
     protected $signature = 'daemon:stop {class}';
 
     public function handle() {
+        CConsole::domainRequired($this);
         $class = $this->argument('class');
 
         $errCode = 0;

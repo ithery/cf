@@ -16,6 +16,7 @@ class CConsole_Command_Make_MakeControllerCommand extends CConsole_Command {
     protected $signature = 'make:controller {controller}';
 
     public function handle() {
+        CConsole::domainRequired($this);
         $controller = $this->argument('controller');
         $controller = str_replace('/', '.', $controller);
         $controllers = explode('.', $controller);
@@ -32,6 +33,11 @@ class CConsole_Command_Make_MakeControllerCommand extends CConsole_Command {
             $controllerClass .= '_' . ucfirst($segment);
         }
         $controllerFile = $controllerPath . $file . EXT;
+
+        if (file_exists($controllerFile)) {
+            $this->info('Controller ' . $controller . ' already created');
+            return CConsole::SUCCESS_EXIT;
+        }
         $controllerClass .= '_' . ucfirst($file);
         $stubFile = CF::findFile('stubs', 'controller', true, 'stub');
         if (!$stubFile) {
@@ -42,7 +48,7 @@ class CConsole_Command_Make_MakeControllerCommand extends CConsole_Command {
         $content = str_replace('{ControllerClass}', $controllerClass, $content);
         CFile::put($controllerFile, $content);
 
-        $this->info($controller . ' created on:' . $controllerFile);
+        $this->info('Controller ' . $controller . ' created on:' . $controllerFile);
     }
 
 }
