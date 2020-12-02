@@ -16,7 +16,7 @@ class CComponent_HydrationMiddleware_HashDataPropertiesForDirtyDetection impleme
 
         c::collect($data)->each(function ($value, $key) use ($instance) {
             if (is_array($value)) {
-                foreach (Arr::dot($value, $key . '.') as $dottedKey => $value) {
+                foreach (carr::dot($value, $key . '.') as $dottedKey => $value) {
                     static::rehashProperty($dottedKey, $value, $instance);
                 }
             } else {
