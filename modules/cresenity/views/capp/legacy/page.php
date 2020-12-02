@@ -24,7 +24,6 @@ $org = $app->org();
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" href="<?php echo curl::base(); ?>media/img/favico.png">
 
-        <link href="<?php echo curl::base(); ?>ccore/css/<?php echo $css_hash; ?>" rel="stylesheet">
         <?php echo $additional_head; ?>
     </head>
     <body>
@@ -69,7 +68,7 @@ $org = $app->org();
                             </li>
                             <li >
                                 <?php
-                                $show_nav = cvariable::get('NAV_MENU_SHOW', $user_id);
+                                $show_nav = CApp_Var::getVar('NAV_MENU_SHOW', $user_id);
                                 if ($show_nav == null)
                                     $show_nav = true;
                                 if ($show_nav):
