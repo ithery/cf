@@ -27,9 +27,16 @@ return array(
     "jquery" => array(
         "js" => array("libs" . DS . "jquery-3.5.1.min.js"),
     ),
+    "jquery-2.1.0" => array(
+        "js" => array("libs/jquery-2.1.0/jquery.min.js"),
+    ),
     "bootstrap" => array(
-        "js" => array("libs" . DS . "bootstrap.min.js"),
-        "css" => array("bootstrap.css", "bootstrap-responsive.css"),
+        "js" => array("libs/bootstrap-4.5/bootstrap.min.js"),
+        "css" => array("libs/bootstrap-4.5/bootstrap.min.css"),
+    ),
+    "bootstrap-2.3" => array(
+        "js" => array("libs/bootstrap-2.3/bootstrap.min.js"),
+        "css" => array("libs/bootstrap-2.3/bootstrap.css", "libs/bootstrap-2.3/bootstrap-responsive.css"),
     ),
     "bootstrap-switch" => array(
         "js" => array("plugins" . DS . "bootstrap-switch" . DS . "bootstrap-switch.js"),
