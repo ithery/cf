@@ -17,6 +17,6 @@ return array(
         "name" => "administrator.stats.server",
         "label" => "Server",
         "controller" => "administrator/stats/server",
-        "method" => "index",
+        "method" => "info",
     ),
 );

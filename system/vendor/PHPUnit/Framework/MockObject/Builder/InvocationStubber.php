@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -10,10 +10,14 @@
 namespace PHPUnit\Framework\MockObject\Builder;
 
 use PHPUnit\Framework\MockObject\Stub\Stub;
+use Throwable;
 
+/**
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ */
 interface InvocationStubber
 {
-    public function will(Stub $stub): Identity;
+    public function will(Stub $stub);
 
     /** @return self */
     public function willReturn($value, ...$nextValues)/*: self */;
@@ -57,5 +61,5 @@ interface InvocationStubber
     public function willReturnOnConsecutiveCalls(...$values)/*: self */;
 
     /** @return self */
-    public function willThrowException(\Throwable $exception)/*: self */;
+    public function willThrowException(Throwable $exception)/*: self */;
 }

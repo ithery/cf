@@ -34,6 +34,7 @@ class CApp extends CObservable {
     private $viewLoginName = 'ccore/login';
     protected static $viewCallback;
     protected $renderer;
+    protected $element;
 
     public function setViewCallback(callable $viewCallback) {
         self::$viewCallback = $viewCallback;

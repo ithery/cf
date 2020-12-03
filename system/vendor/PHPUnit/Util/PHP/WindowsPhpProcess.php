@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,6 +9,8 @@
  */
 namespace PHPUnit\Util\PHP;
 
+use const PHP_MAJOR_VERSION;
+use function tmpfile;
 use PHPUnit\Framework\Exception;
 
 /**
@@ -18,17 +20,21 @@ use PHPUnit\Framework\Exception;
  */
 final class WindowsPhpProcess extends DefaultPhpProcess
 {
-    public function getCommand(array $settings, string $file = null): string
+    public function getCommand(array $settings, $file = null)
     {
-        return '"' . parent::getCommand($settings, $file) . '"';
+        if (PHP_MAJOR_VERSION < 8) {
+            return '"' . parent::getCommand($settings, $file) . '"';
+        }
+
+        return parent::getCommand($settings, $file);
     }
 
     /**
      * @throws Exception
      */
-    protected function getHandles(): array
+    protected function getHandles()
     {
-        if (false === $stdout_handle = \tmpfile()) {
+        if (false === $stdout_handle = tmpfile()) {
             throw new Exception(
                 'A temporary file could not be created; verify that your TEMP environment variable is writable'
             );
@@ -39,7 +45,7 @@ final class WindowsPhpProcess extends DefaultPhpProcess
         ];
     }
 
-    protected function useTemporaryFile(): bool
+    protected function useTemporaryFile()
     {
         return true;
     }

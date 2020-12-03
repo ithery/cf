@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -7,8 +7,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Runner;
+namespace PHPUnit\Runner\Hook;
 
+/**
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
+ */
 interface AfterTestHook extends TestHook
 {
     /**
@@ -17,5 +20,5 @@ interface AfterTestHook extends TestHook
      * For more fine grained control, have a look at the other hooks
      * that extend PHPUnit\Runner\Hook.
      */
-    public function executeAfterTest(string $test, float $time): void;
+    public function executeAfterTest($test, $time);
 }

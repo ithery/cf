@@ -956,7 +956,7 @@ var Cresenity = function () {
 
                 (function (element) {
                     if (typeof settings.onBlock == 'function') {
-                        settings.onBlock();
+                        settings.onBlock($(element));
                     } else {
                         cresenity.blockElement($(element));
                     }
@@ -1010,7 +1010,7 @@ var Cresenity = function () {
                         complete: function () {
                             $(element).data('xhr', false);
                             if (typeof settings.onBlock == 'function') {
-                                settings.onUnblock();
+                                settings.onUnblock($(element));
                             } else {
                                 cresenity.unblockElement($(element));
                             }
@@ -1080,6 +1080,9 @@ var Cresenity = function () {
         if (settings.isSidebar) {
             modalContainer.addClass('sidebar');
             modalContainer.addClass(settings.sidebarMode);
+        }
+        if (settings.isFull) {
+            modalContainer.addClass('sidebar full');
         }
         var modalDialog = jQuery('<div>').addClass('modal-dialog modal-xl');
         var modalContent = jQuery('<div>').addClass('modal-content');
@@ -1285,15 +1288,18 @@ var Cresenity = function () {
                         var onError = function (errMessage) {
                             cresenity.showError(errMessage)
                         };
+                        
+                        haveOnSuccess = false;
                         if (typeof settings.onSuccess == 'function' && validationIsValid) {
                             onSuccess = settings.onSuccess;
+                            haveOnSuccess = true;
                         }
                         if (typeof settings.onError == 'function' && validationIsValid) {
                             onError = settings.onError;
                         }
 
                         if (validationIsValid) {
-                            if (settings.handleJsonResponse == true) {
+                            if (settings.handleJsonResponse == true && haveOnSuccess) {
                                 cresenity.handleJsonResponse(response, onSuccess, onError);
                             } else {
                                 onSuccess(response);
@@ -1352,7 +1358,7 @@ var Cresenity = function () {
             innerMessage: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>',
         }, options);
         $.blockUI({
-            message: settings.message,
+            message: settings.innerMessage,
             css: {
                 backgroundColor: 'transparent',
                 border: '0',
@@ -1409,9 +1415,13 @@ var Cresenity = function () {
     this.unblockPage = function () {
         $.unblockUI();
     };
-    this.blockElement = function (selector) {
+    this.blockElement = function (selector, options) {
+        var settings = $.extend({
+            innerMessage: '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>',
+        }, options);
+        
         $(selector).block({
-            message: '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>',
+            message: settings.innerMessage,
             css: {
                 backgroundColor: 'transparent',
                 border: '0'
@@ -1433,6 +1443,11 @@ var Cresenity = function () {
             return null;
         }
         if (elm.attr('type') == 'checkbox') {
+            if (!elm.is(':checked')) {
+                return null;
+            }
+        }
+        if (elm.attr('type') == 'radio') {
             if (!elm.is(':checked')) {
                 return null;
             }
@@ -2720,6 +2735,12 @@ if (!window.cresenity) {
             if (elm.length == 0)
                 return null;
             if (elm.attr('type') == 'checkbox') {
+
+                if (!elm.is(':checked')) {
+                    return null;
+                }
+            }
+            if (elm.attr('type') == 'radio') {
 
                 if (!elm.is(':checked')) {
                     return null;

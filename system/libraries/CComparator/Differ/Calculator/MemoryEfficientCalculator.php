@@ -44,7 +44,7 @@ final class CComparator_Differ_Calculator_MemoryEfficientCalculator extends CCom
         );
     }
 
-    private function length(array $from, array $to): array {
+    private function length(array $from, array $to) {
         $current = \array_fill(0, \count($to) + 1, 0);
         $cFrom = \count($from);
         $cTo = \count($to);

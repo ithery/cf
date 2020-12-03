@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,6 +9,7 @@
  */
 namespace PHPUnit\Framework\MockObject\Rule;
 
+use function sprintf;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
 
@@ -30,17 +31,17 @@ final class InvokedCount extends InvocationOrder
         $this->expectedCount = $expectedCount;
     }
 
-    public function isNever(): bool
+    public function isNever()
     {
         return $this->expectedCount === 0;
     }
 
-    public function toString(): string
+    public function toString()
     {
         return 'invoked ' . $this->expectedCount . ' time(s)';
     }
 
-    public function matches(BaseInvocation $invocation): bool
+    public function matches(BaseInvocation $invocation)
     {
         return true;
     }
@@ -51,13 +52,13 @@ final class InvokedCount extends InvocationOrder
      *
      * @throws ExpectationFailedException
      */
-    public function verify(): void
+    public function verify()
     {
         $count = $this->getInvocationCount();
 
         if ($count !== $this->expectedCount) {
             throw new ExpectationFailedException(
-                \sprintf(
+                sprintf(
                     'Method was expected to be called %d times, ' .
                     'actually called %d times.',
                     $this->expectedCount,
@@ -70,7 +71,7 @@ final class InvokedCount extends InvocationOrder
     /**
      * @throws ExpectationFailedException
      */
-    protected function invokedDo(BaseInvocation $invocation): void
+    protected function invokedDo(BaseInvocation $invocation)
     {
         $count = $this->getInvocationCount();
 
@@ -89,7 +90,7 @@ final class InvokedCount extends InvocationOrder
                     break;
 
                 default:
-                    $message .= \sprintf(
+                    $message .= sprintf(
                         'was not expected to be called more than %d times.',
                         $this->expectedCount
                     );

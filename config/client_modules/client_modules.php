@@ -27,7 +27,6 @@ return array(
             "libs" . DS . "axios.min.js",
         ),
     ),
-    
     "underscore" => array(
         "js" => array(
             "libs" . DS . "underscore.min.js",
@@ -290,11 +289,11 @@ return array(
     ),
     "terminal" => array(
         "css" => array(
-            "plugins" . DS . "terminal" . DS . "jquery.terminal.css",
+            "plugins" . DS . "terminal" . DS . "jquery.terminal.min.css",
         ),
         "js" => array(
-            "plugins" . DS . "terminal" . DS . "jquery.mousewheel-min.js",
-            "plugins" . DS . "terminal" . DS . "jquery.terminal-min.js",
+            //"plugins" . DS . "terminal" . DS . "jquery.mousewheel-min.js",
+            "plugins" . DS . "terminal" . DS . "jquery.terminal.min.js",
         ),
     ),
     "elfinder" => array(

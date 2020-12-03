@@ -23,6 +23,12 @@ return array(
         
     ),
     array(
+        "name" => "administrator.qc",
+        "label" => "Quality Control",
+        "icon" => " lnr lnr-code",
+        "subnav" => include dirname(__FILE__) . "/Navigation/QC" . EXT,
+    ),
+    array(
         "name" => "administrator.database",
         "label" => "Database",
         "icon" => " lnr lnr-database",

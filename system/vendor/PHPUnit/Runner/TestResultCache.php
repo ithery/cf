@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -14,15 +14,15 @@ namespace PHPUnit\Runner;
  */
 interface TestResultCache
 {
-    public function setState(string $testName, int $state): void;
+    public function setState($testName, $state);
 
-    public function getState(string $testName): int;
+    public function getState($testName);
 
-    public function setTime(string $testName, float $time): void;
+    public function setTime($testName, $time);
 
-    public function getTime(string $testName): float;
+    public function getTime($testName);
 
-    public function load(): void;
+    public function load();
 
-    public function persist(): void;
+    public function persist();
 }

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -17,7 +17,7 @@ use PHPUnit\Framework\MockObject\Invocation as BaseInvocation;
  */
 final class InvokedAtLeastOnce extends InvocationOrder
 {
-    public function toString(): string
+    public function toString()
     {
         return 'invoked at least once';
     }
@@ -28,7 +28,7 @@ final class InvokedAtLeastOnce extends InvocationOrder
      *
      * @throws ExpectationFailedException
      */
-    public function verify(): void
+    public function verify()
     {
         $count = $this->getInvocationCount();
 
@@ -39,12 +39,12 @@ final class InvokedAtLeastOnce extends InvocationOrder
         }
     }
 
-    public function matches(BaseInvocation $invocation): bool
+    public function matches(BaseInvocation $invocation)
     {
         return true;
     }
 
-    protected function invokedDo(BaseInvocation $invocation): void
+    protected function invokedDo(BaseInvocation $invocation)
     {
     }
 }

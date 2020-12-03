@@ -8,14 +8,27 @@
 
 class CFConsole {
 
+    private static $commands = [];
+
+    public static function addCommand($classArray) {
+        $classArray = carr::wrap($classArray);
+        foreach ($classArray as $class) {
+            if (!class_exists($class)) {
+                throw new Exception('Class ' . $class . ' not exists');
+            }
+
+            static::$commands[] = $class;
+        }
+    }
+
     public static function execute() {
 
         $kernel = new CConsole_Kernel();
 
-        $commands = [
+        $commands = array_merge([
             CConsole_Command_DomainCommand::class,
             CConsole_Command_StatusCommand::class,
-        ];
+                ], static::$commands);
         CConsole_Application::starting(function ($cfCli) use ($commands) {
             $cfCli->resolveCommands($commands);
         });
@@ -27,7 +40,7 @@ class CFConsole {
 
         $kernel->terminate($input, $status);
 
-        
+
         exit($status);
     }
 

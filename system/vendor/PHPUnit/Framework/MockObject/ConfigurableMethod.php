@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -26,18 +26,18 @@ final class ConfigurableMethod
      */
     private $returnType;
 
-    public function __construct(string $name, Type $returnType)
+    public function __construct($name, Type $returnType)
     {
         $this->name       = $name;
         $this->returnType = $returnType;
     }
 
-    public function getName(): string
+    public function getName()
     {
         return $this->name;
     }
 
-    public function mayReturn($value): bool
+    public function mayReturn($value)
     {
         if ($value === null && $this->returnType->allowsNull()) {
             return true;
@@ -46,8 +46,8 @@ final class ConfigurableMethod
         return $this->returnType->isAssignable(Type::fromValue($value, false));
     }
 
-    public function getReturnTypeDeclaration(): string
+    public function getReturnTypeDeclaration()
     {
-        return $this->returnType->getReturnTypeDeclaration();
+        return $this->returnType->asString();
     }
 }

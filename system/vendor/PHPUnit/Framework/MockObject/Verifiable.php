@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -22,5 +22,5 @@ interface Verifiable
      *
      * @throws ExpectationFailedException
      */
-    public function verify(): void;
+    public function verify();
 }

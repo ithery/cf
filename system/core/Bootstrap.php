@@ -34,6 +34,7 @@ require SYSPATH.'core/CFEvent'.EXT;
 require SYSPATH.'core/CFData'.EXT;
 require SYSPATH.'core/CFRouter'.EXT;
 require SYSPATH.'core/CFConsole'.EXT;
+require SYSPATH.'core/CFDeprecatedTrait'.EXT;
 require SYSPATH.'core/CF'.EXT;
 
 // Prepare the environment
