@@ -1,3 +1,7 @@
+
+- now return $app instead using echo $app->render(), 
+  echoing in controller is discouraged and make performance slower
+
 - nav in folder config now deprecated, please move to folder nav and CApp will 
   look file for nav.php as default
 
