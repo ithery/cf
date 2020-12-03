@@ -7,7 +7,7 @@
  */
 class CDevSuite_Db {
 
-    public $configuration;
+    public $files;
 
     /**
      * Create a new Nginx instance.

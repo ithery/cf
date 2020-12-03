@@ -35,9 +35,15 @@ class CDevSuite_Deploy_SSH extends CDevSuite_Deploy_RemoteProcessor {
         // the output and feeding it through the callback. This will in turn display
         // the output back out to the screen for the developer to inspect closely.
         foreach ($processes as $host => $process) {
+            $process->run(function ($output) use ($host, $callback) {
+                $callback(null, $host, $output);
+            });
+            /*
             $process->run(function ($type, $output) use ($host, $callback) {
                 $callback($type, $host, $output);
             });
+             * 
+             */
         }
 
         return $this->gatherExitCodes($processes);

@@ -29,9 +29,15 @@ abstract class CDevSuite_Deploy_RemoteProcessor {
         $target = $this->getConfiguredServer($host) ?: $host;
 
         $env = $this->getEnvironment($host);
-        CDevSuite::info('Prepare script:'.PHP_EOL.$task->script.PHP_EOL.'to:'.$target);
+        CDevSuite::info('Prepare script:' . PHP_EOL . $task->script . PHP_EOL . 'to:' . $target);
 
+        $process = new CDevSuite_Deploy_Process(CDevSuite::ssh()->getRemoteSsh($target),$task);
+        return [$target, $process->setTimeout(null)];
+        
+        
+        
         if (in_array($target, ['local', 'localhost', '127.0.0.1'])) {
+            
             $process = Process::fromShellCommandline($task->script, null, $env);
         }
 
@@ -48,7 +54,7 @@ abstract class CDevSuite_Deploy_RemoteProcessor {
             }
 
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-                $process = Process::fromShellCommandline("ssh $target -T");
+                $process = Process::fromShellCommandline("putty.exe -ssh $target -T");
 
                 $process->setInput(
                         implode(PHP_EOL, $env)

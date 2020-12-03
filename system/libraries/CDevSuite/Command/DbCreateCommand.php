@@ -12,12 +12,12 @@ class CDevSuite_Command_DbCreateCommand extends CDevSuite_CommandAbstract {
     }
 
     public function run(CConsole_Command $cfCommand) {
-
-        if (CDevSuite::db()->exists($key)) {
-            CDevSuite::error('Databaes configuration: ' . $key . ' already exists');
+        $name = $cfCommand->argument('name');
+        if (CDevSuite::db()->exists($name)) {
+            CDevSuite::error('Database configuration: ' . $key . ' already exists');
             exit(CConsole::FAILURE_EXIT);
         }
-        $name = $cfCommand->argument('name');
+        
         $data = [];
 
         $type = $cfCommand->choice('Type:', ['mysql', 'mongodb'], 0, 1);
@@ -49,7 +49,7 @@ class CDevSuite_Command_DbCreateCommand extends CDevSuite_CommandAbstract {
         ];
 
         if (CDevSuite::db()->create($name, $data)) {
-            CDevSuite::success('A [' . $name . '] database configuration has been created');
+            CDevSuite::success('A [' . $name . '] ssh configuration has been created');
         }
     }
 

@@ -28,7 +28,7 @@ class CDevSuite_Deploy_SSHConfigFile {
      * Parse the given configuration file.
      *
      * @param  string  $file
-     * @return \Laravel\Envoy\SSHConfigFile
+     * @return CDevSuite_Deploy_SSHConfigFile
      */
     public static function parse($file) {
         return static::parseString(file_get_contents($file));
@@ -38,7 +38,7 @@ class CDevSuite_Deploy_SSHConfigFile {
      * Parse the given configuration string.
      *
      * @param  string  $string
-     * @return \Laravel\Envoy\SSHConfigFile
+     * @return CDevSuite_Deploy_SSHConfigFile
      */
     public static function parseString($string) {
         $groups = [];
@@ -50,7 +50,7 @@ class CDevSuite_Deploy_SSHConfigFile {
         foreach (explode(PHP_EOL, $string) as $line) {
             $line = trim($line);
 
-            if ('' == $line || Str::startsWith($line, '#')) {
+            if ('' == $line || cstr::startsWith($line, '#')) {
                 continue;
             }
 
@@ -129,7 +129,7 @@ class CDevSuite_Deploy_SSHConfigFile {
      * @return array
      */
     protected function parseHost($host) {
-        return Str::contains($host, '@') ? explode('@', $host) : [null, $host];
+        return cstr::contains($host, '@') ? explode('@', $host) : [null, $host];
     }
 
     /**

@@ -5,7 +5,6 @@
  *
  * @author Hery
  */
-
 class CDevSuite_Command_SshCreateCommand extends CDevSuite_CommandAbstract {
 
     public function getSignatureArguments() {
@@ -13,12 +12,12 @@ class CDevSuite_Command_SshCreateCommand extends CDevSuite_CommandAbstract {
     }
 
     public function run(CConsole_Command $cfCommand) {
+        $name = $cfCommand->argument('name');
 
-        if (CDevSuite::ssh()->exists($key)) {
-            CDevSuite::error('Databaes configuration: ' . $key . ' already exists');
+        if (CDevSuite::ssh()->exists($name)) {
+            CDevSuite::error('Ssh configuration: ' . $key . ' already exists');
             exit(CConsole::FAILURE_EXIT);
         }
-        $name = $cfCommand->argument('name');
         $data = [];
 
         $host = $cfCommand->ask('Host:', 'localhost');
@@ -27,24 +26,31 @@ class CDevSuite_Command_SshCreateCommand extends CDevSuite_CommandAbstract {
 
         $user = $cfCommand->ask('User:', 'root');
 
-        $blankPassword = '';
-        if ($type == 'mysql') {
-            $blankPassword = '[blank]';
+        $passwordType = $cfCommand->choice('Password Type:', ['password', 'pubkey'], 1, 2);
+        if ($passwordType == 'password') {
+            $password = $cfCommand->secret('Password:');
+        } else {
+            $password = $cfCommand->ask('File Path:', '~/.ssh/id_rsa');
+            if(!file_exists($password)) {
+                CDevSuite::error($password.' not found');
+                $password = $cfCommand->ask('File Path:', '~/.ssh/id_rsa');
+                if(!file_exists($password)){
+                    CDevSuite::error($password.' not found, please try again');
+                    return CConsole::FAILURE_EXIT;
+                }
+            }
         }
-        $password = $cfCommand->ask('Password:', $blankPassword);
-        if ($password == $blankPassword) {
-            $password = '';
-        }
+        
+        
         $data = [
-            'type' => $type,
             'host' => $host,
-            'database' => $database,
             'port' => $port,
             'user' => $user,
             'password' => $password,
+            'passwordType' => $passwordType,
         ];
 
-        if (CDevSuite::db()->create($name, $data)) {
+        if (CDevSuite::ssh()->create($name, $data)) {
             CDevSuite::success('A [' . $name . '] database configuration has been created');
         }
     }

@@ -63,7 +63,7 @@ trait CDevSuite_Trait_ConsoleTrait {
      * @param string|array $message
      */
     public static function success($message) {
-        static::getOutputStyle()->success($output);
+        static::getOutputStyle()->success($message);
     }
 
     /**

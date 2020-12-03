@@ -1,5 +1,5 @@
-@servers(['web' => 'localhost'])
+@servers(['web' => 'app.ittron.co.id'])
 @task('deploy')
-    cd D:\\xampp\htdocs_pipo\application\bistar
-    git pull origin master
+    cd public_html/application
+   
 @endtask
