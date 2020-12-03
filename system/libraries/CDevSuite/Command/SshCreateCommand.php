@@ -1,11 +1,12 @@
 <?php
 
 /**
- * Description of DbCreateCommand
+ * Description of ServerCreateCommand
  *
  * @author Hery
  */
-class CDevSuite_Command_DbCreateCommand extends CDevSuite_CommandAbstract {
+
+class CDevSuite_Command_SshCreateCommand extends CDevSuite_CommandAbstract {
 
     public function getSignatureArguments() {
         return '{name}';
@@ -13,22 +14,17 @@ class CDevSuite_Command_DbCreateCommand extends CDevSuite_CommandAbstract {
 
     public function run(CConsole_Command $cfCommand) {
 
-        if (CDevSuite::db()->exists($key)) {
+        if (CDevSuite::ssh()->exists($key)) {
             CDevSuite::error('Databaes configuration: ' . $key . ' already exists');
             exit(CConsole::FAILURE_EXIT);
         }
         $name = $cfCommand->argument('name');
         $data = [];
 
-        $type = $cfCommand->choice('Type:', ['mysql', 'mongodb'], 0, 1);
         $host = $cfCommand->ask('Host:', 'localhost');
-        $defaultPort = '3306';
-        if ($type == 'mongodb') {
-            $defaultPort = '27017';
-        }
+        $defaultPort = '22';
         $port = $cfCommand->ask('Port:', $defaultPort);
 
-        $database = $cfCommand->ask('Database:', 'cresenity');
         $user = $cfCommand->ask('User:', 'root');
 
         $blankPassword = '';

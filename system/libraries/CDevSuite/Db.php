@@ -74,8 +74,9 @@ class CDevSuite_Db {
         $data = $this->read();
 
 
-        return c::collect($data)->map(function ($item) {
+        return c::collect($data)->map(function ($item, $key) {
                     return [
+                        'key' => $key,
                         'type' => carr::get($item, 'type'),
                         'database' => carr::get($item, 'database'),
                         'host' => carr::get($item, 'host') . ':' . carr::get($item, 'port'),
@@ -210,8 +211,8 @@ class CDevSuite_Db {
         $resultString = '';
         $haveError = 0;
         $toDB->begin();
-        
-        $allError=[];
+
+        $allError = [];
         foreach ($sqls as $sql) {
             $errSql = 0;
             $resultQ = null;
@@ -220,7 +221,7 @@ class CDevSuite_Db {
                 CDevSuite::info('Executing:' . $sql . ';');
                 $resultQ = $toDB->query($sql);
             } catch (Exception $ex) {
-                CDevSuite::info('Error:' . $ex->getMessage());
+                CDevSuite::error('Error:' . $ex->getMessage());
                 $allError[$sql] = $ex->getMessage();
                 $errSql++;
                 $haveError++;
@@ -234,18 +235,27 @@ class CDevSuite_Db {
         } else {
             $toDB->commit();
         }
-        
-        if($haveError) {
-            CDevSuite::info('Failed Synchronize database from:'.$from.' to:'.$to);
-            CDevSuite::info('Please check error below:');
-            foreach($allError as $sql=>$error) {
-                CDevSuite::info('Error:'.$error.' when executing query:'.$sql);
+
+        if ($haveError) {
+            CDevSuite::error('Failed Synchronize database from:' . $from . ' to:' . $to);
+            CDevSuite::error('Please check error below:');
+            foreach ($allError as $sql => $error) {
+                CDevSuite::error('Error:' . $error . ' when executing query:' . $sql);
             }
         } else {
-            CDevSuite::info('Success Execute Synchronize database from:'.$from.' to:'.$to);
+            CDevSuite::info('Success Execute Synchronize database from:' . $from . ' to:' . $to);
         }
+    }
 
-      
+    public function exists($key) {
+        return is_array(carr::get($this->read(), $key));
+    }
+
+    public function existsOrExit($key) {
+        if (!$this->exists($key)) {
+            CDevSuite::error('Databaes configuration: ' . $key . ' not exists');
+            exit(CConsole::FAILURE_EXIT);
+        }
     }
 
 }

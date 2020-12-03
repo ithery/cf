@@ -31,6 +31,7 @@ trait CDevSuite_Trait_ConsoleTrait {
      * @return void
      */
     public static function info($output) {
+        //static::getOutputStyle()->text($output);
         static::output('<info>' . $output . '</info>');
     }
 
@@ -41,7 +42,28 @@ trait CDevSuite_Trait_ConsoleTrait {
      * @return void
      */
     public static function warning($output) {
-        static::output('<fg=red>' . $output . '</>');
+        static::getOutputStyle()->warning($output);
+        //static::error($output);
+    }
+
+    /**
+     * Output the given text to the console.
+     *
+     * @param string $output
+     * @return void
+     */
+    public static function error($output) {
+        static::getOutputStyle()->error($output);
+        //static::output('<fg=red>' . $output . '</>');
+    }
+
+    /**
+     * Formats a success result bar.
+     *
+     * @param string|array $message
+     */
+    public static function success($message) {
+        static::getOutputStyle()->success($output);
     }
 
     /**
@@ -66,6 +88,17 @@ trait CDevSuite_Trait_ConsoleTrait {
             return;
         }
         static::getOutputStyle()->writeln($output);
+    }
+
+    /**
+     * Confirm the given text to the console.
+     *
+     * @param string $output
+     * @param bool $default
+     * @return void
+     */
+    public static function confirm($output, $default = true) {
+        static::getOutputStyle()->confirm($output, $default);
     }
 
     /**
