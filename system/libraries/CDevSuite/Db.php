@@ -87,7 +87,7 @@ class CDevSuite_Db {
     public function toDbConfig($keyFile) {
         $configArray = $keyFile;
         if (!is_array($configArray)) {
-            $configArray = $this->get($keyFile);
+            $configArray = carr::get($this->read(), $keyFile);
         }
 
         $host = carr::get($configArray, 'host');
@@ -154,6 +154,98 @@ class CDevSuite_Db {
             return false;
         }
         return true;
+    }
+
+    public function compare($from, $to) {
+
+        $fromDB = $this->getDatabase($from);
+        $toDB = $this->getDatabase($to);
+
+        $fromDB->connect();
+        $toDB->connect();
+
+
+        $fromSchemaManager = $fromDB->getSchemaManager();
+        $toSchemaManager = $toDB->getSchemaManager();
+
+        $fromSchema = $fromSchemaManager->createSchema();
+        $toSchema = $toSchemaManager->createSchema();
+
+        $sqls = $toSchema->getMigrateToSql($fromSchema, $fromDB->getDatabasePlatform());
+
+
+        $sqlString = '';
+        $formatted = false;
+        foreach ($sqls as $sql) {
+            if ($formatted) {
+                $sql = CSql::format($sql);
+            }
+            $sqlString .= PHP_EOL . ($sql . ';') . PHP_EOL;
+        }
+        if (strlen(trim($sqlString)) == 0) {
+            $sqlString = '/* No diff */';
+        }
+
+        CDevSuite::info($sqlString);
+    }
+
+    public function sync($from, $to) {
+
+        $fromDB = $this->getDatabase($from);
+        $toDB = $this->getDatabase($to);
+
+        $fromDB->connect();
+        $toDB->connect();
+
+
+        $fromSchemaManager = $fromDB->getSchemaManager();
+        $toSchemaManager = $toDB->getSchemaManager();
+
+        $fromSchema = $fromSchemaManager->createSchema();
+        $toSchema = $toSchemaManager->createSchema();
+
+        $sqls = $toSchema->getMigrateToSql($fromSchema, $fromDB->getDatabasePlatform());
+
+        $sqlString = '';
+        $resultString = '';
+        $haveError = 0;
+        $toDB->begin();
+        
+        $allError=[];
+        foreach ($sqls as $sql) {
+            $errSql = 0;
+            $resultQ = null;
+            try {
+
+                CDevSuite::info('Executing:' . $sql . ';');
+                $resultQ = $toDB->query($sql);
+            } catch (Exception $ex) {
+                CDevSuite::info('Error:' . $ex->getMessage());
+                $allError[$sql] = $ex->getMessage();
+                $errSql++;
+                $haveError++;
+            }
+            if ($errSql == 0) {
+                CDevSuite::info('Success Execute Query');
+            }
+        }
+        if ($haveError) {
+            $toDB->rollback();
+        } else {
+            $toDB->commit();
+        }
+        
+        if($haveError) {
+            CDevSuite::info('Failed Synchronize database from:'.$from.' to:'.$to);
+            CDevSuite::info('Please check error below:');
+            foreach($allError as $sql=>$error) {
+                CDevSuite::info('Error:'.$error.' when executing query:'.$sql);
+            }
+        } else {
+            CDevSuite::info('Success Execute Synchronize database from:'.$from.' to:'.$to);
+        }
+
+      
     }
 
 }
