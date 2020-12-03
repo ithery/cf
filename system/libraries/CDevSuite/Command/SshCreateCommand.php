@@ -37,11 +37,13 @@ class CDevSuite_Command_SshCreateCommand extends CDevSuite_CommandAbstract {
                 if(!file_exists($password)){
                     CDevSuite::error($password.' not found, please try again');
                     return CConsole::FAILURE_EXIT;
-                }
+                } 
             }
         }
         
-        
+        if ($passwordType != 'password') {
+            $password = realpath($password);
+        }
         $data = [
             'host' => $host,
             'port' => $port,
