@@ -30,4 +30,21 @@
 - CF now have console app 
   detail explanation in "php cf help"
 
-- CF now
+- CF now have devsuite feature through cf cli
+  install using php cf devsuite:install
+
+- CF now support debugbar again
+  using it with cookie capp-debugbar=1 to enable
+
+- CF profiler is deprecated, all profiler will run on capp-debugbar for
+  future version
+
+- for model, future doesn't use {prefix}Model::make(), 
+  use {prefix}Model_Post::whatFunction. 
+  extends models is allowed for future version, 
+  but just use to using trait which suitable for application 
+  like CModel_SoftDelete_SoftDeleteTrait,...
+
+- for CApp which using blade.php template, dont use capp.js in theme.
+  object js cresenity always attached 
+
