@@ -13,6 +13,7 @@ application/cresenity/default/config/*
 application/cresenity/config/*
 
 #ignore data domain or org
+/data
 /data/*
 /data/org/*
 

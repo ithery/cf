@@ -215,9 +215,9 @@ class CDevSuite_Deploy {
             }
 
             if ($type == Process::OUT) {
-                CDevSuite::output($hostColor . ': ' . trim($line) . PHP_EOL);
+                CDevSuite::output($hostColor . ': ' . trim($line) );
             } else {
-                CDevSuite::output($hostColor . ':  ' . '<fg=red>' . trim($line) . '</>' . PHP_EOL);
+                CDevSuite::output($hostColor . ':  ' . '<fg=red>' . trim($line) . '</>');
             }
         }
     }
