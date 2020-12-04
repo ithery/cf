@@ -83,9 +83,20 @@ class CDevSuite_Brew {
      *
      * @return bool
      */
-    function hasInstalledNginx() {
+    public function hasInstalledNginx() {
         return $this->installed('nginx') || $this->installed('nginx-full');
     }
+    
+    /**
+     * Determine if a compatible nginx version is Homebrewed.
+     *
+     * @return bool
+     */
+    public function hasInstalledMariaDb() {
+        return $this->installed('mariadb');
+    }
+    
+    
 
     /**
      * Return name of the nginx service installed via Homebrew.
