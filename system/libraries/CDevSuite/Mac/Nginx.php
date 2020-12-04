@@ -8,9 +8,6 @@
 class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
 
     public $brew;
-    public $cli;
-    public $files;
-    public $configuration;
     public $site;
 
     const NGINX_CONF = '/usr/local/etc/nginx/nginx.conf';
@@ -20,11 +17,9 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      * @return void
      */
     public function __construct() {
-        $this->cli = CDevSuite::commandLine();
+        parent::__construct();
         $this->brew = CDevSuite::brew();
         $this->site = CDevSuite::site();
-        $this->files = CDevSuite::filesystem();
-        $this->configuration = CDevSuite::configuration();
     }
 
     /**

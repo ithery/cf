@@ -10,9 +10,6 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
 
     public $pm;
     public $sm;
-    public $cli;
-    public $files;
-    public $configuration;
     public $site;
     public $nginx_conf;
     public $sites_available_conf;
@@ -30,12 +27,10 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
      * @return void
      */
     public function __construct() {
-        $this->cli = CDevSuite::commandLine();
+        parent::__construct();
         $this->pm = CDevSuite::packageManager();
         $this->sm = CDevSuite::serviceManager();
         $this->site = CDevSuite::site();
-        $this->files = CDevSuite::filesystem();
-        $this->configuration = CDevSuite::configuration();
         $this->nginx_conf = '/etc/nginx/nginx.conf';
         $this->sites_available_conf = '/etc/nginx/sites-available/devsuite.conf';
         $this->sites_enabled_conf = '/etc/nginx/sites-enabled/devsuite.conf';
@@ -75,13 +70,12 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
         }
 
         $this->files->backupAsRoot($nginx);
-        CDevSuite::info('Creating file:'.$nginx);
+        CDevSuite::info('Creating file:' . $nginx);
         $this->files->putAsRoot(
-                $nginx, str_replace(['DEVSUITE_USER', 'DEVSUITE_GROUP','DEVSUITE_HOME_PATH', 'DEVSUITE_PID']
-                        , [CDevSuite::user(), CDevSuite::group(), rtrim(CDevSuite::homePath(), '/'),$pid_string]
+                $nginx, str_replace(['DEVSUITE_USER', 'DEVSUITE_GROUP', 'DEVSUITE_HOME_PATH', 'DEVSUITE_PID']
+                        , [CDevSuite::user(), CDevSuite::group(), rtrim(CDevSuite::homePath(), '/'), $pid_string]
                         , $contents)
         );
-
     }
 
     /**
@@ -90,12 +84,12 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
      * @return void
      */
     public function installServer() {
-        CDevSuite::info('Creating file:'.$this->sites_available_conf);
+        CDevSuite::info('Creating file:' . $this->sites_available_conf);
         $this->files->putAsRoot(
                 $this->sites_available_conf,
                 str_replace(
                         ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_PORT'],
-                        [rtrim(CDevSuite::homePath(),'/'), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $this->configuration->read()['port']],
+                        [rtrim(CDevSuite::homePath(), '/'), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $this->configuration->read()['port']],
                         $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
                 )
         );
@@ -107,7 +101,7 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
         $this->cli->run("sudo ln -snf {$this->sites_available_conf} {$this->sites_enabled_conf}");
         $this->files->backupAsRoot('/etc/nginx/fastcgi_params');
 
-        CDevSuite::info('Creating file:'.'/etc/nginx/fastcgi_params');
+        CDevSuite::info('Creating file:' . '/etc/nginx/fastcgi_params');
         $this->files->putAsRoot(
                 '/etc/nginx/fastcgi_params',
                 $this->files->get(CDevSuite::stubsPath() . 'fastcgi_params')
@@ -142,7 +136,7 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
                 $this->sites_available_conf,
                 str_replace(
                         ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_PORT'],
-                        [rtrim(CDevSuite::homePath(),'/'), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $newPort],
+                        [rtrim(CDevSuite::homePath(), '/'), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $newPort],
                         $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
                 )
         );

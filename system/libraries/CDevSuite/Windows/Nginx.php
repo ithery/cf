@@ -9,24 +9,6 @@ class CDevSuite_Windows_Nginx extends CDevSuite_Nginx {
 
     /**
      *
-     * @var CDevSuite_Windows_CommandLine
-     */
-    public $cli;
-
-    /**
-     *
-     * @var CDevSuite_Windows_Filesystem
-     */
-    public $files;
-
-    /**
-     *
-     * @var CDevSuite_Windows_Configuration
-     */
-    public $configuration;
-
-    /**
-     *
      * @var CDevSuite_Windows_Site
      */
     public $site;
@@ -45,11 +27,9 @@ class CDevSuite_Windows_Nginx extends CDevSuite_Nginx {
      * @return void
      */
     public function __construct() {
-        $this->cli = CDevSuite::commandLine();
+        parent::__construct();
         $this->site = CDevSuite::site();
-        $this->files = CDevSuite::filesystem();
         $this->winsw = CDevSuite::winsw();
-        $this->configuration = CDevSuite::configuration();
     }
 
     /**
@@ -75,8 +55,8 @@ class CDevSuite_Windows_Nginx extends CDevSuite_Nginx {
         $contents = $this->files->get(CDevSuite::stubsPath() . 'nginx.conf');
 
         $this->files->putAsUser(
-                $this->path() . '/conf/nginx.conf', str_replace(['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'], 
-                        [CDevSuite::user(), rtrim(CDevSuite::homePath(),'/')], $contents)
+                $this->path() . '/conf/nginx.conf', str_replace(['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'],
+                        [CDevSuite::user(), rtrim(CDevSuite::homePath(), '/')], $contents)
         );
     }
 
@@ -90,8 +70,8 @@ class CDevSuite_Windows_Nginx extends CDevSuite_Nginx {
 
         $this->files->putAsUser(
                 $this->path() . '/devsuite/devsuite.conf', str_replace(
-                        ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'HOME_PATH'], 
-                        [rtrim(CDevSuite::homePath(),'/'), rtrim(CDevSuite::serverPath(),'/'), CDevSuite::staticPrefix(), $_SERVER['HOME']], $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
+                        ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'HOME_PATH'],
+                        [rtrim(CDevSuite::homePath(), '/'), rtrim(CDevSuite::serverPath(), '/'), CDevSuite::staticPrefix(), $_SERVER['HOME']], $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
                 )
         );
 
