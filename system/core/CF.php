@@ -503,7 +503,13 @@ final class CF {
         if (class_exists($class, FALSE)) {
             return TRUE;
         }
-
+        if (($prefix = strrpos($class, '_')) > 0) {
+            // Find the class suffix
+            $prefix = substr($class, 0, $prefix);
+        } else {
+            // No suffix
+            $prefix = FALSE;
+        }
         if (($suffix = strrpos($class, '_')) > 0) {
             // Find the class suffix
             $suffix = substr($class, $suffix + 1);
@@ -512,13 +518,13 @@ final class CF {
             $suffix = FALSE;
         }
 
-        if ($suffix === 'Core') {
-            $type = 'libraries';
-            $file = substr($class, 0, -5);
-        } elseif ($suffix === 'Controller') {
+        if ($suffix === 'Controller' || $prefix==='Controller') {
             $type = 'controllers';
             // Lowercase filename
             $file = strtolower(substr($class, 0, -11));
+            if($prefix) {
+                $file = strtolower(substr($class, 11));
+            }
         } elseif ($suffix === 'Model') {
             $type = 'models';
             // Lowercase filename

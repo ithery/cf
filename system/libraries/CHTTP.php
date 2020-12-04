@@ -9,6 +9,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  */
 class CHTTP {
 
+    protected static $middlewareEnabled = true;
+
     /**
      *
      * @var CHTTP_Request 
@@ -58,12 +60,12 @@ class CHTTP {
             // Replace the global template variables
             $content = str_replace(
                     array
-                (
-                '{cf_version}',
-                '{cf_codename}',
-                '{execution_time}',
-                '{memory_usage}',
-                '{included_files}',
+                        (
+                        '{cf_version}',
+                        '{cf_codename}',
+                        '{execution_time}',
+                        '{memory_usage}',
+                        '{included_files}',
                     ), array
                 (
                 CF_VERSION,
@@ -103,6 +105,10 @@ class CHTTP {
             self::$kernel = new CHTTP_Kernel();
         }
         return self::$kernel;
+    }
+
+    public static function shouldSkipMiddleware() {
+        return !static::$middlewareEnabled;
     }
 
 }

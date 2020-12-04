@@ -451,6 +451,20 @@ class CFRouter {
         static::$routesRuntime[$route] = $routedUri;
     }
 
+    public static function getAllRoute() {
+     
+        return carr::merge(static::getRoutesConfig(), static::getRoutesRuntime());
+    }
+
+    public static function getRoutesConfig() {
+        return CF::config('routes');
+        return carr::merge($routesConfig, $routesRuntime);
+    }
+    
+    public static function getRoutesRuntime() {
+        return CFRouter::$routesRuntime;
+    }
+
 }
 
 // End CFRouter
