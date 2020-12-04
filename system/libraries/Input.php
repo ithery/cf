@@ -56,13 +56,13 @@ class Input {
 
         if (Input::$instance === NULL) {
             // magic_quotes_runtime is enabled
-            if (get_magic_quotes_runtime()) {
+            if (@get_magic_quotes_runtime()) {
                 set_magic_quotes_runtime(0);
                 CF::log(CLogger::DEBUG, 'Disable magic_quotes_runtime! It is evil and deprecated: http://php.net/magic_quotes');
             }
 
             // magic_quotes_gpc is enabled
-            if (get_magic_quotes_gpc()) {
+            if (@get_magic_quotes_gpc()) {
                 $this->magic_quotes_gpc = TRUE;
                 CF::log(CLogger::DEBUG, 'Disable magic_quotes_gpc! It is evil and deprecated: http://php.net/magic_quotes');
             }
@@ -292,7 +292,7 @@ class Input {
                 require_once DOCROOT . 'system/vendor/HTMLPurifier.auto.php';
 
                 $config = HTMLPurifier_Config::createDefault();
-                $config->set('URI.AllowedSchemes', array('http' => true, 'https' => true, 'data' => true));
+                $config->set('URI.AllowedSchemes', array('http' => true, 'https' => true, 'mailto' => true, 'data' => true));
 
                 $def = $config->getHTMLDefinition(true);
                 $def->addAttribute('span', 'data-member-id', 'Number');

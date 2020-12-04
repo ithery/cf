@@ -4,6 +4,8 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class CException extends Exception {
 
+    protected static $exceptionHandler;
+
     /**
      * @var  array  PHP error code => human readable name
      */
@@ -32,11 +34,18 @@ class CException extends Exception {
      * @return  void
      */
     public function __construct($message = "", array $variables = NULL, $code = 0, Exception $previous = NULL) {
+        
         if (is_array($variables)) {
             $message = strtr($message, $variables);
+        } else {
+            if($code instanceof Exception) {
+                $previous = $code;
+                $code = $variables;
+            }
         }
-        // Pass the message and integer code to the parent
+        
         parent::__construct($message, (int) $code, $previous);
+        
     }
 
     /**
@@ -73,8 +82,15 @@ class CException extends Exception {
         header('HTTP/1.1 500 Internal Server Error');
     }
 
-    
-    public static function createExceptionHandler() {
-        return new CException_ExceptionHandler(CContainer::getInstance());
+    /**
+     * 
+     * @return \CException_ExceptionHandler
+     */
+    public static function exceptionHandler() {
+        if (static::$exceptionHandler == null) {
+            static::$exceptionHandler = new CException_ExceptionHandler();
+        }
+        return static::$exceptionHandler;
     }
+
 }

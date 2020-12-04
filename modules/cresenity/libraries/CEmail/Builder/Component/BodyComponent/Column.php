@@ -108,10 +108,9 @@ class CEmail_Builder_Component_BodyComponent_Column extends CEmail_Builder_Compo
         $unit = carr::get($widthParserResult, 'unit');
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
 
-
         if ($unit === '%') {
 
-            return $containerWidth * $parsedWidth / 100 . 'px';
+            return intval($containerWidth) * $parsedWidth / 100 . 'px';
         }
         return $parsedWidth . 'px';
     }

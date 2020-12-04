@@ -58,12 +58,11 @@ final class CManager {
 
 //            $theme = ccfg::get('theme');
 //            if ($theme == null) $theme = 'cresenity';
-        $theme = ctheme::get_current_theme();
-        $theme_file = CF::get_file('themes', $theme);
+        $theme = static::theme()->getCurrentTheme();
+        $theme_file = CF::getFile('themes', $theme);
         if (file_exists($theme_file)) {
             $this->theme_data = include $theme_file;
         }
-        self::theme();
     }
 
     /**

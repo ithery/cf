@@ -218,11 +218,16 @@ abstract class CBackup_Database_AbstractDumper {
     }
 
     protected function echoToFile($command, $dumpFile) {
-        $dumpFile = '"' . addcslashes($dumpFile, '\\"') . '"';
+        if(!CServer::isWindows()) {
+            $dumpFile = '"' . addcslashes($dumpFile, '\\"') . '"';
+        } else {
+            $dumpFile = '"' . addcslashes($dumpFile, '"') . '"';
+        }
         if ($this->compressor) {
             $compressCommand = $this->compressor->useCommand();
             return "(((({$command}; echo \$? >&3) | {$compressCommand} > {$dumpFile}) 3>&1) | (read x; exit \$x))";
         }
+        
         return $command . ' > ' . $dumpFile;
     }
 

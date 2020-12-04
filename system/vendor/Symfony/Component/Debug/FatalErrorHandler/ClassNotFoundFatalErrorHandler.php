@@ -130,7 +130,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
         return array_unique($classes);
     }
 
-    private function findClassInPath(string $path, string $class, string $prefix): array
+    private function findClassInPath(string $path, $class, $prefix): array
     {
         if (!$path = realpath($path.'/'.strtr($prefix, '\\_', '//')) ?: realpath($path.'/'.\dirname(strtr($prefix, '\\_', '//'))) ?: realpath($path)) {
             return [];
@@ -147,7 +147,7 @@ class ClassNotFoundFatalErrorHandler implements FatalErrorHandlerInterface
         return $classes;
     }
 
-    private function convertFileToClass(string $path, string $file, string $prefix): ?string
+    private function convertFileToClass(string $path, $file, $prefix): ?string
     {
         $candidates = [
             // namespaced class

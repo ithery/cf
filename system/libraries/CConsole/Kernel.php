@@ -42,21 +42,7 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      */
     protected $commandsLoaded = false;
 
-    /**
-     * The bootstrap classes for the application.
-     *
-     * @var array
-     */
-    protected $bootstrappers = [
-        \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,
-        \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,
-        \Illuminate\Foundation\Bootstrap\HandleExceptions::class,
-        \Illuminate\Foundation\Bootstrap\RegisterFacades::class,
-        \Illuminate\Foundation\Bootstrap\SetRequestForConsole::class,
-        \Illuminate\Foundation\Bootstrap\RegisterProviders::class,
-        \Illuminate\Foundation\Bootstrap\BootProviders::class,
-    ];
-
+    
     /**
      * Create a new console kernel instance.
      *
@@ -74,6 +60,9 @@ class CConsole_Kernel implements CConsole_KernelInterface {
         }
         $this->events = $events;
 
+        
+        CBootstrap::instance()->boot();
+        
 //        $this->app->booted(function () {
 //            $this->defineConsoleSchedule();
 //        });
@@ -177,7 +166,7 @@ class CConsole_Kernel implements CConsole_KernelInterface {
      * @return void
      */
     protected function load($paths) {
-        $paths = array_unique(Arr::wrap($paths));
+        $paths = array_unique(carr::wrap($paths));
 
         $paths = array_filter($paths, function ($path) {
             return is_dir($path);

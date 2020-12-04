@@ -93,7 +93,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
     }
 
     public function forgetAllTranslations($locale) {
-        CF::collect($this->getTranslatableAttributes())->each(function ( $attribute) use ($locale) {
+        c::collect($this->getTranslatableAttributes())->each(function ( $attribute) use ($locale) {
             $this->forgetTranslation($attribute, $locale);
         });
         return $this;
@@ -140,7 +140,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
     }
 
     public function getTranslationsAttribute() {
-        return CF::collect($this->getTranslatableAttributes())
+        return c::collect($this->getTranslatableAttributes())
                         ->mapWithKeys(function ( $key) {
                             return [$key => $this->getTranslations($key)];
                         })

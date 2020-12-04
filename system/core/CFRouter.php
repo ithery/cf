@@ -31,12 +31,9 @@ class CFRouter {
     public static function setup() {
         self::resetup(self::$current_uri);
 
-        // Last chance to set routing before a 404 is triggered
-        CFEvent::run('system.post_routing');
-
         if (self::$controller === NULL) {
             // No controller was found, so no page can be rendered
-            CFEvent::run('system.404');
+            CF::show404();
         }
     }
 
@@ -63,7 +60,7 @@ class CFRouter {
         // Load routes
         $routesConfig = CF::config('routes');
         $routesRuntime = self::$routesRuntime;
-        $routes = array_merge($routesConfig, $routesRuntime);
+        $routes = carr::merge($routesConfig, $routesRuntime);
 
         // Default route status
         $default_route = FALSE;
@@ -85,7 +82,6 @@ class CFRouter {
 
         // Remove all dot-paths from the URI, they are not valid
         $currentUri = preg_replace('#\.[\s./]*/#', '', $currentUri);
-
 
         if (!isset(self::$routeData[$currentUri])) {
             $data = array();
@@ -247,10 +243,12 @@ class CFRouter {
      * @return string uri
      */
     public static function getUri() {
+
         $currentUri = '';
         if (PHP_SAPI === 'cli') {
+
             if (defined('CFCLI')) {
-                CFConsole::execute();
+                $currentUri = '';
             } else {
                 // Command line requires a bit of hacking
                 if (isset($_SERVER['argv'][1])) {
@@ -378,6 +376,7 @@ class CFRouter {
                 if (is_callable($val)) {
                     preg_match_all("/{([\w]*)}/", $key, $matches, PREG_SET_ORDER);
                     $callbackArgs = array($uri);
+                    $bracketKeys = [];
                     foreach ($matches as $matchedVal) {
                         $str = $matchedVal[1]; //matches str without bracket {}
                         $bStr = $matchedVal[0]; //matches str with bracket {}

@@ -33,29 +33,30 @@ class CApp_Navigation_Helper {
                     return $res;
             }
         } else {
-            $nav_path = carr::get($nav, 'path', '');
-            $nav_method = carr::get($nav, 'method', '');
-            $nav_controller = carr::get($nav, 'controller', '');
+            $navPath = carr::get($nav, 'path', '');
+            $navMethod = carr::get($nav, 'method', '');
+            $navController = carr::get($nav, 'controller', '');
 
             $navAlias = carr::wrap(carr::get($nav, 'alias', ''));
+            $navUri = carr::get($nav, 'uri', '');
 
-            if ($nav_controller != '' &&
-                    $nav_method != '' &&
-                    $path . $controller == $nav_path . $nav_controller &&
-                    ($method == $nav_method || in_array($method, $navAlias))) {
+            if ($navUri != null) {
+                return trim($navUri, '/') == trim(CFRouter::$current_uri, '/');
+            }
+
+            if ($navController != '' &&
+                    $navMethod != '' &&
+                    $path . $controller == $navPath . $navController &&
+                    ($method == $navMethod || in_array($method, $navAlias))) {
                 return $nav;
             }
 
-//                var_dump($path .$controller);
-//                cdbg::var_dump($nav);
-
-
             if (isset($nav["action"])) {
                 foreach ($nav["action"] as $act) {
-                    $act_path = carr::get($act, 'path', $nav_path);
-                    $act_method = carr::get($act, 'method', $nav_method);
-                    $act_controller = carr::get($act, 'controller', $nav_controller);
-                    if ($act_controller != '' && $act_method != '' && $path . $controller == $act_path . $act_controller && $method == $act_method) {
+                    $actPath = carr::get($act, 'path', $navPath);
+                    $actMethod = carr::get($act, 'method', $navMethod);
+                    $actController = carr::get($act, 'controller', $navController);
+                    if ($actController != '' && $actMethod != '' && $path . $controller == $actPath . $actController && $method == $actMethod) {
                         return $nav;
                     }
                 }
@@ -98,7 +99,7 @@ class CApp_Navigation_Helper {
         if ($nav === false) {
             return false;
         }
-        if (isset($_COOKIE['capp-administrator'])) {
+        if (CApp::isAdministrator()) {
             return true;
         }
         $db = CDatabase::instance(null, null, $domain);

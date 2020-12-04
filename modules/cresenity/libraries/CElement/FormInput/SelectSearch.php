@@ -246,13 +246,13 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $strResult = $this->generateSelect2Template($strResult);
 
         if (strlen($strResult) == 0) {
-            $searchFieldText = CF::value($this->searchField);
+            $searchFieldText = c::value($this->searchField);
             if (strlen($searchFieldText) > 0) {
                 $strResult = "'+item." . $searchFieldText . "+'";
             }
         }
         if (strlen($strSelection) == 0) {
-            $searchFieldText = CF::value($this->searchField);
+            $searchFieldText = c::value($this->searchField);
             if (strlen($searchFieldText) > 0) {
                 $strSelection = "'+item." . $searchFieldText . "+'";
             }

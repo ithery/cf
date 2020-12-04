@@ -28,8 +28,8 @@ class CTemporary_Instance {
         $this->disk = $disk;
     }
 
-    protected function disk() {
-        
+    public function disk() {
+
         return CStorage::instance()->disk($this->disk);
     }
 
@@ -50,14 +50,26 @@ class CTemporary_Instance {
         if ($filename == null) {
             $filename = date('Ymd') . cutils::randmd5();
         }
-       
-        
-  
+
+
+
         $file = CTemporary::getPath($folder, $filename);
         $this->disk()->put($file, $content);
         return $file;
     }
 
-    
-    
+    public function getDirectory() {
+            $path = DOCROOT . "temp" . DIRECTORY_SEPARATOR;
+
+
+        if ($folder != null) {
+            $path .= $folder . DIRECTORY_SEPARATOR;
+        }
+
+        if (!is_dir($path)) {
+            @mkdir($path, 0777, true);
+        }
+        return $path;
+    }
+
 }

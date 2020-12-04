@@ -12,8 +12,16 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class c {
 
-    
-    
+    /**
+     * 
+     * @param string $str
+     * @return string
+     */
+    public static function fixPath($str) {
+        $str = str_replace(['/', '\\'], DS, $str);
+        return rtrim($str, DS) . DS;
+    }
+
     public static function urShift($a, $b) {
         if ($b == 0) {
             return $a;
@@ -285,7 +293,7 @@ class c {
      * // => ""
      * </code>
      */
-    function get($object, $path, $defaultValue = null) {
+    public static function get($object, $path, $defaultValue = null) {
 
         return ($object !== null ? c::baseGet($object, $path, $defaultValue) : $defaultValue);
     }
@@ -408,7 +416,7 @@ class c {
 
         return array_unique($results);
     }
-    
+
     /**
      * Returns true of traits is used by a class, its subclasses and trait of their traits.
      *
@@ -416,7 +424,7 @@ class c {
      * @param  string  $trait
      * @return array
      */
-    public static function hasTrait($class,$trait) {
+    public static function hasTrait($class, $trait) {
         return in_array($trait, static::classUsesRecursive($class));
     }
 
@@ -439,7 +447,7 @@ class c {
             return static::value($rescue);
         }
     }
-    
+
     /**
      * Return the given value, optionally passed through the given callback.
      *
@@ -462,7 +470,7 @@ class c {
                 !$exception instanceof Exception) {
             $exception = new FatalThrowableError($exception);
         }
-        $exceptionHandler = new CException_ExceptionHandler();
+        $exceptionHandler = CException::exceptionHandler();
         $exceptionHandler->report($exception);
     }
 
@@ -496,6 +504,374 @@ class c {
      */
     public static function now($tz = null) {
         return CCarbon::now($tz);
+    }
+
+    public static function hrtime($getAsNumber = false) {
+        if (function_exists('hrtime')) {
+            return hrtime($getAsNumber);
+        }
+
+        if ($getAsNumber) {
+            return microtime(true) * 1e+6;
+        }
+        $mt = microtime();
+        $s = floor($mt);
+        return [$s, ($mt - $s) * 1e+6];
+    }
+
+    public static function html($str) {
+        return chtml::specialchars($str);
+    }
+
+    public static function dirname($path, $count = 1) {
+        if ($count > 1) {
+            return dirname(static::dirname($path, --$count));
+        } else {
+            return dirname($path);
+        }
+    }
+
+    /**
+     * Provide access to optional objects.
+     *
+     * @param  mixed  $value
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public static function optional($value = null, callable $callback = null) {
+        if (is_null($callback)) {
+            return new COptional($value);
+        } elseif (!is_null($value)) {
+            return $callback($value);
+        }
+    }
+
+    /**
+     * Encode HTML special characters in a string.
+     *
+     * @param  CBase_DeferringDisplayableValue|CInterface_Htmlable|string  $value
+     * @param  bool  $doubleEncode
+     * @return string
+     */
+    public static function e($value, $doubleEncode = true) {
+        if ($value instanceof CBase_DeferringDisplayableValue) {
+            $value = $value->resolveDisplayableValue();
+        }
+
+        if ($value instanceof CInterface_Htmlable) {
+            return $value->toHtml();
+        }
+
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', $doubleEncode);
+    }
+
+    /**
+     * 
+     * @param string $string
+     * @return \cstr|CBase_String
+     */
+    public static function str($string = null) {
+        if (is_null($string)) {
+            return new CBase_ForwarderStaticClass(cstr::class);
+        };
+
+        return cstr::of($string);
+    }
+
+    /**
+     * Throw the given exception unless the given condition is true.
+     *
+     * @param  mixed  $condition
+     * @param  \Throwable|string  $exception
+     * @param  array  ...$parameters
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    public static function throwUnless($condition, $exception, ...$parameters) {
+        if (!$condition) {
+            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+        }
+
+        return $condition;
+    }
+
+    /**
+     * Throw the given exception if the given condition is true.
+     *
+     * @param  mixed  $condition
+     * @param  \Throwable|string  $exception
+     * @param  array  ...$parameters
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
+    public static function throwIf($condition, $exception, ...$parameters) {
+        if ($condition) {
+            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+        }
+
+        return $condition;
+    }
+
+    /**
+     * Gets the value of an environment variable.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function env($key, $default = null) {
+        return CEnv::get($key, $default);
+    }
+
+    /**
+     * Translate the given message.
+     *
+     * @param  string|null  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @return CTranslation_Translator|string|array|null
+     */
+    public static function trans($key = null, $replace = [], $locale = null) {
+        return CF::lang($key, $replace, $locale);
+    }
+
+    /**
+     * Translate the given message.
+     *
+     * @param  string|null  $key
+     * @param  array  $replace
+     * @param  string|null  $locale
+     * @return string|array|null
+     */
+    function __($key = null, $replace = [], $locale = null) {
+        if (is_null($key)) {
+            return $key;
+        }
+
+        return static::trans($key, $replace, $locale);
+    }
+
+    /**
+     * @return CSession
+     */
+    public static function session() {
+        return CSession::instance();
+    }
+
+    /**
+     * Generate a url for the application.
+     *
+     * @param  string|null  $path
+     * @param  mixed  $parameters
+     * @param  bool|null  $secure
+     * @return CRouting_UrlGenerator|string
+     */
+    public static function url($path = null, $parameters = [], $secure = null) {
+        if (is_null($path)) {
+            return CRouting::urlGenerator();
+        }
+
+        return CRouting::urlGenerator()->to($path, $parameters, $secure);
+    }
+
+    /**
+     * @return CStorage
+     */
+    public static function storage() {
+        return CStorage::instance();
+    }
+
+    /**
+     * Create a new Validator instance.
+     *
+     * @param  array  $data
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
+     * @return CValidation_Validator|CValidation_Factory
+     */
+    public static function validator(array $data = [], array $rules = [], array $messages = [], array $customAttributes = []) {
+        $factory = CValidation::factory();
+
+        if (func_num_args() === 0) {
+            return $factory;
+        }
+
+        return $factory->make($data, $rules, $messages, $customAttributes);
+    }
+
+    /**
+     * Get the evaluated view contents for the given view.
+     *
+     * @param  string|null  $view
+     * @param  CInterface_Arrayable|array  $data
+     * @param  array  $mergeData
+     * @return CView_View|CView_Factory
+     */
+    function view($view = null, $data = [], $mergeData = []) {
+        $factory = CView::factory();
+
+        if (func_num_args() === 0) {
+            return $factory;
+        }
+
+        return $factory->make($view, $data, $mergeData);
+    }
+
+    /**
+     * Throw an HttpException with the given data unless the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  CHTTP_Response|\CInterface_Responsable|int  $code
+     * @param  string  $message
+     * @param  array  $headers
+     * @return void
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public static function abortUnless($boolean, $code, $message = '', array $headers = []) {
+        if (!$boolean) {
+            static::abort($code, $message, $headers);
+        }
+    }
+
+    /**
+     * Displays a 404 page.
+     *
+     * @throws  C_404_Exception
+     * @param   string  URI of page
+     * @param   string  custom template
+     * @return  void
+     */
+    public static function show404($page = FALSE, $template = FALSE) {
+        return CF::abort(404);
+    }
+
+    public static function abort($code, $message = '', array $headers = []) {
+        if ($code instanceof CHTTP_Response) {
+            throw new CHttp_Exception_ResponseException($code);
+        } elseif ($code instanceof CInterface_Responsable) {
+            throw new CHttp_Exception_ResponseException($code->toResponse(CHTTP::request()));
+        }
+
+        if ($code == 404) {
+            throw new CHTTP_Exception_NotFoundHttpException($message);
+        }
+
+        throw new CHTTP_Exception_HttpException($code, $message, null, $headers);
+    }
+
+    /**
+     * Throw an HttpException with the given data if the given condition is true.
+     *
+     * @param  bool  $boolean
+     * @param  CHTTP_Response|\CInterface_Responsable|int  $code
+     * @param  string  $message
+     * @param  array  $headers
+     * @return void
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     */
+    public static function abortIf($boolean, $code, $message = '', array $headers = []) {
+        if ($boolean) {
+            static::abort($code, $message, $headers);
+        }
+    }
+
+    /**
+     * Get an instance of the current request or an input item from the request.
+     *
+     * @param  array|string|null  $key
+     * @param  mixed  $default
+     * @return CHTTP_Request|string|array
+     */
+    function request($key = null, $default = null) {
+        if (is_null($key)) {
+            return CHTTP::request();
+        }
+
+        if (is_array($key)) {
+            return CHTTP::request()->only($key);
+        }
+
+        $value = CHTTP::request()->__get($key);
+
+        return is_null($value) ? c::value($default) : $value;
+    }
+
+    /**
+     * Return a new response from the application.
+     *
+     * @param  CView|string|array|null  $content
+     * @param  int  $status
+     * @param  array  $headers
+     * @return CHTTP_Response|CHTTP_ResponseFactory
+     */
+    public static function response($content = '', $status = 200, array $headers = []) {
+        $factory = CHTTP::responseFactory();
+
+        if (func_num_args() === 0) {
+            return $factory;
+        }
+
+        return $factory->make($content, $status, $headers);
+    }
+
+    /**
+     * Determine if the given value is "blank".
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function blank($value) {
+        if (is_null($value)) {
+            return true;
+        }
+
+        if (is_string($value)) {
+            return trim($value) === '';
+        }
+
+        if (is_numeric($value) || is_bool($value)) {
+            return false;
+        }
+
+        if ($value instanceof Countable) {
+            return count($value) === 0;
+        }
+
+        return empty($value);
+    }
+
+    /**
+     * Determine if a value is "filled".
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function filled($value) {
+        return !static::blank($value);
+    }
+
+    /**
+     * Get an instance of the redirector.
+     *
+     * @param  string|null  $to
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  bool|null  $secure
+     * @return CHTTP_Redirector|CHttp_RedirectResponse
+     */
+    public static function redirect($to = null, $status = 302, $headers = [], $secure = null) {
+        if (is_null($to)) {
+            return CHTTP::redirector();
+        }
+
+        return CHTTP::redirector()->to($to, $status, $headers, $secure);
     }
 
 }

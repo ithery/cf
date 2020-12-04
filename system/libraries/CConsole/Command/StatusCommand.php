@@ -19,20 +19,24 @@ class CConsole_Command_StatusCommand extends CConsole_Command {
     
     public function handle() {
        
-        $fileData = DOCROOT.'data/current-domain';
-        $domain=null;
-        if(file_exists($fileData)) {
-            $domain = file_get_contents($fileData);
-        }
+        $domain = CConsole::domain();
         if($domain==null) {
-            $this->error('Domain not set, please set with php cf domain {domain}');
+            $this->error('Domain not set, please set with php cf domain:switch {domain}');
         }
         
         $this->info('Domain: '.$domain);
         $this->output->newLine();
         
+        
+        $this->info('AppID: '.CF::appId());
+        $this->info('AppCode: '.CF::appCode());
+        $this->info('OrgID: '.CF::orgId());
+        $this->info('OrgCode: '.CF::orgCode());
+        $this->output->newLine();
+        
         $db = CDatabase::instance();
         $config = $db->config();
+       
         $configConnection = carr::get($config,'connection');
        
         $rows=array();

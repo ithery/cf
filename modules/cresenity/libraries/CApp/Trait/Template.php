@@ -133,10 +133,13 @@ trait CApp_Trait_Template {
             }
             return $this->js();
         });
+        
         $helpers->set('element', function () {
             return $this;
         });
-
+        $helpers->set('component', function ($componentName) {
+            return CApp::component()->getHtml($componentName);
+        });
         $helpers->set('section', function ($sectionName) {
             $section = $this->section($sectionName);
             if ($this instanceof CElement) {
@@ -177,9 +180,17 @@ trait CApp_Trait_Template {
 
     protected function collectHtmlJs() {
 
-
-        $resultContent = $this->parseTemplate();
-
+        $obLevel = ob_get_level();
+        $resultContent = "";
+        try {
+            $resultContent = $this->parseTemplate();
+        }
+        catch(Exception $ex) {
+            while(ob_get_level() > $obLevel) {
+                ob_end_clean();
+            }
+            throw $ex;
+        }
 
         $this->htmlOutput = carr::get($resultContent, 'html', '');
         $this->jsOutput = carr::get($resultContent, 'js', '');

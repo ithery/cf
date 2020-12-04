@@ -37,11 +37,14 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
             if (isset($d["subnav"])) {
                 $child_html .= self::render($d["subnav"], $level + 1, $child);
             }
+            $url = carr::get($d, 'uri');
+            if ($url == null) {
+                $url = Helper::url($d);
+            }
 
-            $url = Helper::url($d);
-
-            if (!isset($url) || $url == null)
+            if (!isset($url) || $url == null) {
                 $url = "";
+            }
 
             if (strlen($child_html) > 0 || strlen($url) > 0) {
                 if (!Helper::accessAvailable($d, CF::app_id(), CF::domain())) {
@@ -99,6 +102,7 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
                     if ($level == 0) {
                         $caret = '<b class="caret">';
                     }
+            
 
                     $elem = '<a class="' . $active_class . ' dropdown-toggle sidenav-link sidenav-toggle" href="javascript:;" data-toggle="dropdown">' . $icon_html . '<span>' . clang::__($label) . '</span>' . $caret . '</b>';
                     if ($child > 0) {
@@ -106,6 +110,7 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
                     }
                     $elem .= "</a>\r\n";
                 } else {
+                    $url = '/' . trim($url, '/');
                     $target = "";
                     $notif = "";
                     if (isset($d["target"]) && strlen($d["target"]) > 0) {

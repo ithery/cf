@@ -7,10 +7,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Aug 22, 2018, 4:53:08 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-use Barryvdh\Debugbar\DataFormatter\SimpleFormatter;
-use DebugBar\DataCollector\TimeDataCollector;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Str;
+
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataCollector {

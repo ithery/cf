@@ -8,7 +8,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Symfony\Component\Finder\Finder;
-
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
+use Symfony\Component\Mime\MimeTypes;
 class CFile {
 
     /**
@@ -376,16 +377,70 @@ class CFile {
      * Get the returned value of a file.
      *
      * @param  string  $path
+     * @param  array  $data
      * @return mixed
      *
-     * @throws CFile_Exception_FileNotFoundException
+     * @throws CStorage_Exception_FileNotFoundException
      */
-    public static function getRequire($path) {
+    public static function getRequire($path, array $data = []) {
         if (static::isFile($path)) {
-            return require $path;
-        }
+            $__path = $path;
+            $__data = $data;
+            $function = static function () use ($__path, $__data) {
+                extract($__data, EXTR_SKIP);
 
-        throw new CFile_Exception_FileNotFoundException("File does not exist at path {$path}");
+                return require $__path;
+            };
+            return $function();
+        }
+        
+
+        throw new CStorage_Exception_FileNotFoundException("File does not exist at path {$path}");
     }
 
+    public static function phpValue($val, $level = 0) {
+        $indentString = "    ";
+        $str = '';
+        $eol = PHP_EOL;
+        $indent = str_repeat($indentString, $level);
+        if (is_array($val)) {
+            $str .= 'array(' . $eol;
+            $indent2 = str_repeat($indentString, $level + 1);
+            foreach ($val as $k => $v) {
+                $str .= $indent2 . "'" . addslashes($k) . "'=>";
+                $str .= static::phpValue($v, $level + 1);
+                $str .= "," . $eol;
+            }
+            $str .= $indent . ')';
+        } else if (is_null($val)) {
+            $str .= 'NULL';
+        } else if (is_bool($val)) {
+            $str .= ($val === TRUE ? "TRUE" : "FALSE");
+        } else {
+            $str .= "'" . addslashes($val) . "'";
+        }
+        return $str;
+    }
+
+    public static function putPhpValue($filename, $data, $lock = true) {
+        $val = '<?php ' . PHP_EOL . 'return ' . static::phpValue($data) . ';';
+
+        return static::put($filename, $val, $lock);
+    }
+
+    
+    /**
+     * Get all of the files from the given directory (recursive).
+     *
+     * @param  string  $directory
+     * @param  bool  $hidden
+     * @return \Symfony\Component\Finder\SplFileInfo[]
+     */
+    public static function allFiles($directory, $hidden = false)
+    {
+        return iterator_to_array(
+            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->sortByName(),
+            false
+        );
+    }
 }

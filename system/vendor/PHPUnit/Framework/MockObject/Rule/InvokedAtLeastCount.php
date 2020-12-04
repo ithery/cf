@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -30,7 +30,7 @@ final class InvokedAtLeastCount extends InvocationOrder
         $this->requiredInvocations = $requiredInvocations;
     }
 
-    public function toString(): string
+    public function toString()
     {
         return 'invoked at least ' . $this->requiredInvocations . ' times';
     }
@@ -41,7 +41,7 @@ final class InvokedAtLeastCount extends InvocationOrder
      *
      * @throws ExpectationFailedException
      */
-    public function verify(): void
+    public function verify()
     {
         $count = $this->getInvocationCount();
 
@@ -53,12 +53,12 @@ final class InvokedAtLeastCount extends InvocationOrder
         }
     }
 
-    public function matches(BaseInvocation $invocation): bool
+    public function matches(BaseInvocation $invocation)
     {
         return true;
     }
 
-    protected function invokedDo(BaseInvocation $invocation): void
+    protected function invokedDo(BaseInvocation $invocation)
     {
     }
 }

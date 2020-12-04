@@ -11,10 +11,23 @@ class CDatabase {
     use CDatabase_Trait_DetectLostConnection;
     use CDatabase_Trait_ManageTransaction;
 
-    // Database instances
+    /**
+     * Database instances
+     * @var CDatabase[]
+     */
     public static $instances = array();
-    // Global benchmark
+
+    /**
+     * Global benchmark
+     * @var array
+     */
     public static $benchmarks = array();
+
+    /**
+     * default Database
+     * @var string
+     */
+    protected static $defaultConnection = 'default';
     public $domain;
     public $name;
 
@@ -112,7 +125,11 @@ class CDatabase {
      * @param   mixed   configuration array or DSN
      * @return  CDatabase
      */
-    public static function &instance($name = 'default', $config = NULL, $domain = null) {
+    public static function &instance($name = null, $config = NULL, $domain = null) {
+        if ($name == null) {
+            $name = static::$defaultConnection;
+        }
+
         if (strlen($domain) == 0) {
             //get current domain
             $domain = CF::domain();
@@ -148,6 +165,20 @@ class CDatabase {
     }
 
     /**
+     * 
+     * @param type $config
+     */
+    public function resolveConfig($config) {
+        if (!is_array($config)) {
+            $config = CF::config('database.' . $config);
+            if (is_string($config)) {
+                $config = $this->resolveConfig($config);
+            }
+        }
+        return $config;
+    }
+
+    /**
      * Sets up the database configuration, loads the CDatabase_Driver.
      *
      * @throws  CDatabase_Exception
@@ -178,14 +209,13 @@ class CDatabase {
         $configName = '';
         if ($loadConfig) {
             $found = false;
-            $configName = 'default';
+            $configName = static::$defaultConnection;
             if (is_string($config)) {
                 $configName = $config;
             }
-            $allConfig = CF::config('database');
+            $config = $this->resolveConfig($config);
 
-            if (isset($allConfig[$configName])) {
-                $config = $allConfig[$configName];
+            if (is_array($config)) {
                 $found = true;
             }
 
@@ -303,9 +333,9 @@ class CDatabase {
      */
     public function connect() {
         // A link can be a resource or an object
-        if (!is_resource($this->link) AND ! is_object($this->link)) {
+        if (!is_resource($this->link) AND!is_object($this->link)) {
             $this->link = $this->driver->connect();
-            if (!is_resource($this->link) AND ! is_object($this->link))
+            if (!is_resource($this->link) AND!is_object($this->link))
                 throw new CDatabase_Exception('There was an error connecting to the database: :error', array(':error' => $this->driver->show_error()));
 
             // Clear password after successful connect
@@ -347,19 +377,19 @@ class CDatabase {
         $elapsedTime = $this->getElapsedTime($start);
 
         if ($this->isBenchmarkQuery()) {
-            $this->benchmarkQuery($sql,$elapsedTime,count($result));
+            $this->benchmarkQuery($sql, $elapsedTime, count($result));
             // Benchmark the query
             //CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $elapsedTime, 'rows' => count($result), 'caller' => cdbg::callerInfo());
         }
 
 
 
-        
+
         // Once we have run the query we will calculate the time that it took to run and
         // then log the query, bindings, and execution time so we will report them on
         // the event that the developer needs them. We'll log time in milliseconds.
         $this->logQuery($sql, $bindings, $elapsedTime, $result->count());
-        
+
 
         return $result;
     }
@@ -552,7 +582,7 @@ class CDatabase {
      * @return  Database_Core        This Database object.
      */
     public function where($key, $value = NULL, $quote = TRUE) {
-        $quote = (func_num_args() < 2 AND ! is_array($key)) ? -1 : $quote;
+        $quote = (func_num_args() < 2 AND!is_array($key)) ? -1 : $quote;
         if (is_object($key)) {
             $keys = array((string) $key => '');
         } elseif (!is_array($key)) {
@@ -578,7 +608,7 @@ class CDatabase {
      * @return  Database_Core        This Database object.
      */
     public function orwhere($key, $value = NULL, $quote = TRUE) {
-        $quote = (func_num_args() < 2 AND ! is_array($key)) ? -1 : $quote;
+        $quote = (func_num_args() < 2 AND!is_array($key)) ? -1 : $quote;
         if (is_object($key)) {
             $keys = array((string) $key => '');
         } elseif (!is_array($key)) {
@@ -836,7 +866,7 @@ class CDatabase {
     public function limit($limit, $offset = NULL) {
         $this->limit = (int) $limit;
 
-        if ($offset !== NULL OR ! is_int($this->offset)) {
+        if ($offset !== NULL OR!is_int($this->offset)) {
             $this->offset($offset);
         }
 
@@ -1105,8 +1135,7 @@ class CDatabase {
                 throw new CDatabase_Exception('You must set a database table for your query');
 
             $table = $this->from[0];
-        }
-        else {
+        } else {
             $table = $this->config['table_prefix'] . $table;
         }
 
@@ -1131,7 +1160,7 @@ class CDatabase {
     public function lastQuery() {
         return $this->last_query;
     }
-    
+
     /**
      * Set the last query run.
      *
@@ -1215,7 +1244,7 @@ class CDatabase {
     public function tableExists($table_name, $prefix = TRUE) {
         if ($prefix) {
             return in_array($this->config['table_prefix'] . $table_name, $this->list_tables());
-        } 
+        }
         return in_array($table_name, $this->list_tables());
     }
 
@@ -1665,6 +1694,7 @@ class CDatabase {
     public function isBenchmarkQuery() {
         return carr::get($this->config, 'benchmark', FALSE);
     }
+
     public function benchmarkQuery($query, $time = null, $rowsCount = null) {
         if ($this->isBenchmarkQuery()) {
             // Benchmark the query
@@ -1672,7 +1702,7 @@ class CDatabase {
             static::$benchmarks[] = array('query' => $query, 'time' => $time, 'rows' => $rowsCount, 'caller' => cdbg::callerInfo());
         }
     }
-    
+
     /**
      * Log a query in the connection's query log.
      *
@@ -1682,11 +1712,11 @@ class CDatabase {
      * @return void
      */
     public function logQuery($query, $bindings, $time = null, $rowsCount = null) {
-        if($this->driverName()=='MongoDB') {
-            if(is_array($query)) {
+        if ($this->driverName() == 'MongoDB') {
+            if (is_array($query)) {
                 $query = CDatabase_Helper_MongoDB::commandToString($query);
             }
-        } 
+        }
         $this->dispatchEvent(CDatabase_Event::createOnQueryExecutedEvent($query, $bindings, $time, $rowsCount, $this));
 
         if ($this->isLogQuery()) {
@@ -1842,7 +1872,7 @@ class CDatabase {
     public function driver() {
         return $this->driver;
     }
-    
+
     public function ping() {
         return $this->driver->ping();
     }

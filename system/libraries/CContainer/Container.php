@@ -956,6 +956,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
      * @throws \LogicException
      */
     public function getAlias($abstract) {
+        
+        
         if (!isset($this->aliases[$abstract])) {
             return $abstract;
         }

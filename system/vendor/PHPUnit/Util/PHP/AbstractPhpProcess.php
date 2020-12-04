@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,9 +9,26 @@
  */
 namespace PHPUnit\Util\PHP;
 
+use const DIRECTORY_SEPARATOR;
+use const PHP_SAPI;
+use function array_keys;
+use function array_merge;
+use function assert;
+use function escapeshellarg;
+use function ini_get_all;
+use function restore_error_handler;
+use function set_error_handler;
+use function sprintf;
+use function str_replace;
+use function strpos;
+use function strrpos;
+use function substr;
+use function trim;
+use function unserialize;
 use __PHP_Incomplete_Class;
 use ErrorException;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Exception\Exception;
 use PHPUnit\Framework\SyntheticError;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
@@ -54,9 +71,9 @@ abstract class AbstractPhpProcess
      */
     protected $timeout = 0;
 
-    public static function factory(): self
+    public static function factory()
     {
-        if (\DIRECTORY_SEPARATOR === '\\') {
+        if (DIRECTORY_SEPARATOR === '\\') {
             return new WindowsPhpProcess;
         }
 
@@ -73,7 +90,7 @@ abstract class AbstractPhpProcess
      *
      * Then $stderrRedirection is TRUE, STDERR is redirected to STDOUT.
      */
-    public function setUseStderrRedirection(bool $stderrRedirection): void
+    public function setUseStderrRedirection($stderrRedirection)
     {
         $this->stderrRedirection = $stderrRedirection;
     }
@@ -81,73 +98,73 @@ abstract class AbstractPhpProcess
     /**
      * Returns TRUE if uses STDERR redirection or FALSE if not.
      */
-    public function useStderrRedirection(): bool
+    public function useStderrRedirection()
     {
         return $this->stderrRedirection;
     }
 
     /**
-     * Sets the input string to be sent via STDIN
+     * Sets the input string to be sent via STDIN.
      */
-    public function setStdin(string $stdin): void
+    public function setStdin($stdin)
     {
         $this->stdin = $stdin;
     }
 
     /**
-     * Returns the input string to be sent via STDIN
+     * Returns the input string to be sent via STDIN.
      */
-    public function getStdin(): string
+    public function getStdin()
     {
         return $this->stdin;
     }
 
     /**
-     * Sets the string of arguments to pass to the php job
+     * Sets the string of arguments to pass to the php job.
      */
-    public function setArgs(string $args): void
+    public function setArgs($args)
     {
         $this->args = $args;
     }
 
     /**
-     * Returns the string of arguments to pass to the php job
+     * Returns the string of arguments to pass to the php job.
      */
-    public function getArgs(): string
+    public function getArgs()
     {
         return $this->args;
     }
 
     /**
-     * Sets the array of environment variables to start the child process with
+     * Sets the array of environment variables to start the child process with.
      *
      * @param array<string, string> $env
      */
-    public function setEnv(array $env): void
+    public function setEnv(array $env)
     {
         $this->env = $env;
     }
 
     /**
-     * Returns the array of environment variables to start the child process with
+     * Returns the array of environment variables to start the child process with.
      */
-    public function getEnv(): array
+    public function getEnv()
     {
         return $this->env;
     }
 
     /**
-     * Sets the amount of seconds to wait before timing out
+     * Sets the amount of seconds to wait before timing out.
      */
-    public function setTimeout(int $timeout): void
+    public function setTimeout($timeout)
     {
         $this->timeout = $timeout;
     }
 
     /**
-     * Returns the amount of seconds to wait before timing out
+     * Returns the amount of seconds to wait before timing out.
      */
-    public function getTimeout(): int
+    public function getTimeout()
     {
         return $this->timeout;
     }
@@ -157,7 +174,7 @@ abstract class AbstractPhpProcess
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function runTestJob(string $job, Test $test, TestResult $result): void
+    public function runTestJob($job, Test $test, TestResult $result)
     {
         $result->startTest($test);
 
@@ -174,29 +191,29 @@ abstract class AbstractPhpProcess
     /**
      * Returns the command based into the configurations.
      */
-    public function getCommand(array $settings, string $file = null): string
+    public function getCommand(array $settings, $file = null)
     {
         $command = $this->runtime->getBinary();
 
         if ($this->runtime->hasPCOV()) {
-            $settings = \array_merge(
+            $settings = array_merge(
                 $settings,
                 $this->runtime->getCurrentSettings(
-                    \array_keys(\ini_get_all('pcov'))
+                    array_keys(ini_get_all('pcov'))
                 )
             );
         } elseif ($this->runtime->hasXdebug()) {
-            $settings = \array_merge(
+            $settings = array_merge(
                 $settings,
                 $this->runtime->getCurrentSettings(
-                    \array_keys(\ini_get_all('xdebug'))
+                    array_keys(ini_get_all('xdebug'))
                 )
             );
         }
 
         $command .= $this->settingsToParameters($settings);
 
-        if (\PHP_SAPI === 'phpdbg') {
+        if (PHP_SAPI === 'phpdbg') {
             $command .= ' -qrr';
 
             if (!$file) {
@@ -205,7 +222,7 @@ abstract class AbstractPhpProcess
         }
 
         if ($file) {
-            $command .= ' ' . \escapeshellarg($file);
+            $command .= ' ' . escapeshellarg($file);
         }
 
         if ($this->args) {
@@ -225,14 +242,14 @@ abstract class AbstractPhpProcess
     /**
      * Runs a single job (PHP code) using a separate PHP process.
      */
-    abstract public function runJob(string $job, array $settings = []): array;
+    abstract public function runJob($job, array $settings = []);
 
-    protected function settingsToParameters(array $settings): string
+    protected function settingsToParameters(array $settings)
     {
         $buffer = '';
 
         foreach ($settings as $setting) {
-            $buffer .= ' -d ' . \escapeshellarg($setting);
+            $buffer .= ' -d ' . escapeshellarg($setting);
         }
 
         return $buffer;
@@ -243,40 +260,48 @@ abstract class AbstractPhpProcess
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    private function processChildResult(Test $test, TestResult $result, string $stdout, string $stderr): void
+    private function processChildResult(Test $test, TestResult $result, $stdout, $stderr)
     {
         $time = 0;
 
         if (!empty($stderr)) {
             $result->addError(
                 $test,
-                new Exception(\trim($stderr)),
+                new Exception(trim($stderr)),
                 $time
             );
         } else {
-            \set_error_handler(
+            set_error_handler(
                 /**
                  * @throws ErrorException
                  */
-                static function ($errno, $errstr, $errfile, $errline): void {
+                static function ($errno, $errstr, $errfile, $errline) {
                     throw new ErrorException($errstr, $errno, $errno, $errfile, $errline);
                 }
             );
 
             try {
-                if (\strpos($stdout, "#!/usr/bin/env php\n") === 0) {
-                    $stdout = \substr($stdout, 19);
+                if (strpos($stdout, "#!/usr/bin/env php\n") === 0) {
+                    $stdout = substr($stdout, 19);
                 }
 
-                $childResult = \unserialize(\str_replace("#!/usr/bin/env php\n", '', $stdout));
-                \restore_error_handler();
+                $childResult = unserialize(str_replace("#!/usr/bin/env php\n", '', $stdout));
+                restore_error_handler();
+
+                if ($childResult === false) {
+                    $result->addFailure(
+                        $test,
+                        new AssertionFailedError('Test was run in child process and ended unexpectedly'),
+                        $time
+                    );
+                }
             } catch (ErrorException $e) {
-                \restore_error_handler();
+                restore_error_handler();
                 $childResult = false;
 
                 $result->addError(
                     $test,
-                    new Exception(\trim($stdout), 0, $e),
+                    new Exception(trim($stdout), 0, $e),
                     $time
                 );
             }
@@ -292,7 +317,7 @@ abstract class AbstractPhpProcess
                 $test->addToAssertionCount($childResult['numAssertions']);
 
                 $childResult = $childResult['result'];
-                \assert($childResult instanceof  TestResult);
+                assert($childResult instanceof  TestResult);
 
                 if ($result->getCollectCodeCoverageInformation()) {
                     $result->getCodeCoverage()->merge(
@@ -360,7 +385,7 @@ abstract class AbstractPhpProcess
      *
      * @see https://github.com/sebastianbergmann/phpunit/issues/74
      */
-    private function getException(TestFailure $error): Exception
+    private function getException(TestFailure $error)
     {
         $exception = $error->thrownException();
 
@@ -368,12 +393,12 @@ abstract class AbstractPhpProcess
             $exceptionArray = [];
 
             foreach ((array) $exception as $key => $value) {
-                $key                  = \substr($key, \strrpos($key, "\0") + 1);
+                $key                  = substr($key, strrpos($key, "\0") + 1);
                 $exceptionArray[$key] = $value;
             }
 
             $exception = new SyntheticError(
-                \sprintf(
+                sprintf(
                     '%s: %s',
                     $exceptionArray['_PHP_Incomplete_Class_Name'],
                     $exceptionArray['message']

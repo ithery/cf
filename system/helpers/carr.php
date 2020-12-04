@@ -368,11 +368,11 @@ class carr {
      * array, the default value will be added instead.
      *
      *     // Get the values "username", "password" from $_POST
-     *     $auth = Arr::extract($_POST, array('username', 'password'));
+     *     $auth = carr::extract($_POST, array('username', 'password'));
      *
      *     // Get the value "level1.level2a" from $data
      *     $data = array('level1' => array('level2a' => 'value 1', 'level2b' => 'value 2'));
-     *     Arr::extract($data, array('level1.level2a', 'password'));
+     *     carr::extract($data, array('level1.level2a', 'password'));
      *
      * @param   array  $array    array to extract paths from
      * @param   array  $paths    list of path
@@ -382,7 +382,7 @@ class carr {
     public static function extract($array, array $paths, $default = NULL) {
         $found = array();
         foreach ($paths as $path) {
-            carr::set_path($found, $path, carr::path($array, $path, $default));
+            carr::set($found, $path, carr::get($array, $path, $default));
         }
 
         return $found;
@@ -399,7 +399,7 @@ class carr {
      *     $mary = array('name' => 'mary', 'children' => array('jane'));
      *
      *     // John and Mary are married, merge them together
-     *     $john = Arr::merge($john, $mary);
+     *     $john = carr::merge($john, $mary);
      *
      *     // The output of $john will now be:
      *     array('name' => 'mary', 'children' => array('fred', 'paul', 'sally', 'jane'))
@@ -409,6 +409,12 @@ class carr {
      * @return  array
      */
     public static function merge($array1, $array2) {
+        if($array1 instanceof CInterface_Arrayable) {
+            $array1 = $array1->toArray();
+        }
+        if($array2 instanceof CInterface_Arrayable) {
+            $array2 = $array2->toArray();
+        }
         if (carr::isAssoc($array2)) {
             foreach ($array2 as $key => $value) {
                 if (is_array($value)
@@ -430,7 +436,7 @@ class carr {
 
         if (func_num_args() > 2) {
             foreach (array_slice(func_get_args(), 2) as $array2) {
-                if (carr::is_assoc($array2)) {
+                if (carr::isAssoc($array2)) {
                     foreach ($array2 as $key => $value) {
                         if (is_array($value)
                                 AND isset($array1[$key])
@@ -462,7 +468,7 @@ class carr {
      *     $a2 = array('name' => 'jack', 'food' => 'tacos', 'drink' => 'beer');
      *
      *     // Overwrite the values of $a1 with $a2
-     *     $array = Arr::overwrite($a1, $a2);
+     *     $array = carr::overwrite($a1, $a2);
      *
      *     // The output of $array will now be:
      *     array('name' => 'jack', 'mood' => 'happy', 'food' => 'tacos')
@@ -658,7 +664,7 @@ class carr {
      */
     public static function last($array, callable $callback = null, $default = null) {
         if (is_null($callback)) {
-            return empty($array) ? value($default) : end($array);
+            return empty($array) ? c::value($default) : end($array);
         }
 
         return static::first(array_reverse($array, true), $callback, $default);

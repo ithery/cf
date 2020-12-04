@@ -71,8 +71,9 @@ class CHTTP_UploadedFile extends SymfonyUploadedFile {
      */
     public function storeAs($path, $name, $options = []) {
         $options = $this->parseOptions($options);
-        $disk = Arr::pull($options, 'disk');
-        return Container::getInstance()->make(FilesystemFactory::class)->disk($disk)->putFileAs(
+        $disk = carr::pull($options, 'disk');
+        
+        return CStorage::instance()->disk($disk)->putFileAs(
                         $path, $this, $name, $options
         );
     }
@@ -86,7 +87,7 @@ class CHTTP_UploadedFile extends SymfonyUploadedFile {
      */
     public function get() {
         if (!$this->isValid()) {
-            throw new FileNotFoundException("File does not exist at path {$this->getPathname()}");
+            throw new CStorage_Exception_FileNotFoundException("File does not exist at path {$this->getPathname()}");
         }
         return file_get_contents($this->getPathname());
     }

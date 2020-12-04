@@ -85,80 +85,80 @@ use InvalidArgumentException;
  * @method $this millisecond($seconds = 1) Alias for seconds().
  * @method $this microseconds($seconds = 1) Set the seconds portion of the current interval.
  * @method $this microsecond($seconds = 1) Alias for seconds().
- * @method $this roundYear(float $precision = 1, string $function = "round") Round the current instance year with given precision using the given function.
- * @method $this roundYears(float $precision = 1, string $function = "round") Round the current instance year with given precision using the given function.
+ * @method $this roundYear(float $precision = 1, $function = "round") Round the current instance year with given precision using the given function.
+ * @method $this roundYears(float $precision = 1, $function = "round") Round the current instance year with given precision using the given function.
  * @method $this floorYear(float $precision = 1) Truncate the current instance year with given precision.
  * @method $this floorYears(float $precision = 1) Truncate the current instance year with given precision.
  * @method $this ceilYear(float $precision = 1) Ceil the current instance year with given precision.
  * @method $this ceilYears(float $precision = 1) Ceil the current instance year with given precision.
- * @method $this roundMonth(float $precision = 1, string $function = "round") Round the current instance month with given precision using the given function.
- * @method $this roundMonths(float $precision = 1, string $function = "round") Round the current instance month with given precision using the given function.
+ * @method $this roundMonth(float $precision = 1, $function = "round") Round the current instance month with given precision using the given function.
+ * @method $this roundMonths(float $precision = 1, $function = "round") Round the current instance month with given precision using the given function.
  * @method $this floorMonth(float $precision = 1) Truncate the current instance month with given precision.
  * @method $this floorMonths(float $precision = 1) Truncate the current instance month with given precision.
  * @method $this ceilMonth(float $precision = 1) Ceil the current instance month with given precision.
  * @method $this ceilMonths(float $precision = 1) Ceil the current instance month with given precision.
- * @method $this roundWeek(float $precision = 1, string $function = "round") Round the current instance day with given precision using the given function.
- * @method $this roundWeeks(float $precision = 1, string $function = "round") Round the current instance day with given precision using the given function.
+ * @method $this roundWeek(float $precision = 1, $function = "round") Round the current instance day with given precision using the given function.
+ * @method $this roundWeeks(float $precision = 1, $function = "round") Round the current instance day with given precision using the given function.
  * @method $this floorWeek(float $precision = 1) Truncate the current instance day with given precision.
  * @method $this floorWeeks(float $precision = 1) Truncate the current instance day with given precision.
  * @method $this ceilWeek(float $precision = 1) Ceil the current instance day with given precision.
  * @method $this ceilWeeks(float $precision = 1) Ceil the current instance day with given precision.
- * @method $this roundDay(float $precision = 1, string $function = "round") Round the current instance day with given precision using the given function.
- * @method $this roundDays(float $precision = 1, string $function = "round") Round the current instance day with given precision using the given function.
+ * @method $this roundDay(float $precision = 1, $function = "round") Round the current instance day with given precision using the given function.
+ * @method $this roundDays(float $precision = 1, $function = "round") Round the current instance day with given precision using the given function.
  * @method $this floorDay(float $precision = 1) Truncate the current instance day with given precision.
  * @method $this floorDays(float $precision = 1) Truncate the current instance day with given precision.
  * @method $this ceilDay(float $precision = 1) Ceil the current instance day with given precision.
  * @method $this ceilDays(float $precision = 1) Ceil the current instance day with given precision.
- * @method $this roundHour(float $precision = 1, string $function = "round") Round the current instance hour with given precision using the given function.
- * @method $this roundHours(float $precision = 1, string $function = "round") Round the current instance hour with given precision using the given function.
+ * @method $this roundHour(float $precision = 1, $function = "round") Round the current instance hour with given precision using the given function.
+ * @method $this roundHours(float $precision = 1, $function = "round") Round the current instance hour with given precision using the given function.
  * @method $this floorHour(float $precision = 1) Truncate the current instance hour with given precision.
  * @method $this floorHours(float $precision = 1) Truncate the current instance hour with given precision.
  * @method $this ceilHour(float $precision = 1) Ceil the current instance hour with given precision.
  * @method $this ceilHours(float $precision = 1) Ceil the current instance hour with given precision.
- * @method $this roundMinute(float $precision = 1, string $function = "round") Round the current instance minute with given precision using the given function.
- * @method $this roundMinutes(float $precision = 1, string $function = "round") Round the current instance minute with given precision using the given function.
+ * @method $this roundMinute(float $precision = 1, $function = "round") Round the current instance minute with given precision using the given function.
+ * @method $this roundMinutes(float $precision = 1, $function = "round") Round the current instance minute with given precision using the given function.
  * @method $this floorMinute(float $precision = 1) Truncate the current instance minute with given precision.
  * @method $this floorMinutes(float $precision = 1) Truncate the current instance minute with given precision.
  * @method $this ceilMinute(float $precision = 1) Ceil the current instance minute with given precision.
  * @method $this ceilMinutes(float $precision = 1) Ceil the current instance minute with given precision.
- * @method $this roundSecond(float $precision = 1, string $function = "round") Round the current instance second with given precision using the given function.
- * @method $this roundSeconds(float $precision = 1, string $function = "round") Round the current instance second with given precision using the given function.
+ * @method $this roundSecond(float $precision = 1, $function = "round") Round the current instance second with given precision using the given function.
+ * @method $this roundSeconds(float $precision = 1, $function = "round") Round the current instance second with given precision using the given function.
  * @method $this floorSecond(float $precision = 1) Truncate the current instance second with given precision.
  * @method $this floorSeconds(float $precision = 1) Truncate the current instance second with given precision.
  * @method $this ceilSecond(float $precision = 1) Ceil the current instance second with given precision.
  * @method $this ceilSeconds(float $precision = 1) Ceil the current instance second with given precision.
- * @method $this roundMillennium(float $precision = 1, string $function = "round") Round the current instance millennium with given precision using the given function.
- * @method $this roundMillennia(float $precision = 1, string $function = "round") Round the current instance millennium with given precision using the given function.
+ * @method $this roundMillennium(float $precision = 1, $function = "round") Round the current instance millennium with given precision using the given function.
+ * @method $this roundMillennia(float $precision = 1, $function = "round") Round the current instance millennium with given precision using the given function.
  * @method $this floorMillennium(float $precision = 1) Truncate the current instance millennium with given precision.
  * @method $this floorMillennia(float $precision = 1) Truncate the current instance millennium with given precision.
  * @method $this ceilMillennium(float $precision = 1) Ceil the current instance millennium with given precision.
  * @method $this ceilMillennia(float $precision = 1) Ceil the current instance millennium with given precision.
- * @method $this roundCentury(float $precision = 1, string $function = "round") Round the current instance century with given precision using the given function.
- * @method $this roundCenturies(float $precision = 1, string $function = "round") Round the current instance century with given precision using the given function.
+ * @method $this roundCentury(float $precision = 1, $function = "round") Round the current instance century with given precision using the given function.
+ * @method $this roundCenturies(float $precision = 1, $function = "round") Round the current instance century with given precision using the given function.
  * @method $this floorCentury(float $precision = 1) Truncate the current instance century with given precision.
  * @method $this floorCenturies(float $precision = 1) Truncate the current instance century with given precision.
  * @method $this ceilCentury(float $precision = 1) Ceil the current instance century with given precision.
  * @method $this ceilCenturies(float $precision = 1) Ceil the current instance century with given precision.
- * @method $this roundDecade(float $precision = 1, string $function = "round") Round the current instance decade with given precision using the given function.
- * @method $this roundDecades(float $precision = 1, string $function = "round") Round the current instance decade with given precision using the given function.
+ * @method $this roundDecade(float $precision = 1, $function = "round") Round the current instance decade with given precision using the given function.
+ * @method $this roundDecades(float $precision = 1, $function = "round") Round the current instance decade with given precision using the given function.
  * @method $this floorDecade(float $precision = 1) Truncate the current instance decade with given precision.
  * @method $this floorDecades(float $precision = 1) Truncate the current instance decade with given precision.
  * @method $this ceilDecade(float $precision = 1) Ceil the current instance decade with given precision.
  * @method $this ceilDecades(float $precision = 1) Ceil the current instance decade with given precision.
- * @method $this roundQuarter(float $precision = 1, string $function = "round") Round the current instance quarter with given precision using the given function.
- * @method $this roundQuarters(float $precision = 1, string $function = "round") Round the current instance quarter with given precision using the given function.
+ * @method $this roundQuarter(float $precision = 1, $function = "round") Round the current instance quarter with given precision using the given function.
+ * @method $this roundQuarters(float $precision = 1, $function = "round") Round the current instance quarter with given precision using the given function.
  * @method $this floorQuarter(float $precision = 1) Truncate the current instance quarter with given precision.
  * @method $this floorQuarters(float $precision = 1) Truncate the current instance quarter with given precision.
  * @method $this ceilQuarter(float $precision = 1) Ceil the current instance quarter with given precision.
  * @method $this ceilQuarters(float $precision = 1) Ceil the current instance quarter with given precision.
- * @method $this roundMillisecond(float $precision = 1, string $function = "round") Round the current instance millisecond with given precision using the given function.
- * @method $this roundMilliseconds(float $precision = 1, string $function = "round") Round the current instance millisecond with given precision using the given function.
+ * @method $this roundMillisecond(float $precision = 1, $function = "round") Round the current instance millisecond with given precision using the given function.
+ * @method $this roundMilliseconds(float $precision = 1, $function = "round") Round the current instance millisecond with given precision using the given function.
  * @method $this floorMillisecond(float $precision = 1) Truncate the current instance millisecond with given precision.
  * @method $this floorMilliseconds(float $precision = 1) Truncate the current instance millisecond with given precision.
  * @method $this ceilMillisecond(float $precision = 1) Ceil the current instance millisecond with given precision.
  * @method $this ceilMilliseconds(float $precision = 1) Ceil the current instance millisecond with given precision.
- * @method $this roundMicrosecond(float $precision = 1, string $function = "round") Round the current instance microsecond with given precision using the given function.
- * @method $this roundMicroseconds(float $precision = 1, string $function = "round") Round the current instance microsecond with given precision using the given function.
+ * @method $this roundMicrosecond(float $precision = 1, $function = "round") Round the current instance microsecond with given precision using the given function.
+ * @method $this roundMicroseconds(float $precision = 1, $function = "round") Round the current instance microsecond with given precision using the given function.
  * @method $this floorMicrosecond(float $precision = 1) Truncate the current instance microsecond with given precision.
  * @method $this floorMicroseconds(float $precision = 1) Truncate the current instance microsecond with given precision.
  * @method $this ceilMicrosecond(float $precision = 1) Ceil the current instance microsecond with given precision.
@@ -282,7 +282,8 @@ class CarbonInterval extends DateInterval
         if (!self::$flipCascadeFactors) {
             self::$flipCascadeFactors = [];
 
-            foreach (static::getCascadeFactors() as $to => [$factor, $from]) {
+            foreach (static::getCascadeFactors() as $to => $value) {
+                list($factor, $from) = $value;
                 self::$flipCascadeFactors[self::standardizeUnit($from)] = [self::standardizeUnit($to), $factor];
             }
         }
@@ -369,7 +370,7 @@ class CarbonInterval extends DateInterval
         $target = self::standardizeUnit($target);
         $factors = static::getFlipCascadeFactors();
         if (isset($factors[$source])) {
-            [$to, $factor] = $factors[$source];
+            list($to, $factor) = $factors[$source];
             if ($to === $target) {
                 return $factor;
             }
@@ -477,7 +478,7 @@ class CarbonInterval extends DateInterval
      *
      * @return static
      */
-    public static function createFromFormat(string $format, ?string $interval)
+    public static function createFromFormat($format, $interval)
     {
         $instance = new static(0);
         $length = mb_strlen($format);
@@ -492,7 +493,7 @@ class CarbonInterval extends DateInterval
         for ($index = 0; $index < $length; $index++) {
             $expected = mb_substr($format, $index, 1);
             $nextCharacter = mb_substr($interval, 0, 1);
-            $unit = static::$formats[$expected] ?? null;
+            $unit = isset(static::$formats[$expected]) ? static::$formats[$expected] : null;
 
             if ($unit) {
                 if (!preg_match('/^-?\d+/', $interval, $match)) {
@@ -653,7 +654,7 @@ class CarbonInterval extends DateInterval
         $pattern = '/(\d+(?:\.\d+)?)\h*([^\d\h]*)/i';
         preg_match_all($pattern, $intervalDefinition, $parts, PREG_SET_ORDER);
 
-        while ([$part, $value, $unit] = array_shift($parts)) {
+        while (list($part, $value, $unit) = array_shift($parts)) {
             $intValue = intval($value);
             $fraction = floatval($value) - $intValue;
 
@@ -807,7 +808,7 @@ class CarbonInterval extends DateInterval
         return static::fromString(Carbon::translateTimeString($interval, $locale, 'en'));
     }
 
-    private static function castIntervalToClass(DateInterval $interval, string $className)
+    private static function castIntervalToClass(DateInterval $interval, $className)
     {
         $mainClass = DateInterval::class;
 
@@ -837,7 +838,7 @@ class CarbonInterval extends DateInterval
      *
      * @return DateInterval
      */
-    public function cast(string $className)
+    public function cast($className)
     {
         return self::castIntervalToClass($this, $className);
     }
@@ -1044,7 +1045,7 @@ class CarbonInterval extends DateInterval
                 break;
 
             default:
-                if ($this->localStrictModeEnabled ?? Carbon::isStrictModeEnabled()) {
+                if (isset($this->localStrictModeEnabled) ? $this->localStrictModeEnabled : Carbon::isStrictModeEnabled()) {
                     throw new InvalidArgumentException(sprintf("Unknown setter '%s'", $name));
                 }
 
@@ -1256,7 +1257,7 @@ class CarbonInterval extends DateInterval
                 break;
 
             default:
-                if ($this->localStrictModeEnabled ?? Carbon::isStrictModeEnabled()) {
+                if (isset($this->localStrictModeEnabled) ? $this->localStrictModeEnabled : Carbon::isStrictModeEnabled()) {
                     throw new BadMethodCallException(sprintf("Unknown fluent setter '%s'", $method));
                 }
         }

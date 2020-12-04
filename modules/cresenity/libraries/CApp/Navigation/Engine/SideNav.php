@@ -13,7 +13,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
 
     public function render($navs = null, $level = 0, &$child = 0) {
         $domain = CF::domain();
-        $is_admin = CApp::instance()->isAdmin();
+        $is_admin = CApp::isAdministrator();
         if ($navs == null && $level == 0) {
             $navs = $this->navs;
         }
@@ -22,6 +22,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
         }
         $html = "";
         $childCount = 0;
+
         foreach ($navs as $d) {
 
             $child = 0;
@@ -33,24 +34,25 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
             $icon = carr::get($d, 'icon');
             $class = carr::get($d, 'class');
 
-
-
-
             $childHtml = "";
 
             if (isset($d["subnav"]) && is_array($d["subnav"])) {
                 $childHtml .= self::render(carr::get($d, 'subnav', array()), $level + 1, $child);
             }
+            $url = carr::get($d, 'uri');
+            if ($url == null) {
+                $url = Helper::url($d);
+            }
 
-            $url = Helper::url($d);
-
-            if (!isset($url) || $url == null)
+            if (!isset($url) || $url == null) {
                 $url = "";
+            }
+
+
 
             if (strlen($childHtml) > 0 || strlen($url) > 0) {
 
                 if (!Helper::accessAvailable($d, CF::appId(), $domain)) {
-
                     continue;
                 }
                 if (isset($d["controller"]) && $d["controller"] != "") {
@@ -109,6 +111,7 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
                     }
                     $elem .= "</a>\r\n";
                 } else {
+                    $url = '/' . trim($url, '/');
                     $target = "";
                     $notif = "";
                     if (isset($d["target"]) && strlen($d["target"]) > 0) {

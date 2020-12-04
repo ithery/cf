@@ -13,6 +13,7 @@ application/cresenity/default/config/*
 application/cresenity/config/*
 
 #ignore data domain or org
+/data
 /data/*
 /data/org/*
 
@@ -23,6 +24,9 @@ application/cresenity/config/*
 /.git.bak
 
 /access.log
+
+#phpunit
+.phpunit.result.cache
 
 #ignore libs of CPDF
 /modules/cresenity/vendor/lib/fonts/Helvetica.afm.php
@@ -46,6 +50,7 @@ application/cresenity/config/*
 /temp/*
 /export/
 /resources
+
 /resource
 /files
 /certificate
@@ -53,6 +58,7 @@ application/cresenity/config/*
 /payment_log/
 /public/files/
 /public/files/*
+/compiled
 
 #ignore netbeans ide config
 /nbproject/
@@ -84,3 +90,11 @@ botlog.log
 #ignore vscode
 .vscode
 *.py
+
+#phpunit
+.phpunit.result.cache
+
+.bin/*
+
+
+

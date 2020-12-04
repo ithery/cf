@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,8 +9,10 @@
  */
 namespace PHPUnit\Framework\Constraint;
 
+use function call_user_func;
+
 /**
- * Constraint that evaluates against a specified closure.
+ * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
 final class Callback extends Constraint
 {
@@ -27,7 +29,7 @@ final class Callback extends Constraint
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString(): string
+    public function toString()
     {
         return 'is accepted by specified callback';
     }
@@ -38,8 +40,8 @@ final class Callback extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other): bool
+    protected function matches($other)
     {
-        return \call_user_func($this->callback, $other);
+        return call_user_func($this->callback, $other);
     }
 }

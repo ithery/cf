@@ -194,7 +194,7 @@ class CModel_HasResource_FileAdder_FileAdder {
         $resource->custom_properties = $this->customProperties;
         $resource->responsive_images = [];
         $resource->manipulations = $this->manipulations;
-        if (CF::filled($this->customHeaders)) {
+        if (c::filled($this->customHeaders)) {
             $resource->setCustomHeaders($this->customHeaders);
         }
         $resource->fill($this->properties);
@@ -265,7 +265,7 @@ class CModel_HasResource_FileAdder_FileAdder {
 
     protected function getResourceCollection($collectionName) {
         $this->subject->registerResourceCollections();
-        return CF::collect($this->subject->resourceCollections)
+        return c::collect($this->subject->resourceCollections)
                         ->first(function (CResources_ResourceCollection $collection) use ($collectionName) {
                             return $collection->name === $collectionName;
                         });

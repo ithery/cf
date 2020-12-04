@@ -77,7 +77,7 @@ class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator imp
      * @return string
      */
     public function render($view = null, $data = []) {
-        return new HtmlString(static::viewFactory()->make($view ?: static::$defaultView, array_merge($data, [
+        return new CBase_HtmlString(static::viewFactory()->make($view ?: static::$defaultView, array_merge($data, [
                     'paginator' => $this,
                     'elements' => $this->elements(),
                 ]))->render());
@@ -89,7 +89,7 @@ class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator imp
      * @return array
      */
     protected function elements() {
-        $window = UrlWindow::make($this);
+        $window = CPagination_UrlWindow::make($this);
 
         return array_filter([
             $window['first'],

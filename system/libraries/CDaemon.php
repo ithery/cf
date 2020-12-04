@@ -8,6 +8,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class CDaemon {
 
@@ -148,6 +149,7 @@ class CDaemon {
             }
         }
 
+        
         if ($isUnix) {
             return $this->runUnix();
         } else {
@@ -164,12 +166,19 @@ class CDaemon {
         $binary = $this->getPhpBinary();
         $output = isset($config['debug']) && $config['debug'] ? 'debug.log' : '/dev/null';
 
+
+
         $commandToExecute = "NSS_STRICT_NOFORK=DISABLED $binary $command 1> $output 2>&1 &";
 
-        //cdbg::dd($commandToExecute);
-        exec($commandToExecute);
-        
-        
+        if (defined('CFCLI')) {
+            $process = new Process($commandToExecute);
+            $process->run();
+            $result = $process->getOutput();
+            
+            
+        } else {
+            exec($commandToExecute);
+        }
     }
 
     // @codeCoverageIgnoreStart
@@ -226,6 +235,7 @@ class CDaemon {
 
     public function getPid() {
         $pidFile = carr::get($this->config, 'pidFile');
+
         if ($pidFile && file_exists($pidFile)) {
             return file_get_contents($pidFile);
         }
@@ -236,7 +246,14 @@ class CDaemon {
         $result = '';
         if ($pid = $this->getPid()) {
             $pid = trim($pid);
-            $result = shell_exec('ps x | grep "' . $pid . '" | grep "' . carr::get($this->config, 'serviceName') . '" | grep -v "grep"');
+            $command = 'ps x | grep "' . $pid . '" | grep "' . carr::get($this->config, 'serviceName') . '" | grep -v "grep"';
+            if (defined('CFCLI')) {
+                $process = new Process($command);
+                $process->run();
+                $result = $process->getOutput();
+            } else {
+                $result = shell_exec($command);
+            }
         }
 
         return strlen(trim($result)) > 0;

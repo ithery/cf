@@ -7,6 +7,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Aug 22, 2018, 1:20:44 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+
 class CDebug_Bar_Renderer {
 
     /**
@@ -207,32 +210,42 @@ class CDebug_Bar_Renderer {
         return $js;
     }
 
+    public function isFileResponse($response) {
+        return ($response instanceof StreamedResponse) || ($response instanceof BinaryFileResponse);
+    }
+
     public function apply() {
-        CFEvent::add('system.display', function() {
-            $output = CF::$output;
-            if (CHelper::request()->isAjax()) {
-                try {
-                    if (!headers_sent()) {
-                        header('phpdebugbar-body:1');
-                    }
-                    $jsonHelper = CHelper::json();
-                    $json = null;
+        $renderer = $this;
+        CEvent::dispatcher()->listen(CHTTP_Event_RequestHandled::class, function($event) use($renderer) {
+            $response = $event->response;
+            if (!$renderer->isFileResponse($response)) {
+                if ($response instanceof CHTTP_JsonResponse) {
+                    $output = $response->getContent();
                     try {
-                        $json = $jsonHelper->parse($output);
+                        if (!headers_sent()) {
+                            header('phpdebugbar-body:1');
+                        }
+                        $jsonHelper = CHelper::json();
+                        $json = null;
+                        try {
+                            $json = $jsonHelper->parse($output);
+                        } catch (Exception $ex) {
+                            
+                        }
+                        if (is_array($json)) {
+                            $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
+                            $output = $jsonHelper->stringify($json);
+                            $response->setContent($output);
+                        }
                     } catch (Exception $ex) {
                         
                     }
-                    if (is_array($json)) {
-                        $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
-                        $output = $jsonHelper->stringify($json);
-                    }
-                } catch (Exception $ex) {
-                    
+                } else {
+                    $output = $response->getContent();
+                    $output = $renderer->replaceJavascriptCode($output);
+                    $response->setContent($output);
                 }
-            } else {
-                $output = $this->replaceJavascriptCode(CF::$output);
             }
-            CF::$output = $output;
         });
     }
 

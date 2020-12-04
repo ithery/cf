@@ -50,52 +50,6 @@ abstract class CObservable extends CRenderable {
 
         parent::__construct($id);
         $this->listeners = array();
-        $manager = CManager::instance();
-
-        $manager->registerControl('text', 'CElement_FormInput_Text');
-        $manager->registerControl('number', 'CElement_FormInput_Number');
-        $manager->registerControl('email', 'CElement_FormInput_Email');
-        $manager->registerControl('datepicker', 'CElement_FormInput_Date');
-        $manager->registerControl('date', 'CElement_FormInput_Date');
-        $manager->registerControl('material-datetime', 'CElement_FormInput_DateTime_MaterialDateTime');
-        $manager->registerControl('daterange-picker', 'CElement_FormInput_DateRange');
-        $manager->registerControl('daterange-dropdown', 'CElement_FormInput_DateRange_Dropdown');
-        $manager->registerControl('daterange-button', 'CElement_FormInput_DateRange_DropdownButton');
-        $manager->registerControl('currency', 'CElement_FormInput_Currency');
-        $manager->registerControl('auto-numeric', 'CElement_FormInput_AutoNumeric');
-        $manager->registerControl('time', 'CElement_FormInput_Time');
-        $manager->registerControl('timepicker', 'CElement_FormInput_Time');
-        $manager->registerControl('clock', 'CElement_FormInput_Clock');
-        $manager->registerControl('clockpicker', 'CElement_FormInput_Clock');
-        $manager->registerControl('image', 'CElement_FormInput_Image');
-        $manager->registerControl('image-ajax', 'CElement_FormInput_ImageAjax');
-        $manager->registerControl('multi-image-ajax', 'CElement_FormInput_MultipleImageAjax');
-        $manager->registerControl('file', 'CFormInputFile');
-        $manager->registerControl('file-ajax', 'CElement_FormInput_FileAjax');
-        $manager->registerControl('password', 'CElement_FormInput_Password');
-        $manager->registerControl('textarea', 'CElement_FormInput_Textarea');
-        $manager->registerControl('select', 'CElement_FormInput_Select');
-        $manager->registerControl('minicolor', 'CElement_FormInput_MiniColor');
-        $manager->registerControl('map-picker', CElement_FormInput_MapPicker::class);
-
-        $manager->registerControl('select-tag', 'CElement_FormInput_SelectTag');
-
-        $manager->registerControl('selectsearch', 'CFormInputSelectSearch');
-        $manager->registerControl('label', 'CFormInputLabel');
-        $manager->registerControl('checkbox', CElement_FormInput_Checkbox::class);
-        $manager->registerControl('checkbox-list', 'CFormInputCheckboxList');
-        $manager->registerControl('switcher', 'CElement_FormInput_Checkbox_Switcher');
-        $manager->registerControl('summernote', 'CElement_FormInput_Textarea_Summernote');
-        $manager->registerControl('quill', 'CElement_FormInput_Textarea_Quill');
-        $manager->registerControl('wysiwyg', 'CFormInputWysiwyg');
-        $manager->registerControl('ckeditor', 'CFormInputCKEditor');
-        $manager->registerControl('hidden', 'CFormInputHidden');
-        $manager->registerControl('radio', 'CFormInputRadio');
-        $manager->registerControl('filedrop', 'CFormInputFileDrop');
-        $manager->registerControl('slider', 'CFormInputSlider');
-        $manager->registerControl('tooltip', 'CFormInputTooltip');
-        $manager->registerControl('fileupload', 'CFormInputFileUpload');
-
         $this->javascript = new CObservable_Javascript($this);
     }
 
@@ -147,6 +101,37 @@ abstract class CObservable extends CRenderable {
         $template = CElement_Factory::createTemplate($id);
         $this->wrapper->add($template);
         return $template;
+    }
+    
+    /**
+     * 
+     * @param type $id
+     * @return CElement_Template
+     */
+    public function addComponent($componentName,$id = "") {
+        $viewComponent = CElement_Factory::createViewComponent($componentName,$id);
+        $this->wrapper->add($viewComponent);
+        return $viewComponent;
+    }
+    
+    /**
+     * 
+     * @param type $view
+     * @param string $id
+     * @return type
+     */
+    public function addView($view=null, $data=null, $id=null) {
+        
+        if(strlen($id)==0) {
+            $id = 'view-'.cstr::slug($view).'-'.CObserver::instance()->newId();
+        }
+        
+        $viewElement = CElement_Factory::createView($id,$view,$data);
+        
+        
+        $this->wrapper->add($viewElement);
+        return $viewElement;
+        
     }
 
     /**
@@ -227,6 +212,12 @@ abstract class CObservable extends CRenderable {
         return $code;
     }
 
+    public function addPdfViewer($id = "") {
+        $code = CElement_Factory::createComponent('PdfViewer', $id);
+        $this->add($code);
+        return $code;
+    }
+
     /**
      * 
      * @return $this
@@ -265,6 +256,10 @@ abstract class CObservable extends CRenderable {
 
         return $element;
     }
+    
+    
+    
+    
 
     /**
      * Add Action Element

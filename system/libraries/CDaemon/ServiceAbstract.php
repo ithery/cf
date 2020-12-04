@@ -7,6 +7,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Mar 12, 2019, 3:23:13 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+use Symfony\Component\Process\Process;
+
 abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
     protected $serviceName;
@@ -63,6 +65,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @var float The interval in Seconds
      */
+
     protected $loopInterval = null;
 
     /**
@@ -782,7 +785,16 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         }
         $pid = $this->getPidFromPidFile();
 
-        $result = shell_exec('kill -9 ' . $pid);
+        $command = 'kill -9 ' . $pid;
+        if (defined('CFCLI')) {
+            $process = new Process($command);
+            $process->run();
+            $result = $process->getOutput();
+        } else {
+            $result = shell_exec($command);
+        }
+
+
         //unlink pid file
         if ($this->pidFile && file_exists($this->pidFile)) {
             unlink($this->pidFile);

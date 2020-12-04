@@ -12,7 +12,8 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 class CHTTP_Response extends SymfonyResponse {
 
     use CHTTP_Trait_ResponseTrait;
-    use CTrait_Macroable {
+
+use CTrait_Macroable {
         CTrait_Macroable::__call as macroCall;
     }
 
@@ -55,7 +56,7 @@ class CHTTP_Response extends SymfonyResponse {
         // If this content implements the "Renderable" interface then we will call the
         // render method on the object so we will avoid any "__toString" exceptions
         // that might be thrown and have their errors obscured by PHP's handling.
-        elseif ($content instanceof Renderable) {
+        elseif ($content instanceof CInterface_Renderable) {
             $content = $content->render();
         }
 

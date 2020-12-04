@@ -65,9 +65,9 @@ $maxHeight .= $suffixHeight;
     $('#input-temp-<?php echo $id; ?>').change(function (e) {
 
 <?php if ($cropper != null) : ?>
-
             var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
             var cropperHeight = parseFloat('<?php echo $cropper->getCropperHeight(); ?>');
+            var cropBoxResizable = <?php echo json_encode($cropper->getCropperResizable()); ?>;
 <?php endif; ?>
         $.each(e.target.files, function (i, file) {
             var reader = new FileReader();
@@ -100,7 +100,30 @@ $maxHeight .= $suffixHeight;
                                 cropperImg.cropper({
                                     aspectRatio: cropperWidth / cropperHeight,
                                     zoomOnWheel: false,
+                                    cropBoxResizable: cropBoxResizable,
+                                    ready: function(e) {
+                                        var imgData = $(this).cropper('getImageData');
+                                        var containerData = $(this).cropper('getContainerData');
+                                        var cropBoxData = $(this).cropper('getCropBoxData');
 
+                                        if (imgData.naturalWidth < cropperWidth && imgData.naturalHeight < cropperHeight) {
+                                            $(this).cropper('setCanvasData', {
+                                                left: containerData.width / 2 - imgData.naturalWidth / 2,
+                                                top: containerData.height / 2 - imgData.naturalHeight / 2,
+                                                width: imgData.naturalWidth,
+                                                height: imgData.naturalHeight
+                                            });
+                                        }
+
+                                        if (imgData.naturalWidth == cropperWidth && imgData.naturalHeight == cropperHeight) {
+                                            $(this).cropper('setCanvasData', {
+                                                left: cropBoxData.left,
+                                                top: cropBoxData.top,
+                                                width: cropBoxData.width,
+                                                height: cropBoxData.height
+                                            });
+                                        }
+                                    },
                                     crop: function (e) {
 
                                     }

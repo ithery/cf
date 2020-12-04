@@ -182,7 +182,7 @@
 
 
 .loading {
-    background:url("../../img/ajax-loader.gif") no-repeat;
+    background:url("../img/ajax-loader.gif") no-repeat;
     display: none;
     height:150px;
     width:100%;

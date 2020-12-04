@@ -11,6 +11,8 @@ class CApp_Administrator {
 
     const ADMIN_SESSSION_KEY = 'administrator';
 
+    protected static $navs = [];
+    
     public static function isEnabled() {
         return isset($_COOKIE['capp-administrator']);
     }
@@ -42,6 +44,11 @@ class CApp_Administrator {
         $session->delete(self::ADMIN_SESSSION_KEY);
     }
 
-    
+    public static function addNav($nav) {
+        static::$navs[] = $nav; 
+    }
+     public static function getNav() {
+        return static::$navs;
+    }
    
 }

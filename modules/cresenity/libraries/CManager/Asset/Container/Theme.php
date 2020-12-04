@@ -8,5 +8,14 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CManager_Asset_Container_Theme extends CManager_Asset_Container {
+
+    public function isCompiled() {
+        return true;
+    }
+
+    
+    
+    
+    
     
 }

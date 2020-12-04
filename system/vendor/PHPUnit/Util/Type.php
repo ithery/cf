@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of PHPUnit.
  *
@@ -9,12 +9,14 @@
  */
 namespace PHPUnit\Util;
 
+use Throwable;
+
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class Type
 {
-    public static function isType(string $type): bool
+    public static function isType($type)
     {
         switch ($type) {
             case 'numeric':
@@ -37,11 +39,11 @@ final class Type
         }
     }
 
-    public static function isCloneable(object $object): bool
+    public static function isCloneable(object $object)
     {
         try {
             $clone = clone $object;
-        } catch (\Throwable $t) {
+        } catch (Throwable $t) {
             return false;
         }
 

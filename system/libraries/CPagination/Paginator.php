@@ -92,7 +92,7 @@ class CPagination_Paginator extends CPagination_AbstractPaginator implements CIn
      * @return string
      */
     public function render($view = null, $data = []) {
-        return new HtmlString(
+        return new CBase_HtmlString(
                 static::viewFactory()->make($view ?: static::$defaultSimpleView, array_merge($data, [
                     'paginator' => $this,
                 ]))->render()

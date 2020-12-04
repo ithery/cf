@@ -29,7 +29,7 @@ class curl {
         // Load the site domain
         $site_domain = (string) CF::config('core.site_domain', '');
         $domain = carr::get($_SERVER, 'HTTP_HOST');
-        if(strlen($domain)==0) {
+        if (strlen($domain) == 0) {
             $domain = CF::domain();
         }
         if ($protocol == FALSE) {
@@ -68,11 +68,15 @@ class curl {
     }
 
     public static function urlFull() {
+        static::fullUrl();
+    }
+
+    public static function fullUrl($qs = true) {
         $requestUri = carr::get($_SERVER, 'REQUEST_URI');
-        if (strlen($requestUri) > 0) {
+        if ($qs && strlen($requestUri) > 0) {
             return trim(curl::httpbase(), '/') . $requestUri;
         }
-        return curl::httpbase() . curl::current() . CFRouter::$query_string;
+        return curl::httpbase() . curl::current() . ($qs ? CFRouter::$query_string : '');
     }
 
     /**
@@ -223,7 +227,13 @@ class curl {
         exit('<h1>' . $method . ' - ' . $codes[$method] . '</h1>' . $output);
     }
 
-    public static function as_post_string($val, $key = null) {
+    /**
+     * 
+     * @param string $val
+     * @param string|null $key pass null to no key
+     * @return string
+     */
+    public static function asPostString($val, $key = null) {
         $result = '';
         $prefix = $key;
 
@@ -249,10 +259,34 @@ class curl {
         return $result;
     }
 
-    public static function remove_scheme($url) {
+    /**
+     * 
+     * @param string $val
+     * @param string|null $key
+     * @return string
+     * @deprecated
+     */
+    public static function as_post_string($val, $key = null) {
+        return static::asPostString($val, $key);
+    }
+
+    /**
+     * 
+     * @param string $url
+     * @return string
+     */
+    public static function removeScheme($url) {
         return preg_replace('~^[^:/?#]+:(//)?~', '', $url);
     }
 
-}
+    /**
+     * 
+     * @param string $url
+     * @return string
+     * @deprecated
+     */
+    public static function remove_scheme($url) {
+        return static::removeScheme($url);
+    }
 
-// End url
+}

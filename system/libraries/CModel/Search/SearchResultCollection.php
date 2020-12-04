@@ -21,7 +21,7 @@ class CModel_Search_SearchResultCollection extends CCollection {
         
         $this->paginator[$type]=$results;
         
-        CF::collect($results->items())->each(function ($result) use ($type) {
+        c::collect($results->items())->each(function ($result) use ($type) {
             
             $this->items[] = $result->getSearchResult()->setType($type);
         });

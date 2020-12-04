@@ -23,7 +23,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $ajaxMethod->setData('columns', $columns);
             $ajaxMethod->setData('query', $this->query);
             $ajaxMethod->setData('table', serialize($this));
-            
+
             $ajaxMethod->setData('dbConfig', $this->dbConfig);
             $ajaxMethod->setData('dbName', $this->dbName);
             $ajaxMethod->setData('domain', $this->domain);
@@ -172,38 +172,32 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                                     },
                                     ")
                         ->appendln("'fnRowCallback': function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
-						// Bold the grade for all 'A' grade browsers
 						
-							//$('td:eq(4)', nRow).html( '<b>A</b>' );
-						//$.cresenity.set_confirm($('a.confirm',nRow));
-						
-						var footer_action = $('#" . $this->id . "_wrapper .footer_action');
-						
-						" . ($this->haveFooterAction() ? "footer_action.html(" . json_encode($this->footerActionList->html()) . ");" : "") . " 
-           
-						" . ($this->haveFooterAction() ? "" . $this->footerActionList->js() . "" : "") . " 
-						
-						footer_action.css('position','absolute').css('left','275px').css('margin','4px 8px 2px 10px');
-						
-						for(i=0;i<$(nRow).find('td').length;i++) {
-							
-							//get head data align
-							var data_align = $('#" . $this->id . "').find('thead th:eq('+i+')').data('align');
-							var data_action = $('#" . $this->id . "').find('thead th:eq('+i+')').data('action');
-							var data_no_line_break = $('#" . $this->id . "').find('thead th:eq('+i+')').data('no-line-break');
-							if(data_action) {
-								$('td:eq('+i+')', nRow).addClass(data_action);
-							}
-							if(data_align) {
-								$('td:eq('+i+')', nRow).addClass(data_align);
-							}
-							if(data_no_line_break) {
-								$('td:eq('+i+')', nRow).addClass(data_no_line_break);
-							}
-						}
-						
-						
-					},
+                                        var footer_action = $('#" . $this->id . "_wrapper .footer_action');
+
+                                        " . ($this->haveFooterAction() ? "footer_action.html(" . json_encode($this->footerActionList->html()) . ");" : "") . " 
+
+                                        " . ($this->haveFooterAction() ? "" . $this->footerActionList->js() . "" : "") . " 
+
+                                        footer_action.css('position','absolute').css('left','275px').css('margin','4px 8px 2px 10px');
+
+                                        for(var i=0;i<$(nRow).find('td').length;i++) {
+
+                                            //get head data align
+                                            var data_align = $('#" . $this->id . "').find('thead th:eq('+i+')').data('align');
+                                            var data_action = $('#" . $this->id . "').find('thead th:eq('+i+')').data('action');
+                                            var data_no_line_break = $('#" . $this->id . "').find('thead th:eq('+i+')').data('no-line-break');
+                                            if(data_action) {
+                                                    $('td:eq('+i+')', nRow).addClass(data_action);
+                                            }
+                                            if(data_align) {
+                                                    $('td:eq('+i+')', nRow).addClass(data_align);
+                                            }
+                                            if(data_no_line_break) {
+                                                    $('td:eq('+i+')', nRow).addClass(data_no_line_break);
+                                            }
+                                        }
+                                    },
 				")
                         ->appendln("'fnInitComplete': function() {
                                 this.fnAdjustColumnSizing(true);
@@ -445,7 +439,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             ");
         }
 
-        if($this->haveRowSelection()) {
+        if ($this->haveRowSelection()) {
             if ($this->applyDataTable > 0) {
                 $js->append("
                 $('#" . $this->id . " tbody').on( 'click', 'tr', function () {

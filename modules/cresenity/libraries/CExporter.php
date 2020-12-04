@@ -24,6 +24,7 @@ class CExporter {
     const MPDF = 'Mpdf';
     const DOMPDF = 'Dompdf';
     const TCPDF = 'Tcpdf';
+    const isQueue = false;
 
     /**
      * @param object      $export
@@ -74,7 +75,6 @@ class CExporter {
      */
     public static function download($export, $fileName, $writerType = null, array $headers = []) {
         $localPath = static::export($export, $fileName, $writerType)->getLocalPath();
-
         cdownload::force($localPath, null, $fileName);
         unlink($localPath);
     }
@@ -181,6 +181,28 @@ class CExporter {
      * @return PendingDispatch
      */
     public static function queue($export, $filePath, $disk = null, $writerType = null, $diskOptions = []) {
+        $writerType = CExporter_FileTypeDetector::detectStrict($filePath, $writerType);
+        $export = CExporter_ExportableDetector::toExportable($export);
+        return static::queuedWriter()->store(
+                        $export, $filePath, $disk, $writerType, $diskOptions
+        );
+    }
+    
+    public static function queueAjax($ajaxMethod, $filePath, $disk = null, $writerType = null, $diskOptions = []) {
+        
+        $filename = $ajaxMethod . '.tmp';
+        $file = CTemporary::getPath("ajax", $filename);
+        $disk = CTemporary::disk();
+        if (!$disk->exists($file)) {
+            throw new CException('failed to get temporary file :filename', array(':filename' => $file));
+        }
+        $json = $disk->get($file);
+
+        $data = json_decode($json, true);
+        
+        $ajaxMethod = CAjax::createMethod($json)->setArgs($args);
+        $response = $ajaxMethod->executeEngine();
+        
         $writerType = CExporter_FileTypeDetector::detectStrict($filePath, $writerType);
         $export = CExporter_ExportableDetector::toExportable($export);
         return static::queuedWriter()->store(

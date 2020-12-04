@@ -179,14 +179,16 @@ if (PHP_SAPI === 'cli') {
 }
 $file .= $domain . '.php';
 
-
+/*
 if (file_exists($file)) {
     $content = file_get_contents($file);
     $data = json_decode($content, true);
     $app_code = $data['app_code'];
+   
 
     $cf_application = 'application' . DIRECTORY_SEPARATOR . $app_code;
 }
+*/
 
 // If kohana folders are relative paths, make them absolute.
 $cf_application = file_exists($cf_application) ? $cf_application : DOCROOT . $cf_application;

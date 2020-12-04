@@ -45,11 +45,13 @@ class CSession {
             // Makes a mirrored array, eg: foo=foo
             CSession::$protect = array_combine(CSession::$protect, CSession::$protect);
 
-            // Configure garbage collection
-            ini_set('session.gc_probability', (int) CSession::$config['gc_probability']);
-            ini_set('session.gc_divisor', 100);
-            ini_set('session.gc_maxlifetime', (CSession::$config['expiration'] == 0) ? 86400 : CSession::$config['expiration']);
+            if (session_status() == PHP_SESSION_NONE) {
 
+                // Configure garbage collection
+                ini_set('session.gc_probability', (int) CSession::$config['gc_probability']);
+                ini_set('session.gc_divisor', 100);
+                ini_set('session.gc_maxlifetime', (CSession::$config['expiration'] == 0) ? 86400 : CSession::$config['expiration']);
+            }
             // Create a new session
             $this->create();
 
@@ -121,8 +123,8 @@ class CSession {
                     throw new CException('The :driver driver for the :class library could not be found', array(':driver' => CSession::$config['driver'], ':class' => get_class($this)));
                 }
             } else {
-                $method = 'create'.$driverName.'Driver';
-                CSession::$driver = call_user_func([CSession_Factory::class,$method]);
+                $method = 'create' . $driverName . 'Driver';
+                CSession::$driver = call_user_func([CSession_Factory::class, $method]);
             }
 
             // Validate the driver
@@ -146,7 +148,9 @@ class CSession {
         session_set_cookie_params(CSession::$config['expiration'], CF::config('cookie.path'), CF::config('cookie.domain'), CF::config('cookie.secure'), CF::config('cookie.httponly'));
 
         // Start the session!
-        session_start();
+        if (session_status() == PHP_SESSION_NONE) {
+            @session_start();
+        }
 
         // Put session_id in the session variable
         $_SESSION['session_id'] = session_id();
@@ -156,7 +160,7 @@ class CSession {
             $_SESSION['total_hits'] = 0;
             $_SESSION['_kf_flash_'] = array();
 
-            $_SESSION['user_agent'] = CF::$user_agent;
+            $_SESSION['user_agent'] = CF::userAgent();
             $_SESSION['ip_address'] = $this->input->ip_address();
         }
 
@@ -173,7 +177,7 @@ class CSession {
                 switch ($valid) {
                     // Check user agent for consistency
                     case 'user_agent':
-                        if ($_SESSION[$valid] !== CF::$user_agent)
+                        if ($_SESSION[$valid] !== CF::userAgent())
                             return $this->create();
                         break;
 
@@ -372,12 +376,11 @@ class CSession {
      * @return  mixed   Variable data if key specified, otherwise array containing all session data.
      */
     public function get($key = FALSE, $default = FALSE) {
-        if (empty($key))
+        if (empty($key)) {
             return $_SESSION;
+        }
 
-        $result = isset($_SESSION[$key]) ? $_SESSION[$key] : CF::key_string($_SESSION, $key);
-
-        return ($result === NULL) ? $default : $result;
+        return carr::get($_SESSION, $key, $default);
     }
 
     /**
@@ -387,9 +390,9 @@ class CSession {
      * @param   mixed   default value returned if variable does not exist
      * @return  mixed
      */
-    public function get_once($key, $default = FALSE) {
-        $return = CSession::get($key, $default);
-        CSession::delete($key);
+    public function getOnce($key, $default = FALSE) {
+        $return = $this->get($key, $default);
+        $this->delete($key);
 
         return $return;
     }
@@ -404,12 +407,16 @@ class CSession {
         $args = func_get_args();
 
         foreach ($args as $key) {
-            if (isset(CSession::$protect[$key]))
-                continue;
-
-            // Unset the key
-            unset($_SESSION[$key]);
+            $this->forget($key);
         }
+    }
+
+    public function forget($key) {
+        if (isset(CSession::$protect[$key])) {
+            return false;
+        }
+        // Unset the key
+        unset($_SESSION[$key]);
     }
 
 }

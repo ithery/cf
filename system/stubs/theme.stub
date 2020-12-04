@@ -1,0 +1,33 @@
+<?php
+
+defined('SYSPATH') OR die('No direct script access.');
+
+return [
+    "client_modules" => [
+        "layout-helpers",
+        "sidenav",
+        "pace",
+        "jquery",
+        "bootstrap",
+        "fontawesome-5-f",
+        "themify-icons",
+        "linearicons",
+        "validate",
+        "block-ui",
+        "form",
+        "bootbox",
+        "tippy",
+    ],
+    "js" => [
+        "{app.js}",
+    ],
+    "css" => [
+        "{app.css}",
+    ],
+    "data" => [
+        "table" => [
+            "dom" => "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+        ]
+    ],
+];
+

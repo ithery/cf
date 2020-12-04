@@ -16,11 +16,6 @@ class Controller_Cresenity extends CController {
         CJob::cliRunner();
     }
 
-    public function queue() {
-        $temp = new CApp_TaskQueue_HouseKeeping_Temporary();
-        $temp->dispatch();
-    }
-
     public function dispatch() {
         CQueue::run();
     }
@@ -29,13 +24,21 @@ class Controller_Cresenity extends CController {
         CDaemon::cliRunner();
     }
 
-    public function service() {
-        CService::cliRunner();
+    public function component() {
+        return CApp::component()->controllerHandler(func_get_args());
+    }
+
+    public function qc($className = null) {
+        if ($className == null) {
+            CF::show404();
+            return;
+        }
+        CQC::cliRunner($className);
     }
 
     public function ajax() {
         $args = func_get_args();
-        $method = carr::get($args,0);
+        $method = carr::get($args, 0);
         $app = CApp::instance();
         $filename = $method . '.tmp';
         $file = CTemporary::getPath("ajax", $filename);
@@ -52,7 +55,7 @@ class Controller_Cresenity extends CController {
         $ajaxMethod = CAjax::createMethod($json)->setArgs($args);
         $response = $ajaxMethod->executeEngine();
 
-        echo $response;
+        return $response;
     }
 
     public function api($method, $submethod = null) {
@@ -64,279 +67,14 @@ class Controller_Cresenity extends CController {
         echo json_encode($data);
     }
 
-    public function user_agent() {
-        echo CF::user_agent();
-    }
-
-    public function browser_name() {
-        echo crequest::browser();
-    }
-
-    public function fill_log_login_browser() {
-        $q = "select * from log_login where browser is null limit 100";
-        $r = $db->query($q);
-        foreach ($r as $row) {
-            $browser = crequest::browser($row->user_agent);
-            $db->update("log_login", array("browser" => $browser), array("log_login_id" => $row->log_login_id));
-        }
-    }
-
-    public function convertinnodb() {
-        cdbutils::convert_table_engine();
-    }
-
-    public function convertutf8() {
-        cdbutils::convert_table_charset();
-    }
-
-    public function cleanup_finance() {
-        $db = CDatabase::instance();
-        cdbutils::empty_table("cash_in_detail");
-        cdbutils::empty_table("cash_in");
-        cdbutils::empty_table("cash_out_detail");
-        cdbutils::empty_table("cash_out");
-        cdbutils::empty_table("pre_journal_detail");
-        cdbutils::empty_table("pre_journal");
-
-        $db->query("update coa set debit_balance=0,credit_balance=0");
-    }
-
-    public function cleanup() {
-        $db = CDatabase::instance();
-        cdbutils::empty_table("item_warehouse");
-        cdbutils::empty_table("item_history");
-        cdbutils::empty_table("sales_payment_detail");
-        cdbutils::empty_table("sales_payment");
-        cdbutils::empty_table("sales_return_detail");
-        cdbutils::empty_table("sales_return");
-        cdbutils::empty_table("sales_discount");
-        cdbutils::empty_table("sales_detail");
-        cdbutils::empty_table("sales");
-        cdbutils::empty_table("purchase_payment_detail");
-        cdbutils::empty_table("purchase_return_detail");
-        cdbutils::empty_table("purchase_return");
-        cdbutils::empty_table("purchase_detail");
-        cdbutils::empty_table("purchase_discount");
-        cdbutils::empty_table("purchase");
-        cdbutils::empty_table("item_transfer_detail");
-        cdbutils::empty_table("item_transfer");
-        cdbutils::empty_table("stock_opname_detail");
-        cdbutils::empty_table("stock_opname");
-        cdbutils::empty_table("receivable_payment");
-        cdbutils::empty_table("receivable");
-        cdbutils::empty_table("payable_payment");
-        cdbutils::empty_table("payable");
-        $db->query("update item set stock=0,hpp=0,stock_pcs=0");
-    }
-
     public function change_lang($lang) {
         clang::setlang($lang);
         curl::redirect(request::referrer());
     }
 
     public function change_theme($theme) {
-        ctheme::set_theme($theme);
+        CManager::theme()->setTheme($theme);
         curl::redirect(request::referrer());
-    }
-
-    public function server_time() {
-        $app = CApp::instance();
-        $org = $app->org();
-        $timezone = ccfg::get("default_timezone");
-
-        $localstamp = $_GET["localstamp"];
-        date_default_timezone_set($timezone);
-        $serverTimeStampEST = mktime(date("H"), date("i"), date("s"), date("m"), date("d"), date("Y"));
-        $timedifference = $serverTimeStampEST - $localstamp;
-
-
-        $offset = ctimezone::get_timezone_offset('GMT', $timezone);
-        header("Content-Type: text/plain");
-        print $timedifference . "|" . $offset . "|";
-    }
-
-    public function resend_activation() {
-        $username = "";
-        if (isset($_GET["id"])) {
-            $username = $_GET["id"];
-        }
-        $db = CDatabase::instance();
-        $q = "select * from users where username=" . $db->escape($username);
-        $r = $db->query($q);
-
-        if ($r->count() > 0) {
-            $org_id = $r[0]->org_id;
-            cmail::register($org_id);
-        } else {
-            curl::redirect('');
-        }
-        $app = CApp::instance();
-        $app->resend();
-
-        echo $app->render();
-    }
-
-    public function activation($activation_code) {
-        $db = CDatabase::instance();
-        $q = "select * from org where activation_code=" . $db->escape($activation_code);
-        $r = $db->query($q);
-
-        if ($r->count() > 0) {
-            $org_id = $r[0]->org_id;
-            $db->update("org", array("activation_date" => date("Y-m-d H:i:s"), "is_activated" => "1"), array("org_id" => $org_id));
-        } else {
-            curl::redirect('');
-        }
-        $app = CApp::instance();
-        $app->activation();
-
-        echo $app->render();
-    }
-
-    public function signup() {
-        $db = CDatabase::instance();
-        $post = $this->input->post();
-
-        if ($post != null) {
-            $session = CSession::instance();
-            $email = isset($post["email"]) ? $post["email"] : "";
-            $agree = isset($post["agree"]) ? $post["agree"] : "";
-            $org_name = isset($post["org_name"]) ? $post["org_name"] : "";
-            $password = isset($post["password"]) ? $post["password"] : "";
-            $password2 = isset($post["confirm_password"]) ? $post["confirm_password"] : "";
-            $captcha = isset($post["captcha"]) ? $post["captcha"] : "";
-            $error = 0;
-            $error_message = "";
-
-            if ($error == 0) {
-                if (strlen($org_name) == 0) {
-                    $error++;
-                    $error_message = "Company required";
-                }
-            }
-
-            if ($error == 0) {
-                if (strlen($email) == 0) {
-                    $error++;
-                    $error_message = "Email required";
-                }
-            }
-            if ($error == 0) {
-                if (strlen($password) == 0) {
-                    $error++;
-                    $error_message = "Password required";
-                }
-            }
-            if ($error == 0) {
-                if ($password != $password2) {
-                    $error++;
-                    $error_message = "Password doesn't match";
-                }
-            }
-            if ($error == 0) {
-                //check company exists
-                $q = "select * from org where name='" . $org_name . "' and status>0";
-                $r = $db->query($q);
-                if ($r->count() > 0) {
-                    $error++;
-                    $error_message = "Company exists, please choose another name";
-                }
-            }
-            if ($error == 0) {
-                //check email exists
-                $q = "select * from org where email='" . $email . "' and status>0";
-                $r = $db->query($q);
-                if ($r->count() > 0) {
-                    $error++;
-                    $error_message = "Email exists, you already registered";
-                }
-            }
-            /*
-              if($error==0) {
-              if(!($agree)) {
-              $error++;
-              $error_message = "Please check agree for term of use";
-              }
-              }
-             */
-            if ($error == 0) {
-                try {
-                    $data = array(
-                        "name" => $org_name,
-                        "abbr" => $org_name,
-                        "email" => $email,
-                        "timezone" => ccfg::get('default_timezone'),
-                        "password" => md5($password),
-                        "created" => date("Y-m-d H:i:s"),
-                    );
-                    $r = $db->insert("org", $data);
-                    $org_id = $r->insert_id();
-
-                    $md5_hash = md5(rand(0, 999));
-                    //We don't need a 32 character long string so we trim it down to 10
-                    $activation_code = substr($md5_hash, 10, 10);
-                    //$activation_code .= date('Y').date('h').date('m').date('i').date('d').date('s').$org_id;
-                    $activation_code .= $org_id;
-
-                    //update org
-                    $db->update("org", array("activation_code" => $activation_code), array("org_id" => $org_id));
-
-
-
-                    $data = array(
-                        "code" => "HQ",
-                        "name" => "HQ",
-                        "is_base" => "1",
-                        "org_id" => $org_id,
-                        "created" => date("Y-m-d H:i:s"),
-                        "is_base" => "1",
-                    );
-
-                    $data = array(
-                        "name" => "SUPERADMIN",
-                        "org_id" => $org_id,
-                        "created" => date("Y-m-d H:i:s"),
-                        "is_base" => "1",
-                    );
-                    $r = $db->insert("roles", $data);
-                    $role_id = $r->insert_id();
-
-                    $data = array(
-                        "org_id" => $org_id,
-                        "role_id" => $role_id,
-                        "username" => $email,
-                        "password" => md5($password),
-                        "created" => date("Y-m-d H:i:s"),
-                        "is_base" => "1",
-                    );
-                    $r = $db->insert("users", $data);
-                    $user_id = $r->insert_id();
-
-                    $q = "insert into menu_role(menu_id,role_id) select menu_id," . $db->escape($role_id) . " from menu where status>0";
-                    $r = $db->query($q);
-
-
-                    cmail::register($org_id);
-                } catch (Exception $ex) {
-                    $error++;
-                    //$error_message="Error, please call administrator";
-                    $error_message = "Error, please call administrator" . $ex->getMessage();
-                }
-            }
-            $json = array();
-            if ($error == 0) {
-                $json["result"] = "OK";
-                $json["message"] = "Registration success";
-            } else {
-                $json["result"] = "ERROR";
-                $json["message"] = $error_message;
-            }
-            echo json_encode($json);
-            return true;
-        }
-        $app = CApp::instance();
-        $app->signup();
-        echo $app->render();
     }
 
     public function login() {
@@ -366,43 +104,11 @@ class Controller_Cresenity extends CController {
             }
 
 
-            /*
-              if($error==0) {
-              if(strlen($captcha)==0) {
-              $error++;
-              $error_message = "Captcha required";
-              }
-              }
 
-              if($error==0) {
-              $cap_session = $session->get("captcha");
-              if($cap_session!=md5($captcha)."a4xn") {
-              $error++;
-              $error_message = "Verification code invalid".($cap_session);
-
-              }
-              }
-             */
             if ($error == 0) {
                 try {
                     $success_login = false;
-                    //try for superadmin first
-                    /*
-                      if(!$success_login) {
-                      $cdb = CJDB::instance();
-                      $row = $cdb->get('org',array('email'=>$email,'password'=>md5($password)));
-                      if ($row->count()>0){
-                      $data = array(
-                      'username'=>$row[0]->email,
-                      'password'=>$row[0]->password,
-                      'org_id'=>$row[0]->org_id,
-                      );
-                      $data = json_decode(json_encode($data));
-                      $session->set('user',$data);
-                      $success_login = true;
-                      }
-                      }
-                     */
+
                     if (!$success_login) {
                         $additionalWhere = "";
                         if (CApp_Base::isDevelopment() || CApp_Base::isStaging()) {
@@ -856,6 +562,15 @@ class Controller_Cresenity extends CController {
     }
 
     public function avatar($method = 'initials') {
+
+        if (!function_exists('gd_info')) {
+            throw new Exception("GD Library extension must be installed/enabled to use avatar endpoint.");
+        }
+        if (!function_exists('finfo_buffer')) {
+            throw new Exception("PHP fileinfo extension must be installed/enabled to use avatar endpoint.");
+        }
+
+
         ob_start('ob_gzhandler');
 
         $engineName = 'Initials';
@@ -1131,8 +846,8 @@ class Controller_Cresenity extends CController {
     public function qrcode() {
         $request = $_GET;
         $data = carr::get($request, 'd');
-        $options = []; 
-        $options['s'] = carr::get($request,'s','qr');
+        $options = [];
+        $options['s'] = carr::get($request, 's', 'qr');
         $qrcode = new CImage_QRCode($data, $options);
         $qrcode->outputImage();
     }

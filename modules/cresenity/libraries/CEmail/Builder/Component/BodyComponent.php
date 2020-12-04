@@ -61,8 +61,8 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
         $widthParserResult = Helper::widthParser($containerWidth, ['parseFloatToInt' => false]);
         $unit = carr::get($widthParserResult, 'unit');
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
-        $paddings = $this->getShorthandAttrValue('padding', 'right') + $this->getShorthandAttrValue('padding', 'left');
-        $borders = $this->getShorthandBorderValue('right') + $this->getShorthandBorderValue('left');
+        $paddings = intval($this->getShorthandAttrValue('padding', 'right')) + intval($this->getShorthandAttrValue('padding', 'left'));
+        $borders = intval($this->getShorthandBorderValue('right')) + intval($this->getShorthandBorderValue('left'));
 
 
         return [
