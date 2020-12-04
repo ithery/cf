@@ -110,51 +110,7 @@
                     </div>
                     <div class="row p-lg-4">
                         <article class="main-content col-md-9 pr-lg-5">
-                            <!-- title -Add bootstrap helpers for spacing -->
-                            <h1 class="mb-2 mt-3">Introduction</h1>
-                            <!--//title -->
-                            <p class="lead mb-3"> How to get started with Docu! </p>
-                            <p>Thank you for downloading our themes! We really appreciate it and ready to help you!</p>
-                            <p> This guide will help you get started with the template! All the important stuff – compiling the source, file structure, build tools, file includes – is documented here, but should you have any questions, always feel free to reach out to <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ec85828a83ac9f848d9e898e8383989f989e8d9cc28f8381">[email&#160;protected]</a> </p>
-                            <!-- Sep -->
-                            <hr class="my-5">
-                            <!-- alert -->
-                            <div class="alert alert-primary d-flex justify-content-start align-items-center" role="alert"> <span class="fa fa-info mr-4"></span>
-                                <p class="m-0"> This documentation is always evolving. If you've not been here for a while, perhaps check out the This documentation is always evolving.This is a primary alert with <a href="#" class="alert-link">an example link</a>. Give it a click if you like. </p>
-                            </div>
-                            <!-- heading -->
-                            <h3 class="font-weight-bold mb-2">
-                                Dev setup
-                            </h3>
-                            <p> To get started, you need to do the following: </p>
-                            <ol>
-                                <li><strong>Make sure you have Node installed</strong> since Landkit uses npm to manage dependencies. If you don't, installing is quite easy, just visit the <a href="https://nodejs.org/en/download/">Node Downloads page</a> and install it. </li>
-                                <li><strong>Unzip your theme and open your command line</strong>, making sure your command line prompt is at the root of the unzipped theme directory. </li>
-                                <li><strong class="badge badge-danger-soft"><code>npm install gulp-cli -g</code></strong>: If you don't have the Gulp command line interface, you need to install it.</li>
-                                <li><strong class="badge badge-danger-soft"><code>npm install</code></strong>: Open your command line to the root directory of your unzipped theme and run to install all of Landkit's dependencies.</li>
-                            </ol>
-                            <!-- Sep -->
-                            <hr class="my-5">
-                            <h3 class="font-weight-bold mb-2">
-                                Code example
-                            </h3>
-                            <p>The Prism source, highlighted with Prism (don’t you just love how meta this is?):</p>
-                            <p>The <a href="https://www.w3.org/TR/html5/grouping-content.html#the-pre-element">recommended way to mark up a code block</a> (both for semantics and for Prism) is a <code class=" language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>pre</span><span class="token punctuation">&gt;</span></span></code> element with a <code class=" language-markup"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>code</span><span class="token punctuation">&gt;</span></span></code> element inside, like so:</p>
-                            <figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="c">&lt;!-- As a link --&gt;</span>
-<span class="nt">&lt;nav</span> <span class="na">class=</span><span class="s">"navbar navbar-light bg-light"</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;a</span> <span class="na">class=</span><span class="s">"navbar-brand"</span> <span class="na">href=</span><span class="s">"#"</span><span class="nt">&gt;</span>Navbar<span class="nt">&lt;/a&gt;</span>
-<span class="nt">&lt;/nav&gt;</span>
-
-<span class="c">&lt;!-- As a heading --&gt;</span>
-<span class="nt">&lt;nav</span> <span class="na">class=</span><span class="s">"navbar navbar-light bg-light"</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"navbar-brand mb-0 h1"</span><span class="nt">&gt;</span>Navbar<span class="nt">&lt;/span&gt;</span>
-<span class="nt">&lt;/nav&gt;</span></code></pre></figure>
-                            <hr class="my-5">
-                            <figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;nav</span> <span class="na">class=</span><span class="s">"navbar navbar-expand-lg navbar-light bg-light"</span><span class="nt">&gt;</span>
-  <span class="nt">&lt;div</span> <span class="na">class=</span><span class="s">"container"</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;a</span> <span class="na">class=</span><span class="s">"navbar-brand"</span> <span class="na">href=</span><span class="s">"#"</span><span class="nt">&gt;</span>Navbar<span class="nt">&lt;/a&gt;</span>
-  <span class="nt">&lt;/div&gt;</span>
-<span class="nt">&lt;/nav&gt;</span></code></pre></figure>
+                            @CApp('content')
                         </article>
                         <aside class="col-md-3 d-none d-md-block border-left">
                             <div class="widget widget-support-forum p-md-3 p-sm-2"> <span class="icon icon-forum"></span>

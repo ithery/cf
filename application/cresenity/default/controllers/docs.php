@@ -7,6 +7,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Dec 5, 2020 
  * @license Ittron Global Teknologi
  */
+use League\CommonMark\CommonMarkConverter;
+use League\CommonMark\Environment\Environment;
+use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
+
 
 Class Controller_Docs extends CController {
 
@@ -17,14 +21,40 @@ Class Controller_Docs extends CController {
         $app->setTheme('cresenity-docs');
         $app->setView('docs');
     }
-    
+
     public function index() {
         return $this->page();
     }
 
-    public function page($slug = null) {
+    public function page($category = null, $page = null) {
         $app = CApp::instance();
-        
+
+        if ($page == null) {
+            $page = 'installation';
+        }
+        if ($category == null) {
+            $category = 'starter';
+            $page = 'installation';
+        }
+
+        $fileData = c::fixPath(CF::appDir()) . 'default' . DS . 'data' . DS . 'docs' . DS . $category . DS . $page . '.md';
+        if (!CFile::exists($fileData)) {
+            c::abort(404);
+        }
+        $content = CFile::get($fileData);
+
+        $converter = new CommonMarkConverter([
+            'html_input' => 'strip',
+            'allow_unsafe_links' => false,
+        ]);
+
+        $environment = Environment::createCommonMarkEnvironment();
+$environment->addExtension(new GithubFlavoredMarkdownExtension());
+
+$converter = new CommonMarkConverter([], $environment);
+$html= $converter->convertToHtml($content);
+
+        $app->add($html);
         $app->setView('docs');
         return $app;
     }
