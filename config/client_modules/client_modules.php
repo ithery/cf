@@ -498,11 +498,21 @@ return array(
     "jquery.event.drag" => array(
         "js" => array("plugins/jquery.event.drag/jquery.event.drag-2.2.js"),
     ),
-    "prism-php" => array(
+    "prism" => array(
         "js" => array(
             "plugins/prism/prism.js",
+            "plugins/prism/components/prism-markup-templating.js",
+        ),
+        "css" => [
+            "plugins/prism/prism.css"
+        ],
+    ),
+    "prism-php" => array(
+        "js" => array(
             "plugins/prism/components/prism-php.js",
         ),
+        "css" => [
+        ],
     ),
     "block-ui" => array(
         "css" => array('spinkit.css'),
