@@ -70,7 +70,7 @@ abstract class CRouting_RouteCollectionAbstract implements Countable, IteratorAg
         list($fallbacks, $routes) = c::collect($routes)->partition(function ($route) {
             return $route->isFallback;
         });
-
+        
         return $routes->merge($fallbacks)->first(function (CRouting_Route $route) use ($request, $includingMethod) {
                     return $route->matches($request, $includingMethod);
                 });

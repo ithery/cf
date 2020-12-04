@@ -39,7 +39,7 @@ class CRouting_RouteAction {
             $action['uses'] = static::findCallable($action);
         }
 
-        if (is_string($action['uses']) && !Str::contains($action['uses'], '@')) {
+        if (is_string($action['uses']) && !cstr::contains($action['uses'], '@')) {
             $action['uses'] = static::makeInvokable($action['uses']);
         }
 

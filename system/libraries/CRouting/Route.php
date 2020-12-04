@@ -153,11 +153,11 @@ class CRouting_Route {
         $this->uri = $uri;
         $this->methods = (array) $methods;
         $this->action = carr::except($this->parseAction($action), ['prefix']);
-
+        
         if (in_array('GET', $this->methods) && !in_array('HEAD', $this->methods)) {
             $this->methods[] = 'HEAD';
         }
-
+        
         $this->prefix(is_array($action) ? carr::get($action, 'prefix') : '');
     }
 
@@ -182,7 +182,9 @@ class CRouting_Route {
 
         try {
             if ($this->isControllerAction()) {
-
+                
+       
+       
                 return $this->runController();
             }
 
@@ -282,7 +284,7 @@ class CRouting_Route {
      */
     public function matches(CHTTP_Request $request, $includingMethod = true) {
         $this->compileRoute();
-
+        //cdbg::dd($this->compiled);
         foreach (self::getValidators() as $validator) {
             if (!$includingMethod && $validator instanceof CRouting_Matching_MethodValidator) {
                 continue;
@@ -491,7 +493,7 @@ class CRouting_Route {
      * @return array
      */
     public function bindingFields() {
-        return $this->bindingFields ?? [];
+        return $this->bindingFields ? $this->bindingFields: [];
     }
 
     /**

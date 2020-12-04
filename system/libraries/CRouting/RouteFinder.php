@@ -21,13 +21,18 @@ class CRouting_RouteFinder {
         $method = carr::get($routeData, 'method');
         $route=null;
         if (class_exists($className)) {
+            $routedUri = $controller;
             
-            $route = new CRouting_Route(CRouting_Router::$verbs, $uri, $className . '@' . $method);
+            $routedUri.="/".$method;
 
             $arguments = carr::get($routeData, 'arguments');
+            //cdbg::dd($routeData);
             foreach ($arguments as $key => $argument) {
-                $route->setParameter($key, $argument);
+                $routedUri.="/{any$key}";
             }
+
+            $route = new CRouting_Route(CRouting_Router::$verbs, $routedUri, $className . '@' . $method);
+
         }
         return $route;
     }
