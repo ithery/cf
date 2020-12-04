@@ -168,7 +168,17 @@
     transition: transform .3s ease;
     transition: transform .3s ease, -webkit-transform .3s ease; }
   .sidebar-wrapper .sidebar-menu .sidebar-dropdown .sidebar-submenu {
-    display: none; }
+    height:auto!important;
+    max-height: 0;
+    -webkit-transition: all 0.5s ease-in-out;
+    -moz-transition: all 0.5s ease-in-out;
+    -ms-transition: all 0.5s ease-in-out;
+    -o-transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out;
+    
+    overflow:hidden}
+  .sidebar-wrapper .sidebar-menu .sidebar-dropdown.active > .sidebar-submenu {
+    max-height: 1000px; }
     .sidebar-wrapper .sidebar-menu .sidebar-dropdown .sidebar-submenu ul {
       padding: 5px 0; }
     .sidebar-wrapper .sidebar-menu .sidebar-dropdown .sidebar-submenu li {
@@ -177,6 +187,9 @@
       .sidebar-wrapper .sidebar-menu .sidebar-dropdown .sidebar-submenu li a {
         overflow: hidden;
         text-overflow: ellipsis; }
+        .sidebar-wrapper .sidebar-menu .sidebar-dropdown .sidebar-submenu li a.active {
+            color:rgba(190, 17, 27,1)
+        }
         .sidebar-wrapper .sidebar-menu .sidebar-dropdown .sidebar-submenu li a:before {
           content: "\f111";
           font-family: "Font Awesome 5 Free";

@@ -33,9 +33,11 @@ CApp::component()->registerComponent('test-upload', \Cresenity\Testing\UploadTes
   CRouting::router()->get('posts/{post}/comments/{comment}', function ($postId, $commentId) {
   return $postId.'|'.$commentId;
   });
- * 
- */
 
 CRouting::router()->post('posts', function () {
     return 'this is post from router';
 });
+ * 
+ */
+
+//CRouting::router()->any('/docs/starter/{any}', 'Controller_Docs@starter');

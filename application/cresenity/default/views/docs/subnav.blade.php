@@ -10,7 +10,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 <div class="sidebar-submenu">
     <ul>
         @foreach($subnavs as $subnav)
-        <li> <a href="{{carr::get($subnav,'uri')}}">{{carr::get($subnav,'label')}}</a></li>
+        <li> <a class="active" href="{{c::url(carr::get($subnav,'uri'))}}">{{carr::get($subnav,'label')}}</a></li>
 
         @endforeach
     </ul>

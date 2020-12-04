@@ -61,4 +61,8 @@ Class Controller_Docs extends CController {
         return $app;
     }
 
+    
+    public function __call($method,$args) {
+        return $this->page($method,carr::first($args));
+    }
 }
