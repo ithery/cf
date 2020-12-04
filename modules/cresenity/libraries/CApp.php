@@ -508,7 +508,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     public function toResponse($request) {
         if (c::request()->ajax()) {
-            return c::response()->jsonResponse($this);
+            return c::response()->json($this);
         }
         return CHTTP::createResponse($this->render());
     }
