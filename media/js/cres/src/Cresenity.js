@@ -572,7 +572,7 @@ export default class Cresenity {
         }
 
         if (alertType == 'notify') {
-            obj = $('<div>');
+            var obj = $('<div>');
             container.prepend(obj);
             obj.addClass('notifications');
             obj.addClass('top-right');
