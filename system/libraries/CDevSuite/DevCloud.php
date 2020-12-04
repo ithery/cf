@@ -13,6 +13,7 @@ abstract class CDevSuite_DevCloud {
     ];
     protected $requiredFolders = [
     ];
+    protected $requiredMariaDBFiles = [];
 
     /**
      *
@@ -30,18 +31,24 @@ abstract class CDevSuite_DevCloud {
     public function install() {
         foreach ($this->requiredFiles as $file) {
             $this->downloadIfNotExists($file);
-            
-            if(CServer::getOS()!=CServer::OS_WINNT) {
-                if($file=='ngrok') {
-                    $command = sprintf('chmod +x %s',$this->binPath($file));
+
+            if (CServer::getOS() != CServer::OS_WINNT) {
+                if ($file == 'ngrok') {
+                    $command = sprintf('chmod +x %s', $this->binPath($file));
                     CDevSuite::commandLine()->run($command);
                 }
             }
         }
         foreach ($this->requiredFolders as $folder) {
-            if(!$this->files->isDir($this->binPath($folder))) {
+            if (!$this->files->isDir($this->binPath($folder))) {
                 $this->files->mkdir($this->binPath($folder));
             }
+        }
+    }
+
+    public function installMariaDB() {
+        foreach ($this->requiredMariaDBFiles as $file) {
+            $this->downloadIfNotExists($file);
         }
     }
 
@@ -49,6 +56,11 @@ abstract class CDevSuite_DevCloud {
         foreach ($this->requiredFiles as $file) {
             $this->binDelete($file);
         }
+    }
+
+    public function uninstallMariaDB() {
+        $mariaDBPath = c::fixPath($this->baseBinPath) . 'mariadb';
+        $this->files->deleteDirectory($mariaDBPath);
     }
 
     /**

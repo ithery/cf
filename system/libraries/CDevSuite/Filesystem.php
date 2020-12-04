@@ -41,6 +41,7 @@ class CDevSuite_Filesystem {
         $command = sprintf('sudo mkdir "%s"', $path);
         CDevSuite::commandLine()->run($command);
     }
+
     /**
      * Ensure that the given directory exists.
      *
@@ -57,18 +58,15 @@ class CDevSuite_Filesystem {
         return false;
     }
 
-    
-    
-    public function rename($oldname,$newname) {
+    public function rename($oldname, $newname) {
         rename($oldname, $newname);
     }
-    
-    public function renameAsRoot($oldname,$newname) {
-        $command = sprintf("sudo mv %s %s",$oldname,$newname);
+
+    public function renameAsRoot($oldname, $newname) {
+        $command = sprintf("sudo mv %s %s", $oldname, $newname);
         CDevSuite::commandLine()->run($command);
-        
     }
-    
+
     /**
      * Ensure that the given directory exists.
      *
@@ -171,11 +169,11 @@ class CDevSuite_Filesystem {
     }
 
     public function putAsRoot($path, $contents) {
-        $localFile = CTemporary::createLocalFile($contents,'devsuite');
+        $localFile = CTemporary::createLocalFile($contents, 'devsuite');
         $localFilename = $localFile->getFileName();
-        
+
         $this->copyAsRoot($localFilename, $path);
-        
+
         $localFile->delete();
     }
 
@@ -217,8 +215,8 @@ class CDevSuite_Filesystem {
     public function copy($from, $to) {
         copy($from, $to);
     }
-    
-     /**
+
+    /**
      * Copy the given file to a new location.
      *
      * @param string $from
@@ -227,7 +225,7 @@ class CDevSuite_Filesystem {
      * @return void
      */
     public function copyAsRoot($from, $to) {
-        $command = sprintf('sudo cp %s %s',$from,$to);
+        $command = sprintf('sudo cp %s %s', $from, $to);
         CDevSuite::commandLine()->run($command);
     }
 
@@ -259,7 +257,6 @@ class CDevSuite_Filesystem {
         symlink($target, $link);
     }
 
-    
     /**
      * Create a symlink to the given target.
      *
@@ -271,8 +268,8 @@ class CDevSuite_Filesystem {
         if ($this->exists($link)) {
             $this->unlinkAsRoot($link);
         }
-        
-        $command = sprintf("sudo ln -snf %s %s",$target,$link);
+
+        $command = sprintf("sudo ln -snf %s %s", $target, $link);
         CDevSuite::commandLine()->run($command);
     }
 
@@ -304,8 +301,8 @@ class CDevSuite_Filesystem {
             @unlink($path);
         }
     }
-    
-     /**
+
+    /**
      * Delete the file at the given path.
      *
      * @param string $path
@@ -313,7 +310,7 @@ class CDevSuite_Filesystem {
      */
     public function unlinkAsRoot($path) {
         if (file_exists($path) || is_link($path)) {
-            $command = sprintf("sudo rm %s -f",$path);
+            $command = sprintf("sudo rm %s -f", $path);
             CDevSuite::commandLine()->run($command);
         }
     }
@@ -407,6 +404,10 @@ class CDevSuite_Filesystem {
                         ->reject(function ($file) {
                             return in_array($file, ['.', '..']);
                         })->values()->all();
+    }
+
+    public function deleteDirectory($directory) {
+        return CFile::deleteDirectory($directory);
     }
 
 }

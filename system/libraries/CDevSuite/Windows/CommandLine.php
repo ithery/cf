@@ -18,6 +18,7 @@ class CDevSuite_Windows_CommandLine extends CDevSuite_CommandLine {
      * @return string
      */
     public function runOrDie($command, callable $onError = null) {
+
         return $this->run($command, function ($code, $output) use ($onError) {
                     if ($onError) {
                         $onError($code, $output);
@@ -27,4 +28,5 @@ class CDevSuite_Windows_CommandLine extends CDevSuite_CommandLine {
                 });
     }
 
+   
 }

@@ -66,6 +66,10 @@ class CServer {
         return $os;
     }
 
+    public static function isWindows() {
+        return strtoupper(substr(PHP_OS, 0, 3)) == 'WIN';
+    }
+
     public static function getLoadAvg() {
         return sys_getloadavg();
     }

@@ -8,6 +8,7 @@
 class CDevSuite_Db {
 
     public $files;
+    protected $mariaDb;
 
     /**
      * Create a new Nginx instance.
@@ -80,7 +81,7 @@ class CDevSuite_Db {
                         'type' => carr::get($item, 'type'),
                         'database' => carr::get($item, 'database'),
                         'host' => carr::get($item, 'host') . ':' . carr::get($item, 'port'),
-                        'auth' => carr::get($item, 'user') . ':' . carr::get($item, 'password'),
+                            //'auth' => carr::get($item, 'user') . ':' . carr::get($item, 'password'),
                     ];
                 });
     }
@@ -253,9 +254,52 @@ class CDevSuite_Db {
 
     public function existsOrExit($key) {
         if (!$this->exists($key)) {
-            CDevSuite::error('Databaes configuration: ' . $key . ' not exists');
+            CDevSuite::error('Database configuration: ' . $key . ' not exists');
             exit(CConsole::FAILURE_EXIT);
         }
+    }
+
+    public function mariaDb() {
+        if ($this->mariaDb == null) {
+            switch (CServer::getOS()) {
+                case CServer::OS_LINUX:
+                    $this->mariaDb = new CDevSuite_Linux_Db_MariaDb();
+                    break;
+                case CServer::OS_WINNT:
+                    $this->mariaDb = new CDevSuite_Windows_Db_MariaDb();
+                    break;
+                case CServer::OS_DARWIN:
+                    $this->mariaDb = new CDevSuite_Mac_Db_MariaDb();
+                    break;
+            }
+        }
+        return $this->mariaDb;
+    }
+
+    public function start() {
+        $this->mariaDb()->install();
+    }
+
+    public function delete($key) {
+        $data = $this->read();
+        if (isset($data[$key])) {
+            unset($data[$key]);
+            $this->write($data);
+            return true;
+        }
+        return false;
+    }
+
+    public function cloneDatabase($from, $to) {
+        $fromConfig = $this->toDbConfig($from);
+        $toConfig = $this->toDbConfig($to);
+        
+        CDevSuite::info("Prepare to dumping database:" . $from);
+        $dumpFile = $this->mariaDb()->dump($fromConfig);
+        $this->mariaDb()->restore($toConfig,$dumpFile);
+        
+        //$this->files->unlink($dumpFile);
+        
     }
 
 }
