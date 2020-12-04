@@ -17,6 +17,25 @@ trait CApp_Trait_App_Renderer {
         return carr::get($viewData, 'content');
     }
 
+    public function renderNavigation($expression = null) {
+        if ($expression != null) {
+            
+            $expression = str_replace(['(', ')'], '', $expression);
+            $expression = str_replace(['"', '\''], '', $expression);
+            $expression = str_replace(',', ' ', $expression);
+        }
+        
+        $nav = $expression;
+        if ($nav == null) {
+            $nav = $this->nav;
+        }
+
+        $nav = $this->resolveNav($nav);
+        
+        $renderer = $this->resolveNavRenderer();
+        return $renderer->render($nav);
+    }
+
     public function renderStyles($options = []) {
         $viewData = $this->getViewData();
         return carr::get($viewData, 'head_client_script');
@@ -77,7 +96,7 @@ HTML;
             $viewData = array();
             $this->content = $this->element->html();
             $this->js = $this->element->js();
-            
+
             $viewData['content'] = $this->content;
             $viewData['header_body'] = $this->header_body;
             $viewData['headerBody'] = $this->header_body;
@@ -104,17 +123,17 @@ HTML;
 
             $js .= PHP_EOL . $this->js . $additional_js;
             $jsScriptFile = '';
-            
+
             if ($this->isUseRequireJs()) {
-                
+
                 $js = $asset->renderJsRequire($js);
             } else {
-               
-                $jsScriptFile = PHP_EOL.'<script>' . $asset->varJs() . '</script>';
-                $jsScriptFile .= PHP_EOL.'<script>if(typeof define === "function") define=undefined;</script>';
+
+                $jsScriptFile = PHP_EOL . '<script>' . $asset->varJs() . '</script>';
+                $jsScriptFile .= PHP_EOL . '<script>if(typeof define === "function") define=undefined;</script>';
                 //$jsScriptFile .= '<script src="/media/js/capp.js?v='.uniqid().'"></script>';
-                $jsScriptFile .= PHP_EOL.$asset->render(CManager_Asset::POS_END, CManager_Asset::TYPE_JS_FILE);
-                
+                $jsScriptFile .= PHP_EOL . $asset->render(CManager_Asset::POS_END, CManager_Asset::TYPE_JS_FILE);
+
                 $js = $asset->wrapJs($js, true);
             }
 

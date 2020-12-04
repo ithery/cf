@@ -11,7 +11,6 @@ use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
 
-
 Class Controller_Docs extends CController {
 
     public function __construct() {
@@ -20,6 +19,9 @@ Class Controller_Docs extends CController {
         $app->setLoginRequired(false);
         $app->setTheme('cresenity-docs');
         $app->setView('docs');
+        $app->setNavRenderer(function($navs) {
+            return c::view('docs.nav',['navs'=>$navs])->render();
+        });
     }
 
     public function index() {
@@ -49,10 +51,10 @@ Class Controller_Docs extends CController {
         ]);
 
         $environment = Environment::createCommonMarkEnvironment();
-$environment->addExtension(new GithubFlavoredMarkdownExtension());
+        $environment->addExtension(new GithubFlavoredMarkdownExtension());
 
-$converter = new CommonMarkConverter([], $environment);
-$html= $converter->convertToHtml($content);
+        $converter = new CommonMarkConverter([], $environment);
+        $html = $converter->convertToHtml($content);
 
         $app->add($html);
         $app->setView('docs');

@@ -123,6 +123,7 @@
     position: relative;
     padding: 8px 30px 8px 20px;
     width: 95%;
+    min-height: 51px;
     margin: auto;
     border-radius: 4px; }
     .sidebar-wrapper .sidebar-menu ul li a:hover > i::before {

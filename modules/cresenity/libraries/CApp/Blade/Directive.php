@@ -24,6 +24,11 @@ class CApp_Blade_Directive {
     public static function title($expression) {
         return '{!! CApp::instance()->renderTitle() !!}';
     }
+    
+    public static function nav($expression) {
+        
+        return '{!! CApp::instance()->renderNavigation('.$expression.') !!}';
+    }
 
     public static function content($expression) {
         return '{!! CApp::instance()->renderContent() !!}';

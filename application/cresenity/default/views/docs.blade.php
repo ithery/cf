@@ -36,30 +36,7 @@
                     </div>
                     <!-- sidebar-menu  -->
                     <div class=" sidebar-item sidebar-menu">
-                        <ul>
-                            <li class="header-menu"> <span>Extra</span> </li>
-                            <li class="sidebar-dropdown">
-                                <a href="#"> <i class="fa fa-shopping-cart"></i> <span class="menu-text">Getting Started</span> <span class="badge badge-pill badge-primary">4</span> </a>
-                                <div class="sidebar-submenu">
-                                    <ul>
-                                        <li> <a href="#">Setup home page layout
-
-                                            </a> </li>
-                                        <li> <a href="#">How do i add knowledgebase post</a> </li>
-                                        <li> <a href="#">How do i change header navigation style globally</a> </li>
-                                    </ul>
-                                </div>
-                            </li>
-                            <li>
-                                <a href="#"> <i class="fa fa-book"></i> <span class="menu-text">Basic Usage</span> </a>
-                            </li>
-                            <li>
-                                <a href="#"> <i class="fa fa-calendar"></i> <span class="menu-text">Customizing</span> </a>
-                            </li>
-                            <li>
-                                <a href="#"> <i class="fa fa-folder"></i> <span class="menu-text">Troubleshooting</span> </a>
-                            </li>
-                        </ul>
+                        @CAppNav('docs')
                     </div>
                     <!-- sidebar-menu  -->
                 </div>

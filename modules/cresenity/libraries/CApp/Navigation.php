@@ -107,7 +107,9 @@ class CApp_Navigation {
 
         $engineClassName = 'CApp_Navigation_Engine_' . $engine;
         $engineClass = new $engineClassName();
-        return $engineClass->render();
+        $app->setNavRenderer($engineClass);
+        return $app->renderNavigation();
+        
     }
 
     public function filterNavWithAccess($navs = null, $level = 0, &$child = 0, $domain = null) {
