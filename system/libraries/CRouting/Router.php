@@ -650,7 +650,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */{
                         ->through($middleware)
                         ->then(function ($request) use ($route) {
                             return $this->prepareResponse(
-                                            $request, $route->run()
+                                            $request, $route->runWithOutputBuffer()
                             );
                         });
     }

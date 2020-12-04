@@ -7,22 +7,28 @@
  */
 class CRouting_RouteFinder {
 
-    protected $request;
+    public static function find($uri = null) {
+        if ($uri == null) {
+            $uri = CHTTP::request()->path();
+            $uri = trim($uri, '/');
+        }
+        $routeData = static::getRouteData($uri);
+        $controllerDir = str_replace('/', '_', carr::get($routeData, 'controller_dir_ucfirst', ''));
+        $controller = carr::get($routeData, 'controller', '');
+        $className = 'Controller_' . $controllerDir . ucfirst($controller);
 
-    public function __construct(CHTTP_Request $request) {
-        $this->request = $request;
-    }
+        
+        $method = carr::get($routeData, 'method');
+        $route=null;
+        if (class_exists($className)) {
+            
+            $route = new CRouting_Route(CRouting_Router::$verbs, $uri, $className . '@' . $method);
 
-    public function find() {
-        $uri = $this->request->path();
-        $uri = trim($uri, '/');
-        $data = $this->getRouteData($uri);
-
-        $controller = Controller_Home::class;
-        $method = 'index';
-
-        $route = new CRouting_Route(CRouting_Router::$verbs, $uri, $controller . '@' . $method);
-
+            $arguments = carr::get($routeData, 'arguments');
+            foreach ($arguments as $key => $argument) {
+                $route->setParameter($key, $argument);
+            }
+        }
         return $route;
     }
 
@@ -186,4 +192,87 @@ class CRouting_RouteFinder {
         return $data;
     }
 
+    
+    /**
+     * Generates routed URI from given URI.
+     *
+     * @param  string  URI to convert
+     * @return string  Routed uri
+     */
+    public static function routedUri($uri, & $routes = null) {
+        if ($routes === NULL) {
+            // Load routes
+            $routes = self::getRoutes();
+        }
+
+
+
+        // Prepare variables
+        $routedUri = $uri = trim($uri, '/');
+
+        if (isset($routes[$uri])) {
+            // Literal match, no need for regex
+            $routedUri = $routes[$uri];
+        } else {
+            // Loop through the routes and see if anything matches
+            foreach ($routes as $key => $val) {
+                if ($key === '_default')
+                    continue;
+                if (is_callable($val)) {
+                    preg_match_all("/{([\w]*)}/", $key, $matches, PREG_SET_ORDER);
+                    $callbackArgs = array($uri);
+                    $bracketKeys = [];
+                    foreach ($matches as $matchedVal) {
+                        $str = $matchedVal[1]; //matches str without bracket {}
+                        $bStr = $matchedVal[0]; //matches str with bracket {}
+                        $bracketKeys[] = null;
+                        $key = str_replace($bStr, '(.+?)', $key);
+                    }
+
+
+                    $matchesBracket = false;
+                    $key = str_replace("/", "\/", $key);
+                    preg_match('#' . $key . '#ims', $uri, $matches);
+
+                    if (preg_match('#' . $key . '#ims', $uri, $matches)) {
+
+                        $matchesBracket = array_slice($matches, 1);
+                    }
+                    $matchesBracket ? $callbackArgs = array_merge($callbackArgs, $matchesBracket) : $callbackArgs = array_merge($callbackArgs, $bracketKeys);
+                    $val = call_user_func_array($val, $callbackArgs);
+
+                    if ($val == null) {
+                        continue;
+                    }
+                }
+
+                // Trim slashes
+                $key = trim($key, '/');
+                $val = trim($val, '/');
+
+
+                if (preg_match('#^' . $key . '#u', $uri)) {
+
+                    if (strpos($val, '$') !== FALSE) {
+                        // Use regex routing
+
+                        $routedUri = preg_replace('#^' . $key . '$#u', $val, $uri);
+                    } else {
+                        // Standard routing
+                        $routedUri = $val;
+                    }
+
+                    // A valid route has been found
+                    break;
+                }
+            }
+        }
+
+        if (isset($routes[$routedUri])) {
+            // Check for double routing (without regex)
+            $routedUri = $routes[$routedUri];
+        }
+
+        return trim($routedUri, '/');
+    }
 }

@@ -242,7 +242,7 @@ final class CF {
     }
 
     public static function invoke($uri) {
-
+        
         $routerData = CFRouter::getRouteData($uri);
         $routes = carr::get($routerData, 'routes');
         $current_uri = carr::get($routerData, 'current_uri');

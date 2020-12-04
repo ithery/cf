@@ -12,6 +12,7 @@ class CRouting_Route {
 
     use CRouting_Concern_CreatesRegularExpressionRouteConstraints,
         CRouting_Concern_RouteDependencyResolverTrait,
+        CRouting_Concern_RouteOutputBufferRunner,
         CTrait_Macroable;
 
     /**
@@ -181,6 +182,7 @@ class CRouting_Route {
 
         try {
             if ($this->isControllerAction()) {
+
                 return $this->runController();
             }
 
@@ -480,7 +482,7 @@ class CRouting_Route {
     public function bindingFieldFor($parameter) {
         $fields = is_int($parameter) ? array_values($this->bindingFields) : $this->bindingFields;
 
-        return $fields[$parameter] ?? null;
+        return carr::get($fields, $parameter);
     }
 
     /**
@@ -655,7 +657,7 @@ class CRouting_Route {
             return $this->getDomain();
         }
 
-        $parsed = RouteUri::parse($domain);
+        $parsed = CRouting_RouteUri::parse($domain);
 
         $this->action['domain'] = $parsed->uri;
 
@@ -681,7 +683,7 @@ class CRouting_Route {
      * @return string|null
      */
     public function getPrefix() {
-        return $this->action['prefix'] ?? null;
+        return carr::get($this->action,'prefix');
     }
 
     /**
@@ -705,7 +707,7 @@ class CRouting_Route {
      * @return void
      */
     protected function updatePrefixOnAction($prefix) {
-        if (!empty($newPrefix = trim(rtrim($prefix, '/') . '/' . ltrim($this->action['prefix'] ?? '', '/'), '/'))) {
+        if (!empty($newPrefix = trim(rtrim($prefix, '/') . '/' . ltrim(carr::get($this->action,'prefix',  ''), '/'), '/'))) {
             $this->action['prefix'] = $newPrefix;
         }
     }
@@ -751,7 +753,7 @@ class CRouting_Route {
      * @return string|null
      */
     public function getName() {
-        return $this->action['as'] ?? null;
+        return carr::get($this->action,'as');
     }
 
     /**
@@ -827,7 +829,7 @@ class CRouting_Route {
      * @return string
      */
     public function getActionName() {
-        return $this->action['controller'] ?? 'Closure';
+        return carr::get($this->action,'controller','Closure');
     }
 
     /**
@@ -890,7 +892,7 @@ class CRouting_Route {
      */
     public function middleware($middleware = null) {
         if (is_null($middleware)) {
-            return (array) ($this->action['middleware'] ?? []);
+            return (array) (carr::get($this->action,'middleware',  []));
         }
 
         if (is_string($middleware)) {
@@ -898,7 +900,7 @@ class CRouting_Route {
         }
 
         $this->action['middleware'] = array_merge(
-                (array) ($this->action['middleware'] ?? []), $middleware
+                (array) (carr::get($this->action,'middleware', [])), $middleware
         );
 
         return $this;
@@ -927,7 +929,7 @@ class CRouting_Route {
      */
     public function withoutMiddleware($middleware) {
         $this->action['excluded_middleware'] = array_merge(
-                (array) ($this->action['excluded_middleware'] ?? []), carr::wrap($middleware)
+                (array) (carr::get($this->action,'excluded_middleware', [])), carr::wrap($middleware)
         );
 
         return $this;
@@ -939,7 +941,7 @@ class CRouting_Route {
      * @return array
      */
     public function excludedMiddleware() {
-        return (array) ($this->action['excluded_middleware'] ?? []);
+        return (array) (carr::get($this->action,'excluded_middleware', []));
     }
 
     /**
@@ -990,9 +992,9 @@ class CRouting_Route {
      */
     public function controllerDispatcher() {
         /*
-        if ($this->container->bound(ControllerDispatcherContract::class)) {
-            return $this->container->make(ControllerDispatcherContract::class);
-        }
+          if ($this->container->bound(ControllerDispatcherContract::class)) {
+          return $this->container->make(ControllerDispatcherContract::class);
+          }
          */
 
         return new CController_ControllerDispatcher($this->container);
