@@ -581,10 +581,12 @@ final class CF {
                 // find file at vendor first
                 if ($path = self::findFile('vendor', $routing_file)) {
                     // Load the class file
+                    
+                    
                     require $path;
-
-                    if (class_exists($class)) {
-                        $class_not_found = TRUE;
+                    
+                    if (class_exists($class) || interface_exists($class)) {
+                        $class_not_found = FALSE;
                         return TRUE;
                     }
                 }
