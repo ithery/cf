@@ -525,17 +525,6 @@ final class CF {
             if($prefix) {
                 $file = strtolower(substr($class, 11));
             }
-        } elseif ($suffix === 'Model') {
-            $type = 'models';
-            // Lowercase filename
-            $file = strtolower(substr($class, 0, -6));
-        } elseif ($suffix === 'Driver') {
-            $type = 'libraries/drivers';
-            $file = str_replace('_', '/', substr($class, 0, -7));
-        } elseif ($suffix === 'Interface') {
-            $type = 'interface';
-            $file = str_replace('_', '/', substr($class, 0, -10));
-//            die($file);
         } else {
             // This could be either a library or a helper, but libraries must
             // always be capitalized, so we check if the first character is
