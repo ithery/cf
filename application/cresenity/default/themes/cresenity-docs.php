@@ -7,8 +7,9 @@ return array(
         'fontawesome-5'
     ],
     "js" => [
+        'cresenity-docs.js',
     ],
     "css" => [
-        'cresenity-documentation.css?' . uniqid(),
+        'cresenity-docs.css',
     ],
 );
