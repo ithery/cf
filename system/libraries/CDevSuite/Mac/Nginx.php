@@ -19,7 +19,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      * Create a new Nginx instance.
      * @return void
      */
-    function __construct() {
+    public function __construct() {
         $this->cli = CDevSuite::commandLine();
         $this->brew = CDevSuite::brew();
         $this->site = CDevSuite::site();
@@ -32,7 +32,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      *
      * @return void
      */
-    function install() {
+    public function install() {
         if (!$this->brew->hasInstalledNginx()) {
             $this->brew->installOrFail('nginx', []);
         }
@@ -47,7 +47,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      *
      * @return void
      */
-    function installConfiguration() {
+    public function installConfiguration() {
         CDevSuite::info('Installing nginx configuration...');
 
         $contents = $this->files->get(CDevSuite::stubsPath() . 'nginx.conf');
@@ -62,7 +62,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      *
      * @return void
      */
-    function installServer() {
+    public function installServer() {
         $this->files->ensureDirExists('/usr/local/etc/nginx/devsuite');
 
         $this->files->putAsUser(
@@ -83,7 +83,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      *
      * @return void
      */
-    function installNginxDirectory() {
+    public function installNginxDirectory() {
         CDevSuite::info('Installing nginx directory...');
 
         if (!$this->files->isDir($nginxDirectory = CDevSuite::homePath() . '/Nginx')) {
@@ -111,7 +111,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      *
      * @return void
      */
-    function rewriteSecureNginxFiles() {
+    public function rewriteSecureNginxFiles() {
         $tld = $this->configuration->read()['tld'];
 
         $this->site->resecureForNewTld($tld, $tld);
@@ -122,7 +122,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      *
      * @return void
      */
-    function restart() {
+    public function restart() {
         $this->lint();
 
         $this->brew->restartService($this->brew->nginxServiceName());
@@ -133,7 +133,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      *
      * @return void
      */
-    function stop() {
+    public function stop() {
         CDevSuite::info('Stopping nginx...');
 
         $this->cli->quietly('sudo brew services stop ' . $this->brew->nginxServiceName());
@@ -144,7 +144,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      *
      * @return void
      */
-    function uninstall() {
+    public function uninstall() {
         $this->brew->stopService(['nginx', 'nginx-full']);
         $this->brew->uninstallFormula('nginx nginx-full');
         $this->cli->quietly('rm -rf /usr/local/etc/nginx /usr/local/var/log/nginx');
