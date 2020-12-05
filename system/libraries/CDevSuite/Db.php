@@ -296,7 +296,10 @@ class CDevSuite_Db {
         
         CDevSuite::info("Prepare to dumping database:" . $from);
         $dumpFile = $this->mariaDb()->dump($fromConfig);
-        $this->mariaDb()->restore($toConfig,$dumpFile);
+        
+        $output = $this->mariaDb()->restore($toConfig,$dumpFile);
+        
+        CDevSuite::info($output);
         
         //$this->files->unlink($dumpFile);
         
