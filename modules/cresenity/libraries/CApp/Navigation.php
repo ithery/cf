@@ -109,6 +109,7 @@ class CApp_Navigation {
         $engineClass = new $engineClassName();
         $app = CApp::instance();
         $app->setNavRenderer($engineClass);
+        $app->setNav(CApp_Navigation_Data::get());
         return $app->renderNavigation();
         
     }
