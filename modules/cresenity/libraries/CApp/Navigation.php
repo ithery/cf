@@ -107,6 +107,7 @@ class CApp_Navigation {
 
         $engineClassName = 'CApp_Navigation_Engine_' . $engine;
         $engineClass = new $engineClassName();
+        $app = CApp::instance();
         $app->setNavRenderer($engineClass);
         return $app->renderNavigation();
         
