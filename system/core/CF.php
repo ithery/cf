@@ -503,7 +503,7 @@ final class CF {
         if (class_exists($class, FALSE)) {
             return TRUE;
         }
-        if (($prefix = strrpos($class, '_')) > 0) {
+        if (($prefix = strpos($class, '_')) > 0) {
             // Find the class suffix
             $prefix = substr($class, 0, $prefix);
         } else {
@@ -518,13 +518,18 @@ final class CF {
             $suffix = FALSE;
         }
 
+        
         if ($suffix === 'Controller' || $prefix==='Controller') {
             $type = 'controllers';
+            $directory = 'controllers';
             // Lowercase filename
+            
             $file = strtolower(substr($class, 0, -11));
             if($prefix) {
                 $file = strtolower(substr($class, 11));
+                
             }
+            $file = str_replace('_', DS, $file);
         } else {
             // This could be either a library or a helper, but libraries must
             // always be capitalized, so we check if the first character is
@@ -580,6 +585,8 @@ final class CF {
                     }
                 }
             }
+            
+
             // find file at libraries
             if ($path = self::findFile($directory, $routing_file)) {
                 // Load the class file

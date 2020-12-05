@@ -13,15 +13,19 @@ class CRouting_RouteFinder {
             $uri = trim($uri, '/');
         }
         $routeData = static::getRouteData($uri);
-        $controllerDir = str_replace('/', '_', carr::get($routeData, 'controller_dir_ucfirst', ''));
+        $controllerDir = carr::get($routeData, 'controller_dir_ucfirst', '');
+        $controllerPrefix = str_replace('/', '_', $controllerDir);
         $controller = carr::get($routeData, 'controller', '');
-        $className = 'Controller_' . $controllerDir . ucfirst($controller);
+        $className = 'Controller_' . $controllerPrefix . ucfirst($controller);
 
         
         $method = carr::get($routeData, 'method');
         $route=null;
+      
+        
         if (class_exists($className)) {
-            $routedUri = $controller;
+            
+            $routedUri = strtolower($controllerDir).$controller;
             
             $routedUri.="/".$method;
 
@@ -31,6 +35,8 @@ class CRouting_RouteFinder {
                 $routedUri.="/{any$key}";
             }
 
+            
+            //cdbg::dd($routedUri);
             $route = new CRouting_Route(CRouting_Router::$verbs, $routedUri, $className . '@' . $method);
 
         }
@@ -133,7 +139,7 @@ class CRouting_RouteFinder {
         foreach ($data['rsegments'] as $key => $segment) {
             // Add the segment to the search path
             $c_dir = $controller_path;
-            $c_dir_ucfirst = strtolower($controller_path_ucfirst);
+            $c_dir_ucfirst = ucfirst(strtolower($controller_path_ucfirst));
             $controller_path .= $segment;
             $controller_path_ucfirst .= ucfirst($segment);
             $found = FALSE;
