@@ -116,7 +116,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
         return function ($passable) use ($destination) {
             try {
                 return $destination($passable);
-            } catch (Throwable $e) {
+            } catch (Exception $e) {
                 return $this->handleException($passable, $e);
             }
         };
@@ -155,7 +155,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
                     $carry = method_exists($pipe, $this->method) ? $pipe->{$this->method}(...$parameters) : $pipe(...$parameters);
 
                     return $this->handleCarry($carry);
-                } catch (Throwable $e) {
+                } catch (Exception $e) {
                     return $this->handleException($passable, $e);
                 }
             };
@@ -233,7 +233,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
      *
      * @throws \Throwable
      */
-    protected function handleException($passable, Throwable $e) {
+    protected function handleException($passable, $e) {
         throw $e;
     }
 
