@@ -60,6 +60,7 @@ class CView_Compiler_ComponentTagCompiler {
     public function compile($value) {
         $value = $this->compileSlots($value);
 
+       
         return $this->compileTags($value);
     }
 
@@ -91,7 +92,7 @@ class CView_Compiler_ComponentTagCompiler {
         $pattern = "/
             <
                 \s*
-                x[-\:]([\w\-\:\.]*)
+                cf[-\:]([\w\-\:\.]*)
                 (?<attributes>
                     (?:
                         \s+
@@ -142,7 +143,7 @@ class CView_Compiler_ComponentTagCompiler {
         $pattern = "/
             <
                 \s*
-                x[-\:]([\w\-\:\.]*)
+                cf[-\:]([\w\-\:\.]*)
                 \s*
                 (?<attributes>
                     (?:
@@ -207,8 +208,8 @@ class CView_Compiler_ComponentTagCompiler {
                 'view' => "'$class'",
                 'data' => '[' . $this->attributesToString($data->all(), $escapeBound = false) . ']',
             ];
-
-            $class = CView_AnonymousComponent::class;
+            
+            $class = '\\'.CView_Component_AnonymousComponent::class;
         } else {
             $parameters = $data->all();
         }
@@ -226,7 +227,7 @@ class CView_Compiler_ComponentTagCompiler {
      * @throws \InvalidArgumentException
      */
     public function componentClass($component) {
-        $viewFactory = Container::getInstance()->make(Factory::class);
+        $viewFactory = CContainer::getInstance()->make(CView_Factory::class);
 
         if (isset($this->aliases[$component])) {
             if (class_exists($alias = $this->aliases[$component])) {
@@ -251,6 +252,7 @@ class CView_Compiler_ComponentTagCompiler {
         }
 
         if ($viewFactory->exists($view = $this->guessViewName($component))) {
+            
             return $view;
         }
 
@@ -286,10 +288,12 @@ class CView_Compiler_ComponentTagCompiler {
      * @return string
      */
     public function guessClassName($component) {
+        $namespace = '';
+        /*
         $namespace = CContainer::getInstance()
                 ->make(Application::class)
                 ->getNamespace();
-
+*/
         $class = $this->formatClassName($component);
 
         return $namespace . 'View\\Components\\' . $class;
@@ -316,14 +320,15 @@ class CView_Compiler_ComponentTagCompiler {
      * @return string
      */
     public function guessViewName($name) {
-        $prefix = 'components.';
+        $prefix = 'component.';
+        
+        $delimiter = CView::HINT_PATH_DELIMITER;
 
-        $delimiter = ViewFinderInterface::HINT_PATH_DELIMITER;
-
-        if (Str::contains($name, $delimiter)) {
-            return Str::replaceFirst($delimiter, $delimiter . $prefix, $name);
+        if (cstr::contains($name, $delimiter)) {
+            return cstr::replaceFirst($delimiter, $delimiter . $prefix, $name);
         }
 
+       
         return $prefix . $name;
     }
 
@@ -339,15 +344,15 @@ class CView_Compiler_ComponentTagCompiler {
         // return all of the attributes as both data and attributes since we have
         // now way to partition them. The user can exclude attributes manually.
         if (!class_exists($class)) {
-            return [collect($attributes), collect($attributes)];
+            return [c::collect($attributes), c::collect($attributes)];
         }
 
         $constructor = (new ReflectionClass($class))->getConstructor();
 
-        $parameterNames = $constructor ? collect($constructor->getParameters())->map->getName()->all() : [];
+        $parameterNames = $constructor ? c::collect($constructor->getParameters())->map->getName()->all() : [];
 
-        return collect($attributes)->partition(function ($value, $key) use ($parameterNames) {
-                    return in_array(Str::camel($key), $parameterNames);
+        return c::collect($attributes)->partition(function ($value, $key) use ($parameterNames) {
+                    return in_array(cstr::camel($key), $parameterNames);
                 })->all();
     }
 
@@ -358,7 +363,7 @@ class CView_Compiler_ComponentTagCompiler {
      * @return string
      */
     protected function compileClosingTags($value) {
-        return preg_replace("/<\/\s*x[-\:][\w\-\:\.]*\s*>/", ' @endcomponentClass ', $value);
+        return preg_replace("/<\/\s*cf[-\:][\w\-\:\.]*\s*>/", ' @endcomponentClass ', $value);
     }
 
     /**
@@ -368,7 +373,7 @@ class CView_Compiler_ComponentTagCompiler {
      * @return string
      */
     public function compileSlots($value) {
-        $value = preg_replace_callback('/<\s*x[\-\:]slot\s+(:?)name=(?<name>(\"[^\"]+\"|\\\'[^\\\']+\\\'|[^\s>]+))\s*>/', function ($matches) {
+        $value = preg_replace_callback('/<\s*cf[\-\:]slot\s+(:?)name=(?<name>(\"[^\"]+\"|\\\'[^\\\']+\\\'|[^\s>]+))\s*>/', function ($matches) {
             $name = $this->stripQuotes($matches['name']);
 
             if ($matches[1] !== ':') {
@@ -378,7 +383,7 @@ class CView_Compiler_ComponentTagCompiler {
             return " @slot({$name}) ";
         }, $value);
 
-        return preg_replace('/<\/\s*x[\-\:]slot[^>]*>/', ' @endslot', $value);
+        return preg_replace('/<\/\s*cf[\-\:]slot[^>]*>/', ' @endslot', $value);
     }
 
     /**
@@ -412,7 +417,7 @@ class CView_Compiler_ComponentTagCompiler {
             return [];
         }
 
-        return collect($matches)->mapWithKeys(function ($match) {
+        return c::collect($matches)->mapWithKeys(function ($match) {
                     $attribute = $match['attribute'];
                     $value = carr::get($match, 'value', null);
 
@@ -494,7 +499,7 @@ class CView_Compiler_ComponentTagCompiler {
      * @return string
      */
     protected function escapeSingleQuotesOutsideOfPhpBlocks($value) {
-        return collect(token_get_all($value))->map(function ($token) {
+        return c::collect(token_get_all($value))->map(function ($token) {
                     if (!is_array($token)) {
                         return $token;
                     }

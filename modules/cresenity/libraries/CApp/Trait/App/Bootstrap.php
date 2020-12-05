@@ -109,6 +109,9 @@ trait CApp_Trait_App_Bootstrap {
             CView::blade()->directive('CAppTitle', [CApp_Blade_Directive::class, 'title']);
             CView::blade()->directive('CAppContent', [CApp_Blade_Directive::class, 'content']);
 
+            
+            
+            CView::blade()->component('capp.view-component.modal','modal');
             static::$registerBladeBooted = true;
         }
     }

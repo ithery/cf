@@ -356,7 +356,8 @@ class CView_Factory {
      * @return $this
      */
     public function addNamespace($namespace, $hints) {
-        $this->finder->addNamespace($namespace, $hints);
+        
+        CView::finder()->addNamespace($namespace, $hints);
 
         return $this;
     }
