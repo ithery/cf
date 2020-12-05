@@ -137,7 +137,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
                         // the appropriate method and arguments, returning the results back out.
                         return $pipe($passable, $stack);
                     } elseif (!is_object($pipe)) {
-                        [$name, $parameters] = $this->parsePipeString($pipe);
+                        list($name, $parameters) = $this->parsePipeString($pipe);
 
                         // If the pipe is a string we will parse the string and resolve the class out
                         // of the dependency injection container. We can then build a callable and
@@ -169,7 +169,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
      * @return array
      */
     protected function parsePipeString($pipe) {
-        [$name, $parameters] = array_pad(explode(':', $pipe, 2), 2, []);
+        list($name, $parameters) = array_pad(explode(':', $pipe, 2), 2, []);
 
         if (is_string($parameters)) {
             $parameters = explode(',', $parameters);
