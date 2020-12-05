@@ -17,7 +17,7 @@ class CComponent_ComponentTagCompiler extends CView_Compiler_ComponentTagCompile
         $pattern = "/
             <
                 \s*
-                component\:([\w\-\:\.]*)
+                CAppComponent\:([\w\-\:\.]*)
                 \s*
                 (?<attributes>
                     (?:
@@ -40,6 +40,7 @@ class CComponent_ComponentTagCompiler extends CView_Compiler_ComponentTagCompile
         /x";
 
         return preg_replace_callback($pattern, function (array $matches) {
+           
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
             // Convert kebab attributes to camel-case.
@@ -57,10 +58,10 @@ class CComponent_ComponentTagCompiler extends CView_Compiler_ComponentTagCompile
             $key = $attributes['key'];
             unset($attributes['key']);
 
-            return "@component('{$component}', [" . $this->attributesToString($attributes, $escapeBound = false) . "], key({$key}))";
+            return "@CAppComponent('{$component}', [" . $this->attributesToString($attributes, $escapeBound = false) . "], key({$key}))";
         }
 
-        return "@component('{$component}', [" . $this->attributesToString($attributes, $escapeBound = false) . '])';
+        return "@CAppComponent('{$component}', [" . $this->attributesToString($attributes, $escapeBound = false) . '])';
     }
 
 }

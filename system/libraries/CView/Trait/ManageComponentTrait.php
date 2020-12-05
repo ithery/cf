@@ -78,17 +78,20 @@ trait CView_Trait_ManageComponentTrait {
         $view = array_pop($this->componentStack);
 
         $data = $this->componentData();
-
+        
+        
         if ($view instanceof Closure) {
             $view = $view($data);
         }
-
+        
+        
         if ($view instanceof CView_View) {
             return $view->with($data)->render();
         } elseif ($view instanceof CInterface_Htmlable) {
             return $view->toHtml();
         } else {
             return $this->make($view, $data)->render();
+            
         }
     }
 
@@ -137,7 +140,7 @@ trait CView_Trait_ManageComponentTrait {
      * @return void
      */
     public function endSlot() {
-        last($this->componentStack);
+        carr::last($this->componentStack);
 
         $currentSlot = array_pop(
                 $this->slotStack[$this->currentComponent()]

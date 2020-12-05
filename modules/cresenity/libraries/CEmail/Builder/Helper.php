@@ -12,18 +12,20 @@ class CEmail_Builder_Helper {
         $parseFloatToInt = carr::get($options, 'parseFloatToInt', true);
 
         $unitRegex = '/[\d.,]*(\D*)$/';
-        $widthUnit = '';
+        $widthUnit = 'px';
         if (preg_match($unitRegex, $width, $matches)) {
             $widthUnit = $matches[1];
         }
-        $parsedWidth = $width;
+        $parsedWidth = intval($width);
+     
+      
         switch ($widthUnit) {
             case '%':
-                $parsedWidth = $parseFloatToInt ? floor($width) : $width;
+                $parsedWidth = $parseFloatToInt ? floor($parsedWidth) : $parsedWidth;
                 break;
             case 'px':
             default:
-                $parsedWidth = floor($width);
+                $parsedWidth = floor($parsedWidth);
                 break;
         }
         if (strlen($widthUnit) == 0) {

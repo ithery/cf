@@ -23,7 +23,7 @@ abstract class CView_CompilerAbstract {
      * @throws \InvalidArgumentException
      */
     public function __construct() {
-        $this->cachePath = DOCROOT . 'temp' . DS . 'views' . DS . 'blade';
+        $this->cachePath = CF::config('view.compiled');
         if (!CFile::isDirectory($this->cachePath)) {
             CFile::makeDirectory($this->cachePath, $mode = 0755, $recursive = true);
         }

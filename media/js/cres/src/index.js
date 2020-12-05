@@ -1,3 +1,4 @@
+import "./index.css";
 import Cresenity from '@/Cresenity'
 
 window.cresenity = new Cresenity();

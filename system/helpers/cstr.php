@@ -491,6 +491,19 @@ class cstr {
     }
 
     /**
+     * Cap a string with a single instance of a given value.
+     *
+     * @param  string  $value
+     * @param  string  $cap
+     * @return string
+     */
+    public static function finish($value, $cap) {
+        $quoted = preg_quote($cap, '/');
+
+        return preg_replace('/(?:' . $quoted . ')+$/u', '', $value) . $cap;
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
      * @param  string|array  $pattern

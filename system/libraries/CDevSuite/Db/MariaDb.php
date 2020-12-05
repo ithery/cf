@@ -25,7 +25,40 @@ abstract class CDevSuite_Db_MariaDb {
         $this->files = CDevSuite::filesystem();
         $this->cli = CDevSuite::commandLine();
     }
+    
+   /**
+     * Install the configuration files for MariaDb.
+     *
+     * @return void
+     */
+    abstract public function install();
 
+    /**
+     * Forcefully uninstall MariaDb.
+     *
+     * @return void
+     */
+    abstract public function uninstall();
+
+    /**
+     * Stop the MariaDb service.
+     *
+     * @return void
+     */
+    abstract public function stop();
+
+    /**
+     * Restart the MariaDb service.
+     *
+     * @return void
+     */
+    abstract public function restart();
+    
+    /**
+     * get ini file location
+     * 
+     * @return string
+     */
     public function mariaDbIniFile() {
         return c::fixPath(CDevSuite::homePath()) . 'MariaDb' . DS . 'my.mariadb.ini';
     }
@@ -57,7 +90,9 @@ abstract class CDevSuite_Db_MariaDb {
     }
 
     public function restore($to, $dumpFile) {
-        $process = Process::fromShellCommandline($this->getRestoreCommand($to, $dumpFile));
+        $command=$this->getRestoreCommand($to, $dumpFile);
+        
+        $process = Process::fromShellCommandline($command,null,null,null);
         $output = '';
         $process->run(function ($type, $line) use(&$output) {
             $output .= $line;
@@ -68,20 +103,32 @@ abstract class CDevSuite_Db_MariaDb {
 
     protected function getDumperBinaryPath() {
         //echo realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS . 'mysqldump.exe';
-        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin';
+        
+        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin'.DS;
+        
+         
+    }
+    
+    
+    protected function getClientBinaryPath() {
+        //echo realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS . 'mysqldump.exe';
+        
+        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin'.DS;
+        
+         
     }
 
     protected function getRestoreCommand($dbConfig, $fromFile) {
         $command = [];
         $connection = carr::get($dbConfig, 'connection');
         $driver = carr::get($connection, 'type');
-        $dbName = carr::get($connection, 'database');
+        $database = carr::get($connection, 'database');
         $username = carr::get($connection, 'user');
         $password = carr::get($connection, 'pass');
         $port = carr::get($connection, 'port');
         $host = carr::first(carr::wrap(carr::get($connection, 'host', '')));
 
-        $command[] = CDevSuite::binPath() . 'mariadb' . DS . 'bin' . DS . 'mysql';
+        $command[] = $this->getClientBinaryPath().'mysql';
         $command[] = '-h';
         $command[] = $host;
         $command[] = '-u';

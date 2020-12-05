@@ -46,10 +46,10 @@ class CView_Component_DynamicComponent extends CView_ComponentAbstract {
         $template = <<<'EOF'
 <?php extract(collect($attributes->getAttributes())->mapWithKeys(function ($value, $key) { return [Illuminate\Support\Str::camel(str_replace([':', '.'], ' ', $key)) => $value]; })->all(), EXTR_SKIP); ?>
 {{ props }}
-<x-{{ component }} {{ bindings }} {{ attributes }}>
+<cf-{{ component }} {{ bindings }} {{ attributes }}>
 {{ slots }}
 {{ defaultSlot }}
-</x-{{ component }}>
+</cf-{{ component }}>
 EOF;
 
         return function ($data) use ($template) {
@@ -112,8 +112,8 @@ EOF;
      * @return string
      */
     protected function compileSlots(array $slots) {
-        return CF::collect($slots)->map(function ($slot, $name) {
-                    return $name === '__default' ? null : '<x-slot name="' . $name . '">{{ $' . $name . ' }}</x-slot>';
+        return c::collect($slots)->map(function ($slot, $name) {
+                    return $name === '__default' ? null : '<cf-slot name="' . $name . '">{{ $' . $name . ' }}</cf-slot>';
                 })->filter()->implode(PHP_EOL);
     }
 

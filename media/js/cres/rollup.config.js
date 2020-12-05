@@ -7,6 +7,10 @@ import { terser } from 'rollup-plugin-terser';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import outputManifest from 'rollup-plugin-output-manifest';
+import postcss from "rollup-plugin-postcss";
+
+const isProduction = process.env.NODE_ENV === "production";
+
 
 export default {
     input: 'src/index.js',
@@ -17,10 +21,20 @@ export default {
         file: 'dist/cres.js',
     },
     plugins: [
+
         resolve(),
         commonjs({
             // These npm packages still use common-js modules. Ugh.
             include: /node_modules\/(get-value|isobject|core-js)/,
+        }),
+        postcss({
+            config: {
+                path: "./postcss.config.js",
+            },
+            extensions: [".css"],
+            extract: true,
+            minimize: isProduction,
+            // modules: true,
         }),
         filesize(),
         terser({

@@ -356,7 +356,8 @@ class CView_Factory {
      * @return $this
      */
     public function addNamespace($namespace, $hints) {
-        $this->finder->addNamespace($namespace, $hints);
+        
+        CView::finder()->addNamespace($namespace, $hints);
 
         return $this;
     }
@@ -493,7 +494,7 @@ class CView_Factory {
      * @return \Illuminate\Contracts\Container\Container
      */
     public function getContainer() {
-        return $this->container;
+        return CContainer::getInstance();
     }
 
     /**
@@ -502,7 +503,7 @@ class CView_Factory {
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    public function setContainer(Container $container) {
+    public function setContainer(CContainer_Container $container) {
         $this->container = $container;
     }
 

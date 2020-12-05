@@ -11,6 +11,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
         CView_Compiler_BladeCompiler_CompileEchoTrait,
         CView_Compiler_BladeCompiler_CompileLayoutTrait,
         CView_Compiler_BladeCompiler_CompileRawPhpTrait,
+        CView_Compiler_BladeCompiler_CompileComponentTrait,
         CView_Compiler_BladeCompiler_CompileLoopTrait,
         CView_Compiler_BladeCompiler_CompileConditionalTrait,
         CView_Compiler_BladeCompiler_CompileErrorTrait,
@@ -252,7 +253,9 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
                 $this->compileComments($this->storeUncompiledBlocks($value))
         );
 
+        
         foreach ($this->precompilers as $precompiler) {
+            
             $value = call_user_func($precompiler, $value);
         }
 
@@ -558,6 +561,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
         }
 
         $this->classComponentAliases[$alias] = $class;
+        
     }
 
     /**

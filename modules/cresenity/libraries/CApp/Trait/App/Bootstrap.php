@@ -32,7 +32,7 @@ trait CApp_Trait_App_Bootstrap {
                 return (new CComponent_ComponentTagCompiler())->compile($string);
             });
 
-            CView::blade()->directive('component', [CComponent_BladeDirective::class, 'component']);
+            CView::blade()->directive('CAppComponent', [CComponent_BladeDirective::class, 'component']);
             CView::blade()->directive('this', [CComponent_BladeDirective::class, 'this']);
             CView::blade()->directive('entangle', [CComponent_BladeDirective::class, 'entangle']);
 
@@ -82,6 +82,18 @@ trait CApp_Trait_App_Bootstrap {
                 [CComponent_HydrationMiddleware_CallHydrationHooks::class, 'initialHydrate'],
             ]);
 
+            
+            if (method_exists(CView_ComponentAttributeBag::class, 'macro')) {
+                CView_ComponentAttributeBag::macro('fire', function ($name) {
+                    $entries = carr::head($this->whereStartsWith('fire:'.$name));
+
+                    $directive = carr::head(array_keys($entries));
+                    $value = carr::head(array_values($entries));
+
+                    return new CComponent_CFDirective($name, $directive, $value);
+                });
+            }
+            
             static::$registerComponentBooted = true;
         }
     }
@@ -98,6 +110,9 @@ trait CApp_Trait_App_Bootstrap {
             CView::blade()->directive('CAppContent', [CApp_Blade_Directive::class, 'content']);
             CView::blade()->directive('CAppNav', [CApp_Blade_Directive::class, 'nav']);
 
+            
+            
+            CView::blade()->component('capp.view-component.modal','modal');
             static::$registerBladeBooted = true;
         }
     }

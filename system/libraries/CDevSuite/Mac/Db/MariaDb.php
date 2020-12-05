@@ -34,4 +34,48 @@ class CDevSuite_Mac_Db_MariaDB extends CDevSuite_Db_MariaDb {
         $this->cli->run('mysql_install_db');
     }
 
+    
+    /**
+     * Stop the Nginx service.
+     *
+     * @return void
+     */
+    public function stop() {
+        //CDevSuite::info('Stopping nginx...');
+
+        //$this->cli->quietly('sudo brew services stop ' . $this->brew->nginxServiceName());
+    }
+
+    /**
+     * Forcefully uninstall Nginx.
+     *
+     * @return void
+     */
+    public function uninstall() {
+        //$this->brew->stopService(['nginx', 'nginx-full']);
+        //$this->brew->uninstallFormula('nginx nginx-full');
+        //$this->cli->quietly('rm -rf /usr/local/etc/nginx /usr/local/var/log/nginx');
+    }
+    
+    /**
+     * Restart the Nginx service.
+     *
+     * @return void
+     */
+    public function restart() {
+        $this->lint();
+
+        $this->brew->restartService($this->brew->nginxServiceName());
+    }
+
+    
+    protected function getDumperBinaryPath() {
+        return '';
+        
+         
+    }
+
+    protected function getClientBinaryPath() {
+        return '';
+    }
 }

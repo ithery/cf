@@ -38,7 +38,12 @@ trait CApp_Trait_App_Renderer {
 
     public function renderStyles($options = []) {
         $viewData = $this->getViewData();
-        return carr::get($viewData, 'head_client_script');
+        $cresCss = curl::base() . 'media/js/cres/dist/cres.css?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.js'));
+        
+        $cresStyle = '<link href="'.$cresCss.'" rel="stylesheet" />'.PHP_EOL;
+        return $cresStyle.carr::get($viewData, 'head_client_script');
+        
+        
     }
 
     public function renderScripts($options = []) {

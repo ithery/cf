@@ -47,6 +47,10 @@ class CView {
     public static function blade() {
         return CView_Compiler_BladeCompiler::instance();
     }
+    
+    public static function finder() {
+        return CView_Finder::instance();
+    }
 
     public static function engineResolver() {
         return CView_EngineResolver::instance();
