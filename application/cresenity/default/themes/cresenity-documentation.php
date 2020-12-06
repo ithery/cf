@@ -9,6 +9,6 @@ return array(
     "js" => [
     ],
     "css" => [
-        'cresenity-documentation.css?' . uniqid(),
+        'cresenity-documentation.css',
     ],
 );

@@ -11,6 +11,8 @@ class Controller_Starter extends CController {
     public function __construct() {
         $app = CApp::instance();
         $app->setLoginRequired(false);
+        $app->setTheme('cresenity-starter');
+        $app->setView('starter');
     }
 
     public function index() {
@@ -18,7 +20,7 @@ class Controller_Starter extends CController {
         $app = CApp::instance();
 
 
-
+        
 
         return $app;
     }
