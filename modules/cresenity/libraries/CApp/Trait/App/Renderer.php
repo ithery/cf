@@ -19,10 +19,13 @@ trait CApp_Trait_App_Renderer {
 
     public function renderStyles($options = []) {
         $viewData = $this->getViewData();
-        $cresCss = curl::base() . 'media/js/cres/dist/cres.css?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.js'));
+        $cresCss = curl::base() . 'media/js/cres/dist/cres.css?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.css'));
         
+        $alpineJs = curl::base() . 'media/js/libs/alpine.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/libs/alpine.js'));
+        $alpineScript = '<script src="'.$alpineJs.'"></script>';
         $cresStyle = '<link href="'.$cresCss.'" rel="stylesheet" />'.PHP_EOL;
-        return $cresStyle.carr::get($viewData, 'head_client_script');
+
+        return $alpineScript.$cresStyle.carr::get($viewData, 'head_client_script');
         
         
     }

@@ -27,6 +27,9 @@ return array(
     "jquery" => array(
         "js" => array("libs" . DS . "jquery-3.5.1.min.js"),
     ),
+    "alpine" => array(
+        "js" => array("libs" . DS . "alpine.js"),
+    ),
     "jquery-2.1.0" => array(
         "js" => array("libs/jquery-2.1.0/jquery.min.js"),
     ),

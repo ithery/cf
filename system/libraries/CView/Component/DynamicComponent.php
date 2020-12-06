@@ -70,7 +70,7 @@ EOF;
                         $this->compileBindings($bindings),
                         class_exists($class) ? '{{ $attributes }}' : '',
                         $this->compileSlots($data['__cview_slots']),
-                        '{{ $slot ?? "" }}',
+                        '{{ isset($slot) ? $slot : "" }}',
                     ],
                     $template
             );

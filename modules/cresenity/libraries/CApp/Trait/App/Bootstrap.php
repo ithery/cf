@@ -84,9 +84,9 @@ trait CApp_Trait_App_Bootstrap {
 
             
             if (method_exists(CView_ComponentAttributeBag::class, 'macro')) {
-                CView_ComponentAttributeBag::macro('fire', function ($name) {
-                    $entries = carr::head($this->whereStartsWith('fire:'.$name));
-
+                CView_ComponentAttributeBag::macro('cf', function ($name) {
+                    $entries = carr::head($this->whereStartsWith('cf:'.$name));
+                    
                     $directive = carr::head(array_keys($entries));
                     $value = carr::head(array_values($entries));
 
