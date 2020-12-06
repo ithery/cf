@@ -22,7 +22,9 @@ class CApp_Navigation_Engine_SideNav extends CApp_Navigation_Engine {
         }
         $html = "";
         $childCount = 0;
-
+        if(!is_array($navs)) {
+            return '';
+        }
         foreach ($navs as $d) {
 
             $child = 0;

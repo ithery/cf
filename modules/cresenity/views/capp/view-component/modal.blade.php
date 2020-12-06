@@ -19,12 +19,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
         x-on:keydown.escape.window="show = false"
         class="cf-modal-wrapper"
         style="display: none;">
-        <div x-show="show" class="cf-modal-wrapper-inner" x-on:click="show = false" x-transition:enter="ease-out duration-300"
-                    x-transition:enter-start="opacity-0"
-                    x-transition:enter-end="opacity-100"
-                    x-transition:leave="ease-in duration-200"
-                    x-transition:leave-start="opacity-100"
-                    x-transition:leave-end="opacity-0">
+        <div x-show="show" class="cf-modal-wrapper-inner" >
             <!--
               Background overlay, show/hide based on modal state.
         
@@ -35,7 +30,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
                 From: "opacity-100"
                 To: "opacity-0"
             -->
-            <div class="cf-modal-overlay" aria-hidden="true">
+            <div class="cf-modal-overlay" x-on:click="show = false" x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
+                    x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0">
                 <div class="cf-modal-overlay-inner"></div>
             </div>
 

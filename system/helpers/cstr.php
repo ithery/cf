@@ -82,12 +82,20 @@ class cstr {
         return strpos($string, $needle, $offset);
     }
 
-    public static function between($open, $close, $str) {
-        $start_index = strpos($str, $open);
-        $end_index = strpos($str, $close);
-        $start_index += cstr::len($open);
-        $str = substr($str, $start_index, $end_index - $start_index);
-        return $str;
+    /**
+     * Get the portion of a string between two given values.
+     *
+     * @param  string  $subject
+     * @param  string  $from
+     * @param  string  $to
+     * @return string
+     */
+    public static function between($subject, $from, $to) {
+        if ($from === '' || $to === '') {
+            return $subject;
+        }
+
+        return static::beforeLast(static::after($subject, $from), $to);
     }
 
     public static function sanitize($string = '', $is_filename = FALSE) {
@@ -579,6 +587,27 @@ class cstr {
     }
 
     /**
+     * Return the remainder of a string after the last occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function afterLast($subject, $search) {
+        if ($search === '') {
+            return $subject;
+        }
+
+        $position = strrpos($subject, (string) $search);
+
+        if ($position === false) {
+            return $subject;
+        }
+
+        return substr($subject, $position + strlen($search));
+    }
+
+    /**
      * Get the portion of a string before a given value.
      *
      * @param  string  $subject
@@ -587,6 +616,27 @@ class cstr {
      */
     public static function before($subject, $search) {
         return $search === '' ? $subject : explode($search, $subject)[0];
+    }
+
+    /**
+     * Get the portion of a string before the last occurrence of a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function beforeLast($subject, $search) {
+        if ($search === '') {
+            return $subject;
+        }
+
+        $pos = mb_strrpos($subject, $search);
+
+        if ($pos === false) {
+            return $subject;
+        }
+
+        return static::substr($subject, 0, $pos);
     }
 
     /**

@@ -104,7 +104,7 @@ class CComponent_Manager {
     }
 
     public function dummyMount($id, $tagName) {
-        return "<{$tagName} wire:id=\"{$id}\"></{$tagName}>";
+        return "<{$tagName} cf:id=\"{$id}\"></{$tagName}>";
     }
 
     public function test($name, $params = []) {
