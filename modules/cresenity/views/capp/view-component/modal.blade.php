@@ -12,9 +12,19 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 
 
-<div {{ $attributes }}>
-    <div class="cf-modal-wrapper" {{ $attributes }}>
-        <div class="cf-modal-wrapper-inner">
+<div {{ $attributes }}> 
+    <div id="{{ $id }}" x-data="{ show: @entangle($attributes->cf('model')) }"
+        x-show="show"
+        x-on:close.stop="show = false"
+        x-on:keydown.escape.window="show = false"
+        class="cf-modal-wrapper"
+        style="display: none;">
+        <div x-show="show" class="cf-modal-wrapper-inner" x-on:click="show = false" x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100"
+                    x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100"
+                    x-transition:leave-end="opacity-0">
             <!--
               Background overlay, show/hide based on modal state.
         
@@ -41,7 +51,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
                 From: "opacity-100 translate-y-0 sm:scale-100"
                 To: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             -->
-            <div class="cf-modal" role="dialog" aria-modal="true" aria-labelledby="modal-headline">
+            <div x-show="show" class="cf-modal {{ $maxWidth }}"
+                    x-transition:enter="ease-out duration-300"
+                    x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave="ease-in duration-200"
+                    x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
+                    x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95">
                 {{ $slot }}
             </div>
         </div>

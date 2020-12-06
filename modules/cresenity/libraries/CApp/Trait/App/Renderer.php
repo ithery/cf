@@ -44,9 +44,28 @@ trait CApp_Trait_App_Renderer {
         $alpineScript = '<script src="'.$alpineJs.'"></script>';
         $cresStyle = '<link href="'.$cresCss.'" rel="stylesheet" />'.PHP_EOL;
 
-        return $alpineScript.$cresStyle.carr::get($viewData, 'head_client_script');
+        $allStyles=carr::get($viewData, 'head_client_script');
         
-        
+        return <<<HTML
+<style>
+    [cf\:loading], [cf\:loading\.delay], [cf\:loading\.inline-block], [cf\:loading\.inline], [cf\:loading\.block], [cf\:loading\.flex], [cf\:loading\.table], [cf\:loading\.grid] {
+        display: none;
+    }
+    [cf\:offline] {
+        display: none;
+    }
+    [cf\:dirty]:not(textarea):not(input):not(select) {
+        display: none;
+    }
+    input:-webkit-autofill, select:-webkit-autofill, textarea:-webkit-autofill {
+        animation-duration: 50000s;
+        animation-name: livecfautofill;
+    }
+    @keyframes livecfautofill { from {} }
+</style>
+${cresStyle}
+${allStyles}
+HTML;
     }
 
     public function renderScripts($options = []) {
@@ -57,11 +76,37 @@ trait CApp_Trait_App_Renderer {
         $js = carr::get($viewData, 'js', '');
         $customJs = carr::get($viewData, 'custom_js', '');
 
-
+        $alpineJs = curl::base() . 'media/js/libs/alpine.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/libs/alpine.js'));
+        $alpineScript = '<script src="'.$alpineJs.'"></script>';
+        
         $cresJs = curl::base() . 'media/js/cres/dist/cres.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.js'));
         return <<<HTML
             ${endClientScript}
             <script src="${cresJs}"></script>
+            <script>
+                window.cresenity = new Cresenity();
+                window.cresenity.init();
+                
+                if (window.Alpine) {
+                    /* Defer showing the warning so it doesn't get buried under downstream errors. */
+                    document.addEventListener("DOMContentLoaded", function () {
+                        setTimeout(function() {
+                            console.warn("Cresenity: It looks like AlpineJS has already been loaded. Make sure Creseniity\'s scripts are loaded before Alpine.")
+                        })
+                    });
+                }
+                /* Make Alpine wait until Livewire is finished rendering to do its thing. */
+                window.deferLoadingAlpine = function (callback) {
+                    window.addEventListener('cresenity:load', function () {
+                        callback();
+                    });
+                };
+                document.addEventListener("DOMContentLoaded", function () {
+                    window.cresenity.ui.start();
+                });
+
+            </script>
+            <script src="${alpineJs}"></script>
             <script>
                 ${js}
                 ${readyClientScript}
