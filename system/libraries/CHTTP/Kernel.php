@@ -11,19 +11,11 @@ use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 
 class CHTTP_Kernel {
 
-    use CHTTP_Trait_OutputBufferTrait,
-        CHTTP_Concern_KernelRouting;
+    use CHTTP_Trait_OutputBufferTrait;
 
     protected $isHandled = false;
     protected $terminated;
     protected $controller;
-
-    /**
-     * The application's middleware stack.
-     *
-     * @var array
-     */
-    protected $middleware = [];
 
     public function __construct() {
 
@@ -162,6 +154,7 @@ class CHTTP_Kernel {
     }
 
     public function sendRequest($request) {
+
         $this->startOutputBuffering();
 
 
@@ -177,9 +170,7 @@ class CHTTP_Kernel {
         $output = '';
         $response = null;
         try {
-            $response = $this->sendRequestThroughRouter($request);
-            
-            //$response = $this->invokeController($request);
+            $response = $this->invokeController($request);
         } catch (Exception $e) {
 
             throw $e;
@@ -217,7 +208,7 @@ class CHTTP_Kernel {
 
         $response = null;
         try {
-            //$this->setupRouter();
+            $this->setupRouter();
             $response = $this->sendRequest($request);
         } catch (Exception $e) {
 
