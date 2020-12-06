@@ -116,7 +116,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
         return function ($passable) use ($destination) {
             try {
                 return $destination($passable);
-            } catch (Throwable $e) {
+            } catch (Exception $e) {
                 return $this->handleException($passable, $e);
             }
         };
@@ -137,7 +137,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
                         // the appropriate method and arguments, returning the results back out.
                         return $pipe($passable, $stack);
                     } elseif (!is_object($pipe)) {
-                        [$name, $parameters] = $this->parsePipeString($pipe);
+                        list($name, $parameters) = $this->parsePipeString($pipe);
 
                         // If the pipe is a string we will parse the string and resolve the class out
                         // of the dependency injection container. We can then build a callable and
@@ -155,7 +155,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
                     $carry = method_exists($pipe, $this->method) ? $pipe->{$this->method}(...$parameters) : $pipe(...$parameters);
 
                     return $this->handleCarry($carry);
-                } catch (Throwable $e) {
+                } catch (Exception $e) {
                     return $this->handleException($passable, $e);
                 }
             };
@@ -169,7 +169,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
      * @return array
      */
     protected function parsePipeString($pipe) {
-        [$name, $parameters] = array_pad(explode(':', $pipe, 2), 2, []);
+        list($name, $parameters) = array_pad(explode(':', $pipe, 2), 2, []);
 
         if (is_string($parameters)) {
             $parameters = explode(',', $parameters);
@@ -233,7 +233,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
      *
      * @throws \Throwable
      */
-    protected function handleException($passable, Throwable $e) {
+    protected function handleException($passable, $e) {
         throw $e;
     }
 

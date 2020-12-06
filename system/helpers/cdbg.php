@@ -112,6 +112,7 @@ class cdbg {
     }
 
     public static function varDumpPlain($var) {
+        
         $html = '';
 
         if (is_bool($var)) {

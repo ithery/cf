@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-interface Pipeline {
+interface CBase_PipelineInterface {
 
     /**
      * Set the traveler object being sent on the pipeline.

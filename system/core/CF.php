@@ -242,7 +242,7 @@ final class CF {
     }
 
     public static function invoke($uri) {
-
+        
         $routerData = CFRouter::getRouteData($uri);
         $routes = carr::get($routerData, 'routes');
         $current_uri = carr::get($routerData, 'current_uri');
@@ -503,7 +503,13 @@ final class CF {
         if (class_exists($class, FALSE)) {
             return TRUE;
         }
-
+        if (($prefix = strpos($class, '_')) > 0) {
+            // Find the class suffix
+            $prefix = substr($class, 0, $prefix);
+        } else {
+            // No suffix
+            $prefix = FALSE;
+        }
         if (($suffix = strrpos($class, '_')) > 0) {
             // Find the class suffix
             $suffix = substr($class, $suffix + 1);
@@ -512,24 +518,18 @@ final class CF {
             $suffix = FALSE;
         }
 
-        if ($suffix === 'Core') {
-            $type = 'libraries';
-            $file = substr($class, 0, -5);
-        } elseif ($suffix === 'Controller') {
+        
+        if ($suffix === 'Controller' || $prefix==='Controller') {
             $type = 'controllers';
+            $directory = 'controllers';
             // Lowercase filename
+            
             $file = strtolower(substr($class, 0, -11));
-        } elseif ($suffix === 'Model') {
-            $type = 'models';
-            // Lowercase filename
-            $file = strtolower(substr($class, 0, -6));
-        } elseif ($suffix === 'Driver') {
-            $type = 'libraries/drivers';
-            $file = str_replace('_', '/', substr($class, 0, -7));
-        } elseif ($suffix === 'Interface') {
-            $type = 'interface';
-            $file = str_replace('_', '/', substr($class, 0, -10));
-//            die($file);
+            if($prefix) {
+                $file = strtolower(substr($class, 11));
+                
+            }
+            $file = str_replace('_', DS, $file);
         } else {
             // This could be either a library or a helper, but libraries must
             // always be capitalized, so we check if the first character is
@@ -575,14 +575,18 @@ final class CF {
                 // find file at vendor first
                 if ($path = self::findFile('vendor', $routing_file)) {
                     // Load the class file
+                    
+                    
                     require $path;
-
-                    if (class_exists($class)) {
-                        $class_not_found = TRUE;
+                    
+                    if (class_exists($class) || interface_exists($class)) {
+                        $class_not_found = FALSE;
                         return TRUE;
                     }
                 }
             }
+            
+
             // find file at libraries
             if ($path = self::findFile($directory, $routing_file)) {
                 // Load the class file

@@ -108,17 +108,34 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $html->setIndent($indent);
         $html->incIndent();
         foreach ($this->renderable as $r) {
+            $child = null;
+            
             if ($r instanceof CRenderable) {
-                if ($r->visibility) {
-                    $html->append($r->html($html->getIndent()));
+                if (!$r->visibility) {
+                    continue;
                 }
-            } else {
-                if (is_object($r) || is_array($r)) {
-                    $html->append(cdbg::var_dump($r, true));
-                } else {
-                    $html->append($r);
-                }
+                
+                $r = $r->html($html->getIndent());
+                
+            } 
+            if($r instanceof CInterface_Renderable) {
+                $r = $r->render();
             }
+            
+            /**
+             * \Stringable available on PHP 8
+             */
+            if($r instanceof \Stringable) {
+                $r = $r->__toString();
+            }
+            
+            if (is_object($r) || is_array($r)) {
+                $r = cdbg::d($r,true);
+            } 
+
+
+
+            $html->append($r);
         }
         $html->decIndent();
         return $html->text();

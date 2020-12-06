@@ -28,3 +28,16 @@ CApp::component()->registerComponent('counter', \Cresenity\Component\Counter::cl
 CApp::component()->registerComponent('member-table', \Cresenity\Testing\MemberTableComponent::class);
 CApp::component()->registerComponent('test-validate', \Cresenity\Testing\ValidateTestComponent::class);
 CApp::component()->registerComponent('test-upload', \Cresenity\Testing\UploadTestComponent::class);
+
+/*
+  CRouting::router()->get('posts/{post}/comments/{comment}', function ($postId, $commentId) {
+  return $postId.'|'.$commentId;
+  });
+
+CRouting::router()->post('posts', function () {
+    return 'this is post from router';
+});
+ * 
+ */
+
+//CRouting::router()->any('/docs/starter/{any}', 'Controller_Docs@starter');

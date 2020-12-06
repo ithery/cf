@@ -34,44 +34,21 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     protected $convertedFiles;
 
     /**
-     * Create an object request from a Symfony instance.
+     * The user resolver callback.
      *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
-     * @return CHTTP_Request
+     * @var \Closure
      */
-    public static function createFromBase(SymfonyRequest $request) {
-        if ($request instanceof static) {
-            return $request;
-        }
-
-        $content = $request->content;
-
-        $request = (new static)->duplicate(
-                $request->query->all(), $request->request->all(), $request->attributes->all(), $request->cookies->all(), $request->files->all(), $request->server->all()
-        );
-
-        $request->content = $content;
-
-        $request->request = $request->getInputSource();
-
-        return $request;
-    }
+    protected $userResolver;
 
     /**
-     * Get the input source for the request.
+     * The route resolver callback.
      *
-     * @return \Symfony\Component\HttpFoundation\ParameterBag
+     * @var \Closure
      */
-    protected function getInputSource() {
-        if ($this->isJson()) {
-            return $this->json();
-        }
-
-        return $this->getRealMethod() == 'GET' ? $this->query : $this->request;
-    }
+    protected $routeResolver;
 
     /**
-     * Create a new HTTP request from server variables.
+     * Create a new Illuminate HTTP request from server variables.
      *
      * @return static
      */
@@ -82,12 +59,64 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
+     * Return the Request instance.
+     *
+     * @return $this
+     */
+    public function instance() {
+        return $this;
+    }
+
+    /**
      * Get the request method.
      *
      * @return string
      */
     public function method() {
         return $this->getMethod();
+    }
+
+    /**
+     * Get the root URL for the application.
+     *
+     * @return string
+     */
+    public function root() {
+        return rtrim($this->getSchemeAndHttpHost() . $this->getBaseUrl(), '/');
+    }
+
+    /**
+     * Get the URL (no query string) for the request.
+     *
+     * @return string
+     */
+    public function url() {
+        return rtrim(preg_replace('/\?.*/', '', $this->getUri()), '/');
+    }
+
+    /**
+     * Get the full URL for the request.
+     *
+     * @return string
+     */
+    public function fullUrl() {
+        $query = $this->getQueryString();
+
+        $question = $this->getBaseUrl() . $this->getPathInfo() === '/' ? '/?' : '?';
+
+        return $query ? $this->url() . $question . $query : $this->url();
+    }
+
+    /**
+     * Get the full URL for the request with the added query string parameters.
+     *
+     * @param  array  $query
+     * @return string
+     */
+    public function fullUrlWithQuery(array $query) {
+        $question = $this->getBaseUrl() . $this->getPathInfo() === '/' ? '/?' : '?';
+
+        return count($this->query()) > 0 ? $this->url() . $question . car::query(array_merge($this->query(), $query)) : $this->fullUrl() . $question . car::query($query);
     }
 
     /**
@@ -102,20 +131,82 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
-     * Get the JSON payload for the request.
+     * Get the current decoded path info for the request.
      *
-     * @param  string|null  $key
-     * @param  mixed   $default
-     * @return \Symfony\Component\HttpFoundation\ParameterBag|mixed
+     * @return string
      */
-    public function json($key = null, $default = null) {
-        if (!isset($this->json)) {
-            $this->json = new ParameterBag((array) json_decode($this->getContent(), true));
+    public function decodedPath() {
+        return rawurldecode($this->path());
+    }
+
+    /**
+     * Get a segment from the URI (1 based index).
+     *
+     * @param  int  $index
+     * @param  string|null  $default
+     * @return string|null
+     */
+    public function segment($index, $default = null) {
+        return car::get($this->segments(), $index - 1, $default);
+    }
+
+    /**
+     * Get all of the segments for the request path.
+     *
+     * @return array
+     */
+    public function segments() {
+        $segments = explode('/', $this->decodedPath());
+
+        return array_values(array_filter($segments, function ($value) {
+                    return $value !== '';
+                }));
+    }
+
+    /**
+     * Determine if the current request URI matches a pattern.
+     *
+     * @param  mixed  ...$patterns
+     * @return bool
+     */
+    public function is(...$patterns) {
+        $path = $this->decodedPath();
+
+        foreach ($patterns as $pattern) {
+            if (cstr::is($pattern, $path)) {
+                return true;
+            }
         }
-        if (is_null($key)) {
-            return $this->json;
+
+        return false;
+    }
+
+    /**
+     * Determine if the route name matches a given pattern.
+     *
+     * @param  mixed  ...$patterns
+     * @return bool
+     */
+    public function routeIs(...$patterns) {
+        return $this->route() && $this->route()->named(...$patterns);
+    }
+
+    /**
+     * Determine if the current request URL and query string matches a pattern.
+     *
+     * @param  mixed  ...$patterns
+     * @return bool
+     */
+    public function fullUrlIs(...$patterns) {
+        $url = $this->fullUrl();
+
+        foreach ($patterns as $pattern) {
+            if (cstr::is($pattern, $url)) {
+                return true;
+            }
         }
-        return carr::get($this->json->all(), $key, $default);
+
+        return false;
     }
 
     /**
@@ -137,6 +228,349 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
+     * Determine if the request is the result of an prefetch call.
+     *
+     * @return bool
+     */
+    public function prefetch() {
+        return strcasecmp($this->server->get('HTTP_X_MOZ'), 'prefetch') === 0 ||
+                strcasecmp($this->headers->get('Purpose'), 'prefetch') === 0;
+    }
+
+    /**
+     * Determine if the request is over HTTPS.
+     *
+     * @return bool
+     */
+    public function secure() {
+        return $this->isSecure();
+    }
+
+    /**
+     * Get the client IP address.
+     *
+     * @return string|null
+     */
+    public function ip() {
+        return $this->getClientIp();
+    }
+
+    /**
+     * Get the client IP addresses.
+     *
+     * @return array
+     */
+    public function ips() {
+        return $this->getClientIps();
+    }
+
+    /**
+     * Get the client user agent.
+     *
+     * @return string|null
+     */
+    public function userAgent() {
+        return $this->headers->get('User-Agent');
+    }
+
+    /**
+     * Merge new input into the current request's input array.
+     *
+     * @param  array  $input
+     * @return $this
+     */
+    public function merge(array $input) {
+        $this->getInputSource()->add($input);
+
+        return $this;
+    }
+
+    /**
+     * Replace the input for the current request.
+     *
+     * @param  array  $input
+     * @return $this
+     */
+    public function replace(array $input) {
+        $this->getInputSource()->replace($input);
+
+        return $this;
+    }
+
+    /**
+     * This method belongs to Symfony HttpFoundation and is not usually needed when using Laravel.
+     *
+     * Instead, you may use the "input" method.
+     *
+     * @param  string  $key
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function get($key, $default = null, $deep=false) {
+        return parent::get($key, $default, $deep);
+    }
+
+    /**
+     * Get the JSON payload for the request.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return \Symfony\Component\HttpFoundation\ParameterBag|mixed
+     */
+    public function json($key = null, $default = null) {
+        if (!isset($this->json)) {
+            $this->json = new ParameterBag((array) json_decode($this->getContent(), true));
+        }
+
+        if (is_null($key)) {
+            return $this->json;
+        }
+
+        return data_get($this->json->all(), $key, $default);
+    }
+
+    /**
+     * Get the input source for the request.
+     *
+     * @return \Symfony\Component\HttpFoundation\ParameterBag
+     */
+    protected function getInputSource() {
+        if ($this->isJson()) {
+            return $this->json();
+        }
+
+        return in_array($this->getRealMethod(), ['GET', 'HEAD']) ? $this->query : $this->request;
+    }
+
+    /**
+     * Create a new request instance from the given Laravel request.
+     *
+     * @param  \Illuminate\Http\Request  $from
+     * @param  \Illuminate\Http\Request|null  $to
+     * @return static
+     */
+    public static function createFrom(self $from, $to = null) {
+        $request = $to ?: new static;
+
+        $files = $from->files->all();
+
+        $files = is_array($files) ? array_filter($files) : $files;
+
+        $request->initialize(
+                $from->query->all(),
+                $from->request->all(),
+                $from->attributes->all(),
+                $from->cookies->all(),
+                $files,
+                $from->server->all(),
+                $from->getContent()
+        );
+
+        $request->headers->replace($from->headers->all());
+
+        $request->setJson($from->json());
+
+        if ($session = $from->getSession()) {
+            $request->setLaravelSession($session);
+        }
+
+        $request->setUserResolver($from->getUserResolver());
+
+        $request->setRouteResolver($from->getRouteResolver());
+
+        return $request;
+    }
+
+    /**
+     * Create an Illuminate request from a Symfony instance.
+     *
+     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @return static
+     */
+    public static function createFromBase(SymfonyRequest $request) {
+        $newRequest = (new static)->duplicate(
+                $request->query->all(), $request->request->all(), $request->attributes->all(),
+                $request->cookies->all(), $request->files->all(), $request->server->all()
+        );
+
+        $newRequest->headers->replace($request->headers->all());
+
+        $newRequest->content = $request->content;
+
+        $newRequest->request = $newRequest->getInputSource();
+
+        return $newRequest;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null) {
+        return parent::duplicate($query, $request, $attributes, $cookies, $this->filterFiles($files), $server);
+    }
+
+    /**
+     * Filter the given array of files, removing any empty values.
+     *
+     * @param  mixed  $files
+     * @return mixed
+     */
+    protected function filterFiles($files) {
+        if (!$files) {
+            return;
+        }
+
+        foreach ($files as $key => $file) {
+            if (is_array($file)) {
+                $files[$key] = $this->filterFiles($files[$key]);
+            }
+
+            if (empty($files[$key])) {
+                unset($files[$key]);
+            }
+        }
+
+        return $files;
+    }
+
+    /**
+     * Get the session associated with the request.
+     *
+     * @return \Illuminate\Session\Store
+     *
+     * @throws \RuntimeException
+     */
+    public function session() {
+        if (!$this->hasSession()) {
+            throw new RuntimeException('Session store not set on request.');
+        }
+
+        return $this->session;
+    }
+
+    /**
+     * Get the session associated with the request.
+     *
+     * @return \Illuminate\Session\Store|null
+     */
+    public function getSession() {
+        return $this->session;
+    }
+
+    /**
+     * Set the session instance on the request.
+     *
+     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @return void
+     */
+    public function setLaravelSession($session) {
+        $this->session = $session;
+    }
+
+    /**
+     * Get the user making the request.
+     *
+     * @param  string|null  $guard
+     * @return mixed
+     */
+    public function user($guard = null) {
+        return call_user_func($this->getUserResolver(), $guard);
+    }
+
+    /**
+     * Get the route handling the request.
+     *
+     * @param  string|null  $param
+     * @param  mixed  $default
+     * @return \Illuminate\Routing\Route|object|string|null
+     */
+    public function route($param = null, $default = null) {
+        $route = call_user_func($this->getRouteResolver());
+
+        if (is_null($route) || is_null($param)) {
+            return $route;
+        }
+
+        return $route->parameter($param, $default);
+    }
+
+    /**
+     * Get a unique fingerprint for the request / route / IP address.
+     *
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public function fingerprint() {
+        if (!$route = $this->route()) {
+            throw new RuntimeException('Unable to generate fingerprint. Route unavailable.');
+        }
+
+        return sha1(implode('|', array_merge(
+                                $route->methods(),
+                                [$route->getDomain(), $route->uri(), $this->ip()]
+        )));
+    }
+
+    /**
+     * Set the JSON payload for the request.
+     *
+     * @param  \Symfony\Component\HttpFoundation\ParameterBag  $json
+     * @return $this
+     */
+    public function setJson($json) {
+        $this->json = $json;
+
+        return $this;
+    }
+
+    /**
+     * Get the user resolver callback.
+     *
+     * @return \Closure
+     */
+    public function getUserResolver() {
+        return $this->userResolver ?: function () {
+            //
+        };
+    }
+
+    /**
+     * Set the user resolver callback.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function setUserResolver(Closure $callback) {
+        $this->userResolver = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Get the route resolver callback.
+     *
+     * @return \Closure
+     */
+    public function getRouteResolver() {
+        return $this->routeResolver ?: function () {
+            //
+        };
+    }
+
+    /**
+     * Set the route resolver callback.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function setRouteResolver(Closure $callback) {
+        $this->routeResolver = $callback;
+
+        return $this;
+    }
+
+    /**
      * Get all of the input and files for the request.
      *
      * @return array
@@ -152,8 +586,9 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return bool
      */
     public function offsetExists($offset) {
-        return array_key_exists(
-                $offset, $this->all() + $this->route()->parameters()
+        return car::has(
+                        $this->all() + $this->route()->parameters(),
+                        $offset
         );
     }
 
@@ -205,40 +640,9 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return mixed
      */
     public function __get($key) {
-
-        if (array_key_exists($key, $this->all())) {
-            return carr::get($this->all(), $key);
-        }
-        return null;
-        //return $this->route($key);
-    }
-
-    /**
-     * Get the root URL for the application.
-     *
-     * @return string
-     */
-    public function root() {
-        return rtrim($this->getSchemeAndHttpHost() . $this->getBaseUrl(), '/');
-    }
-
-    /**
-     * Determine if the given request has a valid signature.
-     *
-     * @param  bool  $absolute
-     * @return bool
-     */
-    public function hasValidSignature($absolute = true) {
-        return CRouting::urlGenerator()->hasValidSignature($this, $absolute);
-    }
-
-    /**
-     * Get the URL (no query string) for the request.
-     *
-     * @return string
-     */
-    public function url() {
-        return rtrim(preg_replace('/\?.*/', '', $this->getUri()), '/');
+        return car::get($this->all(), $key, function () use ($key) {
+                    return $this->route($key);
+                });
     }
 
 }
