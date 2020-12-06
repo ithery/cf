@@ -11,10 +11,10 @@ class CComponent_BladeDirective {
 
     public static function component($expression) {
 
-        $lastArg = trim(carr::last(explode(',', $expression)));
+        $lastArg = c::str(carr::last(explode(',', $expression)))->trim();
 
-        if (cstr::startsWith($lastArg, 'key(') && cstr::endsWith($lastArg, ')')) {
-            $cachedKey = cstr::replaceFirst($lastArg, 'key(', '')->replaceLast(')', '');
+        if ($lastArg->startsWith('key(') && $lastArg->endsWith(')')) {
+            $cachedKey = $lastArg->replaceFirst('key(', '')->replaceLast(')', '');
             $args = explode(',', $expression);
             array_pop($args);
             $expression = implode(',', $args);
