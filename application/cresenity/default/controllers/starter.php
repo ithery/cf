@@ -21,6 +21,8 @@ class Controller_Starter extends CController {
 
 
         
+        $app->addView('starter.content');
+        
 
         return $app;
     }

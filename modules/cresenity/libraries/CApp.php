@@ -11,6 +11,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CTrait_Macroable,
         CTrait_RequestInfoTrait,
         CApp_Concern_Navigation,
+        CApp_Concern_ManageStackTrait,
         CApp_Trait_App_Breadcrumb,
         CApp_Trait_App_Variables,
         CApp_Trait_App_View,

@@ -24,21 +24,37 @@ class CApp_Blade_Directive {
     public static function title($expression) {
         return '{!! CApp::instance()->renderTitle() !!}';
     }
-    
+
     public static function nav($expression) {
-        
-        return '{!! CApp::instance()->renderNavigation('.$expression.') !!}';
+
+        return '{!! CApp::instance()->renderNavigation(' . $expression . ') !!}';
     }
 
     public static function content($expression) {
         return '{!! CApp::instance()->renderContent() !!}';
     }
 
+    public static function pushScript($expression) {
+        return '<?php \CApp::instance()->startPush(\'script\') ?>';
+    }
+
+    public static function endPushScript($expression) {
+        return '<?php \CApp::instance()->stopPush(\'script\'); ?>';
+    }
+
+    public static function prependScript($expression) {
+        return '<?php \CApp::instance()->startPrepend(\'script\'); ?>';
+    }
+
+    public static function endPrependScript($expression) {
+        return '<?php \CApp::instance()->stopPrepend(\'script\'); ?>';
+    }
+
     public function directive($expression) {
         $expression = str_replace(['(', ')'], '', $expression);
         $expression = str_replace(['"', '\''], '', $expression);
         $expression = str_replace(',', ' ', $expression);
-        switch($expression) {
+        switch ($expression) {
             case 'styles':
                 return static::styles($expression);
             case 'scripts':
@@ -49,7 +65,8 @@ class CApp_Blade_Directive {
                 return static::pageTitle($expression);
             case 'title':
                 return static::title($expression);
-                
+            default:
+                throw new InvalidArgumentException('Argument '.$expression.' is invalid on CApp directive');
         }
         return $expression;
     }

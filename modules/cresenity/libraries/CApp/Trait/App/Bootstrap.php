@@ -110,6 +110,10 @@ trait CApp_Trait_App_Bootstrap {
             CView::blade()->directive('CAppNav', [CApp_Blade_Directive::class, 'nav']);
             CView::blade()->directive('CAppContent', [CApp_Blade_Directive::class, 'content']);
             CView::blade()->directive('CAppNav', [CApp_Blade_Directive::class, 'nav']);
+            CView::blade()->directive('CAppPushScript', [CApp_Blade_Directive::class, 'pushScript']);
+            CView::blade()->directive('CAppEndPushScript', [CApp_Blade_Directive::class, 'endPushScript']);
+            CView::blade()->directive('CAppPrependScript', [CApp_Blade_Directive::class, 'prependScript']);
+            CView::blade()->directive('CAppEndPrependScript', [CApp_Blade_Directive::class, 'endPrependScript']);
 
             
             
