@@ -9,7 +9,8 @@
 class Controller_Starter extends CController {
 
     public function __construct() {
-        
+        $app = CApp::instance();
+        $app->setLoginRequired(false);
     }
 
     public function index() {
