@@ -38,6 +38,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     private $keepMessage = false;
     private $useRequireJs = false;
     protected $renderer;
+    
+    private static $renderingElement;
 
     /**
      *
@@ -45,6 +47,9 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     protected $element;
 
+    
+    
+    
     /**
      * 
      * @param string $domain
@@ -518,8 +523,16 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator";
     }
 
-    public function setTheme($theme) {
+    public static function setTheme($theme) {
         CManager::theme()->setTheme($theme);
     }
 
+    
+    public static function renderingElement(){
+        return static::$renderingElement;
+    }
+    
+    public static function setRenderingElement($element) {
+        static::$renderingElement = $element;
+    }
 }

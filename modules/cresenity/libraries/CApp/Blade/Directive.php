@@ -50,6 +50,24 @@ class CApp_Blade_Directive {
         return '<?php \CApp::instance()->stopPrepend(\'script\'); ?>';
     }
 
+    public static function element($expression) {
+        $expression = str_replace(['(', ')'], '', $expression);
+        $expression = str_replace(['"', '\''], '', $expression);
+        $expression = str_replace(',', ' ', $expression);
+        $renderingElement = CApp::instance()->renderingElement();
+
+        if ($renderingElement != null) {
+            $viewElement = $renderingElement->viewElement($expression);
+            if ($viewElement) {
+              
+                $view = $viewElement->renderToView();
+                
+                return $view;
+            }
+        }
+        return '';
+    }
+
     public function directive($expression) {
         $expression = str_replace(['(', ')'], '', $expression);
         $expression = str_replace(['"', '\''], '', $expression);
@@ -66,7 +84,7 @@ class CApp_Blade_Directive {
             case 'title':
                 return static::title($expression);
             default:
-                throw new InvalidArgumentException('Argument '.$expression.' is invalid on CApp directive');
+                throw new InvalidArgumentException('Argument ' . $expression . ' is invalid on CApp directive');
         }
         return $expression;
     }

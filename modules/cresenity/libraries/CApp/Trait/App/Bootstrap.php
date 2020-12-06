@@ -114,6 +114,7 @@ trait CApp_Trait_App_Bootstrap {
             CView::blade()->directive('CAppEndPushScript', [CApp_Blade_Directive::class, 'endPushScript']);
             CView::blade()->directive('CAppPrependScript', [CApp_Blade_Directive::class, 'prependScript']);
             CView::blade()->directive('CAppEndPrependScript', [CApp_Blade_Directive::class, 'endPrependScript']);
+            CView::blade()->directive('CAppElement', [CApp_Blade_Directive::class, 'element']);
 
             
             

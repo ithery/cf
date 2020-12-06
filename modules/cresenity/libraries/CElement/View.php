@@ -17,11 +17,15 @@ class CElement_View extends CElement {
     protected $view;
     
     
+    protected $viewElement;
+    
+    
     public function __construct($id, $view = null, $data = array()) {
         parent::__construct($id);
         if($view!=null) {
             $this->setView($view,$data);
         }
+        $this->viewElement=[];
     }
     
     public function setView($view,$data=null) {
@@ -44,6 +48,7 @@ class CElement_View extends CElement {
     }
  
     public function html($indent = 0) {
+        CApp::setRenderingElement($this);
         if($this->view!=null) {
             
             return $this->view->render();
@@ -54,4 +59,11 @@ class CElement_View extends CElement {
         return '';
     }
 
+    
+    public function viewElement($key) {
+        if(!isset($this->viewElement[$key])) {
+            $this->viewElement[$key]=new CElement_PseudoElement();
+        }
+        return $this->viewElement[$key];
+    }
 }
