@@ -31,4 +31,8 @@ class Controller_Starter extends CController {
         return $app;
     }
 
+    
+    public function alpine() {
+        return c::view('alpine');
+    }
 }
