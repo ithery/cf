@@ -242,7 +242,7 @@ final class CF {
     }
 
     public static function invoke($uri) {
-        
+
         $routerData = CFRouter::getRouteData($uri);
         $routes = carr::get($routerData, 'routes');
         $current_uri = carr::get($routerData, 'current_uri');
@@ -518,16 +518,15 @@ final class CF {
             $suffix = FALSE;
         }
 
-        
-        if ($suffix === 'Controller' || $prefix==='Controller') {
+
+        if ($suffix === 'Controller' || $prefix === 'Controller') {
             $type = 'controllers';
             $directory = 'controllers';
             // Lowercase filename
-            
+
             $file = strtolower(substr($class, 0, -11));
-            if($prefix) {
+            if ($prefix) {
                 $file = strtolower(substr($class, 11));
-                
             }
             $file = str_replace('_', DS, $file);
         } else {
@@ -539,7 +538,17 @@ final class CF {
         }
 
         $class_not_found = FALSE;
-
+        //Force type to libraries
+        if ($type == 'controllers') {
+            if ($filename = self::findFile($type, $file)) {
+                require $filename;
+                $class_not_found = true;
+                return TRUE;
+            } else {
+                $type = 'libraries';
+                $directory = 'libraries';
+            }
+        }
         if ($filename = self::findFile($type, $file)) {
             require $filename;
             $class_not_found = TRUE;
@@ -547,6 +556,7 @@ final class CF {
         }
 
         if (!$class_not_found) {
+
             // Transform the class name according to PSR-0
             $routing_class = ltrim($class, '\\');
             $routing_file = '';
@@ -575,17 +585,17 @@ final class CF {
                 // find file at vendor first
                 if ($path = self::findFile('vendor', $routing_file)) {
                     // Load the class file
-                    
-                    
+
+
                     require $path;
-                    
+
                     if (class_exists($class) || interface_exists($class)) {
                         $class_not_found = FALSE;
                         return TRUE;
                     }
                 }
             }
-            
+
 
             // find file at libraries
             if ($path = self::findFile($directory, $routing_file)) {
