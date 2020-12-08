@@ -538,15 +538,15 @@ final class CF {
         }
 
         $class_not_found = FALSE;
-        //Force type to libraries
         if ($type == 'controllers') {
             if ($filename = self::findFile($type, $file)) {
                 require $filename;
-                $class_not_found = true;
+                $class_not_found = TRUE;
                 return TRUE;
             } else {
                 $type = 'libraries';
                 $directory = 'libraries';
+                $file = $class;
             }
         }
         if ($filename = self::findFile($type, $file)) {
@@ -556,7 +556,6 @@ final class CF {
         }
 
         if (!$class_not_found) {
-
             // Transform the class name according to PSR-0
             $routing_class = ltrim($class, '\\');
             $routing_file = '';
