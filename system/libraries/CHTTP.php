@@ -19,6 +19,12 @@ class CHTTP {
 
     /**
      *
+     * @var CHTTP_Cookie 
+     */
+    protected static $cookie;
+
+    /**
+     *
      * @var CHTTP_Kernel
      */
     protected static $kernel;
@@ -111,4 +117,15 @@ class CHTTP {
         return !static::$middlewareEnabled;
     }
 
+    
+    public static function cookie() {
+        if(static::$cookie==null) {
+            $config = CF::config('cookie');
+            static::$cookie = new CHTTP_Cookie();
+            static::$cookie->setDefaultPathAndDomain(
+                $config['path'], $config['domain'], $config['secure'], $config['same_site']
+            );
+        }
+        return static::$cookie;
+    }
 }
