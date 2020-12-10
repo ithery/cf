@@ -128,6 +128,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */{
         $this->events = CEvent::dispatcher();
         $this->routes = new CRouting_RouteCollection();
         $this->container = CContainer::getInstance();
+        $this->middleware = CMiddleware::middleware();
     }
 
     /**
@@ -410,7 +411,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */{
         if ($this->hasGroupStack()) {
             $last = end($this->groupStack);
 
-            return $last['prefix'] ?? '';
+            return carr::get($last,'prefix', '');
         }
 
         return '';
@@ -681,7 +682,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */{
 
                     $reflection = new ReflectionClass($name);
 
-                    return collect($excluded)->contains(function ($exclude) use ($reflection) {
+                    return c::collect($excluded)->contains(function ($exclude) use ($reflection) {
                                 return class_exists($exclude) && $reflection->isSubclassOf($exclude);
                             });
                 })->values();
