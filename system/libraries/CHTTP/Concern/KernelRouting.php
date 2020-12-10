@@ -19,7 +19,7 @@ trait CHTTP_Concern_KernelRouting {
 
         return (new CHTTP_Pipeline())
                         ->send($request)
-                        ->through(CHTTP::shouldSkipMiddleware() ? [] : $this->middleware)
+                        ->through(CHTTP::shouldSkipMiddleware() ? [] : CMiddleware::middleware())
                         ->then($this->dispatchToRouter());
     }
 
