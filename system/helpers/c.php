@@ -874,6 +874,14 @@ class c {
         return CHTTP::redirector()->to($to, $status, $headers, $secure);
     }
 
+    /**
+     * 
+     * @return CContainer_Container
+     */
+    public static function container() {
+        return CContainer::getInstance();
+    }
+
 }
 
 // End c
