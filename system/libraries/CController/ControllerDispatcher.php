@@ -56,7 +56,7 @@ class CController_ControllerDispatcher /*implements ControllerDispatcherContract
             return [];
         }
 
-        return collect($controller->getMiddleware())->reject(function ($data) use ($method) {
+        return c::collect($controller->getMiddleware())->reject(function ($data) use ($method) {
                     return static::methodExcludedByOptions($method, $data['options']);
                 })->pluck('middleware')->all();
     }
