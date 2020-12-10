@@ -45,3 +45,14 @@ $config['regenerate'] = 3;
  * Percentage probability that the gc (garbage collection) routine is started.
  */
 $config['gc_probability'] = 2;
+
+
+$config['lottery'] = [2,100];
+
+$config['http_only'] = false;
+$config['expire_on_close'] = false;
+$config['path']='/';
+$config['domain']=null;
+$config['secure']=null;
+$config['same_site']=null;
+
