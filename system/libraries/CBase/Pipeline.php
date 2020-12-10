@@ -195,24 +195,9 @@ class CBase_Pipeline implements CBase_PipelineInterface {
      * @throws \RuntimeException
      */
     protected function getContainer() {
-        if (!$this->container) {
-            throw new RuntimeException('A container instance has not been passed to the Pipeline.');
-        }
-
-        return $this->container;
+        return CContainer::getInstance();
     }
 
-    /**
-     * Set the container instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return $this
-     */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-
-        return $this;
-    }
 
     /**
      * Handle the value returned from each pipe before passing it to the next.
