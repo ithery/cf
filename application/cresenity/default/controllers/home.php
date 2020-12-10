@@ -7,7 +7,18 @@
  */
 Class Controller_Home extends CController {
 
+    public function session() {
+        $session = CSession::instance();
+        return $session->get('a');
+    }
+    
     public function index() {
+        
+        $session = CSession::instance();
+        $session->set('a','A');
+        echo $session->get('a');
+       
+        
         $app = CApp::instance();
         $app->setLoginRequired(false);
         $app->setView('welcome');
