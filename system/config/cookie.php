@@ -28,4 +28,8 @@ return [
      * secure protocol. This option is only available in PHP 5.2 and above.
      */
     'httponly' => false,
+    /**
+     * same site option
+     */
+    'same_site' => null,
 ];
