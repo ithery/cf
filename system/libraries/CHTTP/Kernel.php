@@ -18,13 +18,7 @@ class CHTTP_Kernel {
     protected $terminated;
     protected $controller;
 
-    /**
-     * The application's middleware stack.
-     *
-     * @var array
-     */
-    protected $middleware = [];
-
+    
     public function __construct() {
 
         $this->terminated = false;
