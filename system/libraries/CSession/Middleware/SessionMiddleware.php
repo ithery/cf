@@ -8,14 +8,7 @@
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
-class CSession_Middleware_SessionMiddleware
-{
-    /**
-     * The session manager.
-     *
-     * @var \Illuminate\Session\SessionManager
-     */
-    protected $manager;
+class CSession_Middleware_SessionMiddleware {
 
     /**
      * The callback that can resolve an instance of the cache factory.
@@ -31,9 +24,7 @@ class CSession_Middleware_SessionMiddleware
      * @param  callable|null  $cacheFactoryResolver
      * @return void
      */
-    public function __construct()
-    {
-        $this->manager = CSession_Manager::instance();
+    public function __construct() {
         $this->cacheFactoryResolver = null;
     }
 
@@ -44,17 +35,16 @@ class CSession_Middleware_SessionMiddleware
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle($request, Closure $next)
-    {
-       
-        if (! $this->sessionConfigured()) {
+    public function handle($request, Closure $next) {
+
+        if (!$this->sessionConfigured()) {
             return $next($request);
         }
 
         $session = $this->getSession($request);
 
-        if ($this->manager->shouldBlock() ||
-            ($request->route() instanceof CRouter_Route && $request->route()->locksFor())) {
+        if (CSession::manager()->shouldBlock() ||
+                ($request->route() instanceof CRouter_Route && $request->route()->locksFor())) {
             return $this->handleRequestWhileBlocking($request, $session, $next);
         } else {
             return $this->handleStatefulRequest($request, $session, $next);
@@ -69,25 +59,20 @@ class CSession_Middleware_SessionMiddleware
      * @param  \Closure  $next
      * @return mixed
      */
-    protected function handleRequestWhileBlocking(Request $request, $session, Closure $next)
-    {
-        if (! $request->route() instanceof Route) {
+    protected function handleRequestWhileBlocking(Request $request, $session, Closure $next) {
+        if (!$request->route() instanceof Route) {
             return;
         }
 
-        $lockFor = $request->route() && $request->route()->locksFor()
-                        ? $request->route()->locksFor()
-                        : 10;
+        $lockFor = $request->route() && $request->route()->locksFor() ? $request->route()->locksFor() : 10;
 
         $lock = $this->cache($this->manager->blockDriver())
-                    ->lock('session:'.$session->getId(), $lockFor)
-                    ->betweenBlockedAttemptsSleepFor(50);
+                ->lock('session:' . $session->getId(), $lockFor)
+                ->betweenBlockedAttemptsSleepFor(50);
 
         try {
             $lock->block(
-                ! is_null($request->route()->waitsFor())
-                        ? $request->route()->waitsFor()
-                        : 10
+                    !is_null($request->route()->waitsFor()) ? $request->route()->waitsFor() : 10
             );
 
             return $this->handleStatefulRequest($request, $session, $next);
@@ -104,13 +89,12 @@ class CSession_Middleware_SessionMiddleware
      * @param  \Closure  $next
      * @return mixed
      */
-    protected function handleStatefulRequest(CHTTP_Request $request, $session, Closure $next)
-    {
+    protected function handleStatefulRequest(CHTTP_Request $request, $session, Closure $next) {
         // If a session driver has been configured, we will need to start the session here
         // so that the data is ready for an application. Note that the Laravel sessions
         // do not make use of PHP "native" sessions in any way since they are crappy.
         $request->setLaravelSession(
-            $this->startSession($request, $session)
+                $this->startSession($request, $session)
         );
 
         $this->collectGarbage($session);
@@ -136,13 +120,12 @@ class CSession_Middleware_SessionMiddleware
      * @param  \Illuminate\Contracts\Session\Session  $session
      * @return \Illuminate\Contracts\Session\Session
      */
-    protected function startSession(CHTTP_Request $request, $session)
-    {
+    protected function startSession(CHTTP_Request $request, $session) {
         return c::tap($session, function ($session) use ($request) {
-            $session->setRequestOnHandler($request);
+                    $session->setRequestOnHandler($request);
 
-            $session->start();
-        });
+                    $session->start();
+                });
     }
 
     /**
@@ -151,22 +134,20 @@ class CSession_Middleware_SessionMiddleware
      * @param  CHTTP_Request  $request
      * @return \Illuminate\Contracts\Session\Session
      */
-    public function getSession(CHTTP_Request $request)
-    {
-        return c::tap($this->manager->driver(), function ($session) use ($request) {
-            $session->setId($request->cookies->get($session->getName()));
-        });
+    public function getSession(CHTTP_Request $request) {
+        return c::tap(CSession::instance()->store(), function ($session) use ($request) {
+                    $session->setId($request->cookies->get($session->getName()));
+                });
     }
 
     /**
      * Remove the garbage from the session if necessary.
      *
-     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param  \CSession_Store  $session
      * @return void
      */
-    protected function collectGarbage(CSession_Store $session)
-    {
-        $config = $this->manager->getSessionConfig();
+    protected function collectGarbage(CSession_Store $session) {
+        $config = CSession::manager()->getSessionConfig();
 
         // Here we will see if this request hits the garbage collection lottery by hitting
         // the odds needed to perform garbage collection on any given request. If we do
@@ -182,9 +163,15 @@ class CSession_Middleware_SessionMiddleware
      * @param  array  $config
      * @return bool
      */
-    protected function configHitsLottery(array $config)
-    {
-        return random_int(1, $config['lottery'][1]) <= $config['lottery'][0];
+    protected function configHitsLottery(array $config) {
+
+        $lottery = $config['gc_probability'];
+        $maxLottery = 100;
+        if (is_array($lottery)) {
+            $maxLottery = carr::get($lottery, 1);
+            $lottery = carr::get($lottery, 0);
+        }
+        return random_int(1, $maxLottery) <= $lottery;
     }
 
     /**
@@ -194,12 +181,11 @@ class CSession_Middleware_SessionMiddleware
      * @param  \Illuminate\Contracts\Session\Session  $session
      * @return void
      */
-    protected function storeCurrentUrl(CHTTP_Request $request, $session)
-    {
+    protected function storeCurrentUrl(CHTTP_Request $request, $session) {
         if ($request->method() === 'GET' &&
-            $request->route() instanceof CRouting_Route &&
-            ! $request->ajax() &&
-            ! $request->prefetch()) {
+                $request->route() instanceof CRouting_Route &&
+                !$request->ajax() &&
+                !$request->prefetch()) {
             $session->setPreviousUrl($request->fullUrl());
         }
     }
@@ -211,13 +197,12 @@ class CSession_Middleware_SessionMiddleware
      * @param  \Illuminate\Contracts\Session\Session  $session
      * @return void
      */
-    protected function addCookieToResponse(Response $response, CSession_Store  $session)
-    {
-        if ($this->sessionIsPersistent($config = $this->manager->getSessionConfig())) {
+    protected function addCookieToResponse(Response $response, CSession_Store $session) {
+        if ($this->sessionIsPersistent($config = CSession::manager()->getSessionConfig())) {
             $response->headers->setCookie(new Cookie(
-                $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
-                $config['path'], $config['domain'], $config['secure'],
-                $config['http_only'] , false, $config['same_site']
+                            $session->getName(), $session->getId(), $this->getCookieExpirationDate(),
+                            $config['path'], $config['domain'], $config['secure'],
+                            $config['httponly'], false, $config['same_site']
             ));
         }
     }
@@ -228,10 +213,9 @@ class CSession_Middleware_SessionMiddleware
      * @param  \Illuminate\Http\Request  $request
      * @return void
      */
-    protected function saveSession($request)
-    {
-       
-        $this->manager->driver()->save();
+    protected function saveSession($request) {
+
+        CSession::instance()->store()->save();
     }
 
     /**
@@ -239,9 +223,8 @@ class CSession_Middleware_SessionMiddleware
      *
      * @return int
      */
-    protected function getSessionLifetimeInSeconds()
-    {
-        return ($this->manager->getSessionConfig()['lifetime'] ?? null) * 60;
+    protected function getSessionLifetimeInSeconds() {
+        return carr::get($this->manager->getSessionConfig(), 'expiration');
     }
 
     /**
@@ -249,13 +232,10 @@ class CSession_Middleware_SessionMiddleware
      *
      * @return \DateTimeInterface|int
      */
-    protected function getCookieExpirationDate()
-    {
-        $config = $this->manager->getSessionConfig();
+    protected function getCookieExpirationDate() {
+        $config = CSession::manager()->getSessionConfig();
 
-        return $config['expire_on_close'] ? 0 : 
-            CCarbon::now()->addSeconds($config['expiration'])
-        ;
+        return $config['expire_on_close'] ? 0 : CCarbon::now()->addSeconds($config['expiration']);
     }
 
     /**
@@ -263,9 +243,8 @@ class CSession_Middleware_SessionMiddleware
      *
      * @return bool
      */
-    protected function sessionConfigured()
-    {
-        return ! is_null(carr::get($this->manager->getSessionConfig(),'driver'));
+    protected function sessionConfigured() {
+        return !is_null(carr::get(CSession::manager()->getSessionConfig(), 'driver'));
     }
 
     /**
@@ -274,21 +253,20 @@ class CSession_Middleware_SessionMiddleware
      * @param  array|null  $config
      * @return bool
      */
-    protected function sessionIsPersistent(array $config = null)
-    {
+    protected function sessionIsPersistent(array $config = null) {
         $config = $config ?: $this->manager->getSessionConfig();
 
-        return ! is_null($config['driver'] ?? null);
+        return !is_null(carr::get($config, 'driver'));
     }
 
     /**
      * Resolve the given cache driver.
      *
      * @param  string  $driver
-     * @return \Illuminate\Cache\Store
+     * @return CCache_DriverAbstract
      */
-    protected function cache($driver)
-    {
+    protected function cache($driver) {
         return call_user_func($this->cacheFactoryResolver)->driver($driver);
     }
+
 }
