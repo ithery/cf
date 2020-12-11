@@ -215,7 +215,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if (ccfg::get("update_last_request")) {
             $user = $this->user();
             if ($user != null) {
-                if (!is_array($user)) {
+                if (!is_array($user) && is_object($user)) {
                     //update last request
                     $db = $this->db();
                     $db->update("users", array("last_request" => date("Y-m-d H:i:s")), array("user_id" => $user->user_id));
