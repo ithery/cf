@@ -159,10 +159,10 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
      * @param  string $name
      * @param  int $seconds
      * @param  string|null $owner
-     * @return \Illuminate\Contracts\Cache\Lock
+     * @return CCache_Lock_RedisLock
      */
     public function lock($name, $seconds = 0, $owner = null) {
-        return new RedisLock($this->connection(), $this->prefix . $name, $seconds, $owner);
+        return new CCache_Lock_RedisLock($this->connection(), $this->prefix . $name, $seconds, $owner);
     }
 
     /**
@@ -170,7 +170,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
      *
      * @param  string  $name
      * @param  string  $owner
-     * @return \Illuminate\Contracts\Cache\Lock
+     * @return CCache_Lock_RedisLock
      */
     public function restoreLock($name, $owner) {
         return $this->lock($name, 0, $owner);
@@ -200,7 +200,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
      * Begin executing a new tags operation.
      *
      * @param  array|mixed  $names
-     * @return \Illuminate\Cache\RedisTaggedCache
+     * @return CCache_Driver_RedisDriver_RedisTaggedCache
      */
     public function tags($names) {
         return new CCache_Driver_RedisDriver_RedisTaggedCache(
@@ -230,7 +230,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Get the Redis database instance.
      *
-     * @return \Illuminate\Contracts\Redis\Factory
+     * @return CRedis
      */
     public function getRedis() {
         return $this->redis;
