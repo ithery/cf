@@ -9,19 +9,19 @@
 class CSession_NativeAdapter implements \ArrayAccess {
 
     public function offsetExists($offset) {
-        return Session::has($offset);
+        return c::session()->has($offset);
     }
 
     public function offsetGet($offset) {
-        return Session::get($offset);
+        return c::session()->get($offset);
     }
 
     public function offsetSet($offset, $value) {
-        return Session::put($offset, $value);
+        return c::session()->put($offset, $value);
     }
 
     public function offsetUnset($offset) {
-        return Session::forget($offset);
+        return c::session()->forget($offset);
     }
 
 }

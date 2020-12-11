@@ -124,4 +124,9 @@ class CSession_Manager {
         return $this->config->get('driver', 'native');
     }
 
+    public function applyNativeSession() {
+        //we will replace the $_SESSION with our adapter
+        $_SESSION = new CSession_NativeAdapter();
+    }
+
 }

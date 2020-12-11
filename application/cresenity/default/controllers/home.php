@@ -7,9 +7,28 @@
  */
 Class Controller_Home extends CController {
 
+    
+    public function login() {
+        //c::session()->put('user','user');
+        $_SESSION['member']='member';
+    }
+    
+    public function dashboard() {
+        if(!isset($_SESSION['member'])) {
+            return c::redirect(c::url('home'));
+        }
+        /*
+        if(!c::session()->has('user')) {
+            return c::redirect(c::url('home'));
+        }
+         * 
+         */
+    }
+    
+    
     public function session() {
         $session = CSession::instance();
-        return $session->get('a');
+        cdbg::dd($session->all());
     }
     
     public function index() {

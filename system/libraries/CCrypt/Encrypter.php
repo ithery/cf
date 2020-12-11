@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-class CCrypt_Encrypter {
+class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
 
     /**
      * The encryption key.

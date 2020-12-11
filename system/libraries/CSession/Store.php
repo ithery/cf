@@ -636,4 +636,12 @@ class CSession_Store {
         }
     }
 
+    
+    public function updateLastActivity() {
+        $this->put('_last_activity',time());
+    }
+    
+    public function updateTotalHits() {
+        $this->increment('_total_hit');
+    }
 }

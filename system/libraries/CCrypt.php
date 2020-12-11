@@ -15,7 +15,7 @@ final class CCrypt {
 
     public static function encrypter() {
         if (static::$encrypter == null) {
-            $config = CF::config('app');
+            $config = CConfig::instance('app');
             $key = $config->get('key');
             $cipher = $config->get('cipher');
 

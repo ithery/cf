@@ -460,10 +460,10 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Set the session instance on the request.
      *
-     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param  CSession_Store  $session
      * @return void
      */
-    public function setLaravelSession($session) {
+    public function setSession($session) {
         $this->session = $session;
     }
 

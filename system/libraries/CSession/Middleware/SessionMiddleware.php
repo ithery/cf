@@ -20,8 +20,6 @@ class CSession_Middleware_SessionMiddleware {
     /**
      * Create a new session middleware.
      *
-     * @param  \Illuminate\Session\SessionManager  $manager
-     * @param  callable|null  $cacheFactoryResolver
      * @return void
      */
     public function __construct() {
@@ -31,7 +29,7 @@ class CSession_Middleware_SessionMiddleware {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  CHTTP_Request  $request
      * @param  \Closure  $next
      * @return mixed
      */
@@ -41,6 +39,8 @@ class CSession_Middleware_SessionMiddleware {
             return $next($request);
         }
 
+        CSession::manager()->applyNativeSession();
+        
         $session = $this->getSession($request);
 
         if (CSession::manager()->shouldBlock() ||
@@ -93,7 +93,7 @@ class CSession_Middleware_SessionMiddleware {
         // If a session driver has been configured, we will need to start the session here
         // so that the data is ready for an application. Note that the Laravel sessions
         // do not make use of PHP "native" sessions in any way since they are crappy.
-        $request->setLaravelSession(
+        $request->setSession(
                 $this->startSession($request, $session)
         );
 
@@ -102,6 +102,10 @@ class CSession_Middleware_SessionMiddleware {
         $response = $next($request);
 
         $this->storeCurrentUrl($request, $session);
+
+        $session->updateTotalHits();
+        $session->updateLastActivity();
+
 
         $this->addCookieToResponse($response, $session);
 
@@ -117,13 +121,12 @@ class CSession_Middleware_SessionMiddleware {
      * Start the session for the given request.
      *
      * @param  CHTTP_Request  $request
-     * @param  \Illuminate\Contracts\Session\Session  $session
-     * @return \Illuminate\Contracts\Session\Session
+     * @param  \CSession_Store  $session
+     * @return \CSession_Store
      */
     protected function startSession(CHTTP_Request $request, $session) {
         return c::tap($session, function ($session) use ($request) {
                     $session->setRequestOnHandler($request);
-
                     $session->start();
                 });
     }
@@ -132,7 +135,7 @@ class CSession_Middleware_SessionMiddleware {
      * Get the session implementation from the manager.
      *
      * @param  CHTTP_Request  $request
-     * @return \Illuminate\Contracts\Session\Session
+     * @return CSession_Store
      */
     public function getSession(CHTTP_Request $request) {
         return c::tap(CSession::instance()->store(), function ($session) use ($request) {
@@ -178,7 +181,7 @@ class CSession_Middleware_SessionMiddleware {
      * Store the current URL for the request if necessary.
      *
      * @param  CHTTP_Request  $request
-     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param  CSession_Store  $session
      * @return void
      */
     protected function storeCurrentUrl(CHTTP_Request $request, $session) {
@@ -210,7 +213,7 @@ class CSession_Middleware_SessionMiddleware {
     /**
      * Save the session data to storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  CHTTP_Request  $request
      * @return void
      */
     protected function saveSession($request) {
