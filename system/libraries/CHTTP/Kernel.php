@@ -190,7 +190,10 @@ class CHTTP_Kernel {
                 $headers = headers_list();
 
                 foreach ($headers as $header) {
-                    list($headerKey, $headerValue) = explode(":", $header);
+                    $headerExploded= explode(":", $header);
+                    $headerKey = carr::get($headerExploded,0);
+                    $headerValue = implode(":", array_splice($headerExploded, 1));
+                    
                     header_remove($headerKey);
                     $response->header($headerKey, $headerValue);
                 }
@@ -276,7 +279,10 @@ class CHTTP_Kernel {
             $response->setNotModified();
         }
 
-        return $response->prepare($request);
+//        CFEvent::run('system.send_headers');
+        $preparedResponse =  $response->prepare($request);
+        
+        return $preparedResponse;
     }
 
 }
