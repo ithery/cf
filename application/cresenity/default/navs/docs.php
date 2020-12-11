@@ -40,4 +40,26 @@ return [
             ]
         ]
     ],
+    [
+        "name" => "component",
+        "label" => c::__("Components"),
+        "subnav" => [
+            [
+                "name" => "component.started",
+                "label" => c::__("Get Started Component"),
+                "uri" => "docs/component/started",
+            ],
+        ]
+    ],
+    [
+        "name" => "command",
+        "label" => c::__("Command"),
+        "subnav" => [
+            [
+                "name" => "command.basic",
+                "label" => c::__("Basic"),
+                "uri" => "docs/command/basic",
+            ],
+        ]
+    ],
 ];

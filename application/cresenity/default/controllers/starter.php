@@ -21,8 +21,18 @@ class Controller_Starter extends CController {
 
 
         
+        $view = $app->addView('starter.content');
+        $viewElement = $view->viewElement('field-email');
+        $table= $viewElement->addTable();
+        $table->addColumn('name');
+        
+        
 
         return $app;
     }
 
+    
+    public function alpine() {
+        return c::view('alpine');
+    }
 }

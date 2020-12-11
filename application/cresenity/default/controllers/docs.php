@@ -19,6 +19,7 @@ Class Controller_Docs extends CController {
         $app->setLoginRequired(false);
         $app->setTheme('cresenity-docs');
         $app->setView('docs');
+        $app->setNav('docs');
         $app->setNavRenderer(function($navs) {
             return c::view('docs.nav',['navs'=>$navs])->render();
         });

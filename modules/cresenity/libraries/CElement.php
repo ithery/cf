@@ -194,4 +194,21 @@ abstract class CElement extends CObservable {
         return $return;
     }
 
+    public function renderToView() {
+        $html = $this->html();
+        $js = $this->js();
+        return <<<HTML
+        ${html}
+        <?php \CApp::instance()->startPush('script'); ?>
+        <script>
+            jQuery(document).ready(function() {
+                ${js}
+            });
+        
+        </script>
+        
+        <?php \CApp::instance()->stopPush('script'); ?>
+        
+HTML;
+    }
 }

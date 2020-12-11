@@ -69,6 +69,7 @@ HTML;
     }
 
     public function renderScripts($options = []) {
+        
         $viewData = $this->getViewData();
         $endClientScript = carr::get($viewData, 'end_client_script', '');
         $readyClientScript = carr::get($viewData, 'ready_client_script', '');
@@ -76,8 +77,13 @@ HTML;
         $js = carr::get($viewData, 'js', '');
         $customJs = carr::get($viewData, 'custom_js', '');
 
+        
+        
         $alpineJs = curl::base() . 'media/js/libs/alpine.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/libs/alpine.js'));
         $alpineScript = '<script src="'.$alpineJs.'"></script>';
+        
+        
+        $pushesScript = $this->yieldPushContent('script');
         
         $cresJs = curl::base() . 'media/js/cres/dist/cres.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.js'));
         return <<<HTML
@@ -114,9 +120,10 @@ HTML;
                     window.onload = function () {
                         ${loadClientScript}
                     }
-                }
+                } 
                 ${customJs}
             </script>
+            ${pushesScript}
 HTML;
     }
 

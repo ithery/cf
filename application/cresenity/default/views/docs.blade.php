@@ -36,7 +36,7 @@
                     </div>
                     <!-- sidebar-menu  -->
                     <div class=" sidebar-item sidebar-menu">
-                        @CAppNav('docs')
+                        @CAppNav
                     </div>
                     <!-- sidebar-menu  -->
                 </div>

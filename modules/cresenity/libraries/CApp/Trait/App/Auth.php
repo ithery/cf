@@ -21,6 +21,10 @@ trait CApp_Trait_App_Auth {
         $this->loginRequired = $bool;
         return $this;
     }
+    
+    public function isLoginRequired() {
+        return $this->loginRequired;
+    }
 
     public function user() {
         if ($this->_user == null) {

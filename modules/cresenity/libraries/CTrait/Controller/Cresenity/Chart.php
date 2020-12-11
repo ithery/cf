@@ -12,7 +12,7 @@ use CImage_Chart_Constant as Constant;
 trait CTrait_Controller_Cresenity_Chart {
 
     public function line() {
-        $data = $data = CImage_Chart::createData();
+        $data = CImage_Chart::createData();
         $data->addPoints([-4, Constant::VOID, Constant::VOID, 12, 8, 3], "Probe 1");
         $data->addPoints([3, 12, 15, 8, 5, -5], "Probe 2");
         $data->addPoints([2, 7, 5, 18, 19, 22], "Probe 3");

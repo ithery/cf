@@ -1,12 +1,17 @@
 <?php
 
-/**
- * Description of ManageStack
- *
- * @author Hery
- */
-trait CView_Trait_ManageStackTrait {
+defined('SYSPATH') OR die('No direct access allowed.');
 
+/**
+ * @author Hery Kurniawan <hery@itton.co.id>
+ * @since Dec 7, 2020 
+ * @license Ittron Global Teknologi
+ */
+trait CApp_Concern_ManageStackTrait {
+    
+    
+    protected $renderCount=0;
+    
     /**
      * All of the finished, captured push sections.
      *
@@ -36,6 +41,7 @@ trait CView_Trait_ManageStackTrait {
      * @return void
      */
     public function startPush($section, $content = '') {
+        
         if ($content === '') {
             if (ob_start()) {
                 $this->pushStack[] = $section;
@@ -56,9 +62,11 @@ trait CView_Trait_ManageStackTrait {
         if (empty($this->pushStack)) {
             throw new InvalidArgumentException('Cannot end a push stack without first starting one.');
         }   
-
+        
         return c::tap(array_pop($this->pushStack), function ($last) {
+            
             $this->extendPush($last, ob_get_clean());
+          
         });
     }
 
@@ -109,7 +117,7 @@ trait CView_Trait_ManageStackTrait {
         if (empty($this->pushStack)) {
             throw new InvalidArgumentException('Cannot end a prepend operation without first starting one.');
         }
-
+        
         return c::tap(array_pop($this->pushStack), function ($last) {
             $this->extendPrepend($last, ob_get_clean());
         });
@@ -142,10 +150,11 @@ trait CView_Trait_ManageStackTrait {
      * @return string
      */
     public function yieldPushContent($section, $default = '') {
+        
         if (!isset($this->pushes[$section]) && !isset($this->prepends[$section])) {
             return $default;
         }
-        
+
         $output = '';
 
         if (isset($this->prepends[$section])) {
@@ -155,7 +164,7 @@ trait CView_Trait_ManageStackTrait {
         if (isset($this->pushes[$section])) {
             $output .= implode($this->pushes[$section]);
         }
-
+        
         return $output;
     }
 

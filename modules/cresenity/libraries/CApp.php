@@ -11,6 +11,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CTrait_Macroable,
         CTrait_RequestInfoTrait,
         CApp_Concern_Navigation,
+        CApp_Concern_ManageStackTrait,
         CApp_Trait_App_Breadcrumb,
         CApp_Trait_App_Variables,
         CApp_Trait_App_View,
@@ -37,6 +38,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     private $keepMessage = false;
     private $useRequireJs = false;
     protected $renderer;
+    
+    private static $renderingElement;
 
     /**
      *
@@ -44,6 +47,9 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     protected $element;
 
+    
+    
+    
     /**
      * 
      * @param string $domain
@@ -517,8 +523,16 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator";
     }
 
-    public function setTheme($theme) {
+    public static function setTheme($theme) {
         CManager::theme()->setTheme($theme);
     }
 
+    
+    public static function renderingElement(){
+        return static::$renderingElement;
+    }
+    
+    public static function setRenderingElement($element) {
+        static::$renderingElement = $element;
+    }
 }
