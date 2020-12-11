@@ -68,11 +68,15 @@ class curl {
     }
 
     public static function urlFull() {
+        static::fullUrl();
+    }
+
+    public static function fullUrl($qs = true) {
         $requestUri = carr::get($_SERVER, 'REQUEST_URI');
-        if (strlen($requestUri) > 0) {
+        if ($qs && strlen($requestUri) > 0) {
             return trim(curl::httpbase(), '/') . $requestUri;
         }
-        return curl::httpbase() . curl::current() . CFRouter::$query_string;
+        return curl::httpbase() . curl::current() . ($qs ? CFRouter::$query_string : '');
     }
 
     /**
