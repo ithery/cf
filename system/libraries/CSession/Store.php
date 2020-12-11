@@ -285,7 +285,7 @@ class CSession_Store {
             return $value;
         }
 
-        return tap($callback(), function ($value) use ($key) {
+        return c::tap($callback(), function ($value) use ($key) {
             $this->put($key, $value);
         });
     }

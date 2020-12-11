@@ -16,13 +16,20 @@ class CSession_Factory {
     public static function createRedisDriver() {
         $cacheOptions = array();
         $cacheOptions['driver'] = 'Redis';
-        
+
         $redis = CRedis::instance(CF::config('session.storage'));
         $driver = new CCache_Driver_RedisDriver($redis);
         $redisStore = new CCache_Repository($driver);
         $expirationSeconds = CF::config('session.expiration');
         $handler = new CSession_Driver_Redis($redisStore, $expirationSeconds);
         return $handler;
+    }
+
+    public static function resolveDriver($driver) {
+        if(!$driver instanceof CSession_Driver) {
+            //we try to resolve this driver
+            
+        }
     }
 
 }
