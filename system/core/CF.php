@@ -747,7 +747,7 @@ final class CF {
         }
 
         // Load include paths
-        $paths = self::paths();
+        $paths = self::paths(null,$reload);
 
         // Nothing found, yet
         $found = NULL;
