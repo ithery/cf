@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
-
     public $pm;
     public $sm;
     public $cli;
@@ -16,10 +15,6 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
     /**
      * Create a new PHP FPM class instance.
      *
-     * @param PackageManager $pm
-     * @param ServiceManager $sm
-     * @param CommandLine    $cli
-     * @param Filesystem     $files
      * @return void
      */
     public function __construct() {
@@ -78,7 +73,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
         $exception = null;
 
         $this->stop();
-        info('Disabling php' . $this->version . '-fpm...');
+        CDevSuite::info('Disabling php' . $this->version . '-fpm...');
         $this->sm->disable($this->fpmServiceName());
 
         if (!isset($version) || strtolower($version) === 'default') {
@@ -95,7 +90,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
         }
 
         if ($this->sm->disabled($this->fpmServiceName())) {
-            info('Enabling php' . $this->version . '-fpm...');
+            CDevSuite::info('Enabling php' . $this->version . '-fpm...');
             $this->sm->enable($this->fpmServiceName());
         }
 
@@ -130,16 +125,21 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
      * @return void
      */
     public function installConfiguration() {
-        $contents = $this->files->get(CDevSuite::stubsPath().'fpm.conf');
+        $contents = $this->files->get(CDevSuite::stubsPath() . 'fpm.conf');
 
-                    $contents = str_replace(['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'], [CDevSuite::user(), rtrim(CDevSuite::homePath(),'/')], $contents);
+        $contents = str_replace(
+            ['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'],
+            [CDevSuite::user(), rtrim(CDevSuite::homePath(), '/')],
+            $contents
+        );
 
-                    
         $this->files->putAsRoot(
-                $this->fpmConfigPath() . '/devsuite.conf', str_replace(
-                        ['DEVSUITE_USER','DEVSUITE_GROUP', 'DEVSUITE_HOME_PATH'] 
-                        ,[CDevSuite::user(), CDevSuite::group(), rtrim(CDevSuite::homePath(),'/')] 
-                        ,$contents)
+            $this->fpmConfigPath() . '/devsuite.conf',
+            str_replace(
+                ['DEVSUITE_USER', 'DEVSUITE_GROUP', 'DEVSUITE_HOME_PATH'],
+                [CDevSuite::user(), CDevSuite::group(), rtrim(CDevSuite::homePath(), '/')],
+                $contents
+            )
         );
 
         if (($this->sm) instanceof CDevSuite_ServiceManager_Systemd) {
@@ -155,7 +155,8 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
     public function systemdDropInOverride() {
         $this->files->ensureDirExists('/etc/systemd/system/php-fpm.service.d');
         $this->files->putAsUser(
-                '/etc/systemd/system/php-fpm.service.d/devsuite.conf', $this->files->get(CDevSuite::homePath() . 'php-fpm.service.d/devsuite.conf')
+            '/etc/systemd/system/php-fpm.service.d/devsuite.conf',
+            $this->files->get(CDevSuite::homePath() . 'php-fpm.service.d/devsuite.conf')
         );
     }
 
@@ -213,7 +214,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
         $status = $this->sm->status($service);
 
         if (strpos($status, 'not-found') || strpos($status, 'not be found')) {
-            return new DomainException("Unable to determine PHP service name.");
+            return new DomainException('Unable to determine PHP service name.');
         }
 
         return $service;
@@ -226,16 +227,15 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
      */
     public function fpmConfigPath() {
         return c::collect([
-                    '/etc/php/' . $this->version . '/fpm/pool.d', // Ubuntu
-                    '/etc/php' . $this->version . '/fpm/pool.d', // Ubuntu
-                    '/etc/php-fpm.d', // Fedora
-                    '/etc/php/php-fpm.d', // Arch
-                    '/etc/php7/fpm/php-fpm.d', // openSUSE
-                ])->first(function ($path) {
-                    return is_dir($path);
-                }, function () {
-                    throw new DomainException('Unable to determine PHP-FPM configuration folder.');
-                });
+            '/etc/php/' . $this->version . '/fpm/pool.d', // Ubuntu
+            '/etc/php' . $this->version . '/fpm/pool.d', // Ubuntu
+            '/etc/php-fpm.d', // Fedora
+            '/etc/php/php-fpm.d', // Arch
+            '/etc/php7/fpm/php-fpm.d', // openSUSE
+        ])->first(function ($path) {
+            return is_dir($path);
+        }, function () {
+            throw new DomainException('Unable to determine PHP-FPM configuration folder.');
+        });
     }
-
 }

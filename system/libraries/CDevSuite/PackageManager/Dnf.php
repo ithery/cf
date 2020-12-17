@@ -1,19 +1,11 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CDevSuite_PackageManager_Dnf extends CDevSuite_PackageManager {
-
     public $cli;
 
     /**
      * Create a new Apt instance.
      *
-     * @param CommandLine $cli
      * @return void
      */
     public function __construct() {
@@ -24,6 +16,7 @@ class CDevSuite_PackageManager_Dnf extends CDevSuite_PackageManager {
      * Determine if the given package is installed.
      *
      * @param string $package
+     *
      * @return bool
      */
     public function installed($package) {
@@ -38,6 +31,7 @@ class CDevSuite_PackageManager_Dnf extends CDevSuite_PackageManager {
      * Ensure that the given package is installed.
      *
      * @param string $package
+     *
      * @return void
      */
     public function ensureInstalled($package) {
@@ -50,6 +44,7 @@ class CDevSuite_PackageManager_Dnf extends CDevSuite_PackageManager {
      * Install the given package and throw an exception on failure.
      *
      * @param string $package
+     *
      * @return void
      */
     public function installOrFail($package) {
@@ -73,6 +68,8 @@ class CDevSuite_PackageManager_Dnf extends CDevSuite_PackageManager {
 
     /**
      * Restart dnsmasq in Fedora.
+     *
+     * @param mixed $sm
      */
     public function nmRestart($sm) {
         $sm->restart('NetworkManager');
@@ -94,5 +91,4 @@ class CDevSuite_PackageManager_Dnf extends CDevSuite_PackageManager {
             return false;
         }
     }
-
 }

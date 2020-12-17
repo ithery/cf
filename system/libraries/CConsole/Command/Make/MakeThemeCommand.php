@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CConsole_Command_Make_MakeThemeCommand extends CConsole_Command {
-
     /**
      * The name and signature of the console command.
      *
@@ -55,5 +54,4 @@ class CConsole_Command_Make_MakeThemeCommand extends CConsole_Command {
 
         $this->info('Theme ' . $theme . ' created on:' . $themeFile);
     }
-
 }

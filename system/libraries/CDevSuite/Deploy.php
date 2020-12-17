@@ -9,7 +9,6 @@
 use Symfony\Component\Process\Process;
 
 class CDevSuite_Deploy {
-
     /**
      * The hosts that have already been assigned a color for output.
      *
@@ -18,7 +17,6 @@ class CDevSuite_Deploy {
     protected $hostsWithColor = [];
 
     /**
-     *
      * @var CDevSuite_Filesystem
      */
     protected $files;
@@ -56,7 +54,6 @@ class CDevSuite_Deploy {
     }
 
     public function run($taskName, $continue, $pretending) {
-
         $container = $this->loadTaskContainer();
 
         $tasks = [$taskName];
@@ -64,7 +61,6 @@ class CDevSuite_Deploy {
         if ($macro = $container->getMacro($taskName)) {
             $tasks = $macro;
         }
-
 
         $exitCode = CConsole::SUCCESS_EXIT;
 
@@ -95,10 +91,10 @@ class CDevSuite_Deploy {
      * @return CDevSuite_TaskContainer
      */
     protected function loadTaskContainer() {
-
-
         c::with($container = new CDevSuite_Deploy_TaskContainer)->load(
-                $this->deployFile(), new CDevSuite_Deploy_Compiler, $this->getOptions()
+            $this->deployFile(),
+            new CDevSuite_Deploy_Compiler,
+            $this->getOptions()
         );
 
         return $container;
@@ -135,8 +131,11 @@ class CDevSuite_Deploy {
     /**
      * Run the given task out of the container.
      *
-     * @param  CDevSuite_Deploy_TaskContainer  $container
-     * @param  string  $task
+     * @param CDevSuite_Deploy_TaskContainer $container
+     * @param string                         $task
+     * @param mixed                          $taskName
+     * @param mixed                          $pretending
+     *
      * @return null|int|void
      */
     protected function runTask($container, $task, $taskName, $pretending) {
@@ -164,7 +163,9 @@ class CDevSuite_Deploy {
     /**
      * Run the given task and return the exit code.
      *
-     * @param  CDevSuite_Deploy_Task  $task
+     * @param CDevSuite_Deploy_Task $task
+     * @param mixed                 $pretending
+     *
      * @return int
      */
     protected function runTaskOverSSH(CDevSuite_Deploy_Task $task, $pretending) {
@@ -183,39 +184,41 @@ class CDevSuite_Deploy {
     /**
      * Run the given task and return the exit code.
      *
-     * @param  CDevSuite_Deploy_Task  $task
+     * @param CDevSuite_Deploy_Task $task
+     *
      * @return int
      */
     protected function passToRemoteProcessor(CDevSuite_Deploy_Task $task) {
         return $this->getRemoteProcessor($task)->run($task, function ($type, $host, $line) {
-                    if (cstr::startsWith($line, 'Warning: Permanently added ')) {
-                        return;
-                    }
+            if (cstr::startsWith($line, 'Warning: Permanently added ')) {
+                return;
+            }
 
-                    $this->displayOutput($type, $host, $line);
-                });
+            $this->displayOutput($type, $host, $line);
+        });
     }
 
     /**
      * Display the given output line.
      *
-     * @param  int  $type
-     * @param  string  $host
-     * @param  string  $line
+     * @param int    $type
+     * @param string $host
+     * @param string $line
+     *
      * @return void
      */
     protected function displayOutput($type, $host, $line) {
         $lines = explode("\n", $line);
 
         $hostColor = $this->getHostColor($host);
-        
+
         foreach ($lines as $line) {
             if (strlen(trim($line)) === 0) {
                 continue;
             }
 
             if ($type == Process::OUT) {
-                CDevSuite::output($hostColor . ': ' . trim($line) );
+                CDevSuite::output($hostColor . ': ' . trim($line));
             } else {
                 CDevSuite::output($hostColor . ':  ' . '<fg=red>' . trim($line) . '</>');
             }
@@ -225,7 +228,8 @@ class CDevSuite_Deploy {
     /**
      * Return the hostname wrapped in a color tag.
      *
-     * @param  string  $host
+     * @param string $host
+     *
      * @return string
      */
     protected function getHostColor($host) {
@@ -243,11 +247,11 @@ class CDevSuite_Deploy {
     /**
      * Get the SSH processor for the task.
      *
-     * @param  CDevSuite_Deploy_Task  $task
+     * @param CDevSuite_Deploy_Task $task
+     *
      * @return CDevSuite_Deploy_RemoteProcessor
      */
     protected function getRemoteProcessor(CDevSuite_Deploy_Task $task) {
         return $task->parallel ? new CDevSuite_Deploy_ParallelSSH : new CDevSuite_Deploy_SSH;
     }
-
 }

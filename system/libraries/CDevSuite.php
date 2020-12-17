@@ -1,98 +1,77 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CDevSuite {
-
     use CDevSuite_Trait_ConsoleTrait,
         CDevSuite_Trait_WindowsTrait,
         CDevSuite_Trait_MacTrait,
         CDevSuite_Trait_LinuxTrait;
 
     /**
-     *
      * @var CDevSuite_Configuration
      */
     protected static $configuration;
 
     /**
-     *
      * @var CDevSuite_Filesystem
      */
     protected static $filesystem;
 
     /**
-     *
      * @var CDevSuite_CommandLine
      */
     protected static $commandLine;
 
     /**
-     *
      * @var CDevSuite_DevCloud
      */
     protected static $devCloud;
 
     /**
-     *
      * @var CDevSuite_Nginx
      */
     protected static $nginx;
 
     /**
-     *
      * @var CDevSuite_System
      */
     protected static $system;
 
     /**
-     *
      * @var CDevSuite_PackageManager
      */
     protected static $packageManager;
 
     /**
-     *
      * @var CDevSuite_ServiceManager
      */
     protected static $serviceManager;
 
     /**
-     *
      * @var CDevSuite_Site
      */
     protected static $site;
 
     /**
-     *
      * @var CDevSuite_PhpFpm
      */
     protected static $phpFpm;
 
     /**
-     *
      * @var CDevSuite_DnsMasq
      */
     protected static $dnsMasq;
 
     /**
-     *
      * @var CDevSuite_Db
      */
     protected static $db;
 
     /**
-     *
      * @var CDevSuite_Ssh
      */
     protected static $ssh;
 
     /**
-     *
      * @var CDevSuite_Deploy
      */
     protected static $deploy;
@@ -134,7 +113,6 @@ class CDevSuite {
     }
 
     /**
-     * 
      * @return CDevSuite_Db
      */
     public static function db() {
@@ -145,7 +123,6 @@ class CDevSuite {
     }
 
     /**
-     * 
      * @return CDevSuite_Ssh
      */
     public static function ssh() {
@@ -156,8 +133,7 @@ class CDevSuite {
     }
 
     /**
-     * 
-     * @return CDevSuite_Ssh
+     * @return CDevSuite_Deploy
      */
     public static function deploy() {
         if (static::$deploy == null) {
@@ -252,7 +228,6 @@ class CDevSuite {
     }
 
     /**
-     * 
      * @return CDevSuite_Site
      */
     public static function site() {
@@ -273,8 +248,8 @@ class CDevSuite {
     }
 
     /**
-     * 
      * @return CDevSuite_DnsMasq
+     *
      * @throws Exception
      */
     public static function dnsMasq() {
@@ -295,7 +270,6 @@ class CDevSuite {
     }
 
     /**
-     * 
      * @return CDevSuite_Nginx
      */
     public static function nginx() {
@@ -315,6 +289,11 @@ class CDevSuite {
         return static::$nginx;
     }
 
+    /**
+     * Get PhpFpm instance
+     *
+     * @return CDevSuite_PhpFpm
+     */
     public static function phpFpm() {
         if (static::$phpFpm == null) {
             switch (CServer::getOS()) {
@@ -337,19 +316,19 @@ class CDevSuite {
             switch (CServer::getOS()) {
                 case CServer::OS_LINUX:
                     static::$packageManager = c::collect([
-                                CDevSuite_PackageManager_Apt::class,
-                                CDevSuite_PackageManager_AptGet::class,
-                                CDevSuite_PackageManager_Dnf::class,
-                                CDevSuite_PackageManager_Pacman::class,
-                                CDevSuite_PackageManager_Yum::class,
-                                CDevSuite_PackageManager_PackageKit::class,
-                                CDevSuite_PackageManager_Eopkg::class,
-                            ])->map(function($className) {
-                                return CDevSuite_Helper::resolve($className);
-                            })->first(static function ($pm) {
+                        CDevSuite_PackageManager_Apt::class,
+                        CDevSuite_PackageManager_AptGet::class,
+                        CDevSuite_PackageManager_Dnf::class,
+                        CDevSuite_PackageManager_Pacman::class,
+                        CDevSuite_PackageManager_Yum::class,
+                        CDevSuite_PackageManager_PackageKit::class,
+                        CDevSuite_PackageManager_Eopkg::class,
+                    ])->map(function ($className) {
+                        return CDevSuite_Helper::resolve($className);
+                    })->first(static function ($pm) {
                         return $pm->isAvailable();
                     }, static function () {
-                        throw new DomainException("No compatible package manager found.");
+                        throw new DomainException('No compatible package manager found.');
                     });
                     break;
             }
@@ -362,14 +341,14 @@ class CDevSuite {
             switch (CServer::getOS()) {
                 case CServer::OS_LINUX:
                     static::$serviceManager = c::collect([
-                                CDevSuite_ServiceManager_LinuxService::class,
-                                CDevSuite_ServiceManager_Systemd::class,
-                            ])->map(function($className) {
-                                return CDevSuite_Helper::resolve($className);
-                            })->first(static function ($pm) {
+                        CDevSuite_ServiceManager_LinuxService::class,
+                        CDevSuite_ServiceManager_Systemd::class,
+                    ])->map(function ($className) {
+                        return CDevSuite_Helper::resolve($className);
+                    })->first(static function ($pm) {
                         return $pm->isAvailable();
                     }, static function () {
-                        throw new DomainException("No compatible service manager found.");
+                        throw new DomainException('No compatible service manager found.');
                     });
                     break;
             }
@@ -419,15 +398,15 @@ class CDevSuite {
     public static function osFolder() {
         $os = CServer::getOs();
         if ($os == CServer::OS_WINNT) {
-            return "win";
+            return 'win';
         }
         if ($os == CServer::OS_DARWIN) {
-            return "mac";
+            return 'mac';
         }
         if ($os == CServer::OS_LINUX) {
-            return "linux";
+            return 'linux';
         }
-        return "linux";
+        return 'linux';
     }
 
     public static function tld() {
@@ -437,5 +416,4 @@ class CDevSuite {
     public static function isInstalled() {
         return static::filesystem()->isDir(static::homePath());
     }
-
 }

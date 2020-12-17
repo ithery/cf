@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CConsole_Command_Make_MakeNavCommand extends CConsole_Command {
-
     /**
      * The name and signature of the console command.
      *
@@ -36,5 +35,4 @@ class CConsole_Command_Make_MakeNavCommand extends CConsole_Command {
 
         $this->info('Nav ' . $nav . ' created on:' . $navFile);
     }
-
 }

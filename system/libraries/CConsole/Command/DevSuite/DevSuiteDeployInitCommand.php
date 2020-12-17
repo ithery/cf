@@ -7,7 +7,6 @@
  */
 
 class CConsole_Command_DevSuite_DevSuiteDeployInitCommand extends CConsole_Command_DevSuiteCommand {
-
     /**
      * Command line options that should not be gathered dynamically.
      *
@@ -34,6 +33,7 @@ class CConsole_Command_DevSuite_DevSuiteDeployInitCommand extends CConsole_Comma
     protected $signature = 'devsuite:deploy:init';
 
     protected $description = 'Create a new deployment file in the project directory.';
+
     /**
      * Configure the command options.
      *
@@ -41,7 +41,5 @@ class CConsole_Command_DevSuite_DevSuiteDeployInitCommand extends CConsole_Comma
      */
     protected function configure() {
         $this->ignoreValidationErrors();
-
     }
-
 }

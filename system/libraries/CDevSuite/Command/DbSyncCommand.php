@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Command_DbSyncCommand extends CDevSuite_CommandAbstract {
-
     public function getSignatureArguments() {
         return '{--from=} {--to=} {--force=}';
     }
@@ -17,20 +16,16 @@ class CDevSuite_Command_DbSyncCommand extends CDevSuite_CommandAbstract {
         $force = $cfCommand->option('force');
         CDevSuite::db()->existsOrExit($from);
         CDevSuite::db()->existsOrExit($to);
-        
+
         CDevSuite::db()->compare($from, $to);
         $choice = true;
-        if(!$force) {
-            $choice = $cfCommand->confirm('Are you sure execute sql on '.$to.':',false);
+        if (!$force) {
+            $choice = $cfCommand->confirm('Are you sure execute sql on ' . $to . ':', false);
         }
-        if($choice) {
-            CDevSuite::db()->sync($from,$to);
+        if ($choice) {
+            CDevSuite::db()->sync($from, $to);
         } else {
             CDevSuite::info('User cancelled command');
         }
-        
-        
     }
-
 }
-

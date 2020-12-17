@@ -1,13 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * Class carr
+ */
+// @codingStandardsIgnoreStart
 class carr {
+    // @codingStandardsIgnoreEnd
 
     /**
      * Determine whether the given value is array accessible.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return bool
      */
     public static function accessible($value) {
@@ -23,8 +29,9 @@ class carr {
      *     // Returns FALSE
      *     carr::isAssoc('foo', 'bar');
      *
-     * @param   array   $array  array to check
-     * @return  boolean
+     * @param array $array array to check
+     *
+     * @return boolean
      */
     public static function isAssoc(array $array) {
         // Keys of the array
@@ -37,14 +44,19 @@ class carr {
 
     /**
      * Alias of isAssoc
-     * 
-     * @deprecated
+     *
      * @param array $value array to check
+     *
      * @return boolean
+     *
+     * @deprecated
      */
+    // @codingStandardsIgnoreStart
     public static function is_assoc(array $array) {
         return static::isAssoc($array);
     }
+
+    // @codingStandardsIgnoreEnd
 
     /**
      * Test if a value is an array with an additional check for array-like objects.
@@ -58,39 +70,46 @@ class carr {
      *     carr::is_array('not an array!');
      *     carr::is_array(Database::instance());
      *
-     * @param   mixed   $value  value to check
-     * @return  boolean
+     * @param mixed $value value to check
+     *
+     * @return boolean
      */
     public static function isArray($value) {
         if (is_array($value)) {
             // Definitely an array
-            return TRUE;
+            return true;
         } else {
             // Possibly a Traversable object, functionally the same as an array
-            return (is_object($value) AND $value instanceof Traversable);
+            return (is_object($value) and $value instanceof Traversable);
         }
     }
 
     /**
      * Alias of isArray
-     * 
-     * @deprecated
+     *
      * @param mixed $value value to check
+     *
      * @return boolean
+     *
+     * @deprecated
      */
+    // @codingStandardsIgnoreStart
     public static function is_array($value) {
         return static::isArray($value);
     }
 
+    // @codingStandardsIgnoreEnd
+
     /**
      * Get an item from an array using "dot" notation.
      *
-     * @param  \ArrayAccess|array  $array
-     * @param  string  $key
-     * @param  mixed   $default
+     * @param \ArrayAccess|array $array
+     * @param string             $key
+     * @param mixed              $default
+     *
      * @return mixed
      */
-    public static function get($array, $key, $default = NULL) {
+    public static function get($array, $key, $default = null) {
         if ($array instanceof ArrayObject) {
             // This is a workaround for inconsistent implementation of isset between PHP and HHVM
             // See https://github.com/facebook/hhvm/issues/3437
@@ -128,9 +147,10 @@ class carr {
      *
      * If no key is given to the method, the entire array will be replaced.
      *
-     * @param  array   $array
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param array  $array
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return array
      */
     public static function set(&$array, $key, $value) {
@@ -172,13 +192,14 @@ class carr {
      *     // Using an array of keys
      *     $colors = carr::path($array, array('theme', '*', 'color'));
      *
-     * @param   array   $array      array to search
-     * @param   mixed   $path       key path string (delimiter separated) or array of keys
-     * @param   mixed   $default    default value if the path is not set
-     * @param   string  $delimiter  key path delimiter
-     * @return  mixed
+     * @param array  $array     array to search
+     * @param mixed  $path      key path string (delimiter separated) or array of keys
+     * @param mixed  $default   default value if the path is not set
+     * @param string $delimiter key path delimiter
+     *
+     * @return mixed
      */
-    public static function path($array, $path, $default = NULL, $delimiter = NULL) {
+    public static function path($array, $path, $default = null, $delimiter = null) {
         if (!carr::isArray($array)) {
             // This is not an array!
             return $default;
@@ -193,7 +214,7 @@ class carr {
                 return $array[$path];
             }
 
-            if ($delimiter === NULL) {
+            if ($delimiter === null) {
                 // Use the default delimiter .
                 $delimiter = '.';
             }
@@ -232,7 +253,7 @@ class carr {
             } elseif ($key === '*') {
                 // Handle wildcards
 
-                $values = array();
+                $values = [];
                 foreach ($array as $arr) {
                     if ($value = carr::path($arr, implode('.', $keys))) {
                         $values[] = $value;
@@ -259,13 +280,15 @@ class carr {
     /**
      * Set a value on an array by path.
      *
+     * @param array  $array     Array to update
+     * @param string $path      Path
+     * @param mixed  $value     Value to set
+     * @param string $delimiter Path delimiter
+     *
      * @see carr::path()
-     * @param array   $array     Array to update
-     * @param string  $path      Path
-     * @param mixed   $value     Value to set
-     * @param string  $delimiter Path delimiter
      */
-    public static function set_path(& $array, $path, $value, $delimiter = NULL) {
+    //@codingStandardsIgnoreStart
+    public static function set_path(&$array, $path, $value, $delimiter = null) {
         if (!$delimiter) {
             // Use the default delimiter
             $delimiter = '.';
@@ -273,7 +296,7 @@ class carr {
 
         // The path has already been separated into keys
         $keys = $path;
-        if (!carr::is_array($path)) {
+        if (!carr::isArray($path)) {
             // Split the keys by delimiter
             $keys = explode($delimiter, $path);
         }
@@ -288,23 +311,27 @@ class carr {
             }
 
             if (!isset($array[$key])) {
-                $array[$key] = array();
+                $array[$key] = [];
             }
 
-            $array = & $array[$key];
+            $array = &$array[$key];
         }
 
         // Set key on inner-most array
         $array[array_shift($keys)] = $value;
     }
 
+    //@codingStandardsIgnoreEnd
+
     /**
      * Return a callback array from a string, eg: limit[10,20] would become
      * array('limit', array('10', '20'))
      *
-     * @param   string  callback string
-     * @return  array
+     * @param string $str callback string
+     *
+     * @return array
      */
+    //@codingStandardsIgnoreStart
     public static function callback_string($str) {
         // command[param,param]
         if (preg_match('/([^\[]*+)\[(.+)\]/', (string) $str, $match)) {
@@ -319,25 +346,29 @@ class carr {
             $command = $str;
 
             // No params
-            $params = NULL;
+            $params = null;
         }
 
-        return array($command, $params);
+        return [$command, $params];
     }
+
+    //@codingStandardsIgnoreEnd
 
     /**
      * Rotates a 2D array clockwise.
      * Example, turns a 2x3 array into a 3x2 array.
      *
-     * @param   array    array to rotate
-     * @param   boolean  keep the keys in the final rotated array. the sub arrays of the source array need to have the same key values.
-     *                   if your subkeys might not match, you need to pass FALSE here!
-     * @return  array
+     * @param array   $source_array array to rotate
+     * @param boolean $keep_keys    keep the keys in the final rotated array.
+     *                              the sub arrays of the source array need to have the same key values.
+     *                              if your subkeys might not match, you need to pass FALSE here!
+     *
+     * @return array
      */
-    public static function rotate($source_array, $keep_keys = TRUE) {
-        $new_array = array();
+    public static function rotate($source_array, $keep_keys = true) {
+        $new_array = [];
         foreach ($source_array as $key => $value) {
-            $value = ($keep_keys === TRUE) ? $value : array_values($value);
+            $value = ($keep_keys === true) ? $value : array_values($value);
             foreach ($value as $k => $v) {
                 $new_array[$k][$key] = $v;
             }
@@ -349,13 +380,15 @@ class carr {
     /**
      * Removes a key from an array and returns the value.
      *
-     * @param   string  key to return
-     * @param   array   array to work on
-     * @return  mixed   value of the requested array key
+     * @param string $key   to return
+     * @param array  $array to work on
+     *
+     * @return mixed value of the requested array key
      */
-    public static function remove($key, & $array) {
-        if (!array_key_exists($key, $array))
-            return NULL;
+    public static function remove($key, &$array) {
+        if (!array_key_exists($key, $array)) {
+            return null;
+        }
 
         $val = $array[$key];
         unset($array[$key]);
@@ -374,13 +407,14 @@ class carr {
      *     $data = array('level1' => array('level2a' => 'value 1', 'level2b' => 'value 2'));
      *     carr::extract($data, array('level1.level2a', 'password'));
      *
-     * @param   array  $array    array to extract paths from
-     * @param   array  $paths    list of path
-     * @param   mixed  $default  default value
-     * @return  array
+     * @param array $array   array to extract paths from
+     * @param array $paths   list of path
+     * @param mixed $default default value
+     *
+     * @return array
      */
-    public static function extract($array, array $paths, $default = NULL) {
-        $found = array();
+    public static function extract($array, array $paths, $default = null) {
+        $found = [];
         foreach ($paths as $path) {
             carr::set($found, $path, carr::get($array, $path, $default));
         }
@@ -404,22 +438,23 @@ class carr {
      *     // The output of $john will now be:
      *     array('name' => 'mary', 'children' => array('fred', 'paul', 'sally', 'jane'))
      *
-     * @param   array  $array1      initial array
-     * @param   array  $array2,...  array to merge
-     * @return  array
+     * @param array $array1     initial array
+     * @param array $array2,... array to merge
+     *
+     * @return array
      */
     public static function merge($array1, $array2) {
-        if($array1 instanceof CInterface_Arrayable) {
+        if ($array1 instanceof CInterface_Arrayable) {
             $array1 = $array1->toArray();
         }
-        if($array2 instanceof CInterface_Arrayable) {
+        if ($array2 instanceof CInterface_Arrayable) {
             $array2 = $array2->toArray();
         }
         if (carr::isAssoc($array2)) {
             foreach ($array2 as $key => $value) {
                 if (is_array($value)
-                        AND isset($array1[$key])
-                        AND is_array($array1[$key])
+                    && isset($array1[$key])
+                    && is_array($array1[$key])
                 ) {
                     $array1[$key] = carr::merge($array1[$key], $value);
                 } else {
@@ -428,7 +463,7 @@ class carr {
             }
         } else {
             foreach ($array2 as $value) {
-                if (!in_array($value, $array1, TRUE)) {
+                if (!in_array($value, $array1, true)) {
                     $array1[] = $value;
                 }
             }
@@ -439,8 +474,8 @@ class carr {
                 if (carr::isAssoc($array2)) {
                     foreach ($array2 as $key => $value) {
                         if (is_array($value)
-                                AND isset($array1[$key])
-                                AND is_array($array1[$key])
+                            && isset($array1[$key])
+                            && is_array($array1[$key])
                         ) {
                             $array1[$key] = carr::merge($array1[$key], $value);
                         } else {
@@ -449,7 +484,7 @@ class carr {
                     }
                 } else {
                     foreach ($array2 as $value) {
-                        if (!in_array($value, $array1, TRUE)) {
+                        if (!in_array($value, $array1, true)) {
                             $array1[] = $value;
                         }
                     }
@@ -473,9 +508,10 @@ class carr {
      *     // The output of $array will now be:
      *     array('name' => 'jack', 'mood' => 'happy', 'food' => 'tacos')
      *
-     * @param   array   $array1 master array
-     * @param   array   $array2 input arrays that will overwrite existing values
-     * @return  array
+     * @param array $array1 master array
+     * @param array $array2 input arrays that will overwrite existing values
+     *
+     * @return array
      */
     public static function overwrite($array1, $array2) {
         foreach (array_intersect_key($array2, $array1) as $key => $value) {
@@ -496,26 +532,31 @@ class carr {
     /**
      * Because PHP does not have this function.
      *
-     * @param   array   array to unshift
-     * @param   string  key to unshift
-     * @param   mixed   value to unshift
-     * @return  array
+     * @param array  $array to unshift
+     * @param string $key   to unshift
+     * @param mixed  $val   to unshift
+     *
+     * @return array
      */
-    public static function unshift_assoc(array & $array, $key, $val) {
-        $array = array_reverse($array, TRUE);
+    //@codingStandardsIgnoreStart
+    public static function unshift_assoc(array &$array, $key, $val) {
+        $array = array_reverse($array, true);
         $array[$key] = $val;
-        $array = array_reverse($array, TRUE);
+        $array = array_reverse($array, true);
 
         return $array;
     }
+
+    //@codingStandardsIgnoreEnd
 
     /**
      * Because PHP does not have this function, and array_walk_recursive creates
      * references in arrays and is not truly recursive.
      *
-     * @param   mixed  callback to apply to each member of the array
-     * @param   array  array to map to
-     * @return  array
+     * @param mixed $callback to apply to each member of the array
+     * @param array $array    to map to
+     *
+     * @return array
      */
     public static function mapRecursive($callback, array $array) {
         foreach ($array as $key => $val) {
@@ -530,22 +571,29 @@ class carr {
      * Because PHP does not have this function, and array_walk_recursive creates
      * references in arrays and is not truly recursive.
      *
-     * @param   mixed  callback to apply to each member of the array
-     * @param   array  array to map to
-     * @return  array
-     * @deprecated since version 1.2
+     * @param mixed $callback to apply to each member of the array
+     * @param array $array    to map to
+     *
+     * @return array
+     *
+     * @deprecated since version 1.1
      */
+    //@codingStandardsIgnoreStart
     public static function map_recursive($callback, array $array) {
         return static::mapRecursive($callback, $array);
     }
 
+    //@codingStandardsIgnoreEnd
+
     /**
-     * @param mixed $needle     the value to search for
-     * @param array $haystack   an array of values to search in
+     * @param mixed   $needle   the value to search for
+     * @param array   $haystack an array of values to search in
      * @param boolean $sort     sort the array now
-     * @return integer|FALSE    the index of the match or FALSE when not found
+     *
+     * @return integer|false the index of the match or FALSE when not found
      */
-    public static function binary_search($needle, $haystack, $sort = FALSE) {
+    //@codingStandardsIgnoreStart
+    public static function binary_search($needle, $haystack, $sort = false) {
         if ($sort) {
             sort($haystack);
         }
@@ -565,21 +613,25 @@ class carr {
             }
         }
 
-        return FALSE;
+        return false;
     }
+
+    //@codingStandardsIgnoreEnd
 
     /**
      * Fill an array with a range of numbers.
      *
-     * @param   integer  stepping
-     * @param   integer  ending number
-     * @return  array
+     * @param integer $step step
+     * @param integer $max  ending number
+     *
+     * @return array
      */
     public static function range($step = 10, $max = 100) {
-        if ($step < 1)
-            return array();
+        if ($step < 1) {
+            return [];
+        }
 
-        $array = array();
+        $array = [];
         for ($i = $step; $i <= $max; $i += $step) {
             $array[$i] = $i;
         }
@@ -591,8 +643,11 @@ class carr {
      * Recursively convert an array to an object.
      *
      * @param   array   array to convert
-     * @return  object
+     * @param mixed $class
+     *
+     * @return object
      */
+    //@codingStandardsIgnoreStart
     public static function to_object(array $array, $class = 'stdClass') {
         $object = new $class;
 
@@ -609,10 +664,17 @@ class carr {
         return $object;
     }
 
+    //@codingStandardsIgnoreEnd
+
+    /**
+     * Replace arr
+     *
+     * @return void
+     */
     public static function replace() {
         $args = func_get_args();
         $num_args = func_num_args();
-        $res = array();
+        $res = [];
         for ($i = 0; $i < $num_args; $i++) {
             if (is_array($args[$i])) {
                 foreach ($args[$i] as $key => $val) {
@@ -620,7 +682,7 @@ class carr {
                 }
             } else {
                 trigger_error(__FUNCTION__ . '(): Argument #' . ($i + 1) . ' is not an array', E_USER_WARNING);
-                return NULL;
+                return null;
             }
         }
         return $res;
@@ -629,9 +691,10 @@ class carr {
     /**
      * Return the first element in an array passing a given truth test.
      *
-     * @param  array  $array
-     * @param  callable|null  $callback
-     * @param  mixed  $default
+     * @param array         $array
+     * @param callable|null $callback
+     * @param mixed         $default
+     *
      * @return mixed
      */
     public static function first($array, callable $callback = null, $default = null) {
@@ -657,9 +720,10 @@ class carr {
     /**
      * Return the last element in an array passing a given truth test.
      *
-     * @param  array  $array
-     * @param  callable|null  $callback
-     * @param  mixed  $default
+     * @param array         $array
+     * @param callable|null $callback
+     * @param mixed         $default
+     *
      * @return mixed
      */
     public static function last($array, callable $callback = null, $default = null) {
@@ -673,8 +737,9 @@ class carr {
     /**
      * Flatten a multi-dimensional array into a single level.
      *
-     * @param  array  $array
-     * @param  int  $depth
+     * @param array $array
+     * @param int   $depth
+     *
      * @return array
      */
     public static function flatten($array, $depth = INF) {
@@ -698,7 +763,8 @@ class carr {
     /**
      * If the given value is not an array, wrap it in one.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return array
      */
     public static function wrap($value) {
@@ -708,9 +774,10 @@ class carr {
     /**
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
-     * @param  array   $array
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param array  $array
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return array
      */
     public static function add($array, $key, $value) {
@@ -724,12 +791,13 @@ class carr {
     /**
      * Filter the array using the given callback.
      *
-     * @param  array  $array
-     * @param  callable  $callback
+     * @param array    $array
+     * @param callable $callback
+     *
      * @return array
      */
     public static function where($array, callable $callback) {
-        $new_array = array();
+        $new_array = [];
         foreach ($array as $k => $v) {
             $passed = true;
             if ($callback != null) {
@@ -737,7 +805,6 @@ class carr {
                     $passed = false;
                 }
             }
-
 
             if ($passed) {
                 $new_array[$k] = $v;
@@ -749,8 +816,9 @@ class carr {
     /**
      * Get all of the given array except for a specified array of keys.
      *
-     * @param  array  $array
-     * @param  array|string  $keys
+     * @param array        $array
+     * @param array|string $keys
+     *
      * @return array
      */
     public static function except($array, $keys) {
@@ -762,8 +830,9 @@ class carr {
     /**
      * Remove one or many array items from a given array using "dot" notation.
      *
-     * @param  array  $array
-     * @param  array|string  $keys
+     * @param array        $array
+     * @param array|string $keys
+     *
      * @return void
      */
     public static function forget(&$array, $keys) {
@@ -805,8 +874,9 @@ class carr {
     /**
      * Determine if the given key exists in the provided array.
      *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|int  $key
+     * @param \ArrayAccess|array $array
+     * @param string|int         $key
+     *
      * @return bool
      */
     public static function exists($array, $key) {
@@ -820,14 +890,14 @@ class carr {
     /**
      * Pluck an array of values from an array.
      *
-     * @param  array  $array
-     * @param  string|array  $value
-     * @param  string|array|null  $key
+     * @param array             $array
+     * @param string|array      $value
+     * @param string|array|null $key
+     *
      * @return array
      */
     public static function pluck($array, $value, $key = null) {
         $results = [];
-
 
         list($value, $key) = static::explodePluckParameters($value, $key);
 
@@ -856,8 +926,9 @@ class carr {
     /**
      * Explode the "value" and "key" arguments passed to "pluck".
      *
-     * @param  string|array  $value
-     * @param  string|array|null  $key
+     * @param string|array      $value
+     * @param string|array|null $key
+     *
      * @return array
      */
     protected static function explodePluckParameters($value, $key) {
@@ -871,7 +942,8 @@ class carr {
     /**
      * Collapse an array of arrays into a single array.
      *
-     * @param  array  $array
+     * @param array $array
+     *
      * @return array
      */
     public static function collapse($array) {
@@ -890,8 +962,9 @@ class carr {
     /**
      * Check if an item or items exist in an array using "dot" notation.
      *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
+     * @param \ArrayAccess|array $array
+     * @param string|array       $keys
+     *
      * @return bool
      */
     public static function has($array, $keys) {
@@ -931,8 +1004,9 @@ class carr {
     /**
      * Flatten a multi-dimensional associative array with dots.
      *
-     * @param  array   $array
-     * @param  string  $prepend
+     * @param array  $array
+     * @param string $prepend
+     *
      * @return array
      */
     public static function dot($array, $prepend = '') {
@@ -957,9 +1031,10 @@ class carr {
     /**
      * Get a value from the array, and remove it.
      *
-     * @param  array   $array
-     * @param  string  $key
-     * @param  mixed   $default
+     * @param array  $array
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
     public static function pull(&$array, $key, $default = null) {
@@ -973,8 +1048,9 @@ class carr {
     /**
      * Get a subset of the items from the given array.
      *
-     * @param  array  $array
-     * @param  array|string  $keys
+     * @param array        $array
+     * @param array|string $keys
+     *
      * @return array
      */
     public static function only($array, $keys) {
@@ -983,8 +1059,9 @@ class carr {
 
     /**
      * Alias of array reset
-     * 
+     *
      * @param array $array
+     *
      * @return mixed the value of the first array element, or <b>FALSE</b> if the array is
      */
     public static function head($array) {
@@ -995,7 +1072,7 @@ class carr {
         if (!is_array($array)) {
             return $array;
         }
-        $string = array();
+        $string = [];
         foreach ($array as $key => $val) {
             if (is_array($val)) {
                 $val = carr::implodes(',', $val);
@@ -1037,18 +1114,19 @@ class carr {
     /**
      * Convert the array into a query string.
      *
-     * @param  array  $array
+     * @param array $array
+     *
      * @return string
      */
     public static function query($array) {
-        return http_build_query($array, null, '&', PHP_QUERY_RFC3986);
+        return http_build_query($array, '', '&', PHP_QUERY_RFC3986);
     }
 
     public static function reduce($collection, $iteratee, $accumulator = null) {
         if ($collection === null) {
             return null;
         }
-        $func = function ( $array, $iteratee, $accumulator, $initAccum = null) {
+        $func = function ($array, $iteratee, $accumulator, $initAccum = null) {
             $length = \count(\is_array($array) ? $array : \iterator_to_array($array));
             if ($initAccum && $length) {
                 $accumulator = \current($array);
@@ -1065,9 +1143,11 @@ class carr {
         $iteratee = c::baseIteratee($predicate);
         //$keys = array_keys($array);
         $result = \array_filter(
-                \is_array($array) ? $array : \iterator_to_array($array), function ($value, $key) use ($array, $iteratee) {
-            return $iteratee($value, $key, $array);
-        }, \ARRAY_FILTER_USE_BOTH
+            \is_array($array) ? $array : \iterator_to_array($array),
+            function ($value, $key) use ($array, $iteratee) {
+                return $iteratee($value, $key, $array);
+            },
+            \ARRAY_FILTER_USE_BOTH
         );
 
         return $result;
@@ -1110,7 +1190,8 @@ class carr {
      */
     public static function find($collection, $predicate = null, $fromIndex = 0) {
         $iteratee = c::baseIteratee($predicate);
-        foreach (\array_slice(\is_array($collection) ? $collection : \iterator_to_array($collection), $fromIndex) as $key => $value) {
+        $array = \array_slice(\is_array($collection) ? $collection : \iterator_to_array($collection), $fromIndex);
+        foreach ($array as $key => $value) {
             if ($iteratee($value, $key, $collection)) {
                 return $value;
             }
@@ -1122,12 +1203,12 @@ class carr {
      * This method is like `findIndex` except that it iterates over elements
      * of `collection` from right to left.
      *
-     *
      * @param array $array     The array to inspect.
      * @param mixed $predicate The function invoked per iteration.
      * @param int   $fromIndex The index to search from.
      *
      * @return int the index of the found element, else `-1`.
+     *
      * @example
      * <code>
      * $users = [
@@ -1140,7 +1221,7 @@ class carr {
      * // => 2
      * </code>
      */
-    function findLastIndex(array $array, $predicate, $fromIndex = null) {
+    public function findLastIndex(array $array, $predicate, $fromIndex = null) {
         $length = \count($array);
         $index = $fromIndex !== null ? $fromIndex : $length - 1;
         if ($index < 0) {
@@ -1170,12 +1251,11 @@ class carr {
      * `sampleSize`, `slice`, `some`, `sortBy`, `split`, `take`, `takeRight`,
      * `template`, `trim`, `trimEnd`, `trimStart`, and `words`
      *
-     * @category Collection
-     *
      * @param array|object          $collection The collection to iterate over.
      * @param callable|string|array $iteratee   The function invoked per iteration.
      *
      * @return array Returns the new mapped array.
+     *
      * @example
      * <code>
      * function square(int $n) {
@@ -1208,7 +1288,6 @@ class carr {
             $values = \get_object_vars($collection);
         }
 
-
         $callable = c::baseIteratee($iteratee);
         $keys = \array_keys($values);
         $items = \array_map(function ($value, $index) use ($callable, $collection) {
@@ -1223,10 +1302,8 @@ class carr {
      * Creates a new array concatenating `array` with any additional arrays
      * and/or values.
      *
-     * @category Array
-     *
-     * @param  array $array The array to concatenate.
-     * @param  array<int, mixed> $values The values to concatenate.
+     * @param array             $array  The array to concatenate.
+     * @param array<int, mixed> $values The values to concatenate.
      *
      * @return array Returns the new concatenated array.
      *
@@ -1254,12 +1331,11 @@ class carr {
      * Iteration is stopped once `predicate` returns truthy. The predicate is
      * invoked with three arguments: (value, index|key, collection).
      *
-     * @category Collection
-     *
      * @param iterable              $collection The collection to iterate over.
      * @param callable|string|array $predicate  The function invoked per iteration.
      *
      * @return boolean Returns `true` if any element passes the predicate check, else `false`.
+     *
      * @example
      * <code>
      * some([null, 0, 'yes', false], , function ($value) { return \is_bool($value); }));
@@ -1302,8 +1378,6 @@ class carr {
      * property are iterated like arrays. To avoid this behavior use `forIn`
      * or `forOwn` for object iteration.
      *
-     * @category     Collection
-     *
      * @param array|iterable|object $collection The collection to iterate over.
      * @param callable              $iteratee   The function invoked per iteration.
      *
@@ -1320,7 +1394,7 @@ class carr {
      */
     public static function each($collection, callable $iteratee) {
         $values = \is_object($collection) ? \get_object_vars($collection) : $collection;
-        /** @var array $values */
+        /* @var array $values */
         foreach ($values as $index => $value) {
             if (false === $iteratee($value, $index, $collection)) {
                 break;
@@ -1332,9 +1406,10 @@ class carr {
     /**
      * Push an item onto the beginning of an array.
      *
-     * @param  array  $array
-     * @param  mixed  $value
-     * @param  mixed  $key
+     * @param array $array
+     * @param mixed $value
+     * @param mixed $key
+     *
      * @return array
      */
     public static function prepend($array, $value, $key = null) {
@@ -1347,14 +1422,13 @@ class carr {
     }
 
     /**
-     * 
      * @param array $array
+     *
      * @return int
      */
     public static function count($array) {
         return count($array);
     }
-
 }
 
 // End carr

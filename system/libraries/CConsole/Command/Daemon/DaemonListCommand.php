@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CConsole_Command_Daemon_DaemonListCommand extends CConsole_Command {
-
     /**
      * The name and signature of the console command.
      *
@@ -31,9 +30,9 @@ class CConsole_Command_Daemon_DaemonListCommand extends CConsole_Command {
             $tableData[] = $this->getTableData(false);
         }
 
-        $i=0;
+        $i = 0;
         foreach ($tableData as $table) {
-            if($i>0) {
+            if ($i > 0) {
                 $this->line('');
             }
             $this->info(carr::get($table, 'group'));
@@ -47,15 +46,14 @@ class CConsole_Command_Daemon_DaemonListCommand extends CConsole_Command {
         $listService = $daemonManager->daemons($group);
         $dataService = [];
 
-        $rows = c::collect($listService)->map(function($serviceName, $className) {
-                    $status = CManager::daemon()->isRunning($className) ? 'RUNNING' : 'STOPPED';
-                    return [
-                        'serviceName' => $serviceName,
-                        'className' => $className,
-                        'status' => $status,
-                    ];
-                })->sortBy('serviceName')->all();
-
+        $rows = c::collect($listService)->map(function ($serviceName, $className) {
+            $status = CManager::daemon()->isRunning($className) ? 'RUNNING' : 'STOPPED';
+            return [
+                'serviceName' => $serviceName,
+                'className' => $className,
+                'status' => $status,
+            ];
+        })->sortBy('serviceName')->all();
 
         return [
             'group' => $group ? $group : '[Ungrouped]',
@@ -63,5 +61,4 @@ class CConsole_Command_Daemon_DaemonListCommand extends CConsole_Command {
             'rows' => $rows,
         ];
     }
-
 }

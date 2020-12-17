@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteDeployRunCommand extends CConsole_Command_DevSuiteCommand {
-
     /**
      * Command line options that should not be gathered dynamically.
      *
@@ -39,7 +38,5 @@ class CConsole_Command_DevSuite_DevSuiteDeployRunCommand extends CConsole_Comman
      */
     protected function configure() {
         $this->ignoreValidationErrors();
-
     }
-
 }

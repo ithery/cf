@@ -7,7 +7,6 @@
  */
 
 class CDevSuite_Command_DeployInitCommand extends CDevSuite_CommandAbstract {
-
     public function getSignatureArguments() {
         return '{host : The host server to initialize with.}';
     }
@@ -20,9 +19,7 @@ class CDevSuite_Command_DeployInitCommand extends CDevSuite_CommandAbstract {
             return CConsole::FAILURE_EXIT;
         }
         CDevSuite::deploy()->init($host);
-        
-        CDevSuite::info('Deploy file created on:'.CDevSuite::deploy()->deployFile());
 
+        CDevSuite::info('Deploy file created on:' . CDevSuite::deploy()->deployFile());
     }
-
 }

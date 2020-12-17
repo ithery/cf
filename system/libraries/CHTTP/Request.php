@@ -1,10 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Jun 2, 2019, 10:24:00 PM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Symfony\Component\HttpFoundation\ParameterBag;
@@ -15,7 +17,6 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
  * @method array validateWithBag(string $errorBag, array $rules, ...$params)
  */
 class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, ArrayAccess {
-
     use CHTTP_Trait_InteractsWithInput,
         CHTTP_Trait_InteractsWithContentTypes;
 
@@ -110,13 +111,16 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get the full URL for the request with the added query string parameters.
      *
-     * @param  array  $query
+     * @param array $query
+     *
      * @return string
      */
     public function fullUrlWithQuery(array $query) {
         $question = $this->getBaseUrl() . $this->getPathInfo() === '/' ? '/?' : '?';
 
-        return count($this->query()) > 0 ? $this->url() . $question . car::query(array_merge($this->query(), $query)) : $this->fullUrl() . $question . car::query($query);
+        return count($this->query()) > 0
+        ? $this->url() . $question . carr::query(array_merge($this->query(), $query))
+        : $this->fullUrl() . $question . carr::query($query);
     }
 
     /**
@@ -142,12 +146,13 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get a segment from the URI (1 based index).
      *
-     * @param  int  $index
-     * @param  string|null  $default
+     * @param int         $index
+     * @param string|null $default
+     *
      * @return string|null
      */
     public function segment($index, $default = null) {
-        return car::get($this->segments(), $index - 1, $default);
+        return carr::get($this->segments(), $index - 1, $default);
     }
 
     /**
@@ -159,14 +164,15 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         $segments = explode('/', $this->decodedPath());
 
         return array_values(array_filter($segments, function ($value) {
-                    return $value !== '';
-                }));
+            return $value !== '';
+        }));
     }
 
     /**
      * Determine if the current request URI matches a pattern.
      *
-     * @param  mixed  ...$patterns
+     * @param mixed ...$patterns
+     *
      * @return bool
      */
     public function is(...$patterns) {
@@ -184,7 +190,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Determine if the route name matches a given pattern.
      *
-     * @param  mixed  ...$patterns
+     * @param mixed ...$patterns
+     *
      * @return bool
      */
     public function routeIs(...$patterns) {
@@ -194,7 +201,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Determine if the current request URL and query string matches a pattern.
      *
-     * @param  mixed  ...$patterns
+     * @param mixed ...$patterns
+     *
      * @return bool
      */
     public function fullUrlIs(...$patterns) {
@@ -233,8 +241,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return bool
      */
     public function prefetch() {
-        return strcasecmp($this->server->get('HTTP_X_MOZ'), 'prefetch') === 0 ||
-                strcasecmp($this->headers->get('Purpose'), 'prefetch') === 0;
+        return strcasecmp($this->server->get('HTTP_X_MOZ'), 'prefetch') === 0
+                || strcasecmp($this->headers->get('Purpose'), 'prefetch') === 0;
     }
 
     /**
@@ -276,7 +284,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Merge new input into the current request's input array.
      *
-     * @param  array  $input
+     * @param array $input
+     *
      * @return $this
      */
     public function merge(array $input) {
@@ -288,7 +297,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Replace the input for the current request.
      *
-     * @param  array  $input
+     * @param array $input
+     *
      * @return $this
      */
     public function replace(array $input) {
@@ -302,19 +312,22 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      *
      * Instead, you may use the "input" method.
      *
-     * @param  string  $key
-     * @param  mixed  $default
+     * @param string $key
+     * @param mixed  $default
+     * @param mixed  $deep
+     *
      * @return mixed
      */
-    public function get($key, $default = null, $deep=false) {
+    public function get($key, $default = null, $deep = false) {
         return parent::get($key, $default, $deep);
     }
 
     /**
      * Get the JSON payload for the request.
      *
-     * @param  string|null  $key
-     * @param  mixed  $default
+     * @param string|null $key
+     * @param mixed       $default
+     *
      * @return \Symfony\Component\HttpFoundation\ParameterBag|mixed
      */
     public function json($key = null, $default = null) {
@@ -326,7 +339,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
             return $this->json;
         }
 
-        return data_get($this->json->all(), $key, $default);
+        return CF::get($this->json->all(), $key, $default);
     }
 
     /**
@@ -345,8 +358,9 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Create a new request instance from the given Laravel request.
      *
-     * @param  \Illuminate\Http\Request  $from
-     * @param  \Illuminate\Http\Request|null  $to
+     * @param \Illuminate\Http\Request      $from
+     * @param \Illuminate\Http\Request|null $to
+     *
      * @return static
      */
     public static function createFrom(self $from, $to = null) {
@@ -357,13 +371,13 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         $files = is_array($files) ? array_filter($files) : $files;
 
         $request->initialize(
-                $from->query->all(),
-                $from->request->all(),
-                $from->attributes->all(),
-                $from->cookies->all(),
-                $files,
-                $from->server->all(),
-                $from->getContent()
+            $from->query->all(),
+            $from->request->all(),
+            $from->attributes->all(),
+            $from->cookies->all(),
+            $files,
+            $from->server->all(),
+            $from->getContent()
         );
 
         $request->headers->replace($from->headers->all());
@@ -384,13 +398,18 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Create an Illuminate request from a Symfony instance.
      *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     *
      * @return static
      */
     public static function createFromBase(SymfonyRequest $request) {
         $newRequest = (new static)->duplicate(
-                $request->query->all(), $request->request->all(), $request->attributes->all(),
-                $request->cookies->all(), $request->files->all(), $request->server->all()
+            $request->query->all(),
+            $request->request->all(),
+            $request->attributes->all(),
+            $request->cookies->all(),
+            $request->files->all(),
+            $request->server->all()
         );
 
         $newRequest->headers->replace($request->headers->all());
@@ -405,14 +424,22 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * {@inheritdoc}
      */
-    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null) {
+    public function duplicate(
+        array $query = null,
+        array $request = null,
+        array $attributes = null,
+        array $cookies = null,
+        array $files = null,
+        array $server = null
+    ) {
         return parent::duplicate($query, $request, $attributes, $cookies, $this->filterFiles($files), $server);
     }
 
     /**
      * Filter the given array of files, removing any empty values.
      *
-     * @param  mixed  $files
+     * @param mixed $files
+     *
      * @return mixed
      */
     protected function filterFiles($files) {
@@ -460,7 +487,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Set the session instance on the request.
      *
-     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param \Illuminate\Contracts\Session\Session $session
+     *
      * @return void
      */
     public function setLaravelSession($session) {
@@ -470,7 +498,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get the user making the request.
      *
-     * @param  string|null  $guard
+     * @param string|null $guard
+     *
      * @return mixed
      */
     public function user($guard = null) {
@@ -480,8 +509,9 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get the route handling the request.
      *
-     * @param  string|null  $param
-     * @param  mixed  $default
+     * @param string|null $param
+     * @param mixed       $default
+     *
      * @return \Illuminate\Routing\Route|object|string|null
      */
     public function route($param = null, $default = null) {
@@ -507,15 +537,16 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         }
 
         return sha1(implode('|', array_merge(
-                                $route->methods(),
-                                [$route->getDomain(), $route->uri(), $this->ip()]
+            $route->methods(),
+            [$route->getDomain(), $route->uri(), $this->ip()]
         )));
     }
 
     /**
      * Set the JSON payload for the request.
      *
-     * @param  \Symfony\Component\HttpFoundation\ParameterBag  $json
+     * @param \Symfony\Component\HttpFoundation\ParameterBag $json
+     *
      * @return $this
      */
     public function setJson($json) {
@@ -538,7 +569,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Set the user resolver callback.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return $this
      */
     public function setUserResolver(Closure $callback) {
@@ -561,7 +593,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Set the route resolver callback.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return $this
      */
     public function setRouteResolver(Closure $callback) {
@@ -582,20 +615,22 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Determine if the given offset exists.
      *
-     * @param  string  $offset
+     * @param string $offset
+     *
      * @return bool
      */
     public function offsetExists($offset) {
-        return car::has(
-                        $this->all() + $this->route()->parameters(),
-                        $offset
+        return carr::has(
+            $this->all() + $this->route()->parameters(),
+            $offset
         );
     }
 
     /**
      * Get the value at the given offset.
      *
-     * @param  string  $offset
+     * @param string $offset
+     *
      * @return mixed
      */
     public function offsetGet($offset) {
@@ -605,8 +640,9 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Set the value at the given offset.
      *
-     * @param  string  $offset
-     * @param  mixed  $value
+     * @param string $offset
+     * @param mixed  $value
+     *
      * @return void
      */
     public function offsetSet($offset, $value) {
@@ -616,7 +652,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Remove the value at the given offset.
      *
-     * @param  string  $offset
+     * @param string $offset
+     *
      * @return void
      */
     public function offsetUnset($offset) {
@@ -626,7 +663,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Check if an input element is set on the request.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function __isset($key) {
@@ -636,13 +674,13 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get an input element from the request.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function __get($key) {
-        return car::get($this->all(), $key, function () use ($key) {
-                    return $this->route($key);
-                });
+        return carr::get($this->all(), $key, function () use ($key) {
+            return $this->route($key);
+        });
     }
-
 }

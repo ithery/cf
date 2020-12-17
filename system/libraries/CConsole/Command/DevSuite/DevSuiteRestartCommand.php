@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteRestartCommand extends CConsole_Command_DevSuiteCommand {
-
     /**
      * The class name of the devsuite command.
      *
@@ -14,5 +13,4 @@ class CConsole_Command_DevSuite_DevSuiteRestartCommand extends CConsole_Command_
      */
     protected $devSuiteCommandClass = CDevSuite_Command_StartCommand::class;
     protected $signature = 'devsuite:restart';
-
 }
