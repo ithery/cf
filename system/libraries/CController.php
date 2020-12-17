@@ -1,26 +1,24 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * CF Controller class. The controller class must be extended to work
  * properly, so this class is defined as abstract.
- *
  */
 abstract class CController {
-
     // Allow all controllers to run in production by default
-    const ALLOW_PRODUCTION = TRUE;
+    const ALLOW_PRODUCTION = true;
 
     protected $baseUri;
 
     /**
      * Loads URI, and Input into this controller.
      *
-     * @return  void
+     * @return void
      */
     public function __construct() {
-        if (CF::$instance == NULL) {
+        if (CF::$instance == null) {
             // Set the instance to the first controller loaded
             CF::$instance = $this;
         }
@@ -37,9 +35,10 @@ abstract class CController {
     /**
      * Handles methods that do not exist.
      *
-     * @param   string  method name
-     * @param   array   arguments
-     * @return  void
+     * @param string $method method name
+     * @param array  $args   arguments
+     *
+     * @return void
      */
     public function __call($method, $args) {
         // Default to showing a 404 page
@@ -48,16 +47,14 @@ abstract class CController {
 
     public static function controllerUrl() {
         $class = get_called_class();
-        $classExplode = explode("_", $class);
-        $classExplode = array_map(function($item) {
+        $classExplode = explode('_', $class);
+        $classExplode = array_map(function ($item) {
             return cstr::camel($item);
         }, $classExplode);
         $url = curl::base() . implode(array_slice($classExplode, 1), '/') . '/';
 
-
         return $url;
     }
-
 }
 
 // End Controller Class

@@ -19,18 +19,26 @@
         <exclude name="PEAR.Commenting.ClassComment.MissingAuthorTag"/>
         <exclude name="PEAR.Commenting.ClassComment.MissingLicenseTag"/>
         <exclude name="PEAR.Commenting.ClassComment.MissingLinkTag"/>
+        <exclude name="PEAR.Commenting.ClassComment.InvalidAuthors"/>
+
+
         <!-- Commenting.FunctionComment -->
-        <exclude name="PEAR.Commenting.FunctionComment.Missing"/> <!-- Temporary:NeedToResolved-->
+        <exclude name="PEAR.Commenting.FunctionComment.Missing"/>
+        <!-- Temporary:NeedToResolved-->
         <exclude name="PEAR.Commenting.FunctionComment.MissingParamComment"/>
         <exclude name="PEAR.Commenting.FunctionComment.MissingParamName"/>
         <exclude name="PEAR.Commenting.FunctionComment.SpacingAfterParamName"/>
         <exclude name="PEAR.Commenting.FunctionComment.SpacingAfterParamType"/>
-        <exclude name="PEAR.Commenting.FunctionComment.MissingParamTag"/> <!-- Temporary:NeedToResolved-->
-        <exclude name="PEAR.Commenting.FunctionComment.MissingReturn"/> <!-- Temporary:NeedToResolved-->
+        <exclude name="PEAR.Commenting.FunctionComment.ParamNameNoMatch"/>
+        <!-- START:Temporary:NeedToResolved-->
+        <exclude name="PEAR.Commenting.FunctionComment.MissingParamTag"/>
+        <exclude name="PEAR.Commenting.FunctionComment.MissingReturn"/>
+        <!-- END:Temporary:NeedToResolved-->
         <!-- Commenting.DocComment -->
         <exclude name="Generic.Commenting.DocComment.MissingShort"/>
         <exclude name="Generic.Commenting.DocComment.TagValueIndent"/>
         <exclude name="Generic.Commenting.DocComment.NonParamGroup"/>
+
 
 
         <!-- Variable Naming Convetions-->
@@ -45,7 +53,11 @@
         <exclude name="PEAR.Classes.ClassDeclaration.OpenBraceNewLine"/>
         <exclude name="PEAR.Functions.FunctionDeclaration.BraceOnSameLine"/>
 
-
+        <!-- Ignore complicated conventions-->
+        <exclude name="PEAR.Functions.FunctionCallSignature.ContentAfterOpenBracket"/>
+        <exclude name="PEAR.Functions.FunctionCallSignature.CloseBracketLine"/>
+        <exclude name="PEAR.WhiteSpace.ScopeIndent.IncorrectExact"/>
+        <exclude name="Generic.Commenting.DocComment.LongNotCapital"/>
         <!-- Ignore that already defined in PSR-->
         <exclude name="PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
     </rule>

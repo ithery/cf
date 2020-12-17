@@ -1,13 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * @author Hery Kurniawan
+ * @license Ittron Global Teknologi <ittron.co.id>
  */
-
 class CConsole {
-
     const SUCCESS_EXIT = 0;
     const FAILURE_EXIT = 1;
     const EXCEPTION_EXIT = 2;
@@ -24,10 +21,9 @@ class CConsole {
             exit(static::FAILURE_EXIT);
         }
         if (!CF::domainExists($domain)) {
-            $console->error('Domain '.$domain.' is not exists on data file');
+            $console->error('Domain ' . $domain . ' is not exists on data file');
             $console->error('Please recheck your domain or create the domain using domain:create command');
             exit(static::FAILURE_EXIT);
-            
         }
     }
 
@@ -38,5 +34,4 @@ class CConsole {
             exit(static::FAILURE_EXIT);
         }
     }
-
 }

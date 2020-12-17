@@ -11,7 +11,6 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 class CBase {
-
     public static function createRecursionContext() {
         return new CBase_RecursionContext();
     }
@@ -23,10 +22,4 @@ class CBase {
     public static function createMapCache() {
         return new CBase_MapCache();
     }
-
-    
-
-    
-    
-
 }

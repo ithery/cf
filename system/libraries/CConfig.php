@@ -1,22 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 class CConfig implements CInterface_Arrayable {
-
-    protected static $instances = array();
+    protected static $instances = [];
     protected $group;
     protected $configs;
 
     /**
-     * 
      * @param string $group
+     *
      * @return CConfig
+     *
      * @throws CException
      */
-    public static function & instance($group = 'app') {
+    public static function &instance($group = 'app') {
         if (!is_string($group)) {
-            throw new CException("Config group must be a string");
+            throw new CException('Config group must be a string');
         }
         if (!isset(CConfig::$instances[$group])) {
             // Create a new instance
@@ -47,19 +47,16 @@ class CConfig implements CInterface_Arrayable {
         $this->configs = [];
         $files = CF::findFile('config', $this->group, $required = false, $ext = false, $refresh = true);
 
-
         //add backward compatibility
         //TODO: remove folder config in DOCROOT
         if (!is_array($files)) {
-            $files = array();
+            $files = [];
         }
         if (file_exists(DOCROOT . 'config' . DS . $this->group . EXT)) {
             $files[] = DOCROOT . 'config' . DS . $this->group . EXT;
         }
 
         foreach ($files as $file) {
-
-
             $cfg = include $file;
             if (!is_array($cfg)) {
                 //backward compatibility with older config
@@ -70,15 +67,15 @@ class CConfig implements CInterface_Arrayable {
             }
             if (!is_array($cfg)) {
                 //there is an invalid format
-                throw new CException("Invalid config format in :file", array(':file' => $file));
+                throw new CException('Invalid config format in :file', [':file' => $file]);
             }
             $this->configs = carr::merge($this->configs, $cfg);
         }
     }
 
     /**
-     * flatten the config array, retrieves information of default value and file which config is created
-     * 
+     * Flatten the config array, retrieves information of default value and file which config is created
+     *
      * @throws CException
      */
     public function getConfigData() {
@@ -87,7 +84,7 @@ class CConfig implements CInterface_Arrayable {
         //add backward compatibility
         //TODO: remove folder config in DOCROOT
         if (!is_array($files)) {
-            $files = array();
+            $files = [];
         }
         if (file_exists(DOCROOT . 'config' . DS . $this->group . EXT)) {
             $files[] = DOCROOT . 'config' . DS . $this->group . EXT;
@@ -96,11 +93,11 @@ class CConfig implements CInterface_Arrayable {
         if ($files == null) {
             //var_dump(debug_backtrace());
             //throw new CF_Exception('file config '.$group.' not found');
-            $files = array();
+            $files = [];
         }
 
-        $resultFiles = array();
-        $resultData = array();
+        $resultFiles = [];
+        $resultData = [];
         foreach ($files as $file) {
             $cfg = include $file;
             if (!is_array($cfg)) {
@@ -111,7 +108,7 @@ class CConfig implements CInterface_Arrayable {
             }
             if (!is_array($cfg)) {
                 //there is an invalid format
-                throw new CException("Invalid config format in :file", array(':file' => $file));
+                throw new CException('Invalid config format in :file', [':file' => $file]);
             }
             $cfgFiles = $cfg;
             foreach ($cfgFiles as $key => $val) {
@@ -122,10 +119,10 @@ class CConfig implements CInterface_Arrayable {
         }
 
         //we will flatten the array of result Data
-        $result = array();
-        $addToResult = function($key, $value, &$result) use($resultFiles, $files) {
+        $result = [];
+        $addToResult = function ($key, $value, &$result) use ($resultFiles, $files) {
             $keyParts = explode('.', $key);
-            $resultData = array();
+            $resultData = [];
             $resultData['key'] = $key;
             $resultData['value'] = $value;
             $resultData['type'] = gettype($value);
@@ -141,7 +138,7 @@ class CConfig implements CInterface_Arrayable {
             $resultData['comment'] = $comment;
             $result[] = $resultData;
         };
-        $flatten = function($array, $keyPath = '') use (&$flatten, $addToResult, &$result) {
+        $flatten = function ($array, $keyPath = '') use (&$flatten, $addToResult, &$result) {
             foreach ($array as $key => $value) {
                 $keyDotted = strlen($keyPath) == 0 ? $key : $keyPath . '.' . $key;
                 if (is_array($value)) {
@@ -164,5 +161,4 @@ class CConfig implements CInterface_Arrayable {
     public function toArray() {
         return $this->configs;
     }
-
 }
