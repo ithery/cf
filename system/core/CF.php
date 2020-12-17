@@ -247,7 +247,8 @@ final class CF {
     /**
      * Invoke
      *
-     * @param  mixed $uri
+     * @param mixed $uri
+     *
      * @return void
      */
     public static function invoke($uri) {
@@ -337,9 +338,11 @@ final class CF {
     /**
      * Displays a 404 page.
      *
+     * @param string $page     URI of page
+     * @param string $template custom template
+     *
      * @throws C_404_Exception
-     * @param  string          $page     URI of page
-     * @param  string          $template custom template
+     *
      * @return void
      */
     public static function show404($page = false, $template = false) {
@@ -347,9 +350,9 @@ final class CF {
     }
 
     /**
+     * @param type $directory
+     * @param type $domain
      *
-     * @param  type   $directory
-     * @param  type   $domain
      * @return string
      */
     public static function getDir($directory = '', $domain = null) {
@@ -367,10 +370,10 @@ final class CF {
     }
 
     /**
+     * @param string $directory
+     * @param string $domain
      *
-     * @param  string $directory
-     * @param  string $domain
-     * @return array  array of directory
+     * @return array array of directory
      */
     public static function getDirs($directory, $domain = null) {
         $includePaths = CF::paths($domain);
@@ -385,10 +388,10 @@ final class CF {
     }
 
     /**
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
      *
-     * @param  string   $directory
-     * @param  string   $filename
-     * @param  string   $domain
      * @return string[]
      */
     public static function getFiles($directory, $filename, $domain = null) {
@@ -408,10 +411,10 @@ final class CF {
     }
 
     /**
+     * @param string $directory
+     * @param string $filename
+     * @param string $domain
      *
-     * @param  string $directory
-     * @param  string $filename
-     * @param  string $domain
      * @return string
      */
     public static function getFile($directory, $filename, $domain = null) {
@@ -426,8 +429,9 @@ final class CF {
      * Get all include paths. APPPATH is the first path, followed by module
      * paths in the order they are configured, follow by the SYSPATH.
      *
-     * @param  null|mixed $domain
-     * @param  boolean    $force_reload
+     * @param null|mixed $domain
+     * @param boolean    $force_reload
+     *
      * @return array
      */
     public static function paths($domain = null, $force_reload = false) {
@@ -473,10 +477,11 @@ final class CF {
     /**
      * Get a config item or group.
      *
+     * @param mixed      $group
+     * @param null|mixed $default
+     * @param mixed      $required
+     *
      * @return mixed
-     * @param  mixed      $group
-     * @param  null|mixed $default
-     * @param  mixed      $required
      */
     public static function config($group, $default = null, $required = true) {
         $path = null;
@@ -495,8 +500,9 @@ final class CF {
     /**
      * Add a new message to the log.
      *
-     * @param  string $level
-     * @param  string $message
+     * @param string $level
+     * @param string $message
+     *
      * @return void
      */
     public static function log($level, $message) {
@@ -508,9 +514,11 @@ final class CF {
     /**
      * Provides class auto-loading.
      *
+     * @param string $class
+     * @param string $directory
+     *
      * @throws CException
-     * @param  mixed      $class
-     * @param  mixed      $directory
+     *
      * @return bool
      */
     public static function autoLoad($class, $directory = 'libraries') {
@@ -729,12 +737,14 @@ final class CF {
      * to the order of the include paths. Configuration and i18n files will be
      * returned in reverse order.
      *
-     * @throws CException        if file is required and not found
-     * @param  mixed             $directory directory to search in
-     * @param  mixed             $filename  filename to look for (without extension)
-     * @param  mixed             $required  file required
-     * @param  mixed             $ext       file extension
-     * @param  mixed             $reload
+     * @param mixed $directory directory to search in
+     * @param mixed $filename  filename to look for (without extension)
+     * @param mixed $required  file required
+     * @param mixed $ext       file extension
+     * @param mixed $reload
+     *
+     * @throws CException if file is required and not found
+     *
      * @return array|string|bool if the type is config, i18n or l10n,
      */
     public static function findFile($directory, $filename, $required = false, $ext = false, $reload = false) {
@@ -805,10 +815,11 @@ final class CF {
     /**
      * Fetch an i18n language item.
      *
-     * @param  null|string $key    language key to fetch
-     * @param  null|array  $args   argument for replace
-     * @param  null|array  $locale additional information to insert into the line
-     * @return string      i18n language string, or the requested key if the i18n item is not found
+     * @param null|string $key    language key to fetch
+     * @param null|array  $args   argument for replace
+     * @param null|array  $locale additional information to insert into the line
+     *
+     * @return string i18n language string, or the requested key if the i18n item is not found
      */
     public static function lang($key = null, array $args = [], $locale = null) {
         if ($key == null) {
@@ -833,7 +844,8 @@ final class CF {
     /**
      * Checks if given data is file, handles mixed input
      *
-     * @param  mixed   $value
+     * @param mixed $value
+     *
      * @return boolean
      */
     private static function isFile($value) {
@@ -845,7 +857,8 @@ final class CF {
     /**
      * Get data domain
      *
-     * @param  string $domain
+     * @param string $domain
+     *
      * @return array
      */
     public static function data($domain = null) {
@@ -865,8 +878,9 @@ final class CF {
     /**
      * Get application id for domain
      *
+     * @param null|mixed $domain
+     *
      * @return string
-     * @param  null|mixed $domain
      */
     public static function appId($domain = null) {
         $data = self::data($domain);
@@ -876,8 +890,9 @@ final class CF {
     /**
      * Get application code for domain
      *
+     * @param null|mixed $domain
+     *
      * @return string
-     * @param  null|mixed $domain
      */
     public static function appCode($domain = null) {
         $data = self::data($domain);
@@ -887,7 +902,8 @@ final class CF {
     /**
      * Get org id for domain
      *
-     * @param  string $domain
+     * @param string $domain
+     *
      * @return int
      */
     public static function orgId($domain = null) {
@@ -898,7 +914,8 @@ final class CF {
     /**
      * Get org code for this domain
      *
-     * @param  string $domain
+     * @param string $domain
+     *
      * @return string
      */
     public static function orgCode($domain = null) {
@@ -922,7 +939,8 @@ final class CF {
     /**
      * Get shared application code for this domain
      *
-     * @param  string $domain
+     * @param string $domain
+     *
      * @return array
      */
     public static function getSharedApp($domain = null) {
@@ -939,8 +957,9 @@ final class CF {
     /**
      * Get theme for this domain
      *
+     * @param null|mixed $domain
+     *
      * @return array
-     * @param  null|mixed $domain
      */
     public static function theme($domain = null) {
         $data = self::data($domain);
@@ -950,8 +969,9 @@ final class CF {
     /**
      * Get modules for this domain
      *
+     * @param null|mixed $domain
+     *
      * @return array
-     * @param  null|mixed $domain
      */
     public static function modules($domain = null) {
         $data = self::data($domain);
@@ -961,8 +981,9 @@ final class CF {
     /**
      * Call the given Closure with the given value then return the value.
      *
-     * @param  mixed         $value
-     * @param  callable|null $callback
+     * @param mixed         $value
+     * @param callable|null $callback
+     *
      * @return mixed
      */
     public static function tap($value, $callback = null) {
@@ -972,7 +993,8 @@ final class CF {
     /**
      * Get the class "basename" of the given object / class.
      *
-     * @param  string|object $class
+     * @param string|object $class
+     *
      * @return string
      */
     public static function classBasename($class) {
@@ -982,7 +1004,8 @@ final class CF {
     /**
      * Returns all traits used by a class, its subclasses and trait of their traits.
      *
-     * @param  object|string $class
+     * @param object|string $class
+     *
      * @return array
      */
     public static function classUsesRecursive($class) {
@@ -992,7 +1015,8 @@ final class CF {
     /**
      * Returns all traits used by a trait and its traits.
      *
-     * @param  string $trait
+     * @param string $trait
+     *
      * @return array
      */
     public static function traitUsesRecursive($trait) {
@@ -1002,7 +1026,8 @@ final class CF {
     /**
      * Return the default value of the given value.
      *
-     * @param  mixed $value
+     * @param mixed $value
+     *
      * @return mixed
      */
     public static function value($value) {
@@ -1012,9 +1037,10 @@ final class CF {
     /**
      * Get an item from an array or object using "dot" notation.
      *
-     * @param  mixed        $target
-     * @param  string|array $key
-     * @param  mixed        $default
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $default
+     *
      * @return mixed
      */
     public static function get($target, $key, $default = null) {
@@ -1046,10 +1072,11 @@ final class CF {
     /**
      * Set an item on an array or object using dot notation.
      *
-     * @param  mixed        $target
-     * @param  string|array $key
-     * @param  mixed        $value
-     * @param  bool         $overwrite
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $value
+     * @param bool         $overwrite
+     *
      * @return mixed
      */
     public function set(&$target, $key, $value, $overwrite = true) {
@@ -1099,7 +1126,8 @@ final class CF {
     /**
      * Create a collection from the given value.
      *
-     * @param  mixed       $value
+     * @param mixed $value
+     *
      * @return CCollection
      */
     public static function collect($value = null) {
@@ -1107,7 +1135,6 @@ final class CF {
     }
 
     /**
-     *
      * @return string
      */
     public static function version() {
@@ -1115,7 +1142,6 @@ final class CF {
     }
 
     /**
-     *
      * @return string
      */
     public static function codeName() {
@@ -1123,8 +1149,8 @@ final class CF {
     }
 
     /**
+     * @param string $domain
      *
-     * @param  string $domain
      * @return string
      */
     public static function appPath($domain = null) {

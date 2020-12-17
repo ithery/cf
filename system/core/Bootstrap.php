@@ -1,6 +1,6 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 define('CF_VERSION', '1.1');
 define('CF_CODENAME', 'CF1.1');
@@ -33,10 +33,8 @@ require SYSPATH . 'core/CF' . EXT;
 // Prepare the environment
 CF::setup();
 
-
 // End CF Loading
 CFBenchmark::stop(SYSTEM_BENCHMARK . '_cf_loading');
-
 
 if (defined('CFCLI')) {
     CFConsole::execute();

@@ -45,6 +45,9 @@
         <exclude name="PEAR.Classes.ClassDeclaration.OpenBraceNewLine"/>
         <exclude name="PEAR.Functions.FunctionDeclaration.BraceOnSameLine"/>
 
+
+        <!-- Ignore that already defined in PSR-->
+        <exclude name="PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
     </rule>
 
     <rule ref="PSR2">
