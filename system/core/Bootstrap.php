@@ -2,6 +2,26 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+if (isset($_COOKIE['cf-strict'])) {
+    error_reporting(E_ALL);
+}
+date_default_timezone_set('Asia/Jakarta');
+
+//define all constant needed by framework
+//we using if because it is maybe already defined in old index.php
+
+if (!defined('DS')) {
+    define('DS', DIRECTORY_SEPARATOR);
+}
+/**
+ * Default php file extension
+ */
+if (!defined('EXT')) {
+    define('EXT', '.php');
+}
+
+//end of constant from index
+
 define('CF_VERSION', '1.1');
 define('CF_CODENAME', 'CF1.1');
 

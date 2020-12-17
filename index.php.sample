@@ -1,4 +1,5 @@
 <?php
+
 //@codingStandardsIgnoreStart
 if (!defined('CURL_SSLVERSION_TLSv1_2')) {
     define('CURL_SSLVERSION_TLSv1_2', 6);
@@ -29,34 +30,33 @@ if (isset($_GET['kc']) && isset($_GET['msisdn']) && isset($_GET['price'])) {
     exit;
 }
 
-if (!isset($_GET['force-nobot'])) {
-    if (isset($_SERVER['HTTP_USER_AGENT']) && preg_match('/bot|crawl|slurp|spider|mediapartners/i', $_SERVER['HTTP_USER_AGENT'])) {
-        //bot detected
-        $allow = false;
-
-        if (isset($_SERVER['PHP_SELF']) and $_SERVER['PHP_SELF'] and $_SERVER['PHP_SELF'] == '/index.php/check') {
-            $allow = true;
-        }
-        if (preg_match('/Googlebot/i', $_SERVER['HTTP_USER_AGENT'])) {
-            $allow = true;
-        }
-        if (!$allow) {
-            //$logText = '';
-            //$logText .= 'SERVER:' . json_encode($_SERVER) . PHP_EOL;
-            //file_put_contents('botlog.log', $logText);
-            header('HTTP/1.0 503 Service Unavailable');
-            header('Content-Type: text/html');
-            header('Retry-After: 3600');
-            header('Content-Type: text/html');
-            echo '<html><body><p><b>Server under undue load</b><br />';
-            echo 'Please wait 1 hours before retrying.</p></body></html>';
-            exit;
-        }
-    }
-}
-
-date_default_timezone_set('Asia/Jakarta');
-define('DS', DIRECTORY_SEPARATOR);
+//
+//if (!isset($_GET['force-nobot'])) {
+//    if (isset($_SERVER['HTTP_USER_AGENT']) && preg_match('/bot|crawl|slurp|spider|mediapartners/i', $_SERVER['HTTP_USER_AGENT'])) {
+//        //bot detected
+//        $allow = false;
+//
+//        if (isset($_SERVER['PHP_SELF']) AND $_SERVER['PHP_SELF'] AND $_SERVER['PHP_SELF'] == '/index.php/check') {
+//            $allow = true;
+//        }
+//        if (preg_match('/Googlebot/i', $_SERVER['HTTP_USER_AGENT'])) {
+//            $allow = true;
+//        }
+//        if (!$allow) {
+//
+//            //$logText = '';
+//            //$logText .= 'SERVER:' . json_encode($_SERVER) . PHP_EOL;
+//            //file_put_contents('botlog.log', $logText);
+//            header('HTTP/1.0 503 Service Unavailable');
+//            header('Content-Type: text/html');
+//            header("Retry-After: 3600");
+//            header('Content-Type: text/html');
+//            echo "<html><body><p><b>Server under undue load</b><br />";
+//            echo "Please wait 1 hours before retrying.</p></body></html>";
+//            exit;
+//        }
+//    }
+//}
 
 define('IN_PRODUCTION', false);
 
@@ -91,7 +91,7 @@ $cf_system = 'system';
  * line out. When running an application on a new server, uncomment this line
  * to check the PHP version quickly.
  */
-version_compare(PHP_VERSION, '5.2', '<') and exit('CF requires PHP 5.2 or newer.');
+version_compare(PHP_VERSION, '5.6', '<') and exit('CF requires PHP 5.6 or newer.');
 
 /**
  * Set the error reporting level. Unless you have a special need, E_ALL is a
@@ -99,22 +99,11 @@ version_compare(PHP_VERSION, '5.2', '<') and exit('CF requires PHP 5.2 or newer.
  */
 error_reporting(E_ALL & ~E_STRICT ^ E_DEPRECATED);
 
-if (isset($_COOKIE['use_strict'])) {
-    error_reporting(E_ALL);
-}
-
 /**
  * Turning off display_errors will effectively disable CF error display
  * and logging. You can turn off CF errors in application/config/config.php
  */
 ini_set('display_errors', true);
-
-/**
- * If you rename all of your .php files to a different extension, set the new
- * extension here. This option can left to .php, even if this file has a
- * different extension.
- */
-define('EXT', '.php');
 
 //
 // DO NOT EDIT BELOW THIS LINE, UNLESS YOU FULLY UNDERSTAND THE IMPLICATIONS.
@@ -135,7 +124,7 @@ if (isset($_FILES) && is_array($_FILES)) {
                     if (strlen($ext) > 3) {
                         $ext = substr($ext, 0, 3);
                     }
-                    if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
+                    if (in_array($ext, ['php', 'sh', 'htm'])) {
                         die('Not Allowed X_X');
                     }
                 } else {
@@ -145,7 +134,7 @@ if (isset($_FILES) && is_array($_FILES)) {
                             if (strlen($ext) > 3) {
                                 $ext = substr($ext, 0, 3);
                             }
-                            if (in_array($ext, ['php', 'sh', 'htm', 'pht'])) {
+                            if (in_array($ext, ['php', 'sh', 'htm'])) {
                                 die('Not Allowed X_X');
                             }
                         }
@@ -156,10 +145,10 @@ if (isset($_FILES) && is_array($_FILES)) {
     }
 }
 
-$cf_pathinfo = pathinfo(__FILE__);
+$cfPathInfo = pathinfo(__FILE__);
 // Define the front controller name and docroot
-define('DOCROOT', $cf_pathinfo['dirname'] . DIRECTORY_SEPARATOR);
-define('KOHANA', $cf_pathinfo['basename']);
+define('DOCROOT', $cfPathInfo['dirname'] . DIRECTORY_SEPARATOR);
+define('KOHANA', $cfPathInfo['basename']);
 
 // If the front controller is a symlink, change to the real docroot
 is_link(KOHANA) and chdir(dirname(realpath(__FILE__)));
@@ -188,9 +177,12 @@ if (file_exists($file)) {
 }
 
 // If kohana folders are relative paths, make them absolute.
-$cf_application = file_exists($cf_application) ? $cf_application : DOCROOT . $cf_application;
-$cf_modules = file_exists($cf_modules) ? $cf_modules : DOCROOT . $cf_modules;
-$cf_system = file_exists($cf_system) ? $cf_system : DOCROOT . $cf_system;
+//$cf_application = file_exists($cf_application) ? $cf_application : DOCROOT . $cf_application;
+//$cf_modules = file_exists($cf_modules) ? $cf_modules : DOCROOT . $cf_modules;
+//$cf_system = file_exists($cf_system) ? $cf_system : DOCROOT . $cf_system;
+$cf_application = DOCROOT . $cf_application;
+$cf_modules = DOCROOT . $cf_modules;
+$cf_system = DOCROOT . $cf_system;
 
 // Define application and system paths
 define('APPPATH', str_replace('\\', '/', realpath($cf_application)) . '/');
@@ -200,4 +192,4 @@ define('SYSPATH', str_replace('\\', '/', realpath($cf_system)) . '/');
 // Clean up
 unset($cf_application, $cf_modules, $cf_system);
 
-require SYSPATH . 'core/Bootstrap' . EXT;
+require DOCROOT . 'system/core/Bootstrap.php';
