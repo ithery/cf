@@ -2,11 +2,59 @@
 <ruleset name="CFStandard">
     <description>CF Coding Standard.</description>
     <rule ref="PEAR">
+        <!-- Ignore Commenting -->
+
+        <!-- FileComment -->
+        <exclude name="PEAR.Commenting.FileComment"/>
         <exclude name="PEAR.Commenting.FileComment.MissingCategoryTag"/>
         <exclude name="PEAR.Commenting.FileComment.MissingPackageTag"/>
         <exclude name="PEAR.Commenting.FileComment.MissingAuthorTag"/>
         <exclude name="PEAR.Commenting.FileComment.MissingLicenseTag"/>
         <exclude name="PEAR.Commenting.FileComment.MissingLinkTag"/>
         <exclude name="PEAR.Commenting.FileComment.MissingVersion"/>
+        <!-- Commenting.ClassComment -->
+        <exclude name="PEAR.Commenting.ClassComment.Missing"/>
+        <exclude name="PEAR.Commenting.ClassComment.MissingCategoryTag"/>
+        <exclude name="PEAR.Commenting.ClassComment.MissingPackageTag"/>
+        <exclude name="PEAR.Commenting.ClassComment.MissingAuthorTag"/>
+        <exclude name="PEAR.Commenting.ClassComment.MissingLicenseTag"/>
+        <exclude name="PEAR.Commenting.ClassComment.MissingLinkTag"/>
+        <!-- Commenting.FunctionComment -->
+        <exclude name="PEAR.Commenting.FunctionComment.Missing"/> <!-- Temporary:NeedToResolved-->
+        <exclude name="PEAR.Commenting.FunctionComment.MissingParamComment"/>
+        <exclude name="PEAR.Commenting.FunctionComment.MissingParamName"/>
+        <exclude name="PEAR.Commenting.FunctionComment.SpacingAfterParamName"/>
+        <exclude name="PEAR.Commenting.FunctionComment.SpacingAfterParamType"/>
+        <exclude name="PEAR.Commenting.FunctionComment.MissingParamTag"/> <!-- Temporary:NeedToResolved-->
+        <exclude name="PEAR.Commenting.FunctionComment.MissingReturn"/> <!-- Temporary:NeedToResolved-->
+        <!-- Commenting.DocComment -->
+        <exclude name="Generic.Commenting.DocComment.MissingShort"/>
+        <exclude name="Generic.Commenting.DocComment.TagValueIndent"/>
+        <exclude name="Generic.Commenting.DocComment.NonParamGroup"/>
+
+
+        <!-- Variable Naming Convetions-->
+        <exclude name="PEAR.NamingConventions.ValidVariableName.PrivateNoUnderscore"/>
+        <exclude name="PEAR.NamingConventions.ValidFunctionName.PrivateNoUnderscore"/>
+
+        <!-- Including File -->
+        <exclude name="PEAR.Files.IncludingFile.UseIncludeOnce"/>
+        <exclude name="PEAR.Files.IncludingFile.UseInclude"/>
+
+        <!-- Ignore Braces -->
+        <exclude name="PEAR.Classes.ClassDeclaration.OpenBraceNewLine"/>
+        <exclude name="PEAR.Functions.FunctionDeclaration.BraceOnSameLine"/>
+
     </rule>
+
+    <rule ref="PSR2">
+        <!-- Files.IncludingFile -->
+        <exclude name="PSR1.Classes.ClassDeclaration.MissingNamespace"/>
+        <exclude name="PSR1.Files.SideEffects.FoundWithSymbols"/>
+        <!-- Ignore Braces -->
+        <exclude name="PSR2.Classes.ClassDeclaration.OpenBraceNewLine"/>
+        <exclude name="Squiz.Functions.MultiLineFunctionDeclaration.BraceOnSameLine"/>
+
+    </rule>
+
 </ruleset>
