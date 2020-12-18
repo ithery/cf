@@ -12,31 +12,31 @@ class CTracker_Populator {
 
     /**
      *
-     * @var CTracker_Populator 
+     * @var CTracker_Populator
      */
     protected static $instance;
 
     /**
      *
-     * @var array 
+     * @var array
      */
     protected $data;
 
     /**
      *
-     * @var bool 
+     * @var bool
      */
     protected $isDataPopulated;
 
     /**
      *
-     * @var CTracker_Parser_UserAgentParser 
+     * @var CTracker_Parser_UserAgentParser
      */
     protected $userAgentParser;
 
     /**
      *
-     * @var CTracker_Detect_MobileDetect 
+     * @var CTracker_Detect_MobileDetect
      */
     protected $mobileDetect;
 
@@ -181,15 +181,20 @@ class CTracker_Populator {
 
             $cookieUuid = (string) UUID::uuid4();
 
-            $cookieJar->queue($config->cookieNamespace(), $cookieUuid, 0);
+            setcookie($config->cookieNamespace(), $cookieUuid,time() + (86400 * 30 * 12));
+
+            //$cookieJar->queue($config->cookieNamespace(), $cookieUuid, 0);
 
             /**
              * directly send cookie, TODO send queued cookies when try to render response
              */
+            /*
             foreach ($cookieJar->getQueuedCookies() as $cookieItem) {
+                $cookieJar->
                 $cookiesString = 'Set-Cookie: ' . $cookieItem . "\r\n";
                 header($cookiesString);
             }
+            */
         }
         $this->data['cookie'] = [];
         $this->data['cookie']['uuid'] = $cookieUuid;
