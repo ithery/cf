@@ -49,7 +49,7 @@ class CHTTP_Kernel {
     }
 
     /**
-     * 
+     *
      * @return ReflectionClass
      * @throws ReflectionException
      */
@@ -188,15 +188,18 @@ class CHTTP_Kernel {
 
             if (!headers_sent()) {
                 $headers = headers_list();
-
                 foreach ($headers as $header) {
                     $headerExploded= explode(":", $header);
                     $headerKey = carr::get($headerExploded,0);
                     $headerValue = implode(":", array_splice($headerExploded, 1));
-                    
-                    header_remove($headerKey);
-                    $response->header($headerKey, $headerValue);
+
+                    if(strtolower($headerKey)!='set-cookie') {
+                        $response->header($headerKey, $headerValue);
+                    }
+
                 }
+
+
             }
         }
 
@@ -279,9 +282,9 @@ class CHTTP_Kernel {
             $response->setNotModified();
         }
 
-//        CFEvent::run('system.send_headers');
+        //CFEvent::run('system.send_headers');
         $preparedResponse =  $response->prepare($request);
-        
+
         return $preparedResponse;
     }
 
