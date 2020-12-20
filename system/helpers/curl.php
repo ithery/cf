@@ -1,17 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
+//@codingStandardsIgnoreStart
 class curl {
+    //@codingStandardsIgnoreEnd
 
     /**
      * Fetches the current URI.
      *
      * @param   boolean  include the query string
-     * @return  string
+     * @param mixed $qs
+     *
+     * @return string
      */
-    public static function current($qs = FALSE) {
-        return ($qs === TRUE) ? CFRouter::$complete_uri : CFRouter::$current_uri;
+    public static function current($qs = false) {
+        return ($qs === true) ? CFRouter::$complete_uri : CFRouter::$current_uri;
     }
 
     /**
@@ -22,26 +26,28 @@ class curl {
      *
      * @param   boolean  include the index page
      * @param   boolean  non-default protocol
-     * @return  string
+     * @param mixed $index
+     * @param mixed $protocol
+     *
+     * @return string
      */
-    public static function base($index = FALSE, $protocol = FALSE) {
-
+    public static function base($index = false, $protocol = false) {
         // Load the site domain
         $site_domain = (string) CF::config('core.site_domain', '');
         $domain = carr::get($_SERVER, 'HTTP_HOST');
         if (strlen($domain) == 0) {
             $domain = CF::domain();
         }
-        if ($protocol == FALSE) {
-            if ($site_domain === '' OR $site_domain[0] === '/') {
+        if ($protocol == false) {
+            if ($site_domain === '' or $site_domain[0] === '/') {
                 // Use the configured site domain
                 $base_url = $site_domain;
             } else {
                 // Guess the protocol to provide full http://domain/path URL
-                $base_url = ((empty($_SERVER['HTTPS']) OR $_SERVER['HTTPS'] === 'off') ? 'http' : 'https') . '://' . $site_domain;
+                $base_url = ((empty($_SERVER['HTTPS']) or $_SERVER['HTTPS'] === 'off') ? 'http' : 'https') . '://' . $site_domain;
             }
         } else {
-            if ($site_domain === '' OR $site_domain[0] === '/') {
+            if ($site_domain === '' or $site_domain[0] === '/') {
                 // Guess the server name if the domain starts with slash
                 $base_url = $protocol . '://' . $domain . $site_domain;
             } else {
@@ -50,7 +56,7 @@ class curl {
             }
         }
 
-        if ($index === TRUE AND $index = CF::config('core.index_page')) {
+        if ($index === true and $index = CF::config('core.index_page')) {
             // Append the index page
             $base_url = $base_url . $index;
         }
@@ -84,9 +90,12 @@ class curl {
      *
      * @param   string  site URI to convert
      * @param   string  non-default protocol
-     * @return  string
+     * @param mixed $uri
+     * @param mixed $protocol
+     *
+     * @return string
      */
-    public static function site($uri = '', $protocol = FALSE) {
+    public static function site($uri = '', $protocol = false) {
         if ($path = trim(parse_url($uri, PHP_URL_PATH), '/')) {
             // Add path suffix
             $path .= CF::config('core.url_suffix');
@@ -103,7 +112,7 @@ class curl {
         }
 
         // Concat the URL
-        return curl::base(TRUE, $protocol) . $path . $query . $fragment;
+        return curl::base(true, $protocol) . $path . $query . $fragment;
     }
 
     /**
@@ -112,10 +121,13 @@ class curl {
      *
      * @param   string   filename
      * @param   boolean  include the index page
-     * @return  string
+     * @param mixed $file
+     * @param mixed $index
+     *
+     * @return string
      */
-    public static function file($file, $index = FALSE) {
-        if (strpos($file, '://') === FALSE) {
+    public static function file($file, $index = false) {
+        if (strpos($file, '://') === false) {
             // Add the base URL to the filename
             $file = curl::base($index) . $file;
         }
@@ -128,7 +140,8 @@ class curl {
      * overload, instead of replace, the current query string.
      *
      * @param   array   associative array of arguments
-     * @return  string
+     *
+     * @return string
      */
     public static function merge(array $arguments) {
         if ($_GET === $arguments) {
@@ -146,7 +159,10 @@ class curl {
      *
      * @param   string  phrase to convert
      * @param   string  word separator (- or _)
-     * @return  string
+     * @param mixed $title
+     * @param mixed $separator
+     *
+     * @return string
      */
     public static function title($title, $separator = '-') {
         $separator = ($separator === '-') ? '-' : '_';
@@ -169,15 +185,17 @@ class curl {
      *
      * @param  mixed   string site URI or URL to redirect to, or array of strings if method is 300
      * @param  string  HTTP method of redirect
+     * @param mixed $uri
+     * @param mixed $method
+     *
      * @return void
      */
     public static function redirect($uri = '', $method = '302') {
         if (CFEvent::has_run('system.send_headers')) {
-            return FALSE;
+            return false;
         }
 
-        $codes = array
-            (
+        $codes = [
             'refresh' => 'Refresh',
             '300' => 'Multiple Choices',
             '301' => 'Moved Permanently',
@@ -186,7 +204,7 @@ class curl {
             '304' => 'Not Modified',
             '305' => 'Use Proxy',
             '307' => 'Temporary Redirect'
-        );
+        ];
 
         // Validate the method and default to 302
         $method = isset($codes[$method]) ? (string) $method : '302';
@@ -209,9 +227,9 @@ class curl {
         // Run the redirect event
         CFEvent::run('system.redirect', $uri);
 
-        if (strpos($uri, '://') === FALSE) {
+        if (strpos($uri, '://') === false) {
             // HTTP headers expect absolute URLs
-            $uri = curl::site($uri, request::protocol());
+            $uri = curl::site($uri, static::protocol());
         }
 
         if ($method === 'refresh') {
@@ -228,9 +246,9 @@ class curl {
     }
 
     /**
-     * 
-     * @param string $val
+     * @param string      $val
      * @param string|null $key pass null to no key
+     *
      * @return string
      */
     public static function asPostString($val, $key = null) {
@@ -239,10 +257,10 @@ class curl {
 
         if (is_array($val)) {
             foreach ($val as $k => $v) {
-                if ($prefix === NULL) {
-                    $result .= '&' . curl::as_post_string($v, $k);
+                if ($prefix === null) {
+                    $result .= '&' . static::asPostString($v, $k);
                 } else {
-                    $result .= '&' . curl::as_post_string($v, $prefix . '[' . $k . ']');
+                    $result .= '&' . static::asPostString($v, $prefix . '[' . $k . ']');
                 }
             }
         } else {
@@ -260,10 +278,11 @@ class curl {
     }
 
     /**
-     * 
-     * @param string $val
+     * @param string      $val
      * @param string|null $key
+     *
      * @return string
+     *
      * @deprecated
      */
     public static function as_post_string($val, $key = null) {
@@ -271,8 +290,8 @@ class curl {
     }
 
     /**
-     * 
      * @param string $url
+     *
      * @return string
      */
     public static function removeScheme($url) {
@@ -280,13 +299,32 @@ class curl {
     }
 
     /**
-     * 
      * @param string $url
+     *
      * @return string
+     *
      * @deprecated
      */
+    //@codingStandardsIgnoreStart
     public static function remove_scheme($url) {
         return static::removeScheme($url);
     }
 
+    //@codingStandardsIgnoreEnd
+
+    /**
+     * Returns the current request protocol, based on $_SERVER['https']. In CLI
+     * mode, NULL will be returned.
+     *
+     * @return string
+     */
+    public static function protocol() {
+        if (PHP_SAPI === 'cli') {
+            return null;
+        } elseif (!empty($_SERVER['HTTPS']) and $_SERVER['HTTPS'] === 'on') {
+            return 'https';
+        } else {
+            return 'http';
+        }
+    }
 }
