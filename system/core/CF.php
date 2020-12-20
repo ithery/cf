@@ -611,6 +611,21 @@ final class CF {
                 }
             }
 
+            if ($directory == 'libraries') {
+                if (static::isTesting()) {
+                    if ($path = self::findFile('tests', $routing_file)) {
+                        // Load the class file
+
+                        require $path;
+
+                        if (class_exists($class) || interface_exists($class)) {
+                            $class_not_found = false;
+                            return true;
+                        }
+                    }
+                }
+            }
+
             // find file at libraries
             if ($path = self::findFile($directory, $routing_file)) {
                 // Load the class file
@@ -1196,7 +1211,9 @@ final class CF {
     }
 
     public static function isTesting() {
-        //TODO: this should be true when CF is running in phpunit
+        if (is_array($_SERVER) && isset($_SERVER['APP_ENV']) && $_SERVER['APP_ENV'] == 'testing') {
+            return true;
+        }
         return false;
     }
 }

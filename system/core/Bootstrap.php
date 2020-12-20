@@ -85,10 +85,12 @@ CF::setup();
 // End CF Loading
 CFBenchmark::stop(SYSTEM_BENCHMARK . '_cf_loading');
 
-if (defined('CFCLI')) {
-    CFConsole::execute();
-} else {
-    CFHTTP::execute();
+if (!CF::isTesting()) {
+    if (defined('CFCLI')) {
+        CFConsole::execute();
+    } else {
+        CFHTTP::execute();
+    }
 }
 
 // stop total_execution

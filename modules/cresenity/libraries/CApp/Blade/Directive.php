@@ -1,14 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
- * @license Ittron Global Teknologi
  */
 class CApp_Blade_Directive {
-
     public static function styles($expression) {
         return '{!! CApp::instance()->renderStyles() !!}';
     }
@@ -26,7 +23,6 @@ class CApp_Blade_Directive {
     }
 
     public static function nav($expression) {
-
         return '{!! CApp::instance()->renderNavigation(' . $expression . ') !!}';
     }
 
@@ -59,16 +55,15 @@ class CApp_Blade_Directive {
         if ($renderingElement != null) {
             $viewElement = $renderingElement->viewElement($expression);
             if ($viewElement) {
-              
                 $view = $viewElement->renderToView();
-                
+
                 return $view;
             }
         }
         return '';
     }
 
-    public function directive($expression) {
+    public static function directive($expression) {
         $expression = str_replace(['(', ')'], '', $expression);
         $expression = str_replace(['"', '\''], '', $expression);
         $expression = str_replace(',', ' ', $expression);
@@ -88,5 +83,4 @@ class CApp_Blade_Directive {
         }
         return $expression;
     }
-
 }
