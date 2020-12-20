@@ -1079,7 +1079,7 @@ final class CF {
      *
      * @return mixed
      */
-    public function set(&$target, $key, $value, $overwrite = true) {
+    public static function set(&$target, $key, $value, $overwrite = true) {
         $segments = is_array($key) ? $key : explode('.', $key);
         if (($segment = array_shift($segments)) === '*') {
             if (!carr::accessible($target)) {
@@ -1100,7 +1100,7 @@ final class CF {
                     $target[$segment] = [];
                 }
                 CF::set($target[$segment], $segments, $value, $overwrite);
-            } elseif ($overwrite || !Arr::exists($target, $segment)) {
+            } elseif ($overwrite || !carr::exists($target, $segment)) {
                 $target[$segment] = $value;
             }
         } elseif (is_object($target)) {

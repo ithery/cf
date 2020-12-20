@@ -1,7 +1,5 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
-
 if (isset($_COOKIE['cf-strict'])) {
     error_reporting(E_ALL);
 }
@@ -19,6 +17,37 @@ if (!defined('DS')) {
 if (!defined('EXT')) {
     define('EXT', '.php');
 }
+
+if (!defined('DOCROOT')) {
+    $docroot = realpath(dirname(__FILE__) . DS . '..' . DS . '..' . DS);
+    define('DOCROOT', $docroot . DS);
+
+    define('KOHANA', DOCROOT . 'index.php');
+
+    // If the front controller is a symlink, change to the real docroot
+    is_link(KOHANA) and chdir(dirname(realpath(__FILE__)));
+}
+
+if (!defined('SYSPATH')) {
+    $sysPath = realpath(DOCROOT . 'system');
+    define('SYSPATH', $sysPath . DS);
+}
+
+if (!defined('MODPATH')) {
+    $modPath = realpath(DOCROOT . 'modules');
+    define('MODPATH', $modPath . DS);
+}
+
+if (!defined('APPPATH')) {
+    $appPath = realpath(DOCROOT . 'application');
+    define('APPPATH', $appPath . DS);
+}
+
+if (!defined('IN_PRODUCTION')) {
+    define('IN_PRODUCTION', false);
+}
+
+//try to load data domain
 
 //end of constant from index
 
