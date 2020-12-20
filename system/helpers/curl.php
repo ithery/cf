@@ -9,8 +9,7 @@ class curl {
     /**
      * Fetches the current URI.
      *
-     * @param   boolean  include the query string
-     * @param mixed $qs
+     * @param boolean $qs include the query string
      *
      * @return string
      */
@@ -24,10 +23,8 @@ class curl {
      * If protocol (and core.site_protocol) and core.site_domain are both empty,
      * then
      *
-     * @param   boolean  include the index page
-     * @param   boolean  non-default protocol
-     * @param mixed $index
-     * @param mixed $protocol
+     * @param boolean $index    include the index page
+     * @param boolean $protocol non-default protocol
      *
      * @return string
      */
@@ -69,9 +66,12 @@ class curl {
         return curl::base(false, (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on') ? 'https' : 'http');
     }
 
+    //@codingStandardsIgnoreStart
     public static function url_full() {
         return self::urlFull();
     }
+
+    //@codingStandardsIgnoreENd
 
     public static function urlFull() {
         static::fullUrl();
@@ -145,13 +145,13 @@ class curl {
      */
     public static function merge(array $arguments) {
         if ($_GET === $arguments) {
-            $query = Router::$query_string;
+            $query = CFRouter::$query_string;
         } elseif ($query = http_build_query(array_merge($_GET, $arguments))) {
             $query = '?' . $query;
         }
 
         // Return the current URI with the arguments merged into the query string
-        return Router::$current_uri . $query;
+        return CFRouter::$current_uri . $query;
     }
 
     /**
