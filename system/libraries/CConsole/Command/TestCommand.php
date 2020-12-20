@@ -136,10 +136,10 @@ class CConsole_Command_TestCommand extends CConsole_Command {
     protected function clearEnv() {
         if (!$this->option('env')) {
             $vars = self::getEnvironmentVariables(
-                            // @phpstan-ignore-next-line
-                            $this->laravel->environmentPath(),
-                            // @phpstan-ignore-next-line
-                            $this->laravel->environmentFile()
+                // @phpstan-ignore-next-line
+                $this->laravel->environmentPath(),
+                // @phpstan-ignore-next-line
+                $this->laravel->environmentFile()
             );
 
             $repository = CEnv::getRepository();
@@ -159,10 +159,10 @@ class CConsole_Command_TestCommand extends CConsole_Command {
     protected static function getEnvironmentVariables($path, $file) {
         try {
             $content = StoreBuilder::createWithNoNames()
-                    ->addPath($path)
-                    ->addName($file)
-                    ->make()
-                    ->read();
+                ->addPath($path)
+                ->addName($file)
+                ->make()
+                ->read();
         } catch (InvalidPathException $e) {
             return [];
         }
