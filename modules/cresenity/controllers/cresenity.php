@@ -78,12 +78,12 @@ class Controller_Cresenity extends CController {
      */
     public function change_lang($lang) {
         clang::setlang($lang);
-        curl::redirect(request::referrer());
+        curl::redirect(crequest::referrer());
     }
 
     public function change_theme($theme) {
         CManager::theme()->setTheme($theme);
-        curl::redirect(request::referrer());
+        curl::redirect(crequest::referrer());
     }
 
     //@codingStandardsIgnoreEnd
