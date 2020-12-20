@@ -165,7 +165,7 @@ class CSession_Store {
      * @return array
      */
     public function only(array $keys) {
-        return Arr::only($this->attributes, $keys);
+        return carr::only($this->attributes, $keys);
     }
 
     /**
