@@ -11,15 +11,12 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface as ExceptionHttpExceptionInterface;
 use Whoops\Handler\HandlerInterface;
 use Whoops\Run as Whoops;
 
 /**
- * @author Hery Kurniawan
- *
- * @since Sep 8, 2019, 5:16:49 AM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
+ * @author Hery Kurniawans
  */
 class CException_ExceptionHandler implements CException_ExceptionHandlerInterface {
     use CTrait_ReflectsClosureTrait;
@@ -81,12 +78,10 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     /**
      * Create a new exception handler instance.
      *
-     * @param CContainer_Container $container
-     *
-     * @return void
+s    * @return void
      */
     public function __construct() {
-        $this->container = CContainer_Container::getInstance();
+        $this->container = c::container();
     }
 
     /**
@@ -115,15 +110,15 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         }
 
         CLogger::instance()->add(CLogger::ERROR, $e->getMessage(), null, $this->context(), $e);
-//        try {
-//            CLogger::instance()->add($reportCallable, $message)
-//            $logger = $this->container->make(LoggerInterface::class);
-//        } catch (Exception $ex) {
-//            throw $e;
-//        }
-//        $logger->error(
-//                $e->getMessage(), array_merge($this->context(), ['exception' => $e]
-//        ));
+        //        try {
+        //            CLogger::instance()->add($reportCallable, $message)
+        //            $logger = $this->container->make(LoggerInterface::class);
+        //        } catch (Exception $ex) {
+        //            throw $e;
+        //        }
+        //        $logger->error(
+        //                $e->getMessage(), array_merge($this->context(), ['exception' => $e]
+        //        ));
     }
 
     /**
@@ -179,7 +174,18 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return \CHTTP_Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render($request, $e) {
+        if (method_exists($e, 'render') && $response = $e->render($request)) {
+            return c::router()->toResponse($request, $response);
+        } elseif ($e instanceof CInterface_Responsable) {
+            return $e->toResponse($request);
+        }
+
         if ($this->isHttpException($e)) {
+            if ($e instanceof CHTTP_Exception_RedirectHttpException) {
+
+                return c::redirect($e->getUri(), $e->getStatusCode());
+            }
+
             if (CView::exists('errors/http/' . $e->getStatusCode())) {
                 return c::response()->view('errors/http/' . $e->getStatusCode(), [], $e->getStatusCode());
             } else {
@@ -190,12 +196,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
                     }
                 }
             }
-        }
-
-        if (method_exists($e, 'render') && $response = $e->render($request)) {
-            return Router::toResponse($request, $response);
-        } elseif ($e instanceof CInterface_Responsable) {
-            return $e->toResponse($request);
         }
 
         $e = $this->prepareException($e);
@@ -212,9 +212,9 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
 
         if ($e instanceof CHTTP_Exception_ResponseException) {
             return $e->getResponse();
-        } elseif ($e instanceof AuthenticationException) {
+        } elseif ($e instanceof CAuth_Exception_AuthenticationException) {
             return $this->unauthenticated($request, $e);
-        } elseif ($e instanceof ValidationException) {
+        } elseif ($e instanceof CValidation_Exception) {
             return $this->convertValidationExceptionToResponse($e, $request);
         }
 
@@ -230,13 +230,13 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function prepareException($e) {
         if ($e instanceof CModel_Exception_ModelNotFound) {
-            $e = new NotFoundHttpException($e->getMessage(), $e);
+            $e = new CHTTP_Exception_NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthorizationException) {
             $e = new AccessDeniedHttpException($e->getMessage(), $e);
         } elseif ($e instanceof TokenMismatchException) {
-            $e = new HttpException(419, $e->getMessage(), $e);
+            $e = new CHTTP_Exception_HttpException(419, $e->getMessage(), $e);
         } elseif ($e instanceof SuspiciousOperationException) {
-            $e = new NotFoundHttpException('Bad hostname provided.', $e);
+            $e = new CHTTP_Exception_NotFoundHttpException('Bad hostname provided.', $e);
         }
         return $e;
     }
@@ -244,24 +244,24 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     /**
      * Convert an authentication exception into a response.
      *
-     * @param \Illuminate\Http\Request                 $request
-     * @param \Illuminate\Auth\AuthenticationException $exception
+     * @param CHTTP_Request                           $request
+     * @param CAuth_Exception_AuthenticationException $exception
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function unauthenticated($request, AuthenticationException $exception) {
-        return $request->expectsJson() ? response()->json(['message' => $exception->getMessage()], 401) : redirect()->guest($exception->redirectTo() ? $exception->redirectTo() : route('login'));
+    protected function unauthenticated($request, CAuth_Exception_AuthenticationException $exception) {
+        return $request->expectsJson() ? c::response()->json(['message' => $exception->getMessage()], 401) : c::redirect()->guest($exception->redirectTo() ? $exception->redirectTo() : c::route('login'));
     }
 
     /**
      * Create a response object from the given validation exception.
      *
-     * @param \Illuminate\Validation\ValidationException $e
-     * @param \Illuminate\Http\Request                   $request
+     * @param CValidation_Exception    $e
+     * @param \CHTTP_Request $request
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function convertValidationExceptionToResponse(ValidationException $e, $request) {
+    protected function convertValidationExceptionToResponse(CValidation_Exception $e, $request) {
         if ($e->response) {
             return $e->response;
         }
@@ -277,21 +277,21 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return CHTTP_Response
      */
     protected function invalid($request, CValidation_Exception $exception) {
-        return c::redirect(isset($exception->redirectTo) ? $exception->redirectTo : url()->previous())
-                        ->withInput(crr::except($request->input(), $this->dontFlash))
+        return c::redirect(isset($exception->redirectTo) ? $exception->redirectTo : c::url()->previous())
+                        ->withInput(carr::except($request->input(), $this->dontFlash))
                         ->withErrors($exception->errors(), $exception->errorBag);
     }
 
     /**
      * Convert a validation exception into a JSON response.
      *
-     * @param \Illuminate\Http\Request                   $request
-     * @param \Illuminate\Validation\ValidationException $exception
+     * @param CHTTP_Request         $request
+     * @param CValidation_Exception $exception
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return CHttp_JsonResponse
      */
-    protected function invalidJson($request, ValidationException $exception) {
-        return response()->json([
+    protected function invalidJson($request, CValidation_Exception $exception) {
+        return c::response()->json([
             'message' => $exception->getMessage(),
             'errors' => $exception->errors(),
         ], $exception->status);
@@ -300,7 +300,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     /**
      * Prepare a response for the given exception.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHTTP_Request $request
      * @param \Exception               $e
      *
      * @return \Symfony\Component\HttpFoundation\Response
@@ -317,6 +317,8 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             $this->renderHttpException($e),
             $e
         );
+
+        //@codingStandardsIgnoreEnd
 
         return $response;
     }
@@ -404,7 +406,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function renderHttpException(HttpExceptionInterface $e) {
+    protected function renderHttpException(Exception $e) {
         $this->registerErrorViewPaths();
         $viewName = 'errors/exception';
         if (CView::exists('errors/http/' . $e->getStatusCode())) {
@@ -433,7 +435,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         });
 
         $paths = c::collect(CF::paths());
-        View::replaceNamespace('errors', $paths->map(function ($path) {
+        c::view()->replaceNamespace('errors', $paths->map(function ($path) {
             return "{$path}/errors";
         })->push(__DIR__ . '/views')->all());
     }
