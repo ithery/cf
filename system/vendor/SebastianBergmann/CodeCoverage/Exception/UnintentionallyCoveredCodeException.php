@@ -7,31 +7,28 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace SebastianBergmann\CodeCoverage;
+
+namespace SebastianBergmann\CodeCoverage\Exception;
 
 use RuntimeException;
 
-final class UnintentionallyCoveredCodeException extends RuntimeException implements Exception
-{
+final class UnintentionallyCoveredCodeException extends RuntimeException implements Exception {
     /**
      * @var array
      */
     private $unintentionallyCoveredUnits;
 
-    public function __construct(array $unintentionallyCoveredUnits)
-    {
+    public function __construct(array $unintentionallyCoveredUnits) {
         $this->unintentionallyCoveredUnits = $unintentionallyCoveredUnits;
 
         parent::__construct($this->toString());
     }
 
-    public function getUnintentionallyCoveredUnits()
-    {
+    public function getUnintentionallyCoveredUnits() {
         return $this->unintentionallyCoveredUnits;
     }
 
-    private function toString()
-    {
+    private function toString() {
         $message = '';
 
         foreach ($this->unintentionallyCoveredUnits as $unit) {
