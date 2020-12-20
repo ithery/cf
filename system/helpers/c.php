@@ -1,6 +1,6 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Common helper class.
@@ -10,11 +10,13 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
+//@codingStandardsIgnoreStart
 class c {
+    //@codingStandardsIgnoreEnd
 
     /**
-     * 
      * @param string $str
+     *
      * @return string
      */
     public static function fixPath($str) {
@@ -30,7 +32,7 @@ class c {
     }
 
     public static function manimgurl($path) {
-        return curl::base() . "public/manual/" . $path;
+        return curl::base() . 'public/manual/' . $path;
     }
 
     public static function baseIteratee($value) {
@@ -38,7 +40,7 @@ class c {
             return $value;
         }
         if (null === $value) {
-            return array('c', 'identity');
+            return ['c', 'identity'];
         }
         if (\is_array($value)) {
             return 2 === \count($value) && [0, 1] === \array_keys($value) ? static::baseMatchesProperty($value[0], $value[1]) : static::baseMatches($value);
@@ -88,6 +90,7 @@ class c {
      * @param array|string $path The path of the property to get.
      *
      * @return callable Returns the new accessor function.
+     *
      * @example
      * <code>
      * $objects = [
@@ -104,12 +107,11 @@ class c {
      */
     public static function property($path) {
         $propertyAccess = PropertyAccess::createPropertyAccessorBuilder()
-                ->disableExceptionOnInvalidIndex()
-                ->getPropertyAccessor();
+            ->disableExceptionOnInvalidIndex()
+            ->getPropertyAccessor();
         return function ($value, $index = 0, $collection = []) use ($path, $propertyAccess) {
             $path = \implode('.', (array) $path);
             if (\is_array($value)) {
-
                 if (false !== \strpos($path, '.')) {
                     $paths = \explode('.', $path);
                     foreach ($paths as $path) {
@@ -175,8 +177,7 @@ class c {
      * @return boolean Returns `true` if `value` is a property name, else `false`.
      */
     public static function isKey($value, $object = []) {
-
-        /** Used to match property names within property paths. */
+        /* Used to match property names within property paths. */
         $reIsDeepProp = '#\.|\[(?:[^[\]]*|(["\'])(?:(?!\1)[^\\\\]|\\.)*?\1)\]#';
         $reIsPlainProp = '/^\w*$/';
         if (\is_array($value)) {
@@ -191,32 +192,31 @@ class c {
 
     public static function stringToPath(...$args) {
         $memoizeCapped = static::memoizeCapped(function ($string) {
-
-                    $reLeadingDot = '/^\./';
-                    $rePropName = '#[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["\'])((?:(?!\2)[^\\\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))#';
-                    /** Used to match backslashes in property paths. */
-                    $reEscapeChar = '/\\(\\)?/g';
-                    $result = [];
-                    if (\preg_match($reLeadingDot, $string)) {
-                        $result[] = '';
-                    }
-                    \preg_match_all($rePropName, $string, $matches, PREG_SPLIT_DELIM_CAPTURE);
-                    foreach ($matches as $match) {
-                        $result[] = isset($match[1]) ? $match[1] : $match[0];
-                    }
-                    return $result;
-                });
+            $reLeadingDot = '/^\./';
+            $rePropName = '#[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["\'])((?:(?!\2)[^\\\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))#';
+            /* Used to match backslashes in property paths. */
+            $reEscapeChar = '/\\(\\)?/g';
+            $result = [];
+            if (\preg_match($reLeadingDot, $string)) {
+                $result[] = '';
+            }
+            \preg_match_all($rePropName, $string, $matches, PREG_SPLIT_DELIM_CAPTURE);
+            foreach ($matches as $match) {
+                $result[] = isset($match[1]) ? $match[1] : $match[0];
+            }
+            return $result;
+        });
         return $memoizeCapped(...$args);
     }
 
     public static function memoizeCapped(callable $func) {
         $MaxMemoizeSize = 500;
         $result = static::memoize($func, function ($key) use ($MaxMemoizeSize) {
-                    if ($this->cache->getSize() === $MaxMemoizeSize) {
-                        $this->cache->clear();
-                    }
-                    return $key;
-                });
+            if ($this->cache->getSize() === $MaxMemoizeSize) {
+                $this->cache->clear();
+            }
+            return $key;
+        });
         return $result;
     }
 
@@ -231,8 +231,6 @@ class c {
      * constructor with one whose instances implement the
      * [`Map`](http://ecma-international.org/ecma-262/7.0/#sec-properties-of-the-map-prototype-object)
      * method interface of `clear`, `delete`, `get`, `has`, and `set`.
-     *
-     * @category Function
      *
      * @param callable      $func     The function to have its output memoized.
      * @param callable|null $resolver The function to resolve the cache key.
@@ -270,11 +268,9 @@ class c {
     /**
      * Gets the value at path of object. If the resolved value is null the defaultValue is returned in its place.
      *
-     * @category Object
-     *
-     * @param mixed $object The associative array or object to fetch value from
-     * @param array|string $path Dot separated or array of string
-     * @param mixed $defaultValue (optional)The value returned for unresolved or null values.
+     * @param mixed        $object       The associative array or object to fetch value from
+     * @param array|string $path         Dot separated or array of string
+     * @param mixed        $defaultValue (optional)The value returned for unresolved or null values.
      *
      * @return mixed Returns the resolved value.
      *
@@ -294,7 +290,6 @@ class c {
      * </code>
      */
     public static function get($object, $path, $defaultValue = null) {
-
         return ($object !== null ? c::baseGet($object, $path, $defaultValue) : $defaultValue);
     }
 
@@ -315,6 +310,7 @@ class c {
      * @param mixed $other The other value to compare.
      *
      * @return boolean Returns `true` if the values are equivalent, else `false`.
+     *
      * @example
      * <code>
      * $object = (object) ['a' => 1];
@@ -343,7 +339,8 @@ class c {
     /**
      * Create a collection from the given value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return CCollection
      */
     public static function collect($value = null) {
@@ -353,8 +350,9 @@ class c {
     /**
      * Call the given Closure with the given value then return the value.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
+     * @param mixed         $value
+     * @param callable|null $callback
+     *
      * @return mixed
      */
     public static function tap($value, $callback = null) {
@@ -370,21 +368,23 @@ class c {
     /**
      * Get the class "basename" of the given object / class.
      *
-     * @param  string|object  $class
+     * @param string|object $class
+     *
      * @return string
      */
     public static function classBasename($class) {
         $class = is_object($class) ? get_class($class) : $class;
 
         $basename = basename(str_replace('\\', '/', $class));
-        $basename = carr::last(explode("_", $basename));
+        $basename = carr::last(explode('_', $basename));
         return $basename;
     }
 
     /**
      * Returns all traits used by a trait and its traits.
      *
-     * @param  string  $trait
+     * @param string $trait
+     *
      * @return array
      */
     public static function traitUsesRecursive($trait) {
@@ -400,7 +400,8 @@ class c {
     /**
      * Returns all traits used by a class, its subclasses and trait of their traits.
      *
-     * @param  object|string  $class
+     * @param object|string $class
+     *
      * @return array
      */
     public static function classUsesRecursive($class) {
@@ -420,8 +421,9 @@ class c {
     /**
      * Returns true of traits is used by a class, its subclasses and trait of their traits.
      *
-     * @param  object|string  $class
-     * @param  string  $trait
+     * @param object|string $class
+     * @param string        $trait
+     *
      * @return array
      */
     public static function hasTrait($class, $trait) {
@@ -431,9 +433,10 @@ class c {
     /**
      * Catch a potential exception and return a default value.
      *
-     * @param  callable  $callback
-     * @param  mixed  $rescue
-     * @param  bool  $report
+     * @param callable $callback
+     * @param mixed    $rescue
+     * @param bool     $report
+     *
      * @return mixed
      */
     public static function rescue(callable $callback, $rescue = null, $report = true) {
@@ -451,8 +454,9 @@ class c {
     /**
      * Return the given value, optionally passed through the given callback.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
+     * @param mixed         $value
+     * @param callable|null $callback
+     *
      * @return mixed
      */
     public static function with($value, callable $callback = null) {
@@ -462,14 +466,19 @@ class c {
     /**
      * Report an exception.
      *
-     * @param  \Throwable  $exception
+     * @param \Throwable $exception
+     *
      * @return void
      */
     public static function report($exception) {
-        if ($exception instanceof Throwable &&
-                !$exception instanceof Exception) {
+        //@codingStandardsIgnoreStart
+        if ($exception instanceof Throwable
+            && !$exception instanceof Exception
+        ) {
             $exception = new FatalThrowableError($exception);
         }
+        //@codingStandardsIgnoreEnd
+
         $exceptionHandler = CException::exceptionHandler();
         $exceptionHandler->report($exception);
     }
@@ -477,29 +486,36 @@ class c {
     /**
      * Return the default value of the given value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return mixed
      */
     public static function value($value) {
         return $value instanceof Closure ? $value() : $value;
     }
 
+    //@codingStandardsIgnoreStart
+
     /**
      * Dispatch an event and call the listeners.
      *
-     * @param  string|object  $event
-     * @param  mixed  $payload
-     * @param  bool  $halt
+     * @param string|object $event
+     * @param mixed         $payload
+     * @param bool          $halt
+     *
      * @return array|null
      */
     public static function event(...$args) {
         return CEvent::dispatch(...$args);
     }
 
+    //@codingStandardsIgnoreEnd
+
     /**
      * Create a new Carbon instance for the current time.
      *
-     * @param  \DateTimeZone|string|null  $tz
+     * @param \DateTimeZone|string|null $tz
+     *
      * @return CCarbon
      */
     public static function now($tz = null) {
@@ -534,8 +550,9 @@ class c {
     /**
      * Provide access to optional objects.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
+     * @param mixed         $value
+     * @param callable|null $callback
+     *
      * @return mixed
      */
     public static function optional($value = null, callable $callback = null) {
@@ -549,12 +566,13 @@ class c {
     /**
      * Encode HTML special characters in a string.
      *
-     * @param  CBase_DeferringDisplayableValue|CInterface_Htmlable|string  $value
-     * @param  bool  $doubleEncode
+     * @param CBase_DeferringDisplayableValue|CInterface_Htmlable|string $value
+     * @param bool                                                       $doubleEncode
+     *
      * @return string
      */
     public static function e($value, $doubleEncode = true) {
-        if ($value instanceof CBase_DeferringDisplayableValue) {
+        if ($value instanceof CBase_DeferringDisplayableValueInterface) {
             $value = $value->resolveDisplayableValue();
         }
 
@@ -566,8 +584,8 @@ class c {
     }
 
     /**
-     * 
      * @param string $string
+     *
      * @return \cstr|CBase_String
      */
     public static function str($string = null) {
@@ -581,9 +599,10 @@ class c {
     /**
      * Throw the given exception unless the given condition is true.
      *
-     * @param  mixed  $condition
-     * @param  \Throwable|string  $exception
-     * @param  array  ...$parameters
+     * @param mixed             $condition
+     * @param \Throwable|string $exception
+     * @param array             ...$parameters
+     *
      * @return mixed
      *
      * @throws \Throwable
@@ -599,9 +618,10 @@ class c {
     /**
      * Throw the given exception if the given condition is true.
      *
-     * @param  mixed  $condition
-     * @param  \Throwable|string  $exception
-     * @param  array  ...$parameters
+     * @param mixed             $condition
+     * @param \Throwable|string $exception
+     * @param array             ...$parameters
+     *
      * @return mixed
      *
      * @throws \Throwable
@@ -617,8 +637,9 @@ class c {
     /**
      * Gets the value of an environment variable.
      *
-     * @param  string  $key
-     * @param  mixed  $default
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
     public static function env($key, $default = null) {
@@ -628,24 +649,28 @@ class c {
     /**
      * Translate the given message.
      *
-     * @param  string|null  $key
-     * @param  array  $replace
-     * @param  string|null  $locale
+     * @param string|null $key
+     * @param array       $replace
+     * @param string|null $locale
+     *
      * @return CTranslation_Translator|string|array|null
      */
     public static function trans($key = null, $replace = [], $locale = null) {
         return CF::lang($key, $replace, $locale);
     }
 
+    //@codingStandardsIgnoreStart
+
     /**
      * Translate the given message.
      *
-     * @param  string|null  $key
-     * @param  array  $replace
-     * @param  string|null  $locale
+     * @param string|null $key
+     * @param array       $replace
+     * @param string|null $locale
+     *
      * @return string|array|null
      */
-    function __($key = null, $replace = [], $locale = null) {
+    public static function __($key = null, $replace = [], $locale = null) {
         if (is_null($key)) {
             return $key;
         }
@@ -653,19 +678,22 @@ class c {
         return static::trans($key, $replace, $locale);
     }
 
+    //@codingStandardsIgnoreEnd
+
     /**
-     * @return CSession
+     * @return CSession_Store
      */
     public static function session() {
-        return CSession::instance();
+        return CSession::instance()->store();
     }
 
     /**
      * Generate a url for the application.
      *
-     * @param  string|null  $path
-     * @param  mixed  $parameters
-     * @param  bool|null  $secure
+     * @param string|null $path
+     * @param mixed       $parameters
+     * @param bool|null   $secure
+     *
      * @return CRouting_UrlGenerator|string
      */
     public static function url($path = null, $parameters = [], $secure = null) {
@@ -686,10 +714,11 @@ class c {
     /**
      * Create a new Validator instance.
      *
-     * @param  array  $data
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
+     * @param array $data
+     * @param array $rules
+     * @param array $messages
+     * @param array $customAttributes
+     *
      * @return CValidation_Validator|CValidation_Factory
      */
     public static function validator(array $data = [], array $rules = [], array $messages = [], array $customAttributes = []) {
@@ -705,12 +734,13 @@ class c {
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param  string|null  $view
-     * @param  CInterface_Arrayable|array  $data
-     * @param  array  $mergeData
+     * @param string|null                $view
+     * @param CInterface_Arrayable|array $data
+     * @param array                      $mergeData
+     *
      * @return CView_View|CView_Factory
      */
-    function view($view = null, $data = [], $mergeData = []) {
+    public static function view($view = null, $data = [], $mergeData = []) {
         $factory = CView::factory();
 
         if (func_num_args() === 0) {
@@ -723,10 +753,11 @@ class c {
     /**
      * Throw an HttpException with the given data unless the given condition is true.
      *
-     * @param  bool  $boolean
-     * @param  CHTTP_Response|\CInterface_Responsable|int  $code
-     * @param  string  $message
-     * @param  array  $headers
+     * @param bool                                       $boolean
+     * @param CHTTP_Response|\CInterface_Responsable|int $code
+     * @param string                                     $message
+     * @param array                                      $headers
+     *
      * @return void
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -741,13 +772,13 @@ class c {
     /**
      * Displays a 404 page.
      *
-     * @throws  C_404_Exception
-     * @param   string  URI of page
-     * @param   string  custom template
-     * @return  void
+     * @param string $page     URI of page
+     * @param string $template custom template
+     *
+     * @return void
      */
-    public static function show404($page = FALSE, $template = FALSE) {
-        return CF::abort(404);
+    public static function show404($page = false, $template = false) {
+        return static::abort(404);
     }
 
     public static function abort($code, $message = '', array $headers = []) {
@@ -767,10 +798,11 @@ class c {
     /**
      * Throw an HttpException with the given data if the given condition is true.
      *
-     * @param  bool  $boolean
-     * @param  CHTTP_Response|\CInterface_Responsable|int  $code
-     * @param  string  $message
-     * @param  array  $headers
+     * @param bool                                       $boolean
+     * @param CHTTP_Response|\CInterface_Responsable|int $code
+     * @param string                                     $message
+     * @param array                                      $headers
+     *
      * @return void
      *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
@@ -785,11 +817,12 @@ class c {
     /**
      * Get an instance of the current request or an input item from the request.
      *
-     * @param  array|string|null  $key
-     * @param  mixed  $default
+     * @param array|string|null $key
+     * @param mixed             $default
+     *
      * @return CHTTP_Request|string|array
      */
-    function request($key = null, $default = null) {
+    public static function request($key = null, $default = null) {
         if (is_null($key)) {
             return CHTTP::request();
         }
@@ -806,9 +839,10 @@ class c {
     /**
      * Return a new response from the application.
      *
-     * @param  CView|string|array|null  $content
-     * @param  int  $status
-     * @param  array  $headers
+     * @param CView|string|array|null $content
+     * @param int                     $status
+     * @param array                   $headers
+     *
      * @return CHTTP_Response|CHTTP_ResponseFactory
      */
     public static function response($content = '', $status = 200, array $headers = []) {
@@ -824,7 +858,8 @@ class c {
     /**
      * Determine if the given value is "blank".
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return bool
      */
     public static function blank($value) {
@@ -850,7 +885,8 @@ class c {
     /**
      * Determine if a value is "filled".
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return bool
      */
     public static function filled($value) {
@@ -860,10 +896,11 @@ class c {
     /**
      * Get an instance of the redirector.
      *
-     * @param  string|null  $to
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  bool|null  $secure
+     * @param string|null $to
+     * @param int         $status
+     * @param array       $headers
+     * @param bool|null   $secure
+     *
      * @return CHTTP_Redirector|CHttp_RedirectResponse
      */
     public static function redirect($to = null, $status = 302, $headers = [], $secure = null) {
@@ -874,6 +911,43 @@ class c {
         return CHTTP::redirector()->to($to, $status, $headers, $secure);
     }
 
+    /**
+     * @return CContainer_Container
+     */
+    public static function container() {
+        return CContainer::getInstance();
+    }
+
+    /**
+     * Get hash manager instance
+     *
+     * @return CCrypt_HashManager
+     */
+    public static function hash() {
+        return CCrypt_HashManager::instance();
+    }
+
+    /**
+     * Get router instance
+     *
+     * @return CRouting_Router
+     */
+    public static function router() {
+        return CRouting_Router::instance();
+    }
+
+    /**
+     * Generate the URL to a named route.
+     *
+     * @param array|string $name
+     * @param mixed        $parameters
+     * @param bool         $absolute
+     *
+     * @return string
+     */
+    public static function route($name, $parameters = [], $absolute = true) {
+        return static::url()->route($name, $parameters, $absolute);
+    }
 }
 
 // End c

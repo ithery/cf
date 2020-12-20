@@ -38,10 +38,10 @@ class CBase_Pipeline implements CBase_PipelineInterface {
     /**
      * Create a new class instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
+     * @param  CContainer_Container|null  $container
      * @return void
      */
-    public function __construct(Container $container = null) {
+    public function __construct(CContainer_Container $container = null) {
         $this->container = $container;
     }
 
@@ -89,7 +89,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
      */
     public function then(Closure $destination) {
         $pipeline = array_reduce(
-                array_reverse($this->pipes()), $this->carry(), $this->prepareDestination($destination)
+            array_reverse($this->pipes()), $this->carry(), $this->prepareDestination($destination)
         );
 
         return $pipeline($this->passable);
@@ -195,24 +195,9 @@ class CBase_Pipeline implements CBase_PipelineInterface {
      * @throws \RuntimeException
      */
     protected function getContainer() {
-        if (!$this->container) {
-            throw new RuntimeException('A container instance has not been passed to the Pipeline.');
-        }
-
-        return $this->container;
+        return CContainer::getInstance();
     }
 
-    /**
-     * Set the container instance.
-     *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return $this
-     */
-    public function setContainer(Container $container) {
-        $this->container = $container;
-
-        return $this;
-    }
 
     /**
      * Handle the value returned from each pipe before passing it to the next.

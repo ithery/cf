@@ -6,12 +6,12 @@
  * @author Hery
  */
 class CBase_Reflector {
-
     /**
      * This is a PHP 7.4 compatible implementation of is_callable.
      *
-     * @param  mixed  $var
-     * @param  bool  $syntaxOnly
+     * @param mixed $var
+     * @param bool  $syntaxOnly
+     *
      * @return bool
      */
     public static function isCallable($var, $syntaxOnly = false) {
@@ -19,14 +19,16 @@ class CBase_Reflector {
             return is_callable($var, $syntaxOnly);
         }
 
-        if ((!isset($var[0]) || !isset($var[1])) ||
-                !is_string(isset($var[1]) ? $var[1] : null)) {
+        if ((!isset($var[0]) || !isset($var[1]))
+            || !is_string(isset($var[1]) ? $var[1] : null)
+        ) {
             return false;
         }
 
-        if ($syntaxOnly &&
-                (is_string($var[0]) || is_object($var[0])) &&
-                is_string($var[1])) {
+        if ($syntaxOnly
+            && (is_string($var[0]) || is_object($var[0]))
+            && is_string($var[1])
+        ) {
             return true;
         }
 
@@ -56,7 +58,8 @@ class CBase_Reflector {
     /**
      * Get the class name of the given parameter's type, if possible.
      *
-     * @param  \ReflectionParameter  $parameter
+     * @param \ReflectionParameter $parameter
+     *
      * @return string|null
      */
     public static function getParameterClassName($parameter) {
@@ -84,8 +87,9 @@ class CBase_Reflector {
     /**
      * Determine if the parameter's type is a subclass of the given type.
      *
-     * @param  \ReflectionParameter  $parameter
-     * @param  string  $className
+     * @param \ReflectionParameter $parameter
+     * @param string               $className
+     *
      * @return bool
      */
     public static function isParameterSubclassOf($parameter, $className) {
@@ -93,5 +97,4 @@ class CBase_Reflector {
 
         return ($paramClassName && class_exists($paramClassName)) ? (new ReflectionClass($paramClassName))->isSubclassOf($className) : false;
     }
-
 }
