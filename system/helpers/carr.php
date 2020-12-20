@@ -1112,6 +1112,67 @@ class carr {
     }
 
     /**
+     * Shuffle the given array and return the result.
+     *
+     * @param array    $array
+     * @param int|null $seed
+     *
+     * @return array
+     */
+    public static function shuffle($array, $seed = null) {
+        if (is_null($seed)) {
+            shuffle($array);
+        } else {
+            mt_srand($seed);
+            shuffle($array);
+            mt_srand();
+        }
+
+        return $array;
+    }
+
+    /**
+     * Sort the array using the given callback or "dot" notation.
+     *
+     * @param array                      $array
+     * @param callable|array|string|null $callback
+     *
+     * @return array
+     */
+    public static function sort($array, $callback = null) {
+        return CCollection::make($array)->sortBy($callback)->all();
+    }
+
+    /**
+     * Recursively sort an array by keys and values.
+     *
+     * @param array $array
+     * @param int   $options
+     * @param bool  $descending
+     *
+     * @return array
+     */
+    public static function sortRecursive($array, $options = SORT_REGULAR, $descending = false) {
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                $value = static::sortRecursive($value, $options, $descending);
+            }
+        }
+
+        if (static::isAssoc($array)) {
+            $descending
+                ? krsort($array, $options)
+                : ksort($array, $options);
+        } else {
+            $descending
+                ? rsort($array, $options)
+                : sort($array, $options);
+        }
+
+        return $array;
+    }
+
+    /**
      * Convert the array into a query string.
      *
      * @param array $array

@@ -592,7 +592,7 @@ trait CTesting_Concern_MakesHttpRequests {
         }
 
         return c::collect($this->defaultCookies)->map(function ($value, $key) {
-            return c::encrypt(CookieValuePrefix::create($key, app('encrypter')->getKey()) . $value, false);
+            return c::encrypt(CHTTP_Cookie_CookieValuePrefix::create($key, CCrypt::encrypter()->getKey()) . $value, false);
         })->merge($this->unencryptedCookies)->all();
     }
 
@@ -608,9 +608,9 @@ trait CTesting_Concern_MakesHttpRequests {
     /**
      * Follow a redirect chain until a non-redirect is received.
      *
-     * @param \Illuminate\Http\Response $response
+     * @param CHTTP_Response $response
      *
-     * @return \Illuminate\Http\Response|\Illuminate\Testing\TestResponse
+     * @return CHttp_Response|CTesting_TestResponse
      */
     protected function followRedirects($response) {
         $this->followRedirects = false;
@@ -625,11 +625,11 @@ trait CTesting_Concern_MakesHttpRequests {
     /**
      * Create the test response instance from the given response.
      *
-     * @param \Illuminate\Http\Response $response
+     * @param CHTTP_Response $response
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     protected function createTestResponse($response) {
-        return TestResponse::fromBaseResponse($response);
+        return CTesting_TestResponse::fromBaseResponse($response);
     }
 }

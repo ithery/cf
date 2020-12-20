@@ -27,8 +27,7 @@ final class CCrypt {
     /**
      * Parse the encryption key.
      *
-     * @param array $config
-     * @param mixed $key
+     * @param string $key
      *
      * @return string
      */
