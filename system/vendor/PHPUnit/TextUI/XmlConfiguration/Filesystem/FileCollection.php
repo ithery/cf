@@ -7,7 +7,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI\XmlConfiguration;
+
+namespace PHPUnit\TextUI\XmlConfiguration\Filesystem;
 
 use function count;
 use Countable;
@@ -17,8 +18,7 @@ use IteratorAggregate;
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  * @psalm-immutable
  */
-final class FileCollection implements Countable, IteratorAggregate
-{
+final class FileCollection implements Countable, IteratorAggregate {
     /**
      * @var File[]
      */
@@ -27,36 +27,30 @@ final class FileCollection implements Countable, IteratorAggregate
     /**
      * @param File[] $files
      */
-    public static function fromArray(array $files)
-    {
+    public static function fromArray(array $files) {
         return new self(...$files);
     }
 
-    private function __construct(File ...$files)
-    {
+    private function __construct(File ...$files) {
         $this->files = $files;
     }
 
     /**
      * @return File[]
      */
-    public function asArray()
-    {
+    public function asArray() {
         return $this->files;
     }
 
-    public function count()
-    {
+    public function count() {
         return count($this->files);
     }
 
-    public function getIterator()
-    {
+    public function getIterator() {
         return new FileCollectionIterator($this);
     }
 
-    public function isEmpty()
-    {
+    public function isEmpty() {
         return $this->count() === 0;
     }
 }

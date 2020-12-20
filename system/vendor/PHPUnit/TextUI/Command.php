@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\TextUI;
 
 use const PATH_SEPARATOR;
@@ -50,8 +51,11 @@ use PHPUnit\TextUI\CliArguments\Mapper;
 use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\FilterMapper;
 use PHPUnit\TextUI\XmlConfiguration\Generator;
 use PHPUnit\TextUI\XmlConfiguration\Loader;
-use PHPUnit\TextUI\XmlConfiguration\Migrator;
-use PHPUnit\TextUI\XmlConfiguration\PhpHandler;
+use PHPUnit\TextUI\XmlConfiguration\Migration\Migrator;
+use PHPUnit\TextUI\XmlConfiguration\PHP\PhpHandler;
+use PHPUnit\TextUI\Exception\RuntimeException;
+use PHPUnit\TextUI\Exception\Exception;
+use PHPUnit\TextUI\Exception\ReflectionException;
 use PHPUnit\Util\FileLoader;
 use PHPUnit\Util\Filesystem;
 use PHPUnit\Util\Printer;
@@ -68,8 +72,7 @@ use Throwable;
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-class Command
-{
+class Command {
     /**
      * @var array<string,mixed>
      */
@@ -92,9 +95,10 @@ class Command
 
     /**
      * @throws Exception
+     *
+     * @param mixed $exit
      */
-    public static function main($exit = true)
-    {
+    public static function main($exit = true) {
         try {
             return (new static)->run($_SERVER['argv'], $exit);
         } catch (Throwable $t) {
@@ -108,9 +112,10 @@ class Command
 
     /**
      * @throws Exception
+     *
+     * @param mixed $exit
      */
-    public function run(array $argv, $exit = true)
-    {
+    public function run(array $argv, $exit = true) {
         $this->handleArguments($argv);
 
         $runner = $this->createRunner();
@@ -166,8 +171,7 @@ class Command
     /**
      * Create a TestRunner, override in subclasses.
      */
-    protected function createRunner()
-    {
+    protected function createRunner() {
         return new TestRunner($this->arguments['loader']);
     }
 
@@ -216,8 +220,7 @@ class Command
      *
      * @throws Exception
      */
-    protected function handleArguments(array $argv)
-    {
+    protected function handleArguments(array $argv) {
         try {
             $arguments = (new Builder)->fromParameters($argv, array_keys($this->longOptions));
         } catch (ArgumentsException $e) {
@@ -418,9 +421,11 @@ class Command
      * Handles the loading of the PHPUnit\Runner\TestSuiteLoader implementation.
      *
      * @deprecated see https://github.com/sebastianbergmann/phpunit/issues/4039
+     *
+     * @param mixed $loaderClass
+     * @param mixed $loaderFile
      */
-    protected function handleLoader($loaderClass, $loaderFile = '')
-    {
+    protected function handleLoader($loaderClass, $loaderFile = '') {
         $this->warnings[] = 'Using a custom test suite loader is deprecated';
 
         if (!class_exists($loaderClass, false)) {
@@ -477,9 +482,11 @@ class Command
      * Handles the loading of the PHPUnit\Util\Printer implementation.
      *
      * @return null|Printer|string
+     *
+     * @param mixed $printerClass
+     * @param mixed $printerFile
      */
-    protected function handlePrinter($printerClass, $printerFile = '')
-    {
+    protected function handlePrinter($printerClass, $printerFile = '') {
         if (!class_exists($printerClass, false)) {
             if ($printerFile === '') {
                 $printerFile = Filesystem::classNameToFilename(
@@ -545,9 +552,10 @@ class Command
 
     /**
      * Loads a bootstrap file.
+     *
+     * @param mixed $filename
      */
-    protected function handleBootstrap($filename)
-    {
+    protected function handleBootstrap($filename) {
         try {
             FileLoader::checkAndLoad($filename);
         } catch (Throwable $t) {
@@ -555,17 +563,16 @@ class Command
         }
     }
 
-    protected function handleVersionCheck()
-    {
+    protected function handleVersionCheck() {
         $this->printVersionString();
 
         $latestVersion = file_get_contents('https://phar.phpunit.de/latest-version-of/phpunit');
-        $isOutdated    = version_compare($latestVersion, Version::id(), '>');
+        $isOutdated = version_compare($latestVersion, Version::id(), '>');
 
         if ($isOutdated) {
             printf(
-                'You are not using the latest version of PHPUnit.' . PHP_EOL .
-                'The latest version is PHPUnit %s.' . PHP_EOL,
+                'You are not using the latest version of PHPUnit.' . PHP_EOL
+                . 'The latest version is PHPUnit %s.' . PHP_EOL,
                 $latestVersion
             );
         } else {
@@ -578,8 +585,7 @@ class Command
     /**
      * Show the help message.
      */
-    protected function showHelp()
-    {
+    protected function showHelp() {
         $this->printVersionString();
         (new Help)->writeToConsole();
     }
@@ -587,12 +593,10 @@ class Command
     /**
      * Custom callback for test suite discovery.
      */
-    protected function handleCustomTestSuite()
-    {
+    protected function handleCustomTestSuite() {
     }
 
-    private function printVersionString()
-    {
+    private function printVersionString() {
         if ($this->versionStringPrinted) {
             return;
         }
@@ -602,8 +606,7 @@ class Command
         $this->versionStringPrinted = true;
     }
 
-    private function exitWithErrorMessage($message)
-    {
+    private function exitWithErrorMessage($message) {
         $this->printVersionString();
 
         print $message . PHP_EOL;
@@ -611,8 +614,7 @@ class Command
         exit(TestRunner::FAILURE_EXIT);
     }
 
-    private function handleExtensions($directory)
-    {
+    private function handleExtensions($directory) {
         foreach ((new FileIteratorFacade)->getFilesAsArray($directory, '.phar') as $file) {
             if (!is_file('phar://' . $file . '/manifest.xml')) {
                 $this->arguments['notLoadedExtensions'][] = $file . ' is not an extension for PHPUnit';
@@ -622,8 +624,8 @@ class Command
 
             try {
                 $applicationName = new ApplicationName('phpunit/phpunit');
-                $version         = new PharIoVersion(Version::series());
-                $manifest        = ManifestLoader::fromFile('phar://' . $file . '/manifest.xml');
+                $version = new PharIoVersion(Version::series());
+                $manifest = ManifestLoader::fromFile('phar://' . $file . '/manifest.xml');
 
                 if (!$manifest->isExtensionFor($applicationName)) {
                     $this->arguments['notLoadedExtensions'][] = $file . ' is not an extension for PHPUnit';
@@ -648,8 +650,7 @@ class Command
         }
     }
 
-    private function handleListGroups(TestSuite $suite, $exit)
-    {
+    private function handleListGroups(TestSuite $suite, $exit) {
         $this->printVersionString();
 
         print 'Available test group(s):' . PHP_EOL;
@@ -678,9 +679,10 @@ class Command
     /**
      * @throws \PHPUnit\Framework\Exception
      * @throws \PHPUnit\TextUI\XmlConfiguration\Exception
+     *
+     * @param mixed $exit
      */
-    private function handleListSuites($exit)
-    {
+    private function handleListSuites($exit) {
         $this->printVersionString();
 
         print 'Available test suite(s):' . PHP_EOL;
@@ -701,9 +703,10 @@ class Command
 
     /**
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     *
+     * @param mixed $exit
      */
-    private function handleListTests(TestSuite $suite, $exit)
-    {
+    private function handleListTests(TestSuite $suite, $exit) {
         $this->printVersionString();
 
         $renderer = new TextTestListRenderer;
@@ -719,9 +722,11 @@ class Command
 
     /**
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
+     *
+     * @param mixed $target
+     * @param mixed $exit
      */
-    private function handleListTestsXml(TestSuite $suite, $target, $exit)
-    {
+    private function handleListTestsXml(TestSuite $suite, $target, $exit) {
         $this->printVersionString();
 
         $renderer = new XmlTestListRenderer;
@@ -740,8 +745,7 @@ class Command
         return TestRunner::SUCCESS_EXIT;
     }
 
-    private function generateConfiguration()
-    {
+    private function generateConfiguration() {
         $this->printVersionString();
 
         print 'Generating phpunit.xml in ' . getcwd() . PHP_EOL . PHP_EOL;
@@ -796,8 +800,7 @@ class Command
         exit(TestRunner::SUCCESS_EXIT);
     }
 
-    private function migrateConfiguration($filename)
-    {
+    private function migrateConfiguration($filename) {
         $this->printVersionString();
 
         if (!(new SchemaDetector)->detect($filename)->detected()) {
@@ -826,8 +829,7 @@ class Command
         exit(TestRunner::SUCCESS_EXIT);
     }
 
-    private function handleCustomOptions(array $unrecognizedOptions)
-    {
+    private function handleCustomOptions(array $unrecognizedOptions) {
         foreach ($unrecognizedOptions as $name => $value) {
             if (isset($this->longOptions[$name])) {
                 $handler = $this->longOptions[$name];
@@ -847,8 +849,7 @@ class Command
         }
     }
 
-    private function handleWarmCoverageCache(XmlConfiguration\Configuration $configuration)
-    {
+    private function handleWarmCoverageCache(XmlConfiguration\Configuration $configuration) {
         $this->printVersionString();
 
         if (isset($this->arguments['coverageCacheDirectory'])) {
@@ -901,8 +902,7 @@ class Command
         exit(TestRunner::SUCCESS_EXIT);
     }
 
-    private function configurationFileInDirectory($directory)
-    {
+    private function configurationFileInDirectory($directory) {
         $candidates = [
             $directory . '/phpunit.xml',
             $directory . '/phpunit.xml.dist',

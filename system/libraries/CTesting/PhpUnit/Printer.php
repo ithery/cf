@@ -1,18 +1,18 @@
 <?php
 
-use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Exception\AssertionFailedError;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestSuite;
-use PHPUnit\Framework\Warning;
+use PHPUnit\Framework\Exception\Warning;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use SebastianBergmann\Timer\Timer;
 
 /**
  * @internal
  */
 final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
-
     /**
      * Holds an instance of the style.
      *
@@ -25,7 +25,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
     /**
      * Holds the duration time of the test suite.
      *
-     * @var Timer
+     * @var CTesting_PhpUnit_Timer
      */
     private $timer;
 
@@ -33,7 +33,7 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
      * Holds the state of the test
      * suite. The number of tests, etc.
      *
-     * @var State
+     * @var CTesting_PhpUnit_State
      */
     private $state;
 
@@ -48,22 +48,24 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
      * Creates a new instance of the listener.
      *
      * @param ConsoleOutput $output
+     * @param mixed         $verbose
+     * @param mixed         $colors
      *
      * @throws \ReflectionException
      */
     public function __construct(\Symfony\Component\Console\Output\ConsoleOutputInterface $output = null, $verbose = false, $colors = 'always') {
-        $this->timer = Timer::start();
+        $this->timer = CTesting_PhpUnit_Timer::start();
 
         $decorated = $colors === 'always' || $colors === 'auto';
 
         $output = $output != null ? $output : new ConsoleOutput(ConsoleOutput::VERBOSITY_NORMAL, $decorated);
 
-        ConfigureIO::of(new ArgvInput(), $output);
+        CTesting_PhpUnit_ConfigureIO::of(new ArgvInput(), $output);
 
-        $this->style = new Style($output);
+        $this->style = new CTesting_PhpUnit_Style($output);
         $dummyTest = new CTesting_PhpUnit_DummyTestCase();
 
-        $this->state = State::from($dummyTest);
+        $this->state = CTesting_PhpUnit_State::from($dummyTest);
     }
 
     /**
@@ -180,6 +182,8 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
 
     /**
      * Intentionally left blank as we output things on events of the listener.
+     *
+     * @param mixed $content
      */
     public function write($content) {
         // ..
@@ -217,5 +221,4 @@ final class CTesting_PhpUnit_Printer implements \PHPUnit\TextUI\ResultPrinter {
 
         $this->style->writeRecap($this->state, $this->timer);
     }
-
 }

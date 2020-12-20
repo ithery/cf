@@ -8,7 +8,6 @@
 use PHPUnit\TextUI\TestRunner;
 
 class CQC_Console_Command_PhpUnitCommand extends CConsole_Command {
-
     /**
      * The name and signature of the console command.
      *
@@ -17,18 +16,14 @@ class CQC_Console_Command_PhpUnitCommand extends CConsole_Command {
     protected $signature = 'qc:phpunit {--group=} {--class=} {--method=}';
 
     public function handle() {
-
-
         $class = $this->option('class');
         $method = $this->option('method');
         $group = $this->option('group');
-
 
         //start the session first
         CSession::instance();
 
         if (strlen($group) > 0) {
-
             //try to get all class from group
             $qcManager = CQC_Manager::instance();
             $listUnitTest = $qcManager->unitTests($group);
@@ -57,7 +52,6 @@ class CQC_Console_Command_PhpUnitCommand extends CConsole_Command {
         $inspector = CQC::createInspector($class);
         $fileName = $inspector->getFileName();
 
-
         $return = TestRunner::FAILURE_EXIT;
 
         $this->info('Running test on file ' . $fileName);
@@ -72,7 +66,7 @@ class CQC_Console_Command_PhpUnitCommand extends CConsole_Command {
             }
             $result = $runner->run($suite, $args, [], true);
         } catch (Throwable $t) {
-            $this->error($t->getMessage() . PHP_EOL.$t->getTraceAsString());
+            $this->error($t->getMessage() . PHP_EOL . $t->getTraceAsString());
             $return = TestRunner::FAILURE_EXIT;
         }
 
@@ -84,5 +78,4 @@ class CQC_Console_Command_PhpUnitCommand extends CConsole_Command {
         return $return;
         return true;
     }
-
 }

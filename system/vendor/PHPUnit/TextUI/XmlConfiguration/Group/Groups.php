@@ -7,14 +7,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI\XmlConfiguration;
+
+namespace PHPUnit\TextUI\XmlConfiguration\Group;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  * @psalm-immutable
  */
-final class Groups
-{
+final class Groups {
     /**
      * @var GroupCollection
      */
@@ -25,29 +25,24 @@ final class Groups
      */
     private $exclude;
 
-    public function __construct(GroupCollection $include, GroupCollection $exclude)
-    {
+    public function __construct(GroupCollection $include, GroupCollection $exclude) {
         $this->include = $include;
         $this->exclude = $exclude;
     }
 
-    public function hasInclude()
-    {
+    public function hasInclude() {
         return !$this->include->isEmpty();
     }
 
-    public function getInclude()
-    {
+    public function getInclude() {
         return $this->include;
     }
 
-    public function hasExclude()
-    {
+    public function hasExclude() {
         return !$this->exclude->isEmpty();
     }
 
-    public function exclude()
-    {
+    public function exclude() {
         return $this->exclude;
     }
 }

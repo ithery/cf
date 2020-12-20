@@ -66,16 +66,17 @@ class CConsole_Command_TestCommand extends CConsole_Command {
         //}
 
         $options = array_slice($_SERVER['argv'], $this->option('without-tty') ? 3 : 2);
-
-        //$this->clearEnv();
-
-        $process = (new Process(array_merge(
+        $commands = array_merge(
             $this->binary(),
             array_merge(
                 $this->arguments,
                 $this->phpunitArguments($options)
             )
-        )))->setTimeout(null);
+        );
+
+        //$this->clearEnv();
+
+        $process = (new Process($commands))->setTimeout(null);
 
         try {
             $process->setTty(!$this->option('without-tty'));
@@ -100,7 +101,11 @@ class CConsole_Command_TestCommand extends CConsole_Command {
      * @return array
      */
     protected function binary() {
-        $command = class_exists(\Pest\Laravel\PestServiceProvider::class) ? c::fixPath(CF::appDir()) . 'vendor/pestphp/pest/bin/pest' : c::fixPath(CF::appDir()) . 'vendor/phpunit/phpunit/phpunit';
+        $command = class_exists(\Pest\Laravel\PestServiceProvider::class)
+            ? c::fixPath(CF::appDir()) . 'vendor/pestphp/pest/bin/pest'
+            : c::fixPath(CF::appDir()) . 'vendor/phpunit/phpunit/phpunit';
+
+        $command = DOCROOT . '.bin' . DS . 'phpunit' . DS . 'phpunit';
 
         if ('phpdbg' === PHP_SAPI) {
             return [PHP_BINARY, '-qrr', $command];

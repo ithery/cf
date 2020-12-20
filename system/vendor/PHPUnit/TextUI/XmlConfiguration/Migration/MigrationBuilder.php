@@ -7,7 +7,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI\XmlConfiguration;
+
+namespace PHPUnit\TextUI\XmlConfiguration\Migration;
 
 use function array_key_exists;
 use function sprintf;
@@ -16,8 +17,7 @@ use function version_compare;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class MigrationBuilder
-{
+final class MigrationBuilder {
     const AVAILABLE_MIGRATIONS = [
         '8.5' => [
             RemoveLogTypes::class,
@@ -44,9 +44,10 @@ final class MigrationBuilder
 
     /**
      * @throws MigrationBuilderException
+     *
+     * @param mixed $fromVersion
      */
-    public function build($fromVersion)
-    {
+    public function build($fromVersion) {
         if (!array_key_exists($fromVersion, self::AVAILABLE_MIGRATIONS)) {
             throw new MigrationBuilderException(
                 sprintf(

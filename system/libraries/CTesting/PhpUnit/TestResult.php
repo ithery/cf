@@ -11,7 +11,6 @@ use PHPUnit\Framework\TestCase;
  * @internal
  */
 final class CTesting_PhpUnit_TestResult {
-
     const FAIL = 'failed';
     const SKIPPED = 'skipped';
     const INCOMPLETE = 'incompleted';
@@ -71,6 +70,13 @@ final class CTesting_PhpUnit_TestResult {
 
     /**
      * Test constructor.
+     *
+     * @param mixed      $testCaseName
+     * @param mixed      $description
+     * @param mixed      $type
+     * @param mixed      $icon
+     * @param mixed      $color
+     * @param null|mixed $throwable
      */
     private function __construct($testCaseName, $description, $type, $icon, $color, $throwable = null) {
         $this->testCaseName = $testCaseName;
@@ -80,7 +86,7 @@ final class CTesting_PhpUnit_TestResult {
         $this->color = $color;
         $this->throwable = $throwable;
 
-        $asWarning = $this->type === TestResult::WARN || $this->type === TestResult::RISKY || $this->type === TestResult::SKIPPED || $this->type === TestResult::INCOMPLETE;
+        $asWarning = $this->type === CTesting_PhpUnit_TestResult::WARN || $this->type === CTesting_PhpUnit_TestResult::RISKY || $this->type === CTesting_PhpUnit_TestResult::SKIPPED || $this->type === CTesting_PhpUnit_TestResult::INCOMPLETE;
 
         if ($throwable instanceof Throwable && $asWarning) {
             $this->warning = trim((string) preg_replace("/\r|\n/", ' ', $throwable->getMessage()));
@@ -89,9 +95,12 @@ final class CTesting_PhpUnit_TestResult {
 
     /**
      * Creates a new test from the given test case.
+     *
+     * @param mixed      $type
+     * @param null|mixed $throwable
      */
     public static function fromTestCase(TestCase $testCase, $type, $throwable = null) {
-        $testCaseName = State::getPrintableTestCaseName($testCase);
+        $testCaseName = CTesting_PhpUnit_State::getPrintableTestCaseName($testCase);
 
         $description = self::makeDescription($testCase);
 
@@ -141,6 +150,8 @@ final class CTesting_PhpUnit_TestResult {
 
     /**
      * Get the test case icon.
+     *
+     * @param mixed $type
      */
     public static function makeIcon($type) {
         switch ($type) {
@@ -163,6 +174,8 @@ final class CTesting_PhpUnit_TestResult {
 
     /**
      * Get the test case color.
+     *
+     * @param mixed $type
      */
     public static function makeColor($type) {
         switch ($type) {
@@ -178,5 +191,4 @@ final class CTesting_PhpUnit_TestResult {
                 return 'green';
         }
     }
-
 }

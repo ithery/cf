@@ -5,19 +5,17 @@
  *
  * @author Hery
  */
-use PHPUnit\Framework\AssertionFailedError;
+use PHPUnit\Framework\Exception\AssertionFailedError;
 use PHPUnit\Framework\ExceptionWrapper;
-use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\Exception\ExpectationFailedException;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
-use Throwable;
 use Whoops\Exception\Inspector;
 
 /**
  * @internal
  */
-final class Style {
-
+final class CTesting_PhpUnit_Style {
     /**
      * @var ConsoleOutput
      */
@@ -36,6 +34,8 @@ final class Style {
 
     /**
      * Prints the content.
+     *
+     * @param mixed $content
      */
     public function write($content) {
         $this->output->write($content);
@@ -56,10 +56,10 @@ final class Style {
 
         if (!$state->headerPrinted) {
             $this->output->writeln($this->titleLineFrom(
-                            $state->getTestCaseTitle() === 'FAIL' ? 'white' : 'black',
-                            $state->getTestCaseTitleColor(),
-                            $state->getTestCaseTitle(),
-                            $state->testCaseName
+                $state->getTestCaseTitle() === 'FAIL' ? 'white' : 'black',
+                $state->getTestCaseTitleColor(),
+                $state->getTestCaseTitle(),
+                $state->testCaseName
             ));
             $state->headerPrinted = true;
         }
@@ -67,10 +67,10 @@ final class Style {
         $state->eachTestCaseTests(function (CTesting_PhpUnit_TestResult $testResult) {
             usleep(20000);
             $this->output->writeln($this->testLineFrom(
-                            $testResult->color,
-                            $testResult->icon,
-                            $testResult->description,
-                            $testResult->warning
+                $testResult->color,
+                $testResult->icon,
+                $testResult->description,
+                $testResult->warning
             ));
         });
     }
@@ -82,6 +82,8 @@ final class Style {
      *    PASS  Unit\ExampleTest
      *    ✓ basic test
      * ```
+     *
+     * @param mixed $onFailure
      */
     public function writeErrorsSummary(CTesting_PhpUnit_State $state, $onFailure) {
         $errors = array_filter($state->suiteTests, function (CTesting_PhpUnit_TestResult $testResult) {
@@ -95,9 +97,9 @@ final class Style {
         array_map(function (CTesting_PhpUnit_TestResult $testResult) use ($onFailure) {
             if (!$onFailure) {
                 $this->output->write(sprintf(
-                                '  <fg=red;options=bold>• %s </>> <fg=red;options=bold>%s</>',
-                                $testResult->testCaseName,
-                                $testResult->description
+                    '  <fg=red;options=bold>• %s </>> <fg=red;options=bold>%s</>',
+                    $testResult->testCaseName,
+                    $testResult->description
                 ));
             }
 
@@ -105,7 +107,7 @@ final class Style {
               if (!$testResult->throwable instanceof Throwable) {
               throw new CTesting_Exception_ShouldNotHappen();
               }
-             * 
+             *
              */
 
             $this->writeError($testResult->throwable);
@@ -140,21 +142,22 @@ final class Style {
             $this->output->write([
                 "\n",
                 sprintf(
-                        '  <fg=white;options=bold>Tests:  </><fg=default>%s</>',
-                        implode(', ', $tests)
+                    '  <fg=white;options=bold>Tests:  </><fg=default>%s</>',
+                    implode(', ', $tests)
                 ),
             ]);
         }
 
         if ($timer !== null) {
             $timeElapsed = number_format($timer->result(), 2, '.', '');
-            $this->output->writeln([
-                '',
-                sprintf(
+            $this->output->writeln(
+                [
+                    '',
+                    sprintf(
                         '  <fg=white;options=bold>Time:   </><fg=default>%ss</>',
                         $timeElapsed
-                ),
-                    ]
+                    ),
+                ]
             );
         }
 
@@ -163,6 +166,8 @@ final class Style {
 
     /**
      * Displays a warning message.
+     *
+     * @param mixed $message
      */
     public function writeWarning($message) {
         $this->output->writeln($this->testLineFrom('yellow', $message, ''));
@@ -171,6 +176,8 @@ final class Style {
     /**
      * Displays the error using Collision's writer
      * and terminates with exit code === 1.
+     *
+     * @param mixed $throwable
      */
     public function writeError($throwable) {
         $writer = (new CTesting_Writer())->setOutput($this->output);
@@ -208,35 +215,44 @@ final class Style {
 
     /**
      * Returns the title contents.
+     *
+     * @param mixed $fg
+     * @param mixed $bg
+     * @param mixed $title
+     * @param mixed $testCaseName
      */
     private function titleLineFrom($fg, $bg, $title, $testCaseName) {
         return sprintf(
-                "\n  <fg=%s;bg=%s;options=bold> %s </><fg=default> %s</>",
-                $fg,
-                $bg,
-                $title,
-                $testCaseName
+            "\n  <fg=%s;bg=%s;options=bold> %s </><fg=default> %s</>",
+            $fg,
+            $bg,
+            $title,
+            $testCaseName
         );
     }
 
     /**
      * Returns the test contents.
+     *
+     * @param mixed      $fg
+     * @param mixed      $icon
+     * @param mixed      $description
+     * @param null|mixed $warning
      */
     private function testLineFrom($fg, $icon, $description, $warning = null) {
         if (!empty($warning)) {
             $warning = sprintf(
-                    ' → %s',
-                    $warning
+                ' → %s',
+                $warning
             );
         }
 
         return sprintf(
-                "  <fg=%s;options=bold>%s</><fg=default> \e[2m%s\e[22m</><fg=yellow>%s</>",
-                $fg,
-                $icon,
-                $description,
-                $warning
+            "  <fg=%s;options=bold>%s</><fg=default> \e[2m%s\e[22m</><fg=yellow>%s</>",
+            $fg,
+            $icon,
+            $description,
+            $warning
         );
     }
-
 }

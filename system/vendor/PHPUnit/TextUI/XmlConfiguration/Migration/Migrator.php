@@ -7,7 +7,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI\XmlConfiguration;
+
+namespace PHPUnit\TextUI\XmlConfiguration\Migration;
 
 use function sprintf;
 use PHPUnit\Util\Xml\Exception as XmlException;
@@ -17,16 +18,16 @@ use PHPUnit\Util\Xml\SchemaDetector;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class Migrator
-{
+final class Migrator {
     /**
      * @throws MigrationBuilderException
      * @throws MigrationException
      * @throws Exception
      * @throws XmlException
+     *
+     * @param mixed $filename
      */
-    public function migrate($filename)
-    {
+    public function migrate($filename) {
         $origin = (new SchemaDetector)->detect($filename);
 
         if (!$origin->detected()) {
@@ -49,7 +50,7 @@ final class Migrator
             $migration->migrate($configurationDocument);
         }
 
-        $configurationDocument->formatOutput       = true;
+        $configurationDocument->formatOutput = true;
         $configurationDocument->preserveWhiteSpace = false;
 
         return $configurationDocument->saveXML();

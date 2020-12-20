@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\TextUI;
 
 use const PHP_VERSION;
@@ -18,31 +19,31 @@ use function strpos;
 use function version_compare;
 use PHPUnit\Framework\Exception\Exception as FrameworkException;
 use PHPUnit\Framework\TestSuite as TestSuiteObject;
-use PHPUnit\TextUI\XmlConfiguration\TestSuiteCollection;
+use PHPUnit\TextUI\XmlConfiguration\TestSuite\TestSuiteCollection;
 use SebastianBergmann\FileIterator\Facade;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class TestSuiteMapper
-{
+final class TestSuiteMapper {
     /**
      * @throws RuntimeException
      * @throws TestDirectoryNotFoundException
      * @throws TestFileNotFoundException
+     *
+     * @param mixed $filter
      */
-    public function map(TestSuiteCollection $configuration, $filter)
-    {
+    public function map(TestSuiteCollection $configuration, $filter) {
         try {
             $filterAsArray = $filter ? explode(',', $filter) : [];
-            $result        = new TestSuiteObject;
+            $result = new TestSuiteObject;
 
             foreach ($configuration as $testSuiteConfiguration) {
                 if (!empty($filterAsArray) && !in_array($testSuiteConfiguration->name(), $filterAsArray, true)) {
                     continue;
                 }
 
-                $testSuite      = new TestSuiteObject($testSuiteConfiguration->name());
+                $testSuite = new TestSuiteObject($testSuiteConfiguration->name());
                 $testSuiteEmpty = true;
 
                 foreach ($testSuiteConfiguration->directories() as $directory) {

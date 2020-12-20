@@ -341,7 +341,7 @@ final class CF {
      * @param string $page     URI of page
      * @param string $template custom template
      *
-     * @throws C_404_Exception
+     * @throws CHTTP_Exception_NotFoundHttpException
      *
      * @return void
      */
@@ -570,6 +570,7 @@ final class CF {
                 $file = $class;
             }
         }
+
         if ($filename = self::findFile($type, $file)) {
             require $filename;
             $class_not_found = true;
@@ -727,7 +728,7 @@ final class CF {
         $domain = '';
         if (static::isCli()) {
             // Command line requires a bit of hacking
-            if (static::isCFCli()) {
+            if (static::isCFCli() || static::isTesting()) {
                 $domain = static::cliDomain();
             } else {
                 if (isset($_SERVER['argv'][2])) {
@@ -947,7 +948,9 @@ final class CF {
         if (!in_array($appCode, self::$sharedAppCode)) {
             self::$sharedAppCode[] = $appCode;
             //do force reload
-            self::paths(null, true);
+            //self::paths(null, true);
+            self::$paths = [];
+            self::$internal_cache = [];
         }
     }
 
@@ -1211,7 +1214,9 @@ final class CF {
     }
 
     public static function isTesting() {
-        if (is_array($_SERVER) && isset($_SERVER['APP_ENV']) && $_SERVER['APP_ENV'] == 'testing') {
+        if (defined('CFTesting')
+            || (is_array($_SERVER) && isset($_SERVER['APP_ENV']) && $_SERVER['APP_ENV'] == 'testing')
+        ) {
             return true;
         }
         return false;

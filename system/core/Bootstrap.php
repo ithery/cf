@@ -43,9 +43,15 @@ if (!defined('APPPATH')) {
     $file = DOCROOT . 'data' . DIRECTORY_SEPARATOR . 'domain' . DIRECTORY_SEPARATOR;
     $domain = '';
     if (PHP_SAPI === 'cli') {
-        // Command line requires a bit of hacking
-        if (isset($_SERVER['argv'][2])) {
-            $domain = $_SERVER['argv'][2];
+        if (defined('CFCLI') || defined('CFTesting')) {
+            if (file_exists(DOCROOT . 'data' . DS . 'current-domain')) {
+                $domain = file_get_contents(DOCROOT . 'data' . DS . 'current-domain');
+            }
+        } else {
+            // Command line requires a bit of hacking
+            if (isset($_SERVER['argv'][2])) {
+                $domain = $_SERVER['argv'][2];
+            }
         }
     } else {
         if (isset($_SERVER['SERVER_NAME'])) {
@@ -53,14 +59,14 @@ if (!defined('APPPATH')) {
         }
     }
     if (strlen($domain) > 0) {
-        $file .= $domain . '.php';
+        $file .= $domain . EXT;
 
         if (file_exists($file)) {
-            $content = file_get_contents($file);
-            $data = json_decode($content, true);
+            $data = require_once $file;
+
             $appCode = $data['app_code'];
 
-            $appPath = $appPath = realpath(DOCROOT . 'application' . DS . $appCode);
+            //$appPath = realpath(DOCROOT . 'application' . DS . $appCode);
         }
     }
     define('APPPATH', $appPath . DS);

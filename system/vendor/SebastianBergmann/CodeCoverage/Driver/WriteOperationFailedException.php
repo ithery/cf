@@ -7,15 +7,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace SebastianBergmann\CodeCoverage\Driver;
 
+use function sprintf;
 use RuntimeException;
-use SebastianBergmann\CodeCoverage\Exception;
+use SebastianBergmann\CodeCoverage\Exception\Exception;
 
-final class PhpdbgNotAvailableException extends RuntimeException implements Exception
-{
-    public function __construct()
-    {
-        parent::__construct('The PHPDBG SAPI is not available');
+final class WriteOperationFailedException extends RuntimeException implements Exception {
+    public function __construct($path) {
+        parent::__construct(sprintf('Cannot write to "%s"', $path));
     }
 }

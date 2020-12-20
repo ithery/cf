@@ -7,7 +7,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI;
+
+namespace PHPUnit\TextUI\Exception;
 
 use function sprintf;
 use RuntimeException;
@@ -15,10 +16,8 @@ use RuntimeException;
 /**
  * @internal This interface is not covered by the backward compatibility promise for PHPUnit
  */
-final class TestDirectoryNotFoundException extends RuntimeException implements Exception
-{
-    public function __construct($path)
-    {
+final class TestDirectoryNotFoundException extends RuntimeException implements Exception {
+    public function __construct($path) {
         parent::__construct(
             sprintf(
                 'Test directory "%s" not found',
