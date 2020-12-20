@@ -28,7 +28,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     private $signup = false;
     private $activation = false;
     private $resend = false;
-    private $_org = null;
+    private $org = null;
     public static $instance = null;
     private $header_body = '';
     private $additional_head = '';
@@ -103,6 +103,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
     }
 
+    public static function auth() {
+        return CApp_Auth::instance();
+    }
+
     /**
      * @return CApp_Temp
      */
@@ -118,7 +122,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function getTranslation($message, $params = [], $lang = null) {
-        return CApp_Lang::__($message, $params, $lang);
+        return CF::lang($message, $params, $lang);
     }
 
     public static function component() {
@@ -126,10 +130,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * @return CDatabase
-     *
      * @param null|mixed $domain
      * @param null|mixed $dbName
+     *
+     * @return CDatabase
      */
     public static function db($domain = null, $dbName = null) {
         return CDatabase::instance($dbName, null, $domain);
@@ -152,13 +156,17 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $this->keepMessage = $bool;
     }
 
+    /**
+     * Get Translator instance
+     *
+     * @return CTranslation_Translator
+     */
     public function translator() {
-        return new CApp_Translation_Translator(new CApp_Translation_Loader_ArrayLoader(), 'en');
+        return CTranslation::translator();
     }
 
     public function validate(array $data, array $rules, array $messages = [], array $customAttributes = []) {
-        $translator = $this->translator();
-        $validation = new CApp_Validation($translator);
+        $validation = CValidation::factory();
         return $validation->validate($data, $rules, $messages, $customAttributes);
     }
 
@@ -169,7 +177,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     public function __construct($domain = null) {
         $this->element = new CApp_Element();
 
-        $this->_org = corg::get(CF::orgCode());
+        $this->org = corg::get(CF::orgCode());
         $this->useRequireJs = ccfg::get('requireJs');
 
         //we load another configuration for this app
@@ -204,7 +212,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if (ccfg::get('update_last_request')) {
             $user = $this->user();
             if ($user != null) {
-                if (!is_array($user)) {
+                if (!is_array($user) && is_object($user)) {
                     //update last request
                     $db = $this->db();
                     $db->update('users', ['last_request' => date('Y-m-d H:i:s')], ['user_id' => $user->user_id]);
@@ -241,11 +249,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return CApp_Config::get($path, $domain);
     }
 
-    public function set_header_body($header_body) {
-        $this->header_body = $header_body;
-        return $this;
-    }
-
     /**
      * @deprecated
      *
@@ -266,8 +269,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * @param boolean    $install
-     * @param null|mixed $domain
+     * @param null|string $domain
      *
      * @return CApp
      */
@@ -337,10 +339,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $manager->registerThemeModule('block-ui');
     }
 
-    public function set_additional_head($str) {
-        $this->additional_head = $str;
-    }
-
     public function reset() {
         $this->rendered = false;
         $this->element->clear();
@@ -360,33 +358,14 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $this;
     }
 
-    public function get_all_js() {
-        $cs = CClientScript::instance();
-        $this->js = $this->element->js();
-        $additional_js = '';
-        $js = '';
-        $vjs = CView::factory('ccore/js');
-        $js .= PHP_EOL . $vjs->render();
-
-        $js .= PHP_EOL . $this->js . $additional_js;
-
-        $js = $cs->renderJsRequire($js);
-
-        if (ccfg::get('minify_js')) {
-            $js = CJSMin::minify($js);
-        }
-
-        return $js;
-    }
-
     public function org() {
-        if ($this->_org == null) {
+        if ($this->org == null) {
             $role = $this->role();
             if ($role != null) {
-                $this->_org = corg::get($role->org_id);
+                $this->org = corg::get($role->org_id);
             }
         }
-        return $this->_org;
+        return $this->org;
     }
 
     public function orgId() {
@@ -459,7 +438,13 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return json_encode($data, $options);
     }
 
-    //override function json
+    /**
+     * Alias of toJson
+     *
+     * @param integer $options
+     *
+     * @return string
+     */
     public function json($options = 0) {
         return $this->toJson($options);
     }
@@ -474,8 +459,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function sendExceptionEmail(Exception $exception, $email = null) {
-        if (!($exception instanceof CF_404_Exception)) {
-            $html = CApp_ErrorHandler::sendExceptionEmail($exception, $email = null);
+        if (!($exception instanceof CHTTP_Exception_NotFoundHttpException)) {
+            $html = CApp_ErrorHandler::sendExceptionEmail($exception, $email);
         }
     }
 
