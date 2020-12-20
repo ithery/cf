@@ -40,6 +40,29 @@ if (!defined('MODPATH')) {
 
 if (!defined('APPPATH')) {
     $appPath = realpath(DOCROOT . 'application');
+    $file = DOCROOT . 'data' . DIRECTORY_SEPARATOR . 'domain' . DIRECTORY_SEPARATOR;
+    $domain = '';
+    if (PHP_SAPI === 'cli') {
+        // Command line requires a bit of hacking
+        if (isset($_SERVER['argv'][2])) {
+            $domain = $_SERVER['argv'][2];
+        }
+    } else {
+        if (isset($_SERVER['SERVER_NAME'])) {
+            $domain = $_SERVER['SERVER_NAME'];
+        }
+    }
+    if (strlen($domain) > 0) {
+        $file .= $domain . '.php';
+
+        if (file_exists($file)) {
+            $content = file_get_contents($file);
+            $data = json_decode($content, true);
+            $appCode = $data['app_code'];
+
+            $appPath = $appPath = realpath(DOCROOT . 'application' . DS . $appCode);
+        }
+    }
     define('APPPATH', $appPath . DS);
 }
 
