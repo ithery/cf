@@ -11,15 +11,42 @@ use Symfony\Component\Process\Process;
 
 class CConsole_Command_ComposerCommand extends CConsole_Command {
     /**
+     * Command line options that should not be gathered dynamically.
+     *
+     * @var array
+     */
+    protected $ignoreOptions = [
+        '--continue',
+        '--pretend',
+        '--help',
+        '--quiet',
+        '--version',
+        '--asci',
+        '--no-asci',
+        '--no-interactions',
+        '--verbose',
+    ];
+
+    /**
      * The name and signature of the console command.
      *
      * @var string
      */
     protected $signature = 'composer {args?*} {--opts=?*}';
 
+    /**
+     * Configure the command options.
+     *
+     * @return void
+     */
+    protected function configure() {
+        $this->ignoreValidationErrors();
+    }
+
     public function handle() {
         $command = $this->getComposserBinaryCommand();
         $arguments = $this->argument('args');
+
         $domain = CConsole::domain();
         $domainData = CFData::domain($domain);
         $appCode = carr::get($domainData, 'app_code');
