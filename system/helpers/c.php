@@ -948,6 +948,18 @@ class c {
     public static function route($name, $parameters = [], $absolute = true) {
         return static::url()->route($name, $parameters, $absolute);
     }
+
+    /**
+     * Encrypt the given value.
+     *
+     * @param mixed $value
+     * @param bool  $serialize
+     *
+     * @return string
+     */
+    public static function encrypt($value, $serialize = true) {
+        return CCrypt::encrypter()->encrypt($value, $serialize);
+    }
 }
 
 // End c

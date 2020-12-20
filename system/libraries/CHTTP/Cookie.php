@@ -8,7 +8,6 @@
 use Symfony\Component\HttpFoundation\Cookie;
 
 class CHTTP_Cookie {
-
     use CTrait_Helper_InteractsWithTime,
         CTrait_Macroable;
 
@@ -50,15 +49,16 @@ class CHTTP_Cookie {
     /**
      * Create a new cookie instance.
      *
-     * @param  string  $name
-     * @param  string  $value
-     * @param  int  $minutes
-     * @param  string|null  $path
-     * @param  string|null  $domain
-     * @param  bool|null  $secure
-     * @param  bool  $httpOnly
-     * @param  bool  $raw
-     * @param  string|null  $sameSite
+     * @param string      $name
+     * @param string      $value
+     * @param int         $minutes
+     * @param string|null $path
+     * @param string|null $domain
+     * @param bool|null   $secure
+     * @param bool        $httpOnly
+     * @param bool        $raw
+     * @param string|null $sameSite
+     *
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function make($name, $value, $minutes = 0, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null) {
@@ -72,14 +72,15 @@ class CHTTP_Cookie {
     /**
      * Create a cookie that lasts "forever" (five years).
      *
-     * @param  string  $name
-     * @param  string  $value
-     * @param  string|null  $path
-     * @param  string|null  $domain
-     * @param  bool|null  $secure
-     * @param  bool  $httpOnly
-     * @param  bool  $raw
-     * @param  string|null  $sameSite
+     * @param string      $name
+     * @param string      $value
+     * @param string|null $path
+     * @param string|null $domain
+     * @param bool|null   $secure
+     * @param bool        $httpOnly
+     * @param bool        $raw
+     * @param string|null $sameSite
+     *
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function forever($name, $value, $path = null, $domain = null, $secure = null, $httpOnly = true, $raw = false, $sameSite = null) {
@@ -89,9 +90,10 @@ class CHTTP_Cookie {
     /**
      * Expire the given cookie.
      *
-     * @param  string  $name
-     * @param  string|null  $path
-     * @param  string|null  $domain
+     * @param string      $name
+     * @param string|null $path
+     * @param string|null $domain
+     *
      * @return \Symfony\Component\HttpFoundation\Cookie
      */
     public function forget($name, $path = null, $domain = null) {
@@ -101,8 +103,9 @@ class CHTTP_Cookie {
     /**
      * Determine if a cookie has been queued.
      *
-     * @param  string  $key
-     * @param  string|null  $path
+     * @param string      $key
+     * @param string|null $path
+     *
      * @return bool
      */
     public function hasQueued($key, $path = null) {
@@ -112,9 +115,10 @@ class CHTTP_Cookie {
     /**
      * Get a queued cookie instance.
      *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @param  string|null  $path
+     * @param string      $key
+     * @param mixed       $default
+     * @param string|null $path
+     *
      * @return \Symfony\Component\HttpFoundation\Cookie|null
      */
     public function queued($key, $default = null, $path = null) {
@@ -130,7 +134,8 @@ class CHTTP_Cookie {
     /**
      * Queue a cookie to send with the next response.
      *
-     * @param  array  $parameters
+     * @param array $parameters
+     *
      * @return void
      */
     public function queue(...$parameters) {
@@ -150,8 +155,9 @@ class CHTTP_Cookie {
     /**
      * Remove a cookie from the queue.
      *
-     * @param  string  $name
-     * @param  string|null  $path
+     * @param string      $name
+     * @param string|null $path
+     *
      * @return void
      */
     public function unqueue($name, $path = null) {
@@ -171,10 +177,11 @@ class CHTTP_Cookie {
     /**
      * Get the path and domain, or the default values.
      *
-     * @param  string  $path
-     * @param  string  $domain
-     * @param  bool|null  $secure
-     * @param  string|null  $sameSite
+     * @param string      $path
+     * @param string      $domain
+     * @param bool|null   $secure
+     * @param string|null $sameSite
+     *
      * @return array
      */
     protected function getPathAndDomain($path, $domain, $secure = null, $sameSite = null) {
@@ -184,10 +191,11 @@ class CHTTP_Cookie {
     /**
      * Set the default path and domain for the jar.
      *
-     * @param  string  $path
-     * @param  string  $domain
-     * @param  bool  $secure
-     * @param  string|null  $sameSite
+     * @param string      $path
+     * @param string      $domain
+     * @param bool        $secure
+     * @param string|null $sameSite
+     *
      * @return $this
      */
     public function setDefaultPathAndDomain($path, $domain, $secure = false, $sameSite = null) {
@@ -204,5 +212,4 @@ class CHTTP_Cookie {
     public function getQueuedCookies() {
         return carr::flatten($this->queued);
     }
-
 }
