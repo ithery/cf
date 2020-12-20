@@ -9,6 +9,7 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Symfony\Component\VarDumper\VarDumper;
 
 //@codingStandardsIgnoreStart
 class c {
@@ -959,6 +960,19 @@ class c {
      */
     public static function encrypt($value, $serialize = true) {
         return CCrypt::encrypter()->encrypt($value, $serialize);
+    }
+
+    /**
+     * Dump variable
+     *
+     * @param mixed $var
+     *
+     * @return void
+     */
+    public static function dump($var) {
+        foreach (func_get_args() as $var) {
+            VarDumper::dump($var);
+        }
     }
 }
 

@@ -270,7 +270,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param string $uri
      * @param array  $headers
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     public function get($uri, array $headers = []) {
         $server = $this->transformHeadersToServerVars($headers);
@@ -285,7 +285,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param string $uri
      * @param array  $headers
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     public function getJson($uri, array $headers = []) {
         return $this->json('GET', $uri, [], $headers);
@@ -298,7 +298,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param array  $data
      * @param array  $headers
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     public function post($uri, array $data = [], array $headers = []) {
         $server = $this->transformHeadersToServerVars($headers);
@@ -314,7 +314,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param array  $data
      * @param array  $headers
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     public function postJson($uri, array $data = [], array $headers = []) {
         return $this->json('POST', $uri, $data, $headers);
@@ -343,7 +343,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param array  $data
      * @param array  $headers
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     public function putJson($uri, array $data = [], array $headers = []) {
         return $this->json('PUT', $uri, $data, $headers);
@@ -356,7 +356,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param array  $data
      * @param array  $headers
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     public function patch($uri, array $data = [], array $headers = []) {
         $server = $this->transformHeadersToServerVars($headers);
@@ -372,7 +372,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param array  $data
      * @param array  $headers
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     public function patchJson($uri, array $data = [], array $headers = []) {
         return $this->json('PATCH', $uri, $data, $headers);
@@ -385,7 +385,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param array  $data
      * @param array  $headers
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     public function delete($uri, array $data = [], array $headers = []) {
         $server = $this->transformHeadersToServerVars($headers);
@@ -401,7 +401,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param array  $data
      * @param array  $headers
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     public function deleteJson($uri, array $data = [], array $headers = []) {
         return $this->json('DELETE', $uri, $data, $headers);
@@ -414,7 +414,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param array  $data
      * @param array  $headers
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     public function options($uri, array $data = [], array $headers = []) {
         $server = $this->transformHeadersToServerVars($headers);
@@ -430,7 +430,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param array  $data
      * @param array  $headers
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     public function optionsJson($uri, array $data = [], array $headers = []) {
         return $this->json('OPTIONS', $uri, $data, $headers);
@@ -444,7 +444,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param array  $data
      * @param array  $headers
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     public function json($method, $uri, array $data = [], array $headers = []) {
         $files = $this->extractFilesFromDataArray($data);
@@ -479,13 +479,13 @@ trait CTesting_Concern_MakesHttpRequests {
      * @param array       $server
      * @param string|null $content
      *
-     * @return \Illuminate\Testing\TestResponse
+     * @return CTesting_TestResponse
      */
     public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null) {
-        $kernel = $this->app->make(HttpKernel::class);
+        $kernel = CHTTP::kernel();
 
         $files = array_merge($files, $this->extractFilesFromDataArray($parameters));
-
+        //$uri = 'http://' . CConsole::domain() . $uri;
         $symfonyRequest = SymfonyRequest::create(
             $this->prepareUrlForRequest($uri),
             $method,
@@ -521,7 +521,8 @@ trait CTesting_Concern_MakesHttpRequests {
             $uri = substr($uri, 1);
         }
 
-        return trim(c::url($uri), '/');
+        return 'http://' . CConsole::domain() . '/' . $uri;
+        //return trim(c::url($uri), '/');
     }
 
     /**

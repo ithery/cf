@@ -123,4 +123,8 @@ class CHTTP {
         }
         return static::$cookie;
     }
+
+    public static function setRequest(CHTTP_Request $request) {
+        static::$request = $request;
+    }
 }

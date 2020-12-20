@@ -1,7 +1,6 @@
 <?php
 defined('SYSPATH') or die('No direct access allowed.');
 
-echo cdbg::getTraceString();
 $username = '';
 $password = '';
 if (isset($_GET['demo'])) {

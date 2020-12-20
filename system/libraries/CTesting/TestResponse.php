@@ -1073,7 +1073,7 @@ class CTesting_TestResponse implements ArrayAccess {
             $content = $json;
         }
 
-        dump($content);
+        c::dump($content);
 
         return $this;
     }
