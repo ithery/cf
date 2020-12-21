@@ -34,4 +34,12 @@ class CConsole {
             exit(static::FAILURE_EXIT);
         }
     }
+
+    public static function phpUnitRequired($console) {
+        if (!CTesting::isInstalled()) {
+            $console->error('testing is not installed');
+            $console->error('Please install testing using test:install command');
+            exit(static::FAILURE_EXIT);
+        }
+    }
 }
