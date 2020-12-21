@@ -482,7 +482,7 @@ trait CTesting_Concern_MakesHttpRequests {
      * @return CTesting_TestResponse
      */
     public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null) {
-        $kernel = CHTTP::kernel();
+        $kernel = new CHTTP_Kernel();
 
         $files = array_merge($files, $this->extractFilesFromDataArray($parameters));
         //$uri = 'http://' . CConsole::domain() . $uri;
@@ -495,7 +495,6 @@ trait CTesting_Concern_MakesHttpRequests {
             array_replace($this->serverVariables, $server),
             $content
         );
-
         $response = $kernel->handle(
             $request = CHTTP_Request::createFromBase($symfonyRequest)
         );

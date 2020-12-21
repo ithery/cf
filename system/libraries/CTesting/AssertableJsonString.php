@@ -2,7 +2,7 @@
 
 use CTesting_Assert as PHPUnit;
 
-class AssertableJsonString implements ArrayAccess, Countable {
+class CTesting_AssertableJsonString implements ArrayAccess, Countable {
     /**
      * The original encoded json.
      *

@@ -7,8 +7,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
 
+namespace PHPUnit\Framework\Constraint\Type;
+
+use PHPUnit\Framework\Constraint\Constraint;
 use function sprintf;
 use ReflectionClass;
 use ReflectionException;
@@ -16,23 +18,20 @@ use ReflectionException;
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class IsInstanceOf extends Constraint
-{
+final class IsInstanceOf extends Constraint {
     /**
      * @var string
      */
     private $className;
 
-    public function __construct($className)
-    {
+    public function __construct($className) {
         $this->className = $className;
     }
 
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString()
-    {
+    public function toString() {
         return sprintf(
             'is instance of %s "%s"',
             $this->getType(),
@@ -46,8 +45,7 @@ final class IsInstanceOf extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other)
-    {
+    protected function matches($other) {
         return $other instanceof $this->className;
     }
 
@@ -61,8 +59,7 @@ final class IsInstanceOf extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function failureDescription($other)
-    {
+    protected function failureDescription($other) {
         return sprintf(
             '%s is an instance of %s "%s"',
             $this->exporter()->shortenedExport($other),
@@ -71,8 +68,7 @@ final class IsInstanceOf extends Constraint
         );
     }
 
-    private function getType()
-    {
+    private function getType() {
         try {
             $reflection = new ReflectionClass($this->className);
 

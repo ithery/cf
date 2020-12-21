@@ -21,6 +21,8 @@ use PHPUnit\Framework\Exception\Exception as FrameworkException;
 use PHPUnit\Framework\TestSuite as TestSuiteObject;
 use PHPUnit\TextUI\XmlConfiguration\TestSuite\TestSuiteCollection;
 use PHPUnit\TextUI\Exception\TestDirectoryNotFoundException;
+use PHPUnit\TextUI\Exception\TestFileNotFoundException;
+use PHPUnit\TextUI\Exception\RuntimeException;
 use SebastianBergmann\FileIterator\Facade;
 
 /**

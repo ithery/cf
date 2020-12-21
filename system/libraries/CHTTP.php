@@ -126,5 +126,6 @@ class CHTTP {
 
     public static function setRequest(CHTTP_Request $request) {
         static::$request = $request;
+        CRouting::urlGenerator()->setRequest(static::$request);
     }
 }

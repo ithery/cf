@@ -204,9 +204,9 @@ class CRouting_UrlGenerator {
         $tail = implode(
             '/',
             array_map(
-            'rawurlencode',
-            (array) $this->formatParameters($extra)
-        )
+                'rawurlencode',
+                (array) $this->formatParameters($extra)
+            )
         );
 
         // Once we have the scheme we will compile the "tail" by collapsing the values
@@ -452,7 +452,7 @@ class CRouting_UrlGenerator {
      * @throws \Illuminate\Routing\Exceptions\UrlGenerationException
      */
     public function toRoute($route, $parameters, $absolute) {
-        $parameters = collect(carr::wrap($parameters))->map(function ($value, $key) use ($route) {
+        $parameters = c::collect(carr::wrap($parameters))->map(function ($value, $key) use ($route) {
             return $value instanceof UrlRoutable && $route->bindingFieldFor($key) ? $value->{$route->bindingFieldFor($key)} : $value;
         })->all();
 
@@ -700,7 +700,7 @@ class CRouting_UrlGenerator {
      * @return CHTTP_Request
      */
     public function getRequest() {
-        return CHTTP::request();
+        return $this->request;
     }
 
     /**
@@ -728,11 +728,11 @@ class CRouting_UrlGenerator {
     /**
      * Set the route collection.
      *
-     * @param \Illuminate\Routing\RouteCollectionInterface $routes
+     * @param CRouting_RouteCollectionInterface $routes
      *
      * @return $this
      */
-    public function setRoutes(RouteCollectionInterface $routes) {
+    public function setRoutes(CRouting_RouteCollectionInterface $routes) {
         $this->routes = $routes;
 
         return $this;

@@ -710,12 +710,12 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Validate and return the decoded response JSON.
      *
-     * @return \Illuminate\Testing\AssertableJsonString
+     * @return CTesting_AssertableJsonString
      *
      * @throws \Throwable
      */
     public function decodeResponseJson() {
-        $testJson = new AssertableJsonString($this->getContent());
+        $testJson = new CTesting_AssertableJsonString($this->getContent());
 
         $decodedResponse = $testJson->json();
 
