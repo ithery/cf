@@ -1,7 +1,6 @@
 <?php
 
 trait CTrait_Macroable {
-
     /**
      * The registered string macros.
      *
@@ -12,8 +11,8 @@ trait CTrait_Macroable {
     /**
      * Register a custom macro.
      *
-     * @param  string $name
-     * @param  object|callable  $macro
+     * @param string          $name
+     * @param object|callable $macro
      *
      * @return void
      */
@@ -24,12 +23,13 @@ trait CTrait_Macroable {
     /**
      * Mix another object into the class.
      *
-     * @param  object  $mixin
+     * @param object $mixin
+     *
      * @return void
      */
     public static function mixin($mixin) {
         $methods = (new ReflectionClass($mixin))->getMethods(
-                ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
+            ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED
         );
 
         foreach ($methods as $method) {
@@ -42,7 +42,8 @@ trait CTrait_Macroable {
     /**
      * Checks if macro is registered.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return bool
      */
     public static function hasMacro($name) {
@@ -52,8 +53,9 @@ trait CTrait_Macroable {
     /**
      * Dynamically handle calls to the class.
      *
-     * @param  string  $method
-     * @param  array   $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      *
      * @throws \BadMethodCallException
@@ -73,8 +75,9 @@ trait CTrait_Macroable {
     /**
      * Dynamically handle calls to the class.
      *
-     * @param  string  $method
-     * @param  array   $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      *
      * @throws \BadMethodCallException
@@ -92,5 +95,4 @@ trait CTrait_Macroable {
 
         return call_user_func_array($macro, $parameters);
     }
-
 }

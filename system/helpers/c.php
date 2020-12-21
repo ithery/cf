@@ -963,6 +963,18 @@ class c {
     }
 
     /**
+     * Decrypt the given value.
+     *
+     * @param string $value
+     * @param bool   $unserialize
+     *
+     * @return mixed
+     */
+    public static function decrypt($value, $unserialize = true) {
+        return CCrypt::encrypter()->decrypt($value, $unserialize);
+    }
+
+    /**
      * Dump variable
      *
      * @param mixed $var
@@ -972,6 +984,40 @@ class c {
     public static function dump($var) {
         foreach (func_get_args() as $var) {
             VarDumper::dump($var);
+        }
+    }
+
+    /**
+     * Retry an operation a given number of times.
+     *
+     * @param int           $times
+     * @param callable      $callback
+     * @param int           $sleep
+     * @param callable|null $when
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public static function retry($times, callable $callback, $sleep = 0, $when = null) {
+        $attempts = 0;
+
+        beginning:
+        $attempts++;
+        $times--;
+
+        try {
+            return $callback($attempts);
+        } catch (Exception $e) {
+            if ($times < 1 || ($when && !$when($e))) {
+                throw $e;
+            }
+
+            if ($sleep) {
+                usleep($sleep * 1000);
+            }
+
+            goto beginning;
         }
     }
 }
