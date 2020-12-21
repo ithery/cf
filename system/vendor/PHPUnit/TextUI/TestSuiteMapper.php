@@ -20,6 +20,7 @@ use function version_compare;
 use PHPUnit\Framework\Exception\Exception as FrameworkException;
 use PHPUnit\Framework\TestSuite as TestSuiteObject;
 use PHPUnit\TextUI\XmlConfiguration\TestSuite\TestSuiteCollection;
+use PHPUnit\TextUI\Exception\TestDirectoryNotFoundException;
 use SebastianBergmann\FileIterator\Facade;
 
 /**
