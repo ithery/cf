@@ -5,6 +5,5 @@
  *
  * @author Hery
  */
-final class Exception extends RuntimeException implements CQC_Exception {
-    
+final class Exception extends RuntimeException {
 }
