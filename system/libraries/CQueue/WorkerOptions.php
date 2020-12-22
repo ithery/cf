@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 5:52:07 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 5:52:07 AM
  */
 class CQueue_WorkerOptions {
-
     /**
      * The number of seconds before a released job will be available.
      *
@@ -61,13 +61,14 @@ class CQueue_WorkerOptions {
     /**
      * Create a new worker options instance.
      *
-     * @param  int  $delay
-     * @param  int  $memory
-     * @param  int  $timeout
-     * @param  int  $sleep
-     * @param  int  $maxTries
-     * @param  bool  $force
-     * @param  bool  $stopWhenEmpty
+     * @param int  $delay
+     * @param int  $memory
+     * @param int  $timeout
+     * @param int  $sleep
+     * @param int  $maxTries
+     * @param bool $force
+     * @param bool $stopWhenEmpty
+     *
      * @return void
      */
     public function __construct($delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 1, $force = false, $stopWhenEmpty = false) {
@@ -79,5 +80,4 @@ class CQueue_WorkerOptions {
         $this->maxTries = $maxTries;
         $this->stopWhenEmpty = $stopWhenEmpty;
     }
-
 }

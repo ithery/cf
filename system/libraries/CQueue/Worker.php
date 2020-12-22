@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 4:51:15 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 4:51:15 AM
  */
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class CQueue_Worker {
-
     use CDatabase_Trait_DetectLostConnection;
 
     /**
@@ -65,10 +65,11 @@ class CQueue_Worker {
     /**
      * Create a new queue worker.
      *
-     * @param  CQueue_Manager $manager
-     * @param  CEvent_Dispatcher  $events
-     * @param  CException_ExceptionHandler  $exceptions
-     * @param  \callable $isDownForMaintenance
+     * @param CQueue_Manager              $manager
+     * @param CEvent_Dispatcher           $events
+     * @param CException_ExceptionHandler $exceptions
+     * @param \callable                   $isDownForMaintenance
+     *
      * @return void
      */
     public function __construct(CQueue_Manager $manager, CEvent_Dispatcher $events, CException_ExceptionHandler $exceptions, callable $isDownForMaintenance) {
@@ -81,9 +82,10 @@ class CQueue_Worker {
     /**
      * Listen to the given queue in a loop.
      *
-     * @param  string  $connectionName
-     * @param  string  $queue
-     * @param  \Illuminate\Queue\WorkerOptions  $options
+     * @param string                          $connectionName
+     * @param string                          $queue
+     * @param \Illuminate\Queue\WorkerOptions $options
+     *
      * @return void
      */
     public function daemon($connectionName, $queue, CQueue_WorkerOptions $options) {
@@ -103,7 +105,8 @@ class CQueue_Worker {
             // register the timeout handler and reset the alarm for this job so it is
             // not stuck in a frozen state forever. Then, we can fire off this job.
             $job = $this->getNextJob(
-                    $this->manager->connection($connectionName), $queue
+                $this->manager->connection($connectionName),
+                $queue
             );
             if ($this->supportsAsyncSignals()) {
                 $this->registerTimeoutHandler($job, $options);
@@ -127,8 +130,9 @@ class CQueue_Worker {
     /**
      * Register the worker timeout handler.
      *
-     * @param  CQueue_AbstractJob|null  $job
-     * @param  CQueue_WorkerOptions  $options
+     * @param CQueue_AbstractJob|null $job
+     * @param CQueue_WorkerOptions    $options
+     *
      * @return void
      */
     protected function registerTimeoutHandler($job, CQueue_WorkerOptions $options) {
@@ -138,13 +142,16 @@ class CQueue_Worker {
         pcntl_signal(SIGALRM, function () use ($job, $options) {
             if ($job) {
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
-                        $job->getConnectionName(), $job, (int) $options->maxTries, $this->maxAttemptsExceededException($job)
+                    $job->getConnectionName(),
+                    $job,
+                    (int) $options->maxTries,
+                    $this->maxAttemptsExceededException($job)
                 );
             }
             $this->kill(1);
         });
         pcntl_alarm(
-                max($this->timeoutForJob($job, $options), 0)
+            max($this->timeoutForJob($job, $options), 0)
         );
     }
 
@@ -160,8 +167,9 @@ class CQueue_Worker {
     /**
      * Get the appropriate timeout for the given job.
      *
-     * @param  CQueue_AbstractJob|null  $job
-     * @param  CQueue_WorkerOptions  $options
+     * @param CQueue_AbstractJob|null $job
+     * @param CQueue_WorkerOptions    $options
+     *
      * @return int
      */
     protected function timeoutForJob($job, CQueue_WorkerOptions $options) {
@@ -171,23 +179,25 @@ class CQueue_Worker {
     /**
      * Determine if the daemon should process on this iteration.
      *
-     * @param  CQueue_WorkerOptions  $options
-     * @param  string  $connectionName
-     * @param  string  $queue
+     * @param CQueue_WorkerOptions $options
+     * @param string               $connectionName
+     * @param string               $queue
+     *
      * @return bool
      */
     protected function daemonShouldRun(CQueue_WorkerOptions $options, $connectionName, $queue) {
         $isDownForMaintenance = $this->isDownForMaintenance();
-        return !(($isDownForMaintenance && !$options->force) ||
-                $this->paused ||
-                $this->events->until(new CQueue_Event_Looping($connectionName, $queue)) === false);
+        return !(($isDownForMaintenance && !$options->force)
+                || $this->paused
+                || $this->events->until(new CQueue_Event_Looping($connectionName, $queue)) === false);
     }
 
     /**
      * Pause the worker for the current loop.
      *
-     * @param  CQueue_WorkerOptions  $options
-     * @param  int  $lastRestart
+     * @param CQueue_WorkerOptions $options
+     * @param int                  $lastRestart
+     *
      * @return void
      */
     protected function pauseWorker(CQueue_WorkerOptions $options, $lastRestart) {
@@ -198,9 +208,9 @@ class CQueue_Worker {
     /**
      * Stop the process if necessary.
      *
-     * @param  CQueue_WorkerOptions  $options
-     * @param  int  $lastRestart
-     * @param  mixed  $job
+     * @param CQueue_WorkerOptions $options
+     * @param int                  $lastRestart
+     * @param mixed                $job
      */
     protected function stopIfNecessary(CQueue_WorkerOptions $options, $lastRestart, $job = null) {
         if ($this->shouldQuit) {
@@ -217,14 +227,16 @@ class CQueue_Worker {
     /**
      * Process the next job on the queue.
      *
-     * @param  string  $connectionName
-     * @param  string  $queue
-     * @param  CQueue_WorkerOptions  $options
+     * @param string               $connectionName
+     * @param string               $queue
+     * @param CQueue_WorkerOptions $options
+     *
      * @return void
      */
     public function runNextJob($connectionName, $queue, CQueue_WorkerOptions $options) {
         $job = $this->getNextJob(
-                $this->manager->connection($connectionName), $queue
+            $this->manager->connection($connectionName),
+            $queue
         );
 
         // If we're able to pull a job off of the stack, we will process it and then return
@@ -239,12 +251,12 @@ class CQueue_Worker {
     /**
      * Get the next job from the queue connection.
      *
-     * @param  CQueue_AbstractQueue  $connection
-     * @param  string  $queue
+     * @param CQueue_AbstractQueue $connection
+     * @param string               $queue
+     *
      * @return CQueue_AbstractJob|null
      */
     protected function getNextJob($connection, $queue) {
-
         try {
             foreach (explode(',', $queue) as $queue) {
                 if (!is_null($job = $connection->pop($queue))) {
@@ -265,14 +277,14 @@ class CQueue_Worker {
     /**
      * Process the given job.
      *
-     * @param  CQueue_AbstractJob  $job
-     * @param  string  $connectionName
-     * @param  CQueue_WorkerOptions  $options
+     * @param CQueue_AbstractJob   $job
+     * @param string               $connectionName
+     * @param CQueue_WorkerOptions $options
+     *
      * @return void
      */
     protected function runJob($job, $connectionName, CQueue_WorkerOptions $options) {
         try {
-
             return $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
             if (CDaemon::getRunningService() != null) {
@@ -295,7 +307,8 @@ class CQueue_Worker {
     /**
      * Stop the worker if we have lost connection to a database.
      *
-     * @param  \Throwable  $e
+     * @param \Throwable $e
+     *
      * @return void
      */
     protected function stopWorkerIfLostConnection($e) {
@@ -307,9 +320,10 @@ class CQueue_Worker {
     /**
      * Process the given job from the queue.
      *
-     * @param  string  $connectionName
-     * @param  CQueue_AbstractJob  $job
-     * @param  CQueue_WorkerOptions  $options
+     * @param string               $connectionName
+     * @param CQueue_AbstractJob   $job
+     * @param CQueue_WorkerOptions $options
+     *
      * @return void
      *
      * @throws \Throwable
@@ -321,7 +335,9 @@ class CQueue_Worker {
             // continually timing out and not actually throwing any exceptions from itself.
             $this->raiseBeforeJobEvent($connectionName, $job);
             $this->markJobAsFailedIfAlreadyExceedsMaxAttempts(
-                    $connectionName, $job, (int) $options->maxTries
+                $connectionName,
+                $job,
+                (int) $options->maxTries
             );
             if ($job->isDeleted()) {
                 return $this->raiseAfterJobEvent($connectionName, $job);
@@ -356,10 +372,11 @@ class CQueue_Worker {
     /**
      * Handle an exception that occurred while the job was running.
      *
-     * @param  string  $connectionName
-     * @param  CQueue_JobInterface  $job
-     * @param  CQueue_WorkerOptions  $options
-     * @param  \Exception  $e
+     * @param string               $connectionName
+     * @param CQueue_JobInterface  $job
+     * @param CQueue_WorkerOptions $options
+     * @param \Exception           $e
+     *
      * @return void
      *
      * @throws \Exception
@@ -371,11 +388,16 @@ class CQueue_Worker {
             // go ahead and mark it as failed now so we do not have to release this again.
             if (!$job->hasFailed()) {
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
-                        $connectionName, $job, (int) $options->maxTries, $e
+                    $connectionName,
+                    $job,
+                    (int) $options->maxTries,
+                    $e
                 );
             }
             $this->raiseExceptionOccurredJobEvent(
-                    $connectionName, $job, $e
+                $connectionName,
+                $job,
+                $e
             );
         } finally {
             // If we catch an exception, we will attempt to release the job back onto the queue
@@ -383,7 +405,7 @@ class CQueue_Worker {
             // another listener (or this same one). We will re-throw this exception after.
             if (!$job->isDeleted() && !$job->isReleased() && !$job->hasFailed()) {
                 $job->release(
-                        method_exists($job, 'delaySeconds') && !is_null($job->delaySeconds()) ? $job->delaySeconds() : $options->delay
+                    method_exists($job, 'delaySeconds') && !is_null($job->delaySeconds()) ? $job->delaySeconds() : $options->delay
                 );
             }
         }
@@ -395,9 +417,10 @@ class CQueue_Worker {
      *
      * This will likely be because the job previously exceeded a timeout.
      *
-     * @param  string  $connectionName
-     * @param  CQueue_AbstractJob  $job
-     * @param  int  $maxTries
+     * @param string             $connectionName
+     * @param CQueue_AbstractJob $job
+     * @param int                $maxTries
+     *
      * @return void
      */
     protected function markJobAsFailedIfAlreadyExceedsMaxAttempts($connectionName, $job, $maxTries) {
@@ -416,10 +439,11 @@ class CQueue_Worker {
     /**
      * Mark the given job as failed if it has exceeded the maximum allowed attempts.
      *
-     * @param  string  $connectionName
-     * @param  CQueue_AbstractJob  $job
-     * @param  int  $maxTries
-     * @param  \Exception  $e
+     * @param string             $connectionName
+     * @param CQueue_AbstractJob $job
+     * @param int                $maxTries
+     * @param \Exception         $e
+     *
      * @return void
      */
     protected function markJobAsFailedIfWillExceedMaxAttempts($connectionName, $job, $maxTries, $e) {
@@ -435,8 +459,9 @@ class CQueue_Worker {
     /**
      * Mark the given job as failed and raise the relevant event.
      *
-     * @param  CQueue_AbstractJob  $job
-     * @param  \Exception  $e
+     * @param CQueue_AbstractJob $job
+     * @param \Exception         $e
+     *
      * @return void
      */
     protected function failJob($job, $e) {
@@ -446,47 +471,55 @@ class CQueue_Worker {
     /**
      * Raise the before queue job event.
      *
-     * @param  string  $connectionName
-     * @param  CQueue_AbstractJob  $job
+     * @param string             $connectionName
+     * @param CQueue_AbstractJob $job
+     *
      * @return void
      */
     protected function raiseBeforeJobEvent($connectionName, $job) {
         $this->events->dispatch(new CQueue_Event_JobProcessing(
-                $connectionName, $job
+            $connectionName,
+            $job
         ));
     }
 
     /**
      * Raise the after queue job event.
      *
-     * @param  string  $connectionName
-     * @param  CQueue_AbstractJob  $job
+     * @param string             $connectionName
+     * @param CQueue_AbstractJob $job
+     *
      * @return void
      */
     protected function raiseAfterJobEvent($connectionName, $job) {
         $this->events->dispatch(new CQueue_Event_JobProcessed(
-                $connectionName, $job
+            $connectionName,
+            $job
         ));
     }
 
     /**
      * Raise the exception occurred queue job event.
      *
-     * @param  string  $connectionName
-     * @param  CQueue_AbstractJob  $job
-     * @param  \Exception  $e
+     * @param string             $connectionName
+     * @param CQueue_AbstractJob $job
+     * @param \Exception         $e
+     *
      * @return void
      */
     protected function raiseExceptionOccurredJobEvent($connectionName, $job, $e) {
         $this->events->dispatch(new CQueue_Event_JobExceptionOccurred(
-                $connectionName, $job, $e
+            $connectionName,
+            $job,
+            $e
         ));
     }
 
     /**
      * Determine if the queue worker should restart.
      *
-     * @param  int|null  $lastRestart
+     * @param int|null $lastRestart
+     *
      * @return bool
      */
     protected function queueShouldRestart($lastRestart) {
@@ -534,7 +567,8 @@ class CQueue_Worker {
     /**
      * Determine if the memory limit has been exceeded.
      *
-     * @param  int   $memoryLimit
+     * @param int $memoryLimit
+     *
      * @return bool
      */
     public function memoryExceeded($memoryLimit) {
@@ -544,7 +578,8 @@ class CQueue_Worker {
     /**
      * Stop listening and bail out of the script.
      *
-     * @param  int  $status
+     * @param int $status
+     *
      * @return void
      */
     public function stop($status = 0) {
@@ -555,7 +590,8 @@ class CQueue_Worker {
     /**
      * Kill the process.
      *
-     * @param  int  $status
+     * @param int $status
+     *
      * @return void
      */
     public function kill($status = 0) {
@@ -569,19 +605,21 @@ class CQueue_Worker {
     /**
      * Create an instance of MaxAttemptsExceededException.
      *
-     * @param  \Illuminate\Contracts\Queue\Job|null  $job
+     * @param \Illuminate\Contracts\Queue\Job|null $job
+     *
      * @return CQueue_Exception_MaxAttemptsExceededException
      */
     protected function maxAttemptsExceededException($job) {
         return new CQueue_Exception_MaxAttemptsExceededException(
-                $job->resolveName() . ' has been attempted too many times or run too long. The job may have previously timed out.'
+            $job->resolveName() . ' has been attempted too many times or run too long. The job may have previously timed out.'
         );
     }
 
     /**
      * Sleep the script for a given number of seconds.
      *
-     * @param  int|float   $seconds
+     * @param int|float $seconds
+     *
      * @return void
      */
     public function sleep($seconds) {
@@ -595,7 +633,8 @@ class CQueue_Worker {
     /**
      * Set the cache repository implementation.
      *
-     * @param  CCache_Repository  $cache
+     * @param CCache_Repository $cache
+     *
      * @return void
      */
     public function setCache(CCache_Repository $cache = null) {
@@ -614,11 +653,11 @@ class CQueue_Worker {
     /**
      * Set the queue manager instance.
      *
-     * @param  CQueue_Manager $manager
+     * @param CQueue_Manager $manager
+     *
      * @return void
      */
     public function setManager(CQueue_Manager $manager) {
         $this->manager = $manager;
     }
-
 }
