@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 2:18:49 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 2:18:49 AM
  */
 abstract class CQueue_AbstractJob {
-
     use CTrait_Helper_InteractsWithTime;
 
     /**
@@ -81,10 +81,10 @@ abstract class CQueue_AbstractJob {
      */
     public function fire() {
         $payload = $this->payload();
-        
+
         list($class, $method) = CQueue_JobName::parse($payload['job']);
         $this->instance = $this->resolve($class);
-        
+
         $this->instance->{$method}($this, $payload['data']);
     }
 
@@ -109,7 +109,8 @@ abstract class CQueue_AbstractJob {
     /**
      * Release the job back into the queue.
      *
-     * @param  int   $delay
+     * @param int $delay
+     *
      * @return void
      */
     public function release($delay = 0) {
@@ -155,7 +156,8 @@ abstract class CQueue_AbstractJob {
     /**
      * Delete the job, call the "failed" method, and raise the failed job event.
      *
-     * @param  \Throwable|null $e
+     * @param \Throwable|null $e
+     *
      * @return void
      */
     public function fail($e = null) {
@@ -172,7 +174,9 @@ abstract class CQueue_AbstractJob {
         } finally {
             $dispatcher = CEvent::dispatcher();
             $dispatcher->dispatch(new CQueue_Event_JobFailed(
-                    $this->connectionName, $this, $e ?: new CQueue_Exception_ManuallFailedException
+                $this->connectionName,
+                $this,
+                $e ?: new CQueue_Exception_ManuallFailedException
             ));
         }
     }
@@ -180,13 +184,14 @@ abstract class CQueue_AbstractJob {
     /**
      * Process an exception that caused the job to fail.
      *
-     * @param  \Throwable|null $e
+     * @param \Throwable|null $e
+     *
      * @return void
      */
     protected function failed($e) {
         $payload = $this->payload();
         list($class, $method) = CQueue_JobName::parse($payload['job']);
-        
+
         if (method_exists($this->instance = $this->resolve($class), 'failed')) {
             $this->instance->failed($payload['data'], $e);
         }
@@ -195,7 +200,8 @@ abstract class CQueue_AbstractJob {
     /**
      * Resolve the given class.
      *
-     * @param  string  $class
+     * @param string $class
+     *
      * @return mixed
      */
     protected function resolve($class) {
@@ -226,7 +232,6 @@ abstract class CQueue_AbstractJob {
      * @return int|null
      */
     public function maxTries() {
-
         return isset($this->payload()['maxTries']) ? $this->payload()['maxTries'] : null;
     }
 
@@ -303,5 +308,4 @@ abstract class CQueue_AbstractJob {
     public function getContainer() {
         return $this->container;
     }
-
 }

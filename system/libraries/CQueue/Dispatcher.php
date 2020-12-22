@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 2:49:31 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 2:49:31 AM
  */
 class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
-
     /**
      * The container implementation.
      *
@@ -47,8 +47,9 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     /**
      * Create a new command dispatcher instance.
      *
-     * @param  CContainer_ContainerInterface  $container
-     * @param  \Closure|null  $queueResolver
+     * @param CContainer_ContainerInterface $container
+     * @param \Closure|null                 $queueResolver
+     *
      * @return void
      */
     public function __construct(CContainer_ContainerInterface $container, Closure $queueResolver = null) {
@@ -60,13 +61,12 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     /**
      * Dispatch a command to its appropriate handler.
      *
-     * @param  mixed  $command
+     * @param mixed $command
+     *
      * @return mixed
      */
     public function dispatch($command) {
-        
         if ($this->queueResolver && $this->commandShouldBeQueued($command)) {
-             
             return $this->dispatchToQueue($command);
         }
         return $this->dispatchNow($command);
@@ -75,8 +75,9 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
-     * @param  mixed  $command
-     * @param  mixed  $handler
+     * @param mixed $command
+     * @param mixed $handler
+     *
      * @return mixed
      */
     public function dispatchNow($command, $handler = null) {
@@ -89,14 +90,15 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
                 return $this->container->call([$command, 'execute']);
             };
         }
-        
+
         return $this->pipeline->send($command)->through($this->pipes)->then($callback);
     }
 
     /**
      * Determine if the given command has a handler.
      *
-     * @param  mixed  $command
+     * @param mixed $command
+     *
      * @return bool
      */
     public function hasCommandHandler($command) {
@@ -106,7 +108,8 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     /**
      * Retrieve the handler for a command.
      *
-     * @param  mixed  $command
+     * @param mixed $command
+     *
      * @return bool|mixed
      */
     public function getCommandHandler($command) {
@@ -119,7 +122,8 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     /**
      * Determine if the given command should be queued.
      *
-     * @param  mixed  $command
+     * @param mixed $command
+     *
      * @return bool
      */
     protected function commandShouldBeQueued($command) {
@@ -129,17 +133,16 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     /**
      * Dispatch a command to its appropriate handler behind a queue.
      *
-     * @param  mixed  $command
+     * @param mixed $command
+     *
      * @return mixed
      *
      * @throws \RuntimeException
      */
     public function dispatchToQueue($command) {
-        
-        
         $connection = $command->connection ? $command->connection : null;
         $queue = call_user_func($this->queueResolver, $connection);
-        
+
         if (!$queue instanceof CQueue_QueueInterface) {
             throw new RuntimeException('Queue resolver did not return a Queue implementation.');
         }
@@ -152,8 +155,9 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     /**
      * Push the command onto the given queue instance.
      *
-     * @param  CQueue_QueueInterface  $queue
-     * @param  mixed  $command
+     * @param CQueue_QueueInterface $queue
+     * @param mixed                 $command
+     *
      * @return mixed
      */
     protected function pushCommandToQueue($queue, $command) {
@@ -172,7 +176,8 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     /**
      * Set the pipes through which commands should be piped before dispatching.
      *
-     * @param  array  $pipes
+     * @param array $pipes
+     *
      * @return $this
      */
     public function pipeThrough(array $pipes) {
@@ -183,12 +188,12 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     /**
      * Map a command to a handler.
      *
-     * @param  array  $map
+     * @param array $map
+     *
      * @return $this
      */
     public function map(array $map) {
         $this->handlers = array_merge($this->handlers, $map);
         return $this;
     }
-
 }
