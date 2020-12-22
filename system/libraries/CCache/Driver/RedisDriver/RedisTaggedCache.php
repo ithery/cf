@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Jul 28, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Jul 28, 2020
  */
 class CCache_Driver_RedisDriver_RedisTaggedCache extends CCache_TaggedCache {
-
     /**
      * Forever reference key.
      *
@@ -26,9 +26,10 @@ class CCache_Driver_RedisDriver_RedisTaggedCache extends CCache_TaggedCache {
     /**
      * Store an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param string                                    $key
+     * @param mixed                                     $value
+     * @param \DateTimeInterface|\DateInterval|int|null $ttl
+     *
      * @return bool
      */
     public function put($key, $value, $ttl = null) {
@@ -44,8 +45,9 @@ class CCache_Driver_RedisDriver_RedisTaggedCache extends CCache_TaggedCache {
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function increment($key, $value = 1) {
@@ -57,8 +59,9 @@ class CCache_Driver_RedisDriver_RedisTaggedCache extends CCache_TaggedCache {
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function decrement($key, $value = 1) {
@@ -70,8 +73,9 @@ class CCache_Driver_RedisDriver_RedisTaggedCache extends CCache_TaggedCache {
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return bool
      */
     public function forever($key, $value) {
@@ -95,8 +99,9 @@ class CCache_Driver_RedisDriver_RedisTaggedCache extends CCache_TaggedCache {
     /**
      * Store standard key references into store.
      *
-     * @param  string  $namespace
-     * @param  string  $key
+     * @param string $namespace
+     * @param string $key
+     *
      * @return void
      */
     protected function pushStandardKeys($namespace, $key) {
@@ -106,8 +111,9 @@ class CCache_Driver_RedisDriver_RedisTaggedCache extends CCache_TaggedCache {
     /**
      * Store forever key references into store.
      *
-     * @param  string  $namespace
-     * @param  string  $key
+     * @param string $namespace
+     * @param string $key
+     *
      * @return void
      */
     protected function pushForeverKeys($namespace, $key) {
@@ -117,9 +123,10 @@ class CCache_Driver_RedisDriver_RedisTaggedCache extends CCache_TaggedCache {
     /**
      * Store a reference to the cache key against the reference key.
      *
-     * @param  string  $namespace
-     * @param  string  $key
-     * @param  string  $reference
+     * @param string $namespace
+     * @param string $key
+     * @param string $reference
+     *
      * @return void
      */
     protected function pushKeys($namespace, $key, $reference) {
@@ -151,7 +158,8 @@ class CCache_Driver_RedisDriver_RedisTaggedCache extends CCache_TaggedCache {
     /**
      * Find and delete all of the items that were stored against a reference.
      *
-     * @param  string  $reference
+     * @param string $reference
+     *
      * @return void
      */
     protected function deleteKeysByReference($reference) {
@@ -165,7 +173,8 @@ class CCache_Driver_RedisDriver_RedisTaggedCache extends CCache_TaggedCache {
     /**
      * Delete item keys that have been stored against a reference.
      *
-     * @param  string  $referenceKey
+     * @param string $referenceKey
+     *
      * @return void
      */
     protected function deleteValues($referenceKey) {
@@ -181,12 +190,12 @@ class CCache_Driver_RedisDriver_RedisTaggedCache extends CCache_TaggedCache {
     /**
      * Get the reference key for the segment.
      *
-     * @param  string  $segment
-     * @param  string  $suffix
+     * @param string $segment
+     * @param string $suffix
+     *
      * @return string
      */
     protected function referenceKey($segment, $suffix) {
         return $this->driver->getPrefix() . $segment . ':' . $suffix;
     }
-
 }
