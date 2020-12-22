@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator implements Cinterface_Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Cinterface_Jsonable, CPagination_LengthAwarePaginatorInterface {
-
     /**
      * The total number of items before slicing.
      *
@@ -25,11 +18,12 @@ class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator imp
     /**
      * Create a new paginator instance.
      *
-     * @param  mixed  $items
-     * @param  int  $total
-     * @param  int  $perPage
-     * @param  int|null  $currentPage
-     * @param  array  $options (path, query, fragment, pageName)
+     * @param mixed    $items
+     * @param int      $total
+     * @param int      $perPage
+     * @param int|null $currentPage
+     * @param array    $options     (path, query, fragment, pageName)
+     *
      * @return void
      */
     public function __construct($items, $total, $perPage, $currentPage = null, array $options = []) {
@@ -48,8 +42,9 @@ class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator imp
     /**
      * Get the current page for the request.
      *
-     * @param  int  $currentPage
-     * @param  string  $pageName
+     * @param int    $currentPage
+     * @param string $pageName
+     *
      * @return int
      */
     protected function setCurrentPage($currentPage, $pageName) {
@@ -61,8 +56,9 @@ class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator imp
     /**
      * Render the paginator using the given view.
      *
-     * @param  string  $view
-     * @param  array  $data
+     * @param string $view
+     * @param array  $data
+     *
      * @return string
      */
     public function links($view = null, $data = []) {
@@ -72,15 +68,16 @@ class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator imp
     /**
      * Render the paginator using the given view.
      *
-     * @param  string  $view
-     * @param  array  $data
+     * @param string $view
+     * @param array  $data
+     *
      * @return string
      */
     public function render($view = null, $data = []) {
         return new CBase_HtmlString(static::viewFactory()->make($view ?: static::$defaultView, array_merge($data, [
-                    'paginator' => $this,
-                    'elements' => $this->elements(),
-                ]))->render());
+            'paginator' => $this,
+            'elements' => $this->elements(),
+        ]))->render());
     }
 
     /**
@@ -170,11 +167,11 @@ class CPagination_LengthAwarePaginator extends CPagination_AbstractPaginator imp
     /**
      * Convert the object to its JSON representation.
      *
-     * @param  int  $options
+     * @param int $options
+     *
      * @return string
      */
     public function toJson($options = 0) {
         return json_encode($this->jsonSerialize(), $options);
     }
-
 }
