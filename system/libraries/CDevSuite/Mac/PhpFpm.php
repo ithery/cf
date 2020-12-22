@@ -6,25 +6,24 @@
  * @author Hery
  */
 class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
-
     public $cli;
     public $files;
     public $brew;
 
-
-    var $taps = [
+    public $taps = [
         'homebrew/homebrew-core'
     ];
 
     /**
      * Create a new PHP FPM class instance.
      *
-     * @param  Brew  $brew
-     * @param  CommandLine  $cli
-     * @param  Filesystem  $files
+     * @param Brew        $brew
+     * @param CommandLine $cli
+     * @param Filesystem  $files
+     *
      * @return void
      */
-    function __construct() {
+    public function __construct() {
         $this->cli = CDevSuite::commandLine();
         $this->files = CDevSuite::filesystem();
         $this->brew = CDevSuite::brew();
@@ -35,7 +34,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
      *
      * @return void
      */
-    function install() {
+    public function install() {
         if (!$this->brew->hasInstalledPhp()) {
             $this->brew->ensureInstalled('php', [], $this->taps);
         }
@@ -49,10 +48,10 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
 
     /**
      * Forcefully uninstall all of DevSuite's supported PHP versions and configurations
-     * 
+     *
      * @return void
      */
-    function uninstall() {
+    public function uninstall() {
         $this->brew->uninstallAllPhpVersions();
         rename(BREW_PREFIX . '/etc/php', BREW_PREFIX . '/etc/php-devsuite-bak' . time());
         $this->cli->run('rm -rf ' . BREW_PREFIX . '/var/log/php-fpm.log');
@@ -63,7 +62,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
      *
      * @return void
      */
-    function updateConfiguration() {
+    public function updateConfiguration() {
         CDevSuite::info('Updating PHP configuration...');
 
         $fpmConfigFile = $this->fpmConfigPath();
@@ -79,7 +78,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
         if (false === strpos($fpmConfigFile, '5.6')) {
             // for PHP 7 we can simply drop in a devsuite-specific fpm pool config, and not touch the default config
             $contents = $this->files->get(CDevSuite::stubsPath() . 'etc-phpfpm-devsuite.conf');
-            $contents = str_replace(['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'], [CDevSuite::user(), rtrim(CDevSuite::homePath(),'/')], $contents);
+            $contents = str_replace(['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'], [CDevSuite::user(), rtrim(CDevSuite::homePath(), '/')], $contents);
         } else {
             // for PHP 5 we must do a direct edit of the fpm pool config to switch it to DevSuite's needs
             $contents = $this->files->get($fpmConfigFile);
@@ -107,7 +106,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
      *
      * @return void
      */
-    function restart() {
+    public function restart() {
         $this->brew->restartLinkedPhp();
     }
 
@@ -116,9 +115,10 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
      *
      * @return void
      */
-    function stop() {
+    public function stop() {
         call_user_func_array(
-                [$this->brew, 'stopService'], CDevSuite_Brew::SUPPORTED_PHP_VERSIONS
+            [$this->brew, 'stopService'],
+            CDevSuite_Brew::SUPPORTED_PHP_VERSIONS
         );
     }
 
@@ -127,11 +127,13 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
      *
      * @return string
      */
-    function fpmConfigPath() {
+    public function fpmConfigPath() {
         $version = $this->brew->linkedPhp();
 
         $versionNormalized = preg_replace(
-                '/php@?(\d)\.?(\d)/', '$1.$2', $version === 'php' ? CDevSuite_Brew::LATEST_PHP_VERSION : $version
+            '/php@?(\d)\.?(\d)/',
+            '$1.$2',
+            $version === 'php' ? CDevSuite_Brew::LATEST_PHP_VERSION : $version
         );
 
         return $versionNormalized === '5.6' ? BREW_PREFIX . '/etc/php/5.6/php-fpm.conf' : BREW_PREFIX . "/etc/php/${versionNormalized}/php-fpm.d/devsuite-fpm.conf";
@@ -140,9 +142,9 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
     /**
      * Only stop running php services
      */
-    function stopRunning() {
+    public function stopRunning() {
         $this->brew->stopService(
-                $this->brew->getRunningServices()
+            $this->brew->getRunningServices()
                         ->filter(function ($service) {
                             return substr($service, 0, 3) === 'php';
                         })
@@ -154,9 +156,10 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
      * Use a specific version of php
      *
      * @param $version
+     *
      * @return string
      */
-    function useVersion($version) {
+    public function useVersion($version) {
         $version = $this->validateRequestedVersion($version);
 
         // Install the relevant formula if not already installed
@@ -181,9 +184,10 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
      * Validate the requested version to be sure we can support it.
      *
      * @param $version
+     *
      * @return string
      */
-    function validateRequestedVersion($version) {
+    public function validateRequestedVersion($version) {
         // If passed php7.2 or php72 formats, normalize to php@7.2 format:
         $version = preg_replace('/(php)([0-9+])(?:.)?([0-9+])/i', '$1@$2.$3', $version);
 
@@ -199,13 +203,13 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
 
         if (!$this->brew->supportedPhpVersions()->contains($version)) {
             throw new DomainException(
-            sprintf(
-                    'DevSuite doesn\'t support PHP version: %s (try something like \'php@7.3\' instead)', $version
+                sprintf(
+                'DevSuite doesn\'t support PHP version: %s (try something like \'php@7.3\' instead)',
+                $version
             )
             );
         }
 
         return $version;
     }
-
 }

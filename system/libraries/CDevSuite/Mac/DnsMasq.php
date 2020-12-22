@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
-
     public $brew;
     public $dnsmasqMasterConfigFile = BREW_PREFIX . '/etc/dnsmasq.conf';
     public $dnsmasqSystemConfDir = BREW_PREFIX . '/etc/dnsmasq.d';
@@ -22,6 +21,8 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
 
     /**
      * Install and configure DnsMasq.
+     *
+     * @param mixed $tld
      *
      * @return void
      */
@@ -44,10 +45,10 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
 
     /**
      * Forcefully uninstall dnsmasq.
-     * 
+     *
      * @return void
      */
-    function uninstall() {
+    public function uninstall() {
         $this->brew->stopService('dnsmasq');
         $this->brew->uninstallFormula('dnsmasq');
         $this->cli->run('rm -rf ' . BREW_PREFIX . '/etc/dnsmasq.d/dnsmasq-devsuite.conf');
@@ -57,10 +58,10 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
 
     /**
      * Tell Homebrew to restart dnsmasq
-     * 
+     *
      * @return void
      */
-    function restart() {
+    public function restart() {
         $this->brew->restartService('dnsmasq');
     }
 
@@ -69,7 +70,7 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
      *
      * @return void
      */
-    function ensureUsingDnsmasqDForConfigs() {
+    public function ensureUsingDnsmasqDForConfigs() {
         CDevSuite::info('Updating Dnsmasq configuration...');
 
         // set primary config to look for configs in /usr/local/etc/dnsmasq.d/*.conf
@@ -93,7 +94,7 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
 
         // add a devsuite-specific config file to point to user's home directory devsuite config
         $contents = $this->files->get(CDevSuite::stubsPath() . 'etc-dnsmasq-devsuite.conf');
-        $contents = str_replace('DEVSUITE_HOME_PATH', rtrim(CDevSuite::homePath(),'/'), $contents);
+        $contents = str_replace('DEVSUITE_HOME_PATH', rtrim(CDevSuite::homePath(), '/'), $contents);
         $this->files->ensureDirExists($this->dnsmasqSystemConfDir, CDevSuite::user());
         $this->files->putAsUser($this->dnsmasqSystemConfDir . '/dnsmasq-devsuite.conf', $contents);
 
@@ -102,10 +103,12 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
 
     /**
      * Create the TLD-specific dnsmasq config file
-     * @param  string  $tld
+     *
+     * @param string $tld
+     *
      * @return void
      */
-    function createDnsmasqTldConfigFile($tld) {
+    public function createDnsmasqTldConfigFile($tld) {
         $tldConfigFile = $this->dnsmasqUserConfigDir() . 'tld-' . $tld . '.conf';
 
         $this->files->putAsUser($tldConfigFile, 'address=/.' . $tld . '/127.0.0.1' . PHP_EOL . 'listen-address=127.0.0.1' . PHP_EOL);
@@ -114,10 +117,11 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
     /**
      * Create the resolver file to point the configured TLD to 127.0.0.1.
      *
-     * @param  string  $tld
+     * @param string $tld
+     *
      * @return void
      */
-    function createTldResolver($tld) {
+    public function createTldResolver($tld) {
         $this->files->ensureDirExistsAsRoot($this->resolverPath);
 
         $this->files->putAsRoot($this->resolverPath . '/' . $tld, 'nameserver 127.0.0.1' . PHP_EOL);
@@ -126,11 +130,12 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
     /**
      * Update the TLD/domain resolved by DnsMasq.
      *
-     * @param  string  $oldTld
-     * @param  string  $newTld
+     * @param string $oldTld
+     * @param string $newTld
+     *
      * @return void
      */
-    function updateTld($oldTld, $newTld) {
+    public function updateTld($oldTld, $newTld) {
         $this->files->unlink($this->resolverPath . '/' . $oldTld);
         $this->files->unlink($this->dnsmasqUserConfigDir() . 'tld-' . $oldTld . '.conf');
 
@@ -142,8 +147,7 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
      *
      * @return string
      */
-    function dnsmasqUserConfigDir() {
+    public function dnsmasqUserConfigDir() {
         return $_SERVER['HOME'] . '/.config/devsuite/dnsmasq.d/';
     }
-
 }

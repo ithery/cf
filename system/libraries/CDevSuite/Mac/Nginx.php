@@ -2,11 +2,11 @@
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 15, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 15, 2020
  */
 class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
-
     public $brew;
     public $site;
 
@@ -14,6 +14,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
 
     /**
      * Create a new Nginx instance.
+     *
      * @return void
      */
     public function __construct() {
@@ -48,7 +49,8 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
         $contents = $this->files->get(CDevSuite::stubsPath() . 'nginx.conf');
 
         $this->files->putAsUser(
-                static::NGINX_CONF, str_replace(['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'], [CDevSuite::user(), rtrim(CDevSuite::homePath(), '/')], $contents)
+            static::NGINX_CONF,
+            str_replace(['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'], [CDevSuite::user(), rtrim(CDevSuite::homePath(), '/')], $contents)
         );
     }
 
@@ -61,13 +63,17 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
         $this->files->ensureDirExists('/usr/local/etc/nginx/devsuite');
 
         $this->files->putAsUser(
-                '/usr/local/etc/nginx/devsuite/devsuite.conf', str_replace(
-                        ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX'], [rtrim(CDevSuite::homePath(), '/'), CDevSuite::serverPath(), CDevSuite::staticPrefix()], $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
-                )
+            '/usr/local/etc/nginx/devsuite/devsuite.conf',
+            str_replace(
+                ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX'],
+                [rtrim(CDevSuite::homePath(), '/'), CDevSuite::serverPath(), CDevSuite::staticPrefix()],
+                $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
+            )
         );
 
         $this->files->putAsUser(
-                '/usr/local/etc/nginx/fastcgi_params', $this->files->get(CDevSuite::stubsPath() . 'fastcgi_params')
+            '/usr/local/etc/nginx/fastcgi_params',
+            $this->files->get(CDevSuite::stubsPath() . 'fastcgi_params')
         );
     }
 
@@ -95,9 +101,10 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      */
     private function lint() {
         $this->cli->run(
-                'sudo nginx -c ' . static::NGINX_CONF . ' -t', function ($exitCode, $outputMessage) {
-            throw new DomainException("Nginx cannot start; please check your nginx.conf [$exitCode: $outputMessage].");
-        }
+            'sudo nginx -c ' . static::NGINX_CONF . ' -t',
+            function ($exitCode, $outputMessage) {
+                throw new DomainException("Nginx cannot start; please check your nginx.conf [$exitCode: $outputMessage].");
+            }
         );
     }
 
@@ -144,5 +151,4 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
         $this->brew->uninstallFormula('nginx nginx-full');
         $this->cli->quietly('rm -rf /usr/local/etc/nginx /usr/local/var/log/nginx');
     }
-
 }

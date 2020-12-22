@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Mac_Configuration extends CDevSuite_Configuration {
-
     /**
      * Install the DevSuite configuration file.
      *
@@ -26,7 +25,7 @@ class CDevSuite_Mac_Configuration extends CDevSuite_Configuration {
 
     /**
      * Forcefully delete the DevSuite home configuration directory and contents.
-     * 
+     *
      * @return void
      */
     public function uninstall() {
@@ -50,5 +49,4 @@ class CDevSuite_Mac_Configuration extends CDevSuite_Configuration {
 
         $this->files->ensureDirExists(CDevSuite::homePath(), CDevSuite::user());
     }
-
 }
