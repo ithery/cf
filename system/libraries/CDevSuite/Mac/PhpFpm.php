@@ -204,9 +204,9 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
         if (!$this->brew->supportedPhpVersions()->contains($version)) {
             throw new DomainException(
                 sprintf(
-                'DevSuite doesn\'t support PHP version: %s (try something like \'php@7.3\' instead)',
-                $version
-            )
+                    'DevSuite doesn\'t support PHP version: %s (try something like \'php@7.3\' instead)',
+                    $version
+                )
             );
         }
 
