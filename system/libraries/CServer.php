@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 13, 2018, 10:19:47 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 13, 2018, 10:19:47 AM
  */
 class CServer {
-
     const OS_WINNT = 'WINNT';
     const OS_LINUX = 'Linux';
     const OS_DARWIN = 'Darwin';
@@ -38,8 +38,8 @@ class CServer {
     }
 
     /**
-     * 
      * @param type $sshConfig | optional
+     *
      * @return CServer_Command
      */
     public static function command($sshConfig = null) {
@@ -75,7 +75,8 @@ class CServer {
     }
 
     /**
-     * 
+     * @param mixed $deviceName
+     *
      * @return CServer_System_Device
      */
     public static function createDevice($deviceName) {
@@ -84,7 +85,6 @@ class CServer {
     }
 
     /**
-     * 
      * @return CServer_Device_Cpu
      */
     public static function createDeviceCpu() {
@@ -92,7 +92,6 @@ class CServer {
     }
 
     /**
-     * 
      * @return CServer_Device_Disk
      */
     public static function createDeviceDisk() {
@@ -101,13 +100,13 @@ class CServer {
 
     public static function isProcOpenDisabled() {
         $isDisabled = false;
-        if (!function_exists("proc_open")) {
+        if (!function_exists('proc_open')) {
             $isDisabled = true;
         }
         $process = null;
         try {
-            $descriptorspec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
-            $pipes = array();
+            $descriptorspec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
+            $pipes = [];
             $process = @proc_open('hostname', $descriptorspec, $pipes);
         } catch (Exception $ex) {
             $isDisabled = true;
@@ -119,21 +118,20 @@ class CServer {
             $isDisabled = true;
         }
 
-
         return $isDisabled;
     }
 
     /**
-     * 
+     * @param mixed $options
+     *
      * @return \CServer_Service_Beanstalkd
      */
     public static function createBeanstalkd($options = []) {
         return new CServer_Service_Beanstalkd($options);
     }
 
-    public static function IsNpmInstalled() {
+    public static function isNpmInstalled() {
         exec('npm -v', $output, $exitCode);
         return $exitCode === 0;
     }
-
 }

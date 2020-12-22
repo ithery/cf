@@ -176,6 +176,11 @@ class CDevSuite {
         return static::$filesystem;
     }
 
+    /**
+     * Get CommandLine instance
+     *
+     * @return CDevSuite_CommandLine
+     */
     public static function commandLine() {
         if (static::$commandLine == null) {
             switch (CServer::getOS()) {
