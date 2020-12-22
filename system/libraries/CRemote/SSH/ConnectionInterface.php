@@ -1,14 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 7, 2018, 2:02:24 AM
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 interface CRemote_SSH_ConnectionInterface {
-
     /**
      * Define a set of commands as a task.
      *

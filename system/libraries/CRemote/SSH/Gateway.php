@@ -1,11 +1,9 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 7, 2018, 2:32:36 AM
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 use phpseclib\Crypt\RSA;
 use phpseclib\Net\SFTP;
@@ -13,7 +11,6 @@ use phpseclib\Net\SSH2;
 use phpseclib\System\SSH\Agent;
 
 class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
-
     /**
      * The host name of the server.
      *
@@ -52,10 +49,10 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     /**
      * Create a new gateway implementation.
      *
-     * @param string                            $host
-     * @param array                             $auth
-     * @param \Illuminate\Filesystem\Filesystem $files
-     * @param                                   $timeout
+     * @param string $host
+     * @param mixed  $port
+     * @param array  $auth
+     * @param        $timeout
      */
     public function __construct($host, $port, array $auth, $timeout) {
         $this->auth = $auth;
@@ -117,19 +114,15 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     protected function getAuthForLogin() {
         if ($this->useAgent()) {
             return $this->getAgent();
-        }
-
-        // If a "key" was specified in the auth credentials, we will load it into a
-        // secure RSA key instance, which will be used to connect to the servers
-        // in place of a password, and avoids the developer specifying a pass.
-        elseif ($this->hasRsaKey()) {
+        } elseif ($this->hasRsaKey()) {
+            // If a "key" was specified in the auth credentials, we will load it into a
+            // secure RSA key instance, which will be used to connect to the servers
+            // in place of a password, and avoids the developer specifying a pass.
             return $this->loadRsaKey($this->auth);
-        }
-
-        // If a plain password was set on the auth credentials, we will just return
-        // that as it can be used to connect to the server. This will be used if
-        // there is no RSA key and it gets specified in the credential arrays.
-        elseif (isset($this->auth['password'])) {
+        } elseif (isset($this->auth['password'])) {
+            // If a plain password was set on the auth credentials, we will just return
+            // that as it can be used to connect to the server. This will be used if
+            // there is no RSA key and it gets specified in the credential arrays.
             return $this->auth['password'];
         }
 
@@ -252,6 +245,7 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
      * Run a command against the server (non-blocking).
      *
      * @param string $command
+     * @param mixed  $callback
      *
      * @return string
      */
@@ -262,8 +256,8 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
     /**
      * Run a command against the server (blocking).
      *
-     * @param string $command
-     * @param int $timeout timeout in second
+     * @param mixed $commands
+     * @param int   $timeout  timeout in second
      *
      * @return string
      */
@@ -386,10 +380,10 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
 
     /**
      * Get log ssh with defined NET_SSH2_LOGGING
+     *
      * @return string
      */
     public function getLog() {
         return $this->getConnection()->getLog();
     }
-
 }

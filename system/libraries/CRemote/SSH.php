@@ -1,21 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 7, 2018, 1:48:03 AM
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
 class CRemote_SSH {
-
     protected $config;
 
     /**
-     *
      * @var CRemote_SSH_Connection
      */
     protected $connection;
@@ -40,7 +36,6 @@ class CRemote_SSH {
      * @return CRemote_SSH_ConnectionInterface
      */
     public function connection() {
-
         return $this->connection;
     }
 
@@ -59,7 +54,13 @@ class CRemote_SSH {
             $host = carr::get($config, 'host');
         }
         $this->setOutput($connection = new CRemote_SSH_Connection(
-                $name, $host, carr::get($config, 'port', 22), $config['username'], $this->getAuth($config), null, $timeout
+            $name,
+            $host,
+            carr::get($config, 'port', 22),
+            $config['username'],
+            $this->getAuth($config),
+            null,
+            $timeout
         ));
 
         return $connection;
@@ -124,6 +125,7 @@ class CRemote_SSH {
 
     /**
      * Get log ssh with defined NET_SSH2_LOGGING
+     *
      * @return string
      */
     public function getLog() {
@@ -141,5 +143,4 @@ class CRemote_SSH {
     public function __call($method, $parameters) {
         return call_user_func_array([$this->connection, $method], $parameters);
     }
-
 }
