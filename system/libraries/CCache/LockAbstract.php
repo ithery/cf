@@ -6,7 +6,6 @@
  * @author Hery
  */
 abstract class CCache_LockAbstract implements CCache_LockInterface {
-
     use CTrait_Helper_InteractsWithTime;
 
     /**
@@ -40,9 +39,10 @@ abstract class CCache_LockAbstract implements CCache_LockInterface {
     /**
      * Create a new lock instance.
      *
-     * @param  string  $name
-     * @param  int  $seconds
-     * @param  string|null  $owner
+     * @param string      $name
+     * @param int         $seconds
+     * @param string|null $owner
+     *
      * @return void
      */
     public function __construct($name, $seconds, $owner = null) {
@@ -79,7 +79,8 @@ abstract class CCache_LockAbstract implements CCache_LockInterface {
     /**
      * Attempt to acquire the lock.
      *
-     * @param  callable|null  $callback
+     * @param callable|null $callback
+     *
      * @return mixed
      */
     public function get($callback = null) {
@@ -99,8 +100,9 @@ abstract class CCache_LockAbstract implements CCache_LockInterface {
     /**
      * Attempt to acquire the lock for the given number of seconds.
      *
-     * @param  int  $seconds
-     * @param  callable|null  $callback
+     * @param int           $seconds
+     * @param callable|null $callback
+     *
      * @return bool
      *
      * @throws \Illuminate\Contracts\Cache\LockTimeoutException
@@ -148,7 +150,8 @@ abstract class CCache_LockAbstract implements CCache_LockInterface {
     /**
      * Specify the number of milliseconds to sleep in between blocked lock aquisition attempts.
      *
-     * @param  int  $milliseconds
+     * @param int $milliseconds
+     *
      * @return $this
      */
     public function betweenBlockedAttemptsSleepFor($milliseconds) {
@@ -156,5 +159,4 @@ abstract class CCache_LockAbstract implements CCache_LockInterface {
 
         return $this;
     }
-
 }
