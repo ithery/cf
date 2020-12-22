@@ -1,13 +1,10 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Dec 25, 2017, 10:08:50 PM
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 trait CModel_Trait_GuardsAttributes {
-
     /**
      * The attributes that are mass assignable.
      *
@@ -41,7 +38,8 @@ trait CModel_Trait_GuardsAttributes {
     /**
      * Set the fillable attributes for the model.
      *
-     * @param  array  $fillable
+     * @param array $fillable
+     *
      * @return $this
      */
     public function fillable(array $fillable) {
@@ -62,7 +60,8 @@ trait CModel_Trait_GuardsAttributes {
     /**
      * Set the guarded attributes for the model.
      *
-     * @param  array  $guarded
+     * @param array $guarded
+     *
      * @return $this
      */
     public function guard(array $guarded) {
@@ -74,7 +73,8 @@ trait CModel_Trait_GuardsAttributes {
     /**
      * Disable all mass assignable restrictions.
      *
-     * @param  bool  $state
+     * @param bool $state
+     *
      * @return void
      */
     public static function unguard($state = true) {
@@ -102,7 +102,8 @@ trait CModel_Trait_GuardsAttributes {
     /**
      * Run the given callable while being unguarded.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     *
      * @return mixed
      */
     public static function unguarded(callable $callback) {
@@ -122,7 +123,8 @@ trait CModel_Trait_GuardsAttributes {
     /**
      * Determine if the given attribute may be mass assigned.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function isFillable($key) {
@@ -144,14 +146,15 @@ trait CModel_Trait_GuardsAttributes {
             return false;
         }
 
-        return empty($this->getFillable()) &&
-                !cstr::startsWith($key, '_');
+        return empty($this->getFillable())
+                && !cstr::startsWith($key, '_');
     }
 
     /**
      * Determine if the given key is guarded.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function isGuarded($key) {
@@ -170,7 +173,8 @@ trait CModel_Trait_GuardsAttributes {
     /**
      * Get the fillable attributes of a given array.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return array
      */
     protected function fillableFromArray(array $attributes) {
@@ -180,5 +184,4 @@ trait CModel_Trait_GuardsAttributes {
 
         return $attributes;
     }
-
 }
