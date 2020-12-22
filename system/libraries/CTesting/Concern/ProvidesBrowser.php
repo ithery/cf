@@ -203,7 +203,7 @@ trait CTesting_Concern_ProvidesBrowser {
      * @throws \Exception
      */
     protected function createWebDriver() {
-        return retry(5, function () {
+        return c::retry(5, function () {
             return $this->driver();
         }, 50);
     }

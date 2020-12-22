@@ -114,11 +114,11 @@ trait CTesting_BrowserConcern_InteractsWithElements {
      */
     protected function parseKeys($keys) {
         return c::collect($keys)->map(function ($key) {
-            if (is_string($key) && Str::startsWith($key, '{') && Str::endsWith($key, '}')) {
+            if (is_string($key) && cstr::startsWith($key, '{') && cstr::endsWith($key, '}')) {
                 $key = constant(WebDriverKeys::class . '::' . strtoupper(trim($key, '{}')));
             }
 
-            if (is_array($key) && Str::startsWith($key[0], '{')) {
+            if (is_array($key) && cstr::startsWith($key[0], '{')) {
                 $key[0] = constant(WebDriverKeys::class . '::' . strtoupper(trim($key[0], '{}')));
             }
 
