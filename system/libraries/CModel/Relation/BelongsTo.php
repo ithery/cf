@@ -4,7 +4,6 @@
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class CModel_Relation_BelongsTo extends CModel_Relation {
-
     use CModel_Relation_Trait_SupportsDefaultModels;
 
     /**
@@ -43,11 +42,12 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Create a new belongs to relationship instance.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel  $child
-     * @param  string  $foreignKey
-     * @param  string  $ownerKey
-     * @param  string  $relation
+     * @param CModel_Query $query
+     * @param CModel       $child
+     * @param string       $foreignKey
+     * @param string       $ownerKey
+     * @param string       $relation
+     *
      * @return void
      */
     public function __construct(CModel_Query $query, CModel $child, $foreignKey, $ownerKey, $relation) {
@@ -91,7 +91,8 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param  array  $models
+     * @param array $models
+     *
      * @return void
      */
     public function addEagerConstraints(array $models) {
@@ -106,7 +107,8 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Gather the keys from an array of related models.
      *
-     * @param  array  $models
+     * @param array $models
+     *
      * @return array
      */
     protected function getEagerModelKeys(array $models) {
@@ -136,8 +138,9 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
-     * @param  string  $relation
+     * @param array  $models
+     * @param string $relation
+     *
      * @return array
      */
     public function initRelation(array $models, $relation) {
@@ -151,9 +154,10 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array   $models
-     * @param  CModel_Collection  $results
-     * @param  string  $relation
+     * @param array             $models
+     * @param CModel_Collection $results
+     * @param string            $relation
+     *
      * @return array
      */
     public function match(array $models, CModel_Collection $results, $relation) {
@@ -185,7 +189,8 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Update the parent model on the relationship.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return mixed
      */
     public function update(array $attributes) {
@@ -195,12 +200,13 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Associate the model instance to the given parent.
      *
-     * @param  CModel|int|string  $model
+     * @param CModel|int|string $model
+     *
      * @return CModel
      */
     public function associate($model) {
         $ownerKey = $model instanceof CModel ? $model->getAttribute($this->ownerKey) : $model;
-        
+
         $this->child->setAttribute($this->foreignKey, $ownerKey);
 
         if ($model instanceof CModel) {
@@ -224,9 +230,10 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Add the constraints for a relationship query.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel_Query  $parentQuery
-     * @param  array|mixed  $columns
+     * @param CModel_Query $query
+     * @param CModel_Query $parentQuery
+     * @param array|mixed  $columns
+     *
      * @return CModel_Query
      */
     public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
@@ -235,27 +242,32 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
         }
 
         return $query->select($columns)->whereColumn(
-                        $this->getQualifiedForeignKey(), '=', $query->getModel()->getTable() . '.' . $this->ownerKey
+            $this->getQualifiedForeignKey(),
+            '=',
+            $query->getModel()->getTable() . '.' . $this->ownerKey
         );
     }
 
     /**
      * Add the constraints for a relationship query on the same table.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel_Query  $parentQuery
-     * @param  array|mixed  $columns
+     * @param CModel_Query $query
+     * @param CModel_Query $parentQuery
+     * @param array|mixed  $columns
+     *
      * @return CModel_Query
      */
     public function getRelationExistenceQueryForSelfRelation(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
         $query->select($columns)->from(
-                $query->getModel()->getTable() . ' as ' . $hash = $this->getRelationCountHash()
+            $query->getModel()->getTable() . ' as ' . $hash = $this->getRelationCountHash()
         );
 
         $query->getModel()->setTable($hash);
 
         return $query->whereColumn(
-                        $hash . '.' . $query->getModel()->getKeyName(), '=', $this->getQualifiedForeignKey()
+            $hash . '.' . $query->getModel()->getKeyName(),
+            '=',
+            $this->getQualifiedForeignKey()
         );
     }
 
@@ -274,17 +286,18 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
      * @return bool
      */
     protected function relationHasIncrementingId() {
-        return $this->related->getIncrementing() &&
-                $this->related->getKeyType() === 'int';
+        return $this->related->getIncrementing()
+                && $this->related->getKeyType() === 'int';
     }
 
     /**
      * Make a new related instance for the given model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param CModel $parent
+     *
+     * @return CModel
      */
-    protected function newRelatedInstanceFor(Model $parent) {
+    protected function newRelatedInstanceFor(CModel $parent) {
         return $this->related->newInstance();
     }
 
@@ -332,5 +345,4 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     public function getRelation() {
         return $this->relation;
     }
-
 }

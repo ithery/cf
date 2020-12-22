@@ -1,7 +1,6 @@
 <?php
 
 trait CModel_Relation_Trait_SupportsDefaultModels {
-
     /**
      * Indicates if a default model instance should be used.
      *
@@ -14,15 +13,17 @@ trait CModel_Relation_Trait_SupportsDefaultModels {
     /**
      * Make a new related instance for the given model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param CModel $parent
+     *
+     * @return CModel
      */
-    abstract protected function newRelatedInstanceFor(Model $parent);
+    abstract protected function newRelatedInstanceFor(CModel $parent);
 
     /**
      * Return a new model instance in case the relationship does not exist.
      *
-     * @param  \Closure|array|bool  $callback
+     * @param \Closure|array|bool $callback
+     *
      * @return $this
      */
     public function withDefault($callback = true) {
@@ -34,7 +35,8 @@ trait CModel_Relation_Trait_SupportsDefaultModels {
     /**
      * Get the default value for this relation.
      *
-     * @param  CModel  $parent
+     * @param CModel $parent
+     *
      * @return CModel|null
      */
     protected function getDefaultFor(CModel $parent) {
@@ -54,5 +56,4 @@ trait CModel_Relation_Trait_SupportsDefaultModels {
 
         return $instance;
     }
-
 }
