@@ -1,7 +1,7 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-return array(
+return [
     'general_error' => 'An error occurred while sending the email message.'
-);
+];

@@ -1,8 +1,8 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-return array(
+return [
     // Two letter days
     'su' => 'Su',
     'mo' => 'Mo',
@@ -53,4 +53,4 @@ return array(
     'october' => 'October',
     'november' => 'November',
     'december' => 'December'
-);
+];

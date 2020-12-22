@@ -1,8 +1,8 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-return array(
+return [
     'undefined_group' => 'The %s group is not defined in your configuration.',
     'error' => 'There was an SQL error: %s',
     'connection' => 'There was an error connecting to the database: %s',
@@ -13,4 +13,4 @@ return array(
     'table_not_found' => 'Table %s does not exist in your database.',
     'not_implemented' => 'The method you called, %s, is not supported by this driver.',
     'result_read_only' => 'Query results are read only.'
-);
+];

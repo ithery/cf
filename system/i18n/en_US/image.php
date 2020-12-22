@@ -1,8 +1,8 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-return array(
+return [
     'getimagesize_missing' => 'The Image library requires the getimagesize() PHP function, which is not available in your installation.',
     'unsupported_method' => 'Your configured driver does not support the %s image transformation.',
     'file_not_found' => 'The specified image, %s, was not found. Please verify that images exist by using file_exists() before manipulating them.',
@@ -14,18 +14,15 @@ return array(
     'invalid_flip' => 'The flip direction specified is not valid.',
     'directory_unwritable' => 'The specified directory, %s, is not writable.',
     // ImageMagick specific messages
-    'imagemagick' => array
-        (
+    'imagemagick' => [
         'not_found' => 'The ImageMagick directory specified does not contain a required program, %s.',
-    ),
+    ],
     // GraphicsMagick specific messages
-    'graphicsmagick' => array
-        (
+    'graphicsmagick' => [
         'not_found' => 'The GraphicsMagick directory specified does not contain a required program, %s.',
-    ),
+    ],
     // GD specific messages
-    'gd' => array
-        (
+    'gd' => [
         'requires_v2' => 'The Image library requires GD2. Please see http://php.net/gd_info for more information.',
-    ),
-);
+    ],
+];

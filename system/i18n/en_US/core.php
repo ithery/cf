@@ -1,8 +1,8 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-return array(
+return [
     'there_can_be_only_one' => 'There can be only one instance of CF per page request',
     'uncaught_exception' => 'Uncaught %s: %s in file %s on line %s',
     'invalid_method' => 'Invalid method %s called in %s',
@@ -31,4 +31,4 @@ return array(
     'model' => 'model',
     'view' => 'view',
     'template' => 'Template',
-);
+];
