@@ -9,7 +9,6 @@ use Opis\Closure\SerializableClosure;
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class CRouting_Route {
-
     use CRouting_Concern_CreatesRegularExpressionRouteConstraints,
         CRouting_Concern_RouteDependencyResolverTrait,
         CRouting_Concern_RouteOutputBufferRunner,
@@ -144,27 +143,34 @@ class CRouting_Route {
     /**
      * Create a new Route instance.
      *
-     * @param  array|string  $methods
-     * @param  string  $uri
-     * @param  \Closure|array  $action
+     * @param array|string   $methods
+     * @param string         $uri
+     * @param \Closure|array $action
+     * @param mixed          $parameters
+     *
      * @return void
      */
-    public function __construct($methods, $uri, $action) {
+    public function __construct($methods, $uri, $action, $parameters = null) {
         $this->uri = $uri;
         $this->methods = (array) $methods;
         $this->action = carr::except($this->parseAction($action), ['prefix']);
-        
+
         if (in_array('GET', $this->methods) && !in_array('HEAD', $this->methods)) {
             $this->methods[] = 'HEAD';
         }
-        
+
         $this->prefix(is_array($action) ? carr::get($action, 'prefix') : '');
+
+        if ($parameters != null) {
+            $this->parameters = $parameters;
+        }
     }
 
     /**
      * Parse the route action into a standard array.
      *
-     * @param  callable|array|null  $action
+     * @param callable|array|null $action
+     *
      * @return array
      *
      * @throws \UnexpectedValueException
@@ -179,12 +185,8 @@ class CRouting_Route {
      * @return mixed
      */
     public function run() {
-
         try {
             if ($this->isControllerAction()) {
-                
-       
-       
                 return $this->runController();
             }
 
@@ -216,7 +218,8 @@ class CRouting_Route {
         }
 
         return $callable(...array_values($this->resolveMethodDependencies(
-                                $this->parametersWithoutNulls(), new ReflectionFunction($callable)
+            $this->parametersWithoutNulls(),
+            new ReflectionFunction($callable)
         )));
     }
 
@@ -238,7 +241,9 @@ class CRouting_Route {
      */
     protected function runController() {
         return $this->controllerDispatcher()->dispatch(
-                        $this, $this->getController(), $this->getControllerMethod()
+            $this,
+            $this->getController(),
+            $this->getControllerMethod()
         );
     }
 
@@ -251,7 +256,11 @@ class CRouting_Route {
         if (!$this->controller) {
             $class = $this->parseControllerCallback()[0];
 
-            $this->controller = CContainer::getInstance()->make(ltrim($class, '\\'));
+            try {
+                $this->controller = CContainer::getInstance()->make(ltrim($class, '\\'));
+            } catch (Exception $ex) {
+                throw $ex;
+            }
         }
 
         return $this->controller;
@@ -278,15 +287,16 @@ class CRouting_Route {
     /**
      * Determine if the route matches a given request.
      *
-     * @param  CHTTP_Request  $request
-     * @param  bool  $includingMethod
+     * @param CHTTP_Request $request
+     * @param bool          $includingMethod
+     *
      * @return bool
      */
     public function matches(CHTTP_Request $request, $includingMethod = true) {
         $this->compileRoute();
-        //cdbg::dd($this->compiled);
+
         foreach (self::getValidators() as $validator) {
-            if (!$includingMethod && $validator instanceof CRouting_Matching_MethodValidator) {
+            if (!$includingMethod && $validator instanceof CRouting_Validator_MethodValidator) {
                 continue;
             }
 
@@ -314,14 +324,16 @@ class CRouting_Route {
     /**
      * Bind the route to a given request for execution.
      *
-     * @param  CHTTP_Request  $request
+     * @param CHTTP_Request $request
+     *
      * @return $this
      */
     public function bind(CHTTP_Request $request) {
         $this->compileRoute();
-
-        $this->parameters = (new CRouting_RouteParameterBinder($this))
+        if ($this->parameters == null) {
+            $this->parameters = (new CRouting_RouteParameterBinder($this))
                 ->parameters($request);
+        }
 
         $this->originalParameters = $this->parameters;
 
@@ -340,7 +352,8 @@ class CRouting_Route {
     /**
      * Determine a given parameter exists from the route.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return bool
      */
     public function hasParameter($name) {
@@ -354,8 +367,9 @@ class CRouting_Route {
     /**
      * Get a given parameter from the route.
      *
-     * @param  string  $name
-     * @param  string|object|null  $default
+     * @param string             $name
+     * @param string|object|null $default
+     *
      * @return string|object|null
      */
     public function parameter($name, $default = null) {
@@ -365,8 +379,9 @@ class CRouting_Route {
     /**
      * Get original value of a given parameter from the route.
      *
-     * @param  string  $name
-     * @param  string|null  $default
+     * @param string      $name
+     * @param string|null $default
+     *
      * @return string|null
      */
     public function originalParameter($name, $default = null) {
@@ -376,8 +391,9 @@ class CRouting_Route {
     /**
      * Set a parameter to the given value.
      *
-     * @param  string  $name
-     * @param  string|object|null  $value
+     * @param string             $name
+     * @param string|object|null $value
+     *
      * @return void
      */
     public function setParameter($name, $value) {
@@ -389,7 +405,8 @@ class CRouting_Route {
     /**
      * Unset a parameter on the route if it is set.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return void
      */
     public function forgetParameter($name) {
@@ -468,7 +485,8 @@ class CRouting_Route {
     /**
      * Get the parameters that are listed in the route / controller signature.
      *
-     * @param  string|null  $subClass
+     * @param string|null $subClass
+     *
      * @return array
      */
     public function signatureParameters($subClass = null) {
@@ -478,7 +496,8 @@ class CRouting_Route {
     /**
      * Get the binding field for the given parameter.
      *
-     * @param  string|int  $parameter
+     * @param string|int $parameter
+     *
      * @return string|null
      */
     public function bindingFieldFor($parameter) {
@@ -493,13 +512,14 @@ class CRouting_Route {
      * @return array
      */
     public function bindingFields() {
-        return $this->bindingFields ? $this->bindingFields: [];
+        return $this->bindingFields ? $this->bindingFields : [];
     }
 
     /**
      * Set the binding fields for the route.
      *
-     * @param  array  $bindingFields
+     * @param array $bindingFields
+     *
      * @return $this
      */
     public function setBindingFields(array $bindingFields) {
@@ -511,7 +531,8 @@ class CRouting_Route {
     /**
      * Get the parent parameter of the given parameter.
      *
-     * @param  string  $parameter
+     * @param string $parameter
+     *
      * @return string
      */
     public function parentOfParameter($parameter) {
@@ -527,8 +548,9 @@ class CRouting_Route {
     /**
      * Set a default value for the route.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return $this
      */
     public function defaults($key, $value) {
@@ -540,7 +562,8 @@ class CRouting_Route {
     /**
      * Set the default values for the route.
      *
-     * @param  array  $defaults
+     * @param array $defaults
+     *
      * @return $this
      */
     public function setDefaults(array $defaults) {
@@ -552,8 +575,9 @@ class CRouting_Route {
     /**
      * Set a regular expression requirement on the route.
      *
-     * @param  array|string  $name
-     * @param  string|null  $expression
+     * @param array|string $name
+     * @param string|null  $expression
+     *
      * @return $this
      */
     public function where($name, $expression = null) {
@@ -567,8 +591,9 @@ class CRouting_Route {
     /**
      * Parse arguments to the where method into an array.
      *
-     * @param  array|string  $name
-     * @param  string  $expression
+     * @param array|string $name
+     * @param string       $expression
+     *
      * @return array
      */
     protected function parseWhere($name, $expression) {
@@ -578,7 +603,8 @@ class CRouting_Route {
     /**
      * Set a list of regular expression requirements on the route.
      *
-     * @param  array  $wheres
+     * @param array $wheres
+     *
      * @return $this
      */
     public function setWheres(array $wheres) {
@@ -603,7 +629,8 @@ class CRouting_Route {
     /**
      * Set the fallback value.
      *
-     * @param  bool  $isFallback
+     * @param bool $isFallback
+     *
      * @return $this
      */
     public function setFallback($isFallback) {
@@ -651,7 +678,8 @@ class CRouting_Route {
     /**
      * Get or set the domain for the route.
      *
-     * @param  string|null  $domain
+     * @param string|null $domain
+     *
      * @return $this|string|null
      */
     public function domain($domain = null) {
@@ -664,7 +692,8 @@ class CRouting_Route {
         $this->action['domain'] = $parsed->uri;
 
         $this->bindingFields = array_merge(
-                $this->bindingFields, $parsed->bindingFields
+            $this->bindingFields,
+            $parsed->bindingFields
         );
 
         return $this;
@@ -685,13 +714,14 @@ class CRouting_Route {
      * @return string|null
      */
     public function getPrefix() {
-        return carr::get($this->action,'prefix');
+        return carr::get($this->action, 'prefix');
     }
 
     /**
      * Add a prefix to the route URI.
      *
-     * @param  string  $prefix
+     * @param string $prefix
+     *
      * @return $this
      */
     public function prefix($prefix) {
@@ -705,11 +735,12 @@ class CRouting_Route {
     /**
      * Update the "prefix" attribute on the action array.
      *
-     * @param  string  $prefix
+     * @param string $prefix
+     *
      * @return void
      */
     protected function updatePrefixOnAction($prefix) {
-        if (!empty($newPrefix = trim(rtrim($prefix, '/') . '/' . ltrim(carr::get($this->action,'prefix',  ''), '/'), '/'))) {
+        if (!empty($newPrefix = trim(rtrim($prefix, '/') . '/' . ltrim(carr::get($this->action, 'prefix', ''), '/'), '/'))) {
             $this->action['prefix'] = $newPrefix;
         }
     }
@@ -726,7 +757,8 @@ class CRouting_Route {
     /**
      * Set the URI that the route responds to.
      *
-     * @param  string  $uri
+     * @param string $uri
+     *
      * @return $this
      */
     public function setUri($uri) {
@@ -738,15 +770,15 @@ class CRouting_Route {
     /**
      * Parse the route URI and normalize / store any implicit binding fields.
      *
-     * @param  string  $uri
+     * @param string $uri
+     *
      * @return string
      */
     protected function parseUri($uri) {
         $this->bindingFields = [];
-
         return c::tap(CRouting_RouteUri::parse($uri), function ($uri) {
-                    $this->bindingFields = $uri->bindingFields;
-                })->uri;
+            $this->bindingFields = $uri->bindingFields;
+        })->uri;
     }
 
     /**
@@ -755,13 +787,14 @@ class CRouting_Route {
      * @return string|null
      */
     public function getName() {
-        return carr::get($this->action,'as');
+        return carr::get($this->action, 'as');
     }
 
     /**
      * Add or change the route name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return $this
      */
     public function name($name) {
@@ -773,7 +806,8 @@ class CRouting_Route {
     /**
      * Determine whether the route's name matches the given patterns.
      *
-     * @param  mixed  ...$patterns
+     * @param mixed ...$patterns
+     *
      * @return bool
      */
     public function named(...$patterns) {
@@ -782,7 +816,7 @@ class CRouting_Route {
         }
 
         foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $routeName)) {
+            if (cstr::is($pattern, $routeName)) {
                 return true;
             }
         }
@@ -793,7 +827,8 @@ class CRouting_Route {
     /**
      * Set the handler for the route.
      *
-     * @param  \Closure|array|string  $action
+     * @param \Closure|array|string $action
+     *
      * @return $this
      */
     public function uses($action) {
@@ -804,19 +839,20 @@ class CRouting_Route {
         $action = is_string($action) ? $this->addGroupNamespaceToStringUses($action) : $action;
 
         return $this->setAction(array_merge($this->action, $this->parseAction([
-                                    'uses' => $action,
-                                    'controller' => $action,
+            'uses' => $action,
+            'controller' => $action,
         ])));
     }
 
     /**
      * Parse a string based action for the "uses" fluent method.
      *
-     * @param  string  $action
+     * @param string $action
+     *
      * @return string
      */
     protected function addGroupNamespaceToStringUses($action) {
-        $groupStack = last($this->router->getGroupStack());
+        $groupStack = carr::last($this->router->getGroupStack());
 
         if (isset($groupStack['namespace']) && strpos($action, '\\') !== 0) {
             return $groupStack['namespace'] . '\\' . $action;
@@ -831,7 +867,7 @@ class CRouting_Route {
      * @return string
      */
     public function getActionName() {
-        return carr::get($this->action,'controller','Closure');
+        return carr::get($this->action, 'controller', 'Closure');
     }
 
     /**
@@ -846,7 +882,8 @@ class CRouting_Route {
     /**
      * Get the action array or one of its properties for the route.
      *
-     * @param  string|null  $key
+     * @param string|null $key
+     *
      * @return mixed
      */
     public function getAction($key = null) {
@@ -856,7 +893,8 @@ class CRouting_Route {
     /**
      * Set the action array for the route.
      *
-     * @param  array  $action
+     * @param array $action
+     *
      * @return $this
      */
     public function setAction(array $action) {
@@ -882,19 +920,21 @@ class CRouting_Route {
         $this->computedMiddleware = [];
 
         return $this->computedMiddleware = CRouting_Router::uniqueMiddleware(array_merge(
-                                $this->middleware(), $this->controllerMiddleware()
+            $this->middleware(),
+            $this->controllerMiddleware()
         ));
     }
 
     /**
      * Get or set the middlewares attached to the route.
      *
-     * @param  array|string|null  $middleware
+     * @param array|string|null $middleware
+     *
      * @return $this|array
      */
     public function middleware($middleware = null) {
         if (is_null($middleware)) {
-            return (array) (carr::get($this->action,'middleware',  []));
+            return (array) (carr::get($this->action, 'middleware', []));
         }
 
         if (is_string($middleware)) {
@@ -902,7 +942,8 @@ class CRouting_Route {
         }
 
         $this->action['middleware'] = array_merge(
-                (array) (carr::get($this->action,'middleware', [])), $middleware
+            (array) (carr::get($this->action, 'middleware', [])),
+            $middleware
         );
 
         return $this;
@@ -919,19 +960,22 @@ class CRouting_Route {
         }
 
         return $this->controllerDispatcher()->getMiddleware(
-                        $this->getController(), $this->getControllerMethod()
+            $this->getController(),
+            $this->getControllerMethod()
         );
     }
 
     /**
      * Specify middleware that should be removed from the given route.
      *
-     * @param  array|string  $middleware
+     * @param array|string $middleware
+     *
      * @return $this|array
      */
     public function withoutMiddleware($middleware) {
         $this->action['excluded_middleware'] = array_merge(
-                (array) (carr::get($this->action,'excluded_middleware', [])), carr::wrap($middleware)
+            (array) (carr::get($this->action, 'excluded_middleware', [])),
+            carr::wrap($middleware)
         );
 
         return $this;
@@ -943,14 +987,15 @@ class CRouting_Route {
      * @return array
      */
     public function excludedMiddleware() {
-        return (array) (carr::get($this->action,'excluded_middleware', []));
+        return (array) (carr::get($this->action, 'excluded_middleware', []));
     }
 
     /**
      * Specify that the route should not allow concurrent requests from the same session.
      *
-     * @param  int|null  $lockSeconds
-     * @param  int|null  $waitSeconds
+     * @param int|null $lockSeconds
+     * @param int|null $waitSeconds
+     *
      * @return $this
      */
     public function block($lockSeconds = 10, $waitSeconds = 10) {
@@ -990,7 +1035,7 @@ class CRouting_Route {
     /**
      * Get the dispatcher for the route's controller.
      *
-     * @return \Illuminate\Routing\Contracts\ControllerDispatcher
+     * @return CController_ControllerDispatcher
      */
     public function controllerDispatcher() {
         /*
@@ -1028,9 +1073,13 @@ class CRouting_Route {
      */
     public function toSymfonyRoute() {
         return new SymfonyRoute(
-                preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri()), $this->getOptionalParameterNames(),
-                $this->wheres, ['utf8' => true, 'action' => $this->action],
-                $this->getDomain() ?: '', [], $this->methods
+            preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->uri()),
+            $this->getOptionalParameterNames(),
+            $this->wheres,
+            ['utf8' => true, 'action' => $this->action],
+            $this->getDomain() ?: '',
+            [],
+            $this->methods
         );
     }
 
@@ -1057,7 +1106,8 @@ class CRouting_Route {
     /**
      * Set the router instance on the route.
      *
-     * @param  CRouting_Router  $router
+     * @param CRouting_Router $router
+     *
      * @return $this
      */
     public function setRouter(CRouting_Router $router) {
@@ -1069,7 +1119,8 @@ class CRouting_Route {
     /**
      * Set the container instance on the route.
      *
-     * @param  CContainer_Container  $container
+     * @param CContainer_Container $container
+     *
      * @return $this
      */
     public function setContainer(CContainer_Container $container) {
@@ -1100,11 +1151,11 @@ class CRouting_Route {
     /**
      * Dynamically access route parameters.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function __get($key) {
         return $this->parameter($key);
     }
-
 }

@@ -449,11 +449,11 @@ class CRouting_UrlGenerator {
      *
      * @return string
      *
-     * @throws \Illuminate\Routing\Exceptions\UrlGenerationException
+     * @throws CRouting_Exception_UrlGenerationException
      */
     public function toRoute($route, $parameters, $absolute) {
         $parameters = c::collect(carr::wrap($parameters))->map(function ($value, $key) use ($route) {
-            return $value instanceof UrlRoutable && $route->bindingFieldFor($key) ? $value->{$route->bindingFieldFor($key)} : $value;
+            return $value instanceof CRouting_UrlRoutableInterface && $route->bindingFieldFor($key) ? $value->{$route->bindingFieldFor($key)} : $value;
         })->all();
 
         return $this->routeUrl()->to(
@@ -512,7 +512,7 @@ class CRouting_UrlGenerator {
         $parameters = carr::wrap($parameters);
 
         foreach ($parameters as $key => $parameter) {
-            if ($parameter instanceof UrlRoutable) {
+            if ($parameter instanceof CRouting_UrlRoutableInterface) {
                 $parameters[$key] = $parameter->getRouteKey();
             }
         }

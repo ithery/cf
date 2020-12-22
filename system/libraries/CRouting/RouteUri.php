@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CRouting_RouteUri {
-
     /**
      * The route URI.
      *
@@ -24,8 +23,9 @@ class CRouting_RouteUri {
     /**
      * Create a new route URI instance.
      *
-     * @param  string  $uri
-     * @param  array  $bindingFields
+     * @param string $uri
+     * @param array  $bindingFields
+     *
      * @return void
      */
     public function __construct($uri, array $bindingFields = []) {
@@ -36,7 +36,8 @@ class CRouting_RouteUri {
     /**
      * Parse the given URI.
      *
-     * @param  string  $uri
+     * @param string $uri
+     *
      * @return static
      */
     public static function parse($uri) {
@@ -58,5 +59,4 @@ class CRouting_RouteUri {
 
         return new static($uri, $bindingFields);
     }
-
 }
