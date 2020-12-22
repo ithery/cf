@@ -6,10 +6,9 @@
  * @author Hery
  */
 trait CBase_Trait_UtilsTrait {
-
     public static function resolveLibraryClassName($name, $folder) {
-        $name = str_replace("/", "_", $name);
-        $names = explode("_", $name);
+        $name = str_replace('/', '_', $name);
+        $names = explode('_', $name);
         if ($folder != null) {
             $folder = ucfirst($folder);
         }
@@ -19,5 +18,4 @@ trait CBase_Trait_UtilsTrait {
         }
         return $prefix . $folder . '_' . $name;
     }
-
 }

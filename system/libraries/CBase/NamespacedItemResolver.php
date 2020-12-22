@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CBase_NamespacedItemResolver {
-
     /**
      * A cache of the parsed items.
      *
@@ -18,7 +11,8 @@ class CBase_NamespacedItemResolver {
     /**
      * Parse a key into namespace, group, and item.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return array
      */
     public function parseKey($key) {
@@ -49,7 +43,8 @@ class CBase_NamespacedItemResolver {
     /**
      * Parse an array of basic segments.
      *
-     * @param  array  $segments
+     * @param array $segments
+     *
      * @return array
      */
     protected function parseBasicSegments(array $segments) {
@@ -69,7 +64,8 @@ class CBase_NamespacedItemResolver {
     /**
      * Parse an array of namespaced segments.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return array
      */
     protected function parseNamespacedSegments($key) {
@@ -81,7 +77,8 @@ class CBase_NamespacedItemResolver {
         $itemSegments = explode('.', $item);
 
         $groupAndItem = array_slice(
-                $this->parseBasicSegments($itemSegments), 1
+            $this->parseBasicSegments($itemSegments),
+            1
         );
 
         return array_merge([$namespace], $groupAndItem);
@@ -90,12 +87,12 @@ class CBase_NamespacedItemResolver {
     /**
      * Set the parsed value of a key.
      *
-     * @param  string  $key
-     * @param  array   $parsed
+     * @param string $key
+     * @param array  $parsed
+     *
      * @return void
      */
     public function setParsedKey($key, $parsed) {
         $this->parsed[$key] = $parsed;
     }
-
 }

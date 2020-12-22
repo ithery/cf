@@ -1,18 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
- * @license Ittron Global Teknologi
- */
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @mixin \CBase_MessageBag
  */
 class CBase_ViewErrorBag implements Countable {
-
     /**
      * The array of the view error bags.
      *
@@ -23,7 +16,8 @@ class CBase_ViewErrorBag implements Countable {
     /**
      * Checks if a named MessageBag exists in the bags.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function hasBag($key = 'default') {
@@ -33,7 +27,8 @@ class CBase_ViewErrorBag implements Countable {
     /**
      * Get a MessageBag instance from the bags.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return CBase_MessageBag
      */
     public function getBag($key) {
@@ -52,8 +47,9 @@ class CBase_ViewErrorBag implements Countable {
     /**
      * Add a new MessageBag instance to the bags.
      *
-     * @param  string  $key
-     * @param  CBase_MessageBag  $bag
+     * @param string           $key
+     * @param CBase_MessageBag $bag
+     *
      * @return $this
      */
     public function put($key, $bag) {
@@ -83,8 +79,9 @@ class CBase_ViewErrorBag implements Countable {
     /**
      * Dynamically call methods on the default bag.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters) {
@@ -94,8 +91,9 @@ class CBase_ViewErrorBag implements Countable {
     /**
      * Dynamically access a view error bag.
      *
-     * @param  string  $key
-     * @return \Illuminate\Contracts\Support\MessageBag
+     * @param string $key
+     *
+     * @return CBase_MessageBag
      */
     public function __get($key) {
         return $this->getBag($key);
@@ -104,8 +102,9 @@ class CBase_ViewErrorBag implements Countable {
     /**
      * Dynamically set a view error bag.
      *
-     * @param  string  $key
-     * @param  \Illuminate\Contracts\Support\MessageBag  $value
+     * @param string           $key
+     * @param CBase_MessageBag $value
+     *
      * @return void
      */
     public function __set($key, $value) {
@@ -120,5 +119,4 @@ class CBase_ViewErrorBag implements Countable {
     public function __toString() {
         return (string) $this->getBag('default');
     }
-
 }

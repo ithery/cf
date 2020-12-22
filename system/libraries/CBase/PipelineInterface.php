@@ -6,11 +6,11 @@
  * @author Hery
  */
 interface CBase_PipelineInterface {
-
     /**
      * Set the traveler object being sent on the pipeline.
      *
-     * @param  mixed  $traveler
+     * @param mixed $traveler
+     *
      * @return $this
      */
     public function send($traveler);
@@ -18,7 +18,8 @@ interface CBase_PipelineInterface {
     /**
      * Set the stops of the pipeline.
      *
-     * @param  dynamic|array  $stops
+     * @param dynamic|array $stops
+     *
      * @return $this
      */
     public function through($stops);
@@ -26,7 +27,8 @@ interface CBase_PipelineInterface {
     /**
      * Set the method to call on the stops.
      *
-     * @param  string  $method
+     * @param string $method
+     *
      * @return $this
      */
     public function via($method);
@@ -34,7 +36,8 @@ interface CBase_PipelineInterface {
     /**
      * Run the pipeline with a final destination callback.
      *
-     * @param  \Closure  $destination
+     * @param \Closure $destination
+     *
      * @return mixed
      */
     public function then(Closure $destination);
