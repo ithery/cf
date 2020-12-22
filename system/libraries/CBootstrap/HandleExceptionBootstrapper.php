@@ -9,7 +9,6 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\ErrorHandler\Error\FatalError;
 
 class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbstract {
-
     /**
      * Reserved memory so that errors can be displayed properly on memory exhaustion.
      *
@@ -23,10 +22,7 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
      * @return void
      */
     public function bootstrap() {
-
         self::$reservedMemory = str_repeat('x', 10240);
-
-
 
         //error_reporting(-1);
 
@@ -44,11 +40,12 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
     /**
      * Convert PHP errors to ErrorException instances.
      *
-     * @param  int  $level
-     * @param  string  $message
-     * @param  string  $file
-     * @param  int  $line
-     * @param  array  $context
+     * @param int    $level
+     * @param string $message
+     * @param string $file
+     * @param int    $line
+     * @param array  $context
+     *
      * @return void
      *
      * @throws \ErrorException
@@ -66,7 +63,8 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
      * the HTTP and Console kernels. But, fatal error exceptions must
      * be handled differently since they are not normal exceptions.
      *
-     * @param  \Throwable  $e
+     * @param \Throwable $e
+     *
      * @return void
      */
     public function handleException($e) {
@@ -88,7 +86,8 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
     /**
      * Render an exception to the console.
      *
-     * @param  \Throwable  $e
+     * @param \Throwable $e
+     *
      * @return void
      */
     protected function renderForConsole($e) {
@@ -98,7 +97,8 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
     /**
      * Render an exception as an HTTP response and send it.
      *
-     * @param  \Throwable  $e
+     * @param \Throwable $e
+     *
      * @return void
      */
     protected function renderHttpResponse($e) {
@@ -119,8 +119,9 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
     /**
      * Create a new fatal error instance from an error array.
      *
-     * @param  array  $error
-     * @param  int|null  $traceOffset
+     * @param array    $error
+     * @param int|null $traceOffset
+     *
      * @return \Symfony\Component\ErrorHandler\Error\FatalError
      */
     protected function fatalErrorFromPhpError(array $error, $traceOffset = null) {
@@ -130,7 +131,8 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
     /**
      * Determine if the error type is fatal.
      *
-     * @param  int  $type
+     * @param int $type
+     *
      * @return bool
      */
     protected function isFatal($type) {
@@ -145,5 +147,4 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
     protected function getExceptionHandler() {
         return CException::exceptionHandler();
     }
-
 }

@@ -6,9 +6,8 @@
  * @author Hery
  */
 abstract class CBootstrap_BootstrapperAbstract {
-
     /**
-     * return void
+     * @return void
      */
-    public abstract function bootstrap();
+    abstract public function bootstrap();
 }

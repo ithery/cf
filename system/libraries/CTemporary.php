@@ -4,14 +4,14 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 10:02:03 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ * @since Feb 16, 2019, 10:02:03 PM
  */
 class CTemporary {
 
     /**
-     * 
-     * @return CStorage_FilesystemInterface
+     *
+     * @return CStorage_Adapter
      */
     public static function disk($diskName = null) {
         return CStorage::instance()->temp($diskName);
@@ -29,7 +29,7 @@ class CTemporary {
     }
 
     /**
-     * 
+     *
      * @param string $path
      * @return \CTemporary_Directory
      */
@@ -38,7 +38,7 @@ class CTemporary {
     }
 
     /**
-     * 
+     *
      * @param string $filename
      * @return \CTemporary_File
      */
@@ -47,7 +47,7 @@ class CTemporary {
     }
 
     /**
-     * 
+     *
      * @return string
      */
     public static function getDirectory($folder = null) {
@@ -65,7 +65,7 @@ class CTemporary {
     }
 
     /**
-     * 
+     *
      * @param string $path
      * @return string
      */
@@ -78,7 +78,7 @@ class CTemporary {
     }
 
     /**
-     * 
+     *
      * @param string $path
      * @param string $folder
      * @return string
@@ -93,7 +93,7 @@ class CTemporary {
     }
 
     /**
-     * 
+     *
      * @param string $folder
      * @param string $filename
      * @return string
@@ -152,7 +152,7 @@ class CTemporary {
     }
 
     /**
-     * 
+     *
      * @param string $folder
      * @param string $filename
      * @return string
@@ -179,7 +179,7 @@ class CTemporary {
     }
 
     /**
-     * 
+     *
      * @param string $folder
      * @param string $filename
      * @return bool
@@ -191,7 +191,7 @@ class CTemporary {
     }
 
     /**
-     * 
+     *
      * @param string $folder
      * @param string $filename
      * @return bool
@@ -233,7 +233,7 @@ class CTemporary {
     }
 
     /**
-     * 
+     *
      * @return CTemporary_Instance
      */
     public static function local() {
@@ -245,7 +245,7 @@ class CTemporary {
     }
 
     /**
-     * 
+     *
      * @return CTemporary_Instance
      */
     public static function instance($disk = null) {
