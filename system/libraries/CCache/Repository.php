@@ -1,19 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 1:50:14 PM
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CCache_Repository implements ArrayAccess {
-
     use CTrait_Helper_InteractsWithTime;
 
     /**
-     *
-     * @var CCache_DriverAbstract 
+     * @var CCache_DriverAbstract
      */
     protected $driver;
 
@@ -34,16 +30,16 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Create a new cache repository instance.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return void
      */
-    public function __construct($options = array()) {
+    public function __construct($options = []) {
         if ($options instanceof CCache_DriverAbstract) {
             $this->driver = $options;
         } else {
-
             $driverName = carr::get($options, 'driver', 'Null');
-            $driverOption = carr::get($options, 'options', array());
+            $driverOption = carr::get($options, 'options', []);
 
             $this->driver = $this->resolveDriver($driverName, $driverOption);
         }
@@ -64,7 +60,8 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Determine if an item exists in the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function has($key) {
@@ -74,7 +71,8 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Determine if an item doesn't exist in the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function missing($key) {
@@ -84,12 +82,12 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
-     * @param  mixed   $default
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
     public function get($key, $default = null) {
-
         $value = $this->driver->get($this->itemKey($key));
         // If we could not find the cache value, we will fire the missed event and get
         // the default value for this cache value. This default could be a callback
@@ -103,13 +101,13 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Store an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  \DateTimeInterface|\DateInterval|int|null  $ttl
+     * @param string                                    $key
+     * @param mixed                                     $value
+     * @param \DateTimeInterface|\DateInterval|int|null $ttl
+     *
      * @return bool
      */
     public function put($key, $value, $ttl = null) {
-
         if ($ttl === null) {
             return $this->forever($key, $value);
         }
@@ -129,15 +127,16 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function forget($key) {
         return CF::tap($this->driver->forget($this->itemKey($key)), function ($result) use ($key) {
-                    if ($result) {
-                        //event fired for success
-                    }
-                });
+            if ($result) {
+                //event fired for success
+            }
+        });
     }
 
     /**
@@ -157,7 +156,8 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Format the key for a cache item.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return string
      */
     protected function itemKey($key) {
@@ -176,7 +176,8 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Set the default cache time in seconds.
      *
-     * @param  int|null  $seconds
+     * @param int|null $seconds
+     *
      * @return $this
      */
     public function setDefaultCacheTime($seconds) {
@@ -196,7 +197,8 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Determine if a cached value exists.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function offsetExists($key) {
@@ -206,7 +208,8 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function offsetGet($key) {
@@ -216,8 +219,9 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Store an item in the cache for the default time.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function offsetSet($key, $value) {
@@ -227,7 +231,8 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return void
      */
     public function offsetUnset($key) {
@@ -237,7 +242,8 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Calculate the number of seconds for the given TTL.
      *
-     * @param  \DateTimeInterface|\DateInterval|int  $ttl
+     * @param \DateTimeInterface|\DateInterval|int $ttl
+     *
      * @return int
      */
     protected function getSeconds($ttl) {
@@ -260,8 +266,9 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function forever($key, $value) {
@@ -273,9 +280,10 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Get an item from the cache, or store the default value.
      *
-     * @param  string  $key
-     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
-     * @param  \Closure  $callback
+     * @param string                                     $key
+     * @param \DateTimeInterface|\DateInterval|float|int $minutes
+     * @param \Closure                                   $callback
+     *
      * @return mixed
      */
     public function remember($key, $minutes, Closure $callback) {
@@ -296,7 +304,8 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Begin executing a new tags operation if the store supports it.
      *
-     * @param  array|mixed  $names
+     * @param array|mixed $names
+     *
      * @return \Illuminate\Cache\TaggedCache
      *
      * @throws \BadMethodCallException
@@ -318,11 +327,11 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Set the event dispatcher instance.
      *
-     * @param  CEvent_Dispatcher  $events
+     * @param CEvent_Dispatcher $events
+     *
      * @return void
      */
     public function setEventDispatcher(CEvent_Dispatcher $events) {
         $this->events = $events;
     }
-
 }

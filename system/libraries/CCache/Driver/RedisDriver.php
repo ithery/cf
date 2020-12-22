@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
-
     /**
      * The Redis factory implementation.
      *
@@ -32,9 +25,10 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Create a new Redis store.
      *
-     * @param  CRedis  $redis
-     * @param  string  $prefix
-     * @param  string  $connection
+     * @param CRedis $redis
+     * @param string $prefix
+     * @param string $connection
+     *
      * @return void
      */
     public function __construct(CRedis $redis, $prefix = '', $connection = 'default') {
@@ -46,7 +40,8 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return mixed
      */
     public function get($key) {
@@ -59,14 +54,15 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
      *
      * Items not found in the cache will have a null value.
      *
-     * @param  array  $keys
+     * @param array $keys
+     *
      * @return array
      */
     public function many(array $keys) {
         $results = [];
         $values = $this->connection()->mget(array_map(function ($key) {
-                    return $this->prefix . $key;
-                }, $keys));
+            return $this->prefix . $key;
+        }, $keys));
         foreach ($values as $index => $value) {
             $results[$keys[$index]] = !is_null($value) ? $this->unserialize($value) : null;
         }
@@ -76,22 +72,26 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int  $seconds
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
      * @return bool
      */
     public function put($key, $value, $seconds) {
         return (bool) $this->connection()->setex(
-                        $this->prefix . $key, (int) max(1, $seconds), $this->serialize($value)
+            $this->prefix . $key,
+            (int) max(1, $seconds),
+            $this->serialize($value)
         );
     }
 
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
-     * @param  int  $seconds
+     * @param array $values
+     * @param int   $seconds
+     *
      * @return bool
      */
     public function putMany(array $values, $seconds) {
@@ -108,23 +108,29 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Store an item in the cache if the key doesn't exist.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int  $seconds
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
      * @return bool
      */
     public function add($key, $value, $seconds) {
         $lua = "return redis.call('exists',KEYS[1])<1 and redis.call('setex',KEYS[1],ARGV[2],ARGV[1])";
         return (bool) $this->connection()->eval(
-                        $lua, 1, $this->prefix . $key, $this->serialize($value), (int) max(1, $seconds)
+            $lua,
+            1,
+            $this->prefix . $key,
+            $this->serialize($value),
+            (int) max(1, $seconds)
         );
     }
 
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int
      */
     public function increment($key, $value = 1) {
@@ -134,8 +140,9 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int
      */
     public function decrement($key, $value = 1) {
@@ -145,8 +152,9 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return bool
      */
     public function forever($key, $value) {
@@ -156,9 +164,10 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Get a lock instance.
      *
-     * @param  string $name
-     * @param  int $seconds
-     * @param  string|null $owner
+     * @param string      $name
+     * @param int         $seconds
+     * @param string|null $owner
+     *
      * @return \Illuminate\Contracts\Cache\Lock
      */
     public function lock($name, $seconds = 0, $owner = null) {
@@ -168,8 +177,9 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Restore a lock instance using the owner identifier.
      *
-     * @param  string  $name
-     * @param  string  $owner
+     * @param string $name
+     * @param string $owner
+     *
      * @return \Illuminate\Contracts\Cache\Lock
      */
     public function restoreLock($name, $owner) {
@@ -179,7 +189,8 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function forget($key) {
@@ -199,12 +210,14 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Begin executing a new tags operation.
      *
-     * @param  array|mixed  $names
+     * @param array|mixed $names
+     *
      * @return \Illuminate\Cache\RedisTaggedCache
      */
     public function tags($names) {
         return new CCache_Driver_RedisDriver_RedisTaggedCache(
-                $this, new CCache_TagSet($this, is_array($names) ? $names : func_get_args())
+            $this,
+            new CCache_TagSet($this, is_array($names) ? $names : func_get_args())
         );
     }
 
@@ -220,7 +233,8 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Set the connection name to be used.
      *
-     * @param  string  $connection
+     * @param string $connection
+     *
      * @return void
      */
     public function setConnection($connection) {
@@ -248,7 +262,8 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Set the cache key prefix.
      *
-     * @param  string  $prefix
+     * @param string $prefix
+     *
      * @return void
      */
     public function setPrefix($prefix) {
@@ -258,7 +273,8 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Serialize the value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return mixed
      */
     protected function serialize($value) {
@@ -268,11 +284,11 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Unserialize the value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return mixed
      */
     protected function unserialize($value) {
         return is_numeric($value) ? $value : unserialize($value);
     }
-
 }
