@@ -9,7 +9,6 @@ use phpseclib\Crypt\RSA;
 use phpseclib\File\X509;
 
 class CDevSuite_Windows_Site extends CDevSuite_Site {
-
     /**
      * Get all certificates from config folder.
      *
@@ -19,12 +18,12 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
      */
     public function getCertificates($path) {
         return c::collect($this->files->scanDir($path))->filter(function ($value, $key) {
-                    return cstr::endsWith($value, '.crt');
-                })->map(function ($cert) {
-                    $certWithoutSuffix = substr($cert, 0, -4);
+            return cstr::endsWith($value, '.crt');
+        })->map(function ($cert) {
+            $certWithoutSuffix = substr($cert, 0, -4);
 
-                    return substr($certWithoutSuffix, 0, strrpos($certWithoutSuffix, '.'));
-                })->flip();
+            return substr($certWithoutSuffix, 0, strrpos($certWithoutSuffix, '.'));
+        })->flip();
     }
 
     /**
@@ -51,8 +50,6 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
         }
     }
 
-    
-
     /**
      * Secure the given host with TLS.
      *
@@ -68,11 +65,11 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
         $this->createCertificate($url);
 
         $this->files->putAsUser(
-                CDevSuite::homePath() . "/Nginx/$url.conf", $this->buildSecureNginxServer($url)
+            CDevSuite::homePath() . "/Nginx/$url.conf",
+            $this->buildSecureNginxServer($url)
         );
     }
 
-    
     /**
      * Create and trust a certificate for the given URL.
      *
@@ -109,6 +106,8 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
      * Create the signing request for the TLS certificate.
      *
      * @param string $keyPath
+     * @param mixed  $url
+     * @param mixed  $csrPath
      *
      * @return void
      */
@@ -184,7 +183,9 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
         $path = $this->certificatesPath();
 
         return str_replace(
-                ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_SITE', 'DEVSUITE_CERT', 'DEVSUITE_KEY', 'HOME_PATH'], [CDevSuite::homePath(), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $url, $path . '/' . $url . '.crt', $path . '/' . $url . '.key', $_SERVER['HOME']], $this->files->get(CDevSuite::stubsPath() . 'secure.devsuite.conf')
+            ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_SITE', 'DEVSUITE_CERT', 'DEVSUITE_KEY', 'HOME_PATH'],
+            [CDevSuite::homePath(), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $url, $path . '/' . $url . '.crt', $path . '/' . $url . '.key', $_SERVER['HOME']],
+            $this->files->get(CDevSuite::stubsPath() . 'secure.devsuite.conf')
         );
     }
 
@@ -206,5 +207,4 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
             $this->cli->run(sprintf('cmd "/C certutil -delstore "Root" "%s""', $url));
         }
     }
-
 }

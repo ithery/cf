@@ -1,19 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CDevSuite_ServiceManager_Systemd extends CDevSuite_ServiceManager {
-
     public $cli;
 
     /**
      * Create a new Brew instance.
-     *
-     * @param CommandLine $cli CommandLine object
      */
     public function __construct() {
         $this->cli = CDevSuite::commandLine();
@@ -185,10 +176,10 @@ class CDevSuite_ServiceManager_Systemd extends CDevSuite_ServiceManager {
     public function isAvailable() {
         try {
             $output = $this->cli->run(
-                    'which systemctl',
-                    function ($exitCode, $output) {
-                throw new DomainException('Systemd not available');
-            }
+                'which systemctl',
+                function ($exitCode, $output) {
+                    throw new DomainException('Systemd not available');
+                }
             );
 
             return $output != '';
@@ -206,12 +197,12 @@ class CDevSuite_ServiceManager_Systemd extends CDevSuite_ServiceManager {
      */
     public function getRealService($service) {
         return c::collect($service)->first(
-                        function ($service) {
-                    return strpos($this->cli->run("systemctl status {$service} | grep Loaded"), 'Loaded: loaded');
-                },
-                        function () {
-                    throw new DomainException("Unable to determine service name.");
-                }
+            function ($service) {
+                return strpos($this->cli->run("systemctl status {$service} | grep Loaded"), 'Loaded: loaded');
+            },
+            function () {
+                throw new DomainException('Unable to determine service name.');
+            }
         );
     }
 
@@ -223,14 +214,13 @@ class CDevSuite_ServiceManager_Systemd extends CDevSuite_ServiceManager {
      * @return void
      */
     public function installDevSuiteDns($files) {
-        info("Installing DevSuite DNS service...");
+        CDevSuite::info('Installing DevSuite DNS service...');
 
         $files->put(
-                '/etc/systemd/system/devsuite-dns.service',
-                $files->get(CDevSuite::stubsPath() . 'init/systemd')
+            '/etc/systemd/system/devsuite-dns.service',
+            $files->get(CDevSuite::stubsPath() . 'init/systemd')
         );
 
         $this->enable('devsuite-dns');
     }
-
 }

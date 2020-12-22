@@ -1,19 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
-
     public $cli;
 
     /**
      * Create a new Brew instance.
-     *
-     * @param CommandLine $cli CommandLine object
      */
     public function __construct() {
         $this->cli = CDevSuite::commandLine();
@@ -78,9 +69,9 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
         $services = is_array($services) ? $services : func_get_args();
 
         foreach ($services as $service) {
-            if ($this->_hasSystemd()) {
+            if ($this->hasSystemd()) {
                 $status = $this->cli->run(
-                        'systemctl status ' . $this->getRealService($service) . ' | grep "Active:"'
+                    'systemctl status ' . $this->getRealService($service) . ' | grep "Active:"'
                 );
 
                 $running = strpos(trim($status), 'running');
@@ -128,7 +119,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
      * @return void
      */
     public function disable($services) {
-        if ($this->_hasSystemd()) {
+        if ($this->hasSystemd()) {
             $services = is_array($services) ? $services : func_get_args();
 
             foreach ($services as $service) {
@@ -168,7 +159,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
      * @return void
      */
     public function enable($services) {
-        if ($this->_hasSystemd()) {
+        if ($this->hasSystemd()) {
             $services = is_array($services) ? $services : func_get_args();
 
             foreach ($services as $service) {
@@ -218,10 +209,10 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
     public function isAvailable() {
         try {
             $output = $this->cli->run(
-                    'which service',
-                    function ($exitCode, $output) {
-                throw new DomainException('Service not available');
-            }
+                'which service',
+                function ($exitCode, $output) {
+                    throw new DomainException('Service not available');
+                }
             );
 
             return $output != '';
@@ -239,15 +230,15 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
      */
     public function getRealService($service) {
         return c::collect($service)->first(
-                        function ($service) {
-                    return !strpos(
-                                    $this->cli->run('service ' . $service . ' status'),
-                                    'not-found'
-                    );
-                },
-                        function () {
-                    throw new DomainException("Unable to determine service name.");
-                }
+            function ($service) {
+                return !strpos(
+                    $this->cli->run('service ' . $service . ' status'),
+                    'not-found'
+                );
+            },
+            function () {
+                throw new DomainException('Unable to determine service name.');
+            }
         );
     }
 
@@ -256,13 +247,13 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
      *
      * @return bool
      */
-    private function _hasSystemd() {
+    private function hasSystemd() {
         try {
             $this->cli->run(
-                    'which systemctl',
-                    function ($exitCode, $output) {
-                throw new DomainException('Systemd not available');
-            }
+                'which systemctl',
+                function ($exitCode, $output) {
+                    throw new DomainException('Systemd not available');
+                }
             );
 
             return true;
@@ -279,18 +270,18 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
      * @return void
      */
     public function installDevSuiteDns($files) {
-        CDevSuite::info("Installing devsuite DNS service...");
+        CDevSuite::info('Installing devsuite DNS service...');
 
         $servicePath = '/etc/init.d/devsuite-dns';
         $serviceFile = CDevSuite::stubsPath() . 'init/sysvinit';
-        $hasSystemd = $this->_hasSystemd();
+        $hasSystemd = $this->hasSystemd();
 
         if ($hasSystemd) {
             $servicePath = '/etc/systemd/system/devsuite-dns.service';
             $serviceFile = CDevSuite::stubsPath() . 'init/systemd';
         }
 
-        $files->copyAsRoot($serviceFile,$servicePath);
+        $files->copyAsRoot($serviceFile, $servicePath);
 
         if (!$hasSystemd) {
             $this->cli->run("sudo chmod +x $servicePath");
@@ -298,5 +289,4 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
 
         $this->enable('devsuite-dns');
     }
-
 }

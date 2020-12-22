@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
-
     protected $requiredFiles = [
         'winsw.exe',
         'php71.ps1',
@@ -48,12 +47,12 @@ class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
         'acrylic/License.txt',
         'acrylic/Readme.txt',
     ];
-    
+
     protected $requiredFolders = [
         'nginx/logs',
         'nginx/temp',
     ];
-    
+
     protected $requiredMariaDBFiles = [
         'mariadb/bin/mysql.exe',
         'mariadb/bin/mysqld.exe',
@@ -151,5 +150,4 @@ class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
         'mariadb/share/errmsg-utf8.txt',
         'mariadb/share/english/errmsg.sys',
     ];
-
 }

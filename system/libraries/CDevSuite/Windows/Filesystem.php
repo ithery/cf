@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Windows_Filesystem extends CDevSuite_Filesystem {
-
     /**
      * Create a symlink to the given target for the non-root user.
      *
@@ -40,10 +39,8 @@ class CDevSuite_Windows_Filesystem extends CDevSuite_Filesystem {
             $link = pathinfo($path, PATHINFO_BASENAME);
 
             if (is_dir($path)) {
-                $command = sprintf('rmdir "%s"',$path);
+                $command = sprintf('rmdir "%s"', $path);
                 CDevSuite::commandLine()->run($command);
-                
-                //exec("cd \"{$dir}\" && rmdir {$link}");
             } else {
                 @unlink($path);
             }
@@ -60,7 +57,6 @@ class CDevSuite_Windows_Filesystem extends CDevSuite_Filesystem {
      * @return bool
      */
     public function isLink($path) {
-
         $realpath = realpath($path);
 
         if ($realpath !== $path) {
@@ -85,5 +81,4 @@ class CDevSuite_Windows_Filesystem extends CDevSuite_Filesystem {
     public function isBrokenLink($path) {
         return is_link($path) || @readlink($path) === false;
     }
-
 }

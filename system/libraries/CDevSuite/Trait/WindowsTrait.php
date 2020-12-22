@@ -6,23 +6,17 @@
  * @author Hery
  */
 trait CDevSuite_Trait_WindowsTrait {
-
     /**
-     *
      * @var CDevSuite_Winsw
      */
     protected static $winsw;
 
-    
-    
     /**
-     *
      * @var CDevSuite_Acrylic
      */
     protected static $acrylic;
-    
+
     /**
-     * 
      * @return CDevSuite_Winsw
      */
     public static function winsw() {
@@ -31,9 +25,8 @@ trait CDevSuite_Trait_WindowsTrait {
         }
         return static::$winsw;
     }
-    
+
     /**
-     * 
      * @return CDevSuite_Acrylic
      */
     public static function acrylic() {
@@ -42,6 +35,4 @@ trait CDevSuite_Trait_WindowsTrait {
         }
         return static::$acrylic;
     }
-
-    
 }
