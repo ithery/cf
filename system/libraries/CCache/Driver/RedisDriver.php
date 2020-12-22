@@ -212,7 +212,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
      *
      * @param array|mixed $names
      *
-     * @return \Illuminate\Cache\RedisTaggedCache
+     * @return CCache_Driver_RedisDriver_RedisTaggedCache
      */
     public function tags($names) {
         return new CCache_Driver_RedisDriver_RedisTaggedCache(
