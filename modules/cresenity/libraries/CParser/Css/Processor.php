@@ -10,7 +10,6 @@ use CParser_Css_Rule_Processor as RuleProcessor;
 use CParser_Css_Rule as Rule;
 
 class CParser_Css_Processor {
-
     /**
      * Get the rules from a given CSS-string
      *
@@ -19,7 +18,7 @@ class CParser_Css_Processor {
      *
      * @return Rule[]
      */
-    public function getRules($css, $existingRules = array()) {
+    public function getRules($css, $existingRules = []) {
         $css = $this->doCleanup($css);
         $rulesProcessor = new RuleProcessor();
         $rules = $rulesProcessor->splitIntoSeparateRules($css);
@@ -36,7 +35,7 @@ class CParser_Css_Processor {
      */
     public function getCssFromStyleTags($html) {
         $css = '';
-        $matches = array();
+        $matches = [];
         $htmlNoComments = preg_replace('|<!--.*?-->|s', '', $html);
         preg_match_all('|<style(?:\s.*)?>(.*)</style>|isU', $htmlNoComments, $matches);
 
@@ -60,8 +59,8 @@ class CParser_Css_Processor {
         // remove media queries
         $css = preg_replace('/@media [^{]*+{([^{}]++|{[^{}]*+})*+}/', '', $css);
 
-        $css = str_replace(array("\r", "\n"), '', $css);
-        $css = str_replace(array("\t"), ' ', $css);
+        $css = str_replace(["\r", "\n"], '', $css);
+        $css = str_replace(["\t"], ' ', $css);
         $css = str_replace('"', '\'', $css);
         $css = preg_replace('|/\*.*?\*/|', '', $css);
         $css = preg_replace('/\s\s++/', ' ', $css);
@@ -69,5 +68,4 @@ class CParser_Css_Processor {
 
         return $css;
     }
-
 }

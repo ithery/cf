@@ -1,28 +1,17 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Symfony\Component\CssSelector\CssSelector;
 use Symfony\Component\CssSelector\CssSelectorConverter;
 use Symfony\Component\CssSelector\Exception\ExceptionInterface;
-
 use CParser_Css_Processor as Processor;
 use CParser_Css_Property_Processor as PropertyProcessor;
 use CParser_Css_Rule_Processor as RuleProcessor;
 
-
 class CParser_CssToInlineStyles {
-
     private $cssConverter;
 
     public function __construct() {
-        if (class_exists('Symfony\Component\CssSelector\CssSelectorConverter')) {
-            $this->cssConverter = new CssSelectorConverter();
-        }
+        $this->cssConverter = new CssSelectorConverter();
     }
 
     /**
@@ -42,7 +31,7 @@ class CParser_CssToInlineStyles {
 
         // get all styles from the style-tags
         $rules = $processor->getRules(
-                $processor->getCssFromStyleTags($html)
+            $processor->getCssFromStyleTags($html)
         );
 
         if ($css !== null) {
@@ -62,13 +51,13 @@ class CParser_CssToInlineStyles {
      *
      * @return \DOMElement
      */
-    public function inlineCssOnElement(\DOMElement $element, array $properties) {
+    public function inlineCssOnElement($element, array $properties) {
         if (empty($properties)) {
             return $element;
         }
 
-        $cssProperties = array();
-        $inlineProperties = array();
+        $cssProperties = [];
+        $inlineProperties = [];
 
         foreach ($this->getInlineStyles($element) as $property) {
             $inlineProperties[$property->getName()] = $property;
@@ -80,7 +69,7 @@ class CParser_CssToInlineStyles {
             }
         }
 
-        $rules = array();
+        $rules = [];
         foreach (array_merge($cssProperties, $inlineProperties) as $property) {
             $rules[] = $property->toString();
         }
@@ -100,9 +89,9 @@ class CParser_CssToInlineStyles {
         $processor = new PropertyProcessor();
 
         return $processor->convertArrayToObjects(
-                        $processor->splitIntoSeparateProperties(
-                                $element->getAttribute('style')
-                        )
+            $processor->splitIntoSeparateProperties(
+                $element->getAttribute('style')
+            )
         );
     }
 
@@ -161,16 +150,11 @@ class CParser_CssToInlineStyles {
 
         $xPath = new \DOMXPath($document);
 
-        usort($rules, array(RuleProcessor::class, 'sortOnSpecificity'));
+        usort($rules, [RuleProcessor::class, 'sortOnSpecificity']);
 
         foreach ($rules as $rule) {
             try {
-                if (null !== $this->cssConverter) {
-                    $expression = $this->cssConverter->toXPath($rule->getSelector());
-                } else {
-                    // Compatibility layer for Symfony 2.7 and older
-                    $expression = CssSelector::toXPath($rule->getSelector());
-                }
+                $expression = $this->cssConverter->toXPath($rule->getSelector());
             } catch (ExceptionInterface $e) {
                 continue;
             }
@@ -183,7 +167,8 @@ class CParser_CssToInlineStyles {
 
             foreach ($elements as $element) {
                 $propertyStorage[$element] = $this->calculatePropertiesToBeApplied(
-                        $rule->getProperties(), $propertyStorage->contains($element) ? $propertyStorage[$element] : array()
+                    $rule->getProperties(),
+                    $propertyStorage->contains($element) ? $propertyStorage[$element] : []
                 );
             }
         }
@@ -234,5 +219,4 @@ class CParser_CssToInlineStyles {
 
         return $cssProperties;
     }
-
 }

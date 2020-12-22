@@ -1,36 +1,34 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
+//@codingStandardsIgnoreStart
 class ctransform {
-
     public static function thousand_separator($rp, $decimal = null, $always_decimal = false) {
-        $minus_str = "";
+        $minus_str = '';
         $rp = floatval($rp);
-        $rp = sprintf('%d',$rp);
+        $rp = sprintf('%d', $rp);
         if (strlen($rp) == 0) {
             return $rp;
         }
         $ds = ccfg::get('decimal_separator');
         if ($ds == null) {
-            $ds = "."; //decimal separator
+            $ds = '.'; //decimal separator
         }
         $ts = ccfg::get('thousand_separator');
         if ($ts == null) {
-            $ts = ","; //thousand separator
+            $ts = ','; //thousand separator
         }
 
-
-        if (strpos($rp, "-") !== false) {
-            $minus_str = substr($rp, 0, strpos($rp, "-") + 1);
-            $rp = substr($rp, strpos($rp, "-") + 1);
+        if (strpos($rp, '-') !== false) {
+            $minus_str = substr($rp, 0, strpos($rp, '-') + 1);
+            $rp = substr($rp, strpos($rp, '-') + 1);
         }
-        $rupiah = "";
-        $float = "";
-        if (strpos($rp, ".") > 0) {
-            $float = substr($rp, strpos($rp, "."));
+        $rupiah = '';
+        $float = '';
+        if (strpos($rp, '.') > 0) {
+            $float = substr($rp, strpos($rp, '.'));
             if (strlen($float) > 3) {
-
                 $char3 = $float[3];
                 if ($char3 >= 5) {
                     $float[2] = $float[2] + 1;
@@ -39,7 +37,7 @@ class ctransform {
                 }
             }
 
-            $rp = substr($rp, 0, strpos($rp, "."));
+            $rp = substr($rp, 0, strpos($rp, '.'));
         }
 
         $p = strlen($rp);
@@ -56,17 +54,18 @@ class ctransform {
             }
         }
 
-        $float = str_replace(".", $ds, $float);
+        $float = str_replace('.', $ds, $float);
         if ($always_decimal == false) {
-            if ($float == ".00")
-                $float = "";
+            if ($float == '.00') {
+                $float = '';
+            }
         }
         $digit = ccfg::get('decimal_digit');
         if ($decimal === null) {
             if ($digit != null) {
-                $float = substr($float, 0, $digit + 1) . "";
-                if ($float == "") {
-                    $float = $ds . str_repeat("0", $digit);
+                $float = substr($float, 0, $digit + 1) . '';
+                if ($float == '') {
+                    $float = $ds . str_repeat('0', $digit);
                 }
             }
         }
@@ -103,7 +102,7 @@ class ctransform {
     }
 
     public static function html_specialchars($x) {
-        return html::specialchars($x);
+        return chtml::specialchars($x);
     }
 
     public static function lang($x) {
@@ -111,21 +110,25 @@ class ctransform {
     }
 
     public static function date_formatted($x) {
-        if (strlen($x) == 0)
+        if (strlen($x) == 0) {
             return $x;
+        }
         $date_format = ccfg::get('date_formatted');
-        if (strlen($date_format) == 0)
+        if (strlen($date_format) == 0) {
             return $x;
+        }
         return date($date_format, strtotime($x));
     }
 
-    public static function long_date_formatted($x, $unformat = FALSE) {
-        if (strlen($x) == 0)
+    public static function long_date_formatted($x, $unformat = false) {
+        if (strlen($x) == 0) {
             return $x;
+        }
         $long_date_format = ccfg::get('long_date_formatted');
-        if (strlen($long_date_format) == 0)
+        if (strlen($long_date_format) == 0) {
             return $x;
-        if ($unformat == TRUE) {
+        }
+        if ($unformat == true) {
             return ctransform::unformat_datetime($x);
         } else {
             return date($long_date_format, strtotime($x));
@@ -156,7 +159,7 @@ class ctransform {
         return date('Y-m-d H:i:s', strtotime($x));
     }
 
-    public static function format_currency($x, $unformat = FALSE) {
+    public static function format_currency($x, $unformat = false) {
         if ($unformat) {
             return self::unformat_currency($x);
         } else {
@@ -167,16 +170,16 @@ class ctransform {
     public static function unformat_currency($x) {
         $ds = ccfg::get('decimal_separator');
         if ($ds == null) {
-            $ds = "."; //decimal separator
+            $ds = '.'; //decimal separator
         }
         $ts = ccfg::get('thousand_separator');
         if ($ts == null) {
-            $ts = ","; //thousand separator
+            $ts = ','; //thousand separator
         }
         $ret = $x;
-        $ret = str_replace($ts, "", $ret);
-        $ret = str_replace($ds, ".", $ret);
+        $ret = str_replace($ts, '', $ret);
+        $ret = str_replace($ds, '.', $ret);
         return $ret;
     }
-
 }
+//@codingStandardsIgnoreEnd

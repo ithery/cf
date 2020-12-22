@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Symfony\Component\CssSelector\Node\Specificity;
 use CParser_Css_Property as Property;
 
 final class CParser_Css_Rule {
-
     /**
      * @var string
      */
@@ -81,5 +74,4 @@ final class CParser_Css_Rule {
     public function getOrder() {
         return $this->order;
     }
-
 }

@@ -1,28 +1,25 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 31, 2020 
- * @license Ittron Global Teknologi
  */
 class CApp_ErrorHandler {
+    public static $errorLang = [
+        E_CF => [1, 'Framework Error', 'Please check the CF documentation for information about the following error.'],
+        E_PAGE_NOT_FOUND => [1, 'Page Not Found', 'The requested page was not found. It may have moved, been deleted, or archived.'],
+        E_DATABASE_ERROR => [1, 'Database Error', 'A database error occurred while performing the requested procedure. Please review the database error below for more information.'],
+        E_RECOVERABLE_ERROR => [1, 'Recoverable Error', 'An error was detected which prevented the loading of this page. If this problem persists, please contact the website administrator.'],
+        E_ERROR => [1, 'Fatal Error', ''],
+        E_USER_ERROR => [1, 'Fatal Error', ''],
+        E_PARSE => [1, 'Syntax Error', ''],
+        E_WARNING => [1, 'Warning Message', ''],
+        E_USER_WARNING => [1, 'Warning Message', ''],
+        E_STRICT => [2, 'Strict Mode Error', ''],
+        E_NOTICE => [2, 'Runtime Message', ''],
+    ];
 
-    public static $errorLang = array(
-        E_CF => array(1, 'Framework Error', 'Please check the CF documentation for information about the following error.'),
-        E_PAGE_NOT_FOUND => array(1, 'Page Not Found', 'The requested page was not found. It may have moved, been deleted, or archived.'),
-        E_DATABASE_ERROR => array(1, 'Database Error', 'A database error occurred while performing the requested procedure. Please review the database error below for more information.'),
-        E_RECOVERABLE_ERROR => array(1, 'Recoverable Error', 'An error was detected which prevented the loading of this page. If this problem persists, please contact the website administrator.'),
-        E_ERROR => array(1, 'Fatal Error', ''),
-        E_USER_ERROR => array(1, 'Fatal Error', ''),
-        E_PARSE => array(1, 'Syntax Error', ''),
-        E_WARNING => array(1, 'Warning Message', ''),
-        E_USER_WARNING => array(1, 'Warning Message', ''),
-        E_STRICT => array(2, 'Strict Mode Error', ''),
-        E_NOTICE => array(2, 'Runtime Message', ''),
-    );
-    
     public static function sendExceptionEmail(Exception $exception, $email = null, $subject = null) {
         $html = static::getHtml($exception);
         $app = CApp::instance();
@@ -36,20 +33,20 @@ class CApp_ErrorHandler {
 
         $ymd = date('Ymd');
         if ($subject == null) {
-            $subject = "Error Cresenity APP - " . $orgName . " on " . crouter::complete_uri() . ' [' . $ymd . ']';
+            $subject = 'Error Cresenity APP - ' . $orgName . ' on ' . crouter::complete_uri() . ' [' . $ymd . ']';
         }
-        $headers = "From: " . strip_tags($orgEmail) . "\r\n";
-        $headers .= "Reply-To: " . strip_tags($orgEmail) . "\r\n";
+        $headers = 'From: ' . strip_tags($orgEmail) . "\r\n";
+        $headers .= 'Reply-To: ' . strip_tags($orgEmail) . "\r\n";
         //$headers .= "CC: susan@example.com\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
 
         $message = $html;
         if ($email == null) {
-            $email = ccfg::get("admin_email");
+            $email = ccfg::get('admin_email');
         }
-        $smtpOptions = array();
-        if (ccfg::get("mail_error_smtp")) {
+        $smtpOptions = [];
+        if (ccfg::get('mail_error_smtp')) {
             $smtpUsername = ccfg::get('smtp_username_error');
             $smtpPassword = ccfg::get('smtp_password_error');
             $smtpHost = ccfg::get('smtp_host_error');
@@ -73,7 +70,7 @@ class CApp_ErrorHandler {
             }
         }
 
-        $ret = cmail::send_smtp($email, $subject . " [FOR ADMINISTRATOR]", $message, array(), array(), array(), $smtpOptions);
+        $ret = cmail::send_smtp($email, $subject . ' [FOR ADMINISTRATOR]', $message, [], [], [], $smtpOptions);
     }
 
     public static function getHtml(Exception $exception) {
@@ -105,18 +102,16 @@ class CApp_ErrorHandler {
         $file = str_replace('\\', '/', realpath($file));
         $file = preg_replace('|^' . preg_quote(DOCROOT) . '|', '', $file);
 
-
         // Test if display_errors is on
         $trace = false;
         $traceArray = false;
-        if ($line != FALSE) {
+        if ($line != false) {
             // Remove the first entry of debug_backtrace(), it is the exception_handler call
             $traceArray = $exception->getTrace();
 
             // Beautify backtrace
             $trace = CF::backtrace($traceArray);
         }
-
 
         $v = CView::factory('cresenity/mail/exception');
         $v->error = $error;
@@ -128,8 +123,6 @@ class CApp_ErrorHandler {
         $v->exception = $exception;
         $html = $v->render();
 
-
         return $html;
     }
-
 }
