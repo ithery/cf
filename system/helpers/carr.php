@@ -960,6 +960,44 @@ class carr {
     }
 
     /**
+     * Cross join the given arrays, returning all possible permutations.
+     *
+     * @param iterable ...$arrays
+     *
+     * @return array
+     */
+    public static function crossJoin(...$arrays) {
+        $results = [[]];
+
+        foreach ($arrays as $index => $array) {
+            $append = [];
+
+            foreach ($results as $product) {
+                foreach ($array as $item) {
+                    $product[$index] = $item;
+
+                    $append[] = $product;
+                }
+            }
+
+            $results = $append;
+        }
+
+        return $results;
+    }
+
+    /**
+     * Divide an array into two arrays. One with keys and the other with values.
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function divide($array) {
+        return [array_keys($array), array_values($array)];
+    }
+
+    /**
      * Check if an item or items exist in an array using "dot" notation.
      *
      * @param \ArrayAccess|array $array
@@ -1043,6 +1081,53 @@ class carr {
         static::forget($array, $key);
 
         return $value;
+    }
+
+    /**
+     * Get one or a specified number of random values from an array.
+     *
+     * @param array      $array
+     * @param int|null   $number
+     * @param bool|false $preserveKeys
+     *
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function random($array, $number = null, $preserveKeys = false) {
+        $requested = is_null($number) ? 1 : $number;
+
+        $count = count($array);
+
+        if ($requested > $count) {
+            throw new InvalidArgumentException(
+                "You requested {$requested} items, but there are only {$count} items available."
+            );
+        }
+
+        if (is_null($number)) {
+            return $array[array_rand($array)];
+        }
+
+        if ((int) $number === 0) {
+            return [];
+        }
+
+        $keys = array_rand($array, $number);
+
+        $results = [];
+
+        if ($preserveKeys) {
+            foreach ((array) $keys as $key) {
+                $results[$key] = $array[$key];
+            }
+        } else {
+            foreach ((array) $keys as $key) {
+                $results[] = $array[$key];
+            }
+        }
+
+        return $results;
     }
 
     /**
