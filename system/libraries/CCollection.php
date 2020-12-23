@@ -282,7 +282,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         (new static(func_get_args()))
             ->push($this)
             ->each(function ($item) {
-                (new Dumper)->dump($item);
+                (new Illuminate\Support\Debug\Dumper)->dump($item);
             });
 
         return $this;
