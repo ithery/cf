@@ -18,10 +18,10 @@ class CHTTP_UploadedFile extends SymfonyUploadedFile {
     /**
      * Begin creating a new file fake.
      *
-     * @return CTesting_FileFactory
+     * @return CHTTP_Testing_FileFactory
      */
     public static function fake() {
-        return new CTesting_FileFactory;
+        return new CHTTP_Testing_FileFactory;
     }
 
     /**

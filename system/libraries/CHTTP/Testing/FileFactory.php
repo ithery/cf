@@ -6,13 +6,13 @@
  * @author Hery
  */
 class CHTTP_Testing_FileFactory {
-
     /**
      * Create a new fake file.
      *
-     * @param  string  $name
-     * @param  string|int  $kilobytes
-     * @param  string|null  $mimeType
+     * @param string      $name
+     * @param string|int  $kilobytes
+     * @param string|null $mimeType
+     *
      * @return CHttp_Testing_File
      */
     public function create($name, $kilobytes = 0, $mimeType = null) {
@@ -29,8 +29,9 @@ class CHTTP_Testing_FileFactory {
     /**
      * Create a new fake file with content.
      *
-     * @param  string  $name
-     * @param  string  $content
+     * @param string $name
+     * @param string $content
+     *
      * @return CHTTP_Testing_File
      */
     public function createWithContent($name, $content) {
@@ -46,23 +47,30 @@ class CHTTP_Testing_FileFactory {
     /**
      * Create a new fake image.
      *
-     * @param  string  $name
-     * @param  int  $width
-     * @param  int  $height
+     * @param string $name
+     * @param int    $width
+     * @param int    $height
+     *
      * @return CHTTP_Testing_File
      */
     public function image($name, $width = 10, $height = 10) {
-        return new CHTTP_Testing_FileFile($name, $this->generateImage(
-                        $width, $height, cstr::endsWith(Str::lower($name), ['.jpg', '.jpeg']) ? 'jpeg' : 'png'
-        ));
+        return new CHTTP_Testing_File(
+            $name,
+            $this->generateImage(
+                $width,
+                $height,
+                cstr::endsWith(cstr::lower($name), ['.jpg', '.jpeg']) ? 'jpeg' : 'png'
+            )
+        );
     }
 
     /**
      * Generate a dummy image of the given width and height.
      *
-     * @param  int  $width
-     * @param  int  $height
-     * @param  string  $type
+     * @param int    $width
+     * @param int    $height
+     * @param string $type
+     *
      * @return resource
      */
     protected function generateImage($width, $height, $type) {
@@ -83,5 +91,4 @@ class CHTTP_Testing_FileFactory {
             fwrite($temp, ob_get_clean());
         });
     }
-
 }
