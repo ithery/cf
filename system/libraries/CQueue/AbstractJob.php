@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Sep 8, 2019, 2:18:49 AM
  */
-abstract class CQueue_AbstractJob {
+abstract class CQueue_AbstractJob implements CQueue_JobInterface {
     use CTrait_Helper_InteractsWithTime;
 
     /**
@@ -21,7 +21,7 @@ abstract class CQueue_AbstractJob {
     /**
      * The IoC container instance.
      *
-     * @var \Illuminate\Container\Container
+     * @var CContainer_Container
      */
     protected $container;
 

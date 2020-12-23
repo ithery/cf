@@ -10,7 +10,6 @@ use Pheanstalk\Job as PheanstalkJob;
 use Pheanstalk\Pheanstalk;
 
 class CQueue_Job_BeanstalkdJob extends CQueue_AbstractJob {
-
     /**
      * The Pheanstalk instance.
      *
@@ -28,11 +27,12 @@ class CQueue_Job_BeanstalkdJob extends CQueue_AbstractJob {
     /**
      * Create a new job instance.
      *
-     * @param  CContainer  $container
-     * @param  \Pheanstalk\Pheanstalk  $pheanstalk
-     * @param  \Pheanstalk\Job  $job
-     * @param  string  $connectionName
-     * @param  string  $queue
+     * @param CContainer             $container
+     * @param \Pheanstalk\Pheanstalk $pheanstalk
+     * @param \Pheanstalk\Job        $job
+     * @param string                 $connectionName
+     * @param string                 $queue
+     *
      * @return void
      */
     public function __construct(CContainer_Container $container, Pheanstalk $pheanstalk, PheanstalkJob $job, $connectionName, $queue) {
@@ -46,7 +46,8 @@ class CQueue_Job_BeanstalkdJob extends CQueue_AbstractJob {
     /**
      * Release the job back into the queue.
      *
-     * @param  int  $delay
+     * @param int $delay
+     *
      * @return void
      */
     public function release($delay = 0) {
@@ -120,5 +121,4 @@ class CQueue_Job_BeanstalkdJob extends CQueue_AbstractJob {
     public function getPheanstalkJob() {
         return $this->job;
     }
-
 }
