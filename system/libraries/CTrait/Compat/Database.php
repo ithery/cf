@@ -1,27 +1,30 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 22, 2019, 2:10:37 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 22, 2019, 2:10:37 PM
  */
-trait CTrait_Compat_Database {
 
+// @codingStandardsIgnoreStart
+trait CTrait_Compat_Database {
     /**
-     * 
-     * @deprecated since version 1.2
      * @return string
+     *
+     * @deprecated since version 1.2
      */
     public function driver_name() {
         return $this->driverName();
     }
 
     /**
-     * 
      * @deprecated
+     *
      * @param string $str
+     *
      * @return string
      */
     public function escape_like($str) {
@@ -29,8 +32,8 @@ trait CTrait_Compat_Database {
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return boolean
      */
     public function in_transaction() {
@@ -41,7 +44,8 @@ trait CTrait_Compat_Database {
      * Returns the last query run.
      *
      * @deprecated
-     * @return  string SQL
+     *
+     * @return string SQL
      */
     public function last_query() {
         return $this->lastQuery();
@@ -51,7 +55,9 @@ trait CTrait_Compat_Database {
      * Escapes a string for a query.
      *
      * @param   string  string to escape
-     * @return  string
+     * @param mixed $str
+     *
+     * @return string
      */
     public function escape_str($str) {
         return $this->escapeStr($str);
@@ -61,7 +67,9 @@ trait CTrait_Compat_Database {
      * Escapes a table name for a query.
      *
      * @param   string  string to escape
-     * @return  string
+     * @param mixed $table
+     *
+     * @return string
      */
     public function escape_table($table) {
         return $this->escapeTable($table);
@@ -71,7 +79,9 @@ trait CTrait_Compat_Database {
      * Escapes a column name for a query.
      *
      * @param   string  string to escape
-     * @return  string
+     * @param mixed $table
+     *
+     * @return string
      */
     public function escape_column($table) {
         return $this->escapeColumn($table);
@@ -82,16 +92,19 @@ trait CTrait_Compat_Database {
      *
      * @param   string   table name
      * @param   boolean  True to attach table prefix
-     * @return  boolean
+     * @param mixed $table_name
+     * @param mixed $prefix
+     *
+     * @return boolean
      */
-    public function table_exists($table_name, $prefix = TRUE) {
+    public function table_exists($table_name, $prefix = true) {
         return $this->tableExists($table_name, $prefix);
     }
 
     /**
      * Lists all the tables in the current database.
      *
-     * @return  array
+     * @return array
      */
     public function list_tables() {
         return $this->listTables();
@@ -101,11 +114,14 @@ trait CTrait_Compat_Database {
      * Get the field data for a database table, along with the field's attributes.
      *
      * @param   string  table name
-     * @return  array
+     * @param mixed $table
+     *
+     * @return array
+     *
      * @deprecated
      */
     public function list_fields($table = '') {
         return $this->listFields($table);
     }
-
 }
+// @codingStandardsIgnoreEnd
