@@ -459,6 +459,17 @@ class CSession_Store {
     }
 
     /**
+     * Remove one or many items from the session. (Alias of forget)
+     *
+     * @param string|array $keys
+     *
+     * @return void
+     */
+    public function delete($keys) {
+        carr::forget($this->attributes, $keys);
+    }
+
+    /**
      * Remove all of the items from the session.
      *
      * @return void
@@ -660,7 +671,7 @@ class CSession_Store {
     /**
      * Set the request on the handler instance.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param CHTTP_Request $request
      *
      * @return void
      */
