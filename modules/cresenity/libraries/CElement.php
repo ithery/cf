@@ -1,7 +1,6 @@
 <?php
 
 abstract class CElement extends CObservable {
-
     use CTrait_Compat_Element;
 
     protected $classes;
@@ -15,22 +14,23 @@ abstract class CElement extends CObservable {
     protected $bootstrap;
     protected $select2;
     protected $theme;
-    protected $theme_style = array();
-    protected $theme_data = array();
+    protected $theme_style = [];
+    protected $theme_data = [];
     protected $before;
     protected $after;
     protected $is_empty = false;
 
-    public static function validTag() {
-        $available_tag = array('div', 'a', 'p', 'span');
+    public function validTag() {
+        $availableTag = ['div', 'a', 'p', 'span'];
+        return $availableTag;
     }
 
-    public function __construct($id = "", $tag = "div") {
+    public function __construct($id = '', $tag = 'div') {
         parent::__construct($id);
 
-        $this->classes = array();
-        $this->attr = array();
-        $this->custom_css = array();
+        $this->classes = [];
+        $this->attr = [];
+        $this->custom_css = [];
         $this->text = '';
         $this->tag = $tag;
         $this->bootstrap = ccfg::get('bootstrap');
@@ -74,8 +74,9 @@ abstract class CElement extends CObservable {
 
     /**
      * Add class attribute for the element
-     * 
+     *
      * @param string $c
+     *
      * @return $this
      */
     public function addClass($c) {
@@ -93,7 +94,7 @@ abstract class CElement extends CObservable {
 
     public function removeClass($class) {
         if (!is_array($class)) {
-            $class = array($class);
+            $class = [$class];
         }
 
         foreach ($class as $c) {
@@ -139,7 +140,6 @@ abstract class CElement extends CObservable {
     }
 
     public function pretag() {
-
         return '<' . $this->tag . '>';
     }
 
@@ -149,16 +149,16 @@ abstract class CElement extends CObservable {
 
     public function generateClass() {
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
+        $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
-            $classes = " " . $classes;
+            $classes = ' ' . $classes;
         }
         return $classes;
     }
 
     public function toArray() {
         if (!empty($this->classes)) {
-            $data['attr']['class'] = implode(" ", $this->classes);
+            $data['attr']['class'] = implode(' ', $this->classes);
         }
         $data['attr']['id'] = $this->id;
 
@@ -178,19 +178,19 @@ abstract class CElement extends CObservable {
         return parent::js($indent);
     }
 
-    public function __to_string() {
-        $return = "<h3> HTML </h3>"
-                . "<pre>"
-                . "<code>"
+    public function __toString() {
+        $return = '<h3> HTML </h3>'
+                . '<pre>'
+                . '<code>'
                 . htmlspecialchars($this->html())
-                . "</code>"
-                . "</pre>";
-        $return .= "<h3> JS </h3>"
-                . "<pre>"
-                . "<code>"
+                . '</code>'
+                . '</pre>';
+        $return .= '<h3> JS </h3>'
+                . '<pre>'
+                . '<code>'
                 . htmlspecialchars($this->js())
-                . "</code>"
-                . "</pre>";
+                . '</code>'
+                . '</pre>';
         return $return;
     }
 
@@ -204,11 +204,11 @@ abstract class CElement extends CObservable {
             jQuery(document).ready(function() {
                 ${js}
             });
-        
+
         </script>
-        
+
         <?php \CApp::instance()->stopPush('script'); ?>
-        
+
 HTML;
     }
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Nov 12, 2017, 3:34:27 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Nov 12, 2017, 3:34:27 AM
  */
 abstract class CElement_Element extends CElement {
-
     protected $before;
     protected $after;
     protected $isBuilded = false;
@@ -17,7 +17,7 @@ abstract class CElement_Element extends CElement {
     protected $is_show = true;
     private $isBuild = false;
 
-    public function __construct($id = "", $tag = "div") {
+    public function __construct($id = '', $tag = 'div') {
         parent::__construct($id);
 
         $this->theme = CManager::theme()->getCurrentTheme();
@@ -27,8 +27,6 @@ abstract class CElement_Element extends CElement {
 
         $this->isBuilded = false;
         $this->isOneTag = false;
-
-
 
         $this->bootstrap = ccfg::get('bootstrap');
         if (strlen($this->bootstrap) == 0) {
@@ -49,8 +47,8 @@ abstract class CElement_Element extends CElement {
     }
 
     /**
-     * 
      * @param bool $bool
+     *
      * @return $this
      */
     public function setHaveIndent($bool = true) {
@@ -59,26 +57,23 @@ abstract class CElement_Element extends CElement {
     }
 
     protected function htmlAttr() {
-        
-
-
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
-        $addition_attribute = "";
+        $addition_attribute = '';
         $haveClass = false;
         foreach ($this->attr as $k => $v) {
-            $addition_attribute .= " " . $k . '="' . $v . '"';
-            if($k=="class") {
-                $haveClass=true;
+            $addition_attribute .= ' ' . $k . '="' . $v . '"';
+            if ($k == 'class') {
+                $haveClass = true;
             }
         }
-        $classAttr = "";
-        if(!$haveClass) {
+        $classAttr = '';
+        if (!$haveClass) {
             $classes = $this->classes;
-            $classes = implode(" ", $classes);
+            $classes = implode(' ', $classes);
             $classAttr = ' class="' . $classes . '"';
         }
         $html_attr = 'id="' . $this->id . '" ' . $classAttr . $custom_css . $addition_attribute;
@@ -124,7 +119,6 @@ abstract class CElement_Element extends CElement {
     }
 
     protected function build() {
-        
     }
 
     public function html($indent = 0) {
@@ -180,7 +174,4 @@ abstract class CElement_Element extends CElement {
 
         return $js->text();
     }
-
-    
-    
 }
