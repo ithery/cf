@@ -48,7 +48,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
 
         $contents = $this->files->get(CDevSuite::stubsPath() . 'nginx.conf');
 
-        $this->files->putAsUser(
+        $this->files->putAsRoot(
             static::NGINX_CONF,
             str_replace(['DEVSUITE_USER', 'DEVSUITE_HOME_PATH'], [CDevSuite::user(), rtrim(CDevSuite::homePath(), '/')], $contents)
         );
@@ -60,9 +60,9 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      * @return void
      */
     public function installServer() {
-        $this->files->ensureDirExists('/usr/local/etc/nginx/devsuite');
+        $this->files->ensureDirExistsAsRoot('/usr/local/etc/nginx/devsuite');
 
-        $this->files->putAsUser(
+        $this->files->putAsRoot(
             '/usr/local/etc/nginx/devsuite/devsuite.conf',
             str_replace(
                 ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX'],
@@ -71,7 +71,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
             )
         );
 
-        $this->files->putAsUser(
+        $this->files->putAsRoot(
             '/usr/local/etc/nginx/fastcgi_params',
             $this->files->get(CDevSuite::stubsPath() . 'fastcgi_params')
         );

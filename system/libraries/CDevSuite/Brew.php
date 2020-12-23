@@ -2,11 +2,12 @@
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 15, 2020 
+ *
+ * @since Nov 15, 2020
+ *
  * @license Ittron Global Teknologi
  */
 class CDevSuite_Brew {
-
     const SUPPORTED_PHP_VERSIONS = [
         'php',
         'php@8.1',
@@ -31,11 +32,12 @@ class CDevSuite_Brew {
     /**
      * Create a new Brew instance.
      *
-     * @param  CommandLine  $cli
-     * @param  Filesystem  $files
+     * @param CommandLine $cli
+     * @param Filesystem  $files
+     *
      * @return void
      */
-    function __construct() {
+    public function __construct() {
         $this->cli = CDevSuite::commandLine();
         $this->files = CDevSuite::filesystem();
     }
@@ -43,11 +45,12 @@ class CDevSuite_Brew {
     /**
      * Determine if the given formula is installed.
      *
-     * @param  string  $formula
+     * @param string $formula
+     *
      * @return bool
      */
-    function installed($formula) {
-        return in_array($formula, explode(PHP_EOL, $this->cli->runAsUser('brew list | grep ' . $formula)));
+    public function installed($formula) {
+        return in_array($formula, explode(PHP_EOL, $this->cli->runAsUser('brew list --formula | grep ' . $formula)));
     }
 
     /**
@@ -55,10 +58,10 @@ class CDevSuite_Brew {
      *
      * @return bool
      */
-    function hasInstalledPhp() {
+    public function hasInstalledPhp() {
         return $this->supportedPhpVersions()->contains(function ($version) {
-                    return $this->installed($version);
-                });
+            return $this->installed($version);
+        });
     }
 
     /**
@@ -66,16 +69,18 @@ class CDevSuite_Brew {
      *
      * @return \Illuminate\Support\Collection
      */
-    function supportedPhpVersions() {
+    public function supportedPhpVersions() {
         return c::collect(static::SUPPORTED_PHP_VERSIONS);
     }
 
     /**
      * Get the aliased formula version from Homebrew
+     *
+     * @param mixed $formula
      */
-    function determineAliasedVersion($formula) {
+    public function determineAliasedVersion($formula) {
         $details = json_decode($this->cli->runAsUser("brew info $formula --json"));
-        return $details[0]->aliases[0] ? : 'ERROR - NO BREW ALIAS FOUND';
+        return $details[0]->aliases[0] ?: 'ERROR - NO BREW ALIAS FOUND';
     }
 
     /**
@@ -86,7 +91,7 @@ class CDevSuite_Brew {
     public function hasInstalledNginx() {
         return $this->installed('nginx') || $this->installed('nginx-full');
     }
-    
+
     /**
      * Determine if a compatible nginx version is Homebrewed.
      *
@@ -95,27 +100,26 @@ class CDevSuite_Brew {
     public function hasInstalledMariaDb() {
         return $this->installed('mariadb');
     }
-    
-    
 
     /**
      * Return name of the nginx service installed via Homebrew.
      *
      * @return string
      */
-    function nginxServiceName() {
+    public function nginxServiceName() {
         return $this->installed('nginx-full') ? 'nginx-full' : 'nginx';
     }
 
     /**
      * Ensure that the given formula is installed.
      *
-     * @param  string  $formula
-     * @param  array  $options
-     * @param  array  $taps
+     * @param string $formula
+     * @param array  $options
+     * @param array  $taps
+     *
      * @return void
      */
-    function ensureInstalled($formula, $options = [], $taps = []) {
+    public function ensureInstalled($formula, $options = [], $taps = []) {
         if (!$this->installed($formula)) {
             $this->installOrFail($formula, $options, $taps);
         }
@@ -124,12 +128,13 @@ class CDevSuite_Brew {
     /**
      * Install the given formula and throw an exception on failure.
      *
-     * @param  string  $formula
-     * @param  array  $options
-     * @param  array  $taps
+     * @param string $formula
+     * @param array  $options
+     * @param array  $taps
+     *
      * @return void
      */
-    function installOrFail($formula, $options = [], $taps = []) {
+    public function installOrFail($formula, $options = [], $taps = []) {
         CDevSuite::info("Installing {$formula}...");
 
         if (count($taps) > 0) {
@@ -148,10 +153,12 @@ class CDevSuite_Brew {
     /**
      * Tap the given formulas.
      *
-     * @param  dynamic[string]  $formula
+     * @param dynamic[string] $formula
+     * @param mixed           $formulas
+     *
      * @return void
      */
-    function tap($formulas) {
+    public function tap($formulas) {
         $formulas = is_array($formulas) ? $formulas : func_get_args();
 
         foreach ($formulas as $formula) {
@@ -163,8 +170,9 @@ class CDevSuite_Brew {
      * Restart the given Homebrew services.
      *
      * @param
+     * @param mixed $services
      */
-    function restartService($services) {
+    public function restartService($services) {
         $services = is_array($services) ? $services : func_get_args();
 
         foreach ($services as $service) {
@@ -181,8 +189,9 @@ class CDevSuite_Brew {
      * Stop the given Homebrew services.
      *
      * @param
+     * @param mixed $services
      */
-    function stopService($services) {
+    public function stopService($services) {
         $services = is_array($services) ? $services : func_get_args();
 
         foreach ($services as $service) {
@@ -199,7 +208,7 @@ class CDevSuite_Brew {
      *
      * @return bool
      */
-    function hasLinkedPhp() {
+    public function hasLinkedPhp() {
         return $this->files->isLink('/usr/local/bin/php');
     }
 
@@ -208,9 +217,9 @@ class CDevSuite_Brew {
      *
      * @return mixed
      */
-    function getParsedLinkedPhp() {
+    public function getParsedLinkedPhp() {
         if (!$this->hasLinkedPhp()) {
-            throw new DomainException("Homebrew PHP appears not to be linked.");
+            throw new DomainException('Homebrew PHP appears not to be linked.');
         }
 
         $resolvedPath = $this->files->readLink('/usr/local/bin/php');
@@ -235,7 +244,7 @@ class CDevSuite_Brew {
      *
      * @return mixed
      */
-    function getLinkedPhpFormula() {
+    public function getLinkedPhpFormula() {
         $matches = $this->getParsedLinkedPhp();
         return $matches[1] . $matches[2];
     }
@@ -245,18 +254,20 @@ class CDevSuite_Brew {
      *
      * @return string
      */
-    function linkedPhp() {
+    public function linkedPhp() {
         $matches = $this->getParsedLinkedPhp();
-        $resolvedPhpVersion = $matches[3] ? : $matches[2];
+        $resolvedPhpVersion = $matches[3] ?: $matches[2];
 
         return $this->supportedPhpVersions()->first(
-                        function ($version) use ($resolvedPhpVersion) {
-                    $resolvedVersionNormalized = preg_replace('/[^\d]/', '', $resolvedPhpVersion);
-                    $versionNormalized = preg_replace('/[^\d]/', '', $version);
-                    return $resolvedVersionNormalized === $versionNormalized;
-                }, function () use ($resolvedPhpVersion) {
-                    throw new DomainException("Unable to determine linked PHP when parsing '$resolvedPhpVersion'");
-                });
+            function ($version) use ($resolvedPhpVersion) {
+                $resolvedVersionNormalized = preg_replace('/[^\d]/', '', $resolvedPhpVersion);
+                $versionNormalized = preg_replace('/[^\d]/', '', $version);
+                return $resolvedVersionNormalized === $versionNormalized;
+            },
+            function () use ($resolvedPhpVersion) {
+                throw new DomainException("Unable to determine linked PHP when parsing '$resolvedPhpVersion'");
+            }
+        );
     }
 
     /**
@@ -264,7 +275,8 @@ class CDevSuite_Brew {
      *
      * @return void
      */
-    function restartLinkedPhp() {
+    public function restartLinkedPhp() {
+        CDevSuite::info($this->getLinkedPhpFormula());
         $this->restartService($this->getLinkedPhpFormula());
     }
 
@@ -273,7 +285,7 @@ class CDevSuite_Brew {
      *
      * @return void
      */
-    function createSudoersEntry() {
+    public function createSudoersEntry() {
         $this->files->ensureDirExists('/etc/sudoers.d');
 
         $this->files->put('/etc/sudoers.d/brew', 'Cmnd_Alias BREW = /usr/local/bin/brew *
@@ -285,7 +297,7 @@ class CDevSuite_Brew {
      *
      * @return void
      */
-    function removeSudoersEntry() {
+    public function removeSudoersEntry() {
         $this->cli->quietly('rm /etc/sudoers.d/brew');
     }
 
@@ -297,29 +309,32 @@ class CDevSuite_Brew {
      *
      * @return string
      */
-    function link($formula, $force = false) {
+    public function link($formula, $force = false) {
         return $this->cli->runAsUser(
-                        sprintf('brew link %s%s', $formula, $force ? ' --force' : ''), function ($exitCode, $errorOutput) use ($formula) {
-                    CDevSuite::output($errorOutput);
+            sprintf('brew link %s%s', $formula, $force ? ' --force' : ''),
+            function ($exitCode, $errorOutput) use ($formula) {
+                CDevSuite::output($errorOutput);
 
-                    throw new DomainException('Brew was unable to link [' . $formula . '].');
-                }
+                throw new DomainException('Brew was unable to link [' . $formula . '].');
+            }
         );
     }
 
     /**
      * Unlink passed formula.
+     *
      * @param $formula
      *
      * @return string
      */
-    function unlink($formula) {
+    public function unlink($formula) {
         return $this->cli->runAsUser(
-                        sprintf('brew unlink %s', $formula), function ($exitCode, $errorOutput) use ($formula) {
-                    CDevSuite::output($errorOutput);
+            sprintf('brew unlink %s', $formula),
+            function ($exitCode, $errorOutput) use ($formula) {
+                CDevSuite::output($errorOutput);
 
-                    throw new DomainException('Brew was unable to unlink [' . $formula . '].');
-                }
+                throw new DomainException('Brew was unable to unlink [' . $formula . '].');
+            }
         );
     }
 
@@ -328,22 +343,23 @@ class CDevSuite_Brew {
      *
      * @return \Illuminate\Support\Collection
      */
-    function getRunningServices() {
+    public function getRunningServices() {
         return c::collect(array_filter(explode(PHP_EOL, $this->cli->runAsUser(
-                                                'brew services list | grep started | awk \'{ print $1; }\'', function ($exitCode, $errorOutput) {
-                                            CDevSuite::output($errorOutput);
+            'brew services list | grep started | awk \'{ print $1; }\'',
+            function ($exitCode, $errorOutput) {
+                CDevSuite::output($errorOutput);
 
-                                            throw new DomainException('Brew was unable to check which services are running.');
-                                        }
+                throw new DomainException('Brew was unable to check which services are running.');
+            }
         ))));
     }
 
     /**
      * Tell Homebrew to forcefully remove all PHP versions that DevSuite supports.
-     * 
+     *
      * @return string
      */
-    function uninstallAllPhpVersions() {
+    public function uninstallAllPhpVersions() {
         $this->supportedPhpVersions()->each(function ($formula) {
             $this->uninstallFormula($formula);
         });
@@ -353,26 +369,27 @@ class CDevSuite_Brew {
 
     /**
      * Uninstall a Homebrew app by formula name.
-     * @param  string $formula
-     * 
+     *
+     * @param string $formula
+     *
      * @return void
      */
-    function uninstallFormula($formula) {
+    public function uninstallFormula($formula) {
         $this->cli->runAsUser('brew uninstall --force ' . $formula);
         $this->cli->run('rm -rf /usr/local/Cellar/' . $formula);
     }
 
     /**
      * Run Homebrew's cleanup commands.
-     * 
+     *
      * @return string
      */
-    function cleanupBrew() {
+    public function cleanupBrew() {
         return $this->cli->runAsUser(
-                        'brew cleanup && brew services cleanup', function ($exitCode, $errorOutput) {
-                    CDevSuite::output($errorOutput);
-                }
+            'brew cleanup && brew services cleanup',
+            function ($exitCode, $errorOutput) {
+                CDevSuite::output($errorOutput);
+            }
         );
     }
-
 }

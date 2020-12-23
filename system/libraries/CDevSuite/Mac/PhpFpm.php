@@ -89,6 +89,8 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
             $contents = preg_replace('/^;?listen\.group = .+$/m', 'listen.group = staff', $contents);
             $contents = preg_replace('/^;?listen\.mode = .+$/m', 'listen.mode = 0777', $contents);
         }
+
+        CDevSuite::info($fpmConfigFile);
         $this->files->put($fpmConfigFile, $contents);
 
         $contents = $this->files->get(CDevSuite::stubsPath() . 'php-memory-limits.ini');
