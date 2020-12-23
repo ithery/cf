@@ -1,7 +1,6 @@
 <?php
 
 class CCurl {
-
     use CTrait_Compat_Curl;
 
     private $handle;
@@ -24,11 +23,11 @@ class CCurl {
         $this->autoinit = true;
         $this->opened = false;
         $this->handle = null;
-        $this->options = array();
-        $this->last_status = array();
-        $this->last_followed = array();
-        $this->last_caseless = array();
-        $this->last_headers = array();
+        $this->options = [];
+        $this->last_status = [];
+        $this->last_followed = [];
+        $this->last_caseless = [];
+        $this->last_headers = [];
         $this->last_response = null;
         $this->last_response_body = null;
         $this->last_response_header = null;
@@ -41,10 +40,10 @@ class CCurl {
     }
 
     private function clear_last_exec() {
-        $this->last_status = array();
-        $this->last_followed = array();
-        $this->last_caseless = array();
-        $this->last_headers = array();
+        $this->last_status = [];
+        $this->last_followed = [];
+        $this->last_caseless = [];
+        $this->last_headers = [];
         $this->last_response = null;
         $this->last_response_body = null;
         $this->last_response_header = null;
@@ -80,15 +79,15 @@ class CCurl {
 
     public function open() {
         switch ($this->engine) {
-            case "curl":
+            case 'curl':
                 $this->handle = curl_init();
                 break;
-            case "soapclient":
-                $http_header = array(
+            case 'soapclient':
+                $http_header = [
                     'trace' => true,
                     'location' => $this->url,
                     'uri' => $this->url,
-                );
+                ];
                 $this->handle = new SoapClient(null, $http_header);
                 break;
         }
@@ -97,7 +96,7 @@ class CCurl {
 
     public function close() {
         switch ($this->engine) {
-            case "curl":
+            case 'curl':
                 @curl_close($this->handle);
                 break;
         }
@@ -131,8 +130,8 @@ class CCurl {
         return $this;
     }
 
-    public function exec($exec = TRUE) {
-        //clear last exec 
+    public function exec($exec = true) {
+        //clear last exec
         $this->clear_last_exec();
 
         //open curl connection
@@ -141,7 +140,7 @@ class CCurl {
         }
         //set default options
 
-        if ($this->engine == "soapclient") {
+        if ($this->engine == 'soapclient') {
             $request = $this->get_opt(CURLOPT_POSTFIELDS);
 
             $this->last_response_body = $this->last_response = $this->handle->__doRequest($request, $this->url, $this->soap_action, 1);
@@ -162,7 +161,7 @@ class CCurl {
             curl_setopt($this->handle, $k, $v);
         }
 
-        if ($exec == TRUE) {
+        if ($exec == true) {
             //exec curl
             $result = curl_exec($this->handle);
             $this->last_response = $result;
@@ -180,7 +179,7 @@ class CCurl {
 
             //no error, we try parse the header
             if ($this->get_opt(CURLOPT_HEADER)) {
-                $this->last_followed = array();
+                $this->last_followed = [];
                 $rv = $result;
 
                 while (count($this->last_followed) <= $this->last_status['redirect_count']) {
@@ -198,9 +197,10 @@ class CCurl {
     }
 
     public function parse_header($header_str = null) {
-        if ($header_str == null)
+        if ($header_str == null) {
             $header_str = $this->last_response_header;
-        $this->last_caseless = array();
+        }
+        $this->last_caseless = [];
 
         $arr = preg_split("/(\r\n)+/", $header_str);
 
@@ -208,7 +208,7 @@ class CCurl {
         // Ditch the HTTP status line.
         //
 
-            if (preg_match('/^HTTP/', $arr[0])) {
+        if (preg_match('/^HTTP/', $arr[0])) {
             $arr = array_slice($arr, 1);
         }
 
@@ -221,7 +221,7 @@ class CCurl {
                 $this->last_caseless[$caseless_tag] = $hstr_arr[0];
             }
             if (!isset($this->last_headers[$this->last_caseless[$caseless_tag]])) {
-                $this->last_headers[$this->last_caseless[$caseless_tag]] = array();
+                $this->last_headers[$this->last_caseless[$caseless_tag]] = [];
             }
             $this->last_headers[$this->last_caseless[$caseless_tag]][] = $hstr_arr[1];
         }
@@ -243,10 +243,10 @@ class CCurl {
     public function get_http_code() {
         $httpcode = 0;
         switch ($this->engine) {
-            case "curl":
+            case 'curl':
                 $httpcode = curl_getinfo($this->handle, CURLINFO_HTTP_CODE);
                 break;
-            case "soapclient":
+            case 'soapclient':
                 $httpcode = '200';
                 break;
         }
@@ -272,7 +272,7 @@ class CCurl {
     }
 
     public function get_followed_headers() {
-        $arr = array();
+        $arr = [];
         if ($this->last_followed) {
             foreach ($this->last_followed as $ah) {
                 $arr[] = explode("\r\n", $ah);
@@ -297,7 +297,6 @@ class CCurl {
 
     //opt helper function
 
-
     public function set_cookies_file($filename) {
         $this->set_opt(CURLOPT_COOKIEJAR, $filename);
         $this->set_opt(CURLOPT_COOKIEFILE, $filename);
@@ -311,14 +310,14 @@ class CCurl {
 
     public function setRawPost($string) {
         $this->post_data = $string;
-        $this->set_opt(CURLOPT_POST, TRUE);
+        $this->set_opt(CURLOPT_POST, true);
         $this->set_opt(CURLOPT_POSTFIELDS, $string);
         return $this;
     }
 
     public function setPost(array $data) {
         $this->post_data = $data;
-        $post_data = curl::as_post_string($data);
+        $post_data = curl::asPostString($data);
         $this->set_opt(CURLOPT_POST, true);
         $this->set_opt(CURLOPT_POSTFIELDS, $post_data);
         return $this;
@@ -354,7 +353,4 @@ class CCurl {
     public function getPostData() {
         return $this->post_data;
     }
-
 }
-
-?>
