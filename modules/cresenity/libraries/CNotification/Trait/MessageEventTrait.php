@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CNotification_Trait_MessageEventTrait {
-
     /**
      * The event map for the notification.
      *
@@ -26,11 +19,11 @@ trait CNotification_Trait_MessageEventTrait {
      */
     protected $observables = [];
 
-    
     /**
      * Register an observer with the Model.
      *
-     * @param  object|string  $class
+     * @param object|string $class
+     *
      * @return void
      */
     public static function observe($class) {
@@ -47,7 +40,7 @@ trait CNotification_Trait_MessageEventTrait {
             }
         }
     }
-    
+
     /**
      * Get the observable event names.
      *
@@ -55,19 +48,17 @@ trait CNotification_Trait_MessageEventTrait {
      */
     public function getObservableEvents() {
         return array_merge(
-                ['sending', 'sent'], $this->observables
+            ['sending', 'sent'],
+            $this->observables
         );
     }
 
-    
-    
-    
-    
     /**
      * Register a notification event with the dispatcher.
      *
-     * @param  string  $event
-     * @param  \Closure|string  $callback
+     * @param string          $event
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     protected static function registerNotificationEvent($event, $callback) {
@@ -80,7 +71,8 @@ trait CNotification_Trait_MessageEventTrait {
     /**
      * Filter the notification event results.
      *
-     * @param  mixed  $result
+     * @param mixed $result
+     *
      * @return mixed
      */
     protected function filterNotificationEventResults($result) {
@@ -96,8 +88,9 @@ trait CNotification_Trait_MessageEventTrait {
     /**
      * Fire a custom notification event for the given event.
      *
-     * @param  string  $event
-     * @param  string  $method
+     * @param string $event
+     * @param string $method
+     *
      * @return mixed|null
      */
     protected function fireCustomNotificationEvent($event, $method) {
@@ -115,13 +108,12 @@ trait CNotification_Trait_MessageEventTrait {
     /**
      * Fire the given event for the notification.
      *
-     * @param  string  $event
-     * @param  bool  $halt
+     * @param string $event
+     * @param bool   $halt
+     *
      * @return mixed
      */
     protected function fireNotificationEvent($event, $halt = true) {
-
-
         if (!isset(static::$dispatcher)) {
             return true;
         }
@@ -132,7 +124,7 @@ trait CNotification_Trait_MessageEventTrait {
         $method = $halt ? 'until' : 'dispatch';
 
         $result = $this->filterNotificationEventResults(
-                $this->fireCustomNotificationEvent($event, $method)
+            $this->fireCustomNotificationEvent($event, $method)
         );
 
         if ($result === false) {
@@ -140,7 +132,8 @@ trait CNotification_Trait_MessageEventTrait {
         }
 
         return !empty($result) ? $result : static::$dispatcher->{$method}(
-                        "eloquent.{$event}: " . static::class, $this
+            "eloquent.{$event}: " . static::class,
+            $this
         );
     }
 
@@ -168,7 +161,8 @@ trait CNotification_Trait_MessageEventTrait {
     /**
      * Register a sending notification event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function sending($callback) {
@@ -178,7 +172,8 @@ trait CNotification_Trait_MessageEventTrait {
     /**
      * Register a sent notification event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function sent($callback) {
@@ -197,7 +192,8 @@ trait CNotification_Trait_MessageEventTrait {
     /**
      * Set the event dispatcher instance.
      *
-     * @param  CEvent_Dispatcher  $dispatcher
+     * @param CEvent_Dispatcher $dispatcher
+     *
      * @return void
      */
     public static function setEventDispatcher(CEvent_Dispatcher $dispatcher) {
@@ -212,5 +208,4 @@ trait CNotification_Trait_MessageEventTrait {
     public static function unsetEventDispatcher() {
         static::$dispatcher = null;
     }
-
 }

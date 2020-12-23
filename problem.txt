@@ -1,0 +1,1 @@
+CNotification_Trait_MessageEventTrait
