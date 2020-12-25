@@ -1147,6 +1147,8 @@ final class CF {
      * @param mixed $value
      *
      * @return CCollection
+     *
+     * @deprecated 1.1, use c::collect
      */
     public static function collect($value = null) {
         return c::collect($value);
