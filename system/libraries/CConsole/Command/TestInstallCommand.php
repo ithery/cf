@@ -57,7 +57,7 @@ class CConsole_Command_TestInstallCommand extends CConsole_Command {
 
     protected function downloadPHPUnitOnBinPath() {
         $binPath = CTesting::phpUnitBinary();
-        if (file_exists($binPath)) {
+        if (!file_exists($binPath)) {
             $this->info('Downloading phpunit ');
             $errCode = 0;
             $errMessage = '';
