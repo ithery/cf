@@ -1,4 +1,10 @@
 <?php
+
+use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
+use Ramsey\Uuid\Generator\CombGenerator;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidFactory;
+
 // @codingStandardsIgnoreStart
 class cstr {
     // @codingStandardsIgnoreEnd
@@ -15,6 +21,13 @@ class cstr {
      * @var array
      */
     protected static $camelCache = [];
+
+    /**
+     * The callback that should be used to generate UUIDs.
+     *
+     * @var callable
+     */
+    protected static $uuidFactory;
 
     /**
      * The cache of studly-cased words.
@@ -194,24 +207,6 @@ class cstr {
         }
 
         return $subject;
-    }
-
-    /**
-     * Uppercase words that are not separated by spaces, using a custom
-     * delimiter or the default.
-     *
-     *      $str = cstr::ucfirst('content-type'); // returns "Content-Type"
-     *
-     * @param string $string    string to transform
-     * @param string $delimiter delimiter to use
-     *
-     * @uses    CUTF8::ucfirst
-     *
-     * @return string
-     */
-    public static function ucfirst($string, $delimiter = ' ') {
-        // Put the keys back the Case-Convention expected
-        return implode($delimiter, array_map('CUTF8::ucfirst', explode($delimiter, $string)));
     }
 
     /**
@@ -923,5 +918,78 @@ class cstr {
      */
     public static function of($string) {
         return new CBase_String($string);
+    }
+
+    /**
+     * Uppercase words that are not separated by spaces, using a custom
+     * delimiter or the default.
+     *
+     *      $str = cstr::ucfirst('content-type'); // returns "Content-Type"
+     *
+     * @param string $string    string to transform
+     * @param string $delimiter delimiter to use
+     *
+     * @uses    CUTF8::ucfirst
+     *
+     * @return string
+     */
+    public static function ucfirst($string, $delimiter = ' ') {
+        // Put the keys back the Case-Convention expected
+        return implode($delimiter, array_map('CUTF8::ucfirst', explode($delimiter, $string)));
+    }
+
+    /**
+     * Generate a UUID (version 4).
+     *
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function uuid() {
+        return static::$uuidFactory
+            ? call_user_func(static::$uuidFactory)
+            : Uuid::uuid4();
+    }
+
+    /**
+     * Generate a time-ordered UUID (version 4).
+     *
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function orderedUuid() {
+        if (static::$uuidFactory) {
+            return call_user_func(static::$uuidFactory);
+        }
+
+        $factory = new UuidFactory();
+
+        $factory->setRandomGenerator(new CombGenerator(
+            $factory->getRandomGenerator(),
+            $factory->getNumberConverter()
+        ));
+
+        $factory->setCodec(new TimestampFirstCombCodec(
+            $factory->getUuidBuilder()
+        ));
+
+        return $factory->uuid4();
+    }
+
+    /**
+     * Set the callable that will be used to generate UUIDs.
+     *
+     * @param callable|null $factory
+     *
+     * @return void
+     */
+    public static function createUuidsUsing(callable $factory = null) {
+        static::$uuidFactory = $factory;
+    }
+
+    /**
+     * Indicate that UUIDs should be created normally and not using a custom factory.
+     *
+     * @return void
+     */
+    public static function createUuidsNormally() {
+        static::$uuidFactory = null;
     }
 }
