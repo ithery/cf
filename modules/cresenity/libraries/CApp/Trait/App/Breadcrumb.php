@@ -1,16 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 27, 2019, 10:18:47 PM
+
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jul 27, 2019, 10:18:47 PM
  */
 trait CApp_Trait_App_Breadcrumb {
-
     private $showBreadcrumb = true;
-    private $breadcrumb = array();
+    private $breadcrumb = [];
     private $breadcrumbCallback = null;
 
     public function showBreadcrumb($bool = true) {
@@ -19,10 +20,10 @@ trait CApp_Trait_App_Breadcrumb {
     }
 
     /**
-     * 
-     * @param string $caption
-     * @param string $url
+     * @param string  $caption
+     * @param string  $url
      * @param boolean $lang
+     *
      * @return CApp
      */
     public function addBreadcrumb($caption, $url = 'javascript:;', $lang = true) {

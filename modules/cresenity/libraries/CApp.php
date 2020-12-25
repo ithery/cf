@@ -3,6 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
+ * @method CElement_Component_Widget addWidget(string $id=null) {@see CElement_Element::addWidget}
  * @mixin CElement
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
