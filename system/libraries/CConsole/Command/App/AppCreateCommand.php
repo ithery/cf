@@ -26,12 +26,6 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
                 $domain = $this->ask('Please input the domain for create this application', $defaultDomain);
             }
         }
-        if (CConsole::domain() != $domain) {
-            $this->call('domain:switch', [
-                'domain' => $domain,
-                '--no-interaction' => carr::get($this->allOptions(), 'no-interaction'),
-            ]);
-        }
         if (!CF::domainExists($domain)) {
             $this->call('domain:create', [
                 'domain' => $domain,
@@ -39,6 +33,14 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
                 '--no-interaction' => carr::get($this->allOptions(), 'no-interaction'),
             ]);
         }
+        if (CConsole::domain() != $domain) {
+            $this->call('domain:switch', [
+                'domain' => $domain,
+                '--no-interaction' => carr::get($this->allOptions(), 'no-interaction'),
+            ]);
+        }
+        CConfig::instance('app')->refresh();
+
         if ($prefix == null) {
             $defaultPrefix = cstr::toupper(substr($appCode, 0, 2));
             if ($defaultPrefix == 'CF') {
@@ -59,6 +61,7 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
         $this->buildDefaultConfig($appCode, $prefix);
 
         CConfig::instance('app')->refresh();
+
         $prefix = CF::config('app.prefix');
 
         //reload prefix
