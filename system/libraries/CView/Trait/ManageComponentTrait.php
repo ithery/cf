@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 28, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 28, 2020
  */
 trait CView_Trait_ManageComponentTrait {
-
     /**
      * The components being rendered.
      *
@@ -40,8 +40,9 @@ trait CView_Trait_ManageComponentTrait {
     /**
      * Start a component rendering process.
      *
-     * @param  \CView_View|\Illuminate\Contracts\Support\Htmlable|\Closure|string  $view
-     * @param  array  $data
+     * @param \CView_View|\Illuminate\Contracts\Support\Htmlable|\Closure|string $view
+     * @param array                                                              $data
+     *
      * @return void
      */
     public function startComponent($view, array $data = []) {
@@ -57,14 +58,15 @@ trait CView_Trait_ManageComponentTrait {
     /**
      * Get the first view that actually exists from the given list, and start a component.
      *
-     * @param  array  $names
-     * @param  array  $data
+     * @param array $names
+     * @param array $data
+     *
      * @return void
      */
     public function startComponentFirst(array $names, array $data = []) {
         $name = carr::first($names, function ($item) {
-                    return $this->exists($item);
-                });
+            return $this->exists($item);
+        });
 
         $this->startComponent($name, $data);
     }
@@ -78,20 +80,17 @@ trait CView_Trait_ManageComponentTrait {
         $view = array_pop($this->componentStack);
 
         $data = $this->componentData();
-        
-        
+
         if ($view instanceof Closure) {
             $view = $view($data);
         }
-        
-        
+
         if ($view instanceof CView_View) {
             return $view->with($data)->render();
         } elseif ($view instanceof CInterface_Htmlable) {
             return $view->toHtml();
         } else {
             return $this->make($view, $data)->render();
-            
         }
     }
 
@@ -105,21 +104,22 @@ trait CView_Trait_ManageComponentTrait {
 
         $slots = array_merge([
             '__default' => $defaultSlot,
-                ], $this->slots[count($this->componentStack)]);
+        ], $this->slots[count($this->componentStack)]);
 
         return array_merge(
-                $this->componentData[count($this->componentStack)],
-                ['slot' => $defaultSlot],
-                $this->slots[count($this->componentStack)],
-                ['__laravel_slots' => $slots]
+            $this->componentData[count($this->componentStack)],
+            ['slot' => $defaultSlot],
+            $this->slots[count($this->componentStack)],
+            ['__laravel_slots' => $slots]
         );
     }
 
     /**
      * Start the slot rendering process.
      *
-     * @param  string  $name
-     * @param  string|null  $content
+     * @param string      $name
+     * @param string|null $content
+     *
      * @return void
      */
     public function slot($name, $content = null) {
@@ -143,11 +143,10 @@ trait CView_Trait_ManageComponentTrait {
         carr::last($this->componentStack);
 
         $currentSlot = array_pop(
-                $this->slotStack[$this->currentComponent()]
+            $this->slotStack[$this->currentComponent()]
         );
 
-        $this->slots[$this->currentComponent()]
-                [$currentSlot] = new CBase_HtmlString(trim(ob_get_clean()));
+        $this->slots[$this->currentComponent()][$currentSlot] = new CBase_HtmlString(trim(ob_get_clean()));
     }
 
     /**
@@ -158,5 +157,4 @@ trait CView_Trait_ManageComponentTrait {
     protected function currentComponent() {
         return count($this->componentStack) - 1;
     }
-
 }

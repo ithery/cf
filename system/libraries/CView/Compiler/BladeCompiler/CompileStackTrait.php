@@ -6,11 +6,11 @@
  * @author Hery
  */
 trait CView_Compiler_BladeCompiler_CompileStackTrait {
-
     /**
      * Compile the stack statements into the content.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileStack($expression) {
@@ -20,7 +20,8 @@ trait CView_Compiler_BladeCompiler_CompileStackTrait {
     /**
      * Compile the push statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compilePush($expression) {
@@ -39,7 +40,8 @@ trait CView_Compiler_BladeCompiler_CompileStackTrait {
     /**
      * Compile the prepend statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compilePrepend($expression) {
@@ -54,5 +56,4 @@ trait CView_Compiler_BladeCompiler_CompileStackTrait {
     protected function compileEndprepend() {
         return '<?php $__env->stopPrepend(); ?>';
     }
-
 }

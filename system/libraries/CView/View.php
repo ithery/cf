@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-class CView_View implements ArrayAccess, CInterface_Htmlable {
+class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterface {
     /**
      * The engine implementation.
      *

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 28, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 28, 2020
  */
 trait CView_Trait_ManageTranslationTrait {
-
     /**
      * The translation replacements for the translation being rendered.
      *
@@ -19,7 +19,8 @@ trait CView_Trait_ManageTranslationTrait {
     /**
      * Start a translation block.
      *
-     * @param  array  $replacements
+     * @param array $replacements
+     *
      * @return void
      */
     public function startTranslation($replacements = []) {
@@ -35,8 +36,8 @@ trait CView_Trait_ManageTranslationTrait {
      */
     public function renderTranslation() {
         return CTranslation::translator()->get(
-                        trim(ob_get_clean()), $this->translationReplacements
+            trim(ob_get_clean()),
+            $this->translationReplacements
         );
     }
-
 }

@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-abstract class CView_EngineAbstract {
+abstract class CView_EngineAbstract implements CView_EngineInterface {
     /**
      * The view that was last to be rendered.
      *

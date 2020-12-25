@@ -6,7 +6,6 @@
  * @author Hery
  */
 trait CView_Compiler_BladeCompiler_CompileLayoutTrait {
-
     /**
      * The name of the last section that was started.
      *
@@ -17,7 +16,8 @@ trait CView_Compiler_BladeCompiler_CompileLayoutTrait {
     /**
      * Compile the extends statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileExtends($expression) {
@@ -33,7 +33,8 @@ trait CView_Compiler_BladeCompiler_CompileLayoutTrait {
     /**
      * Compile the extends-first statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileExtendsFirst($expression) {
@@ -49,7 +50,8 @@ trait CView_Compiler_BladeCompiler_CompileLayoutTrait {
     /**
      * Compile the section statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileSection($expression) {
@@ -70,7 +72,8 @@ trait CView_Compiler_BladeCompiler_CompileLayoutTrait {
     /**
      * Compile the yield statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileYield($expression) {
@@ -121,5 +124,4 @@ trait CView_Compiler_BladeCompiler_CompileLayoutTrait {
     protected function compileEndsection() {
         return '<?php $__env->stopSection(); ?>';
     }
-
 }
