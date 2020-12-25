@@ -1,9 +1,8 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 class CRenderable extends CObject implements CApp_Interface_Renderable {
-
     use CTrait_Compat_Renderable;
 
     protected $renderable;
@@ -12,12 +11,12 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     protected $parent;
     protected $wrapper;
 
-    protected function __construct($id = "") {
+    protected function __construct($id = '') {
         parent::__construct($id);
 
         $this->renderable = new CCollection();
         $this->wrapper = $this;
-        $this->additional_js = "";
+        $this->additional_js = '';
         $this->visibility = true;
         $this->parent = null;
     }
@@ -31,7 +30,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     }
 
     public function setParent($parent) {
-        $this->parent = & $parent;
+        $this->parent = &$parent;
         return $this;
     }
 
@@ -41,10 +40,11 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
 
     /**
      * Apply call method or set property of all childs of this object
-     * 
+     *
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      * @param string $className
+     *
      * @return $this
      */
     public function apply($key, $value, $className = '') {
@@ -88,7 +88,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
                 CObserver::instance()->remove($r);
             }
         }
-        $this->renderable = array();
+        $this->renderable = [];
         return $this;
     }
 
@@ -109,31 +109,28 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $html->incIndent();
         foreach ($this->renderable as $r) {
             $child = null;
-            
+
             if ($r instanceof CRenderable) {
                 if (!$r->visibility) {
                     continue;
                 }
-                
+
                 $r = $r->html($html->getIndent());
-                
-            } 
-            if($r instanceof CInterface_Renderable) {
+            }
+            if ($r instanceof CInterface_Renderable) {
                 $r = $r->render();
             }
-            
+
             /**
              * \Stringable available on PHP 8
              */
-            if($r instanceof \Stringable) {
+            if ($r instanceof \Stringable) {
                 $r = $r->__toString();
             }
-            
+
             if (is_object($r) || is_array($r)) {
-                $r = cdbg::d($r,true);
-            } 
-
-
+                $r = cdbg::d($r, true);
+            }
 
             $html->append($r);
         }
@@ -156,36 +153,12 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         return $js->text();
     }
 
-    public function css($indent = 0) {
-        if (!$this->visibility) {
-            return '';
-        }
-        $css = new CStringBuilder();
-        $css->setIndent($indent);
-        $css->incIndent();
-        foreach ($this->renderable as $r) {
-            if ($r instanceof CRenderable) {
-                if ($r->visibility) {
-                    $html->append($r->css($html->getIndent()));
-                }
-            } else {
-                if (is_object($r) || is_array($r)) {
-                    $html->append(cdbg::var_dump($r, true));
-                } else {
-                    $html->append($r);
-                }
-            }
-        }
-        $html->decIndent();
-        return $html->text();
-    }
-
     public function json() {
-        $data = array();
-        $data["html"] = cmsg::flash_all() . $this->html();
-        $data["js"] = cbase64::encode($this->js());
-        $data["js_require"] = CClientScript::instance()->urlJsFile();
-        $data["css_require"] = CClientScript::instance()->urlCssFile();
+        $data = [];
+        $data['html'] = cmsg::flash_all() . $this->html();
+        $data['js'] = base64_encode($this->js());
+        $data['js_require'] = CClientScript::instance()->urlJsFile();
+        $data['css_require'] = CClientScript::instance()->urlCssFile();
 
         return CHelper::json()->encode($data);
     }
@@ -202,7 +175,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     }
 
     public function toArray() {
-        $arrays = array();
+        $arrays = [];
         foreach ($this->renderable as $r) {
             if ($r instanceof CRenderable) {
                 $arrays[] = $r->toarray();
@@ -210,9 +183,9 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
                 $arrays[] = $r;
             }
         }
-        $data = array();
+        $data = [];
         if (!empty($arrays)) {
-            $data["children"] = $arrays;
+            $data['children'] = $arrays;
         }
         return $data;
     }
@@ -220,16 +193,15 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     /**
      * Fire the given event if possible.
      *
-     * @param  mixed  $event
+     * @param mixed $event
+     *
      * @return void
      */
     protected function dispatchEvent($event) {
-
         $this->getEvent()->dispatch($event);
     }
 
     /**
-     * 
      * @return CApp_Event;
      */
     public function getEvent() {
@@ -239,7 +211,8 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     /**
      * Register a renderable created listener with the CApp.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return void
      */
     public function listenOnRenderableAdded(Closure $callback) {
@@ -248,8 +221,8 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
 
     /**
      * Register custom event with the CApp.
-     * 
-     * @param string $event
+     *
+     * @param string  $event
      * @param Closure $callback
      */
     public function listen($event, Closure $callback) {
@@ -259,5 +232,4 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     public function &getParent() {
         return $this->parent;
     }
-
 }

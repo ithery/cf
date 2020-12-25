@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 27, 2019, 10:23:46 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jul 27, 2019, 10:23:46 PM
  */
 trait CApp_Trait_App_Renderer {
-
     protected $rendered = false;
     protected $viewData = null;
 
@@ -19,19 +19,18 @@ trait CApp_Trait_App_Renderer {
 
     public function renderNavigation($expression = null) {
         if ($expression != null) {
-            
             $expression = str_replace(['(', ')'], '', $expression);
             $expression = str_replace(['"', '\''], '', $expression);
             $expression = str_replace(',', ' ', $expression);
         }
-        
+
         $nav = $expression;
         if ($nav == null) {
             $nav = $this->nav;
         }
 
         $nav = $this->resolveNav($nav);
-        
+
         $renderer = $this->resolveNavRenderer();
         return $renderer->render($nav);
     }
@@ -39,13 +38,13 @@ trait CApp_Trait_App_Renderer {
     public function renderStyles($options = []) {
         $viewData = $this->getViewData();
         $cresCss = curl::base() . 'media/js/cres/dist/cres.css?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.css'));
-        
-        $alpineJs = curl::base() . 'media/js/libs/alpine.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/libs/alpine.js'));
-        $alpineScript = '<script src="'.$alpineJs.'"></script>';
-        $cresStyle = '<link href="'.$cresCss.'" rel="stylesheet" />'.PHP_EOL;
 
-        $allStyles=carr::get($viewData, 'head_client_script');
-        
+        $alpineJs = curl::base() . 'media/js/libs/alpine.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/libs/alpine.js'));
+        $alpineScript = '<script src="' . $alpineJs . '"></script>';
+        $cresStyle = '<link href="' . $cresCss . '" rel="stylesheet" />' . PHP_EOL;
+
+        $allStyles = carr::get($viewData, 'head_client_script');
+
         return <<<HTML
 <style>
     [cf\:loading], [cf\:loading\.delay], [cf\:loading\.inline-block], [cf\:loading\.inline], [cf\:loading\.block], [cf\:loading\.flex], [cf\:loading\.table], [cf\:loading\.grid] {
@@ -69,7 +68,6 @@ HTML;
     }
 
     public function renderScripts($options = []) {
-        
         $viewData = $this->getViewData();
         $endClientScript = carr::get($viewData, 'end_client_script', '');
         $readyClientScript = carr::get($viewData, 'ready_client_script', '');
@@ -77,14 +75,11 @@ HTML;
         $js = carr::get($viewData, 'js', '');
         $customJs = carr::get($viewData, 'custom_js', '');
 
-        
-        
         $alpineJs = curl::base() . 'media/js/libs/alpine.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/libs/alpine.js'));
-        $alpineScript = '<script src="'.$alpineJs.'"></script>';
-        
-        
+        $alpineScript = '<script src="' . $alpineJs . '"></script>';
+
         $pushesScript = $this->yieldPushContent('script');
-        
+
         $cresJs = curl::base() . 'media/js/cres/dist/cres.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.js'));
         return <<<HTML
             ${endClientScript}
@@ -92,7 +87,7 @@ HTML;
             <script>
                 window.cresenity = new Cresenity();
                 window.cresenity.init();
-                
+
                 if (window.Alpine) {
                     /* Defer showing the warning so it doesn't get buried under downstream errors. */
                     document.addEventListener("DOMContentLoaded", function () {
@@ -120,7 +115,7 @@ HTML;
                     window.onload = function () {
                         ${loadClientScript}
                     }
-                } 
+                }
                 ${customJs}
             </script>
             ${pushesScript}
@@ -153,7 +148,7 @@ HTML;
                     $theme_path .= '/';
                 }
             }
-            $viewData = array();
+            $viewData = [];
             $this->content = $this->element->html();
             $this->js = $this->element->js();
 
@@ -167,9 +162,8 @@ HTML;
 
             $css_urls = $asset->getAllCssFileUrl();
             $js_urls = $asset->getAllJsFileUrl();
-            $additional_js = "";
+            $additional_js = '';
             if ($this->isUseRequireJs()) {
-
                 foreach ($css_urls as $url) {
                     $additional_js .= "
                     $.cresenity._filesadded+='['+'" . $url . "'+']';
@@ -179,16 +173,14 @@ HTML;
                 ";
                 }
             }
-            $js = "";
+            $js = '';
 
             $js .= PHP_EOL . $this->js . $additional_js;
             $jsScriptFile = '';
 
             if ($this->isUseRequireJs()) {
-
                 $js = $asset->renderJsRequire($js);
             } else {
-
                 $jsScriptFile = PHP_EOL . '<script>' . $asset->varJs() . '</script>';
                 $jsScriptFile .= PHP_EOL . '<script>if(typeof define === "function") define=undefined;</script>';
                 //$jsScriptFile .= '<script src="/media/js/capp.js?v='.uniqid().'"></script>';
@@ -197,11 +189,7 @@ HTML;
                 $js = $asset->wrapJs($js, true);
             }
 
-
-
-
-
-            if (ccfg::get("minify_js")) {
+            if (ccfg::get('minify_js')) {
                 $js = CJSMin::minify($js);
             }
 
@@ -214,15 +202,14 @@ HTML;
 
             $viewData['js'] = $js;
 
-            $viewData['css_hash'] = "";
-            $viewData['js_hash'] = "";
-            if (ccfg::get("merge_css")) {
+            $viewData['css_hash'] = '';
+            $viewData['js_hash'] = '';
+            if (ccfg::get('merge_css')) {
                 $viewData['css_hash'] = $cs->create_css_hash();
             }
-            if (ccfg::get("merge_js")) {
+            if (ccfg::get('merge_js')) {
                 $viewData['js_hash'] = $cs->create_js_hash();
             }
-
 
             $viewData['theme'] = $theme;
             $viewData['theme_path'] = $theme_path;
@@ -255,7 +242,6 @@ HTML;
             foreach ($module as $type => $urls) {
                 foreach ($urls as $indexUrl => $url) {
                     if ($type == 'js') {
-
                         $allModule[$moduleName][$type][$indexUrl] = CManager_Asset_Helper::urlJsFile($url);
                     }
                     if ($type == 'css') {
@@ -272,13 +258,13 @@ HTML;
 
     /**
      * Render the html of this
-     * 
+     *
      * @return void
+     *
      * @throws CException
      * @throws CApp_Exception
      */
     public function render() {
-
         if ($this->rendered) {
             throw new CException('CApp already Rendered' . cdbg::getTraceString());
         }
@@ -292,13 +278,10 @@ HTML;
             return $this->json();
         }
 
-
         $viewData = $this->getViewData();
         $v = $this->getView();
         $v->set($viewData);
 
-
         return $v->render();
     }
-
 }

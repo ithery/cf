@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 4:21:11 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 4:21:11 PM
  */
 trait CTracker_RepositoryManager_SessionTrait {
-
     /**
-     *
      * @var CTracker_Repository_Session
      */
     public $sessionRepository;
@@ -20,7 +19,6 @@ trait CTracker_RepositoryManager_SessionTrait {
     }
 
     public function getSessionId($sessionData, $updateLastActivity) {
-
         return $this->sessionRepository->getCurrentId($sessionData, $updateLastActivity);
     }
 
@@ -38,5 +36,4 @@ trait CTracker_RepositoryManager_SessionTrait {
     public function updateSessionData($data) {
         return $this->sessionRepository->updateSessionData($data);
     }
-
 }
