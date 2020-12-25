@@ -6,7 +6,6 @@
  * @author Hery
  */
 trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
-
     /**
      * Identifier for the first case in switch statement.
      *
@@ -17,7 +16,8 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the if-auth statements into valid PHP.
      *
-     * @param  string|null  $guard
+     * @param string|null $guard
+     *
      * @return string
      */
     protected function compileAuth($guard = null) {
@@ -29,7 +29,8 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the else-auth statements into valid PHP.
      *
-     * @param  string|null  $guard
+     * @param string|null $guard
+     *
      * @return string
      */
     protected function compileElseAuth($guard = null) {
@@ -50,7 +51,8 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the env statements into valid PHP.
      *
-     * @param  string  $environments
+     * @param string $environments
+     *
      * @return string
      */
     protected function compileEnv($environments) {
@@ -72,7 +74,7 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
      * @return string
      */
     protected function compileProduction() {
-        return "<?php if(CF::isProduction()): ?>";
+        return '<?php if(CF::isProduction()): ?>';
     }
 
     /**
@@ -87,7 +89,8 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the if-guest statements into valid PHP.
      *
-     * @param  string|null  $guard
+     * @param string|null $guard
+     *
      * @return string
      */
     protected function compileGuest($guard = null) {
@@ -99,7 +102,8 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the else-guest statements into valid PHP.
      *
-     * @param  string|null  $guard
+     * @param string|null $guard
+     *
      * @return string
      */
     protected function compileElseGuest($guard = null) {
@@ -120,7 +124,8 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the has-section statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileHasSection($expression) {
@@ -130,7 +135,8 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the section-missing statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileSectionMissing($expression) {
@@ -140,7 +146,8 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the if statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileIf($expression) {
@@ -150,7 +157,8 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the unless statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileUnless($expression) {
@@ -160,7 +168,8 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the else-if statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileElseif($expression) {
@@ -197,7 +206,8 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the if-isset statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileIsset($expression) {
@@ -216,7 +226,8 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the switch statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileSwitch($expression) {
@@ -228,7 +239,8 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile the case statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileCase($expression) {
@@ -262,10 +274,12 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     /**
      * Compile an once block into valid PHP.
      *
+     * @param null|string $id
+     *
      * @return string
      */
     protected function compileOnce($id = null) {
-        $id = $id ? $this->stripParentheses($id) : "'" . (string) Str::uuid() . "'";
+        $id = $id ? $this->stripParentheses($id) : "'" . (string) cstr::uuid() . "'";
 
         return '<?php if (! $__env->hasRenderedOnce(' . $id . ')): $__env->markAsRenderedOnce(' . $id . '); ?>';
     }
@@ -278,5 +292,4 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     public function compileEndOnce() {
         return '<?php endif; ?>';
     }
-
 }

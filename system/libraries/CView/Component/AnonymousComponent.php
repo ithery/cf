@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Dec 6, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Dec 6, 2020
  */
 class CView_Component_AnonymousComponent extends CView_ComponentAbstract {
-
     /**
      * The component view.
      *
@@ -26,8 +26,9 @@ class CView_Component_AnonymousComponent extends CView_ComponentAbstract {
     /**
      * Create a new anonymous component instance.
      *
-     * @param  string  $view
-     * @param  array  $data
+     * @param string $view
+     * @param array  $data
+     *
      * @return void
      */
     public function __construct($view, $data) {
@@ -54,5 +55,4 @@ class CView_Component_AnonymousComponent extends CView_ComponentAbstract {
 
         return $this->data + ['attributes' => $this->attributes];
     }
-
 }

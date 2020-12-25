@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CView_Finder {
-
     /**
      * The array of active view paths.
      *
@@ -36,13 +35,11 @@ class CView_Finder {
     protected $extensions = ['blade.php', 'php', 'css', 'html'];
 
     /**
-     *
      * @var CView_Finder
      */
     private static $instance;
 
     /**
-     * 
      * @return CView_Finder
      */
     public static function instance() {
@@ -55,8 +52,6 @@ class CView_Finder {
     /**
      * Create a new file view loader instance.
      *
-     * @param  array  $paths
-     * @param  array|null  $extensions
      * @return void
      */
     public function __construct() {
@@ -66,7 +61,8 @@ class CView_Finder {
     /**
      * Get the fully qualified location of the view.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     public function find($name) {
@@ -84,7 +80,8 @@ class CView_Finder {
     /**
      * Get the path to a template with a named path.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function findNamespacedView($name) {
@@ -96,7 +93,8 @@ class CView_Finder {
     /**
      * Get the segments of a template with a named path.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return array
      *
      * @throws \InvalidArgumentException
@@ -109,7 +107,6 @@ class CView_Finder {
         }
 
         if (!isset($this->hints[$segments[0]])) {
-            
             throw new InvalidArgumentException("No hint path defined for [{$segments[0]}].");
         }
 
@@ -119,24 +116,21 @@ class CView_Finder {
     /**
      * Find the given view in the list of paths.
      *
-     * @param  string  $name
-     * @param  array  $paths
+     * @param string $name
+     * @param array  $paths
+     *
      * @return string
      *
      * @throws \InvalidArgumentException
      */
     protected function findInPaths($name, $paths) {
         $cfPath = CF::getDirs(CView::VIEW_FOLDER);
-        
-        $paths = array_merge($cfPath,$paths);
 
+        $paths = array_merge($cfPath, $paths);
 
         foreach ((array) $paths as $path) {
-            
             foreach ($this->getPossibleViewFiles($name) as $file) {
-                
                 if (file_exists($viewPath = $path . $file)) {
-                    
                     return $viewPath;
                 }
             }
@@ -148,7 +142,8 @@ class CView_Finder {
     /**
      * Get an array of possible view files.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return array
      */
     protected function getPossibleViewFiles($name) {
@@ -160,7 +155,8 @@ class CView_Finder {
     /**
      * Add a location to the finder.
      *
-     * @param  string  $location
+     * @param string $location
+     *
      * @return void
      */
     public function addLocation($location) {
@@ -170,7 +166,8 @@ class CView_Finder {
     /**
      * Prepend a location to the finder.
      *
-     * @param  string  $location
+     * @param string $location
+     *
      * @return void
      */
     public function prependLocation($location) {
@@ -180,7 +177,8 @@ class CView_Finder {
     /**
      * Resolve the path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     protected function resolvePath($path) {
@@ -190,8 +188,9 @@ class CView_Finder {
     /**
      * Add a namespace hint to the finder.
      *
-     * @param  string  $namespace
-     * @param  string|array  $hints
+     * @param string       $namespace
+     * @param string|array $hints
+     *
      * @return void
      */
     public function addNamespace($namespace, $hints) {
@@ -207,8 +206,9 @@ class CView_Finder {
     /**
      * Prepend a namespace hint to the finder.
      *
-     * @param  string  $namespace
-     * @param  string|array  $hints
+     * @param string       $namespace
+     * @param string|array $hints
+     *
      * @return void
      */
     public function prependNamespace($namespace, $hints) {
@@ -224,8 +224,9 @@ class CView_Finder {
     /**
      * Replace the namespace hints for the given namespace.
      *
-     * @param  string  $namespace
-     * @param  string|array  $hints
+     * @param string       $namespace
+     * @param string|array $hints
+     *
      * @return void
      */
     public function replaceNamespace($namespace, $hints) {
@@ -235,7 +236,8 @@ class CView_Finder {
     /**
      * Register an extension with the view finder.
      *
-     * @param  string  $extension
+     * @param string $extension
+     *
      * @return void
      */
     public function addExtension($extension) {
@@ -249,7 +251,8 @@ class CView_Finder {
     /**
      * Returns whether or not the view name has any hint information.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return bool
      */
     public function hasHintInformation($name) {
@@ -268,7 +271,8 @@ class CView_Finder {
     /**
      * Set the active view paths.
      *
-     * @param  array  $paths
+     * @param array $paths
+     *
      * @return $this
      */
     public function setPaths($paths) {
@@ -312,5 +316,4 @@ class CView_Finder {
     public function getExtensions() {
         return $this->extensions;
     }
-
 }

@@ -6,7 +6,6 @@
  * @author Hery
  */
 abstract class CView_CompilerAbstract {
-
     /**
      * Get the cache path for the compiled views.
      *
@@ -17,7 +16,6 @@ abstract class CView_CompilerAbstract {
     /**
      * Create a new compiler instance.
      *
-     * @param  string  $cachePath
      * @return void
      *
      * @throws \InvalidArgumentException
@@ -32,7 +30,8 @@ abstract class CView_CompilerAbstract {
     /**
      * Get the path to the compiled version of a view.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function getCompiledPath($path) {
@@ -42,7 +41,8 @@ abstract class CView_CompilerAbstract {
     /**
      * Determine if the view at the given path is expired.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public function isExpired($path) {
@@ -57,5 +57,4 @@ abstract class CView_CompilerAbstract {
 
         return CFile::lastModified($path) >= CFile::lastModified($compiled);
     }
-
 }

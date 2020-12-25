@@ -6,11 +6,11 @@
  * @author Hery
  */
 trait CView_Compiler_BladeCompiler_CompileCommentTrait {
-
     /**
      * Compile Blade comments into an empty string.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileComments($value) {
@@ -18,5 +18,4 @@ trait CView_Compiler_BladeCompiler_CompileCommentTrait {
 
         return preg_replace($pattern, '', $value);
     }
-
 }

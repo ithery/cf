@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CView_Engine_PhpEngine extends CView_EngineAbstract {
-
     /**
      * The filesystem instance.
      *
@@ -26,8 +25,9 @@ class CView_Engine_PhpEngine extends CView_EngineAbstract {
     /**
      * Get the evaluated contents of the view.
      *
-     * @param  string  $path
-     * @param  array  $data
+     * @param string $path
+     * @param array  $data
+     *
      * @return string
      */
     public function get($path, array $data = []) {
@@ -37,8 +37,9 @@ class CView_Engine_PhpEngine extends CView_EngineAbstract {
     /**
      * Get the evaluated contents of the view at the given path.
      *
-     * @param  string  $path
-     * @param  array  $data
+     * @param string $path
+     * @param array  $data
+     *
      * @return string
      */
     protected function evaluatePath($path, $data) {
@@ -50,7 +51,6 @@ class CView_Engine_PhpEngine extends CView_EngineAbstract {
         // flush out any stray output that might get out before an error occurs or
         // an exception is thrown. This prevents any partial views from leaking.
         try {
-
             CFile::getRequire($path, $data);
         } catch (Exception $e) {
             $this->handleViewException($e, $obLevel);
@@ -64,8 +64,9 @@ class CView_Engine_PhpEngine extends CView_EngineAbstract {
     /**
      * Handle a view exception.
      *
-     * @param  \Throwable  $e
-     * @param  int  $obLevel
+     * @param \Throwable $e
+     * @param int        $obLevel
+     *
      * @return void
      *
      * @throws \Throwable
@@ -77,5 +78,4 @@ class CView_Engine_PhpEngine extends CView_EngineAbstract {
 
         throw $e;
     }
-
 }

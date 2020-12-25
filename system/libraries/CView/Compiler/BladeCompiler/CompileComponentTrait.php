@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Dec 6, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Dec 6, 2020
  */
 trait CView_Compiler_BladeCompiler_CompileComponentTrait {
-
     /**
      * The component name hash stack.
      *
@@ -19,7 +19,8 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
     /**
      * Compile the component statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileComponent($expression) {
@@ -39,7 +40,8 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
     /**
      * Get a new component hash for a component name.
      *
-     * @param  string  $component
+     * @param string $component
+     *
      * @return string
      */
     public static function newComponentHash($component) {
@@ -51,10 +53,11 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
     /**
      * Compile a class component opening.
      *
-     * @param  string  $component
-     * @param  string  $alias
-     * @param  string  $data
-     * @param  string  $hash
+     * @param string $component
+     * @param string $alias
+     * @param string $data
+     * @param string $hash
+     *
      * @return string
      */
     public static function compileClassComponentOpening($component, $alias, $data, $hash) {
@@ -90,15 +93,16 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
      * @return string
      */
     public function compileEndComponentClass() {
-        return static::compileEndComponent() . "\n" . implode("\n", [
-                    '<?php endif; ?>',
+        return $this->compileEndComponent() . "\n" . implode("\n", [
+            '<?php endif; ?>',
         ]);
     }
 
     /**
      * Compile the slot statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileSlot($expression) {
@@ -117,7 +121,8 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
     /**
      * Compile the component-first statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileComponentFirst($expression) {
@@ -136,7 +141,8 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
     /**
      * Compile the prop statement into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileProps($expression) {
@@ -154,12 +160,12 @@ trait CView_Compiler_BladeCompiler_CompileComponentTrait {
     /**
      * Sanitize the given component attribute value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return mixed
      */
     public static function sanitizeComponentAttribute($value) {
-        return is_string($value) ||
-                (is_object($value) && !$value instanceof CView_ComponentAttributeBag && method_exists($value, '__toString')) ? e($value) : $value;
+        return is_string($value)
+            || (is_object($value) && !$value instanceof CView_ComponentAttributeBag && method_exists($value, '__toString')) ? c::e($value) : $value;
     }
-
 }

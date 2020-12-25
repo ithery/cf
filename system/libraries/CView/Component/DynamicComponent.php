@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CView_Component_DynamicComponent extends CView_ComponentAbstract {
-
     /**
      * The name of the component.
      *
@@ -31,9 +30,11 @@ class CView_Component_DynamicComponent extends CView_ComponentAbstract {
     /**
      * Create a new component instance.
      *
+     * @param mixed $component
+     *
      * @return void
      */
-    public function __construct( $component) {
+    public function __construct($component) {
         $this->component = $component;
     }
 
@@ -56,23 +57,23 @@ EOF;
             $bindings = $this->bindings($class = $this->classForComponent());
 
             return str_replace(
-                    [
-                        '{{ component }}',
-                        '{{ props }}',
-                        '{{ bindings }}',
-                        '{{ attributes }}',
-                        '{{ slots }}',
-                        '{{ defaultSlot }}',
-                    ],
-                    [
-                        $this->component,
-                        $this->compileProps($bindings),
-                        $this->compileBindings($bindings),
-                        class_exists($class) ? '{{ $attributes }}' : '',
-                        $this->compileSlots($data['__cview_slots']),
-                        '{{ isset($slot) ? $slot : "" }}',
-                    ],
-                    $template
+                [
+                    '{{ component }}',
+                    '{{ props }}',
+                    '{{ bindings }}',
+                    '{{ attributes }}',
+                    '{{ slots }}',
+                    '{{ defaultSlot }}',
+                ],
+                [
+                    $this->component,
+                    $this->compileProps($bindings),
+                    $this->compileBindings($bindings),
+                    class_exists($class) ? '{{ $attributes }}' : '',
+                    $this->compileSlots($data['__cview_slots']),
+                    '{{ isset($slot) ? $slot : "" }}',
+                ],
+                $template
             );
         };
     }
@@ -80,7 +81,8 @@ EOF;
     /**
      * Compile the @props directive for the component.
      *
-     * @param  array  $bindings
+     * @param array $bindings
+     *
      * @return string
      */
     protected function compileProps(array $bindings) {
@@ -88,33 +90,35 @@ EOF;
             return '';
         }
 
-        return '@props(' . '[\'' . implode('\',\'', collect($bindings)->map(function ($dataKey) {
-                            return Str::camel($dataKey);
-                        })->all()) . '\']' . ')';
+        return '@props(' . '[\'' . implode('\',\'', c::collect($bindings)->map(function ($dataKey) {
+            return cstr::camel($dataKey);
+        })->all()) . '\']' . ')';
     }
 
     /**
      * Compile the bindings for the component.
      *
-     * @param  array  $bindings
+     * @param array $bindings
+     *
      * @return string
      */
     protected function compileBindings(array $bindings) {
-        return collect($bindings)->map(function ($key) {
-                    return ':' . $key . '="$' . Str::camel(str_replace([':', '.'], ' ', $key)) . '"';
-                })->implode(' ');
+        return c::collect($bindings)->map(function ($key) {
+            return ':' . $key . '="$' . cstr::camel(str_replace([':', '.'], ' ', $key)) . '"';
+        })->implode(' ');
     }
 
     /**
      * Compile the slots for the component.
      *
-     * @param  array  $slots
+     * @param array $slots
+     *
      * @return string
      */
     protected function compileSlots(array $slots) {
         return c::collect($slots)->map(function ($slot, $name) {
-                    return $name === '__default' ? null : '<cf-slot name="' . $name . '">{{ $' . $name . ' }}</cf-slot>';
-                })->filter()->implode(PHP_EOL);
+            return $name === '__default' ? null : '<cf-slot name="' . $name . '">{{ $' . $name . ' }}</cf-slot>';
+        })->filter()->implode(PHP_EOL);
     }
 
     /**
@@ -133,10 +137,11 @@ EOF;
     /**
      * Get the names of the variables that should be bound to the component.
      *
-     * @param  string  $class
+     * @param string $class
+     *
      * @return array
      */
-    protected function bindings( $class) {
+    protected function bindings($class) {
         list($data, $attributes) = $this->compiler()->partitionDataAndAttributes($class, $this->attributes->getAttributes());
 
         return array_keys($data->all());
@@ -145,18 +150,17 @@ EOF;
     /**
      * Get an instance of the Blade tag compiler.
      *
-     * @return \Illuminate\View\Compilers\ComponentTagCompiler
+     * @return \CView_Compiler_ComponentTagCompiler
      */
     protected function compiler() {
         if (!static::$compiler) {
-            static::$compiler = new ComponentTagCompiler(
-                    CContainer::getInstance()->make('blade.compiler')->getClassComponentAliases(),
-                    CContainer::getInstance()->make('blade.compiler')->getClassComponentNamespaces(),
-                    CContainer::getInstance()->make('blade.compiler')
+            static::$compiler = new CView_Compiler_ComponentTagCompiler(
+                CContainer::getInstance()->make('blade.compiler')->getClassComponentAliases(),
+                CContainer::getInstance()->make('blade.compiler')->getClassComponentNamespaces(),
+                CContainer::getInstance()->make('blade.compiler')
             );
         }
 
         return static::$compiler;
     }
-
 }

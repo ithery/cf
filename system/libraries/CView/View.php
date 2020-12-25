@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CView_View implements ArrayAccess, CInterface_Htmlable {
-
     /**
      * The engine implementation.
      *
@@ -38,10 +37,11 @@ class CView_View implements ArrayAccess, CInterface_Htmlable {
     /**
      * Create a new view instance.
      *
-     * @param  CView_AbstractEngine  $engine
-     * @param  string  $view
-     * @param  string  $path
-     * @param  mixed  $data
+     * @param CView_AbstractEngine $engine
+     * @param string               $view
+     * @param string               $path
+     * @param mixed                $data
+     *
      * @return void
      */
     public function __construct(CView_EngineAbstract $engine, $view, $path, $data = []) {
@@ -49,15 +49,15 @@ class CView_View implements ArrayAccess, CInterface_Htmlable {
         $this->path = $path;
         $this->engine = $engine;
 
-
-        $this->data = $data instanceof Arrayable ? $data->toArray() : (array) $data;
+        $this->data = $data instanceof CInterface_Arrayable ? $data->toArray() : (array) $data;
     }
 
     /**
      * Add a piece of data to the view.
      *
-     * @param  string|array  $key
-     * @param  mixed  $value
+     * @param string|array $key
+     * @param mixed        $value
+     *
      * @return $this
      */
     public function with($key, $value = null) {
@@ -118,7 +118,8 @@ class CView_View implements ArrayAccess, CInterface_Htmlable {
     /**
      * Determine if a piece of data is bound.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function offsetExists($key) {
@@ -128,7 +129,8 @@ class CView_View implements ArrayAccess, CInterface_Htmlable {
     /**
      * Get a piece of bound data to the view.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function offsetGet($key) {
@@ -138,8 +140,9 @@ class CView_View implements ArrayAccess, CInterface_Htmlable {
     /**
      * Set a piece of data on the view.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function offsetSet($key, $value) {
@@ -149,7 +152,8 @@ class CView_View implements ArrayAccess, CInterface_Htmlable {
     /**
      * Unset a piece of data from the view.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return void
      */
     public function offsetUnset($key) {
@@ -159,7 +163,8 @@ class CView_View implements ArrayAccess, CInterface_Htmlable {
     /**
      * Get a piece of data from the view.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function &__get($key) {
@@ -169,8 +174,9 @@ class CView_View implements ArrayAccess, CInterface_Htmlable {
     /**
      * Set a piece of data on the view.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function __set($key, $value) {
@@ -180,7 +186,8 @@ class CView_View implements ArrayAccess, CInterface_Htmlable {
     /**
      * Check if a piece of data is bound to the view.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function __isset($key) {
@@ -190,7 +197,8 @@ class CView_View implements ArrayAccess, CInterface_Htmlable {
     /**
      * Remove a piece of bound data from the view.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return void
      */
     public function __unset($key) {
@@ -220,7 +228,8 @@ class CView_View implements ArrayAccess, CInterface_Htmlable {
     /**
      * Get the string contents of the view.
      *
-     * @param  callable|null  $callback
+     * @param callable|null $callback
+     *
      * @return array|string
      *
      * @throws \Throwable
@@ -295,7 +304,9 @@ class CView_View implements ArrayAccess, CInterface_Htmlable {
 
     /**
      * Alias with
+     *
      * @param array $data
+     *
      * @return $this
      */
     public function set($data) {

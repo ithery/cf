@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Dec 6, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Dec 6, 2020
  */
 
-
-abstract class CView_ComponentAbstract
-{
+abstract class CView_ComponentAbstract {
     /**
      * The cache of public property names, keyed by class.
      *
@@ -58,8 +57,7 @@ abstract class CView_ComponentAbstract
      *
      * @return CView_View|\Illuminate\Contracts\Support\Htmlable|\Closure|string
      */
-    public function resolveView()
-    {
+    public function resolveView() {
         $view = $this->render();
 
         if ($view instanceof CView_View) {
@@ -87,26 +85,26 @@ abstract class CView_ComponentAbstract
     /**
      * Create a Blade view with the raw component string content.
      *
-     * @param  CView_Factory  $factory
-     * @param  string  $contents
+     * @param CView_Factory $factory
+     * @param string        $contents
+     *
      * @return string
      */
-    protected function createBladeViewFromString($factory, $contents)
-    {
+    protected function createBladeViewFromString($factory, $contents) {
         $factory->addNamespace(
             '__components',
             $directory = CF::config('view.compiled')
         );
 
-        if (! is_file($viewFile = $directory.'/'.sha1($contents).'.blade.php')) {
-            if (! is_dir($directory)) {
+        if (!is_file($viewFile = $directory . '/' . sha1($contents) . '.blade.php')) {
+            if (!is_dir($directory)) {
                 mkdir($directory, 0755, true);
             }
 
             file_put_contents($viewFile, $contents);
         }
 
-        return '__components::'.basename($viewFile, '.blade.php');
+        return '__components::' . basename($viewFile, '.blade.php');
     }
 
     /**
@@ -117,8 +115,7 @@ abstract class CView_ComponentAbstract
      *
      * @return array
      */
-    public function data()
-    {
+    public function data() {
         $this->attributes = $this->attributes ?: new CView_ComponentAttributeBag;
 
         return array_merge($this->extractPublicProperties(), $this->extractPublicMethods());
@@ -129,14 +126,13 @@ abstract class CView_ComponentAbstract
      *
      * @return array
      */
-    protected function extractPublicProperties()
-    {
+    protected function extractPublicProperties() {
         $class = get_class($this);
 
-        if (! isset(static::$propertyCache[$class])) {
+        if (!isset(static::$propertyCache[$class])) {
             $reflection = new ReflectionClass($this);
 
-            static::$propertyCache[$class] = collect($reflection->getProperties(ReflectionProperty::IS_PUBLIC))
+            static::$propertyCache[$class] = c::collect($reflection->getProperties(ReflectionProperty::IS_PUBLIC))
                 ->reject(function (ReflectionProperty $property) {
                     return $property->isStatic();
                 })
@@ -162,14 +158,13 @@ abstract class CView_ComponentAbstract
      *
      * @return array
      */
-    protected function extractPublicMethods()
-    {
+    protected function extractPublicMethods() {
         $class = get_class($this);
 
-        if (! isset(static::$methodCache[$class])) {
+        if (!isset(static::$methodCache[$class])) {
             $reflection = new ReflectionClass($this);
 
-            static::$methodCache[$class] = collect($reflection->getMethods(ReflectionMethod::IS_PUBLIC))
+            static::$methodCache[$class] = c::collect($reflection->getMethods(ReflectionMethod::IS_PUBLIC))
                 ->reject(function (ReflectionMethod $method) {
                     return $this->shouldIgnore($method->getName());
                 })
@@ -190,11 +185,11 @@ abstract class CView_ComponentAbstract
     /**
      * Create a callable variable from the given method.
      *
-     * @param  \ReflectionMethod  $method
+     * @param \ReflectionMethod $method
+     *
      * @return mixed
      */
-    protected function createVariableFromMethod(ReflectionMethod $method)
-    {
+    protected function createVariableFromMethod(ReflectionMethod $method) {
         return $method->getNumberOfParameters() === 0
                         ? $this->createInvokableVariable($method->getName())
                         : Closure::fromCallable([$this, $method->getName()]);
@@ -203,11 +198,11 @@ abstract class CView_ComponentAbstract
     /**
      * Create an invokable, toStringable variable for the given component method.
      *
-     * @param  string  $method
-     * @return \Illuminate\View\InvokableComponentVariable
+     * @param string $method
+     *
+     * @return CView_InvokableComponentVariable
      */
-    protected function createInvokableVariable( $method)
-    {
+    protected function createInvokableVariable($method) {
         return new CView_InvokableComponentVariable(function () use ($method) {
             return $this->{$method}();
         });
@@ -216,13 +211,13 @@ abstract class CView_ComponentAbstract
     /**
      * Determine if the given property / method should be ignored.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return bool
      */
-    protected function shouldIgnore($name)
-    {
-        return cstr::startsWith($name, '__') ||
-               in_array($name, $this->ignoredMethods());
+    protected function shouldIgnore($name) {
+        return cstr::startsWith($name, '__')
+               || in_array($name, $this->ignoredMethods());
     }
 
     /**
@@ -230,8 +225,7 @@ abstract class CView_ComponentAbstract
      *
      * @return array
      */
-    protected function ignoredMethods()
-    {
+    protected function ignoredMethods() {
         return array_merge([
             'data',
             'render',
@@ -246,11 +240,11 @@ abstract class CView_ComponentAbstract
     /**
      * Set the component alias name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return $this
      */
-    public function withName($name)
-    {
+    public function withName($name) {
         $this->componentName = $name;
 
         return $this;
@@ -259,12 +253,12 @@ abstract class CView_ComponentAbstract
     /**
      * Set the extra attributes that the component should make available.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return $this
      */
-    public function withAttributes(array $attributes)
-    {
-        $this->attributes = $this->attributes ?: new ComponentAttributeBag;
+    public function withAttributes(array $attributes) {
+        $this->attributes = $this->attributes ?: new CView_ComponentAttributeBag;
 
         $this->attributes->setAttributes($attributes);
 
@@ -276,8 +270,7 @@ abstract class CView_ComponentAbstract
      *
      * @return bool
      */
-    public function shouldRender()
-    {
+    public function shouldRender() {
         return true;
     }
 }

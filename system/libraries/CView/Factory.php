@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CView_Factory {
-
     use CView_Trait_ManageEventTrait,
         CView_Trait_ManageLayoutTrait,
         CView_Trait_ManageLoopTrait,
@@ -41,7 +40,6 @@ class CView_Factory {
     protected $shared = [];
 
     /**
-     *
      * @var CView_Factory
      */
     private static $instance;
@@ -69,7 +67,7 @@ class CView_Factory {
 
     /**
      * Get the CView_Factory single instance.
-     * 
+     *
      * @return CView_Factory
      */
     public static function instance() {
@@ -87,14 +85,15 @@ class CView_Factory {
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param  string  $view
-     * @param  CInterface_Arrayable|array  $data
-     * @param  array  $mergeData
+     * @param string                     $view
+     * @param CInterface_Arrayable|array $data
+     * @param array                      $mergeData
+     *
      * @return CView_View
      */
     public function make($view, $data = [], $mergeData = []) {
         $path = CView_Finder::instance()->find(
-                $view = $this->normalizeName($view)
+            $view = $this->normalizeName($view)
         );
 
         // Next, we will create the view instance and call the view creator for the view
@@ -103,40 +102,42 @@ class CView_Factory {
         $data = array_merge($mergeData, $this->parseData($data));
 
         return c::tap($this->viewInstance($view, $path, $data), function ($view) {
-                    $this->callCreator($view);
-                });
+            $this->callCreator($view);
+        });
     }
 
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param  string  $path
-     * @param  CInterface_Arrayable|array  $data
-     * @param  array  $mergeData
+     * @param string                     $path
+     * @param CInterface_Arrayable|array $data
+     * @param array                      $mergeData
+     *
      * @return CView_View
      */
     public function file($path, $data = [], $mergeData = []) {
         $data = array_merge($mergeData, $this->parseData($data));
 
         return c::tap($this->viewInstance($path, $path, $data), function ($view) {
-                    $this->callCreator($view);
-                });
+            $this->callCreator($view);
+        });
     }
 
     /**
      * Get the first view that actually exists from the given list.
      *
-     * @param  array  $views
-     * @param  \CInterface_Arrayable|array  $data
-     * @param  array  $mergeData
+     * @param array                       $views
+     * @param \CInterface_Arrayable|array $data
+     * @param array                       $mergeData
+     *
      * @return \CView_View
      *
      * @throws \InvalidArgumentException
      */
     public function first(array $views, $data = [], $mergeData = []) {
         $view = carr::first($views, function ($view) {
-                    return $this->exists($view);
-                });
+            return $this->exists($view);
+        });
 
         if (!$view) {
             throw new InvalidArgumentException('None of the views in the given array exist.');
@@ -148,10 +149,11 @@ class CView_Factory {
     /**
      * Get the rendered content of the view based on a given condition.
      *
-     * @param  bool  $condition
-     * @param  string  $view
-     * @param  \CInterface_Arrayable|array  $data
-     * @param  array  $mergeData
+     * @param bool                        $condition
+     * @param string                      $view
+     * @param \CInterface_Arrayable|array $data
+     * @param array                       $mergeData
+     *
      * @return string
      */
     public function renderWhen($condition, $view, $data = [], $mergeData = []) {
@@ -165,10 +167,11 @@ class CView_Factory {
     /**
      * Get the rendered contents of a partial from a loop.
      *
-     * @param  string  $view
-     * @param  array  $data
-     * @param  string  $iterator
-     * @param  string  $empty
+     * @param string $view
+     * @param array  $data
+     * @param string $iterator
+     * @param string $empty
+     *
      * @return string
      */
     public function renderEach($view, $data, $iterator, $empty = 'raw|') {
@@ -180,16 +183,15 @@ class CView_Factory {
         if (count($data) > 0) {
             foreach ($data as $key => $value) {
                 $result .= $this->make(
-                                $view, ['key' => $key, $iterator => $value]
-                        )->render();
+                    $view,
+                    ['key' => $key, $iterator => $value]
+                )->render();
             }
-        }
-
-        // If there is no data in the array, we will render the contents of the empty
-        // view. Alternatively, the "empty view" could be a raw string that begins
-        // with "raw|" for convenience and to let this know that it is a string.
-        else {
-            $result = Str::startsWith($empty, 'raw|') ? substr($empty, 4) : $this->make($empty)->render();
+        } else {
+            // If there is no data in the array, we will render the contents of the empty
+            // view. Alternatively, the "empty view" could be a raw string that begins
+            // with "raw|" for convenience and to let this know that it is a string.
+            $result = cstr::startsWith($empty, 'raw|') ? substr($empty, 4) : $this->make($empty)->render();
         }
 
         return $result;
@@ -198,7 +200,8 @@ class CView_Factory {
     /**
      * Normalize a view name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function normalizeName($name) {
@@ -208,7 +211,8 @@ class CView_Factory {
     /**
      * Parse the given data into a raw array.
      *
-     * @param  mixed  $data
+     * @param mixed $data
+     *
      * @return array
      */
     protected function parseData($data) {
@@ -218,9 +222,10 @@ class CView_Factory {
     /**
      * Create a new view instance from the given arguments.
      *
-     * @param  string  $view
-     * @param  string  $path
-     * @param  \CInterface_Arrayable|array  $data
+     * @param string                      $view
+     * @param string                      $path
+     * @param \CInterface_Arrayable|array $data
+     *
      * @return \CView_View
      */
     protected function viewInstance($view, $path, $data) {
@@ -230,7 +235,8 @@ class CView_Factory {
     /**
      * Determine if a given view exists.
      *
-     * @param  string  $view
+     * @param string $view
+     *
      * @return bool
      */
     public function exists($view) {
@@ -245,8 +251,9 @@ class CView_Factory {
     /**
      * Get the appropriate view engine for the given path.
      *
-     * @param  string  $path
-     * @return \Illuminate\Contracts\View\Engine
+     * @param string $path
+     *
+     * @return CView_EngineAbstract
      *
      * @throws \InvalidArgumentException
      */
@@ -263,22 +270,24 @@ class CView_Factory {
     /**
      * Get the extension used by the view file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string|null
      */
     protected function getExtension($path) {
         $extensions = array_keys($this->extensions);
 
         return carr::first($extensions, function ($value) use ($path) {
-                    return cstr::endsWith($path, '.' . $value);
-                });
+            return cstr::endsWith($path, '.' . $value);
+        });
     }
 
     /**
      * Add a piece of shared data to the environment.
      *
-     * @param  array|string  $key
-     * @param  mixed|null  $value
+     * @param array|string $key
+     * @param mixed|null   $value
+     *
      * @return mixed
      */
     public function share($key, $value = null) {
@@ -321,7 +330,8 @@ class CView_Factory {
     /**
      * Determine if the given once token has been rendered.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return bool
      */
     public function hasRenderedOnce($id) {
@@ -331,7 +341,8 @@ class CView_Factory {
     /**
      * Mark the given once token as having been rendered.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return void
      */
     public function markAsRenderedOnce($id) {
@@ -341,7 +352,8 @@ class CView_Factory {
     /**
      * Add a location to the array of view locations.
      *
-     * @param  string  $location
+     * @param string $location
+     *
      * @return void
      */
     public function addLocation($location) {
@@ -351,12 +363,12 @@ class CView_Factory {
     /**
      * Add a new namespace to the loader.
      *
-     * @param  string  $namespace
-     * @param  string|array  $hints
+     * @param string       $namespace
+     * @param string|array $hints
+     *
      * @return $this
      */
     public function addNamespace($namespace, $hints) {
-        
         CView::finder()->addNamespace($namespace, $hints);
 
         return $this;
@@ -365,8 +377,9 @@ class CView_Factory {
     /**
      * Prepend a new namespace to the loader.
      *
-     * @param  string  $namespace
-     * @param  string|array  $hints
+     * @param string       $namespace
+     * @param string|array $hints
+     *
      * @return $this
      */
     public function prependNamespace($namespace, $hints) {
@@ -378,8 +391,9 @@ class CView_Factory {
     /**
      * Replace the namespace hints for the given namespace.
      *
-     * @param  string  $namespace
-     * @param  string|array  $hints
+     * @param string       $namespace
+     * @param string|array $hints
+     *
      * @return $this
      */
     public function replaceNamespace($namespace, $hints) {
@@ -391,9 +405,10 @@ class CView_Factory {
     /**
      * Register a valid view extension and its engine.
      *
-     * @param  string  $extension
-     * @param  string  $engine
-     * @param  \Closure|null  $resolver
+     * @param string        $extension
+     * @param string        $engine
+     * @param \Closure|null $resolver
+     *
      * @return void
      */
     public function addExtension($extension, $engine, $resolver = null) {
@@ -453,7 +468,8 @@ class CView_Factory {
     /**
      * Set the view finder instance.
      *
-     * @param  \Illuminate\View\ViewFinderInterface  $finder
+     * @param \Illuminate\View\ViewFinderInterface $finder
+     *
      * @return void
      */
     public function setFinder(ViewFinderInterface $finder) {
@@ -481,17 +497,18 @@ class CView_Factory {
     /**
      * Set the event dispatcher instance.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @param CEvent_Dispatcher $events
+     *
      * @return void
      */
-    public function setDispatcher(Dispatcher $events) {
+    public function setDispatcher(CEvent_Dispatcher $events) {
         $this->events = $events;
     }
 
     /**
      * Get the IoC container instance.
      *
-     * @return \Illuminate\Contracts\Container\Container
+     * @return CContainer_Container
      */
     public function getContainer() {
         return CContainer::getInstance();
@@ -500,7 +517,8 @@ class CView_Factory {
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param \Illuminate\Contracts\Container\Container $container
+     *
      * @return void
      */
     public function setContainer(CContainer_Container $container) {
@@ -510,8 +528,9 @@ class CView_Factory {
     /**
      * Get an item from the shared data.
      *
-     * @param  string  $key
-     * @param  mixed  $default
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
     public function shared($key, $default = null) {
@@ -526,5 +545,4 @@ class CView_Factory {
     public function getShared() {
         return $this->shared;
     }
-
 }

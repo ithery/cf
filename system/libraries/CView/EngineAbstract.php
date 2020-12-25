@@ -6,7 +6,6 @@
  * @author Hery
  */
 abstract class CView_EngineAbstract {
-
     /**
      * The view that was last to be rendered.
      *
@@ -22,5 +21,4 @@ abstract class CView_EngineAbstract {
     public function getLastRendered() {
         return $this->lastRendered;
     }
-
 }
