@@ -5,13 +5,13 @@
  *
  * @author Hery
  */
-class CDevSuite_Mac_Linux_MariaDB extends CDevSuite_Db_MariaDb {
-
+class CDevSuite_Linux_Db_MariaDB extends CDevSuite_Db_MariaDb {
     public $pm;
     public $sm;
 
     /**
      * Create a new MariaDb instance.
+     *
      * @return void
      */
     public function __construct() {
@@ -76,5 +76,4 @@ class CDevSuite_Mac_Linux_MariaDB extends CDevSuite_Db_MariaDb {
             $this->files->symlinkAsRoot('/etc/nginx/sites-available/default', '/etc/nginx/sites-enabled/default');
         }
     }
-
 }

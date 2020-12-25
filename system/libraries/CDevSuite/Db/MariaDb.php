@@ -8,15 +8,12 @@
 use Symfony\Component\Process\Process;
 
 abstract class CDevSuite_Db_MariaDb {
-
     /**
-     *
      * @var CDevSuite_Filesystem
      */
     protected $files;
 
     /**
-     *
      * @var CDevSuite_CommandLine
      */
     protected $cli;
@@ -25,8 +22,8 @@ abstract class CDevSuite_Db_MariaDb {
         $this->files = CDevSuite::filesystem();
         $this->cli = CDevSuite::commandLine();
     }
-    
-   /**
+
+    /**
      * Install the configuration files for MariaDb.
      *
      * @return void
@@ -53,10 +50,10 @@ abstract class CDevSuite_Db_MariaDb {
      * @return void
      */
     abstract public function restart();
-    
+
     /**
-     * get ini file location
-     * 
+     * Get ini file location
+     *
      * @return string
      */
     public function mariaDbIniFile() {
@@ -69,7 +66,7 @@ abstract class CDevSuite_Db_MariaDb {
         $dbType = mb_strtolower(basename(str_replace('\\', '/', get_class($dbDumper))));
         $dbName = $dbDumper->getDbName();
         if ($dbDumper instanceof CBackup_Database_Dumper_SqliteDumper) {
-            $dbName = $key . '-database';
+            //$dbName = $key . '-database';
         }
         $fileName = "{$dbType}-{$dbName}.{$this->getExtension($dbDumper)}";
 
@@ -77,11 +74,12 @@ abstract class CDevSuite_Db_MariaDb {
         //$temporaryFilePath = DOCROOT . 'temp/devsuite/db/db-dumps/'. $fileName;
 
         $dbDumper->setDumpBinaryPath($this->getDumperBinaryPath());
+
         $this->files->ensureDirExists(dirname($temporaryFilePath));
 
-        CDevSuite::info("Dumping database to:" . $temporaryFilePath);
+        CDevSuite::info('Dumping database to:' . $temporaryFilePath);
 
-        //$dbDumper->dumpToFile($temporaryFilePath);
+        $dbDumper->dumpToFile($temporaryFilePath);
         return $temporaryFilePath;
     }
 
@@ -89,33 +87,41 @@ abstract class CDevSuite_Db_MariaDb {
         return $dbDumper instanceof CBackup_Database_Dumper_MongoDbDumper ? 'archive' : 'sql';
     }
 
-    public function restore($to, $dumpFile) {
-        $command=$this->getRestoreCommand($to, $dumpFile);
-        
-        $process = Process::fromShellCommandline($command,null,null,null);
+    /**
+     * Restore database
+     *
+     * @param array  $to             Database Config
+     * @param string $dumpFile
+     * @param mixed  $deleteDumpFile
+     *
+     * @return string
+     */
+    public function restore($to, $dumpFile, $deleteDumpFile = true) {
+        $command = $this->getRestoreCommand($to, $dumpFile);
+        CDevSuite::info('Restoring from ' . $dumpFile);
+        $process = Process::fromShellCommandline($command, null, null, null);
         $output = '';
-        $process->run(function ($type, $line) use(&$output) {
+        $process->run(function ($type, $line) use (&$output) {
             $output .= $line;
         });
+        if ($deleteDumpFile) {
+            CDevSuite::info('Deleting: ' . $dumpFile);
+            $this->files->unlink($dumpFile);
+        }
 
         return $output;
     }
 
     protected function getDumperBinaryPath() {
         //echo realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS . 'mysqldump.exe';
-        
-        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin'.DS;
-        
-         
+
+        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS;
     }
-    
-    
+
     protected function getClientBinaryPath() {
         //echo realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS . 'mysqldump.exe';
-        
-        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin'.DS;
-        
-         
+
+        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS;
     }
 
     protected function getRestoreCommand($dbConfig, $fromFile) {
@@ -128,7 +134,7 @@ abstract class CDevSuite_Db_MariaDb {
         $port = carr::get($connection, 'port');
         $host = carr::first(carr::wrap(carr::get($connection, 'host', '')));
 
-        $command[] = $this->getClientBinaryPath().'mysql';
+        $command[] = $this->getClientBinaryPath() . 'mysql';
         $command[] = '-h';
         $command[] = $host;
         $command[] = '-u';
@@ -139,7 +145,7 @@ abstract class CDevSuite_Db_MariaDb {
         }
 
         $command[] = $database;
-        return implode(" ", $command) . " < " . $fromFile;
+        return implode(' ', $command) . ' < ' . $fromFile;
     }
 
     /**
@@ -159,5 +165,4 @@ abstract class CDevSuite_Db_MariaDb {
 
         $this->files->putAsUser($mariaDbDirectory . '/.keep', "\n");
     }
-
 }

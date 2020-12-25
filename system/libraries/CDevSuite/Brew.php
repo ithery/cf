@@ -2,10 +2,9 @@
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
+ * @license Ittron Global Teknologi
  *
  * @since Nov 15, 2020
- *
- * @license Ittron Global Teknologi
  */
 class CDevSuite_Brew {
     const SUPPORTED_PHP_VERSIONS = [
@@ -31,9 +30,6 @@ class CDevSuite_Brew {
 
     /**
      * Create a new Brew instance.
-     *
-     * @param CommandLine $cli
-     * @param Filesystem  $files
      *
      * @return void
      */
@@ -111,6 +107,15 @@ class CDevSuite_Brew {
     }
 
     /**
+     * Return name of the nginx service installed via Homebrew.
+     *
+     * @return string
+     */
+    public function mariaDbServiceName() {
+        return 'mariadb';
+    }
+
+    /**
      * Ensure that the given formula is installed.
      *
      * @param string $formula
@@ -153,8 +158,7 @@ class CDevSuite_Brew {
     /**
      * Tap the given formulas.
      *
-     * @param dynamic[string] $formula
-     * @param mixed           $formulas
+     * @param dynamic[string] $formulas
      *
      * @return void
      */
@@ -169,7 +173,6 @@ class CDevSuite_Brew {
     /**
      * Restart the given Homebrew services.
      *
-     * @param
      * @param mixed $services
      */
     public function restartService($services) {
@@ -188,7 +191,6 @@ class CDevSuite_Brew {
     /**
      * Stop the given Homebrew services.
      *
-     * @param
      * @param mixed $services
      */
     public function stopService($services) {

@@ -6,13 +6,13 @@
  * @author Hery
  */
 class CDevSuite_Mac_Db_MariaDB extends CDevSuite_Db_MariaDb {
-
     public $brew;
 
     const NGINX_CONF = '/usr/local/etc/nginx/nginx.conf';
 
     /**
      * Create a new MariaDb instance.
+     *
      * @return void
      */
     public function __construct() {
@@ -34,7 +34,6 @@ class CDevSuite_Mac_Db_MariaDB extends CDevSuite_Db_MariaDb {
         $this->cli->run('mysql_install_db');
     }
 
-    
     /**
      * Stop the Nginx service.
      *
@@ -56,23 +55,20 @@ class CDevSuite_Mac_Db_MariaDB extends CDevSuite_Db_MariaDb {
         //$this->brew->uninstallFormula('nginx nginx-full');
         //$this->cli->quietly('rm -rf /usr/local/etc/nginx /usr/local/var/log/nginx');
     }
-    
+
     /**
      * Restart the Nginx service.
      *
      * @return void
      */
     public function restart() {
-        $this->lint();
+        //$this->lint();
 
-        $this->brew->restartService($this->brew->nginxServiceName());
+        $this->brew->restartService($this->brew->mariaDbServiceName());
     }
 
-    
     protected function getDumperBinaryPath() {
         return '';
-        
-         
     }
 
     protected function getClientBinaryPath() {

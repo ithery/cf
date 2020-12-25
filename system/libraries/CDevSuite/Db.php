@@ -6,16 +6,15 @@
  * @author Hery
  */
 class CDevSuite_Db {
-
     public $files;
     protected $mariaDb;
 
     /**
      * Create a new Nginx instance.
+     *
      * @return void
      */
-    function __construct() {
-
+    public function __construct() {
         $this->files = CDevSuite::filesystem();
     }
 
@@ -35,8 +34,6 @@ class CDevSuite_Db {
     }
 
     public function create($name, $configuration) {
-
-
         if (!$this->isCanConnect($configuration)) {
             CDevSuite::info('Error when connecting to:' . $name . ', please check your configuration');
             return false;
@@ -51,14 +48,15 @@ class CDevSuite_Db {
     /**
      * Write the given configuration to disk.
      *
-     * @param array $config
+     * @param array $data
      *
      * @return void
      */
     public function write($data) {
         $this->files->putAsUser($this->path(), json_encode(
-                        $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-                ) . PHP_EOL);
+            $data,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        ) . PHP_EOL);
     }
 
     /**
@@ -74,16 +72,15 @@ class CDevSuite_Db {
     public function getTableData() {
         $data = $this->read();
 
-
         return c::collect($data)->map(function ($item, $key) {
-                    return [
-                        'key' => $key,
-                        'type' => carr::get($item, 'type'),
-                        'database' => carr::get($item, 'database'),
-                        'host' => carr::get($item, 'host') . ':' . carr::get($item, 'port'),
-                            //'auth' => carr::get($item, 'user') . ':' . carr::get($item, 'password'),
-                    ];
-                });
+            return [
+                'key' => $key,
+                'type' => carr::get($item, 'type'),
+                'database' => carr::get($item, 'database'),
+                'host' => carr::get($item, 'host') . ':' . carr::get($item, 'port'),
+                //'auth' => carr::get($item, 'user') . ':' . carr::get($item, 'password'),
+            ];
+        });
     }
 
     public function toDbConfig($keyFile) {
@@ -99,7 +96,6 @@ class CDevSuite_Db {
         $driver = carr::get($configArray, 'type');
         $database = carr::get($configArray, 'database');
 
-
         if (strlen($driver) == 0) {
             $driver = 'mysqli';
         }
@@ -113,29 +109,29 @@ class CDevSuite_Db {
                 $database = 'admin';
             }
         }
-        $config = array(
-            'benchmark' => TRUE,
-            'persistent' => FALSE,
-            'connection' => array(
+        $config = [
+            'benchmark' => true,
+            'persistent' => false,
+            'connection' => [
                 'type' => $driver,
                 'user' => $username,
                 'pass' => $password,
                 'host' => $host,
                 'port' => $port,
-                'socket' => FALSE,
+                'socket' => false,
                 'database' => $database,
-            ),
+            ],
             'character_set' => 'utf8mb4',
             'table_prefix' => '',
-            'object' => TRUE,
-            'cache' => FALSE,
-            'escape' => TRUE
-        );
+            'object' => true,
+            'cache' => false,
+            'escape' => true
+        ];
         return $config;
     }
 
     /**
-     * 
+     * @param mixed $key
      */
     public function getDatabase($key) {
         $config = $this->toDbConfig($key);
@@ -145,8 +141,6 @@ class CDevSuite_Db {
     }
 
     public function isCanConnect($key) {
-
-
         try {
             $db = $this->getDatabase($key);
             $db->connect();
@@ -159,13 +153,11 @@ class CDevSuite_Db {
     }
 
     public function compare($from, $to) {
-
         $fromDB = $this->getDatabase($from);
         $toDB = $this->getDatabase($to);
 
         $fromDB->connect();
         $toDB->connect();
-
 
         $fromSchemaManager = $fromDB->getSchemaManager();
         $toSchemaManager = $toDB->getSchemaManager();
@@ -174,7 +166,6 @@ class CDevSuite_Db {
         $toSchema = $toSchemaManager->createSchema();
 
         $sqls = $toSchema->getMigrateToSql($fromSchema, $fromDB->getDatabasePlatform());
-
 
         $sqlString = '';
         $formatted = false;
@@ -192,13 +183,11 @@ class CDevSuite_Db {
     }
 
     public function sync($from, $to) {
-
         $fromDB = $this->getDatabase($from);
         $toDB = $this->getDatabase($to);
 
         $fromDB->connect();
         $toDB->connect();
-
 
         $fromSchemaManager = $fromDB->getSchemaManager();
         $toSchemaManager = $toDB->getSchemaManager();
@@ -218,7 +207,6 @@ class CDevSuite_Db {
             $errSql = 0;
             $resultQ = null;
             try {
-
                 CDevSuite::info('Executing:' . $sql . ';');
                 $resultQ = $toDB->query($sql);
             } catch (Exception $ex) {
@@ -293,16 +281,14 @@ class CDevSuite_Db {
     public function cloneDatabase($from, $to) {
         $fromConfig = $this->toDbConfig($from);
         $toConfig = $this->toDbConfig($to);
-        
-        CDevSuite::info("Prepare to dumping database:" . $from);
-        $dumpFile = $this->mariaDb()->dump($fromConfig);
-        
-        $output = $this->mariaDb()->restore($toConfig,$dumpFile);
-        
-        CDevSuite::info($output);
-        
-        //$this->files->unlink($dumpFile);
-        
-    }
 
+        CDevSuite::info('Prepare to dumping database:' . $from);
+        $dumpFile = $this->mariaDb()->dump($fromConfig);
+
+        $output = $this->mariaDb()->restore($toConfig, $dumpFile);
+
+        CDevSuite::info($output);
+
+        //$this->files->unlink($dumpFile);
+    }
 }
