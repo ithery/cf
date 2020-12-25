@@ -1,23 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 15, 2019, 7:57:09 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 15, 2019, 7:57:09 PM
  */
 class CSocialLogin {
-
     /**
-     * 
      * @param string $driverName
-     * @param array $options
+     * @param array  $options
+     *
      * @return CSocialLogin_AbstractProviderInterface
      */
     public static function driver($driverName, $options = []) {
         $driverManager = new CSocialLogin_DriverManager();
         return $driverManager->setConfig($options)->driver($driverName);
     }
-
 }
