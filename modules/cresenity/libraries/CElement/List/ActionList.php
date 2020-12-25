@@ -1,48 +1,42 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2018, 6:10:37 AM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CElement_List_ActionList extends CElement_List {
-
     use CTrait_Compat_Element_ActionList,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
 
-
-    
-    public $actions = array();
+    public $actions = [];
     protected $style;
     protected $withCaret;
 
     public function __construct($listId = null) {
         parent::__construct($listId);
 
-        $this->style = "btn-list";
-        $this->label = clang::__("Action");
-        $this->btn_dropdown_classes = array();
+        $this->style = 'btn-list';
+        $this->label = clang::__('Action');
+        $this->btn_dropdown_classes = [];
         $this->label_size = 2;
         $this->icon = '';
         $this->withCaret = true;
-
     }
 
-    public static function factory($list_id = "") {
+    public static function factory($list_id = '') {
         return new CElement_List_ActionList($list_id);
     }
 
     public function setStyle($style) {
-
-        if (in_array($style, array("form-action", "btn-group", "btn-icon-group", "btn-list", "icon-segment", "btn-dropdown", "widget-action", "table-header-action"))) {
+        if (in_array($style, ['form-action', 'btn-group', 'btn-icon-group', 'btn-list', 'icon-segment', 'btn-dropdown', 'widget-action', 'table-header-action'])) {
             $this->style = $style;
         } else {
             trigger_error('style is not defined');
         }
-        if ($this->id == "test-123") {
+        if ($this->id == 'test-123') {
             //echo($this->style);
         }
         return $this;
@@ -53,17 +47,16 @@ class CElement_List_ActionList extends CElement_List {
     }
 
     public function removeCaret() {
-        $this->withCaret=false;
+        $this->withCaret = false;
         return $this;
     }
-    
-    
+
     protected function htmlCaret() {
-        return $this->withCaret ? '<span class="caret"></span>':'';
+        return $this->withCaret ? '<span class="caret"></span>' : '';
     }
-    
+
     public function html($indent = 0) {
-        if ($this->id == "test-123") {
+        if ($this->id == 'test-123') {
             //die($this->style);
         }
         //apply render style to child before render
@@ -78,25 +71,24 @@ class CElement_List_ActionList extends CElement_List {
         $html = new CStringBuilder();
         $html->setIndent($indent);
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
+        $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
-            $classes = " " . $classes;
+            $classes = ' ' . $classes;
         }
         $btn_dropdown_classes = $this->btn_dropdown_classes;
-        $btn_dropdown_classes = implode(" ", $btn_dropdown_classes);
+        $btn_dropdown_classes = implode(' ', $btn_dropdown_classes);
         if (strlen($btn_dropdown_classes) > 0) {
-            $btn_dropdown_classes = " " . $btn_dropdown_classes;
+            $btn_dropdown_classes = ' ' . $btn_dropdown_classes;
         }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = static::renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
-        
-        
+
         $pretag = '<div id="' . $this->id . '" class="button-list ' . $classes . '">';
         switch ($this->style) {
-            case "form-action":
+            case 'form-action':
                 if ($this->bootstrap == '3.3') {
                     $control_size = 12 - $this->label_size;
                     $pretag = '
@@ -108,58 +100,56 @@ class CElement_List_ActionList extends CElement_List {
                     $pretag = '<div class="form-actions clear-both ' . $classes . '">';
                 }
                 break;
-            case "btn-group":
-            case "btn-icon-group":
+            case 'btn-group':
+            case 'btn-icon-group':
                 $pretag = '<div class="btn-group ' . $classes . '">';
                 break;
-            case "widget-action":
+            case 'widget-action':
                 $pretag = '<div class="buttons ' . $classes . '">';
                 break;
-            case "table-header-action":
+            case 'table-header-action':
                 $pretag = '<div class="buttons ' . $classes . '">';
                 break;
-            case "btn-dropdown":
+            case 'btn-dropdown':
                 $pretag = '<div id="' . $this->id . '" class="btn-group ' . $classes . '">';
                 break;
         }
         $html->appendln($pretag)->incIndent()->br();
-        if ($this->style == "btn-dropdown") {
+        if ($this->style == 'btn-dropdown') {
             $iconHtml = '';
             if (strlen($this->icon) > 0) {
                 $iconHtml = '<i class="' . $this->icon . '"></i> ';
             }
             $caretClass = $this->withCaret ? '' : 'no-caret';
             $html->appendln('
-                    <a class="btn ' . $btn_dropdown_classes . ' dropdown-toggle '.$caretClass.'" data-toggle="dropdown" href="#">
+                    <a class="btn ' . $btn_dropdown_classes . ' dropdown-toggle ' . $caretClass . '" data-toggle="dropdown" href="#">
                             ' . $iconHtml . $this->label . '
-                            '.$this->htmlCaret().'
+                            ' . $this->htmlCaret() . '
                     </a>
                     <ul class="dropdown-menu dropdown-menu-right align-left ' . $classes . '">
 
             ');
         }
 
-        $html->appendln($this->htmlChild($html->get_indent()));
+        $html->appendln($this->htmlChild($html->getIndent()));
 
-
-        if ($this->style == "btn-dropdown") {
+        if ($this->style == 'btn-dropdown') {
             $html->appendln('</ul>');
         }
         $posttag = '</div>';
         switch ($this->style) {
-
-            case "btn-dropdown":
-                $posttag = "</div>";
+            case 'btn-dropdown':
+                $posttag = '</div>';
                 break;
-            case "form-action":
+            case 'form-action':
                 if ($this->bootstrap == '3.3') {
-                    $posttag = "</div></div>";
+                    $posttag = '</div></div>';
                 } else {
-                    $posttag = "</div>";
+                    $posttag = '</div>';
                 }
                 break;
             default:
-                $posttag = "</div>";
+                $posttag = '</div>';
                 break;
         }
         $html->decIndent()->appendln($posttag)->br();
@@ -172,5 +162,4 @@ class CElement_List_ActionList extends CElement_List {
         $js->appendln($this->jsChild($js->getIndent()));
         return $js->text();
     }
-
 }
