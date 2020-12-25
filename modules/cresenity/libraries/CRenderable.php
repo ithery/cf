@@ -178,7 +178,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
         $arrays = [];
         foreach ($this->renderable as $r) {
             if ($r instanceof CRenderable) {
-                $arrays[] = $r->toarray();
+                $arrays[] = $r->toArray();
             } else {
                 $arrays[] = $r;
             }
@@ -231,5 +231,16 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
 
     public function &getParent() {
         return $this->parent;
+    }
+
+    public static function renderStyle(array $styles) {
+        if ($styles == null) {
+            return '';
+        }
+        $ret = '';
+        foreach ($styles as $k => $v) {
+            $ret .= $k . ':' . $v . ';';
+        }
+        return $ret;
     }
 }
