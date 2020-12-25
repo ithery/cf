@@ -1,19 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jan 1, 2018, 4:15:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jan 1, 2018, 4:15:30 PM
  */
 class CElement_Template extends CElement {
-
     use CElement_Trait_Template;
 
-    public function __construct($id, $templateName = '', $data = array()) {
+    public function __construct($id, $templateName = '', $data = []) {
         parent::__construct($id);
-        $this->templateData = array();
+        $this->templateData = [];
         $this->templateName = $templateName;
         $this->setData($data);
     }
@@ -25,5 +25,4 @@ class CElement_Template extends CElement {
     public function js($indent = 0) {
         return $this->getTemplateJs();
     }
-
 }

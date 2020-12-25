@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Social extends CEmail_Builder_Component_BodyComponent {
@@ -79,10 +73,10 @@ class CEmail_Builder_Component_BodyComponent_Social extends CEmail_Builder_Compo
             'text-decoration',
         ];
 
-        return carr::reduce($prop, function($res, $attr) {
-                    $res[$attr] = $this->getAttribute($attr);
-                    return $res;
-                }, $base);
+        return carr::reduce($prop, function ($res, $attr) {
+            $res[$attr] = $this->getAttribute($attr);
+            return $res;
+        }, $base);
     }
 
     public function renderHorizontal() {
@@ -94,7 +88,7 @@ class CEmail_Builder_Component_BodyComponent_Social extends CEmail_Builder_Compo
         $tableAttr['cellspacing'] = '0';
         $tableAttr['role'] = 'presentation';
 
-        $renderer = function($component) {
+        $renderer = function ($component) {
             $tAttr = [];
             $tAttr['align'] = $this->getAttribute('align');
             $tAttr['border'] = '0';
@@ -137,7 +131,6 @@ class CEmail_Builder_Component_BodyComponent_Social extends CEmail_Builder_Compo
         $tableAttr['role'] = 'presentation';
         $tableAttr['style'] = 'tableVertical';
 
-
         return '
       <table' . $this->htmlAttributes($tableAttr) . '>
         ' . $this->renderChildren(['attributes' => $this->getSocialElementAttributes()]) . '
@@ -150,5 +143,4 @@ class CEmail_Builder_Component_BodyComponent_Social extends CEmail_Builder_Compo
       ' . $this->getAttribute('mode') === 'horizontal' ? $this->renderHorizontal() : $this->renderVertical() . '
     ';
     }
-
 }

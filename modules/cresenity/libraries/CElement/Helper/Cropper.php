@@ -1,6 +1,6 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Description of Cropper
@@ -8,7 +8,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @author Hery
  */
 class CElement_Helper_Cropper extends CElement_Element {
-
     use CElement_Trait_Template;
 
     protected $cropperWidth;
@@ -17,22 +16,22 @@ class CElement_Helper_Cropper extends CElement_Element {
     protected $owner;
     protected $imgSrc;
 
-    public function __construct($id = "", $tag = "div") {
+    public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
         $this->templateName = 'CElement/Helper/Cropper';
-        $dataModule = array(
-            'css' => array(
+        $dataModule = [
+            'css' => [
                 'plugins/cropper/cropper.css',
-            ),
-            'js' => array(
+            ],
+            'js' => [
                 'plugins/cropper/cropper.js',
-            ),
-        );
+            ],
+        ];
         CManager::registerModule('cropper', $dataModule);
 
         $this->cropperResizable = true;
-        
-        $this->onBeforeParse(function() {
+
+        $this->onBeforeParse(function () {
             $this->setVar('id', $this->id);
             $this->setVar('imgSrc', $this->imgSrc);
             $this->setVar('cropperWidth', $this->cropperWidth);
@@ -56,17 +55,17 @@ class CElement_Helper_Cropper extends CElement_Element {
         $this->cropperResizable = $bool;
         return $this;
     }
-    
+
     public function getCropperWidth() {
         return $this->cropperWidth;
     }
-    
+
     public function getCropperHeight() {
         return $this->cropperHeight;
     }
-    
+
     public function getAspectRatio() {
-        return $this->cropperWidth/$this->cropperHeight;
+        return $this->cropperWidth / $this->cropperHeight;
     }
 
     public function getCropperResizable() {
@@ -86,5 +85,4 @@ class CElement_Helper_Cropper extends CElement_Element {
 
         return $js;
     }
-
 }

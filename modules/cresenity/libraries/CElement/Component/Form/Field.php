@@ -1,48 +1,48 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 2:29:43 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 17, 2018, 2:29:43 AM
  */
 class CElement_Component_Form_Field extends CElement_Component {
-
     use CTrait_Compat_Element_Form_Field;
 
-    protected $group_classes = array();
-    protected $group_id = "";
-    protected $group_custom_css = array();
-    protected $label = array();
-    protected $show_label = array();
-    protected $label_size = array();
-    protected $fullwidth = array();
-    protected $info_text = array();
-    protected $label_class = array();
-    protected $control_class = array();
+    protected $group_classes = [];
+    protected $group_id = '';
+    protected $group_custom_css = [];
+    protected $label = [];
+    protected $show_label = [];
+    protected $label_size = [];
+    protected $fullwidth = [];
+    protected $info_text = [];
+    protected $label_class = [];
+    protected $control_class = [];
     protected $style_form_group;
     protected $inline_without_default;
     protected $labelRequired = false;
 
-    public function __construct($id = "") {
+    public function __construct($id = '') {
         parent::__construct($id);
-        $this->tag = "div";
-        $this->label = "";
+        $this->tag = 'div';
+        $this->label = '';
         $this->show_label = true;
-        $this->label_size = "medium";
-        $this->info_text = "";
+        $this->label_size = 'medium';
+        $this->info_text = '';
         $this->fullwidth = false;
-        $this->group_id = "";
-        $this->group_classes = array();
-        $this->group_custom_css = array();
+        $this->group_id = '';
+        $this->group_classes = [];
+        $this->group_custom_css = [];
         $this->style_form_group = null;
         $this->inline_without_default = '0';
         $this->inline_without_default = carr::get($this->theme_style, 'inline_without_default');
         $this->labelRequired = false;
     }
 
-    public static function factory($id = "") {
+    public static function factory($id = '') {
         return new CElement_Component_Form_Field($id);
     }
 
@@ -52,21 +52,21 @@ class CElement_Component_Form_Field extends CElement_Component {
     }
 
     public function toArray() {
-        $data = array();
+        $data = [];
 
         $control_data = array_merge_recursive($data, parent::toarray());
-        $data['attr']['class'] = "control-group";
-        $control_label = array();
+        $data['attr']['class'] = 'control-group';
+        $control_label = [];
         $control_label['tag'] = 'label';
         $control_label['attr']['class'] = 'control-label';
         $control_label['attr']['id'] = $this->id . '-label';
         $control_label['text'] = $this->label;
 
-        $control_wrapper = array();
+        $control_wrapper = [];
         if (isset($control_data['children'])) {
             $control_wrapper['children'] = $control_data['children'];
         }
-        $control_wrapper['tag'] = "div";
+        $control_wrapper['tag'] = 'div';
 
         $data['children'][] = $control_label;
         $data['children'][] = $control_wrapper;
@@ -76,18 +76,19 @@ class CElement_Component_Form_Field extends CElement_Component {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
 
         $group_classes = $this->group_classes;
-        $group_classes = implode(" ", $group_classes);
-        if (strlen($group_classes) > 0)
-            $group_classes = " " . $group_classes;
+        $group_classes = implode(' ', $group_classes);
+        if (strlen($group_classes) > 0) {
+            $group_classes = ' ' . $group_classes;
+        }
         $group_custom_css = $this->group_custom_css;
         $group_custom_css = crenderer::render_style($group_custom_css);
         if (strlen($group_custom_css) > 0) {
             $group_custom_css = ' style="' . $group_custom_css . '"';
         }
-        $group_attr = "";
+        $group_attr = '';
         if (strlen($this->group_id) > 0) {
             $group_attr .= ' id="' . $this->group_id . '"';
         }
@@ -102,7 +103,7 @@ class CElement_Component_Form_Field extends CElement_Component {
             if (strlen($this->style_form_group) == 0) {
                 $this->style_form_group = carr::get($this->theme_style, 'form_field_style');
             }
-            $html->appendln('<div class="form-group ' . $group_classes . '" ' . $group_custom_css . $group_attr . '>')->inc_indent();
+            $html->appendln('<div class="form-group ' . $group_classes . '" ' . $group_custom_css . $group_attr . '>')->incIndent();
             $label_class = '';
             $control_class = '';
             if ($this->style_form_group == 'inline') {
@@ -118,10 +119,10 @@ class CElement_Component_Form_Field extends CElement_Component {
                         }
                     }
                     if (count($this->label_class) == 0) {
-                        $this->label_class = array('col-md-2');
+                        $this->label_class = ['col-md-2'];
                     }
                     if (count($this->control_class) == 0) {
-                        $this->control_class = array('col-md-10');
+                        $this->control_class = ['col-md-10'];
                     }
                     $this->label_class[] = 'control-label';
                 }
@@ -136,7 +137,7 @@ class CElement_Component_Form_Field extends CElement_Component {
             if ($this->style_form_group == 'inline') {
                 $html->appendln('<div class="' . $control_class . '">');
             }
-            $html->appendln($this->htmlChild($html->get_indent()))->br();
+            $html->appendln($this->htmlChild($html->getIndent()))->br();
             if ($this->style_form_group == 'inline') {
                 $html->appendln('</div>');
             }
@@ -156,7 +157,7 @@ class CElement_Component_Form_Field extends CElement_Component {
                         if ($this->label_size == 'large') {
                             $label_class = 'col-md-5';
                             $control_class = 'col-md-7';
-                        } else if ($this->label_size == 'small') {
+                        } elseif ($this->label_size == 'small') {
                             $label_class = 'col-md-1';
                             $control_class = 'col-md-11';
                         } else {
@@ -168,37 +169,36 @@ class CElement_Component_Form_Field extends CElement_Component {
             }
             $label_class .= ' ' . implode(' ', $this->label_class);
             $control_class .= ' ' . implode(' ', $this->control_class);
-            $html->appendln('<div class="' . $class_form_field . ' ' . $group_classes . '" ' . $group_custom_css . $group_attr . '>')->inc_indent();
+            $html->appendln('<div class="' . $class_form_field . ' ' . $group_classes . '" ' . $group_custom_css . $group_attr . '>')->incIndent();
             if ($this->show_label) {
                 $html->appendln('<label id="' . $this->id . '" class="form-label ' . $label_class . ' control-label">' . $labelRequiredHtml . $this->label . '</label>')->br();
             }
-            $fullwidth = "";
+            $fullwidth = '';
             if ($this->fullwidth) {
-                $fullwidth .= " " . "full-width";
+                $fullwidth .= ' ' . 'full-width';
             }
 
             if ($this->bootstrap == '3') {
                 if ($this->style_form_group == 'inline') {
-                    $html->appendln('<div class="' . $control_class . '">')->inc_indent()->br();
+                    $html->appendln('<div class="' . $control_class . '">')->incIndent()->br();
                 }
             } else {
-                $html->appendln('<div class="controls">')->inc_indent()->br();
+                $html->appendln('<div class="controls">')->incIndent()->br();
             }
 
-
-            $html->appendln($this->htmlChild($html->get_indent()))->br();
+            $html->appendln($this->htmlChild($html->getIndent()))->br();
             if (strlen($this->info_text) > 0) {
-                $html->appendln('<p class="help-block">' . $this->info_text . '</p>')->inc_indent()->br();
+                $html->appendln('<p class="help-block">' . $this->info_text . '</p>')->incIndent()->br();
             }
             if ($this->bootstrap == '3') {
                 if ($this->style_form_group == 'inline') {
-                    $html->dec_indent()->appendln('</div>')->inc_indent()->br();
+                    $html->decIndent()->appendln('</div>')->incIndent()->br();
                 }
             } else {
-                $html->dec_indent()->appendln('</div>')->inc_indent()->br();
+                $html->decIndent()->appendln('</div>')->incIndent()->br();
             }
-            $html->appendln('<div style="clear:both"></div>')->inc_indent()->br();
-            $html->dec_indent()->appendln('</div>');
+            $html->appendln('<div style="clear:both"></div>')->incIndent()->br();
+            $html->decIndent()->appendln('</div>');
         }
         /*
           if(isset($field["info_bubble"])) {
@@ -214,11 +214,11 @@ class CElement_Component_Form_Field extends CElement_Component {
     }
 
     public function js($indent = 0) {
-        $js = CStringBuilder::factory()->set_indent($indent);
+        $js = CStringBuilder::factory()->setIndent($indent);
 
-        $js->set_indent($indent);
+        $js->setIndent($indent);
 
-        $js->appendln(parent::js($js->get_indent()))->br();
+        $js->appendln(parent::js($js->getIndent()))->br();
 
         return $js->text();
     }
@@ -243,15 +243,8 @@ class CElement_Component_Form_Field extends CElement_Component {
         return $this;
     }
 
-    // public function set_label_size($size) {
-    //     if (in_array($size, array("small", "medium", "large"))) {
-    //         $this->label_size = $size;
-    //     }
-    //     return $this;
-    // }
-
     public function setLabelSize($size) {
-        if (in_array($size, array("small", "medium", "large", "none")) || is_numeric($size)) {
+        if (in_array($size, ['small', 'medium', 'large', 'none']) || is_numeric($size)) {
             $this->label_size = $size;
         }
         return $this;
@@ -263,9 +256,9 @@ class CElement_Component_Form_Field extends CElement_Component {
     }
 
     /**
-     * 
      * @param string $text
-     * @param bool $lang
+     * @param bool   $lang
+     *
      * @return $this
      */
     public function setLabel($text, $lang = true) {
@@ -287,7 +280,7 @@ class CElement_Component_Form_Field extends CElement_Component {
     }
 
     public function styleFormInline() {
-        $this->style_form_group = "inline";
+        $this->style_form_group = 'inline';
         return $this;
     }
 
@@ -301,13 +294,12 @@ class CElement_Component_Form_Field extends CElement_Component {
         return $this;
     }
 
-    function getInlineWithoutDefault() {
+    public function getInlineWithoutDefault() {
         return $this->inline_without_default;
     }
 
-    function setInlineWithoutDefault($inline_without_default) {
+    public function setInlineWithoutDefault($inline_without_default) {
         $this->inline_without_default = $inline_without_default;
         return $this;
     }
-
 }

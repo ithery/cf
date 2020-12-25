@@ -1,41 +1,29 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Ramsey\Uuid\Uuid as UUID;
 
 class CTracker_Populator {
-
     /**
-     *
      * @var CTracker_Populator
      */
     protected static $instance;
 
     /**
-     *
      * @var array
      */
     protected $data;
 
     /**
-     *
      * @var bool
      */
     protected $isDataPopulated;
 
     /**
-     *
      * @var CTracker_Parser_UserAgentParser
      */
     protected $userAgentParser;
 
     /**
-     *
      * @var CTracker_Detect_MobileDetect
      */
     protected $mobileDetect;
@@ -55,11 +43,9 @@ class CTracker_Populator {
     }
 
     public function populateSessionData() {
-
         $sessionData = [];
         $sessionPopulator = new CTracker_Populator_Session();
         $sessionData = $sessionPopulator->populateSessionData($this->data);
-
 
         $this->data['session'] = $sessionData;
     }
@@ -92,7 +78,6 @@ class CTracker_Populator {
     }
 
     public function setCustomLogData(array $logData) {
-
         $this->data['customLogData'] = $logData;
     }
 
@@ -105,10 +90,9 @@ class CTracker_Populator {
         if (isset($headers['x-forwarded-for'])) {
             $clientIp = carr::get($headers, 'x-forwarded-for.0');
         }
-        if (strpos($clientIp, ",") !== false) {
-            $clientIp = trim(carr::get(explode(",", $clientIp), 0));
+        if (strpos($clientIp, ',') !== false) {
+            $clientIp = trim(carr::get(explode(',', $clientIp), 0));
         }
-
 
         if (isset($headers['user-agent'])) {
             $userAgent = carr::get($headers, 'user-agent.0');
@@ -121,9 +105,6 @@ class CTracker_Populator {
         if ($userAgent == null) {
             $userAgent = $this->mobileDetect->getUserAgent();
         }
-
-
-
 
         $requestData['clientIp'] = $clientIp;
         $requestData['referer'] = $request->headers->get('referer');
@@ -139,13 +120,10 @@ class CTracker_Populator {
 
         $requestData['route'] = CFRouter::routedUri(CFRouter::currentUri());
 
-
         $this->data['request'] = $requestData;
     }
 
     protected function populateDeviceData() {
-
-
         if ($this->data['device'] = $this->mobileDetect->detectDevice()) {
             $operatingSystemFamily = null;
             $operatingSystemVersion = null;
@@ -165,12 +143,10 @@ class CTracker_Populator {
     }
 
     protected function populateGeoIpData() {
-
         $this->data['clientIp'] = CHTTP::request()->getClientIp();
     }
 
     protected function populateCookieData() {
-
         $config = CTracker::config();
         $request = CHTTP::request();
         $cookieJar = CCookie::jar();
@@ -178,16 +154,13 @@ class CTracker_Populator {
             return;
         }
         if (!$cookieUuid = $request->cookie($config->cookieNamespace())) {
-
             $cookieUuid = (string) UUID::uuid4();
 
-            setcookie($config->cookieNamespace(), $cookieUuid,time() + (86400 * 30 * 12));
+            setcookie($config->cookieNamespace(), $cookieUuid, time() + (86400 * 30 * 12));
 
             //$cookieJar->queue($config->cookieNamespace(), $cookieUuid, 0);
 
-            /**
-             * directly send cookie, TODO send queued cookies when try to render response
-             */
+            /* directly send cookie, TODO send queued cookies when try to render response */
             /*
             foreach ($cookieJar->getQueuedCookies() as $cookieItem) {
                 $cookieJar->
@@ -201,8 +174,6 @@ class CTracker_Populator {
     }
 
     protected function populateLanguageData() {
-
-
         $languageDetect = new CTracker_Detect_LanguageDetect();
 
         $languages = null;
@@ -242,5 +213,4 @@ class CTracker_Populator {
         $this->data = $data;
         return $this;
     }
-
 }

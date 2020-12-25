@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CEmail_Builder_Trait_NodeTrait {
-
     /**
-     * 
      * @param string $tagName
+     *
      * @return \CEmail_Builder_Node
      */
     protected function addNode($tagName) {
@@ -20,7 +13,6 @@ trait CEmail_Builder_Trait_NodeTrait {
     }
 
     /**
-     * 
      * @return CEmail_Builder_Node
      */
     public function addBody() {
@@ -28,15 +20,13 @@ trait CEmail_Builder_Trait_NodeTrait {
     }
 
     /**
-     * 
      * @return CEmail_Builder_Node
      */
     public function addHead() {
         return $this->addNode('c-head');
     }
-    
+
     /**
-     * 
      * @return CEmail_Builder_Node
      */
     public function addHeadAttributes() {
@@ -44,7 +34,6 @@ trait CEmail_Builder_Trait_NodeTrait {
     }
 
     /**
-     * 
      * @return CEmail_Builder_Node
      */
     public function addSection() {
@@ -52,15 +41,13 @@ trait CEmail_Builder_Trait_NodeTrait {
     }
 
     /**
-     * 
      * @return CEmail_Builder_Node
      */
     public function addColumn() {
         return $this->addNode('c-column');
     }
-    
+
     /**
-     * 
      * @return CEmail_Builder_Node
      */
     public function addGroup() {
@@ -68,7 +55,6 @@ trait CEmail_Builder_Trait_NodeTrait {
     }
 
     /**
-     * 
      * @return CEmail_Builder_Node
      */
     public function addImage() {
@@ -76,7 +62,6 @@ trait CEmail_Builder_Trait_NodeTrait {
     }
 
     /**
-     * 
      * @return CEmail_Builder_Node
      */
     public function addText() {
@@ -84,11 +69,9 @@ trait CEmail_Builder_Trait_NodeTrait {
     }
 
     /**
-     * 
      * @return CEmail_Builder_Node
      */
     public function addDivider() {
         return $this->addNode('c-divider');
     }
-
 }

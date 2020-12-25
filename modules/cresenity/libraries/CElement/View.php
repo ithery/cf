@@ -1,56 +1,49 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 28, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 28, 2020
  */
 
 class CElement_View extends CElement {
-
     /**
-     *
      * @var CView_View
      */
     protected $view;
-    
-    
+
     protected $viewElement;
-    
-    
-    public function __construct($id, $view = null, $data = array()) {
+
+    public function __construct($id, $view = null, $data = []) {
         parent::__construct($id);
-        if($view!=null) {
-            $this->setView($view,$data);
+        if ($view != null) {
+            $this->setView($view, $data);
         }
-        $this->viewElement=[];
+        $this->viewElement = [];
     }
-    
-    public function setView($view,$data=null) {
-        if($view!=null) {
-            if(!($view instanceof CView_View)) {
-                
-                if($data==null) {
-                    $data=[];
+
+    public function setView($view, $data = null) {
+        if ($view != null) {
+            if (!($view instanceof CView_View)) {
+                if ($data == null) {
+                    $data = [];
                 }
-                $view = CView::factory($view,$data);
+                $view = CView::factory($view, $data);
             }
-            if($data!==null) {
+            if ($data !== null) {
                 $view->set($data);
             }
-            
-        } 
-        
+        }
+
         $this->view = $view;
-            
     }
- 
+
     public function html($indent = 0) {
         CApp::setRenderingElement($this);
-        if($this->view!=null) {
-            
+        if ($this->view != null) {
             return $this->view->render();
         }
     }
@@ -59,10 +52,9 @@ class CElement_View extends CElement {
         return '';
     }
 
-    
     public function viewElement($key) {
-        if(!isset($this->viewElement[$key])) {
-            $this->viewElement[$key]=new CElement_PseudoElement();
+        if (!isset($this->viewElement[$key])) {
+            $this->viewElement[$key] = new CElement_PseudoElement();
         }
         return $this->viewElement[$key];
     }

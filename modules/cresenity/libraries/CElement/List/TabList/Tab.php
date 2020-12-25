@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 7:29:54 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 7:29:54 PM
  */
 class CElement_List_TabList_Tab extends CElement_Element {
-
     use CTrait_Compat_Element_Tab,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
@@ -20,35 +20,34 @@ class CElement_List_TabList_Tab extends CElement_Element {
     protected $nopadding;
     protected $tabList;
 
-    public function __construct($id = "") {
+    public function __construct($id = '') {
         parent::__construct($id);
         $this->addFriend('CElement_List_TabList');
-       
-        $this->label = "";
-        $this->target = "";
-        $this->icon = "";
-        $this->ajaxUrl = "";
+
+        $this->label = '';
+        $this->target = '';
+        $this->icon = '';
+        $this->ajaxUrl = '';
         $this->ajax = true;
         $this->active = false;
         $this->nopadding = false;
     }
-    
+
     public function setTabList(CElement_List_TabList $tabList) {
         $this->tabList = $tabList;
         return $this;
     }
 
-    public static function factory($id = "") {
+    public static function factory($id = '') {
         return new CElement_List_TabList_Tab($id);
     }
 
     public function setActive($bool = true) {
-        if($bool && $this->tabList) {
-            
+        if ($bool && $this->tabList) {
             $this->tabList->setActiveTab($this->id);
         }
         $this->active = $bool;
-        
+
         return $this;
     }
 
@@ -77,57 +76,55 @@ class CElement_List_TabList_Tab extends CElement_Element {
     }
 
     public function headerHtml($indent = 0) {
-
         if (strlen($this->ajaxUrl) == 0) {
             if ($this->ajax) {
                 $ajaxUrl = CAjax::createMethod()->setType('Reload')
-                        ->setData('json', $this->json())
-                        ->makeUrl();
+                    ->setData('json', $this->json())
+                    ->makeUrl();
                 $this->setAjaxUrl($ajaxUrl);
             }
         }
 
-        $classActive = "";
+        $classActive = '';
         if ($this->active) {
-            $classActive = "active";
+            $classActive = 'active';
         }
-        $tab_icon = "";
+        $tab_icon = '';
         if (strlen($this->icon) > 0) {
             $tab_icon = ' data-icon="' . $this->icon . '"';
         }
 
-        $tab_class = "";
+        $tab_class = '';
 
-
-        $classes = "";
+        $classes = '';
 
         if (count($this->classes) > 0) {
-            $classes = implode(" ", $this->classes);
+            $classes = implode(' ', $this->classes);
         }
         if ($this->nopadding) {
-            $classes .= " nopadding";
+            $classes .= ' nopadding';
         }
         if (strlen($classes) > 0) {
             $tab_class = ' data-class="' . $classes . '"';
         }
 
-        $tab_responsive = "";
-        $tab_tab = "";
+        $tab_responsive = '';
+        $tab_tab = '';
         if (strlen($this->id) > 0) {
             $tab_tab = ' data-tab="' . $this->id . '"';
             $tab_responsive = ' tab-responsive="#' . $this->id . '"';
         }
 
-        $tab_target = "";
+        $tab_target = '';
         if (strlen($this->target) > 0) {
             $tab_target = ' data-target="' . $this->target . '"';
         }
 
-        $tab_url = "";
+        $tab_url = '';
         if (strlen($this->ajaxUrl) > 0) {
             $tab_url = ' data-url="' . $this->ajaxUrl . '"';
         }
-        $tab_label = "";
+        $tab_label = '';
         if (strlen($this->label) > 0) {
             $tab_label = $this->label;
         }
@@ -143,17 +140,16 @@ class CElement_List_TabList_Tab extends CElement_Element {
     }
 
     public function html($indent = 0) {
-
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $add_class = "";
-        $classActive = "";
+        $add_class = '';
+        $classActive = '';
         if ($this->active) {
-            $classActive = "active";
+            $classActive = 'active';
         }
-        $additional_style = "";
+        $additional_style = '';
         if (strlen($this->ajaxUrl) > 0) {
-            $additional_style .= "display:none;";
+            $additional_style .= 'display:none;';
         }
         $html->appendln('<div class="tab-pane ' . $classActive . '" id="' . $this->id . '" style="' . $additional_style . '">');
         $html->appendln('<div class="tab-container ">');
@@ -164,14 +160,9 @@ class CElement_List_TabList_Tab extends CElement_Element {
     }
 
     public function js($indent = 0) {
-
         $js = new CStringBuilder();
-        $js->set_indent($indent);
-
+        $js->setIndent($indent);
         $js->appendln(parent::js($indent));
-
-
         return $js->text();
     }
-
 }

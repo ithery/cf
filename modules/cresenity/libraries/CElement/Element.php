@@ -58,7 +58,7 @@ abstract class CElement_Element extends CElement {
 
     protected function htmlAttr() {
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = static::renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }

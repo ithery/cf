@@ -5,8 +5,8 @@
  *
  * @author Hery
  */
+// @codingStandardsIgnoreStart
 trait CFDeprecatedTrait {
-
     private static $write_cache;
 
     public static function doDeprecated() {
@@ -16,10 +16,11 @@ trait CFDeprecatedTrait {
     }
 
     /**
-     * 
      * @deprecated
+     *
      * @param string $directory
      * @param string $domain
+     *
      * @return array array of directory
      */
     public static function get_dirs($directory, $domain = null) {
@@ -27,10 +28,11 @@ trait CFDeprecatedTrait {
     }
 
     /**
-     * 
      * @deprecated
+     *
      * @param string $directory
      * @param string $domain
+     *
      * @return string|null directory
      */
     public static function get_dir($directory = '', $domain = null) {
@@ -39,9 +41,11 @@ trait CFDeprecatedTrait {
 
     /**
      * @deprecated Please use getFiles
+     *
      * @param string $directory
      * @param string $filename
      * @param string $domain
+     *
      * @return string[]
      */
     public static function get_files($directory, $filename, $domain = null) {
@@ -49,11 +53,12 @@ trait CFDeprecatedTrait {
     }
 
     /**
-     * 
      * @deprecated
+     *
      * @param string $directory
      * @param string $filename
      * @param string $domain
+     *
      * @return string
      */
     public static function get_file($directory, $filename, $domain = null) {
@@ -62,26 +67,29 @@ trait CFDeprecatedTrait {
 
     /**
      * get path with theme (theme is not supported again, dont use this function)
+     *
      * @deprecated
+     *
      * @param type $process
+     *
      * @return type
      */
-    public static function include_paths_theme($process = FALSE) {
-
+    public static function include_paths_theme($process = false) {
         return self::include_paths($process, true);
     }
 
     /**
-     * 
      * @param type $filename
      * @param type $domain
+     *
      * @return type
+     *
      * @deprecated
      */
     public static function get_config($filename, $domain = null) {
         $files = self::getFiles('config', $filename, $domain);
         $files = array_reverse($files);
-        $ret = array();
+        $ret = [];
         foreach ($files as $file) {
             $cfg = include $file;
             $ret = array_merge($ret, $cfg);
@@ -94,19 +102,25 @@ trait CFDeprecatedTrait {
      * paths in the order they are configured, follow by the SYSPATH.
      *
      * @deprecated
+     *
      * @param   boolean  re-process the include paths
-     * @return  array
+     * @param mixed $process
+     * @param mixed $with_theme
+     *
+     * @return array
+     *
      * @see CF::paths
      */
-    public static function include_paths($process = FALSE, $with_theme = false) {
+    public static function include_paths($process = false, $with_theme = false) {
         return self::paths();
     }
 
     /**
      * Add Shared App in runtime
      * This function is deprecated, use CF::addSharedApp
-     * 
+     *
      * @deprecated
+     *
      * @param string $app_code
      */
     public static function add_shared_app_code($app_code) {
@@ -117,8 +131,11 @@ trait CFDeprecatedTrait {
      * Get application id for domain
      * This function is deprecated, use CF::appId
      *
-     * @return  string
+     * @return string
+     *
      * @deprecated
+     *
+     * @param null|mixed $domain
      */
     public static function app_id($domain = null) {
         return self::appId($domain);
@@ -127,9 +144,12 @@ trait CFDeprecatedTrait {
     /**
      * Get application code for domain
      * This function is deprecated, use CF::appCode
-     * 
+     *
      * @deprecated
-     * @return  string
+     *
+     * @return string
+     *
+     * @param null|mixed $domain
      */
     public static function app_code($domain = null) {
         return self::appCode($domain);
@@ -138,9 +158,11 @@ trait CFDeprecatedTrait {
     /**
      * Get org id for domain
      * This function is deprecated, use CF::orgId
-     * 
+     *
      * @deprecated
+     *
      * @param string $domain
+     *
      * @return int
      */
     public static function org_id($domain = null) {
@@ -152,7 +174,9 @@ trait CFDeprecatedTrait {
      * This function is deprecated, use CF::orgCode
      *
      * @deprecated
+     *
      * @param string $domain
+     *
      * @return string
      */
     public static function org_code($domain = null) {
@@ -162,8 +186,10 @@ trait CFDeprecatedTrait {
     /**
      * Returns all traits used by a class, its subclasses and trait of their traits.
      *
-     * @param  object|string  $class
+     * @param object|string $class
+     *
      * @return array
+     *
      * @deprecated
      */
     public static function class_uses_recursive($class) {
@@ -173,8 +199,10 @@ trait CFDeprecatedTrait {
     /**
      * Returns all traits used by a trait and its traits.
      *
-     * @param  string  $trait
+     * @param string $trait
+     *
      * @return array
+     *
      * @deprecated
      */
     public static function trait_uses_recursive($trait) {
@@ -184,8 +212,10 @@ trait CFDeprecatedTrait {
     /**
      * Get the class "basename" of the given object / class.
      *
-     * @param  string|object  $class
+     * @param string|object $class
+     *
      * @return string
+     *
      * @deprecated
      */
     public static function class_basename($class) {
@@ -195,41 +225,33 @@ trait CFDeprecatedTrait {
     /**
      * Displays a 404 page.
      *
-     * @throws  C_404_Exception
+     * @throws C_404_Exception
+     *
      * @param   string  URI of page
      * @param   string  custom template
-     * @return  void
+     * @param mixed $page
+     * @param mixed $template
+     *
+     * @return void
+     *
      * @deprecated
      */
-    public static function show_404($page = FALSE, $template = FALSE) {
+    public static function show_404($page = false, $template = false) {
         return self::show404($page, $template);
     }
 
     /**
      * @deprecated
+     *
      * @param type $directory
      * @param type $filename
      * @param type $required
      * @param type $ext
+     *
      * @return type
      */
-    public static function find_file($directory, $filename, $required = FALSE, $ext = FALSE) {
+    public static function find_file($directory, $filename, $required = false, $ext = false) {
         return static::findFile($directory, $filename, $required, $ext);
-    }
-
-    /**
-     * Dual-purpose PHP error and exception handler. Uses the kohana_error_page
-     * view to display the message.
-     *
-     * @param   integer|object  exception object or error code
-     * @param   string          error message
-     * @param   string          filename
-     * @param   integer         line number
-     * @return  void
-     * @deprecated
-     */
-    public static function exception_handler($exception, $message = NULL, $file = NULL, $line = NULL) {
-        return CF::exceptionHandler($exception, $message, $file, $line);
     }
 
     /**
@@ -237,10 +259,13 @@ trait CFDeprecatedTrait {
      * output buffer for display during shutdown.
      *
      * @param   boolean  disable to clear buffers, rather than flushing
-     * @return  void
+     * @param mixed $flush
+     *
+     * @return void
+     *
      * @deprecated
      */
-    public static function close_buffers($flush = TRUE) {
+    public static function close_buffers($flush = true) {
         return static::closeBuffers($flush);
     }
 
@@ -248,7 +273,10 @@ trait CFDeprecatedTrait {
      * Clears a config group from the cached configuration.
      *
      * @param   string  config group
-     * @return  void
+     * @param mixed $group
+     *
+     * @return void
+     *
      * @deprecated
      */
     public static function config_clear($group) {
@@ -257,7 +285,7 @@ trait CFDeprecatedTrait {
 
         if (!isset(self::$write_cache['configuration'])) {
             // Cache has changed
-            self::$write_cache['configuration'] = TRUE;
+            self::$write_cache['configuration'] = true;
         }
     }
 
@@ -268,12 +296,16 @@ trait CFDeprecatedTrait {
      *
      * @param   string   key or test name
      * @param   string   used with "accept" tests: user_agent(accept_lang, en)
-     * @return  array    languages and charsets
-     * @return  string   all other keys
-     * @return  boolean  all tests
+     * @param mixed      $key
+     * @param null|mixed $compare
+     *
+     * @return array   languages and charsets
+     * @return string  all other keys
+     * @return boolean all tests
+     *
      * @deprecated
      */
-    public static function user_agent($key = 'agent', $compare = NULL) {
+    public static function user_agent($key = 'agent', $compare = null) {
         return static::userAgent($key, $compare);
     }
 
@@ -282,13 +314,18 @@ trait CFDeprecatedTrait {
      *
      * @param   array   array to search
      * @param   string  dot-noted string: foo.bar.baz
-     * @return  string  if the key is found
-     * @return  void    if the key is not found
+     * @param mixed $array
+     * @param mixed $keys
+     *
+     * @return string if the key is found
+     * @return void   if the key is not found
+     *
      * @deprecated
      */
     public static function key_string($array, $keys) {
-        if (empty($array))
-            return NULL;
+        if (empty($array)) {
+            return null;
+        }
 
         // Prepare for loop
         $keys = explode('.', $keys);
@@ -298,7 +335,7 @@ trait CFDeprecatedTrait {
             $key = array_shift($keys);
 
             if (isset($array[$key])) {
-                if (is_array($array[$key]) AND!empty($keys)) {
+                if (is_array($array[$key]) and !empty($keys)) {
                     // Dig down to prepare the next loop
                     $array = $array[$key];
                 } else {
@@ -311,7 +348,7 @@ trait CFDeprecatedTrait {
             }
         } while (!empty($keys));
 
-        return NULL;
+        return null;
     }
 
     /**
@@ -319,17 +356,22 @@ trait CFDeprecatedTrait {
      *
      * @param   array   array to set keys in (reference)
      * @param   string  dot-noted string: foo.bar.baz
-     * @return  mixed   fill value for the key
-     * @return  void
+     * @param mixed      $array
+     * @param mixed      $keys
+     * @param null|mixed $fill
+     *
+     * @return mixed fill value for the key
+     * @return void
+     *
      * @deprecated
      */
-    public static function key_string_set(& $array, $keys, $fill = NULL) {
-        if (is_object($array) AND ( $array instanceof ArrayObject)) {
+    public static function key_string_set(&$array, $keys, $fill = null) {
+        if (is_object($array) and ($array instanceof ArrayObject)) {
             // Copy the array
             $array_copy = $array->getArrayCopy();
 
             // Is an object
-            $array_object = TRUE;
+            $array_object = true;
         } else {
             if (!is_array($array)) {
                 // Must always be an array
@@ -337,17 +379,18 @@ trait CFDeprecatedTrait {
             }
 
             // Copy is a reference to the array
-            $array_copy = & $array;
+            $array_copy = &$array;
         }
 
-        if (empty($keys))
+        if (empty($keys)) {
             return $array;
+        }
 
         // Create keys
         $keys = explode('.', $keys);
 
         // Create reference to the array
-        $row = & $array_copy;
+        $row = &$array_copy;
 
         for ($i = 0, $end = count($keys) - 1; $i <= $end; $i++) {
             // Get the current key
@@ -356,7 +399,7 @@ trait CFDeprecatedTrait {
             if (!isset($row[$key])) {
                 if (isset($keys[$i + 1])) {
                     // Make the value an array
-                    $row[$key] = array();
+                    $row[$key] = [];
                 } else {
                     // Add the fill key
                     $row[$key] = $fill;
@@ -367,7 +410,7 @@ trait CFDeprecatedTrait {
             }
 
             // Go down a level, creating a new row reference
-            $row = & $row[$key];
+            $row = &$row[$key];
         }
 
         if (isset($array_object)) {
@@ -383,26 +426,31 @@ trait CFDeprecatedTrait {
      *
      * @param   string   key or test name
      * @param   string   used with "accept" tests: user_agent(accept_lang, en)
-     * @return  array    languages and charsets
-     * @return  string   all other keys
-     * @return  boolean  all tests
+     * @param mixed      $key
+     * @param null|mixed $compare
+     *
+     * @return array   languages and charsets
+     * @return string  all other keys
+     * @return boolean all tests
+     *
      * @deprecated
      */
-    public static function userAgent($key = 'agent', $compare = NULL) {
+    public static function userAgent($key = 'agent', $compare = null) {
         static $info;
 
         // Return the raw string
-        if ($key === 'agent')
+        if ($key === 'agent') {
             return self::$user_agent;
+        }
 
-        if ($info === NULL) {
+        if ($info === null) {
             // Parse the user agent and extract basic information
             $agents = self::config('user_agents');
 
             foreach ($agents as $type => $data) {
                 foreach ($data as $agent => $name) {
-                    if (stripos(self::$user_agent, $agent) !== FALSE) {
-                        if ($type === 'browser' AND preg_match('|' . preg_quote($agent) . '[^0-9.]*+([0-9.][0-9.a-z]*)|i', self::$user_agent, $match)) {
+                    if (stripos(self::$user_agent, $agent) !== false) {
+                        if ($type === 'browser' and preg_match('|' . preg_quote($agent) . '[^0-9.]*+([0-9.][0-9.a-z]*)|i', self::$user_agent, $match)) {
                             // Set the browser version
                             $info['version'] = $match[1];
                         }
@@ -424,7 +472,7 @@ trait CFDeprecatedTrait {
                     $return = !empty($info[substr($key, 3)]);
                     break;
                 case 'languages':
-                    $return = array();
+                    $return = [];
                     if (!empty($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
                         if (preg_match_all('/[-a-z]{2,}/', strtolower(trim($_SERVER['HTTP_ACCEPT_LANGUAGE'])), $matches)) {
                             // Found a result
@@ -433,7 +481,7 @@ trait CFDeprecatedTrait {
                     }
                     break;
                 case 'charsets':
-                    $return = array();
+                    $return = [];
                     if (!empty($_SERVER['HTTP_ACCEPT_CHARSET'])) {
                         if (preg_match_all('/[-a-z0-9]{2,}/', strtolower(trim($_SERVER['HTTP_ACCEPT_CHARSET'])), $matches)) {
                             // Found a result
@@ -468,13 +516,13 @@ trait CFDeprecatedTrait {
                     break;
                 default:
                     // Invalid comparison
-                    return FALSE;
+                    return false;
                     break;
             }
         }
 
         // Return the key, if set
-        return isset($info[$key]) ? $info[$key] : NULL;
+        return isset($info[$key]) ? $info[$key] : null;
     }
 
     /**
@@ -482,28 +530,32 @@ trait CFDeprecatedTrait {
      *
      * @param   string   config filename, without extension
      * @param   boolean  is the file required?
-     * @return  array
+     * @param mixed $name
+     * @param mixed $required
+     *
+     * @return array
+     *
      * @deprecated
      */
-    public static function config_load($name, $required = TRUE) {
+    public static function config_load($name, $required = true) {
         if ($name === 'core') {
-            $found = FALSE;
+            $found = false;
 
             // find config file at all available paths
             if ($files = self::findFile('config', 'config', $required)) {
                 foreach ($files as $file) {
                     if (file_exists($file)) {
                         require $file;
-                        $found = TRUE;
+                        $found = true;
                     }
                 }
             }
 
-            if ($found == FALSE) {
+            if ($found == false) {
                 // Load the application configuration file
                 if (file_exists(DOCROOT . 'config/config' . EXT)) {
                     require DOCROOT . 'config/config' . EXT;
-                    $found = TRUE;
+                    $found = true;
                 }
             }
 
@@ -515,17 +567,18 @@ trait CFDeprecatedTrait {
             return $config;
         }
 
-        if (isset(self::$internal_cache['configuration'][$name]))
+        if (isset(self::$internal_cache['configuration'][$name])) {
             return self::$internal_cache['configuration'][$name];
+        }
 
         // Load matching configs
-        $configuration = array();
+        $configuration = [];
 
         if ($files = self::findFile('config', $name, $required)) {
             foreach ($files as $file) {
                 require $file;
 
-                if (isset($config) AND is_array($config)) {
+                if (isset($config) and is_array($config)) {
                     // Merge in configuration
                     $configuration = array_merge($configuration, $config);
                 }
@@ -534,7 +587,7 @@ trait CFDeprecatedTrait {
 
         if (!isset(self::$write_cache['configuration'])) {
             // Cache has changed
-            self::$write_cache['configuration'] = TRUE;
+            self::$write_cache['configuration'] = true;
         }
 
         return self::$internal_cache['configuration'][$name] = $configuration;
@@ -545,7 +598,11 @@ trait CFDeprecatedTrait {
      *
      * @param   string   config key string
      * @param   string   config value
-     * @return  boolean
+     * @param mixed $key
+     * @param mixed $value
+     *
+     * @return boolean
+     *
      * @deprecated
      */
     public static function config_set($key, $value) {
@@ -561,39 +618,44 @@ trait CFDeprecatedTrait {
         }
 
         // Used for recursion
-        $conf = & self::$configuration;
+        $conf = &self::$configuration;
         $last = count($keys) - 1;
 
         foreach ($keys as $i => $k) {
             if ($i === $last) {
                 $conf[$k] = $value;
             } else {
-                $conf = & $conf[$k];
+                $conf = &$conf[$k];
             }
         }
 
         if ($key === 'core.modules') {
             // Reprocess the include paths
-            self::include_paths(TRUE);
+            self::include_paths(true);
         }
 
-        return TRUE;
+        return true;
     }
 
     /**
      * Displays nice backtrace information.
+     *
      * @see http://php.net/debug_backtrace
      *
      * @param   array   backtrace generated by an exception or debug_backtrace
-     * @return  string
+     * @param mixed $trace
+     *
+     * @return string
+     *
      * @deprecated
      */
     public static function backtrace($trace) {
-        if (!is_array($trace))
+        if (!is_array($trace)) {
             return;
+        }
 
         // Final output
-        $output = array();
+        $output = [];
 
         foreach ($trace as $entry) {
             $temp = '<li>';
@@ -613,17 +675,17 @@ trait CFDeprecatedTrait {
             $temp .= $entry['function'] . '( ';
 
             // Add function args
-            if (isset($entry['args']) AND is_array($entry['args'])) {
+            if (isset($entry['args']) and is_array($entry['args'])) {
                 // Separator starts as nothing
                 $sep = '';
 
                 while ($arg = array_shift($entry['args'])) {
-                    if (is_string($arg) AND self::isFile($arg)) {
+                    if (is_string($arg) and self::isFile($arg)) {
                         // Remove docroot from filename
                         $arg = preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $arg);
                     }
 
-                    $temp .= $sep . chtml::specialchars(@print_r($arg, TRUE));
+                    $temp .= $sep . chtml::specialchars(@print_r($arg, true));
 
                     // Change separator to a comma
                     $sep = ', ';
@@ -639,21 +701,22 @@ trait CFDeprecatedTrait {
     }
 
     /**
-     * 
      * @param type $domain
+     *
      * @return type
+     *
      * @deprecated
      */
     public static function domain_data($domain) {
         $data = CFData::get($domain, 'domain');
-        $result = array();
+        $result = [];
         $result['app_id'] = '';
         $result['app_code'] = '';
         $result['org_id'] = '';
         $result['org_code'] = '';
         $result['store_id'] = '';
         $result['store_code'] = '';
-        $result['shared_app_code'] = array();
+        $result['shared_app_code'] = [];
         $result['theme'] = '';
 
         if ($data != null) {
@@ -663,10 +726,10 @@ trait CFDeprecatedTrait {
             $result['org_code'] = isset($data['org_code']) ? $data['org_code'] : null;
             $result['store_id'] = isset($data['store_id']) ? $data['store_id'] : null;
             $result['store_code'] = isset($data['store_code']) ? $data['store_code'] : null;
-            $result['shared_app_code'] = isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
+            $result['shared_app_code'] = isset($data['shared_app_code']) ? $data['shared_app_code'] : [];
             $result['theme'] = isset($data['theme']) ? $data['theme'] : null;
         }
         return $result;
     }
-
 }
+// @codingStandardsIgnoreStart

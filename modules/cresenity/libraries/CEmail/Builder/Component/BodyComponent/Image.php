@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Image extends CEmail_Builder_Component_BodyComponent {
@@ -55,8 +49,6 @@ class CEmail_Builder_Component_BodyComponent_Image extends CEmail_Builder_Compon
         $widthParserResult = Helper::widthParser($width, ['parseFloatToInt' => false]);
         $unit = carr::get($widthParserResult, 'unit');
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
-
-
 
         return [
             'img' => [
@@ -123,7 +115,6 @@ class CEmail_Builder_Component_BodyComponent_Image extends CEmail_Builder_Compon
       ';
         }
 
-
         return $img;
     }
 
@@ -148,5 +139,4 @@ class CEmail_Builder_Component_BodyComponent_Image extends CEmail_Builder_Compon
       </table>
     ';
     }
-
 }

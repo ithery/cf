@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Component_BodyComponent {
@@ -43,7 +37,7 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
     public function getStyles() {
         $parentStyles = parent::getStyles();
         $containerWidth = $this->context->getContainerWidth();
-        
+
         $fullWidth = $this->isFullWidth();
 
         $background = $this->hasBackground() ? $this->getBackground() : ['background' => $this->getAttribute('background-color'), 'background-color' => $this->getAttribute('background-color')];
@@ -77,16 +71,14 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
         $arrBackground = [];
         $arrBackground[] = $this->getAttribute('background-color');
         if ($this->hasBackground()) {
-            
             $arrBackground = array_merge($arrBackground, ['url(' . $this->getAttribute('background-url') . ')', 'top center / ' . $this->getAttribute('background-size'), $this->getAttribute('background-repeat')]);
         }
-        return trim(carr::reduce($arrBackground, function($output, $v, $key) {
-                    
-                    if ($v != null && strlen($v) > 0) {
-                        return $output . ' ' . $v;
-                    }
-                    return $output;
-                },''));
+        return trim(carr::reduce($arrBackground, function ($output, $v, $key) {
+            if ($v != null && strlen($v) > 0) {
+                return $output . ' ' . $v;
+            }
+            return $output;
+        }, ''));
     }
 
     public function hasBackground() {
@@ -99,7 +91,7 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
 
     public function renderBefore() {
         $containerWidth = $this->context ? $this->context->getContainerWidth() : '100%';
-        $attr = array();
+        $attr = [];
         $attr['align'] = 'center';
         $attr['border'] = '0';
         $attr['cellpadding'] = '0';
@@ -107,7 +99,6 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
         $attr['class'] = Helper::suffixCssClasses($this->getAttribute('css-class'), 'outlook');
         $attr['style'] = ['width' => $containerWidth];
         $attr['width'] = $containerWidth;
-
 
         return '
       <!--[if mso | IE]>
@@ -118,7 +109,6 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
     ';
     }
 
-    // eslint-disable-next-line class-methods-use-this
     public function renderAfter() {
         return '
       <!--[if mso | IE]>
@@ -131,7 +121,7 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
 
     public function renderWrappedChildren() {
         $children = $this->getChildren();
-        $renderer = function($component) {
+        $renderer = function ($component) {
             if ($component->isRawElement()) {
                 return $component->render();
             } else {
@@ -151,9 +141,6 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
             }
         };
 
-
-
-
         return '
       <!--[if mso | IE]>
         <tr>
@@ -169,13 +156,13 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
         $fullWidth = $this->isFullWidth();
         $containerWidth = $this->context ? $this->context->getContainerWidth() : '100%';
 
-        $vRectAttr = array();
+        $vRectAttr = [];
         $vRectAttr['style'] = $fullWidth ? ['mso-width-percent' => '1000'] : ['width' => $containerWidth];
         $vRectAttr['xmlns:v'] = 'urn:schemas-microsoft-com:vml';
         $vRectAttr['fill'] = 'true';
         $vRectAttr['stroke'] = 'false';
 
-        $vFillAttr = array();
+        $vFillAttr = [];
         $vFillAttr['origin'] = '0.5, 0';
         $vFillAttr['position'] = '0.5, 0';
         $vFillAttr['src'] = $this->getAttribute('background-url');
@@ -203,7 +190,7 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
             $innerDivOpen = '<div' . $this->htmlAttributes(['style' => 'innerDiv']) . '>';
             $innerDivClose = '</div>';
         }
-        $tableAttributes = array();
+        $tableAttributes = [];
         $tableAttributes['align'] = 'center';
         $tableAttributes['background'] = $this->isFullWidth() ? null : $this->getAttribute('background-url');
         $tableAttributes['border'] = '0';
@@ -238,7 +225,7 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
     public function renderFullWidth() {
         $content = $this->hasBackground() ? $this->renderWithBackground($this->renderBefore() . $this->renderSection() . $this->renderAfter()) : $this->renderBefore() . $this->renderSection() . $this->renderAfter();
 
-        $optionsAttributes = array();
+        $optionsAttributes = [];
         $optionsAttributes['align'] = 'center';
         $optionsAttributes['class'] = $this->getAttribute('css-class');
         $optionsAttributes['background']->$this->getAttribute('background-url');
@@ -248,7 +235,7 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
         $optionsAttributes['role'] = 'presentation';
         $optionsAttributes['style'] = 'tableFullWidth';
         return '
-      <table' . $this->htmlAttributes($optionAttributes) . '>
+      <table' . $this->htmlAttributes($optionsAttributes) . '>
         <tbody>
           <tr>
             <td>
@@ -262,12 +249,11 @@ class CEmail_Builder_Component_BodyComponent_Section extends CEmail_Builder_Comp
 
     public function renderSimple() {
         $section = $this->renderSection();
-        
+
         return $this->renderBefore() . ($this->hasBackground() ? $this->renderWithBackground($section) : $section) . $this->renderAfter();
     }
 
     public function render() {
         return $this->isFullWidth() ? $this->renderFullWidth() : $this->renderSimple();
     }
-
 }

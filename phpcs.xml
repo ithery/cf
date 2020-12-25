@@ -61,6 +61,7 @@
         <exclude name="Squiz.Classes.ValidClassName.NotCamelCaps"/>
         <exclude name="PEAR.Functions.FunctionCallSignature.Indent"/>
         <exclude name="Generic.Files.LineLength.TooLong"/>
+        <exclude name="Internal.NoCodeFound"/>
 
         <!-- Ignore that already defined in PSR-->
         <exclude name="PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
