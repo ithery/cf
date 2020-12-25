@@ -1,21 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 trait CApp_Trait_App_Bootstrap {
-
     protected static $registerComponentBooted = false;
     protected static $registerControlBooted = false;
     protected static $registerBladeBooted = false;
 
     public static function registerComponent() {
         if (!static::$registerComponentBooted) {
-
             CComponent_RenameMe_SupportEvents::init();
             CComponent_RenameMe_SupportLocales::init();
             CComponent_RenameMe_SupportChildren::init();
@@ -27,7 +26,7 @@ trait CApp_Trait_App_Bootstrap {
             CComponent_RenameMe_SupportActionReturns::init();
             CComponent_RenameMe_SupportBrowserHistory::init();
             CComponent_RenameMe_SupportComponentTraits::init();
-            
+
             CView::blade()->precompiler(function ($string) {
                 return (new CComponent_ComponentTagCompiler())->compile($string);
             });
@@ -36,7 +35,6 @@ trait CApp_Trait_App_Bootstrap {
             CView::blade()->directive('this', [CComponent_BladeDirective::class, 'this']);
             CView::blade()->directive('entangle', [CComponent_BladeDirective::class, 'entangle']);
 
-            
             CView::engineResolver()->register('blade', function () {
                 return new CComponent_ComponentCompilerEngine();
             });
@@ -82,26 +80,23 @@ trait CApp_Trait_App_Bootstrap {
                 [CComponent_HydrationMiddleware_CallHydrationHooks::class, 'initialHydrate'],
             ]);
 
-            
             if (method_exists(CView_ComponentAttributeBag::class, 'macro')) {
                 CView_ComponentAttributeBag::macro('cf', function ($name) {
-                    $entries = carr::head($this->whereStartsWith('cf:'.$name));
-                    
+                    $entries = carr::head($this->whereStartsWith('cf:' . $name));
+
                     $directive = carr::head(array_keys($entries));
                     $value = carr::head(array_values($entries));
 
                     return new CComponent_CFDirective($name, $directive, $value);
                 });
             }
-            
+
             static::$registerComponentBooted = true;
         }
     }
 
     public static function registerBlade() {
         if (!static::$registerBladeBooted) {
-
-
             CView::blade()->directive('CApp', [CApp_Blade_Directive::class, 'directive']);
             CView::blade()->directive('CAppStyles', [CApp_Blade_Directive::class, 'styles']);
             CView::blade()->directive('CAppScripts', [CApp_Blade_Directive::class, 'scripts']);
@@ -116,9 +111,7 @@ trait CApp_Trait_App_Bootstrap {
             CView::blade()->directive('CAppEndPrependScript', [CApp_Blade_Directive::class, 'endPrependScript']);
             CView::blade()->directive('CAppElement', [CApp_Blade_Directive::class, 'element']);
 
-            
-            
-            CView::blade()->component('capp.view-component.modal','modal');
+            CView::blade()->component('capp.view-component.modal', 'modal');
             static::$registerBladeBooted = true;
         }
     }
@@ -173,5 +166,4 @@ trait CApp_Trait_App_Bootstrap {
             static::$registerControlBooted = true;
         }
     }
-
 }

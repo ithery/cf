@@ -96,11 +96,11 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
-     * @param type       $view
-     * @param string     $id
-     * @param null|mixed $data
+     * @param CElement_View}string $view
+     * @param string               $id
+     * @param null|mixed           $data
      *
-     * @return type
+     * @return CElement_View
      */
     public function addView($view = null, $data = null, $id = null) {
         if (strlen($id) == 0) {
