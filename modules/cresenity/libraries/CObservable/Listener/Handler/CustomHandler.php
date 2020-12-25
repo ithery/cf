@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 20, 2019, 3:27:04 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 20, 2019, 3:27:04 PM
  */
 class CObservable_Listener_Handler_CustomHandler extends CObservable_Listener_Handler {
-
     use CTrait_Compat_Handler_Driver_Custom;
 
     protected $js;
@@ -20,7 +20,6 @@ class CObservable_Listener_Handler_CustomHandler extends CObservable_Listener_Ha
     }
 
     public function setJs($js) {
-
         $this->js = $js;
 
         return $this;
@@ -30,8 +29,6 @@ class CObservable_Listener_Handler_CustomHandler extends CObservable_Listener_Ha
         $js = '';
         $js .= $this->js;
 
-
         return $js;
     }
-
 }

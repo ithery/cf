@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 12, 2018, 9:08:07 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 12, 2018, 9:08:07 PM
  */
 class CElement_Component_Action extends CElement_Component {
-
     use CTrait_Compat_Element_Action,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
@@ -33,20 +33,20 @@ class CElement_Component_Action extends CElement_Component {
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->jsfunc = "";
-        $this->type = "jsfunc";
-        $this->icon = "";
-        $this->link = "";
-        $this->jsparam = array();
-        $this->link_target = "";
+        $this->jsfunc = '';
+        $this->type = 'jsfunc';
+        $this->icon = '';
+        $this->link = '';
+        $this->jsparam = [];
+        $this->link_target = '';
         $this->submit = false;
         $this->submitTo = false;
         $this->submitToTarget = false;
-        $this->label = "";
-        $this->style = "";
+        $this->label = '';
+        $this->style = '';
         $this->disabled = false;
         $this->confirm = false;
-        $this->confirm_message = "";
+        $this->confirm_message = '';
         $this->button = false;
         $this->btn_style = 'default';
         $this->value = '';
@@ -57,32 +57,12 @@ class CElement_Component_Action extends CElement_Component {
     }
 
     /**
-     * 
      * @param bool $bool
+     *
      * @return $this
      */
     public function setConfirm($bool = true) {
         $this->confirm = $bool;
-        return $this;
-    }
-
-    public function set_confirm_message($message) {
-        $this->confirm_message = $message;
-        return $this;
-    }
-
-    public function set_type($type) {
-        $this->type = $type;
-        return $this;
-    }
-
-    public function set_value($value) {
-        $this->value = $value;
-        return $this;
-    }
-
-    public function set_jsfunc($jsfunc) {
-        $this->jsfunc = $jsfunc;
         return $this;
     }
 
@@ -92,7 +72,7 @@ class CElement_Component_Action extends CElement_Component {
     }
 
     public function setLink($link) {
-        $this->type = "link";
+        $this->type = 'link';
         $this->link = $link;
         return $this;
     }
@@ -107,7 +87,7 @@ class CElement_Component_Action extends CElement_Component {
         return $this;
     }
 
-    public function setSubmitTo($url, $target = "") {
+    public function setSubmitTo($url, $target = '') {
         $this->submitTo = $url;
 
         if (strlen($target) > 0) {
@@ -118,11 +98,6 @@ class CElement_Component_Action extends CElement_Component {
 
     public function setDisabled($bool = true) {
         $this->disabled = $bool;
-        return $this;
-    }
-
-    public function set_button($bool) {
-        $this->button = $bool;
         return $this;
     }
 
@@ -147,8 +122,7 @@ class CElement_Component_Action extends CElement_Component {
     }
 
     public function toarray() {
-        $data = array();
-
+        $data = [];
 
         $data = array_merge_recursive($data, parent::toarray());
         if ($this->submit) {
@@ -171,29 +145,31 @@ class CElement_Component_Action extends CElement_Component {
         $html->setIndent($indent);
         $jsparam = $this->jsparam;
         $link = $this->link;
-        $param = "";
+        $param = '';
         $i = 0;
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
-            $classes = " " . $classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
-        $addition_attribute = "";
+        $addition_attribute = '';
         foreach ($this->attr as $k => $v) {
-            $addition_attribute .= " " . $k . '="' . $v . '"';
+            $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
         foreach ($jsparam as $k => $p) {
             $i++;
-            if ($k == "param1") {
-                if (strlen($param) > 0)
-                    $param .= ",";
+            if ($k == 'param1') {
+                if (strlen($param) > 0) {
+                    $param .= ',';
+                }
                 $param .= "'" . $p . "'";
             }
-            if ($this->type == "link") {
+            if ($this->type == 'link') {
                 //$link = str_replace("{param1}",$p,$link);
                 preg_match_all("/{([\w]*)}/", $link, $matches, PREG_SET_ORDER);
                 foreach ($matches as $val) {
@@ -209,22 +185,22 @@ class CElement_Component_Action extends CElement_Component {
         if (strlen($this->link_target)) {
             $link_target = ' target="' . $this->link_target . '"';
         }
-        $disabled = "";
+        $disabled = '';
         if ($this->disabled) {
             $disabled = ' disabled="disabled"';
         }
-        $add_class = "";
-        $add_attr = "";
+        $add_class = '';
+        $add_attr = '';
         if ($this->confirm && !$this->submitTo) {
-            $add_class .= " confirm";
+            $add_class .= ' confirm';
         }
         if ($this->bootstrap == '3.3') {
             if (strlen($this->btn_style) == 0) {
                 $add_class .= ' btn-' . $this->btn_style;
             }
         }
-        if ($this->style == "btn-icon-group" && strlen($this->label) > 0) {
-            $add_class .= " tip-top";
+        if ($this->style == 'btn-icon-group' && strlen($this->label) > 0) {
+            $add_class .= ' tip-top';
             $add_attr .= ' data-original-title="' . $this->label . '"';
         }
         if (strlen($this->confirm_message) > 0) {
@@ -232,10 +208,10 @@ class CElement_Component_Action extends CElement_Component {
         }
 
         if ($this->render_as_input()) {
-            $input_type = "button";
+            $input_type = 'button';
 
             if ($this->submit) {
-                $input_type = "submit";
+                $input_type = 'submit';
             }
             if ($this->button) {
                 $html->appendln('<button id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '>' . $this->label . '</button>');
@@ -249,30 +225,29 @@ class CElement_Component_Action extends CElement_Component {
                 $html->appendln('<button type="submit" id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . ' value="' . $this->label . '">' . $this->label . '</button>');
             }
         } else {
-            if ($this->type == "jsfunc") {
+            if ($this->type == 'jsfunc') {
                 $link = 'javascript:;';
-                if ($this->jsfunc != "") {
+                if ($this->jsfunc != '') {
                     $link = 'javascript:' . $this->jsfunc . '(' . $param . ')';
                 }
             }
-            if ($this->style == "btn-dropdown") {
+            if ($this->style == 'btn-dropdown') {
                 $html->appendln('<li>');
             }
-            if ($this->style == "btn-dropdown") {
+            if ($this->style == 'btn-dropdown') {
                 $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class=" ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
             } else {
                 $html->appendln('<a id="' . $this->id . '" href="' . $link . '"' . $link_target . ' class="btn ' . $add_class . '' . $classes . '" ' . $disabled . $add_attr . $addition_attribute . $custom_css . '>');
             }
 
             if (strlen($this->icon) > 0) {
-
                 $html->append('<i class="icon icon-' . $this->getIcon() . ' ' . $this->getIcon() . '"></i> ');
             }
-            if ($this->style != "btn-icon-group") {
+            if ($this->style != 'btn-icon-group') {
                 $html->append($this->label);
             }
             $html->append('</a>');
-            if ($this->style == "btn-dropdown") {
+            if ($this->style == 'btn-dropdown') {
                 $html->appendln('</li>');
             }
         }
@@ -280,7 +255,6 @@ class CElement_Component_Action extends CElement_Component {
     }
 
     public function js($indent = 0) {
-
         $js = new CStringBuilder();
         $js->setIndent($indent);
 
@@ -288,7 +262,6 @@ class CElement_Component_Action extends CElement_Component {
             $js->appendln("jQuery('#" . $this->id . "').click(function(e) { e.preventDefault(); });");
         } else {
             if ($this->render_as_input()) {
-
                 if (strlen($this->link) > 0) {
                     if ($this->submit) {
                         $js->appendln("jQuery('#" . $this->id . "').click(function() { jQuery(this).closest('form').attr('action','" . $this->link . "'); });");
@@ -298,15 +271,15 @@ class CElement_Component_Action extends CElement_Component {
                 }
             } else {
                 if (strlen($this->submitTo) > 0) {
-                    $jsSubmitToTarget = "";
+                    $jsSubmitToTarget = '';
                     if (strlen($this->submitToTarget) > 0) {
                         $jsSubmitToTarget = "jQuery('#" . $this->id . "').closest('form').attr('target','" . $this->submitToTarget . "');";
                     }
-                    $this->addListener('click')->addHandler('custom')->setJs("
+                    $this->onClickListener()->addCustomHandler()->setJs("
                         jQuery('#" . $this->id . "').closest('form').attr('action','" . $this->submitTo . "');
                         " . $jsSubmitToTarget . "
                         jQuery('#" . $this->id . "').closest('form').submit();
-                       
+
                     ");
                 }
             }
@@ -317,5 +290,4 @@ class CElement_Component_Action extends CElement_Component {
 
         return $js->text();
     }
-
 }

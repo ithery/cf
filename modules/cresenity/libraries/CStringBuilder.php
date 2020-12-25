@@ -2,17 +2,17 @@
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 2:16:00 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 17, 2018, 2:16:00 AM
  */
 class CStringBuilder {
-
     use CTrait_Compat_StringBuilder;
 
-    private $text = "";
+    private $text = '';
     private $indent = 0;
 
-    public function __construct($str = "") {
+    public function __construct($str = '') {
         $this->text = $str;
     }
 
@@ -22,8 +22,9 @@ class CStringBuilder {
 
     /**
      * Set indentation of string
-     * 
+     *
      * @param int $ind
+     *
      * @return $this
      */
     public function setIndent($ind) {
@@ -33,7 +34,7 @@ class CStringBuilder {
 
     /**
      * Get indentation of string
-     * 
+     *
      * @return int
      */
     public function getIndent() {
@@ -42,8 +43,9 @@ class CStringBuilder {
 
     /**
      * Increment the indentation
-     * 
+     *
      * @param int $n
+     *
      * @return $this
      */
     public function incIndent($n = 1) {
@@ -53,8 +55,9 @@ class CStringBuilder {
 
     /**
      * Decrement the indentation
-     * 
+     *
      * @param int $n
+     *
      * @return $this
      */
     public function decIndent($n = 1) {
@@ -84,7 +87,4 @@ class CStringBuilder {
     public function __toString() {
         return $this->text;
     }
-
 }
-
-?>

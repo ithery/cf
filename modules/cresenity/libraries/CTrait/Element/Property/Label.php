@@ -1,32 +1,32 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2018, 5:11:13 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2018, 5:11:13 AM
  */
 trait CTrait_Element_Property_Label {
-
     /**
      * Label of element
-     * 
+     *
      * @var string
      */
     protected $label;
 
     /**
      * Label of element before translation
-     * 
-     * @var string 
+     *
+     * @var string
      */
     protected $rawLabel;
 
     /**
-     * 
      * @param string $label
      * @param string $lang
+     *
      * @return $this
      */
     public function setLabel($label, $lang = true) {
@@ -39,7 +39,6 @@ trait CTrait_Element_Property_Label {
     }
 
     /**
-     * 
      * @return string
      */
     public function getLabel() {
@@ -47,11 +46,9 @@ trait CTrait_Element_Property_Label {
     }
 
     /**
-     * 
      * @return string
      */
     public function getTranslationLabel() {
         return $this->label;
     }
-
 }
