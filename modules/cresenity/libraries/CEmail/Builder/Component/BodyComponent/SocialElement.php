@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_SocialElement extends CEmail_Builder_Component_BodyComponent {
@@ -31,14 +25,12 @@ class CEmail_Builder_Component_BodyComponent_SocialElement extends CEmail_Builde
             'src' => self::IMG_BASE_URL . 'google-plus.png',
         ],
         'pinterest' => [
-            'share-url' =>
-            'https=>//pinterest.com/pin/create/button/?url=[[URL]]&media=&description=',
+            'share-url' => 'https=>//pinterest.com/pin/create/button/?url=[[URL]]&media=&description=',
             'background-color' => '#bd081c',
             'src' => self::IMG_BASE_URL . 'pinterest.png',
         ],
         'linkedin' => [
-            'share-url' =>
-            'https=>//www.linkedin.com/shareArticle?mini=true&url=[[URL]]&title=&summary=&source=',
+            'share-url' => 'https=>//www.linkedin.com/shareArticle?mini=true&url=[[URL]]&title=&summary=&source=',
             'background-color' => '#0077b5',
             'src' => self::IMG_BASE_URL . 'linkedin.png',
         ],
@@ -129,15 +121,11 @@ class CEmail_Builder_Component_BodyComponent_SocialElement extends CEmail_Builde
         'text-decoration' => 'none',
     ];
 
-    
     public function getStyles() {
-
         $socialAttributes = $this->getSocialAttributes();
         $iconSize = carr::get($socialAttributes, 'icon-size');
         $iconHeight = carr::get($socialAttributes, 'icon-height');
         $backgroundColor = carr::get($socialAttributes, 'background-color');
-
-
 
         return [
             'td' => [
@@ -183,14 +171,14 @@ class CEmail_Builder_Component_BodyComponent_SocialElement extends CEmail_Builde
         };
 
         $attrs = carr::reduce([
-                    'icon-size',
-                    'icon-height',
-                    'src',
-                    'background-color',
-                        ], function($r, $attr) use ($socialNetwork) {
-                    $r[$attr] = $this->getAttribute($attr) ? $this->getAttribute($attr) : carr::get($socialNetwork, $attr);
-                    return $r;
-                }, []);
+            'icon-size',
+            'icon-height',
+            'src',
+            'background-color',
+        ], function ($r, $attr) use ($socialNetwork) {
+            $r[$attr] = $this->getAttribute($attr) ? $this->getAttribute($attr) : carr::get($socialNetwork, $attr);
+            return $r;
+        }, []);
 
         $attrs['href'] = $href;
         return $attrs;
@@ -212,7 +200,6 @@ class CEmail_Builder_Component_BodyComponent_SocialElement extends CEmail_Builde
         $tableAttr['role'] = 'presentation';
         $tableAttr['style'] = 'table';
 
-
         $imgAttr = [];
         $imgAttr['alt'] = $this->getAttribute('alt');
         $imgAttr['title'] = $this->getAttribute('title');
@@ -220,8 +207,6 @@ class CEmail_Builder_Component_BodyComponent_SocialElement extends CEmail_Builde
         $imgAttr['src'] = $src;
         $imgAttr['style'] = 'img';
         $imgAttr['width'] = $iconSize;
-
-
 
         $openLink = '';
         $closeLink = '';
@@ -265,5 +250,4 @@ class CEmail_Builder_Component_BodyComponent_SocialElement extends CEmail_Builde
       </tr>
     ';
     }
-
 }

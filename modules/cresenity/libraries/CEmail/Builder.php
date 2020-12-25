@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CEmail_Builder {
-
     protected $components;
     protected static $instance;
 
@@ -36,7 +29,7 @@ class CEmail_Builder {
     }
 
     public function registerComponent($componentClass) {
-        $name = carr::last(explode("_", $componentClass));
+        $name = carr::last(explode('_', $componentClass));
         $this->components[cstr::kebabCase($name)] = $componentClass;
     }
 
@@ -61,7 +54,6 @@ class CEmail_Builder {
     }
 
     /**
-     * 
      * @return CEmail_Builder_GlobalData
      */
     public function globalData() {
@@ -78,11 +70,9 @@ class CEmail_Builder {
     }
 
     /**
-     * 
      * @return \CEmail_Builder_RuntimeBuilder
      */
     public function createRuntimeBuilder() {
         return new CEmail_Builder_RuntimeBuilder();
     }
-
 }

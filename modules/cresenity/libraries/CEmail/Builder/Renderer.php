@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CEmail_Builder_Renderer {
-
     protected $content;
 
     public function __construct($content, $options) {
@@ -24,7 +17,7 @@ class CEmail_Builder_Renderer {
         if (strlen($lang) > 0) {
             $langAttribute = 'lang="' . $lang . '" ';
         }
-    
+
         $backgroundColor = $this->get('backgroundColor');
 
         $backgroundColorAttribute = '';
@@ -33,25 +26,23 @@ class CEmail_Builder_Renderer {
         }
         $title = $this->get('title', '');
         $breakpoint = $this->get('breakpoint', '480px');
-        $componentHeadStyleHtml = carr::reduce($this->get('componentHeadStyle',[]), function($result,$compHeadStyle) use($breakpoint){
-            return $result."\n".$compHeadStyle($breakpoint);
-        },'');
-        
-       
-        $headStyleHtml = carr::reduce($this->get('headStyle',[]),function($result,$headStyle) use($breakpoint) {
-            return $result."\n".$headStyle($breakpoint);
-        },'');
+        $componentHeadStyleHtml = carr::reduce($this->get('componentHeadStyle', []), function ($result, $compHeadStyle) use ($breakpoint) {
+            return $result . "\n" . $compHeadStyle($breakpoint);
+        }, '');
+
+        $headStyleHtml = carr::reduce($this->get('headStyle', []), function ($result, $headStyle) use ($breakpoint) {
+            return $result . "\n" . $headStyle($breakpoint);
+        }, '');
 
         $styleHtml = implode('', $this->get('style', []));
         $headRaw = $this->get('headRaw');
         $headRawHtml = '';
         if ($headRaw != null) {
-            $headRaw = carr::filter($headRaw, function($item) {
-                        return $item != null;
-                    });
+            $headRaw = carr::filter($headRaw, function ($item) {
+                return $item != null;
+            });
             $headRawHtml .= implode("\n", $headRaw);
         }
-
 
         return '
     <!doctype html>
@@ -90,7 +81,7 @@ class CEmail_Builder_Renderer {
         <style type="text/css">
         ' . $componentHeadStyleHtml . '
         ' . $headStyleHtml . '
-        ' . $styleHtml . '    
+        ' . $styleHtml . '
         </style>
         ' . $headRawHtml . '
       </head>
@@ -121,27 +112,24 @@ class CEmail_Builder_Renderer {
         $inlineStyle = $this->get('inlineStyle', '');
         $toImport = [];
         foreach ($fonts as $name => $url) {
-
             $regex = '#"[^"]*font-family:[^"]*' . $name . '[^"]*"#mi';
             $inlineRegex = '#font-family:[^;}]*' . $name . '#mi';
-            $inlineCallback = function($s) use ($inlineRegex) {
-
+            $inlineCallback = function ($s) use ($inlineRegex) {
                 return preg_match($inlineRegex, $s);
             };
-            
+
             if (preg_match($regex, $this->content) || carr::some($inlineStyle, $inlineCallback)) {
                 $toImport[] = $url;
             }
         }
 
-
         if (count($toImport) > 0) {
-            $toImportLink = implode("\n", carr::map($toImport, function($url) {
-                        return '<link href="' . $url . '" rel="stylesheet" type="text/css">';
-                    }));
-            $toImportStyle = implode("\n", carr::map($toImport, function($url) {
-                        return '@import url(' . $url . ');';
-                    }));
+            $toImportLink = implode("\n", carr::map($toImport, function ($url) {
+                return '<link href="' . $url . '" rel="stylesheet" type="text/css">';
+            }));
+            $toImportStyle = implode("\n", carr::map($toImport, function ($url) {
+                return '@import url(' . $url . ');';
+            }));
 
             return '
       <!--[if !mso]><!-->
@@ -163,18 +151,17 @@ class CEmail_Builder_Renderer {
         if (count($mediaQueries) == 0) {
             return '';
         }
-        $baseMediaQueries = carr::map($mediaQueries, function($mediaQuery, $className) {
-                    return '.' . $className . ' ' . $mediaQuery;
-                });
+        $baseMediaQueries = carr::map($mediaQueries, function ($mediaQuery, $className) {
+            return '.' . $className . ' ' . $mediaQuery;
+        });
         $owaStyle = '';
         if ($forceOWADesktop) {
-            $owaQueries = carr::map($baseMediaQueries, function($mq) {
-                        return '[owa] ' . $mq;
-                    });
-            $owaStyle = '<style type="text/css">\n' . implode("\n", $owaStyle) . '\n</style>';
+            $owaQueries = carr::map($baseMediaQueries, function ($mq) {
+                return '[owa] ' . $mq;
+            });
+            $owaStyle = '<style type="text/css">\n' . implode("\n", $owaQueries) . '\n</style>';
         }
         $baseMediaQueriesStyle = implode("\n", $baseMediaQueries);
-
 
         return '
     <style type="text/css">
@@ -185,5 +172,4 @@ class CEmail_Builder_Renderer {
     ' . $owaStyle . '
   ';
     }
-
 }

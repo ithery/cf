@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 1, 2019, 11:58:21 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 1, 2019, 11:58:21 PM
  */
 interface CModel_HasResourceInterface {
-
     /**
      * Set the polymorphic relation.
      *
@@ -63,7 +63,7 @@ interface CModel_HasResourceInterface {
     /**
      * Remove all resource in the given collection except some.
      *
-     * @param string $collectionName
+     * @param string                                                            $collectionName
      * @param \Spatie\ResourceLibrary\Resource[]|\Illuminate\Support\Collection $excludedResource
      *
      * @return string $collectionName
@@ -85,29 +85,30 @@ interface CModel_HasResourceInterface {
      * @return mixed
      */
     public function loadResource($collectionName);
+
     /*
      * Add a conversion.
      */
 
     /**
-     * 
      * @param type $name
+     *
      * @return Conversion
      */
     public function addResourceConversion($name);
-    /*
+
+    /**
      * Register the resource conversions.
      */
-
     public function registerResourceConversions(CApp_Model_Interface_ResourceInterface $resource = null);
-    /*
+
+    /**
      * Register the resource collections.
      */
-
     public function registerResourceCollections();
-    /*
+
+    /**
      * Register the resource conversions and conversions set in resource collections.
      */
-
     public function registerAllResourceConversions();
 }

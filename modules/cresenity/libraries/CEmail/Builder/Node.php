@@ -1,14 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CEmail_Builder_Node {
-
-
     use CEmail_Builder_Trait_NodeTrait;
 
     public $parent = null;
@@ -58,7 +50,7 @@ class CEmail_Builder_Node {
     public function add($node) {
         if ($node instanceof CEmail_Builder_Node) {
             $this->children[] = $node;
-        } else if (is_string($node)) {
+        } elseif (is_string($node)) {
             $this->content .= $node;
         } else {
             throw new Exception('Invalid argument for add method on object node');
@@ -74,5 +66,4 @@ class CEmail_Builder_Node {
         }
         throw new Exception('undefined method ' . $name . ' called for node');
     }
-
 }
