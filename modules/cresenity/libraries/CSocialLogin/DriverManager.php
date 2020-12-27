@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 15, 2019, 8:13:37 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 15, 2019, 8:13:37 PM
  */
 use League\OAuth1\Client\Server\Twitter as TwitterServer;
 
 class CSocialLogin_DriverManager {
-
     use CTrait_Manager_DriverManager;
 
     protected $config;
@@ -18,7 +18,8 @@ class CSocialLogin_DriverManager {
     /**
      * Get a driver instance.
      *
-     * @param  string  $driver
+     * @param string $driver
+     *
      * @return mixed
      */
     public function with($driver) {
@@ -83,7 +84,7 @@ class CSocialLogin_DriverManager {
     protected function createGitlabDriver() {
         return $this->buildProvider(CSocialLogin_OAuth2_Provider_GitlabProvider::class, $this->config);
     }
-    
+
     /**
      * Create an instance of the specified driver.
      *
@@ -96,12 +97,17 @@ class CSocialLogin_DriverManager {
     /**
      * Build an OAuth 2 provider instance.
      *
-     * @param  string  $provider
-     * @param  array  $config
+     * @param string $provider
+     * @param array  $config
+     *
      * @return CSocialLogin_OAuth2_AbstractProvider
      */
     public function buildProvider($provider, $config) {
-        return new $provider($config['client_id'], $config['client_secret'], $this->formatRedirectUrl($config), carr::get($config, 'guzzle', [])
+        return new $provider(
+            $config['client_id'],
+            $config['client_secret'],
+            $this->formatRedirectUrl($config),
+            carr::get($config, 'guzzle', [])
         );
     }
 
@@ -117,7 +123,8 @@ class CSocialLogin_DriverManager {
     /**
      * Format the server configuration.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return array
      */
     public function formatConfig(array $config) {
@@ -125,13 +132,14 @@ class CSocialLogin_DriverManager {
             'identifier' => $config['client_id'],
             'secret' => $config['client_secret'],
             'callback_uri' => $this->formatRedirectUrl($config),
-                ], $config);
+        ], $config);
     }
 
     /**
      * Format the callback URL, resolving a relative URI if needed.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return string
      */
     protected function formatRedirectUrl(array $config) {
@@ -150,5 +158,4 @@ class CSocialLogin_DriverManager {
     public function getDefaultDriver() {
         throw new InvalidArgumentException('No Socialite driver was specified.');
     }
-
 }

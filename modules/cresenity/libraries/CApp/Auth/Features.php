@@ -63,4 +63,22 @@ class CApp_Auth_Features {
     public static function twoFactorAuthentication(array $options = []) {
         return 'two-factor-authentication';
     }
+
+    /**
+     * Enable the teams feature.
+     *
+     * @return string
+     */
+    public static function teams() {
+        return 'teams';
+    }
+
+    /**
+     * Enable the profile photo upload feature.
+     *
+     * @return string
+     */
+    public static function profilePhotos() {
+        return 'profile-photos';
+    }
 }

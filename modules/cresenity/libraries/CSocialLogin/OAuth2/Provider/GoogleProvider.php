@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 15, 2019, 8:00:37 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 15, 2019, 8:00:37 PM
  */
 class CSocialLogin_OAuth2_Provider_GoogleProvider extends CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_OAuth2_ProviderInterface {
-
     /**
      * The separating character for the requested scopes.
      *
@@ -44,7 +44,8 @@ class CSocialLogin_OAuth2_Provider_GoogleProvider extends CSocialLogin_OAuth2_Ab
     /**
      * Get the POST fields for the token request.
      *
-     * @param  string  $code
+     * @param string $code
+     *
      * @return array
      */
     protected function getTokenFields($code) {
@@ -76,13 +77,12 @@ class CSocialLogin_OAuth2_Provider_GoogleProvider extends CSocialLogin_OAuth2_Ab
         $user['verified_email'] = carr::get($user, 'email_verified');
         $user['link'] = carr::get($user, 'profile');
         return (new CSocialLogin_OAuth2_User)->setRaw($user)->map([
-                    'id' => carr::get($user, 'sub'),
-                    'nickname' => carr::get($user, 'nickname'),
-                    'name' => carr::get($user, 'name'),
-                    'email' => carr::get($user, 'email'),
-                    'avatar' => $avatarUrl = carr::get($user, 'picture'),
-                    'avatar_original' => $avatarUrl,
+            'id' => carr::get($user, 'sub'),
+            'nickname' => carr::get($user, 'nickname'),
+            'name' => carr::get($user, 'name'),
+            'email' => carr::get($user, 'email'),
+            'avatar' => $avatarUrl = carr::get($user, 'picture'),
+            'avatar_original' => $avatarUrl,
         ]);
     }
-
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 15, 2019, 8:06:59 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 15, 2019, 8:06:59 PM
  */
 abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_UserInterface {
-
     /**
      * The unique identifier for the user.
      *
@@ -108,7 +108,8 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Us
     /**
      * Set the raw user array from the provider.
      *
-     * @param  array  $user
+     * @param array $user
+     *
      * @return $this
      */
     public function setRaw(array $user) {
@@ -119,7 +120,8 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Us
     /**
      * Map the given array onto the user's properties.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return $this
      */
     public function map(array $attributes) {
@@ -132,7 +134,8 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Us
     /**
      * Determine if the given raw user attribute exists.
      *
-     * @param  string  $offset
+     * @param string $offset
+     *
      * @return bool
      */
     public function offsetExists($offset) {
@@ -142,7 +145,8 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Us
     /**
      * Get the given key from the raw user.
      *
-     * @param  string  $offset
+     * @param string $offset
+     *
      * @return mixed
      */
     public function offsetGet($offset) {
@@ -152,8 +156,9 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Us
     /**
      * Set the given attribute on the raw user array.
      *
-     * @param  string  $offset
-     * @param  mixed  $value
+     * @param string $offset
+     * @param mixed  $value
+     *
      * @return void
      */
     public function offsetSet($offset, $value) {
@@ -163,11 +168,11 @@ abstract class CSocialLogin_AbstractUser implements ArrayAccess, CSocialLogin_Us
     /**
      * Unset the given value from the raw user array.
      *
-     * @param  string  $offset
+     * @param string $offset
+     *
      * @return void
      */
     public function offsetUnset($offset) {
         unset($this->user[$offset]);
     }
-
 }
