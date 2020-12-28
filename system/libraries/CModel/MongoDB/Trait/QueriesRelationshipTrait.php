@@ -1,20 +1,15 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-trait CModel_MongoDB_QueriesRelationshipTrait {
-
+trait CModel_MongoDB_Trait_QueriesRelationshipTrait {
     /**
      * Add a relationship count / exists condition to the query.
-     * @param string $relation
-     * @param string $operator
-     * @param int $count
-     * @param string $boolean
+     *
+     * @param string       $relation
+     * @param string       $operator
+     * @param int          $count
+     * @param string       $boolean
      * @param Closure|null $callback
+     *
      * @return Builder|static
      */
     public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) {
@@ -32,7 +27,8 @@ trait CModel_MongoDB_QueriesRelationshipTrait {
         // clause. This will make these queries run much faster compared with a count.
         $method = $this->canUseExistsForExistenceCheck($operator, $count) ? 'getRelationExistenceQuery' : 'getRelationExistenceCountQuery';
         $hasQuery = $relation->{$method}(
-                $relation->getRelated()->newQuery(), $this
+            $relation->getRelated()->newQuery(),
+            $this
         );
         // Next we will call any given callback as an "anonymous" scope so they can get the
         // proper logical grouping of the where clauses if needed by this Eloquent query
@@ -41,12 +37,17 @@ trait CModel_MongoDB_QueriesRelationshipTrait {
             $hasQuery->callScope($callback);
         }
         return $this->addHasWhere(
-                        $hasQuery, $relation, $operator, $count, $boolean
+            $hasQuery,
+            $relation,
+            $operator,
+            $count,
+            $boolean
         );
     }
 
     /**
      * @param $relation
+     *
      * @return bool
      */
     protected function isAcrossConnections($relation) {
@@ -55,12 +56,15 @@ trait CModel_MongoDB_QueriesRelationshipTrait {
 
     /**
      * Compare across databases
+     *
      * @param $relation
-     * @param string $operator
-     * @param int $count
-     * @param string $boolean
+     * @param string       $operator
+     * @param int          $count
+     * @param string       $boolean
      * @param Closure|null $callback
+     *
      * @return mixed
+     *
      * @throws Exception
      */
     public function addHybridHas($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) {
@@ -81,6 +85,7 @@ trait CModel_MongoDB_QueriesRelationshipTrait {
 
     /**
      * @param $relation
+     *
      * @return string
      */
     protected function getHasCompareKey($relation) {
@@ -94,12 +99,13 @@ trait CModel_MongoDB_QueriesRelationshipTrait {
      * @param $relations
      * @param $operator
      * @param $count
+     *
      * @return array
      */
     protected function getConstrainedRelatedIds($relations, $operator, $count) {
         $relationCount = array_count_values(array_map(function ($id) {
-                    return (string) $id; // Convert Back ObjectIds to Strings
-                }, is_array($relations) ? $relations : $relations->flatten()->toArray()));
+            return (string) $id; // Convert Back ObjectIds to Strings
+        }, is_array($relations) ? $relations : $relations->flatten()->toArray()));
         // Remove unwanted related objects based on the operator and count.
         $relationCount = array_filter($relationCount, function ($counted) use ($count, $operator) {
             // If we are comparing to 0, we always need all results.
@@ -124,8 +130,11 @@ trait CModel_MongoDB_QueriesRelationshipTrait {
 
     /**
      * Returns key we are constraining this parent model's query with
+     *
      * @param $relation
+     *
      * @return string
+     *
      * @throws Exception
      */
     protected function getRelatedConstraintKey($relation) {
@@ -138,7 +147,6 @@ trait CModel_MongoDB_QueriesRelationshipTrait {
         if ($relation instanceof CModel_Relation_BelongsToMany && !$this->isAcrossConnections($relation)) {
             return $this->model->getKeyName();
         }
-        throw new Exception(CF::class_basename($relation) . ' is not supported for hybrid query constraints.');
+        throw new Exception(c::classBasename($relation) . ' is not supported for hybrid query constraints.');
     }
-
 }

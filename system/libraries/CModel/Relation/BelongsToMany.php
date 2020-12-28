@@ -1,15 +1,6 @@
 <?php
 
-//namespace Illuminate\Database\Eloquent\Relations;
-//
-//use Illuminate\Support\Str;
-//use Illuminate\Database\Eloquent\Model;
-//use Illuminate\Database\Eloquent\Builder;
-//use Illuminate\Database\Eloquent\Collection;
-//use Illuminate\Database\Eloquent\ModelNotFoundException;
-
 class CModel_Relation_BelongsToMany extends CModel_Relation {
-
     use CModel_Relation_Trait_InteractsWithPivotTable;
 
     /**
@@ -120,14 +111,15 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Create a new belongs to many relationship instance.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel  $parent
-     * @param  string  $table
-     * @param  string  $foreignPivotKey
-     * @param  string  $relatedPivotKey
-     * @param  string  $parentKey
-     * @param  string  $relatedKey
-     * @param  string  $relationName
+     * @param CModel_Query $query
+     * @param CModel       $parent
+     * @param string       $table
+     * @param string       $foreignPivotKey
+     * @param string       $relatedPivotKey
+     * @param string       $parentKey
+     * @param string       $relatedKey
+     * @param string       $relationName
+     *
      * @return void
      */
     public function __construct(CModel_Query $query, CModel $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName = null) {
@@ -157,7 +149,8 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Set the join clause for the relation query.
      *
-     * @param  CModel_Query|null  $query
+     * @param CModel_Query|null $query
+     *
      * @return $this
      */
     protected function performJoin($query = null) {
@@ -169,7 +162,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
         $baseTable = $this->related->getTable();
 
         $key = $baseTable . '.' . $this->relatedKey;
-        
+
         $query->join($this->table, $key, '=', $this->getQualifiedRelatedPivotKeyName());
 
         return $this;
@@ -182,7 +175,9 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      */
     protected function addWhereConstraints() {
         $this->query->where(
-                $this->getQualifiedForeignPivotKeyName(), '=', $this->parent->{$this->parentKey}
+            $this->getQualifiedForeignPivotKeyName(),
+            '=',
+            $this->parent->{$this->parentKey}
         );
 
         return $this;
@@ -191,7 +186,8 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param  array  $models
+     * @param array $models
+     *
      * @return void
      */
     public function addEagerConstraints(array $models) {
@@ -201,8 +197,9 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
-     * @param  string  $relation
+     * @param array  $models
+     * @param string $relation
+     *
      * @return array
      */
     public function initRelation(array $models, $relation) {
@@ -216,9 +213,10 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array   $models
-     * @param  CModel_Collection  $results
-     * @param  string  $relation
+     * @param array             $models
+     * @param CModel_Collection $results
+     * @param string            $relation
+     *
      * @return array
      */
     public function match(array $models, CModel_Collection $results, $relation) {
@@ -230,7 +228,8 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
         foreach ($models as $model) {
             if (isset($dictionary[$key = $model->{$this->parentKey}])) {
                 $model->setRelation(
-                        $relation, $this->related->newCollection($dictionary[$key])
+                    $relation,
+                    $this->related->newCollection($dictionary[$key])
                 );
             }
         }
@@ -241,7 +240,8 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Build model dictionary keyed by the relation's foreign key.
      *
-     * @param  CModel_Collection  $results
+     * @param CModel_Collection $results
+     *
      * @return array
      */
     protected function buildDictionary(CModel_Collection $results) {
@@ -260,7 +260,8 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Specify the custom pivot model to use for the relationship.
      *
-     * @param  string  $class
+     * @param string $class
+     *
      * @return CModel_Relation_BelongsToMany
      */
     public function using($class) {
@@ -272,10 +273,10 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Specify the custom pivot accessor to use for the relationship.
      *
-     * @param  string  $accessor
+     * @param string $accessor
+     *
      * @return CModel_Relation_BelongsToMany
      */
-    //public function as
     public function alias($accessor) {
         $this->accessor = $accessor;
 
@@ -285,10 +286,11 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Set a where clause for a pivot table column.
      *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  mixed   $value
-     * @param  string  $boolean
+     * @param string $column
+     * @param string $operator
+     * @param mixed  $value
+     * @param string $boolean
+     *
      * @return CModel_Relation_BelongsToMany
      */
     public function wherePivot($column, $operator = null, $value = null, $boolean = 'and') {
@@ -300,10 +302,11 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Set a "where in" clause for a pivot table column.
      *
-     * @param  string  $column
-     * @param  mixed   $values
-     * @param  string  $boolean
-     * @param  bool    $not
+     * @param string $column
+     * @param mixed  $values
+     * @param string $boolean
+     * @param bool   $not
+     *
      * @return CModel_Relation_BelongsToMany
      */
     public function wherePivotIn($column, $values, $boolean = 'and', $not = false) {
@@ -315,9 +318,10 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Set an "or where" clause for a pivot table column.
      *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  mixed   $value
+     * @param string $column
+     * @param string $operator
+     * @param mixed  $value
+     *
      * @return CModel_Relation_BelongsToMany
      */
     public function orWherePivot($column, $operator = null, $value = null) {
@@ -327,8 +331,9 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Set an "or where in" clause for a pivot table column.
      *
-     * @param  string  $column
-     * @param  mixed   $values
+     * @param string $column
+     * @param mixed  $values
+     *
      * @return CModel_Relation_BelongsToMany
      */
     public function orWherePivotIn($column, $values) {
@@ -338,8 +343,9 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Find a related model by its primary key or return new instance of the related model.
      *
-     * @param  mixed  $id
-     * @param  array  $columns
+     * @param mixed $id
+     * @param array $columns
+     *
      * @return CCollection|\CModel
      */
     public function findOrNew($id, $columns = ['*']) {
@@ -353,7 +359,8 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Get the first related model record matching the attributes or instantiate it.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return CModel
      */
     public function firstOrNew(array $attributes) {
@@ -367,9 +374,10 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Get the first related record matching the attributes or create it.
      *
-     * @param  array  $attributes
-     * @param  array  $joining
-     * @param  bool   $touch
+     * @param array $attributes
+     * @param array $joining
+     * @param bool  $touch
+     *
      * @return CModel
      */
     public function firstOrCreate(array $attributes, array $joining = [], $touch = true) {
@@ -383,10 +391,11 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
-     * @param  array  $attributes
-     * @param  array  $values
-     * @param  array  $joining
-     * @param  bool   $touch
+     * @param array $attributes
+     * @param array $values
+     * @param array $joining
+     * @param bool  $touch
+     *
      * @return CModel
      */
     public function updateOrCreate(array $attributes, array $values = [], array $joining = [], $touch = true) {
@@ -404,34 +413,40 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Find a related model by its primary key.
      *
-     * @param  mixed  $id
-     * @param  array  $columns
+     * @param mixed $id
+     * @param array $columns
+     *
      * @return CModel|CModel_Collection|null
      */
     public function find($id, $columns = ['*']) {
         return is_array($id) ? $this->findMany($id, $columns) : $this->where(
-                        $this->getRelated()->getQualifiedKeyName(), '=', $id
-                )->first($columns);
+            $this->getRelated()->getQualifiedKeyName(),
+            '=',
+            $id
+        )->first($columns);
     }
 
     /**
      * Find multiple related models by their primary keys.
      *
-     * @param  mixed  $ids
-     * @param  array  $columns
+     * @param mixed $ids
+     * @param array $columns
+     *
      * @return CModel_Collection
      */
     public function findMany($ids, $columns = ['*']) {
         return empty($ids) ? $this->getRelated()->newCollection() : $this->whereIn(
-                        $this->getRelated()->getQualifiedKeyName(), $ids
-                )->get($columns);
+            $this->getRelated()->getQualifiedKeyName(),
+            $ids
+        )->get($columns);
     }
 
     /**
      * Find a related model by its primary key or throw an exception.
      *
-     * @param  mixed  $id
-     * @param  array  $columns
+     * @param mixed $id
+     * @param array $columns
+     *
      * @return CModel|CModel_Collection
      *
      * @throws CModel_Exception_ModelNotFound
@@ -453,7 +468,8 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Execute the query and get the first result.
      *
-     * @param  array   $columns
+     * @param array $columns
+     *
      * @return mixed
      */
     public function first($columns = ['*']) {
@@ -465,17 +481,18 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Execute the query and get the first result or throw an exception.
      *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @param array $columns
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @return \CModel|static
+     *
+     * @throws \CModel_Exception_ModelNotFound
      */
     public function firstOrFail($columns = ['*']) {
         if (!is_null($model = $this->first($columns))) {
             return $model;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->related));
+        throw (new CModel_Exception_ModelNotFound)->setModel(get_class($this->related));
     }
 
     /**
@@ -490,7 +507,8 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array  $columns
+     * @param array $columns
+     *
      * @return CModel_Collection
      */
     public function get($columns = ['*']) {
@@ -502,8 +520,8 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
         $builder = $this->query->applyScopes();
 
         $models = $builder->addSelect(
-                        $this->shouldSelect($columns)
-                )->getModels();
+            $this->shouldSelect($columns)
+        )->getModels();
 
         $this->hydratePivotRelation($models);
 
@@ -520,7 +538,8 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Get the select columns for the relation query.
      *
-     * @param  array  $columns
+     * @param array $columns
+     *
      * @return CModel_Relation_BelongsToMany
      */
     protected function shouldSelect(array $columns = ['*']) {
@@ -542,17 +561,18 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
         $defaults = [$this->foreignPivotKey, $this->relatedPivotKey];
 
         return c::collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
-                    return $this->table . '.' . $column . ' as pivot_' . $column;
-                })->unique()->all();
+            return $this->table . '.' . $column . ' as pivot_' . $column;
+        })->unique()->all();
     }
 
     /**
      * Get a paginator for the "select" statement.
      *
-     * @param  int  $perPage
-     * @param  array  $columns
-     * @param  string  $pageName
-     * @param  int|null  $page
+     * @param int      $perPage
+     * @param array    $columns
+     * @param string   $pageName
+     * @param int|null $page
+     *
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
@@ -566,10 +586,11 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Paginate the given query into a simple paginator.
      *
-     * @param  int  $perPage
-     * @param  array  $columns
-     * @param  string  $pageName
-     * @param  int|null  $page
+     * @param int      $perPage
+     * @param array    $columns
+     * @param string   $pageName
+     * @param int|null $page
+     *
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
@@ -583,24 +604,26 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Chunk the results of the query.
      *
-     * @param  int  $count
-     * @param  callable  $callback
+     * @param int      $count
+     * @param callable $callback
+     *
      * @return bool
      */
     public function chunk($count, callable $callback) {
         $this->query->addSelect($this->shouldSelect());
 
         return $this->query->chunk($count, function ($results) use ($callback) {
-                    $this->hydratePivotRelation($results->all());
+            $this->hydratePivotRelation($results->all());
 
-                    return $callback($results);
-                });
+            return $callback($results);
+        });
     }
 
     /**
      * Hydrate the pivot table relationship on the models.
      *
-     * @param  array  $models
+     * @param array $models
+     *
      * @return void
      */
     protected function hydratePivotRelation(array $models) {
@@ -609,7 +632,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
         // will set the attributes, table, and connections on it so it will work.
         foreach ($models as $model) {
             $model->setRelation($this->accessor, $this->newExistingPivot(
-                            $this->migratePivotAttributes($model)
+                $this->migratePivotAttributes($model)
             ));
         }
     }
@@ -617,7 +640,8 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Get the pivot attributes from a model.
      *
-     * @param  CModel  $model
+     * @param CModel $model
+     *
      * @return array
      */
     protected function migratePivotAttributes(CModel $model) {
@@ -704,12 +728,13 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Save a new model and attach it to the parent model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  array  $pivotAttributes
-     * @param  bool   $touch
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param CModel $model
+     * @param array  $pivotAttributes
+     * @param bool   $touch
+     *
+     * @return CModel
      */
-    public function save(Model $model, array $pivotAttributes = [], $touch = true) {
+    public function save(CModel $model, array $pivotAttributes = [], $touch = true) {
         $model->save(['touch' => false]);
 
         $this->attach($model->getKey(), $pivotAttributes, $touch);
@@ -720,8 +745,9 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Save an array of new models and attach them to the parent model.
      *
-     * @param  \Illuminate\Support\Collection|array  $models
-     * @param  array  $pivotAttributes
+     * @param \Illuminate\Support\Collection|array $models
+     * @param array                                $pivotAttributes
+     *
      * @return array
      */
     public function saveMany($models, array $pivotAttributes = []) {
@@ -738,9 +764,10 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Create a new instance of the related model.
      *
-     * @param  array  $attributes
-     * @param  array  $joining
-     * @param  bool   $touch
+     * @param array $attributes
+     * @param array $joining
+     * @param bool  $touch
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function create(array $attributes = [], array $joining = [], $touch = true) {
@@ -759,8 +786,9 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Create an array of new instances of the related models.
      *
-     * @param  array  $records
-     * @param  array  $joinings
+     * @param array $records
+     * @param array $joinings
+     *
      * @return array
      */
     public function createMany(array $records, array $joinings = []) {
@@ -779,9 +807,10 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Add the constraints for a relationship query.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel_Query  $parentQuery
-     * @param  array|mixed  $columns
+     * @param CModel_Query $query
+     * @param CModel_Query $parentQuery
+     * @param array|mixed  $columns
+     *
      * @return CModel_Query
      */
     public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
@@ -797,9 +826,10 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Add the constraints for a relationship query on the same table.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel_Query  $parentQuery
-     * @param  array|mixed  $columns
+     * @param CModel_Query $query
+     * @param CModel_Query $parentQuery
+     * @param array|mixed  $columns
+     *
      * @return CModel_Query
      */
     public function getRelationExistenceQueryForSelfJoin(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
@@ -835,8 +865,9 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Specify that the pivot table has creation and update timestamps.
      *
-     * @param  mixed  $createdAt
-     * @param  mixed  $updatedAt
+     * @param mixed $createdAt
+     * @param mixed $updatedAt
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function withTimestamps($createdAt = null, $updatedAt = null) {
@@ -937,5 +968,4 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     public function getPivotAccessor() {
         return $this->accessor;
     }
-
 }

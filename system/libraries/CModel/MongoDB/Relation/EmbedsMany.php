@@ -1,18 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Oct 21, 2019, 9:23:35 PM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use MongoDB\BSON\ObjectID;
 
-class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
-
+class CModel_MongoDB_Relation_EmbedsMany extends CModel_MongoDB_Relation_EmbedsOneOrMany {
     /**
      * @inheritdoc
      */
@@ -32,7 +33,9 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
 
     /**
      * Save a new model and attach it to the parent model.
+     *
      * @param Model $model
+     *
      * @return Model|bool
      */
     public function performInsert(CModel_MongoDB_Model $model) {
@@ -56,7 +59,9 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
 
     /**
      * Save an existing model and attach it to the parent model.
+     *
      * @param CModel_MongoDB_Model $model
+     *
      * @return CModel_MongoDB_Model|bool
      */
     public function performUpdate(CModel_MongoDB_Model $model) {
@@ -70,7 +75,7 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
         $values = $this->getUpdateValues($model->getDirty(), $this->localKey . '.$.');
         // Update document in database.
         $result = $this->getBaseQuery()->where($this->localKey . '.' . $model->getKeyName(), $foreignKey)
-                ->update($values);
+            ->update($values);
         // Attach the model to its parent.
         if ($result) {
             $this->associate($model);
@@ -80,7 +85,9 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
 
     /**
      * Delete an existing model and detach it from the parent model.
+     *
      * @param CModel_MongoDB_Model $model
+     *
      * @return int
      */
     public function performDelete(CModel_MongoDB_Model $model) {
@@ -100,7 +107,9 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
 
     /**
      * Associate the model instance to the given parent, without saving it to the database.
+     *
      * @param CModel_MongoDB_Model $model
+     *
      * @return CModel_MongoDB_Model
      */
     public function associate(CModel_MongoDB_Model $model) {
@@ -112,7 +121,9 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
 
     /**
      * Dissociate the model instance from the given parent, without saving it to the database.
+     *
      * @param mixed $ids
+     *
      * @return int
      */
     public function dissociate($ids = []) {
@@ -134,7 +145,9 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
 
     /**
      * Destroy the embedded models for the given IDs.
+     *
      * @param mixed $ids
+     *
      * @return int
      */
     public function destroy($ids = []) {
@@ -153,6 +166,7 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
 
     /**
      * Delete all embedded models.
+     *
      * @return int
      */
     public function delete() {
@@ -166,7 +180,9 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
 
     /**
      * Destroy alias.
+     *
      * @param mixed $ids
+     *
      * @return int
      */
     public function detach($ids = []) {
@@ -175,7 +191,9 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
 
     /**
      * Save alias.
+     *
      * @param CModel_MongoDB_Model $model
+     *
      * @return CModel_MongoDB_Model
      */
     public function attach(CModel_MongoDB_Model $model) {
@@ -184,7 +202,9 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
 
     /**
      * Associate a new model instance to the given parent, without saving it to the database.
+     *
      * @param CModel_MongoDB_Model $model
+     *
      * @return CModel_MongoDB_Model
      */
     protected function associateNew($model) {
@@ -200,7 +220,9 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
 
     /**
      * Associate an existing model instance to the given parent, without saving it to the database.
+     *
      * @param CModel_MongoDB_Model $model
+     *
      * @return CModel_MongoDB_Model
      */
     protected function associateExisting($model) {
@@ -220,7 +242,9 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
 
     /**
      * Get a paginator for the "select" statement.
+     *
      * @param int $perPage
+     *
      * @return \Illuminate\Pagination\AbstractPaginator
      */
     public function paginate($perPage = null) {
@@ -264,12 +288,13 @@ class CModel_Relation_EmbedsMany extends CModel_Relation_EmbedsOneOrMany {
 
     /**
      * Get the name of the "where in" method for eager loading.
+     *
      * @param \Illuminate\Database\Eloquent\Model $model
-     * @param string $key
+     * @param string                              $key
+     *
      * @return string
      */
     protected function whereInMethod(CModel $model, $key) {
         return 'whereIn';
     }
-
 }
