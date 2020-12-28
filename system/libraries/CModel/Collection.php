@@ -1,12 +1,12 @@
 <?php
 
 class CModel_Collection extends CCollection implements CQueue_QueueableCollectionInterface {
-
     /**
      * Find a model in the collection by key.
      *
-     * @param  mixed  $key
-     * @param  mixed  $default
+     * @param mixed $key
+     * @param mixed $default
+     *
      * @return CModel|static
      */
     public function find($key, $default = null) {
@@ -23,14 +23,15 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
         }
 
         return carr::first($this->items, function ($model) use ($key) {
-                    return $model->getKey() == $key;
-                }, $default);
+            return $model->getKey() == $key;
+        }, $default);
     }
 
     /**
      * Load a set of relationships onto the collection.
      *
-     * @param  mixed  $relations
+     * @param mixed $relations
+     *
      * @return $this
      */
     public function load($relations) {
@@ -50,7 +51,8 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     /**
      * Add an item to the collection.
      *
-     * @param  mixed  $item
+     * @param mixed $item
+     *
      * @return $this
      */
     public function add($item) {
@@ -62,26 +64,26 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     /**
      * Determine if a key exists in the collection.
      *
-     * @param  mixed  $key
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param mixed $key
+     * @param mixed $operator
+     * @param mixed $value
+     *
      * @return bool
      */
     public function contains($key, $operator = null, $value = null) {
         if (func_num_args() > 1 || $this->useAsCallable($key)) {
-
             return parent::contains($key, $operator, $value);
         }
 
         if ($key instanceof CModel) {
             return parent::contains(function ($model) use ($key) {
-                        return $model->is($key);
-                    });
+                return $model->is($key);
+            });
         }
 
         return parent::contains(function ($model) use ($key) {
-                    return $model->getKey() == $key;
-                });
+            return $model->getKey() == $key;
+        });
     }
 
     /**
@@ -98,7 +100,8 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     /**
      * Merge the collection with the given items.
      *
-     * @param  \ArrayAccess|array  $items
+     * @param \ArrayAccess|array $items
+     *
      * @return static
      */
     public function merge($items) {
@@ -114,22 +117,24 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     /**
      * Run a map over each of the items.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     *
      * @return CCollection|static
      */
     public function map(callable $callback) {
         $result = parent::map($callback);
 
         $a = $result->contains(function ($item) {
-                    return !$item instanceof CModel;
-                }) ? $result->toBase() : $result;
+            return !$item instanceof CModel;
+        }) ? $result->toBase() : $result;
         return $a;
     }
 
     /**
      * Reload a fresh model instance from the database for all the entities.
      *
-     * @param  array|string  $with
+     * @param array|string $with
+     *
      * @return static
      */
     public function fresh($with = []) {
@@ -140,20 +145,21 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
         $model = $this->first();
 
         $freshModels = $model->newQueryWithoutScopes()
-                ->with(is_string($with) ? func_get_args() : $with)
-                ->whereIn($model->getKeyName(), $this->modelKeys())
-                ->get()
-                ->getDictionary();
+            ->with(is_string($with) ? func_get_args() : $with)
+            ->whereIn($model->getKeyName(), $this->modelKeys())
+            ->get()
+            ->getDictionary();
 
         return $this->map(function ($model) use ($freshModels) {
-                    return $model->exists && isset($freshModels[$model->getKey()]) ? $freshModels[$model->getKey()] : null;
-                });
+            return $model->exists && isset($freshModels[$model->getKey()]) ? $freshModels[$model->getKey()] : null;
+        });
     }
 
     /**
      * Diff the collection with the given items.
      *
-     * @param  \ArrayAccess|array  $items
+     * @param \ArrayAccess|array $items
+     *
      * @return static
      */
     public function diff($items) {
@@ -173,7 +179,8 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     /**
      * Intersect the collection with the given items.
      *
-     * @param  \ArrayAccess|array  $items
+     * @param \ArrayAccess|array $items
+     *
      * @return static
      */
     public function intersect($items) {
@@ -193,8 +200,9 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     /**
      * Return only unique items from the collection.
      *
-     * @param  string|callable|null  $key
-     * @param  bool  $strict
+     * @param string|callable|null $key
+     * @param bool                 $strict
+     *
      * @return static|\Illuminate\Support\Collection
      */
     public function unique($key = null, $strict = false) {
@@ -208,7 +216,8 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     /**
      * Returns only the models from the collection with the specified keys.
      *
-     * @param  mixed  $keys
+     * @param mixed $keys
+     *
      * @return static
      */
     public function only($keys) {
@@ -224,7 +233,8 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     /**
      * Returns all models in the collection except the models with specified keys.
      *
-     * @param  mixed  $keys
+     * @param mixed $keys
+     *
      * @return static
      */
     public function except($keys) {
@@ -236,31 +246,34 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     /**
      * Make the given, typically visible, attributes hidden across the entire collection.
      *
-     * @param  array|string  $attributes
+     * @param array|string $attributes
+     *
      * @return $this
      */
     public function makeHidden($attributes) {
         return $this->each(function ($model) use ($attributes) {
-                    $model->addHidden($attributes);
-                });
+            $model->addHidden($attributes);
+        });
     }
 
     /**
      * Make the given, typically hidden, attributes visible across the entire collection.
      *
-     * @param  array|string  $attributes
+     * @param array|string $attributes
+     *
      * @return $this
      */
     public function makeVisible($attributes) {
         return $this->each(function ($model) use ($attributes) {
-                    $model->makeVisible($attributes);
-                });
+            $model->makeVisible($attributes);
+        });
     }
 
     /**
      * Get a dictionary keyed by primary keys.
      *
-     * @param  \ArrayAccess|array|null  $items
+     * @param \ArrayAccess|array|null $items
+     *
      * @return array
      */
     public function getDictionary($items = null) {
@@ -277,13 +290,17 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
 
     /**
      * The following methods are intercepted to always return base collections.
+     *
+     * @param mixed      $value
+     * @param null|mixed $key
      */
 
     /**
      * Get an array with the values of a given key.
      *
-     * @param  string  $value
-     * @param  string|null  $key
+     * @param string      $value
+     * @param string|null $key
+     *
      * @return CCollection
      */
     public function pluck($value, $key = null) {
@@ -302,7 +319,8 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     /**
      * Zip the collection together with one or more arrays.
      *
-     * @param  mixed ...$items
+     * @param mixed ...$items
+     *
      * @return CCollection
      */
     public function zip($items) {
@@ -321,7 +339,8 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     /**
      * Get a flattened array of the items in the collection.
      *
-     * @param  int  $depth
+     * @param int $depth
+     *
      * @return CCollection
      */
     public function flatten($depth = INF) {
@@ -340,8 +359,9 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     /**
      * Pad collection to the specified length with a value.
      *
-     * @param  int  $size
-     * @param  mixed $value
+     * @param int   $size
+     * @param mixed $value
+     *
      * @return \Illuminate\Support\Collection
      */
     public function pad($size, $value) {
@@ -352,6 +372,7 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
      * Get the type of the entities being queued.
      *
      * @return string|null
+     *
      * @throws \LogicException
      */
     public function getQueueableClass() {
@@ -407,6 +428,7 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
      * Get the connection of the entities being queued.
      *
      * @return string|null
+     *
      * @throws \LogicException
      */
     public function getQueueableConnection() {
@@ -433,5 +455,4 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
         }
         return $result;
     }
-
 }

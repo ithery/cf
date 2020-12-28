@@ -4,7 +4,6 @@
  * @mixin CModel_Query
  */
 class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
-
     /**
      * The type of the polymorphic relation.
      *
@@ -36,12 +35,13 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
     /**
      * Create a new morph to relationship instance.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel  $parent
-     * @param  string  $foreignKey
-     * @param  string  $ownerKey
-     * @param  string  $type
-     * @param  string  $relation
+     * @param CModel_Query $query
+     * @param CModel       $parent
+     * @param string       $foreignKey
+     * @param string       $ownerKey
+     * @param string       $type
+     * @param string       $relation
+     *
      * @return void
      */
     public function __construct(CModel_Query $query, CModel $parent, $foreignKey, $ownerKey, $type, $relation) {
@@ -52,20 +52,22 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param  array  $models
+     * @param array $models
+     *
      * @return void
      */
     public function addEagerConstraints(array $models) {
-        $this->buildDictionary($this->models = Collection::make($models));
+        $this->buildDictionary($this->models = CModel_Collection::make($models));
     }
 
     /**
      * Build a dictionary with the models.
      *
-     * @param  CModel_Collection  $models
+     * @param CModel_Collection $models
+     *
      * @return void
      */
-    protected function buildDictionary(Collection $models) {
+    protected function buildDictionary(CModel_Collection $models) {
         foreach ($models as $model) {
             if ($model->{$this->morphType}) {
                 $this->dictionary[$model->{$this->morphType}][$model->{$this->foreignKey}][] = $model;
@@ -90,49 +92,54 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
     /**
      * Get all of the relation results for a type.
      *
-     * @param  string  $type
+     * @param string $type
+     *
      * @return CModel_Collection
      */
     protected function getResultsByType($type) {
         $instance = $this->createModelByType($type);
         $ownerKey = $this->ownerKey ? $this->ownerKey : $instance->getKeyName();
         $query = $this->replayMacros($instance->newQuery())
-                ->mergeConstraintsFrom($this->getQuery())
-                ->with($this->getQuery()->getEagerLoads());
+            ->mergeConstraintsFrom($this->getQuery())
+            ->with($this->getQuery()->getEagerLoads());
         return $query->whereIn(
-                        $instance->getTable() . '.' . $ownerKey, $this->gatherKeysByType($type)
-                )->get();
+            $instance->getTable() . '.' . $ownerKey,
+            $this->gatherKeysByType($type)
+        )->get();
     }
 
     /**
      * Gather all of the foreign keys for a given type.
      *
-     * @param  string  $type
+     * @param string $type
+     *
      * @return array
      */
     protected function gatherKeysByType($type) {
-        return collect($this->dictionary[$type])->map(function ($models) {
-                    return head($models)->{$this->foreignKey};
-                })->values()->unique()->all();
+        return c::collect($this->dictionary[$type])->map(function ($models) {
+            return carr::head($models)->{$this->foreignKey};
+        })->values()->unique()->all();
     }
 
     /**
      * Create a new model instance by type.
      *
-     * @param  string  $type
+     * @param string $type
+     *
      * @return CModel
      */
     public function createModelByType($type) {
-        $class = Model::getActualClassNameForMorph($type);
+        $class = CModel::getActualClassNameForMorph($type);
         return new $class;
     }
 
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array   $models
-     * @param  CModel_Collection  $results
-     * @param  string  $relation
+     * @param array             $models
+     * @param CModel_Collection $results
+     * @param string            $relation
+     *
      * @return array
      */
     public function match(array $models, CModel_Collection $results, $relation) {
@@ -142,11 +149,12 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
     /**
      * Match the results for a given type to their parents.
      *
-     * @param  string  $type
-     * @param  CModel_Collection  $results
+     * @param string            $type
+     * @param CModel_Collection $results
+     *
      * @return void
      */
-    protected function matchToMorphParents($type, Collection $results) {
+    protected function matchToMorphParents($type, CModel_Collection $results) {
         foreach ($results as $result) {
             $ownerKey = !is_null($this->ownerKey) ? $result->{$this->ownerKey} : $result->getKey();
             if (isset($this->dictionary[$type][$ownerKey])) {
@@ -160,15 +168,18 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
     /**
      * Associate the model instance to the given parent.
      *
-     * @param  CModel  $model
+     * @param CModel $model
+     *
      * @return CModel
      */
     public function associate($model) {
         $this->parent->setAttribute(
-                $this->foreignKey, $model instanceof CModel ? $model->getKey() : null
+            $this->foreignKey,
+            $model instanceof CModel ? $model->getKey() : null
         );
         $this->parent->setAttribute(
-                $this->morphType, $model instanceof CModel ? $model->getMorphClass() : null
+            $this->morphType,
+            $model instanceof CModel ? $model->getMorphClass() : null
         );
         return $this->parent->setRelation($this->relation, $model);
     }
@@ -198,10 +209,11 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
     /**
      * Make a new related instance for the given model.
      *
-     * @param  CModel  $parent
+     * @param CModel $parent
+     *
      * @return CModel
      */
-    protected function newRelatedInstanceFor(Model $parent) {
+    protected function newRelatedInstanceFor(CModel $parent) {
         return $parent->{$this->getRelationName()}()->getRelated()->newInstance();
     }
 
@@ -226,10 +238,11 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
     /**
      * Replay stored macro calls on the actual related instance.
      *
-     * @param  CModel_Query  $query
+     * @param CModel_Query $query
+     *
      * @return CModel_Query
      */
-    protected function replayMacros(Builder $query) {
+    protected function replayMacros(CModel_Query $query) {
         foreach ($this->macroBuffer as $macro) {
             $query->{$macro['method']}(...$macro['parameters']);
         }
@@ -239,8 +252,9 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
     /**
      * Handle dynamic method calls to the relationship.
      *
-     * @param  string  $method
-     * @param  array   $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters) {
@@ -250,14 +264,12 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
                 $this->macroBuffer[] = compact('method', 'parameters');
             }
             return $result;
-        }
-        // If we tried to call a method that does not exist on the parent Builder instance,
-        // we'll assume that we want to call a query macro (e.g. withTrashed) that only
-        // exists on related models. We will just store the call and replay it later.
-        catch (BadMethodCallException $e) {
+        } catch (BadMethodCallException $e) {
+            // If we tried to call a method that does not exist on the parent Builder instance,
+            // we'll assume that we want to call a query macro (e.g. withTrashed) that only
+            // exists on related models. We will just store the call and replay it later.
             $this->macroBuffer[] = compact('method', 'parameters');
             return $this;
         }
     }
-
 }
