@@ -62,7 +62,9 @@
         <exclude name="PEAR.Functions.FunctionCallSignature.Indent"/>
         <exclude name="Generic.Files.LineLength.TooLong"/>
         <exclude name="Internal.NoCodeFound"/>
-
+        <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterCloseParenthesis"/>
+        <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterKeyword"/>
+        <exclude name="PEAR.ControlStructures.MultiLineCondition.SpaceBeforeOpenBrace"/>
         <!-- Ignore that already defined in PSR-->
         <exclude name="PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
     </rule>
