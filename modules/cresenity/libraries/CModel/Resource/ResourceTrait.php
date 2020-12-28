@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 21, 2019, 3:39:27 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jul 21, 2019, 3:39:27 AM
  */
 trait CModel_Resource_ResourceTrait {
-
     public static function bootResourceTrait() {
         static::observe(new CModel_Resource_ResourceObserver());
     }
@@ -17,10 +17,11 @@ trait CModel_Resource_ResourceTrait {
         return $this->morphTo();
     }
 
-    /*
+    /**
      * Get the full url to a original media file.
+     *
+     * @param mixed $conversionName
      */
-
     public function getFullUrl($conversionName = '') {
         $url = $this->getUrl($conversionName);
         if (!cstr::startsWith($url, ['http://', 'https://'])) {
@@ -29,10 +30,11 @@ trait CModel_Resource_ResourceTrait {
         return $url;
     }
 
-    /*
+    /**
      * Get the url to a original media file.
+     *
+     * @param mixed $conversionName
      */
-
     public function getUrl($conversionName = '') {
         $urlGenerator = CResources_Factory::createUrlGeneratorForResource($this, $conversionName);
         return $urlGenerator->getUrl();
@@ -43,10 +45,11 @@ trait CModel_Resource_ResourceTrait {
         return $urlGenerator->getTemporaryUrl($expiration, $options);
     }
 
-    /*
+    /**
      * Get the path to the original media file.
+     *
+     * @param mixed $conversionName
      */
-
     public function getPath($conversionName = '') {
         $urlGenerator = CResources_Factory::createUrlGeneratorForResource($this, $conversionName);
         return $urlGenerator->getPath();
@@ -58,8 +61,7 @@ trait CModel_Resource_ResourceTrait {
     }
 
     public function getImageGenerators() {
-
-        return CF::collect(CF::config('resource.image_generators'));
+        return c::collect(CF::config('resource.image_generators'));
     }
 
     public function getTypeAttribute() {
@@ -72,19 +74,19 @@ trait CModel_Resource_ResourceTrait {
 
     public function getTypeFromExtension() {
         $imageGenerator = $this->getImageGenerators()
-                        ->map(function ( $className) {
-                            return new $className();
-                        })
-                ->first->canHandleExtension(strtolower($this->extension));
+            ->map(function ($className) {
+                return new $className();
+            })
+            ->first->canHandleExtension(strtolower($this->extension));
         return $imageGenerator ? $imageGenerator->getType() : static::TYPE_OTHER;
     }
 
     public function getTypeFromMime() {
         $imageGenerator = $this->getImageGenerators()
-                        ->map(function ( $className) {
-                            return new $className();
-                        })
-                ->first->canHandleMime($this->mime_type);
+            ->map(function ($className) {
+                return new $className();
+            })
+            ->first->canHandleMime($this->mime_type);
         return $imageGenerator ? $imageGenerator->getType() : static::TYPE_OTHER;
     }
 
@@ -97,17 +99,17 @@ trait CModel_Resource_ResourceTrait {
     }
 
     public function getDiskDriverName() {
-
         if (strlen($this->disk) == 0) {
             return 'local';
         }
         return strtolower(CF::config("storage.disks.{$this->disk}.driver"));
     }
 
-    /*
+    /**
      * Determine if the media item has a custom property with the given name.
+     *
+     * @param mixed $propertyName
      */
-
     public function hasCustomProperty($propertyName) {
         return carr::has($this->custom_properties, $propertyName);
     }
@@ -116,7 +118,7 @@ trait CModel_Resource_ResourceTrait {
      * Get the value of custom property with the given name.
      *
      * @param string $propertyName
-     * @param mixed $default
+     * @param mixed  $default
      *
      * @return mixed
      */
@@ -126,7 +128,7 @@ trait CModel_Resource_ResourceTrait {
 
     /**
      * @param string $name
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return $this
      */
@@ -144,15 +146,14 @@ trait CModel_Resource_ResourceTrait {
         return $this;
     }
 
-    /*
+    /**
      * Get all the names of the registered resource conversions.
      */
-
     public function getResourceConversionNames() {
         $conversions = CResources_ConversionCollection::createForResource($this);
         return $conversions->map(function (CResources_Conversion $conversion) {
-                    return $conversion->getName();
-                })->toArray();
+            return $conversion->getName();
+        })->toArray();
     }
 
     public function hasGeneratedConversion($conversionName) {
@@ -173,7 +174,7 @@ trait CModel_Resource_ResourceTrait {
     /**
      * Create an HTTP response that represents the object.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\Response
      */
@@ -186,12 +187,12 @@ trait CModel_Resource_ResourceTrait {
             'Pragma' => 'public',
         ];
         return response()->stream(function () {
-                    $stream = $this->stream();
-                    fpassthru($stream);
-                    if (is_resource($stream)) {
-                        fclose($stream);
-                    }
-                }, 200, $downloadHeaders);
+            $stream = $this->stream();
+            fpassthru($stream);
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+        }, 200, $downloadHeaders);
     }
 
     public function getResponsiveImageUrls($conversionName = '') {
@@ -212,7 +213,7 @@ trait CModel_Resource_ResourceTrait {
 
     /**
      * @param string|array $conversion
-     * @param array $extraAttributes
+     * @param array        $extraAttributes
      *
      * @return string
      */
@@ -227,9 +228,9 @@ trait CModel_Resource_ResourceTrait {
             $extraAttributes = array_merge($attributes, $extraAttributes);
         }
         $attributeString = c::collect($extraAttributes)
-                        ->map(function ($value, $name) {
-                            return $name . '="' . $value . '"';
-                        })->implode(' ');
+            ->map(function ($value, $name) {
+                return $name . '="' . $value . '"';
+            })->implode(' ');
         if (strlen($attributeString)) {
             $attributeString = ' ' . $attributeString;
         }
@@ -240,8 +241,11 @@ trait CModel_Resource_ResourceTrait {
             $viewName = CF::config('resource.responsive_images.use_tiny_placeholders') ? 'responsiveImageWithPlaceholder' : 'responsiveImage';
             $width = $this->responsiveImages($conversion)->files->first()->width();
         }
-        return view("medialibrary::{$viewName}", compact(
-                        'media', 'conversion', 'attributeString', 'width'
+        return c::view("medialibrary::{$viewName}", compact(
+            'media',
+            'conversion',
+            'attributeString',
+            'width'
         ));
     }
 
@@ -256,10 +260,10 @@ trait CModel_Resource_ResourceTrait {
         $temporaryFile = $temporaryDirectory->path($this->file_name);
         app(Filesystem::class)->copyFromMediaLibrary($this, $temporaryFile);
         $newMedia = $model
-                ->addMedia($temporaryFile)
-                ->usingName($this->name)
-                ->withCustomProperties($this->custom_properties)
-                ->toMediaCollection($collectionName);
+            ->addResource($temporaryFile)
+            ->usingName($this->name)
+            ->withCustomProperties($this->custom_properties)
+            ->toMediaCollection($collectionName);
         $temporaryDirectory->delete();
         return $newMedia;
     }
@@ -269,12 +273,12 @@ trait CModel_Resource_ResourceTrait {
     }
 
     public function stream() {
-        $filesystem = app(Filesystem::class);
+        $filesystem = new CFile();
         return $filesystem->getStream($this);
     }
 
     public function __invoke(...$arguments) {
-        return new HtmlString($this->img(...$arguments));
+        return new CBase_HtmlString($this->img(...$arguments));
     }
 
     public function regenerateConversion($only = [], $onlyMissing = true) {
@@ -286,7 +290,8 @@ trait CModel_Resource_ResourceTrait {
         $resourceFileSystem = CResources_Factory::createFileSystem();
         $temporaryDirectoryPath = CResources_Helpers_TemporaryDirectory::generateLocalFilePath($this->getExtensionAttribute());
         $copiedOriginalFile = $resourceFileSystem->copyFromResourceLibrary(
-                $this, $temporaryDirectoryPath
+            $this,
+            $temporaryDirectoryPath
         );
 
         $image = new CImage_Image($copiedOriginalFile);
@@ -295,5 +300,4 @@ trait CModel_Resource_ResourceTrait {
 
         CResources_Helpers_TemporaryDirectory::delete($temporaryDirectoryPath);
     }
-
 }

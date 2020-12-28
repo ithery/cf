@@ -1,25 +1,24 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 19, 2018, 11:36:57 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 19, 2018, 11:36:57 PM
  */
 trait CApp_Model_Trait_Roles {
-
     use CModel_Nested_NestedTrait;
 
-    public function __construct(array $attributes = array()) {
+    public function __construct(array $attributes = []) {
         parent::__construct($attributes);
         $this->primaryKey = 'role_id';
         $this->table = 'roles';
-        $this->guarded = array('role_id');
+        $this->guarded = ['role_id'];
     }
 
     /**
-     * 
      * @return CModel_Relation_BelongsTo
      */
     public function org() {
@@ -30,7 +29,7 @@ trait CApp_Model_Trait_Roles {
         return $this->hasMany('CApp_Model_RolePermission', 'role_id', 'role_id');
     }
 
-    public function getDescendantsTree($rootId = null, $orgId = null,$type=null) {
+    public function getDescendantsTree($rootId = null, $orgId = null, $type = null) {
         $root = $this;
         if (strlen($rootId) > 0) {
             $root = $this->find($rootId);
@@ -42,9 +41,9 @@ trait CApp_Model_Trait_Roles {
 
         $root = $root->descendants();
         if (strlen($orgId) > 0) {
-            $root = $root->where(function($query) use ($orgId) {
-                        $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
-                    })->where('status', '>', 0);
+            $root = $root->where(function ($query) use ($orgId) {
+                $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
+            })->where('status', '>', 0);
         }
         if (strlen($type) > 0) {
             $root = $root->where('type', '=', $type);
@@ -53,5 +52,4 @@ trait CApp_Model_Trait_Roles {
 
         return $tree;
     }
-
 }
