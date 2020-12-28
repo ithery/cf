@@ -1,15 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 2, 2019, 2:39:11 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 2, 2019, 2:39:11 AM
  */
 class CResources_ConversionCollection extends CCollection {
-
-    /** @var CApp_Model_Interface_ResourceInterface */
+    /**
+     * @var CApp_Model_Interface_ResourceInterface
+     */
     protected $resource;
 
     /**
@@ -61,7 +63,7 @@ class CResources_ConversionCollection extends CCollection {
      */
     protected function addConversionsFromRelatedModel(CApp_Model_Interface_ResourceInterface $resource) {
         $modelName = carr::get(CModel_Relation::morphMap(), $resource->model_type, $resource->model_type);
-        /** @var CModel_HasResourceInterface $model */
+        /* @var CModel_HasResourceInterface $model */
         $model = new $modelName();
         /*
          * In some cases the user might want to get the actual model
@@ -73,7 +75,7 @@ class CResources_ConversionCollection extends CCollection {
             $model->resourceConversion = [];
         }
         $model->registerAllResourceConversions($resource);
-        
+
         $this->items = $model->resourceConversions;
     }
 
@@ -83,7 +85,7 @@ class CResources_ConversionCollection extends CCollection {
      * @param CApp_Model_Interface_ResourceInterface $resource
      */
     protected function addManipulationsFromDb(CApp_Model_Interface_ResourceInterface $resource) {
-        CF::collect($resource->manipulations)->each(function ($manipulations, $conversionName) {
+        c::collect($resource->manipulations)->each(function ($manipulations, $conversionName) {
             $this->addManipulationToConversion(new CImage_Manipulations([$manipulations]), $conversionName);
         });
     }
@@ -95,44 +97,47 @@ class CResources_ConversionCollection extends CCollection {
         return $this->filter->shouldBePerformedOn($collectionName);
     }
 
-    /*
+    /**
      * Get all the conversions in the collection that should be queued.
+     *
+     * @param mixed $collectionName
      */
-
     public function getQueuedConversions($collectionName = '') {
         return $this->getConversions($collectionName)->filter->shouldBeQueued();
     }
 
-    /*
+    /**
      * Add the given manipulation to the conversion with the given name.
+     *
+     * @param mixed $conversionName
      */
-
     protected function addManipulationToConversion(CImage_Manipulations $manipulations, $conversionName) {
-        optional($this->first(function (CResources_Conversion $conversion) use ($conversionName) {
-                    return $conversion->getName() === $conversionName;
-                }))->addAsFirstManipulations($manipulations);
+        c::optional($this->first(function (CResources_Conversion $conversion) use ($conversionName) {
+            return $conversion->getName() === $conversionName;
+        }))->addAsFirstManipulations($manipulations);
         if ($conversionName === '*') {
             $this->each->addAsFirstManipulations(clone $manipulations);
         }
     }
 
-    /*
+    /**
      * Get all the conversions in the collection that should not be queued.
+     *
+     * @param mixed $collectionName
      */
-
-    public function getNonQueuedConversions( $collectionName = '') {
+    public function getNonQueuedConversions($collectionName = '') {
         return $this->getConversions($collectionName)->reject->shouldBeQueued();
     }
 
-    /*
+    /**
      * Return the list of conversion files.
+     *
+     * @param mixed $collectionName
      */
-
-    public function getConversionsFiles( $collectionName = '') {
+    public function getConversionsFiles($collectionName = '') {
         $fileName = pathinfo($this->resource->file_name, PATHINFO_FILENAME);
         return $this->getConversions($collectionName)->map(function (CResources_Conversion $conversion) use ($fileName) {
-                    return $conversion->getConversionFile($fileName);
-                });
+            return $conversion->getConversionFile($fileName);
+        });
     }
-
 }

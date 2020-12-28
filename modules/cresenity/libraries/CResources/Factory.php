@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 2, 2019, 1:24:32 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 2, 2019, 1:24:32 AM
  */
 class CResources_Factory {
-
     /**
-     * 
      * @return CResources_PathGenerator
      */
     public static function createPathGenerator() {
@@ -24,19 +23,20 @@ class CResources_Factory {
     }
 
     /**
-     * 
+     * @param mixed $conversionName
+     *
      * @return CResources_PathGenerator
      */
     public static function createUrlGeneratorForResource(CApp_Model_Interface_ResourceInterface $resource, $conversionName = '') {
-        $urlGeneratorClass = CF::config('resource.url_generator') != null ?
-                CF::config('resource.url_generator') : 'CResources_UrlGenerator_' . ucfirst($resource->getDiskDriverName()) . 'UrlGenerator';
-       
+        $urlGeneratorClass = CF::config('resource.url_generator') != null
+                ? CF::config('resource.url_generator') : 'CResources_UrlGenerator_' . ucfirst($resource->getDiskDriverName()) . 'UrlGenerator';
+
         static::guardAgainstInvalidUrlGenerator($urlGeneratorClass);
         $urlGenerator = new $urlGeneratorClass();
         $pathGenerator = static::createPathGenerator();
         $urlGenerator
-                ->setResource($resource)
-                ->setPathGenerator($pathGenerator);
+            ->setResource($resource)
+            ->setPathGenerator($pathGenerator);
         if ($conversionName !== '') {
             $conversion = CResources_ConversionCollection::createForResource($resource)->getByName($conversionName);
             $urlGenerator->setConversion($conversion);
@@ -54,15 +54,13 @@ class CResources_Factory {
     }
 
     /**
-     * 
      * @return \CResources_FileManipulator
      */
     public static function createFileManipulator() {
         return new CResources_FileManipulator();
     }
-    
-     /**
-     * 
+
+    /**
      * @return \CResources_FileSystem
      */
     public static function createFileSystem() {
@@ -70,8 +68,8 @@ class CResources_Factory {
     }
 
     /**
-     * 
      * @param string $pathGeneratorClass
+     *
      * @throws CResources_Exception_InvalidPathGenerator
      */
     protected static function guardAgainstInvalidPathGenerator($pathGeneratorClass) {
@@ -82,5 +80,4 @@ class CResources_Factory {
             throw CResources_Exception_InvalidPathGenerator::isntAPathGenerator($pathGeneratorClass);
         }
     }
-
 }
