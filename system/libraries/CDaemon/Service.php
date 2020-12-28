@@ -1,78 +1,75 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 12, 2019, 3:23:13 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 12, 2019, 3:23:13 PM
  */
 class CDaemon_Service {
-
     /**
-     *
      * @var string
      */
     protected $serviceName;
 
     /**
-     *
      * @var array
      */
     protected $config;
 
     /**
-     *
      * @var string
      */
     protected $pidFile = null;
 
     /**
-     *
      * @var bool
      */
     protected $stdout = true;
 
     /**
      * Handle for log() method
+     *
      * @var stream
      */
     private $logHandle = false;
 
     /**
      * Process ID
+     *
      * @var integer
      */
     private $pid;
 
     /**
      * Is Parent Process?
+     *
      * @var bool
      */
     private $isParent = true;
 
     /**
-     * startTime
+     * StartTime
+     *
      * @var bool
      */
     private $startTime = true;
 
     /**
-     *
-     * @var CDaemon_Event 
+     * @var CDaemon_Event
      */
     protected $event;
 
     /**
-     *
      * @var CDaemon_LoopInterface
      */
     protected $loop;
 
     /**
-     * 
      * @param string $serviceName
-     * @param array $config
+     * @param array  $config
      */
     public function __construct($serviceName, $config) {
         CDaemon_ErrorHandler::init();
@@ -104,16 +101,17 @@ class CDaemon_Service {
      * was chosen specifically to avoid forcing another dependency on you.
      *
      * @param string $message
-     * @param string $label Truncated at 12 chars
+     * @param string $label   Truncated at 12 chars
+     * @param mixed  $indent
      */
     public function log($message, $label = '', $indent = 0) {
         static $logFile = '';
         static $logFileCheckAt = 0;
         static $logFileError = false;
         $header = "\nDate                  PID   Label         Message\n";
-        $date = date("Y-m-d H:i:s");
-        $pid = str_pad($this->pid, 5, " ", STR_PAD_LEFT);
-        $label = str_pad(substr($label, 0, 12), 13, " ", STR_PAD_RIGHT);
+        $date = date('Y-m-d H:i:s');
+        $pid = str_pad($this->pid, 5, ' ', STR_PAD_LEFT);
+        $label = str_pad(substr($label, 0, 12), 13, ' ', STR_PAD_RIGHT);
         $prefix = "[$date] $pid $label" . str_repeat("\t", $indent);
         if (time() >= $logFileCheckAt && $this->logFile() != $logFile) {
             $logFile = $this->logFile();
@@ -131,7 +129,7 @@ class CDaemon_Service {
                 }
             } elseif (!$logFileError) {
                 $logFileError = true;
-                trigger_error(__CLASS__ . "Error: Could not write to logfile " . $logFile, E_USER_WARNING);
+                trigger_error(__CLASS__ . 'Error: Could not write to logfile ' . $logFile, E_USER_WARNING);
             }
         }
         $message = $prefix . ' ' . str_replace("\n", "\n$prefix ", trim($message)) . "\n";
@@ -178,7 +176,10 @@ class CDaemon_Service {
 
     /**
      * Combination getter/setter for the $pid property.
+     *
      * @param boolean $setValue
+     * @param mixed   $pid
+     *
      * @return int
      */
     protected function setPid($pid) {
@@ -194,6 +195,7 @@ class CDaemon_Service {
 
     /**
      * Raise a fatal error and kill-off the process. If it's been running for a while, it'll try to restart itself.
+     *
      * @param string $message
      * @param string $label
      */
@@ -240,5 +242,4 @@ class CDaemon_Service {
     public function run() {
         $this->setup();
     }
-
 }

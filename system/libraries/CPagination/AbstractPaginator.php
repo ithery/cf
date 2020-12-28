@@ -9,7 +9,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
     /**
      * All of the items being paginated.
      *
-     * @var \Illuminate\Support\Collection
+     * @var CCollection
      */
     protected $items;
 
