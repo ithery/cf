@@ -4,14 +4,14 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     /**
      * The "through" parent model instance.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var \CModel
      */
     protected $throughParent;
 
     /**
      * The far parent model instance.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var \CModel
      */
     protected $farParent;
 
@@ -53,13 +53,13 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     /**
      * Create a new has many through relationship instance.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param \Illuminate\Database\Eloquent\Model   $farParent
-     * @param \Illuminate\Database\Eloquent\Model   $throughParent
-     * @param string                                $firstKey
-     * @param string                                $secondKey
-     * @param string                                $localKey
-     * @param string                                $secondLocalKey
+     * @param \CModel_Query $query
+     * @param \CModel       $farParent
+     * @param \CModel       $throughParent
+     * @param string        $firstKey
+     * @param string        $secondKey
+     * @param string        $localKey
+     * @param string        $secondLocalKey
      *
      * @return void
      */
@@ -188,7 +188,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     /**
      * Build model dictionary keyed by the relation's foreign key.
      *
-     * @param \Illuminate\Database\Eloquent\Collection $results
+     * @param \CModel_Collection $results
      *
      * @return array
      */
@@ -210,7 +210,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      *
      * @param array $attributes
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \CModel
      */
     public function firstOrNew(array $attributes) {
         if (is_null($instance = $this->where($attributes)->first())) {
@@ -226,7 +226,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @param array $attributes
      * @param array $values
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \CModel
      */
     public function updateOrCreate(array $attributes, array $values = []) {
         $instance = $this->firstOrNew($attributes);
@@ -272,7 +272,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @param mixed $id
      * @param array $columns
      *
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|null
+     * @return \CModel|\CModel_Collection|null
      */
     public function find($id, $columns = ['*']) {
         if (is_array($id)) {
@@ -292,7 +292,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @param mixed $ids
      * @param array $columns
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \CModel_Collection
      */
     public function findMany($ids, $columns = ['*']) {
         if (empty($ids)) {
@@ -311,9 +311,9 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @param mixed $id
      * @param array $columns
      *
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return \CModel|\CModel_Collection
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \CModel_Exception_ModelNotFound
      */
     public function findOrFail($id, $columns = ['*']) {
         $result = $this->find($id, $columns);
@@ -343,7 +343,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      *
      * @param array $columns
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return CModel_Collection
      */
     public function get($columns = ['*']) {
         // First we'll add the proper select columns onto the query so it is run with
@@ -375,7 +375,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @param string $pageName
      * @param int    $page
      *
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @return CPagination_LengthAwarePaginator
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
         $this->query->addSelect($this->shouldSelect($columns));
@@ -391,7 +391,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @param string   $pageName
      * @param int|null $page
      *
-     * @return \Illuminate\Contracts\Pagination\Paginator
+     * @return CPagination_Paginator
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
         $this->query->addSelect($this->shouldSelect($columns));

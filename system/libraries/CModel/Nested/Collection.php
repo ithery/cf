@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2018, 5:06:51 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2018, 5:06:51 AM
  */
 class CModel_Nested_Collection extends CModel_Collection {
-
     /**
      * Fill `parent` and `children` relationships for every node in the collection.
      *
@@ -21,13 +21,13 @@ class CModel_Nested_Collection extends CModel_Collection {
             return $this;
         }
         $groupedNodes = $this->groupBy($this->first()->getParentIdName());
-        /** @var NodeTrait|CModel $node */
+        /* @var NodeTrait|CModel $node */
         foreach ($this->items as $node) {
             if (!$node->getParentId()) {
                 $node->setRelation('parent', null);
             }
             $children = $groupedNodes->get($node->getKey(), []);
-            /** @var CModel|NodeTrait $child */
+            /* @var CModel|NodeTrait $child */
             foreach ($children as $child) {
                 $child->setRelation('parent', $node);
             }
@@ -54,7 +54,7 @@ class CModel_Nested_Collection extends CModel_Collection {
         $this->linkNodes();
         $items = [];
         $root = $this->getRootNodeId($root);
-        /** @var CModel|NodeTrait $node */
+        /* @var CModel|NodeTrait $node */
         foreach ($this->items as $node) {
             if ($node->getParentId() == $root) {
                 $items[] = $node;
@@ -78,7 +78,7 @@ class CModel_Nested_Collection extends CModel_Collection {
         // If root node is not specified we take parent id of node with
         // least lft value as root node id.
         $leastValue = null;
-        /** @var CModel|NodeTrait $node */
+        /* @var CModel|NodeTrait $node */
         foreach ($this->items as $node) {
             if ($leastValue === null || $node->getLft() < $leastValue) {
                 $leastValue = $node->getLft();
@@ -98,8 +98,9 @@ class CModel_Nested_Collection extends CModel_Collection {
      */
     public function toFlatTree($root = false) {
         $result = new static;
-        if ($this->isEmpty())
+        if ($this->isEmpty()) {
             return $result;
+        }
         $groupedNodes = $this->groupBy($this->first()->getParentIdName());
         return $result->flattenTree($groupedNodes, $this->getRootNodeId($root));
     }
@@ -108,7 +109,7 @@ class CModel_Nested_Collection extends CModel_Collection {
      * Flatten a tree into a non recursive array.
      *
      * @param Collection $groupedNodes
-     * @param mixed $parentId
+     * @param mixed      $parentId
      *
      * @return $this
      */
@@ -119,6 +120,4 @@ class CModel_Nested_Collection extends CModel_Collection {
         }
         return $this;
     }
-
-
 }
