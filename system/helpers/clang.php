@@ -1,16 +1,15 @@
 <?php
 
+//@codingStandardsIgnoreStart
 class clang {
-
     private static $lang = null;
-    private static $langs = array(
-        "default" => "Default",
-        "en" => "English",
-        "id" => "Indonesia",
-    );
+    private static $langs = [
+        'default' => 'Default',
+        'en' => 'English',
+        'id' => 'Indonesia',
+    ];
 
-    public static function __($message, $params = array(), $lang = null) {
-
+    public static function __($message, $params = [], $lang = null) {
         if (strpos($message, '.') !== false) {
             $message = CTranslation::translator()->get($message, $params, $lang);
         }
@@ -22,7 +21,6 @@ class clang {
 
         //get translation
         $translation = $langObject->getTranslation($message, $params, $lang);
-
 
         return $translation;
     }
@@ -62,7 +60,6 @@ class clang {
         $code = clang::getlang();
         $name = clang::get_lang_name_by_code($code);
 
-
         return $name;
     }
 
@@ -76,7 +73,6 @@ class clang {
     }
 
     public static function get_lang_list() {
-
         return self::$langs;
     }
 
@@ -85,11 +81,9 @@ class clang {
     }
 
     public static function getlang() {
-
-
         $session = CSession::instance();
 
-        $lang = $session->get("lang");
+        $lang = $session->get('lang');
         //die($lang);
         if ($lang == null) {
             $lang = clang::defaultlang();
@@ -100,7 +94,7 @@ class clang {
 
     public static function setlang($lang) {
         $session = CSession::instance();
-        $session->set("lang", $lang);
+        $session->set('lang', $lang);
     }
 
     public static function get_file($lang) {
@@ -119,7 +113,7 @@ class clang {
         return null;
     }
 
-    public static function langfiles($directory, $filename, $required = FALSE, $ext = FALSE) {
+    public static function langfiles($directory, $filename, $required = false, $ext = false) {
         // NOTE: This test MUST be not be a strict comparison (===), or empty
         // extensions will be allowed!
         if ($ext == '') {
@@ -133,11 +127,10 @@ class clang {
         // Search path
         $search = $directory . '/' . $filename . $ext;
 
-
         // Load include paths
         //$paths = self::$include_paths;
         // Add APPPATH as the first path
-        $paths = array(APPPATH);
+        $paths = [APPPATH];
 
         foreach (CF::config('core.modules') as $path) {
             if ($path = str_replace('\\', '/', realpath($path))) {
@@ -150,9 +143,9 @@ class clang {
         $paths[] = SYSPATH;
 
         // Nothing found, yet
-        $found = NULL;
+        $found = null;
 
-        if ($directory === 'config' OR $directory === 'i18n' OR $directory === 'lang') {
+        if ($directory === 'config' or $directory === 'i18n' or $directory === 'lang') {
             // Search in reverse, for merging
             $paths = array_reverse($paths);
 
@@ -174,8 +167,8 @@ class clang {
             }
         }
 
-        if ($found === NULL) {
-            if ($required === TRUE) {
+        if ($found === null) {
+            if ($required === true) {
                 // Directory i18n key
                 $directory = 'core.' . inflector::singular($directory);
 
@@ -183,13 +176,11 @@ class clang {
                 throw new CF_Exception('core.resource_not_found', self::lang($directory), $filename);
             } else {
                 // Nothing was found, return FALSE
-                $found = FALSE;
+                $found = false;
             }
         }
 
-
-
         return $found;
     }
-
 }
+//@codingStandardsIgnoreEnd

@@ -426,4 +426,10 @@ class Controller_Cresenity extends CController {
         $qrcode = new CImage_QRCode($data, $options);
         $qrcode->outputImage();
     }
+
+    public function auth() {
+        $args = func_get_args();
+        $method = carr::get($args, 0);
+        $parameters = array_slice($args, 1);
+    }
 }

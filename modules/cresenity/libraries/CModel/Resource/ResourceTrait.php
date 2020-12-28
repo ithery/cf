@@ -174,9 +174,9 @@ trait CModel_Resource_ResourceTrait {
     /**
      * Create an HTTP response that represents the object.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param CHTTP_Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @return CHTTP_Response
      */
     public function toResponse($request) {
         $downloadHeaders = [

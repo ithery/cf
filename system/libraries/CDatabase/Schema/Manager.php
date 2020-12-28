@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 8:09:14 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 8:09:14 AM
  */
 abstract class CDatabase_Schema_Manager {
-
     /**
      * Holds instance of the connection for this schema manager.
      *
@@ -26,7 +26,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Constructor. Accepts the Connection instance to manage the schema for.
      *
-     * @param CDatabase                      $conn
+     * @param CDatabase               $conn
      * @param CDatabase_Platform|null $platform
      */
     public function __construct(CDatabase $conn, CDatabase_Platform $platform = null) {
@@ -198,11 +198,11 @@ abstract class CDatabase_Schema_Manager {
         }
 
         return array_values(
-                array_filter($assetNames, function ($assetName) use ($filterExpr) {
-                    $assetName = ($assetName instanceof CDatabase_AbstractAsset) ? $assetName->getName() : $assetName;
+            array_filter($assetNames, function ($assetName) use ($filterExpr) {
+                $assetName = ($assetName instanceof CDatabase_AbstractAsset) ? $assetName->getName() : $assetName;
 
-                    return preg_match($filterExpr, $assetName);
-                })
+                return preg_match($filterExpr, $assetName);
+            })
         );
     }
 
@@ -578,6 +578,8 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Methods for filtering return values of list*() methods to convert
      * the native DBMS data definition to a portable Doctrine definition
+     *
+     * @param mixed $databases
      */
 
     /**
@@ -728,14 +730,13 @@ abstract class CDatabase_Schema_Manager {
         foreach ($tableColumns as $tableColumn) {
             $column = null;
             $defaultPrevented = false;
-            
+
             if (null !== $eventManager && $eventManager->hasListeners(CDatabase_Event::onSchemaColumnDefinition)) {
                 $eventArgs = new SchemaColumnDefinitionEventArgs($tableColumn, $table, $database, $this->db);
                 $eventManager->dispatchEvent(CDatabase_Event::onSchemaColumnDefinition, $eventArgs);
                 $defaultPrevented = $eventArgs->isDefaultPrevented();
                 $column = $eventArgs->getColumn();
             }
-           
 
             if (!$defaultPrevented) {
                 $column = $this->_getPortableTableColumnDefinition($tableColumn);
@@ -962,7 +963,6 @@ abstract class CDatabase_Schema_Manager {
 
         $searchPaths = $this->getSchemaSearchPaths();
 
-
         if (isset($searchPaths[0])) {
             $schemaConfig->setName($searchPaths[0]);
         }
@@ -1021,5 +1021,4 @@ abstract class CDatabase_Schema_Manager {
     public function removeDoctrineTypeFromComment($comment, $type) {
         return str_replace('(DC2Type:' . $type . ')', '', $comment);
     }
-
 }
