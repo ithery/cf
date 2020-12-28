@@ -38,7 +38,7 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
      * @param string $id
      * @param string $localKey
      *
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     * @return CModel_Relation_MorphOne
      */
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null) {
         // Check if it is a relation with an original model.
@@ -48,7 +48,7 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         $instance = new $related;
         list($type, $id) = $this->getMorphs($name, $type, $id);
         $localKey = $localKey ?: $this->getKeyName();
-        return new CModel_MongoDB_Relation_MorphOne($instance->newQuery(), $this, $type, $id, $localKey);
+        return new CModel_Relation_MorphOne($instance->newQuery(), $this, $type, $id, $localKey);
     }
 
     /**
@@ -58,7 +58,7 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
      * @param string $foreignKey
      * @param string $localKey
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return CModel_Relation_HasMany
      */
     public function hasMany($related, $foreignKey = null, $localKey = null) {
         // Check if it is a relation with an original model.
