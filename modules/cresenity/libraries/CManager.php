@@ -5,7 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 final class CManager {
     use CTrait_Compat_Manager;
 
-    private static $_instance;
+    private static $instance;
     protected $controls = [];
     protected $controls_code = [];
     protected $elements = [];
@@ -40,10 +40,10 @@ final class CManager {
      * @return CManager
      */
     public static function instance() {
-        if (self::$_instance == null) {
-            self::$_instance = new CManager();
+        if (self::$instance == null) {
+            self::$instance = new CManager();
         }
-        return self::$_instance;
+        return self::$instance;
     }
 
     public function __construct() {

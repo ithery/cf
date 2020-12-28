@@ -6,13 +6,11 @@
  * @author Hery
  */
 class CManager_Theme {
-
     /**
-     *
      * @var callable
      */
     protected static $themeCallback;
-    protected static $themeData = array();
+    protected static $themeData = [];
 
     public static function setThemeCallback(callable $themeCallback) {
         self::$themeCallback = $themeCallback;
@@ -69,16 +67,23 @@ class CManager_Theme {
         return self::$themeData[$theme];
     }
 
-    public static function getData($key,$default=null) {
+    public static function getData($key, $default = null) {
         $themeAllData = self::getThemeData();
-        $themeData = carr::get($themeAllData, 'data',$default);
-        return carr::get($themeData, $key,$default);
+        $themeData = carr::get($themeAllData, 'data', $default);
+        return carr::get($themeData, $key, $default);
     }
 
+    /**
+     * Get Theme Path
+     *
+     * @return string
+     *
+     * @deprecated 1.1
+     */
     public static function getThemePath() {
         $themePath = '';
         $theme = self::getCurrentTheme();
-        $themeFile = CF::get_file('themes', $theme);
+        $themeFile = CF::getFile('themes', $theme);
         if (file_exists($themeFile)) {
             $themeData = include $themeFile;
             $themePath = carr::get($themeData, 'theme_path');
@@ -90,5 +95,4 @@ class CManager_Theme {
         }
         return $themePath;
     }
-
 }

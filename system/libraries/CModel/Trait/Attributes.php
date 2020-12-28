@@ -620,7 +620,7 @@ trait CModel_Trait_Attributes {
         $value = $this->asJson($value);
 
         if ($value === false) {
-            throw JsonEncodingException::forAttribute(
+            throw CModel_Exception_JsonEncodingException::forAttribute(
                 $this,
                 $key,
                 json_last_error_msg()

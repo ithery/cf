@@ -20,6 +20,15 @@ class CApp {
     }
 
     /**
+     * @param null|string $id
+     *
+     * @return CElement_Element_Div
+     */
+    public function addDiv($id = null) {
+        return $this->element->addDiv($id);
+    }
+
+    /**
      * @param CElement_View}string $view
      * @param string               $id
      * @param null|mixed           $data

@@ -1,19 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Dec 25, 2017, 10:08:50 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Dec 25, 2017, 10:08:50 PM
  */
 trait CModel_Trait_GlobalScopes {
-
     /**
      * Register a new global scope on the model.
      *
-     * @param  CModel_Interface_Scope|\Closure|string  $scope
-     * @param  \Closure|null  $implementation
+     * @param CModel_Interface_Scope|\Closure|string $scope
+     * @param \Closure|null                          $implementation
+     *
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -33,7 +34,8 @@ trait CModel_Trait_GlobalScopes {
     /**
      * Determine if a model has a global scope.
      *
-     * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
+     * @param \Illuminate\Database\Eloquent\Scope|string $scope
+     *
      * @return bool
      */
     public static function hasGlobalScope($scope) {
@@ -43,7 +45,8 @@ trait CModel_Trait_GlobalScopes {
     /**
      * Get a global scope registered with the model.
      *
-     * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
+     * @param \Illuminate\Database\Eloquent\Scope|string $scope
+     *
      * @return \Illuminate\Database\Eloquent\Scope|\Closure|null
      */
     public static function getGlobalScope($scope) {
@@ -52,7 +55,8 @@ trait CModel_Trait_GlobalScopes {
         }
 
         return carr::get(
-                        static::$globalScopes, static::class . '.' . get_class($scope)
+            static::$globalScopes,
+            static::class . '.' . get_class($scope)
         );
     }
 
@@ -64,5 +68,4 @@ trait CModel_Trait_GlobalScopes {
     public function getGlobalScopes() {
         return carr::get(static::$globalScopes, static::class, []);
     }
-
 }

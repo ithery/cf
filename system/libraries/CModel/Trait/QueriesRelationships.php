@@ -1,22 +1,23 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Dec 25, 2017, 10:08:50 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Dec 25, 2017, 10:08:50 PM
  */
 trait CModel_Trait_QueriesRelationships {
-
     /**
      * Add a relationship count / exists condition to the query.
      *
-     * @param  string  $relation
-     * @param  string  $operator
-     * @param  int     $count
-     * @param  string  $boolean
-     * @param  \Closure|null  $callback
+     * @param string        $relation
+     * @param string        $operator
+     * @param int           $count
+     * @param string        $boolean
+     * @param \Closure|null $callback
+     *
      * @return CModel_Query|static
      */
     public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) {
@@ -32,7 +33,8 @@ trait CModel_Trait_QueriesRelationships {
         $method = $this->canUseExistsForExistenceCheck($operator, $count) ? 'getRelationExistenceQuery' : 'getRelationExistenceCountQuery';
 
         $hasQuery = $relation->{$method}(
-                $relation->getRelated()->newQuery(), $this
+            $relation->getRelated()->newQuery(),
+            $this
         );
 
         // Next we will call any given callback as an "anonymous" scope so they can get the
@@ -43,7 +45,11 @@ trait CModel_Trait_QueriesRelationships {
         }
 
         return $this->addHasWhere(
-                        $hasQuery, $relation, $operator, $count, $boolean
+            $hasQuery,
+            $relation,
+            $operator,
+            $count,
+            $boolean
         );
     }
 
@@ -52,11 +58,12 @@ trait CModel_Trait_QueriesRelationships {
      *
      * Sets up recursive call to whereHas until we finish the nested relation.
      *
-     * @param  string  $relations
-     * @param  string  $operator
-     * @param  int     $count
-     * @param  string  $boolean
-     * @param  \Closure|null  $callback
+     * @param string        $relations
+     * @param string        $operator
+     * @param int           $count
+     * @param string        $boolean
+     * @param \Closure|null $callback
+     *
      * @return CModel_Query|static
      */
     protected function hasNested($relations, $operator = '>=', $count = 1, $boolean = 'and', $callback = null) {
@@ -75,9 +82,10 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Add a relationship count / exists condition to the query with an "or".
      *
-     * @param  string  $relation
-     * @param  string  $operator
-     * @param  int     $count
+     * @param string $relation
+     * @param string $operator
+     * @param int    $count
+     *
      * @return CModel_Query|static
      */
     public function orHas($relation, $operator = '>=', $count = 1) {
@@ -87,9 +95,10 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Add a relationship count / exists condition to the query.
      *
-     * @param  string  $relation
-     * @param  string  $boolean
-     * @param  \Closure|null  $callback
+     * @param string        $relation
+     * @param string        $boolean
+     * @param \Closure|null $callback
+     *
      * @return CModel_Query|static
      */
     public function doesntHave($relation, $boolean = 'and', Closure $callback = null) {
@@ -99,7 +108,8 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Add a relationship count / exists condition to the query with an "or".
      *
-     * @param  string  $relation
+     * @param string $relation
+     *
      * @return CModel_Query|static
      */
     public function orDoesntHave($relation) {
@@ -109,10 +119,11 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * @param  string  $relation
-     * @param  \Closure|null  $callback
-     * @param  string  $operator
-     * @param  int     $count
+     * @param string        $relation
+     * @param \Closure|null $callback
+     * @param string        $operator
+     * @param int           $count
+     *
      * @return CModel_Query|static
      */
     public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1) {
@@ -122,10 +133,11 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  string    $relation
-     * @param  \Closure  $callback
-     * @param  string    $operator
-     * @param  int       $count
+     * @param string   $relation
+     * @param \Closure $callback
+     * @param string   $operator
+     * @param int      $count
+     *
      * @return CModel_Query|static
      */
     public function orWhereHas($relation, Closure $callback = null, $operator = '>=', $count = 1) {
@@ -135,8 +147,9 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
-     * @param  string  $relation
-     * @param  \Closure|null  $callback
+     * @param string        $relation
+     * @param \Closure|null $callback
+     *
      * @return CModel_Query|static
      */
     public function whereDoesntHave($relation, Closure $callback = null) {
@@ -146,8 +159,9 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
-     * @param  string    $relation
-     * @param  \Closure  $callback
+     * @param string   $relation
+     * @param \Closure $callback
+     *
      * @return CModel_Query|static
      */
     public function orWhereDoesntHave($relation, Closure $callback = null) {
@@ -157,7 +171,8 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Add subselect queries to count the relations.
      *
-     * @param  mixed  $relations
+     * @param mixed $relations
+     *
      * @return $this
      */
     public function withCount($relations) {
@@ -189,7 +204,8 @@ trait CModel_Trait_QueriesRelationships {
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
             // count query. We will normalize the relation name then append _count as the name.
             $query = $relation->getRelationExistenceCountQuery(
-                    $relation->getRelated()->newQuery(), $this
+                $relation->getRelated()->newQuery(),
+                $this
             );
 
             $query->callScope($constraints);
@@ -210,11 +226,12 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Add the "has" condition where clause to the query.
      *
-     * @param  CModel_Query  $hasQuery
-     * @param  CModel_Relation  $relation
-     * @param  string  $operator
-     * @param  int  $count
-     * @param  string  $boolean
+     * @param CModel_Query    $hasQuery
+     * @param CModel_Relation $relation
+     * @param string          $operator
+     * @param int             $count
+     * @param string          $boolean
+     *
      * @return CModel_Query|static
      */
     protected function addHasWhere(CModel_Query $hasQuery, CModel_Relation $relation, $operator, $count, $boolean) {
@@ -226,7 +243,8 @@ trait CModel_Trait_QueriesRelationships {
     /**
      * Merge the where constraints from another query to the current query.
      *
-     * @param  CModel_Query  $from
+     * @param CModel_Query $from
+     *
      * @return CModel_Query|static
      */
     public function mergeConstraintsFrom(CModel_Query $from) {
@@ -237,50 +255,56 @@ trait CModel_Trait_QueriesRelationships {
         // copy over any where constraints on the query as well as remove any global scopes the
         // query might have removed. Then we will return ourselves with the finished merging.
         return $this->withoutGlobalScopes(
-                        $from->removedScopes()
-                )->mergeWheres(
-                        $from->getQuery()->wheres, $whereBindings
+            $from->removedScopes()
+        )->mergeWheres(
+            $from->getQuery()->wheres,
+            $whereBindings
         );
     }
 
     /**
      * Add a sub-query count clause to this query.
      *
-     * @param  CDatabase_Query_Builder $query
-     * @param  string  $operator
-     * @param  int  $count
-     * @param  string  $boolean
+     * @param CDatabase_Query_Builder $query
+     * @param string                  $operator
+     * @param int                     $count
+     * @param string                  $boolean
+     *
      * @return $this
      */
     protected function addWhereCountQuery(CDatabase_Query_Builder $query, $operator = '>=', $count = 1, $boolean = 'and') {
         $this->query->addBinding($query->getBindings(), 'where');
 
         return $this->where(
-                        new CDatabase_Query_Expression('(' . $query->toSql() . ')'), $operator, is_numeric($count) ? new CDatabase_Query_Expression($count) : $count, $boolean
+            new CDatabase_Query_Expression('(' . $query->toSql() . ')'),
+            $operator,
+            is_numeric($count) ? new CDatabase_Query_Expression($count) : $count,
+            $boolean
         );
     }
 
     /**
      * Get the "has relation" base query instance.
      *
-     * @param  string  $relation
+     * @param string $relation
+     *
      * @return CModel_Relation
      */
     protected function getRelationWithoutConstraints($relation) {
         return CModel_Relation::noConstraints(function () use ($relation) {
-                    return $this->getModel()->{$relation}();
-                });
+            return $this->getModel()->{$relation}();
+        });
     }
 
     /**
      * Check if we can run an "exists" query to optimize performance.
      *
-     * @param  string  $operator
-     * @param  int  $count
+     * @param string $operator
+     * @param int    $count
+     *
      * @return bool
      */
     protected function canUseExistsForExistenceCheck($operator, $count) {
         return ($operator === '>=' || $operator === '<') && $count === 1;
     }
-
 }

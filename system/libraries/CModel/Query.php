@@ -1,10 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Dec 26, 2017, 2:22:28 AM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 
@@ -12,7 +14,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @mixin CDatabase_Query_Builder
  */
 class CModel_Query {
-
     use CDatabase_Trait_Builder,
         CModel_Trait_QueriesRelationships;
 
@@ -85,7 +86,8 @@ class CModel_Query {
     /**
      * Create a new Eloquent query builder instance.
      *
-     * @param  CDatabase_Query_Builder  $query
+     * @param CDatabase_Query_Builder $query
+     *
      * @return void
      */
     public function __construct(CDatabase_Query_Builder $query) {
@@ -95,7 +97,8 @@ class CModel_Query {
     /**
      * Create and return an un-saved model instance.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return CModel
      */
     public function make(array $attributes = []) {
@@ -105,8 +108,9 @@ class CModel_Query {
     /**
      * Register a new global scope.
      *
-     * @param  string  $identifier
-     * @param  \Illuminate\Database\Eloquent\Scope|\Closure  $scope
+     * @param string                          $identifier
+     * @param CModel_Interface_Scope|\Closure $scope
+     *
      * @return $this
      */
     public function withGlobalScope($identifier, $scope) {
@@ -122,7 +126,8 @@ class CModel_Query {
     /**
      * Remove a registered global scope.
      *
-     * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
+     * @param \Illuminate\Database\Eloquent\Scope|string $scope
+     *
      * @return $this
      */
     public function withoutGlobalScope($scope) {
@@ -140,7 +145,8 @@ class CModel_Query {
     /**
      * Remove all or passed registered global scopes.
      *
-     * @param  array|null  $scopes
+     * @param array|null $scopes
+     *
      * @return $this
      */
     public function withoutGlobalScopes(array $scopes = null) {
@@ -167,11 +173,12 @@ class CModel_Query {
     /**
      * Add a where clause on the primary key to the query.
      *
-     * @param  mixed  $id
+     * @param mixed $id
+     *
      * @return $this
      */
     public function whereKey($id) {
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (is_array($id) || $id instanceof CInterface_Arrayable) {
             $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
@@ -183,11 +190,12 @@ class CModel_Query {
     /**
      * Add a where clause on the primary key to the query.
      *
-     * @param  mixed  $id
+     * @param mixed $id
+     *
      * @return $this
      */
     public function whereKeyNot($id) {
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (is_array($id) || $id instanceof CInterface_Arrayable) {
             $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
@@ -199,10 +207,11 @@ class CModel_Query {
     /**
      * Add a basic where clause to the query.
      *
-     * @param  string|array|\Closure  $column
-     * @param  string  $operator
-     * @param  mixed  $value
-     * @param  string  $boolean
+     * @param string|array|\Closure $column
+     * @param string                $operator
+     * @param mixed                 $value
+     * @param string                $boolean
+     *
      * @return $this
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and') {
@@ -222,9 +231,10 @@ class CModel_Query {
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  \Closure|array|string  $column
-     * @param  string  $operator
-     * @param  mixed  $value
+     * @param \Closure|array|string $column
+     * @param string                $operator
+     * @param mixed                 $value
+     *
      * @return CModel_Query|static
      */
     public function orWhere($column, $operator = null, $value = null) {
@@ -234,36 +244,38 @@ class CModel_Query {
     /**
      * Create a collection of models from plain arrays.
      *
-     * @param  array  $items
+     * @param array $items
+     *
      * @return CModel_Collection
      */
     public function hydrate(array $items) {
         $instance = $this->newModelInstance();
 
         return $instance->newCollection(array_map(function ($item) use ($instance) {
-                            return $instance->newFromBuilder($item);
-                        }, $items));
+            return $instance->newFromBuilder($item);
+        }, $items));
     }
-
 
     /**
      * Create a collection of models from a raw query.
      *
-     * @param  string  $query
-     * @param  array  $bindings
+     * @param string $query
+     * @param array  $bindings
+     *
      * @return CModel_Collection
      */
     public function fromQuery($query, $bindings = []) {
         return $this->hydrate(
-                        $this->query->getConnection()->select($query, $bindings)
+            $this->query->getConnection()->select($query, $bindings)
         );
     }
 
     /**
      * Find a model by its primary key.
      *
-     * @param  mixed  $id
-     * @param  array  $columns
+     * @param mixed $id
+     * @param array $columns
+     *
      * @return CModel|CModel_Collection|static[]|static|null
      */
     public function find($id, $columns = ['*']) {
@@ -276,8 +288,9 @@ class CModel_Query {
     /**
      * Find multiple models by their primary keys.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
-     * @param  array  $columns
+     * @param \Illuminate\Contracts\Support\Arrayable|array $ids
+     * @param array                                         $columns
+     *
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function findMany($ids, $columns = ['*']) {
@@ -291,8 +304,9 @@ class CModel_Query {
     /**
      * Find a model by its primary key or throw an exception.
      *
-     * @param  mixed  $id
-     * @param  array  $columns
+     * @param mixed $id
+     * @param array $columns
+     *
      * @return CModel|CModel_Collection
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
@@ -309,15 +323,17 @@ class CModel_Query {
         }
 
         throw (new CModel_Exception_ModelNotFound)->setModel(
-                get_class($this->model), $id
+            get_class($this->model),
+            $id
         );
     }
 
     /**
      * Find a model by its primary key or return fresh model instance.
      *
-     * @param  mixed  $id
-     * @param  array  $columns
+     * @param mixed $id
+     * @param array $columns
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function findOrNew($id, $columns = ['*']) {
@@ -331,8 +347,9 @@ class CModel_Query {
     /**
      * Get the first record matching the attributes or instantiate it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * @param array $attributes
+     * @param array $values
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function firstOrNew(array $attributes, array $values = []) {
@@ -346,16 +363,17 @@ class CModel_Query {
     /**
      * Get the first record matching the attributes or create it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param array $attributes
+     * @param array $values
+     *
+     * @return CModel
      */
     public function firstOrCreate(array $attributes, array $values = []) {
         if (!is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
-        return tap($this->newModelInstance($attributes + $values), function ($instance) {
+        return c::tap($this->newModelInstance($attributes + $values), function ($instance) {
             $instance->save();
         });
     }
@@ -363,20 +381,22 @@ class CModel_Query {
     /**
      * Create or update a record matching the attributes, and fill it with values.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * @param array $attributes
+     * @param array $values
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function updateOrCreate(array $attributes, array $values = []) {
         return $this->tap($this->firstOrNew($attributes), function ($instance) use ($values) {
-                    $instance->fill($values)->save();
-                });
+            $instance->fill($values)->save();
+        });
     }
 
     /**
      * Execute the query and get the first result or throw an exception.
      *
-     * @param  array  $columns
+     * @param array $columns
+     *
      * @return \Illuminate\Database\Eloquent\Model|static
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
@@ -392,8 +412,9 @@ class CModel_Query {
     /**
      * Execute the query and get the first result or call a callback.
      *
-     * @param  \Closure|array  $columns
-     * @param  \Closure|null  $callback
+     * @param \Closure|array $columns
+     * @param \Closure|null  $callback
+     *
      * @return \Illuminate\Database\Eloquent\Model|static|mixed
      */
     public function firstOr($columns = ['*'], Closure $callback = null) {
@@ -413,7 +434,8 @@ class CModel_Query {
     /**
      * Get a single column's value from the first result of a query.
      *
-     * @param  string  $column
+     * @param string $column
+     *
      * @return mixed
      */
     public function value($column) {
@@ -425,12 +447,12 @@ class CModel_Query {
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array  $columns
+     * @param array $columns
+     *
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function get($columns = ['*']) {
         $builder = $this->applyScopes();
-
 
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded, which will solve the
@@ -439,14 +461,14 @@ class CModel_Query {
             $models = $builder->eagerLoadRelations($models);
         }
 
-
         return $builder->getModel()->newCollection($models);
     }
 
     /**
      * Get the hydrated models without eager loading.
      *
-     * @param  array  $columns
+     * @param array $columns
+     *
      * @return CModel[]
      */
     public function getModels($columns = ['*']) {
@@ -456,7 +478,8 @@ class CModel_Query {
     /**
      * Eager load the relationships for the models.
      *
-     * @param  array  $models
+     * @param array $models
+     *
      * @return array
      */
     public function eagerLoadRelations(array $models) {
@@ -475,9 +498,10 @@ class CModel_Query {
     /**
      * Eagerly load the relationship on a set of models.
      *
-     * @param  array  $models
-     * @param  string  $name
-     * @param  \Closure  $constraints
+     * @param array    $models
+     * @param string   $name
+     * @param \Closure $constraints
+     *
      * @return array
      */
     protected function eagerLoadRelation(array $models, $name, Closure $constraints) {
@@ -494,14 +518,17 @@ class CModel_Query {
         // using the relationship instance. Then we just return the finished arrays
         // of models which have been eagerly hydrated and are readied for return.
         return $relation->match(
-                        $relation->initRelation($models, $name), $relation->getEager(), $name
+            $relation->initRelation($models, $name),
+            $relation->getEager(),
+            $name
         );
     }
 
     /**
      * Get the relation instance for the given relation name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return \Illuminate\Database\Eloquent\Relations\Relation
      */
     public function getRelation($name) {
@@ -509,12 +536,12 @@ class CModel_Query {
         // not have to remove these where clauses manually which gets really hacky
         // and error prone. We don't want constraints because we add eager ones.
         $relation = CModel_Relation::noConstraints(function () use ($name) {
-                    try {
-                        return $this->getModel()->{$name}();
-                    } catch (BadMethodCallException $e) {
-                        throw CModel_Exception_RelationNotFoundException::make($this->getModel(), $name);
-                    }
-                });
+            try {
+                return $this->getModel()->{$name}();
+            } catch (BadMethodCallException $e) {
+                throw CModel_Exception_RelationNotFoundException::make($this->getModel(), $name);
+            }
+        });
 
         $nested = $this->relationsNestedUnder($name);
 
@@ -531,7 +558,8 @@ class CModel_Query {
     /**
      * Get the deeply nested relations for a given top-level relation.
      *
-     * @param  string  $relation
+     * @param string $relation
+     *
      * @return array
      */
     protected function relationsNestedUnder($relation) {
@@ -552,8 +580,9 @@ class CModel_Query {
     /**
      * Determine if the relationship is nested.
      *
-     * @param  string  $relation
-     * @param  string  $name
+     * @param string $relation
+     * @param string $name
+     *
      * @return bool
      */
     protected function isNestedUnder($relation, $name) {
@@ -574,10 +603,11 @@ class CModel_Query {
     /**
      * Chunk the results of a query by comparing numeric IDs.
      *
-     * @param  int  $count
-     * @param  callable  $callback
-     * @param  string  $column
-     * @param  string|null  $alias
+     * @param int         $count
+     * @param callable    $callback
+     * @param string      $column
+     * @param string|null $alias
+     *
      * @return bool
      */
     public function chunkById($count, callable $callback, $column = null, $alias = null) {
@@ -630,8 +660,9 @@ class CModel_Query {
     /**
      * Get an array with the values of a given column.
      *
-     * @param  string  $column
-     * @param  string|null  $key
+     * @param string      $column
+     * @param string|null $key
+     *
      * @return \Illuminate\Support\Collection
      */
     public function pluck($column, $key = null) {
@@ -640,24 +671,26 @@ class CModel_Query {
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
         // columns are returned as you would expect from these Eloquent models.
-        if (!$this->model->hasGetMutator($column) &&
-                !$this->model->hasCast($column) &&
-                !in_array($column, $this->model->getDates())) {
+        if (!$this->model->hasGetMutator($column)
+            && !$this->model->hasCast($column)
+            && !in_array($column, $this->model->getDates())
+        ) {
             return $results;
         }
 
         return $results->map(function ($value) use ($column) {
-                    return $this->model->newFromBuilder([$column => $value])->{$column};
-                });
+            return $this->model->newFromBuilder([$column => $value])->{$column};
+        });
     }
 
     /**
      * Paginate the given query.
      *
-     * @param  int  $perPage
-     * @param  array  $columns
-     * @param  string  $pageName
-     * @param  int|null  $page
+     * @param int      $perPage
+     * @param array    $columns
+     * @param string   $pageName
+     * @param int|null $page
+     *
      * @return CPagination_LengthAwarePaginatorInterface
      *
      * @throws \InvalidArgumentException
@@ -670,18 +703,19 @@ class CModel_Query {
         $results = ($total = $this->toBase()->getCountForPagination()) ? $this->forPage($page, $perPage)->get($columns) : $this->model->newCollection();
 
         return $this->paginator($results, $total, $perPage, $page, [
-                    'path' => CPagination_Paginator::resolveCurrentPath(),
-                    'pageName' => $pageName,
+            'path' => CPagination_Paginator::resolveCurrentPath(),
+            'pageName' => $pageName,
         ]);
     }
 
     /**
      * Paginate the given query into a simple paginator.
      *
-     * @param  int  $perPage
-     * @param  array  $columns
-     * @param  string  $pageName
-     * @param  int|null  $page
+     * @param int      $perPage
+     * @param array    $columns
+     * @param string   $pageName
+     * @param int|null $page
+     *
      * @return CPagination_PaginatorInterface
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
@@ -695,44 +729,46 @@ class CModel_Query {
         $this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
         return $this->simplePaginator($this->get($columns), $perPage, $page, [
-                    'path' => CPagination_Paginator::resolveCurrentPath(),
-                    'pageName' => $pageName,
+            'path' => CPagination_Paginator::resolveCurrentPath(),
+            'pageName' => $pageName,
         ]);
     }
 
     /**
      * Save a new model and return the instance.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return CModel|$this
      */
     public function create(array $attributes = []) {
         return CF::tap($this->newModelInstance($attributes), function ($instance) {
-            
-                    if($instance->status==null) {
-                        $instance->status=1;
-                    }
-                    
-                    $instance->save();
-                });
+            if ($instance->status == null) {
+                $instance->status = 1;
+            }
+
+            $instance->save();
+        });
     }
 
     /**
      * Save a new model and return the instance. Allow mass-assignment.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
     public function forceCreate(array $attributes) {
         return $this->model->unguarded(function () use ($attributes) {
-                    return $this->newModelInstance()->create($attributes);
-                });
+            return $this->newModelInstance()->create($attributes);
+        });
     }
 
     /**
      * Update a record in the database.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return int
      */
     public function update(array $values) {
@@ -742,35 +778,42 @@ class CModel_Query {
     /**
      * Increment a column's value by a given amount.
      *
-     * @param  string  $column
-     * @param  int  $amount
-     * @param  array  $extra
+     * @param string $column
+     * @param int    $amount
+     * @param array  $extra
+     *
      * @return int
      */
     public function increment($column, $amount = 1, array $extra = []) {
         return $this->toBase()->increment(
-                        $column, $amount, $this->addUpdatedAtColumn($extra)
+            $column,
+            $amount,
+            $this->addUpdatedAtColumn($extra)
         );
     }
 
     /**
      * Decrement a column's value by a given amount.
      *
-     * @param  string  $column
-     * @param  int  $amount
-     * @param  array  $extra
+     * @param string $column
+     * @param int    $amount
+     * @param array  $extra
+     *
      * @return int
      */
     public function decrement($column, $amount = 1, array $extra = []) {
         return $this->toBase()->decrement(
-                        $column, $amount, $this->addUpdatedAtColumn($extra)
+            $column,
+            $amount,
+            $this->addUpdatedAtColumn($extra)
         );
     }
 
     /**
      * Add the "updated at" column to an array of values.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return array
      */
     protected function addUpdatedAtColumn(array $values) {
@@ -779,7 +822,9 @@ class CModel_Query {
         }
 
         return carr::add(
-                        $values, $this->model->getUpdatedAtColumn(), $this->model->freshTimestampString()
+            $values,
+            $this->model->getUpdatedAtColumn(),
+            $this->model->freshTimestampString()
         );
     }
 
@@ -810,7 +855,8 @@ class CModel_Query {
     /**
      * Register a replacement for the default delete function.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return void
      */
     public function onDelete(Closure $callback) {
@@ -820,7 +866,8 @@ class CModel_Query {
     /**
      * Call the given local model scopes.
      *
-     * @param  array  $scopes
+     * @param array $scopes
+     *
      * @return mixed
      */
     public function scopes(array $scopes) {
@@ -838,7 +885,8 @@ class CModel_Query {
             // care of grouping the "wheres" properly so the logical order doesn't get
             // messed up when adding scopes. Then we'll return back out the builder.
             $builder = $builder->callScope(
-                    [$this->model, 'scope' . ucfirst($scope)], (array) $parameters
+                [$this->model, 'scope' . ucfirst($scope)],
+                (array) $parameters
             );
         }
 
@@ -885,8 +933,9 @@ class CModel_Query {
     /**
      * Apply the given scope on the current builder instance.
      *
-     * @param  callable  $scope
-     * @param  array  $parameters
+     * @param callable $scope
+     * @param array    $parameters
+     *
      * @return mixed
      */
     protected function callScope(callable $scope, $parameters = []) {
@@ -915,8 +964,9 @@ class CModel_Query {
     /**
      * Nest where conditions by slicing them at the given where count.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  int  $originalWhereCount
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param int                                $originalWhereCount
+     *
      * @return void
      */
     protected function addNewWheresWithinGroup(CDatabase_Query_Builder $query, $originalWhereCount) {
@@ -928,19 +978,22 @@ class CModel_Query {
         $query->wheres = [];
 
         $this->groupWhereSliceForScope(
-                $query, array_slice($allWheres, 0, $originalWhereCount)
+            $query,
+            array_slice($allWheres, 0, $originalWhereCount)
         );
 
         $this->groupWhereSliceForScope(
-                $query, array_slice($allWheres, $originalWhereCount)
+            $query,
+            array_slice($allWheres, $originalWhereCount)
         );
     }
 
     /**
      * Slice where conditions at the given offset and add them to the query as a nested condition.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $whereSlice
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $whereSlice
+     *
      * @return void
      */
     protected function groupWhereSliceForScope(CDatabase_Query_Builder $query, $whereSlice) {
@@ -951,7 +1004,8 @@ class CModel_Query {
         // we don't add any unnecessary nesting thus keeping the query clean.
         if ($whereBooleans->contains('or')) {
             $query->wheres[] = $this->createNestedWhere(
-                    $whereSlice, $whereBooleans->first()
+                $whereSlice,
+                $whereBooleans->first()
             );
         } else {
             $query->wheres = array_merge($query->wheres, $whereSlice);
@@ -961,8 +1015,9 @@ class CModel_Query {
     /**
      * Create a where array with nested where conditions.
      *
-     * @param  array  $whereSlice
-     * @param  string  $boolean
+     * @param array  $whereSlice
+     * @param string $boolean
+     *
      * @return array
      */
     protected function createNestedWhere($whereSlice, $boolean = 'and') {
@@ -976,7 +1031,8 @@ class CModel_Query {
     /**
      * Set the relationships that should be eager loaded.
      *
-     * @param  mixed  $relations
+     * @param mixed $relations
+     *
      * @return $this
      */
     public function with($relations) {
@@ -990,12 +1046,13 @@ class CModel_Query {
     /**
      * Prevent the specified relations from being eager loaded.
      *
-     * @param  mixed  $relations
+     * @param mixed $relations
+     *
      * @return $this
      */
     public function without($relations) {
         $this->eagerLoad = array_diff_key($this->eagerLoad, array_flip(
-                        is_string($relations) ? func_get_args() : $relations
+            is_string($relations) ? func_get_args() : $relations
         ));
 
         return $this;
@@ -1004,7 +1061,8 @@ class CModel_Query {
     /**
      * Create a new instance of the model being queried.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function newModelInstance($attributes = []) {
@@ -1014,7 +1072,8 @@ class CModel_Query {
     /**
      * Parse a list of relations into individuals.
      *
-     * @param  array  $relations
+     * @param array $relations
+     *
      * @return array
      */
     protected function parseWithRelations(array $relations) {
@@ -1028,8 +1087,8 @@ class CModel_Query {
                 $name = $constraints;
 
                 list($name, $constraints) = cstr::contains($name, ':') ? $this->createSelectWithConstraint($name) : [$name, function () {
-                        //
-                    }];
+                    //
+                }];
             }
 
             // We need to separate out any nested includes. Which allows the developers
@@ -1046,20 +1105,22 @@ class CModel_Query {
     /**
      * Create a constraint to select the given columns for the relation.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return array
      */
     protected function createSelectWithConstraint($name) {
         return [explode(':', $name)[0], function ($query) use ($name) {
-                $query->select(explode(',', explode(':', $name)[1]));
-            }];
+            $query->select(explode(',', explode(':', $name)[1]));
+        }];
     }
 
     /**
      * Parse the nested relationships in a relation.
      *
-     * @param  string  $name
-     * @param  array  $results
+     * @param string $name
+     * @param array  $results
+     *
      * @return array
      */
     protected function addNestedWiths($name, $results) {
@@ -1087,14 +1148,14 @@ class CModel_Query {
      * @return CDatabase_Query_Builder
      */
     public function getQuery() {
-
         return $this->query;
     }
 
     /**
      * Set the underlying query builder instance.
      *
-     * @param  CDatabase_Query_Builder  $query
+     * @param CDatabase_Query_Builder $query
+     *
      * @return $this
      */
     public function setQuery(CDatabase_Query_Builder $query) {
@@ -1124,7 +1185,8 @@ class CModel_Query {
     /**
      * Set the relationships being eagerly loaded.
      *
-     * @param  array  $eagerLoad
+     * @param array $eagerLoad
+     *
      * @return $this
      */
     public function setEagerLoads(array $eagerLoad) {
@@ -1136,7 +1198,7 @@ class CModel_Query {
     /**
      * Get the model instance being queried.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return CModel
      */
     public function getModel() {
         return $this->model;
@@ -1145,7 +1207,8 @@ class CModel_Query {
     /**
      * Set a model instance for the model being queried.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param CModel $model
+     *
      * @return $this
      */
     public function setModel(CModel $model) {
@@ -1159,7 +1222,8 @@ class CModel_Query {
     /**
      * Get the given macro by name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return \Closure
      */
     public function getMacro($name) {
@@ -1169,12 +1233,12 @@ class CModel_Query {
     /**
      * Dynamically handle calls into the query instance.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters) {
-
         if ($method === 'macro') {
             $this->localMacros[$parameters[0]] = $parameters[1];
 
@@ -1197,15 +1261,13 @@ class CModel_Query {
         }
 
         if (method_exists($this->model, $scope = 'scope' . ucfirst($method))) {
-
             return $this->callScope([$this->model, $scope], $parameters);
         }
-       
-        if (in_array($method, $this->passthru)) {
 
+        if (in_array($method, $this->passthru)) {
             try {
                 $base = $this->toBase();
-                
+
                 $class = new ReflectionClass(get_class($base));
                 try {
                     // Load the controller method
@@ -1219,25 +1281,22 @@ class CModel_Query {
                         cdbg::var_dump(nl2br($ex->getTraceAsString()));
                     }
                     die(
-                            sprintf('Call to undefined method %s::%s()', get_class($base), $method)
+                        sprintf('Call to undefined method %s::%s()', get_class($base), $method)
                     );
                     $method_object = $class->getMethod('__call');
 
                     // Use arguments in __call format
-                    $parameters = array($method, $parameters);
+                    $parameters = [$method, $parameters];
                 }
-
 
                 return $method_object->invokeArgs($this->query, $parameters);
                 //$this->query->{$method}(...$parameters);
             } catch (BadMethodCallException $e) {
-
                 throw new BadMethodCallException(
-                sprintf('Call to undefined method %s::%s()', get_class($this), $method)
+                    sprintf('Call to undefined method %s::%s()', get_class($this), $method)
                 );
             }
         }
-
 
         $class = new ReflectionClass(get_class($this->query));
 
@@ -1250,7 +1309,7 @@ class CModel_Query {
                     // Use __call instead
                     $method_object = $class->getMethod('__call');
                     // Use arguments in __call format
-                    $parameters = array($method, $parameters);
+                    $parameters = [$method, $parameters];
                 } else {
                     try {
                         throw new Exception('404 doesn\'t have method __call on CDatabase_Query_Builder');
@@ -1259,18 +1318,16 @@ class CModel_Query {
                         cdbg::var_dump($ex->getMessage());
                     }
                     die(
-                            sprintf('Call to undefined method %s::%s()', get_class($this->query), $method)
+                        sprintf('Call to undefined method %s::%s()', get_class($this->query), $method)
                     );
                 }
             }
 
-
             $method_object->invokeArgs($this->query, $parameters);
             //$this->query->{$method}(...$parameters);
         } catch (BadMethodCallException $e) {
-
             throw new BadMethodCallException(
-            sprintf('Call to undefined method %s::%s()', get_class($this), $method)
+                sprintf('Call to undefined method %s::%s()', get_class($this), $method)
             );
         }
 
@@ -1280,8 +1337,9 @@ class CModel_Query {
     /**
      * Dynamically handle calls into the query instance.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      *
      * @throws \BadMethodCallException
@@ -1312,5 +1370,4 @@ class CModel_Query {
     public function __clone() {
         $this->query = clone $this->query;
     }
-
 }

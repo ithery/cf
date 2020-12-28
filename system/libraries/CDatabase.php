@@ -25,7 +25,7 @@ class CDatabase {
     public static $benchmarks = [];
 
     /**
-     * default Database
+     * Default Database
      *
      * @var string
      */
@@ -120,7 +120,6 @@ class CDatabase {
     /**
      * Returns a singleton instance of Database.
      *
-     * @param   mixed   configuration array or DSN
      * @param null|mixed $name
      * @param null|mixed $config
      * @param null|mixed $domain
@@ -184,10 +183,10 @@ class CDatabase {
     /**
      * Sets up the database configuration, loads the CDatabase_Driver.
      *
-     * @throws CDatabase_Exception
-     *
      * @param mixed      $config
      * @param null|mixed $domain
+     *
+     * @throws CDatabase_Exception
      */
     public function __construct($config = [], $domain = null) {
         if ($domain == null) {
