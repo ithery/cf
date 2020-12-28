@@ -10,11 +10,11 @@ use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Helper\Table;
 
 class CServer_Console {
-
     /**
      * Output the given text to the console.
      *
-     * @param  string  $output
+     * @param string $output
+     *
      * @return void
      */
     public static function info($output) {
@@ -24,7 +24,8 @@ class CServer_Console {
     /**
      * Output the given text to the console.
      *
-     * @param  string  $output
+     * @param string $output
+     *
      * @return void
      */
     public static function warning($output) {
@@ -36,6 +37,7 @@ class CServer_Console {
      *
      * @param array $headers
      * @param array $rows
+     *
      * @return void
      */
     public static function table(array $headers = [], array $rows = []) {
@@ -49,7 +51,8 @@ class CServer_Console {
     /**
      * Output the given text to the console.
      *
-     * @param  string  $output
+     * @param string $output
+     *
      * @return void
      */
     public static function output($output) {
@@ -59,5 +62,4 @@ class CServer_Console {
 
         (new ConsoleOutput)->writeln($output);
     }
-
 }

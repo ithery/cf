@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Jul 30, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Jul 30, 2020
  */
 class CServer_PhpInfo_Filter {
-
     const All = -1;
     const General = 1;
     const Credits = 2;
@@ -22,7 +22,4 @@ class CServer_PhpInfo_Filter {
         $oClass = new \ReflectionClass(__CLASS__);
         return $oClass->getConstants();
     }
-
-    
-
 }

@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 13, 2018, 5:11:06 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 13, 2018, 5:11:06 PM
  */
 use CServer_PhpInfo_Filter as Filter;
 
 final class CServer_PhpInfo {
-
     protected static $instance;
-    protected static $info = array();
+    protected static $info = [];
 
     public static function instance() {
         if (self::$instance == null) {
@@ -25,15 +25,15 @@ final class CServer_PhpInfo {
         if (empty(self::$info)) {
             ob_start();
             @phpinfo();
-            $phpinfo = array('phpinfo' => array());
-            $matches = array();
+            $phpinfo = ['phpinfo' => []];
+            $matches = [];
             if (preg_match_all('#(?:<h2>(?:<a name=".*?">)?(.*?)(?:</a>)?</h2>)|(?:<tr(?: class=".*?")?><t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>)?)?</tr>)#s', ob_get_clean(), $matches, PREG_SET_ORDER)) {
                 foreach ($matches as $match) {
                     if (strlen($match[1])) {
-                        $phpinfo[$match[1]] = array();
+                        $phpinfo[$match[1]] = [];
                     } elseif (isset($match[3])) {
                         $keys = array_keys($phpinfo);
-                        $phpinfo[end($keys)][$match[2]] = isset($match[4]) ? array($match[3], $match[4]) : $match[3];
+                        $phpinfo[end($keys)][$match[2]] = isset($match[4]) ? [$match[3], $match[4]] : $match[3];
                     } else {
                         $keys = array_keys($phpinfo);
                         $phpinfo[end($keys)][] = $match[2];
@@ -49,7 +49,6 @@ final class CServer_PhpInfo {
         return PHP_VERSION;
     }
 
-    //for getting data
     public static function toCollection($filter = Filter::All) {
         ob_start();
 
@@ -58,14 +57,13 @@ final class CServer_PhpInfo {
         $phpinfo = ['phpinfo' => c::collect()];
 
         if (preg_match_all('#(?:<h2>(?:<a name=".*?">)?(.*?)(?:</a>)?</h2>)|(?:<tr(?: class=".*?")?><t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>(?:<t[hd](?: class=".*?")?>(.*?)\s*</t[hd]>)?)?</tr>)#s', ob_get_clean(), $matches, PREG_SET_ORDER)) {
-
-            c::collect($matches)->each(function($match) use (&$phpinfo) {
+            c::collect($matches)->each(function ($match) use (&$phpinfo) {
                 if (strlen($match[1])) {
-                    $phpinfo[$match[1]] = collect();
+                    $phpinfo[$match[1]] = c::collect();
                 } elseif (isset($match[3])) {
                     $keys1 = array_keys($phpinfo);
 
-                    $phpinfo[end($keys1)][$match[2]] = isset($match[4]) ? collect([$match[3], $match[4]]) : $match[3];
+                    $phpinfo[end($keys1)][$match[2]] = isset($match[4]) ? c::collect([$match[3], $match[4]]) : $match[3];
                 } else {
                     $keys1 = array_keys($phpinfo);
 
@@ -76,5 +74,4 @@ final class CServer_PhpInfo {
 
         return c::collect($phpinfo);
     }
-
 }

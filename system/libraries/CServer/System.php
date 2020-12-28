@@ -1,24 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 1:45:37 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 1:45:37 PM
  */
 class CServer_System extends CServer_Base {
-
-    protected static $instance = array();
+    protected static $instance = [];
 
     /**
-     *
      * @var CServer_System_OS
      */
     protected $os;
 
     /**
-     *
      * @var CServer_System_Info
      */
     protected $info;
@@ -33,13 +31,13 @@ class CServer_System extends CServer_Base {
     }
 
     /**
-     * 
      * @param array $sshConfig
+     *
      * @return CServer_System
      */
     public static function instance(array $sshConfig = null) {
         if (!is_array(self::$instance)) {
-            self::$instance = array();
+            self::$instance = [];
         }
         $host = 'localhost';
 
@@ -140,5 +138,4 @@ class CServer_System extends CServer_Base {
         }
         return $this->info->getCpus();
     }
-
 }
