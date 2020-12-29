@@ -12,7 +12,7 @@ class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
         'php72.ps1',
         'php73.ps1',
         'php74.ps1',
-        'ngrok.exe',
+        // 'ngrok.exe',
         'configuredns.bat',
         'nginx/nginx.exe',
         'nginx/conf/fastcgi.conf',
