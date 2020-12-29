@@ -2,9 +2,9 @@
 
 defined('SYSPATH') or die('No direct script access.');
 
-class {prefix}Controller extends CController  {
+class {prefix}Admin_Controller extends {prefix}Controller  {
     public function __construct() {
         parent::__construct();
-        //do something here
+        CManager::setTheme('{theme}');
     }
 }

@@ -13,6 +13,12 @@ class CConsole {
         return CF::cliDomain();
     }
 
+    public static function prefix() {
+        $appConfig = CConfig::instance('app');
+        $appConfig->refresh();
+        return $appConfig->get('prefix');
+    }
+
     public static function domainRequired($console) {
         $domain = CConsole::domain();
         if (strlen($domain) == 0) {
@@ -39,6 +45,16 @@ class CConsole {
         if (!CTesting::isInstalled()) {
             $console->error('testing is not installed');
             $console->error('Please install testing using test:install command');
+            exit(static::FAILURE_EXIT);
+        }
+    }
+
+    public static function prefixRequired($console) {
+        static::domainRequired($console);
+
+        if (strlen(static::prefix()) == 0) {
+            $console->error('Prefix is not set');
+            $console->error('Please set your prefix in config app.php');
             exit(static::FAILURE_EXIT);
         }
     }

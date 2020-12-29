@@ -46,6 +46,7 @@ class CFConsole {
         CConsole_Command_Make_MakeThemeCommand::class,
         CConsole_Command_App_AppCreateCommand::class,
         CConsole_Command_App_AppPresetCommand::class,
+        CConsole_Command_App_AppPresetAdminCommand::class,
         CConsole_Command_App_AppCodeCommand::class,
         CConsole_Command_TestInstallCommand::class,
         CConsole_Command_TestCommand::class,
