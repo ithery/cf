@@ -23,8 +23,8 @@ abstract class CDevSuite_CommandLine {
     /**
      * Run the given command.
      *
-     * @param string   $command
-     * @param callable $onError
+     * @param string|array $command
+     * @param callable     $onError
      *
      * @return string
      */
@@ -78,8 +78,8 @@ abstract class CDevSuite_CommandLine {
     /**
      * Run the given command as the non-root user.
      *
-     * @param string   $command
-     * @param callable $onError
+     * @param string|array $command
+     * @param callable     $onError
      *
      * @return string
      */
@@ -102,8 +102,8 @@ abstract class CDevSuite_CommandLine {
     /**
      * Run the given command and die if fails.
      *
-     * @param string   $command
-     * @param callable $onError
+     * @param string|array $command
+     * @param callable     $onError
      *
      * @return string
      */

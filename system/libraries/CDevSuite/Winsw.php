@@ -6,15 +6,12 @@
  * @author Hery
  */
 class CDevSuite_Winsw {
-
     /**
-     *
      * @var CDevSuite_Windows_CommandLine
      */
     protected $cli;
 
     /**
-     *
      * @var CDevSuite_Windows_Filesystem
      */
     protected $files;
@@ -43,10 +40,14 @@ class CDevSuite_Winsw {
 
         $bin = realpath(CDevSuite::binPath());
         $this->files->copy("$bin/winsw.exe", CDevSuite::homePath() . "Services/$service.exe");
-        $command = 'cmd "/C ' . CDevSuite::homePath() . 'Services/' . $service . ' install"';
+        //$command = 'cmd "/C ' . escapeshellarg(CDevSuite::homePath() . 'Services/' . $service) . ' install"';
+        $command = [
+            CDevSuite::homePath() . 'Services/' . $service,
+            'install'
+        ];
         $this->cli->runOrDie($command, function ($code, $output) use ($service) {
             CDevSuite::warning("Could not install the $service service. Check ~/.devsuite/Log for errors.");
-            CDevSuite::warning("Output:" . $output);
+            CDevSuite::warning('Output:' . $output);
         });
     }
 
@@ -64,7 +65,8 @@ class CDevSuite_Winsw {
         $contents = $this->files->get(CDevSuite::stubsPath() . "$service.xml");
 
         $this->files->putAsUser(
-                CDevSuite::homePath() . "/Services/$service.xml", str_replace(array_keys($args), array_values($args), $contents)
+            CDevSuite::homePath() . "/Services/$service.xml",
+            str_replace(array_keys($args), array_values($args), $contents)
         );
     }
 
@@ -78,7 +80,11 @@ class CDevSuite_Winsw {
     public function uninstall($service) {
         $this->stop($service);
 
-        $this->cli->run('cmd "/C ' . CDevSuite::homePath() . 'Services/' . $service . ' uninstall"');
+        $command = [
+            CDevSuite::homePath() . 'Services/' . $service,
+            'uninstall'
+        ];
+        $this->cli->run($command);
 
         $this->files->unlink(CDevSuite::homePath() . "Services/$service.exe");
         $this->files->unlink(CDevSuite::homePath() . "Services/$service.xml");
@@ -94,8 +100,11 @@ class CDevSuite_Winsw {
     public function restart($service) {
         $this->stop($service);
 
-        $command = 'cmd "/C ' . CDevSuite::homePath() . 'Services/' . $service . ' start"';
-
+        //$command = 'cmd "/C ' . CDevSuite::homePath() . 'Services/' . $service . ' start"';
+        $command = [
+            CDevSuite::homePath() . 'Services/' . $service,
+            'start'
+        ];
         $this->cli->run($command, function () use ($service, $command) {
             sleep(2);
 
@@ -113,7 +122,10 @@ class CDevSuite_Winsw {
      * @return void
      */
     public function stop($service) {
-        $this->cli->run('cmd "/C ' . CDevSuite::homePath() . 'Services/' . $service . ' stop"');
+        $command = [
+            CDevSuite::homePath() . 'Services/' . $service,
+            'stop'
+        ];
+        $this->cli->run($command);
     }
-
 }

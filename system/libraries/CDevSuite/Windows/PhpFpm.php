@@ -32,7 +32,6 @@ class CDevSuite_Windows_PhpFpm extends CDevSuite_PhpFpm {
      */
     public function install() {
         $this->uninstall();
-
         $this->winsw->install(static::SERVICE, ['PHP_PATH' => $this->findPhpPath()]);
 
         $this->restart();

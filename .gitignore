@@ -89,6 +89,7 @@ botlog.log
 
 #ignore vscode
 .vscode
+.php_cs.cache
 *.py
 
 #phpunit
