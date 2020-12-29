@@ -114,14 +114,20 @@ abstract class CDevSuite_Db_MariaDb {
 
     protected function getDumperBinaryPath() {
         //echo realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS . 'mysqldump.exe';
-
-        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS;
+        $path = realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS;
+        if (!is_dir($path)) {
+            return '';
+        }
+        return $path;
     }
 
     protected function getClientBinaryPath() {
         //echo realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS . 'mysqldump.exe';
-
-        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS;
+        $path = realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS;
+        if (!is_dir($path)) {
+            return '';
+        }
+        return $path;
     }
 
     protected function getRestoreCommand($dbConfig, $fromFile) {

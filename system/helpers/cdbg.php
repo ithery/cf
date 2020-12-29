@@ -123,8 +123,6 @@ class cdbg {
      * @return void
      */
     public static function dd() {
-        cdbg::traceDump();
-        die;
         $args = func_get_args();
 
         foreach ($args as $x) {

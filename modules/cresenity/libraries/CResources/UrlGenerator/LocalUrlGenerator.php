@@ -38,8 +38,7 @@ class CResources_UrlGenerator_LocalUrlGenerator extends CResources_UrlGeneratorA
         if ($diskUrl = CF::config("storage.disks.{$this->resource->disk}.url")) {
             return str_replace(c::url('/'), '', $diskUrl);
         }
-
-        if (!cstr::startsWith($this->getStoragePath(), DOCROOT)) {
+        if (!cstr::startsWith(c::fixPath($this->getStoragePath()), c::fixPath(DOCROOT))) {
             throw CResources_Exception_UrlCannotBeDetermined::resourceNotPubliclyAvailable($this->getStoragePath(), DOCROOT);
         }
         return rtrim($this->getBaseResourceDirectory(), '/');

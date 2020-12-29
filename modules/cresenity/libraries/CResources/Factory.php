@@ -25,7 +25,7 @@ class CResources_Factory {
     /**
      * @param mixed $conversionName
      *
-     * @return CResources_PathGenerator
+     * @return CResources_UrlGeneratorAbstract
      */
     public static function createUrlGeneratorForResource(CApp_Model_Interface_ResourceInterface $resource, $conversionName = '') {
         $urlGeneratorClass = CF::config('resource.url_generator') != null

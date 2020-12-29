@@ -6,9 +6,7 @@
  * @author Hery
  */
 class CDevSuite_Windows_Db_MariaDb extends CDevSuite_Db_MariaDb {
-
     /**
-     *
      * @var CDevSuite_Winsw
      */
     public $winsw;
@@ -72,7 +70,10 @@ class CDevSuite_Windows_Db_MariaDb extends CDevSuite_Db_MariaDb {
      * @return string
      */
     public function path() {
-        return realpath(CDevSuite::binPath() . 'mariadb');
+        $path = realpath(CDevSuite::binPath() . 'mariadb');
+        if (!is_dir($path)) {
+            return '';
+        }
+        return $path;
     }
-
 }
