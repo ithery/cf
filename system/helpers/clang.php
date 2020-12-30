@@ -173,7 +173,7 @@ class clang {
                 $directory = 'core.' . inflector::singular($directory);
 
                 // If the file is required, throw an exception
-                throw new CF_Exception('core.resource_not_found', self::lang($directory), $filename);
+                throw new CException('core.resource_not_found', [CF::lang($directory)], $filename);
             } else {
                 // Nothing was found, return FALSE
                 $found = false;

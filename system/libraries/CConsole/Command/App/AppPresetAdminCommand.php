@@ -51,7 +51,7 @@ class CConsole_Command_App_AppPresetAdminCommand extends CConsole_Command {
 
         $baseFile = $librariesDir . $prefix . 'Admin' . EXT;
         if (!CFile::exists($baseFile)) {
-            $stubFile = CF::findFile('stubs', 'libraries/base/admin/base', true, 'stub');
+            $stubFile = CF::findFile('stubs', 'admin/libraries/base/base', true, 'stub');
             if (!$stubFile) {
                 $this->error('base stub not found');
                 exit(1);
@@ -68,7 +68,7 @@ class CConsole_Command_App_AppPresetAdminCommand extends CConsole_Command {
         $baseControllerDir = $librariesDir . 'Controller';
         $this->ensureDirectoryExists($baseControllerDir);
         if (!CFile::exists($baseControllerFile)) {
-            $stubFile = CF::findFile('stubs', 'libraries/base/admin/controller', true, 'stub');
+            $stubFile = CF::findFile('stubs', 'admin/libraries/base/controller', true, 'stub');
             if (!$stubFile) {
                 $this->error('base controller stub not found');
                 exit(1);

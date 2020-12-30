@@ -1,24 +1,25 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 3:15:06 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 3:15:06 PM
  */
 use CModel_HasSlug_InvalidOptionException as InvalidOptionException;
 
 trait CModel_HasSlug_HasSlugTrait {
-
-    /** @var CModel_HasSlug_SlugOptions */
+    /**
+     * @var CModel_HasSlug_SlugOptions
+     */
     protected $slugOptions;
 
     abstract public function getSlugOptions();
 
     protected static function bootHasSlugTrait() {
-
-//        static::observe(new CModel_HasSlug_Observer());
+        // static::observe(new CModel_HasSlug_Observer());
         // Auto generate slugs early before validation
         if (static::usesValidating()) {
             static::validating(function (CModel $model) {
@@ -29,7 +30,6 @@ trait CModel_HasSlug_HasSlugTrait {
                 }
             });
         } else {
-
             static::creating(function (CModel $model) {
                 $model->generateSlugOnCreate();
             });
@@ -61,7 +61,6 @@ trait CModel_HasSlug_HasSlugTrait {
     }
 
     protected function addSlug() {
-
         $this->ensureValidSlugOptions();
         $slug = $this->generateNonUniqueSlug();
         if ($this->slugOptions->generateUniqueSlugs) {
@@ -90,7 +89,7 @@ trait CModel_HasSlug_HasSlugTrait {
             return substr($slugSourceString, 0, $this->slugOptions->maximumLength);
         }
         $slugSourceString = c::collect($this->slugOptions->generateSlugFrom)
-                ->map(function ( $fieldName) {
+                ->map(function ($fieldName) {
                     return carr::get($this, $fieldName, '');
                 })
                 ->implode($this->slugOptions->slugSeparator);
@@ -121,7 +120,6 @@ trait CModel_HasSlug_HasSlugTrait {
     }
 
     protected static function usesValidating() {
-
         if (in_array('CModel_Validating_ValidatingTrait', class_uses(static::class))) {
             return true;
         }
@@ -139,5 +137,4 @@ trait CModel_HasSlug_HasSlugTrait {
             throw InvalidOptionException::invalidMaximumLength();
         }
     }
-
 }
