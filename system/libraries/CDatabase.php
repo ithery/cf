@@ -431,10 +431,9 @@ class CDatabase {
     /**
      * Selects the column names for a database query.
      *
-     * @param   string  string or array of column names to select
-     * @param mixed $sql
+     * @param string $sql string or array of column names to select
      *
-     * @return Database_Core This Database object.
+     * @return CDatabase This Database object.
      */
     public function select($sql = '*') {
         if (func_num_args() > 1) {
@@ -472,10 +471,9 @@ class CDatabase {
     /**
      * Selects the from table(s) for a database query.
      *
-     * @param   string  string or array of tables to select
-     * @param mixed $sql
+     * @param string $sql string or array of tables to select
      *
-     * @return Database_Core This Database object.
+     * @return CDatabase This Database object.
      */
     public function from($sql) {
         if (func_num_args() > 1) {
@@ -514,16 +512,12 @@ class CDatabase {
     /**
      * Generates the JOIN portion of the query.
      *
-     * @param   string        table name
-     * @param   string|array  where key or array of key => value pairs
-     * @param   string        where value
-     * @param   string        type of join
-     * @param mixed      $table
-     * @param mixed      $key
-     * @param null|mixed $value
-     * @param mixed      $type
+     * @param string       $table table name
+     * @param string|array $key   where key or array of key => value pairs
+     * @param string       $value where value
+     * @param string       $type  type of join
      *
-     * @return Database_Core This Database object.
+     * @return CDatabase This Database object.
      */
     public function join($table, $key, $value = null, $type = '') {
         $join = [];
@@ -588,14 +582,11 @@ class CDatabase {
     /**
      * Selects the where(s) for a database query.
      *
-     * @param   string|array  key name or array of key => value pairs
-     * @param   string        value to match with key
-     * @param   boolean       disable quoting of WHERE clause
-     * @param mixed      $key
-     * @param null|mixed $value
-     * @param mixed      $quote
+     * @param string|array $key   key name or array of key => value pairs
+     * @param string       $value value to match with key
+     * @param boolean      $quote disable quoting of WHERE clause
      *
-     * @return Database_Core This Database object.
+     * @return CDatabase This Database object.
      */
     public function where($key, $value = null, $quote = true) {
         $quote = (func_num_args() < 2 and !is_array($key)) ? -1 : $quote;
@@ -618,14 +609,11 @@ class CDatabase {
     /**
      * Selects the or where(s) for a database query.
      *
-     * @param   string|array  key name or array of key => value pairs
-     * @param   string        value to match with key
-     * @param   boolean       disable quoting of WHERE clause
-     * @param mixed      $key
-     * @param null|mixed $value
-     * @param mixed      $quote
+     * @param string|array $key   key name or array of key => value pairs
+     * @param string       $value value to match with key
+     * @param boolean      $quote disable quoting of WHERE clause
      *
-     * @return Database_Core This Database object.
+     * @return CDatabase This Database object.
      */
     public function orwhere($key, $value = null, $quote = true) {
         $quote = (func_num_args() < 2 and !is_array($key)) ? -1 : $quote;
@@ -648,14 +636,11 @@ class CDatabase {
     /**
      * Selects the like(s) for a database query.
      *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        like value to match with field
-     * @param   boolean       automatically add starting and ending wildcards
-     * @param mixed $field
-     * @param mixed $match
-     * @param mixed $auto
+     * @param string|array $field field name or array of field => match pairs
+     * @param string       $match like value to match with field
+     * @param boolean      $auto  automatically add starting and ending wildcards
      *
-     * @return Database_Core This Database object.
+     * @return CDatabase This Database object.
      */
     public function like($field, $match = '', $auto = true) {
         $fields = is_array($field) ? $field : [$field => $match];
@@ -671,14 +656,11 @@ class CDatabase {
     /**
      * Selects the or like(s) for a database query.
      *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        like value to match with field
-     * @param   boolean       automatically add starting and ending wildcards
-     * @param mixed $field
-     * @param mixed $match
-     * @param mixed $auto
+     * @param string|array $field field name or array of field => match pairs
+     * @param string       $match like value to match with field
+     * @param boolean      $auto  automatically add starting and ending wildcards
      *
-     * @return Database_Core This Database object.
+     * @return CDatabase This Database object.
      */
     public function orlike($field, $match = '', $auto = true) {
         $fields = is_array($field) ? $field : [$field => $match];
@@ -694,14 +676,11 @@ class CDatabase {
     /**
      * Selects the not like(s) for a database query.
      *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        like value to match with field
-     * @param   boolean       automatically add starting and ending wildcards
-     * @param mixed $field
-     * @param mixed $match
-     * @param mixed $auto
+     * @param string|array $field field name or array of field => match pairs
+     * @param string       $match like value to match with field
+     * @param boolean      $auto  automatically add starting and ending wildcards
      *
-     * @return Database_Core This Database object.
+     * @return CDatabase This Database object.
      */
     public function notlike($field, $match = '', $auto = true) {
         $fields = is_array($field) ? $field : [$field => $match];
@@ -717,13 +696,11 @@ class CDatabase {
     /**
      * Selects the or not like(s) for a database query.
      *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        like value to match with field
-     * @param mixed $field
-     * @param mixed $match
-     * @param mixed $auto
+     * @param string|array $field field name or array of field => match pairs
+     * @param string       $match like value to match with field
+     * @param mixed        $auto
      *
-     * @return Database_Core This Database object.
+     * @return CDatabase This Database object.
      */
     public function ornotlike($field, $match = '', $auto = true) {
         $fields = is_array($field) ? $field : [$field => $match];
@@ -739,12 +716,10 @@ class CDatabase {
     /**
      * Selects the like(s) for a database query.
      *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        like value to match with field
-     * @param mixed $field
-     * @param mixed $match
+     * @param string|array $field field name or array of field => match pairs
+     * @param string       $match like value to match with field
      *
-     * @return Database_Core This Database object.
+     * @return CDatabase This Database object.
      */
     public function regex($field, $match = '') {
         $fields = is_array($field) ? $field : [$field => $match];
@@ -753,200 +728,6 @@ class CDatabase {
             $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
             $this->where[] = $this->driver->regex($field, $match, 'AND ', count($this->where));
         }
-
-        return $this;
-    }
-
-    /**
-     * Selects the or like(s) for a database query.
-     *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        like value to match with field
-     * @param mixed $field
-     * @param mixed $match
-     *
-     * @return Database_Core This Database object.
-     */
-    public function orregex($field, $match = '') {
-        $fields = is_array($field) ? $field : [$field => $match];
-
-        foreach ($fields as $field => $match) {
-            $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
-            $this->where[] = $this->driver->regex($field, $match, 'OR ', count($this->where));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Selects the not regex(s) for a database query.
-     *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        regex value to match with field
-     * @param mixed $field
-     * @param mixed $match
-     *
-     * @return Database_Core This Database object.
-     */
-    public function notregex($field, $match = '') {
-        $fields = is_array($field) ? $field : [$field => $match];
-
-        foreach ($fields as $field => $match) {
-            $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
-            $this->where[] = $this->driver->notregex($field, $match, 'AND ', count($this->where));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Selects the or not regex(s) for a database query.
-     *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        regex value to match with field
-     * @param mixed $field
-     * @param mixed $match
-     *
-     * @return Database_Core This Database object.
-     */
-    public function ornotregex($field, $match = '') {
-        $fields = is_array($field) ? $field : [$field => $match];
-
-        foreach ($fields as $field => $match) {
-            $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
-            $this->where[] = $this->driver->notregex($field, $match, 'OR ', count($this->where));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Chooses the column to group by in a select query.
-     *
-     * @param   string  column name to group by
-     * @param mixed $by
-     *
-     * @return Database_Core This Database object.
-     */
-    public function groupby($by) {
-        if (!is_array($by)) {
-            $by = explode(',', (string) $by);
-        }
-
-        foreach ($by as $val) {
-            $val = trim($val);
-
-            if ($val != '') {
-                // Add the table prefix if we are using table.column names
-                if (strpos($val, '.')) {
-                    $val = $this->config['table_prefix'] . $val;
-                }
-
-                $this->groupby[] = $this->driver->escape_column($val);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Selects the having(s) for a database query.
-     *
-     * @param   string|array  key name or array of key => value pairs
-     * @param   string        value to match with key
-     * @param   boolean       disable quoting of WHERE clause
-     * @param mixed $key
-     * @param mixed $value
-     * @param mixed $quote
-     *
-     * @return Database_Core This Database object.
-     */
-    public function having($key, $value = '', $quote = true) {
-        $this->having[] = $this->driver->where($key, $value, 'AND', count($this->having), true);
-        return $this;
-    }
-
-    /**
-     * Selects the or having(s) for a database query.
-     *
-     * @param   string|array  key name or array of key => value pairs
-     * @param   string        value to match with key
-     * @param   boolean       disable quoting of WHERE clause
-     * @param mixed $key
-     * @param mixed $value
-     * @param mixed $quote
-     *
-     * @return Database_Core This Database object.
-     */
-    public function orhaving($key, $value = '', $quote = true) {
-        $this->having[] = $this->driver->where($key, $value, 'OR', count($this->having), true);
-        return $this;
-    }
-
-    /**
-     * Chooses which column(s) to order the select query by.
-     *
-     * @param   string|array  column(s) to order on, can be an array, single column, or comma seperated list of columns
-     * @param   string        direction of the order
-     * @param mixed      $orderby
-     * @param null|mixed $direction
-     *
-     * @return Database_Core This Database object.
-     */
-    public function orderby($orderby, $direction = null) {
-        if (!is_array($orderby)) {
-            $orderby = [$orderby => $direction];
-        }
-
-        foreach ($orderby as $column => $direction) {
-            $direction = strtoupper(trim($direction));
-
-            // Add a direction if the provided one isn't valid
-            if (!in_array($direction, ['ASC', 'DESC', 'RAND()', 'RANDOM()', 'NULL'])) {
-                $direction = 'ASC';
-            }
-
-            // Add the table prefix if a table.column was passed
-            if (strpos($column, '.')) {
-                $column = $this->config['table_prefix'] . $column;
-            }
-
-            $this->orderby[] = $this->driver->escape_column($column) . ' ' . $direction;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Selects the limit section of a query.
-     *
-     * @param   integer  number of rows to limit result to
-     * @param   integer  offset in result to start returning rows from
-     * @param mixed      $limit
-     * @param null|mixed $offset
-     *
-     * @return Database_Core This Database object.
-     */
-    public function limit($limit, $offset = null) {
-        $this->limit = (int) $limit;
-
-        if ($offset !== null or !is_int($this->offset)) {
-            $this->offset($offset);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Sets the offset portion of a query.
-     *
-     * @param   integer  offset value
-     * @param mixed $value
-     *
-     * @return Database_Core This Database object.
-     */
-    public function offset($value) {
-        $this->offset = (int) $value;
 
         return $this;
     }

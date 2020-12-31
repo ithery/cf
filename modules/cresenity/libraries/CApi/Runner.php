@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CApi_Runner {
-
     private static $instance;
 
     public static function instance() {
@@ -17,7 +16,6 @@ class CApi_Runner {
     }
 
     public function __construct() {
-        
     }
 
     public function runMethod(CApi_MethodAbstract $method) {
@@ -25,5 +23,4 @@ class CApi_Runner {
 
         return $method->toArray();
     }
-
 }

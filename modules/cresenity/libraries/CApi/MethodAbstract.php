@@ -6,7 +6,6 @@
  * @author Hery
  */
 abstract class CApi_MethodAbstract implements CInterface_Arrayable {
-
     protected $errCode = 0;
     protected $errMessage = '';
     protected $data = [];
@@ -20,5 +19,4 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
             'data' => $this->data,
         ];
     }
-
 }

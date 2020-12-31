@@ -123,5 +123,217 @@ trait CTrait_Compat_Database {
     public function list_fields($table = '') {
         return $this->listFields($table);
     }
+
+    /**
+     * Selects the or like(s) for a database query.
+     *
+     * @param   string|array  field name or array of field => match pairs
+     * @param   string        like value to match with field
+     * @param mixed $field
+     * @param mixed $match
+     *
+     * @return Database_Core This Database object.
+     *
+     * @deprecated
+     */
+    public function orregex($field, $match = '') {
+        $fields = is_array($field) ? $field : [$field => $match];
+
+        foreach ($fields as $field => $match) {
+            $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
+            $this->where[] = $this->driver->regex($field, $match, 'OR ', count($this->where));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Selects the not regex(s) for a database query.
+     *
+     * @param   string|array  field name or array of field => match pairs
+     * @param   string        regex value to match with field
+     * @param mixed $field
+     * @param mixed $match
+     *
+     * @return Database_Core This Database object.
+     *
+     * @deprecated
+     */
+    public function notregex($field, $match = '') {
+        $fields = is_array($field) ? $field : [$field => $match];
+
+        foreach ($fields as $field => $match) {
+            $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
+            $this->where[] = $this->driver->notregex($field, $match, 'AND ', count($this->where));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Selects the or not regex(s) for a database query.
+     *
+     * @param   string|array  field name or array of field => match pairs
+     * @param   string        regex value to match with field
+     * @param mixed $field
+     * @param mixed $match
+     *
+     * @return Database_Core This Database object.
+     *
+     * @deprecated
+     */
+    public function ornotregex($field, $match = '') {
+        $fields = is_array($field) ? $field : [$field => $match];
+
+        foreach ($fields as $field => $match) {
+            $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
+            $this->where[] = $this->driver->notregex($field, $match, 'OR ', count($this->where));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Chooses the column to group by in a select query.
+     *
+     * @param   string  column name to group by
+     * @param mixed $by
+     *
+     * @return Database_Core This Database object.
+     *
+     * @deprecated
+     */
+    public function groupby($by) {
+        if (!is_array($by)) {
+            $by = explode(',', (string) $by);
+        }
+
+        foreach ($by as $val) {
+            $val = trim($val);
+
+            if ($val != '') {
+                // Add the table prefix if we are using table.column names
+                if (strpos($val, '.')) {
+                    $val = $this->config['table_prefix'] . $val;
+                }
+
+                $this->groupby[] = $this->driver->escape_column($val);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Selects the having(s) for a database query.
+     *
+     * @param   string|array  key name or array of key => value pairs
+     * @param   string        value to match with key
+     * @param   boolean       disable quoting of WHERE clause
+     * @param mixed $key
+     * @param mixed $value
+     * @param mixed $quote
+     *
+     * @return Database_Core This Database object.
+     *
+     * @deprecated
+     */
+    public function having($key, $value = '', $quote = true) {
+        $this->having[] = $this->driver->where($key, $value, 'AND', count($this->having), true);
+        return $this;
+    }
+
+    /**
+     * Selects the or having(s) for a database query.
+     *
+     * @param   string|array  key name or array of key => value pairs
+     * @param   string        value to match with key
+     * @param   boolean       disable quoting of WHERE clause
+     * @param mixed $key
+     * @param mixed $value
+     * @param mixed $quote
+     *
+     * @return Database_Core This Database object.
+     *
+     * @deprecated
+     */
+    public function orhaving($key, $value = '', $quote = true) {
+        $this->having[] = $this->driver->where($key, $value, 'OR', count($this->having), true);
+        return $this;
+    }
+
+    /**
+     * Chooses which column(s) to order the select query by.
+     *
+     * @param   string|array  column(s) to order on, can be an array, single column, or comma seperated list of columns
+     * @param   string        direction of the order
+     * @param mixed      $orderby
+     * @param null|mixed $direction
+     *
+     * @return Database_Core This Database object.
+     *
+     * @deprecated
+     */
+    public function orderby($orderby, $direction = null) {
+        if (!is_array($orderby)) {
+            $orderby = [$orderby => $direction];
+        }
+
+        foreach ($orderby as $column => $direction) {
+            $direction = strtoupper(trim($direction));
+
+            // Add a direction if the provided one isn't valid
+            if (!in_array($direction, ['ASC', 'DESC', 'RAND()', 'RANDOM()', 'NULL'])) {
+                $direction = 'ASC';
+            }
+
+            // Add the table prefix if a table.column was passed
+            if (strpos($column, '.')) {
+                $column = $this->config['table_prefix'] . $column;
+            }
+
+            $this->orderby[] = $this->driver->escape_column($column) . ' ' . $direction;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Selects the limit section of a query.
+     *
+     * @param   integer  number of rows to limit result to
+     * @param   integer  offset in result to start returning rows from
+     * @param mixed      $limit
+     * @param null|mixed $offset
+     *
+     * @return CDatabase This Database object.
+     *
+     * @deprecated
+     */
+    public function limit($limit, $offset = null) {
+        $this->limit = (int) $limit;
+
+        if ($offset !== null or !is_int($this->offset)) {
+            $this->offset($offset);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets the offset portion of a query.
+     *
+     * @param   integer  offset value
+     * @param mixed $value
+     *
+     * @return Database_Core This Database object.
+     *
+     * @deprecated 1.1
+     */
+    public function offset($value) {
+        $this->offset = (int) $value;
+
+        return $this;
+    }
 }
 // @codingStandardsIgnoreEnd

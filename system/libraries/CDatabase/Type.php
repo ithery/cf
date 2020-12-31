@@ -1,10 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Aug 18, 2018, 10:57:55 AM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 
@@ -12,10 +14,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * The base class for mapping types.
  *
  * A Type object is obtained by calling the static {@link getType()} method.
- *
  */
 abstract class CDatabase_Type {
-
     const TARRAY = 'array';
     const SIMPLE_ARRAY = 'simple_array';
     const JSON_ARRAY = 'json_array';
@@ -88,14 +88,13 @@ abstract class CDatabase_Type {
      * Prevents instantiation and forces use of the factory method.
      */
     final private function __construct() {
-        
     }
 
     /**
      * Converts a value from its PHP representation to its database representation
      * of this type.
      *
-     * @param mixed                                     $value    The value to convert.
+     * @param mixed              $value    The value to convert.
      * @param CDatabase_Platform $platform The currently used database platform.
      *
      * @return mixed The database representation of the value.
@@ -108,7 +107,7 @@ abstract class CDatabase_Type {
      * Converts a value from its database representation to its PHP representation
      * of this type.
      *
-     * @param mixed                                     $value    The value to convert.
+     * @param mixed              $value    The value to convert.
      * @param CDatabase_Platform $platform The currently used database platform.
      *
      * @return mixed The PHP representation of the value.
@@ -133,8 +132,8 @@ abstract class CDatabase_Type {
     /**
      * Gets the SQL declaration snippet for a field of this type.
      *
-     * @param array                     $fieldDeclaration The field declaration.
-     * @param \CDatabase_Platform       $platform         The currently used database platform.
+     * @param array               $fieldDeclaration The field declaration.
+     * @param \CDatabase_Platform $platform         The currently used database platform.
      *
      * @return string
      */
@@ -155,7 +154,7 @@ abstract class CDatabase_Type {
      *
      * @param string $name The name of the type (as returned by getName()).
      *
-     * @return \Doctrine\DBAL\Types\Type
+     * @return CDatabase_Type
      *
      * @throws \Doctrine\DBAL\DBALException
      */
@@ -178,11 +177,11 @@ abstract class CDatabase_Type {
      *
      * @return void
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws CDatabase_Exception
      */
     public static function addType($name, $className) {
         if (isset(self::$_typesMap[$name])) {
-            throw DBALException::typeExists($name);
+            throw CDatabase_Exception::typeExists($name);
         }
 
         self::$_typesMap[$name] = $className;
@@ -211,7 +210,7 @@ abstract class CDatabase_Type {
      */
     public static function overrideType($name, $className) {
         if (!isset(self::$_typesMap[$name])) {
-            throw DBALException::typeNotFound($name);
+            throw CDatabase_Exception::typeNotFound($name);
         }
 
         if (isset(self::$_typeObjects[$name])) {
@@ -269,7 +268,7 @@ abstract class CDatabase_Type {
     /**
      * Modifies the SQL expression (identifier, parameter) to convert to a database value.
      *
-     * @param string                                    $sqlExpr
+     * @param string             $sqlExpr
      * @param CDatabase_Platform $platform
      *
      * @return string
@@ -281,7 +280,7 @@ abstract class CDatabase_Type {
     /**
      * Modifies the SQL expression (identifier, parameter) to convert to a PHP value.
      *
-     * @param string                                    $sqlExpr
+     * @param string             $sqlExpr
      * @param CDatabase_Platform $platform
      *
      * @return string
@@ -314,5 +313,4 @@ abstract class CDatabase_Type {
     public function requiresSQLCommentHint(CDatabase_Platform $platform) {
         return false;
     }
-
 }
