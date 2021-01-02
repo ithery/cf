@@ -735,10 +735,8 @@ class CDatabase {
     /**
      * Allows key/value pairs to be set for inserting or updating.
      *
-     * @param   string|array  key name or array of key => value pairs
-     * @param   string        value to match with key
-     * @param mixed $key
-     * @param mixed $value
+     * @param string|array $key   key name or array of key => value pairs
+     * @param string       $value value to match with key
      *
      * @return Database_Core This Database object.
      */
@@ -762,12 +760,9 @@ class CDatabase {
     /**
      * Compiles the select statement based on the other functions called and runs the query.
      *
-     * @param   string  table name
-     * @param   string  limit clause
-     * @param   string  offset clause
-     * @param mixed      $table
-     * @param null|mixed $limit
-     * @param null|mixed $offset
+     * @param string      $table  table name
+     * @param null|string $limit  limit clause
+     * @param null|string $offset offset clause
      *
      * @return CDatabase_Result
      */
@@ -794,14 +789,10 @@ class CDatabase {
     /**
      * Compiles the select statement based on the other functions called and runs the query.
      *
-     * @param   string  table name
-     * @param   array   where clause
-     * @param   string  limit clause
-     * @param   string  offset clause
-     * @param mixed      $table
-     * @param null|mixed $where
-     * @param null|mixed $limit
-     * @param null|mixed $offset
+     * @param string $table  table name
+     * @param array  $where  where clause
+     * @param string $limit  limit clause
+     * @param string $offset offset clause
      *
      * @return Database_Core This Database object.
      */
@@ -830,12 +821,9 @@ class CDatabase {
     /**
      * Compiles the select statement based on the other functions called and returns the query string.
      *
-     * @param   string  table name
-     * @param   string  limit clause
-     * @param   string  offset clause
-     * @param mixed      $table
-     * @param null|mixed $limit
-     * @param null|mixed $offset
+     * @param string $table  table name
+     * @param string $limit  limit clause
+     * @param string $offset offset clause
      *
      * @return string sql string
      */
@@ -858,10 +846,8 @@ class CDatabase {
     /**
      * Compiles an insert string and runs the query.
      *
-     * @param   string  table name
-     * @param   array   array of key/value pairs to insert
-     * @param mixed      $table
-     * @param null|mixed $set
+     * @param string $table table name
+     * @param array  $set   array of key/value pairs to insert
      *
      * @return CDatabase_Result Query result
      */
@@ -921,12 +907,12 @@ class CDatabase {
     /**
      * Adds a "NOT IN" condition to the where clause
      *
-     * @param   string  Name of the column being examined
-     * @param   mixed   An array or string to match against
-     * @param mixed $field
-     * @param mixed $values
+     * @param string $field  Name of the column being examined
+     * @param mixed  $values An array or string to match against
      *
-     * @return Database_Core This Database object.
+     * @return CDatabase This Database object.
+     *
+     * @deprecated 1.1
      */
     public function notin($field, $values) {
         return $this->in($field, $values, true);
@@ -935,10 +921,8 @@ class CDatabase {
     /**
      * Compiles a merge string and runs the query.
      *
-     * @param   string  table name
-     * @param   array   array of key/value pairs to merge
-     * @param mixed      $table
-     * @param null|mixed $set
+     * @param string $table table name
+     * @param array  $set   array of key/value pairs to merge
      *
      * @return CDatabase_Result Query result
      */
@@ -966,12 +950,9 @@ class CDatabase {
     /**
      * Compiles an update string and runs the query.
      *
-     * @param   string  table name
-     * @param   array   associative array of update values
-     * @param   array   where clause
-     * @param mixed      $table
-     * @param null|mixed $set
-     * @param null|mixed $where
+     * @param string $table table name
+     * @param array  $set   associative array of update values
+     * @param array  $where where clause
      *
      * @return CDatabase_Result Query result
      */
@@ -1003,10 +984,8 @@ class CDatabase {
     /**
      * Compiles a delete string and runs the query.
      *
-     * @param   string  table name
-     * @param   array   where clause
-     * @param mixed      $table
-     * @param null|mixed $where
+     * @param string $table table name
+     * @param array  $where where clause
      *
      * @return CDatabase_Result Query result
      */
@@ -1056,10 +1035,8 @@ class CDatabase {
     /**
      * Count query records.
      *
-     * @param   string   table name
-     * @param   array    where clause
-     * @param mixed      $table
-     * @param null|mixed $where
+     * @param string $table table name
+     * @param array  $where where clause
      *
      * @return integer
      */
@@ -1123,10 +1100,8 @@ class CDatabase {
     /**
      * See if a table exists in the database.
      *
-     * @param   string   table name
-     * @param   boolean  True to attach table prefix
-     * @param mixed $table_name
-     * @param mixed $prefix
+     * @param string  $table_name table name
+     * @param boolean $prefix     True to attach table prefix
      *
      * @return boolean
      */
@@ -1140,10 +1115,8 @@ class CDatabase {
     /**
      * Combine a SQL statement with the bind values. Used for safe queries.
      *
-     * @param   string  query to bind to the values
-     * @param   array   array of values to bind to the query
-     * @param mixed $sql
-     * @param mixed $binds
+     * @param string $sql   query to bind to the values
+     * @param array  $binds array of values to bind to the query
      *
      * @return string
      */

@@ -229,7 +229,7 @@ abstract class CDatabase_Type {
      * @return int
      */
     public function getBindingType() {
-        return ParameterType::STRING;
+        return CDatabase_ParameterType::STRING;
     }
 
     /**

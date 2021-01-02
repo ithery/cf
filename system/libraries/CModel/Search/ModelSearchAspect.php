@@ -1,25 +1,30 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 28, 2019, 9:34:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 28, 2019, 9:34:34 PM
  */
 class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
-
-    /** @var CModel */
+    /**
+     * @var CModel
+     */
     protected $model;
 
-    /** @var callable */
+    /**
+     * @var callable
+     */
     protected $callback;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $attributes = [];
-    
-    
-    protected $explodeWord=false;
+
+    protected $explodeWord = false;
 
     public static function forModel(/* string $model, ...$attributes */) {
         $args = func_get_args();
@@ -29,9 +34,9 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
     }
 
     /**
-     * @param string $model
+     * @param string         $model
      * @param array|\Closure $attributes
-     *
+     * @param null|mixed     $callback
      */
     public function __construct($model, $attributes = [], $callback = null) {
         $this->callback = $callback;
@@ -59,12 +64,12 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
     }
 
     public function addSearchableAttribute($attribute, $partial = true) {
-        $this->attributes[] = SearchableAttribute::create($attribute, $partial);
+        $this->attributes[] = CModel_Search_SearchableAttribute::create($attribute, $partial);
         return $this;
     }
 
     public function addExactSearchableAttribute($attribute) {
-        $this->attributes[] = SearchableAttribute::createExact($attribute);
+        $this->attributes[] = CModel_Search_SearchableAttribute::createExact($attribute);
         return $this;
     }
 
@@ -80,13 +85,13 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
         if (empty($this->attributes)) {
             throw CModel_Search_Exception_InvalidModelSearchAspectException::noSearchableAttributes($this->model);
         }
-        $query = call_user_func(array($this->model, 'query'));
+        $query = call_user_func([$this->model, 'query']);
 
         $this->addSearchConditions($query, $term);
         if (is_callable($this->callback)) {
-            $query = call_user_func_array($this->callback, array($query));
+            $query = call_user_func_array($this->callback, [$query]);
         }
-       
+
         if ($page != null && $perPage != null) {
             return $query->paginate($perPage, ['*'], 'page', $page);
         }
@@ -95,12 +100,12 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
 
     protected function addSearchConditions(CModel_Query $query, $term) {
         $attributes = $this->attributes;
-        $searchTerms=$term;
-        if($this->explodeWord) {
+        $searchTerms = $term;
+        if ($this->explodeWord) {
             $searchTerms = explode(' ', $term);
-        } 
-        if(!is_array($searchTerms)) {
-            $searchTerms = array($searchTerms);
+        }
+        if (!is_array($searchTerms)) {
+            $searchTerms = [$searchTerms];
         }
         $query->where(function (CModel_Query $query) use ($attributes, $term, $searchTerms) {
             foreach (carr::wrap($attributes) as $attribute) {
@@ -112,5 +117,4 @@ class CModel_Search_ModelSearchAspect extends CModel_Search_SearchAspect {
             }
         });
     }
-
 }
