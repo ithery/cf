@@ -1,13 +1,10 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 4:43:18 PM
  * @license Ittron Global Teknologi <ittron.co.id>
- */
-/*
  * This file is part of the DebugBar package.
  *
  * (c) 2013 Maxime Bouroumeau-Fuseau
@@ -20,29 +17,31 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * Formats data to be outputed as string
  */
 interface CDebug_Interface_DataFormatterInterface {
-
     /**
      * Transforms a PHP variable to a string representation
      *
-     * @param mixed $var
+     * @param mixed $data
+     *
      * @return string
      */
-    function formatVar($data);
+    public function formatVar($data);
 
     /**
      * Transforms a duration in seconds in a readable string
      *
      * @param float $seconds
+     *
      * @return string
      */
-    function formatDuration($seconds);
+    public function formatDuration($seconds);
 
     /**
      * Transforms a size in bytes to a human readable string
      *
-     * @param string $size
+     * @param string  $size
      * @param integer $precision
+     *
      * @return string
      */
-    function formatBytes($size, $precision = 2);
+    public function formatBytes($size, $precision = 2);
 }

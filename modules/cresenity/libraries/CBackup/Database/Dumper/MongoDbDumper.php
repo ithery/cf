@@ -1,21 +1,18 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Symfony\Component\Process\Process;
 
 class CBackup_Database_Dumper_MongoDbDumper extends CBackup_Database_AbstractDumper {
-
     protected $port = 27017;
 
-    /** @var null|string */
+    /**
+     * @var null|string
+     */
     protected $collection = null;
 
-    /** @var null|string */
+    /**
+     * @var null|string
+     */
     protected $authenticationDatabase = null;
 
     /**
@@ -23,8 +20,8 @@ class CBackup_Database_Dumper_MongoDbDumper extends CBackup_Database_AbstractDum
      *
      * @param string $dumpFile
      *
-     * @throws \Spatie\DbDumper\Exceptions\CannotStartDump
-     * @throws \Spatie\DbDumper\Exceptions\DumpFailed
+     * @throws \CBackup_Database_Exception_CannotStartDumpException
+     * @throws \CBackup_Database_Exception_DumpFailedException
      */
     public function dumpToFile($dumpFile) {
         $this->guardAgainstIncompleteCredentials();
@@ -37,7 +34,8 @@ class CBackup_Database_Dumper_MongoDbDumper extends CBackup_Database_AbstractDum
     /**
      * Verifies if the dbname and host options are set.
      *
-     * @throws \Spatie\DbDumper\Exceptions\CannotStartDump
+     * @throws \CBackup_Database_Exception_CannotStartDumpException
+     *
      * @return void
      */
     protected function guardAgainstIncompleteCredentials() {
@@ -102,5 +100,4 @@ class CBackup_Database_Dumper_MongoDbDumper extends CBackup_Database_AbstractDum
         }
         return $this->echoToFile(implode(' ', $command), $filename);
     }
-
 }

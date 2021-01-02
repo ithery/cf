@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 6:21:24 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 6:21:24 PM
  */
 
 /**
  * Collects data about SQL statements executed with PDO
  */
 class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface, CDebug_DataCollector_AssetProviderInterface {
-
     protected $timeCollector;
     protected $queries = [];
     protected $renderSqlWithParams = false;
@@ -26,25 +26,27 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     /**
      * @param TimeDataCollector $timeCollector
      */
-    public function __construct(CDebugTimeDataCollector $timeCollector = null) {
+    public function __construct(CDebug_DataCollector_TimeDataCollector $timeCollector = null) {
         $this->timeCollector = $timeCollector;
         $this->setDataFormatter(new CDebug_DataFormatter_QueryFormatter());
         $db = CDatabase::instance();
         try {
-            $db->listenOnQueryExecuted(function ($query) use ($db) {
-
-                $bindings = $query->bindings;
-                $time = $query->time;
-                $connection = $query->connection;
-                $sql = $query->sql;
-                $this->addQuery($sql, $bindings, $time, $connection);
-            }
+            $db->listenOnQueryExecuted(
+                function ($query) use ($db) {
+                    $bindings = $query->bindings;
+                    $time = $query->time;
+                    $connection = $query->connection;
+                    $sql = $query->sql;
+                    $this->addQuery($sql, $bindings, $time, $connection);
+                }
             );
         } catch (\Exception $e) {
             CDebug::bar()->addThrowable(
-                    new Exception(
-                    'Cannot add listen to Queries for Debugbar: ' . $e->getMessage(), $e->getCode(), $e
-                    )
+                new Exception(
+                    'Cannot add listen to Queries for Debugbar: ' . $e->getMessage(),
+                    $e->getCode(),
+                    $e
+                )
             );
         }
     }
@@ -53,7 +55,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
      * Renders the SQL of traced statements with params embedded
      *
      * @param boolean $enabled
-     * @param string $quotationChar NOT USED
+     * @param string  $quotationChar NOT USED
      */
     public function setRenderSqlWithParams($enabled = true, $quotationChar = "'") {
         $this->renderSqlWithParams = $enabled;
@@ -71,7 +73,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     /**
      * Enable/disable finding the source
      *
-     * @param bool $value
+     * @param bool  $value
      * @param array $middleware
      */
     public function setFindSource($value, array $middleware) {
@@ -82,8 +84,8 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     /**
      * Enable/disable the EXPLAIN queries
      *
-     * @param  bool $enabled
-     * @param  array|null $types Array of types to explain queries (select/insert/update/delete)
+     * @param bool       $enabled
+     * @param array|null $types   Array of types to explain queries (select/insert/update/delete)
      */
     public function setExplainSource($enabled, $types) {
         $this->explainQuery = $enabled;
@@ -93,10 +95,9 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     }
 
     /**
-     *
-     * @param string $query
-     * @param array $bindings
-     * @param float $time
+     * @param string    $query
+     * @param array     $bindings
+     * @param float     $time
      * @param CDatabase $db
      */
     public function addQuery($query, $bindings, $time, $db) {
@@ -126,7 +127,6 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
         try {
             $source = $this->findSource();
         } catch (\Exception $e) {
-            
         }
         $this->queries[] = [
             'query' => $query,
@@ -148,12 +148,16 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
      *
      * Perform simple regex analysis on the code
      *
+     * @param string $query
+     *
      * @package xplain (https://github.com/rap2hpoutre/mysql-xplain-xplain)
+     *
      * @author e-doceo
      * @copyright 2014
+     *
      * @version $Id$
      * @access public
-     * @param string $query
+     *
      * @return string
      */
     protected function performQueryAnalysis($query) {
@@ -199,24 +203,25 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     /**
      * Parse a trace element from the backtrace stack.
      *
-     * @param  int    $index
-     * @param  array  $trace
+     * @param int   $index
+     * @param array $trace
+     *
      * @return object|bool
      */
     protected function parseTrace($index, array $trace) {
         $frame = (object) [
-                    'index' => $index,
-                    'namespace' => null,
-                    'name' => null,
-                    'line' => isset($trace['line']) ? $trace['line'] : '?',
+            'index' => $index,
+            'namespace' => null,
+            'name' => null,
+            'line' => isset($trace['line']) ? $trace['line'] : '?',
         ];
         if (isset($trace['function']) && $trace['function'] == 'substituteBindings') {
             $frame->name = 'Route binding';
             return $frame;
         }
-        if (isset($trace['class']) &&
-                isset($trace['file']) &&
-                !$this->fileIsInExcludedPath($trace['file'])
+        if (isset($trace['class'])
+                && isset($trace['file'])
+                && !$this->fileIsInExcludedPath($trace['file'])
         ) {
             $file = $trace['file'];
 
@@ -230,6 +235,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
      * Check if the given file is to be excluded from analysis
      *
      * @param string $file
+     *
      * @return bool
      */
     protected function fileIsInExcludedPath($file) {
@@ -251,6 +257,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
      * Shorten the path by removing the relative links and base dir
      *
      * @param string $path
+     *
      * @return string
      */
     protected function normalizeFilename($path) {
@@ -262,8 +269,10 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
 
     /**
      * Collect a database transaction event.
-     * @param  string $event
+     *
+     * @param string                          $event
      * @param \Illuminate\Database\Connection $connection
+     *
      * @return array
      */
     public function collectTransactionEvent($event, $connection) {
@@ -272,7 +281,6 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
             try {
                 $source = $this->findSource();
             } catch (\Exception $e) {
-                
             }
         }
         $this->queries[] = [
@@ -352,24 +360,23 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
      */
     public function getWidgets() {
         return [
-            "queries" => [
-                "icon" => "database",
-                "widget" => "PhpDebugBar.Widgets.CFSQLQueriesWidget",
-                "map" => "queries",
-                "default" => "[]"
+            'queries' => [
+                'icon' => 'database',
+                'widget' => 'PhpDebugBar.Widgets.CFSQLQueriesWidget',
+                'map' => 'queries',
+                'default' => '[]'
             ],
-            "queries:badge" => [
-                "map" => "queries.nb_statements",
-                "default" => 0
+            'queries:badge' => [
+                'map' => 'queries.nb_statements',
+                'default' => 0
             ]
         ];
     }
 
     public function getAssets() {
-        return array(
-            'css' => array('debug/debugbar/widgets/sqlqueries/widget.css'),
-            'js' => array('debug/debugbar/widgets/cfsqlqueries/widget.js')
-        );
+        return [
+            'css' => ['debug/debugbar/widgets/sqlqueries/widget.css'],
+            'js' => ['debug/debugbar/widgets/cfsqlqueries/widget.js']
+        ];
     }
-
 }

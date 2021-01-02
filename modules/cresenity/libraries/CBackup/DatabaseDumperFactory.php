@@ -1,19 +1,12 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CBackup_DatabaseDumperFactory {
-
     protected static $custom = [];
 
     public static function createFromConnection($dbConnectionName) {
         $dbConfig = $dbConnectionName;
-        if(!is_array($dbConfig)) {
-             $dbConfig = CF::config('database.' . $dbConnectionName);
+        if (!is_array($dbConfig)) {
+            $dbConfig = CF::config('database.' . $dbConnectionName);
         }
         if (!is_array($dbConfig)) {
             throw CBackup_Exception_CannotCreateDatabaseDumperException::unsupportedDriver($dbConnectionName);
@@ -21,7 +14,8 @@ class CBackup_DatabaseDumperFactory {
 
         if (isset($dbConfig['read'])) {
             $dbConfig = carr::except(
-                            array_merge($dbConfig, $dbConfig['read']), ['read', 'write']
+                array_merge($dbConfig, $dbConfig['read']),
+                ['read', 'write']
             );
         }
         $connection = carr::get($dbConfig, 'connection');
@@ -32,12 +26,11 @@ class CBackup_DatabaseDumperFactory {
         $port = carr::get($connection, 'port');
         $host = carr::first(carr::wrap(carr::get($connection, 'host', '')));
 
-
         $dbDumper = static::forDriver($driver)
-                ->setHost($host)
-                ->setDbName($dbName)
-                ->setUserName($username)
-                ->setPassword($password);
+            ->setHost($host)
+            ->setDbName($dbName)
+            ->setUserName($username)
+            ->setPassword($password);
         if ($dbDumper instanceof CBackup_Database_Dumper_MySqlDumper) {
             $dbDumper->setDefaultCharacterSet(carr::get($dbConfig, 'character_set', ''));
         }
@@ -92,7 +85,7 @@ class CBackup_DatabaseDumperFactory {
         return $dbDumper;
     }
 
-    protected static function callMethodOnDumper(DbDumper $dbDumper, $methodName, $methodValue) {
+    protected static function callMethodOnDumper(CBackup_Database_AbstractDumper $dbDumper, $methodName, $methodValue) {
         if (!$methodValue) {
             $dbDumper->$methodName();
             return $dbDumper;
@@ -101,11 +94,10 @@ class CBackup_DatabaseDumperFactory {
         return $dbDumper;
     }
 
-    protected static function determineValidMethodName(DbDumper $dbDumper, $methodName) {
+    protected static function determineValidMethodName(CBackup_Database_AbstractDumper $dbDumper, $methodName) {
         return c::collect([$methodName, 'set' . ucfirst($methodName)])
-                        ->first(function ( $methodName) use ($dbDumper) {
+                        ->first(function ($methodName) use ($dbDumper) {
                             return method_exists($dbDumper, $methodName);
                         }, '');
     }
-
 }

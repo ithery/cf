@@ -1,23 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 1:09:21 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 1:09:21 PM
  */
 class CDebug_Bar_Config {
+    protected $config = [];
 
-    protected $config = array();
-
-    public function __construct(array $config = array()) {
+    public function __construct(array $config = []) {
         $this->config = $config;
     }
 
-    public function setOptions(array $config = array()) {
+    public function setOptions(array $config = []) {
         $this->config = $config;
         return $this;
     }
-
 }

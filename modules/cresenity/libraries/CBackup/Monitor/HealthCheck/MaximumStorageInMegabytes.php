@@ -1,14 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CBackup_Monitor_HealthCheck_MaximumStorageInMegabytes extends CBackup_Monitor_AbstractHealthCheck {
-
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $maximumSizeInMegaBytes;
 
     public function __construct($maximumSizeInMegaBytes = 5000) {
@@ -18,10 +13,11 @@ class CBackup_Monitor_HealthCheck_MaximumStorageInMegabytes extends CBackup_Moni
     public function checkHealth(CBackup_BackupDestination $backupDestination) {
         $usageInBytes = $backupDestination->usedStorage();
         $this->failIf(
-                $this->exceedsAllowance($usageInBytes), clang::__('backup.unhealthy_backup_found_full', [
-                    ':disk_usage' => $this->humanReadableSize($usageInBytes),
-                    ':disk_limit' => $this->humanReadableSize($this->bytes($this->maximumSizeInMegaBytes)),
-                ])
+            $this->exceedsAllowance($usageInBytes),
+            clang::__('backup.unhealthy_backup_found_full', [
+                ':disk_usage' => $this->humanReadableSize($usageInBytes),
+                ':disk_limit' => $this->humanReadableSize($this->bytes($this->maximumSizeInMegaBytes)),
+            ])
         );
     }
 
@@ -36,5 +32,4 @@ class CBackup_Monitor_HealthCheck_MaximumStorageInMegabytes extends CBackup_Moni
     protected function humanReadableSize($sizeInBytes) {
         return CBackup_Helper::formatHumanReadableSize($sizeInBytes);
     }
-
 }
