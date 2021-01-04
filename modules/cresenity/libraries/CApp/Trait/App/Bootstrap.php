@@ -118,51 +118,52 @@ trait CApp_Trait_App_Bootstrap {
 
     public static function registerControl() {
         if (!static::$registerControlBooted) {
+            CFBenchmark::start('CApp.RegisterControl');
             $manager = CManager::instance();
+            $manager->registerControls([
+                'text' => CElement_FormInput_Text::class,
+                'number' => CElement_FormInput_Number::class,
+                'email' => CElement_FormInput_Email::class,
+                'datepicker' => CElement_FormInput_Date::class,
+                'material-datetime' => CElement_FormInput_DateTime_MaterialDateTime::class,
+                'daterange-picker' => CElement_FormInput_DateRange::class,
+                'daterange-dropdown' => CElement_FormInput_DateRange_Dropdown::class,
+                'daterange-button' => CElement_FormInput_DateRange_DropdownButton::class,
+                'currency' => CElement_FormInput_Currency::class,
+                'auto-numeric' => CElement_FormInput_AutoNumeric::class,
+                'time' => CElement_FormInput_Time::class,
+                'timepicker' => CElement_FormInput_Time::class,
+                'clock' => CElement_FormInput_Clock::class,
+                'clockpicker' => CElement_FormInput_Clock::class,
+                'image' => CElement_FormInput_Image::class,
+                'image-ajax' => CElement_FormInput_ImageAjax::class,
+                'multi-image-ajax' => CElement_FormInput_MultipleImageAjax::class,
+                'file-ajax' => CElement_FormInput_FileAjax::class,
+                'password' => CElement_FormInput_Password::class,
+                'select' => CElement_FormInput_Select::class,
+                'minicolor' => CElement_FormInput_MiniColor::class,
+                'map-picker' => CElement_FormInput_MapPicker::class,
+                'hidden' => CElement_FormInput_Hidden::class,
+                'select-tag' => CElement_FormInput_SelectTag::class,
+                'selectsearch' => CFormInputSelectSearch::class,
+                'checkbox' => CElement_FormInput_Checkbox::class,
+                'checkbox-list' => CFormInputCheckboxList::class,
+                'switcher' => CFormInputCheckboxList::class,
+                'summernote' => CElement_FormInput_Textarea_Summernote::class,
+            ]);
 
-            $manager->registerControl('text', 'CElement_FormInput_Text');
-            $manager->registerControl('number', 'CElement_FormInput_Number');
-            $manager->registerControl('email', 'CElement_FormInput_Email');
-            $manager->registerControl('datepicker', 'CElement_FormInput_Date');
-            $manager->registerControl('date', 'CElement_FormInput_Date');
-            $manager->registerControl('material-datetime', 'CElement_FormInput_DateTime_MaterialDateTime');
-            $manager->registerControl('daterange-picker', 'CElement_FormInput_DateRange');
-            $manager->registerControl('daterange-dropdown', 'CElement_FormInput_DateRange_Dropdown');
-            $manager->registerControl('daterange-button', 'CElement_FormInput_DateRange_DropdownButton');
-            $manager->registerControl('currency', 'CElement_FormInput_Currency');
-            $manager->registerControl('auto-numeric', 'CElement_FormInput_AutoNumeric');
-            $manager->registerControl('time', CElement_FormInput_Time::class);
-            $manager->registerControl('timepicker', 'CElement_FormInput_Time');
-            $manager->registerControl('clock', 'CElement_FormInput_Clock');
-            $manager->registerControl('clockpicker', 'CElement_FormInput_Clock');
-            $manager->registerControl('image', 'CElement_FormInput_Image');
-            $manager->registerControl('image-ajax', 'CElement_FormInput_ImageAjax');
-            $manager->registerControl('multi-image-ajax', 'CElement_FormInput_MultipleImageAjax');
-            $manager->registerControl('file', 'CFormInputFile');
-            $manager->registerControl('file-ajax', 'CElement_FormInput_FileAjax');
-            $manager->registerControl('password', 'CElement_FormInput_Password');
-            $manager->registerControl('textarea', 'CElement_FormInput_Textarea');
-            $manager->registerControl('select', 'CElement_FormInput_Select');
-            $manager->registerControl('minicolor', 'CElement_FormInput_MiniColor');
-            $manager->registerControl('map-picker', CElement_FormInput_MapPicker::class);
-
-            $manager->registerControl('select-tag', 'CElement_FormInput_SelectTag');
-
-            $manager->registerControl('selectsearch', 'CFormInputSelectSearch');
-            $manager->registerControl('label', 'CFormInputLabel');
-            $manager->registerControl('checkbox', CElement_FormInput_Checkbox::class);
-            $manager->registerControl('checkbox-list', 'CFormInputCheckboxList');
-            $manager->registerControl('switcher', 'CElement_FormInput_Checkbox_Switcher');
-            $manager->registerControl('summernote', 'CElement_FormInput_Textarea_Summernote');
             $manager->registerControl('quill', 'CElement_FormInput_Textarea_Quill');
-            $manager->registerControl('wysiwyg', 'CFormInputWysiwyg');
-            $manager->registerControl('ckeditor', 'CFormInputCKEditor');
-            $manager->registerControl('hidden', 'CFormInputHidden');
             $manager->registerControl('radio', 'CFormInputRadio');
+            $manager->registerControl('label', 'CFormInputLabel');
+            $manager->registerControl('file', 'CFormInputFile');
+            $manager->registerControl('ckeditor', 'CFormInputCKEditor');
             $manager->registerControl('filedrop', 'CFormInputFileDrop');
             $manager->registerControl('slider', 'CFormInputSlider');
             $manager->registerControl('tooltip', 'CFormInputTooltip');
             $manager->registerControl('fileupload', 'CFormInputFileUpload');
+            $manager->registerControl('wysiwyg', 'CFormInputWysiwyg');
+            CFBenchmark::stop('CApp.RegisterControl');
+
             static::$registerControlBooted = true;
         }
     }

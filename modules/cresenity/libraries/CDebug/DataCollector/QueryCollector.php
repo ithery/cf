@@ -241,50 +241,14 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     }
 
     /**
-     * Check if the given file is to be excluded from analysis
-     *
-     * @param string $file
-     *
-     * @return bool
-     */
-    protected function fileIsInExcludedPath($file) {
-        $excludedPaths = [
-            '/system/core/',
-            '/system/libraries/',
-            '/modules/cresenity/libraries/CDebug/',
-        ];
-        $normalizedPath = str_replace('\\', '/', $file);
-        foreach ($excludedPaths as $excludedPath) {
-            if (strpos($normalizedPath, $excludedPath) !== false) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Shorten the path by removing the relative links and base dir
-     *
-     * @param string $path
-     *
-     * @return string
-     */
-    protected function normalizeFilename($path) {
-        if (file_exists($path)) {
-            $path = realpath($path);
-        }
-        return str_replace(DOCROOT, '', $path);
-    }
-
-    /**
      * Collect a database transaction event.
      *
-     * @param  string $event
+     * @param string                          $event
      * @param \Illuminate\Database\Connection $connection
+     *
      * @return array
      */
-    public function collectTransactionEvent($event, $connection)
-    {
+    public function collectTransactionEvent($event, $connection) {
         $source = [];
 
         if ($this->findSource) {

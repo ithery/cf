@@ -1,29 +1,28 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 3, 2018, 2:38:26 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 3, 2018, 2:38:26 PM
  */
 trait CTrait_Element_Property_Placeholder {
-
     /**
-     *
-     * @var string 
+     * @var string
      */
     public $placeholder;
 
     /**
-     *
-     * @var string 
+     * @var string
      */
     public $rawPlaceholder;
 
     /**
-     * 
      * @param string $placeholder
+     * @param mixed  $lang
+     *
      * @return $this
      */
     public function setPlaceholder($placeholder, $lang = true) {
@@ -36,16 +35,13 @@ trait CTrait_Element_Property_Placeholder {
     }
 
     /**
-     * 
      * @return string
      */
     public function getPlaceholder() {
         return $this->rawPlaceholder;
     }
 
-    
     /**
-     * 
      * @return string
      */
     public function getTranslationPlaceholder() {

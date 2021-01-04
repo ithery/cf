@@ -198,14 +198,13 @@ final class CF {
         // Set locale information
         self::$locale = setlocale(LC_ALL, $locale);
 
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
         static::loadBootstrapFiles();
 
         // Setup is complete, prevent it from being run again
         $run = true;
 
         // Stop the environment setup routine
-
-        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
     }
 
     /**
@@ -216,23 +215,29 @@ final class CF {
     private static function loadBootstrapFiles() {
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_bootstrap');
 
+        CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_system_bootstrap');
         $bootstrapPath = DOCROOT . 'system' . DS;
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_system_bootstrap');
         //try to locate bootstrap files for modules
+        CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_module_bootstrap');
         foreach (CF::modules() as $module) {
             $bootstrapPath = DOCROOT . 'modules' . DS . $module . DS;
             if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
                 include $bootstrapPath . 'bootstrap' . EXT;
             }
         }
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_module_bootstrap');
 
         //try to locate bootstrap files for application
+        CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_application_bootstrap');
         $bootstrapPath = DOCROOT . 'application' . DS . CF::appCode() . DS;
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_application_bootstrap');
 
         //try to locate bootstrap files for org
         if (strlen(CF::orgCode()) > 0) {

@@ -14,7 +14,7 @@ final class CManager {
     protected $mobile_path = '';
     protected $theme_data = null;
     protected static $langObjectCallback = null;
-    protected static $useRequireJs = null;
+    protected static $useRequireJs = false;
 
     /**
      * @var CManager_Javascript
@@ -140,6 +140,13 @@ final class CManager {
      */
     public static function unregisterModule($module) {
         return CClientModules::instance()->unregisterModule($module);
+    }
+
+    public function registerControls($controls) {
+        foreach ($controls as $type => $class) {
+            $this->controls[$type] = $class;
+            $this->controls_code[$type] = '';
+        }
     }
 
     /**

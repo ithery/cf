@@ -66,6 +66,20 @@ class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataC
 
             $params['listeners.' . $i] = $listener;
         }
+
+        $source = null;
+        try {
+            $source = $this->findSource();
+        } catch (Exception $ex) {
+        }
+        if ($source != null) {
+            $trace = $this->prepareParams(c::collect($source)->map(function ($value) {
+                return $value->name . ':' . $value->line;
+            })->all());
+
+            $params['trace'] = htmlentities($this->getDataFormatter()->formatVar($trace), ENT_QUOTES, 'UTF-8', false);
+        }
+
         $this->addMeasure($name, $this->previousTime, $currentTime, $params);
         $this->previousTime = $currentTime;
     }
@@ -78,7 +92,7 @@ class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataC
     protected function prepareParams($params) {
         $data = [];
         foreach ($params as $key => $value) {
-            if (is_object($value) && cstr::is('Illuminate\*\Events\*', get_class($value))) {
+            if (is_object($value)) {
                 $value = $this->prepareParams(get_object_vars($value));
             }
             $data[$key] = htmlentities($this->getDataFormatter()->formatVar($value), ENT_QUOTES, 'UTF-8', false);
@@ -90,6 +104,54 @@ class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataC
         $data = parent::collect();
         $data['nb_measures'] = count($data['measures']);
         return $data;
+    }
+
+    /**
+     * Use a backtrace to search for the origins of the events.
+     *
+     * @return array
+     */
+    protected function findSource() {
+        $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS | DEBUG_BACKTRACE_PROVIDE_OBJECT, 50);
+
+        $sources = [];
+
+        foreach ($stack as $index => $trace) {
+            $sources[] = $this->parseTrace($index, $trace);
+        }
+
+        return array_filter($sources);
+    }
+
+    /**
+     * Parse a trace element from the backtrace stack.
+     *
+     * @param int   $index
+     * @param array $trace
+     *
+     * @return object|bool
+     */
+    protected function parseTrace($index, array $trace) {
+        $frame = (object) [
+            'index' => $index,
+            'namespace' => null,
+            'name' => null,
+            'line' => isset($trace['line']) ? $trace['line'] : '?',
+        ];
+        if (isset($trace['function']) && $trace['function'] == 'substituteBindings') {
+            $frame->name = 'Route binding';
+            return $frame;
+        }
+        if (isset($trace['class'])
+            && isset($trace['file'])
+            && !$this->fileIsInExcludedPath($trace['file'])
+        ) {
+            $file = $trace['file'];
+
+            $frame->name = $this->normalizeFilename($file);
+            return $frame;
+        }
+        return false;
     }
 
     public function getName() {

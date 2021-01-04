@@ -74,6 +74,14 @@ class CDebug_Bar extends CDebug_AbstractBar {
         $this->addCollector(new CDebug_DataCollector_ExceptionsCollector());
         $this->addCollector(new CDebug_DataCollector_ModelCollector());
 
+        CFBenchmark::onStopCallback(function ($name, $data) use ($timeDataCollector) {
+            $timeDataCollector->addMeasure($name, carr::get($data, 'start'), carr::get($data, 'stop'));
+        });
+        $completedBenchmarks = CFBenchmark::completed();
+        foreach ($completedBenchmarks as $name => $data) {
+            $timeDataCollector->addMeasure($name, carr::get($data, 'start'), carr::get($data, 'stop'));
+        }
+
         $this->startMeasure('application', 'Application');
 
         //if (CHelper::request()->isAjax()) {

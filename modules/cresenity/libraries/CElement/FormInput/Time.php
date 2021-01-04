@@ -31,21 +31,6 @@ class CElement_FormInput_Time extends CElement_FormInput {
         CManager::instance()->registerModule('timepicker');
     }
 
-    public function set_show_meridian($bool) {
-        $this->show_meridian = $bool;
-        return $this;
-    }
-
-    public function set_show_second($bool) {
-        $this->show_second = $bool;
-        return $this;
-    }
-
-    public function set_minute_step($step) {
-        $this->minute_step = $step;
-        return $this;
-    }
-
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);

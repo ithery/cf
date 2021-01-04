@@ -249,9 +249,18 @@ class CDebug_Bar_Renderer {
                     } catch (Exception $ex) {
                     }
                 } else {
+                    $original = null;
+                    if ($response instanceof CHTTP_Response && $response->getOriginalContent()) {
+                        $original = $response->getOriginalContent();
+                    }
                     $output = $response->getContent();
                     $output = $renderer->replaceJavascriptCode($output);
                     $response->setContent($output);
+                    $response->headers->remove('Content-Length');
+                    // Restore original response (eg. the View or Ajax data)
+                    if ($original) {
+                        $response->original = $original;
+                    }
                 }
             }
         });

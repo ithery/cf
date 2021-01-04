@@ -8,6 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 final class CFBenchmark {
     // Benchmark timestamps
     private static $marks;
+    private static $onStopCallback;
 
     /**
      * Set a benchmark start point.
@@ -42,6 +43,11 @@ final class CFBenchmark {
         if (isset(self::$marks[$name]) and self::$marks[$name][0]['stop'] === false) {
             self::$marks[$name][0]['stop'] = microtime(true);
             self::$marks[$name][0]['memory_stop'] = self::memoryUsage();
+
+            if (static::$onStopCallback != null) {
+                $callback = static::$onStopCallback;
+                $callback($name, static::$marks[$name][0]);
+            }
         }
     }
 
@@ -106,6 +112,24 @@ final class CFBenchmark {
         }
 
         return $func ? memory_get_usage() : 0;
+    }
+
+    public static function all() {
+        return static::$marks;
+    }
+
+    public static function completed() {
+        $completed = [];
+        foreach (static::all() as $key => $marks) {
+            if ($marks[0]['stop'] !== false) {
+                $completed[$key] = $marks[0];
+            }
+        }
+        return $completed;
+    }
+
+    public static function onStopCallback($callback) {
+        static::$onStopCallback = $callback;
     }
 }
 

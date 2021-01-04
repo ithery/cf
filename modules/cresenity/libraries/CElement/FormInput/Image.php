@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 24, 2018, 6:55:42 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 24, 2018, 6:55:42 PM
  */
 class CElement_FormInput_Image extends CElement_FormInput {
-
     use CElement_Trait_Template,
         CTrait_Compat_Element_FormInput_Image;
 
@@ -16,20 +16,18 @@ class CElement_FormInput_Image extends CElement_FormInput {
     protected $maxWidth;
     protected $maxHeight;
     protected $disabledUpload;
-   
 
     public function __construct($id) {
         parent::__construct($id);
-        $this->type = "image";
-        $this->tag = "div";
+        $this->type = 'image';
+        $this->tag = 'div';
         $this->imgSrc = CApp_Base::noImageUrl();
-        $this->maxWidth = "200";
-        $this->maxHeight = "150";
+        $this->maxWidth = '200';
+        $this->maxHeight = '150';
         $this->disabledUpload = false;
         $this->templateName = 'CElement/FormInput/Image';
 
-        $this->onBeforeParse(function() {
-
+        $this->onBeforeParse(function () {
             $this->setVar('id', $this->id);
             $this->setVar('imgSrc', $this->imgSrc);
             $this->setVar('maxWidth', $this->maxWidth);
@@ -75,5 +73,4 @@ class CElement_FormInput_Image extends CElement_FormInput {
 
         return $js;
     }
-
 }

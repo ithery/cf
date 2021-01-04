@@ -6,6 +6,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
+ * @see CApp
  * @since Jul 27, 2019, 10:23:46 PM
  */
 trait CApp_Trait_App_Renderer {
@@ -177,8 +178,9 @@ HTML;
 
             $js .= PHP_EOL . $this->js . $additional_js;
             $jsScriptFile = '';
-
-            if ($this->isUseRequireJs()) {
+            $isUseRequireJs = $this->isUseRequireJs();
+            $isUseRequireJs = false;
+            if ($isUseRequireJs) {
                 $js = $asset->renderJsRequire($js);
             } else {
                 $jsScriptFile = PHP_EOL . '<script>' . $asset->varJs() . '</script>';
@@ -187,10 +189,6 @@ HTML;
                 $jsScriptFile .= PHP_EOL . $asset->render(CManager_Asset::POS_END, CManager_Asset::TYPE_JS_FILE);
 
                 $js = $asset->wrapJs($js, true);
-            }
-
-            if (ccfg::get('minify_js')) {
-                $js = CJSMin::minify($js);
             }
 
             /*
