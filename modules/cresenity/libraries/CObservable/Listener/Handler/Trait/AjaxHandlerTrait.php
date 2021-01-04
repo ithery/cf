@@ -4,23 +4,22 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Apr 17, 2019, 11:23:04 PM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
     protected $method;
 
     /**
-     * url for ajax handler type
+     * Url for ajax handler type
      *
      * @var string $url
      */
     protected $url;
 
     /**
-     * @var string $urlParam
+     * @var array $urlParam
      */
     protected $urlParam = [];
 
@@ -38,7 +37,7 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
     }
 
     public function addUrlParam($k, $urlParam) {
-        $this->urlParam[$k] = $url_param;
+        $this->urlParam[$k] = $urlParam;
         return $this;
     }
 
@@ -47,8 +46,8 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
 
         if (strlen($link) == 0) {
             $ajaxUrl = CAjax::createMethod()->setType('handler_' . $this->name)
-                    ->setData('json', $this->content->json())
-                    ->makeUrl();
+                ->setData('json', $this->content->json())
+                ->makeUrl();
             $link = $ajaxUrl;
         }
 
