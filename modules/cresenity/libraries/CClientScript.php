@@ -5,7 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CClientScript extends CObject {
     use CTrait_Compat_ClientScript;
 
-    protected static $_instance;
+    protected static $instance;
 
     /**
      * POS CONST
@@ -28,7 +28,7 @@ class CClientScript extends CObject {
     const TYPE_PLAIN = CManager_Asset::TYPE_PLAIN;
 
     /**
-     * array of all type script
+     * Array of all type script
      *
      * @var array
      */
@@ -55,10 +55,10 @@ class CClientScript extends CObject {
      * @return CClientScript
      */
     public static function instance() {
-        if (self::$_instance == null) {
-            self::$_instance = new CClientScript();
+        if (static::$instance == null) {
+            static::$instance = new CClientScript();
         }
-        return self::$_instance;
+        return static::$instance;
     }
 
     public function registerJsFiles($files, $pos = CManager_Asset::POS_END) {
@@ -121,10 +121,6 @@ class CClientScript extends CObject {
         return CManager::asset()->runTime()->registerPlain($plain, $pos);
     }
 
-    public function create_js_hash() {
-        return CResource::instance('js')->create_hash($this->jsFiles());
-    }
-
     public function urlJsFile() {
         return CManager::asset()->getAllJsFileUrl();
     }
@@ -141,18 +137,6 @@ class CClientScript extends CObject {
             }
         }
         return $cssFileArray;
-    }
-
-    public function create_css_hash() {
-        return CResource::instance('css')->create_hash($this->cssFiles());
-    }
-
-    public function js($hash) {
-        return CResource::instance('js')->load($hash);
-    }
-
-    public function css($hash) {
-        return CResource::instance('css')->load($hash);
     }
 
     public function manifest() {

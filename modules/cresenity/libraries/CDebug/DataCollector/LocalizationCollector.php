@@ -1,44 +1,44 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 5:08:47 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 5:08:47 PM
  */
 
 /**
  * Collects info about the current localization state
  */
 class CDebug_DataCollector_LocalizationCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
-
     /**
      * Get the current locale
      *
      * @return string
      */
     public function getLocale() {
-        return setlocale(LC_ALL, 0);
+        return CF::getLocale();
     }
 
     /**
-     * Get the current translations domain
+     * Get the current domain
      *
      * @return string
      */
     public function getDomain() {
-        return textdomain(null);
+        return CF::domain();
     }
 
     /**
      * @return array
      */
     public function collect() {
-        return array(
+        return [
             'locale' => $this->getLocale(),
             'domain' => $this->getDomain(),
-        );
+        ];
     }
 
     /**
@@ -52,16 +52,13 @@ class CDebug_DataCollector_LocalizationCollector extends CDebug_DataCollector im
      * @return array
      */
     public function getWidgets() {
-        return array(
-            'domain' => array(
-                'icon' => 'bookmark',
-                'map' => 'localization.domain',
-            ),
-            'locale' => array(
+        return [
+            'locale' => [
                 'icon' => 'flag',
                 'map' => 'localization.locale',
-            )
-        );
+                'tooltip' => 'Current locale',
+                'default' => ''
+            ]
+        ];
     }
-
 }

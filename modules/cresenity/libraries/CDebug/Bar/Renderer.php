@@ -1,56 +1,54 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Aug 22, 2018, 1:20:44 PM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class CDebug_Bar_Renderer {
-
     /**
-     *
      * @var CDebug_Bar
      */
     protected $debugBar;
 
     /**
-     *
      * @var string
      */
     protected $javascriptClass = 'PhpDebugBar.DebugBar';
 
     /**
-     *
      * @var string
      */
     protected $variableName = 'phpdebugbar';
-    protected $controls = array();
-    protected $ignoredCollectors = array();
+    protected $controls = [];
+    protected $ignoredCollectors = [];
     protected $ajaxHandlerClass = 'PhpDebugBar.AjaxHandler';
     protected $ajaxHandlerBindToJquery = true;
     protected $ajaxHandlerBindToXHR = false;
     protected $ajaxHandlerAutoShow = true;
     protected $openHandlerClass = 'PhpDebugBar.OpenHandler';
     protected $openHandlerUrl;
-    protected $cssFiles = array(
+    protected $cssFiles = [
         'debug/debugbar.css',
         'debug/debugbar/widgets.css',
         'debug/debugbar/openhandler.css',
         'debug/debugbar/font-awesome/css/font-awesome.min.css',
         'debug/debugbar/highlightjs/styles/github.css',
         'debug/debugbar-custom.css',
-    );
-    protected $jsFiles = array(
+    ];
+    protected $jsFiles = [
         'debug/debugbar.js',
         'debug/debugbar/widgets.js',
         'debug/debugbar/openhandler.js',
         'debug/debugbar/highlightjs/highlight.pack.js',
-    );
+    ];
 
     const REPLACEABLE_TAG = '<!-- CAPP-DEBUGBAR-CODE -->';
     const REPLACEABLE_JS_TAG = '/* CAPP-DEBUGBAR-CODE */';
@@ -62,10 +60,9 @@ class CDebug_Bar_Renderer {
     public function populateAssets() {
         $cssFiles = $this->cssFiles;
         $jsFiles = $this->jsFiles;
-        $inlineCss = array();
-        $inlineJs = array();
-        $inlineHead = array();
-
+        $inlineCss = [];
+        $inlineJs = [];
+        $inlineHead = [];
 
         // finds assets provided by collectors
         foreach ($this->debugBar->getCollectors() as $collector) {
@@ -74,7 +71,6 @@ class CDebug_Bar_Renderer {
             }
         }
         foreach ($additionalAssets as $assets) {
-
             if (isset($assets['css'])) {
                 $cssFiles = array_merge($cssFiles, $assets['css']);
             }
@@ -116,8 +112,9 @@ class CDebug_Bar_Renderer {
      *
      * AJAX request should not render the initialization code.
      *
-     * @param boolean $initialize Whether or not to render the debug bar initialization code
+     * @param boolean $initialize        Whether or not to render the debug bar initialization code
      * @param boolean $renderStackedData Whether or not to render the stacked data
+     *
      * @return string
      */
     public function getJavascriptCode($initialize = true, $renderStackedData = true) {
@@ -154,7 +151,7 @@ class CDebug_Bar_Renderer {
             }
         }
         if ($this->openHandlerUrl !== null) {
-            $js .= sprintf("%s.setOpenHandler(new %s(%s));\n", $this->variableName, $this->openHandlerClass, json_encode(array("url" => $this->openHandlerUrl)));
+            $js .= sprintf("%s.setOpenHandler(new %s(%s));\n", $this->variableName, $this->openHandlerClass, json_encode(['url' => $this->openHandlerUrl]));
         }
         return $js;
     }
@@ -165,14 +162,15 @@ class CDebug_Bar_Renderer {
      * Controls can be defined by collectors themselves or using {@see addControl()}
      *
      * @param string $varname Debug bar's variable name
+     *
      * @return string
      */
     protected function getJsControlsDefinitionCode($varname) {
         $js = '';
-        $dataMap = array();
-        $excludedOptions = array('indicator', 'tab', 'map', 'default', 'widget', 'position');
+        $dataMap = [];
+        $excludedOptions = ['indicator', 'tab', 'map', 'default', 'widget', 'position'];
         // finds controls provided by collectors
-        $widgets = array();
+        $widgets = [];
         foreach ($this->debugBar->getCollectors() as $collector) {
             if (($collector instanceof CDebug_Bar_Interface_RenderableInterface) && !in_array($collector->getName(), $this->ignoredCollectors)) {
                 if ($w = $collector->getWidgets()) {
@@ -189,18 +187,30 @@ class CDebug_Bar_Renderer {
                 if (!isset($opts['title'])) {
                     $opts['title'] = ucfirst(str_replace('_', ' ', $name));
                 }
-                $js .= sprintf("%s.addTab(\"%s\", new %s({%s%s}));\n", $varname, $name, isset($options['tab']) ? $options['tab'] : 'PhpDebugBar.DebugBar.Tab', substr(json_encode($opts, JSON_FORCE_OBJECT), 1, -1), isset($options['widget']) ? sprintf('%s"widget": new %s()', count($opts) ? ', ' : '', $options['widget']) : ''
+                $js .= sprintf(
+                    "%s.addTab(\"%s\", new %s({%s%s}));\n",
+                    $varname,
+                    $name,
+                    isset($options['tab']) ? $options['tab'] : 'PhpDebugBar.DebugBar.Tab',
+                    substr(json_encode($opts, JSON_FORCE_OBJECT), 1, -1),
+                    isset($options['widget']) ? sprintf('%s"widget": new %s()', count($opts) ? ', ' : '', $options['widget']) : ''
                 );
             } elseif (isset($options['indicator']) || isset($options['icon'])) {
-                $js .= sprintf("%s.addIndicator(\"%s\", new %s(%s), \"%s\");\n", $varname, $name, isset($options['indicator']) ? $options['indicator'] : 'PhpDebugBar.DebugBar.Indicator', json_encode($opts, JSON_FORCE_OBJECT), isset($options['position']) ? $options['position'] : 'right'
+                $js .= sprintf(
+                    "%s.addIndicator(\"%s\", new %s(%s), \"%s\");\n",
+                    $varname,
+                    $name,
+                    isset($options['indicator']) ? $options['indicator'] : 'PhpDebugBar.DebugBar.Indicator',
+                    json_encode($opts, JSON_FORCE_OBJECT),
+                    isset($options['position']) ? $options['position'] : 'right'
                 );
             }
             if (isset($options['map']) && isset($options['default'])) {
-                $dataMap[$name] = array($options['map'], $options['default']);
+                $dataMap[$name] = [$options['map'], $options['default']];
             }
         }
         // creates the data mapping object
-        $mapJson = array();
+        $mapJson = [];
         foreach ($dataMap as $name => $values) {
             $mapJson[] = sprintf('"%s": ["%s", %s]', $name, $values[0], $values[1]);
         }
@@ -216,7 +226,7 @@ class CDebug_Bar_Renderer {
 
     public function apply() {
         $renderer = $this;
-        CEvent::dispatcher()->listen(CHTTP_Event_RequestHandled::class, function($event) use($renderer) {
+        CEvent::dispatcher()->listen(CHTTP_Event_RequestHandled::class, function ($event) use ($renderer) {
             $response = $event->response;
             if (!$renderer->isFileResponse($response)) {
                 if ($response instanceof CHTTP_JsonResponse) {
@@ -230,7 +240,6 @@ class CDebug_Bar_Renderer {
                         try {
                             $json = $jsonHelper->parse($output);
                         } catch (Exception $ex) {
-                            
                         }
                         if (is_array($json)) {
                             $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
@@ -238,7 +247,6 @@ class CDebug_Bar_Renderer {
                             $response->setContent($output);
                         }
                     } catch (Exception $ex) {
-                        
                     }
                 } else {
                     $output = $response->getContent();
@@ -253,12 +261,13 @@ class CDebug_Bar_Renderer {
      * Returns the js code needed to add a dataset
      *
      * @param string $requestId
-     * @param array $data
-     * @param mixed $suffix
+     * @param array  $data
+     * @param mixed  $suffix
+     *
      * @return string
      */
     protected function getAddDatasetCode($requestId, $data, $suffix = null) {
-        $js = sprintf("%s.addDataSet(%s, \"%s\"%s);\n", $this->variableName, json_encode($data), $requestId, $suffix ? ", " . json_encode($suffix) : '');
+        $js = sprintf("%s.addDataSet(%s, \"%s\"%s);\n", $this->variableName, json_encode($data), $requestId, $suffix ? ', ' . json_encode($suffix) : '');
         return $js;
     }
 
@@ -378,5 +387,4 @@ class CDebug_Bar_Renderer {
     public function getOpenHandlerUrl() {
         return $this->openHandlerUrl;
     }
-
 }

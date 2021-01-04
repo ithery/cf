@@ -65,6 +65,9 @@
         <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterCloseParenthesis"/>
         <exclude name="Squiz.ControlStructures.ControlSignature.SpaceAfterKeyword"/>
         <exclude name="PEAR.ControlStructures.MultiLineCondition.SpaceBeforeOpenBrace"/>
+        <exclude name="Generic.Commenting.DocComment.ContentAfterOpen"/>
+        <exclude name="Generic.Commenting.DocComment.ContentBeforeClose"/>
+
         <!-- Ignore that already defined in PSR-->
         <exclude name="PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
     </rule>

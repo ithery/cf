@@ -116,11 +116,11 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
     /**
      * Sets the variable dumper instance used by this collector
      *
-     * @param DebugBarVarDumper $varDumper
+     * @param CDebug_DataFormatter_DebugBarVarDumper $varDumper
      *
      * @return $this
      */
-    public function setVarDumper(DebugBarVarDumper $varDumper) {
+    public function setVarDumper(CDebug_DataFormatter_DebugBarVarDumper $varDumper) {
         $this->varDumper = $varDumper;
         return $this;
     }

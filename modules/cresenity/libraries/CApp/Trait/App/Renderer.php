@@ -193,12 +193,14 @@ HTML;
                 $js = CJSMin::minify($js);
             }
 
+            /*
             if (!$this->isUseRequireJs()) {
                 $bar = CDebug::bar();
                 if ($bar->isEnabled()) {
                     $js .= $bar->getJavascriptReplaceCode();
                 }
             }
+            */
 
             $viewData['js'] = $js;
 

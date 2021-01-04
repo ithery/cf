@@ -12,48 +12,65 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataCollector {
-    /** @var Dispatcher */
+    /**
+     * @var CEvent_Dispatcher
+     */
     protected $events;
+
+    /**
+     * @var integer
+     */
+    protected $previousTime;
 
     public function __construct($requestStartTime = null) {
         parent::__construct($requestStartTime);
+        $this->previousTime = microtime(true);
         $this->setDataFormatter(new CDebug_DataFormatter_SimpleFormatter());
+        $this->subscribe(CEvent::dispatcher());
     }
 
     public function onWildcardEvent($name = null, $data = []) {
         $params = $this->prepareParams($data);
-        $time = microtime(true);
+        $currentTime = microtime(true);
+
         // Find all listeners for the current event
         foreach ($this->events->getListeners($name) as $i => $listener) {
             // Check if it's an object + method name
             if (is_array($listener) && count($listener) > 1 && is_object($listener[0])) {
                 list($class, $method) = $listener;
+
                 // Skip this class itself
                 if ($class instanceof static) {
                     continue;
                 }
+
                 // Format the listener to readable format
                 $listener = get_class($class) . '@' . $method;
-            // Handle closures
             } elseif ($listener instanceof \Closure) {
+                // Handle closures
                 $reflector = new \ReflectionFunction($listener);
+
                 // Skip our own listeners
                 if ($reflector->getNamespaceName() == 'Barryvdh\Debugbar') {
                     continue;
                 }
+
                 // Format the closure to a readable format
-                $filename = ltrim(str_replace(base_path(), '', $reflector->getFileName()), '/');
-                $listener = $reflector->getName() . ' (' . $filename . ':' . $reflector->getStartLine() . '-' . $reflector->getEndLine() . ')';
+                $filename = ltrim(str_replace(DOCROOT, '', $reflector->getFileName()), '/');
+                $lines = $reflector->getStartLine() . '-' . $reflector->getEndLine();
+                $listener = $reflector->getName() . ' (' . $filename . ':' . $lines . ')';
             } else {
                 // Not sure if this is possible, but to prevent edge cases
                 $listener = $this->getDataFormatter()->formatVar($listener);
             }
+
             $params['listeners.' . $i] = $listener;
         }
-        $this->addMeasure($name, $time, $time, $params);
+        $this->addMeasure($name, $this->previousTime, $currentTime, $params);
+        $this->previousTime = $currentTime;
     }
 
-    public function subscribe(Dispatcher $events) {
+    public function subscribe(CEvent_Dispatcher $events) {
         $this->events = $events;
         $events->listen('*', [$this, 'onWildcardEvent']);
     }
