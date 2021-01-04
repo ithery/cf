@@ -53,6 +53,14 @@ class CDebug_DataCollector_LocalizationCollector extends CDebug_DataCollector im
      */
     public function getWidgets() {
         return [
+            /*
+            'domain' => [
+                'icon' => 'bookmark',
+                'map' => 'localization.domain',
+                'tooltip' => 'Current domain',
+                'default' => ''
+            ],
+            */
             'locale' => [
                 'icon' => 'flag',
                 'map' => 'localization.locale',
