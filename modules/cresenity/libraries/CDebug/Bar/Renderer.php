@@ -9,6 +9,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
+
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -103,8 +104,67 @@ class CDebug_Bar_Renderer {
         return self::REPLACEABLE_JS_TAG;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function renderHead() {
+        $html = '';
+        foreach ($this->cssFiles as $css) {
+            $cssRoute = curl::base() . 'modules/cresenity/media/css/' . $css;
+            $html .= "<link rel='stylesheet' type='text/css' property='stylesheet' href='{$cssRoute}'>" . PHP_EOL;
+        }
+        $jquery = curl::base() . 'media/js/libs/jquery-3.3.1/jquery-3.3.1.min.js';
+        $html .= "<script type='text/javascript' src='{$jquery}'></script>" . PHP_EOL;
+        foreach ($this->jsFiles as $js) {
+            $jsRoute = curl::base() . 'modules/cresenity/media/js/' . $js;
+            $html .= "<script type='text/javascript' src='{$jsRoute}'></script>" . PHP_EOL;
+        }
+        // finds assets provided by collectors
+        foreach ($this->debugBar->getCollectors() as $collector) {
+            if (($collector instanceof CDebug_DataCollector_AssetProviderInterface) && !in_array($collector->getName(), $this->ignoredCollectors)) {
+                $assets = $collector->getAssets();
+                foreach (carr::get($assets, 'css', []) as $css) {
+                    $cssRoute = curl::base() . 'modules/cresenity/media/css/' . $css;
+                    $html .= "<link rel='stylesheet' type='text/css' property='stylesheet' href='{$cssRoute}'>" . PHP_EOL;
+                }
+                foreach (carr::get($assets, 'js', []) as $js) {
+                    $jsRoute = curl::base() . 'modules/cresenity/media/js/' . $js;
+                    $html .= "<script type='text/javascript' src='{$jsRoute}'></script>" . PHP_EOL;
+                }
+                foreach (carr::get($assets, 'inline_head', []) as $inline) {
+                    $html .= $inline . PHP_EOL;
+                }
+            }
+        }
+        $html .= '<script type="text/javascript">jQuery.noConflict(true);</script>' . "\n";
+
+        return $html;
+    }
+
     public function replaceJavascriptCode($string) {
-        return str_replace($this->getJavascriptReplaceCode(), $this->getJavascriptCode(), $string);
+        $javascriptCode = $this->getJavascriptCode();
+        if (strpos($string, $this->getJavascriptReplaceCode()) !== false) {
+            $string = str_replace($this->getJavascriptReplaceCode(), $javascriptCode, $string);
+        } else {
+            $javascriptCode = '<script>' . $javascriptCode . '</script>';
+
+            // Try to put the js/css directly before the </head>
+            $pos = strripos($string, '</head>');
+            $head = $this->renderHead();
+            if (false !== $pos) {
+                $string = substr($string, 0, $pos) . $head . substr($string, $pos);
+            } else {
+                // Append the head before the widget
+                $javascriptCode = $head . $javascriptCode;
+            }
+            $pos = strripos($string, '</body>');
+            if (false !== $pos) {
+                $string = substr($string, 0, $pos) . $javascriptCode . substr($string, $pos);
+            } else {
+                $string = $string . $javascriptCode;
+            }
+        }
+        return $string;
     }
 
     /**
@@ -230,7 +290,7 @@ class CDebug_Bar_Renderer {
             $response = $event->response;
             $jsonHelper = CHelper::json();
             if (!$renderer->isFileResponse($response)) {
-                if ($response instanceof CHTTP_JsonResponse) {
+                if ($response instanceof CHTTP_JsonResponse && CApp::isAjax()) {
                     $output = $response->getContent();
                     try {
                         if (!headers_sent()) {
@@ -258,7 +318,7 @@ class CDebug_Bar_Renderer {
 
                     $isJson = false;
 
-                    if (cstr::startsWith(trim($output), '{')) {
+                    if (cstr::startsWith(trim($output), '{') && CApp::isAjax()) {
                         $json = null;
                         try {
                             $json = $jsonHelper->parse($output);
