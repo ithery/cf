@@ -1,17 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 4:53:08 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 4:53:08 PM
  */
 
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataCollector {
-
     /** @var Dispatcher */
     protected $events;
 
@@ -34,7 +34,7 @@ class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataC
                 }
                 // Format the listener to readable format
                 $listener = get_class($class) . '@' . $method;
-                // Handle closures
+            // Handle closures
             } elseif ($listener instanceof \Closure) {
                 $reflector = new \ReflectionFunction($listener);
                 // Skip our own listeners
@@ -81,11 +81,11 @@ class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataC
 
     public function getWidgets() {
         return [
-            "events" => [
-                "icon" => "tasks",
-                "widget" => "PhpDebugBar.Widgets.TimelineWidget",
-                "map" => "event",
-                "default" => "{}",
+            'events' => [
+                'icon' => 'tasks',
+                'widget' => 'PhpDebugBar.Widgets.TimelineWidget',
+                'map' => 'event',
+                'default' => '{}',
             ],
             'events:badge' => [
                 'map' => 'event.nb_measures',
@@ -93,5 +93,4 @@ class CDebug_DataCollector_EventCollector extends CDebug_DataCollector_TimeDataC
             ],
         ];
     }
-
 }

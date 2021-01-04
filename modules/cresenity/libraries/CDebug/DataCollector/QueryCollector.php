@@ -220,8 +220,8 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
             return $frame;
         }
         if (isset($trace['class'])
-                && isset($trace['file'])
-                && !$this->fileIsInExcludedPath($trace['file'])
+            && isset($trace['file'])
+            && !$this->fileIsInExcludedPath($trace['file'])
         ) {
             $file = $trace['file'];
 

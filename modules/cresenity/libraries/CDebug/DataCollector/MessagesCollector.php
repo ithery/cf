@@ -55,11 +55,11 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
     /**
      * Sets the variable dumper instance used by this collector
      *
-     * @param DebugBarVarDumper $varDumper
+     * @param CDebug_DataFormatter_DebugBarVarDumper $varDumper
      *
      * @return $this
      */
-    public function setVarDumper(DebugBarVarDumper $varDumper) {
+    public function setVarDumper(CDebug_DataFormatter_DebugBarVarDumper $varDumper) {
         $this->varDumper = $varDumper;
         return $this;
     }
@@ -132,9 +132,9 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
     /**
      * Aggregates messages from other collectors
      *
-     * @param MessagesAggregateInterface $messages
+     * @param CDebug_DataCollector_MessagesAggregateInterface $messages
      */
-    public function aggregate(MessagesAggregateInterface $messages) {
+    public function aggregate(CDebug_DataCollector_MessagesAggregateInterface $messages) {
         $this->aggregates[] = $messages;
     }
 
