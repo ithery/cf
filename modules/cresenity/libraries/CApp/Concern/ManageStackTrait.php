@@ -1,17 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Dec 7, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Dec 7, 2020
  */
 trait CApp_Concern_ManageStackTrait {
-    
-    
-    protected $renderCount=0;
-    
+    protected $renderCount = 0;
+
     /**
      * All of the finished, captured push sections.
      *
@@ -36,12 +35,12 @@ trait CApp_Concern_ManageStackTrait {
     /**
      * Start injecting content into a push section.
      *
-     * @param  string  $section
-     * @param  string  $content
+     * @param string $section
+     * @param string $content
+     *
      * @return void
      */
     public function startPush($section, $content = '') {
-        
         if ($content === '') {
             if (ob_start()) {
                 $this->pushStack[] = $section;
@@ -61,20 +60,19 @@ trait CApp_Concern_ManageStackTrait {
     public function stopPush() {
         if (empty($this->pushStack)) {
             throw new InvalidArgumentException('Cannot end a push stack without first starting one.');
-        }   
-        
+        }
+
         return c::tap(array_pop($this->pushStack), function ($last) {
-            
             $this->extendPush($last, ob_get_clean());
-          
         });
     }
 
     /**
      * Append content to a given push section.
      *
-     * @param  string  $section
-     * @param  string  $content
+     * @param string $section
+     * @param string $content
+     *
      * @return void
      */
     protected function extendPush($section, $content) {
@@ -92,8 +90,9 @@ trait CApp_Concern_ManageStackTrait {
     /**
      * Start prepending content into a push section.
      *
-     * @param  string  $section
-     * @param  string  $content
+     * @param string $section
+     * @param string $content
+     *
      * @return void
      */
     public function startPrepend($section, $content = '') {
@@ -117,7 +116,7 @@ trait CApp_Concern_ManageStackTrait {
         if (empty($this->pushStack)) {
             throw new InvalidArgumentException('Cannot end a prepend operation without first starting one.');
         }
-        
+
         return c::tap(array_pop($this->pushStack), function ($last) {
             $this->extendPrepend($last, ob_get_clean());
         });
@@ -126,8 +125,9 @@ trait CApp_Concern_ManageStackTrait {
     /**
      * Prepend content to a given stack.
      *
-     * @param  string  $section
-     * @param  string  $content
+     * @param string $section
+     * @param string $content
+     *
      * @return void
      */
     protected function extendPrepend($section, $content) {
@@ -145,12 +145,12 @@ trait CApp_Concern_ManageStackTrait {
     /**
      * Get the string contents of a push section.
      *
-     * @param  string  $section
-     * @param  string  $default
+     * @param string $section
+     * @param string $default
+     *
      * @return string
      */
     public function yieldPushContent($section, $default = '') {
-        
         if (!isset($this->pushes[$section]) && !isset($this->prepends[$section])) {
             return $default;
         }
@@ -164,7 +164,7 @@ trait CApp_Concern_ManageStackTrait {
         if (isset($this->pushes[$section])) {
             $output .= implode($this->pushes[$section]);
         }
-        
+
         return $output;
     }
 
@@ -178,5 +178,4 @@ trait CApp_Concern_ManageStackTrait {
         $this->prepends = [];
         $this->pushStack = [];
     }
-
 }

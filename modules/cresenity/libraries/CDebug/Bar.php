@@ -54,17 +54,19 @@ class CDebug_Bar extends CDebug_AbstractBar {
             return;
         }
 
+        $timeDataCollector = new CDebug_DataCollector_TimeDataCollector();
+
         $this->addCollector(new CDebug_DataCollector_PhpInfoCollector());
         $this->addCollector(new CDebug_DataCollector_MemoryCollector());
         $this->addCollector(new CDebug_DataCollector_LocalizationCollector());
         $this->addCollector(new CDebug_DataCollector_MessagesCollector());
         $this->addCollector(new CDebug_DataCollector_EventCollector());
         $this->addCollector(new CDebug_DataCollector_RequestDataCollector());
-        $this->addCollector(new CDebug_DataCollector_TimeDataCollector());
+        $this->addCollector($timeDataCollector);
         $this->addCollector(new CDebug_DataCollector_FilesCollector());
         $this->addCollector(new CDebug_DataCollector_RenderableCollector());
 
-        $queryCollector = new CDebug_DataCollector_QueryCollector();
+        $queryCollector = new CDebug_DataCollector_QueryCollector($timeDataCollector);
 
         $queryCollector->setRenderSqlWithParams(true);
         $this->addCollector($queryCollector);

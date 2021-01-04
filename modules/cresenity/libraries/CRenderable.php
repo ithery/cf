@@ -202,10 +202,10 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     }
 
     /**
-     * @return CApp_Event;
+     * @return CEvent_Dispatcher;
      */
     public function getEvent() {
-        return CManager_Event::app();
+        return CEvent::dispatcher();
     }
 
     /**
@@ -216,7 +216,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
      * @return void
      */
     public function listenOnRenderableAdded(Closure $callback) {
-        $this->getEvent()->listen(CApp_Event::onRenderableAdded, $callback);
+        $this->getEvent()->listen(CApp_Event::ON_RENDERABLE_ADDED, $callback);
     }
 
     /**

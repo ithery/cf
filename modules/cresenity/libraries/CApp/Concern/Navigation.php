@@ -6,7 +6,6 @@
  * @author Hery
  */
 trait CApp_Concern_Navigation {
-
     protected $nav = 'nav';
     protected $navRenderer = CApp_Navigation_Engine_SideNav::class;
 
@@ -23,45 +22,43 @@ trait CApp_Concern_Navigation {
         }
         return $nav;
     }
-    
-    public function resolveNavRenderer($renderer=null) {
-        if($renderer==null) {
+
+    public function resolveNavRenderer($renderer = null) {
+        if ($renderer == null) {
             $renderer = CApp::instance()->getNavRenderer();
         }
-        if(is_array($renderer)) {
-            $engine = carr::get($options, 'engine', 'Bootstrap');
-            $layout = carr::get($options, 'layout', 'horizontal');
+        if (is_array($renderer)) {
+            $engine = carr::get($renderer, 'engine', 'Bootstrap');
+            $layout = carr::get($renderer, 'layout', 'horizontal');
 
             $engineClassName = 'CApp_Navigation_Engine_' . $engine;
             $renderer = CContainer::getInstance()->make($engineClassName);
         }
-        if(is_string($renderer) && class_exists($renderer)) {
+        if (is_string($renderer) && class_exists($renderer)) {
             $renderer = CContainer::getInstance()->make($renderer);
         }
-        
-        if($renderer instanceof Closure || is_callable($renderer)) {
+
+        if ($renderer instanceof Closure || is_callable($renderer)) {
             $engine = new CApp_Navigation_Engine_Closure();
             $engine->setClosure($renderer);
             $renderer = $engine;
         }
-        
-        if(!($renderer instanceof CApp_Navigation_Engine)) {
+
+        if (!($renderer instanceof CApp_Navigation_Engine)) {
             throw new Exception('Renderer must extends CNavigation_Engine');
         }
         return $renderer;
     }
 
     public function getNav() {
-
         return $this->resolveNav($this->nav);
     }
 
     public function getNavRenderer() {
         return $this->navRenderer;
     }
-    
+
     public function setNavRenderer($renderer) {
         $this->navRenderer = $renderer;
     }
-    
- }
+}

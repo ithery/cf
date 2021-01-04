@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 27, 2019, 10:53:10 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jul 27, 2019, 10:53:10 PM
  */
 trait CApp_Trait_App_Auth {
-
-    private $_role = null;
-    private $_user = null;
+    private $role = null;
+    private $user = null;
     private $loginRequired = true;
 
     public function isUserLogin() {
@@ -21,31 +21,30 @@ trait CApp_Trait_App_Auth {
         $this->loginRequired = $bool;
         return $this;
     }
-    
+
     public function isLoginRequired() {
         return $this->loginRequired;
     }
 
     public function user() {
-        if ($this->_user == null) {
+        if ($this->user == null) {
             $session = CSession::instance();
-            $user = $session->get("user");
+            $user = $session->get('user');
             if (!$user) {
                 $user = null;
             }
-            $this->_user = $user;
+            $this->user = $user;
         }
-        return $this->_user;
+        return $this->user;
     }
 
     public function role() {
-        if ($this->_role == null) {
+        if ($this->role == null) {
             $user = $this->user();
             if ($user != null) {
-                $this->_role = crole::get(cobj::get($user, 'role_id'));
+                $this->role = crole::get(cobj::get($user, 'role_id'));
             }
         }
-        return $this->_role;
+        return $this->role;
     }
-
 }

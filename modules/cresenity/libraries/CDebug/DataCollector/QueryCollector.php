@@ -20,11 +20,12 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     protected $middleware = [];
     protected $explainQuery = false;
     protected $explainTypes = ['SELECT']; // ['SELECT', 'INSERT', 'UPDATE', 'DELETE']; for MySQL 5.6.3+
-    protected $showHints = false;
+    protected $showHints = true;
     protected $reflection = [];
+    protected $showCopyButton = true;
 
     /**
-     * @param TimeDataCollector $timeCollector
+     * @param CDebug_DataCollector_TimeDataCollector $timeCollector
      */
     public function __construct(CDebug_DataCollector_TimeDataCollector $timeCollector = null) {
         $this->timeCollector = $timeCollector;
@@ -109,9 +110,10 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
         $bindings = $db->prepareBindings($bindings);
         // Run EXPLAIN on this query (if needed)
         if ($this->explainQuery && preg_match('/^(' . implode($this->explainTypes) . ') /i', $query)) {
-            $statement = $db->prepare('EXPLAIN ' . $query);
-            $statement->execute($bindings);
-            $explainResults = $statement->fetchAll(\PDO::FETCH_CLASS);
+            $result = $db->query('EXPLAIN ' . $query, $bindings);
+
+            //$statement->execute($bindings);
+            $explainResults = $result->result_array();
         }
         $bindings = $this->getDataFormatter()->checkBindings($bindings);
         if (!empty($bindings) && $this->renderSqlWithParams) {
@@ -137,6 +139,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
             'explain' => $explainResults,
             'connection' => $db->getDatabaseName(),
             'hints' => $this->showHints ? $hints : null,
+            'show_copy' => $this->showCopyButton,
         ];
         if ($this->timeCollector !== null) {
             $this->timeCollector->addMeasure($query, $startTime, $endTime);
@@ -161,14 +164,15 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
      * @return string
      */
     protected function performQueryAnalysis($query) {
+        // @codingStandardsIgnoreStart
         $hints = [];
         if (preg_match('/^\\s*SELECT\\s*`?[a-zA-Z0-9]*`?\\.?\\*/i', $query)) {
             $hints[] = 'Use <code>SELECT *</code> only if you need all columns from table';
         }
         if (preg_match('/ORDER BY RAND()/i', $query)) {
             $hints[] = '<code>ORDER BY RAND()</code> is slow, try to avoid if you can.
-				You can <a href="http://stackoverflow.com/questions/2663710/how-does-mysqls-order-by-rand-work" target="_blank">read this</a>
-				or <a href="http://stackoverflow.com/questions/1244555/how-can-i-optimize-mysqls-order-by-rand-function" target="_blank">this</a>';
+                You can <a href="http://stackoverflow.com/questions/2663710/how-does-mysqls-order-by-rand-work" target="_blank">read this</a>
+                or <a href="http://stackoverflow.com/questions/1244555/how-can-i-optimize-mysqls-order-by-rand-function" target="_blank">this</a>';
         }
         if (strpos($query, '!=') !== false) {
             $hints[] = 'The <code>!=</code> operator is not standard. Use the <code>&lt;&gt;</code> operator to test for inequality instead.';
@@ -181,9 +185,11 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
         }
         if (preg_match('/LIKE\\s[\'"](%.*?)[\'"]/i', $query, $matches)) {
             $hints[] = 'An argument has a leading wildcard character: <code>' . $matches[1] . '</code>.
-								The predicate with this argument is not sargable and cannot use an index if one exists.';
+                The predicate with this argument is not sargable and cannot use an index if one exists.';
         }
         return $hints;
+
+        // @codingStandardsIgnoreEnd
     }
 
     /**
@@ -193,10 +199,13 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
      */
     protected function findSource() {
         $stack = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS | DEBUG_BACKTRACE_PROVIDE_OBJECT, 50);
+
         $sources = [];
+
         foreach ($stack as $index => $trace) {
             $sources[] = $this->parseTrace($index, $trace);
         }
+
         return array_filter($sources);
     }
 
@@ -270,19 +279,21 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
     /**
      * Collect a database transaction event.
      *
-     * @param string                          $event
+     * @param  string $event
      * @param \Illuminate\Database\Connection $connection
-     *
      * @return array
      */
-    public function collectTransactionEvent($event, $connection) {
+    public function collectTransactionEvent($event, $connection)
+    {
         $source = [];
+
         if ($this->findSource) {
             try {
                 $source = $this->findSource();
             } catch (\Exception $e) {
             }
         }
+
         $this->queries[] = [
             'query' => $event,
             'type' => 'transaction',
@@ -292,6 +303,7 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
             'explain' => [],
             'connection' => $connection->getDatabaseName(),
             'hints' => null,
+            'show_copy' => false,
         ];
     }
 
@@ -378,5 +390,12 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
             'css' => ['debug/debugbar/widgets/sqlqueries/widget.css'],
             'js' => ['debug/debugbar/widgets/cfsqlqueries/widget.js']
         ];
+    }
+
+    /**
+     * @return CDebug_DataFormatter_QueryFormatter
+     */
+    public function getDataFormatter() {
+        return parent::getDataFormatter();
     }
 }
