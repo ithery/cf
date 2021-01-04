@@ -288,10 +288,10 @@ class CModel_Query {
     /**
      * Find multiple models by their primary keys.
      *
-     * @param \Illuminate\Contracts\Support\Arrayable|array $ids
-     * @param array                                         $columns
+     * @param CInterface_Arrayable|array $ids
+     * @param array                      $columns
      *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return CModel_Collection
      */
     public function findMany($ids, $columns = ['*']) {
         if (empty($ids)) {
@@ -309,7 +309,7 @@ class CModel_Query {
      *
      * @return CModel|CModel_Collection
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \CModel_Exception_ModelNotFound
      */
     public function findOrFail($id, $columns = ['*']) {
         $result = $this->find($id, $columns);
@@ -334,7 +334,7 @@ class CModel_Query {
      * @param mixed $id
      * @param array $columns
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return CModel
      */
     public function findOrNew($id, $columns = ['*']) {
         if (!is_null($model = $this->find($id, $columns))) {
@@ -350,7 +350,7 @@ class CModel_Query {
      * @param array $attributes
      * @param array $values
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return CModel
      */
     public function firstOrNew(array $attributes, array $values = []) {
         if (!is_null($instance = $this->where($attributes)->first())) {
@@ -384,7 +384,7 @@ class CModel_Query {
      * @param array $attributes
      * @param array $values
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return CModel
      */
     public function updateOrCreate(array $attributes, array $values = []) {
         return $this->tap($this->firstOrNew($attributes), function ($instance) use ($values) {
@@ -397,9 +397,9 @@ class CModel_Query {
      *
      * @param array $columns
      *
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @return CModel|static
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws CModel_Exception_ModelNotFound
      */
     public function firstOrFail($columns = ['*']) {
         if (!is_null($model = $this->first($columns))) {
@@ -415,7 +415,7 @@ class CModel_Query {
      * @param \Closure|array $columns
      * @param \Closure|null  $callback
      *
-     * @return \Illuminate\Database\Eloquent\Model|static|mixed
+     * @return CModel|static|mixed
      */
     public function firstOr($columns = ['*'], Closure $callback = null) {
         if ($columns instanceof Closure) {

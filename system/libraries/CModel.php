@@ -101,13 +101,6 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     protected static $resolver;
 
     /**
-     * The event dispatcher instance.
-     *
-     * @var CEvent_DispatcherInterface
-     */
-    protected static $dispatcher;
-
-    /**
      * The array of booted models.
      *
      * @var array
@@ -349,7 +342,6 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         $model = $this->newInstance([], true);
 
         $model->setRawAttributes((array) $attributes, true);
-
         $model->fireModelEvent('retrieved', false);
 
         return $model;

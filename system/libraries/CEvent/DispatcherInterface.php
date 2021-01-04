@@ -1,19 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 10, 2019, 1:07:02 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 10, 2019, 1:07:02 AM
  */
 interface CEvent_DispatcherInterface {
-
     /**
      * Register an event listener with the dispatcher.
      *
-     * @param  string|array  $events
-     * @param  mixed  $listener
+     * @param string|array $events
+     * @param mixed        $listener
+     *
      * @return void
      */
     public function listen($events, $listener);
@@ -21,7 +22,8 @@ interface CEvent_DispatcherInterface {
     /**
      * Determine if a given event has listeners.
      *
-     * @param  string  $eventName
+     * @param string $eventName
+     *
      * @return bool
      */
     public function hasListeners($eventName);
@@ -29,7 +31,8 @@ interface CEvent_DispatcherInterface {
     /**
      * Register an event subscriber with the dispatcher.
      *
-     * @param  object|string  $subscriber
+     * @param object|string $subscriber
+     *
      * @return void
      */
     public function subscribe($subscriber);
@@ -37,8 +40,9 @@ interface CEvent_DispatcherInterface {
     /**
      * Dispatch an event until the first non-null response is returned.
      *
-     * @param  string|object  $event
-     * @param  mixed  $payload
+     * @param string|object $event
+     * @param mixed         $payload
+     *
      * @return array|null
      */
     public function until($event, $payload = []);
@@ -46,9 +50,10 @@ interface CEvent_DispatcherInterface {
     /**
      * Dispatch an event and call the listeners.
      *
-     * @param  string|object  $event
-     * @param  mixed  $payload
-     * @param  bool  $halt
+     * @param string|object $event
+     * @param mixed         $payload
+     * @param bool          $halt
+     *
      * @return array|null
      */
     public function dispatch($event, $payload = [], $halt = false);
@@ -56,8 +61,9 @@ interface CEvent_DispatcherInterface {
     /**
      * Register an event and payload to be fired later.
      *
-     * @param  string  $event
-     * @param  array  $payload
+     * @param string $event
+     * @param array  $payload
+     *
      * @return void
      */
     public function push($event, $payload = []);
@@ -65,7 +71,8 @@ interface CEvent_DispatcherInterface {
     /**
      * Flush a set of pushed events.
      *
-     * @param  string  $event
+     * @param string $event
+     *
      * @return void
      */
     public function flush($event);
@@ -73,7 +80,8 @@ interface CEvent_DispatcherInterface {
     /**
      * Remove a set of listeners from the dispatcher.
      *
-     * @param  string  $event
+     * @param string $event
+     *
      * @return void
      */
     public function forget($event);

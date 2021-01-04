@@ -315,7 +315,7 @@ class CDatabase {
             throw new CDatabase_Exception('The :driver driver for the :class library could not be found', [':driver' => $driver, ':class' => get_class($this)]);
         }
 
-        $this->events = CDatabase_Dispatcher::instance();
+        $this->events = CEvent::dispatcher();
         CModel::setEventDispatcher($this->events);
         $this->configuration = new CDatabase_Configuration();
 

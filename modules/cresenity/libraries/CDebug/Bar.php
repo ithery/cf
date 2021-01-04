@@ -70,6 +70,8 @@ class CDebug_Bar extends CDebug_AbstractBar {
         $this->addCollector($queryCollector);
 
         $this->addCollector(new CDebug_DataCollector_ExceptionsCollector());
+        $this->addCollector(new CDebug_DataCollector_ModelCollector());
+
         $this->startMeasure('application', 'Application');
 
         //if (CHelper::request()->isAjax()) {
