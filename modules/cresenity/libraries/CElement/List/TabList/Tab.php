@@ -70,7 +70,7 @@ class CElement_List_TabList_Tab extends CElement_Element {
         return $this->ajaxUrl;
     }
 
-    public function setAjax($bool) {
+    public function setAjax($bool = true) {
         $this->ajax = $bool;
         return $this;
     }

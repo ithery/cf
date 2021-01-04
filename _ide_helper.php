@@ -38,4 +38,22 @@ class CApp {
     public function addView($view = null, $data = null, $id = null) {
         return $this->element->addView($view, $data, $id);
     }
+
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_List_TabList
+     */
+    public function addTabList($id = null) {
+        return $this->element->addTabList($id);
+    }
+
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_Component_Form
+     */
+    public function addForm($id = null) {
+        return $this->element->addForm($id);
+    }
 }

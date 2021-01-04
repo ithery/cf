@@ -842,7 +842,7 @@ final class CF {
             return CTranslation::translator();
         }
 
-        return CTranslation::translator()->trans($key, $args);
+        return CTranslation::translator()->trans($key, $args, $locale);
     }
 
     /**

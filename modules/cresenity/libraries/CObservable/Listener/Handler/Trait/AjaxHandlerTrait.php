@@ -1,27 +1,28 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Apr 17, 2019, 11:23:04 PM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
-
     protected $method;
 
     /**
      * url for ajax handler type
+     *
      * @var string $url
      */
     protected $url;
 
     /**
-     *
      * @var string $urlParam
      */
-    protected $urlParam = array();
+    protected $urlParam = [];
 
     public function setUrl($url) {
         $this->url = $url;
@@ -64,6 +65,11 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         return $link;
     }
 
+    /**
+     * Add Ajax Success Listener
+     *
+     * @return CObservable_Listener_Pseudo_SuccessListener
+     */
     public function onSuccessListener() {
         if (!isset($this->handlerListeners['ajaxSuccess'])) {
             $this->handlerListeners['ajaxSuccess'] = new CObservable_Listener_Pseudo_SuccessListener($this);
@@ -71,6 +77,11 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         return $this->handlerListeners['ajaxSuccess'];
     }
 
+    /**
+     * Add Ajax Error Listener
+     *
+     * @return CObservable_Listener_Pseudo_ErrorListener
+     */
     public function onErrorListener() {
         if (!isset($this->handlerListeners['ajaxError'])) {
             $this->handlerListeners['ajaxError'] = new CObservable_Listener_Pseudo_ErrorListener($this);
@@ -78,6 +89,11 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         return $this->handlerListeners['ajaxError'];
     }
 
+    /**
+     * Add Ajax Complete Listener
+     *
+     * @return CObservable_Listener_Pseudo_CompleteListener
+     */
     public function onCompleteListener() {
         if (!isset($this->handlerListeners['ajaxComplete'])) {
             $this->handlerListeners['ajaxComplete'] = new CObservable_Listener_Pseudo_CompleteListener($this);
@@ -85,15 +101,30 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         return $this->handlerListeners['ajaxComplete'];
     }
 
+    /**
+     * Check have success listener
+     *
+     * @return bool
+     */
     public function haveSuccessListener() {
         return $this->haveListener('ajaxSuccess');
     }
 
+    /**
+     * Check have error listener
+     *
+     * @return bool
+     */
     public function haveErrorListener() {
         return $this->haveListener('ajaxError');
         return isset($this->handlerListeners['ajaxError']);
     }
 
+    /**
+     * Check have complete listener
+     *
+     * @return bool
+     */
     public function haveCompleteListener() {
         return $this->haveListener('ajaxComplete');
     }
@@ -110,7 +141,6 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         return $this->getListener('ajaxError');
     }
 
-    
     public function setMethod($method) {
         $this->method = $method;
         return $this;

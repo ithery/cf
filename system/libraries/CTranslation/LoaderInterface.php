@@ -1,20 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 11:43:10 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 11:43:10 AM
  */
 interface CTranslation_LoaderInterface {
-
     /**
      * Load the messages for the given locale.
      *
-     * @param  string  $locale
-     * @param  string  $group
-     * @param  string  $namespace
+     * @param string $locale
+     * @param string $group
+     * @param string $namespace
+     *
      * @return array
      */
     public function load($locale, $group, $namespace = null);
@@ -22,8 +23,9 @@ interface CTranslation_LoaderInterface {
     /**
      * Add a new namespace to the loader.
      *
-     * @param  string  $namespace
-     * @param  string  $hint
+     * @param string $namespace
+     * @param string $hint
+     *
      * @return void
      */
     public function addNamespace($namespace, $hint);
@@ -31,7 +33,8 @@ interface CTranslation_LoaderInterface {
     /**
      * Add a new JSON path to the loader.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return void
      */
     public function addJsonPath($path);

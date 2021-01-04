@@ -1266,7 +1266,6 @@ var Cresenity = function () {
         var selector = settings.selector;
         $(selector).each(function () {
             //don't do it again if still loading
-
             var formAjaxUrl = $(this).attr('action') || '';
             var formMethod = $(this).attr('method') || 'get';
             (function (element) {
@@ -1288,7 +1287,7 @@ var Cresenity = function () {
                         var onError = function (errMessage) {
                             cresenity.showError(errMessage)
                         };
-                        
+
                         haveOnSuccess = false;
                         if (typeof settings.onSuccess == 'function' && validationIsValid) {
                             onSuccess = settings.onSuccess;
@@ -1419,7 +1418,7 @@ var Cresenity = function () {
         var settings = $.extend({
             innerMessage: '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>',
         }, options);
-        
+
         $(selector).block({
             message: settings.innerMessage,
             css: {
@@ -1663,15 +1662,15 @@ var Cresenity = function () {
                                             if (data.state == 'DONE') {
                                                 progressContainer.find('.progress-container-status').empty();
                                                 var innerStatus = $('<div>');
-                                                
+
                                                 var innerStatusLabel = $('<label>', {class:'mb-3 d-block'}).append("Your file is ready");
                                                 var linkDownload = $('<a>', {target:'_blank', href:data.fileUrl, class:'btn btn-primary'}).append("Download");
                                                 var linkClose = $('<a>', {href:'javascript:;', class:'btn btn-primary ml-3'}).append("Close");
-                                                
+
                                                 innerStatus.append(innerStatusLabel);
                                                 innerStatus.append(linkDownload);
                                                 innerStatus.append(linkClose);
-                                                
+
                                                 progressContainer.find('.progress-container-status').append(innerStatus);
                                                 linkClose.click(function(){
                                                     cresenity.closeLastModal();
@@ -1682,7 +1681,7 @@ var Cresenity = function () {
                                     }
                                 });
                             }, 3000);
-                            
+
                             var innerStatus = $('<div>');
                                 var innerStatusLabel = $('<label>', {class:'mb-4'}).append("Please Wait...");
                                 var innerStatusAnimation = $('<div>').append('<div class="sk-fading-circle sk-primary"><div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div><div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div><div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div><div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div></div>');
@@ -1693,12 +1692,12 @@ var Cresenity = function () {
                                 innerStatus.append(innerStatusAnimation);
                                 innerStatus.append(innerStatusAction);
                             progressContainer.append($('<div>').addClass('progress-container-status').append(innerStatus));
-                            
+
                             innerStatusCancelButton.click(function(){
                                 clearInterval(interval);
                                 cresenity.closeLastModal();
                             });
-                            
+
 
                             cresenity.modal({
                                 message: progressContainer,

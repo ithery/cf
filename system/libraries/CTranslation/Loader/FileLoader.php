@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 11:54:53 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 11:54:53 AM
  */
 class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
-
     /**
      * The filesystem instance.
      *
@@ -40,8 +40,9 @@ class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
     /**
      * Create a new file loader instance.
      *
-     * @param  CFile  $files
-     * @param  string  $path
+     * @param CFile  $files
+     * @param string $path
+     *
      * @return void
      */
     public function __construct(CFile $files, $path) {
@@ -52,9 +53,10 @@ class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
     /**
      * Load the messages for the given locale.
      *
-     * @param  string  $locale
-     * @param  string  $group
-     * @param  string  $namespace
+     * @param string $locale
+     * @param string $group
+     * @param string $namespace
+     *
      * @return array
      */
     public function load($locale, $group, $namespace = null) {
@@ -72,9 +74,10 @@ class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
     /**
      * Load a namespaced translation group.
      *
-     * @param  string  $locale
-     * @param  string  $group
-     * @param  string  $namespace
+     * @param string $locale
+     * @param string $group
+     * @param string $namespace
+     *
      * @return array
      */
     protected function loadNamespaced($locale, $group, $namespace) {
@@ -90,10 +93,11 @@ class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
     /**
      * Load a local namespaced translation group for overrides.
      *
-     * @param  array  $lines
-     * @param  string  $locale
-     * @param  string  $group
-     * @param  string  $namespace
+     * @param array  $lines
+     * @param string $locale
+     * @param string $group
+     * @param string $namespace
+     *
      * @return array
      */
     protected function loadNamespaceOverrides(array $lines, $locale, $group, $namespace) {
@@ -109,26 +113,25 @@ class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
     /**
      * Load a locale from a given path.
      *
-     * @param  string  $path
-     * @param  string  $locale
-     * @param  string  $group
+     * @param string $path
+     * @param string $locale
+     * @param string $group
+     *
      * @return array
      */
     protected function loadPath($path, $locale, $group) {
         $cfPaths = CF::paths();
-        $result = array();
+        $result = [];
         foreach ($cfPaths as $cfPath) {
             $pathToFind = $cfPath . $path;
 
             if ($this->files->exists($full = "{$pathToFind}/{$locale}/{$group}.php")) {
-
                 $array = $this->files->getRequire($full);
-                if(is_array($array)) {
+                if (is_array($array)) {
                     $result = array_merge($result, $array);
                 }
             }
         }
-
 
         return $result;
     }
@@ -136,33 +139,35 @@ class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
     /**
      * Load a locale from the given JSON file path.
      *
-     * @param  string  $locale
+     * @param string $locale
+     *
      * @return array
      *
      * @throws \RuntimeException
      */
     protected function loadJsonPaths($locale) {
-        return CF::collect(array_merge($this->jsonPaths, [$this->path]))
-                        ->reduce(function ($output, $path) use ($locale) {
-                            if ($this->files->exists($full = "{$path}/{$locale}.json")) {
-                                $decoded = json_decode($this->files->get($full), true);
+        return c::collect(array_merge($this->jsonPaths, [$this->path]))
+            ->reduce(function ($output, $path) use ($locale) {
+                if ($this->files->exists($full = "{$path}/{$locale}.json")) {
+                    $decoded = json_decode($this->files->get($full), true);
 
-                                if (is_null($decoded) || json_last_error() !== JSON_ERROR_NONE) {
-                                    throw new RuntimeException("Translation file [{$full}] contains an invalid JSON structure.");
-                                }
+                    if (is_null($decoded) || json_last_error() !== JSON_ERROR_NONE) {
+                        throw new RuntimeException("Translation file [{$full}] contains an invalid JSON structure.");
+                    }
 
-                                $output = array_merge($output, $decoded);
-                            }
+                    $output = array_merge($output, $decoded);
+                }
 
-                            return $output;
-                        }, []);
+                return $output;
+            }, []);
     }
 
     /**
      * Add a new namespace to the loader.
      *
-     * @param  string  $namespace
-     * @param  string  $hint
+     * @param string $namespace
+     * @param string $hint
+     *
      * @return void
      */
     public function addNamespace($namespace, $hint) {
@@ -172,7 +177,8 @@ class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
     /**
      * Add a new JSON path to the loader.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return void
      */
     public function addJsonPath($path) {
@@ -187,5 +193,4 @@ class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
     public function namespaces() {
         return $this->hints;
     }
-
 }

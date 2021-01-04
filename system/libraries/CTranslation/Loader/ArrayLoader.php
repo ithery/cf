@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 11:44:13 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 11:44:13 AM
  */
 class CTranslation_Loader_ArrayLoader extends CTranslation_LoaderAbstract {
-
     /**
      * All of the translation messages.
      *
@@ -19,9 +19,10 @@ class CTranslation_Loader_ArrayLoader extends CTranslation_LoaderAbstract {
     /**
      * Load the messages for the given locale.
      *
-     * @param  string  $locale
-     * @param  string  $group
-     * @param  string  $namespace
+     * @param string $locale
+     * @param string $group
+     * @param string $namespace
+     *
      * @return array
      */
     public function load($locale, $group, $namespace = null) {
@@ -37,8 +38,9 @@ class CTranslation_Loader_ArrayLoader extends CTranslation_LoaderAbstract {
     /**
      * Add a new namespace to the loader.
      *
-     * @param  string  $namespace
-     * @param  string  $hint
+     * @param string $namespace
+     * @param string $hint
+     *
      * @return void
      */
     public function addNamespace($namespace, $hint) {
@@ -48,7 +50,8 @@ class CTranslation_Loader_ArrayLoader extends CTranslation_LoaderAbstract {
     /**
      * Add a new JSON path to the loader.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return void
      */
     public function addJsonPath($path) {
@@ -58,10 +61,11 @@ class CTranslation_Loader_ArrayLoader extends CTranslation_LoaderAbstract {
     /**
      * Add messages to the loader.
      *
-     * @param  string  $locale
-     * @param  string  $group
-     * @param  array  $messages
-     * @param  string|null  $namespace
+     * @param string      $locale
+     * @param string      $group
+     * @param array       $messages
+     * @param string|null $namespace
+     *
      * @return $this
      */
     public function addMessages($locale, $group, array $messages, $namespace = null) {
@@ -80,5 +84,4 @@ class CTranslation_Loader_ArrayLoader extends CTranslation_LoaderAbstract {
     public function namespaces() {
         return [];
     }
-
 }
