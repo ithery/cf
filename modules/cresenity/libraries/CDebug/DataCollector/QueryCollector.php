@@ -142,7 +142,10 @@ class CDebug_DataCollector_QueryCollector extends CDebug_DataCollector implement
             'show_copy' => $this->showCopyButton,
         ];
         if ($this->timeCollector !== null) {
-            $this->timeCollector->addMeasure($query, $startTime, $endTime);
+            $plainQuery = $query;
+            $plainQuery = str_replace("\n", '', $plainQuery);
+            $plainQuery = str_replace("\r", '', $plainQuery);
+            $this->timeCollector->addMeasure($plainQuery, $startTime, $endTime);
         }
     }
 

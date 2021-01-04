@@ -400,14 +400,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $childList;
     }
 
-    /**
-     * Get the collection of items as JSON.
-     *
-     * @param int $options
-     *
-     * @return string
-     */
-    public function toJson($options = 0) {
+    public function toArray() {
         $data = [];
         $data['title'] = $this->title;
         $message = '';
@@ -422,19 +415,30 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $asset = CManager::asset();
         $js = $this->js();
 
-        if ($this->isUseRequireJs()) {
+        $isUseRequireJs = $this->isUseRequireJs();
+        $isUseRequireJs = false;
+        if ($isUseRequireJs) {
             $js = $asset->renderJsRequire($js);
         } else {
             $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
         }
-        if (ccfg::get('minify_js')) {
-            $js = CJSMin::minify($js);
-        }
-        $data['js'] = cbase64::encode($js);
+        $data['js'] = base64_encode($js);
         $data['css_require'] = $asset->getAllCssFileUrl();
         $data['message'] = $messageOrig;
         $data['ajaxData'] = $this->ajaxData;
         $data['html'] = mb_convert_encoding($data['html'], 'UTF-8', 'UTF-8');
+        return $data;
+    }
+
+    /**
+     * Get the collection of items as JSON.
+     *
+     * @param int $options
+     *
+     * @return string
+     */
+    public function toJson($options = 0) {
+        $data = $this->toArray();
         return json_encode($data, $options);
     }
 

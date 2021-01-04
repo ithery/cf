@@ -228,6 +228,7 @@ class CDebug_Bar_Renderer {
         $renderer = $this;
         CEvent::dispatcher()->listen(CHTTP_Event_RequestHandled::class, function ($event) use ($renderer) {
             $response = $event->response;
+            $jsonHelper = CHelper::json();
             if (!$renderer->isFileResponse($response)) {
                 if ($response instanceof CHTTP_JsonResponse) {
                     $output = $response->getContent();
@@ -235,7 +236,7 @@ class CDebug_Bar_Renderer {
                         if (!headers_sent()) {
                             header('phpdebugbar-body:1');
                         }
-                        $jsonHelper = CHelper::json();
+
                         $json = null;
                         try {
                             $json = $jsonHelper->parse($output);
@@ -254,7 +255,26 @@ class CDebug_Bar_Renderer {
                         $original = $response->getOriginalContent();
                     }
                     $output = $response->getContent();
-                    $output = $renderer->replaceJavascriptCode($output);
+
+                    $isJson = false;
+
+                    if (cstr::startsWith(trim($output), '{')) {
+                        $json = null;
+                        try {
+                            $json = $jsonHelper->parse($output);
+                            $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
+                            $output = $jsonHelper->stringify($json);
+                            $isJson = true;
+                        } catch (Exception $ex) {
+                        }
+                    }
+                    if (!$isJson) {
+                        $output = $renderer->replaceJavascriptCode($output);
+                    } else {
+                        if (!headers_sent()) {
+                            header('phpdebugbar-body:1');
+                        }
+                    }
                     $response->setContent($output);
                     $response->headers->remove('Content-Length');
                     // Restore original response (eg. the View or Ajax data)
