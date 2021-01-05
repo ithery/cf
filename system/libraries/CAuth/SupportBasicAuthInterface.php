@@ -1,6 +1,6 @@
 <?php
 
-interface CAutth_SupportsBasicAuthInterface {
+interface CAuth_SupportBasicAuthInterface {
     /**
      * Attempt to authenticate using HTTP Basic Auth.
      *

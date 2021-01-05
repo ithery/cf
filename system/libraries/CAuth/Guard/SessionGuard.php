@@ -3,7 +3,7 @@
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
-class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAutth_SupportsBasicAuthInterface {
+class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_SupportBasicAuthInterface {
     use CAuth_Guard_Concern_GuardHelper, CTrait_Macroable;
 
     /**
@@ -751,7 +751,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAutth_S
      *
      * @return void
      */
-    public function setCookieJar(CookieJar $cookie) {
+    public function setCookieJar(CHTTP_Cookie $cookie) {
         $this->cookie = $cookie;
     }
 

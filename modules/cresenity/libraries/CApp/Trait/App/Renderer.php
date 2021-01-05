@@ -167,7 +167,9 @@ HTML;
             if ($this->isUseRequireJs()) {
                 foreach ($css_urls as $url) {
                     $additional_js .= "
-                    $.cresenity._filesadded+='['+'" . $url . "'+']';
+                    if($ && $.cresenity) {
+                        $.cresenity._filesadded+='['+'" . $url . "'+']';
+                    }
                     if(cresenity) {
                         cresenity.filesAdded+='['+'" . $url . "'+']';
                     }

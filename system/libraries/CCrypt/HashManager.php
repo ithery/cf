@@ -26,7 +26,7 @@ class CCrypt_HashManager extends CBase_ManagerAbstract implements CCrypt_HasherI
      * @return CCrypt_Hasher_BcryptHasher
      */
     public function createBcryptDriver() {
-        return new CCrypt_Hasher_BcryptHasher($this->config->get('hashing.bcrypt') ?? []);
+        return new CCrypt_Hasher_BcryptHasher($this->config->get('hashing.bcrypt', []));
     }
 
     /**
@@ -35,7 +35,7 @@ class CCrypt_HashManager extends CBase_ManagerAbstract implements CCrypt_HasherI
      * @return CCrypt_Hasher_ArgonHasher
      */
     public function createArgonDriver() {
-        return new CCrypt_Hasher_ArgonHasher($this->config->get('hashing.argon') ?? []);
+        return new CCrypt_Hasher_ArgonHasher($this->config->get('hashing.argon', []));
     }
 
     /**
@@ -44,7 +44,7 @@ class CCrypt_HashManager extends CBase_ManagerAbstract implements CCrypt_HasherI
      * @return CCrypt_Hasher_Argon2IdHasher
      */
     public function createArgon2idDriver() {
-        return new CCrypt_Hasher_Argon2IdHasher($this->config->get('hashing.argon') ?? []);
+        return new CCrypt_Hasher_Argon2IdHasher($this->config->get('hashing.argon', []));
     }
 
     /**

@@ -76,7 +76,7 @@ trait CAuth_Concern_CreateUserProvider {
      * @return \CAuth_UserProvider_ModelUserProvider
      */
     protected function createEloquentProvider($config) {
-        return new \CAuth_UserProvider_ModelUserProvider(CCrypt::hasher(), $config['model']);
+        return new \CAuth_UserProvider_ModelUserProvider(c::hash(), $config['model']);
     }
 
     /**
