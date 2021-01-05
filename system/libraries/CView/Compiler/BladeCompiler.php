@@ -10,6 +10,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
         CView_Compiler_BladeCompiler_CompileComponentTrait,
         CView_Compiler_BladeCompiler_CompileConditionalTrait,
         CView_Compiler_BladeCompiler_CompileErrorTrait,
+        CView_Compiler_BladeCompiler_CompileHelperTrait,
         CView_Compiler_BladeCompiler_CompileEchoTrait,
         CView_Compiler_BladeCompiler_CompileLayoutTrait,
         CView_Compiler_BladeCompiler_CompileRawPhpTrait,
@@ -527,7 +528,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
      *
      * @return void
      */
-    public function _if($name, callable $callback) {
+    public function aliasIf($name, callable $callback) {
         $this->conditions[$name] = $callback;
 
         $this->directive($name, function ($expression) use ($name) {
@@ -652,18 +653,6 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
         $this->directive('end' . $alias, function ($expression) {
             return '<?php echo $__env->renderComponent(); ?>';
         });
-    }
-
-    /**
-     * Register an include alias directive.
-     *
-     * @param string      $path
-     * @param string|null $alias
-     *
-     * @return void
-     */
-    public function _include($path, $alias = null) {
-        $this->aliasInclude($path, $alias);
     }
 
     /**

@@ -1,7 +1,12 @@
 <?php
 
 class CAuth {
-    public static function factory() {
+    /**
+     * Get Manager instance
+     *
+     * @return CAuth_Manager
+     */
+    public static function manager() {
         return CAuth_Manager::instance();
     }
 }

@@ -1054,10 +1054,52 @@ class c {
      */
     public static function auth($guard = null) {
         if (is_null($guard)) {
-            return CAuth::factory();
+            return CAuth::manager();
         }
 
-        return CAuth::factory()->guard($guard);
+        return CAuth::manager()->guard($guard);
+    }
+
+    /**
+     * Generate a CSRF token form field.
+     *
+     * @return CBase_HtmlString
+     */
+    public static function csrfField() {
+        return new CBase_HtmlString('<input type="hidden" name="_token" value="' . static::csrfToken() . '">');
+    }
+
+    /**
+     * Get the CSRF token value.
+     *
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public static function csrfToken() {
+        $session = CSession::instance();
+
+        if (isset($session)) {
+            return $session->token();
+        }
+
+        throw new RuntimeException('Application session store not set.');
+    }
+
+    /**
+     * Get the available container instance.
+     *
+     * @param string|null $abstract
+     * @param array       $parameters
+     *
+     * @return mixed|\Illuminate\Contracts\Foundation\Application
+     */
+    public static function app($abstract = null, array $parameters = []) {
+        if (is_null($abstract)) {
+            return static::container();
+        }
+
+        return c::container()->make($abstract, $parameters);
     }
 }
 

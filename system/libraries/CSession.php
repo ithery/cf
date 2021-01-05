@@ -62,10 +62,10 @@ class CSession {
 
             // Close the session just before sending the headers, so that
             // the session cookie(s) can be written.
-            CFEvent::add('system.send_headers', [$this, 'write_close']);
+            CFEvent::add('system.send_headers', [$this, 'writeClose']);
 
             // Make sure that sessions are closed before exiting
-            register_shutdown_function([$this, 'write_close']);
+            register_shutdown_function([$this, 'writeClose']);
 
             // Singleton instance
             CSession::$instance = $this;
@@ -86,8 +86,7 @@ class CSession {
     /**
      * Create a new session.
      *
-     * @param   array  variables to set after creation
-     * @param null|mixed $vars
+     * @param null|array $vars variables to set after creation
      *
      * @return void
      */
@@ -124,7 +123,7 @@ class CSession {
 
             // Validate the driver
             if (!(CSession::$driver instanceof CSession_Driver)) {
-                throw new CFException('The :driver driver for the :class library must implement the :interface interface', [':driver' => CSession::$config['driver'], ':class' => get_class($this), ':interface' => 'Session_Driver']);
+                throw new CException('The :driver driver for the :class library must implement the :interface interface', [':driver' => CSession::$config['driver'], ':class' => get_class($this), ':interface' => 'Session_Driver']);
             }
 
             // Register non-native driver as the session handler
@@ -133,7 +132,7 @@ class CSession {
 
         // Validate the session name
         if (!preg_match('~^(?=.*[a-z])[a-z0-9_]++$~iD', CSession::$config['name'])) {
-            throw new CFException('The session_name, :name, is invalid. It must contain only alphanumeric characters and underscores. Also at least one letter must be present.', [':name', CSession::$config['name']]);
+            throw new CException('The session_name, :name, is invalid. It must contain only alphanumeric characters and underscores. Also at least one letter must be present.', [':name', CSession::$config['name']]);
         }
 
         // Name the session, this will also be the name of the cookie
@@ -201,7 +200,11 @@ class CSession {
         $_SESSION['last_activity'] = time();
 
         // Set the new data
-        CSession::set($vars);
+        $this->set($vars);
+
+        if (!$this->has('_token')) {
+            $this->regenerateToken();
+        }
     }
 
     /**
@@ -257,7 +260,7 @@ class CSession {
      *
      * @return void
      */
-    public function write_close() {
+    public function writeClose() {
         static $run;
 
         if ($run === null) {
@@ -277,10 +280,8 @@ class CSession {
     /**
      * Set a session variable.
      *
-     * @param   string|array  key, or array of values
-     * @param   mixed         value (if keys is not an array)
-     * @param mixed $keys
-     * @param mixed $val
+     * @param string|array $keys key, or array of values
+     * @param mixed        $val  value (if keys is not an array)
      *
      * @return void
      */
@@ -306,10 +307,8 @@ class CSession {
     /**
      * Set a flash variable.
      *
-     * @param   string|array  key, or array of values
-     * @param   mixed         value (if keys is not an array)
-     * @param mixed $keys
-     * @param mixed $val
+     * @param string|array $keys key, or array of values
+     * @param mixed        $val  value (if keys is not an array)
      *
      * @return void
      */
@@ -327,16 +326,15 @@ class CSession {
                 continue;
             }
 
-            CSession::$flash[$key] = 'new';
-            CSession::set($key, $val);
+            $this->flash[$key] = 'new';
+            $this->set($key, $val);
         }
     }
 
     /**
      * Freshen one, multiple or all flash variables.
      *
-     * @param   string  variable key(s)
-     * @param null|mixed $keys
+     * @param null|mixed $keys variable key(s)
      *
      * @return void
      */
@@ -382,10 +380,8 @@ class CSession {
     /**
      * Get a variable. Access to sub-arrays is supported with key.subkey.
      *
-     * @param   string  variable key
-     * @param   mixed   default value returned if variable does not exist
-     * @param mixed $key
-     * @param mixed $default
+     * @param string $key     variable key
+     * @param mixed  $default default value returned if variable does not exist
      *
      * @return mixed Variable data if key specified, otherwise array containing all session data.
      */
@@ -400,10 +396,8 @@ class CSession {
     /**
      * Get a variable, and delete it.
      *
-     * @param   string  variable key
-     * @param   mixed   default value returned if variable does not exist
-     * @param mixed $key
-     * @param mixed $default
+     * @param string $key     variable key
+     * @param mixed  $default default value returned if variable does not exist
      *
      * @return mixed
      */
@@ -417,8 +411,7 @@ class CSession {
     /**
      * Delete one or more variables.
      *
-     * @param   string  variable key(s)
-     * @param mixed $keys
+     * @param string $keys variable key(s)
      *
      * @return void
      */
@@ -440,6 +433,37 @@ class CSession {
 
     public function store() {
         return $this;
+    }
+
+    /**
+     * Get the CSRF token value.
+     *
+     * @return string
+     */
+    public function token() {
+        return $this->get('_token');
+    }
+
+    /**
+     * Regenerate the CSRF token value.
+     *
+     * @return void
+     */
+    public function regenerateToken() {
+        $this->set('_token', cstr::random(40));
+    }
+
+    /**
+     * Checks if a key is present and not null.
+     *
+     * @param string|array $key
+     *
+     * @return bool
+     */
+    public function has($key) {
+        return !c::collect(is_array($key) ? $key : func_get_args())->contains(function ($key) {
+            return is_null($this->get($key));
+        });
     }
 }
 
