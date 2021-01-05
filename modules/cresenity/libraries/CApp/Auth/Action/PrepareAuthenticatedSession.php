@@ -4,14 +4,14 @@ class AttemptToAuthenticate {
     /**
      * The guard implementation.
      *
-     * @var \Illuminate\Contracts\Auth\StatefulGuard
+     * @var CAuth_StatefulGuardInterface
      */
     protected $guard;
 
     /**
      * The login rate limiter instance.
      *
-     * @var \Laravel\Fortify\LoginRateLimiter
+     * @var CApp_Auth_LoginRateLimiter
      */
     protected $limiter;
 
