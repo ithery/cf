@@ -149,7 +149,7 @@ trait CApp_Trait_App_Bootstrap {
                 'selectsearch' => CFormInputSelectSearch::class,
                 'checkbox' => CElement_FormInput_Checkbox::class,
                 'checkbox-list' => CFormInputCheckboxList::class,
-                'switcher' => CFormInputCheckboxList::class,
+                'switcher' => CElement_FormInput_Checkbox_Switcher::class,
                 'summernote' => CElement_FormInput_Textarea_Summernote::class,
                 'radio' => CFormInputRadio::class,
                 'label' => CFormInputLabel::class,
