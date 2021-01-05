@@ -20,11 +20,11 @@ class CCache_RateLimiter {
     /**
      * Create a new rate limiter instance.
      *
-     * @param \Illuminate\Contracts\Cache\Repository $cache
+     * @param CCache_Repository $cache
      *
      * @return void
      */
-    public function __construct(Cache $cache) {
+    public function __construct(CCache_Repository $cache) {
         $this->cache = $cache;
     }
 
@@ -36,7 +36,7 @@ class CCache_RateLimiter {
      *
      * @return $this
      */
-    public function for(string $name, Closure $callback) {
+    public function aliasFor(string $name, Closure $callback) {
         $this->limiters[$name] = $callback;
 
         return $this;
@@ -50,7 +50,7 @@ class CCache_RateLimiter {
      * @return \Closure
      */
     public function limiter(string $name) {
-        return $this->limiters[$name] ?? null;
+        return carr::get($this->limiters, $name);
     }
 
     /**

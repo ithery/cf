@@ -88,7 +88,7 @@ class CApp_Auth_Features {
      *
      * @return bool
      */
-    public static function enabled(string $feature) {
+    public static function enabled($feature) {
         return in_array($feature, static::$features);
     }
 }

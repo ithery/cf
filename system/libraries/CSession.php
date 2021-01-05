@@ -2,18 +2,34 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * Session Class
+ *
+ * @see CSession_Store
+ *
+ * @method void set(string $key, mixed|null $value = null)
+ */
 class CSession {
-    // Session singleton
+    use CTrait_Compat_Session;
+
+    protected $initialized = false;
+
+    /**
+     * Session singleton
+     *
+     * @var CSession
+     */
     protected static $instance;
-    // Protected key names (cannot be set by the user)
-    protected static $protect = ['session_id', 'user_agent', 'last_activity', 'ip_address', 'total_hits', '_kf_flash_'];
-    // Configuration and driver
-    protected static $config;
-    protected static $driver;
-    // Flash variables
-    protected static $flash;
-    // Input library
-    protected $input;
+
+    /**
+     * @var CSession_Store
+     */
+    protected $store;
+
+    /**
+     * @var CSession_Driver
+     */
+    protected $driver;
 
     /**
      * Singleton instance of Session.
@@ -32,46 +48,20 @@ class CSession {
     /**
      * On first session instance creation, sets up the driver and creates session.
      */
-    public function __construct() {
-        $this->input = Input::instance();
+    private function __construct() {
+        $this->initializeSession();
+        CF::log(CLogger::DEBUG, 'Session Library initialized');
+    }
 
-        // This part only needs to be run once
-        if (CSession::$instance === null) {
-            // Load config
-            CSession::$config = CF::config('session');
-
-            // Makes a mirrored array, eg: foo=foo
-            CSession::$protect = array_combine(CSession::$protect, CSession::$protect);
-
-            if (session_status() == PHP_SESSION_NONE) {
-                // Configure garbage collection
-                ini_set('session.gc_probability', (int) CSession::$config['gc_probability']);
-                ini_set('session.gc_divisor', 100);
-                ini_set('session.gc_maxlifetime', (CSession::$config['expiration'] == 0) ? 86400 : CSession::$config['expiration']);
-            }
-            // Create a new session
-            $this->create();
-
-            if (CSession::$config['regenerate'] > 0 and ($_SESSION['total_hits'] % CSession::$config['regenerate']) === 0) {
-                // Regenerate session id and update session cookie
-                $this->regenerate();
-            } else {
-                // Always update session cookie to keep the session alive
-                cookie::set(CSession::$config['name'], $_SESSION['session_id'], CSession::$config['expiration']);
-            }
-
-            // Close the session just before sending the headers, so that
-            // the session cookie(s) can be written.
-            CFEvent::add('system.send_headers', [$this, 'writeClose']);
-
-            // Make sure that sessions are closed before exiting
-            register_shutdown_function([$this, 'writeClose']);
-
-            // Singleton instance
-            CSession::$instance = $this;
+    /**
+     * @return CSession_Store
+     */
+    public function store() {
+        if ($this->store == null) {
+            $this->store = CSession_Manager::instance()->createStore();
         }
 
-        CF::log(CLogger::DEBUG, 'Session Library initialized');
+        return $this->store;
     }
 
     /**
@@ -80,390 +70,38 @@ class CSession {
      * @return string
      */
     public function id() {
-        return $_SESSION['session_id'];
+        return $this->store()->getId();
     }
 
-    /**
-     * Create a new session.
-     *
-     * @param null|array $vars variables to set after creation
-     *
-     * @return void
-     */
-    public function create($vars = null) {
-        // Destroy any current sessions
-        $this->destroy();
+    public function __call($name, $arguments) {
+        return call_user_func_array([$this->store(), $name], $arguments);
+    }
 
-        if (CSession::$config['driver'] !== 'native') {
-            // Set driver name
+    public static function manager() {
+        return CSession_Manager::instance();
+    }
 
-            $driverName = CSession::$config['driver'];
-            if (!preg_match('/^[A-Z]/', $driverName)) {
-                $driverName = ucfirst($driverName);
-            }
+    protected function initializeSession() {
+        if (!$this->initialized && static::sessionConfigured()) {
+            $request = CHTTP::request();
+            static::manager()->applyNativeSession();
 
-            $driver = 'CSession_Driver_' . $driverName;
-
-            $cacheBasedDriver = ['Redis'];
-
-            if (!in_array($driverName, $cacheBasedDriver)) {
-                // Load the driver
-                try {
-                    // Validation of the driver
-                    $class = new ReflectionClass($driver);
-                    // Initialize the driver
-                    CSession::$driver = $class->newInstance();
-                } catch (ReflectionException $ex) {
-                    throw new CException('The :driver driver for the :class library could not be found', [':driver' => CSession::$config['driver'], ':class' => get_class($this)]);
-                }
-            } else {
-                $method = 'create' . $driverName . 'Driver';
-                CSession::$driver = call_user_func([CSession_Factory::class, $method]);
-            }
-
-            // Validate the driver
-            if (!(CSession::$driver instanceof CSession_Driver)) {
-                throw new CException('The :driver driver for the :class library must implement the :interface interface', [':driver' => CSession::$config['driver'], ':class' => get_class($this), ':interface' => 'Session_Driver']);
-            }
-
-            // Register non-native driver as the session handler
-            session_set_save_handler([CSession::$driver, 'open'], [CSession::$driver, 'close'], [CSession::$driver, 'read'], [CSession::$driver, 'write'], [CSession::$driver, 'destroy'], [CSession::$driver, 'gc']);
-        }
-
-        // Validate the session name
-        if (!preg_match('~^(?=.*[a-z])[a-z0-9_]++$~iD', CSession::$config['name'])) {
-            throw new CException('The session_name, :name, is invalid. It must contain only alphanumeric characters and underscores. Also at least one letter must be present.', [':name', CSession::$config['name']]);
-        }
-
-        // Name the session, this will also be the name of the cookie
-        session_name(CSession::$config['name']);
-
-        // Set the session cookie parameters
-        session_set_cookie_params(CSession::$config['expiration'], CF::config('cookie.path'), CF::config('cookie.domain'), CF::config('cookie.secure'), CF::config('cookie.httponly'));
-
-        // Start the session!
-        if (session_status() == PHP_SESSION_NONE) {
-            @session_start();
-        }
-
-        // Put session_id in the session variable
-        $_SESSION['session_id'] = session_id();
-
-        // Set defaults
-        if (!isset($_SESSION['_kf_flash_'])) {
-            $_SESSION['total_hits'] = 0;
-            $_SESSION['_kf_flash_'] = [];
-
-            $_SESSION['user_agent'] = CF::userAgent();
-            $_SESSION['ip_address'] = $this->input->ip_address();
-        }
-
-        // Set up flash variables
-        CSession::$flash = &$_SESSION['_kf_flash_'];
-
-        // Increase total hits
-        $_SESSION['total_hits'] += 1;
-
-        // Validate data only on hits after one
-        if ($_SESSION['total_hits'] > 1) {
-            // Validate the session
-            foreach (CSession::$config['validate'] as $valid) {
-                switch ($valid) {
-                    // Check user agent for consistency
-                    case 'user_agent':
-                        if ($_SESSION[$valid] !== CF::userAgent()) {
-                            return $this->create();
-                        }
-                        break;
-
-                    // Check ip address for consistency
-                    case 'ip_address':
-                        if ($_SESSION[$valid] !== $this->input->$valid()) {
-                            return $this->create();
-                        }
-                        break;
-
-                    // Check expiration time to prevent users from manually modifying it
-                    case 'expiration':
-                        if (time() - $_SESSION['last_activity'] > ini_get('session.gc_maxlifetime')) {
-                            return $this->create();
-                        }
-                        break;
-                }
-            }
-        }
-
-        // Expire flash keys
-        $this->expire_flash();
-
-        // Update last activity
-        $_SESSION['last_activity'] = time();
-
-        // Set the new data
-        $this->set($vars);
-
-        if (!$this->has('_token')) {
-            $this->regenerateToken();
+            return c::tap($this->store(), function ($session) use ($request) {
+                $session->setId($request->cookies->get($session->getName()));
+                $session->setRequestOnHandler($request);
+                $session->start();
+            });
+            $this->initialized = true;
         }
     }
 
     /**
-     * Regenerates the global session id.
-     *
-     * @return void
-     */
-    public function regenerate() {
-        if (CSession::$config['driver'] === 'native') {
-            // Generate a new session id
-            // Note: also sets a new session cookie with the updated id
-            session_regenerate_id(true);
-
-            // Update session with new id
-            $_SESSION['session_id'] = session_id();
-        } else {
-            // Pass the regenerating off to the driver in case it wants to do anything special
-            $_SESSION['session_id'] = CSession::$driver->regenerate();
-        }
-
-        // Get the session name
-        $name = session_name();
-
-        if (isset($_COOKIE[$name])) {
-            // Change the cookie value to match the new session id to prevent "lag"
-            $_COOKIE[$name] = $_SESSION['session_id'];
-        }
-    }
-
-    /**
-     * Destroys the current session.
-     *
-     * @return void
-     */
-    public function destroy() {
-        if (session_id() !== '') {
-            // Get the session name
-            $name = session_name();
-
-            // Destroy the session
-            session_destroy();
-
-            // Re-initialize the array
-            $_SESSION = [];
-
-            // Delete the session cookie
-            cookie::delete($name);
-        }
-    }
-
-    /**
-     * Runs the system.session_write event, then calls session_write_close.
-     *
-     * @return void
-     */
-    public function writeClose() {
-        static $run;
-
-        if ($run === null) {
-            $run = true;
-
-            // Run the events that depend on the session being open
-            CFEvent::run('system.session_write');
-
-            // Expire flash keys
-            $this->expire_flash();
-
-            // Close the session
-            session_write_close();
-        }
-    }
-
-    /**
-     * Set a session variable.
-     *
-     * @param string|array $keys key, or array of values
-     * @param mixed        $val  value (if keys is not an array)
-     *
-     * @return void
-     */
-    public function set($keys, $val = false) {
-        if (empty($keys)) {
-            return false;
-        }
-
-        if (!is_array($keys)) {
-            $keys = [$keys => $val];
-        }
-
-        foreach ($keys as $key => $val) {
-            if (isset(CSession::$protect[$key])) {
-                continue;
-            }
-
-            // Set the key
-            $_SESSION[$key] = $val;
-        }
-    }
-
-    /**
-     * Set a flash variable.
-     *
-     * @param string|array $keys key, or array of values
-     * @param mixed        $val  value (if keys is not an array)
-     *
-     * @return void
-     */
-    public function set_flash($keys, $val = false) {
-        if (empty($keys)) {
-            return false;
-        }
-
-        if (!is_array($keys)) {
-            $keys = [$keys => $val];
-        }
-
-        foreach ($keys as $key => $val) {
-            if ($key == false) {
-                continue;
-            }
-
-            $this->flash[$key] = 'new';
-            $this->set($key, $val);
-        }
-    }
-
-    /**
-     * Freshen one, multiple or all flash variables.
-     *
-     * @param null|mixed $keys variable key(s)
-     *
-     * @return void
-     */
-    public function keep_flash($keys = null) {
-        $keys = ($keys === null) ? array_keys(CSession::$flash) : func_get_args();
-
-        foreach ($keys as $key) {
-            if (isset(CSession::$flash[$key])) {
-                CSession::$flash[$key] = 'new';
-            }
-        }
-    }
-
-    /**
-     * Expires old flash data and removes it from the session.
-     *
-     * @return void
-     */
-    public function expire_flash() {
-        static $run;
-
-        // Method can only be run once
-        if ($run === true) {
-            return;
-        }
-
-        if (!empty(CSession::$flash)) {
-            foreach (CSession::$flash as $key => $state) {
-                if ($state === 'old') {
-                    // Flash has expired
-                    unset(CSession::$flash[$key], $_SESSION[$key]);
-                } else {
-                    // Flash will expire
-                    CSession::$flash[$key] = 'old';
-                }
-            }
-        }
-
-        // Method has been run
-        $run = true;
-    }
-
-    /**
-     * Get a variable. Access to sub-arrays is supported with key.subkey.
-     *
-     * @param string $key     variable key
-     * @param mixed  $default default value returned if variable does not exist
-     *
-     * @return mixed Variable data if key specified, otherwise array containing all session data.
-     */
-    public function get($key = false, $default = false) {
-        if (empty($key)) {
-            return $_SESSION;
-        }
-
-        return carr::get($_SESSION, $key, $default);
-    }
-
-    /**
-     * Get a variable, and delete it.
-     *
-     * @param string $key     variable key
-     * @param mixed  $default default value returned if variable does not exist
-     *
-     * @return mixed
-     */
-    public function getOnce($key, $default = false) {
-        $return = $this->get($key, $default);
-        $this->delete($key);
-
-        return $return;
-    }
-
-    /**
-     * Delete one or more variables.
-     *
-     * @param string $keys variable key(s)
-     *
-     * @return void
-     */
-    public function delete($keys) {
-        $args = func_get_args();
-
-        foreach ($args as $key) {
-            $this->forget($key);
-        }
-    }
-
-    public function forget($key) {
-        if (isset(CSession::$protect[$key])) {
-            return false;
-        }
-        // Unset the key
-        unset($_SESSION[$key]);
-    }
-
-    public function store() {
-        return $this;
-    }
-
-    /**
-     * Get the CSRF token value.
-     *
-     * @return string
-     */
-    public function token() {
-        return $this->get('_token');
-    }
-
-    /**
-     * Regenerate the CSRF token value.
-     *
-     * @return void
-     */
-    public function regenerateToken() {
-        $this->set('_token', cstr::random(40));
-    }
-
-    /**
-     * Checks if a key is present and not null.
-     *
-     * @param string|array $key
+     * Determine if a session driver has been configured.
      *
      * @return bool
      */
-    public function has($key) {
-        return !c::collect(is_array($key) ? $key : func_get_args())->contains(function ($key) {
-            return is_null($this->get($key));
-        });
+    public static function sessionConfigured() {
+        return !is_null(carr::get(static::manager()->getSessionConfig(), 'driver'));
     }
 }
 

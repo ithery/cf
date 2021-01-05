@@ -45,3 +45,5 @@ if (isset($_COOKIE['capp-profiler'])) {
 if (isset($_COOKIE['capp-debugbar'])) {
     CDebug::bar()->enable();
 }
+
+CApp_Auth_Features::setFeatures(CF::config('app.auth.features'));
