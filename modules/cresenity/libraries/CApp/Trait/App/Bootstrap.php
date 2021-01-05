@@ -122,6 +122,7 @@ trait CApp_Trait_App_Bootstrap {
             $manager = CManager::instance();
             $manager->registerControls([
                 'text' => CElement_FormInput_Text::class,
+                'textarea' => CElement_FormInput_Textarea::class,
                 'number' => CElement_FormInput_Number::class,
                 'email' => CElement_FormInput_Email::class,
                 'datepicker' => CElement_FormInput_Date::class,
@@ -150,20 +151,19 @@ trait CApp_Trait_App_Bootstrap {
                 'checkbox-list' => CFormInputCheckboxList::class,
                 'switcher' => CFormInputCheckboxList::class,
                 'summernote' => CElement_FormInput_Textarea_Summernote::class,
+                'radio' => CFormInputRadio::class,
+                'label' => CFormInputLabel::class,
+                'quill' => CElement_FormInput_Textarea_Quill::class,
+                'file' => CFormInputFile::class,
+                'ckeditor' => CFormInputCKEditor::class,
+                'filedrop' => CFormInputFileDrop::class,
+                'slider' => CFormInputSlider::class,
+                'tooltip' => CFormInputTooltip::class,
+                'fileupload' => CFormInputFileUpload::class,
+                'wysiwyg' => CFormInputWysiwyg::class,
             ]);
 
-            $manager->registerControl('quill', 'CElement_FormInput_Textarea_Quill');
-            $manager->registerControl('radio', 'CFormInputRadio');
-            $manager->registerControl('label', 'CFormInputLabel');
-            $manager->registerControl('file', 'CFormInputFile');
-            $manager->registerControl('ckeditor', 'CFormInputCKEditor');
-            $manager->registerControl('filedrop', 'CFormInputFileDrop');
-            $manager->registerControl('slider', 'CFormInputSlider');
-            $manager->registerControl('tooltip', 'CFormInputTooltip');
-            $manager->registerControl('fileupload', 'CFormInputFileUpload');
-            $manager->registerControl('wysiwyg', 'CFormInputWysiwyg');
             CFBenchmark::stop('CApp.RegisterControl');
-
             static::$registerControlBooted = true;
         }
     }
