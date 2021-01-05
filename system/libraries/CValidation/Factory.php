@@ -2,10 +2,6 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- *s
- */
 class CValidation_Factory implements CValidation_FactoryInterface {
     /**
      * @var CValidation_Factory
@@ -190,7 +186,7 @@ class CValidation_Factory implements CValidation_FactoryInterface {
     public function extend($rule, $extension, $message = null) {
         $this->extensions[$rule] = $extension;
         if ($message) {
-            $this->fallbackMessages[Str::snake($rule)] = $message;
+            $this->fallbackMessages[cstr::snake($rule)] = $message;
         }
     }
 

@@ -1,11 +1,10 @@
 <?php
 
 class CApp_Auth_Features {
-    protected $features;
+    protected static $features;
 
-    public function setFeatures($features) {
-        $this->features = $features;
-        return $this;
+    public static function setFeatures($features) {
+        static::$features = $features;
     }
 
     /**
@@ -13,7 +12,7 @@ class CApp_Auth_Features {
      *
      * @return string
      */
-    public function registration() {
+    public static function registration() {
         return 'registration';
     }
 
@@ -80,5 +79,16 @@ class CApp_Auth_Features {
      */
     public static function profilePhotos() {
         return 'profile-photos';
+    }
+
+    /**
+     * Determine if the given feature is enabled.
+     *
+     * @param string $feature
+     *
+     * @return bool
+     */
+    public static function enabled(string $feature) {
+        return in_array($feature, static::$features);
     }
 }

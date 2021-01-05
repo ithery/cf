@@ -1,6 +1,6 @@
 <?php
 
-class LoginRateLimiter {
+class CApp_Auth_LoginRateLimiter {
     /**
      * The login rate limiter instance.
      *

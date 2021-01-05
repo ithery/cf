@@ -1,5 +1,5 @@
 <?php
-class CApp_Auth_Response_LoginResponse implements CApp_Auth_Contact_LoginResponseInterface {
+class CApp_Auth_Response_LoginResponse implements CApp_Auth_Contract_LoginResponseInterface {
     /**
      * Create an HTTP response that represents the object.
      *

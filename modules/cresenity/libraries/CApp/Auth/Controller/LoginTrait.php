@@ -33,7 +33,7 @@ trait CApp_Auth_Controller_LoginTrait {
             ));
         }
 
-        if (is_array(config('app.auth.pipelines.login'))) {
+        if (is_array(CF::config('app.auth.pipelines.login'))) {
             return (new CBase_Pipeline(c::app()))->send($request)->through(array_filter(
                 CF::config('fortify.pipelines.login')
             ));
@@ -41,7 +41,7 @@ trait CApp_Auth_Controller_LoginTrait {
 
         return (new CBase_Pipeline(c::app()))->send($request)->through(array_filter([
             CF::config('app.auth.limiters.login') ? null : EnsureLoginIsNotThrottled::class,
-            CApp_Auth_Features::enabled(Features::twoFactorAuthentication()) ? RedirectIfTwoFactorAuthenticatable::class : null,
+            CApp_Auth_Features::enabled(CApp_Auth_Features::twoFactorAuthentication()) ? RedirectIfTwoFactorAuthenticatable::class : null,
             AttemptToAuthenticate::class,
             PrepareAuthenticatedSession::class,
         ]));

@@ -1,20 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 26, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Aug 26, 2020
  */
 trait CTrait_ForwardsCalls {
-
     /**
      * Forward a method call to the given object.
      *
-     * @param  mixed  $object
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param mixed  $object
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      *
      * @throws \BadMethodCallException
@@ -29,8 +30,9 @@ trait CTrait_ForwardsCalls {
                 throw $e;
             }
 
-            if ($matches['class'] != get_class($object) ||
-                    $matches['method'] != $method) {
+            if ($matches['class'] != get_class($object)
+                || $matches['method'] != $method
+            ) {
                 throw $e;
             }
 
@@ -41,15 +43,17 @@ trait CTrait_ForwardsCalls {
     /**
      * Throw a bad method call exception for the given method.
      *
-     * @param  string  $method
+     * @param string $method
+     *
      * @return void
      *
      * @throws \BadMethodCallException
      */
     protected static function throwBadMethodCallException($method) {
         throw new BadMethodCallException(sprintf(
-                        'Call to undefined method %s::%s()', static::class, $method
+            'Call to undefined method %s::%s()',
+            static::class,
+            $method
         ));
     }
-
 }
