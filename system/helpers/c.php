@@ -1020,6 +1020,45 @@ class c {
             goto beginning;
         }
     }
+
+    /**
+     * Generate an media path for the application.
+     *
+     * @param string    $path
+     * @param bool|null $secure
+     *
+     * @return string
+     */
+    public static function media($path = '', $secure = null) {
+        return c::url()->asset($path, $secure);
+    }
+
+    /**
+     * Retrieve an old input item.
+     *
+     * @param string|null $key
+     * @param mixed       $default
+     *
+     * @return mixed
+     */
+    public static function old($key = null, $default = null) {
+        return CHTTP::request()->old($key, $default);
+    }
+
+    /**
+     * Get the available auth instance.
+     *
+     * @param string|null $guard
+     *
+     * @return CAuth_Factory|CAuth_GuardInterface|CAuth_StatefulGuardInterface
+     */
+    public static function auth($guard = null) {
+        if (is_null($guard)) {
+            return CAuth::factory();
+        }
+
+        return CAuth::factory()->guard($guard);
+    }
 }
 
 // End c

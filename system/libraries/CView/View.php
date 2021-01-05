@@ -71,6 +71,47 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
     }
 
     /**
+     * Add a view instance to the view data.
+     *
+     * @param string $key
+     * @param string $view
+     * @param array  $data
+     *
+     * @return $this
+     */
+    public function nest($key, $view, array $data = []) {
+        return $this->with($key, CView::factory()->make($view, $data));
+    }
+
+    /**
+     * Add validation errors to the view.
+     *
+     * @param CBase_MessageProviderInterface|array $provider
+     * @param string                               $bag
+     *
+     * @return $this
+     */
+    public function withErrors($provider, $bag = 'default') {
+        return $this->with('errors', (new CBase_ViewErrorBag)->put(
+            $bag,
+            $this->formatErrors($provider)
+        ));
+    }
+
+    /**
+     * Parse the given errors into an appropriate value.
+     *
+     * @param CBase_MessageProviderInterface|array|string $provider
+     *
+     * @return CBase_MessageBag
+     */
+    protected function formatErrors($provider) {
+        return $provider instanceof CBase_MessageProviderInterface
+            ? $provider->getMessageBag()
+            : new CBase_MessageBag((array) $provider);
+    }
+
+    /**
      * Get the name of the view.
      *
      * @return string

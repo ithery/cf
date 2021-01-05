@@ -1,11 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
-return array(
+defined('SYSPATH') or die('No direct access allowed.');
+return [
     /**
      * Your app name, it will used for display app identifier when running on framework
      */
-    "title" => "CRESENITY",
+    'title' => 'CRESENITY',
     /**
      * Base path of the web site. If this includes a domain, eg: localhost/cresenity/
      * then a full URL will be used, eg: http://localhost/cresenity/. If it only includes
@@ -53,7 +53,7 @@ return array(
      * running in. This may determine how you prefer to configure various
      * services the application utilizes. Override this in your application config file
      */
-    'environment' => 'development',
+    'environment' => CBase::ENVIRONMENT_DEVELOPMENT,
     /*
      * When your application is in debug mode, detailed error messages with
      * stack traces will be shown on every error that occurs within your
@@ -61,23 +61,23 @@ return array(
      *
      */
     'debug' => !IN_PRODUCTION,
-    "lang" => "id", //deprecated
-    "app_id" => 1,
-    "install" => false,
-    "sidebar" => true,
-    "signup" => false,
-    "theme" => "",
-    "admin_email" => "contact@cresenitytech.com",
-    "set_timezone" => true, //deprecated
-    "default_timezone" => 'Asia/Jakarta', //deprecated
-    "multilang" => true,
-    "top_menu_cashier" => false,
-    "update_last_request" => true,
-    "ip_address" => "192.168.1.19",
-    "code_test" => false,
-    "require_js" => true,
-    "merge_js" => false,
-    "minify_js" => false,
-    "merge_css" => false,
-    "minify_css" => false,
-);
+    'lang' => 'id', //deprecated
+    'app_id' => 1,
+    'install' => false,
+    'sidebar' => true,
+    'signup' => false,
+    'theme' => '',
+    'admin_email' => 'contact@cresenitytech.com',
+    'set_timezone' => true, //deprecated
+    'default_timezone' => 'Asia/Jakarta', //deprecated
+    'multilang' => true,
+    'top_menu_cashier' => false,
+    'update_last_request' => true,
+    'ip_address' => '192.168.1.19',
+    'code_test' => false,
+    'require_js' => true,
+    'merge_js' => false,
+    'minify_js' => false,
+    'merge_css' => false,
+    'minify_css' => false,
+];

@@ -1,11 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct script access.');
+defined('SYSPATH') or die('No direct script access.');
 
 class {ControllerClass} extends CController {
-    
+
     /**
-     * default route controller 
+     * default route controller
      */
     public function index() {
         //TODO:do something awesome on controller index

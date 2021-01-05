@@ -24,7 +24,7 @@ class CView {
      * @param mixed      $data
      * @param mixed      $mergeData
      *
-     * @return object
+     * @return CView_Factory|CView_View
      */
     public static function factory($name = null, $data = [], $mergeData = []) {
         if ($name == null) {

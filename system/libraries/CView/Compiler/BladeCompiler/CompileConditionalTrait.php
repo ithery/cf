@@ -23,7 +23,7 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     protected function compileAuth($guard = null) {
         $guard = is_null($guard) ? '()' : $guard;
 
-        return "<?php if(auth()->guard{$guard}->check()): ?>";
+        return "<?php if(c::auth()->guard{$guard}->check()): ?>";
     }
 
     /**
@@ -36,7 +36,7 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     protected function compileElseAuth($guard = null) {
         $guard = is_null($guard) ? '()' : $guard;
 
-        return "<?php elseif(auth()->guard{$guard}->check()): ?>";
+        return "<?php elseif(c::auth()->guard{$guard}->check()): ?>";
     }
 
     /**
@@ -56,7 +56,7 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
      * @return string
      */
     protected function compileEnv($environments) {
-        return "<?php if(app()->environment{$environments}): ?>";
+        return "<?php if(c::environment{$environments}): ?>";
     }
 
     /**
@@ -96,7 +96,7 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     protected function compileGuest($guard = null) {
         $guard = is_null($guard) ? '()' : $guard;
 
-        return "<?php if(auth()->guard{$guard}->guest()): ?>";
+        return "<?php if(c::auth()->guard{$guard}->guest()): ?>";
     }
 
     /**
@@ -109,7 +109,7 @@ trait CView_Compiler_BladeCompiler_CompileConditionalTrait {
     protected function compileElseGuest($guard = null) {
         $guard = is_null($guard) ? '()' : $guard;
 
-        return "<?php elseif(auth()->guard{$guard}->guest()): ?>";
+        return "<?php elseif(c::auth()->guard{$guard}->guest()): ?>";
     }
 
     /**

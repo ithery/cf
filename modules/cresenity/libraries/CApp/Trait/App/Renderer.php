@@ -278,6 +278,11 @@ HTML;
             return $this->json();
         }
 
+        CView::factory()->share(
+            'errors',
+            CSession::instance()->get('errors') ?: new CBase_ViewErrorBag
+        );
+
         $viewData = $this->getViewData();
         $v = $this->getView();
         $v->set($viewData);

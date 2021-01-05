@@ -18,7 +18,8 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
  */
 class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, ArrayAccess {
     use CHTTP_Trait_InteractsWithInput,
-        CHTTP_Trait_InteractsWithContentTypes;
+        CHTTP_Trait_InteractsWithContentTypes,
+        CHTTP_Trait_InteractsWithFlashData;
 
     /**
      * The decoded JSON content for the request.
