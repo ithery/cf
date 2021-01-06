@@ -126,6 +126,7 @@ trait CApp_Trait_App_Bootstrap {
                 'number' => CElement_FormInput_Number::class,
                 'email' => CElement_FormInput_Email::class,
                 'datepicker' => CElement_FormInput_Date::class,
+                'date' => CElement_FormInput_Date::class,
                 'material-datetime' => CElement_FormInput_DateTime_MaterialDateTime::class,
                 'daterange-picker' => CElement_FormInput_DateRange::class,
                 'daterange-dropdown' => CElement_FormInput_DateRange_Dropdown::class,
