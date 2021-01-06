@@ -396,7 +396,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
      * @return void
      */
     public function login(CAuth_AuthenticatableInterface $user, $remember = false) {
-        $this->updateSession($user->getAuthIdentifier());
+        $this->updateSession($user);
 
         // If the user should be permanently "remembered" by the application we will
         // queue a permanent cookie that contains the encrypted copy of the user
@@ -418,14 +418,15 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
     /**
      * Update the session with the given ID.
      *
-     * @param string $id
+     * @param CAuth_AuthenticatableInterface $user
      *
      * @return void
      */
-    protected function updateSession($id) {
-        $this->session->put($this->getName(), $id);
+    protected function updateSession(CAuth_AuthenticatableInterface $user) {
+        $this->session->put($this->getName(), $user->getAuthIdentifier());
+        $this->session->put('user', $user->getAttributes());
 
-        $this->session->migrate(true);
+        //$this->session->migrate(true);
     }
 
     /**

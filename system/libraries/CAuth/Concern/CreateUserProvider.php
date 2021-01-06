@@ -33,8 +33,8 @@ trait CAuth_Concern_CreateUserProvider {
         switch ($driver) {
             case 'database':
                 return $this->createDatabaseProvider($config);
-            case 'eloquent':
-                return $this->createEloquentProvider($config);
+            case 'model':
+                return $this->createModelProvider($config);
             default:
                 throw new InvalidArgumentException(
                     "Authentication user provider [{$driver}] is not defined."
@@ -69,14 +69,14 @@ trait CAuth_Concern_CreateUserProvider {
     }
 
     /**
-     * Create an instance of the Eloquent user provider.
+     * Create an instance of the Model user provider.
      *
      * @param array $config
      *
      * @return \CAuth_UserProvider_ModelUserProvider
      */
-    protected function createEloquentProvider($config) {
-        return new \CAuth_UserProvider_ModelUserProvider(c::hash(), $config['model']);
+    protected function createModelProvider($config) {
+        return new \CAuth_UserProvider_ModelUserProvider(c::hash(carr::get($config, 'hasher')), $config['model']);
     }
 
     /**

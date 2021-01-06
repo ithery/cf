@@ -1,6 +1,6 @@
 <?php
 
-class AttemptToAuthenticate {
+class CApp_Auth_Action_PrepareAuthenticatedSession {
     /**
      * The guard implementation.
      *

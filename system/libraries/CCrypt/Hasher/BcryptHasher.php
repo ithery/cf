@@ -23,8 +23,8 @@ class CCrypt_Hasher_BcryptHasher extends CCrypt_HasherAbstract implements CCrypt
      * @return void
      */
     public function __construct(array $options = []) {
-        $this->rounds = $options['rounds'] ?? $this->rounds;
-        $this->verifyAlgorithm = $options['verify'] ?? $this->verifyAlgorithm;
+        $this->rounds = carr::get($options, 'rounds', $this->rounds);
+        $this->verifyAlgorithm = carr::get($options, 'verify', $this->verifyAlgorithm);
     }
 
     /**
@@ -103,6 +103,6 @@ class CCrypt_Hasher_BcryptHasher extends CCrypt_HasherAbstract implements CCrypt
      * @return int
      */
     protected function cost(array $options = []) {
-        return $options['rounds'] ?? $this->rounds;
+        return carr::get($options, 'rounds', $this->rounds);
     }
 }

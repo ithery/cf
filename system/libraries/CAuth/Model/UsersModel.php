@@ -1,6 +1,6 @@
 <?php
 
-class CAuth_Model_UsersModel extends CModel {
+class CAuth_Model_UsersModel extends CModel implements CAuth_AuthenticatableInterface {
     use CAuth_Concern_AuthenticatableTrait,
         CAuth_Concern_AuthorizableTrait;
 

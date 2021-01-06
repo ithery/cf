@@ -465,6 +465,101 @@ class CSession {
             return is_null($this->get($key));
         });
     }
+
+    /**
+     * Flash an input array to the session.
+     *
+     * @param array $value
+     *
+     * @return void
+     */
+    public function flashInput(array $value) {
+        $this->flash('_old_input', $value);
+    }
+
+    /**
+     * Flash a key / value pair to the session.
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return void
+     */
+    public function flash($key, $value = true) {
+        $this->put($key, $value);
+
+        $this->push('_flash.new', $key);
+
+        $this->removeFromOldFlashData([$key]);
+    }
+
+    /**
+     * Remove the given keys from the old flash data.
+     *
+     * @param array $keys
+     *
+     * @return void
+     */
+    protected function removeFromOldFlashData(array $keys) {
+        $this->put('_flash.old', array_diff($this->get('_flash.old', []), $keys));
+    }
+
+    /**
+     * Put a key / value pair or array of key / value pairs in the session.
+     *
+     * @param string|array $key
+     * @param mixed        $value
+     *
+     * @return void
+     */
+    public function put($key, $value = null) {
+        if (!is_array($key)) {
+            $key = [$key => $value];
+        }
+
+        foreach ($key as $arrayKey => $arrayValue) {
+            $this->set($arrayKey, $arrayValue);
+        }
+    }
+
+    /**
+     * Push a value onto a session array.
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return void
+     */
+    public function push($key, $value) {
+        $array = $this->get($key, []);
+
+        $array[] = $value;
+
+        $this->put($key, $array);
+    }
+
+    /**
+     * Generate a new session ID for the session.
+     *
+     * @param bool $destroy
+     *
+     * @return bool
+     */
+    public function migrate($destroy = false) {
+        return true;
+    }
+
+    /**
+     * Get the value of a given key and then forget it.
+     *
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return mixed
+     */
+    public function pull($key, $default = null) {
+        return carr::pull($_SESSION, $key, $default);
+    }
 }
 
 // End Session Class

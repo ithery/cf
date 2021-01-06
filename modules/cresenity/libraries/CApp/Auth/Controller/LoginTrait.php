@@ -35,15 +35,18 @@ trait CApp_Auth_Controller_LoginTrait {
 
         if (is_array(CF::config('app.auth.pipelines.login'))) {
             return (new CBase_Pipeline(c::app()))->send($request)->through(array_filter(
-                CF::config('fortify.pipelines.login')
+                CF::config('app.auth.pipelines.login')
             ));
         }
 
         return (new CBase_Pipeline(c::app()))->send($request)->through(array_filter([
             CF::config('app.auth.limiters.login') ? null : CApp_Auth_Action_EnsureLoginIsNotThrottled::class,
-            CApp_Auth_Features::enabled(CApp_Auth_Features::twoFactorAuthentication()) ? CApp_Auth_Action_RedirectIfTwoFactorAuthenticatable::class : null,
-            CApp_Auth_Action_AttemptToAuthenticate::class,
-            CApp_Auth_Action_PrepareAuthenticatedSession::class,
+
+            CApp_Auth_Features::enabled(CApp_Auth_Features::twoFactorAuthentication()) ? new CApp_Auth_Action_RedirectIfTwoFactorAuthenticatable(CApp_Auth::guard(), CApp_Auth::loginRateLimiter()) : null,
+
+            new CApp_Auth_Action_AttemptToAuthenticate(CApp_Auth::guard(), CApp_Auth::loginRateLimiter()),
+
+            new CApp_Auth_Action_PrepareAuthenticatedSession(CApp_Auth::guard(), CApp_Auth::loginRateLimiter()),
         ]));
     }
 }

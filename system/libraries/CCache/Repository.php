@@ -52,7 +52,7 @@ class CCache_Repository implements ArrayAccess {
                 return new CCache_Driver_RedisDriver($redis, carr::get($options, 'prefix', ''), carr::get($options, 'connection', 'default'));
                 break;
             default:
-                $driverClass = 'CCache_Driver_' . $driverName . 'Driver';
+                $driverClass = 'CCache_Driver_' . ucfirst($driverName) . 'Driver';
                 return new $driverClass($options);
         }
     }

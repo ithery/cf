@@ -9,7 +9,7 @@ class CCache {
     /**
      * @var CCache_Repository[]
      */
-    protected $repository;
+    protected static $repository;
 
     /**
      * @param array $options

@@ -107,7 +107,7 @@ class CAuth_Access_Response implements CInterface_Arrayable {
     public function authorize() {
         if ($this->denied()) {
             throw (new CAuth_Exception_AuthorizationException($this->message(), $this->code()))
-                        ->setResponse($this);
+                ->setResponse($this);
         }
 
         return $this;

@@ -31,8 +31,8 @@ class CApp_Auth_Action_RedirectIfTwoFactorAuthenticatable {
     /**
      * Handle the incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param callable                 $next
+     * @param \CHTTP_Request $request
+     * @param callable       $next
      *
      * @return mixed
      */
@@ -40,7 +40,7 @@ class CApp_Auth_Action_RedirectIfTwoFactorAuthenticatable {
         $user = $this->validateCredentials($request);
 
         if (c::optional($user)->two_factor_secret
-            && in_array(TwoFactorAuthenticatable::class, c::classUsesRecursive($user))
+            && in_array(CApp_Auth_TwoFactor_TwoFactorAuthenticatableTrait::class, c::classUsesRecursive($user))
         ) {
             return $this->twoFactorChallengeResponse($request, $user);
         }
@@ -99,7 +99,7 @@ class CApp_Auth_Action_RedirectIfTwoFactorAuthenticatable {
     /**
      * Fire the failed authentication attempt event with the given arguments.
      *
-     * @param CHTTP_Request                       $request
+     * @param \CHTTP_Request                      $request
      * @param CAuth_AuthenticatableInterface|null $user
      *
      * @return void
@@ -114,8 +114,8 @@ class CApp_Auth_Action_RedirectIfTwoFactorAuthenticatable {
     /**
      * Get the two factor authentication enabled response.
      *
-     * @param CHTTP_Request $request
-     * @param mixed         $user
+     * @param \CHTTP_Request $request
+     * @param mixed          $user
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */

@@ -70,11 +70,11 @@ class CAuth_Guard_RequestGuard implements CAuth_GuardInterface {
     /**
      * Set the current request instance.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHTTP_Request $request
      *
      * @return $this
      */
-    public function setRequest(Request $request) {
+    public function setRequest(CHTTP_Request $request) {
         $this->request = $request;
 
         return $this;

@@ -10,13 +10,11 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CHTTP_ResponseFactory {
-
     use CTrait_Macroable;
 
     protected static $instance;
 
     private function __construct() {
-        
     }
 
     public static function instance() {
@@ -29,9 +27,10 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new response instance.
      *
-     * @param  string  $content
-     * @param  int  $status
-     * @param  array  $headers
+     * @param string $content
+     * @param int    $status
+     * @param array  $headers
+     *
      * @return CHTTP_Response
      */
     public function make($content = '', $status = 200, array $headers = []) {
@@ -41,8 +40,9 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new "no content" response.
      *
-     * @param  int  $status
-     * @param  array  $headers
+     * @param int   $status
+     * @param array $headers
+     *
      * @return CHTTP_Response
      */
     public function noContent($status = 204, array $headers = []) {
@@ -52,10 +52,11 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new response for a given view.
      *
-     * @param  string|CView  $view
-     * @param  array  $data
-     * @param  int  $status
-     * @param  array  $headers
+     * @param string|CView $view
+     * @param array        $data
+     * @param int          $status
+     * @param array        $headers
+     *
      * @return CHTTP_Response
      */
     public function view($view, $data = [], $status = 200, array $headers = []) {
@@ -75,10 +76,11 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new JSON response instance.
      *
-     * @param  mixed  $data
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  int  $options
+     * @param mixed $data
+     * @param int   $status
+     * @param array $headers
+     * @param int   $options
+     *
      * @return CHTTP_JsonResponse
      */
     public function json($data = [], $status = 200, array $headers = [], $options = 0) {
@@ -88,11 +90,12 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new JSONP response instance.
      *
-     * @param  string  $callback
-     * @param  mixed  $data
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  int  $options
+     * @param string $callback
+     * @param mixed  $data
+     * @param int    $status
+     * @param array  $headers
+     * @param int    $options
+     *
      * @return CHTTP_JsonResponse
      */
     public function jsonp($callback, $data = [], $status = 200, array $headers = [], $options = 0) {
@@ -102,9 +105,10 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new streamed response instance.
      *
-     * @param  \Closure  $callback
-     * @param  int  $status
-     * @param  array  $headers
+     * @param \Closure $callback
+     * @param int      $status
+     * @param array    $headers
+     *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function stream($callback, $status = 200, array $headers = []) {
@@ -114,10 +118,11 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new streamed response instance as a file download.
      *
-     * @param  \Closure  $callback
-     * @param  string|null  $name
-     * @param  array  $headers
-     * @param  string|null  $disposition
+     * @param \Closure    $callback
+     * @param string|null $name
+     * @param array       $headers
+     * @param string|null $disposition
+     *
      * @return \Symfony\Component\HttpFoundation\StreamedResponse
      */
     public function streamDownload($callback, $name = null, array $headers = [], $disposition = 'attachment') {
@@ -125,7 +130,9 @@ class CHTTP_ResponseFactory {
 
         if (!is_null($name)) {
             $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
-                            $disposition, $name, $this->fallbackName($name)
+                $disposition,
+                $name,
+                $this->fallbackName($name)
             ));
         }
 
@@ -135,10 +142,11 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new file download response.
      *
-     * @param  \SplFileInfo|string  $file
-     * @param  string|null  $name
-     * @param  array  $headers
-     * @param  string|null  $disposition
+     * @param \SplFileInfo|string $file
+     * @param string|null         $name
+     * @param array               $headers
+     * @param string|null         $disposition
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function download($file, $name = null, array $headers = [], $disposition = 'attachment') {
@@ -154,7 +162,8 @@ class CHTTP_ResponseFactory {
     /**
      * Convert the string to ASCII characters that are equivalent to the given name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function fallbackName($name) {
@@ -164,8 +173,9 @@ class CHTTP_ResponseFactory {
     /**
      * Return the raw contents of a binary file.
      *
-     * @param  \SplFileInfo|string  $file
-     * @param  array  $headers
+     * @param \SplFileInfo|string $file
+     * @param array               $headers
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function file($file, array $headers = []) {
@@ -175,10 +185,11 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new redirect response to the given path.
      *
-     * @param  string  $path
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  bool|null  $secure
+     * @param string    $path
+     * @param int       $status
+     * @param array     $headers
+     * @param bool|null $secure
+     *
      * @return CHTTP_RedirectResponse
      */
     public function redirectTo($path, $status = 302, $headers = [], $secure = null) {
@@ -188,10 +199,11 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new redirect response to a named route.
      *
-     * @param  string  $route
-     * @param  mixed  $parameters
-     * @param  int  $status
-     * @param  array  $headers
+     * @param string $route
+     * @param mixed  $parameters
+     * @param int    $status
+     * @param array  $headers
+     *
      * @return CHTTP_RedirectResponse
      */
     public function redirectToRoute($route, $parameters = [], $status = 302, $headers = []) {
@@ -201,10 +213,11 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new redirect response to a controller action.
      *
-     * @param  string  $action
-     * @param  mixed  $parameters
-     * @param  int  $status
-     * @param  array  $headers
+     * @param string $action
+     * @param mixed  $parameters
+     * @param int    $status
+     * @param array  $headers
+     *
      * @return CHTTP_RedirectResponse
      */
     public function redirectToAction($action, $parameters = [], $status = 302, $headers = []) {
@@ -214,10 +227,11 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new redirect response, while putting the current URL in the session.
      *
-     * @param  string  $path
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  bool|null  $secure
+     * @param string    $path
+     * @param int       $status
+     * @param array     $headers
+     * @param bool|null $secure
+     *
      * @return CHTTP_RedirectResponse
      */
     public function redirectGuest($path, $status = 302, $headers = [], $secure = null) {
@@ -227,14 +241,14 @@ class CHTTP_ResponseFactory {
     /**
      * Create a new redirect response to the previously intended location.
      *
-     * @param  string  $default
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  bool|null  $secure
+     * @param string    $default
+     * @param int       $status
+     * @param array     $headers
+     * @param bool|null $secure
+     *
      * @return CHTTP_RedirectResponse
      */
     public function redirectToIntended($default = '/', $status = 302, $headers = [], $secure = null) {
         return $this->redirector->intended($default, $status, $headers, $secure);
     }
-
 }

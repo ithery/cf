@@ -49,7 +49,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
      * @param mixed  $identifier
      * @param string $token
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return CAuth_AuthenticatableInterface|null
      */
     public function retrieveByToken($identifier, $token) {
         $model = $this->createModel();
@@ -94,7 +94,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
      *
      * @param array $credentials
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return CAuth_AuthenticatableInterface|null
      */
     public function retrieveByCredentials(array $credentials) {
         if (empty($credentials)
@@ -154,9 +154,9 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     /**
      * Get a new query builder for the model instance.
      *
-     * @param \Illuminate\Database\Eloquent\Model|null $model
+     * @param CModel|null $model
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
     protected function newModelQuery($model = null) {
         return is_null($model)
@@ -167,7 +167,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     /**
      * Create a new instance of the model.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return CModel
      */
     public function createModel() {
         $class = '\\' . ltrim($this->model, '\\');

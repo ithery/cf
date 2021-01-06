@@ -13,11 +13,35 @@ class CCrypt_HashManager extends CBase_ManagerAbstract implements CCrypt_HasherI
      *
      * @return CCrypt_HashManager
      */
-    public static function instance() {
+
+    protected $config;
+
+    protected $driverName;
+
+    public static function instance($driver = null) {
         if (static::$instance == null) {
-            static::$instance = new static();
+            static::$instance = [];
         }
-        return static::$instance;
+        if (!isset(static::$instance[$driver])) {
+            static::$instance[$driver] = new static($driver);
+        }
+        return static::$instance[$driver];
+    }
+
+    /**
+     * Create a new manager instance.
+     *
+     * @param null|string $driverName
+     *
+     * @return void
+     */
+    public function __construct($driverName = null) {
+        parent::__construct();
+        $this->config = CConfig::instance('hashing');
+        if ($driverName == null) {
+            $driverName = $this->getDefaultDriver();
+        }
+        $this->driverName = $driverName;
     }
 
     /**
@@ -26,7 +50,7 @@ class CCrypt_HashManager extends CBase_ManagerAbstract implements CCrypt_HasherI
      * @return CCrypt_Hasher_BcryptHasher
      */
     public function createBcryptDriver() {
-        return new CCrypt_Hasher_BcryptHasher($this->config->get('hashing.bcrypt', []));
+        return new CCrypt_Hasher_BcryptHasher($this->config->get('bcrypt', []));
     }
 
     /**
@@ -35,7 +59,7 @@ class CCrypt_HashManager extends CBase_ManagerAbstract implements CCrypt_HasherI
      * @return CCrypt_Hasher_ArgonHasher
      */
     public function createArgonDriver() {
-        return new CCrypt_Hasher_ArgonHasher($this->config->get('hashing.argon', []));
+        return new CCrypt_Hasher_ArgonHasher($this->config->get('argon', []));
     }
 
     /**
@@ -44,7 +68,16 @@ class CCrypt_HashManager extends CBase_ManagerAbstract implements CCrypt_HasherI
      * @return CCrypt_Hasher_Argon2IdHasher
      */
     public function createArgon2idDriver() {
-        return new CCrypt_Hasher_Argon2IdHasher($this->config->get('hashing.argon', []));
+        return new CCrypt_Hasher_Argon2IdHasher($this->config->get('argon', []));
+    }
+
+    /**
+     * Create an instance of the Bcrypt hash Driver.
+     *
+     * @return CCrypt_Hasher_Md5Hasher
+     */
+    public function createMd5Driver() {
+        return new CCrypt_Hasher_Md5Hasher($this->config->get('md5', []));
     }
 
     /**
@@ -101,6 +134,13 @@ class CCrypt_HashManager extends CBase_ManagerAbstract implements CCrypt_HasherI
      * @return string
      */
     public function getDefaultDriver() {
-        return $this->config->get('hashing.driver', 'bcrypt');
+        return $this->config->get('driver', 'bcrypt');
+    }
+
+    public function driver($driver = null) {
+        if ($driver == null) {
+            $driver = $this->driverName;
+        }
+        return parent::driver($driver);
     }
 }

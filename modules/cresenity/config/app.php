@@ -36,6 +36,7 @@ return [
         'passwords' => 'users',
         'username' => 'username',
         'email' => 'email',
+        'hasher' => 'md5',
         'views' => true,
         'home' => '/home',
         'prefix' => '',
@@ -49,7 +50,7 @@ return [
             CApp_Auth_Features::emailVerification(),
             CApp_Auth_Features::updateProfileInformation(),
             CApp_Auth_Features::updatePasswords(),
-            CApp_Auth_Features::twoFactorAuthentication(),
+            //CApp_Auth_Features::twoFactorAuthentication(),
         ],
     ],
 ];

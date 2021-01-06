@@ -46,4 +46,11 @@ interface CAuth_GuardInterface {
      * @return void
      */
     public function setUser(CAuth_AuthenticatableInterface $user);
+
+    /**
+     * Get the user provider used by the guard.
+     *
+     * @return CAuth_UserProviderInterface
+     */
+    public function getProvider();
 }

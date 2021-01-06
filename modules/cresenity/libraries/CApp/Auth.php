@@ -152,6 +152,14 @@ class CApp_Auth {
      * @return string
      */
     public static function username() {
-        return CF::config('app.auth.email', 'username');
+        return CF::config('app.auth.username', 'username');
+    }
+
+    public static function guard() {
+        return c::auth(CF::config('app.auth.guard'));
+    }
+
+    public static function loginRateLimiter() {
+        return new CApp_Auth_LoginRateLimiter(new CCache_RateLimiter(CCache::repository()));
     }
 }

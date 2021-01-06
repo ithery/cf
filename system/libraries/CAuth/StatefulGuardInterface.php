@@ -22,8 +22,8 @@ interface CAuth_StatefulGuardInterface extends CAuth_GuardInterface {
     /**
      * Log a user into the application.
      *
-     * @param \Illuminate\Contracts\Auth\Authenticatable $user
-     * @param bool                                       $remember
+     * @param CAuth_AuthenticatableInterface $user
+     * @param bool                           $remember
      *
      * @return void
      */

@@ -922,10 +922,12 @@ class c {
     /**
      * Get hash manager instance
      *
+     * @param null|string $hasher
+     *
      * @return CCrypt_HashManager
      */
-    public static function hash() {
-        return CCrypt_HashManager::instance();
+    public static function hash($hasher = null) {
+        return CCrypt_HashManager::instance($hasher);
     }
 
     /**
@@ -1050,7 +1052,7 @@ class c {
      *
      * @param string|null $guard
      *
-     * @return CAuth_Factory|CAuth_GuardInterface|CAuth_StatefulGuardInterface
+     * @return CAuth_Manager|CAuth_GuardInterface|CAuth_StatefulGuardInterface
      */
     public static function auth($guard = null) {
         if (is_null($guard)) {
