@@ -5,17 +5,22 @@ trait CApp_Auth_Controller_LoginTrait {
      * Attempt to authenticate a new session.
      *
      * @param CHTTP_Request $request
+     * @param null|mixed    $callback
      *
      * @return mixed
      */
-    public function store(CHTTP_Request $request) {
+    public function store(CHTTP_Request $request, $callback = null) {
         $this->validate($request, [
             CApp_Auth::username() => 'required|string',
             'password' => 'required|string',
         ]);
 
-        return $this->loginPipeline($request)->then(function ($request) {
-            return c::app(CApp_Auth_Response_LoginResponse::class);
+        return $this->loginPipeline($request)->then(function ($request) use ($callback) {
+            if ($callback != null) {
+                return $callback($request);
+            } else {
+                return c::app(CApp_Auth_Response_LoginResponse::class);
+            }
         });
     }
 

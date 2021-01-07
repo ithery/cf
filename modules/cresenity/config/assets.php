@@ -14,13 +14,13 @@ return [
         'disk' => 'local',
         'minify' => false,
         'filters' => [],
-        'versioning' => true,
+        'versioning' => false,
     ],
     'js' => [
         'compile' => false,
         'minify' => false,
         'disk' => 'local',
         'filters' => [],
-        'versioning' => true,
+        'versioning' => false,
     ],
 ];
