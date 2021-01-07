@@ -758,67 +758,6 @@ class CDatabase {
     }
 
     /**
-     * Compiles the select statement based on the other functions called and runs the query.
-     *
-     * @param string      $table  table name
-     * @param null|string $limit  limit clause
-     * @param null|string $offset offset clause
-     *
-     * @return CDatabase_Result
-     */
-    public function get($table = '', $limit = null, $offset = null) {
-        if ($table != '') {
-            $this->from($table);
-        }
-
-        if (!is_null($limit)) {
-            $this->limit($limit, $offset);
-        }
-
-        $sql = $this->driver->compile_select(get_object_vars($this));
-
-        $this->reset_select();
-
-        $result = $this->query($sql);
-
-        $this->last_query = $sql;
-
-        return $result;
-    }
-
-    /**
-     * Compiles the select statement based on the other functions called and runs the query.
-     *
-     * @param string $table  table name
-     * @param array  $where  where clause
-     * @param string $limit  limit clause
-     * @param string $offset offset clause
-     *
-     * @return Database_Core This Database object.
-     */
-    public function getwhere($table = '', $where = null, $limit = null, $offset = null) {
-        if ($table != '') {
-            $this->from($table);
-        }
-
-        if (!is_null($where)) {
-            $this->where($where);
-        }
-
-        if (!is_null($limit)) {
-            $this->limit($limit, $offset);
-        }
-
-        $sql = $this->driver->compile_select(get_object_vars($this));
-
-        $this->reset_select();
-
-        $result = $this->query($sql);
-
-        return $result;
-    }
-
-    /**
      * Compiles the select statement based on the other functions called and returns the query string.
      *
      * @param string $table  table name
@@ -1033,60 +972,6 @@ class CDatabase {
     }
 
     /**
-     * Count query records.
-     *
-     * @param string $table table name
-     * @param array  $where where clause
-     *
-     * @return integer
-     */
-    public function count_records($table = false, $where = null) {
-        if (count($this->from) < 1) {
-            if ($table == false) {
-                throw new CDatabase_Exception('You must set a database table for your query');
-            }
-            $this->from($table);
-        }
-
-        if ($where !== null) {
-            $this->where($where);
-        }
-
-        $query = $this->select('COUNT(*) AS ' . $this->escape_column('records_found'))->get()->result(true);
-
-        return (int) $query->current()->records_found;
-    }
-
-    /**
-     * Resets all private select variables.
-     *
-     * @return void
-     */
-    protected function reset_select() {
-        $this->select = [];
-        $this->from = [];
-        $this->join = [];
-        $this->where = [];
-        $this->orderby = [];
-        $this->groupby = [];
-        $this->having = [];
-        $this->distinct = false;
-        $this->limit = false;
-        $this->offset = false;
-    }
-
-    /**
-     * Resets all private insert and update variables.
-     *
-     * @return void
-     */
-    protected function reset_write() {
-        $this->set = [];
-        $this->from = [];
-        $this->where = [];
-    }
-
-    /**
      * Lists all the tables in the current database.
      *
      * @return array
@@ -1146,8 +1031,7 @@ class CDatabase {
     /**
      * Get the field data for a database table, along with the field's attributes.
      *
-     * @param   string  table name
-     * @param mixed $table
+     * @param string $table table name
      *
      * @return array
      */
@@ -1160,22 +1044,19 @@ class CDatabase {
     /**
      * Get the field data for a database table, along with the field's attributes.
      *
-     * @param   string  table name
-     * @param mixed $table
+     * @param string $table table name
      *
      * @return array
      */
     public function listFields($table = '') {
         $this->link or $this->connect();
-
         return $this->driver->list_fields($this->config['table_prefix'] . $table);
     }
 
     /**
      * Escapes a value for a query.
      *
-     * @param   mixed   value to escape
-     * @param mixed $value
+     * @param mixed $value value to escape
      *
      * @return string
      */
@@ -1186,8 +1067,7 @@ class CDatabase {
     /**
      * Escapes a string for a query.
      *
-     * @param   string  string to escape
-     * @param mixed $str
+     * @param string $str string to escape
      *
      * @return string
      */
@@ -1198,8 +1078,7 @@ class CDatabase {
     /**
      * Escapes a table name for a query.
      *
-     * @param   string  string to escape
-     * @param mixed $table
+     * @param string $table string to escape
      *
      * @return string
      */
@@ -1210,97 +1089,12 @@ class CDatabase {
     /**
      * Escapes a column name for a query.
      *
-     * @param   string  string to escape
-     * @param mixed $table
+     * @param string $table string to escape
      *
      * @return string
      */
     public function escapeColumn($table) {
         return $this->driver->escape_column($table);
-    }
-
-    /**
-     * Returns table prefix of current configuration.
-     *
-     * @return string
-     */
-    public function table_prefix() {
-        return $this->config['table_prefix'];
-    }
-
-    /**
-     * Clears the query cache.
-     *
-     * @param   string|true  clear cache by SQL statement or TRUE for last query
-     * @param null|mixed $sql
-     *
-     * @return Database_Core This Database object.
-     */
-    public function clear_cache($sql = null) {
-        if ($sql === true) {
-            $this->driver->clear_cache($this->last_query);
-        } elseif (is_string($sql)) {
-            $this->driver->clear_cache($sql);
-        } else {
-            $this->driver->clear_cache();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Pushes existing query space onto the query stack.  Use push
-     * and pop to prevent queries from clashing before they are
-     * executed
-     *
-     * @return Database_Core This Databaes object
-     */
-    public function push() {
-        array_push($this->query_history, [
-            $this->select,
-            $this->from,
-            $this->join,
-            $this->where,
-            $this->orderby,
-            $this->order,
-            $this->groupby,
-            $this->having,
-            $this->distinct,
-            $this->limit,
-            $this->offset
-        ]);
-
-        $this->reset_select();
-
-        return $this;
-    }
-
-    /**
-     * Pops from query stack into the current query space.
-     *
-     * @return Database_Core This Databaes object
-     */
-    public function pop() {
-        if (count($this->query_history) == 0) {
-            // No history
-            return $this;
-        }
-
-        list(
-                $this->select,
-                $this->from,
-                $this->join,
-                $this->where,
-                $this->orderby,
-                $this->order,
-                $this->groupby,
-                $this->having,
-                $this->distinct,
-                $this->limit,
-                $this->offset
-                ) = array_pop($this->query_history);
-
-        return $this;
     }
 
     /**
