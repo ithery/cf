@@ -1,29 +1,27 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 24, 2019, 3:48:03 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 24, 2019, 3:48:03 AM
  */
 trait CElement_Component_DataTable_Trait_ExportTrait {
-
     public $export_xml;
     public $export_excel;
     public $export_excelxml;
     public $export_excelcsv;
     public $export_pdf;
-    public $report_header = array();
+    public $report_header = [];
     public $export_filename = '';
     public $export_sheetname = '';
 
     private static function exportExcelxmlStatic($filename, $sheet_name = null, $table) {
-
-
-        header("Cache-Control: no-cache, no-store, must-revalidate");
-        header("Content-Type: application/vnd.ms-excel");
-        header("Content-Disposition: attachment; filename=" . $filename);
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename=' . $filename);
         echo '
                 <html xmlns:o="urn:schemas-microsoft-com:office:office"
                         xmlns:x="urn:schemas-microsoft-com:office:excel"
@@ -142,36 +140,36 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
             $data = CDatabase::instance()->query($table->query);
         }
         if (!is_resource($data)) {
-            if (is_object($data))
+            if (is_object($data)) {
                 $data = $data->result_array(false);
+            }
         }
         foreach ($data as $row) {
             $no++;
-            $key = "";
+            $key = '';
 
             if (array_key_exists($table->keyField, $row)) {
-
                 $key = $row[$table->keyField];
             }
-            $class = "";
+            $class = '';
             if ($no % 2 == 0) {
-                $class .= " even";
+                $class .= ' even';
             } else {
-                $class .= " odd";
+                $class .= ' odd';
             }
             echo '<tr class="' . $class . '" id="tr-' . $key . '">';
-
 
             if ($table->numbering) {
                 echo '<td scope="row" class="align-right">' . $no . '</td>';
             }
 
-            $jsparam = array();
+            $js = '';
+            $jsparam = [];
             foreach ($table->columns as $col) {
                 $col_found = false;
-                $new_v = "";
-                $col_v = "";
-                $ori_v = "";
+                $new_v = '';
+                $col_v = '';
+                $ori_v = '';
                 //do print from query
                 foreach ($row as $k => $v) {
                     if ($k == $col->get_fieldname()) {
@@ -186,10 +184,8 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 if (strlen($col->format) > 0) {
                     $temp_v = $col->format;
                     foreach ($row as $k2 => $v2) {
-
-                        if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
-                            $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
+                        if (strpos($temp_v, '{' . $k2 . '}') !== false) {
+                            $temp_v = str_replace('{' . $k2 . '}', $v2, $temp_v);
                         }
                         $col_v = $temp_v;
                     }
@@ -212,22 +208,22 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                     }
                     //call_user_func($table->cellCallbackFunc,$table,$col->get_fieldname(),$row,$v);
                 }
-                $class = "";
+                $class = '';
                 switch ($col->getAlign()) {
                     case CConstant::ALIGN_LEFT:
-                        $class .= " align-left";
+                        $class .= ' align-left';
                         break;
                     case CConstant::ALIGN_RIGHT:
-                        $class .= " align-right";
+                        $class .= ' align-right';
                         break;
                     case CConstant::ALIGN_CENTER:
-                        $class .= " align-center";
+                        $class .= ' align-center';
                         break;
                 }
                 if ($no % 2 == 0) {
-                    $class .= " even";
+                    $class .= ' even';
                 } else {
-                    $class .= " odd";
+                    $class .= ' odd';
                 }
                 echo '<td class="' . $class . '" data-column="' . $col->get_fieldname() . '">' . $new_v . '</td>';
 
@@ -241,29 +237,34 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
             $totalColumn = count($table->columns);
             $additionColumn = 0;
-            if ($table->numbering)
+            if ($table->numbering) {
                 $additionColumn++;
+            }
 
             foreach ($table->footer_field as $f) {
                 echo '<tr>';
 
-                $colspan = $f["labelcolspan"];
-                if ($colspan == 0)
+                $colspan = $f['labelcolspan'];
+                if ($colspan == 0) {
                     $colspan = $totalColumn + $additionColumn - 1;
+                }
                 echo '<td class="tfoot" colspan="' . ($colspan) . '">';
-                echo $f["label"];
+                echo $f['label'];
                 echo '</td>';
-                $class = "";
-                switch ($f["align"]) {
-                    case "left": $class .= " align-left";
+                $class = '';
+                switch ($f['align']) {
+                    case 'left':
+                        $class .= ' align-left';
                         break;
-                    case "right": $class .= " align-right";
+                    case 'right':
+                        $class .= ' align-right';
                         break;
-                    case "center": $class .= " align-center";
+                    case 'center':
+                        $class .= ' align-center';
                         break;
                 }
 
-                $fval = $f["value"];
+                $fval = $f['value'];
 
                 if (is_array($fval)) {
                     $skip_column = 0;
@@ -275,17 +276,20 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                             $is_skipped = true;
                         }
                         if (!$is_skipped) {
-                            $fcolval = "";
+                            $fcolval = '';
                             if (isset($fval[$col->get_fieldname()])) {
                                 $fcolval = $fval[$col->get_fieldname()];
                             }
 
                             switch ($col->get_align()) {
-                                case "left": $class .= " align-left";
+                                case 'left':
+                                    $class .= ' align-left';
                                     break;
-                                case "right": $class .= " align-right";
+                                case 'right':
+                                    $class .= ' align-right';
                                     break;
-                                case "center": $class .= " align-center";
+                                case 'center':
+                                    $class .= ' align-center';
                                     break;
                             }
                             echo '<td class="tfoot ' . $class . '">';
@@ -313,13 +317,15 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
     }
 
     public function setPdfOrientation($orientation) {
-
-        if (strtoupper($orientation) == "PORTRAIT")
-            $orientation = "P";
-        if (strtoupper($orientation) == "LANDSCAPE")
-            $orientation = "L";
-        if (!in_array($orientation, array("L", "P")))
-            $orientation = "P";
+        if (strtoupper($orientation) == 'PORTRAIT') {
+            $orientation = 'P';
+        }
+        if (strtoupper($orientation) == 'LANDSCAPE') {
+            $orientation = 'L';
+        }
+        if (!in_array($orientation, ['L', 'P'])) {
+            $orientation = 'P';
+        }
 
         $this->pdf_orientation = $orientation;
         return $this;
@@ -339,53 +345,58 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
     public function exportExcelcsv($filename) {
         $this->export_excelcsv = true;
-        $csv_field_terminated = ",";
-        $csv_field_enclosed = "\"";
-        $csv_field_escaped = "\"\"";
+        $csv_field_terminated = ',';
+        $csv_field_enclosed = '"';
+        $csv_field_escaped = '""';
         $csv_line_terminated = "\r\n";
         $csv_header = true;
         $csv_header_uppercase = true;
-        $csv_header_field_terminated = ",";
+        $csv_header_field_terminated = ',';
         $csv_header_line_terminated = "\r\n";
-        header("Cache-Control: no-cache, no-store, must-revalidate");
-        header("Content-Type: application/vnd.ms-excel");
-        header("Content-Disposition: attachment; filename=" . $filename);
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename=' . $filename);
         if ($csv_header) {
-            $line_header = "";
+            $line_header = '';
             if ($this->numbering) {
-                if (strlen($line_header) > 0)
+                if (strlen($line_header) > 0) {
                     $line_header .= $csv_header_field_terminated;
+                }
                 $field = 'No';
-                if ($csv_header_uppercase)
+                if ($csv_header_uppercase) {
                     $field = strtoupper($field);
+                }
                 $line_header .= $field;
             }
             foreach ($this->columns as $col) {
-                if (strlen($line_header) > 0)
+                if (strlen($line_header) > 0) {
                     $line_header .= $csv_header_field_terminated;
+                }
                 $field = $col->get_label();
-                if ($csv_header_uppercase)
+                if ($csv_header_uppercase) {
                     $field = strtoupper($field);
+                }
                 $line_header .= $field;
             }
             echo $line_header . $csv_header_line_terminated;
         }
         $data = $this->data;
         $no = 0;
-        if (is_object($data))
+        if (is_object($data)) {
             $data = $data->result_array(false);
+        }
         foreach ($data as $row) {
             $no++;
-            $key = "";
-            $line = "";
+            $key = '';
+            $line = '';
             if (array_key_exists($this->keyField, $row)) {
-
                 $key = $row[$this->keyField];
             }
-            $class = "";
+            $class = '';
             if ($this->numbering) {
-                if (strlen($line) > 0)
+                if (strlen($line) > 0) {
                     $line .= $csv_field_terminated;
+                }
                 $field = $no;
                 if (strlen($csv_field_escaped) > 0) {
                     $field = str_replace($csv_field_enclosed, $csv_field_escaped, $field);
@@ -396,12 +407,12 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 $line .= $field;
             }
 
-            $jsparam = array();
+            $jsparam = [];
             foreach ($this->columns as $col) {
                 $col_found = false;
-                $new_v = "";
-                $col_v = "";
-                $ori_v = "";
+                $new_v = '';
+                $col_v = '';
+                $ori_v = '';
                 //do print from query
                 foreach ($row as $k => $v) {
                     if ($k == $col->get_fieldname()) {
@@ -416,10 +427,8 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 if (strlen($col->format) > 0) {
                     $temp_v = $col->format;
                     foreach ($row as $k2 => $v2) {
-
-                        if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
-                            $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
+                        if (strpos($temp_v, '{' . $k2 . '}') !== false) {
+                            $temp_v = str_replace('{' . $k2 . '}', $v2, $temp_v);
                         }
                         $col_v = $temp_v;
                     }
@@ -436,12 +445,12 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                             ->set_require($this->requires)
                             ->execute();
 
-
                     //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
                 }
-                $class = "";
-                if (strlen($line) > 0)
+                $class = '';
+                if (strlen($line) > 0) {
                     $line .= $csv_field_terminated;
+                }
                 $field = $new_v;
                 if (strlen($csv_field_escaped) > 0) {
                     $field = str_replace($csv_field_enclosed, $csv_field_escaped, $field);
@@ -451,11 +460,8 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 }
                 $line .= $field;
 
-
-
                 $col_found = true;
             }
-
 
             echo $line . $csv_line_terminated;
         }
@@ -465,18 +471,18 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
     public function exportExcelxml($filename, $sheet_name = null) {
         $this->export_excelxml = true;
 
-        header("Cache-Control: no-cache, no-store, must-revalidate");
-        header("Content-Type: application/vnd.ms-excel");
-        header("Content-Disposition: attachment; filename=" . $filename);
+        header('Cache-Control: no-cache, no-store, must-revalidate');
+        header('Content-Type: application/vnd.ms-excel');
+        header('Content-Disposition: attachment; filename=' . $filename);
 
         if ($this->isCallback) {
             $callbackData = CFunction::factory($this->query)
                     ->addArg($this->callbackOptions)
                     ->setRequire($this->callbackRequire)
                     ->execute();
-            $this->data =carr::get($callbackData,'data');
+            $this->data = carr::get($callbackData, 'data');
         }
-        
+
         echo '
                 <html xmlns:o="urn:schemas-microsoft-com:office:office"
                         xmlns:x="urn:schemas-microsoft-com:office:excel"
@@ -567,8 +573,9 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         $header_count = count($this->report_header);
         $totalColumn = count($this->columns);
         $additionColumn = 0;
-        if ($this->numbering)
+        if ($this->numbering) {
             $additionColumn++;
+        }
         for ($ii = 1; $ii <= $header_count; $ii++) {
             echo '<tr><td colspan="' . ($totalColumn + $additionColumn) . '">' . $this->report_header[$ii - 1] . '</td></tr>';
         }
@@ -593,30 +600,28 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
         foreach ($data as $row) {
             $no++;
-            $key = "";
+            $key = '';
             if (array_key_exists($this->keyField, $row)) {
-
                 $key = $row[$this->keyField];
             }
-            $class = "";
+            $class = '';
             if ($no % 2 == 0) {
-                $class .= " even";
+                $class .= ' even';
             } else {
-                $class .= " odd";
+                $class .= ' odd';
             }
             echo '<tr class="' . $class . '" id="tr-' . $key . '">';
-
 
             if ($this->numbering) {
                 echo '<td scope="row" class="align-right">' . $no . '</td>';
             }
 
-            $jsparam = array();
+            $jsparam = [];
             foreach ($this->columns as $col) {
                 $col_found = false;
-                $new_v = "";
-                $col_v = "";
-                $ori_v = "";
+                $new_v = '';
+                $col_v = '';
+                $ori_v = '';
                 //do print from query
                 foreach ($row as $k => $v) {
                     if ($k == $col->getFieldname()) {
@@ -634,10 +639,8 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 if (strlen($col->format) > 0) {
                     $temp_v = $col->format;
                     foreach ($row as $k2 => $v2) {
-
-                        if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
-                            $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
+                        if (strpos($temp_v, '{' . $k2 . '}') !== false) {
+                            $temp_v = str_replace('{' . $k2 . '}', $v2, $temp_v);
                         }
                         $col_v = $temp_v;
                     }
@@ -654,25 +657,24 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                             ->setRequire($this->requires)
                             ->execute();
 
-
                     //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
                 }
-                $class = "";
+                $class = '';
                 switch ($col->getAlign()) {
                     case CConstant::ALIGN_LEFT:
-                        $class .= " align-left";
+                        $class .= ' align-left';
                         break;
                     case CConstant::ALIGN_RIGHT:
-                        $class .= " align-right";
+                        $class .= ' align-right';
                         break;
                     case CConstant::ALIGN_CENTER:
-                        $class .= " align-center";
+                        $class .= ' align-center';
                         break;
                 }
                 if ($no % 2 == 0) {
-                    $class .= " even";
+                    $class .= ' even';
                 } else {
-                    $class .= " odd";
+                    $class .= ' odd';
                 }
                 echo '<td class="' . $class . '" data-column="' . $col->getFieldname() . '">' . $new_v . '</td>';
 
@@ -686,29 +688,34 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
             $totalColumn = count($this->columns);
             $additionColumn = 0;
-            if ($this->numbering)
+            if ($this->numbering) {
                 $additionColumn++;
+            }
 
             foreach ($this->footer_field as $f) {
                 echo '<tr>';
 
-                $colspan = $f["labelcolspan"];
-                if ($colspan == 0)
+                $colspan = $f['labelcolspan'];
+                if ($colspan == 0) {
                     $colspan = $totalColumn + $additionColumn - 1;
+                }
                 echo '<td class="tfoot" colspan="' . ($colspan) . '">';
-                echo $f["label"];
+                echo $f['label'];
                 echo '</td>';
-                $class = "";
-                switch ($f["align"]) {
-                    case "left": $class .= " align-left";
+                $class = '';
+                switch ($f['align']) {
+                    case 'left':
+                        $class .= ' align-left';
                         break;
-                    case "right": $class .= " align-right";
+                    case 'right':
+                        $class .= ' align-right';
                         break;
-                    case "center": $class .= " align-center";
+                    case 'center':
+                        $class .= ' align-center';
                         break;
                 }
 
-                $fval = $f["value"];
+                $fval = $f['value'];
 
                 if (is_array($fval)) {
                     $skip_column = 0;
@@ -720,20 +727,20 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                             $is_skipped = true;
                         }
                         if (!$is_skipped) {
-                            $fcolval = "";
+                            $fcolval = '';
                             if (isset($fval[$col->get_fieldname()])) {
                                 $fcolval = $fval[$col->get_fieldname()];
                             }
 
                             switch ($col->getAlign()) {
                                 case CConstant::ALIGN_LEFT:
-                                    $class .= " align-left";
+                                    $class .= ' align-left';
                                     break;
                                 case CConstant::ALIGN_RIGHT:
-                                    $class .= " align-right";
+                                    $class .= ' align-right';
                                     break;
                                 case CConstant::ALIGN_CENTER:
-                                    $class .= " align-center";
+                                    $class .= ' align-center';
                                     break;
                             }
                             echo '<td class="tfoot ' . $class . '">';
@@ -763,7 +770,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
     public function exportExcel($filename, $sheet_name = 'data') {
         $this->export_excel = true;
-        $excel = CExcel::factory()->set_creator("cresenity_system")->set_subject("Cresenity Report");
+        $excel = CExcel::factory()->set_creator('cresenity_system')->set_subject('Cresenity Report');
         $excel->setActiveSheetName($sheet_name);
         $header_count = count($this->report_header);
         $colStart = 1;
@@ -776,20 +783,16 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
             $totalColumn = 2;
         }
 
-
-
         $totalColumn += $additionColumn - 1;
 
-
         for ($ii = 1; $ii <= $header_count; $ii++) {
-
             $excel->writeByIndex(0, $ii, $this->report_header[$ii - 1]);
             $excel->mergeCell(0, $ii, $totalColumn, $ii);
         }
 
         $i = $colStart;
         if ($this->numbering) {
-            $excel->writeByIndex($i, $header_count + 1, "No");
+            $excel->writeByIndex($i, $header_count + 1, 'No');
             $i++;
         }
         foreach ($this->columns as $col) {
@@ -797,15 +800,11 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
             $i++;
         }
 
-
-
-
         $i = $colStart;
         $j = 2 + $header_count;
         $no = 0;
 
         foreach ($this->data as $row) {
-
             $i = $colStart;
             $no++;
             $key = carr::get($row, $this->keyField);
@@ -815,11 +814,10 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 $i++;
             }
 
-
             foreach ($this->columns as $col) {
                 $col_found = false;
-                $new_v = "";
-                $col_v = "";
+                $new_v = '';
+                $col_v = '';
                 //do print from query
                 foreach ($row as $k => $v) {
                     if ($k == $col->getFieldname()) {
@@ -834,10 +832,8 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 if (strlen($col->format) > 0) {
                     $temp_v = $col->format;
                     foreach ($row as $k2 => $v2) {
-
-                        if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
-                            $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
+                        if (strpos($temp_v, '{' . $k2 . '}') !== false) {
+                            $temp_v = str_replace('{' . $k2 . '}', $v2, $temp_v);
                         }
                         $col_v = $temp_v;
                     }
@@ -863,27 +859,25 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                             ->setRequire($this->requires)
                             ->execute();
 
-
                     //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
                 }
-                $class = "";
+                $class = '';
                 switch ($col->getAlign()) {
                     case CConstant::ALIGN_LEFT:
-                        $class .= " align-left";
+                        $class .= ' align-left';
                         break;
                     case CConstant::ALIGN_RIGHT:
-                        $class .= " align-right";
+                        $class .= ' align-right';
                         break;
                     case CConstant::ALIGN_CENTER:
-                        $class .= " align-center";
+                        $class .= ' align-center';
                         break;
                 }
                 //parse new_v
-                $ss = array();
+                $ss = [];
                 while (preg_match('/<a.+?>(.+?)<\/a>/', $new_v, $ss)) {
                     $new_v = str_replace($ss[0], $ss[1], $new_v);
                 }
-
 
                 $excel->writeByIndex($i, $j, $new_v);
                 $excel->setAlignByIndex($i, $j, $col->getAlign());
@@ -895,23 +889,24 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         }
         //footer
 
-
         if ($this->footer) {
             $totalColumn = count($this->columns);
             $additionColumn = 0;
-            if ($this->numbering)
+            if ($this->numbering) {
                 $additionColumn++;
-            if ($totalColumn < 2)
+            }
+            if ($totalColumn < 2) {
                 $totalColumn = 2;
+            }
             foreach ($this->footer_field as $f) {
-
-                $colspan = $f["labelcolspan"];
-                if ($colspan == 0)
+                $colspan = $f['labelcolspan'];
+                if ($colspan == 0) {
                     $colspan = $totalColumn + $additionColumn - 1;
+                }
 
-                $excel->writeByIndex($colStart, $j, $f["label"] . $colspan);
-                $excel->setAlignByIndex($colStart, $j, "left");
-                $fval = $f["value"];
+                $excel->writeByIndex($colStart, $j, $f['label'] . $colspan);
+                $excel->setAlignByIndex($colStart, $j, 'left');
+                $fval = $f['value'];
 
                 if (is_array($fval)) {
                     $skip_column = 0;
@@ -925,20 +920,20 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                             $is_skipped = true;
                         }
                         if (!$is_skipped) {
-                            $fcolval = "";
+                            $fcolval = '';
                             if (isset($fval[$col->get_fieldname()])) {
                                 $fcolval = $fval[$col->get_fieldname()];
                             }
 
                             switch ($col->getAlign()) {
                                 case CConstant::ALIGN_LEFT:
-                                    $class .= " align-left";
+                                    $class .= ' align-left';
                                     break;
                                 case CConstant::ALIGN_RIGHT:
-                                    $class .= " align-right";
+                                    $class .= ' align-right';
                                     break;
                                 case CConstant::ALIGN_CENTER:
-                                    $class .= " align-center";
+                                    $class .= ' align-center';
                                     break;
                             }
                             $excel->writeByIndex($i, $j, $fcolval);
@@ -948,7 +943,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                     }
                 } else {
                     $excel->writeByIndex($totalColumn, $j, $fval);
-                    $excel->setAlignByIndex($totalColumn, $j, $f["align"]);
+                    $excel->setAlignByIndex($totalColumn, $j, $f['align']);
                 }
                 if ($colspan > 1) {
                     $excel->merge_cell($colStart, $j, $colspan - 1, $j);
@@ -962,9 +957,9 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         $excel->setHeaderStyle($header_count + 1);
         $sfn = cstr::sanitize($filename, true);
 
-        $fn = cexport::makepath("excel", $sfn);
+        $fn = CExporter::makePath('excel', $sfn);
         $excel->save($fn);
-        //echo $fn;
+        // echo $fn;
 
         cdownload::force($fn, null, $sfn);
     }
@@ -1004,5 +999,4 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         }
         return '';
     }
-
 }

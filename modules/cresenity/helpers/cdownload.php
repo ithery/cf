@@ -1,9 +1,8 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 class cdownload {
-
     /**
      * Force a download of a file to the user's browser. This function is
      * binary-safe and will work with any MIME type that Kohana is aware of.
@@ -11,11 +10,16 @@ class cdownload {
      * @param   string  a file path or file name
      * @param   mixed   data to be sent if the filename does not exist
      * @param   string  suggested filename to display in the download
-     * @return  void
+     * @param null|mixed $filename
+     * @param null|mixed $data
+     * @param null|mixed $nicename
+     *
+     * @return void
      */
-    public static function force($filename = NULL, $data = NULL, $nicename = NULL) {
-        if (empty($filename))
-            return FALSE;
+    public static function force($filename = null, $data = null, $nicename = null) {
+        if (empty($filename)) {
+            return false;
+        }
 
         if (is_file($filename)) {
             // Get the real path
@@ -45,7 +49,7 @@ class cdownload {
 
         if (empty($mime)) {
             // Set a default mime if none was found
-            $mime = array('application/octet-stream');
+            $mime = ['application/octet-stream'];
         }
         // Generate the server headers
         //header('Content-Type: '.$mime[0]);
@@ -66,14 +70,14 @@ class cdownload {
             header('Pragma: no-cache');
         }
         // Clear the output buffer
-        CF::close_buffers(FALSE);
+        // CF::close_buffers(FALSE);
 
         if (isset($filepath)) {
             //echo $filepath;
             $data = file_get_contents($filepath);
             echo $data;
 
-            // Open the file
+        // Open the file
             //$handle = fopen($filepath, 'rb');
             // Send the file data
             //fpassthru($handle);
@@ -83,8 +87,9 @@ class cdownload {
             // Send the file data
             echo $data;
         }
-    }
 
+        exit;
+    }
 }
 
 // End download
