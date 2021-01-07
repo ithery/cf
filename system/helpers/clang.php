@@ -98,7 +98,7 @@ class clang {
     }
 
     public static function get_file($lang) {
-        $file = CF::get_file('lang', $lang);
+        $file = CF::getFile('lang', $lang);
         if ($file != null) {
             return $file;
         }
@@ -106,7 +106,7 @@ class clang {
     }
 
     public static function get_dir($lang) {
-        $file = CF::get_dir('lang');
+        $file = CF::getDir('lang');
         if ($file != null) {
             return $file;
         }
