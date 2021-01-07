@@ -136,7 +136,7 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
             return $line;
         }
 
-        return $key;
+        return $this->makeReplacements($key, $replace);
     }
 
     /**
@@ -268,6 +268,9 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
         $replace = $this->sortReplacements($replace);
 
         foreach ($replace as $key => $value) {
+            if (cstr::start($key, ':')) {
+                $key = substr($key, 1);
+            }
             $line = str_replace(
                 [':' . $key, ':' . cstr::upper($key), ':' . cstr::ucfirst($key)],
                 [$value, cstr::upper($value), cstr::ucfirst($value)],
