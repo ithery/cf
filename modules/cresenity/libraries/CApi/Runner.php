@@ -19,7 +19,9 @@ class CApi_Runner {
     }
 
     public function runMethod(CApi_MethodAbstract $method) {
-        $method->execute();
+        if (!$method->hasError()) {
+            $method->execute();
+        }
 
         return $method->toArray();
     }
