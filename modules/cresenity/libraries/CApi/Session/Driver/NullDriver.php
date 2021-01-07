@@ -7,7 +7,6 @@ class CApi_Session_Driver_NullDriver extends CApi_Session_DriverAbstract {
 
     public function destroy($id) {
         return true;
-        //return $this->disk->delete($this->getFilePath($id));
     }
 
     public function gc($maxlifetime) {
