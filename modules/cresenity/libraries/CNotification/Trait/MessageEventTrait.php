@@ -132,7 +132,7 @@ trait CNotification_Trait_MessageEventTrait {
         }
 
         return !empty($result) ? $result : static::$dispatcher->{$method}(
-            "eloquent.{$event}: " . static::class,
+            "model.{$event}: " . static::class,
             $this
         );
     }
