@@ -4,10 +4,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Apr 4, 2019, 9:20:01 PM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 CBootstrap::instance()->addBootstrapper([
     CApp_Bootstrapper_DependencyChecker::class,

@@ -1,9 +1,12 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 $app = CApp::instance();
 $org = $app->org();
 $user = $app->user();
 $role = $app->role();
+
+$httpReferer = carr::get($_SERVER, 'HTTP_REFERER', '');
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
@@ -71,9 +74,10 @@ $role = $app->role();
                                         <p><strong>Complete Uri</strong>:<?php echo crouter::complete_uri(); ?></p>
                                         <p><strong>Controller</strong>:<?php echo crouter::controller(); ?></p>
                                         <p><strong>Method</strong>:<?php echo crouter::method(); ?></p>
+                                        <p><strong>Referer</strong>:<?php echo $httpReferer; ?></p>
                                         <h3><?php echo chtml::specialchars($error) ?></h3>
                                         <p><?php echo chtml::specialchars($description) ?></p>
-                                        <?php if (!empty($line) AND ! empty($file)): ?>
+                                        <?php if (!empty($line) and !empty($file)): ?>
                                             <p><?php echo CF::lang('core.error_file_line', ['file' => $file, 'line' => $line]) ?></p>
                                         <?php endif ?>
                                         <p>
@@ -92,7 +96,7 @@ $role = $app->role();
                         </table>
                     </td>
                 </tr>
-            </table>	
+            </table>
 
         </div>
 
