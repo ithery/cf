@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CVendor_Google_Recaptcha_RecaptchaV3 extends CVendor_Google_Recaptcha_AbstractRecaptcha {
     /* -----------------------------------------------------------------
       |  Properties
@@ -25,7 +19,7 @@ class CVendor_Google_Recaptcha_RecaptchaV3 extends CVendor_Google_Recaptcha_Abst
      */
 
     /**
-     * @param  string  $name
+     * @param string $name
      *
      * @return CElement_FormInput_Hidden
      */
@@ -37,12 +31,11 @@ class CVendor_Google_Recaptcha_RecaptchaV3 extends CVendor_Google_Recaptcha_Abst
     /**
      * Get script tag.
      *
-     * @param  string|null  $callbackName
+     * @param string|null $callbackName
      *
      * @return string
      */
     public function script($callbackName = null) {
-
         $script = '';
 
         if (!$this->scriptLoaded) {
@@ -79,7 +72,7 @@ class CVendor_Google_Recaptcha_RecaptchaV3 extends CVendor_Google_Recaptcha_Abst
     /**
      * Check if callback is not empty.
      *
-     * @param  string|null  $callbackName
+     * @param string|null $callbackName
      *
      * @return bool
      */
@@ -95,7 +88,7 @@ class CVendor_Google_Recaptcha_RecaptchaV3 extends CVendor_Google_Recaptcha_Abst
     /**
      * Parse the response.
      *
-     * @param  string  $json
+     * @param string $json
      *
      * @return CVendor_Google_Recaptcha_Http_ResponseV3|mixed
      */
@@ -106,7 +99,7 @@ class CVendor_Google_Recaptcha_RecaptchaV3 extends CVendor_Google_Recaptcha_Abst
     /**
      * Get script source link.
      *
-     * @param  string|null  $callbackName
+     * @param string|null $callbackName
      *
      * @return string
      */
@@ -121,9 +114,7 @@ class CVendor_Google_Recaptcha_RecaptchaV3 extends CVendor_Google_Recaptcha_Abst
         if ($this->hasCallbackName($callbackName)) {
             carr::set($queries, 'onload', $callbackName);
         }
-        
-        
+
         return $this->getClientUrl() . (count($queries) ? '?' . http_build_query($queries) : '');
     }
-
 }
