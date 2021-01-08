@@ -39,9 +39,9 @@ class CFRouter {
     /**
      * CFRouter get route data
      *
-     * @return array
-     *
      * @param null|mixed $uri
+     *
+     * @return array
      */
     public static function getRouteData($uri = null) {
         if (self::$routeData == null) {
@@ -156,7 +156,8 @@ class CFRouter {
 
                         // The controller must be a file that exists with the search path
                         if ($c = str_replace('\\', '/', realpath($dir . $controller_path . EXT))
-                                and is_file($c)) {
+                            and is_file($c)
+                        ) {
                             // Set controller name
                             $data['controller'] = $segment;
 
@@ -341,16 +342,18 @@ class CFRouter {
         return array_merge($routesConfig, $routesRuntime);
     }
 
+    //@codingStandardsIgnoreStart
     public static function routed_uri($uri, &$routes = null) {
         return static::routedUri($uri, $routes);
     }
 
+    //@codingStandardsIgnoreEnd
+
     /**
      * Generates routed URI from given URI.
      *
-     * @param  string  URI to convert
-     * @param mixed      $uri
-     * @param null|mixed $routes
+     * @param mixed  $uri
+     * @param string $routes URI to convert
      *
      * @return string Routed uri
      */
@@ -452,7 +455,6 @@ class CFRouter {
 
     public static function getRoutesConfig() {
         return CF::config('routes');
-        return carr::merge($routesConfig, $routesRuntime);
     }
 
     public static function getRoutesRuntime() {
