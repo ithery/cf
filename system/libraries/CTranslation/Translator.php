@@ -42,7 +42,7 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * The message selector.
      *
-     * @var \Illuminate\Translation\MessageSelector
+     * @var CTranslation_MessageSelector
      */
     protected $selector;
 
@@ -268,7 +268,7 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
         $replace = $this->sortReplacements($replace);
 
         foreach ($replace as $key => $value) {
-            if (cstr::start($key, ':')) {
+            if (cstr::startsWith($key, ':')) {
                 $key = substr($key, 1);
             }
             $line = str_replace(
