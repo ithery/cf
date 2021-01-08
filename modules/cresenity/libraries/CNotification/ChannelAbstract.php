@@ -19,7 +19,7 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
 
         $isQueued = CF::config('notification.queue.queued');
         if ($isQueued) {
-            $taskQueue = $notificationSenderJobClass::dispatch($options);
+            $taskQueue = call_user_func([$notificationSenderJobClass, 'dispatch'], $options);
             if ($customConnection = CF::config('notification.queue.connection')) {
                 $taskQueue->onConnection($customConnection);
             }
@@ -27,8 +27,9 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
                 $taskQueue->onQueue($customQueue);
             }
         } else {
-            $notificationSenderJobClass::dispatchNow($options);
+            $taskQueue = call_user_func([$notificationSenderJobClass, 'dispatchNow'], $options);
         }
+        return $taskQueue;
     }
 
     public function sendWithoutQueue($className, array $options = []) {
