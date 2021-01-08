@@ -75,8 +75,8 @@ $httpReferer = carr::get($_SERVER, 'HTTP_REFERER', '');
                                         <p><strong>Controller</strong>:<?php echo crouter::controller(); ?></p>
                                         <p><strong>Method</strong>:<?php echo crouter::method(); ?></p>
                                         <p><strong>Referer</strong>:<?php echo $httpReferer; ?></p>
-                                        <h3><?php echo chtml::specialchars($error) ?></h3>
-                                        <p><?php echo chtml::specialchars($description) ?></p>
+                                        <h3><?php echo c::e($error) ?></h3>
+                                        <p><?php echo c::e($description) ?></p>
                                         <?php if (!empty($line) and !empty($file)): ?>
                                             <p><?php echo CF::lang('core.error_file_line', ['file' => $file, 'line' => $line]) ?></p>
                                         <?php endif ?>
@@ -89,7 +89,7 @@ $httpReferer = carr::get($_SERVER, 'HTTP_REFERER', '');
 
                                         <?php if (!empty($trace)): ?>
                                             <h3><?php echo CF::lang('core.stack_trace') ?></h3>
-                                            <?php echo $trace ?>
+                                            <?php echo c::e($trace) ?>
                                         <?php endif ?>
                                 </td>
                             </tr>
