@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 2, 2019, 12:56:36 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 2, 2019, 12:56:36 AM
  */
 class CResources_File {
-
     /** @var string */
     public $name;
 
@@ -31,5 +31,4 @@ class CResources_File {
     public function __toString() {
         return "name: {$this->name}, size: {$this->size}, mime: {$this->mimeType}";
     }
-
 }

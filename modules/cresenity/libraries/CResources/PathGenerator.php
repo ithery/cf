@@ -34,6 +34,7 @@ class CResources_PathGenerator implements CResources_PathGeneratorInterface {
      * Get a unique base path for the given resource.
      */
     protected function getBasePath(CApp_Model_Interface_ResourceInterface $resource) {
+        /** @var CModel $resource */
         $ymd = date('Ymd', strtotime($resource->created));
         return 'resources' . '/' . $ymd . '/' . $resource->model_type . '/' . $resource->getKey();
     }
