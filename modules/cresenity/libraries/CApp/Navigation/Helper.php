@@ -1,15 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 1, 2018, 12:11:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 1, 2018, 12:11:34 PM
  */
 class CApp_Navigation_Helper {
-
-    protected static $role_navs = array();
+    protected static $role_navs = [];
 
     public static function nav($nav = null, $controller = null, $method = null, $path = null) {
         if ($controller == null) {
@@ -22,15 +22,16 @@ class CApp_Navigation_Helper {
             $path = CFRouter::$controller_dir;
         }
 
-
         if ($nav == null) {
             $navs = CApp_Navigation_Data::get();
-            if ($navs == null)
+            if ($navs == null) {
                 return null;
+            }
             foreach ($navs as $nav) {
                 $res = self::nav($nav, $controller, $method);
-                if ($res !== false)
+                if ($res !== false) {
                     return $res;
+                }
             }
         } else {
             $navPath = carr::get($nav, 'path', '');
@@ -44,15 +45,16 @@ class CApp_Navigation_Helper {
                 return trim($navUri, '/') == trim(CFRouter::$current_uri, '/');
             }
 
-            if ($navController != '' &&
-                    $navMethod != '' &&
-                    $path . $controller == $navPath . $navController &&
-                    ($method == $navMethod || in_array($method, $navAlias))) {
+            if ($navController != ''
+                && $navMethod != ''
+                && $path . $controller == $navPath . $navController
+                && ($method == $navMethod || in_array($method, $navAlias))
+            ) {
                 return $nav;
             }
 
-            if (isset($nav["action"])) {
-                foreach ($nav["action"] as $act) {
+            if (isset($nav['action'])) {
+                foreach ($nav['action'] as $act) {
                     $actPath = carr::get($act, 'path', $navPath);
                     $actMethod = carr::get($act, 'method', $navMethod);
                     $actController = carr::get($act, 'controller', $navController);
@@ -61,11 +63,12 @@ class CApp_Navigation_Helper {
                     }
                 }
             }
-            if (isset($nav["subnav"])) {
-                foreach ($nav["subnav"] as $sn) {
+            if (isset($nav['subnav'])) {
+                foreach ($nav['subnav'] as $sn) {
                     $res = self::nav($sn, $controller, $method);
-                    if ($res !== false)
+                    if ($res !== false) {
                         return $res;
+                    }
                 }
             }
         }
@@ -83,18 +86,19 @@ class CApp_Navigation_Helper {
     }
 
     protected static function protectedhaveAccess($nav = null, $roleId = null, $appId = null, $domain = null) {
-
         $app = CApp::instance();
         if ($roleId == null) {
             $role = $app->role();
-            if ($role != null)
+            if ($role != null) {
                 $roleId = $role->role_id;
+            }
         }
         if ($appId == null) {
             $appId = CF::appId();
         }
-        if ($nav == null)
+        if ($nav == null) {
             $nav = self::nav();
+        }
 
         if ($nav === false) {
             return false;
@@ -103,7 +107,7 @@ class CApp_Navigation_Helper {
             return true;
         }
         $db = CDatabase::instance(null, null, $domain);
-        if ($roleId == "PUBLIC") {
+        if ($roleId == 'PUBLIC') {
             $roleId = null;
         }
 
@@ -113,13 +117,11 @@ class CApp_Navigation_Helper {
             return true;
         }
 
-
         if (!isset(self::$role_navs[$appId]) || !isset(self::$role_navs[$appId][$roleId])) {
             if (!isset(self::$role_navs[$appId])) {
-                self::$role_navs[$appId] = array();
+                self::$role_navs[$appId] = [];
             }
             if (!isset(self::$role_navs[$appId][$roleId])) {
-
                 $roleNavModel = CApp::model('RoleNav')->whereNull('role_id');
                 //$q = "select nav from role_nav where role_id is null and app_id=" . $db->escape($appId);
                 if ($roleId != null) {
@@ -132,12 +134,10 @@ class CApp_Navigation_Helper {
             }
         }
 
-        return in_array($nav["name"], self::$role_navs[$appId][$roleId]);
+        return in_array($nav['name'], self::$role_navs[$appId][$roleId]);
     }
 
     public static function havePermission($action, $nav = null, $roleId = null, $appId = null, $domain = null) {
-
-
         $app = CApp::instance();
 
         if ($roleId == null) {
@@ -167,17 +167,17 @@ class CApp_Navigation_Helper {
         return $role->rolePermission()->where('name', '=', $action)->where('app_id', '=', $appId)->count() > 0;
     }
 
-    public static function appUserRightsArray($appId, $roleId, $appRoleId = "", $domain = null) {
+    public static function appUserRightsArray($appId, $roleId, $appRoleId = '', $domain = null) {
         $navs = CApp_Navigation_Data::get($domain);
         return self::asUserRightsArray($appId, $roleId, $navs, $appRoleId, $domain);
     }
 
-    public static function asUserRightsArray($appId, $roleId, $navs = null, $appRoleId = "", $domain = "", $level = 0) {
+    public static function asUserRightsArray($appId, $roleId, $navs = null, $appRoleId = '', $domain = '', $level = 0) {
         if ($navs == null) {
             $navs = CNavigation::instance()->navs();
         }
 
-        $result = array();
+        $result = [];
 
         foreach ($navs as $d) {
             if (!self::accessAvailable($d, $appId, $domain, $appRoleId)) {
@@ -189,16 +189,16 @@ class CApp_Navigation_Helper {
                 throw new CException('Error on nav structure on navs: ' . json_encode($navs));
             }
 
-            $res["level"] = $level;
-            $res["role_id"] = $roleId;
-            $res["app_id"] = $appId;
-            $res["domain"] = $domain;
-            $subnav = array();
-            if (isset($d["subnav"]) && is_array($d["subnav"]) && count($d["subnav"]) > 0) {
-                $subnav = self::asUserRightsArray($appId, $roleId, $d["subnav"], $appRoleId, $domain, $level + 1);
+            $res['level'] = $level;
+            $res['role_id'] = $roleId;
+            $res['app_id'] = $appId;
+            $res['domain'] = $domain;
+            $subnav = [];
+            if (isset($d['subnav']) && is_array($d['subnav']) && count($d['subnav']) > 0) {
+                $subnav = self::asUserRightsArray($appId, $roleId, $d['subnav'], $appRoleId, $domain, $level + 1);
             }
-            if (count($subnav) == 0 && (!isset($d["controller"]) || strlen($d["controller"]) == 0 )) {
-                if (!isset($d["link"]) || strlen($d["link"]) == 0) {
+            if (count($subnav) == 0 && (!isset($d['controller']) || strlen($d['controller']) == 0)) {
+                if (!isset($d['link']) || strlen($d['link']) == 0) {
                     continue;
                 }
             }
@@ -209,68 +209,74 @@ class CApp_Navigation_Helper {
     }
 
     public static function isPublic($nav) {
-        if (isset($nav["is_public"]) && $nav["is_public"]) {
+        if (isset($nav['is_public']) && $nav['is_public']) {
             return true;
         }
         return false;
     }
 
     public static function childCount($nav) {
-        if (isset($nav["subnav"])) {
-            if (is_array($nav["subnav"])) {
-                return count($nav["subnav"]);
+        if (isset($nav['subnav'])) {
+            if (is_array($nav['subnav'])) {
+                return count($nav['subnav']);
             }
         }
         return 0;
     }
 
     public static function haveChild($nav) {
-        return self::childCount() > 0;
+        return self::childCount($nav) > 0;
     }
 
     public static function isLeaf($nav) {
-        return isset($nav["subnav"]) && is_array($nav["subnav"]);
+        return isset($nav['subnav']) && is_array($nav['subnav']);
     }
 
     public static function url($nav) {
-        $controller = "";
-        $method = "";
-        $path = "";
-        $link = "";
+        $controller = '';
+        $method = '';
+        $path = '';
+        $link = '';
 
-        if (isset($nav["path"]))
-            $path = $nav["path"];
-        if (isset($nav["controller"]))
-            $controller = $nav["controller"];
-        if (isset($nav["method"]))
-            $method = $nav["method"];
-        if (isset($nav["link"]))
-            $link = $nav["link"];
+        if (isset($nav['path'])) {
+            $path = $nav['path'];
+        }
+        if (isset($nav['controller'])) {
+            $controller = $nav['controller'];
+        }
+        if (isset($nav['method'])) {
+            $method = $nav['method'];
+        }
+        if (isset($nav['link'])) {
+            $link = $nav['link'];
+        }
 
         if (strlen($link) > 0) {
             $url = $link;
         } else {
-            if (strlen($path) > 0)
+            if (strlen($path) > 0) {
                 $path .= '/';
-            if (strlen($controller) == 0)
-                return "";
-            if (strlen($method) == 0)
-                return "";
-            $url = curl::base() . $path . $controller . "/" . $method;
+            }
+            if (strlen($controller) == 0) {
+                return '';
+            }
+            if (strlen($method) == 0) {
+                return '';
+            }
+            $url = curl::base() . $path . $controller . '/' . $method;
         }
-
 
         return $url;
     }
 
-    public static function accessAvailable($nav = null, $appId = "", $domain = "", $appRoleId = "") {
+    public static function accessAvailable($nav = null, $appId = '', $domain = '', $appRoleId = '') {
         if ($nav == null) {
             $nav = self::nav();
         }
         if ($nav === false) {
             return false;
         }
-        $navname = carr::get($nav, "name");
+        $navname = carr::get($nav, 'name');
         $app = CApp::instance();
 
         if (strlen($appRoleId) == 0) {
@@ -279,14 +285,12 @@ class CApp_Navigation_Helper {
             }
         }
 
-
-
         if (strlen($appRoleId) > 0) {
             $app_role = crole::get($appRoleId);
-            if ($app_role != null && $app_role->parent_id == null)
+            if ($app_role != null && $app_role->parent_id == null) {
                 return true;
-            if ($app_role != null && (!isset($nav["subnav"]) || count($nav["subnav"]) == 0)) {
-
+            }
+            if ($app_role != null && (!isset($nav['subnav']) || count($nav['subnav']) == 0)) {
                 $parent_role_id = $app_role->parent_id;
                 if ($parent_role_id != null) {
                     if (!self::haveAccess($nav, $appRoleId, $appId)) {
@@ -296,10 +300,9 @@ class CApp_Navigation_Helper {
             }
         }
 
-        if (isset($nav["requirements"])) {
-            $requirements = $nav["requirements"];
+        if (isset($nav['requirements'])) {
+            $requirements = $nav['requirements'];
             foreach ($requirements as $k => $v) {
-
                 $configValue = ccfg::get($k, $domain);
                 if ($configValue != $v) {
                     return false;
@@ -310,23 +313,24 @@ class CApp_Navigation_Helper {
         return true;
     }
 
-    public static function permissionAvailable($action, $nav = null, $appId = "", $domain = "", $appRoleId = "") {
-
-        if ($nav == null)
+    public static function permissionAvailable($action, $nav = null, $appId = '', $domain = '', $appRoleId = '') {
+        if ($nav == null) {
             $nav = self::nav();
-        if ($nav === false)
+        }
+        if ($nav === false) {
             return false;
+        }
 
-        if (!self::accessAvailable($nav, $appId, $domain, $appRoleId))
+        if (!self::accessAvailable($nav, $appId, $domain, $appRoleId)) {
             return false;
+        }
 
-        $navname = $nav["name"];
-        if (isset($nav["action"])) {
-            $navactions = $nav["action"];
+        $navname = $nav['name'];
+        if (isset($nav['action'])) {
+            $navactions = $nav['action'];
             foreach ($navactions as $act) {
-                if ($act['name'] == $action && isset($act["requirements"])) {
-
-                    $requirements = $act["requirements"];
+                if ($act['name'] == $action && isset($act['requirements'])) {
+                    $requirements = $act['requirements'];
 
                     foreach ($requirements as $k => $v) {
                         $config_value = ccfg::get($k, $domain);
@@ -342,52 +346,56 @@ class CApp_Navigation_Helper {
     }
 
     public static function render($navs = null, $level = 0, &$child = 0) {
-        $is_admin = CApp::instance()->isAdmin();
-        if ($navs == null)
+        $isAdministrator = CApp::instance()->isAdministrator();
+        if ($navs == null) {
             $navs = CNavigation::instance()->navs();
+        }
 
-        if ($navs == null)
+        if ($navs == null) {
             return false;
-        $html = "";
+        }
+        $html = '';
         $child_count = 0;
         foreach ($navs as $d) {
-
             $child = 0;
             $pass = 0;
-            $active_class = "";
-            $controller = "";
-            $method = "";
-            $label = "";
-            $icon = "";
+            $active_class = '';
+            $controller = '';
+            $method = '';
+            $label = '';
+            $icon = '';
 
-            if (isset($d["controller"]))
-                $controller = $d["controller"];
-            if (isset($d["method"]))
-                $method = $d["method"];
-            if (isset($d["label"]))
-                $label = $d["label"];
-            if (isset($d["icon"]))
-                $icon = $d["icon"];
+            if (isset($d['controller'])) {
+                $controller = $d['controller'];
+            }
+            if (isset($d['method'])) {
+                $method = $d['method'];
+            }
+            if (isset($d['label'])) {
+                $label = $d['label'];
+            }
+            if (isset($d['icon'])) {
+                $icon = $d['icon'];
+            }
 
+            $child_html = '';
 
-            $child_html = "";
-
-            if (isset($d["subnav"])) {
-                $child_html .= self::render($d["subnav"], $level + 1, $child);
+            if (isset($d['subnav'])) {
+                $child_html .= self::render($d['subnav'], $level + 1, $child);
             }
 
             $url = self::url($d);
 
-            if (!isset($url) || $url == null)
-                $url = "";
+            if (!isset($url) || $url == null) {
+                $url = '';
+            }
 
             if (strlen($child_html) > 0 || strlen($url) > 0) {
-                if (!self::accessAvailable($d, CF::app_id(), CF::domain())) {
+                if (!self::accessAvailable($d, CF::appId(), CF::domain())) {
                     continue;
                 }
-                if (isset($d["controller"]) && $d["controller"] != "") {
-                    if (!$is_admin && ccfg::get("have_user_access")) {
-
+                if (isset($d['controller']) && $d['controller'] != '') {
+                    if (!$isAdministrator && ccfg::get('have_user_access')) {
                         if (!self::haveAccess($d)) {
                             continue;
                         }
@@ -401,16 +409,16 @@ class CApp_Navigation_Helper {
                 $find_nav = self::nav($d);
 
                 if ($find_nav !== false) {
-                    $active_class = " active";
+                    $active_class = ' active';
                 }
 
-                $li_class = "sidenav-item ";
+                $li_class = 'sidenav-item ';
                 if ($child > 0) {
-                    $li_class .= " with-right-arrow";
+                    $li_class .= ' with-right-arrow';
                     if ($level == 0) {
-                        $li_class .= " dropdown";
+                        $li_class .= ' dropdown';
                     } else {
-                        $li_class .= " dropdown-submenu ";
+                        $li_class .= ' dropdown-submenu ';
                     }
                 }
 
@@ -428,12 +436,12 @@ class CApp_Navigation_Helper {
                 if (strlen($iconClass) > 0 && strpos($iconClass, 'fa-') === false && strpos($iconClass, 'ion-') === false) {
                     $iconClass = 'icon-' . $iconClass;
                 }
-                $icon_html = "";
+                $icon_html = '';
                 if (strlen($iconClass) > 0) {
                     $icon_html = '<i class="' . $iconClass . '"></i>';
                 }
-                if ($url == "") {
-                    $caret = "";
+                if ($url == '') {
+                    $caret = '';
                     if ($level == 0) {
                         $caret = '<b class="caret">';
                     }
@@ -444,13 +452,13 @@ class CApp_Navigation_Helper {
                     }
                     $elem .= "</a>\r\n";
                 } else {
-                    $target = "";
-                    $notif = "";
-                    if (isset($d["target"]) && strlen($d["target"]) > 0) {
-                        $target = ' target="' . $d["target"] . '"';
+                    $target = '';
+                    $notif = '';
+                    if (isset($d['target']) && strlen($d['target']) > 0) {
+                        $target = ' target="' . $d['target'] . '"';
                     }
-                    if (isset($d["notif_count"])) {
-                        $callable = $d["notif_count"];
+                    if (isset($d['notif_count'])) {
+                        $callable = $d['notif_count'];
 
                         if (is_callable($callable)) {
                             $notif = call_user_func($callable);
@@ -461,7 +469,7 @@ class CApp_Navigation_Helper {
                     if ($notif != null && $notif > 0) {
                         $strNotif = ' <span class="label label-info nav-notif nav-notif-count">' . $notif . '</span>';
                     }
-                    $elem = '<a class="' . $active_class . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . "</span>" . $strNotif . "</a>\r\n";
+                    $elem = '<a class="' . $active_class . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . '</span>' . $strNotif . "</a>\r\n";
                 }
                 $html .= $elem;
                 $html .= $child_html;
@@ -470,18 +478,16 @@ class CApp_Navigation_Helper {
         }
         if (strlen($html) > 0) {
             if ($level == 0) {
-
                 $html = "  <ul class=\"mainnav \">\r\n" . $html . "  </ul>\r\n";
             } else {
                 $html = "  <ul class=\"dropdown-menu\">\r\n" . $html . "  </ul>\r\n";
             }
         }
         if ($child_count == 0) {
-            $html = "";
+            $html = '';
         }
         $child = $child_count;
 
         return $html;
     }
-
 }
