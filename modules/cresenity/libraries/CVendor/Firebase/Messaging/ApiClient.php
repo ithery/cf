@@ -1,23 +1,14 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
-
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-
 
 /**
  * @internal
  */
-class CVendor_Firebase_Messaging_ApiClient implements ClientInterface
-{
+class CVendor_Firebase_Messaging_ApiClient implements ClientInterface {
     use CVendor_Firebase_Trait_WrappedGuzzleClientTrait;
 
     /** @var MessagingApiExceptionConverter */
@@ -29,8 +20,7 @@ class CVendor_Firebase_Messaging_ApiClient implements ClientInterface
     /**
      * @internal
      */
-    public function __construct(ClientInterface $client)
-    {
+    public function __construct(ClientInterface $client) {
         $this->client = $client;
         $this->errorHandler = new CVendor_Firebase_Messaging_ApiExceptionConverter();
 
@@ -45,49 +35,43 @@ class CVendor_Firebase_Messaging_ApiClient implements ClientInterface
      *
      * @deprecated 4.29.0
      */
-    public function getClient()
-    {
+    public function getClient() {
         return $this->client;
     }
 
     /**
      * @deprecated 4.29.0
      */
-    public function sendMessage(CVendor_Firebase_Messaging_MessageInterface $message)
-    {
-        return $this->send(new SendMessage($this->projectId, $message));
+    public function sendMessage(CVendor_Firebase_Messaging_MessageInterface $message) {
+        return $this->send(new CVendor_Firebase_Messaging_Request_SendMessageRequest($this->projectId, $message));
     }
 
     /**
      * @deprecated 4.29.0
      */
-    public function sendMessageAsync(CVendor_Firebase_Messaging_MessageInterface $message)
-    {
-        return $this->sendAsync(new SendMessage($this->projectId, $message));
+    public function sendMessageAsync(CVendor_Firebase_Messaging_MessageInterface $message) {
+        return $this->sendAsync(new CVendor_Firebase_Messaging_Request_SendMessageRequest($this->projectId, $message));
     }
 
     /**
      * @deprecated 4.29.0
      */
-    public function validateMessage(CVendor_Firebase_Messaging_MessageInterface $message)
-    {
-        return $this->send(new ValidateMessage($this->projectId, $message));
+    public function validateMessage(CVendor_Firebase_Messaging_MessageInterface $message) {
+        return $this->send(new CVendor_Firebase_Messaging_Request_ValidateMessageRequest($this->projectId, $message));
     }
 
     /**
      * @deprecated 4.29.0
      */
-    public function validateMessageAsync(CVendor_Firebase_Messaging_MessageInterface $message)
-    {
-        return $this->sendAsync(new ValidateMessage($this->projectId, $message));
+    public function validateMessageAsync(CVendor_Firebase_Messaging_MessageInterface $message) {
+        return $this->sendAsync(new CVendor_Firebase_Messaging_Request_ValidateMessageRequest($this->projectId, $message));
     }
 
     /**
      * @throws MessagingException
      * @throws FirebaseException
      */
-    public function send(RequestInterface $request, array $options = [])
-    {
+    public function send(RequestInterface $request, array $options = []) {
         try {
             return $this->client->send($request);
         } catch (Throwable $e) {
@@ -95,8 +79,7 @@ class CVendor_Firebase_Messaging_ApiClient implements ClientInterface
         }
     }
 
-    public function sendAsync(RequestInterface $request, array $options = [])
-    {
+    public function sendAsync(RequestInterface $request, array $options = []) {
         return $this->client->sendAsync($request, $options)
             ->then(null, function (Throwable $e) {
                 throw $this->errorHandler->convertException($e);
