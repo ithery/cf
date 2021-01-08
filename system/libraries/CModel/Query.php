@@ -4,10 +4,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Dec 26, 2017, 2:22:28 AM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 
 /**
@@ -244,11 +243,11 @@ class CModel_Query {
     /**
      * Create a collection of models from plain arrays.
      *
-     * @param array $items
+     * @param array|CDatabase_Result $items
      *
      * @return CModel_Collection
      */
-    public function hydrate(array $items) {
+    public function hydrate($items) {
         $instance = $this->newModelInstance();
 
         return $instance->newCollection(array_map(function ($item) use ($instance) {
@@ -266,7 +265,7 @@ class CModel_Query {
      */
     public function fromQuery($query, $bindings = []) {
         return $this->hydrate(
-            $this->query->getConnection()->select($query, $bindings)
+            $this->query->getConnection()->query($query, $bindings)
         );
     }
 
@@ -1063,7 +1062,7 @@ class CModel_Query {
      *
      * @param array $attributes
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return CModel
      */
     public function newModelInstance($attributes = []) {
         return $this->model->newInstance($attributes);
