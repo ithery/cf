@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CVendor_Firebase_Messaging {
-
     /** @var string */
     private $projectId;
 
@@ -18,6 +11,8 @@ class CVendor_Firebase_Messaging {
     private $appInstanceApi;
 
     /**
+     * @param null|mixed $projectId
+     *
      * @internal
      */
     public function __construct(CVendor_Firebase_Messaging_ApiClient $messagingApiClient, CVendor_Firebase_Messaging_AppInstanceApiClient $appInstanceApiClient, $projectId = null) {
@@ -54,13 +49,13 @@ class CVendor_Firebase_Messaging {
     }
 
     /**
-     * @param array|Message|mixed $message
+     * @param array|Message|mixed                             $message
      * @param RegistrationToken[]|string[]|RegistrationTokens $registrationTokens
      *
      * @throws InvalidArgumentException if the message is invalid
-     * @throws MessagingException if the API request failed
-     * @throws FirebaseException if something very unexpected happened (never :))
-     * 
+     * @throws MessagingException       if the API request failed
+     * @throws FirebaseException        if something very unexpected happened (never :))
+     *
      * @return CVendor_Firebase_Messaging_MulticastSendReport
      */
     public function sendMulticast($message, $registrationTokens) {
@@ -78,8 +73,8 @@ class CVendor_Firebase_Messaging {
      * @param array[]|Message[]|Messages $messages
      *
      * @throws InvalidArgumentException if the message is invalid
-     * @throws MessagingException if the API request failed
-     * @throws FirebaseException if something very unexpected happened (never :))
+     * @throws MessagingException       if the API request failed
+     * @throws FirebaseException        if something very unexpected happened (never :))
      */
     public function sendAll($messages) {
         $ensuredMessages = [];
@@ -106,11 +101,11 @@ class CVendor_Firebase_Messaging {
     public function validate($message) {
         $message = $this->makeMessage($message);
 
-        $request = new ValidateMessage($this->projectId, $message);
+        $request = new CVendor_Firebase_Messaging_Request_ValidateMessageRequest($this->projectId, $message);
         try {
             $response = $this->messagingApi->send($request);
-        } catch (NotFound $e) {
-            $error = new InvalidMessage($e->getMessage(), $e->getCode(), $e->getPrevious());
+        } catch (CVendor_Firebase_Messaging_Exception_NotFoundException $e) {
+            $error = new CVendor_Firebase_Messaging_Exception_InvalidMessageException($e->getMessage(), $e->getCode(), $e->getPrevious());
             $error = $error->withErrors($e->errors());
 
             if ($response = $e->response()) {
@@ -120,51 +115,51 @@ class CVendor_Firebase_Messaging {
             throw $error;
         }
 
-        return JSON::decode((string) $response->getBody(), true);
+        return CHelper::json()->decode((string) $response->getBody(), true);
     }
 
     /**
-     * @param string|Topic $topic
-     * @param mixed $registrationTokenOrTokens
+     * @param string|CVendor_Firebase_Messaging_Topic $topic
+     * @param mixed                                   $registrationTokenOrTokens
      *
      * @throws MessagingException
      * @throws FirebaseException
      */
     public function subscribeToTopic($topic, $registrationTokenOrTokens) {
-        $topic = $topic instanceof Topic ? $topic : Topic::fromValue($topic);
+        $topic = $topic instanceof CVendor_Firebase_Messaging_Topic ? $topic : CVendor_Firebase_Messaging_Topic::fromValue($topic);
         $tokens = $this->ensureNonEmptyRegistrationTokens($registrationTokenOrTokens);
 
         $response = $this->appInstanceApi->subscribeToTopic($topic, $tokens->asStrings());
 
-        return JSON::decode((string) $response->getBody(), true);
+        return CHelper::json()->decode((string) $response->getBody(), true);
     }
 
     /**
-     * @param string|Topic $topic
-     * @param mixed $registrationTokenOrTokens
+     * @param string|CVendor_Firebase_Messaging_Topic $topic
+     * @param mixed                                   $registrationTokenOrTokens
      *
      * @throws MessagingException
      * @throws FirebaseException
      */
     public function unsubscribeFromTopic($topic, $registrationTokenOrTokens) {
-        $topic = $topic instanceof Topic ? $topic : Topic::fromValue($topic);
+        $topic = $topic instanceof CVendor_Firebase_Messaging_Topic ? $topic : CVendor_Firebase_Messaging_Topic::fromValue($topic);
         $tokens = $this->ensureNonEmptyRegistrationTokens($registrationTokenOrTokens);
 
         $response = $this->appInstanceApi->unsubscribeFromTopic($topic, $tokens->asStrings());
 
-        return JSON::decode((string) $response->getBody(), true);
+        return CHelper::json()->decode((string) $response->getBody(), true);
     }
 
     /**
+     * @param CVendor_Firebase_Messaging_RegistrationToken|string $registrationToken
+     *
      * @see https://developers.google.com/instance-id/reference/server#results
      *
-     * @param RegistrationToken|string $registrationToken
-     *
-     * @throws InvalidArgument if the registration token is invalid
+     * @throws InvalidArgument   if the registration token is invalid
      * @throws FirebaseException
      */
     public function getAppInstance($registrationToken) {
-        $token = $registrationToken instanceof RegistrationToken ? $registrationToken : RegistrationToken::fromValue($registrationToken);
+        $token = $registrationToken instanceof CVendor_Firebase_Messaging_RegistrationToken ? $registrationToken : CVendor_Firebase_Messaging_RegistrationToken::fromValue($registrationToken);
 
         try {
             $response = $this->appInstanceApi->getAppInstance((string) $token);
@@ -190,7 +185,7 @@ class CVendor_Firebase_Messaging {
 
         if (!\is_array($message)) {
             throw new CVendor_Firebase_Exception_InvalidArgumentException(
-                    'Unsupported message type. Use an array or a class implementing %s' . CVendor_Firebase_Messaging_MessageInterface::class
+                'Unsupported message type. Use an array or a class implementing %s' . CVendor_Firebase_Messaging_MessageInterface::class
             );
         }
 
@@ -218,7 +213,6 @@ class CVendor_Firebase_Messaging {
     }
 
     /**
-     * 
      * @return CVendor_Firebase_Messaging_CloudMessage
      */
     public static function createCloudMessage() {
@@ -226,11 +220,13 @@ class CVendor_Firebase_Messaging {
     }
 
     /**
-     * 
+     * @param null|mixed $title
+     * @param null|mixed $body
+     * @param null|mixed $imageUrl
+     *
      * @return CVendor_Firebase_Messaging_Notification
      */
     public static function createNotification($title = null, $body = null, $imageUrl = null) {
         return CVendor_Firebase_Messaging_Notification::create($title, $body, $imageUrl);
     }
-
 }
