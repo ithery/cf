@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 14, 2018, 9:32:42 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 14, 2018, 9:32:42 PM
  */
 class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
-
     public function __construct($options) {
         parent::__construct($options);
         $this->baseUrl .= 'Server/';
@@ -25,7 +25,7 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
     }
 
     public function getDomainInfo($domain) {
-        $post = array();
+        $post = [];
         $post['domain'] = $domain;
         $data = $this->request($this->baseUrl . 'GetDomainInfo', $post);
         return $data;
@@ -42,14 +42,14 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
     }
 
     public function deleteDomain($domain) {
-        $post = array();
+        $post = [];
         $post['domain'] = $domain;
         $data = $this->request($this->baseUrl . 'DomainDelete', $post);
         return $data;
     }
 
     public function getFileList($directory) {
-        $post = array();
+        $post = [];
         $post['directory'] = $directory;
         $data = $this->request($this->baseUrl . 'GetFileList', $post);
         return $data;
@@ -80,5 +80,4 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
         $post['file'] = $file;
         return $this->temp($post);
     }
-
 }
