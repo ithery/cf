@@ -1,17 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 24, 2019, 1:09:54 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 24, 2019, 1:09:54 AM
  */
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
 class CGit_Client {
-
     protected $path;
 
     public function __construct($path = null) {
@@ -25,7 +25,8 @@ class CGit_Client {
     /**
      * Creates a new repository on the specified path.
      *
-     * @param  string     $path Path where the new repository will be created
+     * @param string     $path Path where the new repository will be created
+     * @param null|mixed $bare
      *
      * @return CGit_Repository Instance of Repository
      */
@@ -40,7 +41,7 @@ class CGit_Client {
     /**
      * Opens a repository at the specified path.
      *
-     * @param  string     $path Path where the repository is located
+     * @param string $path Path where the repository is located
      *
      * @return CGit_Repository Instance of Repository
      */
@@ -96,5 +97,4 @@ class CGit_Client {
         $this->path = $path;
         return $this;
     }
-
 }
