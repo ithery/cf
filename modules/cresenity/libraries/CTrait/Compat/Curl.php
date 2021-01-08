@@ -1,17 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 29, 2018, 10:57:46 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 29, 2018, 10:57:46 PM
  */
+//@codingStandardsIgnoreStart
 trait CTrait_Compat_Curl {
-
     /**
-     * 
      * @deprecated since version 1.2, please use function addBreadcrumb
+     *
      * @return CCurl
      */
     public function set_ssl() {
@@ -19,9 +20,10 @@ trait CTrait_Compat_Curl {
     }
 
     /**
-     * 
      * @deprecated since version 1.2, please use function setPost
+     *
      * @param array $data
+     *
      * @return $this
      */
     public function set_post($data) {
@@ -71,5 +73,5 @@ trait CTrait_Compat_Curl {
     public function get_post_data() {
         return $this->getPostData();
     }
-
 }
+//@codingStandardsIgnoreEnd
