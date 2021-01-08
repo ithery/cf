@@ -3,6 +3,8 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CSession {
+    use CTrait_Compat_Session;
+
     // Session singleton
     protected static $instance;
     // Protected key names (cannot be set by the user)
@@ -10,8 +12,7 @@ class CSession {
     // Configuration and driver
     protected static $config;
     protected static $driver;
-    // Flash variables
-    protected static $flash;
+
     // Input library
     protected $input;
 
@@ -154,7 +155,7 @@ class CSession {
             $_SESSION['total_hits'] = 0;
             $_SESSION['_kf_flash_'] = [];
 
-            $_SESSION['user_agent'] = CF::userAgent();
+            $_SESSION['user_agent'] = c::userAgent();
             $_SESSION['ip_address'] = $this->input->ip_address();
         }
 
@@ -171,7 +172,7 @@ class CSession {
                 switch ($valid) {
                     // Check user agent for consistency
                     case 'user_agent':
-                        if ($_SESSION[$valid] !== CF::userAgent()) {
+                        if ($_SESSION[$valid] !== c::userAgent()) {
                             return $this->create();
                         }
                         break;
@@ -285,7 +286,7 @@ class CSession {
      *
      * @return void
      */
-    public function set($keys, $val = false) {
+    public static function set($keys, $val = false) {
         if (empty($keys)) {
             return false;
         }
@@ -302,79 +303,6 @@ class CSession {
             // Set the key
             $_SESSION[$key] = $val;
         }
-    }
-
-    /**
-     * Set a flash variable.
-     *
-     * @param string|array $keys key, or array of values
-     * @param mixed        $val  value (if keys is not an array)
-     *
-     * @return void
-     */
-    public function set_flash($keys, $val = false) {
-        if (empty($keys)) {
-            return false;
-        }
-
-        if (!is_array($keys)) {
-            $keys = [$keys => $val];
-        }
-
-        foreach ($keys as $key => $val) {
-            if ($key == false) {
-                continue;
-            }
-
-            $this->flash[$key] = 'new';
-            $this->set($key, $val);
-        }
-    }
-
-    /**
-     * Freshen one, multiple or all flash variables.
-     *
-     * @param null|mixed $keys variable key(s)
-     *
-     * @return void
-     */
-    public function keep_flash($keys = null) {
-        $keys = ($keys === null) ? array_keys(CSession::$flash) : func_get_args();
-
-        foreach ($keys as $key) {
-            if (isset(CSession::$flash[$key])) {
-                CSession::$flash[$key] = 'new';
-            }
-        }
-    }
-
-    /**
-     * Expires old flash data and removes it from the session.
-     *
-     * @return void
-     */
-    public function expire_flash() {
-        static $run;
-
-        // Method can only be run once
-        if ($run === true) {
-            return;
-        }
-
-        if (!empty(CSession::$flash)) {
-            foreach (CSession::$flash as $key => $state) {
-                if ($state === 'old') {
-                    // Flash has expired
-                    unset(CSession::$flash[$key], $_SESSION[$key]);
-                } else {
-                    // Flash will expire
-                    CSession::$flash[$key] = 'old';
-                }
-            }
-        }
-
-        // Method has been run
-        $run = true;
     }
 
     /**

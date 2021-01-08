@@ -1103,6 +1103,10 @@ class c {
 
         return c::container()->make($abstract, $parameters);
     }
+
+    public static function userAgent() {
+        return (!empty($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '');
+    }
 }
 
 // End c
