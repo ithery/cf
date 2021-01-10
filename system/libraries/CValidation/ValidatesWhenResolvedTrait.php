@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Provides default implementation of ValidatesWhenResolved contract.
  */
 trait CValidation_ValidatesWhenResolvedTrait {
-
     /**
      * Validate the class instance.
      *
@@ -51,13 +44,14 @@ trait CValidation_ValidatesWhenResolvedTrait {
     /**
      * Handle a failed validation attempt.
      *
-     * @param  CValidation_Validator  $validator
+     * @param CValidation_Validator $validator
+     *
      * @return void
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \CValidation_Exception
      */
-    protected function failedValidation(Validator $validator) {
-        throw new ValidationException($validator);
+    protected function failedValidation(CValidation_Validator $validator) {
+        throw new CValidation_Exception($validator);
     }
 
     /**
@@ -78,10 +72,9 @@ trait CValidation_ValidatesWhenResolvedTrait {
      *
      * @return void
      *
-     * @throws \Illuminate\Validation\UnauthorizedException
+     * @throws \CValidation_UnauthorizedException
      */
     protected function failedAuthorization() {
-        throw new UnauthorizedException;
+        throw new CValidation_UnauthorizedException;
     }
-
 }

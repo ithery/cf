@@ -355,9 +355,9 @@ class CValidation_Validator {
             throw new CValidation_Exception($this);
         }
 
-        $data = CF::collect($this->getData());
+        $data = c::collect($this->getData());
 
-        return $data->only(CF::collect($this->getRules())->keys()->map(function ($rule) {
+        return $data->only(c::collect($this->getRules())->keys()->map(function ($rule) {
             return explode('.', $rule)[0];
         })->unique())->toArray();
     }
@@ -706,7 +706,7 @@ class CValidation_Validator {
      * @return array
      */
     protected function attributesThatHaveMessages() {
-        return CF::collect($this->messages()->toArray())->map(function ($message, $key) {
+        return c::collect($this->messages()->toArray())->map(function ($message, $key) {
             return explode('.', $key)[0];
         })->unique()->flip()->all();
     }
@@ -892,7 +892,7 @@ class CValidation_Validator {
      * @return $this
      */
     public function sometimes($attribute, $rules, callable $callback) {
-        $payload = new Fluent($this->getData());
+        $payload = new CBase_Fluent($this->getData());
 
         if (call_user_func($callback, $payload)) {
             foreach ((array) $attribute as $key) {
@@ -1244,6 +1244,6 @@ class CValidation_Validator {
         $messages = $this->errors()->messages();
         $flattenMessages = carr::flatten($messages);
 
-        return CF::collect($flattenMessages)->implode(',');
+        return c::collect($flattenMessages)->implode(',');
     }
 }

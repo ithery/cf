@@ -1,27 +1,30 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 10:07:30 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 10:07:30 AM
  */
 class CValidation_Data {
-
     public static function initializeAndGatherData($attribute, $masterData) {
         $data = carr::dot(static::initializeAttributeOnData($attribute, $masterData));
 
         return array_merge($data, static::extractValuesForWildcards(
-                        $masterData, $data, $attribute
+            $masterData,
+            $data,
+            $attribute
         ));
     }
 
     /**
      * Gather a copy of the attribute data filled with any missing attributes.
      *
-     * @param  string  $attribute
-     * @param  array  $masterData
+     * @param string $attribute
+     * @param array  $masterData
+     *
      * @return array
      */
     protected static function initializeAttributeOnData($attribute, $masterData) {
@@ -33,15 +36,16 @@ class CValidation_Data {
             return $data;
         }
 
-        return data_set($data, $attribute, null, true);
+        return CF::set($data, $attribute, null, true);
     }
 
     /**
      * Get all of the exact attribute values for a given wildcard attribute.
      *
-     * @param  array  $masterData
-     * @param  array  $data
-     * @param  string  $attribute
+     * @param array  $masterData
+     * @param array  $data
+     * @param string $attribute
+     *
      * @return array
      */
     protected static function extractValuesForWildcards($masterData, $data, $attribute) {
@@ -71,8 +75,9 @@ class CValidation_Data {
      *
      * Used to extract a sub-section of the data for faster iteration.
      *
-     * @param  string  $attribute
-     * @param  array  $masterData
+     * @param string $attribute
+     * @param array  $masterData
+     *
      * @return array
      */
     public static function extractDataFromPath($attribute, $masterData) {
@@ -94,11 +99,11 @@ class CValidation_Data {
      *
      * Allows us to not spin through all of the flattened data for some operations.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return string
      */
     public static function getLeadingExplicitAttributePath($attribute) {
         return rtrim(explode('*', $attribute)[0], '.') ?: null;
     }
-
 }
