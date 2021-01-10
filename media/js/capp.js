@@ -956,7 +956,7 @@ var Cresenity = function () {
 
                 (function (element) {
                     if (typeof settings.onBlock == 'function') {
-                        settings.onBlock();
+                        settings.onBlock($(element));
                     } else {
                         cresenity.blockElement($(element));
                     }
@@ -1010,7 +1010,7 @@ var Cresenity = function () {
                         complete: function () {
                             $(element).data('xhr', false);
                             if (typeof settings.onBlock == 'function') {
-                                settings.onUnblock();
+                                settings.onUnblock($(element));
                             } else {
                                 cresenity.unblockElement($(element));
                             }

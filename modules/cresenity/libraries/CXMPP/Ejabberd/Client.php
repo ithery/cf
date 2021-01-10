@@ -75,7 +75,12 @@ class CXMPP_Ejabberd_Client {
            
         
         } catch (GuzzleException $e) {
-            $result = $e->getResponse()->getBody()->getContents();
+            if ($e->getResponse() == null) {
+                throw $e;
+            }
+            else {
+                $result = $e->getResponse()->getBody()->getContents();
+            }
         } catch (\Exception $e) {
 
             $result = $e;
