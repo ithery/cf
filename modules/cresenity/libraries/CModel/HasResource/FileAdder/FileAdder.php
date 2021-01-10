@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 1, 2019, 11:15:13 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 1, 2019, 11:15:13 PM
  */
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
@@ -14,8 +15,7 @@ use CResources_File as PendingFile;
 use CResources_ImageGenerator_FileType_ImageType as ImageGenerator;
 
 class CModel_HasResource_FileAdder_FileAdder {
-
-    /** @var CModel subject */
+    /** @var CModel|CModel_HasResourceInterface subject */
     protected $subject;
 
     /** @var \Spatie\ResourceLibrary\Filesystem\Filesystem */
@@ -77,14 +77,13 @@ class CModel_HasResource_FileAdder_FileAdder {
         return $this;
     }
 
-    /*
+    /**
      * Set the file that needs to be imported.
      *
      * @param string|\Symfony\Component\HttpFoundation\File\UploadedFile $file
      *
      * @return $this
      */
-
     public function setFile($file) {
         $this->file = $file;
         if (is_string($file)) {
@@ -162,11 +161,10 @@ class CModel_HasResource_FileAdder_FileAdder {
     }
 
     public function toResourceCollectionOnCloudDisk($collectionName = 'default') {
-        return $this->toResourceCollection($collectionName, config('filesystems.cloud'));
+        return $this->toResourceCollection($collectionName, CF::config('storage.cloud'));
     }
 
     public function toResourceCollection($collectionName = 'default', $diskName = '') {
-       
         if (!is_file($this->pathToFile)) {
             throw CResources_Exception_FileCannotBeAdded_FileDoesNotExist::create($this->pathToFile);
         }
@@ -255,12 +253,11 @@ class CModel_HasResource_FileAdder_FileAdder {
         }
         if ($collectionSizeLimit = COptional::create($this->getResourceCollection($resource->collection_name))->collectionSizeLimit) {
             $collectionResource = $this->subject->fresh()->getResource($resource->collection_name);
-            
+
             if ($collectionResource->count() > $collectionSizeLimit) {
                 $model->clearResourceCollectionExcept($resource->collection_name, $collectionResource->reverse()->take($collectionSizeLimit));
             }
         }
-        
     }
 
     protected function getResourceCollection($collectionName) {
@@ -280,5 +277,4 @@ class CModel_HasResource_FileAdder_FileAdder {
             throw CResources_Exception_FileCannotBeAdded_FileUnacceptableForCollection::create($file, $collection, $this->subject);
         }
     }
-
 }
