@@ -24,12 +24,12 @@ class CRunner_FFMpeg {
     private $disk;
 
     /**
-     * @var \ProtoneMedia\LaravelFFMpeg\Drivers\PHPFFMpeg
+     * @var CRunner_FFMpeg_Driver_PHPFFMpeg
      */
     private $driver;
 
     /**
-     * @var \ProtoneMedia\LaravelFFMpeg\Filesystem\MediaCollection
+     * @var CRunner_FFMpeg_MediaCollection
      */
     private $collection;
 
@@ -168,10 +168,10 @@ class CRunner_FFMpeg {
     /**
      * Forwards all calls to the underlying driver.
      *
-     * @return void
-     *
      * @param mixed $method
      * @param mixed $arguments
+     *
+     * @return void
      */
     public function __call($method, $arguments) {
         $result = $this->forwardCallTo($driver = $this->getDriver(), $method, $arguments);
