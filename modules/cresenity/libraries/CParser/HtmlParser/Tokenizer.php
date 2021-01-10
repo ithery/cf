@@ -553,7 +553,7 @@ class CParser_HtmlParser_Tokenizer {
         } elseif ($this->running) {
             if ($this->state === State::Text) {
                 if ($this->sectionStart !== $this->index) {
-                    $this->callbacks->ontext($this->buffer . substr($this->sectionStart));
+                    $this->callbacks->ontext(substr($this->buffer, $this->sectionStart));
                 }
                 $this->buffer = '';
                 $this->bufferOffset += $this->index;
@@ -565,7 +565,7 @@ class CParser_HtmlParser_Tokenizer {
                 $this->index = 0;
             } else {
                 //remove everything unnecessary
-                $this->buffer = $this->buffer . substr($this->sectionStart);
+                $this->buffer = substr($this->buffer, $this->sectionStart);
                 $this->index -= $this->sectionStart;
                 $this->bufferOffset += $this->sectionStart;
             }
@@ -573,17 +573,20 @@ class CParser_HtmlParser_Tokenizer {
         }
     }
 
-    //TODO make events conditional
     public function write($chunk) {
         if ($this->ended) {
-            $this->callbacks->onerror(Error('.write() after done!'));
+            $this->callbacks->onerror(new Exception('.write() after done!'), $this->state);
         }
         $this->buffer .= $chunk;
         $this->parse();
     }
 
-    // Iterates through the buffer, calling the function corresponding to the current state.
-    // States that are more likely to be hit are higher up, as a performance improvement.
+    /**
+     * Iterates through the buffer, calling the function corresponding to the current state.
+     * States that are more likely to be hit are higher up, as a performance improvement.
+     *
+     * @return void
+     */
     public function parse() {
         while ($this->index < strlen($this->buffer) && $this->running) {
             $c = $this->buffer[$this->index];
@@ -711,7 +714,7 @@ class CParser_HtmlParser_Tokenizer {
 
     public function resume() {
         $this->running = true;
-        if ($this->index < $this->buffer . length) {
+        if ($this->index < strlen($this->buffer)) {
             $this->parse();
         }
         if ($this->ended) {
@@ -721,7 +724,7 @@ class CParser_HtmlParser_Tokenizer {
 
     public function end($chunk) {
         if ($this->ended) {
-            $this->callbacks->onerror('.end() after done!');
+            $this->callbacks->onerror(new Exception('.end() after done!'), $this->state);
         }
         if ($chunk) {
             $this->write($chunk);

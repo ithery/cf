@@ -1,5 +1,6 @@
 <?php
 
+//@codingStandardsIgnoreStart
 class CParser_HtmlParser_Tokenizer_State {
     const Text = 1;
     const BeforeTagName = 2; //after <
@@ -63,3 +64,5 @@ class CParser_HtmlParser_Tokenizer_State {
     const InNumericEntity = 54;
     const InHexEntity = 55; //X
 }
+
+//@codingStandardsIgnoreEnd
