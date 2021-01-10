@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 10, 2019, 7:42:33 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 10, 2019, 7:42:33 AM
  */
 class CApp_Cloud_Api {
-
     /**
      * @var string
      */
@@ -26,7 +26,7 @@ class CApp_Cloud_Api {
 
     /**
      * @param CApp_Cloud_AdapterInterface $adapter
-     * @param string|null      $endpoint
+     * @param string|null                 $endPoint
      */
     public function __construct(CApp_Cloud_AdapterInterface $adapter, $endPoint = null) {
         $this->adapter = $adapter;
@@ -34,13 +34,12 @@ class CApp_Cloud_Api {
     }
 
     public function getDefaultPost() {
-        $default = array();
+        $default = [];
         $default['domain'] = CF::domain();
         return $default;
     }
 
-    public function execute($query, $postData = array()) {
-
+    public function execute($query, $postData = []) {
         $post = array_merge($this->getDefaultPost(), $postData);
         $errCode = 0;
         $errMessage = '';
@@ -69,8 +68,6 @@ class CApp_Cloud_Api {
             throw new CApp_Cloud_Exception_ApiException($errMessage);
         }
 
-
         return carr::get($result, 'data');
     }
-
 }

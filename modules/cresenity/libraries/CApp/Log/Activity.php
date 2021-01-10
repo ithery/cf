@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 16, 2019, 2:40:46 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 16, 2019, 2:40:46 AM
  */
 use CApp_Base as Base;
 
 class CApp_Log_Activity {
-
     public static function populate($description, $data) {
         $model = new CApp_Model_LogActivity();
         $nav = cnav::nav();
@@ -19,14 +19,17 @@ class CApp_Log_Activity {
         $navLabel = '';
         $actionName = '';
         $actionLabel = '';
+        $controller = CFRouter::$controller;
+        $method = CFRouter::$method;
+
         if (!$nav) {
-            $navName = $nav["name"];
-            $navLabel = $nav["label"];
-            if (isset($nav["action"])) {
-                foreach ($nav["action"] as $act) {
-                    if (isset($act["controller"]) && isset($act["method"]) && $act["controller"] == $controller && $act["method"] == $method) {
-                        $actionName = $act["name"];
-                        $actionLabel = $act["label"];
+            $navName = $nav['name'];
+            $navLabel = $nav['label'];
+            if (isset($nav['action'])) {
+                foreach ($nav['action'] as $act) {
+                    if (isset($act['controller']) && isset($act['method']) && $act['controller'] == $controller && $act['method'] == $method) {
+                        $actionName = $act['name'];
+                        $actionLabel = $act['label'];
                     }
                 }
             }
@@ -45,7 +48,7 @@ class CApp_Log_Activity {
             'browser_version' => $browser->getVersion(),
             'platform' => $browser->getPlatform(),
             'platform_version' => null,
-            "user_id" => $userId,
+            'user_id' => $userId,
             'uri' => crouter::complete_uri(),
             'routed_uri' => crouter::routed_uri(),
             'controller' => crouter::controller(),
@@ -63,5 +66,4 @@ class CApp_Log_Activity {
         $model->description = $description;
         $model->save();
     }
-
 }
