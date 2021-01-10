@@ -468,11 +468,11 @@ class CView_Factory {
     /**
      * Set the view finder instance.
      *
-     * @param \Illuminate\View\ViewFinderInterface $finder
+     * @param \CView_Finder $finder
      *
      * @return void
      */
-    public function setFinder(ViewFinderInterface $finder) {
+    public function setFinder(CView_Finder $finder) {
         $this->finder = $finder;
     }
 
