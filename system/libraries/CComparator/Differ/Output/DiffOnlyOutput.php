@@ -1,17 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Builds a diff string representation in a loose unified diff format
  * listing only changes lines. Does not include line numbers.
  */
 final class CComparator_Differ_Output_DiffOnlyOutput implements CComparator_Differ_OutputInterface {
-
     /**
      * @var string
      */
@@ -30,11 +23,11 @@ final class CComparator_Differ_Output_DiffOnlyOutput implements CComparator_Diff
             }
         }
         foreach ($diff as $diffEntry) {
-            if ($diffEntry[1] === Differ::ADDED) {
+            if ($diffEntry[1] === CComparator_Differ::ADDED) {
                 \fwrite($buffer, '+' . $diffEntry[0]);
-            } elseif ($diffEntry[1] === Differ::REMOVED) {
+            } elseif ($diffEntry[1] === CComparator_Differ::REMOVED) {
                 \fwrite($buffer, '-' . $diffEntry[0]);
-            } elseif ($diffEntry[1] === Differ::DIFF_LINE_END_WARNING) {
+            } elseif ($diffEntry[1] === CComparator_Differ::DIFF_LINE_END_WARNING) {
                 \fwrite($buffer, ' ' . $diffEntry[0]);
                 continue; // Warnings should not be tested for line break, it will always be there
             } else { /* Not changed (old) 0 */
@@ -49,5 +42,4 @@ final class CComparator_Differ_Output_DiffOnlyOutput implements CComparator_Diff
         \fclose($buffer);
         return $diff;
     }
-
 }

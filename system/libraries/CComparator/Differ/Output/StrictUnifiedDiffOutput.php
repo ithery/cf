@@ -1,18 +1,11 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Strict Unified diff output builder.
  *
  * Generates (strict) Unified diff's (unidiffs) with hunks.
  */
 final class CComparator_Differ_Output_StrictUnifiedDiffOutput implements CComparator_Differ_OutputInterface {
-
     private static $default = [
         'collapseRanges' => true, // ranges of length one are rendered with the trailing `,1`
         'commonLineThreshold' => 6, // number of same lines before ending a new hunk and creating a new one (if needed)
@@ -51,26 +44,30 @@ final class CComparator_Differ_Output_StrictUnifiedDiffOutput implements CCompar
     public function __construct(array $options = []) {
         $options = \array_merge(self::$default, $options);
         if (!\is_bool($options['collapseRanges'])) {
-            throw new ConfigurationException('collapseRanges', 'a bool', $options['collapseRanges']);
+            throw new CComparator_Differ_Exception_ConfigurationException('collapseRanges', 'a bool', $options['collapseRanges']);
         }
         if (!\is_int($options['contextLines']) || $options['contextLines'] < 0) {
-            throw new ConfigurationException('contextLines', 'an int >= 0', $options['contextLines']);
+            throw new CComparator_Differ_Exception_ConfigurationException('contextLines', 'an int >= 0', $options['contextLines']);
         }
         if (!\is_int($options['commonLineThreshold']) || $options['commonLineThreshold'] <= 0) {
-            throw new ConfigurationException('commonLineThreshold', 'an int > 0', $options['commonLineThreshold']);
+            throw new CComparator_Differ_Exception_ConfigurationException('commonLineThreshold', 'an int > 0', $options['commonLineThreshold']);
         }
         foreach (['fromFile', 'toFile'] as $option) {
             if (!\is_string($options[$option])) {
-                throw new ConfigurationException($option, 'a string', $options[$option]);
+                throw new CComparator_Differ_Exception_ConfigurationException($option, 'a string', $options[$option]);
             }
         }
         foreach (['fromFileDate', 'toFileDate'] as $option) {
             if (null !== $options[$option] && !\is_string($options[$option])) {
-                throw new ConfigurationException($option, 'a string or <null>', $options[$option]);
+                throw new CComparator_Differ_Exception_ConfigurationException($option, 'a string or <null>', $options[$option]);
             }
         }
         $this->header = \sprintf(
-                "--- %s%s\n+++ %s%s\n", $options['fromFile'], null === $options['fromFileDate'] ? '' : "\t" . $options['fromFileDate'], $options['toFile'], null === $options['toFileDate'] ? '' : "\t" . $options['toFileDate']
+            "--- %s%s\n+++ %s%s\n",
+            $options['fromFile'],
+            null === $options['fromFileDate'] ? '' : "\t" . $options['fromFileDate'],
+            $options['toFile'],
+            null === $options['toFileDate'] ? '' : "\t" . $options['toFileDate']
         );
         $this->collapseRanges = $options['collapseRanges'];
         $this->commonLineThreshold = $options['commonLineThreshold'];
@@ -94,8 +91,7 @@ final class CComparator_Differ_Output_StrictUnifiedDiffOutput implements CCompar
         // If the last char is not a linebreak: add it.
         // This might happen when both the `from` and `to` do not have a trailing linebreak
         $last = \substr($diff, -1);
-        return "\n" !== $last && "\r" !== $last ? $diff . "\n" : $diff
-        ;
+        return "\n" !== $last && "\r" !== $last ? $diff . "\n" : $diff;
     }
 
     private function writeDiffHunks($output, array $diff) {
@@ -104,7 +100,7 @@ final class CComparator_Differ_Output_StrictUnifiedDiffOutput implements CCompar
         if (0 === $diff[$upperLimit - 1][1]) {
             $lc = \substr($diff[$upperLimit - 1][0], -1);
             if ("\n" !== $lc) {
-                \array_splice($diff, $upperLimit, 0, [["\n\\ No newline at end of file\n", Differ::NO_LINE_END_EOF_WARNING]]);
+                \array_splice($diff, $upperLimit, 0, [["\n\\ No newline at end of file\n", CComparator_Differ::NO_LINE_END_EOF_WARNING]]);
             }
         } else {
             // search back for the last `+` and `-` line,
@@ -115,7 +111,7 @@ final class CComparator_Differ_Output_StrictUnifiedDiffOutput implements CCompar
                     unset($toFind[$diff[$i][1]]);
                     $lc = \substr($diff[$i][0], -1);
                     if ("\n" !== $lc) {
-                        \array_splice($diff, $i + 1, 0, [["\n\\ No newline at end of file\n", Differ::NO_LINE_END_EOF_WARNING]]);
+                        \array_splice($diff, $i + 1, 0, [["\n\\ No newline at end of file\n", CComparator_Differ::NO_LINE_END_EOF_WARNING]]);
                     }
                     if (!\count($toFind)) {
                         break;
@@ -139,8 +135,7 @@ final class CComparator_Differ_Output_StrictUnifiedDiffOutput implements CCompar
                 ++$toRange;
                 ++$fromRange;
                 if ($sameCount === $cutOff) {
-                    $contextStartOffset = ($hunkCapture - $this->contextLines) < 0 ? $hunkCapture : $this->contextLines
-                    ;
+                    $contextStartOffset = ($hunkCapture - $this->contextLines) < 0 ? $hunkCapture : $this->contextLines;
                     // note: $contextEndOffset = $this->contextLines;
                     //
                     // because we never go beyond the end of the diff.
@@ -152,7 +147,14 @@ final class CComparator_Differ_Output_StrictUnifiedDiffOutput implements CCompar
                     //
                     // ; that would be true for a trailing incomplete hunk case which is dealt with after this loop
                     $this->writeHunk(
-                            $diff, $hunkCapture - $contextStartOffset, $i - $cutOff + $this->contextLines + 1, $fromStart - $contextStartOffset, $fromRange - $cutOff + $contextStartOffset + $this->contextLines, $toStart - $contextStartOffset, $toRange - $cutOff + $contextStartOffset + $this->contextLines, $output
+                        $diff,
+                        $hunkCapture - $contextStartOffset,
+                        $i - $cutOff + $this->contextLines + 1,
+                        $fromStart - $contextStartOffset,
+                        $fromRange - $cutOff + $contextStartOffset + $this->contextLines,
+                        $toStart - $contextStartOffset,
+                        $toRange - $cutOff + $contextStartOffset + $this->contextLines,
+                        $output
                     );
                     $fromStart += $fromRange;
                     $toStart += $toRange;
@@ -162,17 +164,17 @@ final class CComparator_Differ_Output_StrictUnifiedDiffOutput implements CCompar
                 continue;
             }
             $sameCount = 0;
-            if ($entry[1] === Differ::NO_LINE_END_EOF_WARNING) {
+            if ($entry[1] === CComparator_Differ::NO_LINE_END_EOF_WARNING) {
                 continue;
             }
             $this->changed = true;
             if (false === $hunkCapture) {
                 $hunkCapture = $i;
             }
-            if (Differ::ADDED === $entry[1]) { // added
+            if (CComparator_Differ::ADDED === $entry[1]) { // added
                 ++$toRange;
             }
-            if (Differ::REMOVED === $entry[1]) { // removed
+            if (CComparator_Differ::REMOVED === $entry[1]) { // removed
                 ++$fromRange;
             }
         }
@@ -181,20 +183,33 @@ final class CComparator_Differ_Output_StrictUnifiedDiffOutput implements CCompar
         }
         // we end here when cutoff (commonLineThreshold) was not reached, but we where capturing a hunk,
         // do not render hunk till end automatically because the number of context lines might be less than the commonLineThreshold
-        $contextStartOffset = $hunkCapture - $this->contextLines < 0 ? $hunkCapture : $this->contextLines
-        ;
+        $contextStartOffset = $hunkCapture - $this->contextLines < 0 ? $hunkCapture : $this->contextLines;
         // prevent trying to write out more common lines than there are in the diff _and_
         // do not write more than configured through the context lines
         $contextEndOffset = \min($sameCount, $this->contextLines);
         $fromRange -= $sameCount;
         $toRange -= $sameCount;
         $this->writeHunk(
-                $diff, $hunkCapture - $contextStartOffset, $i - $sameCount + $contextEndOffset + 1, $fromStart - $contextStartOffset, $fromRange + $contextStartOffset + $contextEndOffset, $toStart - $contextStartOffset, $toRange + $contextStartOffset + $contextEndOffset, $output
+            $diff,
+            $hunkCapture - $contextStartOffset,
+            $i - $sameCount + $contextEndOffset + 1,
+            $fromStart - $contextStartOffset,
+            $fromRange + $contextStartOffset + $contextEndOffset,
+            $toStart - $contextStartOffset,
+            $toRange + $contextStartOffset + $contextEndOffset,
+            $output
         );
     }
 
     private function writeHunk(
-    array $diff, $diffStartIndex, $diffEndIndex, $fromStart, $fromRange, $toStart, $toRange, $output
+        array $diff,
+        $diffStartIndex,
+        $diffEndIndex,
+        $fromStart,
+        $fromRange,
+        $toStart,
+        $toRange,
+        $output
     ) {
         \fwrite($output, '@@ -' . $fromStart);
         if (!$this->collapseRanges || 1 !== $fromRange) {
@@ -206,15 +221,15 @@ final class CComparator_Differ_Output_StrictUnifiedDiffOutput implements CCompar
         }
         \fwrite($output, " @@\n");
         for ($i = $diffStartIndex; $i < $diffEndIndex; ++$i) {
-            if ($diff[$i][1] === Differ::ADDED) {
+            if ($diff[$i][1] === CComparator_Differ::ADDED) {
                 $this->changed = true;
                 \fwrite($output, '+' . $diff[$i][0]);
-            } elseif ($diff[$i][1] === Differ::REMOVED) {
+            } elseif ($diff[$i][1] === CComparator_Differ::REMOVED) {
                 $this->changed = true;
                 \fwrite($output, '-' . $diff[$i][0]);
-            } elseif ($diff[$i][1] === Differ::OLD) {
+            } elseif ($diff[$i][1] === CComparator_Differ::OLD) {
                 \fwrite($output, ' ' . $diff[$i][0]);
-            } elseif ($diff[$i][1] === Differ::NO_LINE_END_EOF_WARNING) {
+            } elseif ($diff[$i][1] === CComparator_Differ::NO_LINE_END_EOF_WARNING) {
                 $this->changed = true;
                 \fwrite($output, $diff[$i][0]);
             }
@@ -225,5 +240,4 @@ final class CComparator_Differ_Output_StrictUnifiedDiffOutput implements CCompar
             //}
         }
     }
-
 }

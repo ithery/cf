@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 final class CComparator_Differ_Chunk {
-
     /**
      * @var int
      */
@@ -75,5 +68,4 @@ final class CComparator_Differ_Chunk {
         }
         $this->lines = $lines;
     }
-
 }

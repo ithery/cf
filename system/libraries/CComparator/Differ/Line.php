@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 final class CComparator_Differ_Line {
-
     const ADDED = 1;
     const REMOVED = 2;
     const UNCHANGED = 3;
@@ -34,5 +27,4 @@ final class CComparator_Differ_Line {
     public function getType() {
         return $this->type;
     }
-
 }

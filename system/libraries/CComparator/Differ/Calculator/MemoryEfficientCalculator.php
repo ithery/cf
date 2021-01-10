@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 final class CComparator_Differ_Calculator_MemoryEfficientCalculator extends CComparator_Differ_AbstractCalculator {
-
     /**
      * {@inheritdoc}
      */
@@ -40,7 +33,8 @@ final class CComparator_Differ_Calculator_MemoryEfficientCalculator extends CCom
         $toStart = \array_slice($to, 0, $jMax);
         $toEnd = \array_slice($to, $jMax);
         return \array_merge(
-                $this->calculate($fromStart, $toStart), $this->calculate($fromEnd, $toEnd)
+            $this->calculate($fromStart, $toStart),
+            $this->calculate($fromEnd, $toEnd)
         );
     }
 
@@ -60,5 +54,4 @@ final class CComparator_Differ_Calculator_MemoryEfficientCalculator extends CCom
         }
         return $current;
     }
-
 }
