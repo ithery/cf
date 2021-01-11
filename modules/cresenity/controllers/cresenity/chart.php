@@ -100,4 +100,29 @@ class Controller_Cresenity_Chart extends CController {
         $piChart->setColors(['ff3344', '11ff11', '22aacc', '3333aa']);
         $piChart->renderImage();
     }
+
+    public function passthru() {
+        $url = 'http://chart.apis.google.com/chart';
+        $get = $_GET;
+        $get['chid'] = md5(uniqid(rand(), true));
+        $url .= '?' . curl::asPostString($get);
+        try {
+            $context = stream_context_create(
+                ['http' => [
+                    'method' => 'GET',
+                    'header' => 'Content-type: application/x-www-form-urlencoded' . "\r\n",
+                ]]
+            );
+            fpassthru(fopen($url, 'r', false, $context));
+            header('Content-type: image/png');
+        } catch (Exception $ex) {
+            $response = [];
+            $response['errCode'] = '1';
+            $response['errMessage'] = $ex->getMessage();
+            $response['data'] = [];
+            $response['data']['exception'] = get_class($ex); // Reflection might be better here
+            $response['data']['trace'] = $ex->getTraceAsString();
+            return c::response()->json($response);
+        }
+    }
 }
