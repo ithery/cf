@@ -11,6 +11,7 @@ class CManager_Theme {
      */
     protected static $themeCallback;
     protected static $themeData = [];
+    protected static $theme = null;
 
     public static function setThemeCallback(callable $themeCallback) {
         self::$themeCallback = $themeCallback;
@@ -25,7 +26,7 @@ class CManager_Theme {
     }
 
     public static function getCurrentTheme() {
-        $theme = CSession::instance()->get('theme');
+        $theme = CSession::instance()->get('theme', static::$theme);
         if ($theme == null) {
             $theme = self::getDefaultTheme();
             if ($theme == null) {
@@ -40,6 +41,7 @@ class CManager_Theme {
     }
 
     public static function setTheme($theme) {
+        static::$theme = $theme;
         CSession::instance()->set('theme', $theme);
     }
 
