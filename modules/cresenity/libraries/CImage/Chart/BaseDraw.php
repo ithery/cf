@@ -1120,6 +1120,4 @@ class CImage_Chart_BaseDraw {
         }
         return $result;
     }
-
-
 }
