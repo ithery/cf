@@ -16,4 +16,12 @@ class CImage_Chart {
     public static function createImage($xSize, $ySize, CImage_Chart_Data $dataSet = null, $transparentBackground = false) {
         return new CImage_Chart_Image($xSize, $ySize, $dataSet, $transparentBackground);
     }
+
+    public static function createPie(CImage_Chart_Image $image, CImage_Chart_Data $data) {
+        return new CImage_Chart_Pie($image, $data);
+    }
+
+    public static function createProcessor($options) {
+        return new CImage_Chart_Processor($options);
+    }
 }

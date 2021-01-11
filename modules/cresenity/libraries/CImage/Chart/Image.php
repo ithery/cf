@@ -162,13 +162,11 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
      */
     public function autoOutput($fileName = 'output.png') {
         if (php_sapi_name() == 'cli') {
-            $this->Render($fileName);
+            $this->render($fileName);
         } else {
-            $this->Stroke();
+            $this->stroke();
         }
     }
-
-
 
     /**
      * Attach a dataset to your pChart Object
@@ -242,7 +240,7 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
                 }
             }
         } elseif ($this->imageMapStorageMode == Constant::IMAGE_MAP_STORAGE_FILE) {
-            $TempArray = [];
+            $tempArray = [];
             $handle = $this->openFileHandle();
             if ($handle) {
                 while (($buffer = fgets($handle, 4096)) !== false) {
@@ -250,26 +248,26 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
                         sprintf('/%s/', Constant::imageMapDelimiter()),
                         str_replace([chr(10), chr(13)], '', $buffer)
                     );
-                    $TempArray[] = [$fields[0], $fields[1], $fields[2], $fields[3], $fields[4]];
+                    $tempArray[] = [$fields[0], $fields[1], $fields[2], $fields[3], $fields[4]];
                 }
                 fclose($handle);
                 if (is_array($newTitle)) {
                     $ID = 0;
-                    foreach ($TempArray as $key => $settings) {
+                    foreach ($tempArray as $key => $settings) {
                         if ($settings[3] == $oldTitle && isset($newTitle[$ID])) {
-                            $TempArray[$key][3] = $newTitle[$ID];
+                            $tempArray[$key][3] = $newTitle[$ID];
                             $ID++;
                         }
                     }
                 } else {
-                    foreach ($TempArray as $key => $settings) {
+                    foreach ($tempArray as $key => $settings) {
                         if ($settings[3] == $oldTitle) {
-                            $TempArray[$key][3] = $newTitle;
+                            $tempArray[$key][3] = $newTitle;
                         }
                     }
                 }
                 $handle = $this->openFileHandle('w');
-                foreach ($TempArray as $key => $settings) {
+                foreach ($tempArray as $key => $settings) {
                     fwrite(
                         $handle,
                         sprintf(
@@ -318,7 +316,7 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
                 }
             }
         } elseif ($this->imageMapStorageMode == Constant::IMAGE_MAP_STORAGE_FILE) {
-            $TempArray = [];
+            $tempArray = [];
             $handle = $this->openFileHandle();
             if ($handle) {
                 while (($buffer = fgets($handle, 4096)) !== false) {
@@ -326,19 +324,19 @@ class CImage_Chart_Image extends CImage_Chart_Draw {
                         '/' . Constant::imageMapDelimiter() . '/',
                         str_replace([chr(10), chr(13)], '', $buffer)
                     );
-                    $TempArray[] = [$fields[0], $fields[1], $fields[2], $fields[3], $fields[4]];
+                    $tempArray[] = [$fields[0], $fields[1], $fields[2], $fields[3], $fields[4]];
                 }
                 fclose($handle);
-                foreach ($TempArray as $key => $settings) {
+                foreach ($tempArray as $key => $settings) {
                     if ($settings[3] == $Title) {
                         if (isset($values[$ID])) {
-                            $TempArray[$key][4] = $values[$ID];
+                            $tempArray[$key][4] = $values[$ID];
                         }
                         $ID++;
                     }
                 }
                 $handle = $this->openFileHandle('w');
-                foreach ($TempArray as $key => $settings) {
+                foreach ($tempArray as $key => $settings) {
                     fwrite(
                         $handle,
                         sprintf(
