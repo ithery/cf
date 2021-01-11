@@ -89,7 +89,7 @@ $httpReferer = carr::get($_SERVER, 'HTTP_REFERER', '');
 
                                         <?php if (!empty($trace)): ?>
                                             <h3><?php echo CF::lang('core.stack_trace') ?></h3>
-                                            <?php echo c::e($trace) ?>
+                                            <?php echo $trace; ?>
                                         <?php endif ?>
                                 </td>
                             </tr>
