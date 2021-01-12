@@ -79,7 +79,6 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $aojson['bSearchable'] = false;
                 $aojson['bVisible'] = true;
                 $js->appendln('vaoColumns.push( ' . json_encode($aojson) . ' );')->br();
-                ;
             }
             if ($this->checkbox) {
                 $aojson = [];
@@ -145,14 +144,24 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                                         'success': function(data) {
                                             fnCallback(data.datatable);
                                             if(data.js && data.js.length>0) {
-                                                var script = $.cresenity.base64.decode(data.js);
+                                                var script = data.js;
+                                                if(cresenity) {
+                                                    script = cresenity.base64.decode(script);
+                                                } else {
+                                                    script = $.cresenity.base64.decode(script);
+                                                }
+
                                                 eval(script);
                                             }
                                             jQuery('#" . $this->id . "-check-all').removeAttr('checked');
                                             jQuery('#" . $this->id . "-check-all').prop('checked',false);
                                         },
                                         'error': function(a,b,c) {
-                                            $.cresenity.message(a);
+                                            if(cresenity) {
+                                                cresenity.message(a);
+                                            } else {
+                                                $.cresenity.message(a);
+                                            }
                                         }
                                     })
                                 },
