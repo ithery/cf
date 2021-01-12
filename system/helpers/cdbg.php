@@ -39,8 +39,8 @@ class cdbg {
     /**
      * Better var dump
      *
-     * @param string  $var
-     * @param boolean $return
+     * @param string $var
+     * @param bool   $return
      *
      * @return void
      */
@@ -54,8 +54,8 @@ class cdbg {
     /**
      * Better var_dump
      *
-     * @param string  $var
-     * @param boolean $return
+     * @param string $var
+     * @param bool   $return
      *
      * @return void
      */
@@ -316,9 +316,9 @@ class cdbg {
      *     // Highlights the current line of the current file
      *     echo Debug::source(__FILE__, __LINE__);
      *
-     * @param string  $file        file to open
-     * @param integer $line_number line number to highlight
-     * @param integer $padding     number of padding lines
+     * @param string $file        file to open
+     * @param int    $line_number line number to highlight
+     * @param int    $padding     number of padding lines
      *
      * @return string|false source of file|file is unreadable
      */
@@ -375,9 +375,9 @@ class cdbg {
      *
      * Borrows heavily on concepts from the Debug class of [Nette](http://nettephp.com/).
      *
-     * @param mixed   $value           variable to dump
-     * @param integer $length          maximum length of strings
-     * @param integer $level_recursion recursion limit
+     * @param mixed $value           variable to dump
+     * @param int   $length          maximum length of strings
+     * @param int   $level_recursion recursion limit
      *
      * @return string
      */
@@ -388,10 +388,10 @@ class cdbg {
     /**
      * Helper for Debug::dump(), handles recursion in arrays and objects.
      *
-     * @param mixed   $var    variable to dump
-     * @param integer $length maximum length of strings
-     * @param integer $limit  recursion limit
-     * @param integer $level  current recursion level (internal usage only!)
+     * @param mixed $var    variable to dump
+     * @param int   $length maximum length of strings
+     * @param int   $limit  recursion limit
+     * @param int   $level  current recursion level (internal usage only!)
      *
      * @return string
      */
