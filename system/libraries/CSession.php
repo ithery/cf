@@ -313,7 +313,7 @@ class CSession {
      *
      * @return mixed Variable data if key specified, otherwise array containing all session data.
      */
-    public function get($key = false, $default = false) {
+    public function get($key = false, $default = null) {
         if (empty($key)) {
             return $_SESSION;
         }
