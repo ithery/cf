@@ -175,7 +175,7 @@ class c {
      * @param mixed        $value  The value to check.
      * @param object|array $object The object to query keys on.
      *
-     * @return boolean Returns `true` if `value` is a property name, else `false`.
+     * @return bool Returns `true` if `value` is a property name, else `false`.
      */
     public static function isKey($value, $object = []) {
         /* Used to match property names within property paths. */
@@ -310,7 +310,7 @@ class c {
      * @param mixed $value The value to compare.
      * @param mixed $other The other value to compare.
      *
-     * @return boolean Returns `true` if the values are equivalent, else `false`.
+     * @return bool Returns `true` if the values are equivalent, else `false`.
      *
      * @example
      * <code>
@@ -592,7 +592,7 @@ class c {
     public static function str($string = null) {
         if (is_null($string)) {
             return new CBase_ForwarderStaticClass(cstr::class);
-        };
+        }
 
         return cstr::of($string);
     }
@@ -682,10 +682,10 @@ class c {
     //@codingStandardsIgnoreEnd
 
     /**
-     * @return CSession_Store
+     * @return CSession
      */
     public static function session() {
-        return CSession::instance()->store();
+        return CSession::instance();
     }
 
     /**

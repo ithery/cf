@@ -488,6 +488,17 @@ class CSession {
     public function pull($key, $default = null) {
         return carr::pull($_SESSION, $key, $default);
     }
+
+    /**
+     * Remove an item from the session, returning its value.
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function remove($key) {
+        return $this->pull($key);
+    }
 }
 
 // End Session Class
