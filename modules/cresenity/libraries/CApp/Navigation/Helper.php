@@ -154,8 +154,8 @@ class CApp_Navigation_Helper {
         }
         $db = CDatabase::instance(null, null, $domain);
 
-        /* @var $role CApp_Model */
-        $role = CApp::model('Roles')->find($roleId);
+        /** @var CApp_Model_Roles $role  */
+        $role = CApp_Auth_Role::getModel($roleId);
         if ($role == null) {
             return false;
         }
