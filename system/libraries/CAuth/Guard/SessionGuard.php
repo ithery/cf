@@ -32,7 +32,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
     /**
      * The session used by the guard.
      *
-     * @var \Illuminate\Contracts\Session\Session
+     * @var CSession
      */
     protected $session;
 
@@ -53,7 +53,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var CEvent_Dispatcher
      */
     protected $events;
 
