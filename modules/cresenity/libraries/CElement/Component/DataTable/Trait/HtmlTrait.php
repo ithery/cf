@@ -2,13 +2,20 @@
 
 trait CElement_Component_DataTable_Trait_HtmlTrait {
     public function html($indent = 0) {
+        /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
         $html = new CStringBuilder();
         $html->setIndent($indent);
 
         if ($this->haveRowAction()) {
             if ($this->getRowActionStyle() == 'btn-dropdown') {
-                $this->rowActionList->addClass('pull-right');
+                if ($this->actionLocation == 'first') {
+                    $this->rowActionList->addClass('pull-left');
+                    $this->rowActionList->addClass('dropdown-menu-left');
+                } else {
+                    $this->rowActionList->addClass('pull-right');
+                    $this->rowActionList->addClass('dropdown-menu-right');
+                }
             }
         }
 

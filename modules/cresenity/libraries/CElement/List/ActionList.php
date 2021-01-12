@@ -70,7 +70,13 @@ class CElement_List_ActionList extends CElement_List {
         $this->apply('style', $this->style, 'CElement_Component_Action');
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $classes = $this->classes;
+        $classes = $this->getNormalizedClasses();
+        $ulDropdownClasses = 'dropdown-menu-right';
+        if (in_array('dropdown-menu-right', $classes)
+            || in_array('dropdown-menu-left', $classes)
+        ) {
+            $ulDropdownClasses = '';
+        }
         $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
@@ -126,7 +132,7 @@ class CElement_List_ActionList extends CElement_List {
                             ' . $iconHtml . $this->label . '
                             ' . $this->htmlCaret() . '
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-right align-left ' . $classes . '">
+                    <ul class="dropdown-menu ' . $ulDropdownClasses . ' align-left ' . $classes . '">
 
             ');
         }

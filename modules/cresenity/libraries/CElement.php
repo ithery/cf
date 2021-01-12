@@ -147,8 +147,24 @@ abstract class CElement extends CObservable {
         return '</' . $this->tag . '>';
     }
 
+    protected function getNormalizedClasses($classesToProcess = null) {
+        $classes = [];
+        if ($classesToProcess == null) {
+            $classesToProcess = $this->classes;
+        }
+        foreach ($classesToProcess as $class) {
+            $classArray = explode(' ', $class);
+            foreach ($classArray as $c) {
+                if (strlen($c) > 0) {
+                    $classes[trim($c)] = trim($c);
+                }
+            }
+        }
+        return $classes;
+    }
+
     public function generateClass() {
-        $classes = $this->classes;
+        $classes = $this->getNormalizedClasses();
         $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
