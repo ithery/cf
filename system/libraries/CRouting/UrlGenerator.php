@@ -124,7 +124,7 @@ class CRouting_UrlGenerator {
      */
     public function __construct() {
         //$this->routes = $routes;
-        //$this->assetRoot = $assetRoot;
+        $this->assetRoot = '/application/' . CF::appCode() . '/default/media';
         $this->keyResolver = function () {
             return CF::config('app.key');
         };
