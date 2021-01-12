@@ -196,42 +196,42 @@ class CPOP3_Message {
         if (isset($this->parsed_header['Received'])) {
             return $this->parsed_header['Received'];
         }
-        return $false;
+        return false;
     }
 
     public function from() {
         if (isset($this->parsed_header['From'])) {
             return $this->parsed_header['From'];
         }
-        return $false;
+        return false;
     }
 
     public function to() {
         if (isset($this->parsed_header['To'])) {
             return $this->parsed_header['To'];
         }
-        return $false;
+        return false;
     }
 
     public function reply_to() {
         if (isset($this->parsed_header['Reply-To'])) {
             return $this->parsed_header['Reply-To'];
         }
-        return $false;
+        return false;
     }
 
     public function content_type() {
         if (isset($this->parsed_header['Content-Type'])) {
             return $this->parsed_header['Content-Type'];
         }
-        return $false;
+        return false;
     }
 
     public function received_date() {
         if (isset($this->parsed_header['Date'])) {
             return $this->parsed_header['Date'];
         }
-        return $false;
+        return false;
     }
 }
 
