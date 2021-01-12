@@ -259,7 +259,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * @param boolean $install
+     * @param bool $install
      *
      * @return CApp
      */
@@ -358,6 +358,13 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $this;
     }
 
+    public function getCustomData($key = null, $default = null) {
+        if ($key === null) {
+            return $this->custom_data;
+        }
+        return carr::get($this->custom_data, $key, $default);
+    }
+
     public function org() {
         if ($this->org == null) {
             $role = $this->role();
@@ -445,7 +452,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     /**
      * Alias of toJson
      *
-     * @param integer $options
+     * @param int $options
      *
      * @return string
      */
