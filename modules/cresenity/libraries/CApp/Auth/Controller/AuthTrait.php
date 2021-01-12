@@ -1,6 +1,6 @@
 <?php
 
-trait CApp_Auth_Controller_LoginTrait {
+trait CApp_Auth_Controller_AuthTrait {
     /**
      * Attempt to authenticate a new session.
      *
@@ -53,5 +53,25 @@ trait CApp_Auth_Controller_LoginTrait {
 
             new CApp_Auth_Action_PrepareAuthenticatedSession(CApp_Auth::guard(), CApp_Auth::loginRateLimiter()),
         ]));
+    }
+
+    /**
+     * Destroy an authenticated session.
+     *
+     * @param CHTTP_Request $request
+     * @param null|mixed    $callback
+     *
+     * @return \Laravel\Fortify\Contracts\LogoutResponse
+     */
+    public function destroy($request, $callback = null) {
+        c::auth()->guard()->logout();
+
+        c::session()->destroy();
+
+        if ($callback != null) {
+            return $callback($request);
+        } else {
+            return c::app(CApp_Auth_Response_LogoutResponse::class);
+        }
     }
 }
