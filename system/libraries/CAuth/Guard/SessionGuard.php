@@ -424,7 +424,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
      */
     protected function updateSession(CAuth_AuthenticatableInterface $user) {
         $this->session->put($this->getName(), $user->getAuthIdentifier());
-        $this->session->put('user', $user->getAttributes());
+        $this->session->put('user', (object) $user->getAttributes());
 
         //$this->session->migrate(true);
     }
