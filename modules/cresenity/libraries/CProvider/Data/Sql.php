@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 24, 2019, 12:55:10 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 24, 2019, 12:55:10 AM
  */
 class CProvider_Data_Sql extends CProvider_DataAbstract {
-
     protected $sql;
     protected $db;
 
@@ -22,11 +22,10 @@ class CProvider_Data_Sql extends CProvider_DataAbstract {
     }
 
     public function getData() {
-        if($this->db==null) {
+        if ($this->db == null) {
             $this->db = CDatabase::instance();
         }
         $row = $this->db->query($this->sql);
         return $row->result_array(false);
     }
-
 }

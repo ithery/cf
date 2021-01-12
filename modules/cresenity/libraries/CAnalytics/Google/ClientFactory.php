@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 12:48:42 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 12:48:42 PM
  */
 class CAnalytics_Google_ClientFactory {
-
     public static function createForConfig(array $analyticsConfig) {
         $authenticatedClient = self::createAuthenticatedGoogleClient($analyticsConfig);
         $googleService = new Google_Service_Analytics($authenticatedClient);
@@ -26,12 +26,12 @@ class CAnalytics_Google_ClientFactory {
     }
 
     protected static function configureCache(Google_Client $client, $config) {
-        $config = CF::collect($config);
+        $config = c::collect($config);
         $store = \Cache::store($config->get('store'));
         $cache = new CacheItemPool($store);
         $client->setCache($cache);
         $client->setCacheConfig(
-                $config->except('store')->toArray()
+            $config->except('store')->toArray()
         );
     }
 
@@ -40,5 +40,4 @@ class CAnalytics_Google_ClientFactory {
         $client->setCacheLifeTimeInMinutes($analyticsConfig['cache_lifetime_in_minutes']);
         return $client;
     }
-
 }

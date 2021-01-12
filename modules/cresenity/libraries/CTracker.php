@@ -44,15 +44,15 @@ class CTracker {
         return CTracker_RepositoryManager::instance()->getLastSessions(CPeriod::minutes($minutes), $results);
     }
 
-    public function pageViews($minutes, $results = true) {
+    public static function pageViews($minutes, $results = true) {
         return CTracker_RepositoryManager::instance()->pageViews(CPeriod::minutes($minutes), $results);
     }
 
-    public function pageViewsByCountry($minutes, $results = true) {
+    public static function pageViewsByCountry($minutes, $results = true) {
         return CTracker_RepositoryManager::instance()->pageViewsByCountry(CPeriod::minutes($minutes), $results);
     }
 
-    public function userDevices($minutes, $user_id = null, $results = true) {
+    public static function userDevices($minutes, $user_id = null, $results = true) {
         return CTracker_RepositoryManager::instance()->userDevices(CPeriod::minutes($minutes), $user_id, $results);
     }
 

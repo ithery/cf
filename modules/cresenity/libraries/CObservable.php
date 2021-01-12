@@ -73,7 +73,7 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
-     * @param type $id
+     * @param string $id
      *
      * @return CElement_Template
      */
@@ -84,8 +84,8 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
-     * @param type  $id
-     * @param mixed $componentName
+     * @param string $componentName
+     * @param string $id
      *
      * @return CElement_Template
      */
@@ -97,8 +97,8 @@ abstract class CObservable extends CRenderable {
 
     /**
      * @param CElement_View}string $view
+     * @param null|array           $data
      * @param string               $id
-     * @param null|mixed           $data
      *
      * @return CElement_View
      */
@@ -126,8 +126,17 @@ abstract class CObservable extends CRenderable {
         return $field;
     }
 
-    public function addRow($row_id = '') {
-        $row = CTableRow::factory($row_id);
+    /**
+     * Add Row
+     *
+     * @param string $id
+     *
+     * @return CTableRow
+     *
+     * @deprecated 2.0
+     */
+    public function addRow($id = '') {
+        $row = CTableRow::factory($id);
         $this->add($row);
         return $row;
     }

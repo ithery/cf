@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 24, 2019, 1:11:06 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 24, 2019, 1:11:06 AM
  */
 class CProvider {
-
     /**
-     * 
      * @return \CProvider_Data_Sql
      */
     public static function createSqlDataProvider() {
@@ -18,7 +17,6 @@ class CProvider {
     }
 
     /**
-     * 
      * @return \CProvider_Data_Array
      */
     public static function createArrayDataProvider() {
@@ -26,7 +24,6 @@ class CProvider {
     }
 
     /**
-     * 
      * @return \CProvider_Data_Elastic
      */
     public static function createElasticDataProvider() {
@@ -34,7 +31,6 @@ class CProvider {
     }
 
     /**
-     * 
      * @return \CProvider_Data_Model
      */
     public static function createModelDataProvider() {
@@ -42,11 +38,9 @@ class CProvider {
     }
 
     /**
-     * 
      * @return \CProvider_Data_Null
      */
     public static function createNullDataProvider() {
         return new CProvider_Data_Null();
     }
-
 }

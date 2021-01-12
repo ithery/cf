@@ -22,7 +22,7 @@ class CElement_List_TabList_Tab extends CElement_Element {
 
     public function __construct($id = '') {
         parent::__construct($id);
-        $this->addFriend('CElement_List_TabList');
+        $this->addFriend(CElement_List_TabList::class);
 
         $this->label = '';
         $this->target = '';

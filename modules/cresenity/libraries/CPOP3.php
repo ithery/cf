@@ -1,19 +1,24 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
+//@codingStandardsIgnoreStart
+/**
+ * Undocumented class
+ *
+ * @deprecated 2.0
+ */
 class CPOP3 extends CObject {
-
     public function __construct() {
-        $valid_prop = array(
-            "user",
-            "password",
-            "authhost",
-        );
+        $valid_prop = [
+            'user',
+            'password',
+            'authhost',
+        ];
         $this->add_valid_prop($valid_prop);
-        $this->user = "";
-        $this->password = "";
-        $this->authhost = "";
+        $this->user = '';
+        $this->password = '';
+        $this->authhost = '';
     }
 
     public function set_user($user) {
@@ -32,11 +37,11 @@ class CPOP3 extends CObject {
     }
 
     public function set_host($host) {
-        $auh = "";
+        $auh = '';
         switch ($host) {
-            case "gmail":$auh = "{pop.gmail.com:995/pop3/ssl/novalidate-cert}";
+            case 'gmail':$auh = '{pop.gmail.com:995/pop3/ssl/novalidate-cert}';
                 break;
-            default : trigger_error("host not found in CPOP3");
+            default: trigger_error('host not found in CPOP3');
                 break;
         }
         $this->authhost = $auh;
@@ -50,11 +55,11 @@ class CPOP3 extends CObject {
     public static function factory() {
         return new CPOP3();
     }
-
 }
-
+/**
+ * @deprecated 2.0
+ */
 class CPOP3_Connection {
-
     private $_connection = null;
 
     public function __construct($authhost, $user, $pass) {
@@ -65,70 +70,74 @@ class CPOP3_Connection {
         @imap_close($this->_connection);
     }
 
-    function stat() {
+    public function stat() {
         $check = imap_mailboxmsginfo($this->_connection);
         return ((array) $check);
     }
 
-    function get_last_message() {
+    public function get_last_message() {
         $num = $this->msg_count();
-        //return $this->mail_mime_to_array(imap_body($this->_connection, $num),true); 
+        //return $this->mail_mime_to_array(imap_body($this->_connection, $num),true);
         return $this->mail_mime_to_array($num, true);
     }
 
-    function msg_list($message = "") {
+    public function msg_list($message = '') {
         if ($message) {
             $range = $message;
         } else {
             $MC = imap_check($this->_connection);
-            $range = "1:" . $MC->Nmsgs;
+            $range = '1:' . $MC->Nmsgs;
         }
         $response = imap_fetch_overview($this->_connection, $range);
-        foreach ($response as $msg)
+        foreach ($response as $msg) {
             $result[$msg->msgno] = (array) $msg;
+        }
     }
 
-    function retrieve($message) {
+    public function retrieve($message) {
         return(imap_fetchheader($this->_connection, $message, FT_PREFETCHTEXT));
     }
 
-    function delete($message) {
+    public function delete($message) {
         return(imap_delete($this->_connection, $message));
     }
 
-    function msg_count() {
+    public function msg_count() {
         return imap_num_msg($this->_connection);
     }
 
-    function mail_parse_headers($headers) {
+    public function mail_parse_headers($headers) {
         $headers = preg_replace('/\r\n\s+/m', '', $headers);
         preg_match_all('/([^: ]+): (.+?(?:\r\n\s(?:.+?))*)?\r\n/m', $headers, $matches);
-        foreach ($matches[1] as $key => $value)
+        foreach ($matches[1] as $key => $value) {
             $result[$value] = $matches[2][$key];
+        }
         return($result);
     }
 
-    function mail_mime_to_array($mid, $parse_headers = false) {
+    public function mail_mime_to_array($mid, $parse_headers = false) {
         $mail = imap_fetchstructure($this->_connection, $mid);
         $mail = $this->mail_get_parts($mid, $mail, 0);
-        if ($parse_headers)
-            $mail[0]["parsed"] = $this->mail_parse_headers($mail[0]["data"]);
+        if ($parse_headers) {
+            $mail[0]['parsed'] = $this->mail_parse_headers($mail[0]['data']);
+        }
         return($mail);
     }
 
-    function mail_get_parts($mid, $part, $prefix) {
-        $attachments = array();
+    public function mail_get_parts($mid, $part, $prefix) {
+        $attachments = [];
         $attachments[$prefix] = $this->mail_decode_part($mid, $part, $prefix);
         if (isset($part->parts)) { // multipart
-            $prefix = ($prefix == "0") ? "" : "$prefix.";
-            foreach ($part->parts as $number => $subpart)
+            $prefix = ($prefix == '0') ? '' : "$prefix.";
+            foreach ($part->parts as $number => $subpart) {
                 $attachments = array_merge($attachments, $this->mail_get_parts($mid, $subpart, $prefix . ($number + 1)));
+            }
         }
         return $attachments;
     }
 
-    function mail_decode_part($message_number, $part, $prefix) {
-        $attachment = array();
+    public function mail_decode_part($message_number, $part, $prefix) {
+        $attachment = [];
 
         if ($part->ifdparameters) {
             foreach ($part->dparameters as $object) {
@@ -158,65 +167,72 @@ class CPOP3_Connection {
         }
         return($attachment);
     }
-
 }
 
 class CPOP3_Message {
-
-    private $msg = array();
-    private $parsed_header = array();
+    private $msg = [];
+    private $parsed_header = [];
 
     public function construct($mail) {
         $this->msg = $mail;
-        $this->parsed_header = $mail[0]["parsed"];
+        $this->parsed_header = $mail[0]['parsed'];
     }
 
     public function subject() {
-        if (isset($this->parsed_header['Subject']))
+        if (isset($this->parsed_header['Subject'])) {
             return $this->parsed_header['Subject'];
+        }
         return false;
     }
 
     public function delivered_to() {
-        if (isset($this->parsed_header['Delivered-To']))
+        if (isset($this->parsed_header['Delivered-To'])) {
             return $this->parsed_header['Delivered-To'];
+        }
         return false;
     }
 
     public function received() {
-        if (isset($this->parsed_header['Received']))
+        if (isset($this->parsed_header['Received'])) {
             return $this->parsed_header['Received'];
+        }
         return $false;
     }
 
     public function from() {
-        if (isset($this->parsed_header['From']))
+        if (isset($this->parsed_header['From'])) {
             return $this->parsed_header['From'];
+        }
         return $false;
     }
 
     public function to() {
-        if (isset($this->parsed_header['To']))
+        if (isset($this->parsed_header['To'])) {
             return $this->parsed_header['To'];
+        }
         return $false;
     }
 
     public function reply_to() {
-        if (isset($this->parsed_header['Reply-To']))
+        if (isset($this->parsed_header['Reply-To'])) {
             return $this->parsed_header['Reply-To'];
+        }
         return $false;
     }
 
     public function content_type() {
-        if (isset($this->parsed_header['Content-Type']))
+        if (isset($this->parsed_header['Content-Type'])) {
             return $this->parsed_header['Content-Type'];
+        }
         return $false;
     }
 
     public function received_date() {
-        if (isset($this->parsed_header['Date']))
+        if (isset($this->parsed_header['Date'])) {
             return $this->parsed_header['Date'];
+        }
         return $false;
     }
-
 }
+
+//@codingStandardsIgnoreEnd

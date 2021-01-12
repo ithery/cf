@@ -277,6 +277,7 @@ class CStorage {
         if ($config === true) {
             return new MemoryStore;
         }
+
         return new Cache(
             $this->app['cache']->store($config['store']),
             isset($config['prefix']) ? $config['prefix'] : 'flysystem',
