@@ -1,18 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * 
  * @author Hery Kurniawan
- * @since Jun 6, 2018, 11:32:00 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 6, 2018, 11:32:00 AM
  */
 class CAjax {
-
     /**
-     * 
      * @param type $options
+     *
      * @return \CAjax_Method
      */
     public static function createMethod($options = null) {
@@ -27,15 +26,13 @@ class CAjax {
     public static function getData($file) {
         $filename = $file . '.tmp';
 
-        $file = CTemporary::getPath("ajax", $filename);
-
+        $file = CTemporary::getPath('ajax', $filename);
 
         $disk = CTemporary::disk();
         if (!$disk->exists($file)) {
-            throw new CException('failed to get temporary file :filename', array(':filename' => $file));
+            throw new CException('failed to get temporary file :filename', [':filename' => $file]);
         }
         $json = $disk->get($file);
-
 
         $data = json_decode($json, true);
         return $data;
@@ -44,8 +41,7 @@ class CAjax {
     public static function setData($file, $data) {
         $filename = $file . '.tmp';
 
-        $file = CTemporary::getPath("ajax", $filename);
-
+        $file = CTemporary::getPath('ajax', $filename);
 
         $disk = CTemporary::disk();
 
@@ -53,5 +49,4 @@ class CAjax {
 
         return $data;
     }
-
 }

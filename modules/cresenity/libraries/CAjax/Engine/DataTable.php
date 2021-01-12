@@ -28,6 +28,7 @@ class CAjax_Engine_DataTable extends CAjax_Engine {
             $processorType = 'Callback';
         }
         $processor = $this->createProcessor($processorType, $data);
+
         $response = $processor->process();
 
         if (is_array($response)) {

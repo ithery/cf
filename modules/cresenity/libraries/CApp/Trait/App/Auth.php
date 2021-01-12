@@ -30,9 +30,11 @@ trait CApp_Trait_App_Auth {
         if ($this->user == null) {
             $session = CSession::instance();
             $user = $session->get('user');
+
             if (!$user) {
                 $user = null;
             }
+
             $this->user = $user;
         }
         return $this->user;
@@ -41,6 +43,7 @@ trait CApp_Trait_App_Auth {
     public function role() {
         if ($this->role == null) {
             $user = $this->user();
+
             if ($user != null) {
                 $this->role = crole::get(cobj::get($user, 'role_id'));
             }

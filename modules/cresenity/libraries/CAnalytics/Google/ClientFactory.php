@@ -27,7 +27,7 @@ class CAnalytics_Google_ClientFactory {
 
     protected static function configureCache(Google_Client $client, $config) {
         $config = c::collect($config);
-        $store = \Cache::store($config->get('store'));
+        $store = \CCache::store($config->get('store'));
         $cache = new CacheItemPool($store);
         $client->setCache($cache);
         $client->setCacheConfig(

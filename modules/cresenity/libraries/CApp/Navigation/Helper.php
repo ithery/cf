@@ -24,6 +24,7 @@ class CApp_Navigation_Helper {
 
         if ($nav == null) {
             $navs = CApp_Navigation_Data::get();
+
             if ($navs == null) {
                 return null;
             }
@@ -112,6 +113,7 @@ class CApp_Navigation_Helper {
         }
 
         $role = crole::get($roleId);
+
         if ($role != null && $role->parent_id == null) {
             //is is superadmin
             return true;
