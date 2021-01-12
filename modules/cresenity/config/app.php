@@ -12,7 +12,13 @@ return [
     'update_last_request' => true,
     'date_formatted' => 'Y-m-d',
     'long_date_formatted' => 'Y-m-d H:i:s',
+    /**
+     * @deprecated
+     */
     'require_js' => true,
+    /**
+     * @deprecated
+     */
     'requireJs' => true,
     'merge_js' => false,
     'minify_js' => false,
