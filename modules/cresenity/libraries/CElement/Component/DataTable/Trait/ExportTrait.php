@@ -18,7 +18,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
     public $export_filename = '';
     public $export_sheetname = '';
 
-    private static function exportExcelxmlStatic($filename, $sheet_name = null, $table) {
+    private static function exportExcelxmlStatic($filename, $sheet_name = null, $table = null) {
         header('Cache-Control: no-cache, no-store, must-revalidate');
         header('Content-Type: application/vnd.ms-excel');
         header('Content-Disposition: attachment; filename=' . $filename);
@@ -631,7 +631,6 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                             if ($trans->getFunction() != 'format_currency') {
                                 $col_v = $trans->execute($col_v);
                             }
-//                                $col_v = $trans->execute($col_v);
                         }
                     }
                 }
@@ -946,7 +945,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                     $excel->setAlignByIndex($totalColumn, $j, $f['align']);
                 }
                 if ($colspan > 1) {
-                    $excel->merge_cell($colStart, $j, $colspan - 1, $j);
+                    $excel->mergeCell($colStart, $j, $colspan - 1, $j);
                 }
                 $excel->setRowStyle($j);
 
