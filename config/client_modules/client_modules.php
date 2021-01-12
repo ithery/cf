@@ -1,691 +1,692 @@
 <?php
 
-return array(
-    "excanvas" => array(
-        "js" => array("libs" . DS . "excanvas.min.js"),
-    ),
-    "canvas-to-blob" => array(
-        "js" => array("libs" . DS . "canvas-to-blob.min.js"),
-    ),
-    "load-image" => array(
-        "js" => array("libs" . DS . "load-image.min.js"),
-    ),
-    "tmpl" => array(
-        "js" => array("libs" . DS . "tmpl.min.js"),
-    ),
-    "vue" => array(
-        "js" => array(
-            "libs" . DS . "vue.min.js",
-            "libs" . DS . "vue-loader.js",
-        ),
-    ),
-    "axios" => array(
-        "js" => array(
-            "libs" . DS . "axios.min.js",
-        ),
-    ),
-    "jquery" => array(
-        "js" => array("libs" . DS . "jquery-3.5.1.min.js"),
-    ),
-    "alpine" => array(
-        "js" => array("libs" . DS . "alpine.js"),
-    ),
-    "jquery-2.1.0" => array(
-        "js" => array("libs/jquery-2.1.0/jquery.min.js"),
-    ),
-    "bootstrap" => array(
-        "js" => array("libs/bootstrap-4.5/bootstrap.min.js"),
-        "css" => array("libs/bootstrap-4.5/bootstrap.min.css"),
-    ),
-    "bootstrap-2.3" => array(
-        "js" => array("libs/bootstrap-2.3/bootstrap.min.js"),
-        "css" => array("libs/bootstrap-2.3/bootstrap.css", "libs/bootstrap-2.3/bootstrap-responsive.css"),
-    ),
-    "bootstrap-switch" => array(
-        "js" => array("plugins" . DS . "bootstrap-switch" . DS . "bootstrap-switch.js"),
-        "css" => array("plugins" . DS . "bootstrap-switch" . DS . "bootstrap-switch.css"),
-    ),
-    "font-awesome" => array(
-        "css" => array("font-awesome.css"),
-    ),
-    "font-awesome-4.5.0" => array(
-        "css" => array("plugins/font-awesome/font-awesome 4.5.0.min.css"),
-    ),
-    "jquery.ui" => array(
-        "js" => array("libs" . DS . "jquery.ui.custom.js"),
-        "css" => array("plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui.css", "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery.ui.theme.css"),
-    ),
-    "jquery-ui-1.12.1.custom" => array(
-        "js" => array("libs" . DS . "jquery-ui-1.12.1.custom" . DS . "jquery-ui.min.js"),
-        "css" => array(
-            "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui-1.12.1.min.css",
-            "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui-1.12.1.theme.min.css",
-            "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery-ui.css",
-            "plugins" . DS . "jquery-ui" . DS . "smoothness" . DS . "jquery.ui.theme.css"
-        ),
-    ),
-    "jquery.lazyload" => array(
-        "js" => array("plugins" . DS . "lazyload" . DS . "jquery.lazyload.min.js"),
-    ),
-    "jquery.dialog2" => array(
-        "js" => array("plugins" . DS . "dialog2" . DS . "jquery.dialog2.js", "plugins" . DS . "dialog2" . DS . "jquery.dialog2.helpers.js"),
-        "css" => array("plugins" . DS . "dialog2" . DS . "jquery.dialog2.css"),
-    ),
-    "jquery.datatable" => array(
-        "js" => array(
-            "plugins" . DS . "datatable" . DS . "jquery.dataTables.js",
-            "plugins" . DS . "datatable" . DS . "TableTools.min.js",
-            "plugins" . DS . "datatable" . DS . "ColReorder.min.js",
-            "plugins" . DS . "datatable" . DS . "ColVis.min.js",
-            "plugins" . DS . "datatable" . DS . "jquery.dataTables.columnFilter.js",
-        ),
-    ),
-    "jquery.datatable.tabletools" => array(
-        "js" => array(
-            "plugins" . DS . "datatable" . DS . "TableTools.min.js",
-        ),
-        "requirements" => array("jquery.datatable"),
-    ),
-    "jquery.datatable.colreorder" => array(
-        "js" => array(
-            "plugins" . DS . "datatable" . DS . "ColReorder.min.js",
-        ),
-        "requirements" => array("jquery.datatable"),
-    ),
-    "jquery.datatable.colvis" => array(
-        "js" => array(
-            "plugins" . DS . "datatable" . DS . "ColVis.min.js",
-        ),
-        "requirements" => array("jquery.datatable"),
-    ),
-    "jquery.datatable.columnfilter" => array(
-        "js" => array(
-            "plugins" . DS . "datatable" . DS . "jquery.dataTables.columnFilter.js",
-        ),
-        "requirements" => array("jquery.datatable"),
-    ),
-    "chosen" => array(
-        "js" => array("plugins" . DS . "chosen" . DS . "chosen.jquery.min.js"),
-        "css" => array("plugins" . DS . "chosen" . DS . "chosen.css"),
-    ),
-    "jquery.nestable" => array(
-        "js" => array("plugins" . DS . "nestable" . DS . "jquery.nestable.js"),
-        "css" => array("plugins" . DS . "nestable" . DS . "jquery.nestable.css"),
-    ),
-    "cresenity" => array(
-        "js" => array(
-            "cresenity.func.js",
-            "cresenity.js",
-            "cresenity.item_batch.js",
-            "cresenity.pricing_detail.js",
-        ),
-        "css" => array(
-            "cresenity.colors.css",
-            "cresenity.main.css",
-            "cresenity.responsive.css",
-            "cresenity.pos.css",
-            "cresenity.retail.css",
-            "cresenity.widget.css",
-            "cresenity.table.css",
-            "cresenity.css",
-        ),
-    ),
-    "vkeyboard" => array(
-        "js" => array("plugins" . DS . "vkeyboard" . DS . "bootstrap-vkeyboard.js"),
-        "css" => array("plugins" . DS . "vkeyboard" . DS . "bootstrap-vkeyboard.css"),
-    ),
-    "jquery-autocomplete" => array(
-        "js" => array("plugins" . DS . "jquery-autocomplete" . DS . "jquery-autocomplete.js"),
-    ),
-    "fileupload" => array(
-        "js" => array("plugins" . DS . "fileupload" . DS . "bootstrap-fileupload.min.js"),
-    ),
-    "peity" => array(
-        "js" => array("plugins" . DS . "peity" . DS . "jquery.peity.min.js"),
-    ),
-    "flot" => array(
-        "js" => array(
-            "plugins" . DS . "flot" . DS . "jquery.flot.min.js",
-            "plugins" . DS . "flot" . DS . "jquery.flot.bar.order.min.js",
-            "plugins" . DS . "flot" . DS . "jquery.flot.pie.min.js",
-            "plugins" . DS . "flot" . DS . "jquery.flot.resize.min.js",
-            "plugins" . DS . "flot" . DS . "jquery.flot.stack.js",
-        ),
-    ),
-    "colorpicker" => array(
-        "js" => array("plugins" . DS . "colorpicker" . DS . "bootstrap-colorpicker.js"),
-        "css" => array("plugins" . DS . "colorpicker" . DS . "colorpicker.css"),
-    ),
-    "wysihtml5" => array(
-        "js" => array(
-            "libs" . DS . "wysihtml5-0.3.0.js",
-            "plugins" . DS . "wysihtml5" . DS . "bootstrap-wysihtml5.js",
-        ),
-        "css" => array("plugins" . DS . "wysihtml5" . DS . "bootstrap-wysihtml5.css"),
-    ),
-    "notify" => array(
-        "js" => array("plugins" . DS . "notify" . DS . "bootstrap-notify.js"),
-        "css" => array(
-            "plugins" . DS . "notify" . DS . "bootstrap-notify.css",
-            "plugins" . DS . "notify" . DS . "bootstrap-notify-alert-backgloss.css",
-        ),
-    ),
-    "bootbox" => array(
-        "js" => array("plugins" . DS . "bootbox" . DS . "bootbox.all.min.js?v=2"),
-    ),
-    "bootbox4.4.0" => array(
-        "js" => array("plugins" . DS . "bootbox" . DS . "bootboxbootstrap3.min.js?v=3"),
-    ),
-    "form" => array(
-        "js" => array("plugins" . DS . "form" . DS . "jquery.form.js"),
-    ),
-    "controls" => array(
-        "js" => array("plugins" . DS . "controls" . DS . "jquery.controls.js"),
-    ),
-    "event" => array(
-        "js" => array(
-            "plugins" . DS . "event" . DS . "jquery.event.move.js",
-            "plugins" . DS . "event" . DS . "jquery.event.swipe.js"
-        ),
-    ),
-    "slimscroll" => array(
-        "js" => array(
-            "plugins" . DS . "slimscroll" . DS . "jquery.slimscroll.js",
-            "plugins" . DS . "slimscroll" . DS . "jquery.slimscroll-horizontal.js",
-        ),
-    ),
-    "effects" => array(
-        "js" => array(
-            "plugins" . DS . "effects" . DS . "jquery.effects.core.js",
-            "plugins" . DS . "effects" . DS . "jquery.effects.slide.js",
-        ),
-    ),
-    "validation" => array(
-        "js" => array(
-            "plugins" . DS . "validation-engine" . DS . "jquery.validationEngine-3.0.0.js?v=2",
-            "plugins" . DS . "validation-engine" . DS . "languages" . DS . "jquery.validationEngine-en.js",
-        ),
-        "css" => array("plugins" . DS . "validation-engine" . DS . "jquery.validationEngine.css"),
-    ),
-    "validate" => array(
-        "js" => array(
-            "plugins" . DS . "validate" . DS . "validate.js?v=1",
-        ),
-    ),
-    "ckeditor" => array(
-        "js" => array("plugins" . DS . "ckeditor" . DS . "ckeditor.js"),
-    ),
-    "ckeditor-4" => array(
-        "js" => array("plugins" . DS . "ckeditor" . DS . "4.5.9" . DS . "ckeditor.js"),
-    ),
-    "isotope" => array(
-        "js" => array("plugins" . DS . "isotope" . DS . "jquery.isotope.min.js"),
-    ),
-    "easing" => array(
-        "js" => array("plugins" . DS . "easing" . DS . "jquery-easing-1.3.js"),
-    ),
-    "select2_v4" => array(
-        "js" => array("plugins" . DS . "select2" . DS . "select2_v4.js"),
-        "css" => array("plugins" . DS . "select2" . DS . "select2_v4.css"),
-    ),
-    "select2" => array(
-        "js" => array("plugins" . DS . "select2" . DS . "select2.js"),
-        "css" => array("plugins" . DS . "select2" . DS . "select2.css"),
-    ),
-    "select2-4.0" => array(
-        "js" => array("plugins" . DS . "select2" . DS . "select2.full.js"),
-        "css" => array("plugins" . DS . "select2" . DS . "select2-4.0.0.min.css"),
-    ),
-    "datepicker" => array(
-        "js" => array("plugins" . DS . "datepicker" . DS . "bootstrap-datepicker.js"),
-        "css" => array("plugins" . DS . "datepicker" . DS . "datepicker.css"),
-    ),
-    "bootstrap3-datepicker" => array(
-        "js" => array("plugins" . DS . "datepicker" . DS . "bootstrap3-datepicker.js"),
-        "css" => array("plugins" . DS . "datepicker" . DS . "datepicker.css"),
-    ),
-    "timepicker" => array(
-        "js" => array("plugins" . DS . "timepicker" . DS . "bootstrap-timepicker.min.js"),
-        "css" => array("plugins" . DS . "timepicker" . DS . "bootstrap-timepicker.min.css"),
-    ),
-    "image-gallery" => array(
-        "css" => array("plugins" . DS . "image-gallery" . DS . "bootstrap-image-gallery.min.css"),
-    ),
-    "modernizr" => array(
-        "js" => array("libs" . DS . "modernizr.custom.js"),
-    ),
-    "multiselect" => array(
-        "js" => array("plugins" . DS . "multiselect" . DS . "jquery.multi-select.js"),
-        "css" => array("plugins" . DS . "multiselect" . DS . "multi-select.css"),
-    ),
-    "terminal" => array(
-        "css" => array(
-            "plugins" . DS . "terminal" . DS . "jquery.terminal.min.css",
-        ),
-        "js" => array(
+return [
+    'excanvas' => [
+        'js' => ['libs' . DS . 'excanvas.min.js'],
+    ],
+    'canvas-to-blob' => [
+        'js' => ['libs' . DS . 'canvas-to-blob.min.js'],
+    ],
+    'load-image' => [
+        'js' => ['libs' . DS . 'load-image.min.js'],
+    ],
+    'tmpl' => [
+        'js' => ['libs' . DS . 'tmpl.min.js'],
+    ],
+    'vue' => [
+        'js' => [
+            'libs' . DS . 'vue.min.js',
+            'libs' . DS . 'vue-loader.js',
+        ],
+    ],
+    'axios' => [
+        'js' => [
+            'libs' . DS . 'axios.min.js',
+        ],
+    ],
+    'jquery' => [
+        'js' => ['libs' . DS . 'jquery-3.5.1.min.js'],
+    ],
+    'alpine' => [
+        'js' => ['libs' . DS . 'alpine.js'],
+    ],
+    'jquery-2.1.0' => [
+        'js' => ['libs/jquery-2.1.0/jquery.min.js'],
+    ],
+    'bootstrap' => [
+        'js' => [
+            'libs/bootstrap-4.5/bootstrap.bundle.min.js',
+        ],
+        'css' => ['libs/bootstrap-4.5/bootstrap.min.css'],
+    ],
+    'bootstrap-2.3' => [
+        'js' => ['libs/bootstrap-2.3/bootstrap.min.js'],
+        'css' => ['libs/bootstrap-2.3/bootstrap.css', 'libs/bootstrap-2.3/bootstrap-responsive.css'],
+    ],
+    'bootstrap-switch' => [
+        'js' => ['plugins' . DS . 'bootstrap-switch' . DS . 'bootstrap-switch.js'],
+        'css' => ['plugins' . DS . 'bootstrap-switch' . DS . 'bootstrap-switch.css'],
+    ],
+    'font-awesome' => [
+        'css' => ['font-awesome.css'],
+    ],
+    'font-awesome-4.5.0' => [
+        'css' => ['plugins/font-awesome/font-awesome 4.5.0.min.css'],
+    ],
+    'jquery.ui' => [
+        'js' => ['libs' . DS . 'jquery.ui.custom.js'],
+        'css' => ['plugins' . DS . 'jquery-ui' . DS . 'smoothness' . DS . 'jquery-ui.css', 'plugins' . DS . 'jquery-ui' . DS . 'smoothness' . DS . 'jquery.ui.theme.css'],
+    ],
+    'jquery-ui-1.12.1.custom' => [
+        'js' => ['libs' . DS . 'jquery-ui-1.12.1.custom' . DS . 'jquery-ui.min.js'],
+        'css' => [
+            'plugins' . DS . 'jquery-ui' . DS . 'smoothness' . DS . 'jquery-ui-1.12.1.min.css',
+            'plugins' . DS . 'jquery-ui' . DS . 'smoothness' . DS . 'jquery-ui-1.12.1.theme.min.css',
+            'plugins' . DS . 'jquery-ui' . DS . 'smoothness' . DS . 'jquery-ui.css',
+            'plugins' . DS . 'jquery-ui' . DS . 'smoothness' . DS . 'jquery.ui.theme.css'
+        ],
+    ],
+    'jquery.lazyload' => [
+        'js' => ['plugins' . DS . 'lazyload' . DS . 'jquery.lazyload.min.js'],
+    ],
+    'jquery.dialog2' => [
+        'js' => ['plugins' . DS . 'dialog2' . DS . 'jquery.dialog2.js', 'plugins' . DS . 'dialog2' . DS . 'jquery.dialog2.helpers.js'],
+        'css' => ['plugins' . DS . 'dialog2' . DS . 'jquery.dialog2.css'],
+    ],
+    'jquery.datatable' => [
+        'js' => [
+            'plugins' . DS . 'datatable' . DS . 'jquery.dataTables.js',
+            'plugins' . DS . 'datatable' . DS . 'TableTools.min.js',
+            'plugins' . DS . 'datatable' . DS . 'ColReorder.min.js',
+            'plugins' . DS . 'datatable' . DS . 'ColVis.min.js',
+            'plugins' . DS . 'datatable' . DS . 'jquery.dataTables.columnFilter.js',
+        ],
+    ],
+    'jquery.datatable.tabletools' => [
+        'js' => [
+            'plugins' . DS . 'datatable' . DS . 'TableTools.min.js',
+        ],
+        'requirements' => ['jquery.datatable'],
+    ],
+    'jquery.datatable.colreorder' => [
+        'js' => [
+            'plugins' . DS . 'datatable' . DS . 'ColReorder.min.js',
+        ],
+        'requirements' => ['jquery.datatable'],
+    ],
+    'jquery.datatable.colvis' => [
+        'js' => [
+            'plugins' . DS . 'datatable' . DS . 'ColVis.min.js',
+        ],
+        'requirements' => ['jquery.datatable'],
+    ],
+    'jquery.datatable.columnfilter' => [
+        'js' => [
+            'plugins' . DS . 'datatable' . DS . 'jquery.dataTables.columnFilter.js',
+        ],
+        'requirements' => ['jquery.datatable'],
+    ],
+    'chosen' => [
+        'js' => ['plugins' . DS . 'chosen' . DS . 'chosen.jquery.min.js'],
+        'css' => ['plugins' . DS . 'chosen' . DS . 'chosen.css'],
+    ],
+    'jquery.nestable' => [
+        'js' => ['plugins' . DS . 'nestable' . DS . 'jquery.nestable.js'],
+        'css' => ['plugins' . DS . 'nestable' . DS . 'jquery.nestable.css'],
+    ],
+    'cresenity' => [
+        'js' => [
+            'cresenity.func.js',
+            'cresenity.js',
+            'cresenity.item_batch.js',
+            'cresenity.pricing_detail.js',
+        ],
+        'css' => [
+            'cresenity.colors.css',
+            'cresenity.main.css',
+            'cresenity.responsive.css',
+            'cresenity.pos.css',
+            'cresenity.retail.css',
+            'cresenity.widget.css',
+            'cresenity.table.css',
+            'cresenity.css',
+        ],
+    ],
+    'vkeyboard' => [
+        'js' => ['plugins' . DS . 'vkeyboard' . DS . 'bootstrap-vkeyboard.js'],
+        'css' => ['plugins' . DS . 'vkeyboard' . DS . 'bootstrap-vkeyboard.css'],
+    ],
+    'jquery-autocomplete' => [
+        'js' => ['plugins' . DS . 'jquery-autocomplete' . DS . 'jquery-autocomplete.js'],
+    ],
+    'fileupload' => [
+        'js' => ['plugins' . DS . 'fileupload' . DS . 'bootstrap-fileupload.min.js'],
+    ],
+    'peity' => [
+        'js' => ['plugins' . DS . 'peity' . DS . 'jquery.peity.min.js'],
+    ],
+    'flot' => [
+        'js' => [
+            'plugins' . DS . 'flot' . DS . 'jquery.flot.min.js',
+            'plugins' . DS . 'flot' . DS . 'jquery.flot.bar.order.min.js',
+            'plugins' . DS . 'flot' . DS . 'jquery.flot.pie.min.js',
+            'plugins' . DS . 'flot' . DS . 'jquery.flot.resize.min.js',
+            'plugins' . DS . 'flot' . DS . 'jquery.flot.stack.js',
+        ],
+    ],
+    'colorpicker' => [
+        'js' => ['plugins' . DS . 'colorpicker' . DS . 'bootstrap-colorpicker.js'],
+        'css' => ['plugins' . DS . 'colorpicker' . DS . 'colorpicker.css'],
+    ],
+    'wysihtml5' => [
+        'js' => [
+            'libs' . DS . 'wysihtml5-0.3.0.js',
+            'plugins' . DS . 'wysihtml5' . DS . 'bootstrap-wysihtml5.js',
+        ],
+        'css' => ['plugins' . DS . 'wysihtml5' . DS . 'bootstrap-wysihtml5.css'],
+    ],
+    'notify' => [
+        'js' => ['plugins' . DS . 'notify' . DS . 'bootstrap-notify.js'],
+        'css' => [
+            'plugins' . DS . 'notify' . DS . 'bootstrap-notify.css',
+            'plugins' . DS . 'notify' . DS . 'bootstrap-notify-alert-backgloss.css',
+        ],
+    ],
+    'bootbox' => [
+        'js' => ['plugins' . DS . 'bootbox' . DS . 'bootbox.all.min.js?v=2'],
+    ],
+    'bootbox4.4.0' => [
+        'js' => ['plugins' . DS . 'bootbox' . DS . 'bootboxbootstrap3.min.js?v=3'],
+    ],
+    'form' => [
+        'js' => ['plugins' . DS . 'form' . DS . 'jquery.form.js'],
+    ],
+    'controls' => [
+        'js' => ['plugins' . DS . 'controls' . DS . 'jquery.controls.js'],
+    ],
+    'event' => [
+        'js' => [
+            'plugins' . DS . 'event' . DS . 'jquery.event.move.js',
+            'plugins' . DS . 'event' . DS . 'jquery.event.swipe.js'
+        ],
+    ],
+    'slimscroll' => [
+        'js' => [
+            'plugins' . DS . 'slimscroll' . DS . 'jquery.slimscroll.js',
+            'plugins' . DS . 'slimscroll' . DS . 'jquery.slimscroll-horizontal.js',
+        ],
+    ],
+    'effects' => [
+        'js' => [
+            'plugins' . DS . 'effects' . DS . 'jquery.effects.core.js',
+            'plugins' . DS . 'effects' . DS . 'jquery.effects.slide.js',
+        ],
+    ],
+    'validation' => [
+        'js' => [
+            'plugins' . DS . 'validation-engine' . DS . 'jquery.validationEngine-3.0.0.js?v=2',
+            'plugins' . DS . 'validation-engine' . DS . 'languages' . DS . 'jquery.validationEngine-en.js',
+        ],
+        'css' => ['plugins' . DS . 'validation-engine' . DS . 'jquery.validationEngine.css'],
+    ],
+    'validate' => [
+        'js' => [
+            'plugins' . DS . 'validate' . DS . 'validate.js?v=1',
+        ],
+    ],
+    'ckeditor' => [
+        'js' => ['plugins' . DS . 'ckeditor' . DS . 'ckeditor.js'],
+    ],
+    'ckeditor-4' => [
+        'js' => ['plugins' . DS . 'ckeditor' . DS . '4.5.9' . DS . 'ckeditor.js'],
+    ],
+    'isotope' => [
+        'js' => ['plugins' . DS . 'isotope' . DS . 'jquery.isotope.min.js'],
+    ],
+    'easing' => [
+        'js' => ['plugins' . DS . 'easing' . DS . 'jquery-easing-1.3.js'],
+    ],
+    'select2_v4' => [
+        'js' => ['plugins' . DS . 'select2' . DS . 'select2_v4.js'],
+        'css' => ['plugins' . DS . 'select2' . DS . 'select2_v4.css'],
+    ],
+    'select2' => [
+        'js' => ['plugins' . DS . 'select2' . DS . 'select2.js'],
+        'css' => ['plugins' . DS . 'select2' . DS . 'select2.css'],
+    ],
+    'select2-4.0' => [
+        'js' => ['plugins' . DS . 'select2' . DS . 'select2.full.js'],
+        'css' => ['plugins' . DS . 'select2' . DS . 'select2-4.0.0.min.css'],
+    ],
+    'datepicker' => [
+        'js' => ['plugins' . DS . 'datepicker' . DS . 'bootstrap-datepicker.js'],
+        'css' => ['plugins' . DS . 'datepicker' . DS . 'datepicker.css'],
+    ],
+    'bootstrap3-datepicker' => [
+        'js' => ['plugins' . DS . 'datepicker' . DS . 'bootstrap3-datepicker.js'],
+        'css' => ['plugins' . DS . 'datepicker' . DS . 'datepicker.css'],
+    ],
+    'timepicker' => [
+        'js' => ['plugins' . DS . 'timepicker' . DS . 'bootstrap-timepicker.min.js'],
+        'css' => ['plugins' . DS . 'timepicker' . DS . 'bootstrap-timepicker.min.css'],
+    ],
+    'image-gallery' => [
+        'css' => ['plugins' . DS . 'image-gallery' . DS . 'bootstrap-image-gallery.min.css'],
+    ],
+    'modernizr' => [
+        'js' => ['libs' . DS . 'modernizr.custom.js'],
+    ],
+    'multiselect' => [
+        'js' => ['plugins' . DS . 'multiselect' . DS . 'jquery.multi-select.js'],
+        'css' => ['plugins' . DS . 'multiselect' . DS . 'multi-select.css'],
+    ],
+    'terminal' => [
+        'css' => [
+            'plugins' . DS . 'terminal' . DS . 'jquery.terminal.min.css',
+        ],
+        'js' => [
             //"plugins" . DS . "terminal" . DS . "jquery.mousewheel-min.js",
-            "plugins" . DS . "terminal" . DS . "jquery.terminal.min.js",
-        ),
-    ),
-    "elfinder" => array(
-        "js" => array(
-            "plugins" . DS . "elfinder" . DS . "elfinder.min.js?v=1"
-        ),
-        "css" => array(
-            "plugins" . DS . "elfinder" . DS . "elfinder.min.css",
-            "plugins" . DS . "elfinder" . DS . "theme-bootstrap-libreicons-svg.css",
-        ),
-    ),
-    "jquery.filemanager" => array(
-        "js" => array("plugins" . DS . "jquery" . DS . "fileManager" . DS . "jquery.fileManager.js"),
-        "css" => array("plugins" . DS . "jquery" . DS . "fileManager" . DS . "jquery.fileManager.css"),
-    ),
-    "prettify" => array(
-        "js" => array("plugins" . DS . "google-code-prettify" . DS . "prettify.js"),
-        "css" => array("plugins" . DS . "google-code-prettify" . DS . "prettify.css"),
-    ),
-    "jstree" => array(
-        "js" => array("plugins" . DS . "jstree" . DS . "jstree.min.js"),
-        "css" => array("plugins" . DS . "jstree" . DS . "style.min.css"),
-    ),
-    "dropzone" => array(
-        "js" => array("plugins" . DS . "dropzone" . DS . "dropzone.js"),
-        "css" => array("plugins" . DS . "dropzone" . DS . "dropzone.css"),
-    ),
-    "bootstrap-3.3.5" => array(
-        "css" => array(
-            "plugins/bootstrap-3.3.5/bootstrap.min.css",
-        ),
-        "js" => array(
-            "libs/bootstrap-3.3.5/bootstrap.js",
-        ),
-    ),
-    "bootstrap-dropdown" => array(
-        "css" => array(
-            "bootstrap-dropdown.css",
-        ),
-        "js" => array(
-            "libs" . DS . "bootstrap" . DS . "bootstrap-dropdown.js"
-        ),
-    ),
-    "jquery.datatable-bootstrap3" => array(
-        "css" => array(
-            "plugins" . DS . "datatable" . DS . "dataTables.bootstrap.min.css",
-            "plugins" . DS . "datatable" . DS . "responsive.bootstrap.min.css",
-        ),
-        "js" => array(
-            "plugins" . DS . "datatable" . DS . "jquery.dataTables.js",
-            "plugins" . DS . "datatable" . DS . "dataTables.bootstrap.js",
-            "plugins" . DS . "datatable" . DS . "dataTables.responsive.2.0.2.min.js",
-//                "plugins" . DS . "datatable" . DS . "TableTools.min.js",
-//                "plugins" . DS . "datatable" . DS . "ColReorder.min.js",
-//                "plugins" . DS . "datatable" . DS . "ColVis.min.js",
-//                "plugins" . DS . "datatable" . DS . "jquery.dataTables.columnFilter.js",
-        ),
-    ),
-    "bootstrap-slider" => array(
-        "css" => array(
-            "bootstrap-slider.css",
-        ),
-        "js" => array(
-            "libs/bootstrap/bootstrap-slider.js",
-        ),
-    ),
-    "materialize" => array(
-        "css" => array(
-            "materialize/materialize.min.css",
+            'plugins' . DS . 'terminal' . DS . 'jquery.terminal.min.js',
+        ],
+    ],
+    'elfinder' => [
+        'js' => [
+            'plugins' . DS . 'elfinder' . DS . 'elfinder.min.js?v=1'
+        ],
+        'css' => [
+            'plugins' . DS . 'elfinder' . DS . 'elfinder.min.css',
+            'plugins' . DS . 'elfinder' . DS . 'theme-bootstrap-libreicons-svg.css',
+        ],
+    ],
+    'jquery.filemanager' => [
+        'js' => ['plugins' . DS . 'jquery' . DS . 'fileManager' . DS . 'jquery.fileManager.js'],
+        'css' => ['plugins' . DS . 'jquery' . DS . 'fileManager' . DS . 'jquery.fileManager.css'],
+    ],
+    'prettify' => [
+        'js' => ['plugins' . DS . 'google-code-prettify' . DS . 'prettify.js'],
+        'css' => ['plugins' . DS . 'google-code-prettify' . DS . 'prettify.css'],
+    ],
+    'jstree' => [
+        'js' => ['plugins' . DS . 'jstree' . DS . 'jstree.min.js'],
+        'css' => ['plugins' . DS . 'jstree' . DS . 'style.min.css'],
+    ],
+    'dropzone' => [
+        'js' => ['plugins' . DS . 'dropzone' . DS . 'dropzone.js'],
+        'css' => ['plugins' . DS . 'dropzone' . DS . 'dropzone.css'],
+    ],
+    'bootstrap-3.3.5' => [
+        'css' => [
+            'plugins/bootstrap-3.3.5/bootstrap.min.css',
+        ],
+        'js' => [
+            'libs/bootstrap-3.3.5/bootstrap.js',
+        ],
+    ],
+    'bootstrap-dropdown' => [
+        'css' => [
+            'bootstrap-dropdown.css',
+        ],
+        'js' => [
+            'libs' . DS . 'bootstrap' . DS . 'bootstrap-dropdown.js'
+        ],
+    ],
+    'jquery.datatable-bootstrap3' => [
+        'css' => [
+            'plugins' . DS . 'datatable' . DS . 'dataTables.bootstrap.min.css',
+            'plugins' . DS . 'datatable' . DS . 'responsive.bootstrap.min.css',
+        ],
+        'js' => [
+            'plugins' . DS . 'datatable' . DS . 'jquery.dataTables.js',
+            'plugins' . DS . 'datatable' . DS . 'dataTables.bootstrap.js',
+            'plugins' . DS . 'datatable' . DS . 'dataTables.responsive.2.0.2.min.js',
+            //                "plugins" . DS . "datatable" . DS . "TableTools.min.js",
+            //                "plugins" . DS . "datatable" . DS . "ColReorder.min.js",
+            //                "plugins" . DS . "datatable" . DS . "ColVis.min.js",
+            //                "plugins" . DS . "datatable" . DS . "jquery.dataTables.columnFilter.js",
+        ],
+    ],
+    'bootstrap-slider' => [
+        'css' => [
+            'bootstrap-slider.css',
+        ],
+        'js' => [
+            'libs/bootstrap/bootstrap-slider.js',
+        ],
+    ],
+    'materialize' => [
+        'css' => [
+            'materialize/materialize.min.css',
             // "materialize/bootstrap-material-design.min.css",
-            "materialize/material-icons.css",
-            "materialize/swiper/swiper.min.css",
-            "materialize/materialize.clockpicker.css",
+            'materialize/material-icons.css',
+            'materialize/swiper/swiper.min.css',
+            'materialize/materialize.clockpicker.css',
             // "materialize/ripples.min.css",
-            "materialize/materialize.css",
-        ),
-        "js" => array(
-// "materialize/hammer.min.js",
-            "materialize/materialize.min.js",
+            'materialize/materialize.css',
+        ],
+        'js' => [
+            // "materialize/hammer.min.js",
+            'materialize/materialize.min.js',
             // "materialize/material.min.js",
-// "materialize/materialize.amd.js",
-// "materialize/ripples.min.js",
-            "materialize/swiper/swiper.jquery.js",
-            "materialize/materialize.clockpicker.js",
-            "materialize/jscroll/jquery.jscroll.js",
-            "require.js",
-            "materialize/material_main.js",
-            "materialize/dlmenu/jquery.dlmenu.js",
-            "materialize/dlmenu/modernizr.custom.js",
-        ),
-    ),
-    "moment" => array(
-        "js" => array(
-            "plugins/momentjs/moment.js",
-            "plugins/momentjs/moment-with-locales.min.js",
-        ),
-    ),
-    "slick" => array(
-        "js" => array(
-            "plugins/slick/slick.min.js",
-        ),
-        "css" => array(
-            "plugins/slick/slick.css",
-            "plugins/slick/slick-theme.css",
-        ),
-    ),
-    "datepicker_material" => array(
-        "css" => array(
-            "plugins/datepicker_material/bootstrap-material-datetimepicker.css",
-        ),
-        "js" => array(
-            "plugins/datepicker_material/bootstrap-material-datetimepicker.js",
-        ),
-    ),
-    "fullcalendar" => array(
-        "css" => array(
-            "plugins/fullcalendar/fullcalendar.min.css",
-//                "plugins/fullcalendar/fullcalendar.print.css",
-        ),
-        "js" => array(
-            "plugins/fullcalendar/fullcalendar.min.js",
-        ),
-    ),
-    "swiper" => array(
-        "css" => array(
-            "materialize/swiper/swiper.min.css",
-        ),
-        "js" => array(
-            "materialize/swiper/swiper.jquery.js",
-        ),
-    ),
-    "pace" => array(
-        "js" => array(
-            "plugins/pace/pace.js",
-        ),
-    ),
-    "animate" => array(
-        "css" => array(
-            "plugins/animate/animate.css?v=1",
-        ),
-    ),
-    "summernote" => array(
-        "css" => array(
+            // "materialize/materialize.amd.js",
+            // "materialize/ripples.min.js",
+            'materialize/swiper/swiper.jquery.js',
+            'materialize/materialize.clockpicker.js',
+            'materialize/jscroll/jquery.jscroll.js',
+            'require.js',
+            'materialize/material_main.js',
+            'materialize/dlmenu/jquery.dlmenu.js',
+            'materialize/dlmenu/modernizr.custom.js',
+        ],
+    ],
+    'moment' => [
+        'js' => [
+            'plugins/momentjs/moment.js',
+            'plugins/momentjs/moment-with-locales.min.js',
+        ],
+    ],
+    'slick' => [
+        'js' => [
+            'plugins/slick/slick.min.js',
+        ],
+        'css' => [
+            'plugins/slick/slick.css',
+            'plugins/slick/slick-theme.css',
+        ],
+    ],
+    'datepicker_material' => [
+        'css' => [
+            'plugins/datepicker_material/bootstrap-material-datetimepicker.css',
+        ],
+        'js' => [
+            'plugins/datepicker_material/bootstrap-material-datetimepicker.js',
+        ],
+    ],
+    'fullcalendar' => [
+        'css' => [
+            'plugins/fullcalendar/fullcalendar.min.css',
+            //                "plugins/fullcalendar/fullcalendar.print.css",
+        ],
+        'js' => [
+            'plugins/fullcalendar/fullcalendar.min.js',
+        ],
+    ],
+    'swiper' => [
+        'css' => [
+            'materialize/swiper/swiper.min.css',
+        ],
+        'js' => [
+            'materialize/swiper/swiper.jquery.js',
+        ],
+    ],
+    'pace' => [
+        'js' => [
+            'plugins/pace/pace.js',
+        ],
+    ],
+    'animate' => [
+        'css' => [
+            'plugins/animate/animate.css?v=1',
+        ],
+    ],
+    'summernote' => [
+        'css' => [
             // "plugins/summernote/summernote.css",
-            "plugins/summernote/summernote-bs4.css",
-        ),
-        "js" => array(
+            'plugins/summernote/summernote-bs4.css',
+        ],
+        'js' => [
             // "plugins/summernote/summernote.min.js",
-            "plugins/summernote/summernote-bs4.min.js",
-        ),
-    ),
-    "jquery-3.2.1" => array(
-        "js" => array("libs/jquery-3.2.1/jquery.min.js"),
-    ),
-    "bootstrap-4" => array(
-        "css" => array("libs/bootstrap-4/bootstrap.css"),
-        "js" => array("libs/bootstrap-4/popper.js", "libs/bootstrap-4/bootstrap.js"),
-    ),
-    "bootstrap-4-material" => array(
-        "css" => array("libs/bootstrap-4-material/bootstrap-material.css"),
-        "js" => array("libs/bootstrap-4/popper.js", "libs/bootstrap-4/bootstrap.js", "libs/material/material-ripple.js"),
-    ),
-    "bootstrap-4-datepicker" => array(
-        "css" => array(
-            "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.css",
-            "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.css"
-        ),
-        "js" => array(
-            "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.js",
-            "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.js"
-        ),
-        "requirements" => array("bootstrap-4-moment"),
-    ),
-    "bootstrap-4-material-datepicker" => array(
-        "css" => array(
-            "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.css",
-            "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.css",
-            "libs/bootstrap-4-material/plugins/datetimepicker/bootstrap-material-datetimepicker.css?v=1",
-        ),
-        "js" => array(
-            "libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.js",
-            "libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.js",
-            "libs/bootstrap-4-material/plugins/datetimepicker/bootstrap-material-datetimepicker.js",
-        ),
-        "requirements" => array("bootstrap-4-moment"),
-    ),
-    "bootstrap-4-moment" => array(
-        "js" => array(
-            "libs/bootstrap-4/plugins/moment/moment.js",
-        ),
-    ),
+            'plugins/summernote/summernote-bs4.min.js',
+        ],
+    ],
+    'jquery-3.2.1' => [
+        'js' => ['libs/jquery-3.2.1/jquery.min.js'],
+    ],
+    'bootstrap-4' => [
+        'css' => ['libs/bootstrap-4/bootstrap.css'],
+        'js' => ['libs/bootstrap-4/popper.js', 'libs/bootstrap-4/bootstrap.js'],
+    ],
+    'bootstrap-4-material' => [
+        'css' => ['libs/bootstrap-4-material/bootstrap-material.css'],
+        'js' => ['libs/bootstrap-4/popper.js', 'libs/bootstrap-4/bootstrap.js', 'libs/material/material-ripple.js'],
+    ],
+    'bootstrap-4-datepicker' => [
+        'css' => [
+            'libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.css',
+            'libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.css'
+        ],
+        'js' => [
+            'libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.js',
+            'libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.js'
+        ],
+        'requirements' => ['bootstrap-4-moment'],
+    ],
+    'bootstrap-4-material-datepicker' => [
+        'css' => [
+            'libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.css',
+            'libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.css',
+            'libs/bootstrap-4-material/plugins/datetimepicker/bootstrap-material-datetimepicker.css?v=1',
+        ],
+        'js' => [
+            'libs/bootstrap-4/plugins/datepicker/bootstrap-datepicker.js',
+            'libs/bootstrap-4/plugins/daterangepicker/bootstrap-daterangepicker.js',
+            'libs/bootstrap-4-material/plugins/datetimepicker/bootstrap-material-datetimepicker.js',
+        ],
+        'requirements' => ['bootstrap-4-moment'],
+    ],
+    'bootstrap-4-moment' => [
+        'js' => [
+            'libs/bootstrap-4/plugins/moment/moment.js',
+        ],
+    ],
     /*
      * ICON
      */
-    "fontawesome-3" => array(
-        "css" => array("icon/fontawesome-3.css"),
-    ),
-    "fontawesome-4.5" => array(
-        "css" => array("icon/fontawesome-4.5.css"),
-    ),
-    "fontawesome-5" => array(
-        "css" => array("icon/fontawesome-5.css"),
-    ),
-    "fontawesome-5-f" => array(
-        "css" => array("icon/fontawesome-5-f.min.css"),
-    ),
-    "ionicons" => array(
-        "css" => array("icon/ionicons.css"),
-    ),
-    "linearicons" => array(
-        "css" => array("icon/linearicons.css"),
-    ),
-    "themify-icons" => array(
-        "css" => array("icon/themify-icons.css"),
-    ),
-    "material-design-iconic-font" => array(
-        "css" => array("icon/material-design-iconic-font.min.css"),
-    ),
-    "piconsthin" => array(
-        "css" => array("icon/piconsthin.css"),
-    ),
-    "osicon" => array(
-        "css" => array("icon/osicon.css"),
-    ),
-    "open-ionic" => array(
-        "css" => array("icon/open-ionic.css"),
-    ),
-    "pe-icon-7-stroke" => array(
-        "css" => array("icon/pe-icon-7-stroke.css"),
-    ),
-    "glyphicons" => array(
-        "css" => array("icon/glyphicons.css"),
-    ),
-    "jquery.event.drag" => array(
-        "js" => array("plugins/jquery.event.drag/jquery.event.drag-2.2.js"),
-    ),
-    "prism" => array(
-        "js" => array(
-            "plugins/prism/prism.js",
-            "plugins/prism/components/prism-markup-templating.js",
-        ),
-        "css" => [
-            "plugins/prism/prism.css"
+    'fontawesome-3' => [
+        'css' => ['icon/fontawesome-3.css'],
+    ],
+    'fontawesome-4.5' => [
+        'css' => ['icon/fontawesome-4.5.css'],
+    ],
+    'fontawesome-5' => [
+        'css' => ['icon/fontawesome-5.css'],
+    ],
+    'fontawesome-5-f' => [
+        'css' => ['icon/fontawesome-5-f.min.css'],
+    ],
+    'ionicons' => [
+        'css' => ['icon/ionicons.css'],
+    ],
+    'linearicons' => [
+        'css' => ['icon/linearicons.css'],
+    ],
+    'themify-icons' => [
+        'css' => ['icon/themify-icons.css'],
+    ],
+    'material-design-iconic-font' => [
+        'css' => ['icon/material-design-iconic-font.min.css'],
+    ],
+    'piconsthin' => [
+        'css' => ['icon/piconsthin.css'],
+    ],
+    'osicon' => [
+        'css' => ['icon/osicon.css'],
+    ],
+    'open-ionic' => [
+        'css' => ['icon/open-ionic.css'],
+    ],
+    'pe-icon-7-stroke' => [
+        'css' => ['icon/pe-icon-7-stroke.css'],
+    ],
+    'glyphicons' => [
+        'css' => ['icon/glyphicons.css'],
+    ],
+    'jquery.event.drag' => [
+        'js' => ['plugins/jquery.event.drag/jquery.event.drag-2.2.js'],
+    ],
+    'prism' => [
+        'js' => [
+            'plugins/prism/prism.js',
+            'plugins/prism/components/prism-markup-templating.js',
         ],
-    ),
-    "prism-php" => array(
-        "js" => array(
-            "plugins/prism/components/prism-php.js",
-        ),
-        "css" => [
+        'css' => [
+            'plugins/prism/prism.css'
         ],
-    ),
-    "block-ui" => array(
-        "css" => array('spinkit.css'),
-        "js" => array("plugins/block-ui/block-ui.js"),
-    ),
-    "layout-helpers" => array(
-        "js" => array("plugins/layout-helpers/layout-helpers.js"),
-    ),
-    "perfect-scrollbar" => array(
-        "css" => array("plugins/perfect-scrollbar/perfect-scrollbar.css"),
-        "js" => array("plugins/perfect-scrollbar/perfect-scrollbar.js"),
-    ),
-    "sidenav" => array(
-        "js" => array("plugins/sidenav/sidenav.js"),
-    ),
-    "theme-material" => array(
-        "css" => array(
-            "theme/theme-material/colors-material.css",
-            "theme/theme-material/app-material.css",
-            "theme/theme-material/theme-material.css",
-        ),
-    ),
-    "auto-numeric" => array(
-        "js" => array("plugins/autonumeric/autonumeric.js"),
-    ),
-    "fullcalendar-3" => array(
-        "css" => array(
-            "plugins/fullcalendar-3/fullcalendar.min.css",
-        ),
-        "js" => array(
-            "plugins/fullcalendar-3/fullcalendar.min.js",
-        ),
-        "requirements" => array("moment"),
-    ),
-    "bootstrap-material-datetimepicker" => array(
-        "css" => array(
-            "plugins/bootstrap-material-datetimepicker/bootstrap-material-datetimepicker.css",
-        ),
-        "js" => array(
-            "plugins/bootstrap-material-datetimepicker/bootstrap-material-datetimepicker.js",
-        ),
-    ),
-    "flot" => array(
-        "css" => array(
-            "plugins/flotjs/flot.css",
-        ),
-        "js" => array(
-            "plugins/flotjs/flot.js",
-        ),
-    ),
-    "sparkline" => array(
-        "js" => array(
-            "plugins/sparklines/sparkline.js"
-        ),
-    ),
-    "c3" => array(
-        "css" => array(
-            "plugins/c3/c3.css",
-        ),
-        "js" => array(
-            "plugins/d3/d3.js",
-            "plugins/c3/c3.js",
-        ),
-    ),
-    "chartjs" => array(
-        "js" => array(
-            "plugins/chartjs/chartjs.js",
-        ),
-    ),
-    "chartist" => array(
-        "css" => array(
-            "plugins/chartist/chartist.css",
-        ),
-        "js" => array(
-            "plugins/chartist/chartist.js",
-        ),
-    ),
-    "morris" => array(
-        "css" => array(
-            "plugins/morris/morris.css",
-        ),
-        "js" => array(
-            "plugins/morris/morris.js",
-        ),
-    ),
-    "raphael" => array(
-        "js" => array(
-            "plugins/raphael/raphael.js",
-        ),
-    ),
-    "vis" => array(
-        "js" => array(
-            "plugins/vis/vis.min.js",
-        ),
-        "css" => array(
-            "plugins/vis/vis.min.css",
-        ),
-    ),
-    "toastr" => array(
-        "css" => array("plugins/toastr/toastr.css"),
-        "js" => array("plugins/toastr/toastr.js")
-    ),
-    "minicolors" => array(
-        "js" => array(
-            "plugins/minicolors/minicolors.js",
-        ),
-        "css" => array(
-            "plugins/minicolors/minicolors.css",
-        ),
-    ),
-    "dragula" => array(
-        "js" => array(
-            "plugins/dragula/dragula.js",
-        ),
-        "css" => array(
-            "plugins/dragula/dragula.css",
-        ),
-    ),
-    "clipboard" => array(
-        "js" => array(
-            "plugins/clipboard/clipboard.js",
-        )
-    ),
-    "quill" => array(
-        "js" => array(
-            "plugins/quill/quill.js",
-        ),
-        "css" => array(
-            "plugins/quill/quill.core.css",
-        ),
-    ),
-    "tippy" => array(
-        "js" => array(
-            "plugins/tippy/tippy.js",
-        ),
-    ),
-    "waypoints" => array(
-        "js" => array(
-            "plugins/waypoints/jquery.waypoints.min.js",
-        ),
-    ),
-    "locationpicker" => array(
-        "js" => array(
-            "plugins/locationpicker/locationpicker.jquery.js",
-        ),
-    ),
-    "pdfjs" => array(
-        "js" => array(
-            "plugins/pdfjs/pdf.js",
-            "plugins/pdfjs/viewer.js",
-        ),
-        "css" => array(
-            "plugins/pdfjs/viewer.css",
-        ),
-    ),
-    "bootstrap-daterangepicker" => array(
-        "js" => array(
-            "plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.js",
-        ),
-        "css" => array(
-            "plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.css",
-        ),
-    ),
-    "cropper" => array(
-        'css' => array(
+    ],
+    'prism-php' => [
+        'js' => [
+            'plugins/prism/components/prism-php.js',
+        ],
+        'css' => [
+        ],
+    ],
+    'block-ui' => [
+        'css' => ['spinkit.css'],
+        'js' => ['plugins/block-ui/block-ui.js'],
+    ],
+    'layout-helpers' => [
+        'js' => ['plugins/layout-helpers/layout-helpers.js'],
+    ],
+    'perfect-scrollbar' => [
+        'css' => ['plugins/perfect-scrollbar/perfect-scrollbar.css'],
+        'js' => ['plugins/perfect-scrollbar/perfect-scrollbar.js'],
+    ],
+    'sidenav' => [
+        'js' => ['plugins/sidenav/sidenav.js'],
+    ],
+    'theme-material' => [
+        'css' => [
+            'theme/theme-material/colors-material.css',
+            'theme/theme-material/app-material.css',
+            'theme/theme-material/theme-material.css',
+        ],
+    ],
+    'auto-numeric' => [
+        'js' => ['plugins/autonumeric/autonumeric.js'],
+    ],
+    'fullcalendar-3' => [
+        'css' => [
+            'plugins/fullcalendar-3/fullcalendar.min.css',
+        ],
+        'js' => [
+            'plugins/fullcalendar-3/fullcalendar.min.js',
+        ],
+        'requirements' => ['moment'],
+    ],
+    'bootstrap-material-datetimepicker' => [
+        'css' => [
+            'plugins/bootstrap-material-datetimepicker/bootstrap-material-datetimepicker.css',
+        ],
+        'js' => [
+            'plugins/bootstrap-material-datetimepicker/bootstrap-material-datetimepicker.js',
+        ],
+    ],
+    'flot' => [
+        'css' => [
+            'plugins/flotjs/flot.css',
+        ],
+        'js' => [
+            'plugins/flotjs/flot.js',
+        ],
+    ],
+    'sparkline' => [
+        'js' => [
+            'plugins/sparklines/sparkline.js'
+        ],
+    ],
+    'c3' => [
+        'css' => [
+            'plugins/c3/c3.css',
+        ],
+        'js' => [
+            'plugins/d3/d3.js',
+            'plugins/c3/c3.js',
+        ],
+    ],
+    'chartjs' => [
+        'js' => [
+            'plugins/chartjs/chartjs.js',
+        ],
+    ],
+    'chartist' => [
+        'css' => [
+            'plugins/chartist/chartist.css',
+        ],
+        'js' => [
+            'plugins/chartist/chartist.js',
+        ],
+    ],
+    'morris' => [
+        'css' => [
+            'plugins/morris/morris.css',
+        ],
+        'js' => [
+            'plugins/morris/morris.js',
+        ],
+    ],
+    'raphael' => [
+        'js' => [
+            'plugins/raphael/raphael.js',
+        ],
+    ],
+    'vis' => [
+        'js' => [
+            'plugins/vis/vis.min.js',
+        ],
+        'css' => [
+            'plugins/vis/vis.min.css',
+        ],
+    ],
+    'toastr' => [
+        'css' => ['plugins/toastr/toastr.css'],
+        'js' => ['plugins/toastr/toastr.js']
+    ],
+    'minicolors' => [
+        'js' => [
+            'plugins/minicolors/minicolors.js',
+        ],
+        'css' => [
+            'plugins/minicolors/minicolors.css',
+        ],
+    ],
+    'dragula' => [
+        'js' => [
+            'plugins/dragula/dragula.js',
+        ],
+        'css' => [
+            'plugins/dragula/dragula.css',
+        ],
+    ],
+    'clipboard' => [
+        'js' => [
+            'plugins/clipboard/clipboard.js',
+        ]
+    ],
+    'quill' => [
+        'js' => [
+            'plugins/quill/quill.js',
+        ],
+        'css' => [
+            'plugins/quill/quill.core.css',
+        ],
+    ],
+    'tippy' => [
+        'js' => [
+            'plugins/tippy/tippy.js',
+        ],
+    ],
+    'waypoints' => [
+        'js' => [
+            'plugins/waypoints/jquery.waypoints.min.js',
+        ],
+    ],
+    'locationpicker' => [
+        'js' => [
+            'plugins/locationpicker/locationpicker.jquery.js',
+        ],
+    ],
+    'pdfjs' => [
+        'js' => [
+            'plugins/pdfjs/pdf.js',
+            'plugins/pdfjs/viewer.js',
+        ],
+        'css' => [
+            'plugins/pdfjs/viewer.css',
+        ],
+    ],
+    'bootstrap-daterangepicker' => [
+        'js' => [
+            'plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.js',
+        ],
+        'css' => [
+            'plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.css',
+        ],
+    ],
+    'cropper' => [
+        'css' => [
             'plugins/cropper/cropper.css',
-        ),
-        'js' => array(
+        ],
+        'js' => [
             'plugins/cropper/cropper.js',
-        ),
-    ),
-);
-?>
+        ],
+    ],
+];
