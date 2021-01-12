@@ -156,12 +156,12 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->infoText = clang::__('Showing') . ' _START_ ' . clang::__('to') . ' _END_ ' . clang::__('of') . ' _TOTAL_ ' . clang::__('entries') . '';
         if (isset($this->theme)) {
             if ($this->bootstrap >= '3.3') {
-                CClientModules::instance()->register_module('jquery.datatable-bootstrap3');
+                CClientModules::instance()->registerModule('jquery.datatable-bootstrap3');
             } else {
-                CClientModules::instance()->register_module('jquery.datatable');
+                CClientModules::instance()->registerModule('jquery.datatable');
             }
         } else {
-            CClientModules::instance()->register_module('jquery.datatable');
+            CClientModules::instance()->registerModule('jquery.datatable');
         }
 
         $this->dom = CManager::theme()->getData('table.dom');
