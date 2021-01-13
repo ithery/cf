@@ -39,7 +39,7 @@ class CView {
      *
      * @param string $name
      *
-     * @return boolean
+     * @return bool
      */
     public static function exists($name) {
         return CView_Factory::instance()->exists($name);
