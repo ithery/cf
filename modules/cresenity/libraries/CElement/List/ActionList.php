@@ -71,11 +71,16 @@ class CElement_List_ActionList extends CElement_List {
         $html = new CStringBuilder();
         $html->setIndent($indent);
         $classes = $this->getNormalizedClasses();
-        $ulDropdownClasses = 'dropdown-menu-right';
-        if (in_array('dropdown-menu-right', $classes)
-            || in_array('dropdown-menu-left', $classes)
+        $ulDropdownClasses = '';
+        if (!in_array('dropdown-menu-right', $classes)
+            && !in_array('dropdown-menu-left', $classes)
         ) {
-            $ulDropdownClasses = '';
+            $ulDropdownClasses .= ' dropdown-menu-right';
+        }
+        if (!in_array('pull-right', $classes)
+            && !in_array('pull-left', $classes)
+        ) {
+            $ulDropdownClasses .= ' pull-right';
         }
         $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
