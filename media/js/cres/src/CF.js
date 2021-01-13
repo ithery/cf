@@ -2,6 +2,7 @@
 export default class CF {
     constructor() {
         this.required = typeof this.required === 'undefined' ? [] : this.required;
+        this.cssRequired = typeof this.cssRequired === 'undefined' ? [] : this.cssRequired;
 
         this.window = window;
         this.document = window.document;
@@ -49,6 +50,70 @@ export default class CF {
     CFVersion() {
         return this.getConfig().CFVersion;
     }
+    requireCss(url, callback) {
+        if (!~this.cssRequired.indexOf(url)) {
+            this.cssRequired.push(url);
+            if (document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null) {
+                return
+            }
+            var string = "<link rel='stylesheet' type='text/css' href='" + url + "' />";
+            if ((document.readyState === 'loading'/* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
+                document.write(string);
+            } else {
+                var el;
+                el = this.document.createElement('link');
+                el.rel = 'stylesheet';
+                el.type = 'text/css';
+                el.href = url;
+                // IE 6 & 7
+                if (typeof (callback) === 'function') {
+                    el.onload = callback;
+                    el.onreadystatechange = function () {
+                        if (this.readyState == 'complete') {
+                            callback();
+                        }
+                    }
+                }
+                this.head.appendChild(el);
+            }
+        } else {
+            if (typeof (callback) === 'function') {
+                callback();
+            }
+        }
+    }
+    requireJs(url, callback) {
+        if (!~this.required.indexOf(url)) {
+            this.required.push(url);
+            if (document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null) {
+                return
+            }
+            var string = "<script type='text/javascript'  src='" + url + "'></script>";
+            if ((document.readyState === 'loading'/* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
+                document.write(string);
+            } else {
+
+                var el;
+                el = this.document.createElement('script');
+                el.src = url;
+                el.setAttribute('type', 'text/javascript');
+                // IE 6 & 7
+                if (typeof (callback) === 'function') {
+                    el.onload = callback;
+                    el.onreadystatechange = function () {
+                        if (this.readyState == 'complete') {
+                            callback();
+                        }
+                    }
+                }
+                this.body.appendChild(el);
+            }
+        } else {
+            if (typeof (callback) === 'function') {
+                callback();
+            }
+        }
+    }
     require(url, callback) {
 
         if (typeof url != "string") {
@@ -59,61 +124,21 @@ export default class CF {
             return;
         }
 
-        var toPush = url
+        var toPush = url.trim();
+        var t = 'js';
 
-        var t = url.split('.').pop();
-        //url = url.contains('//') ? url : (t !== "css" ? "<?php print( mw_includes_url() ); ?>api/" + url : "<?php print( mw_includes_url() ); ?>css/" + url);
-
-        if (!~this.required.indexOf(toPush)) {
-            this.required.push(toPush);
-            url = url.contains("?") ? url + '&cappv=' + this.CFVersion() : url + "?cappv=" + this.CFVersion();
-            if (document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null) {
-                return
-            }
-            var string = t !== "css" ? "<script type='text/javascript'  src='" + url + "'></script>" : "<link rel='stylesheet' type='text/css' href='" + url + "' />";
-            if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/ ) && !!window.CanvasRenderingContext2D && self === parent) {
-                document.write(string);
-            } else {
-
-                var el;
-                if (t !== "css") {
-
-                    el = this.document.createElement('script');
-                    el.src = url;
-                    el.setAttribute('type', 'text/javascript');
-                    // IE 6 & 7
-                    if (typeof(callback) === 'function') {
-                        el.onload = callback;
-                        el.onreadystatechange = function() {
-                            if (this.readyState == 'complete') {
-                                callback();
-                            }
-                        }
-                    }
-                    this.head.appendChild(el);
-                } else {
-                    el = this.document.createElement('link');
-                    el.rel = 'stylesheet';
-                    el.type = 'text/css';
-                    el.href = url;
-                    // IE 6 & 7
-                    if (typeof(callback) === 'function') {
-                        el.onload = callback;
-                        el.onreadystatechange = function() {
-                            if (this.readyState == 'complete') {
-                                callback();
-                            }
-                        }
-                    }
-                    this.head.appendChild(el);
-                }
-
-            }
-        } else {
-            if (typeof(callback) === 'function') {
-                callback();
-            }
+        var urlObject = new URL(toPush,document.baseURI);
+        if(urlObject) {
+            t = urlObject.pathname.split('.').pop();
         }
+
+        if(t=='js') {
+            this.requireJs(toPush,callback);
+        }
+        if(t=='css') {
+            this.requireCss(toPush,callback);
+        }
+
     };
 
     loadJQuery(callback) {

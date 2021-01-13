@@ -2,8 +2,8 @@
     "main": "dist/cres.js",
     "name": "cf-cres",
     "scripts": {
-        "build": "NODE_ENV=production npx rollup -c",
-        "watch": "NODE_ENV=production npx rollup -c -w"
+        "build": "SET NODE_ENV=production && npx rollup -c",
+        "watch": "SET NODE_ENV=production && npx rollup -c -w"
     },
     "author": "Hery Kurniawan",
     "license": "MIT",

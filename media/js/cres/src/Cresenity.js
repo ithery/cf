@@ -1,4 +1,4 @@
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -64,81 +64,18 @@ export default class Cresenity {
         return false;
     };
 
-    loadJs(filename, callback) {
-        var fileref = document.createElement('script');
-        fileref.setAttribute("type", "text/javascript");
-        fileref.setAttribute("src", filename);
-        // IE 6 & 7
-        if (typeof(callback) === 'function') {
-            fileref.onload = callback;
-            fileref.onreadystatechange = function() {
-                if (this.readyState == 'complete') {
-                    callback();
-                }
-            }
-        }
-        document.getElementsByTagName("head")[0].appendChild(fileref);
 
-    };
-
-    loadJsCss(filename, filetype, callback) {
-        if (filetype == "js") { //if filename is a external JavaScript file
-            var fileref = document.createElement('script')
-            fileref.setAttribute("type", "text/javascript")
-            fileref.setAttribute("src", filename)
-        } else if (filetype == "css") { //if filename is an external CSS file
-            var fileref = document.createElement("link")
-            fileref.setAttribute("rel", "stylesheet")
-            fileref.setAttribute("type", "text/css")
-            fileref.setAttribute("href", filename)
-        }
-        if (typeof fileref != "undefined") {
-            //fileref.onload = callback;
-            // IE 6 & 7
-            if (typeof(callback) === 'function') {
-                fileref.onload = cresenity.handleResponseCallback(callback);
-                fileref.onreadystatechange = function() {
-                    if (this.readyState == 'complete') {
-                        cresenity.handleResponseCallback(callback);
-                    }
-                }
-            }
-            document.getElementsByTagName("head")[0].appendChild(fileref);
-        }
-    };
-    require(filename, filetype, callback) {
-        if (this.filesAdded.indexOf("[" + filename + "]") == -1) {
-            this.loadJsCss(filename, filetype, callback);
-            this.filesAdded += "[" + filename + "]" //List of files added in the form "[filename1],[filename2],etc"
-        } else {
-            cresenity.filesLoaded++;
-
-            if (cresenity.filesLoaded == cresenity.filesNeeded) {
-                callback();
-            }
-        }
-    };
 
     handleResponse(data, callback) {
         if (data.css_require && data.css_require.length > 0) {
             for (var i = 0; i < data.css_require.length; i++) {
-                cresenity.require(data.css_require[i], 'css');
+                cresenity.cf.require(data.css_require[i], 'css');
             }
         }
-        if (data.js_require && data.js_require.length > 0) {
-            for (var i = 0; i < data.js_require.length; i++) {
-                cresenity.require(data.js_require[i], 'js');
-            }
-        }
+
         callback();
 
 
-    };
-    handleResponseCallback(callback) {
-        cresenity.filesLoaded++;
-        if (cresenity.filesLoaded == $.cresenity.filesNeeded) {
-            callback();
-        }
     };
 
     reload(options) {
