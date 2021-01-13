@@ -1,4 +1,3 @@
-
 export default class CF {
     constructor() {
         this.required = typeof this.required === 'undefined' ? [] : this.required;
@@ -57,7 +56,7 @@ export default class CF {
                 return
             }
             var string = "<link rel='stylesheet' type='text/css' href='" + url + "' />";
-            if ((document.readyState === 'loading'/* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
+            if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/ ) && !!window.CanvasRenderingContext2D && self === parent) {
                 document.write(string);
             } else {
                 var el;
@@ -89,7 +88,7 @@ export default class CF {
                 return
             }
             var string = "<script type='text/javascript'  src='" + url + "'></script>";
-            if ((document.readyState === 'loading'/* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
+            if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/ ) && !!window.CanvasRenderingContext2D && self === parent) {
                 document.write(string);
             } else {
 
@@ -127,16 +126,16 @@ export default class CF {
         var toPush = url.trim();
         var t = 'js';
 
-        var urlObject = new URL(toPush,document.baseURI);
-        if(urlObject) {
+        var urlObject = new URL(toPush, document.baseURI);
+        if (urlObject) {
             t = urlObject.pathname.split('.').pop();
         }
 
-        if(t=='js') {
-            this.requireJs(toPush,callback);
+        if (t == 'js') {
+            this.requireJs(toPush, callback);
         }
-        if(t=='css') {
-            this.requireCss(toPush,callback);
+        if (t == 'css') {
+            this.requireCss(toPush, callback);
         }
 
     };
@@ -148,9 +147,9 @@ export default class CF {
             fileref.setAttribute("type", "text/javascript");
             fileref.setAttribute("src", this.getConfig().defaultJQueryUrl);
             // IE 6 & 7
-            if (typeof(callback) === 'function') {
+            if (typeof (callback) === 'function') {
                 fileref.onload = callback;
-                fileref.onreadystatechange = function() {
+                fileref.onreadystatechange = function () {
                     if (this.readyState == 'complete') {
                         callback();
                     }
@@ -164,40 +163,24 @@ export default class CF {
 
     init() {
         var arrayJsUrl = this.getConfig().jsUrl;
-        this.beforeInitCallback.forEach(function(item) {
+        this.beforeInitCallback.forEach(function (item) {
             item();
         });
 
         this.loadJQuery(() => {
-
-
-
-
             if (typeof arrayJsUrl !== 'undefined') {
-                //todo add required for script already written in <script
-
                 arrayJsUrl.forEach((item) => {
-                    //console.log(item);
-                    //if (document.querySelector('script[src="' + item + '"]') !== null) {
-                    //document.querySelector('script[src="/media/js/plugins/form/jquery.form.js"]')
                     this.required.push(item);
-                    //}
                 });
-
-                //                arrayJsUrl.forEach((item) => {
-                //
-                //                    this.require(item);
-                //                });
+            }
+            if (typeof arrayCssUrl !== 'undefined') {
+                arrayCssUrl.forEach((item) => {
+                    this.cssRequired.push(item);
+                });
             }
         });
-
-
-
-        this.afterInitCallback.forEach(function(item) {
+        this.afterInitCallback.forEach(function (item) {
             item();
         });
-
-
-
     }
 }
