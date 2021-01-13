@@ -57,22 +57,19 @@ trait CApp_Trait_App_Variables {
         $variables['labelCancel'] = clang::__('Cancel');
 
         $asset = CManager::asset();
-        $variables['requireJs'] = $asset->isUseRequireJs();
-        if (!$asset->isUseRequireJs()) {
-            $variables['requireJs'] = false;
+        $variables['requireJs'] = false;
 
-            //we collect all client modules data
-            $allModules = CManager::asset()->module()->allModules();
-            $variables['modules'] = $allModules;
-            $variables['theme'] = [];
-            $variables['theme']['name'] = CManager::theme()->getCurrentTheme();
-            $variables['theme']['data'] = CManager::theme()->getThemeData();
+        //we collect all client modules data
+        $allModules = CManager::asset()->module()->allModules();
+        $variables['modules'] = $allModules;
+        $variables['theme'] = [];
+        $variables['theme']['name'] = CManager::theme()->getCurrentTheme();
+        $variables['theme']['data'] = CManager::theme()->getThemeData();
 
-            $variables['jsUrl'] = CManager::asset()->getAllJsFileUrl();
-            $variables['cssUrl'] = CManager::asset()->getAllCssFileUrl();
+        $variables['jsUrl'] = CManager::asset()->getAllJsFileUrl();
+        $variables['cssUrl'] = CManager::asset()->getAllCssFileUrl();
 
-            $variables['defaultJQueryUrl'] = curl::base() . 'media/js/libs/jquery-3.3.1/jquery-3.3.1.min.js';
-        }
+        $variables['defaultJQueryUrl'] = curl::base() . 'media/js/libs/jquery-3.3.1/jquery-3.3.1.min.js';
         if (is_array(static::$variables)) {
             $variables = array_merge($variables, static::$variables);
         }

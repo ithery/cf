@@ -164,34 +164,17 @@ HTML;
             $css_urls = $asset->getAllCssFileUrl();
             $js_urls = $asset->getAllJsFileUrl();
             $additional_js = '';
-            if ($this->isUseRequireJs()) {
-                foreach ($css_urls as $url) {
-                    $additional_js .= "
-                    if($ && $.cresenity) {
-                        $.cresenity._filesadded+='['+'" . $url . "'+']';
-                    }
-                    if(cresenity) {
-                        cresenity.filesAdded+='['+'" . $url . "'+']';
-                    }
-                ";
-                }
-            }
+
             $js = '';
 
             $js .= PHP_EOL . $this->js . $additional_js;
             $jsScriptFile = '';
-            $isUseRequireJs = $this->isUseRequireJs();
-            $isUseRequireJs = false;
-            if ($isUseRequireJs) {
-                $js = $asset->renderJsRequire($js);
-            } else {
-                $jsScriptFile = PHP_EOL . '<script>' . $asset->varJs() . '</script>';
-                $jsScriptFile .= PHP_EOL . '<script>if(typeof define === "function") define=undefined;</script>';
-                //$jsScriptFile .= '<script src="/media/js/capp.js?v='.uniqid().'"></script>';
-                $jsScriptFile .= PHP_EOL . $asset->render(CManager_Asset::POS_END, CManager_Asset::TYPE_JS_FILE);
+            $jsScriptFile = PHP_EOL . '<script>' . $asset->varJs() . '</script>';
+            $jsScriptFile .= PHP_EOL . '<script>if(typeof define === "function") define=undefined;</script>';
+            //$jsScriptFile .= '<script src="/media/js/capp.js?v='.uniqid().'"></script>';
+            $jsScriptFile .= PHP_EOL . $asset->render(CManager_Asset::POS_END, CManager_Asset::TYPE_JS_FILE);
 
-                $js = $asset->wrapJs($js, true);
-            }
+            $js = $asset->wrapJs($js, true);
 
             /*
             if (!$this->isUseRequireJs()) {

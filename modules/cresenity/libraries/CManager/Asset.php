@@ -154,7 +154,7 @@ class CManager_Asset {
         return $js_before . $js . PHP_EOL . ';' . PHP_EOL;
     }
 
-    public function renderJsRequire($js, $require = 'require') {
+    public function renderJsRequire($js, $require = 'cresenity.cf.require') {
         //return CClientModules::instance()->require_js($js);
         $app = CApp::instance();
 
@@ -278,14 +278,6 @@ class CManager_Asset {
         }
 
         return $script;
-    }
-
-    public function isUseRequireJs() {
-        $isUseRequireJs = CApp::instance()->isUseRequireJs();
-        if ($isUseRequireJs === null) {
-            $isUseRequireJs = true;
-        }
-        return $isUseRequireJs;
     }
 
     public function compileCss($files) {

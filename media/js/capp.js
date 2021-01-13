@@ -25,6 +25,7 @@ var CF = function () {
 
 
     this.required = typeof this.required === 'undefined' ? [] : this.required;
+    this.cssRequired = typeof this.cssRequired === 'undefined' ? [] : this.cssRequired;
 
     this.window = window;
     this.document = window.document;
@@ -53,6 +54,71 @@ var CF = function () {
     this.CFVersion = function () {
         return this.getConfig().CFVersion;
     }
+
+    this.requireCss = function (url, callback) {
+        if (!~this.cssRequired.indexOf(url)) {
+            this.cssRequired.push(url);
+            if (document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null) {
+                return
+            }
+            var string = "<link rel='stylesheet' type='text/css' href='" + url + "' />";
+            if ((document.readyState === 'loading'/* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
+                document.write(string);
+            } else {
+                var el;
+                el = this.document.createElement('link');
+                el.rel = 'stylesheet';
+                el.type = 'text/css';
+                el.href = url;
+                // IE 6 & 7
+                if (typeof (callback) === 'function') {
+                    el.onload = callback;
+                    el.onreadystatechange = function () {
+                        if (this.readyState == 'complete') {
+                            callback();
+                        }
+                    }
+                }
+                this.head.appendChild(el);
+            }
+        } else {
+            if (typeof (callback) === 'function') {
+                callback();
+            }
+        }
+    }
+    this.requireJs = function (url, callback) {
+        if (!~this.required.indexOf(url)) {
+            this.required.push(url);
+            if (document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null) {
+                return
+            }
+            var string = "<script type='text/javascript'  src='" + url + "'></script>";
+            if ((document.readyState === 'loading'/* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
+                document.write(string);
+            } else {
+
+                var el;
+                el = this.document.createElement('script');
+                el.src = url;
+                el.setAttribute('type', 'text/javascript');
+                // IE 6 & 7
+                if (typeof (callback) === 'function') {
+                    el.onload = callback;
+                    el.onreadystatechange = function () {
+                        if (this.readyState == 'complete') {
+                            callback();
+                        }
+                    }
+                }
+                this.body.appendChild(el);
+            }
+        } else {
+            if (typeof (callback) === 'function') {
+                callback();
+            }
+        }
+    }
     this.require = function (url, callback) {
 
         if (typeof url != "string") {
@@ -63,61 +129,21 @@ var CF = function () {
             return;
         }
 
-        var toPush = url
+        var toPush = url.trim();
+        var t = 'js';
 
-        var t = url.split('.').pop();
-        //url = url.contains('//') ? url : (t !== "css" ? "<?php print( mw_includes_url() ); ?>api/" + url : "<?php print( mw_includes_url() ); ?>css/" + url);
-
-        if (!~this.required.indexOf(toPush)) {
-            this.required.push(toPush);
-            url = url.contains("?") ? url + '&cappv=' + this.CFVersion() : url + "?cappv=" + this.CFVersion();
-            if (document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null) {
-                return
-            }
-            var string = t !== "css" ? "<script type='text/javascript'  src='" + url + "'></script>" : "<link rel='stylesheet' type='text/css' href='" + url + "' />";
-            if ((document.readyState === 'loading'/* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
-                document.write(string);
-            } else {
-
-                var el;
-                if (t !== "css") {
-
-                    el = this.document.createElement('script');
-                    el.src = url;
-                    el.setAttribute('type', 'text/javascript');
-                    // IE 6 & 7
-                    if (typeof (callback) === 'function') {
-                        el.onload = callback;
-                        el.onreadystatechange = function () {
-                            if (this.readyState == 'complete') {
-                                callback();
-                            }
-                        }
-                    }
-                    this.head.appendChild(el);
-                } else {
-                    el = this.document.createElement('link');
-                    el.rel = 'stylesheet';
-                    el.type = 'text/css';
-                    el.href = url;
-                    // IE 6 & 7
-                    if (typeof (callback) === 'function') {
-                        el.onload = callback;
-                        el.onreadystatechange = function () {
-                            if (this.readyState == 'complete') {
-                                callback();
-                            }
-                        }
-                    }
-                    this.head.appendChild(el);
-                }
-
-            }
-        } else {
-            if (typeof (callback) === 'function') {
-                callback();
-            }
+        var urlObject = new URL(toPush,document.baseURI);
+        if(urlObject) {
+            t = urlObject.pathname.split('.').pop();
         }
+
+        if(t=='js') {
+            this.requireJs(toPush,callback);
+        }
+        if(t=='css') {
+            this.requireCss(toPush,callback);
+        }
+
     };
 
     this.loadJQuery = function (callback) {
@@ -143,18 +169,14 @@ var CF = function () {
 
     this.init = function () {
         var arrayJsUrl = this.getConfig().jsUrl;
+        var arrayCssUrl = this.getConfig().cssUrl;
         this.beforeInitCallback.forEach(function (item) {
             item();
         });
 
         this.loadJQuery(() => {
-
-
-
-
             if (typeof arrayJsUrl !== 'undefined') {
                 //todo add required for script already written in <script
-
                 arrayJsUrl.forEach((item) => {
                     //console.log(item);
                     //if (document.querySelector('script[src="' + item + '"]') !== null) {
@@ -162,11 +184,15 @@ var CF = function () {
                     this.required.push(item);
                     //}
                 });
-
-//                arrayJsUrl.forEach((item) => {
-//
-//                    this.require(item);
-//                });
+            }
+            if (typeof arrayCssUrl !== 'undefined') {
+                arrayCssUrl.forEach((item) => {
+                    //console.log(item);
+                    //if (document.querySelector('script[src="' + item + '"]') !== null) {
+                    //document.querySelector('script[src="/media/js/plugins/form/jquery.form.js"]')
+                    this.cssRequired.push(item);
+                    //}
+                });
             }
         });
 
@@ -377,17 +403,17 @@ var CUploader = function (options) {
         }
 
         if (this.objectType == 'image' && this.previewElement) {
-            var imgPreview = $('<img>', {class: 'img-fluid w-100 media-preview', src: url});
+            var imgPreview = $('<img>', { class: 'img-fluid w-100 media-preview', src: url });
             this.previewElement.prepend(imgPreview);
         }
         if (this.objectType == 'video' && this.previewElement) {
-            var videoPreviewControl = $('<video>', {controls: '', width: '100%', height: '100%', class: 'w-100 media-preview'});
-            var videoSource = $('<source>', {src: url});
+            var videoPreviewControl = $('<video>', { controls: '', width: '100%', height: '100%', class: 'w-100 media-preview' });
+            var videoSource = $('<source>', { src: url });
             videoPreviewControl.append(videoSource);
             this.previewElement.prepend(videoPreviewControl);
         }
         if (this.objectType == 'file' && this.previewElement) {
-            var filePreview = $('<i>', {class: 'media-preview far fa-file fa-10x text-center'});
+            var filePreview = $('<i>', { class: 'media-preview far fa-file fa-10x text-center' });
             this.previewElement.prepend(filePreview);
         }
     }
@@ -449,8 +475,8 @@ function strlen(string) {
 
     var str = string + ''
     var i = 0,
-            chr = '',
-            lgth = 0;
+        chr = '',
+        lgth = 0;
 
     if (!this.php_js || !this.php_js.ini || !this.php_js.ini['unicode.semantics'] || this.php_js.ini['unicode.semantics'].local_value.toLowerCase() !== 'on') {
         return string.length
@@ -549,15 +575,15 @@ var Cresenity = function () {
                 scrollTop: dest
             }, this.setting.scrollduration);
         },
-                this.keepfixed = function () {
-                    var $window = jQuery(window)
-                    var controlx = $window.scrollLeft() + $window.width() - this.$control.width() - this.controlattrs.offsetx
-                    var controly = $window.scrollTop() + $window.height() - this.$control.height() - this.controlattrs.offsety
-                    this.$control.css({
-                        left: controlx + 'px',
-                        top: controly + 'px'
-                    })
-                };
+        this.keepfixed = function () {
+            var $window = jQuery(window)
+            var controlx = $window.scrollLeft() + $window.width() - this.$control.width() - this.controlattrs.offsetx
+            var controly = $window.scrollTop() + $window.height() - this.$control.height() - this.controlattrs.offsety
+            this.$control.css({
+                left: controlx + 'px',
+                top: controly + 'px'
+            })
+        };
         this.togglecontrol = function () {
             var scrolltop = jQuery(window).scrollTop()
             if (!this.cssfixedsupport) {
@@ -586,22 +612,22 @@ var Cresenity = function () {
                 //not IE or IE7+ browsers in standards mode
                 mainobj.$body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body');
                 mainobj.$control = $('<div id="topcontrol">' + mainobj.controlHTML + '</div>')
-                        .css({
-                            position: mainobj.cssfixedsupport ? 'fixed' : 'absolute',
-                            bottom: mainobj.controlattrs.offsety,
-                            right: mainobj.controlattrs.offsetx,
-                            opacity: 0,
-                            cursor: 'pointer',
-                            zIndex: 99999
-                        })
-                        .attr({
-                            title: 'Scroll Back to Top'
-                        })
-                        .click(function () {
-                            mainobj.scrollup();
-                            return false
-                        })
-                        .appendTo('body')
+                    .css({
+                        position: mainobj.cssfixedsupport ? 'fixed' : 'absolute',
+                        bottom: mainobj.controlattrs.offsety,
+                        right: mainobj.controlattrs.offsetx,
+                        opacity: 0,
+                        cursor: 'pointer',
+                        zIndex: 99999
+                    })
+                    .attr({
+                        title: 'Scroll Back to Top'
+                    })
+                    .click(function () {
+                        mainobj.scrollup();
+                        return false
+                    })
+                    .appendTo('body')
                 if (document.all && !window.XMLHttpRequest && mainobj.$control.text() != '') { //loose check for IE6 and below, plus whether control contains any text
                     mainobj.$control.css({
                         width: mainobj.$control.width()
@@ -810,47 +836,7 @@ var Cresenity = function () {
         }
         return false;
     };
-    this.loadJs = function (filename, callback) {
-        var fileref = document.createElement('script');
-        fileref.setAttribute("type", "text/javascript");
-        fileref.setAttribute("src", filename);
-        // IE 6 & 7
-        if (typeof (callback) === 'function') {
-            fileref.onload = callback;
-            fileref.onreadystatechange = function () {
-                if (this.readyState == 'complete') {
-                    callback();
-                }
-            }
-        }
-        document.getElementsByTagName("head")[0].appendChild(fileref);
 
-    };
-    this.loadJsCss = function (filename, filetype, callback) {
-        if (filetype == "js") { //if filename is a external JavaScript file
-            var fileref = document.createElement('script')
-            fileref.setAttribute("type", "text/javascript")
-            fileref.setAttribute("src", filename)
-        } else if (filetype == "css") { //if filename is an external CSS file
-            var fileref = document.createElement("link")
-            fileref.setAttribute("rel", "stylesheet")
-            fileref.setAttribute("type", "text/css")
-            fileref.setAttribute("href", filename)
-        }
-        if (typeof fileref != "undefined") {
-            //fileref.onload = callback;
-            // IE 6 & 7
-            if (typeof (callback) === 'function') {
-                fileref.onload = cresenity.handleResponseCallback(callback);
-                fileref.onreadystatechange = function () {
-                    if (this.readyState == 'complete') {
-                        cresenity.handleResponseCallback(callback);
-                    }
-                }
-            }
-            document.getElementsByTagName("head")[0].appendChild(fileref);
-        }
-    };
     this.removeJsCss = function (filename, filetype) {
         var targetelement = (filetype == "js") ? "script" : (filetype == "css") ? "link" : "none"; //determine element type to create nodelist from
         var targetattr = (filetype == "js") ? "src" : (filetype == "css") ? "href" : "none"; //determine corresponding attribute to test for
@@ -861,22 +847,18 @@ var Cresenity = function () {
             }
         }
     };
+
+
     this.handleResponse = function (data, callback) {
         if (data.css_require && data.css_require.length > 0) {
             for (var i = 0; i < data.css_require.length; i++) {
-                cresenity.require(data.css_require[i], 'css');
+                cresenity.cf.require(data.css_require[i], 'css');
             }
         }
-        require(data.js_require, callback);
-
+        callback();
 
     };
-    this.handleResponseCallback = function (callback) {
-        cresenity.filesLoaded++;
-        if (cresenity.filesLoaded == $.cresenity.filesNeeded) {
-            callback();
-        }
-    };
+
     this.handleJsonResponse = function (response, onSuccess, onError) {
         var errMessage = 'Unexpected error happen, please relogin ro refresh this page';
         if (typeof onError == 'string') {
@@ -1219,7 +1201,7 @@ var Cresenity = function () {
             type: settings.method,
 
             success: function (response) {
-                var onSuccess = function () {};
+                var onSuccess = function () { };
                 var onError = function (errMessage) {
                     cresenity.showError(errMessage)
                 };
@@ -1283,7 +1265,7 @@ var Cresenity = function () {
                         return true;
                     },
                     success: function (response) {
-                        var onSuccess = function () {};
+                        var onSuccess = function () { };
                         var onError = function (errMessage) {
                             cresenity.showError(errMessage)
                         };
@@ -1482,7 +1464,7 @@ var Cresenity = function () {
                 if (!message) {
                     message = window.capp.label_confirm;
                 } else {
-                    message = $.cresenity.base64.decode(message);
+                    message = cresenity.base64.decode(message);
                 }
 
                 str_confirm = window.capp.label_ok;
@@ -1538,7 +1520,7 @@ var Cresenity = function () {
                 if (!message) {
                     message = window.capp.label_confirm;
                 } else {
-                    message = $.cresenity.base64.decode(message);
+                    message = cresenity.base64.decode(message);
                 }
 
                 str_confirm = window.capp.label_ok;
@@ -1569,7 +1551,7 @@ var Cresenity = function () {
 
             });
             jQuery("#toggle-fullscreen").click(function () {
-                $.cresenity.fullscreen(document.documentElement);
+                cresenity.fullscreen(document.documentElement);
             });
         });
 
@@ -1663,16 +1645,16 @@ var Cresenity = function () {
                                                 progressContainer.find('.progress-container-status').empty();
                                                 var innerStatus = $('<div>');
 
-                                                var innerStatusLabel = $('<label>', {class:'mb-3 d-block'}).append("Your file is ready");
-                                                var linkDownload = $('<a>', {target:'_blank', href:data.fileUrl, class:'btn btn-primary'}).append("Download");
-                                                var linkClose = $('<a>', {href:'javascript:;', class:'btn btn-primary ml-3'}).append("Close");
+                                                var innerStatusLabel = $('<label>', { class: 'mb-3 d-block' }).append("Your file is ready");
+                                                var linkDownload = $('<a>', { target: '_blank', href: data.fileUrl, class: 'btn btn-primary' }).append("Download");
+                                                var linkClose = $('<a>', { href: 'javascript:;', class: 'btn btn-primary ml-3' }).append("Close");
 
                                                 innerStatus.append(innerStatusLabel);
                                                 innerStatus.append(linkDownload);
                                                 innerStatus.append(linkClose);
 
                                                 progressContainer.find('.progress-container-status').append(innerStatus);
-                                                linkClose.click(function(){
+                                                linkClose.click(function () {
                                                     cresenity.closeLastModal();
                                                 })
                                                 clearInterval(interval);
@@ -1683,17 +1665,17 @@ var Cresenity = function () {
                             }, 3000);
 
                             var innerStatus = $('<div>');
-                                var innerStatusLabel = $('<label>', {class:'mb-4'}).append("Please Wait...");
-                                var innerStatusAnimation = $('<div>').append('<div class="sk-fading-circle sk-primary"><div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div><div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div><div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div><div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div></div>');
-                                var innerStatusAction = $('<div>', {class:'text-center my-3'});
-                                var innerStatusCancelButton = $('<button>', {class:'btn btn-primary'}).append('Cancel');
-                                innerStatusAction.append(innerStatusCancelButton);
-                                innerStatus.append(innerStatusLabel);
-                                innerStatus.append(innerStatusAnimation);
-                                innerStatus.append(innerStatusAction);
+                            var innerStatusLabel = $('<label>', { class: 'mb-4' }).append("Please Wait...");
+                            var innerStatusAnimation = $('<div>').append('<div class="sk-fading-circle sk-primary"><div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div><div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div><div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div><div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div></div>');
+                            var innerStatusAction = $('<div>', { class: 'text-center my-3' });
+                            var innerStatusCancelButton = $('<button>', { class: 'btn btn-primary' }).append('Cancel');
+                            innerStatusAction.append(innerStatusCancelButton);
+                            innerStatus.append(innerStatusLabel);
+                            innerStatus.append(innerStatusAnimation);
+                            innerStatus.append(innerStatusAction);
                             progressContainer.append($('<div>').addClass('progress-container-status').append(innerStatus));
 
-                            innerStatusCancelButton.click(function(){
+                            innerStatusCancelButton.click(function () {
                                 clearInterval(interval);
                                 cresenity.closeLastModal();
                             });
@@ -1972,12 +1954,12 @@ if (!window.cresenity) {
             encode: function (e) {
                 var t = "";
                 var n,
-                        r,
-                        i,
-                        s,
-                        o,
-                        u,
-                        a;
+                    r,
+                    i,
+                    s,
+                    o,
+                    u,
+                    a;
                 var f = 0;
                 e = this._utf8_encode(e);
                 while (f < e.length) {
@@ -2000,12 +1982,12 @@ if (!window.cresenity) {
             decode: function (e) {
                 var t = "";
                 var n,
-                        r,
-                        i;
+                    r,
+                    i;
                 var s,
-                        o,
-                        u,
-                        a;
+                    o,
+                    u,
+                    a;
                 var f = 0;
                 e = e.replace(/[^A-Za-z0-9+/=]/g, "");
                 while (f < e.length) {
@@ -2473,18 +2455,18 @@ if (!window.cresenity) {
                 if (typeof data_addition == 'undefined')
                     data_addition = {};
                 var _dialog_html = "<div class='modal fade'>"
-                        + "<div class='modal-dialog'>"
-                        + "<div class='modal-content'>"
-                        + "<div class='modal-header'>"
-                        + "<button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>�</span></button>"
-                        + "<h4 class='modal-title'></h4>"
-                        + "</div>"
-                        + "<div class='modal-body loading'>"
-                        + "</div>"
+                    + "<div class='modal-dialog'>"
+                    + "<div class='modal-content'>"
+                    + "<div class='modal-header'>"
+                    + "<button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>�</span></button>"
+                    + "<h4 class='modal-title'></h4>"
+                    + "</div>"
+                    + "<div class='modal-body loading'>"
+                    + "</div>"
 
-                        + "</div>"
-                        + "</div>"
-                        + "</div>";
+                    + "</div>"
+                    + "</div>"
+                    + "</div>";
 
                 var selection = jQuery('#' + id_target);
 
@@ -2847,8 +2829,8 @@ appValidation = {
     arrayRules: function (element) {
 
         var rules = {},
-                validator = $.data(element.form, "validator"),
-                cache = validator.arrayRulesCache;
+            validator = $.data(element.form, "validator"),
+            cache = validator.arrayRulesCache;
 
         // Is not an Array
         if (element.name.indexOf('[') === -1) {
@@ -2949,10 +2931,10 @@ appValidation = {
          */
         $.validator.addMethod("appValidationRemote", function (value, element, params) {
             var implicit = false,
-                    check = params[0][1],
-                    attribute = element.name,
-                    token = check[1],
-                    validateAll = check[2];
+                check = params[0][1],
+                attribute = element.name,
+                token = check[1],
+                validateAll = check[2];
 
             $.each(params, function (i, parameters) {
                 implicit = implicit || parameters[3];
@@ -2963,8 +2945,8 @@ appValidation = {
             }
 
             var previous = this.previousValue(element),
-                    validator,
-                    data;
+                validator,
+                data;
 
             if (!this.settings.messages[element.name]) {
                 this.settings.messages[element.name] = {};
@@ -2975,7 +2957,7 @@ appValidation = {
             var param = typeof param === "string" && {
                 url: param
             }
-            || param;
+                || param;
 
             if (appValidation.helpers.arrayEquals(previous.old, value) || previous.old === value) {
                 return previous.valid;
@@ -3018,9 +3000,9 @@ appValidation = {
                 }
             }, param)).always(function (response, textStatus) {
                 var errors,
-                        message,
-                        submitted,
-                        valid;
+                    message,
+                    submitted,
+                    valid;
 
                 if (textStatus === 'error') {
                     valid = false;
@@ -3338,18 +3320,18 @@ $.extend(true, appValidation, {
             if (el[0] !== undefined && validator.settings.onfocusout) {
                 var event = 'blur';
                 if (el[0].tagName === 'SELECT' ||
-                        el[0].tagName === 'OPTION' ||
-                        el[0].type === 'checkbox' ||
-                        el[0].type === 'radio') {
+                    el[0].tagName === 'OPTION' ||
+                    el[0].type === 'checkbox' ||
+                    el[0].type === 'radio') {
                     event = 'click';
                 }
 
                 var ruleName = '.validate-appValidation';
                 el.off(ruleName)
-                        .off(event + ruleName + '-' + element.name)
-                        .on(event + ruleName + '-' + element.name, function () {
-                            $(element).valid();
-                        });
+                    .off(event + ruleName + '-' + element.name)
+                    .on(event + ruleName + '-' + element.name, function () {
+                        $(element).valid();
+                    });
             }
 
             return el[0];
@@ -3939,17 +3921,17 @@ $.extend(true, appValidation, {
          */
         RequiredWith: function (value, element, params) {
             var validator = this,
-                    required = false;
+                required = false;
             var currentObject = this;
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
-                        currentObject, element, param);
+                    currentObject, element, param);
                 required = required || (
-                        target !== undefined &&
-                        $.validator.methods.required.call(
-                                validator,
-                                currentObject.elementValue(target),
-                                target, true));
+                    target !== undefined &&
+                    $.validator.methods.required.call(
+                        validator,
+                        currentObject.elementValue(target),
+                        target, true));
             });
             if (required) {
                 return $.validator.methods.required.call(this, value, element, true);
@@ -3963,17 +3945,17 @@ $.extend(true, appValidation, {
          */
         RequiredWithAll: function (value, element, params) {
             var validator = this,
-                    required = true;
+                required = true;
             var currentObject = this;
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
-                        currentObject, element, param);
+                    currentObject, element, param);
                 required = required && (
-                        target !== undefined &&
-                        $.validator.methods.required.call(
-                                validator,
-                                currentObject.elementValue(target),
-                                target, true));
+                    target !== undefined &&
+                    $.validator.methods.required.call(
+                        validator,
+                        currentObject.elementValue(target),
+                        target, true));
             });
             if (required) {
                 return $.validator.methods.required.call(this, value, element, true);
@@ -3987,17 +3969,17 @@ $.extend(true, appValidation, {
          */
         RequiredWithout: function (value, element, params) {
             var validator = this,
-                    required = false;
+                required = false;
             var currentObject = this;
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
-                        currentObject, element, param);
+                    currentObject, element, param);
                 required = required ||
-                        target === undefined ||
-                        !$.validator.methods.required.call(
-                                validator,
-                                currentObject.elementValue(target),
-                                target, true);
+                    target === undefined ||
+                    !$.validator.methods.required.call(
+                        validator,
+                        currentObject.elementValue(target),
+                        target, true);
             });
             if (required) {
                 return $.validator.methods.required.call(this, value, element, true);
@@ -4011,17 +3993,17 @@ $.extend(true, appValidation, {
          */
         RequiredWithoutAll: function (value, element, params) {
             var validator = this,
-                    required = true,
-                    currentObject = this;
+                required = true,
+                currentObject = this;
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
-                        currentObject, element, param);
+                    currentObject, element, param);
                 required = required && (
-                        target === undefined ||
-                        !$.validator.methods.required.call(
-                                validator,
-                                currentObject.elementValue(target),
-                                target, true));
+                    target === undefined ||
+                    !$.validator.methods.required.call(
+                        validator,
+                        currentObject.elementValue(target),
+                        target, true));
             });
             if (required) {
                 return $.validator.methods.required.call(this, value, element, true);
@@ -4036,14 +4018,14 @@ $.extend(true, appValidation, {
         RequiredIf: function (value, element, params) {
 
             var target = appValidation.helpers.dependentElement(
-                    this, element, params[0]);
+                this, element, params[0]);
             if (target !== undefined) {
                 var val = String(this.elementValue(target));
                 if (typeof val !== 'undefined') {
                     var data = params.slice(1);
                     if ($.inArray(val, data) !== -1) {
                         return $.validator.methods.required.call(
-                                this, value, element, true);
+                            this, value, element, true);
                     }
                 }
             }
@@ -4059,7 +4041,7 @@ $.extend(true, appValidation, {
         RequiredUnless: function (value, element, params) {
 
             var target = appValidation.helpers.dependentElement(
-                    this, element, params[0]);
+                this, element, params[0]);
             if (target !== undefined) {
                 var val = String(this.elementValue(target));
                 if (typeof val !== 'undefined') {
@@ -4071,7 +4053,7 @@ $.extend(true, appValidation, {
             }
 
             return $.validator.methods.required.call(
-                    this, value, element, true);
+                this, value, element, true);
         },
         /**
          * Validate that an attribute has a matching confirmation.
@@ -4089,7 +4071,7 @@ $.extend(true, appValidation, {
         Same: function (value, element, params) {
 
             var target = appValidation.helpers.dependentElement(
-                    this, element, params[0]);
+                this, element, params[0]);
             if (target !== undefined) {
                 return String(value) === String(this.elementValue(target));
             }
@@ -4215,15 +4197,15 @@ $.extend(true, appValidation, {
          */
         Digits: function (value, element, params) {
             return (
-                    $.validator.methods.number.call(this, value, element, true) &&
-                    value.length === parseInt(params, 10));
+                $.validator.methods.number.call(this, value, element, true) &&
+                value.length === parseInt(params, 10));
         },
         /**
          * The field under validation must have a length between the given min and max.
          */
         DigitsBetween: function (value, element, params) {
             return ($.validator.methods.number.call(this, value, element, true)
-                    && value.length >= parseFloat(params[0]) && value.length <= parseFloat(params[1]));
+                && value.length >= parseFloat(params[0]) && value.length <= parseFloat(params[1]));
         },
         /**
          * Validate the size of an attribute.
@@ -4240,7 +4222,7 @@ $.extend(true, appValidation, {
          */
         Between: function (value, element, params) {
             return (appValidation.helpers.getSize(this, element, value) >= parseFloat(params[0]) &&
-                    appValidation.helpers.getSize(this, element, value) <= parseFloat(params[1]));
+                appValidation.helpers.getSize(this, element, value) <= parseFloat(params[1]));
         },
         /**
          * Validate the size of an attribute is greater than a minimum value.
@@ -4285,7 +4267,7 @@ $.extend(true, appValidation, {
          */
         Ip: function (value) {
             return /^(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)\.(25[0-5]|2[0-4]\d|[01]?\d\d?)$/i.test(value) ||
-                    /^((([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}:[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){5}:([0-9A-Fa-f]{1,4}:)?[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){4}:([0-9A-Fa-f]{1,4}:){0,2}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){3}:([0-9A-Fa-f]{1,4}:){0,3}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){2}:([0-9A-Fa-f]{1,4}:){0,4}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(([0-9A-Fa-f]{1,4}:){0,5}:((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(::([0-9A-Fa-f]{1,4}:){0,5}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|([0-9A-Fa-f]{1,4}::([0-9A-Fa-f]{1,4}:){0,5}[0-9A-Fa-f]{1,4})|(::([0-9A-Fa-f]{1,4}:){0,6}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,7}:))$/i.test(value);
+                /^((([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}:[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){5}:([0-9A-Fa-f]{1,4}:)?[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){4}:([0-9A-Fa-f]{1,4}:){0,2}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){3}:([0-9A-Fa-f]{1,4}:){0,3}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){2}:([0-9A-Fa-f]{1,4}:){0,4}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){6}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(([0-9A-Fa-f]{1,4}:){0,5}:((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|(::([0-9A-Fa-f]{1,4}:){0,5}((\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b)\.){3}(\b((25[0-5])|(1\d{2})|(2[0-4]\d)|(\d{1,2}))\b))|([0-9A-Fa-f]{1,4}::([0-9A-Fa-f]{1,4}:){0,5}[0-9A-Fa-f]{1,4})|(::([0-9A-Fa-f]{1,4}:){0,6}[0-9A-Fa-f]{1,4})|(([0-9A-Fa-f]{1,4}:){1,7}:))$/i.test(value);
         },
         /**
          * Validate that an attribute is a valid e-mail address.
@@ -4375,12 +4357,12 @@ $.extend(true, appValidation, {
                     var width = parseFloat(img.naturalWidth);
                     var ratio = width / height;
                     var notValid = ((params['width']) && parseFloat(params['width'] !== width)) ||
-                            ((params['min_width']) && parseFloat(params['min_width']) > width) ||
-                            ((params['max_width']) && parseFloat(params['max_width']) < width) ||
-                            ((params['height']) && parseFloat(params['height']) !== height) ||
-                            ((params['min_height']) && parseFloat(params['min_height']) > height) ||
-                            ((params['max_height']) && parseFloat(params['max_height']) < height) ||
-                            ((params['ratio']) && ratio !== parseFloat(eval(params['ratio'])));
+                        ((params['min_width']) && parseFloat(params['min_width']) > width) ||
+                        ((params['max_width']) && parseFloat(params['max_width']) < width) ||
+                        ((params['height']) && parseFloat(params['height']) !== height) ||
+                        ((params['min_height']) && parseFloat(params['min_height']) > height) ||
+                        ((params['max_height']) && parseFloat(params['max_height']) < height) ||
+                        ((params['ratio']) && ratio !== parseFloat(eval(params['ratio'])));
                     callback(!notValid);
                 };
                 img.onerror = function () {
