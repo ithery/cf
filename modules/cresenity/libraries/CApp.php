@@ -171,15 +171,11 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $validation->validate($data, $rules, $messages, $customAttributes);
     }
 
-    public function isUseRequireJs() {
-        return $this->useRequireJs ? true : false;
-    }
 
     public function __construct($domain = null) {
         $this->element = new CApp_Element();
 
         $this->org = corg::get(CF::orgCode());
-        $this->useRequireJs = ccfg::get('requireJs');
 
         //we load another configuration for this app
         //org configuration
@@ -423,13 +419,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $asset = CManager::asset();
         $js = $this->js();
 
-        $isUseRequireJs = $this->isUseRequireJs();
-        $isUseRequireJs = false;
-        if ($isUseRequireJs) {
-            $js = $asset->renderJsRequire($js);
-        } else {
-            $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
-        }
+        $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
         $data['js'] = base64_encode($js);
         $data['css_require'] = $asset->getAllCssFileUrl();
         $data['message'] = $messageOrig;
