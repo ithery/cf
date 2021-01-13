@@ -6,11 +6,11 @@
  * @author Hery
  */
 trait CTrait_ReflectsClosureTrait {
-
     /**
      * Get the class names / types of the parameters of the given Closure.
      *
-     * @param  \Closure  $closure
+     * @param \Closure $closure
+     *
      * @return array
      *
      * @throws \ReflectionException
@@ -19,19 +19,19 @@ trait CTrait_ReflectsClosureTrait {
         $reflection = new ReflectionFunction($closure);
 
         return c::collect($reflection->getParameters())->mapWithKeys(function ($parameter) {
-                    if ($parameter->isVariadic()) {
-                        return [$parameter->getName() => null];
-                    }
-                    
-                    
-                    return [$parameter->getName() => $parameter->getClass()->getName()];
-                })->all();
+            if ($parameter->isVariadic()) {
+                return [$parameter->getName() => null];
+            }
+
+            return [$parameter->getName() => $parameter->getClass()->getName()];
+        })->all();
     }
 
     /**
      * Get the class name of the first parameter of the given Closure.
      *
-     * @param  \Closure  $closure
+     * @param \Closure $closure
+     *
      * @return string
      *
      * @throws \ReflectionException|\RuntimeException
@@ -49,5 +49,4 @@ trait CTrait_ReflectsClosureTrait {
 
         return $types[0];
     }
-
 }
