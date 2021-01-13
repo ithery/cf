@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 10, 2019, 4:48:43 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 10, 2019, 4:48:43 AM
  */
 class CContainer_ContextualBindingBuilder implements CContainer_ContextualBindingBuilderInterface {
-
     /**
      * The underlying container instance.
      *
@@ -33,11 +33,12 @@ class CContainer_ContextualBindingBuilder implements CContainer_ContextualBindin
     /**
      * Create a new contextual binding builder.
      *
-     * @param  CContainer_ContainerInterface  $container
-     * @param  string|array  $concrete
+     * @param CContainer_ContainerInterface $container
+     * @param string|array                  $concrete
+     *
      * @return void
      */
-    public function __construct(Container $container, $concrete) {
+    public function __construct(CContainer_Container $container, $concrete) {
         $this->concrete = $concrete;
         $this->container = $container;
     }
@@ -45,7 +46,8 @@ class CContainer_ContextualBindingBuilder implements CContainer_ContextualBindin
     /**
      * Define the abstract target that depends on the context.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return $this
      */
     public function needs($abstract) {
@@ -56,7 +58,8 @@ class CContainer_ContextualBindingBuilder implements CContainer_ContextualBindin
     /**
      * Define the implementation for the contextual binding.
      *
-     * @param  \Closure|string  $implementation
+     * @param \Closure|string $implementation
+     *
      * @return void
      */
     public function give($implementation) {
@@ -64,5 +67,4 @@ class CContainer_ContextualBindingBuilder implements CContainer_ContextualBindin
             $this->container->addContextualBinding($concrete, $this->needs, $implementation);
         }
     }
-
 }
