@@ -77,11 +77,13 @@ class CElement_List_ActionList extends CElement_List {
         ) {
             $ulDropdownClasses .= ' dropdown-menu-right';
         }
+        /*
         if (!in_array('pull-right', $classes)
             && !in_array('pull-left', $classes)
         ) {
             $ulDropdownClasses .= ' pull-right';
         }
+        */
         $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
@@ -132,8 +134,9 @@ class CElement_List_ActionList extends CElement_List {
                 $iconHtml = '<i class="' . $this->icon . '"></i> ';
             }
             $caretClass = $this->withCaret ? '' : 'no-caret';
+            $ulId = uniqid();
             $html->appendln('
-                    <a class="btn ' . $btn_dropdown_classes . ' dropdown-toggle ' . $caretClass . '" data-toggle="dropdown" href="#">
+                    <a class="btn ' . $btn_dropdown_classes . ' dropdown-toggle ' . $caretClass . '" data-toggle="dropdown" href="javascript:;">
                             ' . $iconHtml . $this->label . '
                             ' . $this->htmlCaret() . '
                     </a>

@@ -10,10 +10,8 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         if ($this->haveRowAction()) {
             if ($this->getRowActionStyle() == 'btn-dropdown') {
                 if ($this->actionLocation == 'first') {
-                    $this->rowActionList->addClass('pull-left');
                     $this->rowActionList->addClass('dropdown-menu-left');
                 } else {
-                    $this->rowActionList->addClass('pull-right');
                     $this->rowActionList->addClass('dropdown-menu-right');
                 }
             }

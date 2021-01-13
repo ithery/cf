@@ -150,8 +150,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                                                 } else {
                                                     script = $.cresenity.base64.decode(script);
                                                 }
-
-                                                eval(script);
+                                                if(script.trim().length > 0) {
+                                                    eval(script);
+                                                }
                                             }
                                             jQuery('#" . $this->id . "-check-all').removeAttr('checked');
                                             jQuery('#" . $this->id . "-check-all').prop('checked',false);
@@ -169,31 +170,27 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                     ->appendln("'fnRowCallback': function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
 
                                     var footer_action = $('#" . $this->id . "_wrapper .footer_action');
-
                                     " . ($this->haveFooterAction() ? 'footer_action.html(' . json_encode($this->footerActionList->html()) . ');' : '') . '
-
                                     ' . ($this->haveFooterAction() ? '' . $this->footerActionList->js() . '' : '') . "
 
                                     footer_action.css('position','absolute').css('left','275px').css('margin','4px 8px 2px 10px');
-
                                     for(var i=0;i<$(nRow).find('td').length;i++) {
-
                                         //get head data align
                                         var data_align = $('#" . $this->id . "').find('thead th:eq('+i+')').data('align');
                                         var data_action = $('#" . $this->id . "').find('thead th:eq('+i+')').data('action');
                                         var data_no_line_break = $('#" . $this->id . "').find('thead th:eq('+i+')').data('no-line-break');
                                         if(data_action) {
-                                                $('td:eq('+i+')', nRow).addClass(data_action);
+                                            $('td:eq('+i+')', nRow).addClass(data_action);
                                         }
                                         if(data_align) {
-                                                $('td:eq('+i+')', nRow).addClass(data_align);
+                                            $('td:eq('+i+')', nRow).addClass(data_align);
                                         }
                                         if(data_no_line_break) {
-                                                $('td:eq('+i+')', nRow).addClass(data_no_line_break);
+                                            $('td:eq('+i+')', nRow).addClass(data_no_line_break);
                                         }
                                     }
                                 },
-            ")
+                    ")
                     ->appendln("'fnInitComplete': function() {
                             this.fnAdjustColumnSizing(true);
                         },
