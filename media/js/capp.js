@@ -111,7 +111,7 @@ var CF = function () {
                         }
                     }
                 }
-                this.body.appendChild(el);
+                this.head.appendChild(el);
             }
         } else {
             if (typeof (callback) === 'function') {
