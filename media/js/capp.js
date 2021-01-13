@@ -196,13 +196,9 @@ var CF = function () {
             }
         });
 
-
-
         this.afterInitCallback.forEach(function (item) {
             item();
         });
-
-
 
     }
 }
@@ -1557,16 +1553,6 @@ var Cresenity = function () {
 
     }
 
-    this.initClock = function () {
-        if (!!this.cf.getConfig().haveClock) {
-            $(document).ready(function () {
-                $('#servertime').serverTime({
-                    ajaxFile: window.capp.base_url + 'cresenity/server_time',
-                    displayDateFormat: "yyyy-mm-dd HH:MM:ss"
-                });
-            });
-        }
-    }
     this.init = function () {
         this.cf.onBeforeInit(() => {
             this.normalizeRequireJs();
