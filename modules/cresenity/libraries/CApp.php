@@ -36,6 +36,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     private $renderMessage = true;
     private $keepMessage = false;
     private $useRequireJs = false;
+    private static $haveScrollToTop = null;
     protected $renderer;
 
     private static $renderingElement;
@@ -512,5 +513,16 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     public static function setRenderingElement($element) {
         static::$renderingElement = $element;
+    }
+
+    public static function setHaveScrollToTop($bool = true) {
+        static::$haveScrollToTop = $bool;
+    }
+
+    public static function haveScrollToTop() {
+        if (static::$haveScrollToTop === null) {
+            static::$haveScrollToTop = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
+        }
+        return static::$haveScrollToTop;
     }
 }

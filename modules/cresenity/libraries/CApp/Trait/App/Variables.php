@@ -4,6 +4,8 @@
  * Description of Variables
  *
  * @author Hery
+ *
+ * @see CApp
  */
 trait CApp_Trait_App_Variables {
     /**
@@ -26,8 +28,8 @@ trait CApp_Trait_App_Variables {
         $variables['decimalDigit'] = ccfg::get('decimal_digit') === null ? '0' : ccfg::get('decimal_digit');
         $variables['have_clock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
         $variables['haveClock'] = ccfg::get('have_clock') === null ? false : ccfg::get('have_clock');
-        $variables['have_scroll_to_top'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
-        $variables['haveScrollToTop'] = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
+        $variables['have_scroll_to_top'] = static::haveScrollToTop();
+        $variables['haveScrollToTop'] = static::haveScrollToTop();
         $variables['CFVersion'] = CF::version();
         $variables['domain'] = CF::domain();
         $variables['appCode'] = CF::appCode();
