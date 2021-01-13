@@ -34,7 +34,7 @@ trait CTrait_Compat_Database {
     /**
      * @deprecated since version 1.2
      *
-     * @return boolean
+     * @return bool
      */
     public function in_transaction() {
         return $this->inTransaction();
@@ -91,11 +91,11 @@ trait CTrait_Compat_Database {
      * See if a table exists in the database.
      *
      * @param   string   table name
-     * @param   boolean  True to attach table prefix
+     * @param   bool  True to attach table prefix
      * @param mixed $table_name
      * @param mixed $prefix
      *
-     * @return boolean
+     * @return bool
      */
     public function table_exists($table_name, $prefix = true) {
         return $this->tableExists($table_name, $prefix);
@@ -132,7 +132,7 @@ trait CTrait_Compat_Database {
      * @param mixed $field
      * @param mixed $match
      *
-     * @return Database_Core This Database object.
+     * @return Database_Core this Database object
      *
      * @deprecated
      */
@@ -155,7 +155,7 @@ trait CTrait_Compat_Database {
      * @param mixed $field
      * @param mixed $match
      *
-     * @return Database_Core This Database object.
+     * @return Database_Core this Database object
      *
      * @deprecated
      */
@@ -178,7 +178,7 @@ trait CTrait_Compat_Database {
      * @param mixed $field
      * @param mixed $match
      *
-     * @return Database_Core This Database object.
+     * @return Database_Core this Database object
      *
      * @deprecated
      */
@@ -199,7 +199,7 @@ trait CTrait_Compat_Database {
      * @param   string  column name to group by
      * @param mixed $by
      *
-     * @return Database_Core This Database object.
+     * @return Database_Core this Database object
      *
      * @deprecated
      */
@@ -229,12 +229,12 @@ trait CTrait_Compat_Database {
      *
      * @param   string|array  key name or array of key => value pairs
      * @param   string        value to match with key
-     * @param   boolean       disable quoting of WHERE clause
+     * @param   bool       disable quoting of WHERE clause
      * @param mixed $key
      * @param mixed $value
      * @param mixed $quote
      *
-     * @return Database_Core This Database object.
+     * @return Database_Core this Database object
      *
      * @deprecated
      */
@@ -248,12 +248,12 @@ trait CTrait_Compat_Database {
      *
      * @param   string|array  key name or array of key => value pairs
      * @param   string        value to match with key
-     * @param   boolean       disable quoting of WHERE clause
+     * @param   bool       disable quoting of WHERE clause
      * @param mixed $key
      * @param mixed $value
      * @param mixed $quote
      *
-     * @return Database_Core This Database object.
+     * @return Database_Core this Database object
      *
      * @deprecated
      */
@@ -270,7 +270,7 @@ trait CTrait_Compat_Database {
      * @param mixed      $orderby
      * @param null|mixed $direction
      *
-     * @return Database_Core This Database object.
+     * @return Database_Core this Database object
      *
      * @deprecated
      */
@@ -301,12 +301,12 @@ trait CTrait_Compat_Database {
     /**
      * Selects the limit section of a query.
      *
-     * @param   integer  number of rows to limit result to
-     * @param   integer  offset in result to start returning rows from
+     * @param   int  number of rows to limit result to
+     * @param   int  offset in result to start returning rows from
      * @param mixed      $limit
      * @param null|mixed $offset
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      *
      * @deprecated
      */
@@ -323,10 +323,10 @@ trait CTrait_Compat_Database {
     /**
      * Sets the offset portion of a query.
      *
-     * @param   integer  offset value
+     * @param   int  offset value
      * @param mixed $value
      *
-     * @return Database_Core This Database object.
+     * @return Database_Core this Database object
      *
      * @deprecated 1.1
      */
@@ -342,7 +342,7 @@ trait CTrait_Compat_Database {
      * @param string $table table name
      * @param array  $where where clause
      *
-     * @return integer
+     * @return int
      *
      * @deprecated 1.1
      */
@@ -435,7 +435,7 @@ trait CTrait_Compat_Database {
      * @param string $limit  limit clause
      * @param string $offset offset clause
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      *
      * @deprecated 1.1
      */
@@ -478,7 +478,7 @@ trait CTrait_Compat_Database {
      * @param   string|true  clear cache by SQL statement or TRUE for last query
      * @param null|mixed $sql
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      *
      * @deprecated 1.1
      */
@@ -551,6 +551,30 @@ trait CTrait_Compat_Database {
                 ) = array_pop($this->query_history);
 
         return $this;
+    }
+
+    /**
+     * Get the field data for a database table, along with the field's attributes.
+     *
+     * @param string $table table name
+     *
+     * @return array
+     *
+     * @deprecated
+     */
+    public function field_data($table = '') {
+        return $this->fieldData($table);
+    }
+
+    /**
+     * Count the number of records in the last query, without LIMIT or OFFSET applied.
+     *
+     * @return int
+     *
+     * @deprecated 1.1
+     */
+    public function count_last_query() {
+        return $this->countLastQuery();
     }
 }
 // @codingStandardsIgnoreEnd

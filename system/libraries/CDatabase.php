@@ -30,7 +30,9 @@ class CDatabase {
      * @var string
      */
     protected static $defaultConnection = 'default';
+
     public $domain;
+
     public $name;
 
     /**
@@ -52,6 +54,7 @@ class CDatabase {
      * @var CDatabase_Configuration
      */
     protected $configuration;
+
     // Configuration
     protected $config = [
         'benchmark' => true,
@@ -63,25 +66,43 @@ class CDatabase {
         'cache' => false,
         'escape' => true,
     ];
+
     // Database driver object
     protected $driver;
+
     protected $driver_name;
+
     protected $link;
+
     // Un-compiled parts of the SQL query
     protected $select = [];
+
     protected $set = [];
+
     protected $from = [];
+
     protected $join = [];
+
     protected $where = [];
+
     protected $orderby = [];
+
     protected $order = [];
+
     protected $groupby = [];
+
     protected $having = [];
+
     protected $distinct = false;
+
     protected $limit = false;
+
     protected $offset = false;
+
     protected $last_query = '';
+
     protected $queryLog = [];
+
     // Stack of queries for push/pop
     protected $query_history = [];
 
@@ -433,7 +454,7 @@ class CDatabase {
      *
      * @param string $sql string or array of column names to select
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      */
     public function select($sql = '*') {
         if (func_num_args() > 1) {
@@ -473,7 +494,7 @@ class CDatabase {
      *
      * @param string $sql string or array of tables to select
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      */
     public function from($sql) {
         if (func_num_args() > 1) {
@@ -517,7 +538,7 @@ class CDatabase {
      * @param string       $value where value
      * @param string       $type  type of join
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      */
     public function join($table, $key, $value = null, $type = '') {
         $join = [];
@@ -584,9 +605,9 @@ class CDatabase {
      *
      * @param string|array $key   key name or array of key => value pairs
      * @param string       $value value to match with key
-     * @param boolean      $quote disable quoting of WHERE clause
+     * @param bool         $quote disable quoting of WHERE clause
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      */
     public function where($key, $value = null, $quote = true) {
         $quote = (func_num_args() < 2 and !is_array($key)) ? -1 : $quote;
@@ -611,9 +632,9 @@ class CDatabase {
      *
      * @param string|array $key   key name or array of key => value pairs
      * @param string       $value value to match with key
-     * @param boolean      $quote disable quoting of WHERE clause
+     * @param bool         $quote disable quoting of WHERE clause
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      */
     public function orwhere($key, $value = null, $quote = true) {
         $quote = (func_num_args() < 2 and !is_array($key)) ? -1 : $quote;
@@ -638,9 +659,9 @@ class CDatabase {
      *
      * @param string|array $field field name or array of field => match pairs
      * @param string       $match like value to match with field
-     * @param boolean      $auto  automatically add starting and ending wildcards
+     * @param bool         $auto  automatically add starting and ending wildcards
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      */
     public function like($field, $match = '', $auto = true) {
         $fields = is_array($field) ? $field : [$field => $match];
@@ -658,9 +679,9 @@ class CDatabase {
      *
      * @param string|array $field field name or array of field => match pairs
      * @param string       $match like value to match with field
-     * @param boolean      $auto  automatically add starting and ending wildcards
+     * @param bool         $auto  automatically add starting and ending wildcards
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      */
     public function orlike($field, $match = '', $auto = true) {
         $fields = is_array($field) ? $field : [$field => $match];
@@ -678,9 +699,9 @@ class CDatabase {
      *
      * @param string|array $field field name or array of field => match pairs
      * @param string       $match like value to match with field
-     * @param boolean      $auto  automatically add starting and ending wildcards
+     * @param bool         $auto  automatically add starting and ending wildcards
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      */
     public function notlike($field, $match = '', $auto = true) {
         $fields = is_array($field) ? $field : [$field => $match];
@@ -700,7 +721,7 @@ class CDatabase {
      * @param string       $match like value to match with field
      * @param mixed        $auto
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      */
     public function ornotlike($field, $match = '', $auto = true) {
         $fields = is_array($field) ? $field : [$field => $match];
@@ -719,7 +740,7 @@ class CDatabase {
      * @param string|array $field field name or array of field => match pairs
      * @param string       $match like value to match with field
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      */
     public function regex($field, $match = '') {
         $fields = is_array($field) ? $field : [$field => $match];
@@ -738,7 +759,7 @@ class CDatabase {
      * @param string|array $key   key name or array of key => value pairs
      * @param string       $value value to match with key
      *
-     * @return Database_Core This Database object.
+     * @return Database_Core this Database object
      */
     public function set($key, $value = '') {
         if (!is_array($key)) {
@@ -822,7 +843,7 @@ class CDatabase {
      * @param mixed  $values An array or string to match against
      * @param bool   $not    Generate a NOT IN clause instead
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      */
     public function in($field, $values, $not = false) {
         if (is_array($values)) {
@@ -849,7 +870,7 @@ class CDatabase {
      * @param string $field  Name of the column being examined
      * @param mixed  $values An array or string to match against
      *
-     * @return CDatabase This Database object.
+     * @return CDatabase this Database object
      *
      * @deprecated 1.1
      */
@@ -985,10 +1006,10 @@ class CDatabase {
     /**
      * See if a table exists in the database.
      *
-     * @param string  $table_name table name
-     * @param boolean $prefix     True to attach table prefix
+     * @param string $table_name table name
+     * @param bool   $prefix     True to attach table prefix
      *
-     * @return boolean
+     * @return bool
      */
     public function tableExists($table_name, $prefix = true) {
         if ($prefix) {
@@ -1035,7 +1056,7 @@ class CDatabase {
      *
      * @return array
      */
-    public function field_data($table = '') {
+    public function fieldData($table = '') {
         $this->link or $this->connect();
 
         return $this->driver->field_data($this->config['table_prefix'] . $table);
@@ -1100,9 +1121,9 @@ class CDatabase {
     /**
      * Count the number of records in the last query, without LIMIT or OFFSET applied.
      *
-     * @return integer
+     * @return int
      */
-    public function count_last_query() {
+    public function countLastQuery() {
         if ($sql = $this->lastQuery()) {
             if (stripos($sql, 'LIMIT') !== false) {
                 // Remove LIMIT from the SQL
@@ -1151,8 +1172,8 @@ class CDatabase {
     /**
      * Prepares and executes an SQL query and returns the result as an associative array.
      *
-     * @param string $sql    The SQL query.
-     * @param array  $params The query parameters.
+     * @param string $sql    the SQL query
+     * @param array  $params the query parameters
      *
      * @return array
      */
@@ -1289,7 +1310,7 @@ class CDatabase {
      *
      * Evaluates custom platform class and version in order to set the correct platform.
      *
-     * @throws CDatabase_Exception if an invalid platform was specified for this connection.
+     * @throws CDatabase_Exception if an invalid platform was specified for this connection
      */
     private function detectDatabasePlatform() {
         $version = $this->getDatabasePlatformVersion();
