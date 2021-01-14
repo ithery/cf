@@ -20,23 +20,41 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Trait_App_Title;
 
     private $content = '';
+
     private $js = '';
+
     private $custom_js = '';
+
     private $custom_header = '';
+
     private $custom_footer = '';
+
     private $custom_data = [];
+
     private $signup = false;
+
     private $activation = false;
+
     private $resend = false;
+
     private $org = null;
+
     public static $instance = null;
+
     private $header_body = '';
+
     private $additional_head = '';
+
     private $ajaxData = [];
+
     private $renderMessage = true;
+
     private $keepMessage = false;
+
     private $useRequireJs = false;
+
     private static $haveScrollToTop = null;
+
     protected $renderer;
 
     private static $renderingElement;
@@ -170,7 +188,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $validation = CValidation::factory();
         return $validation->validate($data, $rules, $messages, $customAttributes);
     }
-
 
     public function __construct($domain = null) {
         $this->element = new CApp_Element();
