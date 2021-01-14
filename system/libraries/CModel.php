@@ -5,6 +5,13 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @author Hery Kurniawan
  */
+
+/**
+ * Model Class
+ *
+ * @method static CModel_Query where($column, $operator = null, $value = null, $boolean = 'and')
+ * @method static CModel findOrFail($id, $columns = ['*'])
+ */
 abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_Jsonable, CQueue_QueueableEntityInterface {
     use CModel_Trait_GuardsAttributes,
         CModel_Trait_Attributes,
