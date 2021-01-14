@@ -359,16 +359,26 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $this;
     }
 
+    /**
+     * Alias of setCustomData
+     *
+     * @param string $key
+     * @param string $value
+     *
+     * @return CApp
+     */
     public function addCustomData($key, $value) {
+        return $this->setCustomData($key, $value);
+    }
+
+    public function setCustomData($key, $value) {
+        if (is_array($key)) {
+            $this->custom_data = $key;
+        }
         if (!is_array($this->custom_data)) {
             $this->custom_data = [];
         }
         $this->custom_data[$key] = $value;
-        return $this;
-    }
-
-    public function setCustomData($data) {
-        $this->custom_data = $data;
         return $this;
     }
 
