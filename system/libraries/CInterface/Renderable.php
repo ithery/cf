@@ -6,7 +6,6 @@
  * @author Hery
  */
 interface CInterface_Renderable {
-
     /**
      * Get the evaluated contents of the object.
      *
