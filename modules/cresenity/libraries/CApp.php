@@ -376,6 +376,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     public function setCustomData($key, $value = null) {
         if (is_array($key)) {
             $this->custom_data = $key;
+            return $this;
         }
         if (!is_array($this->custom_data)) {
             $this->custom_data = [];
