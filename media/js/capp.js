@@ -707,6 +707,7 @@ var Cresenity = function () {
             return t
         };
 
+
         this.decode = function (e) {
             var t = "";
             var n, r, i;
@@ -800,6 +801,22 @@ var Cresenity = function () {
     this.filesAdded = "";
     this.modalElements = [];
     this.callback = {};
+    this.loadJs = function (filename, callback) {
+        var fileref = document.createElement('script');
+        fileref.setAttribute("type", "text/javascript");
+        fileref.setAttribute("src", filename);
+        // IE 6 & 7
+        if (typeof (callback) === 'function') {
+            fileref.onload = callback;
+            fileref.onreadystatechange = function () {
+                if (this.readyState == 'complete') {
+                    callback();
+                }
+            }
+        }
+        document.getElementsByTagName("head")[0].appendChild(fileref);
+
+    };
     this.haveCallback = (name) => {
         return typeof this.callback[name] == 'function';
     };
