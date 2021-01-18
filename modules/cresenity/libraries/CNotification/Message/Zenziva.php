@@ -15,10 +15,27 @@ class CNotification_Message_Zenziva extends CNotification_MessageAbstract {
 
         $message = $this->getOption('message');
         $msisdn = $this->getOption('recipient');
+        $otp = $this->getOption('otp');
         $text = urlencode($message);
-        $url = 'https://reguler.zenziva.net/apps/smsapi.php?userkey=' . $userKey . '&passkey=' . $userPass . '&nohp=' . $msisdn . '&pesan=' . $text;
+        $smsMethod = 'sendsms/';
+        if ($otp) {
+            $smsMethod = 'sendOTP/';
+        }
+        $url = 'https://console.zenziva.net/reguler/api/' . $smsMethod; // New API Zenziva
+        // $url = 'https://reguler.zenziva.net/apps/smsapi.php?userkey=' . $userKey . '&passkey=' . $userPass . '&nohp=' . $msisdn . '&pesan=' . $text;
         $curl = CCurl::factory($url);
         $curl->setSSL();
+        $post = [
+            'userkey' => $userKey,
+            'passkey' => $userPass,
+            'to' => $msisdn,
+        ];
+        if ($otp) {
+            $post['kode_otp'] = $otp;
+        } else {
+            $post['message'] = $text;
+        }
+        $curl->setRawPost($post);
         $response = $curl->exec()->response();
 
         if (!preg_match('#<status>0</status>#ims', $response, $matches)) {
