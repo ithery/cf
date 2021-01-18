@@ -52,7 +52,7 @@ abstract class CDevSuite_Db_MariaDb {
     abstract public function restart();
 
     /**
-     * Get ini file location
+     * get ini file location
      *
      * @return string
      */
@@ -66,7 +66,7 @@ abstract class CDevSuite_Db_MariaDb {
         $dbType = mb_strtolower(basename(str_replace('\\', '/', get_class($dbDumper))));
         $dbName = $dbDumper->getDbName();
         if ($dbDumper instanceof CBackup_Database_Dumper_SqliteDumper) {
-            //$dbName = $key . '-database';
+            $dbName = $key . '-database';
         }
         $fileName = "{$dbType}-{$dbName}.{$this->getExtension($dbDumper)}";
 
@@ -74,12 +74,11 @@ abstract class CDevSuite_Db_MariaDb {
         //$temporaryFilePath = DOCROOT . 'temp/devsuite/db/db-dumps/'. $fileName;
 
         $dbDumper->setDumpBinaryPath($this->getDumperBinaryPath());
-
         $this->files->ensureDirExists(dirname($temporaryFilePath));
 
         CDevSuite::info('Dumping database to:' . $temporaryFilePath);
 
-        $dbDumper->dumpToFile($temporaryFilePath);
+        //$dbDumper->dumpToFile($temporaryFilePath);
         return $temporaryFilePath;
     }
 
@@ -87,47 +86,28 @@ abstract class CDevSuite_Db_MariaDb {
         return $dbDumper instanceof CBackup_Database_Dumper_MongoDbDumper ? 'archive' : 'sql';
     }
 
-    /**
-     * Restore database
-     *
-     * @param array  $to             Database Config
-     * @param string $dumpFile
-     * @param mixed  $deleteDumpFile
-     *
-     * @return string
-     */
-    public function restore($to, $dumpFile, $deleteDumpFile = true) {
+    public function restore($to, $dumpFile) {
         $command = $this->getRestoreCommand($to, $dumpFile);
-        CDevSuite::info('Restoring from ' . $dumpFile);
+
         $process = Process::fromShellCommandline($command, null, null, null);
         $output = '';
         $process->run(function ($type, $line) use (&$output) {
             $output .= $line;
         });
-        if ($deleteDumpFile) {
-            CDevSuite::info('Deleting: ' . $dumpFile);
-            $this->files->unlink($dumpFile);
-        }
 
         return $output;
     }
 
     protected function getDumperBinaryPath() {
         //echo realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS . 'mysqldump.exe';
-        $path = realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS;
-        if (!is_dir($path)) {
-            return '';
-        }
-        return $path;
+
+        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS;
     }
 
     protected function getClientBinaryPath() {
         //echo realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS . 'mysqldump.exe';
-        $path = realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS;
-        if (!is_dir($path)) {
-            return '';
-        }
-        return $path;
+
+        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS;
     }
 
     protected function getRestoreCommand($dbConfig, $fromFile) {
