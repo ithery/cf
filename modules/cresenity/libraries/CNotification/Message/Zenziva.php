@@ -33,7 +33,7 @@ class CNotification_Message_Zenziva extends CNotification_MessageAbstract {
         if ($otp) {
             $post['kode_otp'] = $otp;
         } else {
-            $post['message'] = $text;
+            $post['message'] = $message;
         }
         $curl->setRawPost($post);
         $response = $curl->exec()->response();
