@@ -9,17 +9,22 @@ final class CF {
     use CFDeprecatedTrait;
 
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
+
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
 
     // The singleton instance of the controller (last of the controller)
     public static $instance;
+
     // The multiple instance of the controller when callback when routing is failed or redirected
     public static $instances;
+
     // The current user agent
     public static $user_agent;
+
     // The current locale
     public static $locale;
+
     // Configuration
     private static $configuration;
 
@@ -39,7 +44,9 @@ final class CF {
 
     /* log threshold default , CLogger::LOG_WARNING (4) */
     public static $log_threshold = LOG_WARNING; // 4
+
     public static $global_xss_filtering = true;
+
     // Internal caches and write status
     private static $internal_cache = [];
 
@@ -56,6 +63,7 @@ final class CF {
      * @var array
      */
     private static $sharedAppCode = [];
+
     private static $translator;
 
     /**
@@ -435,7 +443,7 @@ final class CF {
      * paths in the order they are configured, follow by the SYSPATH.
      *
      * @param null|mixed $domain
-     * @param boolean    $force_reload
+     * @param bool       $force_reload
      *
      * @return array
      */
@@ -701,7 +709,7 @@ final class CF {
     /**
      * Detect CF is running on console in cf command or not
      *
-     * @return boolean
+     * @return bool
      */
     public static function isCFCli() {
         return defined('CFCLI');
@@ -867,7 +875,7 @@ final class CF {
      *
      * @param mixed $value
      *
-     * @return boolean
+     * @return bool
      */
     private static function isFile($value) {
         $value = strval(str_replace("\0", '', $value));
@@ -1052,6 +1060,8 @@ final class CF {
      * @param mixed $value
      *
      * @return mixed
+     *
+     * @deprecated 1.2 use c::value
      */
     public static function value($value) {
         return c::value($value);
@@ -1065,6 +1075,8 @@ final class CF {
      * @param mixed        $default
      *
      * @return mixed
+     *
+     * @deprecated 1.2 use c::dataGet
      */
     public static function get($target, $key, $default = null) {
         if (is_null($key)) {
@@ -1101,6 +1113,8 @@ final class CF {
      * @param bool         $overwrite
      *
      * @return mixed
+     *
+     * @deprecated 1.2 use c::dataSet
      */
     public static function set(&$target, $key, $value, $overwrite = true) {
         $segments = is_array($key) ? $key : explode('.', $key);
