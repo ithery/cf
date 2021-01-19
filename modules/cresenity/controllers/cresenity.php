@@ -238,7 +238,7 @@ class Controller_Cresenity extends CController {
         $txt_color = imagecolorallocate($image, base_convert(substr($txt_color, 0, 2), 16, 10), base_convert(substr($txt_color, 2, 2), 16, 10), base_convert(substr($txt_color, 4, 2), 16, 10));
 
         //Fill the background color
-        ImageFill($image, 0, 0, $bg_color);
+        imagefill($image, 0, 0, $bg_color);
         //Calculating font size
         $fontsize = ($width > $height) ? ($height / 10) : ($width / 10);
         if ($width < 100) {
@@ -256,13 +256,26 @@ class Controller_Cresenity extends CController {
           ($height/2) + ($fontsize* 0.2),
           $txt_color, 'Arial.ttf', $text);
          */
-
         //Tell the browser what kind of file is come in
         header('Content-Type: image/png');
         //Output the newly created image in png format
         imagepng($image);
         //Free up resources
         imagedestroy($image);
+
+        /*
+        //Tell the browser what kind of file is come in
+        $headers = [
+            'Content-Type' => 'image/png',
+        ];
+
+        return c::response()->stream(function () use ($image) {
+            //Output the newly created image in png format
+            imagepng($image);
+            //Free up resources
+            imagedestroy($image);
+        }, 200, $headers);
+        */
     }
 
     public function transparent($width = 100, $height = 100) {
