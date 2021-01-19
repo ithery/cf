@@ -88,9 +88,9 @@ class c {
     /**
      * Creates a function that returns the value at `path` of a given object.
      *
-     * @param array|string $path The path of the property to get.
+     * @param array|string $path the path of the property to get
      *
-     * @return callable Returns the new accessor function.
+     * @return callable returns the new accessor function
      *
      * @example
      * <code>
@@ -150,9 +150,9 @@ class c {
     /**
      * Converts `value` to a string key if it's not a string.
      *
-     * @param mixed $value The value to inspect.
+     * @param mixed $value the value to inspect
      *
-     * @return string Returns the key.
+     * @return string returns the key
      */
     public static function toKey($value) {
         if (\is_string($value)) {
@@ -172,10 +172,10 @@ class c {
     /**
      * Checks if `value` is a property name and not a property path.
      *
-     * @param mixed        $value  The value to check.
-     * @param object|array $object The object to query keys on.
+     * @param mixed        $value  the value to check
+     * @param object|array $object the object to query keys on
      *
-     * @return bool Returns `true` if `value` is a property name, else `false`.
+     * @return bool returns `true` if `value` is a property name, else `false`
      */
     public static function isKey($value, $object = []) {
         /* Used to match property names within property paths. */
@@ -233,10 +233,10 @@ class c {
      * [`Map`](http://ecma-international.org/ecma-262/7.0/#sec-properties-of-the-map-prototype-object)
      * method interface of `clear`, `delete`, `get`, `has`, and `set`.
      *
-     * @param callable      $func     The function to have its output memoized.
-     * @param callable|null $resolver The function to resolve the cache key.
+     * @param callable      $func     the function to have its output memoized
+     * @param callable|null $resolver the function to resolve the cache key
      *
-     * @return callable Returns the new memoized function.
+     * @return callable returns the new memoized function
      *
      * @example
      * <code>
@@ -271,9 +271,9 @@ class c {
      *
      * @param mixed        $object       The associative array or object to fetch value from
      * @param array|string $path         Dot separated or array of string
-     * @param mixed        $defaultValue (optional)The value returned for unresolved or null values.
+     * @param mixed        $defaultValue (optional)The value returned for unresolved or null values
      *
-     * @return mixed Returns the resolved value.
+     * @return mixed returns the resolved value
      *
      * @author punit-kulal
      *
@@ -307,10 +307,10 @@ class c {
     /**
      * Performs a comparison between two values to determine if they are equivalent.
      *
-     * @param mixed $value The value to compare.
-     * @param mixed $other The other value to compare.
+     * @param mixed $value the value to compare
+     * @param mixed $other the other value to compare
      *
-     * @return bool Returns `true` if the values are equivalent, else `false`.
+     * @return bool returns `true` if the values are equivalent, else `false`
      *
      * @example
      * <code>
@@ -1106,6 +1106,139 @@ class c {
 
     public static function userAgent() {
         return (!empty($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '');
+    }
+
+    /**
+     * Get an item from an array or object using "dot" notation.
+     *
+     * @param mixed                 $target
+     * @param string|array|int|null $key
+     * @param mixed                 $default
+     *
+     * @return mixed
+     */
+    public static function dataGet($target, $key, $default = null) {
+        if (is_null($key)) {
+            return $target;
+        }
+
+        $key = is_array($key) ? $key : explode('.', $key);
+
+        foreach ($key as $i => $segment) {
+            unset($key[$i]);
+
+            if (is_null($segment)) {
+                return $target;
+            }
+
+            if ($segment === '*') {
+                if ($target instanceof CCollection) {
+                    $target = $target->all();
+                } elseif (!is_array($target)) {
+                    return c::value($default);
+                }
+
+                $result = [];
+
+                foreach ($target as $item) {
+                    $result[] = static::dataGet($item, $key);
+                }
+
+                return in_array('*', $key) ? carr::collapse($result) : $result;
+            }
+
+            if (carr::accessible($target) && carr::exists($target, $segment)) {
+                $target = $target[$segment];
+            } elseif (is_object($target) && isset($target->{$segment})) {
+                $target = $target->{$segment};
+            } else {
+                return static::value($default);
+            }
+        }
+
+        return $target;
+    }
+
+    /**
+     * Set an item on an array or object using dot notation.
+     *
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $value
+     * @param bool         $overwrite
+     *
+     * @return mixed
+     */
+    public static function dataSet(&$target, $key, $value, $overwrite = true) {
+        $segments = is_array($key) ? $key : explode('.', $key);
+
+        if (($segment = array_shift($segments)) === '*') {
+            if (!carr::accessible($target)) {
+                $target = [];
+            }
+
+            if ($segments) {
+                foreach ($target as &$inner) {
+                    static::dataSet($inner, $segments, $value, $overwrite);
+                }
+            } elseif ($overwrite) {
+                foreach ($target as &$inner) {
+                    $inner = $value;
+                }
+            }
+        } elseif (carr::accessible($target)) {
+            if ($segments) {
+                if (!carr::exists($target, $segment)) {
+                    $target[$segment] = [];
+                }
+
+                static::dataSet($target[$segment], $segments, $value, $overwrite);
+            } elseif ($overwrite || !carr::exists($target, $segment)) {
+                $target[$segment] = $value;
+            }
+        } elseif (is_object($target)) {
+            if ($segments) {
+                if (!isset($target->{$segment})) {
+                    $target->{$segment} = [];
+                }
+
+                static::dataSet($target->{$segment}, $segments, $value, $overwrite);
+            } elseif ($overwrite || !isset($target->{$segment})) {
+                $target->{$segment} = $value;
+            }
+        } else {
+            $target = [];
+
+            if ($segments) {
+                static::dataSet($target[$segment], $segments, $value, $overwrite);
+            } elseif ($overwrite) {
+                $target[$segment] = $value;
+            }
+        }
+
+        return $target;
+    }
+
+    /**
+     * Get the first element of an array. Useful for method chaining.
+     *
+     * @param array $array
+     *
+     * @return mixed
+     */
+    public static function head($array) {
+        return reset($array);
+    }
+
+    /**
+     * Get the last element from an array.
+     *
+     * @param array $array
+     *
+     * @return mixed
+     */
+    public static function last($array) {
+        return end($array);
     }
 }
 
