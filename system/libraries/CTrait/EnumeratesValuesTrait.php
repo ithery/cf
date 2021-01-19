@@ -447,7 +447,7 @@ trait CTrait_EnumeratesValuesTrait {
      */
     public function when($value, callable $callback = null, callable $default = null) {
         if (!$callback) {
-            return new HigherOrderWhenProxy($this, $value);
+            return new CBase_HigherOrderWhenProxy($this, $value);
         }
 
         if ($value) {
@@ -580,7 +580,7 @@ trait CTrait_EnumeratesValuesTrait {
         $values = $this->getArrayableItems($values);
 
         return $this->filter(function ($item) use ($key, $values, $strict) {
-            return in_array(data_get($item, $key), $values, $strict);
+            return in_array(CF::get($item, $key), $values, $strict);
         });
     }
 
@@ -618,7 +618,7 @@ trait CTrait_EnumeratesValuesTrait {
      */
     public function whereNotBetween($key, $values) {
         return $this->filter(function ($item) use ($key, $values) {
-            return data_get($item, $key) < reset($values) || data_get($item, $key) > end($values);
+            return CF::get($item, $key) < reset($values) || CF::get($item, $key) > end($values);
         });
     }
 
@@ -635,7 +635,7 @@ trait CTrait_EnumeratesValuesTrait {
         $values = $this->getArrayableItems($values);
 
         return $this->reject(function ($item) use ($key, $values, $strict) {
-            return in_array(data_get($item, $key), $values, $strict);
+            return in_array(CF::get($item, $key), $values, $strict);
         });
     }
 
@@ -788,10 +788,10 @@ trait CTrait_EnumeratesValuesTrait {
     /**
      * Collect the values into a collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     public function collect() {
-        return new Collection($this->all());
+        return new CCollection($this->all());
     }
 
     /**
@@ -801,7 +801,7 @@ trait CTrait_EnumeratesValuesTrait {
      */
     public function toArray() {
         return $this->map(function ($value) {
-            return $value instanceof Arrayable ? $value->toArray() : $value;
+            return $value instanceof CInterface_Arrayable ? $value->toArray() : $value;
         })->all();
     }
 
@@ -814,9 +814,9 @@ trait CTrait_EnumeratesValuesTrait {
         return array_map(function ($value) {
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
-            } elseif ($value instanceof Jsonable) {
+            } elseif ($value instanceof Cinterface_Jsonable) {
                 return json_decode($value->toJson(), true);
-            } elseif ($value instanceof Arrayable) {
+            } elseif ($value instanceof Cinterface_Arrayable) {
                 return $value->toArray();
             }
 
@@ -880,7 +880,7 @@ trait CTrait_EnumeratesValuesTrait {
             throw new Exception("Property [{$key}] does not exist on this collection instance.");
         }
 
-        return new HigherOrderCollectionProxy($this, $key);
+        return new CBase_HigherOrderCollectionProxy($this, $key);
     }
 
     /**
@@ -893,11 +893,11 @@ trait CTrait_EnumeratesValuesTrait {
     protected function getArrayableItems($items) {
         if (is_array($items)) {
             return $items;
-        } elseif ($items instanceof Enumerable) {
+        } elseif ($items instanceof CInterface_Enumerable) {
             return $items->all();
-        } elseif ($items instanceof Arrayable) {
+        } elseif ($items instanceof CInterface_Arrayable) {
             return $items->toArray();
-        } elseif ($items instanceof Jsonable) {
+        } elseif ($items instanceof CInterface_Jsonable) {
             return json_decode($items->toJson(), true);
         } elseif ($items instanceof JsonSerializable) {
             return (array) $items->jsonSerialize();
@@ -931,7 +931,7 @@ trait CTrait_EnumeratesValuesTrait {
         }
 
         return function ($item) use ($key, $operator, $value) {
-            $retrieved = data_get($item, $key);
+            $retrieved = CF::get($item, $key);
 
             $strings = array_filter([$retrieved, $value], function ($value) {
                 return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
@@ -989,7 +989,7 @@ trait CTrait_EnumeratesValuesTrait {
         }
 
         return function ($item) use ($value) {
-            return data_get($item, $value);
+            return CF::get($item, $value);
         };
     }
 
