@@ -1230,6 +1230,39 @@ class CModel_Query {
     }
 
     /**
+     * Checks if a macro is registered.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function hasMacro($name) {
+        return isset($this->localMacros[$name]);
+    }
+
+    /**
+     * Get the given global macro by name.
+     *
+     * @param string $name
+     *
+     * @return \Closure
+     */
+    public static function getGlobalMacro($name) {
+        return carr::get(static::$macros, $name);
+    }
+
+    /**
+     * Checks if a global macro is registered.
+     *
+     * @param string $name
+     *
+     * @return bool
+     */
+    public static function hasGlobalMacro($name) {
+        return isset(static::$macros[$name]);
+    }
+
+    /**
      * Dynamically handle calls into the query instance.
      *
      * @param string $method
@@ -1244,19 +1277,20 @@ class CModel_Query {
             return;
         }
 
-        if (isset($this->localMacros[$method])) {
+        if ($this->hasMacro($method)) {
             array_unshift($parameters, $this);
 
             //return $this->localMacros[$method](...$parameters);
             return call_user_func_array($this->localMacros[$method], $parameters);
         }
 
-        if (isset(static::$macros[$method])) {
+        if (static::hasGlobalMacro($method)) {
+            $callable = static::$macros[$method];
             if (static::$macros[$method] instanceof Closure) {
-                return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
+                return call_user_func_array($callable->bindTo($this, static::class), $parameters);
             }
 
-            return call_user_func_array(static::$macros[$method], $parameters);
+            return call_user_func_array($callable, $parameters);
         }
 
         if (method_exists($this->model, $scope = 'scope' . ucfirst($method))) {
