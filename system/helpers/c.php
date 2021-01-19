@@ -266,34 +266,6 @@ class c {
         return $memoized;
     }
 
-    /**
-     * Gets the value at path of object. If the resolved value is null the defaultValue is returned in its place.
-     *
-     * @param mixed        $object       The associative array or object to fetch value from
-     * @param array|string $path         Dot separated or array of string
-     * @param mixed        $defaultValue (optional)The value returned for unresolved or null values
-     *
-     * @return mixed returns the resolved value
-     *
-     * @author punit-kulal
-     *
-     * @example
-     * <code>
-     * $sampleArray = ["key1" => ["key2" => ["key3" => "val1", "key4" => ""]]];
-     * get($sampleArray, 'key1.key2.key3');
-     * // => "val1"
-     *
-     * get($sampleArray, 'key1.key2.key5', "default");
-     * // => "default"
-     *
-     * get($sampleArray, 'key1.key2.key4', "default");
-     * // => ""
-     * </code>
-     */
-    public static function get($object, $path, $defaultValue = null) {
-        return ($object !== null ? c::baseGet($object, $path, $defaultValue) : $defaultValue);
-    }
-
     public static function assocIndexOf(array $array, $key) {
         $length = \count($array);
         while ($length--) {
@@ -1117,7 +1089,7 @@ class c {
      *
      * @return mixed
      */
-    public static function dataGet($target, $key, $default = null) {
+    public static function get($target, $key, $default = null) {
         if (is_null($key)) {
             return $target;
         }
@@ -1141,7 +1113,7 @@ class c {
                 $result = [];
 
                 foreach ($target as $item) {
-                    $result[] = static::dataGet($item, $key);
+                    $result[] = static::get($item, $key);
                 }
 
                 return in_array('*', $key) ? carr::collapse($result) : $result;
@@ -1169,7 +1141,7 @@ class c {
      *
      * @return mixed
      */
-    public static function dataSet(&$target, $key, $value, $overwrite = true) {
+    public static function set(&$target, $key, $value, $overwrite = true) {
         $segments = is_array($key) ? $key : explode('.', $key);
 
         if (($segment = array_shift($segments)) === '*') {
@@ -1179,7 +1151,7 @@ class c {
 
             if ($segments) {
                 foreach ($target as &$inner) {
-                    static::dataSet($inner, $segments, $value, $overwrite);
+                    static::set($inner, $segments, $value, $overwrite);
                 }
             } elseif ($overwrite) {
                 foreach ($target as &$inner) {
@@ -1192,7 +1164,7 @@ class c {
                     $target[$segment] = [];
                 }
 
-                static::dataSet($target[$segment], $segments, $value, $overwrite);
+                static::set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite || !carr::exists($target, $segment)) {
                 $target[$segment] = $value;
             }
@@ -1202,7 +1174,7 @@ class c {
                     $target->{$segment} = [];
                 }
 
-                static::dataSet($target->{$segment}, $segments, $value, $overwrite);
+                static::set($target->{$segment}, $segments, $value, $overwrite);
             } elseif ($overwrite || !isset($target->{$segment})) {
                 $target->{$segment} = $value;
             }
@@ -1210,7 +1182,7 @@ class c {
             $target = [];
 
             if ($segments) {
-                static::dataSet($target[$segment], $segments, $value, $overwrite);
+                static::set($target[$segment], $segments, $value, $overwrite);
             } elseif ($overwrite) {
                 $target[$segment] = $value;
             }
