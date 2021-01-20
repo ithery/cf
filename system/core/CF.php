@@ -198,7 +198,7 @@ final class CF {
         error_reporting($ER);
 
         // Send default text/html UTF-8 header
-        header('Content-Type: text/html; charset=UTF-8');
+        //header('Content-Type: text/html; charset=UTF-8');
 
         // Load locales
         $locale = self::config('app.locale');
@@ -231,12 +231,14 @@ final class CF {
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_system_bootstrap');
         //try to locate bootstrap files for modules
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_module_bootstrap');
+
         foreach (CF::modules() as $module) {
             $bootstrapPath = DOCROOT . 'modules' . DS . $module . DS;
             if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
                 include $bootstrapPath . 'bootstrap' . EXT;
             }
         }
+
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_module_bootstrap');
 
         //try to locate bootstrap files for application
