@@ -252,33 +252,7 @@ class Controller_Cresenity extends CController {
         $center_y = ceil(((imagesy($image) - (imagefontheight($fontsize) * $total_lines)) / 2) + (($line_number - 1) * ImageFontHeight($fontsize)));
         //Inserting Text
         imagestring($image, $fontsize, $center_x, $center_y, $text, $txt_color);
-        /*
-          imagettftext($image,$fontsize, 0,
-          ($width/2) - ($fontsize * 2.75),
-          ($height/2) + ($fontsize* 0.2),
-          $txt_color, 'Arial.ttf', $text);
-         */
 
-        /*
-        //Tell the browser what kind of file is come in
-        header('Content-Type: image/png');
-        //Output the newly created image in png format
-        imagepng($image);
-        //Free up resources
-        imagedestroy($image);
-        */
-
-        ob_start();
-        imagepng($image);
-        // Capture the output and clear the output buffer
-        $imagedata = ob_get_clean();
-        //print '<p><img src="data:image/png;base64,' . base64_encode($imagedata) . '" alt="image 1"/></p>';
-        //exit;
-
-        //header('Content-Type: image/png');
-        echo base64_encode($imagedata);
-        exit;
-        /*
         //Tell the browser what kind of file is come in
         $headers = [
             'Content-Type' => 'image/png',
@@ -290,7 +264,6 @@ class Controller_Cresenity extends CController {
             //Free up resources
             imagedestroy($image);
         }, 200, $headers);
-        */
     }
 
     public function transparent($width = 100, $height = 100) {
