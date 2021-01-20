@@ -13,7 +13,9 @@ class CHTTP_Kernel {
     use CHTTP_Trait_OutputBufferTrait;
 
     protected $isHandled = false;
+
     protected $terminated;
+
     protected $controller;
 
     public function __construct() {
@@ -212,9 +214,9 @@ class CHTTP_Kernel {
         }
 
         CEvent::dispatch(new CHTTP_Event_RequestHandled($request, $response));
-//        if($response->getStatusCode()!=200) {
-//            $this->endOutputBuffering();
-//        }
+        //        if($response->getStatusCode()!=200) {
+        //            $this->endOutputBuffering();
+        //        }
 
         $this->isHandled = true;
 
@@ -249,11 +251,12 @@ class CHTTP_Kernel {
         } elseif ($response instanceof CModel && $response->wasRecentlyCreated) {
             $response = new CHTTP_JsonResponse($response, 201);
         } elseif (!$response instanceof SymfonyResponse
-                && ($response instanceof CInterface_Arrayable
-                || $response instanceof CInterface_Jsonable
-                || $response instanceof ArrayObject
-                || $response instanceof JsonSerializable
-                || is_array($response))) {
+            && ($response instanceof CInterface_Arrayable
+            || $response instanceof CInterface_Jsonable
+            || $response instanceof ArrayObject
+            || $response instanceof JsonSerializable
+            || is_array($response))
+        ) {
             $response = new CHTTP_JsonResponse($response);
         } elseif (!$response instanceof SymfonyResponse) {
             $response = new CHTTP_Response($response, 200, ['Content-Type' => 'text/html']);
