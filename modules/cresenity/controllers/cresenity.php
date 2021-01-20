@@ -295,7 +295,7 @@ class Controller_Cresenity extends CController {
         }
 
         $avatarApi = CImage::avatar()->api($engineName);
-
+        /*
         if (!isset($_GET['noheader'])) {
             header('Content-type: image/png');
             header('Pragma: public');
@@ -303,6 +303,17 @@ class Controller_Cresenity extends CController {
             header('Expires: ' . gmdate('D, d M Y H:i:s \G\M\T', time() + 172800));
         }
         $avatarApi->render();
+        */
+        $headers = [
+            'Content-Type' => 'image/png',
+            'Pragma' => 'public',
+            'Cache-Control' => 'max-age=172800',
+            'Expires' => gmdate('D, d M Y H:i:s \G\M\T', time() + 172800),
+        ];
+
+        return c::response()->stream(function () use ($avatarApi) {
+            $avatarApi->render();
+        }, 200, $headers);
     }
 
     public function connector($engine, $method = null) {
