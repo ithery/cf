@@ -10,7 +10,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CApp_Trait_App_Bootstrap {
     protected static $registerComponentBooted = false;
+
     protected static $registerControlBooted = false;
+
     protected static $registerBladeBooted = false;
 
     public static function registerComponent() {
@@ -25,8 +27,8 @@ trait CApp_Trait_App_Bootstrap {
             CComponent_RenameMe_SupportFileDownloads::init();
             CComponent_RenameMe_SupportActionReturns::init();
             CComponent_RenameMe_SupportBrowserHistory::init();
-            CComponent_RenameMe_SupportComponentTraits::init();
 
+            CComponent_RenameMe_SupportComponentTraits::init();
             CView::blade()->precompiler(function ($string) {
                 return (new CComponent_ComponentTagCompiler())->compile($string);
             });

@@ -231,6 +231,8 @@ class Controller_Cresenity extends CController {
 
     public function noimage($width = 200, $height = 150, $bg_color = 'EFEFEF', $txt_color = 'AAAAAA', $text = 'NO IMAGE') {
         //Create the image resource
+        $width = (int) $width;
+        $height = (int) $height;
         $image = imagecreate($width, $height);
         //Making of colors, we are changing HEX to RGB
         $bg_color = imagecolorallocate($image, base_convert(substr($bg_color, 0, 2), 16, 10), base_convert(substr($bg_color, 2, 2), 16, 10), base_convert(substr($bg_color, 4, 2), 16, 10));
@@ -256,13 +258,26 @@ class Controller_Cresenity extends CController {
           ($height/2) + ($fontsize* 0.2),
           $txt_color, 'Arial.ttf', $text);
          */
+
+        /*
         //Tell the browser what kind of file is come in
         header('Content-Type: image/png');
         //Output the newly created image in png format
         imagepng($image);
         //Free up resources
         imagedestroy($image);
+        */
 
+        ob_start();
+        imagepng($image);
+        // Capture the output and clear the output buffer
+        $imagedata = ob_get_clean();
+        //print '<p><img src="data:image/png;base64,' . base64_encode($imagedata) . '" alt="image 1"/></p>';
+        //exit;
+
+        //header('Content-Type: image/png');
+        echo base64_encode($imagedata);
+        exit;
         /*
         //Tell the browser what kind of file is come in
         $headers = [

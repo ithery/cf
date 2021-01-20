@@ -33,11 +33,14 @@ if (carr::first(explode('/', trim(CFRouter::getUri(), '/'))) == 'administrator')
         'js' => ['administrator/datatables/datatables.js'],
     ]);
 }
+
 CFBenchmark::start('CApp_Bootstrap');
 CApp::registerBlade();
 CApp::registerComponent();
+
 CApp::registerControl();
 CFBenchmark::stop('CApp_Bootstrap');
+
 if (isset($_COOKIE['capp-profiler'])) {
     CProfiler::enable();
 }
