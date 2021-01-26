@@ -213,12 +213,15 @@ class CFRouter {
         if ($uri !== null) {
             self::$current_uri = $uri;
         }
-
         if (strlen(self::$current_uri) == 0) {
             self::findUri();
         }
         $data = self::getRouteData(self::$current_uri);
 
+        static::applyRouteData($data);
+    }
+
+    public static function applyRouteData(array $data) {
         self::$routes = carr::get($data, 'routes');
         self::$current_uri = carr::get($data, 'current_uri');
         self::$query_string = carr::get($data, 'query_string');
