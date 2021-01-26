@@ -14,7 +14,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CModel_Query {
     use CDatabase_Trait_Builder,
-        CModel_Trait_QueriesRelationships;
+        CModel_Trait_QueriesRelationships,
+        CTrait_ForwardsCalls;
 
     /**
      * The base query builder instance.
@@ -116,7 +117,9 @@ class CModel_Query {
         $this->scopes[$identifier] = $scope;
 
         if (method_exists($scope, 'extend')) {
-            $scope->extend($this);
+            //pass extend to variable to surpress intelephense vscode error warning
+            $method = 'extend';
+            $scope->$method($this);
         }
 
         return $this;
@@ -528,7 +531,7 @@ class CModel_Query {
      *
      * @param string $name
      *
-     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     * @return CModel_Relation
      */
     public function getRelation($name) {
         // We want to run a relationship query without any constrains so that we will
@@ -536,7 +539,7 @@ class CModel_Query {
         // and error prone. We don't want constraints because we add eager ones.
         $relation = CModel_Relation::noConstraints(function () use ($name) {
             try {
-                return $this->getModel()->{$name}();
+                return $this->getModel()->newInstance()->{$name}();
             } catch (BadMethodCallException $e) {
                 throw CModel_Exception_RelationNotFoundException::make($this->getModel(), $name);
             }
@@ -1066,6 +1069,11 @@ class CModel_Query {
      */
     public function newModelInstance($attributes = []) {
         return $this->model->newInstance($attributes);
+        /*
+        return $this->model->newInstance($attributes)->setConnection(
+            $this->query->getConnection()->getName()
+        );
+        */
     }
 
     /**
@@ -1298,71 +1306,10 @@ class CModel_Query {
         }
 
         if (in_array($method, $this->passthru)) {
-            try {
-                $base = $this->toBase();
-
-                $class = new ReflectionClass(get_class($base));
-                try {
-                    // Load the controller method
-                    $method_object = $class->getMethod($method);
-                } catch (ReflectionException $e) {
-                    // Use __call instead
-
-                    try {
-                        throw new Exception('404');
-                    } catch (Exception $ex) {
-                        cdbg::var_dump(nl2br($ex->getTraceAsString()));
-                    }
-                    die(
-                        sprintf('Call to undefined method %s::%s()', get_class($base), $method)
-                    );
-                    $method_object = $class->getMethod('__call');
-
-                    // Use arguments in __call format
-                    $parameters = [$method, $parameters];
-                }
-
-                return $method_object->invokeArgs($this->query, $parameters);
-                //$this->query->{$method}(...$parameters);
-            } catch (BadMethodCallException $e) {
-                throw new BadMethodCallException(
-                    sprintf('Call to undefined method %s::%s()', get_class($this), $method)
-                );
-            }
+            return $this->toBase()->{$method}(...$parameters);
         }
 
-        $class = new ReflectionClass(get_class($this->query));
-
-        try {
-            try {
-                // Load the controller method
-                $method_object = $class->getMethod($method);
-            } catch (ReflectionException $e) {
-                if ($class->hasMethod('__call')) {
-                    // Use __call instead
-                    $method_object = $class->getMethod('__call');
-                    // Use arguments in __call format
-                    $parameters = [$method, $parameters];
-                } else {
-                    try {
-                        throw new Exception('404 doesn\'t have method __call on CDatabase_Query_Builder');
-                    } catch (Exception $ex) {
-                        cdbg::var_dump(nl2br($ex->getTraceAsString()));
-                        cdbg::var_dump($ex->getMessage());
-                    }
-                    die(
-                        sprintf('Call to undefined method %s::%s()', get_class($this->query), $method)
-                    );
-                }
-            }
-
-            $method_object->invokeArgs($this->query, $parameters);
-            //$this->query->{$method}(...$parameters);
-        } catch (BadMethodCallException $e) {
-            throw new BadMethodCallException(
-                sprintf('Call to undefined method %s::%s()', get_class($this), $method)
-            );
-        }
+        $this->forwardCallTo($this->query, $method, $parameters);
 
         return $this;
     }
@@ -1384,15 +1331,16 @@ class CModel_Query {
             return;
         }
 
-        if (!isset(static::$macros[$method])) {
-            throw new BadMethodCallException("Method {$method} does not exist.");
+        if (!static::hasGlobalMacro($method)) {
+            static::throwBadMethodCallException($method);
         }
 
-        if (static::$macros[$method] instanceof Closure) {
-            return call_user_func_array(Closure::bind(static::$macros[$method], null, static::class), $parameters);
-        }
+        $callable = static::$macros[$method];
 
-        return call_user_func_array(static::$macros[$method], $parameters);
+        if ($callable instanceof Closure) {
+            $callable = $callable->bindTo(null, static::class);
+        }
+        return $callable(...$parameters);
     }
 
     /**
