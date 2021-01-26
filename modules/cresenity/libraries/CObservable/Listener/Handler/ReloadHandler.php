@@ -37,6 +37,15 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
         return $this->content;
     }
 
+    public function toAttributeArray() {
+        return [
+            'selector' => $this->getSelector(),
+            'url' => $this->generatedUrl(),
+            'method' => $this->method,
+            'blockType' => $this->blockType,
+        ];
+    }
+
     public function js() {
         $js = '';
         $dataAddition = $this->populateParamJson();
