@@ -4,9 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2019, 1:08:53 AM
  */
 class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface {
     /**
@@ -337,6 +334,20 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     }
 
     /**
+     * Register a shared binding if it hasn't already been registered.
+     *
+     * @param string               $abstract
+     * @param \Closure|string|null $concrete
+     *
+     * @return void
+     */
+    public function singletonIf($abstract, $concrete = null) {
+        if (!$this->bound($abstract)) {
+            $this->singleton($abstract, $concrete);
+        }
+    }
+
+    /**
      * "Extend" an abstract type in the container.
      *
      * @param string   $abstract
@@ -580,7 +591,7 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
         if ($this->has($id)) {
             return $this->resolve($id);
         }
-        throw new EntryNotFoundException;
+        throw new CContainer_Exception_EntryNotFoundException;
     }
 
     /**
