@@ -1212,6 +1212,24 @@ class c {
     public static function last($array) {
         return end($array);
     }
+
+    /**
+     * Spaceship operator for php 5.6
+     * 0 if $a == $b
+     * -1 if $a < $b
+     * 1 if $a > $b
+     *
+     * @param mixed $a
+     * @param mixed $b
+     *
+     * @return void
+     */
+    public static function spaceshipOperator($a, $b) {
+        if ($a == $b) {
+            return 0;
+        }
+        return $a > $b ? 1 : -1;
+    }
 }
 
 // End c
