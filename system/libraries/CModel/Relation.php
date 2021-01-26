@@ -5,7 +5,7 @@
  */
 abstract class CModel_Relation {
     /**
-     * The Eloquent query builder instance.
+     * The model query builder instance.
      *
      * @var CModel_Query
      */
