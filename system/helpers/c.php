@@ -9,8 +9,12 @@ use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Symfony\Component\VarDumper\VarDumper;
 
+//@codingStandardsIgnoreStart
 class c {
+    //@codingStandardsIgnoreEnd
+
     /**
      * @param string $str
      *
@@ -104,8 +108,8 @@ class c {
      */
     public static function property($path) {
         $propertyAccess = PropertyAccess::createPropertyAccessorBuilder()
-                ->disableExceptionOnInvalidIndex()
-                ->getPropertyAccessor();
+            ->disableExceptionOnInvalidIndex()
+            ->getPropertyAccessor();
         return function ($value, $index = 0, $collection = []) use ($path, $propertyAccess) {
             $path = \implode('.', (array) $path);
             if (\is_array($value)) {
@@ -174,7 +178,7 @@ class c {
      * @return bool returns `true` if `value` is a property name, else `false`
      */
     public static function isKey($value, $object = []) {
-        /** Used to match property names within property paths. */
+        /* Used to match property names within property paths. */
         $reIsDeepProp = '#\.|\[(?:[^[\]]*|(["\'])(?:(?!\1)[^\\\\]|\\.)*?\1)\]#';
         $reIsPlainProp = '/^\w*$/';
         if (\is_array($value)) {
@@ -191,7 +195,7 @@ class c {
         $memoizeCapped = static::memoizeCapped(function ($string) {
             $reLeadingDot = '/^\./';
             $rePropName = '#[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["\'])((?:(?!\2)[^\\\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))#';
-            /** Used to match backslashes in property paths. */
+            /* Used to match backslashes in property paths. */
             $reEscapeChar = '/\\(\\)?/g';
             $result = [];
             if (\preg_match($reLeadingDot, $string)) {
@@ -229,8 +233,6 @@ class c {
      * [`Map`](http://ecma-international.org/ecma-262/7.0/#sec-properties-of-the-map-prototype-object)
      * method interface of `clear`, `delete`, `get`, `has`, and `set`.
      *
-     * @category Function
-     *
      * @param callable      $func     the function to have its output memoized
      * @param callable|null $resolver the function to resolve the cache key
      *
@@ -262,36 +264,6 @@ class c {
         $memoized = CBase::createMemoizeResolver($func, $resolver);
         $memoized->cache = CBase::createMapCache();
         return $memoized;
-    }
-
-    /**
-     * Gets the value at path of object. If the resolved value is null the defaultValue is returned in its place.
-     *
-     * @category Object
-     *
-     * @param mixed        $object       The associative array or object to fetch value from
-     * @param array|string $path         Dot separated or array of string
-     * @param mixed        $defaultValue (optional)The value returned for unresolved or null values
-     *
-     * @return mixed returns the resolved value
-     *
-     * @author punit-kulal
-     *
-     * @example
-     * <code>
-     * $sampleArray = ["key1" => ["key2" => ["key3" => "val1", "key4" => ""]]];
-     * get($sampleArray, 'key1.key2.key3');
-     * // => "val1"
-     *
-     * get($sampleArray, 'key1.key2.key5', "default");
-     * // => "default"
-     *
-     * get($sampleArray, 'key1.key2.key4', "default");
-     * // => ""
-     * </code>
-     */
-    public static function get($object, $path, $defaultValue = null) {
-        return ($object !== null ? c::baseGet($object, $path, $defaultValue) : $defaultValue);
     }
 
     public static function assocIndexOf(array $array, $key) {
@@ -472,10 +444,14 @@ class c {
      * @return void
      */
     public static function report($exception) {
+        //@codingStandardsIgnoreStart
         if ($exception instanceof Throwable
-                && !$exception instanceof Exception) {
+            && !$exception instanceof Exception
+        ) {
             $exception = new FatalThrowableError($exception);
         }
+        //@codingStandardsIgnoreEnd
+
         $exceptionHandler = CException::exceptionHandler();
         $exceptionHandler->report($exception);
     }
@@ -491,6 +467,8 @@ class c {
         return $value instanceof Closure ? $value() : $value;
     }
 
+    //@codingStandardsIgnoreStart
+
     /**
      * Dispatch an event and call the listeners.
      *
@@ -503,6 +481,8 @@ class c {
     public static function event(...$args) {
         return CEvent::dispatch(...$args);
     }
+
+    //@codingStandardsIgnoreEnd
 
     /**
      * Create a new Carbon instance for the current time.
@@ -565,7 +545,7 @@ class c {
      * @return string
      */
     public static function e($value, $doubleEncode = true) {
-        if ($value instanceof CBase_DeferringDisplayableValue) {
+        if ($value instanceof CBase_DeferringDisplayableValueInterface) {
             $value = $value->resolveDisplayableValue();
         }
 
@@ -652,6 +632,8 @@ class c {
         return CF::lang($key, $replace, $locale);
     }
 
+    //@codingStandardsIgnoreStart
+
     /**
      * Translate the given message.
      *
@@ -661,7 +643,7 @@ class c {
      *
      * @return string|array|null
      */
-    public function __($key = null, $replace = [], $locale = null) {
+    public static function __($key = null, $replace = [], $locale = null) {
         if (is_null($key)) {
             return $key;
         }
@@ -669,11 +651,13 @@ class c {
         return static::trans($key, $replace, $locale);
     }
 
+    //@codingStandardsIgnoreEnd
+
     /**
-     * @return CSession_Store
+     * @return CSession
      */
     public static function session() {
-        return CSession::instance()->store();
+        return CSession::instance();
     }
 
     /**
@@ -729,7 +713,7 @@ class c {
      *
      * @return CView_View|CView_Factory
      */
-    public function view($view = null, $data = [], $mergeData = []) {
+    public static function view($view = null, $data = [], $mergeData = []) {
         $factory = CView::factory();
 
         if (func_num_args() === 0) {
@@ -761,17 +745,13 @@ class c {
     /**
      * Displays a 404 page.
      *
-     * @throws C_404_Exception
-     *
-     * @param   string  URI of page
-     * @param   string  custom template
-     * @param mixed $page
-     * @param mixed $template
+     * @param string $page     URI of page
+     * @param string $template custom template
      *
      * @return void
      */
     public static function show404($page = false, $template = false) {
-        return CF::abort(404);
+        return static::abort(404);
     }
 
     public static function abort($code, $message = '', array $headers = []) {
@@ -815,7 +795,7 @@ class c {
      *
      * @return CHTTP_Request|string|array
      */
-    public function request($key = null, $default = null) {
+    public static function request($key = null, $default = null) {
         if (is_null($key)) {
             return CHTTP::request();
         }
@@ -909,6 +889,346 @@ class c {
      */
     public static function container() {
         return CContainer::getInstance();
+    }
+
+    /**
+     * Get hash manager instance
+     *
+     * @param null|string $hasher
+     *
+     * @return CCrypt_HashManager
+     */
+    public static function hash($hasher = null) {
+        return CCrypt_HashManager::instance($hasher);
+    }
+
+    /**
+     * Get router instance
+     *
+     * @return CRouting_Router
+     */
+    public static function router() {
+        return CRouting_Router::instance();
+    }
+
+    /**
+     * Generate the URL to a named route.
+     *
+     * @param array|string $name
+     * @param mixed        $parameters
+     * @param bool         $absolute
+     *
+     * @return string
+     */
+    public static function route($name, $parameters = [], $absolute = true) {
+        return static::url()->route($name, $parameters, $absolute);
+    }
+
+    /**
+     * Encrypt the given value.
+     *
+     * @param mixed $value
+     * @param bool  $serialize
+     *
+     * @return string
+     */
+    public static function encrypt($value, $serialize = true) {
+        return CCrypt::encrypter()->encrypt($value, $serialize);
+    }
+
+    /**
+     * Decrypt the given value.
+     *
+     * @param string $value
+     * @param bool   $unserialize
+     *
+     * @return mixed
+     */
+    public static function decrypt($value, $unserialize = true) {
+        return CCrypt::encrypter()->decrypt($value, $unserialize);
+    }
+
+    /**
+     * Dump variable
+     *
+     * @param mixed $var
+     *
+     * @return void
+     */
+    public static function dump($var) {
+        foreach (func_get_args() as $var) {
+            VarDumper::dump($var);
+        }
+    }
+
+    /**
+     * Retry an operation a given number of times.
+     *
+     * @param int           $times
+     * @param callable      $callback
+     * @param int           $sleep
+     * @param callable|null $when
+     *
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public static function retry($times, callable $callback, $sleep = 0, $when = null) {
+        $attempts = 0;
+
+        beginning:
+        $attempts++;
+        $times--;
+
+        try {
+            return $callback($attempts);
+        } catch (Exception $e) {
+            if ($times < 1 || ($when && !$when($e))) {
+                throw $e;
+            }
+
+            if ($sleep) {
+                usleep($sleep * 1000);
+            }
+
+            goto beginning;
+        }
+    }
+
+    /**
+     * Generate an media path for the application.
+     *
+     * @param string    $path
+     * @param bool|null $secure
+     *
+     * @return string
+     */
+    public static function media($path = '', $secure = null) {
+        return c::url()->asset($path, $secure);
+    }
+
+    /**
+     * Retrieve an old input item.
+     *
+     * @param string|null $key
+     * @param mixed       $default
+     *
+     * @return mixed
+     */
+    public static function old($key = null, $default = null) {
+        return CHTTP::request()->old($key, $default);
+    }
+
+    /**
+     * Get the available auth instance.
+     *
+     * @param string|null $guard
+     *
+     * @return CAuth_Manager|CAuth_GuardInterface|CAuth_StatefulGuardInterface
+     */
+    public static function auth($guard = null) {
+        if (is_null($guard)) {
+            return CAuth::manager();
+        }
+
+        return CAuth::manager()->guard($guard);
+    }
+
+    /**
+     * Generate a CSRF token form field.
+     *
+     * @return CBase_HtmlString
+     */
+    public static function csrfField() {
+        return new CBase_HtmlString('<input type="hidden" name="_token" value="' . static::csrfToken() . '">');
+    }
+
+    /**
+     * Get the CSRF token value.
+     *
+     * @return string
+     *
+     * @throws \RuntimeException
+     */
+    public static function csrfToken() {
+        $session = CSession::instance();
+
+        if (isset($session)) {
+            return $session->token();
+        }
+
+        throw new RuntimeException('Application session store not set.');
+    }
+
+    /**
+     * Get the available container instance.
+     *
+     * @param string|null $abstract
+     * @param array       $parameters
+     *
+     * @return mixed|\Illuminate\Contracts\Foundation\Application
+     */
+    public static function app($abstract = null, array $parameters = []) {
+        if (is_null($abstract)) {
+            return static::container();
+        }
+
+        return c::container()->make($abstract, $parameters);
+    }
+
+    public static function userAgent() {
+        return (!empty($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '');
+    }
+
+    /**
+     * Get an item from an array or object using "dot" notation.
+     *
+     * @param mixed                 $target
+     * @param string|array|int|null $key
+     * @param mixed                 $default
+     *
+     * @return mixed
+     */
+    public static function get($target, $key, $default = null) {
+        if (is_null($key)) {
+            return $target;
+        }
+
+        $key = is_array($key) ? $key : explode('.', $key);
+
+        foreach ($key as $i => $segment) {
+            unset($key[$i]);
+
+            if (is_null($segment)) {
+                return $target;
+            }
+
+            if ($segment === '*') {
+                if ($target instanceof CCollection) {
+                    $target = $target->all();
+                } elseif (!is_array($target)) {
+                    return c::value($default);
+                }
+
+                $result = [];
+
+                foreach ($target as $item) {
+                    $result[] = static::get($item, $key);
+                }
+
+                return in_array('*', $key) ? carr::collapse($result) : $result;
+            }
+
+            if (carr::accessible($target) && carr::exists($target, $segment)) {
+                $target = $target[$segment];
+            } elseif (is_object($target) && isset($target->{$segment})) {
+                $target = $target->{$segment};
+            } else {
+                return static::value($default);
+            }
+        }
+
+        return $target;
+    }
+
+    /**
+     * Set an item on an array or object using dot notation.
+     *
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $value
+     * @param bool         $overwrite
+     *
+     * @return mixed
+     */
+    public static function set(&$target, $key, $value, $overwrite = true) {
+        $segments = is_array($key) ? $key : explode('.', $key);
+
+        if (($segment = array_shift($segments)) === '*') {
+            if (!carr::accessible($target)) {
+                $target = [];
+            }
+
+            if ($segments) {
+                foreach ($target as &$inner) {
+                    static::set($inner, $segments, $value, $overwrite);
+                }
+            } elseif ($overwrite) {
+                foreach ($target as &$inner) {
+                    $inner = $value;
+                }
+            }
+        } elseif (carr::accessible($target)) {
+            if ($segments) {
+                if (!carr::exists($target, $segment)) {
+                    $target[$segment] = [];
+                }
+
+                static::set($target[$segment], $segments, $value, $overwrite);
+            } elseif ($overwrite || !carr::exists($target, $segment)) {
+                $target[$segment] = $value;
+            }
+        } elseif (is_object($target)) {
+            if ($segments) {
+                if (!isset($target->{$segment})) {
+                    $target->{$segment} = [];
+                }
+
+                static::set($target->{$segment}, $segments, $value, $overwrite);
+            } elseif ($overwrite || !isset($target->{$segment})) {
+                $target->{$segment} = $value;
+            }
+        } else {
+            $target = [];
+
+            if ($segments) {
+                static::set($target[$segment], $segments, $value, $overwrite);
+            } elseif ($overwrite) {
+                $target[$segment] = $value;
+            }
+        }
+
+        return $target;
+    }
+
+    /**
+     * Get the first element of an array. Useful for method chaining.
+     *
+     * @param array $array
+     *
+     * @return mixed
+     */
+    public static function head($array) {
+        return reset($array);
+    }
+
+    /**
+     * Get the last element from an array.
+     *
+     * @param array $array
+     *
+     * @return mixed
+     */
+    public static function last($array) {
+        return end($array);
+    }
+
+    /**
+     * Spaceship operator for php 5.6
+     * 0 if $a == $b
+     * -1 if $a < $b
+     * 1 if $a > $b
+     *
+     * @param mixed $a
+     * @param mixed $b
+     *
+     * @return void
+     */
+    public static function spaceshipOperator($a, $b) {
+        if ($a == $b) {
+            return 0;
+        }
+        return $a > $b ? 1 : -1;
     }
 }
 

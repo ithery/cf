@@ -91,7 +91,7 @@ class CMiddleware_SortedMiddleware extends CCollection {
      * @return \Generator
      */
     protected function middlewareNames($middleware) {
-        $stripped = head(explode(':', $middleware));
+        $stripped = c::head(explode(':', $middleware));
 
         yield $stripped;
 
