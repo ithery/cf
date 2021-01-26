@@ -119,9 +119,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     public function fullUrlWithQuery(array $query) {
         $question = $this->getBaseUrl() . $this->getPathInfo() === '/' ? '/?' : '?';
 
-        return count($this->query()) > 0
-        ? $this->url() . $question . carr::query(array_merge($this->query(), $query))
-        : $this->fullUrl() . $question . carr::query($query);
+        return count($this->query()) > 0 ? $this->url() . $question . carr::query(array_merge($this->query(), $query)) : $this->fullUrl() . $question . carr::query($query);
     }
 
     /**
@@ -340,7 +338,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
             return $this->json;
         }
 
-        return CF::get($this->json->all(), $key, $default);
+        return c::get($this->json->all(), $key, $default);
     }
 
     /**
@@ -386,7 +384,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         $request->setJson($from->json());
 
         if ($session = $from->getSession()) {
-            $request->setLaravelSession($session);
+            $request->setSession($session);
         }
 
         $request->setUserResolver($from->getUserResolver());
@@ -425,14 +423,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * {@inheritdoc}
      */
-    public function duplicate(
-        array $query = null,
-        array $request = null,
-        array $attributes = null,
-        array $cookies = null,
-        array $files = null,
-        array $server = null
-    ) {
+    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null) {
         return parent::duplicate($query, $request, $attributes, $cookies, $this->filterFiles($files), $server);
     }
 
@@ -488,11 +479,11 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Set the session instance on the request.
      *
-     * @param \Illuminate\Contracts\Session\Session $session
+     * @param CSession_Store $session
      *
      * @return void
      */
-    public function setLaravelSession($session) {
+    public function setSession($session) {
         $this->session = $session;
     }
 
