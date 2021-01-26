@@ -7,10 +7,65 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 
 /**
- * Model Class
+ * @method CModel|CModel_Collection|null find($id, $columns = ['*']) Find a model by its primary key.
+ * @method static CModel_Collection findMany($ids, $columns = ['*']) Find a model by its primary key.
+ * @method static CModel|CModel_Collection|$this findOrFail($id, $columns = ['*']) Find a model by its primary key or throw an exception.
+ * @method CModel|CModel_Query|null first($columns = ['*']) Execute the query and get the first result.
+ * @method CModel|CModel_Query firstOrFail($columns = ['*']) Execute the query and get the first result or throw an exception.
+ * @method CModel_Collection|CModel_Query[] get($columns = ['*']) Execute the query as a "select" statement.
+ * @method mixed value($column) Get a single column's value from the first result of a query.
+ * @method mixed pluck($column) Get a single column's value from the first result of a query.
+ * @method void chunk($count, callable $callback) Chunk the results of the query.
+ * @method \CCollection lists($column, $key = null) Get an array with the values of a given column.
+ * @method \CPagination_LengthAwarePaginatorInterface paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) Paginate the given query.
+ * @method \CPagination_PaginatorInterface simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page') Paginate the given query into a simple paginator.
+ * @method void onDelete(Closure $callback) Register a replacement for the default delete function.
+ * @method CModel[] getModels($columns = ['*']) Get the hydrated models without eager loading.
+ * @method array eagerLoadRelations(array $models) Eager load the relationships for the models.
+ * @method array loadRelation(array $models, $name, Closure $constraints) Eagerly load the relationship on a set of models.
+ * @method CModel_Query where($column, $operator = null, $value = null, $boolean = 'and') Add a basic where clause to the query.
+ * @method CModel_Query orWhere($column, $operator = null, $value = null) Add an "or where" clause to the query.
+ * @method CModel_Query has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
+ * @method CDatabase_Query_Builder where($column, $operator = null, $value = null)
+ * @method CDatabase_Query_Builder whereRaw($sql, array $bindings = [])
+ * @method CDatabase_Query_Builder whereBetween($column, array $values)
+ * @method CDatabase_Query_Builder whereNotBetween($column, array $values)
+ * @method CDatabase_Query_Builder whereNested(Closure $callback)
+ * @method CDatabase_Query_Builder addNestedWhereQuery($query)
+ * @method CDatabase_Query_Builder whereExists(Closure $callback)
+ * @method CDatabase_Query_Builder whereNotExists(Closure $callback)
+ * @method CDatabase_Query_Builder whereIn($column, $values)
+ * @method CDatabase_Query_Builder whereNotIn($column, $values)
+ * @method CDatabase_Query_Builder whereNull($column)
+ * @method CDatabase_Query_Builder whereNotNull($column)
+ * @method static CDatabase_Query_Builder where($column, $operator = null, $value = null)
+ * @method static CDatabase_Query_Builder whereRaw($sql, array $bindings = [])
+ * @method static CDatabase_Query_Builder whereBetween($column, array $values)
+ * @method static CDatabase_Query_Builder whereNotBetween($column, array $values)
+ * @method static CDatabase_Query_Builder whereNested(Closure $callback)
+ * @method static CDatabase_Query_Builder addNestedWhereQuery($query)
+ * @method static CDatabase_Query_Builder whereExists(Closure $callback)
+ * @method static CDatabase_Query_Builder whereNotExists(Closure $callback)
+ * @method static CDatabase_Query_Builder whereIn($column, $values)
+ * @method static CDatabase_Query_Builder whereNotIn($column, $values)
+ * @method static CDatabase_Query_Builder whereNull($column)
+ * @method static CDatabase_Query_Builder whereNotNull($column)
+ * @method CDatabase_Query_Builder orWhere($column, $operator = null, $value = null)
+ * @method CDatabase_Query_Builder orWhereRaw($sql, array $bindings = [])
+ * @method CDatabase_Query_Builder orWhereBetween($column, array $values)
+ * @method CDatabase_Query_Builder orWhereNotBetween($column, array $values)
+ * @method CDatabase_Query_Builder orWhereExists(Closure $callback)
+ * @method CDatabase_Query_Builder orWhereNotExists(Closure $callback)
+ * @method CDatabase_Query_Builder orWhereIn($column, $values)
+ * @method CDatabase_Query_Builder orWhereNotIn($column, $values)
+ * @method CDatabase_Query_Builder orWhereNull($column)
+ * @method CDatabase_Query_Builder orWhereNotNull($column)
+ * @method CDatabase_Query_Builder whereDate($column, $operator, $value)
+ * @method CDatabase_Query_Builder whereDay($column, $operator, $value)
+ * @method CDatabase_Query_Builder whereMonth($column, $operator, $value)
+ * @method CDatabase_Query_Builder whereYear($column, $operator, $value)
  *
- * @method static CModel_Query where($column, $operator = null, $value = null, $boolean = 'and')
- * @method static CModel findOrFail($id, $columns = ['*'])
+ * Class TBModel
  */
 abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_Jsonable, CQueue_QueueableEntityInterface {
     use CModel_Trait_GuardsAttributes,
