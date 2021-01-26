@@ -66,7 +66,7 @@ trait CModel_Resource_ResourceTrait {
 
     public function getTypeAttribute() {
         $type = $this->getTypeFromExtension();
-        if ($type !== self::TYPE_OTHER) {
+        if ($type !== CModel_Resource::TYPE_OTHER) {
             return $type;
         }
         return $this->getTypeFromMime();
@@ -78,7 +78,7 @@ trait CModel_Resource_ResourceTrait {
                 return new $className();
             })
             ->first->canHandleExtension(strtolower($this->extension));
-        return $imageGenerator ? $imageGenerator->getType() : static::TYPE_OTHER;
+        return $imageGenerator ? $imageGenerator->getType() : CModel_Resource::TYPE_OTHER;
     }
 
     public function getTypeFromMime() {
@@ -87,7 +87,7 @@ trait CModel_Resource_ResourceTrait {
                 return new $className();
             })
             ->first->canHandleMime($this->mime_type);
-        return $imageGenerator ? $imageGenerator->getType() : static::TYPE_OTHER;
+        return $imageGenerator ? $imageGenerator->getType() : CModel_Resource::TYPE_OTHER;
     }
 
     public function getExtensionAttribute() {
@@ -258,12 +258,12 @@ trait CModel_Resource_ResourceTrait {
     public function copy(CModel_HasResourceInterface $model, $collectionName = 'default') {
         $temporaryDirectory = TemporaryDirectory::create();
         $temporaryFile = $temporaryDirectory->path($this->file_name);
-        app(Filesystem::class)->copyFromMediaLibrary($this, $temporaryFile);
+        CResources_Factory::createFileSystem()->copyFromResourceLibrary($this, $temporaryFile);
         $newMedia = $model
             ->addResource($temporaryFile)
             ->usingName($this->name)
             ->withCustomProperties($this->custom_properties)
-            ->toMediaCollection($collectionName);
+            ->toResourceCollection($collectionName);
         $temporaryDirectory->delete();
         return $newMedia;
     }
@@ -273,7 +273,7 @@ trait CModel_Resource_ResourceTrait {
     }
 
     public function stream() {
-        $filesystem = new CFile();
+        $filesystem = CResources_Factory::createFileSystem();
         return $filesystem->getStream($this);
     }
 

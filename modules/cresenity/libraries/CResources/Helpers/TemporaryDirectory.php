@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CResources_Helpers_TemporaryDirectory {
-
     const DEFAULT_FOLDER = 'resource';
 
     protected static function folder() {
@@ -19,7 +12,6 @@ class CResources_Helpers_TemporaryDirectory {
     }
 
     public static function generateLocalFilePath($extension = null) {
-
         $filename = CTemporary::generateRandomFilename();
         if ($extension != null) {
             $filename .= '.' . $extension;
@@ -36,5 +28,4 @@ class CResources_Helpers_TemporaryDirectory {
         $filename = basename($filename);
         return CTemporary::deleteLocal(static::folder(), $filename);
     }
-
 }

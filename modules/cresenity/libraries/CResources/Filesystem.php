@@ -9,10 +9,14 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since May 1, 2019, 11:36:15 PM
  */
 class CResources_Filesystem {
-    /** @var CResources_Manager */
+    /**
+     * @var CResources_Manager
+     */
     protected $filesystem;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $customRemoteHeaders = [];
 
     public function __construct($filesystem = null) {
