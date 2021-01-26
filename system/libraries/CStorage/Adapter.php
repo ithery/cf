@@ -46,15 +46,25 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      * Assert that the given file exists.
      *
      * @param string|array $path
+     * @param string|null  $content
      *
      * @return $this
      */
-    public function assertExists($path) {
+    public function assertExists($path, $content = null) {
         $paths = carr::wrap($path);
         foreach ($paths as $path) {
             PHPUnit::assertTrue(
                 $this->exists($path),
                 "Unable to find a file at path [{$path}]."
+            );
+        }
+        if (!is_null($content)) {
+            $actual = $this->get($path);
+
+            PHPUnit::assertSame(
+                $content,
+                $actual,
+                "File [{$path}] was found, but content [{$actual}] does not match [{$content}]."
             );
         }
         return $this;
@@ -90,6 +100,17 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
     }
 
     /**
+     * Determine if a file or directory is missing.
+     *
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function missing($path) {
+        return !$this->exists($path);
+    }
+
+    /**
      * Get the full path for the file at the given "short" path.
      *
      * @param string $path
@@ -97,7 +118,13 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      * @return string
      */
     public function path($path) {
-        return $this->driver->getAdapter()->getPathPrefix() . $path;
+        $adapter = $this->driver->getAdapter();
+
+        if ($adapter instanceof CachedAdapter) {
+            $adapter = $adapter->getAdapter();
+        }
+
+        return $adapter->getPathPrefix() . $path;
     }
 
     /**
@@ -182,7 +209,9 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
      * @return bool
      */
     public function put($path, $contents, $options = []) {
-        $options = is_string($options) ? ['visibility' => $options] : (array) $options;
+        $options = is_string($options)
+            ? ['visibility' => $options]
+            : (array) $options;
 
         // If the given contents is actually a file or uploaded file instance than we will
         // automatically store the file using a stream. This provides a convenient path
@@ -192,35 +221,41 @@ class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudIn
         ) {
             return $this->putFile($path, $contents, $options);
         }
+        if ($contents instanceof StreamInterface) {
+            return $this->driver->putStream($path, $contents->detach(), $options);
+        }
 
-        return is_resource($contents) ? $this->driver->putStream($path, $contents, $options) : $this->driver->put($path, $contents, $options);
+        return is_resource($contents)
+            ? $this->driver->putStream($path, $contents, $options)
+            : $this->driver->put($path, $contents, $options);
     }
 
     /**
      * Store the uploaded file on the disk.
      *
-     * @param string                        $path
-     * @param CHttp_File|CHttp_UploadedFile $file
-     * @param array                         $options
+     * @param string                               $path
+     * @param CHttp_File|CHttp_UploadedFile|string $file
+     * @param array                                $options
      *
      * @return string|false
      */
     public function putFile($path, $file, $options = []) {
+        $file = is_string($file) ? new CHTTP_File($file) : $file;
         return $this->putFileAs($path, $file, $file->hashName(), $options);
     }
 
     /**
      * Store the uploaded file on the disk with a given name.
      *
-     * @param string                        $path
-     * @param CHttp_File|CHttp_UploadedFile $file
-     * @param string                        $name
-     * @param array                         $options
+     * @param string                               $path
+     * @param CHttp_File|CHttp_UploadedFile|string $file
+     * @param string                               $name
+     * @param array                                $options
      *
      * @return string|false
      */
     public function putFileAs($path, $file, $name, $options = []) {
-        $stream = fopen($file->getRealPath(), 'r');
+        $stream = fopen(is_string($file) ? $file : $file->getRealPath(), 'r');
         // Next, we will format the path of the file and store the file using a stream since
         // they provide better performance than alternatives. Once we write the file this
         // stream will get closed automatically by us so the developer doesn't have to.
