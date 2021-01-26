@@ -10,24 +10,24 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 
 class CHTTP_Kernel {
-
     use CHTTP_Trait_OutputBufferTrait,
         CHTTP_Concern_KernelRouting;
 
     protected $isHandled = false;
+
     protected $terminated;
+
     protected $controller;
 
-    
     public function __construct() {
-
         $this->terminated = false;
     }
 
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Exception  $e
+     * @param \Exception $e
+     *
      * @return void
      */
     protected function reportException($e) {
@@ -37,8 +37,9 @@ class CHTTP_Kernel {
     /**
      * Render the exception to a response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $e
+     * @param \Illuminate\Http\Request $request
+     * @param \Exception               $e
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function renderException($request, $e) {
@@ -51,19 +52,16 @@ class CHTTP_Kernel {
     }
 
     /**
-     * 
      * @return ReflectionClass
+     *
      * @throws ReflectionException
      */
     public function getReflectionControllerClass() {
-
         CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
         $reflectionClass = null;
         // Include the Controller file
         if (strlen(CFRouter::$controller_path) > 0) {
             require_once CFRouter::$controller_path;
-
-
 
             try {
                 // Start validation of the controller
@@ -79,12 +77,11 @@ class CHTTP_Kernel {
                 }
             }
 
-            if (isset($reflectionClass) && ($reflectionClass->isAbstract() OR ( IN_PRODUCTION AND $reflectionClass->getConstant('ALLOW_PRODUCTION') == FALSE))) {
+            if (isset($reflectionClass) && ($reflectionClass->isAbstract() or (IN_PRODUCTION and $reflectionClass->getConstant('ALLOW_PRODUCTION') == false))) {
                 // Controller is not allowed to run in production
                 return null;
             }
         }
-
 
         return $reflectionClass;
     }
@@ -113,7 +110,7 @@ class CHTTP_Kernel {
             $method = $reflectionClass->getMethod('__call');
 
             // Use arguments in __call format
-            $arguments = array(CFRouter::$method, CFRouter::$arguments);
+            $arguments = [CFRouter::$method, CFRouter::$arguments];
         }
 
         return [$method, $arguments];
@@ -134,8 +131,6 @@ class CHTTP_Kernel {
 
         // Start the controller execution benchmark
         CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_execution');
-
-
 
         if ($reflectionMethod == null) {
             CF::show404();
@@ -158,9 +153,8 @@ class CHTTP_Kernel {
     public function sendRequest($request) {
         $this->startOutputBuffering();
 
-
         $kernel = $this;
-        register_shutdown_function(function() use ($kernel) {
+        register_shutdown_function(function () use ($kernel) {
             if (!$kernel->isHandled()) {
                 $output = $kernel->cleanOutputBuffer();
                 if (strlen($output) > 0) {
@@ -172,70 +166,62 @@ class CHTTP_Kernel {
         $response = null;
         try {
             $response = $this->sendRequestThroughRouter($request);
-            
+
             //$response = $this->invokeController($request);
         } catch (Exception $e) {
-
             throw $e;
         } finally {
-
             $output = $this->cleanOutputBuffer();
         }
         if ($response instanceof CInterface_Responsable) {
             $response = $response->toResponse($request);
         }
         if ($response == null || is_bool($response)) {
-
             //collect the header
             $response = c::response($output);
 
             if (!headers_sent()) {
                 $headers = headers_list();
-
                 foreach ($headers as $header) {
-                    $headerExploded= explode(":", $header);
-                    $headerKey = carr::get($headerExploded,0);
-                    $headerValue = implode(":", array_splice($headerExploded, 1));
-                    
-                    header_remove($headerKey);
-                    $response->header($headerKey, $headerValue);
+                    $headerExploded = explode(':', $header);
+                    $headerKey = carr::get($headerExploded, 0);
+                    $headerValue = implode(':', array_splice($headerExploded, 1));
+
+                    if (strtolower($headerKey) != 'set-cookie') {
+                        $response->header($headerKey, $headerValue);
+                    }
                 }
             }
         }
 
         $response = $this->toResponse($request, $response);
 
-
         return $response;
     }
 
     public function handle(CHTTP_Request $request) {
+        CHTTP::setRequest($request);
         CBootstrap::instance()->boot();
-
         $response = null;
         try {
-            //$this->setupRouter();
+            $this->setupRouter();
             $response = $this->sendRequest($request);
         } catch (Exception $e) {
-
-
             $this->reportException($e);
 
             $response = $this->renderException($request, $e);
         } catch (Throwable $e) {
-
             $this->reportException($e);
 
             $response = $this->renderException($request, $e);
         }
 
         CEvent::dispatch(new CHTTP_Event_RequestHandled($request, $response));
-//        if($response->getStatusCode()!=200) {
-//            $this->endOutputBuffering();
-//        }
+        //        if($response->getStatusCode()!=200) {
+        //            $this->endOutputBuffering();
+        //        }
 
         $this->isHandled = true;
-
 
         return $response;
     }
@@ -253,8 +239,9 @@ class CHTTP_Kernel {
     /**
      * Static version of prepareResponse.
      *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
-     * @param  mixed  $response
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     * @param mixed                                     $response
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public static function toResponse($request, $response) {
@@ -266,13 +253,13 @@ class CHTTP_Kernel {
             $response = (new HttpFoundationFactory)->createResponse($response);
         } elseif ($response instanceof CModel && $response->wasRecentlyCreated) {
             $response = new CHTTP_JsonResponse($response, 201);
-        } elseif (!$response instanceof SymfonyResponse &&
-                ($response instanceof CInterface_Arrayable ||
-                $response instanceof CInterface_Jsonable ||
-                $response instanceof ArrayObject ||
-                $response instanceof JsonSerializable ||
-                is_array($response))) {
-
+        } elseif (!$response instanceof SymfonyResponse
+            && ($response instanceof CInterface_Arrayable
+            || $response instanceof CInterface_Jsonable
+            || $response instanceof ArrayObject
+            || $response instanceof JsonSerializable
+            || is_array($response))
+        ) {
             $response = new CHTTP_JsonResponse($response);
         } elseif (!$response instanceof SymfonyResponse) {
             $response = new CHTTP_Response($response, 200, ['Content-Type' => 'text/html']);
@@ -282,10 +269,9 @@ class CHTTP_Kernel {
             $response->setNotModified();
         }
 
-//        CFEvent::run('system.send_headers');
-        $preparedResponse =  $response->prepare($request);
-        
+        //CFEvent::run('system.send_headers');
+        $preparedResponse = $response->prepare($request);
+
         return $preparedResponse;
     }
-
 }

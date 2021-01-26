@@ -6,10 +6,8 @@
  * @author Hery
  */
 class CMiddleware_Manager {
-
     /**
-     *
-     * @var CMiddleware_Manager 
+     * @var CMiddleware_Manager
      */
     private static $instance;
 
@@ -21,13 +19,13 @@ class CMiddleware_Manager {
      * @var array
      */
     protected $middleware = [
-            // \App\Http\Middleware\TrustHosts::class,
-            //\App\Http\Middleware\TrustProxies::class,
-            //\Fruitcake\Cors\HandleCors::class,
-            //\App\Http\Middleware\PreventRequestsDuringMaintenance::class,
-            //\Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-            //\App\Http\Middleware\TrimStrings::class,
-            //\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        // \App\Http\Middleware\TrustHosts::class,
+        //\App\Http\Middleware\TrustProxies::class,
+        //\Fruitcake\Cors\HandleCors::class,
+        //\App\Http\Middleware\PreventRequestsDuringMaintenance::class,
+        //\Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
+        //\App\Http\Middleware\TrimStrings::class,
+        //\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
     ];
 
     /**
@@ -37,21 +35,20 @@ class CMiddleware_Manager {
      */
     protected $middlewareGroups = [
         'web' => [
-        //\App\Http\Middleware\EncryptCookies::class,
-        //\Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-        //\Laravel\Jetstream\Http\Middleware\AuthenticateSession::class,
-        //\Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        //\App\Http\Middleware\VerifyCsrfToken::class,
-        //\Illuminate\Routing\Middleware\SubstituteBindings::class,
+            //\App\Http\Middleware\EncryptCookies::class,
+            //\Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            //\Laravel\Jetstream\Http\Middleware\AuthenticateSession::class,
+            //\Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            //\App\Http\Middleware\VerifyCsrfToken::class,
+            //\Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
         'api' => [
-        //'throttle:api',
-        //\Illuminate\Routing\Middleware\SubstituteBindings::class,
+            //'throttle:api',
+            //\Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
 
     /**
-     * 
      * @return CMiddleware_Manager
      */
     public static function instance() {
@@ -82,7 +79,8 @@ class CMiddleware_Manager {
     /**
      * Gather the route middleware for the given request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return array
      */
     protected function gatherRouteMiddleware($request) {
@@ -96,7 +94,8 @@ class CMiddleware_Manager {
     /**
      * Parse a middleware string to get the name and parameters.
      *
-     * @param  string  $middleware
+     * @param string $middleware
+     *
      * @return array
      */
     protected function parseMiddleware($middleware) {
@@ -112,7 +111,8 @@ class CMiddleware_Manager {
     /**
      * Determine if the kernel has a given middleware.
      *
-     * @param  string  $middleware
+     * @param string $middleware
+     *
      * @return bool
      */
     public function hasMiddleware($middleware) {
@@ -122,7 +122,8 @@ class CMiddleware_Manager {
     /**
      * Add a new middleware to beginning of the stack if it does not already exist.
      *
-     * @param  string  $middleware
+     * @param string $middleware
+     *
      * @return $this
      */
     public function prependMiddleware($middleware) {
@@ -136,7 +137,8 @@ class CMiddleware_Manager {
     /**
      * Add a new middleware to end of the stack if it does not already exist.
      *
-     * @param  string  $middleware
+     * @param string $middleware
+     *
      * @return $this
      */
     public function pushMiddleware($middleware) {
@@ -150,8 +152,9 @@ class CMiddleware_Manager {
     /**
      * Prepend the given middleware to the given middleware group.
      *
-     * @param  string  $group
-     * @param  string  $middleware
+     * @param string $group
+     * @param string $middleware
+     *
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -173,8 +176,9 @@ class CMiddleware_Manager {
     /**
      * Append the given middleware to the given middleware group.
      *
-     * @param  string  $group
-     * @param  string  $middleware
+     * @param string $group
+     * @param string $middleware
+     *
      * @return $this
      *
      * @throws \InvalidArgumentException
@@ -196,7 +200,8 @@ class CMiddleware_Manager {
     /**
      * Prepend the given middleware to the middleware priority list.
      *
-     * @param  string  $middleware
+     * @param string $middleware
+     *
      * @return $this
      */
     public function prependToMiddlewarePriority($middleware) {
@@ -212,7 +217,8 @@ class CMiddleware_Manager {
     /**
      * Append the given middleware to the middleware priority list.
      *
-     * @param  string  $middleware
+     * @param string $middleware
+     *
      * @return $this
      */
     public function appendToMiddlewarePriority($middleware) {
@@ -245,5 +251,4 @@ class CMiddleware_Manager {
     public function getMiddleware() {
         return $this->middleware;
     }
-
 }

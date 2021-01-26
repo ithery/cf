@@ -6,12 +6,12 @@
  * @author Hery
  */
 class CMiddleware_SortedMiddleware extends CCollection {
-
     /**
      * Create a new Sorted Middleware container.
      *
-     * @param  array  $priorityMap
-     * @param  CCollection|array  $middlewares
+     * @param array             $priorityMap
+     * @param CCollection|array $middlewares
+     *
      * @return void
      */
     public function __construct(array $priorityMap, $middlewares) {
@@ -27,13 +27,14 @@ class CMiddleware_SortedMiddleware extends CCollection {
      *
      * Each call to this method makes one discrete middleware movement if necessary.
      *
-     * @param  array  $priorityMap
-     * @param  array  $middlewares
+     * @param array $priorityMap
+     * @param array $middlewares
+     *
      * @return array
      */
     protected function sortMiddleware($priorityMap, $middlewares) {
         $lastIndex = 0;
-        
+
         foreach ($middlewares as $index => $middleware) {
             if (!is_string($middleware)) {
                 continue;
@@ -47,7 +48,8 @@ class CMiddleware_SortedMiddleware extends CCollection {
                 // middleware, we will move this middleware to be above the previous encounter.
                 if (isset($lastPriorityIndex) && $priorityIndex < $lastPriorityIndex) {
                     return $this->sortMiddleware(
-                                    $priorityMap, array_values($this->moveMiddleware($middlewares, $index, $lastIndex))
+                        $priorityMap,
+                        array_values($this->moveMiddleware($middlewares, $index, $lastIndex))
                     );
                 }
 
@@ -66,8 +68,9 @@ class CMiddleware_SortedMiddleware extends CCollection {
     /**
      * Calculate the priority map index of the middleware.
      *
-     * @param  array  $priorityMap
-     * @param  string  $middleware
+     * @param array  $priorityMap
+     * @param string $middleware
+     *
      * @return int|null
      */
     protected function priorityMapIndex($priorityMap, $middleware) {
@@ -83,7 +86,8 @@ class CMiddleware_SortedMiddleware extends CCollection {
     /**
      * Resolve the middleware names to look for in the priority array.
      *
-     * @param  string  $middleware
+     * @param string $middleware
+     *
      * @return \Generator
      */
     protected function middlewareNames($middleware) {
@@ -103,9 +107,10 @@ class CMiddleware_SortedMiddleware extends CCollection {
     /**
      * Splice a middleware into a new position and remove the old entry.
      *
-     * @param  array  $middlewares
-     * @param  int  $from
-     * @param  int  $to
+     * @param array $middlewares
+     * @param int   $from
+     * @param int   $to
+     *
      * @return array
      */
     protected function moveMiddleware($middlewares, $from, $to) {
@@ -115,5 +120,4 @@ class CMiddleware_SortedMiddleware extends CCollection {
 
         return $middlewares;
     }
-
 }
