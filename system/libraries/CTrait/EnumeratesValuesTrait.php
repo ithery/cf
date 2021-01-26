@@ -1,4 +1,3 @@
-
 <?php
 
 use Symfony\Component\VarDumper\VarDumper;
@@ -104,7 +103,7 @@ trait CTrait_EnumeratesValuesTrait {
      *
      * @return static
      */
-    public static function empty() {
+    public static function createEmpty() {
         return new static([]);
     }
 
@@ -161,7 +160,7 @@ trait CTrait_EnumeratesValuesTrait {
     public function containsStrict($key, $value = null) {
         if (func_num_args() === 2) {
             return $this->contains(function ($item) use ($key, $value) {
-                return CF::get($item, $key) === $value;
+                return c::get($item, $key) === $value;
             });
         }
 
@@ -580,7 +579,7 @@ trait CTrait_EnumeratesValuesTrait {
         $values = $this->getArrayableItems($values);
 
         return $this->filter(function ($item) use ($key, $values, $strict) {
-            return in_array(CF::get($item, $key), $values, $strict);
+            return in_array(c::get($item, $key), $values, $strict);
         });
     }
 
@@ -618,7 +617,7 @@ trait CTrait_EnumeratesValuesTrait {
      */
     public function whereNotBetween($key, $values) {
         return $this->filter(function ($item) use ($key, $values) {
-            return CF::get($item, $key) < reset($values) || CF::get($item, $key) > end($values);
+            return c::get($item, $key) < reset($values) || c::get($item, $key) > end($values);
         });
     }
 
@@ -635,7 +634,7 @@ trait CTrait_EnumeratesValuesTrait {
         $values = $this->getArrayableItems($values);
 
         return $this->reject(function ($item) use ($key, $values, $strict) {
-            return in_array(CF::get($item, $key), $values, $strict);
+            return in_array(c::get($item, $key), $values, $strict);
         });
     }
 
@@ -931,7 +930,7 @@ trait CTrait_EnumeratesValuesTrait {
         }
 
         return function ($item) use ($key, $operator, $value) {
-            $retrieved = CF::get($item, $key);
+            $retrieved = c::get($item, $key);
 
             $strings = array_filter([$retrieved, $value], function ($value) {
                 return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
@@ -989,7 +988,7 @@ trait CTrait_EnumeratesValuesTrait {
         }
 
         return function ($item) use ($value) {
-            return CF::get($item, $value);
+            return c::get($item, $value);
         };
     }
 
