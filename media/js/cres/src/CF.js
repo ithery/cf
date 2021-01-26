@@ -10,21 +10,20 @@ export default class CF {
         this.afterInitCallback = [];
         this.config = window.capp;
         if (this.config.cssUrl) {
-            this.config.cssUrl.forEach((item, index) => {
+            this.config.cssUrl.forEach((item) => {
                 this.required.push(item);
             });
         }
         if (this.config.jsUrl) {
-            this.config.jsUrl.forEach((item, index) => {
+            this.config.jsUrl.forEach((item) => {
                 this.required.push(item);
             });
         }
-
     }
 
     debug(msg) {
         if (this.getConfig().debug) {
-            console.log(msg);
+            window.console.log(msg);
         }
     }
 
@@ -53,13 +52,13 @@ export default class CF {
         if (!~this.cssRequired.indexOf(url)) {
             this.cssRequired.push(url);
             if (document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null) {
-                return
+                return;
             }
-            var string = "<link rel='stylesheet' type='text/css' href='" + url + "' />";
-            if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/ ) && !!window.CanvasRenderingContext2D && self === parent) {
+            let string = '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + url + '\' />';
+            if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
                 document.write(string);
             } else {
-                var el;
+                let el;
                 el = this.document.createElement('link');
                 el.rel = 'stylesheet';
                 el.type = 'text/css';
@@ -71,28 +70,25 @@ export default class CF {
                         if (this.readyState == 'complete') {
                             callback();
                         }
-                    }
+                    };
                 }
                 this.head.appendChild(el);
             }
-        } else {
-            if (typeof (callback) === 'function') {
-                callback();
-            }
+        } else if (typeof (callback) === 'function') {
+            callback();
         }
     }
     requireJs(url, callback) {
         if (!~this.required.indexOf(url)) {
             this.required.push(url);
             if (document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null) {
-                return
+                return;
             }
-            var string = "<script type='text/javascript'  src='" + url + "'></script>";
-            if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/ ) && !!window.CanvasRenderingContext2D && self === parent) {
+            let string = '<script type=\'text/javascript\'  src=\'' + url + '\'></script>';
+            if ((document.readyState === 'loading' /* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
                 document.write(string);
             } else {
-
-                var el;
+                let el;
                 el = this.document.createElement('script');
                 el.src = url;
                 el.setAttribute('type', 'text/javascript');
@@ -103,19 +99,16 @@ export default class CF {
                         if (this.readyState == 'complete') {
                             callback();
                         }
-                    }
+                    };
                 }
                 this.body.appendChild(el);
             }
-        } else {
-            if (typeof (callback) === 'function') {
-                callback();
-            }
+        } else if (typeof (callback) === 'function') {
+            callback();
         }
     }
     require(url, callback) {
-
-        if (typeof url != "string") {
+        if (typeof url != 'string') {
             url = url[0];
         }
 
@@ -123,10 +116,10 @@ export default class CF {
             return;
         }
 
-        var toPush = url.trim();
-        var t = 'js';
+        let toPush = url.trim();
+        let t = 'js';
 
-        var urlObject = new URL(toPush, document.baseURI);
+        let urlObject = new URL(toPush, document.baseURI);
         if (urlObject) {
             t = urlObject.pathname.split('.').pop();
         }
@@ -137,15 +130,13 @@ export default class CF {
         if (t == 'css') {
             this.requireCss(toPush, callback);
         }
-
-    };
+    }
 
     loadJQuery(callback) {
-
         if (typeof jQuery == 'undefined') {
-            var fileref = this.document.createElement('script');
-            fileref.setAttribute("type", "text/javascript");
-            fileref.setAttribute("src", this.getConfig().defaultJQueryUrl);
+            let fileref = this.document.createElement('script');
+            fileref.setAttribute('type', 'text/javascript');
+            fileref.setAttribute('src', this.getConfig().defaultJQueryUrl);
             // IE 6 & 7
             if (typeof (callback) === 'function') {
                 fileref.onload = callback;
@@ -153,7 +144,7 @@ export default class CF {
                     if (this.readyState == 'complete') {
                         callback();
                     }
-                }
+                };
             }
             this.head.appendChild(fileref);
         } else {
@@ -162,7 +153,8 @@ export default class CF {
     }
 
     init() {
-        var arrayJsUrl = this.getConfig().jsUrl;
+        let arrayJsUrl = this.getConfig().jsUrl;
+        let arrayCssUrl = this.getConfig().cssUrl;
         this.beforeInitCallback.forEach(function (item) {
             item();
         });

@@ -5,18 +5,18 @@ export default class Url {
     addQueryString(url, key, value) {
         key = encodeURI(key);
         value = encodeURI(value);
-        var urlArray = url.split('?');
-        var queryString = '';
-        var baseUrl = urlArray[0];
+        let urlArray = url.split('?');
+        let queryString = '';
+        let baseUrl = urlArray[0];
         if (urlArray.length > 1) {
             queryString = urlArray[1];
         }
-        var kvp = queryString.split('&');
-        var i = kvp.length;
-        var x;
+        let kvp = queryString.split('&');
+        let i = kvp.length;
+        let x;
         while (i--) {
             x = kvp[i].split('=');
-            if (x[0] == key) {
+            if (x[0] === key) {
                 x[1] = value;
                 kvp[i] = x.join('=');
                 break;
@@ -28,22 +28,21 @@ export default class Url {
         }
 
         queryString = kvp.join('&');
-        if (queryString.substr(0, 1) == '&')
-            queryString = queryString.substr(1);
+        if (queryString.substr(0, 1) === '&') {queryString = queryString.substr(1);}
         return baseUrl + '?' + queryString;
-    };
+    }
     replaceParam(url) {
-        var available = true;
+        let available = true;
         while (available) {
-            var matches = url.match(/{([\w]*)}/);
-            if (matches != null) {
-                var key = matches[1];
-                var val = null;
+            let matches = url.match(/{([\w]*)}/);
+            if (matches !== null) {
+                let key = matches[1];
+                let val = null;
                 if ($('#' + key).length > 0) {
-                    var val = cresenity.value('#' + key);
+                    val = window.cresenity.value('#' + key);
                 }
 
-                if (val == null) {
+                if (val === null) {
                     val = key;
                 }
 
@@ -51,7 +50,6 @@ export default class Url {
             } else {
                 available = false;
             }
-
         }
         return url;
     }

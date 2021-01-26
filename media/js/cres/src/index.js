@@ -1,18 +1,20 @@
-
+// eslint-disable-next-line no-extend-native
 String.prototype.contains = function (a) {
     return !!~this.indexOf(a);
 };
+
+// eslint-disable-next-line no-extend-native
 String.prototype.toNumber = function () {
-    var n = parseFloat(this);
+    let n = parseFloat(this);
     if (!isNaN(n)) {
         return n;
-    } else {
-        return 0;
     }
-}
+    return 0;
+};
 
-import "./index.css";
-import Cresenity from '@/Cresenity'
 
+import './index.css';
+import Cresenity from '@/Cresenity';
 
 window.Cresenity = Cresenity;
+window.cresenity = new Cresenity();
