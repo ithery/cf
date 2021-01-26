@@ -1,23 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 1:06:35 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 1:06:35 PM
  */
 class CCache {
-
     /**
-     *
      * @var CCache_Repository[]
      */
     protected $repository;
 
     /**
-     * 
-     * @param array $options
+     * @param null|mixed $name
+     *
      * @return CCache_Repository
      */
     public static function repository($name = null) {
@@ -27,7 +26,6 @@ class CCache {
             $instanceKey = carr::hash($options);
         }
         if (!isset(self::$repository[$instanceKey])) {
-
             self::$repository[$instanceKey] = new CCache_Repository($options);
         }
         return self::$repository[$instanceKey];
@@ -47,12 +45,10 @@ class CCache {
             $options = $config->get($name);
         }
 
-
-        $defaultOptions = array(
+        $defaultOptions = [
             'driver' => 'array',
-        );
+        ];
 
         return $options ? $options : $defaultOptions;
     }
-
 }

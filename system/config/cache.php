@@ -1,6 +1,6 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @package  Cache
  *
@@ -25,7 +25,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
  *             caches are deleted. This is commonly referred to as "garbage collection".
  *             Setting this to 0 or a negative number will disable automatic garbage collection.
  */
-return array(
+return [
     'default' => 'file',
     'stores' => [
         'apc' => [
@@ -52,7 +52,7 @@ return array(
                 c::env('MEMCACHED_PASSWORD'),
             ],
             'options' => [
-            // Memcached::OPT_CONNECT_TIMEOUT => 2000,
+                // Memcached::OPT_CONNECT_TIMEOUT => 2000,
             ],
             'servers' => [
                 [
@@ -75,4 +75,4 @@ return array(
             'endpoint' => c::env('DYNAMODB_ENDPOINT'),
         ],
     ],
-);
+];
