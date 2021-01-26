@@ -10,7 +10,8 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 
 class CHTTP_Kernel {
-    use CHTTP_Trait_OutputBufferTrait;
+    use CHTTP_Trait_OutputBufferTrait,
+        CHTTP_Concern_KernelRouting;
 
     protected $isHandled = false;
 
