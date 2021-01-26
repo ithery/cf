@@ -9,8 +9,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Jul 21, 2019, 3:39:27 AM
  */
 trait CModel_Resource_ResourceTrait {
-    const TYPE_OTHER = 'other';
-
     public static function bootResourceTrait() {
         static::observe(new CModel_Resource_ResourceObserver());
     }
