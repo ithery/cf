@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CRouting_Event_RouteMatched {
-
     /**
      * The route instance.
      *
@@ -24,13 +23,13 @@ class CRouting_Event_RouteMatched {
     /**
      * Create a new event instance.
      *
-     * @param  CRouting_Route  $route
-     * @param  CHTTP_Request  $request
+     * @param CRouting_Route $route
+     * @param CHTTP_Request  $request
+     *
      * @return void
      */
     public function __construct($route, $request) {
         $this->route = $route;
         $this->request = $request;
     }
-
 }

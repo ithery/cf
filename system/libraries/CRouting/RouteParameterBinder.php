@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CRouting_RouteParameterBinder {
-
     /**
      * The route instance.
      *
@@ -17,7 +16,8 @@ class CRouting_RouteParameterBinder {
     /**
      * Create a new Route parameter binder instance.
      *
-     * @param  CRouting_Route  $route
+     * @param CRouting_Route $route
+     *
      * @return void
      */
     public function __construct($route) {
@@ -27,7 +27,8 @@ class CRouting_RouteParameterBinder {
     /**
      * Get the parameters for the route.
      *
-     * @param  CHTTP_Request  $request
+     * @param CHTTP_Request $request
+     *
      * @return array
      */
     public function parameters($request) {
@@ -38,7 +39,8 @@ class CRouting_RouteParameterBinder {
         // merge them into this parameters array so that this array is completed.
         if (!is_null($this->route->compiled->getHostRegex())) {
             $parameters = $this->bindHostParameters(
-                    $request, $parameters
+                $request,
+                $parameters
             );
         }
 
@@ -48,7 +50,8 @@ class CRouting_RouteParameterBinder {
     /**
      * Get the parameter matches for the path portion of the URI.
      *
-     * @param  CHTTP_Request  $request
+     * @param CHTTP_Request $request
+     *
      * @return array
      */
     protected function bindPathParameters($request) {
@@ -62,8 +65,9 @@ class CRouting_RouteParameterBinder {
     /**
      * Extract the parameter list from the host part of the request.
      *
-     * @param  CHTTP_Request  $request
-     * @param  array  $parameters
+     * @param CHTTP_Request $request
+     * @param array         $parameters
+     *
      * @return array
      */
     protected function bindHostParameters($request, $parameters) {
@@ -75,7 +79,8 @@ class CRouting_RouteParameterBinder {
     /**
      * Combine a set of parameter matches with the route's keys.
      *
-     * @param  array  $matches
+     * @param array $matches
+     *
      * @return array
      */
     protected function matchToKeys(array $matches) {
@@ -93,7 +98,8 @@ class CRouting_RouteParameterBinder {
     /**
      * Replace null parameters with their defaults.
      *
-     * @param  array  $parameters
+     * @param array $parameters
+     *
      * @return array
      */
     protected function replaceDefaults(array $parameters) {
@@ -109,5 +115,4 @@ class CRouting_RouteParameterBinder {
 
         return $parameters;
     }
-
 }

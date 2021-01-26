@@ -707,7 +707,6 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      * @return array
      */
     public function gatherRouteMiddleware(CRouting_Route $route) {
-
         $excluded = c::collect($route->excludedMiddleware())->map(function ($name) {
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->values()->all();
@@ -731,7 +730,6 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
                 return class_exists($exclude) && $reflection->isSubclassOf($exclude);
             });
         })->values();
-
 
         return $this->sortMiddleware($middleware);
     }

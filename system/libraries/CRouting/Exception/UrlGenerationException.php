@@ -4,7 +4,7 @@ class CRouting_Exception_UrlGenerationException extends Exception {
     /**
      * Create a new exception for missing route parameters.
      *
-     * @param \Illuminate\Routing\Route $route
+     * @param CRouting_Route $route
      *
      * @return static
      */
