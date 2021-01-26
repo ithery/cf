@@ -1,28 +1,35 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 28, 2019, 9:37:29 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 28, 2019, 9:37:29 PM
  */
 class CModel_Search_SearchResult {
-
-    /** @var \Spatie\Searchable\Searchable */
+    /**
+     * @var CModel_SearchableInterface
+     */
     public $searchable;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     public $title;
 
-    /** @var null|string */
+    /**
+     * @var null|string
+     */
     public $url;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     public $type;
 
     public function __construct($searchable, $title, $url = null) {
-
         $this->searchable = $searchable;
         $this->title = $title;
         $this->url = $url;
@@ -32,5 +39,4 @@ class CModel_Search_SearchResult {
         $this->type = $type;
         return $this;
     }
-
 }

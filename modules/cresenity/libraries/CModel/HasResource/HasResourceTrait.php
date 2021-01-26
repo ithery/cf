@@ -131,7 +131,7 @@ trait CModel_HasResource_HasResourceTrait {
         $file = CModel_HasResource_FileAdder_FileAdderFactory::create($this, $temporaryFile)
             ->usingName(pathinfo($filename, PATHINFO_FILENAME))
             ->usingFileName($filename);
-        ;
+
         return $file;
     }
 
@@ -292,6 +292,7 @@ trait CModel_HasResource_HasResourceTrait {
             ->map(function (array $newResourceItem) use ($collectionName) {
                 static $orderColumn = 1;
                 $resourceClass = CF::config('resource.resource_model');
+                /** @var CApp_Model_Interface_ResourceInterface|CModel $resourceClass */
                 $currentResource = $resourceClass::findOrFail($newResourceItem['id']);
                 if ($currentResource->collection_name !== $collectionName) {
                     throw CResources_Exception_ResourceCannotBeUpdated::doesNotBelongToCollection($collectionName, $currentResource);
@@ -474,7 +475,7 @@ trait CModel_HasResource_HasResourceTrait {
             ['file' => 'mimetypes:' . implode(',', $allowedMimeTypes)]
         );
         if ($validation->fails()) {
-            throw MimeTypeNotAllowed::create($file, $allowedMimeTypes);
+            throw CResources_Exception_FileCannotBeAdded_MimeTypeNotAllowed::create($file, $allowedMimeTypes);
         }
     }
 

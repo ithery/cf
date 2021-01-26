@@ -2,18 +2,25 @@
 
 interface CResources_UrlGeneratorInterface {
     /**
-     * Get the url for a media item.
+     * Get the url for a resource item.
      *
      * @return string
      */
     public function getUrl();
 
     /**
+     * Get the path for a resource item.
+     *
+     * @return string
+     */
+    public function getPath();
+
+    /**
      * @param CApp_Model_Interface_ResourceInterface $resource
      *
      * @return CResources_UrlGeneratorInterface
      */
-    public function setResource(CApp_Model_Interface_ResourceInterface $media);
+    public function setResource(CApp_Model_Interface_ResourceInterface $resource);
 
     /**
      * @param CResources_Conversion $conversion
