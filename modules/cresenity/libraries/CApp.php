@@ -43,8 +43,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     public static $instance = null;
 
-    private $header_body = '';
-
     private $additional_head = '';
 
     private $ajaxData = [];

@@ -11,6 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CApp_Trait_App_Renderer {
     protected $rendered = false;
+
     protected $viewData = null;
 
     public function renderContent($options = []) {
@@ -154,8 +155,6 @@ HTML;
             $this->js = $this->element->js();
 
             $viewData['content'] = $this->content;
-            $viewData['header_body'] = $this->header_body;
-            $viewData['headerBody'] = $this->header_body;
 
             $viewData['title'] = $this->title;
             $viewData['pageTitle'] = $this->title;
@@ -216,6 +215,11 @@ HTML;
             $viewData['custom_data'] = $this->custom_data;
             $viewData['login_required'] = $this->loginRequired;
             $viewData['loginRequired'] = $this->loginRequired;
+
+            //deprecated view data
+            $viewData['header_body'] = '';
+            $viewData['headerBody'] = '';
+
             $this->viewData = $viewData;
         }
         return $this->viewData;

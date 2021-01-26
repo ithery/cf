@@ -208,5 +208,44 @@ trait CTrait_Compat_App {
     public function is_member_login() {
         return $this->member() != null;
     }
+
+    /**
+     * Undocumented function
+     *
+     * @param [type] $str
+     *
+     * @return void
+     *
+     * @deprecated 1.1
+     */
+    public function set_additional_head($str) {
+        $this->additional_head = $str;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return void
+     *
+     * @deprecated 1.1
+     */
+    public function get_all_js() {
+        $cs = CClientScript::instance();
+        $this->js = parent::js();
+        $additional_js = '';
+        $js = '';
+        $vjs = CView::factory('ccore/js');
+        $js .= PHP_EOL . $vjs->render();
+
+        $js .= PHP_EOL . $this->js . $additional_js;
+
+        $js = $cs->renderJsRequire($js);
+
+        if (ccfg::get('minify_js')) {
+            $js = CJSMin::minify($js);
+        }
+
+        return $js;
+    }
 }
 //@codingStandardsIgnoreEnd
