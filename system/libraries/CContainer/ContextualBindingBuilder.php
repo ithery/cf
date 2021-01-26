@@ -4,9 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2019, 4:48:43 AM
  */
 class CContainer_ContextualBindingBuilder implements CContainer_ContextualBindingBuilderInterface {
     /**
