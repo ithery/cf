@@ -1,7 +1,6 @@
 import Base64 from './module/Base64';
 import Url from './module/Url';
 
-import Util from './module/Util';
 import CF from './CF';
 import ScrollToTop from './module/ScrollToTop';
 import CUI from './cui';
@@ -150,7 +149,6 @@ export default class Cresenity {
             } else {
                 this.blockElement($(element));
             }
-            window.console.log(element);
             $(element).data('xhr', $.ajax({
                 type: method,
                 url: url,
@@ -906,7 +904,20 @@ export default class Cresenity {
             });
         });
     }
-
+    initReload() {
+        let reloadInitialized = $('body').attr('data-reload-initialized');
+        if (!reloadInitialized) {
+            $('.capp-reload').each((idx, item) => {
+                if(!$(item).hasClass('capp-reloaded')) {
+                    let reloadOptions = {};
+                    reloadOptions.selector = $(item);
+                    this.reload(reloadOptions);
+                    $(item).addClass('capp-reloaded');
+                }
+            });
+            $('body').attr('data-reload-initialized', '1');
+        }
+    }
     init() {
         this.cf.onBeforeInit(() => {
             this.normalizeRequireJs();
@@ -918,6 +929,7 @@ export default class Cresenity {
                 }
             }
             this.initConfirm();
+            this.initReload();
         });
 
 
