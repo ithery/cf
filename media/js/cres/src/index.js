@@ -17,4 +17,7 @@ import './index.css';
 import Cresenity from '@/Cresenity';
 
 window.Cresenity = Cresenity;
-window.cresenity = new Cresenity();
+if (!window.cresenity) {
+    window.cresenity = new Cresenity();
+    window.cresenity.init();
+}

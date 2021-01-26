@@ -32,7 +32,7 @@ export default class Cresenity {
         // IE 6 & 7
         if (typeof (callback) === 'function') {
             fileref.onload = callback;
-            fileref.onreadystatechange = function () {
+            fileref.onreadystatechange = () => {
                 if (this.readyState === 'complete') {
                     callback();
                 }
@@ -102,7 +102,8 @@ export default class Cresenity {
                 targetOptions.dataAddition = JSON.parse(target.attr('data-data-addition'));
             }
         }
-        let settings = Util.extend({
+
+        let settings = $.extend({
             // These are the defaults.
             method: 'get',
             dataAddition: {},
@@ -149,7 +150,7 @@ export default class Cresenity {
             } else {
                 this.blockElement($(element));
             }
-
+            window.console.log(element);
             $(element).data('xhr', $.ajax({
                 type: method,
                 url: url,
@@ -157,7 +158,7 @@ export default class Cresenity {
                 data: dataAddition,
                 success: (data) => {
                     this.doCallback('onReloadSuccess', data);
-                    this.handleResponse(data, function () {
+                    this.handleResponse(data, () => {
                         switch (settings.reloadType) {
                             case 'after':
                                 $(element).after(data.html);
@@ -398,8 +399,8 @@ export default class Cresenity {
             type: settings.method,
 
             success: (response) => {
-                let onSuccess = function () {};
-                let onError = function (errMessage) {
+                let onSuccess = () => {};
+                let onError = (errMessage) => {
                     this.showError(errMessage);
                 };
                 if (typeof settings.onSuccess === 'function' && validationIsValid) {
@@ -458,8 +459,8 @@ export default class Cresenity {
                     return true;
                 },
                 success: (response) => {
-                    let onSuccess = function () {};
-                    let onError = function (errMessage) {
+                    let onSuccess = () => {};
+                    let onError = (errMessage) => {
                         this.showError(errMessage);
                     };
 
@@ -601,10 +602,10 @@ export default class Cresenity {
             if (window.getComputedStyle) {
                 // convenience methods to turn css case ('background-image') to camel ('backgroundImage')
                 let pattern = /\-([a-z])/g;
-                let uc = function (a, b) {
+                let uc = (a, b) => {
                     return b.toUpperCase();
                 };
-                let camelize = function (string) {
+                let camelize = (string) => {
                     return string.replace(pattern, uc);
                 };
 
@@ -717,7 +718,7 @@ export default class Cresenity {
         newElement.css(styles);
         if (depth === 0) {
             newElement.addClass('capp-ph-item');
-            newElement.attr('style', function (i, s) {
+            newElement.attr('style', (i, s) => {
                 return (s || '') + 'margin: 0 !important;';
             });
         }
@@ -827,7 +828,7 @@ export default class Cresenity {
                 window.bootbox.confirm({
                     className: 'capp-modal-confirm',
                     message: message,
-                    callback: function (confirmed) {
+                    callback: (confirmed) => {
                         if (confirmed) {
                             if (ahref) {
                                 window.location.href = ahref;
@@ -839,7 +840,7 @@ export default class Cresenity {
                         } else {
                             btn.removeAttr('data-clicked');
                         }
-                        setTimeout(function () {
+                        setTimeout(() => {
                             let modalExists = $('.modal:visible').length > 0;
                             if (!modalExists) {
                                 $('body').removeClass('modal-open');
@@ -875,7 +876,7 @@ export default class Cresenity {
                 window.bootbox.confirm({
                     className: 'capp-modal-confirm',
                     message: message,
-                    callback: function (confirmed) {
+                    callback: (confirmed) => {
                         if (confirmed) {
                             jQuery(e.target).closest('form').submit();
                         } else {
@@ -889,8 +890,8 @@ export default class Cresenity {
             });
             $('body').attr('data-confirm-submit-initialized', '1');
         }
-        jQuery(document).ready(function () {
-            jQuery('#toggle-subnavbar').click(function () {
+        jQuery(document).ready(() => {
+            jQuery('#toggle-subnavbar').click(() =>{
                 let cmd = jQuery('#toggle-subnavbar span').html();
                 if (cmd === 'Hide') {
                     jQuery('#subnavbar').slideUp('slow');
@@ -900,22 +901,12 @@ export default class Cresenity {
                     jQuery('#toggle-subnavbar span').html('Hide');
                 }
             });
-            jQuery('#toggle-fullscreen').click(function () {
+            jQuery('#toggle-fullscreen').click(() => {
                 $.cresenity.fullscreen(document.documentElement);
             });
         });
     }
 
-    initClock() {
-        if (this.cf.getConfig().haveClock) {
-            $(document).ready(function () {
-                $('#servertime').serverTime({
-                    ajaxFile: window.capp.base_url + 'cresenity/server_time',
-                    displayDateFormat: 'yyyy-mm-dd HH:MM:ss'
-                });
-            });
-        }
-    }
     init() {
         this.cf.onBeforeInit(() => {
             this.normalizeRequireJs();
@@ -973,7 +964,7 @@ export default class Cresenity {
             dataType: 'json',
             data: dataAddition,
             success: (response) => {
-                this.handleJsonResponse(response, function (data) {
+                this.handleJsonResponse(response, (data) => {
                     let progressUrl = data.progressUrl;
                     let progressContainer = $('<div>').addClass('progress-container');
 
@@ -983,7 +974,7 @@ export default class Cresenity {
                             url: progressUrl,
                             dataType: 'json',
                             success: (responseProgress) => {
-                                this.handleJsonResponse(responseProgress, function (dataProgress) {
+                                this.handleJsonResponse(responseProgress, (dataProgress) => {
                                     if (data.state === 'DONE') {
                                         progressContainer.find('.progress-container-status').empty();
                                         let innerStatus = $('<div>');
