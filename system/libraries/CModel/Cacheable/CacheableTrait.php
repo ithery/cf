@@ -190,7 +190,7 @@ trait CModel_Cacheable_CacheableTrait {
         // We will append the names of the class to the event to distinguish it from
         // other model events that are fired, allowing us to listen on each model
         // event set individually instead of catching event for all the models.
-        $event = "eloquent.{$event}: " . static::class;
+        $event = "model.{$event}: " . static::class;
         $method = $halt ? 'until' : 'dispatch';
         return static::$dispatcher->{$method}($event, static::class);
     }
@@ -264,7 +264,7 @@ trait CModel_Cacheable_CacheableTrait {
             app('cache')->setDefaultDriver($driver);
         }
         // We need cache tags, check if default driver supports it
-        
+
         if (method_exists(app('cache')->getStore(), 'tags')) {
             $result = $lifetime === -1 ? app('cache')->tags($modelName)->rememberForever($cacheKey, $closure) : app('cache')->tags($modelName)->remember($cacheKey, $lifetime, $closure);
             return $result;

@@ -4,7 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use Dompdf\Dompdf;
 
-class CDOMPDF extends DOMPDF {
+class CDOMPDF extends Dompdf {
 
     public function __construct() {
         parent::__construct();

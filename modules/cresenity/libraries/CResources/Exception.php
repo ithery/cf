@@ -1,5 +1,4 @@
 <?php
 
-class CResources_Exception extends CException {
-    
+class CResources_Exception extends Exception {
 }

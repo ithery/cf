@@ -1,135 +1,166 @@
 <?php
-
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+    //@codingStandardsIgnoreStart
 
 trait CTrait_Compat_Manager {
-
     /**
-     * 
-     * @deprecated plase use registerControl
      * @param type $type
      * @param type $class
      * @param type $code_path
+     *
      * @return $this
+     *
+     * @deprecated plase use registerControl
      */
     public function register_control($type, $class, $code_path = '') {
         return $this->registerControl($type, $class, $code_path);
     }
 
     /**
-     * 
-     * @deprecated plase use registerElement
      * @param type $type
      * @param type $class
      * @param type $code_path
+     *
      * @return $this
+     *
+     * @deprecated plase use registerElement
      */
     public function register_element($type, $class, $code_path = '') {
         return $this->registerElement($type, $class, $code_path);
     }
 
     /**
-     * 
-     * @deprecated plase use isRegisteredControl
      * @param string $type Type of control to check
+     *
      * @return boolean
+     *
+     * @deprecated plase use isRegisteredControl
      */
     public function is_registered_control($type) {
         return $this->isRegisteredControl($type);
     }
 
     /**
-     * 
-     * @deprecated plase use getRegisteredControl
      * @return array
+     *
+     * @deprecated plase use getRegisteredControl
      */
     public function get_registered_controls() {
         return $this->getRegisteredControl();
     }
 
     /**
-     * 
-     * @deprecated plase use isRegisteredElement
      * @param string $type Type of element to check
+     *
      * @return boolean
+     *
+     * @deprecated plase use isRegisteredElement
      */
     public function is_registered_element($type) {
         return $this->isRegisteredElement($type);
     }
 
     /**
-     * 
-     * @deprecated plase use createControl
      * @param string $id
      * @param string $type
+     *
      * @return CElement_FormInput
+     *
      * @throws CException
+     *
+     * @deprecated plase use createControl
      */
     public function create_control($id, $type) {
         return $this->createControl($id, $type);
     }
 
     /**
-     * 
-     * @deprecated plase use createElement
      * @param string $id
      * @param string $type
+     *
      * @return CElement_Element
+     *
      * @throws CException
+     *
+     * @deprecated plase use createElement
      */
     public function create_element($id, $type) {
         return $this->createElement($id, $type);
     }
 
     /**
-     * 
-     * @deprecated plase use setMobilePath
      * @param type $path
+     *
      * @return $this
+     *
+     * @deprecated plase use setMobilePath
      */
     public function set_mobile_path($path) {
         return $this->setMobilePath($path);
     }
 
     /**
-     * 
-     * @deprecated plase use getMobilePath
      * @return this
+     *
+     * @deprecated plase use getMobilePath
      */
     public function get_mobile_path() {
         return $this->getMobilePath();
     }
 
     /**
-     * 
-     * @deprecated plase use isMobile
      * @return this
+     *
+     * @deprecated plase use isMobile
      */
     public function is_mobile() {
         return $this->isMobile();
     }
 
     /**
-     * 
-     * @deprecated plase use isMobile
      * @return array
+     *
+     * @deprecated plase use isMobile
      */
     public function get_theme_data() {
         return $this->getThemeData();
     }
 
     /**
-     * 
-     * @deprecated plase use isMobile
      * @param array $theme_data
+     *
      * @return $this
+     *
+     * @deprecated plase use isMobile
      */
     public function set_theme_data($theme_data) {
         return $this->setThemeData($theme_data);
     }
 
+    /**
+     * Backward compatibility of registerModule
+     *
+     * @param string $module
+     * @param array  $data   optional
+     *
+     * @return boolean
+     *
+     * @deprecated 1.1
+     */
+    public static function register_module($module, $data = []) {
+        return self::registerModule($module, $data);
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @param string $module
+     *
+     * @return void
+     *
+     * @deprecated 1.1
+     */
+    public static function unregister_module($module) {
+        return CClientModules::instance()->unregisterModule($module);
+    }
 }
+ //@codingStandardsIgnoreEnd

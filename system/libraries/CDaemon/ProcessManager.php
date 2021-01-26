@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 16, 2019, 11:59:56 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 16, 2019, 11:59:56 AM
  */
 class CDaemon_ProcessManager {
-
     /**
      * The length (in seconds) of the rolling window used to detect process churn
      */
@@ -27,13 +27,14 @@ class CDaemon_ProcessManager {
     /**
      * @var CDaemon_Process[]
      */
-    public $processes = array();
+    public $processes = [];
 
     /**
      * Array of failed forks -- reaped within in expected_min_ttl
-     * @var Array   Numeric key, the value is the time the failure occurred
+     *
+     * @var array Numeric key, the value is the time the failure occurred
      */
-    private $failures = array();
+    private $failures = [];
 
     public function __construct(CDaemon_ServiceAbstract $service) {
         $this->service = $service;
@@ -45,14 +46,16 @@ class CDaemon_ProcessManager {
 
     /**
      * Called on Construct or Init
+     *
      * @return void
      */
     public function setup() {
-        $this->service->on(CDaemon_ServiceAbstract::ON_IDLE, array($this, 'reap'), 30);
+        $this->service->on(CDaemon_ServiceAbstract::ON_IDLE, [$this, 'reap'], 30);
     }
 
     /**
      * Called on Destruct
+     *
      * @return void
      */
     public function teardown() {
@@ -73,7 +76,9 @@ class CDaemon_ProcessManager {
 
     /**
      * Return the number of processes, optional by $group
+     *
      * @param $group
+     *
      * @return int
      */
     public function count($group = null) {
@@ -94,7 +99,9 @@ class CDaemon_ProcessManager {
 
     /**
      * The $processes array is hierarchical by process group. This will return a flat array of processes.
+     *
      * @param null $group
+     *
      * @return CDaemon_Process[]
      */
     public function processes($group = null) {
@@ -102,11 +109,11 @@ class CDaemon_ProcessManager {
             if (isset($this->processes[$group])) {
                 return $this->processes[$group];
             } else {
-                return array();
+                return [];
             }
         }
         // List processes across all process groups
-        $list = array();
+        $list = [];
         foreach ($this->processes as $process_group) {
             $list += $process_group;
         }
@@ -115,7 +122,9 @@ class CDaemon_ProcessManager {
 
     /**
      * Return a single process by its pid
+     *
      * @param $pid
+     *
      * @return CDaemon_Process
      */
     public function process($pid) {
@@ -129,10 +138,12 @@ class CDaemon_ProcessManager {
 
     /**
      * Fork a new process, optionally within the supplied process $group.
+     *
      * @param null $group
-     * @return bool|CDaemon_Process    On failure, will return false. On success, a CDaemon_Process object will be
-     *         returned to the caller in the original (parent) process, and True will be returned to the caller in the
-     *         new (child) process.
+     *
+     * @return bool|CDaemon_Process On failure, will return false. On success, a CDaemon_Process object will be
+     *                              returned to the caller in the original (parent) process, and True will be returned to the caller in the
+     *                              new (child) process.
      */
     public function fork($group = null) {
         $pid = pcntl_fork();
@@ -151,7 +162,7 @@ class CDaemon_ProcessManager {
                 $proc->pid = $pid;
                 $proc->group = $group;
                 if (!isset($this->processes[$group])) {
-                    $this->processes[$group] = array();
+                    $this->processes[$group] = [];
                 }
                 $this->processes[$group][$pid] = $proc;
                 return $proc;
@@ -160,31 +171,36 @@ class CDaemon_ProcessManager {
 
     /**
      * Maintain the worker process map and notify the worker of an exited process.
-     * @param bool $block   When true, method will block waiting for an exit signal
+     *
+     * @param bool $block When true, method will block waiting for an exit signal
+     *
      * @return void
      */
     public function reap($block = false) {
         $map = $this->processes();
         while (true) {
-            $pid = pcntl_wait($status, ($block === true && $this->service->isParent()) ? NULL : WNOHANG);
+            $pid = pcntl_wait($status, ($block === true && $this->service->isParent()) ? null : WNOHANG);
             if (!$pid || !isset($map[$pid])) {
                 break;
             }
             $alias = $map[$pid]->group;
             $process = $this->processes[$alias][$pid];
-            $this->service->dispatch(CDaemon_Event::ON_REAP, array($process, $status));
+            $this->service->dispatch(CDaemon_Event::ON_REAP, [$process, $status]);
             unset($this->processes[$alias][$pid]);
             // Keep track of process churn -- failures within a processes min_ttl
             // If too many failures of new processes occur inside a given interval, that's a problem.
             // Raise a fatal error to prevent runaway process forking which can be very damaging to a server
-            if ($this->service->isShutdown() || $process->runtime() >= $process->min_ttl)
+            if ($this->service->isShutdown() || $process->runtime() >= $process->min_ttl) {
                 continue;
-            foreach ($this->failures as $key => $failure_time)
-                if ($failure_time + self::CHURN_WINDOW < time())
+            }
+            foreach ($this->failures as $key => $failure_time) {
+                if ($failure_time + self::CHURN_WINDOW < time()) {
                     unset($this->failures[$key]);
-            if (count($this->failures) > self::CHURN_LIMIT)
-                $this->service->fatal_error("Recently forked processes are continuously failing. See error log for additional details.");
+                }
+            }
+            if (count($this->failures) > self::CHURN_LIMIT) {
+                $this->service->fatalError('Recently forked processes are continuously failing. See error log for additional details.');
+            }
         }
     }
-
 }

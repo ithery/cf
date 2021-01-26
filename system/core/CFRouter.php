@@ -1,12 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class CFRouter {
-
-    protected static $routesRuntime = array();
+    protected static $routesRuntime = [];
     protected static $routes;
     public static $current_uri = '';
     public static $query_string = '';
@@ -20,38 +19,37 @@ class CFRouter {
     public static $controller_dir_ucfirst;
     public static $controller_path;
     public static $method = 'index';
-    public static $arguments = array();
-    public static $routeData = array();
+    public static $arguments = [];
+    public static $routeData = [];
 
     /**
      * CFRouter setup routine. Automatically called during CF setup process.
      *
-     * @return  void
+     * @return void
      */
     public static function setup() {
         self::resetup(self::$current_uri);
 
-        // Last chance to set routing before a 404 is triggered
-        CFEvent::run('system.post_routing');
-
-        if (self::$controller === NULL) {
+        if (self::$controller === null) {
             // No controller was found, so no page can be rendered
-            CFEvent::run('system.404');
+            CF::show404();
         }
     }
 
     /**
      * CFRouter get route data
      *
-     * @return  array
+     * @param null|mixed $uri
+     *
+     * @return array
      */
     public static function getRouteData($uri = null) {
         if (self::$routeData == null) {
-            self::$routeData = array();
+            self::$routeData = [];
         }
 
-        $currentUri = NULL;
-        $routes = NULL;
+        $currentUri = null;
+        $routes = null;
         if ($uri !== null) {
             $currentUri = $uri;
         }
@@ -63,32 +61,31 @@ class CFRouter {
         // Load routes
         $routesConfig = CF::config('routes');
         $routesRuntime = self::$routesRuntime;
-        $routes = array_merge($routesConfig, $routesRuntime);
+        $routes = carr::merge($routesConfig, $routesRuntime);
 
         // Default route status
-        $default_route = FALSE;
+        $default_route = false;
 
         if ($currentUri === '') {
             // Make sure the default route is set
-            if (!isset($routes['_default']))
+            if (!isset($routes['_default'])) {
                 throw new CException('Please set a default route in config/routes.php');
-
+            }
             // Use the default route when no segments exist
             $currentUri = $routes['_default'];
 
             // Default route is in use
-            $default_route = TRUE;
+            $default_route = true;
         }
 
         // Make sure the URL is not tainted with HTML characters
-        $currentUri = chtml::specialchars($currentUri, FALSE);
+        $currentUri = chtml::specialchars($currentUri, false);
 
         // Remove all dot-paths from the URI, they are not valid
         $currentUri = preg_replace('#\.[\s./]*/#', '', $currentUri);
 
-
         if (!isset(self::$routeData[$currentUri])) {
-            $data = array();
+            $data = [];
             $data['routesConfig'] = $routesConfig;
             $data['routesRuntime'] = $routesRuntime;
             $data['routes'] = $routes;
@@ -97,15 +94,14 @@ class CFRouter {
             $data['complete_uri'] = '';
             $data['routed_uri'] = '';
             $data['url_suffix'] = '';
-            $data['segments'] = NULL;
-            $data['rsegments'] = NULL;
-            $data['controller'] = NULL;
-            $data['controller_dir'] = NULL;
-            $data['controller_dir_ucfirst'] = NULL;
-            $data['controller_path'] = NULL;
+            $data['segments'] = null;
+            $data['rsegments'] = null;
+            $data['controller'] = null;
+            $data['controller_dir'] = null;
+            $data['controller_dir_ucfirst'] = null;
+            $data['controller_path'] = null;
             $data['method'] = 'index';
-            $data['arguments'] = array();
-
+            $data['arguments'] = [];
 
             if (!empty($_SERVER['QUERY_STRING'])) {
                 // Set the query string to the current query string
@@ -119,9 +115,9 @@ class CFRouter {
             $data['complete_uri'] = $data['current_uri'] . $data['query_string'];
 
             // Explode the segments by slashes
-            $data['segments'] = ($default_route === TRUE OR $data['segments'] === '') ? array() : explode('/', $data['segments']);
+            $data['segments'] = ($default_route === true or $data['segments'] === '') ? [] : explode('/', $data['segments']);
 
-            if ($default_route === FALSE AND count($data['routes']) > 1) {
+            if ($default_route === false and count($data['routes']) > 1) {
                 // Custom routing
                 $data['rsegments'] = self::routedUri($data['current_uri'], $data['routes']);
             }
@@ -137,7 +133,7 @@ class CFRouter {
             $controller_path_ucfirst = '';
             $c_dir = '';
             $c_dir_ucfirst = '';
-            $method_segment = NULL;
+            $method_segment = null;
 
             // Paths to search
             $paths = CF::paths();
@@ -148,21 +144,20 @@ class CFRouter {
                 $c_dir_ucfirst = strtolower($controller_path_ucfirst);
                 $controller_path .= $segment;
                 $controller_path_ucfirst .= ucfirst($segment);
-                $found = FALSE;
+                $found = false;
 
                 foreach ($paths as $dir) {
                     // Search within controllers only
                     $dir .= 'controllers' . DS;
 
-                    if (is_dir($dir . $controller_path) OR is_file($dir . $controller_path . EXT)) {
-
+                    if (is_dir($dir . $controller_path) or is_file($dir . $controller_path . EXT)) {
                         // Valid path
-                        $found = TRUE;
+                        $found = true;
 
                         // The controller must be a file that exists with the search path
                         if ($c = str_replace('\\', '/', realpath($dir . $controller_path . EXT))
-                                AND is_file($c)) {
-
+                            and is_file($c)
+                        ) {
                             // Set controller name
                             $data['controller'] = $segment;
 
@@ -185,7 +180,7 @@ class CFRouter {
                     //                                echo $c_dir .'<br/>';
                 }
 
-                if ($found === FALSE) {
+                if ($found === false) {
                     // Maximum depth has been reached, stop searching
                     break;
                 }
@@ -195,7 +190,7 @@ class CFRouter {
                 $controller_path_ucfirst .= '/';
             }
 
-            if ($method_segment !== NULL AND isset($data['rsegments'][$method_segment])) {
+            if ($method_segment !== null and isset($data['rsegments'][$method_segment])) {
                 // Set method
                 $data['method'] = $data['rsegments'][$method_segment];
 
@@ -210,15 +205,15 @@ class CFRouter {
     }
 
     /**
-     * 
-     * @param string $uri if null, using the current uri 
-     * 
+     * @param string $uri if null, using the current uri
+     *
      * @return void
      */
     public static function resetup($uri = null) {
         if ($uri !== null) {
             self::$current_uri = $uri;
         }
+
         if (strlen(self::$current_uri) == 0) {
             self::findUri();
         }
@@ -241,15 +236,16 @@ class CFRouter {
     }
 
     /**
-     * 
      * Attempts to determine the current URI using CLI, GET, PATH_INFO, ORIG_PATH_INFO, REQUEST_URI or PHP_SELF.
-     * 
+     *
      * @return string uri
      */
     public static function getUri() {
+        if (CF::isTesting()) {
+            return ltrim(c::url()->getRequest()->path(), '/');
+        }
         $currentUri = '';
         if (PHP_SAPI === 'cli') {
-
             if (defined('CFCLI')) {
                 $currentUri = '';
             } else {
@@ -258,8 +254,8 @@ class CFRouter {
                     $currentUri = $_SERVER['argv'][1];
 
                     // Remove GET string from segments
-                    if (($query = strpos($currentUri, '?')) !== FALSE) {
-                        list ($currentUri, $query) = explode('?', $currentUri, 2);
+                    if (($query = strpos($currentUri, '?')) !== false) {
+                        list($currentUri, $query) = explode('?', $currentUri, 2);
 
                         // Parse the query string into $_GET
                         parse_str($query, $_GET);
@@ -270,7 +266,6 @@ class CFRouter {
                 }
             }
         } elseif (isset($_GET['cfUri'])) {
-
             // Use the URI defined in the query string
             $currentUri = $_GET['cfUri'];
 
@@ -279,7 +274,7 @@ class CFRouter {
 
             // Remove the URI from $_SERVER['QUERY_STRING']
             $_SERVER['QUERY_STRING'] = preg_replace('~\cfUri\b[^&]*+&?~', '', $_SERVER['QUERY_STRING']);
-        } elseif (isset($_SERVER['PATH_INFO']) AND $_SERVER['PATH_INFO']) {
+        } elseif (isset($_SERVER['PATH_INFO']) and $_SERVER['PATH_INFO']) {
             $currentUri = $_SERVER['PATH_INFO'];
             if ($currentUri == '/404.shtml' || $currentUri == '404.shtml') {
                 $currentUri = $_SERVER['REQUEST_URI'];
@@ -298,16 +293,16 @@ class CFRouter {
                     $_SERVER['QUERY_STRING'] = $_SERVER['REDIRECT_REDIRECT_QUERY_STRING'];
                 }
             }
-        } elseif (isset($_SERVER['ORIG_PATH_INFO']) AND $_SERVER['ORIG_PATH_INFO'] AND $_SERVER['ORIG_PATH_INFO'] != '/403.shtml') {
+        } elseif (isset($_SERVER['ORIG_PATH_INFO']) and $_SERVER['ORIG_PATH_INFO'] and $_SERVER['ORIG_PATH_INFO'] != '/403.shtml') {
             $currentUri = $_SERVER['ORIG_PATH_INFO'];
-        } elseif (isset($_SERVER['REQUEST_URI']) AND $_SERVER['REQUEST_URI']) {
+        } elseif (isset($_SERVER['REQUEST_URI']) and $_SERVER['REQUEST_URI']) {
             $currentUri = $_SERVER['REQUEST_URI'];
             $currentUri = strtok($currentUri, '?');
-        } elseif (isset($_SERVER['PHP_SELF']) AND $_SERVER['PHP_SELF']) {
+        } elseif (isset($_SERVER['PHP_SELF']) and $_SERVER['PHP_SELF']) {
             $currentUri = $_SERVER['PHP_SELF'];
         }
 
-        if (($strpos_fc = strpos($currentUri, KOHANA)) !== FALSE) {
+        if (($strpos_fc = strpos($currentUri, KOHANA)) !== false) {
             // Remove the front controller from the current uri
             $currentUri = (string) substr($currentUri, $strpos_fc + strlen(KOHANA));
         }
@@ -316,7 +311,7 @@ class CFRouter {
         $currentUri = trim($currentUri, '/');
 
         if ($currentUri !== '') {
-            if ($suffix = CF::config('core.url_suffix') AND strpos($currentUri, $suffix) !== FALSE) {
+            if ($suffix = CF::config('core.url_suffix') and strpos($currentUri, $suffix) !== false) {
                 // Remove the URL suffix
                 $currentUri = preg_replace('#' . preg_quote($suffix) . '$#u', '', $currentUri);
 
@@ -334,7 +329,7 @@ class CFRouter {
     /**
      * Attempts to determine the current URI using CLI, GET, PATH_INFO, ORIG_PATH_INFO, or PHP_SELF.
      *
-     * @return  void
+     * @return void
      */
     public static function findUri() {
         self::$current_uri = self::getUri();
@@ -347,23 +342,26 @@ class CFRouter {
         return array_merge($routesConfig, $routesRuntime);
     }
 
-    public static function routed_uri($uri, & $routes = null) {
+    //@codingStandardsIgnoreStart
+    public static function routed_uri($uri, &$routes = null) {
         return static::routedUri($uri, $routes);
     }
+
+    //@codingStandardsIgnoreEnd
 
     /**
      * Generates routed URI from given URI.
      *
-     * @param  string  URI to convert
-     * @return string  Routed uri
+     * @param mixed  $uri
+     * @param string $routes URI to convert
+     *
+     * @return string Routed uri
      */
-    public static function routedUri($uri, & $routes = null) {
-        if ($routes === NULL) {
+    public static function routedUri($uri, &$routes = null) {
+        if ($routes === null) {
             // Load routes
             $routes = self::getRoutes();
         }
-
-
 
         // Prepare variables
         $routedUri = $uri = trim($uri, '/');
@@ -374,11 +372,12 @@ class CFRouter {
         } else {
             // Loop through the routes and see if anything matches
             foreach ($routes as $key => $val) {
-                if ($key === '_default')
+                if ($key === '_default') {
                     continue;
+                }
                 if (is_callable($val)) {
                     preg_match_all("/{([\w]*)}/", $key, $matches, PREG_SET_ORDER);
-                    $callbackArgs = array($uri);
+                    $callbackArgs = [$uri];
                     $bracketKeys = [];
                     foreach ($matches as $matchedVal) {
                         $str = $matchedVal[1]; //matches str without bracket {}
@@ -387,13 +386,11 @@ class CFRouter {
                         $key = str_replace($bStr, '(.+?)', $key);
                     }
 
-
                     $matchesBracket = false;
-                    $key = str_replace("/", "\/", $key);
+                    $key = str_replace('/', "\/", $key);
                     preg_match('#' . $key . '#ims', $uri, $matches);
 
                     if (preg_match('#' . $key . '#ims', $uri, $matches)) {
-
                         $matchesBracket = array_slice($matches, 1);
                     }
                     $matchesBracket ? $callbackArgs = array_merge($callbackArgs, $matchesBracket) : $callbackArgs = array_merge($callbackArgs, $bracketKeys);
@@ -408,10 +405,8 @@ class CFRouter {
                 $key = trim($key, '/');
                 $val = trim($val, '/');
 
-
                 if (preg_match('#^' . $key . '#u', $uri)) {
-
-                    if (strpos($val, '$') !== FALSE) {
+                    if (strpos($val, '$') !== false) {
                         // Use regex routing
 
                         $routedUri = preg_replace('#^' . $key . '$#u', $val, $uri);
@@ -454,6 +449,17 @@ class CFRouter {
         static::$routesRuntime[$route] = $routedUri;
     }
 
+    public static function getAllRoute() {
+        return carr::merge(static::getRoutesConfig(), static::getRoutesRuntime());
+    }
+
+    public static function getRoutesConfig() {
+        return CF::config('routes');
+    }
+
+    public static function getRoutesRuntime() {
+        return CFRouter::$routesRuntime;
+    }
 }
 
 // End CFRouter

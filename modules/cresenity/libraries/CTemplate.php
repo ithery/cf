@@ -1,55 +1,60 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jan 6, 2018, 6:33:59 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jan 6, 2018, 6:33:59 PM
  */
 class CTemplate {
-
     /**
      * The stack of section names currently being captured.
+     *
      * @var array
      */
     private $capture;
 
     /**
      * A collection point for section content.
+     *
      * @var array
      */
     private $section;
 
     /**
      * Default folder for templates view
+     *
      * @var string
      */
     protected $templateFolder = 'templates';
 
     /**
      * Data assigned to the template.
+     *
      * @var array
      */
-    protected $data = array();
+    protected $data = [];
     protected $name;
     protected $registry;
     protected $blockRoutingCallback = null;
 
     /**
      * An aribtrary object for helpers.
+     *
      * @var object
      */
     private $helpers;
 
-    public function __construct($name, $data = array()) {
+    public function __construct($name, $data = []) {
         $this->registry = new CTemplate_Registry();
 
-        $filename = CF::find_file($this->templateFolder, $name, TRUE);
+        $filename = CF::findFile($this->templateFolder, $name, true);
         $this->name = $name;
         $this->registry->set($name, $filename);
-        if ($data === NULL || !is_array($data)) {
-            $data = array();
+        if ($data === null || !is_array($data)) {
+            $data = [];
         }
         $this->helpers = new CTemplate_Helpers();
         $this->data = $data;
@@ -59,18 +64,18 @@ class CTemplate {
         $this->blockRoutingCallback = $callback;
     }
 
-    public static function factory($name, $data = array()) {
+    public static function factory($name, $data = []) {
         return new CTemplate($name, $data);
     }
 
-    public function block($name, $data = array()) {
+    public function block($name, $data = []) {
         if ($this->blockRoutingCallback != null && is_callable($this->blockRoutingCallback)) {
-            $name = call_user_func_array($this->blockRoutingCallback, array($name));
+            $name = call_user_func_array($this->blockRoutingCallback, [$name]);
         }
-        $filename = CF::find_file($this->templateFolder, $name, TRUE);
+        $filename = CF::findFile($this->templateFolder, $name, true);
         $this->registry->set($name, $filename);
-        if ($data === NULL || !is_array($data)) {
-            $data = array();
+        if ($data === null || !is_array($data)) {
+            $data = [];
         }
         $data = array_merge($this->data, $data);
         ob_start();
@@ -81,9 +86,10 @@ class CTemplate {
     /**
      * Magically sets a view variable.
      *
-     * @param   string   variable key
-     * @param   string   variable value
-     * @return  void
+     * @param mixed $key
+     * @param mixed $value
+     *
+     * @return void
      */
     public function __set($key, $value) {
         $this->data[$key] = $value;
@@ -92,9 +98,9 @@ class CTemplate {
     /**
      * Magically gets a view variable.
      *
-     * @param  string  variable key
-     * @return mixed   variable value if the key is found
-     * @return void    if the key is not found
+     * @param mixed $key
+     *
+     * @return void|mixed variable value if the key is found
      */
     public function __get($key) {
         if (isset($this->data[$key])) {
@@ -107,22 +113,25 @@ class CTemplate {
 
     /**
      * Magic call to expose helper object methods as template methods.
+     *
      * @param string $name The helper object method name.
-     * @param array $args The arguments to pass to the helper.
+     * @param array  $args The arguments to pass to the helper.
+     *
      * @return mixed
      */
     public function __call($name, $args) {
-        return call_user_func_array(array($this->helpers, $name), $args);
+        return call_user_func_array([$this->helpers, $name], $args);
     }
 
     /**
      * Sets a view variable.
      *
-     * @param   string|array  name of variable or an array of variables
-     * @param   mixed         value when using a named variable
-     * @return  object
+     * @param mixed      $name
+     * @param null|mixed $value
+     *
+     * @return object
      */
-    public function set($name, $value = NULL) {
+    public function set($name, $value = null) {
         if (is_array($name)) {
             foreach ($name as $key => $value) {
                 $this->__set($key, $value);
@@ -140,11 +149,9 @@ class CTemplate {
     }
 
     /**
-     *
      * Gets the arbitrary object for helpers.
      *
      * @return object
-     *
      */
     public function getHelpers() {
         return $this->helpers;
@@ -153,22 +160,27 @@ class CTemplate {
     /**
      * Renders a view.
      *
-     * @param   boolean   set to TRUE to echo the output instead of returning it
-     * @param   callback  special renderer to pass the output through
-     * @return  string    if print is FALSE
-     * @return  void      if print is TRUE
+     * @param mixed $print
+     * @param mixed $renderer
+     *
+     * @return string if print is FALSE
      */
-    public function render($print = FALSE, $renderer = FALSE) {
+    public function render($print = false, $renderer = false) {
         ob_start();
-        $this->getRegistry($this->name)->__invoke($this->data);
+        try {
+            $this->getRegistry($this->name)->__invoke($this->data);
+        } catch (Exception $ex) {
+            ob_end_clean();
+            throw $ex;
+        }
         return ob_get_clean();
     }
 
     /**
-     *
      * Is a particular named section available?
      *
      * @param string $name The section name.
+     *
      * @return bool
      */
     protected function hasSection($name) {
@@ -176,12 +188,12 @@ class CTemplate {
     }
 
     /**
-     *
      * Sets the body of a named section directly, as opposed to buffering and
      * capturing output.
      *
      * @param string $name The section name.
      * @param string $body The section body.
+     *
      * @return null
      */
     protected function setSection($name, $body) {
@@ -189,10 +201,10 @@ class CTemplate {
     }
 
     /**
-     *
      * Gets the body of a named section.
      *
      * @param string $name The section name.
+     *
      * @return string
      */
     protected function getSection($name) {
@@ -200,12 +212,11 @@ class CTemplate {
     }
 
     /**
-     *
      * Begins output buffering for a named section.
      *
      * @param string $name The section name.
-     * @return null
      *
+     * @return null
      */
     protected function beginSection($name) {
         $this->capture[] = $name;
@@ -213,8 +224,8 @@ class CTemplate {
     }
 
     /**
-     *
      * Ends buffering and retains output for the most-recent section.
+     *
      * @return null
      */
     protected function endSection() {
@@ -222,5 +233,4 @@ class CTemplate {
         $name = array_pop($this->capture);
         $this->setSection($name, $body);
     }
-
 }

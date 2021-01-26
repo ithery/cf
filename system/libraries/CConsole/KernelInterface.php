@@ -1,19 +1,12 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
-interface CConsole_KernelInterface
-{
+interface CConsole_KernelInterface {
     /**
      * Handle an incoming console command.
      *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface|null  $output
+     * @param \Symfony\Component\Console\Input\InputInterface        $input
+     * @param \Symfony\Component\Console\Output\OutputInterface|null $output
+     *
      * @return int
      */
     public function handle($input, $output = null);
@@ -21,9 +14,10 @@ interface CConsole_KernelInterface
     /**
      * Run an Artisan console command by name.
      *
-     * @param  string  $command
-     * @param  array  $parameters
-     * @param  \Symfony\Component\Console\Output\OutputInterface|null  $outputBuffer
+     * @param string                                                 $command
+     * @param array                                                  $parameters
+     * @param \Symfony\Component\Console\Output\OutputInterface|null $outputBuffer
+     *
      * @return int
      */
     public function call($command, array $parameters = [], $outputBuffer = null);
@@ -31,8 +25,9 @@ interface CConsole_KernelInterface
     /**
      * Queue an Artisan console command by name.
      *
-     * @param  string  $command
-     * @param  array  $parameters
+     * @param string $command
+     * @param array  $parameters
+     *
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     public function queue($command, array $parameters = []);

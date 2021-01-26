@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of PHPUnit.
  *
@@ -7,22 +8,24 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\Constraint\String;
 
 use function json_decode;
 use function json_last_error;
 use function sprintf;
 use PHPUnit\Framework\Constraint\Constraint;
+use PHPUnit\Framework\Constraint\JsonMatchesErrorMessageProvider;
+
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class IsJson extends Constraint
-{
+final class IsJson extends Constraint {
+
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString()
-    {
+    public function toString() {
         return 'is valid JSON';
     }
 
@@ -32,8 +35,7 @@ final class IsJson extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other)
-    {
+    protected function matches($other) {
         if ($other === '') {
             return false;
         }
@@ -57,21 +59,19 @@ final class IsJson extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function failureDescription($other)
-    {
+    protected function failureDescription($other) {
         if ($other === '') {
             return 'an empty string is valid JSON';
         }
 
         json_decode($other);
         $error = (string) JsonMatchesErrorMessageProvider::determineJsonError(
-            (string) json_last_error()
+                        (string) json_last_error()
         );
 
         return sprintf(
-            '%s is valid JSON (%s)',
-            $this->exporter()->shortenedExport($other),
-            $error
+                '%s is valid JSON (%s)', $this->exporter()->shortenedExport($other), $error
         );
     }
+
 }

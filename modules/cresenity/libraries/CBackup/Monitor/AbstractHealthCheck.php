@@ -1,17 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 abstract class CBackup_Monitor_AbstractHealthCheck {
-
     abstract public function checkHealth(CBackup_BackupDestination $backupDestination);
 
     public function name() {
-        return cstr::title(class_basename($this));
+        return cstr::title(c::classBasename($this));
     }
 
     protected function fail($message) {
@@ -29,5 +22,4 @@ abstract class CBackup_Monitor_AbstractHealthCheck {
             $this->fail($message);
         }
     }
-
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 15, 2019, 1:02:13 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 15, 2019, 1:02:13 PM
  */
 class CValidation_Rule_NotIn {
-
     /**
      * The name of the rule.
      */
@@ -24,7 +24,8 @@ class CValidation_Rule_NotIn {
     /**
      * Create a new "not in" rule instance.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return void
      */
     public function __construct(array $values) {
@@ -42,5 +43,4 @@ class CValidation_Rule_NotIn {
         }, $this->values);
         return $this->rule . ':' . implode(',', $values);
     }
-
 }

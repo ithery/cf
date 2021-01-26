@@ -146,7 +146,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
         }
     }
 
-    public function onSessionUsage(): void
+    public function onSessionUsage()
     {
         if (!$this->debug) {
             return;
@@ -181,7 +181,7 @@ abstract class AbstractSessionListener implements EventSubscriberInterface
         throw new UnexpectedSessionUsageException('Session was used while the request was declared stateless.');
     }
 
-    public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents()
     {
         return [
             KernelEvents::REQUEST => ['onKernelRequest', 128],

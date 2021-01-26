@@ -1,34 +1,33 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Simple benchmarking.
- *
  */
 final class CFBenchmark {
-
     // Benchmark timestamps
     private static $marks;
+    private static $onStopCallback;
 
     /**
      * Set a benchmark start point.
      *
-     * @param   string  benchmark name
-     * @return  void
+     * @param string $name benchmark name
+     *
+     * @return void
      */
     public static function start($name) {
         if (!isset(self::$marks[$name])) {
-            self::$marks[$name] = array();
+            self::$marks[$name] = [];
         }
 
-        $mark = array
-            (
-            'start' => microtime(TRUE),
-            'stop' => FALSE,
-            'memory_start' => self::memory_usage(),
-            'memory_stop' => FALSE
-        );
+        $mark = [
+            'start' => microtime(true),
+            'stop' => false,
+            'memory_start' => self::memoryUsage(),
+            'memory_stop' => false
+        ];
 
         array_unshift(self::$marks[$name], $mark);
     }
@@ -36,26 +35,33 @@ final class CFBenchmark {
     /**
      * Set a benchmark stop point.
      *
-     * @param   string  benchmark name
-     * @return  void
+     * @param string $name benchmark name
+     *
+     * @return void
      */
     public static function stop($name) {
-        if (isset(self::$marks[$name]) AND self::$marks[$name][0]['stop'] === FALSE) {
-            self::$marks[$name][0]['stop'] = microtime(TRUE);
-            self::$marks[$name][0]['memory_stop'] = self::memory_usage();
+        if (isset(self::$marks[$name]) and self::$marks[$name][0]['stop'] === false) {
+            self::$marks[$name][0]['stop'] = microtime(true);
+            self::$marks[$name][0]['memory_stop'] = self::memoryUsage();
+
+            if (static::$onStopCallback != null) {
+                $callback = static::$onStopCallback;
+                $callback($name, static::$marks[$name][0]);
+            }
         }
     }
 
     /**
      * Get the elapsed time between a start and stop.
      *
-     * @param   string   benchmark name, TRUE for all
-     * @param   integer  number of decimal places to count to
-     * @return  array
+     * @param string  $name     benchmark name, TRUE for all
+     * @param integer $decimals number of decimal places to count to
+     *
+     * @return array
      */
     public static function get($name, $decimals = 4) {
-        if ($name === TRUE) {
-            $times = array();
+        if ($name === true) {
+            $times = [];
             $names = array_keys(self::$marks);
 
             foreach ($names as $name) {
@@ -67,10 +73,11 @@ final class CFBenchmark {
             return $times;
         }
 
-        if (!isset(self::$marks[$name]))
-            return FALSE;
+        if (!isset(self::$marks[$name])) {
+            return false;
+        }
 
-        if (self::$marks[$name][0]['stop'] === FALSE) {
+        if (self::$marks[$name][0]['stop'] === false) {
             // Stop the benchmark to prevent mis-matched results
             self::stop($name);
         }
@@ -83,24 +90,23 @@ final class CFBenchmark {
             $memory += self::$marks[$name][$i]['memory_stop'] - self::$marks[$name][$i]['memory_start'];
         }
 
-        return array
-            (
+        return [
             'time' => number_format($time, $decimals),
             'memory' => $memory,
             'count' => count(self::$marks[$name])
-        );
+        ];
     }
 
     /**
      * Returns the current memory usage. This is only possible if the
      * memory_get_usage function is supported in PHP.
      *
-     * @return  integer
+     * @return integer
      */
-    private static function memory_usage() {
+    private static function memoryUsage() {
         static $func;
 
-        if ($func === NULL) {
+        if ($func === null) {
             // Test if memory usage can be seen
             $func = function_exists('memory_get_usage');
         }
@@ -108,6 +114,23 @@ final class CFBenchmark {
         return $func ? memory_get_usage() : 0;
     }
 
+    public static function all() {
+        return static::$marks;
+    }
+
+    public static function completed() {
+        $completed = [];
+        foreach (static::all() as $key => $marks) {
+            if ($marks[0]['stop'] !== false) {
+                $completed[$key] = $marks[0];
+            }
+        }
+        return $completed;
+    }
+
+    public static function onStopCallback($callback) {
+        static::$onStopCallback = $callback;
+    }
 }
 
 // End Benchmark

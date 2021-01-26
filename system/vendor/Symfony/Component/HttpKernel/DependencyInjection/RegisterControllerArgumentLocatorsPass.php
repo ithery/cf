@@ -36,7 +36,7 @@ class RegisterControllerArgumentLocatorsPass implements CompilerPassInterface
     private $controllerLocator;
     private $notTaggedControllerResolverServiceId;
 
-    public function __construct(string $resolverServiceId = 'argument_resolver.service', string $controllerTag = 'controller.service_arguments', string $controllerLocator = 'argument_resolver.controller_locator', string $notTaggedControllerResolverServiceId = 'argument_resolver.not_tagged_controller')
+    public function __construct($resolverServiceId = 'argument_resolver.service', $controllerTag = 'controller.service_arguments', $controllerLocator = 'argument_resolver.controller_locator', $notTaggedControllerResolverServiceId = 'argument_resolver.not_tagged_controller')
     {
         $this->resolverServiceId = $resolverServiceId;
         $this->controllerTag = $controllerTag;

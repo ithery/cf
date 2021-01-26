@@ -1,29 +1,28 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 3:16:57 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 3:16:57 AM
  */
 class CColor_String {
-
     use CColor_Trait_OptionsTrait,
         CColor_Trait_ColorInfoTrait;
 
     protected $string;
     protected $int32;
 
-    public function __construct($string, $options = array()) {
+    public function __construct($string, $options = []) {
         $this->string = $string;
         $this->int32 = hexdec(substr(md5($this->string), 0, 8));
-        $this->options = array();
+        $this->options = [];
     }
 
     private function pickHue() {
-
-        return $this->getModulo(array(0, 255));
+        return $this->getModulo([0, 255]);
     }
 
     private function pickSaturation($h) {
@@ -31,7 +30,7 @@ class CColor_String {
             return 0;
         }
         if ($this->getOption('luminosity') === 'random') {
-            return $this->getModulo(array(0, 100));
+            return $this->getModulo([0, 100]);
         }
         $colorInfo = $this->getColorInfo($h);
         $range = $colorInfo['s'];
@@ -54,9 +53,9 @@ class CColor_String {
 
     private function pickBrightness($h, $s) {
         if ($this->getOption('luminosity') === 'random') {
-            $range = array(0, 100);
+            $range = [0, 100];
         } else {
-            $range = array($this->getMinimumBrightness($h, $s), 100);
+            $range = [$this->getMinimumBrightness($h, $s), 100];
             if ($this->haveOption('luminosity')) {
                 switch ($this->getOption('luminosity')) {
                     case 'dark':
@@ -72,7 +71,6 @@ class CColor_String {
     }
 
     /**
-     * 
      * @return CColor_Format_Type_Hex
      */
     public function toHex() {
@@ -81,7 +79,6 @@ class CColor_String {
     }
 
     /**
-     * 
      * @return \CColor_Format_Type_Hsv
      */
     public function toHsv() {
@@ -98,5 +95,4 @@ class CColor_String {
         }
         return $range[0] + ($this->int32 % ($range[1] - $range[0]));
     }
-
 }

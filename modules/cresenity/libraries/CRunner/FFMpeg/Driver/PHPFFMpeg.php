@@ -1,10 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 26, 2020 
+ *
+ * @since Aug 26, 2020
+ *
  * @license Ittron Global Teknologi
  */
 use FFMpeg\Coordinate\TimeCode;
@@ -22,7 +24,6 @@ use FFMpeg\Media\Video;
  * @mixin \FFMpeg\Media\AbstractMediaType
  */
 class CRunner_FFMpeg_Driver_PHPFFMpeg {
-
     use CTrait_ForwardsCalls;
 
     /**
@@ -31,7 +32,7 @@ class CRunner_FFMpeg_Driver_PHPFFMpeg {
     private $ffmpeg;
 
     /**
-     * @var \ProtoneMedia\LaravelFFMpeg\Filesystem\MediaCollection
+     * @var CRunner_FFMpeg_MediaCollection
      */
     private $mediaCollection;
 
@@ -41,7 +42,7 @@ class CRunner_FFMpeg_Driver_PHPFFMpeg {
     private $forceAdvanced = false;
 
     /**
-     * @var \Illuminate\Support\Collection
+     * @var CCollection
      */
     private $pendingComplexFilters;
 
@@ -51,7 +52,7 @@ class CRunner_FFMpeg_Driver_PHPFFMpeg {
     private $media;
 
     public function __construct(FFMpeg $ffmpeg = null) {
-        if($ffmpeg==null) {
+        if ($ffmpeg == null) {
             $ffmpeg = FFMpeg::create();
         }
         $this->ffmpeg = $ffmpeg;
@@ -123,8 +124,8 @@ class CRunner_FFMpeg_Driver_PHPFFMpeg {
     public function concatWithoutTranscoding() {
         $localPaths = $this->mediaCollection->getLocalPaths();
 
-        $this->media = $this->ffmpeg->open(Arr::first($localPaths))
-                ->concat($localPaths);
+        $this->media = $this->ffmpeg->open(carr::first($localPaths))
+            ->concat($localPaths);
 
         return $this;
     }
@@ -143,16 +144,14 @@ class CRunner_FFMpeg_Driver_PHPFFMpeg {
             return iterator_to_array($this->media->getStreams());
         }
 
-        return $this->mediaCollection->map(function (Media $media) {
-                    return $this->fresh()->open(MediaCollection::make([$media]))->getStreams();
-                })->collapse()->all();
+        return $this->mediaCollection->map(function (CRunner_FFMpeg_Media $media) {
+            return $this->fresh()->open(CRunner_FFMpeg_MediaCollection::make([$media]))->getStreams();
+        })->collapse()->all();
     }
 
     public function getFilters() {
         return iterator_to_array($this->media->getFiltersCollection());
     }
-
-    //
 
     public function getDurationInSeconds() {
         return round($this->getDurationInMiliseconds() / 1000);
@@ -180,8 +179,8 @@ class CRunner_FFMpeg_Driver_PHPFFMpeg {
      */
     public function getAudioStream() {
         return carr::first($this->getStreams(), function (Stream $stream) {
-                    return $stream->isAudio();
-                });
+            return $stream->isAudio();
+        });
     }
 
     /**
@@ -189,8 +188,8 @@ class CRunner_FFMpeg_Driver_PHPFFMpeg {
      */
     public function getVideoStream() {
         return carr::first($this->getStreams(), function (Stream $stream) {
-                    return $stream->isVideo();
-                });
+            return $stream->isVideo();
+        });
     }
 
     //
@@ -242,12 +241,15 @@ class CRunner_FFMpeg_Driver_PHPFFMpeg {
      * Maps the arguments into a 'LegacyFilterMapping' instance and
      * pushed it to the 'pendingComplexFilters' collection. These
      * filters will be applied later on by the MediaExporter.
+     *
+     * @param mixed $in
+     * @param mixed $out
      */
     public function addFilterAsComplexFilter($in, $out, ...$arguments) {
         $this->pendingComplexFilters->push(new LegacyFilterMapping(
-                        $in,
-                        $out,
-                        ...$arguments
+            $in,
+            $out,
+            ...$arguments
         ));
 
         return $this;
@@ -267,13 +269,13 @@ class CRunner_FFMpeg_Driver_PHPFFMpeg {
     /**
      * Forwards the call to the underling media object and returns the result
      * if it's something different than the media object itself.
+     *
+     * @param mixed $method
+     * @param mixed $arguments
      */
     public function __call($method, $arguments) {
-        
-            
         $result = $this->forwardCallTo($media = $this->get(), $method, $arguments);
 
         return ($result === $media) ? $this : $result;
     }
-
 }

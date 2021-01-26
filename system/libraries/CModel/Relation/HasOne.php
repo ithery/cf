@@ -1,7 +1,6 @@
 <?php
 
 class CModel_Relation_HasOne extends CModel_Relation_HasOneOrMany {
-
     use CModel_Relation_Trait_SupportsDefaultModels;
 
     /**
@@ -16,8 +15,9 @@ class CModel_Relation_HasOne extends CModel_Relation_HasOneOrMany {
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
-     * @param  string  $relation
+     * @param array  $models
+     * @param string $relation
+     *
      * @return array
      */
     public function initRelation(array $models, $relation) {
@@ -31,9 +31,10 @@ class CModel_Relation_HasOne extends CModel_Relation_HasOneOrMany {
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array  $models
-     * @param  CModel_Collection  $results
-     * @param  string  $relation
+     * @param array             $models
+     * @param CModel_Collection $results
+     * @param string            $relation
+     *
      * @return array
      */
     public function match(array $models, CModel_Collection $results, $relation) {
@@ -43,13 +44,14 @@ class CModel_Relation_HasOne extends CModel_Relation_HasOneOrMany {
     /**
      * Make a new related instance for the given model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param CModel $parent
+     *
+     * @return CModel
      */
-    public function newRelatedInstanceFor(Model $parent) {
+    public function newRelatedInstanceFor(CModel $parent) {
         return $this->related->newInstance()->setAttribute(
-                        $this->getForeignKeyName(), $parent->{$this->localKey}
+            $this->getForeignKeyName(),
+            $parent->{$this->localKey}
         );
     }
-
 }

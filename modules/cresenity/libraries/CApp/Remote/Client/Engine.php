@@ -1,28 +1,25 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 14, 2018, 9:32:14 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 14, 2018, 9:32:14 PM
  */
 abstract class CApp_Remote_Client_Engine {
-
     /**
-     *
      * @var string
      */
     protected $domain;
 
     /**
-     *
      * @var array
      */
     protected $options;
 
     /**
-     *
      * @var string
      */
     protected $baseApiUrl;
@@ -35,14 +32,14 @@ abstract class CApp_Remote_Client_Engine {
         $this->baseUrl = $protocol . '://' . $this->domain . ':' . $port . '/cresenity/api/';
     }
 
-    public function request($url, $post = array()) {
+    public function request($url, $post = []) {
         $curl = CCurl::factory($url);
         $curl->setPost($post);
         $response = $curl->exec()->response();
         $responseData = json_decode($response, true);
         if (!is_array($responseData)) {
             //failed to decode json
-            throw new CException('failed to decode api from url :url, response :response', array(':url' => $url, ':response' => htmlspecialchars($response)));
+            throw new CException('failed to decode api from url :url, response :response', [':url' => $url, ':response' => htmlspecialchars($response)]);
         }
 
         $errCode = carr::get($responseData, 'err_code');
@@ -53,5 +50,4 @@ abstract class CApp_Remote_Client_Engine {
         $data = carr::get($responseData, 'data');
         return $data;
     }
-
 }

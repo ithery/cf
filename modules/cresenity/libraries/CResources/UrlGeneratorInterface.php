@@ -1,26 +1,26 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 interface CResources_UrlGeneratorInterface {
-
     /**
-     * Get the url for a media item.
+     * Get the url for a resource item.
      *
      * @return string
      */
     public function getUrl();
 
     /**
+     * Get the path for a resource item.
+     *
+     * @return string
+     */
+    public function getPath();
+
+    /**
      * @param CApp_Model_Interface_ResourceInterface $resource
      *
      * @return CResources_UrlGeneratorInterface
      */
-    public function setResource(CApp_Model_Interface_ResourceInterface $media);
+    public function setResource(CApp_Model_Interface_ResourceInterface $resource);
 
     /**
      * @param CResources_Conversion $conversion
@@ -42,7 +42,7 @@ interface CResources_UrlGeneratorInterface {
      * Get the temporary url for a media item.
      *
      * @param DateTimeInterface $expiration
-     * @param array              $options
+     * @param array             $options
      *
      * @return string
      */

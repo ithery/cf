@@ -1,18 +1,11 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Factory for comparators which compare values for equality.
  */
 class CComparator_Factory {
-
     /**
-     * @var Factory
+     * @var CComparator_Factory
      */
     private static $instance;
 
@@ -72,7 +65,7 @@ class CComparator_Factory {
      * existing comparators, meaning that its accept() method will be invoked
      * before those of the other comparators.
      *
-     * @param Comparator $comparator The comparator to be registered
+     * @param CComparator_AbstractEngine $comparator The comparator to be registered
      */
     public function register(CComparator_AbstractEngine $comparator) {
         \array_unshift($this->customComparators, $comparator);
@@ -84,7 +77,7 @@ class CComparator_Factory {
      *
      * This comparator will no longer be considered by getComparatorFor().
      *
-     * @param Comparator $comparator The comparator to be unregistered
+     * @param CComparator_AbstractEngine $comparator The comparator to be unregistered
      */
     public function unregister(CComparator_AbstractEngine $comparator) {
         foreach ($this->customComparators as $key => $_comparator) {
@@ -120,5 +113,4 @@ class CComparator_Factory {
         $this->defaultComparators[] = $comparator;
         $comparator->setFactory($this);
     }
-
 }

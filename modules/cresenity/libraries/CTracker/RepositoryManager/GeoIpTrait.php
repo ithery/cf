@@ -1,23 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 5:43:14 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 5:43:14 AM
  */
 trait CTracker_RepositoryManager_GeoIpTrait {
-
     /**
-     *
      * @var CTracker_Repository_GeoIp
      */
     protected $geoIpRepository;
 
     /**
-     *
-     * @var CTracker_GeoIp 
+     * @var CTracker_GeoIp
      */
     protected $geoIp;
 
@@ -27,17 +25,17 @@ trait CTracker_RepositoryManager_GeoIpTrait {
     }
 
     public function getGeoIpId($clientIp) {
-        if (strpos($clientIp, ",") !== false) {
-            $clientIp = trim(carr::get(explode(",", $clientIp), 0));
+        if (strpos($clientIp, ',') !== false) {
+            $clientIp = trim(carr::get(explode(',', $clientIp), 0));
         }
-     
+
         $id = null;
         if ($geoIpData = $this->geoIp->searchAddr($clientIp)) {
             $id = $this->geoIpRepository->findOrCreate(
-                    $geoIpData, ['latitude', 'longitude']
+                $geoIpData,
+                ['latitude', 'longitude']
             );
         }
         return $id;
     }
-
 }

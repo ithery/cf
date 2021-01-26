@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 28, 2018, 9:00:50 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 28, 2018, 9:00:50 AM
  */
 use OpenTracing\Exceptions\UnsupportedFormat;
 use OpenTracing\Formats;
@@ -18,7 +19,6 @@ use OpenTracing\Tracer as OpenTracingTracer;
 require_once DOCROOT . 'modules/cresenity/vendor/OpenTracing/Formats.php';
 
 final class CDebug_Tracer implements OpenTracingTracer {
-
     /**
      * @var Span[][]
      */
@@ -60,9 +60,9 @@ final class CDebug_Tracer implements OpenTracingTracer {
     private $scopeManager;
 
     /**
-     * @param Transport $transport
+     * @param Transport    $transport
      * @param Propagator[] $propagators
-     * @param array $config
+     * @param array        $config
      */
     public function __construct(CDebug_Tracer_Transport $transport = null, array $propagators = null, array $config = []) {
         $this->transport = $transport ?: new CDebug_Tracer_Transport_Http(new CDebug_Tracer_Encoder_Json());
@@ -78,11 +78,13 @@ final class CDebug_Tracer implements OpenTracingTracer {
      */
     public static function noop() {
         return new self(
-                new NoopTransport(), [
-            Formats\BINARY => new NoopPropagator(),
-            Formats\TEXT_MAP => new NoopPropagator(),
-            Formats\HTTP_HEADERS => new NoopPropagator(),
-                ], ['enabled' => false]
+            new NoopTransport(),
+            [
+                Formats\BINARY => new NoopPropagator(),
+                Formats\TEXT_MAP => new NoopPropagator(),
+                Formats\HTTP_HEADERS => new NoopPropagator(),
+            ],
+            ['enabled' => false]
         );
     }
 
@@ -103,7 +105,11 @@ final class CDebug_Tracer implements OpenTracingTracer {
             $context = SpanContext::createAsChild($reference->getContext());
         }
         $span = new Span(
-                $operationName, $context, $this->config['service_name'], array_key_exists('resource', $this->config) ? $this->config['resource'] : $operationName, $options->getStartTime()
+            $operationName,
+            $context,
+            $this->config['service_name'],
+            array_key_exists('resource', $this->config) ? $this->config['resource'] : $operationName,
+            $options->getStartTime()
         );
         $tags = $options->getTags() + $this->config['global_tags'];
         foreach ($tags as $key => $value) {
@@ -129,6 +135,7 @@ final class CDebug_Tracer implements OpenTracingTracer {
 
     /**
      * @param array|Reference[] $references
+     *
      * @return null|Reference
      */
     private function findParent(array $references) {
@@ -218,5 +225,4 @@ final class CDebug_Tracer implements OpenTracingTracer {
         }
         $this->traces[$span->getTraceId()][$span->getSpanId()] = $span;
     }
-
 }

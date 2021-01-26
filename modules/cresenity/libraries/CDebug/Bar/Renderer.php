@@ -1,53 +1,55 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Aug 22, 2018, 1:20:44 PM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-class CDebug_Bar_Renderer {
 
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+
+class CDebug_Bar_Renderer {
     /**
-     *
      * @var CDebug_Bar
      */
     protected $debugBar;
 
     /**
-     *
      * @var string
      */
     protected $javascriptClass = 'PhpDebugBar.DebugBar';
 
     /**
-     *
      * @var string
      */
     protected $variableName = 'phpdebugbar';
-    protected $controls = array();
-    protected $ignoredCollectors = array();
+    protected $controls = [];
+    protected $ignoredCollectors = [];
     protected $ajaxHandlerClass = 'PhpDebugBar.AjaxHandler';
     protected $ajaxHandlerBindToJquery = true;
     protected $ajaxHandlerBindToXHR = false;
     protected $ajaxHandlerAutoShow = true;
     protected $openHandlerClass = 'PhpDebugBar.OpenHandler';
     protected $openHandlerUrl;
-    protected $cssFiles = array(
+    protected $cssFiles = [
         'debug/debugbar.css',
         'debug/debugbar/widgets.css',
         'debug/debugbar/openhandler.css',
         'debug/debugbar/font-awesome/css/font-awesome.min.css',
         'debug/debugbar/highlightjs/styles/github.css',
         'debug/debugbar-custom.css',
-    );
-    protected $jsFiles = array(
+    ];
+    protected $jsFiles = [
         'debug/debugbar.js',
         'debug/debugbar/widgets.js',
         'debug/debugbar/openhandler.js',
         'debug/debugbar/highlightjs/highlight.pack.js',
-    );
+    ];
 
     const REPLACEABLE_TAG = '<!-- CAPP-DEBUGBAR-CODE -->';
     const REPLACEABLE_JS_TAG = '/* CAPP-DEBUGBAR-CODE */';
@@ -59,10 +61,9 @@ class CDebug_Bar_Renderer {
     public function populateAssets() {
         $cssFiles = $this->cssFiles;
         $jsFiles = $this->jsFiles;
-        $inlineCss = array();
-        $inlineJs = array();
-        $inlineHead = array();
-
+        $inlineCss = [];
+        $inlineJs = [];
+        $inlineHead = [];
 
         // finds assets provided by collectors
         foreach ($this->debugBar->getCollectors() as $collector) {
@@ -71,7 +72,6 @@ class CDebug_Bar_Renderer {
             }
         }
         foreach ($additionalAssets as $assets) {
-
             if (isset($assets['css'])) {
                 $cssFiles = array_merge($cssFiles, $assets['css']);
             }
@@ -104,8 +104,67 @@ class CDebug_Bar_Renderer {
         return self::REPLACEABLE_JS_TAG;
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function renderHead() {
+        $html = '';
+        foreach ($this->cssFiles as $css) {
+            $cssRoute = curl::base() . 'modules/cresenity/media/css/' . $css;
+            $html .= "<link rel='stylesheet' type='text/css' property='stylesheet' href='{$cssRoute}'>" . PHP_EOL;
+        }
+        $jquery = curl::base() . 'media/js/libs/jquery-3.3.1/jquery-3.3.1.min.js';
+        $html .= "<script type='text/javascript' src='{$jquery}'></script>" . PHP_EOL;
+        foreach ($this->jsFiles as $js) {
+            $jsRoute = curl::base() . 'modules/cresenity/media/js/' . $js;
+            $html .= "<script type='text/javascript' src='{$jsRoute}'></script>" . PHP_EOL;
+        }
+        // finds assets provided by collectors
+        foreach ($this->debugBar->getCollectors() as $collector) {
+            if (($collector instanceof CDebug_DataCollector_AssetProviderInterface) && !in_array($collector->getName(), $this->ignoredCollectors)) {
+                $assets = $collector->getAssets();
+                foreach (carr::get($assets, 'css', []) as $css) {
+                    $cssRoute = curl::base() . 'modules/cresenity/media/css/' . $css;
+                    $html .= "<link rel='stylesheet' type='text/css' property='stylesheet' href='{$cssRoute}'>" . PHP_EOL;
+                }
+                foreach (carr::get($assets, 'js', []) as $js) {
+                    $jsRoute = curl::base() . 'modules/cresenity/media/js/' . $js;
+                    $html .= "<script type='text/javascript' src='{$jsRoute}'></script>" . PHP_EOL;
+                }
+                foreach (carr::get($assets, 'inline_head', []) as $inline) {
+                    $html .= $inline . PHP_EOL;
+                }
+            }
+        }
+        $html .= '<script type="text/javascript">jQuery.noConflict(true);</script>' . "\n";
+
+        return $html;
+    }
+
     public function replaceJavascriptCode($string) {
-        return str_replace($this->getJavascriptReplaceCode(), $this->getJavascriptCode(), $string);
+        $javascriptCode = $this->getJavascriptCode();
+        if (strpos($string, $this->getJavascriptReplaceCode()) !== false) {
+            $string = str_replace($this->getJavascriptReplaceCode(), $javascriptCode, $string);
+        } else {
+            $javascriptCode = '<script>' . $javascriptCode . '</script>';
+
+            // Try to put the js/css directly before the </head>
+            $pos = strripos($string, '</head>');
+            $head = $this->renderHead();
+            if (false !== $pos) {
+                $string = substr($string, 0, $pos) . $head . substr($string, $pos);
+            } else {
+                // Append the head before the widget
+                $javascriptCode = $head . $javascriptCode;
+            }
+            $pos = strripos($string, '</body>');
+            if (false !== $pos) {
+                $string = substr($string, 0, $pos) . $javascriptCode . substr($string, $pos);
+            } else {
+                $string = $string . $javascriptCode;
+            }
+        }
+        return $string;
     }
 
     /**
@@ -113,8 +172,9 @@ class CDebug_Bar_Renderer {
      *
      * AJAX request should not render the initialization code.
      *
-     * @param boolean $initialize Whether or not to render the debug bar initialization code
+     * @param boolean $initialize        Whether or not to render the debug bar initialization code
      * @param boolean $renderStackedData Whether or not to render the stacked data
+     *
      * @return string
      */
     public function getJavascriptCode($initialize = true, $renderStackedData = true) {
@@ -151,7 +211,7 @@ class CDebug_Bar_Renderer {
             }
         }
         if ($this->openHandlerUrl !== null) {
-            $js .= sprintf("%s.setOpenHandler(new %s(%s));\n", $this->variableName, $this->openHandlerClass, json_encode(array("url" => $this->openHandlerUrl)));
+            $js .= sprintf("%s.setOpenHandler(new %s(%s));\n", $this->variableName, $this->openHandlerClass, json_encode(['url' => $this->openHandlerUrl]));
         }
         return $js;
     }
@@ -162,14 +222,15 @@ class CDebug_Bar_Renderer {
      * Controls can be defined by collectors themselves or using {@see addControl()}
      *
      * @param string $varname Debug bar's variable name
+     *
      * @return string
      */
     protected function getJsControlsDefinitionCode($varname) {
         $js = '';
-        $dataMap = array();
-        $excludedOptions = array('indicator', 'tab', 'map', 'default', 'widget', 'position');
+        $dataMap = [];
+        $excludedOptions = ['indicator', 'tab', 'map', 'default', 'widget', 'position'];
         // finds controls provided by collectors
-        $widgets = array();
+        $widgets = [];
         foreach ($this->debugBar->getCollectors() as $collector) {
             if (($collector instanceof CDebug_Bar_Interface_RenderableInterface) && !in_array($collector->getName(), $this->ignoredCollectors)) {
                 if ($w = $collector->getWidgets()) {
@@ -186,18 +247,30 @@ class CDebug_Bar_Renderer {
                 if (!isset($opts['title'])) {
                     $opts['title'] = ucfirst(str_replace('_', ' ', $name));
                 }
-                $js .= sprintf("%s.addTab(\"%s\", new %s({%s%s}));\n", $varname, $name, isset($options['tab']) ? $options['tab'] : 'PhpDebugBar.DebugBar.Tab', substr(json_encode($opts, JSON_FORCE_OBJECT), 1, -1), isset($options['widget']) ? sprintf('%s"widget": new %s()', count($opts) ? ', ' : '', $options['widget']) : ''
+                $js .= sprintf(
+                    "%s.addTab(\"%s\", new %s({%s%s}));\n",
+                    $varname,
+                    $name,
+                    isset($options['tab']) ? $options['tab'] : 'PhpDebugBar.DebugBar.Tab',
+                    substr(json_encode($opts, JSON_FORCE_OBJECT), 1, -1),
+                    isset($options['widget']) ? sprintf('%s"widget": new %s()', count($opts) ? ', ' : '', $options['widget']) : ''
                 );
             } elseif (isset($options['indicator']) || isset($options['icon'])) {
-                $js .= sprintf("%s.addIndicator(\"%s\", new %s(%s), \"%s\");\n", $varname, $name, isset($options['indicator']) ? $options['indicator'] : 'PhpDebugBar.DebugBar.Indicator', json_encode($opts, JSON_FORCE_OBJECT), isset($options['position']) ? $options['position'] : 'right'
+                $js .= sprintf(
+                    "%s.addIndicator(\"%s\", new %s(%s), \"%s\");\n",
+                    $varname,
+                    $name,
+                    isset($options['indicator']) ? $options['indicator'] : 'PhpDebugBar.DebugBar.Indicator',
+                    json_encode($opts, JSON_FORCE_OBJECT),
+                    isset($options['position']) ? $options['position'] : 'right'
                 );
             }
             if (isset($options['map']) && isset($options['default'])) {
-                $dataMap[$name] = array($options['map'], $options['default']);
+                $dataMap[$name] = [$options['map'], $options['default']];
             }
         }
         // creates the data mapping object
-        $mapJson = array();
+        $mapJson = [];
         foreach ($dataMap as $name => $values) {
             $mapJson[] = sprintf('"%s": ["%s", %s]', $name, $values[0], $values[1]);
         }
@@ -207,32 +280,69 @@ class CDebug_Bar_Renderer {
         return $js;
     }
 
+    public function isFileResponse($response) {
+        return ($response instanceof StreamedResponse) || ($response instanceof BinaryFileResponse);
+    }
+
     public function apply() {
-        CFEvent::add('system.display', function() {
-            $output = CF::$output;
-            if (CHelper::request()->isAjax()) {
-                try {
-                    if (!headers_sent()) {
-                        header('phpdebugbar-body:1');
-                    }
-                    $jsonHelper = CHelper::json();
-                    $json = null;
+        $renderer = $this;
+        CEvent::dispatcher()->listen(CHTTP_Event_RequestHandled::class, function ($event) use ($renderer) {
+            $response = $event->response;
+            $jsonHelper = CHelper::json();
+            if (!$renderer->isFileResponse($response)) {
+                if ($response instanceof CHTTP_JsonResponse && CApp::isAjax()) {
+                    $output = $response->getContent();
                     try {
-                        $json = $jsonHelper->parse($output);
+                        if (!headers_sent()) {
+                            header('phpdebugbar-body:1');
+                        }
+
+                        $json = null;
+                        try {
+                            $json = $jsonHelper->parse($output);
+                        } catch (Exception $ex) {
+                        }
+                        if (is_array($json)) {
+                            $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
+                            $output = $jsonHelper->stringify($json);
+                            $response->setContent($output);
+                        }
                     } catch (Exception $ex) {
-                        
                     }
-                    if (is_array($json)) {
-                        $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
-                        $output = $jsonHelper->stringify($json);
+                } else {
+                    $original = null;
+                    if ($response instanceof CHTTP_Response && $response->getOriginalContent()) {
+                        $original = $response->getOriginalContent();
                     }
-                } catch (Exception $ex) {
-                    
+                    $output = $response->getContent();
+
+                    $isJson = false;
+
+                    if (cstr::startsWith(trim($output), '{') && CApp::isAjax()) {
+                        $json = null;
+                        try {
+                            $json = $jsonHelper->parse($output);
+                            $json = array_merge($json, $this->debugBar->getDataAsHeaders('phpdebugbar', 4096, PHP_INT_MAX));
+                            $output = $jsonHelper->stringify($json);
+                            $isJson = true;
+                        } catch (Exception $ex) {
+                        }
+                    }
+                    if (!$isJson) {
+                        $output = $renderer->replaceJavascriptCode($output);
+                    } else {
+                        if (!headers_sent()) {
+                            header('phpdebugbar-body:1');
+                        }
+                    }
+                    $response->setContent($output);
+                    $response->headers->remove('Content-Length');
+                    // Restore original response (eg. the View or Ajax data)
+                    if ($original) {
+                        $response->original = $original;
+                    }
                 }
-            } else {
-                $output = $this->replaceJavascriptCode(CF::$output);
             }
-            CF::$output = $output;
         });
     }
 
@@ -240,12 +350,13 @@ class CDebug_Bar_Renderer {
      * Returns the js code needed to add a dataset
      *
      * @param string $requestId
-     * @param array $data
-     * @param mixed $suffix
+     * @param array  $data
+     * @param mixed  $suffix
+     *
      * @return string
      */
     protected function getAddDatasetCode($requestId, $data, $suffix = null) {
-        $js = sprintf("%s.addDataSet(%s, \"%s\"%s);\n", $this->variableName, json_encode($data), $requestId, $suffix ? ", " . json_encode($suffix) : '');
+        $js = sprintf("%s.addDataSet(%s, \"%s\"%s);\n", $this->variableName, json_encode($data), $requestId, $suffix ? ', ' . json_encode($suffix) : '');
         return $js;
     }
 
@@ -365,5 +476,4 @@ class CDebug_Bar_Renderer {
     public function getOpenHandlerUrl() {
         return $this->openHandlerUrl;
     }
-
 }

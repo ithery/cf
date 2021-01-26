@@ -1,26 +1,26 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 4:20:26 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 4:20:26 PM
  */
 class CConstant implements CApp_Interface_ConstantInterface {
-
     use CApp_Trait_ConstantTrait;
 
     /**
      * Handler Constant
      */
-    const HANDLER_TYPE_DIALOG = CRenderable_Listener_Handler::TYPE_DIALOG;
-    const HANDLER_TYPE_REMOVE = CRenderable_Listener_Handler::TYPE_REMOVE;
-    const HANDLER_TYPE_SUBMIT = CRenderable_Listener_Handler::TYPE_SUBMIT;
-    const HANDLER_TYPE_EMPTY = CRenderable_Listener_Handler::TYPE_EMPTY;
-    const HANDLER_TYPE_CUSTOM = CRenderable_Listener_Handler::TYPE_CUSTOM;
-    const HANDLER_TYPE_APPEND = CRenderable_Listener_Handler::TYPE_APPEND;
-    const HANDLER_TYPE_RELOAD = CRenderable_Listener_Handler::TYPE_RELOAD;
+    const HANDLER_TYPE_DIALOG = CObservable_Listener_Handler::TYPE_DIALOG;
+    const HANDLER_TYPE_REMOVE = CObservable_Listener_Handler::TYPE_REMOVE;
+    const HANDLER_TYPE_SUBMIT = CObservable_Listener_Handler::TYPE_SUBMIT;
+    const HANDLER_TYPE_EMPTY = CObservable_Listener_Handler::TYPE_EMPTY;
+    const HANDLER_TYPE_CUSTOM = CObservable_Listener_Handler::TYPE_CUSTOM;
+    const HANDLER_TYPE_APPEND = CObservable_Listener_Handler::TYPE_APPEND;
+    const HANDLER_TYPE_RELOAD = CObservable_Listener_Handler::TYPE_RELOAD;
 
     /**
      * Path Constant
@@ -42,5 +42,4 @@ class CConstant implements CApp_Interface_ConstantInterface {
      */
     const TABLE_VIEW_COL = 'col';
     const TABLE_VIEW_ROW = 'row';
-
 }

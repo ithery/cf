@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 1:39:35 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 1:39:35 AM
  */
 class CString_Initials {
-
     private $length = 2;
     private $initials = 'JD';
     private $keepCase = false;
@@ -19,7 +19,7 @@ class CString_Initials {
      *
      * @param string $nameOrInitials
      *
-     * @return Initials
+     * @return CString_Initials
      */
     public function name($nameOrInitials) {
         $this->generate($nameOrInitials);
@@ -32,7 +32,7 @@ class CString_Initials {
      *
      * @param boolean $keepCase
      *
-     * @return Initials
+     * @return CString_Initials
      */
     public function keepCase($keepCase = true) {
         $this->keepCase = $keepCase;
@@ -44,7 +44,7 @@ class CString_Initials {
      *
      * @param int $length
      *
-     * @return Initials
+     * @return CString_Initials
      */
     public function length($length = 2) {
         $this->length = (int) $length;
@@ -592,5 +592,4 @@ class CString_Initials {
             ],
         ];
     }
-
 }

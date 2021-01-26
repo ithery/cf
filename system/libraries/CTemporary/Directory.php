@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 10:16:40 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 10:16:40 PM
  */
 class CTemporary_Directory {
-
     protected $path;
 
     public function __construct($path) {
@@ -55,5 +55,4 @@ class CTemporary_Directory {
     protected function isFilePath($path) {
         return strpos($path, '.') !== false;
     }
-
 }

@@ -1,12 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 class CClientScript extends CObject {
-
     use CTrait_Compat_ClientScript;
 
-    protected static $_instance;
+    protected static $instance;
 
     /**
      * POS CONST
@@ -29,11 +28,11 @@ class CClientScript extends CObject {
     const TYPE_PLAIN = CManager_Asset::TYPE_PLAIN;
 
     /**
-     * array of all type script
-     * 
+     * Array of all type script
+     *
      * @var array
      */
-    public static $allType = array(
+    public static $allType = [
         self::TYPE_JS_FILE,
         self::TYPE_JS,
         self::TYPE_CSS_FILE,
@@ -42,25 +41,24 @@ class CClientScript extends CObject {
         self::TYPE_JS,
         self::TYPE_LINK,
         self::TYPE_PLAIN,
-    );
+    ];
 
     public static function allAvailablePos() {
-        return array(self::POS_HEAD, self::POS_BEGIN, self::POS_END, self::POS_LOAD, self::POS_READY);
+        return [self::POS_HEAD, self::POS_BEGIN, self::POS_END, self::POS_LOAD, self::POS_READY];
     }
 
     public static function allAvailableType() {
-        return array(self::TYPE_JS_FILE, self::TYPE_JS, self::TYPE_CSS_FILE, self::TYPE_CSS, self::TYPE_META, self::TYPE_LINK, self::TYPE_PLAIN);
+        return [self::TYPE_JS_FILE, self::TYPE_JS, self::TYPE_CSS_FILE, self::TYPE_CSS, self::TYPE_META, self::TYPE_LINK, self::TYPE_PLAIN];
     }
 
     /**
-     * 
      * @return CClientScript
      */
     public static function instance() {
-        if (self::$_instance == null) {
-            self::$_instance = new CClientScript();
+        if (static::$instance == null) {
+            static::$instance = new CClientScript();
         }
-        return self::$_instance;
+        return static::$instance;
     }
 
     public function registerJsFiles($files, $pos = CManager_Asset::POS_END) {
@@ -123,10 +121,6 @@ class CClientScript extends CObject {
         return CManager::asset()->runTime()->registerPlain($plain, $pos);
     }
 
-    public function create_js_hash() {
-        return CResource::instance('js')->create_hash($this->jsFiles());
-    }
-
     public function urlJsFile() {
         return CManager::asset()->getAllJsFileUrl();
     }
@@ -136,7 +130,7 @@ class CClientScript extends CObject {
     }
 
     public function cssFiles() {
-        $cssFileArray = array();
+        $cssFileArray = [];
         foreach ($this->scripts as $script) {
             foreach ($script['css_file'] as $k) {
                 $cssFileArray[] = $k;
@@ -145,57 +139,45 @@ class CClientScript extends CObject {
         return $cssFileArray;
     }
 
-    public function create_css_hash() {
-        return CResource::instance('css')->create_hash($this->cssFiles());
-    }
-
-    public function js($hash) {
-        return CResource::instance('js')->load($hash);
-    }
-
-    public function css($hash) {
-        return CResource::instance('css')->load($hash);
-    }
-
     public function manifest() {
         $jsFiles = $this->jsFiles();
         $cssFiles = $this->cssFiles();
-        $manifest = array();
-        $manifest["files"] = array();
+        $manifest = [];
+        $manifest['files'] = [];
         $lastFilemtime = 0;
         foreach ($jsFiles as $f) {
             $urlJsFile = $this->urlJsFile($f);
             $fullpathJsFile = $f;
-            $arr = array();
-            $arr["type"] = "js";
-            $arr["url"] = $urlJsFile;
-            $arr["file"] = $f;
+            $arr = [];
+            $arr['type'] = 'js';
+            $arr['url'] = $urlJsFile;
+            $arr['file'] = $f;
             $filemtime = filemtime($fullpathJsFile);
-            $arr["version"] = $filemtime;
+            $arr['version'] = $filemtime;
             if ($lastFilemtime < $filemtime) {
                 $lastFilemtime = $filemtime;
             }
-            $manifest["files"][] = $arr;
+            $manifest['files'][] = $arr;
         }
         foreach ($cssFiles as $f) {
             $urlCssFile = $this->urlCssFile($f);
             $fullpathCssFile = $f;
-            $arr = array();
-            $arr["type"] = "css";
-            $arr["url"] = $urlCssFile;
-            $arr["file"] = $f;
+            $arr = [];
+            $arr['type'] = 'css';
+            $arr['url'] = $urlCssFile;
+            $arr['file'] = $f;
 
             $file = explode('?', $fullpathCssFile);
             $fullpathCssFile = $file[0];
 
-
             $filemtime = filemtime($fullpathCssFile);
-            $arr["version"] = $filemtime;
-            if ($lastFilemtime < $filemtime)
+            $arr['version'] = $filemtime;
+            if ($lastFilemtime < $filemtime) {
                 $lastFilemtime = $filemtime;
-            $manifest["files"][] = $arr;
+            }
+            $manifest['files'][] = $arr;
         }
-        $manifest["version"] = $lastFilemtime;
+        $manifest['version'] = $lastFilemtime;
         return $manifest;
     }
 
@@ -206,5 +188,4 @@ class CClientScript extends CObject {
     public function render($pos, $type = null) {
         return CManager::asset()->render($pos, $type);
     }
-
 }

@@ -1,18 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 16, 2019, 4:55:13 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 16, 2019, 4:55:13 PM
  */
 class CSocialLogin_OAuth2_Provider_GitlabProvider extends CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_OAuth2_ProviderInterface {
-
-    protected $baseUrl = "https://gitlab.com/";
+    protected $baseUrl = 'https://gitlab.com/';
 
     /**
-     * 
      * @return string
      */
     public function getBaseUrl() {
@@ -20,8 +19,8 @@ class CSocialLogin_OAuth2_Provider_GitlabProvider extends CSocialLogin_OAuth2_Ab
     }
 
     /**
-     * 
      * @param string $baseUrl
+     *
      * @return $this
      */
     public function setBaseUrl($baseUrl) {
@@ -58,11 +57,11 @@ class CSocialLogin_OAuth2_Provider_GitlabProvider extends CSocialLogin_OAuth2_Ab
      */
     protected function mapUserToObject(array $user) {
         return (new CSocialLogin_OAuth2_User)->setRaw($user)->map([
-                    'id' => $user['id'],
-                    'nickname' => $user['username'],
-                    'name' => $user['name'],
-                    'email' => $user['email'],
-                    'avatar' => $user['avatar_url'],
+            'id' => $user['id'],
+            'nickname' => $user['username'],
+            'name' => $user['name'],
+            'email' => $user['email'],
+            'avatar' => $user['avatar_url'],
         ]);
     }
 
@@ -72,5 +71,4 @@ class CSocialLogin_OAuth2_Provider_GitlabProvider extends CSocialLogin_OAuth2_Ab
     protected function getTokenFields($code) {
         return parent::getTokenFields($code) + ['grant_type' => 'authorization_code'];
     }
-
 }

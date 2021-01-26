@@ -7,7 +7,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI\XmlConfiguration;
+
+namespace PHPUnit\TextUI\XmlConfiguration\PHP;
 
 use function count;
 use Countable;
@@ -17,8 +18,7 @@ use IteratorAggregate;
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  * @psalm-immutable
  */
-final class IniSettingCollection implements Countable, IteratorAggregate
-{
+final class IniSettingCollection implements Countable, IteratorAggregate {
     /**
      * @var IniSetting[]
      */
@@ -27,31 +27,26 @@ final class IniSettingCollection implements Countable, IteratorAggregate
     /**
      * @param IniSetting[] $iniSettings
      */
-    public static function fromArray(array $iniSettings)
-    {
+    public static function fromArray(array $iniSettings) {
         return new self(...$iniSettings);
     }
 
-    private function __construct(IniSetting ...$iniSettings)
-    {
+    private function __construct(IniSetting ...$iniSettings) {
         $this->iniSettings = $iniSettings;
     }
 
     /**
      * @return IniSetting[]
      */
-    public function asArray()
-    {
+    public function asArray() {
         return $this->iniSettings;
     }
 
-    public function count()
-    {
+    public function count() {
         return count($this->iniSettings);
     }
 
-    public function getIterator()
-    {
+    public function getIterator() {
         return new IniSettingCollectionIterator($this);
     }
 }

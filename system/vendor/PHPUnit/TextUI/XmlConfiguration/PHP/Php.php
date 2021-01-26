@@ -7,14 +7,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI\XmlConfiguration;
+
+namespace PHPUnit\TextUI\XmlConfiguration\PHP;
+
+use PHPUnit\TextUI\XmlConfiguration\Filesystem\DirectoryCollection;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  * @psalm-immutable
  */
-final class Php
-{
+final class Php {
     /**
      * @var DirectoryCollection
      */
@@ -70,73 +72,61 @@ final class Php
      */
     private $requestVariables;
 
-    public function __construct(DirectoryCollection $includePaths, IniSettingCollection $iniSettings, ConstantCollection $constants, VariableCollection $globalVariables, VariableCollection $envVariables, VariableCollection $postVariables, VariableCollection $getVariables, VariableCollection $cookieVariables, VariableCollection $serverVariables, VariableCollection $filesVariables, VariableCollection $requestVariables)
-    {
-        $this->includePaths     = $includePaths;
-        $this->iniSettings      = $iniSettings;
-        $this->constants        = $constants;
-        $this->globalVariables  = $globalVariables;
-        $this->envVariables     = $envVariables;
-        $this->postVariables    = $postVariables;
-        $this->getVariables     = $getVariables;
-        $this->cookieVariables  = $cookieVariables;
-        $this->serverVariables  = $serverVariables;
-        $this->filesVariables   = $filesVariables;
+    public function __construct(DirectoryCollection $includePaths, IniSettingCollection $iniSettings, ConstantCollection $constants, VariableCollection $globalVariables, VariableCollection $envVariables, VariableCollection $postVariables, VariableCollection $getVariables, VariableCollection $cookieVariables, VariableCollection $serverVariables, VariableCollection $filesVariables, VariableCollection $requestVariables) {
+        $this->includePaths = $includePaths;
+        $this->iniSettings = $iniSettings;
+        $this->constants = $constants;
+        $this->globalVariables = $globalVariables;
+        $this->envVariables = $envVariables;
+        $this->postVariables = $postVariables;
+        $this->getVariables = $getVariables;
+        $this->cookieVariables = $cookieVariables;
+        $this->serverVariables = $serverVariables;
+        $this->filesVariables = $filesVariables;
         $this->requestVariables = $requestVariables;
     }
 
-    public function includePaths()
-    {
+    public function includePaths() {
         return $this->includePaths;
     }
 
-    public function iniSettings()
-    {
+    public function iniSettings() {
         return $this->iniSettings;
     }
 
-    public function constants()
-    {
+    public function constants() {
         return $this->constants;
     }
 
-    public function globalVariables()
-    {
+    public function globalVariables() {
         return $this->globalVariables;
     }
 
-    public function envVariables()
-    {
+    public function envVariables() {
         return $this->envVariables;
     }
 
-    public function postVariables()
-    {
+    public function postVariables() {
         return $this->postVariables;
     }
 
-    public function getVariables()
-    {
+    public function getVariables() {
         return $this->getVariables;
     }
 
-    public function cookieVariables()
-    {
+    public function cookieVariables() {
         return $this->cookieVariables;
     }
 
-    public function serverVariables()
-    {
+    public function serverVariables() {
         return $this->serverVariables;
     }
 
-    public function filesVariables()
-    {
+    public function filesVariables() {
         return $this->filesVariables;
     }
 
-    public function requestVariables()
-    {
+    public function requestVariables() {
         return $this->requestVariables;
     }
 }

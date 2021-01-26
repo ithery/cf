@@ -1,22 +1,14 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Command  
+ * Command
  *
  * This class is an extension of mikehaertl\shellcommand\Command and adds `wk*`
  * specific features like xvfb support and proper argument handling.
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
- * @license http://www.opensource.org/licenses/MIT
  */
 class CRunner_WkHtmlToPdf_Command extends CRunner_Command {
-
     /**
      * @var bool whether to enable the built in Xvfb support (uses xvfb-run)
      */
@@ -24,46 +16,46 @@ class CRunner_WkHtmlToPdf_Command extends CRunner_Command {
 
     /**
      * @var string the name of the xvfb-run comand. Default is `xvfb-run`.  You
-     * can also configure a full path here.
+     *             can also configure a full path here.
      */
     public $xvfbRunBinary = 'xvfb-run';
 
     /**
      * @var string options to pass to the xfvb-run command. Default is
-     * `--server-args="-screen 0, 1024x768x24"`.
+     *             `--server-args="-screen 0, 1024x768x24"`.
      */
     public $xvfbRunOptions = '-a --server-args="-screen 0, 1024x768x24"';
 
     /**
      * @param array $args args to add to the command. These can be:
-     * ```
-     * [
-     *   // Special argument 'input' will not get prepended with '--'.
-     *   'input' => 'cover',
+     *                    ```
+     *                    [
+     *                    // Special argument 'input' will not get prepended with '--'.
+     *                    'input' => 'cover',
      *
-     *   // Special argument 'inputArg' is treated like 'input' but will get escaped
-     *   // Both 'input' and 'inputArg' can be used in combination
-     *   'inputArg' => '/tmp/tmpFileName.html',
+     *                    // Special argument 'inputArg' is treated like 'input' but will get escaped
+     *                    // Both 'input' and 'inputArg' can be used in combination
+     *                    'inputArg' => '/tmp/tmpFileName.html',
      *
-     *   'no-outline',           // option without argument
-     *   'encoding' => 'UTF-8',  // option with argument
+     *                    'no-outline',           // option without argument
+     *                    'encoding' => 'UTF-8',  // option with argument
      *
-     *   // Option with 2 arguments
-     *   'cookie' => array('name'=>'value'),
+     *                    // Option with 2 arguments
+     *                    'cookie' => array('name'=>'value'),
      *
-     *   // Repeatable options with single argument
-     *   'run-script' => array(
-     *       'local1.js',
-     *       'local2.js',
-     *   ),
+     *                    // Repeatable options with single argument
+     *                    'run-script' => array(
+     *                    'local1.js',
+     *                    'local2.js',
+     *                    ),
      *
-     *   // Repeatable options with 2 arguments
-     *   'replace' => array(
-     *       '{page}' => $page++,
-     *       '{title}' => $pageTitle,
-     *   ),
-     * ]
-     * ```
+     *                    // Repeatable options with 2 arguments
+     *                    'replace' => array(
+     *                    '{page}' => $page++,
+     *                    '{title}' => $pageTitle,
+     *                    ),
+     *                    ]
+     *                    ```
      */
     public function addArgs($args) {
         if (isset($args['input'])) {
@@ -84,7 +76,7 @@ class CRunner_WkHtmlToPdf_Command extends CRunner_Command {
                     if (is_int($vkey)) {
                         $this->addArg("--$key", $vval);
                     } else {
-                        $this->addArg("--$key", array($vkey, $vval));
+                        $this->addArg("--$key", [$vkey, $vval]);
                     }
                 }
             } else {
@@ -95,7 +87,7 @@ class CRunner_WkHtmlToPdf_Command extends CRunner_Command {
 
     /**
      * @return string|bool the command to execute with optional Xfvb wrapper
-     * applied. Null if none set.
+     *                     applied. Null if none set.
      */
     public function getExecCommand() {
         $command = parent::getExecCommand();
@@ -104,5 +96,4 @@ class CRunner_WkHtmlToPdf_Command extends CRunner_Command {
         }
         return $command;
     }
-
 }

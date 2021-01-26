@@ -7,7 +7,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI\XmlConfiguration;
+
+namespace PHPUnit\TextUI\XmlConfiguration\TestSuite;
 
 use PHPUnit\Util\VersionComparisonOperator;
 
@@ -15,8 +16,7 @@ use PHPUnit\Util\VersionComparisonOperator;
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  * @psalm-immutable
  */
-final class TestFile
-{
+final class TestFile {
     /**
      * @var string
      */
@@ -32,25 +32,21 @@ final class TestFile
      */
     private $phpVersionOperator;
 
-    public function __construct($path, $phpVersion, VersionComparisonOperator $phpVersionOperator)
-    {
-        $this->path               = $path;
-        $this->phpVersion         = $phpVersion;
+    public function __construct($path, $phpVersion, VersionComparisonOperator $phpVersionOperator) {
+        $this->path = $path;
+        $this->phpVersion = $phpVersion;
         $this->phpVersionOperator = $phpVersionOperator;
     }
 
-    public function path()
-    {
+    public function path() {
         return $this->path;
     }
 
-    public function phpVersion()
-    {
+    public function phpVersion() {
         return $this->phpVersion;
     }
 
-    public function phpVersionOperator()
-    {
+    public function phpVersionOperator() {
         return $this->phpVersionOperator;
     }
 }

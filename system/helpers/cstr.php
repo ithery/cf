@@ -1,7 +1,13 @@
 <?php
 
-class cstr {
+use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
+use Ramsey\Uuid\Generator\CombGenerator;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidFactory;
 
+// @codingStandardsIgnoreStart
+class cstr {
+    // @codingStandardsIgnoreEnd
     /**
      * The cache of snake-cased words.
      *
@@ -17,54 +23,18 @@ class cstr {
     protected static $camelCache = [];
 
     /**
+     * The callback that should be used to generate UUIDs.
+     *
+     * @var callable
+     */
+    protected static $uuidFactory;
+
+    /**
      * The cache of studly-cased words.
      *
      * @var array
      */
     protected static $studlyCache = [];
-
-    public static function strip_thousand_separator($val) {
-        $x = $val;
-        $dec_sep = "";
-        if (strlen($x) > 3) {
-            $dec_sep = substr($x, strlen($x) - 3, 1);
-        }
-        if ($dec_sep == "," || $dec_sep == ".") {
-            if ($dec_sep == ",") {
-                $x = str_replace(".", "", $x);
-            } else {
-                $x = str_replace(",", "", $x);
-            }
-        } else {
-            $x = str_replace(".", "", $x);
-            $x = str_replace(",", "", $x);
-        }
-        return $x;
-    }
-
-    public static function replace_id_month($val) {
-        $val_new = $val;
-        $val_new = str_replace("Januari", "January", $val_new);
-        $val_new = str_replace("Februari", "February", $val_new);
-        $val_new = str_replace("Maret", "March", $val_new);
-        $val_new = str_replace("April", "April", $val_new);
-        $val_new = str_replace("Mei", "May", $val_new);
-        $val_new = str_replace("Juni", "June", $val_new);
-        $val_new = str_replace("Juli", "July", $val_new);
-        $val_new = str_replace("Agustus", "August", $val_new);
-        $val_new = str_replace("September", "September", $val_new);
-        $val_new = str_replace("Oktober", "October", $val_new);
-        $val_new = str_replace("November", "November", $val_new);
-        $val_new = str_replace("Desember", "December", $val_new);
-
-        $val_new = str_replace("Agust", "Aug", $val_new);
-        $val_new = str_replace("Agu", "Aug", $val_new);
-        $val_new = str_replace("Okt", "Oct", $val_new);
-        $val_new = str_replace("Des", "Dec", $val_new);
-        $val_new = str_replace("Nop", "Nov", $val_new);
-
-        return $val_new;
-    }
 
     public static function len($str) {
         return strlen($str);
@@ -82,15 +52,24 @@ class cstr {
         return strpos($string, $needle, $offset);
     }
 
-    public static function between($open, $close, $str) {
-        $start_index = strpos($str, $open);
-        $end_index = strpos($str, $close);
-        $start_index += cstr::len($open);
-        $str = substr($str, $start_index, $end_index - $start_index);
-        return $str;
+    /**
+     * Get the portion of a string between two given values.
+     *
+     * @param string $subject
+     * @param string $from
+     * @param string $to
+     *
+     * @return string
+     */
+    public static function between($subject, $from, $to) {
+        if ($from === '' || $to === '') {
+            return $subject;
+        }
+
+        return static::beforeLast(static::after($subject, $from), $to);
     }
 
-    public static function sanitize($string = '', $is_filename = FALSE) {
+    public static function sanitize($string = '', $is_filename = false) {
         // Replace all weird characters with dashes
         $string = preg_replace('/[^\w\-' . ($is_filename ? '~_\.' : '') . ']+/u', '-', $string);
 
@@ -101,8 +80,9 @@ class cstr {
     /**
      * Limit the number of characters in a string and give ... in end of string
      *
-     * @param  string  $value
-     * @param  int     $limit
+     * @param string $value
+     * @param int    $limit
+     *
      * @return string
      */
     public static function ellipsis($value, $limit = 100) {
@@ -112,9 +92,10 @@ class cstr {
     /**
      * Limit the number of characters in a string.
      *
-     * @param  string  $value
-     * @param  int     $limit
-     * @param  string  $end
+     * @param string $value
+     * @param int    $limit
+     * @param string $end
+     *
      * @return string
      */
     public static function limit($value, $limit = 100, $end = '...') {
@@ -128,9 +109,10 @@ class cstr {
     /**
      * Limit the number of words in a string.
      *
-     * @param  string  $value
-     * @param  int     $words
-     * @param  string  $end
+     * @param string $value
+     * @param int    $words
+     * @param string $end
+     *
      * @return string
      */
     public static function limitWords($value, $words = 100, $end = '...') {
@@ -146,7 +128,8 @@ class cstr {
     /**
      * Generate a more truly "random" alpha-numeric string.
      *
-     * @param  int  $length
+     * @param int $length
+     *
      * @return string
      */
     public static function random($length = 16) {
@@ -170,9 +153,10 @@ class cstr {
     /**
      * Replace a given value in the string sequentially with an array.
      *
-     * @param  string  $search
-     * @param  array   $replace
-     * @param  string  $subject
+     * @param string $search
+     * @param array  $replace
+     * @param string $subject
+     *
      * @return string
      */
     public static function replaceArray($search, array $replace, $subject) {
@@ -186,9 +170,10 @@ class cstr {
     /**
      * Replace the first occurrence of a given value in the string.
      *
-     * @param  string  $search
-     * @param  string  $replace
-     * @param  string  $subject
+     * @param string $search
+     * @param string $replace
+     * @param string $subject
+     *
      * @return string
      */
     public static function replaceFirst($search, $replace, $subject) {
@@ -208,9 +193,10 @@ class cstr {
     /**
      * Replace the last occurrence of a given value in the string.
      *
-     * @param  string  $search
-     * @param  string  $replace
-     * @param  string  $subject
+     * @param string $search
+     * @param string $replace
+     * @param string $subject
+     *
      * @return string
      */
     public static function replaceLast($search, $replace, $subject) {
@@ -223,127 +209,12 @@ class cstr {
         return $subject;
     }
 
-    public static function between_replace($open, $close, &$in, $with, $limit = false, $from = 0) {
-        if ($limit !== false && $limit == 0) {
-            return $in;
-        }
-        $open_position = strpos($in, $open, $from);
-        if ($open_position === false) {
-            return false;
-        };
-        $close_position = strpos($in, $close, $open_position + strlen($open));
-        if ($close_position === false) {
-            return false;
-        };
-        $current = false;
-        if (strpos($with, '{*}') !== false) {
-            $current = substr($in, $open_position + strlen($open), $close_position - $open_position - strlen($open));
-            $current = str_replace('{*}', $current, $with);
-            //debug_echo ($current);
-        } else {
-            $current = $with;
-        }
-        $in = substr_replace($in, $current, $open_position + strlen($open), $close_position - $open_position - strlen($open));
-        $next_position = $open_position + strlen($current) + 1;
-        if ($next_position >= strlen($in)) {
-            return false;
-        }
-        if ($limit !== false) {
-            $limit--;
-        }
-        between_replace($open, $close, $in, $with, $limit, $next_position);
-        return $in;
-    }
-
-    /**
-     * Uppercase words that are not separated by spaces, using a custom
-     * delimiter or the default.
-     *
-     *      $str = cstr::ucfirst('content-type'); // returns "Content-Type"
-     *
-     * @param   string  $string     string to transform
-     * @param   string  $delimiter  delimiter to use
-     * @uses    CUTF8::ucfirst
-     * @return  string
-     */
-    public static function ucfirst($string, $delimiter = ' ') {
-        // Put the keys back the Case-Convention expected
-        return implode($delimiter, array_map('CUTF8::ucfirst', explode($delimiter, $string)));
-    }
-
-    /**
-     * Returns information about the client user agent.
-     *
-     *     // Returns "Chrome" when using Google Chrome
-     *     $browser = Text::user_agent($agent, 'browser');
-     *
-     * Multiple values can be returned at once by using an array:
-     *
-     *     // Get the browser and platform with a single call
-     *     $info = Text::user_agent($agent, array('browser', 'platform'));
-     *
-     * When using an array for the value, an associative array will be returned.
-     *
-     * @param   string  $agent  user_agent
-     * @param   mixed   $value  array or string to return: browser, version, robot, mobile, platform
-     * @return  mixed   requested information, FALSE if nothing is found
-     * @uses    Kohana::$config
-     */
-    public static function user_agent($agent, $value) {
-        if (is_array($value)) {
-            $data = array();
-            foreach ($value as $part) {
-                // Add each part to the set
-                $data[$part] = Text::user_agent($agent, $part);
-            }
-
-            return $data;
-        }
-
-        if ($value === 'browser' OR $value == 'version') {
-            // Extra data will be captured
-            $info = array();
-
-            // Load browsers
-            $browsers = Kohana::$config->load('user_agents')->browser;
-
-            foreach ($browsers as $search => $name) {
-                if (stripos($agent, $search) !== FALSE) {
-                    // Set the browser name
-                    $info['browser'] = $name;
-
-                    if (preg_match('#' . preg_quote($search) . '[^0-9.]*+([0-9.][0-9.a-z]*)#i', $agent, $matches)) {
-                        // Set the version number
-                        $info['version'] = $matches[1];
-                    } else {
-                        // No version number found
-                        $info['version'] = FALSE;
-                    }
-
-                    return $info[$value];
-                }
-            }
-        } else {
-            // Load the search group for this type
-            $group = CF::config('user_agents');
-
-            foreach ($group as $search => $name) {
-                if (stripos($agent, $search) !== FALSE) {
-                    // Set the value name
-                    return $name;
-                }
-            }
-        }
-
-        // The value requested could not be found
-        return FALSE;
-    }
-
     /**
      * Determine if a given string contains a given substring.
      *
-     * @param  string  $haystack
-     * @param  string|array  $needles
+     * @param string       $haystack
+     * @param string|array $needles
+     *
      * @return bool
      */
     public static function contains($haystack, $needles) {
@@ -359,8 +230,9 @@ class cstr {
     /**
      * Convert a string to snake case.
      *
-     * @param  string  $value
-     * @param  string  $delimiter
+     * @param string $value
+     * @param string $delimiter
+     *
      * @return string
      */
     public static function snake($value, $delimiter = '_') {
@@ -382,7 +254,8 @@ class cstr {
     /**
      * Convert a string to kebab case.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public static function kebab($value) {
@@ -392,8 +265,9 @@ class cstr {
     /**
      * Begin a string with a single instance of a given value.
      *
-     * @param  string  $value
-     * @param  string  $prefix
+     * @param string $value
+     * @param string $prefix
+     *
      * @return string
      */
     public static function start($value, $prefix) {
@@ -405,7 +279,8 @@ class cstr {
     /**
      * Convert the given string to title case.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public static function title($value) {
@@ -415,8 +290,9 @@ class cstr {
     /**
      * Determine if a given string starts with a given substring.
      *
-     * @param  string  $haystack
-     * @param  string|array  $needles
+     * @param string       $haystack
+     * @param string|array $needles
+     *
      * @return bool
      */
     public static function startsWith($haystack, $needles) {
@@ -432,8 +308,9 @@ class cstr {
     /**
      * Determine if a given string ends with a given substring.
      *
-     * @param  string  $haystack
-     * @param  string|array  $needles
+     * @param string       $haystack
+     * @param string|array $needles
+     *
      * @return bool
      */
     public static function endsWith($haystack, $needles) {
@@ -449,7 +326,8 @@ class cstr {
     /**
      * Convert a value to studly caps case.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public static function studly($value) {
@@ -467,7 +345,8 @@ class cstr {
     /**
      * Convert a value to camel case.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public static function camel($value) {
@@ -481,7 +360,8 @@ class cstr {
     /**
      * Convert the given string to lower-case.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public static function lower($value) {
@@ -491,8 +371,9 @@ class cstr {
     /**
      * Get the plural form of an English word.
      *
-     * @param  string  $value
-     * @param  int     $count
+     * @param string $value
+     * @param int    $count
+     *
      * @return string
      */
     public static function plural($value, $count = 2) {
@@ -502,7 +383,8 @@ class cstr {
     /**
      * Get the singular form of an English word.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public static function singular($value) {
@@ -512,9 +394,10 @@ class cstr {
     /**
      * Generate a URL friendly "slug" from a given string.
      *
-     * @param  string  $title
-     * @param  string  $separator
-     * @param  string  $language
+     * @param string $title
+     * @param string $separator
+     * @param string $language
+     *
      * @return string
      */
     public static function slug($title, $separator = '-', $language = 'en') {
@@ -540,7 +423,8 @@ class cstr {
     /**
      * Convert the given string to upper-case.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public static function upper($value) {
@@ -550,8 +434,9 @@ class cstr {
     /**
      * Parse a Class@method style callback into class and method.
      *
-     * @param  string  $callback
-     * @param  string|null  $default
+     * @param string      $callback
+     * @param string|null $default
+     *
      * @return array
      */
     public static function parseCallback($callback, $default = null) {
@@ -559,10 +444,25 @@ class cstr {
     }
 
     /**
+     * Cap a string with a single instance of a given value.
+     *
+     * @param string $value
+     * @param string $cap
+     *
+     * @return string
+     */
+    public static function finish($value, $cap) {
+        $quoted = preg_quote($cap, '/');
+
+        return preg_replace('/(?:' . $quoted . ')+$/u', '', $value) . $cap;
+    }
+
+    /**
      * Determine if a given string matches a given pattern.
      *
-     * @param  string|array  $pattern
-     * @param  string  $value
+     * @param string|array $pattern
+     * @param string       $value
+     *
      * @return bool
      */
     public static function is($pattern, $value) {
@@ -598,9 +498,10 @@ class cstr {
     /**
      * Returns the portion of string specified by the start and length parameters.
      *
-     * @param  string  $string
-     * @param  int  $start
-     * @param  int|null  $length
+     * @param string   $string
+     * @param int      $start
+     * @param int|null $length
+     *
      * @return string
      */
     public static function substr($string, $start, $length = null) {
@@ -610,8 +511,9 @@ class cstr {
     /**
      * Return the length of the given string.
      *
-     * @param  string  $value
-     * @param  string  $encoding
+     * @param string $value
+     * @param string $encoding
+     *
      * @return int
      */
     public static function length($value, $encoding = null) {
@@ -625,8 +527,9 @@ class cstr {
     /**
      * Return the remainder of a string after a given value.
      *
-     * @param  string  $subject
-     * @param  string  $search
+     * @param string $subject
+     * @param string $search
+     *
      * @return string
      */
     public static function after($subject, $search) {
@@ -634,10 +537,33 @@ class cstr {
     }
 
     /**
+     * Return the remainder of a string after the last occurrence of a given value.
+     *
+     * @param string $subject
+     * @param string $search
+     *
+     * @return string
+     */
+    public static function afterLast($subject, $search) {
+        if ($search === '') {
+            return $subject;
+        }
+
+        $position = strrpos($subject, (string) $search);
+
+        if ($position === false) {
+            return $subject;
+        }
+
+        return substr($subject, $position + strlen($search));
+    }
+
+    /**
      * Get the portion of a string before a given value.
      *
-     * @param  string  $subject
-     * @param  string  $search
+     * @param string $subject
+     * @param string $search
+     *
      * @return string
      */
     public static function before($subject, $search) {
@@ -645,10 +571,33 @@ class cstr {
     }
 
     /**
+     * Get the portion of a string before the last occurrence of a given value.
+     *
+     * @param string $subject
+     * @param string $search
+     *
+     * @return string
+     */
+    public static function beforeLast($subject, $search) {
+        if ($search === '') {
+            return $subject;
+        }
+
+        $pos = mb_strrpos($subject, $search);
+
+        if ($pos === false) {
+            return $subject;
+        }
+
+        return static::substr($subject, 0, $pos);
+    }
+
+    /**
      * Transliterate a UTF-8 value to ASCII.
      *
-     * @param  string  $value
-     * @param  string  $language
+     * @param string $value
+     * @param string $language
+     *
      * @return string
      */
     public static function ascii($value, $language = 'en') {
@@ -803,9 +752,10 @@ class cstr {
      *
      * Note: Adapted from Stringy\Stringy.
      *
+     * @param string $language
+     *
      * @see https://github.com/danielstjules/Stringy/blob/3.1.0/LICENSE.txt
      *
-     * @param  string  $language
      * @return array|null
      */
     protected static function languageSpecificCharsArray($language) {
@@ -838,10 +788,8 @@ class cstr {
     /**
      * Splits `string` into an array of its words.
      *
-     * @category String
-     *
-     * @param    string $string  The string to inspect.
-     * @param   string  $pattern The pattern to match words.
+     * @param string $string  The string to inspect.
+     * @param string $pattern The pattern to match words.
      *
      * @return array Returns the words of `string`.
      *
@@ -855,7 +803,6 @@ class cstr {
      * </code>
      */
     public static function words($string, $pattern = null) {
-
         $asciiWords = '/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/';
         $hasUnicodeWord = '/[a-z][A-Z]|[A-Z]{2,}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/';
 
@@ -875,14 +822,11 @@ class cstr {
     /**
      * Splits a Unicode `string` into an array of its words.
      *
-     * @private
-     *
      * @param string $string The string to inspect.
      *
      * @return array Returns the words of `string`.
      */
     public static function unicodeWords($string) {
-
         $rsAstralRange = '\\x{e800}-\\x{efff}';
         $rsComboMarksRange = '\\x{0300}-\\x{036f}';
         $reComboHalfMarksRange = '\\x{fe20}-\\x{fe2f}';
@@ -897,8 +841,8 @@ class cstr {
         $rsUpperRange = 'A-Z\\xc0-\\xd6\\xd8-\\xde';
         $rsVarRange = '\\x{fe0e}\\x{fe0f}';
         $rsBreakRange = $rsMathOpRange . $rsNonCharRange . $rsPunctuationRange . $rsSpaceRange;
-        /** Used to compose unicode capture groups. */
-        $rsApos = "[\\x{2019}]";
+        /* Used to compose unicode capture groups. */
+        $rsApos = '[\\x{2019}]';
         $rsBreak = '[' . $rsBreakRange . ']';
         $rsCombo = '[' . $rsComboRange . ']';
         $rsDigits = '\\d+';
@@ -912,7 +856,7 @@ class cstr {
         $rsSurrPair = '[\\x{e800}-\\x{ebff}][\\x{ec00}-\\x{efff}]';
         $rsUpper = '[' . $rsUpperRange . ']';
         $rsZWJ = '\\x{200d}';
-        /** Used to compose unicode regexes. */
+        /* Used to compose unicode regexes. */
         $rsMiscLower = '(?:' . $rsLower . '|' . $rsMisc . ')';
         $rsMiscUpper = '(?:' . $rsUpper . '|' . $rsMisc . ')';
         $rsOptContrLower = '(?:' . $rsApos . '(?:d|ll|m|re|s|t|ve))?';
@@ -927,19 +871,19 @@ class cstr {
         $rsAstral = '[' . $rsAstralRange . ']';
         $rsNonAstralCombo = $rsNonAstral . $rsCombo . '?';
         $rsSymbol = '(?:' . implode('|', [$rsNonAstralCombo, $rsCombo, $rsRegional, $rsSurrPair, $rsAstral]) . ')';
-        /** Used to match [string symbols](https://mathiasbynens.be/notes/javascript-unicode). */
+        /* Used to match [string symbols](https://mathiasbynens.be/notes/javascript-unicode). */
         $reUnicode = $rsFitz . '(?=' . $rsFitz . ')|' . $rsSymbol . $rsSeq;
 
         $regex = '#' . \implode('|', [
-                    $rsUpper . '?' . $rsLower . '+' . $rsOptContrLower . '(?=' . \implode('|', [$rsBreak, $rsUpper, '$']) . ')',
-                    $rsMiscUpper . '+' . $rsOptContrUpper . '(?=' . \implode('|', [$rsBreak, $rsUpper . $rsMiscLower, '$']) . ')',
-                    $rsUpper . '?' . $rsMiscLower . '+' . $rsOptContrLower,
-                    $rsUpper . '+' . $rsOptContrUpper,
-                    $rsOrdUpper,
-                    $rsOrdLower,
-                    $rsDigits,
-                    $rsEmoji,
-                ]) . '#u';
+            $rsUpper . '?' . $rsLower . '+' . $rsOptContrLower . '(?=' . \implode('|', [$rsBreak, $rsUpper, '$']) . ')',
+            $rsMiscUpper . '+' . $rsOptContrUpper . '(?=' . \implode('|', [$rsBreak, $rsUpper . $rsMiscLower, '$']) . ')',
+            $rsUpper . '?' . $rsMiscLower . '+' . $rsOptContrLower,
+            $rsUpper . '+' . $rsOptContrUpper,
+            $rsOrdUpper,
+            $rsOrdLower,
+            $rsDigits,
+            $rsEmoji,
+        ]) . '#u';
         if (\preg_match_all($regex, $string, $matches) > 0) {
             return $matches[0];
         }
@@ -950,11 +894,10 @@ class cstr {
      * Escapes the `RegExp` special characters "^", "$", "\", ".", "*", "+",
      * "?", "(", ")", "[", "]", "{", "}", and "|" in `string`.
      *
-     * @category String
-     *
      * @param string $string The string to escape.
      *
      * @return string Returns the escaped string.
+     *
      * @example
      * <code>
      * escapeRegExp('[lodash](https://lodash.com/)')
@@ -966,4 +909,87 @@ class cstr {
         return \preg_replace($reRegExpChar, '\\\$0', $string);
     }
 
+    /**
+     * Get a new stringable object from the given string.
+     *
+     * @param string $string
+     *
+     * @return CBase_String
+     */
+    public static function of($string) {
+        return new CBase_String($string);
+    }
+
+    /**
+     * Uppercase words that are not separated by spaces, using a custom
+     * delimiter or the default.
+     *
+     *      $str = cstr::ucfirst('content-type'); // returns "Content-Type"
+     *
+     * @param string $string    string to transform
+     * @param string $delimiter delimiter to use
+     *
+     * @uses    CUTF8::ucfirst
+     *
+     * @return string
+     */
+    public static function ucfirst($string, $delimiter = ' ') {
+        // Put the keys back the Case-Convention expected
+        return implode($delimiter, array_map('CUTF8::ucfirst', explode($delimiter, $string)));
+    }
+
+    /**
+     * Generate a UUID (version 4).
+     *
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function uuid() {
+        return static::$uuidFactory
+            ? call_user_func(static::$uuidFactory)
+            : Uuid::uuid4();
+    }
+
+    /**
+     * Generate a time-ordered UUID (version 4).
+     *
+     * @return \Ramsey\Uuid\UuidInterface
+     */
+    public static function orderedUuid() {
+        if (static::$uuidFactory) {
+            return call_user_func(static::$uuidFactory);
+        }
+
+        $factory = new UuidFactory();
+
+        $factory->setRandomGenerator(new CombGenerator(
+            $factory->getRandomGenerator(),
+            $factory->getNumberConverter()
+        ));
+
+        $factory->setCodec(new TimestampFirstCombCodec(
+            $factory->getUuidBuilder()
+        ));
+
+        return $factory->uuid4();
+    }
+
+    /**
+     * Set the callable that will be used to generate UUIDs.
+     *
+     * @param callable|null $factory
+     *
+     * @return void
+     */
+    public static function createUuidsUsing(callable $factory = null) {
+        static::$uuidFactory = $factory;
+    }
+
+    /**
+     * Indicate that UUIDs should be created normally and not using a custom factory.
+     *
+     * @return void
+     */
+    public static function createUuidsNormally() {
+        static::$uuidFactory = null;
+    }
 }

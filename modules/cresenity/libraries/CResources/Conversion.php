@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 2, 2019, 2:28:30 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 2, 2019, 2:28:30 AM
  */
 
 /** @mixin CImage_Manipulations */
 class CResources_Conversion {
-
     /** @var string */
     protected $name = '';
 
@@ -35,8 +35,8 @@ class CResources_Conversion {
     public function __construct($name) {
         $this->name = $name;
         $this->manipulations = (new CImage_Manipulations())
-                ->optimize(CF::config('resource.image_optimizers'))
-                ->format('jpg');
+            ->optimize(CF::config('resource.image_optimizers'))
+            ->format('jpg');
     }
 
     public static function create($name) {
@@ -47,11 +47,12 @@ class CResources_Conversion {
         return $this->name;
     }
 
-    /*
+    /**
      * Set the timecode in seconds to extract a video thumbnail.
      * Only used on video media.
+     *
+     * @param mixed $timeCode
      */
-
     public function extractVideoFrameAtSecond($timeCode) {
         $this->extractVideoFrameAtSecond = $timeCode;
         return $this;
@@ -71,7 +72,6 @@ class CResources_Conversion {
     }
 
     /**
-     * 
      * @return CImage_Manipulations
      */
     public function getManipulations() {
@@ -123,8 +123,8 @@ class CResources_Conversion {
     public function addAsFirstManipulations(CImage_Manipulations $manipulations) {
         $manipulationSequence = $manipulations->getManipulationSequence()->toArray();
         $this->manipulations
-                ->getManipulationSequence()
-                ->mergeArray($manipulationSequence);
+            ->getManipulationSequence()
+            ->mergeArray($manipulationSequence);
         return $this;
     }
 
@@ -140,11 +140,12 @@ class CResources_Conversion {
         return $this;
     }
 
-    /*
+    /**
      * Determine if this conversion should be performed on the given
      * collection.
+     *
+     * @param mixed $collectionName
      */
-
     public function shouldBePerformedOn($collectionName) {
         //if no collections were specified, perform conversion on all collections
         if (!count($this->performOnCollections)) {
@@ -201,18 +202,18 @@ class CResources_Conversion {
         return $this->generateResponsiveImages;
     }
 
-    /*
+    /**
      * Determine if the conversion should be queued.
      */
-
     public function shouldBeQueued() {
         return $this->performOnQueue;
     }
 
-    /*
+    /**
      * Get the extension that the result of this conversion must have.
+     *
+     * @param mixed $originalFileExtension
      */
-
     public function getResultExtension($originalFileExtension = '') {
         if ($this->shouldKeepOriginalImageFormat()) {
             if (in_array($originalFileExtension, ['jpg', 'pjpg', 'png', 'gif'])) {
@@ -226,7 +227,6 @@ class CResources_Conversion {
     }
 
     public function getConversionFile($file) {
-        
         $fileName = pathinfo($file, PATHINFO_FILENAME);
         $extension = $this->getResultExtension();
         if (!$extension) {
@@ -234,5 +234,4 @@ class CResources_Conversion {
         }
         return "{$fileName}-{$this->getName()}.{$extension}";
     }
-
 }

@@ -106,7 +106,7 @@ class CModel_Nested_Move {
 
             $this->node->getConnection()->transaction(function() use ($self) {
                 $self->updateStructure();
-               
+
             });
 
             $this->target->reload();
@@ -190,7 +190,7 @@ class CModel_Nested_Move {
         if (c::hasTrait($node,'CModel_Nested_NestedTrait')) {
             return $node->reload();
         }
-       
+
         return $this->node->newNestedSetQuery()->find($node);
     }
 
@@ -207,7 +207,7 @@ class CModel_Nested_Move {
             throw new CModel_Nested_Exception_MoveNotPossibleException("Position should be one of ['child', 'left', 'right'] but is {$this->position}.");
 
         if (!$this->promotingToRoot()) {
-            
+
             if (is_null($this->target)) {
                 if ($this->position === 'left' || $this->position === 'right')
                     throw new CModel_Nested_Exception_MoveNotPossibleException("Could not resolve target node. This node cannot move any further to the {$this->position}.");
@@ -361,7 +361,7 @@ class CModel_Nested_Move {
 
         // Basically the same as \Illuminate\Database\Eloquent\Model->fireModelEvent
         // but we relay the event into the node instance.
-        $event = "eloquent.{$event}: " . get_class($this->node);
+        $event = "model.{$event}: " . get_class($this->node);
 
         $method = $halt ? 'until' : 'fire';
 
@@ -380,7 +380,7 @@ class CModel_Nested_Move {
 
         $connection = $this->node->getConnection();
 
-        
+
 
         return $connection->escape($value);
     }

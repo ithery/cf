@@ -13,6 +13,7 @@ use function array_keys;
 use function get_class;
 use function spl_object_hash;
 use PHPUnit\Util\Filter;
+use PHPUnit\Framework\Exception\Exception;
 use Throwable;
 
 /**
@@ -38,7 +39,7 @@ final class ExceptionWrapper extends Exception
      */
     protected $previous;
 
-    public function __construct(Throwable $t)
+    public function __construct( $t)
     {
         // PDOException::getCode() is a string.
         // @see https://php.net/manual/en/class.pdoexception.php#95812

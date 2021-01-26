@@ -72,7 +72,7 @@ class CModel_Validating_ValidatingObserver {
         if ($dispatcher == null) {
             return true;
         }
-        return $dispatcher->until("eloquent.validating: " . get_class($model), [$model, $event]);
+        return $dispatcher->until("model.validating: " . get_class($model), [$model, $event]);
     }
 
     /**
@@ -88,7 +88,7 @@ class CModel_Validating_ValidatingObserver {
             return true;
         }
 
-        $dispatcher->dispatch("eloquent.validated: " . get_class($model), [$model, $status]);
+        $dispatcher->dispatch("model.validated: " . get_class($model), [$model, $status]);
     }
 
 }

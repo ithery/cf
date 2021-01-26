@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 20, 2019, 1:19:47 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 20, 2019, 1:19:47 PM
  */
 trait CObservable_Listener_Trait_HandlerTrait {
-
     /**
-     * 
      * @return \CObservable_Listener_Handler_ReloadHandler
      */
     public function addReloadHandler() {
@@ -31,7 +30,6 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
-     * 
      * @return \CObservable_Listener_Handler_ReloadDataTableHandler
      */
     public function addReloadDataTableHandler() {
@@ -41,7 +39,6 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
-     * 
      * @return \CObservable_Listener_Handler_AppendHandler
      */
     public function addAppendHandler() {
@@ -51,7 +48,6 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
-     * 
      * @return \CObservable_Listener_Handler_PrependHandler
      */
     public function addPrependHandler() {
@@ -61,7 +57,6 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
-     * 
      * @return \CObservable_Listener_Handler_DialogHandler
      */
     public function addDialogHandler() {
@@ -71,7 +66,6 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
-     * 
      * @return \CObservable_Listener_Handler_CloseDialogHandler
      */
     public function addCloseDialogHandler() {
@@ -81,7 +75,6 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
-     * 
      * @return \CObservable_Listener_Handler_AjaxSubmitHandler
      */
     public function addAjaxSubmitHandler() {
@@ -91,7 +84,6 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
-     * 
      * @return \CObservable_Listener_Handler_AjaxHandler
      */
     public function addAjaxHandler() {
@@ -101,7 +93,6 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
-     * 
      * @return \CObservable_Listener_Handler_RemoveHandler
      */
     public function addRemoveHandler() {
@@ -111,7 +102,6 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
-     * 
      * @return \CObservable_Listener_Handler_ToastHandler
      */
     public function addToastHandler() {
@@ -120,4 +110,12 @@ trait CObservable_Listener_Trait_HandlerTrait {
         return $handler;
     }
 
+    /**
+     * @return \CObservable_Listener_Handler_CustomHandler
+     */
+    public function addCustomHandler() {
+        $handler = new CObservable_Listener_Handler_CustomHandler($this);
+        $this->handlers[] = $handler;
+        return $handler;
+    }
 }

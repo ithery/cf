@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 12, 2019, 8:26:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 12, 2019, 8:26:34 PM
  */
-class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterface_Jsonable, JsonSerializable, CValidation_MessageBagInterface {
-
+class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterface_Jsonable, JsonSerializable, CBase_MessageBagInterface {
     /**
      * All of the registered messages.
      *
@@ -26,7 +26,8 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Create a new message bag instance.
      *
-     * @param  array  $messages
+     * @param array $messages
+     *
      * @return void
      */
     public function __construct(array $messages = []) {
@@ -47,8 +48,9 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Add a message to the bag.
      *
-     * @param  string  $key
-     * @param  string  $message
+     * @param string $key
+     * @param string $message
+     *
      * @return $this
      */
     public function add($key, $message) {
@@ -62,8 +64,9 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Determine if a key and message combination already exists.
      *
-     * @param  string  $key
-     * @param  string  $message
+     * @param string $key
+     * @param string $message
+     *
      * @return bool
      */
     protected function isUnique($key, $message) {
@@ -75,11 +78,12 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Merge a new array of messages into the bag.
      *
-     * @param  \Illuminate\Contracts\Support\MessageProvider|array  $messages
+     * @param \Illuminate\Contracts\Support\MessageProvider|array $messages
+     *
      * @return $this
      */
     public function merge($messages) {
-        if ($messages instanceof MessageProvider) {
+        if ($messages instanceof CBase_MessageProviderInterface) {
             $messages = $messages->getMessageBag()->getMessages();
         }
 
@@ -91,7 +95,8 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Determine if messages exist for all of the given keys.
      *
-     * @param  array|string  $key
+     * @param array|string $key
+     *
      * @return bool
      */
     public function has($key) {
@@ -113,7 +118,8 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Determine if messages exist for any of the given keys.
      *
-     * @param  array|string  $keys
+     * @param array|string $keys
+     *
      * @return bool
      */
     public function hasAny($keys = []) {
@@ -131,8 +137,9 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Get the first message from the bag for a given key.
      *
-     * @param  string  $key
-     * @param  string  $format
+     * @param string $key
+     * @param string $format
+     *
      * @return string
      */
     public function first($key = null, $format = null) {
@@ -146,8 +153,9 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Get all of the messages from the bag for a given key.
      *
-     * @param  string  $key
-     * @param  string  $format
+     * @param string $key
+     * @param string $format
+     *
      * @return array
      */
     public function get($key, $format = null) {
@@ -156,7 +164,9 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
         // all the messages that match a given key and output it as an array.
         if (array_key_exists($key, $this->messages)) {
             return $this->transform(
-                            $this->messages[$key], $this->checkFormat($format), $key
+                $this->messages[$key],
+                $this->checkFormat($format),
+                $key
             );
         }
 
@@ -170,18 +180,21 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Get the messages for a wildcard key.
      *
-     * @param  string  $key
-     * @param  string|null  $format
+     * @param string      $key
+     * @param string|null $format
+     *
      * @return array
      */
     protected function getMessagesForWildcardKey($key, $format) {
-        return CF::collect($this->messages)
+        return c::collect($this->messages)
                         ->filter(function ($messages, $messageKey) use ($key) {
                             return cstr::is($key, $messageKey);
                         })
                         ->map(function ($messages, $messageKey) use ($format) {
                             return $this->transform(
-                                            $messages, $this->checkFormat($format), $messageKey
+                                $messages,
+                                $this->checkFormat($format),
+                                $messageKey
                             );
                         })->all();
     }
@@ -189,7 +202,8 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Get all of the messages for every key in the bag.
      *
-     * @param  string  $format
+     * @param string $format
+     *
      * @return array
      */
     public function all($format = null) {
@@ -207,7 +221,8 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Get all of the unique messages for every key in the bag.
      *
-     * @param  string  $format
+     * @param string $format
+     *
      * @return array
      */
     public function unique($format = null) {
@@ -217,25 +232,27 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Format an array of messages.
      *
-     * @param  array   $messages
-     * @param  string  $format
-     * @param  string  $messageKey
+     * @param array  $messages
+     * @param string $format
+     * @param string $messageKey
+     *
      * @return array
      */
     protected function transform($messages, $format, $messageKey) {
-        return CF::collect((array) $messages)
-                        ->map(function ($message) use ($format, $messageKey) {
-                            // We will simply spin through the given messages and transform each one
-                            // replacing the :message place holder with the real message allowing
-                            // the messages to be easily formatted to each developer's desires.
-                            return str_replace([':message', ':key'], [$message, $messageKey], $format);
-                        })->all();
+        return c::collect((array) $messages)
+            ->map(function ($message) use ($format, $messageKey) {
+                // We will simply spin through the given messages and transform each one
+                // replacing the :message place holder with the real message allowing
+                // the messages to be easily formatted to each developer's desires.
+                return str_replace([':message', ':key'], [$message, $messageKey], $format);
+            })->all();
     }
 
     /**
      * Get the appropriate format based on the given format.
      *
-     * @param  string  $format
+     * @param string $format
+     *
      * @return string
      */
     protected function checkFormat($format) {
@@ -281,7 +298,8 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Set the default message format.
      *
-     * @param  string  $format
+     * @param string $format
+     *
      * @return \Illuminate\Support\MessageBag
      */
     public function setFormat($format = ':message') {
@@ -347,7 +365,8 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     /**
      * Convert the object to its JSON representation.
      *
-     * @param  int  $options
+     * @param int $options
+     *
      * @return string
      */
     public function toJson($options = 0) {
@@ -362,5 +381,4 @@ class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterf
     public function __toString() {
         return $this->toJson();
     }
-
 }

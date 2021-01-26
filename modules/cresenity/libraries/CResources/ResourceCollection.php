@@ -1,45 +1,62 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 2, 2019, 2:47:36 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 2, 2019, 2:47:36 AM
  */
 class CResources_ResourceCollection {
-
-    /** @var string */
+    /**
+     * @var string
+     */
     public $name = '';
 
-    /** @var string */
+    /**
+     * @var string
+     */
     public $diskName = '';
 
-    /** @var callable */
+    /**
+     * @var callable
+     */
     public $resourceConversionRegistrations;
 
-    /** @var callable */
+    /**
+     * @var callable
+     */
     public $acceptsFile;
 
-    /** @var array $acceptsMimeTypes */
+    /**
+     * @var array $acceptsMimeTypes
+     */
     public $acceptsMimeTypes = [];
 
-    /** @var int */
+    /**
+     * @var int
+     */
     public $collectionSizeLimit = false;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     public $singleFile = false;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     public $fallbackUrl = '';
 
-    /** @var string */
+    /**
+     * @var string
+     */
     public $fallbackPath = '';
 
     public function __construct($name) {
         $this->name = $name;
         $this->resourceConversionRegistrations = function () {
-            
         };
         $this->acceptsFile = function () {
             return true;
@@ -91,5 +108,4 @@ class CResources_ResourceCollection {
         $this->fallbackPath = $path;
         return $this;
     }
-
 }

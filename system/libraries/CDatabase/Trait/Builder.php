@@ -1,19 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 24, 2018, 1:15:35 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 24, 2018, 1:15:35 PM
  */
 trait CDatabase_Trait_Builder {
-
     /**
      * Chunk the results of the query.
      *
-     * @param  int  $count
-     * @param  callable  $callback
+     * @param int      $count
+     * @param callable $callback
+     *
      * @return bool
      */
     public function chunk($count, callable $callback) {
@@ -43,24 +44,26 @@ trait CDatabase_Trait_Builder {
     /**
      * Execute a callback over each item while chunking.
      *
-     * @param  callable  $callback
-     * @param  int  $count
+     * @param callable $callback
+     * @param int      $count
+     *
      * @return bool
      */
     public function each(callable $callback, $count = 1000) {
         return $this->chunk($count, function ($results) use ($callback) {
-                    foreach ($results as $key => $value) {
-                        if ($callback($value, $key) === false) {
-                            return false;
-                        }
-                    }
-                });
+            foreach ($results as $key => $value) {
+                if ($callback($value, $key) === false) {
+                    return false;
+                }
+            }
+        });
     }
 
     /**
      * Execute the query and get the first result.
      *
-     * @param  array  $columns
+     * @param array $columns
+     *
      * @return CModel|object|static|null
      */
     public function first($columns = ['*']) {
@@ -70,13 +73,13 @@ trait CDatabase_Trait_Builder {
     /**
      * Apply the callback's query changes if the given "value" is true.
      *
-     * @param  mixed  $value
-     * @param  callable  $callback
-     * @param  callable  $default
+     * @param mixed    $value
+     * @param callable $callback
+     * @param callable $default
+     *
      * @return mixed
      */
     public function when($value, $callback, $default = null) {
-
         if ($value) {
             return $callback($this, $value) ?: $this;
         } elseif ($default) {
@@ -88,7 +91,8 @@ trait CDatabase_Trait_Builder {
     /**
      * Pass the query to a given callback.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return CDatabase_Query_Builder
      */
     public function tap($callback) {
@@ -98,9 +102,10 @@ trait CDatabase_Trait_Builder {
     /**
      * Apply the callback's query changes if the given "value" is false.
      *
-     * @param  mixed  $value
-     * @param  callable  $callback
-     * @param  callable  $default
+     * @param mixed    $value
+     * @param callable $callback
+     * @param callable $default
+     *
      * @return mixed
      */
     public function unless($value, $callback, $default = null) {
@@ -115,43 +120,52 @@ trait CDatabase_Trait_Builder {
     /**
      * Create a new length-aware paginator instance.
      *
-     * @param  CCollection  $items
-     * @param  int  $total
-     * @param  int  $perPage
-     * @param  int  $currentPage
-     * @param  array  $options
+     * @param CCollection $items
+     * @param int         $total
+     * @param int         $perPage
+     * @param int         $currentPage
+     * @param array       $options
+     *
      * @return CPagination_LengthAwarePaginator
      */
     protected function paginator($items, $total, $perPage, $currentPage, $options) {
         return CContainer::getInstance()->makeWith(CPagination_LengthAwarePaginator::class, compact(
-                                'items', 'total', 'perPage', 'currentPage', 'options'
+            'items',
+            'total',
+            'perPage',
+            'currentPage',
+            'options'
         ));
     }
 
     /**
      * Create a new simple paginator instance.
      *
-     * @param  CCollection  $items
-     * @param  int $perPage
-     * @param  int $currentPage
-     * @param  array  $options
+     * @param CCollection $items
+     * @param int         $perPage
+     * @param int         $currentPage
+     * @param array       $options
+     *
      * @return CPagination_Paginator
      */
     protected function simplePaginator($items, $perPage, $currentPage, $options) {
         return CContainer::getInstance()->makeWith(CPagination_Paginator::class, compact(
-                                'items', 'perPage', 'currentPage', 'options'
+            'items',
+            'perPage',
+            'currentPage',
+            'options'
         ));
     }
 
     /**
      * Set the limit and offset for a given page.
      *
-     * @param  int  $page
-     * @param  int  $perPage
+     * @param int $page
+     * @param int $perPage
+     *
      * @return CDatabase_Query_Builder|static
      */
     public function forPage($page, $perPage = 15) {
         return $this->skip(($page - 1) * $perPage)->take($perPage);
     }
-
 }

@@ -1,17 +1,12 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php
+
+defined('SYSPATH') OR die('No direct access allowed.');
+
 /**
- * @package  Core
- *
- * Allowed non-php view types. Most file extensions are supported.
+ * @author Hery Kurniawan <hery@itton.co.id>
+ * @since Dec 6, 2020 
+ * @license Ittron Global Teknologi
  */
-$config['allowed_filetypes'] = array
-(
-	'gif',
-	'jpg', 'jpeg',
-	'png',
-	'tif', 'tiff',
-	'swf',
-	'htm', 'html',
-	'css',
-	'js'
-);
+return [
+    'compiled' => DOCROOT . 'temp' . DS . 'views' . DS . 'blade',
+];

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 1, 2019, 11:36:15 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 1, 2019, 11:36:15 PM
  */
 class CResources_Filesystem {
-
     /** @var CResources_Manager */
     protected $filesystem;
 
@@ -31,19 +31,19 @@ class CResources_Filesystem {
     public function copyToResourceLibrary($pathToFile, CApp_Model_Interface_ResourceInterface $resource, $type = null, $targetFileName = null) {
         $destinationFileName = $targetFileName ?: pathinfo($pathToFile, PATHINFO_BASENAME);
         $destination = $this->getResourceDirectory($resource, $type) . $destinationFileName;
-        
+
         $file = fopen($pathToFile, 'r');
         if ($resource->getDiskDriverName() === 'local') {
             $this->filesystem
-                    ->disk($resource->disk)
-                    ->put($destination, $file);
+                ->disk($resource->disk)
+                ->put($destination, $file);
             fclose($file);
             return;
         }
-        
+
         $this->filesystem
-                ->disk($resource->disk)
-                ->put($destination, $file, $this->getRemoteHeadersForFile($pathToFile, $resource->getCustomHeaders()));
+            ->disk($resource->disk)
+            ->put($destination, $file, $this->getRemoteHeadersForFile($pathToFile, $resource->getCustomHeaders()));
         if (is_resource($file)) {
             fclose($file);
         }
@@ -81,10 +81,10 @@ class CResources_Filesystem {
         $resourceDirectory = $this->getResourceDirectory($resource);
         $conversionsDirectory = $this->getResourceDirectory($resource, 'conversions');
         $responsiveImagesDirectory = $this->getResourceDirectory($resource, 'responsiveImages');
-        CF::collect([$resourceDirectory, $conversionsDirectory, $responsiveImagesDirectory])
-                ->each(function ($directory) use ($resource) {
-                    $this->filesystem->disk($resource->disk)->deleteDirectory($directory);
-                });
+        c::collect([$resourceDirectory, $conversionsDirectory, $responsiveImagesDirectory])
+            ->each(function ($directory) use ($resource) {
+                $this->filesystem->disk($resource->disk)->deleteDirectory($directory);
+            });
     }
 
     public function removeFile(CApp_Model_Interface_ResourceInterface $resource, $path) {
@@ -94,7 +94,7 @@ class CResources_Filesystem {
     public function removeResponsiveImages(CApp_Model_Interface_ResourceInterface $resource, $conversionName = 'resourcelibrary_original') {
         $responsiveImagesDirectory = $this->getResponsiveImagesDirectory($resource);
         $allFilePaths = $this->filesystem->allFiles($responsiveImagesDirectory);
-        $responsiveImagePaths = array_filter($allFilePaths, function ( $path) use ($conversionName) {
+        $responsiveImagePaths = array_filter($allFilePaths, function ($path) use ($conversionName) {
             return str_contains($path, $conversionName);
         });
         $this->filesystem->delete($responsiveImagePaths);
@@ -118,7 +118,7 @@ class CResources_Filesystem {
         $newFileName = $resource->file_name;
         $oldFileName = $resource->getOriginal('file_name');
         $conversionDirectory = $this->getConversionDirectory($resource);
-        $conversionCollection = ConversionCollection::createForResource($resource);
+        $conversionCollection = CResources_ConversionCollection::createForResource($resource);
         foreach ($resource->getResourceConversionNames() as $conversionName) {
             $conversion = $conversionCollection->getByName($conversionName);
             $oldFile = $conversionDirectory . $conversion->getConversionFile($oldFileName);
@@ -156,5 +156,4 @@ class CResources_Filesystem {
     public function getResponsiveImagesDirectory(CApp_Model_Interface_ResourceInterface $resource) {
         return $this->getResourceDirectory($resource, 'responsiveImages');
     }
-
 }

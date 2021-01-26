@@ -2,6 +2,7 @@
 
 class CResources_Engine_Image extends CResources_Engine {
     use CTrait_Compat_Resources_Engine_Image;
+
     public function __construct($type, $options) {
         parent::__construct('Image', $type, $options);
     }
@@ -37,19 +38,16 @@ class CResources_Engine_Image extends CResources_Engine {
             $scale = min($width / $img_width, $height / $img_height);
 
             if ($scale >= 1) {
-
-                ///////////////////// jja ///////////////////// 
+                ///////////////////// jja /////////////////////
                 $size_path = $path . $sizeName . DS;
                 if (!is_dir($size_path)) {
                     mkdir($size_path);
                 }
                 $file_path = $fullfilename;
                 $new_file_path = $size_path . $filename;
-                ///////////////////// jja ///////////////////// 
-
+                ///////////////////// jja /////////////////////
 
                 if ($file_path !== $new_file_path) {
-
                     copy($file_path, $new_file_path);
                 }
             }
@@ -91,12 +89,11 @@ class CResources_Engine_Image extends CResources_Engine {
             if ($dst == null) {
                 throw new CException('Error when resizing image, resizing ' . $filename);
             }
-            $wideimage = CWideImage::load($dst);
+            $wideimage = \WideImage\WideImage::load($dst);
 
             if ($crop) {
                 $wideimage = $wideimage->crop('center', 'center', $width, $height);
             }
-
 
             if ($whitespace) {
                 $w = ($maxPropHeight / $height) * $width;
@@ -118,7 +115,6 @@ class CResources_Engine_Image extends CResources_Engine {
             if ($crop) {
                 $wideimage = $wideimage->crop('center', 'center', $width, $height);
             }
-
 
             $wideimage->saveToFile($full_size_path);
         } catch (CResources_Exception $ex) {
@@ -142,24 +138,21 @@ class CResources_Engine_Image extends CResources_Engine {
             $new_height = $height;
             list($img_width, $img_height) = @getimagesize($fullfilename);
             if ($proportional) {
-
                 if (!$img_width || !$img_height) {
                     throw new Exception('Fail to getimagesize ' . $fullfilename);
                 }
                 $scale = min($width / $img_width, $height / $img_height);
                 if ($scale >= 1) {
-
-                    ///////////////////// jja ///////////////////// 
+                    ///////////////////// jja /////////////////////
                     $size_path = $path . $k . DS;
                     if (!is_dir($size_path)) {
                         mkdir($size_path);
                     }
                     $file_path = $fullfilename;
                     $new_file_path = $size_path . $filename;
-                    ///////////////////// jja ///////////////////// 
+                    ///////////////////// jja /////////////////////
 
                     if ($file_path !== $new_file_path) {
-
                         copy($file_path, $new_file_path);
                     }
                 }
@@ -173,7 +166,7 @@ class CResources_Engine_Image extends CResources_Engine {
             $full_size_path = $size_path . $filename;
 
             try {
-                $wideimage = CWideImage::load($fullfilename);
+                $wideimage = \WideImage\WideImage::load($fullfilename);
                 if ($whitespace) {
                     $w = ($img_height / $height) * $width;
                     $h = ($img_width / $width) * $height;
@@ -193,7 +186,6 @@ class CResources_Engine_Image extends CResources_Engine {
                     $wideimage = $wideimage->crop('center', 'center', $width, $height);
                 }
 
-
                 $wideimage->saveToFile($full_size_path);
             } catch (CResources_Exception $ex) {
                 throw $ex;
@@ -202,5 +194,4 @@ class CResources_Engine_Image extends CResources_Engine {
 
         return $filename;
     }
-
 }

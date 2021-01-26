@@ -1,17 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 10:02:03 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 10:02:03 PM
  */
 class CTemporary {
-
     /**
-     * 
-     * @return CStorage_FilesystemInterface
+     * @param null|mixed $diskName
+     *
+     * @return CStorage_Adapter
      */
     public static function disk($diskName = null) {
         return CStorage::instance()->temp($diskName);
@@ -29,8 +30,8 @@ class CTemporary {
     }
 
     /**
-     * 
      * @param string $path
+     *
      * @return \CTemporary_Directory
      */
     public static function createDirectory($path) {
@@ -38,8 +39,8 @@ class CTemporary {
     }
 
     /**
-     * 
      * @param string $filename
+     *
      * @return \CTemporary_File
      */
     public static function createFile($filename) {
@@ -47,12 +48,12 @@ class CTemporary {
     }
 
     /**
-     * 
+     * @param null|mixed $folder
+     *
      * @return string
      */
     public static function getDirectory($folder = null) {
-        $path = DOCROOT . "temp" . DIRECTORY_SEPARATOR;
-
+        $path = DOCROOT . 'temp' . DIRECTORY_SEPARATOR;
 
         if ($folder != null) {
             $path .= $folder . DIRECTORY_SEPARATOR;
@@ -65,8 +66,8 @@ class CTemporary {
     }
 
     /**
-     * 
      * @param string $path
+     *
      * @return string
      */
     public static function makeDir($path) {
@@ -78,9 +79,9 @@ class CTemporary {
     }
 
     /**
-     * 
      * @param string $path
      * @param string $folder
+     *
      * @return string
      */
     public static function makeFolder($path, $folder) {
@@ -93,9 +94,9 @@ class CTemporary {
     }
 
     /**
-     * 
      * @param string $folder
      * @param string $filename
+     *
      * @return string
      */
     public static function makePath($folder, $filename) {
@@ -106,11 +107,11 @@ class CTemporary {
         $path = self::makeFolder($path, $mainFolder);
         $basefile = basename($filename);
         for ($i = 0; $i < $depth; $i++) {
-            $c = "_";
+            $c = '_';
             if (strlen($basefile) > ($i + 1)) {
                 $c = substr($basefile, $i + 8, 1);
                 if (strlen($c) == 0) {
-                    $c = "_";
+                    $c = '_';
                 }
                 $path = self::makefolder($path, $c);
             }
@@ -134,11 +135,11 @@ class CTemporary {
 
         $basefile = basename($filename);
         for ($i = 0; $i < $depth; $i++) {
-            $c = "_";
+            $c = '_';
             if (strlen($basefile) > ($i + 1)) {
                 $c = substr($basefile, $i + 8, 1);
                 if (strlen($c) == 0) {
-                    $c = "_";
+                    $c = '_';
                 }
                 $path = $path = $path . $c . DIRECTORY_SEPARATOR;
             }
@@ -152,9 +153,9 @@ class CTemporary {
     }
 
     /**
-     * 
      * @param string $folder
      * @param string $filename
+     *
      * @return string
      */
     public static function getUrl($folder, $filename) {
@@ -166,11 +167,11 @@ class CTemporary {
         $url = curl::base() . 'temp/' . $folder . '/' . $mainFolder . '/';
         $depth = 5;
         for ($i = 0; $i < $depth; $i++) {
-            $c = "_";
+            $c = '_';
             if (strlen($basefile) > ($i + 1)) {
                 $c = substr($basefile, $i + 8, 1);
                 if (strlen($c) == 0) {
-                    $c = "_";
+                    $c = '_';
                 }
                 $url .= $c . '/';
             }
@@ -179,21 +180,20 @@ class CTemporary {
     }
 
     /**
-     * 
      * @param string $folder
      * @param string $filename
+     *
      * @return bool
      */
     public static function delete($folder, $filename) {
-
         $disk = static::disk();
         return $disk->delete(static::getPath($folder, $filename));
     }
 
     /**
-     * 
      * @param string $folder
      * @param string $filename
+     *
      * @return bool
      */
     public static function deleteLocal($folder, $filename) {
@@ -202,7 +202,7 @@ class CTemporary {
     }
 
     public static function generateRandomFilename($extension = null) {
-        return date('Ymd') . cutils::randmd5() . (strlen($extension) > 0 ? $extension : "");
+        return date('Ymd') . cutils::randmd5() . (strlen($extension) > 0 ? $extension : '');
     }
 
     public static function put($folder, $content, $filename = null) {
@@ -215,25 +215,21 @@ class CTemporary {
     }
 
     public static function get($folder, $filename) {
-
         $path = static::getPath($folder, $filename);
         return static::disk()->get($path);
     }
 
     public static function getSize($folder, $filename) {
-
         $path = static::getPath($folder, $filename);
         return static::disk()->size($path);
     }
 
     public static function isExists($folder, $filename) {
-
         $path = static::getPath($folder, $filename);
         return static::disk()->exists($path);
     }
 
     /**
-     * 
      * @return CTemporary_Instance
      */
     public static function local() {
@@ -245,7 +241,8 @@ class CTemporary {
     }
 
     /**
-     * 
+     * @param null|mixed $disk
+     *
      * @return CTemporary_Instance
      */
     public static function instance($disk = null) {
@@ -255,5 +252,4 @@ class CTemporary {
     public static function __callStatic($name, $arguments) {
         return CTemporary::instance()->$name(...$arguments);
     }
-
 }

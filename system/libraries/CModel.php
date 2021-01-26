@@ -1,26 +1,87 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Dec 25, 2017, 8:42:17 PM
- * @license Ittron Global Teknologi <ittron.co.id>
  */
-abstract class CModel implements ArrayAccess {
 
+/**
+ * @method CModel|CModel_Collection|null find($id, $columns = ['*']) Find a model by its primary key.
+ * @method static CModel_Collection findMany($ids, $columns = ['*']) Find a model by its primary key.
+ * @method static CModel|CModel_Collection|$this findOrFail($id, $columns = ['*']) Find a model by its primary key or throw an exception.
+ * @method CModel|CModel_Query|null first($columns = ['*']) Execute the query and get the first result.
+ * @method CModel|CModel_Query firstOrFail($columns = ['*']) Execute the query and get the first result or throw an exception.
+ * @method CModel_Collection|CModel_Query[] get($columns = ['*']) Execute the query as a "select" statement.
+ * @method mixed value($column) Get a single column's value from the first result of a query.
+ * @method mixed pluck($column) Get a single column's value from the first result of a query.
+ * @method void chunk($count, callable $callback) Chunk the results of the query.
+ * @method \CCollection lists($column, $key = null) Get an array with the values of a given column.
+ * @method \CPagination_LengthAwarePaginatorInterface paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) Paginate the given query.
+ * @method \CPagination_PaginatorInterface simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page') Paginate the given query into a simple paginator.
+ * @method void onDelete(Closure $callback) Register a replacement for the default delete function.
+ * @method CModel[] getModels($columns = ['*']) Get the hydrated models without eager loading.
+ * @method array eagerLoadRelations(array $models) Eager load the relationships for the models.
+ * @method array loadRelation(array $models, $name, Closure $constraints) Eagerly load the relationship on a set of models.
+ * @method CModel_Query where($column, $operator = null, $value = null, $boolean = 'and') Add a basic where clause to the query.
+ * @method CModel_Query orWhere($column, $operator = null, $value = null) Add an "or where" clause to the query.
+ * @method CModel_Query has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
+ * @method CDatabase_Query_Builder where($column, $operator = null, $value = null)
+ * @method CDatabase_Query_Builder whereRaw($sql, array $bindings = [])
+ * @method CDatabase_Query_Builder whereBetween($column, array $values)
+ * @method CDatabase_Query_Builder whereNotBetween($column, array $values)
+ * @method CDatabase_Query_Builder whereNested(Closure $callback)
+ * @method CDatabase_Query_Builder addNestedWhereQuery($query)
+ * @method CDatabase_Query_Builder whereExists(Closure $callback)
+ * @method CDatabase_Query_Builder whereNotExists(Closure $callback)
+ * @method CDatabase_Query_Builder whereIn($column, $values)
+ * @method CDatabase_Query_Builder whereNotIn($column, $values)
+ * @method CDatabase_Query_Builder whereNull($column)
+ * @method CDatabase_Query_Builder whereNotNull($column)
+ * @method static CDatabase_Query_Builder where($column, $operator = null, $value = null)
+ * @method static CDatabase_Query_Builder whereRaw($sql, array $bindings = [])
+ * @method static CDatabase_Query_Builder whereBetween($column, array $values)
+ * @method static CDatabase_Query_Builder whereNotBetween($column, array $values)
+ * @method static CDatabase_Query_Builder whereNested(Closure $callback)
+ * @method static CDatabase_Query_Builder addNestedWhereQuery($query)
+ * @method static CDatabase_Query_Builder whereExists(Closure $callback)
+ * @method static CDatabase_Query_Builder whereNotExists(Closure $callback)
+ * @method static CDatabase_Query_Builder whereIn($column, $values)
+ * @method static CDatabase_Query_Builder whereNotIn($column, $values)
+ * @method static CDatabase_Query_Builder whereNull($column)
+ * @method static CDatabase_Query_Builder whereNotNull($column)
+ * @method CDatabase_Query_Builder orWhere($column, $operator = null, $value = null)
+ * @method CDatabase_Query_Builder orWhereRaw($sql, array $bindings = [])
+ * @method CDatabase_Query_Builder orWhereBetween($column, array $values)
+ * @method CDatabase_Query_Builder orWhereNotBetween($column, array $values)
+ * @method CDatabase_Query_Builder orWhereExists(Closure $callback)
+ * @method CDatabase_Query_Builder orWhereNotExists(Closure $callback)
+ * @method CDatabase_Query_Builder orWhereIn($column, $values)
+ * @method CDatabase_Query_Builder orWhereNotIn($column, $values)
+ * @method CDatabase_Query_Builder orWhereNull($column)
+ * @method CDatabase_Query_Builder orWhereNotNull($column)
+ * @method CDatabase_Query_Builder whereDate($column, $operator, $value)
+ * @method CDatabase_Query_Builder whereDay($column, $operator, $value)
+ * @method CDatabase_Query_Builder whereMonth($column, $operator, $value)
+ * @method CDatabase_Query_Builder whereYear($column, $operator, $value)
+ *
+ * Class TBModel
+ */
+abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_Jsonable, CQueue_QueueableEntityInterface {
     use CModel_Trait_GuardsAttributes,
         CModel_Trait_Attributes,
         CModel_Trait_Relationships,
         CModel_Trait_Event,
         CModel_Trait_GlobalScopes,
         CModel_Trait_HidesAttributes,
-        CModel_Trait_Timestamps;
+        CModel_Trait_Timestamps,
+        CTrait_ForwardsCalls;
 
     /**
      * The connection name for the model.
      *
      * @var string
+     *
      * @deprecated
      */
     protected $db;
@@ -103,13 +164,6 @@ abstract class CModel implements ArrayAccess {
     protected static $resolver;
 
     /**
-     * The event dispatcher instance.
-     *
-     * @var CEvent_DispatcherInterface
-     */
-    protected static $dispatcher;
-
-    /**
      * The array of booted models.
      *
      * @var array
@@ -174,9 +228,9 @@ abstract class CModel implements ArrayAccess {
 
     /**
      * Add Mapping
-     * 
-     * @param string $modelName 
-     * @param string $modelClass 
+     *
+     * @param string $tableName
+     * @param string $modelClass
      */
     public static function addMapping($tableName, $modelClass = '') {
         if (is_array($tableName)) {
@@ -201,11 +255,12 @@ abstract class CModel implements ArrayAccess {
     /**
      * Create a new Eloquent model instance.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return void
      */
     public function __construct(array $attributes = []) {
-        $this->primaryKey = $this->table . "_id";
+        $this->primaryKey = $this->table . '_id';
         $this->bootIfNotBooted();
 
         $this->syncOriginal();
@@ -223,11 +278,20 @@ abstract class CModel implements ArrayAccess {
             static::$booted[static::class] = true;
 
             $this->fireModelEvent('booting', false);
-
+            static::booting();
             static::boot();
-
+            static::booted();
             $this->fireModelEvent('booted', false);
         }
+    }
+
+    /**
+     * Perform any actions required before the model boots.
+     *
+     * @return void
+     */
+    protected static function booting() {
+        //
     }
 
     /**
@@ -247,14 +311,23 @@ abstract class CModel implements ArrayAccess {
     protected static function bootTraits() {
         $class = static::class;
         $booted = [];
-        foreach (CF::class_uses_recursive($class) as $trait) {
-            $method = 'boot' . CF::class_basename($trait);
+        foreach (c::classUsesRecursive($class) as $trait) {
+            $method = 'boot' . c::classBasename($trait);
             $classMethod = $class . $method;
             if (method_exists($class, $method) && !in_array($classMethod, $booted)) {
                 forward_static_call([$class, $method]);
                 $booted[] = $classMethod;
             }
         }
+    }
+
+    /**
+     * Perform any actions required after the model boots.
+     *
+     * @return void
+     */
+    protected static function booted() {
+        //
     }
 
     /**
@@ -269,9 +342,21 @@ abstract class CModel implements ArrayAccess {
     }
 
     /**
+     * Remove the table name from a given key.
+     *
+     * @param string $key
+     *
+     * @return string
+     */
+    protected function removeTableFromKey($key) {
+        return cstr::contains($key, '.') ? carr::last(explode('.', $key)) : $key;
+    }
+
+    /**
      * Fill the model with an array of attributes.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return $this
      *
      * @throws CModel_Exception_MassAssignment
@@ -287,7 +372,11 @@ abstract class CModel implements ArrayAccess {
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
             } elseif ($totallyGuarded) {
-                throw new CModel_Exception_MassAssignment($key);
+                throw new CModel_Exception_MassAssignment(sprintf(
+                    'Add [%s] to fillable property to allow mass assignment on [%s].',
+                    $key,
+                    get_class($this)
+                ));
             }
         }
 
@@ -297,30 +386,37 @@ abstract class CModel implements ArrayAccess {
     /**
      * Fill the model with an array of attributes. Force mass assignment.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return $this
      */
     public function forceFill(array $attributes) {
         return static::unguarded(function () use ($attributes) {
-                    return $this->fill($attributes);
-                });
+            return $this->fill($attributes);
+        });
     }
 
     /**
-     * Remove the table name from a given key.
+     * Qualify the given column name by the model's table.
      *
-     * @param  string  $key
+     * @param string $column
+     *
      * @return string
      */
-    protected function removeTableFromKey($key) {
-        return cstr::contains($key, '.') ? last(explode('.', $key)) : $key;
+    public function qualifyColumn($column) {
+        if (cstr::contains($column, '.')) {
+            return $column;
+        }
+
+        return $this->getTable() . '.' . $column;
     }
 
     /**
      * Create a new instance of the given model.
      *
-     * @param  array  $attributes
-     * @param  bool  $exists
+     * @param array $attributes
+     * @param bool  $exists
+     *
      * @return static
      */
     public function newInstance($attributes = [], $exists = false) {
@@ -331,7 +427,11 @@ abstract class CModel implements ArrayAccess {
 
         $model->exists = $exists;
 
+        $model->setConnection($this->getConnectionName());
 
+        $model->setTable($this->getTable());
+
+        $model->mergeCasts($this->casts);
 
         return $model;
     }
@@ -339,15 +439,16 @@ abstract class CModel implements ArrayAccess {
     /**
      * Create a new model instance that is existing.
      *
-     * @param  array  $attributes
-     * @param  string|null  $connection
+     * @param array       $attributes
+     * @param string|null $connection
+     *
      * @return static
      */
     public function newFromBuilder($attributes = [], $connection = null) {
         $model = $this->newInstance([], true);
 
         $model->setRawAttributes((array) $attributes, true);
-
+        $model->setConnection($connection ?: $this->getConnectionName());
         $model->fireModelEvent('retrieved', false);
 
         return $model;
@@ -356,8 +457,9 @@ abstract class CModel implements ArrayAccess {
     /**
      * Begin querying the model on a given connection.
      *
-     * @param  string|null  $connection
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param string|null $connection
+     *
+     * @return CModel_Query
      */
     public static function on($connection = null) {
         // First we will just create a fresh instance of this model, and then we can
@@ -373,7 +475,7 @@ abstract class CModel implements ArrayAccess {
     /**
      * Begin querying the model on the write connection.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return CDatabae_Query_Builder
      */
     public static function onWriteConnection() {
         $instance = new static;
@@ -384,36 +486,39 @@ abstract class CModel implements ArrayAccess {
     /**
      * Get all of the models from the database.
      *
-     * @param  array|mixed  $columns
+     * @param array|mixed $columns
+     *
      * @return CModel_COllection|static[]
      */
     public static function all($columns = ['*']) {
-        return (new static)->newQuery()->get(
-                        is_array($columns) ? $columns : func_get_args()
+        return static::query()->get(
+            is_array($columns) ? $columns : func_get_args()
         );
     }
 
     /**
      * Begin querying a model with eager loading.
      *
-     * @param  array|string  $relations
+     * @param array|string $relations
+     *
      * @return CModel_Query|static
      */
     public static function with($relations) {
-        return (new static)->newQuery()->with(
-                        is_string($relations) ? func_get_args() : $relations
+        return static::query()->with(
+            is_string($relations) ? func_get_args() : $relations
         );
     }
 
     /**
      * Eager load relations on the model.
      *
-     * @param  array|string  $relations
+     * @param array|string $relations
+     *
      * @return $this
      */
     public function load($relations) {
-        $query = $this->newQuery()->with(
-                is_string($relations) ? func_get_args() : $relations
+        $query = $this->newQueryWithoutRelationships()->with(
+            is_string($relations) ? func_get_args() : $relations
         );
 
         $query->eagerLoadRelations([$this]);
@@ -424,23 +529,25 @@ abstract class CModel implements ArrayAccess {
     /**
      * Eager load relations on the model if they are not already eager loaded.
      *
-     * @param  array|string  $relations
+     * @param array|string $relations
+     *
      * @return $this
      */
     public function loadMissing($relations) {
         $relations = is_string($relations) ? func_get_args() : $relations;
 
         return $this->load(array_filter($relations, function ($relation) {
-                            return !$this->relationLoaded($relation);
-                        }));
+            return !$this->relationLoaded($relation);
+        }));
     }
 
     /**
      * Increment a column's value by a given amount.
      *
-     * @param  string  $column
-     * @param  int  $amount
-     * @param  array  $extra
+     * @param string $column
+     * @param int    $amount
+     * @param array  $extra
+     *
      * @return int
      */
     public function increment($column, $amount = 1, array $extra = []) {
@@ -450,9 +557,10 @@ abstract class CModel implements ArrayAccess {
     /**
      * Decrement a column's value by a given amount.
      *
-     * @param  string  $column
-     * @param  int  $amount
-     * @param  array  $extra
+     * @param string $column
+     * @param int    $amount
+     * @param array  $extra
+     *
      * @return int
      */
     public function decrement($column, $amount = 1, array $extra = []) {
@@ -462,10 +570,11 @@ abstract class CModel implements ArrayAccess {
     /**
      * Run the increment or decrement method on the model.
      *
-     * @param  string  $column
-     * @param  int  $amount
-     * @param  array  $extra
-     * @param  string  $method
+     * @param string $column
+     * @param int    $amount
+     * @param array  $extra
+     * @param string $method
+     *
      * @return int
      */
     protected function incrementOrDecrement($column, $amount, $extra, $method) {
@@ -478,17 +587,19 @@ abstract class CModel implements ArrayAccess {
         $this->incrementOrDecrementAttributeValue($column, $amount, $extra, $method);
 
         return $query->where(
-                        $this->getKeyName(), $this->getKey()
-                )->{$method}($column, $amount, $extra);
+            $this->getKeyName(),
+            $this->getKey()
+        )->{$method}($column, $amount, $extra);
     }
 
     /**
      * Increment the underlying attribute value and sync with original.
      *
-     * @param  string  $column
-     * @param  int  $amount
-     * @param  array  $extra
-     * @param  string  $method
+     * @param string $column
+     * @param int    $amount
+     * @param array  $extra
+     * @param string $method
+     *
      * @return void
      */
     protected function incrementOrDecrementAttributeValue($column, $amount, $extra, $method) {
@@ -502,8 +613,9 @@ abstract class CModel implements ArrayAccess {
     /**
      * Update the model in the database.
      *
-     * @param  array  $attributes
-     * @param  array  $options
+     * @param array $attributes
+     * @param array $options
+     *
      * @return bool
      */
     public function update(array $attributes = [], array $options = []) {
@@ -528,7 +640,7 @@ abstract class CModel implements ArrayAccess {
         // the relationships and save each model via this "push" method, which allows
         // us to recurse into all of these nested relations for the model instance.
         foreach ($this->relations as $models) {
-            $models = $models instanceof Collection ? $models->all() : [$models];
+            $models = $models instanceof CCollection ? $models->all() : [$models];
 
             foreach (array_filter($models) as $model) {
                 if (!$model->push()) {
@@ -543,11 +655,11 @@ abstract class CModel implements ArrayAccess {
     /**
      * Save the model to the database without raising any events.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return bool
      */
-    public function saveQuietly(array $options = [])
-    {
+    public function saveQuietly(array $options = []) {
         return static::withoutEvents(function () use ($options) {
             return $this->save($options);
         });
@@ -556,7 +668,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Save the model to the database.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return bool
      */
     public function save(array $options = []) {
@@ -573,14 +686,12 @@ abstract class CModel implements ArrayAccess {
         // that is already in this database using the current IDs in this "where"
         // clause to only update this model. Otherwise, we'll just insert them.
         if ($this->exists) {
-            $saved = $this->isDirty() ?
-                    $this->performUpdate($query) : true;
-        }
-
-        // If the model is brand new, we'll insert it into our database and set the
-        // ID attribute on the model to the value of the newly inserted row's ID
-        // which is typically an auto-increment value managed by the database.
-        else {
+            $saved = $this->isDirty()
+                ? $this->performUpdate($query) : true;
+        } else {
+            // If the model is brand new, we'll insert it into our database and set the
+            // ID attribute on the model to the value of the newly inserted row's ID
+            // which is typically an auto-increment value managed by the database.
             $saved = $this->performInsert($query);
 
             if (!$this->getConnectionName() && $connection = $query->getConnection()) {
@@ -601,21 +712,23 @@ abstract class CModel implements ArrayAccess {
     /**
      * Save the model to the database using transaction.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return bool
      *
      * @throws \Throwable
      */
     public function saveOrFail(array $options = []) {
         return $this->getConnection()->transaction(function () use ($options) {
-                    return $this->save($options);
-                });
+            return $this->save($options);
+        });
     }
 
     /**
      * Perform any actions that are necessary after the model is saved.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return void
      */
     protected function finishSave(array $options) {
@@ -631,7 +744,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Perform a model update operation.
      *
-     * @param  CModel_Query  $query
+     * @param CModel_Query $query
+     *
      * @return bool
      */
     protected function performUpdate(CModel_Query $query) {
@@ -668,7 +782,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Set the keys for a save update query.
      *
-     * @param  CModel_Query  $query
+     * @param CModel_Query $query
+     *
      * @return CModel_Query
      */
     protected function setKeysForSaveQuery(CModel_Query $query) {
@@ -689,7 +804,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Perform a model insert operation.
      *
-     * @param  CModel_Query  $query
+     * @param CModel_Query $query
+     *
      * @return bool
      */
     protected function performInsert(CModel_Query $query) {
@@ -711,12 +827,10 @@ abstract class CModel implements ArrayAccess {
 
         if ($this->getIncrementing()) {
             $this->insertAndSetId($query, $attributes);
-        }
-
-        // If the table isn't incrementing we'll simply insert these attributes as they
-        // are. These attribute arrays must contain an "id" column previously placed
-        // there by the developer as the manually determined key for these models.
-        else {
+        } else {
+            // If the table isn't incrementing we'll simply insert these attributes as they
+            // are. These attribute arrays must contain an "id" column previously placed
+            // there by the developer as the manually determined key for these models.
             if (empty($attributes)) {
                 return true;
             }
@@ -739,8 +853,9 @@ abstract class CModel implements ArrayAccess {
     /**
      * Insert the given attributes and set the ID on the model.
      *
-     * @param  CModel_Query  $query
-     * @param  array  $attributes
+     * @param CModel_Query $query
+     * @param array        $attributes
+     *
      * @return void
      */
     protected function insertAndSetId(CModel_Query $query, $attributes) {
@@ -752,7 +867,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Destroy the models for the given IDs.
      *
-     * @param  array|int  $ids
+     * @param array|int $ids
+     *
      * @return int
      */
     public static function destroy($ids) {
@@ -862,13 +978,14 @@ abstract class CModel implements ArrayAccess {
      * @return CModel_Query
      */
     public function newQueryWithoutRelationships() {
-        return $this->registerGlobalScopes($this->newModelQuery($this->newBaseQueryBuilder())->setModel($this));
+        return $this->registerGlobalScopes($this->newModelQuery());
     }
 
     /**
      * Register the global scopes for this builder instance.
      *
-     * @param  CModel_Query  $builder
+     * @param CModel_Query $query
+     *
      * @return CModel_Query
      */
     public function registerGlobalScopes($query) {
@@ -886,14 +1003,15 @@ abstract class CModel implements ArrayAccess {
      */
     public function newQueryWithoutScopes() {
         return $this->newModelQuery()
-                        ->with($this->with)
-                        ->withCount($this->withCount);
+            ->with($this->with)
+            ->withCount($this->withCount);
     }
 
     /**
      * Get a new query instance without a given scope.
      *
-     * @param  CModel_Interface_Scope|string  $scope
+     * @param CModel_Interface_Scope|string $scope
+     *
      * @return CModel_Query
      */
     public function newQueryWithoutScope($scope) {
@@ -905,7 +1023,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Get a new query to restore one or more models by their queueable IDs.
      *
-     * @param  array|int  $ids
+     * @param array|int $ids
+     *
      * @return CModel_Query
      */
     public function newQueryForRestoration($ids) {
@@ -928,7 +1047,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Create a new Eloquent query builder for the model.
      *
-     * @param  CDatabase_Query_Builder  $query
+     * @param CDatabase_Query_Builder $query
+     *
      * @return CModel_Query|static
      */
     public function newModelBuilder($query) {
@@ -947,7 +1067,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Create a new Eloquent Collection instance.
      *
-     * @param  array  $models
+     * @param array $models
+     *
      * @return CModel_Collection
      */
     public function newCollection(array $models = []) {
@@ -957,11 +1078,12 @@ abstract class CModel implements ArrayAccess {
     /**
      * Create a new pivot model instance.
      *
-     * @param  CModel  $parent
-     * @param  array  $attributes
-     * @param  string  $table
-     * @param  bool  $exists
-     * @param  string|null  $using
+     * @param CModel      $parent
+     * @param array       $attributes
+     * @param string      $table
+     * @param bool        $exists
+     * @param string|null $using
+     *
      * @return CModel_Relation_Pivot
      */
     public function newPivot(CModel $parent, array $attributes, $table, $exists, $using = null) {
@@ -980,7 +1102,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Convert the model instance to JSON.
      *
-     * @param  int  $options
+     * @param int $options
+     *
      * @return string
      *
      * @throws CModel_Exception_JsonEncodingException
@@ -1007,7 +1130,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Reload a fresh model instance from the database.
      *
-     * @param  array|string  $with
+     * @param array|string $with
+     *
      * @return static|null
      */
     public function fresh($with = []) {
@@ -1015,10 +1139,10 @@ abstract class CModel implements ArrayAccess {
             return;
         }
 
-        return static::newQueryWithoutScopes()
-                        ->with(is_string($with) ? func_get_args() : $with)
-                        ->where($this->getKeyName(), $this->getKey())
-                        ->first();
+        return $this->newQueryWithoutScopes()
+            ->with(is_string($with) ? func_get_args() : $with)
+            ->where($this->getKeyName(), $this->getKey())
+            ->first();
     }
 
     /**
@@ -1041,7 +1165,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Clone the model into a new, non-existing instance.
      *
-     * @param  array|null  $except
+     * @param array|null $except
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function replicate(array $except = null) {
@@ -1052,10 +1177,11 @@ abstract class CModel implements ArrayAccess {
         ];
 
         $attributes = carr::except(
-                        $this->attributes, $except ? array_unique(array_merge($except, $defaults)) : $defaults
+            $this->attributes,
+            $except ? array_unique(array_merge($except, $defaults)) : $defaults
         );
 
-        return tap(new static, function ($instance) use ($attributes) {
+        return c::tap(new static, function ($instance) use ($attributes) {
             $instance->setRawAttributes($attributes);
 
             $instance->setRelations($this->relations);
@@ -1065,20 +1191,22 @@ abstract class CModel implements ArrayAccess {
     /**
      * Determine if two models have the same ID and belong to the same table.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|null  $model
+     * @param \Illuminate\Database\Eloquent\Model|null $model
+     *
      * @return bool
      */
     public function is($model) {
-        return !is_null($model) &&
-                $this->getKey() === $model->getKey() &&
-                $this->getTable() === $model->getTable() &&
-                $this->getConnectionName() === $model->getConnectionName();
+        return !is_null($model)
+                && $this->getKey() === $model->getKey()
+                && $this->getTable() === $model->getTable()
+                && $this->getConnectionName() === $model->getConnectionName();
     }
 
     /**
      * Determine if two models are not the same.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|null  $model
+     * @param \Illuminate\Database\Eloquent\Model|null $model
+     *
      * @return bool
      */
     public function isNot($model) {
@@ -1091,7 +1219,6 @@ abstract class CModel implements ArrayAccess {
      * @return CDatabase
      */
     public function getConnection() {
-
         return static::resolveConnection($this->getConnectionName());
     }
 
@@ -1101,18 +1228,17 @@ abstract class CModel implements ArrayAccess {
      * @return string
      */
     public function getConnectionName() {
-
         return $this->connection;
     }
 
     /**
      * Set the connection associated with the model.
      *
-     * @param  string  $name
+     * @param mixed $connection
+     *
      * @return $this
      */
     public function setConnection($connection) {
-
         $this->connection = $connection;
 
         return $this;
@@ -1121,7 +1247,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Resolve a connection instance.
      *
-     * @param  string|null  $connection
+     * @param string|null $connection
+     *
      * @return CDatabase
      */
     public static function resolveConnection($connection = null) {
@@ -1130,6 +1257,8 @@ abstract class CModel implements ArrayAccess {
 
     /**
      * Get the connection resolver instance.
+     *
+     * @param null|mixed $domain
      *
      * @return CDatabase_ResolverInterface
      */
@@ -1147,7 +1276,7 @@ abstract class CModel implements ArrayAccess {
      */
     public function getTable() {
         if (!isset($this->table)) {
-            return str_replace('\\', '', cstr::snake(cstr::plural(CF::class_basename($this))));
+            return str_replace('\\', '', cstr::snake(cstr::plural(c::classBasename($this))));
         }
 
         return $this->table;
@@ -1156,7 +1285,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Set the table associated with the model.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return $this
      */
     public function setTable($table) {
@@ -1177,7 +1307,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Set the primary key for the model.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return $this
      */
     public function setKeyName($key) {
@@ -1192,7 +1323,7 @@ abstract class CModel implements ArrayAccess {
      * @return string
      */
     public function getQualifiedKeyName() {
-        return $this->getTable() . '.' . $this->getKeyName();
+        return $this->qualifyColumn($this->getKeyName());
     }
 
     /**
@@ -1207,7 +1338,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Set the data type for the primary key.
      *
-     * @param  string  $type
+     * @param string $type
+     *
      * @return $this
      */
     public function setKeyType($type) {
@@ -1228,7 +1360,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Set whether IDs are incrementing.
      *
-     * @param  bool  $value
+     * @param bool $value
+     *
      * @return $this
      */
     public function setIncrementing($value) {
@@ -1266,13 +1399,13 @@ abstract class CModel implements ArrayAccess {
         foreach ($this->getRelations() as $key => $relation) {
             $relations[] = $key;
 
-            if ($relation instanceof QueueableCollection) {
+            if ($relation instanceof CQueue_QueueableCollectionInterface) {
                 foreach ($relation->getQueueableRelations() as $collectionKey => $collectionValue) {
                     $relations[] = $key . '.' . $collectionKey;
                 }
             }
 
-            if ($relation instanceof QueueableEntity) {
+            if ($relation instanceof CQueue_QueueableEntityInterface) {
                 foreach ($relation->getQueueableRelations() as $entityKey => $entityValue) {
                     $relations[] = $key . '.' . $entityValue;
                 }
@@ -1312,7 +1445,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function resolveRouteBinding($value) {
@@ -1325,7 +1459,6 @@ abstract class CModel implements ArrayAccess {
      * @return string
      */
     public function getForeignKey() {
-
         return $this->primaryKey;
     }
 
@@ -1341,7 +1474,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Set the number of models to return per page.
      *
-     * @param  int  $perPage
+     * @param int $perPage
+     *
      * @return $this
      */
     public function setPerPage($perPage) {
@@ -1353,12 +1487,13 @@ abstract class CModel implements ArrayAccess {
     /**
      * Dynamically retrieve attributes on the model.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function __get($key) {
         /**
-         * backward compatibility for use this->db using in model. it deprecated and this code will removed
+         * Backward compatibility for use this->db using in model. it deprecated and this code will removed
          */
         if ($key == 'db') {
             return $this->getConnection();
@@ -1369,8 +1504,9 @@ abstract class CModel implements ArrayAccess {
     /**
      * Dynamically set attributes on the model.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function __set($key, $value) {
@@ -1380,7 +1516,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Determine if the given attribute exists.
      *
-     * @param  mixed  $offset
+     * @param mixed $offset
+     *
      * @return bool
      */
     public function offsetExists($offset) {
@@ -1390,7 +1527,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Get the value for a given offset.
      *
-     * @param  mixed  $offset
+     * @param mixed $offset
+     *
      * @return mixed
      */
     public function offsetGet($offset) {
@@ -1400,8 +1538,9 @@ abstract class CModel implements ArrayAccess {
     /**
      * Set the value for a given offset.
      *
-     * @param  mixed  $offset
-     * @param  mixed  $value
+     * @param mixed $offset
+     * @param mixed $value
+     *
      * @return void
      */
     public function offsetSet($offset, $value) {
@@ -1411,7 +1550,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Unset the value for a given offset.
      *
-     * @param  mixed  $offset
+     * @param mixed $offset
+     *
      * @return void
      */
     public function offsetUnset($offset) {
@@ -1421,7 +1561,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Determine if an attribute or relation exists on the model.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function __isset($key) {
@@ -1431,7 +1572,8 @@ abstract class CModel implements ArrayAccess {
     /**
      * Unset an attribute on the model.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return void
      */
     public function __unset($key) {
@@ -1441,88 +1583,28 @@ abstract class CModel implements ArrayAccess {
     /**
      * Handle dynamic method calls into the model.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters) {
-
-
         if (in_array($method, ['increment', 'decrement'])) {
-            $class = new ReflectionClass(get_class($this));
-
-
-            try {
-                // Load the controller method
-                $method_object = $class->getMethod($method);
-            } catch (ReflectionException $e) {
-                // Use __call instead
-                $method_object = $class->getMethod('__call');
-
-                // Use arguments in __call format
-                $parameters = array($method, $parameters);
-            }
-
-
-            return $method_object->invokeArgs($this, $parameters);
+            return $this->$method(...$parameters);
         }
-
-        try {
-            $query = $this->newQuery();
-
-
-
-
-            $class = new ReflectionClass(get_class($query));
-
-
-            try {
-                // Load the controller method
-                $method_object = $class->getMethod($method);
-            } catch (ReflectionException $e) {
-                // Use __call instead
-                $method_object = $class->getMethod('__call');
-
-                // Use arguments in __call format
-                $parameters = array($method, $parameters);
-            }
-
-            return $method_object->invokeArgs($query, $parameters);
-        } catch (BadMethodCallException $e) {
-            try {
-                throw new Exception('404');
-            } catch (Exception $ex) {
-                cdbg::var_dump(nl2br($ex->getTraceAsString()));
-            }
-            throw new BadMethodCallException(
-            sprintf('Call to undefined method %s::%s()' . $e->getMessage(), get_class($this), $method)
-            );
-        }
+        return $this->forwardCallTo($this->newQuery(), $method, $parameters);
     }
 
     /**
      * Handle dynamic static method calls into the method.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public static function __callStatic($method, $parameters) {
-
-        $class = new ReflectionClass(get_called_class());
-        $object = $class->newInstance();
-
-        try {
-            // Load the controller method
-            $method_object = $class->getMethod($method);
-        } catch (ReflectionException $e) {
-            // Use __call instead
-            $method_object = $class->getMethod('__call');
-
-            // Use arguments in __call format
-            $parameters = array($method, $parameters);
-        }
-        return $method_object->invokeArgs($object, $parameters);
+        return (new static)->$method(...$parameters);
     }
 
     /**
@@ -1547,37 +1629,27 @@ abstract class CModel implements ArrayAccess {
      * @return bool
      */
     public static function usesSoftDelete() {
-
-
         $classUses = c::collect(c::classUsesRecursive(static::class));
-        $lastClassUses = $classUses->map(function($item) {
-
+        $lastClassUses = $classUses->map(function ($item) {
             return carr::last(explode('_', $item));
         });
         if (in_array('SoftDeleteTrait', $lastClassUses->toArray())) {
-
             return true;
         }
         return false;
     }
-    
-    
+
     /**
      * @return bool
      */
     public static function usesDeleted() {
-
-
         $classUses = c::collect(c::classUsesRecursive(static::class));
-        $lastClassUses = $classUses->map(function($item) {
-
+        $lastClassUses = $classUses->map(function ($item) {
             return carr::last(explode('_', $item));
         });
         if (in_array('DeletedTrait', $lastClassUses->toArray())) {
-
             return true;
         }
         return false;
     }
-
 }

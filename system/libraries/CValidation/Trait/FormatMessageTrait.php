@@ -1,21 +1,25 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 12, 2019, 8:39:17 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 12, 2019, 8:39:17 PM
  */
-trait CValidation_Trait_FormatMessageTrait {
 
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+trait CValidation_Trait_FormatMessageTrait {
     use CValidation_Trait_ReplaceAttributeTrait;
 
     /**
      * Get the validation message for an attribute and rule.
      *
-     * @param  string  $attribute
-     * @param  string  $rule
+     * @param string $attribute
+     * @param string $rule
+     *
      * @return string
      */
     protected function getMessage($attribute, $rule) {
@@ -31,7 +35,7 @@ trait CValidation_Trait_FormatMessageTrait {
         $lowerRule = cstr::snake($rule);
 
         $customMessage = $this->getCustomMessageFromTranslator(
-                $customKey = "validation.custom.{$attribute}.{$lowerRule}"
+            $customKey = "validation.custom.{$attribute}.{$lowerRule}"
         );
 
         // First we check for a custom defined validation message for the attribute
@@ -39,12 +43,10 @@ trait CValidation_Trait_FormatMessageTrait {
         // only some attributes and rules that need to get specially formed.
         if ($customMessage !== $customKey) {
             return $customMessage;
-        }
-
-        // If the rule being validated is a "size" rule, we will need to gather the
-        // specific error message for the type of attribute being validated such
-        // as a number, file or string which all have different message types.
-        elseif (in_array($rule, $this->sizeRules)) {
+        } elseif (in_array($rule, $this->sizeRules)) {
+            // If the rule being validated is a "size" rule, we will need to gather the
+            // specific error message for the type of attribute being validated such
+            // as a number, file or string which all have different message types.
             return $this->getSizeMessage($attribute, $rule);
         }
 
@@ -52,22 +54,24 @@ trait CValidation_Trait_FormatMessageTrait {
         // special messages apply for this rule, we will just pull the default
         // messages out of the translator service for this validation rule.
         $key = "validation.{$lowerRule}";
-       
+
         if ($key != ($value = $this->translator->trans($key))) {
             return $value;
         }
 
-
         return $this->getFromLocalArray(
-                        $attribute, $lowerRule, $this->fallbackMessages
-                ) ?: $key;
+            $attribute,
+            $lowerRule,
+            $this->fallbackMessages
+        ) ?: $key;
     }
 
     /**
      * Get the proper inline error message for standard and size rules.
      *
-     * @param  string  $attribute
-     * @param  string  $rule
+     * @param string $attribute
+     * @param string $rule
+     *
      * @return string|null
      */
     protected function getInlineMessage($attribute, $rule) {
@@ -79,9 +83,10 @@ trait CValidation_Trait_FormatMessageTrait {
     /**
      * Get the inline message for a rule if it exists.
      *
-     * @param  string  $attribute
-     * @param  string  $lowerRule
-     * @param  array|null  $source
+     * @param string     $attribute
+     * @param string     $lowerRule
+     * @param array|null $source
+     *
      * @return string|null
      */
     protected function getFromLocalArray($attribute, $lowerRule, $source = null) {
@@ -104,7 +109,8 @@ trait CValidation_Trait_FormatMessageTrait {
     /**
      * Get the custom error message from translator.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return string
      */
     protected function getCustomMessageFromTranslator($key) {
@@ -116,20 +122,23 @@ trait CValidation_Trait_FormatMessageTrait {
         // messages and loop through them and try to find a wildcard match for the
         // given key. Otherwise, we will simply return the key's value back out.
         $shortKey = preg_replace(
-                '/^validation\.custom\./', '', $key
+            '/^validation\.custom\./',
+            '',
+            $key
         );
 
         return $this->getWildcardCustomMessages(carr::dot(
-                                (array) $this->translator->trans('validation.custom')
-                        ), $shortKey, $key);
+            (array) $this->translator->trans('validation.custom')
+        ), $shortKey, $key);
     }
 
     /**
      * Check the given messages for a wildcard key.
      *
-     * @param  array  $messages
-     * @param  string  $search
-     * @param  string  $default
+     * @param array  $messages
+     * @param string $search
+     * @param string $default
+     *
      * @return string
      */
     protected function getWildcardCustomMessages($messages, $search, $default) {
@@ -145,8 +154,9 @@ trait CValidation_Trait_FormatMessageTrait {
     /**
      * Get the proper error message for an attribute and size rule.
      *
-     * @param  string  $attribute
-     * @param  string  $rule
+     * @param string $attribute
+     * @param string $rule
+     *
      * @return string
      */
     protected function getSizeMessage($attribute, $rule) {
@@ -165,7 +175,8 @@ trait CValidation_Trait_FormatMessageTrait {
     /**
      * Get the data type of the given attribute.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return string
      */
     protected function getAttributeType($attribute) {
@@ -186,15 +197,17 @@ trait CValidation_Trait_FormatMessageTrait {
     /**
      * Replace all error message place-holders with actual values.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     public function makeReplacements($message, $attribute, $rule, $parameters) {
         $message = $this->replaceAttributePlaceholder(
-                $message, $this->getDisplayableAttribute($attribute)
+            $message,
+            $this->getDisplayableAttribute($attribute)
         );
 
         $message = $this->replaceInputPlaceholder($message, $attribute);
@@ -211,7 +224,8 @@ trait CValidation_Trait_FormatMessageTrait {
     /**
      * Get the displayable name of the attribute.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return string
      */
     public function getDisplayableAttribute($attribute) {
@@ -248,32 +262,36 @@ trait CValidation_Trait_FormatMessageTrait {
     /**
      * Get the given attribute from the attribute translations.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function getAttributeFromTranslations($name) {
-       
         return carr::get($this->translator->trans('validation.attributes'), $name);
     }
 
     /**
      * Replace the :attribute placeholder in the given message.
      *
-     * @param  string  $message
-     * @param  string  $value
+     * @param string $message
+     * @param string $value
+     *
      * @return string
      */
     protected function replaceAttributePlaceholder($message, $value) {
         return str_replace(
-                [':attribute', ':ATTRIBUTE', ':Attribute'], [$value, cstr::upper($value), cstr::ucfirst($value)], $message
+            [':attribute', ':ATTRIBUTE', ':Attribute'],
+            [$value, cstr::upper($value), cstr::ucfirst($value)],
+            $message
         );
     }
 
     /**
      * Replace the :input placeholder in the given message.
      *
-     * @param  string  $message
-     * @param  string  $attribute
+     * @param string $message
+     * @param string $attribute
+     *
      * @return string
      */
     protected function replaceInputPlaceholder($message, $attribute) {
@@ -289,8 +307,9 @@ trait CValidation_Trait_FormatMessageTrait {
     /**
      * Get the displayable name of the value.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return string
      */
     public function getDisplayableValue($attribute, $value) {
@@ -310,7 +329,8 @@ trait CValidation_Trait_FormatMessageTrait {
     /**
      * Transform an array of attributes to their displayable form.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return array
      */
     protected function getAttributeList(array $values) {
@@ -329,11 +349,12 @@ trait CValidation_Trait_FormatMessageTrait {
     /**
      * Call a custom validator message replacer.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @param  \Illuminate\Validation\Validator  $validator
+     * @param string                           $message
+     * @param string                           $attribute
+     * @param string                           $rule
+     * @param array                            $parameters
+     * @param \Illuminate\Validation\Validator $validator
+     *
      * @return string|null
      */
     protected function callReplacer($message, $attribute, $rule, $parameters, $validator) {
@@ -349,12 +370,13 @@ trait CValidation_Trait_FormatMessageTrait {
     /**
      * Call a class based validator message replacer.
      *
-     * @param  string  $callback
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @param  \Illuminate\Validation\Validator  $validator
+     * @param string                           $callback
+     * @param string                           $message
+     * @param string                           $attribute
+     * @param string                           $rule
+     * @param array                            $parameters
+     * @param \Illuminate\Validation\Validator $validator
+     *
      * @return string
      */
     protected function callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters, $validator) {
@@ -362,5 +384,4 @@ trait CValidation_Trait_FormatMessageTrait {
 
         return call_user_func_array([$this->container->make($class), $method], array_slice(func_get_args(), 1));
     }
-
 }

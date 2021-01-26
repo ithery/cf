@@ -1,35 +1,39 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Carbon\Carbon;
 
 class CBackup_BackupJob {
-
-    /** @var CBackup_FileSelection */
+    /**
+     * @var CBackup_FileSelection
+     */
     protected $fileSelection;
 
-    /** @var CCollection */
+    /**
+     * @var CCollection
+     */
     protected $dbDumpers;
 
-    /** @var CCollection */
+    /**
+     * @var CCollection
+     */
     protected $backupDestinations;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $filename;
 
-    /** @var CTemporary_Directory */
+    /**
+     * @var CTemporary_Directory
+     */
     protected $temporaryDirectory;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $sendNotifications = true;
 
     public function __construct() {
-
         $this->dontBackupFilesystem();
         $this->dontBackupDatabases();
         $this->setDefaultFilename();
@@ -43,9 +47,10 @@ class CBackup_BackupJob {
 
     public function onlyDbName(array $allowedDbNames) {
         $this->dbDumpers = $this->dbDumpers->filter(
-                function (CBackup_Database_AbstractDumper $dbDumper, $connectionName) use ($allowedDbNames) {
-            return in_array($connectionName, $allowedDbNames);
-        });
+            function (CBackup_Database_AbstractDumper $dbDumper, $connectionName) use ($allowedDbNames) {
+                return in_array($connectionName, $allowedDbNames);
+            }
+        );
         return $this;
     }
 
@@ -146,17 +151,17 @@ class CBackup_BackupJob {
 
     protected function directoriesUsedByBackupJob() {
         return $this->backupDestinations
-                        ->filter(function (CBackup_BackupDestination $backupDestination) {
-                            return $backupDestination->filesystemType() === 'local';
-                        })
-                        ->map(function (CBackup_BackupDestination $backupDestination) {
-                            return $backupDestination->disk()->getDriver()->getAdapter()->applyPathPrefix('') . $backupDestination->backupName();
-                        })
-                        ->each(function ( $backupDestinationDirectory) {
-                            $this->fileSelection->excludeFilesFrom($backupDestinationDirectory);
-                        })
-                        ->push($this->temporaryDirectory->getPath())
-                        ->toArray();
+            ->filter(function (CBackup_BackupDestination $backupDestination) {
+                return $backupDestination->filesystemType() === 'local';
+            })
+            ->map(function (CBackup_BackupDestination $backupDestination) {
+                return $backupDestination->disk()->getDriver()->getAdapter()->applyPathPrefix('') . $backupDestination->backupName();
+            })
+            ->each(function ($backupDestinationDirectory) {
+                $this->fileSelection->excludeFilesFrom($backupDestinationDirectory);
+            })
+            ->push($this->temporaryDirectory->getPath())
+            ->toArray();
     }
 
     protected function createZipContainingEveryFileInManifest(CBackup_Manifest $manifest) {
@@ -176,43 +181,43 @@ class CBackup_BackupJob {
      */
     protected function dumpDatabases() {
         return $this->dbDumpers->map(function (CBackup_Database_AbstractDumper $dbDumper, $key) {
-                    CBackup::output()->info("Dumping database {$dbDumper->getDbName()}...");
-                    $dbType = mb_strtolower(basename(str_replace('\\', '/', get_class($dbDumper))));
-                    $dbName = $dbDumper->getDbName();
-                    if ($dbDumper instanceof CBackup_Database_Dumper_SqliteDumper) {
-                        $dbName = $key . '-database';
-                    }
-                    $fileName = "{$dbType}-{$dbName}.{$this->getExtension($dbDumper)}";
-                    if ($this->getConfig('backup.gzip_database_dump')) {
-                        $dbDumper->useCompressor(new CBackup_Compressor_GzipCompressor());
-                        $fileName .= '.' . $dbDumper->getCompressorExtension();
-                    }
-                    if ($compressor = $this->getConfig('backup.database_dump_compressor')) {
-                        $dbDumper->useCompressor(new $compressor());
-                        $fileName .= '.' . $dbDumper->getCompressorExtension();
-                    }
-                    $temporaryFilePath = $this->temporaryDirectory->getPath('db-dumps' . DIRECTORY_SEPARATOR . $fileName);
-                    $dbDumper->dumpToFile($temporaryFilePath);
-                    return $temporaryFilePath;
-                })->toArray();
+            CBackup::output()->info("Dumping database {$dbDumper->getDbName()}...");
+            $dbType = mb_strtolower(basename(str_replace('\\', '/', get_class($dbDumper))));
+            $dbName = $dbDumper->getDbName();
+            if ($dbDumper instanceof CBackup_Database_Dumper_SqliteDumper) {
+                $dbName = $key . '-database';
+            }
+            $fileName = "{$dbType}-{$dbName}.{$this->getExtension($dbDumper)}";
+            if ($this->getConfig('backup.gzip_database_dump')) {
+                $dbDumper->useCompressor(new CBackup_Compressor_GzipCompressor());
+                $fileName .= '.' . $dbDumper->getCompressorExtension();
+            }
+            if ($compressor = $this->getConfig('backup.database_dump_compressor')) {
+                $dbDumper->useCompressor(new $compressor());
+                $fileName .= '.' . $dbDumper->getCompressorExtension();
+            }
+            $temporaryFilePath = $this->temporaryDirectory->getPath('db-dumps' . DIRECTORY_SEPARATOR . $fileName);
+            $dbDumper->dumpToFile($temporaryFilePath);
+            return $temporaryFilePath;
+        })->toArray();
     }
 
     protected function copyToBackupDestinations($path) {
         return $this->backupDestinations->map(function (CBackup_BackupDestination $backupDestination) use ($path) {
-                    try {
-                        CBackup::output()->info("Copying zip to disk named {$backupDestination->diskName()}...");
-                        $filename = $backupDestination->write($path);
-                        CBackup::output()->info("Successfully copied zip to disk named {$backupDestination->diskName()}.");
-                        //$this->sendNotification(new BackupWasSuccessful($backupDestination));
-                        return [
-                            'disk' => $backupDestination->diskName(),
-                            'filename' => $filename,
-                        ];
-                    } catch (Exception $exception) {
-                        CBackup::output()->error("Copying zip failed because: {$exception->getMessage()}.");
-                        //$this->sendNotification(new BackupHasFailed($exception, $backupDestination ?? null));
-                    }
-                })->toArray();
+            try {
+                CBackup::output()->info("Copying zip to disk named {$backupDestination->diskName()}...");
+                $filename = $backupDestination->write($path);
+                CBackup::output()->info("Successfully copied zip to disk named {$backupDestination->diskName()}.");
+                //$this->sendNotification(new BackupWasSuccessful($backupDestination));
+                return [
+                    'disk' => $backupDestination->diskName(),
+                    'filename' => $filename,
+                ];
+            } catch (Exception $exception) {
+                CBackup::output()->error("Copying zip failed because: {$exception->getMessage()}.");
+                //$this->sendNotification(new BackupHasFailed($exception, $backupDestination ?? null));
+            }
+        })->toArray();
     }
 
     protected function sendNotification($notification) {
@@ -232,5 +237,4 @@ class CBackup_BackupJob {
     protected function getConfig($key, $defaultValue = null) {
         return CBackup::getConfig($key, $defaultValue);
     }
-
 }

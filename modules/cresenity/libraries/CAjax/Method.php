@@ -1,33 +1,33 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2018, 9:59:28 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2018, 9:59:28 PM
  */
 class CAjax_Method implements CInterface_Jsonable {
-
-    public $name = "";
-    public $method = "GET";
-    public $data = array();
-    public $type = "";
-    public $target = "";
-    public $param = array();
+    public $name = '';
+    public $method = 'GET';
+    public $data = [];
+    public $type = '';
+    public $target = '';
+    public $param = [];
     public $args = [];
 
-    public function __construct($options = array()) {
+    public function __construct($options = []) {
         if ($options == null) {
-            $options = array();
+            $options = [];
         }
         $this->fromArray($options);
     }
 
     /**
-     * 
      * @param type $key
      * @param type $data
+     *
      * @return $this
      */
     public function setData($key, $data) {
@@ -36,7 +36,6 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * 
      * @return type
      */
     public function getData() {
@@ -44,8 +43,8 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * 
      * @param type $type
+     *
      * @return $this
      */
     public function setType($type) {
@@ -54,17 +53,16 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * 
      * @param array $type
+     *
      * @return $this
      */
     public function setArgs(array $args) {
         $this->args = $args;
         return $this;
     }
-    
+
     /**
-     * 
      * @return array
      */
     public function getArgs() {
@@ -72,7 +70,6 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * 
      * @return string
      */
     public function getType() {
@@ -80,8 +77,8 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * 
      * @param type $method
+     *
      * @return $this
      */
     public function setMethod($method) {
@@ -90,7 +87,6 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * 
      * @return type
      */
     public function getMethod() {
@@ -98,8 +94,8 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * 
      * @param type $jsonOption
+     *
      * @return type
      */
     public function makeUrl($jsonOption = 0) {
@@ -109,19 +105,19 @@ class CAjax_Method implements CInterface_Jsonable {
         //save this object to file.
         $ajaxMethod = date('Ymd') . cutils::randmd5();
         $disk = CTemporary::disk();
-        $filename = $ajaxMethod . ".tmp";
+        $filename = $ajaxMethod . '.tmp';
 
-        $file = CTemporary::getPath("ajax", $filename);
+        $file = CTemporary::getPath('ajax', $filename);
         $disk->put($file, $json);
 
         $base_url = curl::httpbase();
 
-        return $base_url . "cresenity/ajax/" . $ajaxMethod;
+        return $base_url . 'cresenity/ajax/' . $ajaxMethod;
     }
 
     /**
-     * 
      * @param int $options
+     *
      * @return string
      */
     public function toJson($options = 0) {
@@ -129,8 +125,8 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * 
      * @param string $json
+     *
      * @return $this
      */
     public function fromJson($json) {
@@ -139,15 +135,15 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     public function fromArray(array $array) {
-        $this->data = carr::get($array, 'data', array());
+        $this->data = carr::get($array, 'data', []);
         $this->method = carr::get($array, 'method', 'GET');
         $this->type = carr::get($array, 'type');
         return $this;
     }
 
     /**
-     * 
      * @param string $json
+     *
      * @return CAjax_Method
      */
     public static function createFromJson($json) {
@@ -156,31 +152,30 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * 
      * @param CAjax_Method $ajaxMethod
-     * @param array|null $input
+     * @param array|null   $input
+     *
      * @return CAjax_Engine
+     *
      * @throws CAjax_Exception
      */
     public static function createEngine(CAjax_Method $ajaxMethod, $input = null) {
         $class = 'CAjax_Engine_' . $ajaxMethod->type;
 
         if (!class_exists($class)) {
-            throw new CAjax_Exception('class ajax engine :class not found', array(':class' => $class));
+            throw new CAjax_Exception('class ajax engine :class not found', [':class' => $class]);
         }
         $engine = new $class($ajaxMethod, $input);
         return $engine;
     }
 
     /**
-     * 
      * @param type $input
+     *
      * @return type
      */
     public function executeEngine($input = null) {
-
         $engine = self::createEngine($this, $input);
         return $engine->execute();
     }
-
 }

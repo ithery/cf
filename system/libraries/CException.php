@@ -3,11 +3,12 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CException extends Exception {
+    protected static $exceptionHandler;
 
     /**
-     * @var  array  PHP error code => human readable name
+     * @var array PHP error code => human readable name
      */
-    public static $php_errors = array(
+    public static $php_errors = [
         E_ERROR => 'Fatal Error',
         E_USER_ERROR => 'User Error',
         E_PARSE => 'Parse Error',
@@ -17,7 +18,7 @@ class CException extends Exception {
         E_NOTICE => 'Notice',
         E_RECOVERABLE_ERROR => 'Recoverable Error',
         E_DEPRECATED => 'Deprecated',
-    );
+    ];
 
     /**
      * Creates a new translated exception.
@@ -25,17 +26,23 @@ class CException extends Exception {
      *     throw new CException('Something went terrible wrong, :user',
      *         array(':user' => $user));
      *
-     * @param   string          $message    error message
-     * @param   array           $variables  translation variables
-     * @param   integer|string  $code       the exception code
-     * @param   Exception       $previous   Previous exception
-     * @return  void
+     * @param string         $message   error message
+     * @param array          $variables translation variables
+     * @param integer|string $code      the exception code
+     * @param Exception      $previous  Previous exception
+     *
+     * @return void
      */
-    public function __construct($message = "", array $variables = NULL, $code = 0, Exception $previous = NULL) {
+    public function __construct($message = '', array $variables = null, $code = 0, Exception $previous = null) {
         if (is_array($variables)) {
             $message = strtr($message, $variables);
+        } else {
+            if ($code instanceof Exception) {
+                $previous = $code;
+                $code = $variables;
+            }
         }
-        // Pass the message and integer code to the parent
+
         parent::__construct($message, (int) $code, $previous);
     }
 
@@ -44,8 +51,9 @@ class CException extends Exception {
      *
      * Error [ Code ]: Message ~ File [ Line ]
      *
-     * @param   Exception  $e
-     * @return  string
+     * @param Exception $e
+     *
+     * @return string
      */
     public static function text(Exception $e) {
         return sprintf('%s [ %s ]: %s ~ %s [ %d ]', get_class($e), $e->getCode(), strip_tags($e->getMessage()), cdbg::path($e->getFile()), $e->getLine());
@@ -57,7 +65,8 @@ class CException extends Exception {
      *     echo $exception;
      *
      * @uses    CException::text
-     * @return  string
+     *
+     * @return string
      */
     public function __toString() {
         return self::text($this);
@@ -66,15 +75,20 @@ class CException extends Exception {
     /**
      * Sends an Internal Server Error header.
      *
-     * @return  void
+     * @return void
      */
     public function send_headers() {
         // Send the 500 header
         header('HTTP/1.1 500 Internal Server Error');
     }
 
-    
-    public static function createExceptionHandler() {
-        return new CException_ExceptionHandler(CContainer::getInstance());
+    /**
+     * @return \CException_ExceptionHandler
+     */
+    public static function exceptionHandler() {
+        if (static::$exceptionHandler == null) {
+            static::$exceptionHandler = new CException_ExceptionHandler();
+        }
+        return static::$exceptionHandler;
     }
 }

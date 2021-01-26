@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 3:12:42 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 3:12:42 PM
  */
 
 /**
  * Indicates that a DataCollector provides some assets
  */
-interface CDebug_DataCollector_AssetProviderInterface
-{
+interface CDebug_DataCollector_AssetProviderInterface {
     /**
      * Returns an array with the following keys:
      *  - base_path
@@ -37,5 +37,5 @@ interface CDebug_DataCollector_AssetProviderInterface
      *
      * @return array
      */
-    function getAssets();
+    public function getAssets();
 }

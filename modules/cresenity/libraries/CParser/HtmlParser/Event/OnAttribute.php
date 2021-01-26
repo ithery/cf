@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CParser_HtmlParser_Event_OnAttribute {
-
     public $attributeName;
     public $attributeValue;
 
@@ -15,5 +8,4 @@ class CParser_HtmlParser_Event_OnAttribute {
         $this->attributeName = $attributeName;
         $this->attributeValue = $attributeValue;
     }
-
 }

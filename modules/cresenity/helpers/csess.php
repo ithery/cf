@@ -1,7 +1,7 @@
 <?php
 
+//@codingStandardsIgnoreStart
 class csess {
-
     public static function get($key) {
         $session = CSession::instance();
         return $session->get($key);
@@ -24,5 +24,5 @@ class csess {
         $session = CSession::instance();
         return $session->id();
     }
-
 }
+//@codingStandardsIgnoreEnd

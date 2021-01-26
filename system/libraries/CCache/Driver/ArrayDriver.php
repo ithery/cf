@@ -1,15 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 19, 2019, 12:38:07 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 19, 2019, 12:38:07 PM
  */
-class CCache_Driver_ArrayDriver extends CCache_DriverAbstract {
-    
-    use CTrait_Helper_InteractsWithTime;
+class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_LockProviderInterface {
+    use CTrait_Helper_InteractsWithTime, CCache_Trait_RetrievesMultipleKeys;
 
     /**
      * The array of stored values.
@@ -21,7 +21,8 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract {
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return mixed
      */
     public function get($key) {
@@ -40,9 +41,10 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract {
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int  $seconds
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
      * @return bool
      */
     public function put($key, $value, $seconds) {
@@ -56,8 +58,9 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract {
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int
      */
     public function increment($key, $value = 1) {
@@ -72,8 +75,9 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract {
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int
      */
     public function decrement($key, $value = 1) {
@@ -83,8 +87,9 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract {
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return bool
      */
     public function forever($key, $value) {
@@ -94,7 +99,8 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract {
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function forget($key) {
@@ -127,7 +133,8 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract {
     /**
      * Get the expiration time of the key.
      *
-     * @param  int  $seconds
+     * @param int $seconds
+     *
      * @return int
      */
     protected function calculateExpiration($seconds) {
@@ -137,11 +144,36 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract {
     /**
      * Get the UNIX timestamp for the given number of seconds.
      *
-     * @param  int  $seconds
+     * @param int $seconds
+     *
      * @return int
      */
     protected function toTimestamp($seconds) {
         return $seconds > 0 ? $this->availableAt($seconds) : 0;
     }
 
+    /**
+     * Get a lock instance.
+     *
+     * @param string      $name
+     * @param int         $seconds
+     * @param string|null $owner
+     *
+     * @return CCache_LockInterface
+     */
+    public function lock($name, $seconds = 0, $owner = null) {
+        return new CCache_Lock_ArrayLock($this, $name, $seconds, $owner);
+    }
+
+    /**
+     * Restore a lock instance using the owner identifier.
+     *
+     * @param string $name
+     * @param string $owner
+     *
+     * @return CCache_LockInterface
+     */
+    public function restoreLock($name, $owner) {
+        return $this->lock($name, 0, $owner);
+    }
 }

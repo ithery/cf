@@ -25,7 +25,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var CEvent_Dispatcher
      */
     protected $events;
 

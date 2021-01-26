@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CElement_Component_DataTable_Trait_ActionCreationTrait {
-
     public function createExportAction($options) {
         $id = carr::get($options, 'id');
         $options['action'] = CExporter::ACTION_STORE;
@@ -23,11 +16,10 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
 
         return $act;
     }
-    
-    
-    public function createDownloadAction($options=[]) {
+
+    public function createDownloadAction($options = []) {
         $id = carr::get($options, 'id');
-        
+
         $options['action'] = CExporter::ACTION_DOWNLOAD;
         $act = CElement_Factory::createComponent('Action', $id)->setLabel('Export');
 
@@ -41,21 +33,19 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
 
         return $act;
     }
-    
-    
-    public function createDownloadProgressAction($options=[]) {
+
+    public function createDownloadProgressAction($options = []) {
         $id = carr::get($options, 'id');
-        
+
         $options['action'] = CExporter::ACTION_DOWNLOAD;
         $options['queued'] = true;
         $act = CElement_Factory::createComponent('Action', $id)->setLabel('Export');
 
-        
-        $disk = carr::get($options,'disk');
-        $filename = carr::get($options,'filename');
-        
+        $disk = carr::get($options, 'disk');
+        $filename = carr::get($options, 'filename');
+
         $fileUrl = CStorage::instance()->disk($disk)->url($filename);
-        
+
         $ajaxMethod = CAjax::createMethod();
         $ajaxMethod->setType('DataTableExporter');
         $ajaxMethod->setData('table', serialize($this));
@@ -70,7 +60,5 @@ trait CElement_Component_DataTable_Trait_ActionCreationTrait {
         $act->addListener('click')->addHandler('downloadProgress')->setUrl($downloadUrl);
 
         return $act;
-        
     }
-
 }

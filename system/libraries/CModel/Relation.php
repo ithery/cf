@@ -4,9 +4,8 @@
  * @mixin CModel_Query
  */
 abstract class CModel_Relation {
-
     /**
-     * The Eloquent query builder instance.
+     * The model query builder instance.
      *
      * @var CModel_Query
      */
@@ -43,8 +42,9 @@ abstract class CModel_Relation {
     /**
      * Create a new relation instance.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel  $parent
+     * @param CModel_Query $query
+     * @param CModel       $parent
+     *
      * @return void
      */
     public function __construct(CModel_Query $query, CModel $parent) {
@@ -58,7 +58,8 @@ abstract class CModel_Relation {
     /**
      * Run a callback with constraints disabled on the relation.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return mixed
      */
     public static function noConstraints(Closure $callback) {
@@ -86,7 +87,8 @@ abstract class CModel_Relation {
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param  array  $models
+     * @param array $models
+     *
      * @return void
      */
     abstract public function addEagerConstraints(array $models);
@@ -94,8 +96,9 @@ abstract class CModel_Relation {
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
-     * @param  string  $relation
+     * @param array  $models
+     * @param string $relation
+     *
      * @return array
      */
     abstract public function initRelation(array $models, $relation);
@@ -103,9 +106,10 @@ abstract class CModel_Relation {
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array   $models
-     * @param  CModel_Collection  $results
-     * @param  string  $relation
+     * @param array             $models
+     * @param CModel_Collection $results
+     * @param string            $relation
+     *
      * @return array
      */
     abstract public function match(array $models, CModel_Collection $results, $relation);
@@ -129,7 +133,8 @@ abstract class CModel_Relation {
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array  $columns
+     * @param array $columns
+     *
      * @return CModel_Collection
      */
     public function get($columns = ['*']) {
@@ -150,7 +155,8 @@ abstract class CModel_Relation {
     /**
      * Run a raw update against the base query.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return int
      */
     public function rawUpdate(array $attributes = []) {
@@ -160,14 +166,17 @@ abstract class CModel_Relation {
     /**
      * Add the constraints for a relationship count query.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel_Query  $parentQuery
+     * @param CModel_Query $query
+     * @param CModel_Query $parentQuery
+     *
      * @return CModel_Query
      */
     public function getRelationExistenceCountQuery(CModel_Query $query, CModel_Query $parentQuery) {
         return $this->getRelationExistenceQuery(
-                        $query, $parentQuery, new CDatabase_Query_Expression('count(*)')
-                )->setBindings([], 'select');
+            $query,
+            $parentQuery,
+            new CDatabase_Query_Expression('count(*)')
+        )->setBindings([], 'select');
     }
 
     /**
@@ -175,28 +184,32 @@ abstract class CModel_Relation {
      *
      * Essentially, these queries compare on column names like whereColumn.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel_Query  $parentQuery
-     * @param  array|mixed $columns
+     * @param CModel_Query $query
+     * @param CModel_Query $parentQuery
+     * @param array|mixed  $columns
+     *
      * @return CModel_Query
      */
     public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
         return $query->select($columns)->whereColumn(
-                        $this->getQualifiedParentKeyName(), '=', $this->getExistenceCompareKey()
+            $this->getQualifiedParentKeyName(),
+            '=',
+            $this->getExistenceCompareKey()
         );
     }
 
     /**
      * Get all of the primary keys for an array of models.
      *
-     * @param  array   $models
-     * @param  string  $key
+     * @param array  $models
+     * @param string $key
+     *
      * @return array
      */
     protected function getKeys(array $models, $key = null) {
-        return CF::collect($models)->map(function ($value) use ($key) {
-                    return $key ? $value->getAttribute($key) : $value->getKey();
-                })->values()->unique()->sort()->all();
+        return c::collect($models)->map(function ($value) use ($key) {
+            return $key ? $value->getAttribute($key) : $value->getKey();
+        })->values()->unique()->sort()->all();
     }
 
     /**
@@ -274,8 +287,9 @@ abstract class CModel_Relation {
     /**
      * Set or get the morph map for polymorphic relations.
      *
-     * @param  array|null  $map
-     * @param  bool  $merge
+     * @param array|null $map
+     * @param bool       $merge
+     *
      * @return array
      */
     public static function morphMap(array $map = null, $merge = true) {
@@ -291,7 +305,8 @@ abstract class CModel_Relation {
     /**
      * Builds a table-keyed array from model class names.
      *
-     * @param  string[]|null  $models
+     * @param string[]|null $models
+     *
      * @return array|null
      */
     protected static function buildMorphMapFromModels(array $models = null) {
@@ -300,14 +315,15 @@ abstract class CModel_Relation {
         }
 
         return array_combine(array_map(function ($model) {
-                    return (new $model)->getTable();
-                }, $models), $models);
+            return (new $model)->getTable();
+        }, $models), $models);
     }
 
     /**
      * Get the model associated with a custom polymorphic type.
      *
-     * @param  string  $alias
+     * @param string $alias
+     *
      * @return string|null
      */
     public static function getMorphedModel($alias) {
@@ -317,14 +333,13 @@ abstract class CModel_Relation {
     /**
      * Handle dynamic method calls to the relationship.
      *
-     * @param  string  $method
-     * @param  array   $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters) {
-
         $class = new ReflectionClass(get_class($this->query));
-
 
         try {
             // Load the controller method
@@ -334,7 +349,7 @@ abstract class CModel_Relation {
             $method_object = $class->getMethod('__call');
 
             // Use arguments in __call format
-            $parameters = array($method, $parameters);
+            $parameters = [$method, $parameters];
         }
 
         $result = $method_object->invokeArgs($this->query, $parameters);
@@ -356,5 +371,4 @@ abstract class CModel_Relation {
     public function __clone() {
         $this->query = clone $this->query;
     }
-
 }

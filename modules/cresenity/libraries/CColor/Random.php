@@ -1,21 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 3:04:48 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 3:04:48 AM
  */
 class CColor_Random {
-
     use CColor_Trait_OptionsTrait,
         CColor_Trait_ColorInfoTrait;
 
-    public function __construct($options = array()) {
-        $optionsDefault = array(
+    public function __construct($options = []) {
+        $optionsDefault = [
             'format' => 'hex',
-        );
+        ];
         $this->options = array_merge($optionsDefault, $options);
     }
 
@@ -27,9 +27,9 @@ class CColor_Random {
     }
 
     public function many($count) {
-        $colors = array();
+        $colors = [];
         for ($i = 0; $i < $count; $i++) {
-            $colors[] = self::one();
+            $colors[] = $this->one();
         }
         return $colors;
     }
@@ -42,13 +42,12 @@ class CColor_Random {
             case 'hsl':
                 return $hsv->toHsl();
             case 'hslCss':
-
-                $hslValue = $hsv->toHsl()->value;
+                $hsl = $hsv->toHsl()->value;
                 return 'hsl(' . $hsl['h'] . ',' . $hsl['s'] . '%,' . $hsl['l'] . '%)';
             case 'rgb':
                 return $hsv->toRgb();
             case 'rgbCss':
-                return 'rgb(' . implode(',', $hsv->toRgb()) . ')';
+                return 'rgb(' . implode(',', $hsv->toRgb()->value()) . ')';
             case 'hex':
             default:
                 return $hsv->toHex();
@@ -74,7 +73,7 @@ class CColor_Random {
             return 0;
         }
         if ($this->getOption('luminosity') === 'random') {
-            return $this->rand(array(0, 100));
+            return $this->rand([0, 100]);
         }
         $colorInfo = $this->getColorInfo($h);
         $range = $colorInfo['s'];
@@ -97,9 +96,9 @@ class CColor_Random {
 
     private function pickBrightness($h, $s) {
         if ($this->getOption('luminosity') === 'random') {
-            $range = array(0, 100);
+            $range = [0, 100];
         } else {
-            $range = array($this->getMinimumBrightness($h, $s), 100);
+            $range = [$this->getMinimumBrightness($h, $s), 100];
             if ($this->haveOption('luminosity')) {
                 switch ($this->getOption('luminosity')) {
                     case 'dark':
@@ -115,35 +114,34 @@ class CColor_Random {
     }
 
     private function getHueRange() {
-        $ranges = array();
+        $ranges = [];
         if ($this->haveOption('hue')) {
             if (!is_array($this->getOption('hue'))) {
-                $this->setOption('hue', array($this->getOption('hue')));
+                $this->setOption('hue', [$this->getOption('hue')]);
             }
             foreach ($this->getOption('hue') as $hue) {
                 if ($hue === 'random') {
-                    $ranges[] = array(0, 360);
-                } else if (isset(self::$dictionary[$hue])) {
+                    $ranges[] = [0, 360];
+                } elseif (isset(self::$dictionary[$hue])) {
                     $ranges[] = self::$dictionary[$hue]['h'];
-                } else if (is_numeric($hue)) {
+                } elseif (is_numeric($hue)) {
                     $hue = intval($hue);
                     if ($hue <= 360 && $hue >= 0) {
-                        $ranges[] = array($hue, $hue);
+                        $ranges[] = [$hue, $hue];
                     }
                 }
             }
         }
         if (($l = count($ranges)) === 0) {
-            return array(0, 360);
-        } else if ($l === 1) {
+            return [0, 360];
+        } elseif ($l === 1) {
             return $ranges[0];
         } else {
-            return $ranges[$this->rand(array(0, $l - 1))];
+            return $ranges[$this->rand([0, $l - 1])];
         }
     }
 
     private function rand($bounds) {
-
         if ($this->haveOption('prng')) {
             $prng = $this->getOption('prng');
             return $prng($bounds[0], $bounds[1]);
@@ -151,5 +149,4 @@ class CColor_Random {
             return mt_rand($bounds[0], $bounds[1]);
         }
     }
-
 }

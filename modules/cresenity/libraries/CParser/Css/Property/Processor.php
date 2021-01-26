@@ -1,15 +1,8 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Symfony\Component\CssSelector\Node\Specificity;
 
 class CParser_Css_Property_Processor {
-
     /**
      * Split a string into separate properties
      *
@@ -21,7 +14,7 @@ class CParser_Css_Property_Processor {
         $propertiesString = $this->cleanup($propertiesString);
 
         $properties = (array) explode(';', $propertiesString);
-        $keysToRemove = array();
+        $keysToRemove = [];
         $numberOfProperties = count($properties);
 
         for ($i = 0; $i < $numberOfProperties; $i++) {
@@ -49,8 +42,8 @@ class CParser_Css_Property_Processor {
      * @return string
      */
     private function cleanup($string) {
-        $string = str_replace(array("\r", "\n"), '', $string);
-        $string = str_replace(array("\t"), ' ', $string);
+        $string = str_replace(["\r", "\n"], '', $string);
+        $string = str_replace(["\t"], ' ', $string);
         $string = str_replace('"', '\'', $string);
         $string = preg_replace('|/\*.*?\*/|', '', $string);
         $string = preg_replace('/\s\s+/', ' ', $string);
@@ -93,7 +86,7 @@ class CParser_Css_Property_Processor {
      * @return Property[]
      */
     public function convertArrayToObjects(array $properties, Specificity $specificity = null) {
-        $objects = array();
+        $objects = [];
 
         foreach ($properties as $property) {
             $object = $this->convertToObject($property, $specificity);
@@ -115,7 +108,7 @@ class CParser_Css_Property_Processor {
      * @return string
      */
     public function buildPropertiesString(array $properties) {
-        $chunks = array();
+        $chunks = [];
 
         foreach ($properties as $property) {
             $chunks[] = $property->toString();
@@ -123,5 +116,4 @@ class CParser_Css_Property_Processor {
 
         return implode(' ', $chunks);
     }
-
 }

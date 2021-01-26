@@ -1,14 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CResources_UrlGenerator_S3UrlGenerator extends CResources_UrlGeneratorAbstract {
-
-    /** @var \CStorage */
+    /**
+     * @var \CStorage
+     */
     protected $filesystemManager;
 
     public function __construct() {
@@ -28,24 +23,25 @@ class CResources_UrlGenerator_S3UrlGenerator extends CResources_UrlGeneratorAbst
         }
         $url = $this->rawUrlEncodeFilename($url);
         $url = $this->versionUrl($url);
-        
+
         //return CF::config('resource.s3.domain') . '/' . $url;
-        return CStorage::instance()->disk($this->resource->disk)->url($url);;
+        return CStorage::instance()->disk($this->resource->disk)->url($url);
+        ;
     }
 
     /**
      * Get the temporary url for a media item.
      *
      * @param \DateTimeInterface $expiration
-     * @param array $options
+     * @param array              $options
      *
      * @return string
      */
     public function getTemporaryUrl(DateTimeInterface $expiration, array $options = []) {
         return $this
-                        ->filesystemManager
-                        ->disk($this->resource->disk)
-                        ->temporaryUrl($this->getPath(), $expiration, $options);
+            ->filesystemManager
+            ->disk($this->resource->disk)
+            ->temporaryUrl($this->getPath(), $expiration, $options);
     }
 
     /**
@@ -67,7 +63,6 @@ class CResources_UrlGenerator_S3UrlGenerator extends CResources_UrlGeneratorAbst
         if ($root = CF::config('storage.disks.' . $this->resource->disk . '.root')) {
             $url = $root . '/' . $url;
         }
-        return config('resource.s3.domain') . '/' . $url;
+        return CF::config('resource.s3.domain') . '/' . $url;
     }
-
 }

@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 10, 2019, 7:07:06 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 10, 2019, 7:07:06 AM
  */
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
@@ -13,9 +14,8 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Response;
 
 class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_AdapterAbstract {
-
     /**
-     * @var ClientInterface
+     * @var Client
      */
     protected $client;
 
@@ -25,11 +25,9 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_AdapterAbstract {
     protected $response;
 
     /**
-     * @param string               $token
      * @param ClientInterface|null $client
      */
     public function __construct(ClientInterface $client = null) {
-
         $this->client = $client ?: new Client();
     }
 
@@ -104,6 +102,8 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_AdapterAbstract {
     }
 
     /**
+     * @param mixed $e
+     *
      * @throws HttpException
      */
     protected function handleError($e) {
@@ -113,11 +113,10 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_AdapterAbstract {
         $body = (string) $this->response->getBody();
         $code = (int) $this->response->getStatusCode();
         if ($code != 200) {
-            throw new CApp_Cloud_Exception_HttpException(isset($body) ? $body : 'Request not processed.', array(), $code);
+            throw new CApp_Cloud_Exception_HttpException(isset($body) ? $body : 'Request not processed.', [], $code);
         }
         $content = json_decode($body);
 
-        throw new CApp_Cloud_Exception_ApiException(isset($content->errMessage) ? $content->errMessage : 'Request not processed.', array(), $code);
+        throw new CApp_Cloud_Exception_ApiException(isset($content->errMessage) ? $content->errMessage : 'Request not processed.', [], $code);
     }
-
 }

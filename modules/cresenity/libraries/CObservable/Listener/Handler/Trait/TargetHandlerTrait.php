@@ -1,16 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 20, 2019, 1:36:31 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 20, 2019, 1:36:31 PM
  */
 trait CObservable_Listener_Handler_Trait_TargetHandlerTrait {
-
     /**
      * id of handler targeted renderable
+     *
      * @var string
      */
     protected $target;
@@ -23,5 +24,4 @@ trait CObservable_Listener_Handler_Trait_TargetHandlerTrait {
 
         return $this;
     }
-
 }

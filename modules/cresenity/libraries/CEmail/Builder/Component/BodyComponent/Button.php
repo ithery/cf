@@ -1,15 +1,8 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Button extends CEmail_Builder_Component_BodyComponent {
-    
     protected static $endingTag = true;
     protected static $tagName = 'c-button';
     protected $allowedAttributes = [
@@ -111,7 +104,6 @@ class CEmail_Builder_Component_BodyComponent_Button extends CEmail_Builder_Compo
             return null;
         }
 
-
         $widthParserResult = Helper::widthParser($width);
         $unit = carr::get($widthParserResult, 'unit');
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
@@ -163,5 +155,4 @@ class CEmail_Builder_Component_BodyComponent_Button extends CEmail_Builder_Compo
       </table>
     ';
     }
-
 }

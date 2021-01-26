@@ -2,10 +2,8 @@
 
 /**
  * CDatabase_Result
- *
  */
 abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAccess, Iterator, Countable {
-
     // Result resource, insert id, and SQL
     protected $result;
     protected $insert_id;
@@ -20,7 +18,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     /**
      * Returns the SQL used to fetch the result.
      *
-     * @return  string
+     * @return string
      */
     public function sql() {
         return $this->sql;
@@ -29,7 +27,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     /**
      * Returns the insert id from the result.
      *
-     * @return  mixed
+     * @return mixed
      */
     public function insert_id() {
         return $this->insert_id;
@@ -38,32 +36,36 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     /**
      * Prepares the query result.
      *
-     * @param   boolean   return rows as objects
-     * @param   mixed     type
-     * @return  CDatabase_Result
+     * @param mixed $object
+     * @param mixed $type
+     *
+     * @return CDatabase_Result
      */
-    abstract function result($object = TRUE, $type = FALSE);
+    abstract public function result($object = true, $type = false);
 
     /**
      * Builds an array of query results.
      *
-     * @param   boolean   return rows as objects
-     * @param   mixed     type
-     * @return  array
+     * @param null|bool $object
+     * @param mixed     $type
+     *
+     * @return array
      */
-    abstract function result_array($object = NULL, $type = FALSE);
+    abstract public function result_array($object = null, $type = false);
 
     /**
      * Gets the fields of an already run query.
      *
-     * @return  array
+     * @return array
      */
     abstract public function list_fields();
 
     /**
      * Seek to an offset in the results.
      *
-     * @return  boolean
+     * @param int $offset
+     *
+     * @return boolean
      */
     abstract public function seek($offset);
 
@@ -76,24 +78,29 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
 
     /**
      * ArrayAccess: offsetExists
+     *
+     * @param mixed $offset
      */
     public function offsetExists($offset) {
         if ($this->total_rows > 0) {
             $min = 0;
             $max = $this->total_rows - 1;
 
-            return !($offset < $min OR $offset > $max);
+            return !($offset < $min or $offset > $max);
         }
 
-        return FALSE;
+        return false;
     }
 
     /**
      * ArrayAccess: offsetGet
+     *
+     * @param mixed $offset
      */
     public function offsetGet($offset) {
-        if (!$this->seek($offset))
-            return FALSE;
+        if (!$this->seek($offset)) {
+            return false;
+        }
 
         // Return the row by calling the defined fetching callback
         return call_user_func($this->fetch_type, $this->result, $this->return_type);
@@ -102,7 +109,10 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     /**
      * ArrayAccess: offsetSet
      *
-     * @throws  CDatabase_Exception
+     * @param mixed $offset
+     * @param mixed $value
+     *
+     * @throws CDatabase_Exception
      */
     public function offsetSet($offset, $value) {
         throw new CDatabase_Exception('Query results are read only');
@@ -111,7 +121,9 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     /**
      * ArrayAccess: offsetUnset
      *
-     * @throws  CDatabase_Exception
+     * @param mixed $offset
+     *
+     * @throws CDatabase_Exception
      */
     public function offsetUnset($offset) {
         throw new CDatabase_Exception('Query results are read only');
@@ -161,7 +173,4 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     public function valid() {
         return $this->offsetExists($this->current_row);
     }
-
 }
-
-// End Database Result Interface

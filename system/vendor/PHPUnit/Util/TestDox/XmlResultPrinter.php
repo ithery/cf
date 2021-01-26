@@ -16,7 +16,7 @@ use function strpos;
 use DOMDocument;
 use DOMElement;
 use PHPUnit\Framework\AssertionFailedError;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\TestListener;

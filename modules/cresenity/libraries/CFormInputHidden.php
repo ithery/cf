@@ -1,10 +1,9 @@
 <?php
 
 class CFormInputHidden extends CFormInput {
-
     public function __construct($id) {
         parent::__construct($id);
-        $this->type = "text";
+        $this->type = 'text';
     }
 
     public static function factory($id = '') {
@@ -12,8 +11,8 @@ class CFormInputHidden extends CFormInput {
     }
 
     public function toarray() {
-        $data = array();
-        $data['attr']['type'] = "hidden";
+        $data = [];
+        $data['attr']['type'] = 'hidden';
         $data['attr']['value'] = $this->value;
 
         $data = array_merge_recursive($data, parent::toarray());
@@ -22,11 +21,12 @@ class CFormInputHidden extends CFormInput {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
-            $classes = " " . $classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
 
         $attr = '';
         foreach ($this->attr as $k => $v) {
@@ -38,7 +38,6 @@ class CFormInputHidden extends CFormInput {
     }
 
     public function js($indent = 0) {
-        return "";
+        return '';
     }
-
 }

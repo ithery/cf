@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 10, 2019, 1:08:53 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 10, 2019, 1:08:53 AM
  */
 class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface {
-
     /**
      * The current globally available container (if any).
      *
@@ -131,7 +131,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Define a contextual binding.
      *
-     * @param  string  $concrete
+     * @param string $concrete
+     *
      * @return CContainer_ContextualBindingBuilderInterface
      */
     public function when($concrete) {
@@ -141,13 +142,14 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Determine if the given abstract type has been bound.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return bool
      */
     public function bound($abstract) {
-        return isset($this->bindings[$abstract]) ||
-                isset($this->instances[$abstract]) ||
-                $this->isAlias($abstract);
+        return isset($this->bindings[$abstract])
+                || isset($this->instances[$abstract])
+                || $this->isAlias($abstract);
     }
 
     /**
@@ -160,33 +162,36 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Determine if the given abstract type has been resolved.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return bool
      */
     public function resolved($abstract) {
         if ($this->isAlias($abstract)) {
             $abstract = $this->getAlias($abstract);
         }
-        return isset($this->resolved[$abstract]) ||
-                isset($this->instances[$abstract]);
+        return isset($this->resolved[$abstract])
+                || isset($this->instances[$abstract]);
     }
 
     /**
      * Determine if a given type is shared.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return bool
      */
     public function isShared($abstract) {
-        return isset($this->instances[$abstract]) ||
-                (isset($this->bindings[$abstract]['shared']) &&
-                $this->bindings[$abstract]['shared'] === true);
+        return isset($this->instances[$abstract])
+                || (isset($this->bindings[$abstract]['shared'])
+                && $this->bindings[$abstract]['shared'] === true);
     }
 
     /**
      * Determine if a given string is an alias.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return bool
      */
     public function isAlias($name) {
@@ -196,9 +201,10 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Register a binding with the container.
      *
-     * @param  string  $abstract
-     * @param  \Closure|string|null  $concrete
-     * @param  bool  $shared
+     * @param string               $abstract
+     * @param \Closure|string|null $concrete
+     * @param bool                 $shared
+     *
      * @return void
      */
     public function bind($abstract, $concrete = null, $shared = false) {
@@ -227,8 +233,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Get the Closure to be used when building a type.
      *
-     * @param  string  $abstract
-     * @param  string  $concrete
+     * @param string $abstract
+     * @param string $concrete
+     *
      * @return \Closure
      */
     protected function getClosure($abstract, $concrete) {
@@ -243,7 +250,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Determine if the container has a method binding.
      *
-     * @param  string  $method
+     * @param string $method
+     *
      * @return bool
      */
     public function hasMethodBinding($method) {
@@ -253,8 +261,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Bind a callback to resolve with Container::call.
      *
-     * @param  array|string  $method
-     * @param  \Closure  $callback
+     * @param array|string $method
+     * @param \Closure     $callback
+     *
      * @return void
      */
     public function bindMethod($method, $callback) {
@@ -264,7 +273,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Get the method to be bound in class@method format.
      *
-     * @param  array|string $method
+     * @param array|string $method
+     *
      * @return string
      */
     protected function parseBindMethod($method) {
@@ -277,8 +287,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Get the method binding for the given method.
      *
-     * @param  string  $method
-     * @param  mixed  $instance
+     * @param string $method
+     * @param mixed  $instance
+     *
      * @return mixed
      */
     public function callMethodBinding($method, $instance) {
@@ -288,9 +299,10 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Add a contextual binding to the container.
      *
-     * @param  string  $concrete
-     * @param  string  $abstract
-     * @param  \Closure|string  $implementation
+     * @param string          $concrete
+     * @param string          $abstract
+     * @param \Closure|string $implementation
+     *
      * @return void
      */
     public function addContextualBinding($concrete, $abstract, $implementation) {
@@ -300,9 +312,10 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Register a binding if it hasn't already been registered.
      *
-     * @param  string  $abstract
-     * @param  \Closure|string|null  $concrete
-     * @param  bool  $shared
+     * @param string               $abstract
+     * @param \Closure|string|null $concrete
+     * @param bool                 $shared
+     *
      * @return void
      */
     public function bindIf($abstract, $concrete = null, $shared = false) {
@@ -314,8 +327,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Register a shared binding in the container.
      *
-     * @param  string  $abstract
-     * @param  \Closure|string|null  $concrete
+     * @param string               $abstract
+     * @param \Closure|string|null $concrete
+     *
      * @return void
      */
     public function singleton($abstract, $concrete = null) {
@@ -325,8 +339,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * "Extend" an abstract type in the container.
      *
-     * @param  string    $abstract
-     * @param  \Closure  $closure
+     * @param string   $abstract
+     * @param \Closure $closure
+     *
      * @return void
      *
      * @throws \InvalidArgumentException
@@ -347,8 +362,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Register an existing instance as shared in the container.
      *
-     * @param  string  $abstract
-     * @param  mixed   $instance
+     * @param string $abstract
+     * @param mixed  $instance
+     *
      * @return mixed
      */
     public function instance($abstract, $instance) {
@@ -368,7 +384,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Remove an alias from the contextual binding alias cache.
      *
-     * @param  string  $searched
+     * @param string $searched
+     *
      * @return void
      */
     protected function removeAbstractAlias($searched) {
@@ -387,8 +404,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Assign a set of tags to a given binding.
      *
-     * @param  array|string  $abstracts
-     * @param  array|mixed   ...$tags
+     * @param array|string $abstracts
+     * @param array|mixed  ...$tags
+     *
      * @return void
      */
     public function tag($abstracts, $tags) {
@@ -406,7 +424,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Resolve all of the bindings for a given tag.
      *
-     * @param  string  $tag
+     * @param string $tag
+     *
      * @return array
      */
     public function tagged($tag) {
@@ -422,8 +441,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Alias a type to a different name.
      *
-     * @param  string  $abstract
-     * @param  string  $alias
+     * @param string $abstract
+     * @param string $alias
+     *
      * @return void
      */
     public function alias($abstract, $alias) {
@@ -434,8 +454,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Bind a new callback to an abstract's rebind event.
      *
-     * @param  string    $abstract
-     * @param  \Closure  $callback
+     * @param string   $abstract
+     * @param \Closure $callback
+     *
      * @return mixed
      */
     public function rebinding($abstract, Closure $callback) {
@@ -448,21 +469,23 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Refresh an instance on the given target and method.
      *
-     * @param  string  $abstract
-     * @param  mixed   $target
-     * @param  string  $method
+     * @param string $abstract
+     * @param mixed  $target
+     * @param string $method
+     *
      * @return mixed
      */
     public function refresh($abstract, $target, $method) {
         return $this->rebinding($abstract, function ($app, $instance) use ($target, $method) {
-                    $target->{$method}($instance);
-                });
+            $target->{$method}($instance);
+        });
     }
 
     /**
      * Fire the "rebound" callbacks for the given abstract type.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return void
      */
     protected function rebound($abstract) {
@@ -475,7 +498,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Get the rebound callbacks for a given type.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return array
      */
     protected function getReboundCallbacks($abstract) {
@@ -488,8 +512,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Wrap the given closure such that its dependencies will be injected when executed.
      *
-     * @param  \Closure  $callback
-     * @param  array  $parameters
+     * @param \Closure $callback
+     * @param array    $parameters
+     *
      * @return \Closure
      */
     public function wrap(Closure $callback, array $parameters = []) {
@@ -501,9 +526,10 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Call the given Closure / class@method and inject its dependencies.
      *
-     * @param  callable|string  $callback
-     * @param  array  $parameters
-     * @param  string|null  $defaultMethod
+     * @param callable|string $callback
+     * @param array           $parameters
+     * @param string|null     $defaultMethod
+     *
      * @return mixed
      */
     public function call($callback, array $parameters = [], $defaultMethod = null) {
@@ -513,7 +539,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Get a closure to resolve the given type from the container.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return \Closure
      */
     public function factory($abstract) {
@@ -525,8 +552,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * An alias function name for make().
      *
-     * @param  string  $abstract
-     * @param  array  $parameters
+     * @param string $abstract
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function makeWith($abstract, array $parameters = []) {
@@ -536,8 +564,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Resolve the given type from the container.
      *
-     * @param  string  $abstract
-     * @param  array  $parameters
+     * @param string $abstract
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function make($abstract, array $parameters = []) {
@@ -557,14 +586,15 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Resolve the given type from the container.
      *
-     * @param  string  $abstract
-     * @param  array  $parameters
+     * @param string $abstract
+     * @param array  $parameters
+     *
      * @return mixed
      */
     protected function resolve($abstract, $parameters = []) {
         $abstract = $this->getAlias($abstract);
         $needsContextualBuild = !empty($parameters) || !is_null(
-                        $this->getContextualConcrete($abstract)
+            $this->getContextualConcrete($abstract)
         );
         // If an instance of the type is currently being managed as a singleton we'll
         // just return an existing instance instead of instantiating new instances
@@ -583,7 +613,6 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
         } else {
             $object = $this->make($concrete);
         }
-
 
         // If we defined any extenders for this type, we'll need to spin through them
         // and apply them to the object being built. This allows for the extension
@@ -610,8 +639,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Get the concrete type for a given abstract.
      *
-     * @param  string  $abstract
-     * @return mixed   $concrete
+     * @param string $abstract
+     *
+     * @return mixed $concrete
      */
     protected function getConcrete($abstract) {
         if (!is_null($concrete = $this->getContextualConcrete($abstract))) {
@@ -629,7 +659,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Get the contextual concrete binding for the given abstract.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return string|null
      */
     protected function getContextualConcrete($abstract) {
@@ -652,7 +683,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Find the concrete binding for the given abstract in the contextual binding array.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return string|null
      */
     protected function findInContextualBindings($abstract) {
@@ -664,8 +696,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Determine if the given concrete is buildable.
      *
-     * @param  mixed   $concrete
-     * @param  string  $abstract
+     * @param mixed  $concrete
+     * @param string $abstract
+     *
      * @return bool
      */
     protected function isBuildable($concrete, $abstract) {
@@ -675,7 +708,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Instantiate a concrete instance of the given type.
      *
-     * @param  string  $concrete
+     * @param string $concrete
+     *
      * @return mixed
      *
      * @throws CContainer_Exception_BindingResolutionException
@@ -708,7 +742,7 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
         // dependency instances and then use the reflection instances to make a
         // new instance of this class, injecting the created dependencies in.
         $instances = $this->resolveDependencies(
-                $dependencies
+            $dependencies
         );
         array_pop($this->buildStack);
         return $reflector->newInstanceArgs($instances);
@@ -717,7 +751,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Resolve all of the dependencies from the ReflectionParameters.
      *
-     * @param  array  $dependencies
+     * @param array $dependencies
+     *
      * @return array
      */
     protected function resolveDependencies(array $dependencies) {
@@ -741,19 +776,22 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Determine if the given dependency has a parameter override.
      *
-     * @param  \ReflectionParameter  $dependency
+     * @param \ReflectionParameter $dependency
+     *
      * @return bool
      */
     protected function hasParameterOverride($dependency) {
         return array_key_exists(
-                $dependency->name, $this->getLastParameterOverride()
+            $dependency->name,
+            $this->getLastParameterOverride()
         );
     }
 
     /**
      * Get a parameter override for a dependency.
      *
-     * @param  \ReflectionParameter  $dependency
+     * @param \ReflectionParameter $dependency
+     *
      * @return mixed
      */
     protected function getParameterOverride($dependency) {
@@ -772,7 +810,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Resolve a non-class hinted primitive dependency.
      *
-     * @param  \ReflectionParameter  $parameter
+     * @param \ReflectionParameter $parameter
+     *
      * @return mixed
      *
      * @throws \CContainer_Exception_BindingResolutionException
@@ -790,7 +829,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Resolve a class based dependency from the container.
      *
-     * @param  \ReflectionParameter  $parameter
+     * @param \ReflectionParameter $parameter
+     *
      * @return mixed
      *
      * @throws CContainer_Exception_BindingResolutionException
@@ -798,11 +838,10 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     protected function resolveClass(ReflectionParameter $parameter) {
         try {
             return $this->make($parameter->getClass()->name);
-        }
-        // If we can not resolve the class instance, we will check to see if the value
-        // is optional, and if it is we will return the optional parameter value as
-        // the value of the dependency, similarly to how we do this with scalars.
-        catch (CContainer_Exception_BindingResolutionException $e) {
+        } catch (CContainer_Exception_BindingResolutionException $e) {
+            // If we can not resolve the class instance, we will check to see if the value
+            // is optional, and if it is we will return the optional parameter value as
+            // the value of the dependency, similarly to how we do this with scalars.
             if ($parameter->isOptional()) {
                 return $parameter->getDefaultValue();
             }
@@ -813,7 +852,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Throw an exception that the concrete is not instantiable.
      *
-     * @param  string  $concrete
+     * @param string $concrete
+     *
      * @return void
      *
      * @throws CContainer_Exception_BindingResolutionException
@@ -831,7 +871,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Throw an exception for an unresolvable primitive.
      *
-     * @param  \ReflectionParameter  $parameter
+     * @param \ReflectionParameter $parameter
+     *
      * @return void
      *
      * @throws CContainer_Exception_BindingResolutionException
@@ -844,8 +885,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Register a new resolving callback.
      *
-     * @param  \Closure|string  $abstract
-     * @param  \Closure|null  $callback
+     * @param \Closure|string $abstract
+     * @param \Closure|null   $callback
+     *
      * @return void
      */
     public function resolving($abstract, Closure $callback = null) {
@@ -862,8 +904,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Register a new after resolving callback for all types.
      *
-     * @param  \Closure|string  $abstract
-     * @param  \Closure|null  $callback
+     * @param \Closure|string $abstract
+     * @param \Closure|null   $callback
+     *
      * @return void
      */
     public function afterResolving($abstract, Closure $callback = null) {
@@ -880,14 +923,16 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Fire all of the resolving callbacks.
      *
-     * @param  string  $abstract
-     * @param  mixed   $object
+     * @param string $abstract
+     * @param mixed  $object
+     *
      * @return void
      */
     protected function fireResolvingCallbacks($abstract, $object) {
         $this->fireCallbackArray($object, $this->globalResolvingCallbacks);
         $this->fireCallbackArray(
-                $object, $this->getCallbacksForType($abstract, $object, $this->resolvingCallbacks)
+            $object,
+            $this->getCallbacksForType($abstract, $object, $this->resolvingCallbacks)
         );
         $this->fireAfterResolvingCallbacks($abstract, $object);
     }
@@ -895,23 +940,25 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Fire all of the after resolving callbacks.
      *
-     * @param  string  $abstract
-     * @param  mixed   $object
+     * @param string $abstract
+     * @param mixed  $object
+     *
      * @return void
      */
     protected function fireAfterResolvingCallbacks($abstract, $object) {
         $this->fireCallbackArray($object, $this->globalAfterResolvingCallbacks);
         $this->fireCallbackArray(
-                $object, $this->getCallbacksForType($abstract, $object, $this->afterResolvingCallbacks)
+            $object,
+            $this->getCallbacksForType($abstract, $object, $this->afterResolvingCallbacks)
         );
     }
 
     /**
      * Get all callbacks for a given type.
      *
-     * @param  string  $abstract
-     * @param  object  $object
-     * @param  array   $callbacksPerType
+     * @param string $abstract
+     * @param object $object
+     * @param array  $callbacksPerType
      *
      * @return array
      */
@@ -928,8 +975,9 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Fire an array of callbacks with an object.
      *
-     * @param  mixed  $object
-     * @param  array  $callbacks
+     * @param mixed $object
+     * @param array $callbacks
+     *
      * @return void
      */
     protected function fireCallbackArray($object, array $callbacks) {
@@ -950,7 +998,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Get the alias for an abstract if available.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return string
      *
      * @throws \LogicException
@@ -968,7 +1017,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Get the extender callbacks for a given type.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return array
      */
     protected function getExtenders($abstract) {
@@ -982,7 +1032,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Remove all of the extender callbacks for a given type.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return void
      */
     public function forgetExtenders($abstract) {
@@ -992,7 +1043,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Drop all of the stale instances and aliases.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return void
      */
     protected function dropStaleInstances($abstract) {
@@ -1002,7 +1054,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Remove a resolved instance from the instance cache.
      *
-     * @param  string  $abstract
+     * @param string $abstract
+     *
      * @return void
      */
     public function forgetInstance($abstract) {
@@ -1046,7 +1099,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Set the shared instance of the container.
      *
-     * @param  CContainer_ContainerInterface|null  $container
+     * @param CContainer_ContainerInterface|null $container
+     *
      * @return CContainer_ContainerInterface|static
      */
     public static function setInstance(CContainer_ContainerInterface $container = null) {
@@ -1056,7 +1110,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Determine if a given offset exists.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function offsetExists($key) {
@@ -1066,7 +1121,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Get the value at a given offset.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function offsetGet($key) {
@@ -1076,20 +1132,22 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Set the value at a given offset.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function offsetSet($key, $value) {
         $this->bind($key, $value instanceof Closure ? $value : function () use ($value) {
-                    return $value;
-                });
+            return $value;
+        });
     }
 
     /**
      * Unset the value at a given offset.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return void
      */
     public function offsetUnset($key) {
@@ -1099,7 +1157,8 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Dynamically access container services.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function __get($key) {
@@ -1109,12 +1168,12 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Dynamically set container services.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function __set($key, $value) {
         $this[$key] = $value;
     }
-
 }

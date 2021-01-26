@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Nov 6, 2019, 5:20:00 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Nov 6, 2019, 5:20:00 PM
  */
 use MongoDB\BSON\ObjectID;
 
 class CModel_MongoDB_Relation_EmbedsOne extends CModel_MongoDB_Relation_EmbedsOneOrMany {
-
     /**
      * @inheritdoc
      */
@@ -30,7 +30,9 @@ class CModel_MongoDB_Relation_EmbedsOne extends CModel_MongoDB_Relation_EmbedsOn
 
     /**
      * Save a new model and attach it to the parent model.
+     *
      * @param CModel_MongoDB_Model $model
+     *
      * @return CModel_MongoDB_Model|bool
      */
     public function performInsert(CModel_MongoDB_Model $model) {
@@ -53,7 +55,9 @@ class CModel_MongoDB_Relation_EmbedsOne extends CModel_MongoDB_Relation_EmbedsOn
 
     /**
      * Save an existing model and attach it to the parent model.
+     *
      * @param CModel_MongoDB_Model $model
+     *
      * @return CModel_MongoDB_Model|bool
      */
     public function performUpdate(CModel_MongoDB_Model $model) {
@@ -72,6 +76,7 @@ class CModel_MongoDB_Relation_EmbedsOne extends CModel_MongoDB_Relation_EmbedsOn
 
     /**
      * Delete an existing model and detach it from the parent model.
+     *
      * @return int
      */
     public function performDelete() {
@@ -91,7 +96,9 @@ class CModel_MongoDB_Relation_EmbedsOne extends CModel_MongoDB_Relation_EmbedsOn
 
     /**
      * Attach the model to its parent.
+     *
      * @param CModel_MongoDB_Model $model
+     *
      * @return CModel_MongoDB_Model
      */
     public function associate(CModel_MongoDB_Model $model) {
@@ -100,6 +107,7 @@ class CModel_MongoDB_Relation_EmbedsOne extends CModel_MongoDB_Relation_EmbedsOn
 
     /**
      * Detach the model from its parent.
+     *
      * @return CModel_MongoDB_Model
      */
     public function dissociate() {
@@ -108,6 +116,7 @@ class CModel_MongoDB_Relation_EmbedsOne extends CModel_MongoDB_Relation_EmbedsOn
 
     /**
      * Delete all embedded models.
+     *
      * @return int
      */
     public function delete() {
@@ -116,12 +125,13 @@ class CModel_MongoDB_Relation_EmbedsOne extends CModel_MongoDB_Relation_EmbedsOn
 
     /**
      * Get the name of the "where in" method for eager loading.
+     *
      * @param CModel $model
      * @param string $key
+     *
      * @return string
      */
     protected function whereInMethod(CModel $model, $key) {
         return 'whereIn';
     }
-
 }

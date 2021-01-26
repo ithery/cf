@@ -1,19 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 5:32:55 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 5:32:55 AM
  */
 trait CHTTP_Trait_InteractsWithInput {
-
     /**
      * Retrieve a server variable from the request.
      *
-     * @param  string  $key
-     * @param  string|array|null  $default
+     * @param string            $key
+     * @param string|array|null $default
+     *
      * @return string|array
      */
     public function server($key = null, $default = null) {
@@ -23,7 +24,8 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Determine if a header is set on the request.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function hasHeader($key) {
@@ -33,8 +35,9 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Retrieve a header from the request.
      *
-     * @param  string  $key
-     * @param  string|array|null  $default
+     * @param string            $key
+     * @param string|array|null $default
+     *
      * @return string|array
      */
     public function header($key = null, $default = null) {
@@ -57,7 +60,8 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Determine if the request contains a given input item key.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return bool
      */
     public function exists($key) {
@@ -67,7 +71,8 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Determine if the request contains a given input item key.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return bool
      */
     public function has($key) {
@@ -87,7 +92,8 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Determine if the request contains any of the given inputs.
      *
-     * @param  dynamic  $key
+     * @param dynamic $key
+     *
      * @return bool
      */
     public function hasAny(...$keys) {
@@ -105,7 +111,8 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Determine if the request contains a non-empty value for an input item.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return bool
      */
     public function filled($key) {
@@ -123,7 +130,8 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Determine if the given input key is an empty string for "has".
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     protected function isEmptyString($key) {
@@ -144,7 +152,8 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Get all of the input and files for the request.
      *
-     * @param  array|mixed  $keys
+     * @param array|mixed $keys
+     *
      * @return array
      */
     public function all($keys = null) {
@@ -157,7 +166,7 @@ trait CHTTP_Trait_InteractsWithInput {
         $results = [];
 
         foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            carr::set($results, $key, Arr::get($input, $key));
+            carr::set($results, $key, carr::get($input, $key));
         }
 
         return $results;
@@ -166,20 +175,24 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Retrieve an input item from the request.
      *
-     * @param  string  $key
-     * @param  string|array|null  $default
+     * @param string            $key
+     * @param string|array|null $default
+     *
      * @return string|array
      */
     public function input($key = null, $default = null) {
         return CF::get(
-                $this->getInputSource()->all() + $this->query->all(), $key, $default
+            $this->getInputSource()->all() + $this->query->all(),
+            $key,
+            $default
         );
     }
 
     /**
      * Get a subset containing the provided keys with values from the input data.
      *
-     * @param  array|mixed  $keys
+     * @param array|mixed $keys
+     *
      * @return array
      */
     public function only($keys) {
@@ -190,7 +203,7 @@ trait CHTTP_Trait_InteractsWithInput {
         $placeholder = new stdClass;
 
         foreach (is_array($keys) ? $keys : func_get_args() as $key) {
-            $value = data_get($input, $key, $placeholder);
+            $value = carr::get($input, $key, $placeholder);
 
             if ($value !== $placeholder) {
                 carr::set($results, $key, $value);
@@ -203,7 +216,8 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Get all of the input except for a specified array of items.
      *
-     * @param  array|mixed  $keys
+     * @param array|mixed $keys
+     *
      * @return array
      */
     public function except($keys) {
@@ -219,8 +233,9 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Retrieve a query string item from the request.
      *
-     * @param  string  $key
-     * @param  string|array|null  $default
+     * @param string            $key
+     * @param string|array|null $default
+     *
      * @return string|array
      */
     public function query($key = null, $default = null) {
@@ -230,8 +245,8 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Retrieve a request payload item from the request.
      *
-     * @param  string  $key
-     * @param  string|array|null  $default
+     * @param string            $key
+     * @param string|array|null $default
      *
      * @return string|array
      */
@@ -242,7 +257,8 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Determine if a cookie is set on the request.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function hasCookie($key) {
@@ -252,8 +268,9 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Retrieve a cookie from the request.
      *
-     * @param  string  $key
-     * @param  string|array|null  $default
+     * @param string            $key
+     * @param string|array|null $default
+     *
      * @return string|array
      */
     public function cookie($key = null, $default = null) {
@@ -274,7 +291,8 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Convert the given array of Symfony UploadedFiles to custom Laravel UploadedFiles.
      *
-     * @param  array  $files
+     * @param array $files
+     *
      * @return array
      */
     protected function convertUploadedFiles(array $files) {
@@ -290,7 +308,8 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Determine if the uploaded data contains a file.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function hasFile($key) {
@@ -310,7 +329,8 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Check that the given file is a valid file instance.
      *
-     * @param  mixed  $file
+     * @param mixed $file
+     *
      * @return bool
      */
     protected function isValidFile($file) {
@@ -320,9 +340,10 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Retrieve a file from the request.
      *
-     * @param  string  $key
-     * @param  mixed  $default
-     * @return \Illuminate\Http\UploadedFile|array|null
+     * @param string $key
+     * @param mixed  $default
+     *
+     * @return CHTTP_UploadedFile|array|null
      */
     public function file($key = null, $default = null) {
         return CF::get($this->allFiles(), $key, $default);
@@ -331,9 +352,10 @@ trait CHTTP_Trait_InteractsWithInput {
     /**
      * Retrieve a parameter item from a given source.
      *
-     * @param  string  $source
-     * @param  string  $key
-     * @param  string|array|null  $default
+     * @param string            $source
+     * @param string            $key
+     * @param string|array|null $default
+     *
      * @return string|array
      */
     protected function retrieveItem($source, $key, $default) {
@@ -343,5 +365,4 @@ trait CHTTP_Trait_InteractsWithInput {
 
         return $this->$source->get($key, $default);
     }
-
 }

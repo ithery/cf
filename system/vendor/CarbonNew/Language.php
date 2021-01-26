@@ -59,7 +59,7 @@ class Language implements JsonSerializable
      */
     protected $nativeName;
 
-    public function __construct(string $id)
+    public function __construct($id)
     {
         $this->id = str_replace('-', '_', $id);
         $parts = explode('_', $this->id);
@@ -208,7 +208,7 @@ class Language implements JsonSerializable
      *
      * @param string $isoName
      */
-    public function setIsoName(string $isoName): self
+    public function setIsoName($isoName): self
     {
         $this->isoName = $isoName;
 
@@ -234,7 +234,7 @@ class Language implements JsonSerializable
      *
      * @param string $nativeName
      */
-    public function setNativeName(string $nativeName): self
+    public function setNativeName($nativeName): self
     {
         $this->nativeName = $nativeName;
 

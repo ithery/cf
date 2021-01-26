@@ -13,6 +13,7 @@ application/cresenity/default/config/*
 application/cresenity/config/*
 
 #ignore data domain or org
+/data
 /data/*
 /data/org/*
 
@@ -23,6 +24,9 @@ application/cresenity/config/*
 /.git.bak
 
 /access.log
+
+#phpunit
+.phpunit.result.cache
 
 #ignore libs of CPDF
 /modules/cresenity/vendor/lib/fonts/Helvetica.afm.php
@@ -85,4 +89,13 @@ botlog.log
 
 #ignore vscode
 .vscode
+.php_cs.cache
 *.py
+
+#phpunit
+.phpunit.result.cache
+
+.bin/*
+
+
+

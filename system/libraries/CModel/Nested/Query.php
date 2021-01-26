@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2018, 5:17:17 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2018, 5:17:17 AM
  */
 use Carbon\Carbon;
 
 class CModel_Nested_Query extends CModel_Query {
-
     /**
      * @var CModel_Nested_Trait|CModel
      */
@@ -19,10 +19,10 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * Get node's `lft` and `rgt` values.
      *
-     * @since 2.0
-     *
      * @param mixed $id
-     * @param bool $required
+     * @param bool  $required
+     *
+     * @since 2.0
      *
      * @return array
      */
@@ -40,10 +40,10 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * Get plain node data.
      *
-     * @since 2.0
-     *
      * @param mixed $id
-     * @param bool $required
+     * @param bool  $required
+     *
+     * @since 2.0
      *
      * @return array
      */
@@ -64,12 +64,11 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * Limit results to ancestors of specified node.
      *
-     * @since 2.0
-     *
-     * @param mixed $id
-     * @param bool $andSelf
-     *
+     * @param mixed  $id
+     * @param bool   $andSelf
      * @param string $boolean
+     *
+     * @since 2.0
      *
      * @return $this
      */
@@ -81,12 +80,12 @@ class CModel_Nested_Query extends CModel_Query {
             $id = $id->getKey();
         } else {
             $valueQuery = $this->model
-                    ->newQuery()
-                    ->toBase()
-                    ->select("_." . $this->model->getRgtName())
-                    ->from($this->model->getTable() . ' as _')
-                    ->where($this->model->getKeyName(), '=', $id)
-                    ->limit(1);
+                ->newQuery()
+                ->toBase()
+                ->select('_.' . $this->model->getRgtName())
+                ->from($this->model->getTable() . ' as _')
+                ->where($this->model->getKeyName(), '=', $id)
+                ->limit(1);
             $this->query->mergeBindings($valueQuery);
             $value = '(' . $valueQuery->toSql() . ')';
         }
@@ -122,14 +121,14 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * Get ancestors of specified node.
      *
-     * @since 2.0
-     *
      * @param mixed $id
      * @param array $columns
      *
+     * @since 2.0
+     *
      * @return \Kalnoy\Nestedset\Collection
      */
-    public function ancestorsOf($id, array $columns = array('*')) {
+    public function ancestorsOf($id, array $columns = ['*']) {
         return $this->whereAncestorOf($id)->get($columns);
     }
 
@@ -146,11 +145,11 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * Add node selection statement between specified range.
      *
-     * @since 2.0
-     *
-     * @param array $values
+     * @param array  $values
      * @param string $boolean
-     * @param bool $not
+     * @param bool   $not
+     *
+     * @since 2.0
      *
      * @return $this
      */
@@ -162,9 +161,9 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * Add node selection statement between specified range joined with `or` operator.
      *
-     * @since 2.0
-     *
      * @param array $values
+     *
+     * @since 2.0
      *
      * @return $this
      */
@@ -175,22 +174,26 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * Add constraint statement to descendants of specified node.
      *
-     * @since 2.0
-     *
-     * @param mixed $id
+     * @param mixed  $id
      * @param string $boolean
-     * @param bool $not
-     * @param bool $andSelf
+     * @param bool   $not
+     * @param bool   $andSelf
+     *
+     * @since 2.0
      *
      * @return $this
      */
-    public function whereDescendantOf($id, $boolean = 'and', $not = false, $andSelf = false
+    public function whereDescendantOf(
+        $id,
+        $boolean = 'and',
+        $not = false,
+        $andSelf = false
     ) {
         if (CModel_Nested_NestedSet::isNode($id)) {
             $data = $id->getBounds();
         } else {
             $data = $this->model->newNestedSetQuery()
-                    ->getPlainNodeData($id, true);
+                ->getPlainNodeData($id, true);
         }
         // Don't include the node
         if (!$andSelf) {
@@ -229,7 +232,7 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * @param $id
      * @param string $boolean
-     * @param bool $not
+     * @param bool   $not
      *
      * @return $this
      */
@@ -240,13 +243,13 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * Get descendants of specified node.
      *
-     * @since 2.0
-     *
      * @param mixed $id
      * @param array $columns
-     * @param bool $andSelf
+     * @param bool  $andSelf
      *
-     * @return Collection
+     * @since 2.0
+     *
+     * @return CCollection
      */
     public function descendantsOf($id, array $columns = ['*'], $andSelf = false) {
         try {
@@ -279,11 +282,11 @@ class CModel_Nested_Query extends CModel_Query {
             $this->query->addBinding($id->getLft());
         } else {
             $valueQuery = $this->model
-                    ->newQuery()
-                    ->toBase()
-                    ->select('_n.' . $this->model->getLftName())
-                    ->from($this->model->getTable() . ' as _n')
-                    ->where('_n.' . $this->model->getKeyName(), '=', $id);
+                ->newQuery()
+                ->toBase()
+                ->select('_n.' . $this->model->getLftName())
+                ->from($this->model->getTable() . ' as _n')
+                ->where('_n.' . $this->model->getKeyName(), '=', $id);
             $this->query->mergeBindings($valueQuery);
             $value = '(' . $valueQuery->toSql() . ')';
         }
@@ -295,10 +298,10 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * Constraint nodes to those that are after specified node.
      *
-     * @since 2.0
-     *
-     * @param mixed $id
+     * @param mixed  $id
      * @param string $boolean
+     *
+     * @since 2.0
      *
      * @return $this
      */
@@ -309,10 +312,10 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * Constraint nodes to those that are before specified node.
      *
-     * @since 2.0
-     *
-     * @param mixed $id
+     * @param mixed  $id
      * @param string $boolean
+     *
+     * @since 2.0
      *
      * @return $this
      */
@@ -345,18 +348,19 @@ class CModel_Nested_Query extends CModel_Query {
      * @return $this
      */
     public function withDepth($as = 'depth') {
-        if ($this->query->columns === null)
+        if ($this->query->columns === null) {
             $this->query->columns = ['*'];
+        }
         $table = $this->wrappedTable();
         list($lft, $rgt) = $this->wrappedColumns();
         $alias = '_d';
         $wrappedAlias = $this->query->getGrammar()->wrapTable($alias);
         $query = $this->model
-                ->newScopedQuery('_d')
-                ->toBase()
-                ->selectRaw('count(1) - 1')
-                ->from($this->model->getTable() . ' as ' . $alias)
-                ->whereRaw("{$table}.{$lft} between {$wrappedAlias}.{$lft} and {$wrappedAlias}.{$rgt}");
+            ->newScopedQuery('_d')
+            ->toBase()
+            ->selectRaw('count(1) - 1')
+            ->from($this->model->getTable() . ' as ' . $alias)
+            ->whereRaw("{$table}.{$lft} between {$wrappedAlias}.{$lft} and {$wrappedAlias}.{$rgt}");
         $this->query->selectSub($query, $as);
         return $this;
     }
@@ -461,13 +465,13 @@ class CModel_Nested_Query extends CModel_Query {
      * Move a node to the new position.
      *
      * @param mixed $key
-     * @param int $position
+     * @param int   $position
      *
      * @return int
      */
     public function moveNode($key, $position) {
         list($lft, $rgt) = $this->model->newNestedSetQuery()
-                ->getPlainNodeData($key, true);
+            ->getPlainNodeData($key, true);
         if ($lft < $position && $position <= $rgt) {
             throw new LogicException('Cannot move node into itself.');
         }
@@ -499,10 +503,10 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * Make or remove gap in the tree. Negative height will remove gap.
      *
-     * @since 2.0
-     *
      * @param int $cut
      * @param int $height
+     *
+     * @since 2.0
      *
      * @return int
      */
@@ -518,9 +522,9 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * Get patch for columns.
      *
-     * @since 2.0
-     *
      * @param array $params
+     *
+     * @since 2.0
      *
      * @return array
      */
@@ -536,18 +540,19 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * Get patch for single column.
      *
-     * @since 2.0
-     *
      * @param string $col
-     * @param array $params
+     * @param array  $params
+     *
+     * @since 2.0
      *
      * @return string
      */
     protected function columnPatch($col, array $params) {
         extract($params);
         /** @var int $height */
-        if ($height > 0)
+        if ($height > 0) {
             $height = '+' . $height;
+        }
         if (isset($cut)) {
             return new CDatabase_Query_Expression("case when {$col} >= {$cut} then {$col}{$height} else {$col} end");
         }
@@ -556,12 +561,14 @@ class CModel_Nested_Query extends CModel_Query {
         /** @var int $rgt */
         /** @var int $from */
         /** @var int $to */
-        if ($distance > 0)
+        if ($distance > 0) {
             $distance = '+' . $distance;
-        return new CDatabase_Query_Expression("case " .
-                "when {$col} between {$lft} and {$rgt} then {$col}{$distance} " . // Move the node
-                "when {$col} between {$from} and {$to} then {$col}{$height} " . // Move other nodes
-                "else {$col} end"
+        }
+        return new CDatabase_Query_Expression(
+            'case '
+                . "when {$col} between {$lft} and {$rgt} then {$col}{$distance} " // Move the node
+                . "when {$col} between {$from} and {$to} then {$col}{$height} " // Move other nodes
+                . "else {$col} end"
         );
     }
 
@@ -595,13 +602,13 @@ class CModel_Nested_Query extends CModel_Query {
      */
     protected function getOdnessQuery() {
         return $this->model
-                        ->newNestedSetQuery()
-                        ->toBase()
-                        ->whereNested(function (\CDatabase_Query_Builder $inner) {
-                            list($lft, $rgt) = $this->wrappedColumns();
-                            $inner->whereRaw("{$lft} >= {$rgt}")
-                            ->orWhereRaw("({$rgt} - {$lft}) % 2 = 0");
-                        });
+            ->newNestedSetQuery()
+            ->toBase()
+            ->whereNested(function (\CDatabase_Query_Builder $inner) {
+                list($lft, $rgt) = $this->wrappedColumns();
+                $inner->whereRaw("{$lft} >= {$rgt}")
+                    ->orWhereRaw("({$rgt} - {$lft}) % 2 = 0");
+            });
     }
 
     /**
@@ -615,17 +622,17 @@ class CModel_Nested_Query extends CModel_Query {
         $waFirst = $this->query->getGrammar()->wrapTable($firstAlias);
         $waSecond = $this->query->getGrammar()->wrapTable($secondAlias);
         $query = $this->model
-                ->newNestedSetQuery($firstAlias)
-                ->toBase()
-                ->from($this->query->raw("{$table} as {$waFirst}, {$table} {$waSecond}"))
-                ->whereRaw("{$waFirst}.{$keyName} < {$waSecond}.{$keyName}")
-                ->whereNested(function (CDatabase_Query_Builder $inner) use ($waFirst, $waSecond) {
-            list($lft, $rgt) = $this->wrappedColumns();
-            $inner->orWhereRaw("{$waFirst}.{$lft}={$waSecond}.{$lft}")
-            ->orWhereRaw("{$waFirst}.{$rgt}={$waSecond}.{$rgt}")
-            ->orWhereRaw("{$waFirst}.{$lft}={$waSecond}.{$rgt}")
-            ->orWhereRaw("{$waFirst}.{$rgt}={$waSecond}.{$lft}");
-        });
+            ->newNestedSetQuery($firstAlias)
+            ->toBase()
+            ->from($this->query->raw("{$table} as {$waFirst}, {$table} {$waSecond}"))
+            ->whereRaw("{$waFirst}.{$keyName} < {$waSecond}.{$keyName}")
+            ->whereNested(function (CDatabase_Query_Builder $inner) use ($waFirst, $waSecond) {
+                list($lft, $rgt) = $this->wrappedColumns();
+                $inner->orWhereRaw("{$waFirst}.{$lft}={$waSecond}.{$lft}")
+                    ->orWhereRaw("{$waFirst}.{$rgt}={$waSecond}.{$rgt}")
+                    ->orWhereRaw("{$waFirst}.{$lft}={$waSecond}.{$rgt}")
+                    ->orWhereRaw("{$waFirst}.{$rgt}={$waSecond}.{$lft}");
+            });
         return $this->model->applyNestedSetScope($query, $secondAlias);
     }
 
@@ -644,18 +651,18 @@ class CModel_Nested_Query extends CModel_Query {
         $waChild = $grammar->wrapTable($childAlias);
         $waInterm = $grammar->wrapTable($intermAlias);
         $query = $this->model
-                ->newNestedSetQuery('c')
-                ->toBase()
-                ->from($this->query->raw("{$table} as {$waChild}, {$table} as {$waParent}, $table as {$waInterm}"))
-                ->whereRaw("{$waChild}.{$parentIdName}={$waParent}.{$keyName}")
-                ->whereRaw("{$waInterm}.{$keyName} <> {$waParent}.{$keyName}")
-                ->whereRaw("{$waInterm}.{$keyName} <> {$waChild}.{$keyName}")
-                ->whereNested(function (CDatabase_Query_Builder $inner) use ($waInterm, $waChild, $waParent) {
-            list($lft, $rgt) = $this->wrappedColumns();
-            $inner->whereRaw("{$waChild}.{$lft} not between {$waParent}.{$lft} and {$waParent}.{$rgt}")
-            ->orWhereRaw("{$waChild}.{$lft} between {$waInterm}.{$lft} and {$waInterm}.{$rgt}")
-            ->whereRaw("{$waInterm}.{$lft} between {$waParent}.{$lft} and {$waParent}.{$rgt}");
-        });
+            ->newNestedSetQuery('c')
+            ->toBase()
+            ->from($this->query->raw("{$table} as {$waChild}, {$table} as {$waParent}, $table as {$waInterm}"))
+            ->whereRaw("{$waChild}.{$parentIdName}={$waParent}.{$keyName}")
+            ->whereRaw("{$waInterm}.{$keyName} <> {$waParent}.{$keyName}")
+            ->whereRaw("{$waInterm}.{$keyName} <> {$waChild}.{$keyName}")
+            ->whereNested(function (CDatabase_Query_Builder $inner) use ($waInterm, $waChild, $waParent) {
+                list($lft, $rgt) = $this->wrappedColumns();
+                $inner->whereRaw("{$waChild}.{$lft} not between {$waParent}.{$lft} and {$waParent}.{$rgt}")
+                    ->orWhereRaw("{$waChild}.{$lft} between {$waInterm}.{$lft} and {$waInterm}.{$rgt}")
+                    ->whereRaw("{$waInterm}.{$lft} between {$waParent}.{$lft} and {$waParent}.{$rgt}");
+            });
         $this->model->applyNestedSetScope($query, $parentAlias);
         $this->model->applyNestedSetScope($query, $intermAlias);
         return $query;
@@ -666,26 +673,26 @@ class CModel_Nested_Query extends CModel_Query {
      */
     protected function getMissingParentQuery() {
         return $this->model
-                        ->newNestedSetQuery()
-                        ->toBase()
-                        ->whereNested(function (CDatabase_Query_Builder $inner) {
-                            $grammar = $this->query->getGrammar();
-                            $table = $this->wrappedTable();
-                            $keyName = $this->wrappedKey();
-                            $parentIdName = $grammar->wrap($this->model->getParentIdName());
-                            $alias = 'p';
-                            $wrappedAlias = $grammar->wrapTable($alias);
-                            $existsCheck = $this->model
-                                    ->newNestedSetQuery()
-                                    ->toBase()
-                                    ->selectRaw('1')
-                                    ->from($this->query->raw("{$table} as {$wrappedAlias}"))
-                                    ->whereRaw("{$table}.{$parentIdName} = {$wrappedAlias}.{$keyName}")
-                                    ->limit(1);
-                            $this->model->applyNestedSetScope($existsCheck, $alias);
-                            $inner->whereRaw("{$parentIdName} is not null")
-                            ->addWhereExistsQuery($existsCheck, 'and', true);
-                        });
+            ->newNestedSetQuery()
+            ->toBase()
+            ->whereNested(function (CDatabase_Query_Builder $inner) {
+                $grammar = $this->query->getGrammar();
+                $table = $this->wrappedTable();
+                $keyName = $this->wrappedKey();
+                $parentIdName = $grammar->wrap($this->model->getParentIdName());
+                $alias = 'p';
+                $wrappedAlias = $grammar->wrapTable($alias);
+                $existsCheck = $this->model
+                    ->newNestedSetQuery()
+                    ->toBase()
+                    ->selectRaw('1')
+                    ->from($this->query->raw("{$table} as {$wrappedAlias}"))
+                    ->whereRaw("{$table}.{$parentIdName} = {$wrappedAlias}.{$keyName}")
+                    ->limit(1);
+                $this->model->applyNestedSetScope($existsCheck, $alias);
+                $inner->whereRaw("{$parentIdName} is not null")
+                    ->addWhereExistsQuery($existsCheck, 'and', true);
+            });
     }
 
     /**
@@ -727,14 +734,14 @@ class CModel_Nested_Query extends CModel_Query {
             $this->model->getRgtName(),
         ];
         $dictionary = $this->model
-                ->newNestedSetQuery()
-                ->when($root, function (self $query) use ($root) {
-                    return $query->whereDescendantOf($root);
-                })
-                ->defaultOrder()
-                ->get($columns)
-                ->groupBy($this->model->getParentIdName())
-                ->all();
+            ->newNestedSetQuery()
+            ->when($root, function (self $query) use ($root) {
+                return $query->whereDescendantOf($root);
+            })
+            ->defaultOrder()
+            ->get($columns)
+            ->groupBy($this->model->getParentIdName())
+            ->all();
         return $this->fixNodes($dictionary, $root);
     }
 
@@ -748,7 +755,7 @@ class CModel_Nested_Query extends CModel_Query {
     }
 
     /**
-     * @param array $dictionary
+     * @param array                           $dictionary
      * @param CModel_Nested_Trait|CModel|null $parent
      *
      * @return int
@@ -782,10 +789,14 @@ class CModel_Nested_Query extends CModel_Query {
      * @param int $cut
      *
      * @return int
+     *
      * @internal param int $fixed
      */
     protected static function reorderNodes(
-    array &$dictionary, array &$updated, $parentId = null, $cut = 1
+        array &$dictionary,
+        array &$updated,
+        $parentId = null,
+        $cut = 1
     ) {
         if (!isset($dictionary[$parentId])) {
             return $cut;
@@ -809,9 +820,9 @@ class CModel_Nested_Query extends CModel_Query {
      * If item data does not contain primary key, new node will be created.
      *
      * @param array $data
-     * @param bool $delete Whether to delete nodes that exists but not in the data
-     *                     array
-     * @param null $root
+     * @param bool  $delete Whether to delete nodes that exists but not in the data
+     *                      array
+     * @param null  $root
      *
      * @return int
      */
@@ -820,11 +831,11 @@ class CModel_Nested_Query extends CModel_Query {
             $this->withTrashed();
         }
         $existing = $this
-                ->when($root, function (self $query) use ($root) {
-                    return $query->whereDescendantOf($root);
-                })
-                ->get()
-                ->getDictionary();
+            ->when($root, function (self $query) use ($root) {
+                return $query->whereDescendantOf($root);
+            })
+            ->get()
+            ->getDictionary();
         $dictionary = [];
         $parentId = $root ? $root->getKey() : null;
         $this->buildRebuildDictionary($dictionary, $data, $existing, $parentId);
@@ -832,14 +843,14 @@ class CModel_Nested_Query extends CModel_Query {
         if (!empty($existing)) {
             if ($delete && !$this->model->usesSoftDelete()) {
                 $this->model
-                        ->newScopedQuery()
-                        ->whereIn($this->model->getKeyName(), array_keys($existing))
-                        ->delete();
+                    ->newScopedQuery()
+                    ->whereIn($this->model->getKeyName(), array_keys($existing))
+                    ->delete();
             } else {
                 foreach ($existing as $model) {
                     $dictionary[$model->getParentId()][] = $model;
-                    if ($delete && $this->model->usesSoftDelete() &&
-                            !$model->{$model->getDeletedAtColumn()}
+                    if ($delete && $this->model->usesSoftDelete()
+                        && !$model->{$model->getDeletedAtColumn()}
                     ) {
                         $time = $this->model->fromDateTime($this->model->freshTimestamp());
                         $model->{$model->getDeletedAtColumn()} = $time;
@@ -853,7 +864,7 @@ class CModel_Nested_Query extends CModel_Query {
     /**
      * @param $root
      * @param array $data
-     * @param bool $delete
+     * @param bool  $delete
      *
      * @return int
      */
@@ -867,7 +878,11 @@ class CModel_Nested_Query extends CModel_Query {
      * @param array $existing
      * @param mixed $parentId
      */
-    protected function buildRebuildDictionary(array &$dictionary, array $data, array &$existing, $parentId = null
+    protected function buildRebuildDictionary(
+        array &$dictionary,
+        array $data,
+        array &$existing,
+        $parentId = null
     ) {
         $keyName = $this->model->getKeyName();
         foreach ($data as $itemData) {
@@ -887,8 +902,9 @@ class CModel_Nested_Query extends CModel_Query {
             }
             $model->fill(carr::except($itemData, 'children'))->save();
             $dictionary[$parentId][] = $model;
-            if (!isset($itemData['children']))
+            if (!isset($itemData['children'])) {
                 continue;
+            }
             $this->buildRebuildDictionary($dictionary, $itemData['children'], $existing, $model->getKey());
         }
     }
@@ -912,5 +928,4 @@ class CModel_Nested_Query extends CModel_Query {
     public function root(array $columns = ['*']) {
         return $this->whereIsRoot()->first($columns);
     }
-
 }

@@ -7,7 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
+namespace PHPUnit\Framework\Constraint\Cardinality;
 
 use function count;
 use function is_array;
@@ -18,8 +18,9 @@ use EmptyIterator;
 use Generator;
 use Iterator;
 use IteratorAggregate;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 use Traversable;
+use PHPUnit\Framework\Constraint\Constraint;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit

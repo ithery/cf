@@ -1,28 +1,30 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 24, 2019, 11:31:50 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 24, 2019, 11:31:50 AM
  */
 trait CModel_Geographical_GeographicalTrait {
-
     /**
-     * @param Builder $query
-     * @param float $latitude Latitude
-     * @param float $longitude Longitude
-     * @return Builder
+     * @param CModel_Query $query
+     * @param float        $latitude  Latitude
+     * @param float        $longitude Longitude
+     *
+     * @return CModel_Query
      */
     public function scopeDistance($query, $latitude, $longitude) {
         $latName = $this->getQualifiedLatitudeColumn();
         $lonName = $this->getQualifiedLongitudeColumn();
 
         $query->select($this->getTable() . '.*');
-        $sql = "((ACOS(SIN(? * PI() / 180) * SIN(" . $latName . " * PI() / 180) + COS(? * PI() / 180) * COS(" .
-                $latName . " * PI() / 180) * COS((? - " . $lonName . ") * PI() / 180)) * 180 / PI()) * 60 * ?) as distance";
+        $sql = '((ACOS(SIN(? * PI() / 180) * SIN(' . $latName . ' * PI() / 180) + COS(? * PI() / 180) * COS('
+                . $latName . ' * PI() / 180) * COS((? - ' . $lonName . ') * PI() / 180)) * 180 / PI()) * 60 * ?) as distance';
         $kilometers = false;
+
         if (property_exists(static::class, 'kilometers')) {
             $kilometers = static::$kilometers;
         }
@@ -41,12 +43,12 @@ trait CModel_Geographical_GeographicalTrait {
         $query = $this->scopeDistance($query, $latitude, $longitude);
         return $query->havingRaw('distance BETWEEN ? AND ?', [$inner_radius, $outer_radius]);
     }
-    
-    public function scopeOrderByDistanceRuntime($query, $latitude, $longitude ,$direction = 'asc') {
+
+    public function scopeOrderByDistanceRuntime($query, $latitude, $longitude, $direction = 'asc') {
         $latName = $this->getQualifiedLatitudeColumn();
         $lonName = $this->getQualifiedLongitudeColumn();
-        $sql= "((ACOS(SIN(? * PI() / 180) * SIN(" . $latName . " * PI() / 180) + COS(? * PI() / 180) * COS(" .
-                $latName . " * PI() / 180) * COS((? - " . $lonName . ") * PI() / 180)) * 180 / PI()) * 60 * ?) ";
+        $sql = '((ACOS(SIN(? * PI() / 180) * SIN(' . $latName . ' * PI() / 180) + COS(? * PI() / 180) * COS('
+                . $latName . ' * PI() / 180) * COS((? - ' . $lonName . ') * PI() / 180)) * 180 / PI()) * 60 * ?) ';
         $kilometers = false;
         if (property_exists(static::class, 'kilometers')) {
             $kilometers = static::$kilometers;
@@ -57,13 +59,14 @@ trait CModel_Geographical_GeographicalTrait {
             // miles
             $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
         }
-        return $query->orderByRaw($sql.' '.$direction);
+        return $query->orderByRaw($sql . ' ' . $direction);
     }
+
     public function scopeGeofenceRuntime($query, $latitude, $longitude, $inner_radius, $outer_radius) {
         $latName = $this->getQualifiedLatitudeColumn();
         $lonName = $this->getQualifiedLongitudeColumn();
-        $sql= "((ACOS(SIN(? * PI() / 180) * SIN(" . $latName . " * PI() / 180) + COS(? * PI() / 180) * COS(" .
-                $latName . " * PI() / 180) * COS((? - " . $lonName . ") * PI() / 180)) * 180 / PI()) * 60 * ?) ";
+        $sql = '((ACOS(SIN(? * PI() / 180) * SIN(' . $latName . ' * PI() / 180) + COS(? * PI() / 180) * COS('
+                . $latName . ' * PI() / 180) * COS((? - ' . $lonName . ') * PI() / 180)) * 180 / PI()) * 60 * ?) ';
         $kilometers = false;
         if (property_exists(static::class, 'kilometers')) {
             $kilometers = static::$kilometers;
@@ -74,7 +77,7 @@ trait CModel_Geographical_GeographicalTrait {
             // miles
             $sql = $this->getConnection()->compileBinds($sql, [$latitude, $latitude, $longitude, 1.1515]);
         }
-        return $query->whereRaw($sql.' BETWEEN ? AND ?', [$inner_radius, $outer_radius]);
+        return $query->whereRaw($sql . ' BETWEEN ? AND ?', [$inner_radius, $outer_radius]);
     }
 
     protected function getQualifiedLatitudeColumn() {
@@ -92,5 +95,4 @@ trait CModel_Geographical_GeographicalTrait {
     public function getLongitudeColumn() {
         return defined('static::LONGITUDE') ? static::LONGITUDE : 'longitude';
     }
-
 }

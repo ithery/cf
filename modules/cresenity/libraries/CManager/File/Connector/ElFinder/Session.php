@@ -1,25 +1,26 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 28, 2019, 3:10:32 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 28, 2019, 3:10:32 AM
  */
 class CManager_File_Connector_ElFinder_Session implements CManager_File_Connector_ElFinder_SessionInterface {
-
     /**
      * A flag of session started
      *
-     * @var        boolean
+     * @var boolean
      */
     protected $started = false;
 
     /**
      * To fix PHP bug that duplicate Set-Cookie header to be sent
      *
-     * @var        boolean
+     * @var boolean
+     *
      * @see        https://bugs.php.net/bug.php?id=75554
      */
     protected $fixCookieRegist = false;
@@ -27,36 +28,36 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
     /**
      * Array of session keys of this instance
      *
-     * @var        array
+     * @var array
      */
-    protected $keys = array();
+    protected $keys = [];
 
     /**
      * Is enabled base64encode
      *
-     * @var        boolean
+     * @var boolean
      */
     protected $base64encode = false;
 
     /**
      * Default options array
      *
-     * @var        array
+     * @var array
      */
-    protected $opts = array(
+    protected $opts = [
         'base64encode' => false,
-        'keys' => array(
+        'keys' => [
             'default' => 'elFinderCaches',
             'netvolume' => 'elFinderNetVolumes'
-        )
-    );
+        ]
+    ];
 
     /**
      * Constractor
      *
-     * @param      array $opts The options
+     * @param array $opts The options
      *
-     * @return     self    Instanse of this class
+     * @return self Instanse of this class
      */
     public function __construct($opts) {
         $this->opts = array_merge($this->opts, $opts);
@@ -82,7 +83,7 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
         $data = null;
 
         if ($this->started) {
-            $session = & $this->getSessionRef($key);
+            $session = &$this->getSessionRef($key);
             $data = $session;
             if ($data && $this->base64encode) {
                 $data = $this->decodeData($data);
@@ -130,7 +131,7 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
                 session_start();
             }
         } else {
-            set_error_handler(array($this, 'session_start_error'), E_NOTICE);
+            set_error_handler([$this, 'session_start_error'], E_NOTICE);
             session_start();
             restore_error_handler();
         }
@@ -146,7 +147,7 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
      *
      * @return mixed|null
      */
-    protected function & getSessionRef($key) {
+    protected function &getSessionRef($key) {
         $session = null;
         if ($this->started) {
             list($cat, $name) = array_pad(explode('.', $key, 2), 2, null);
@@ -166,22 +167,22 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
                 if (!isset($_SESSION[$cat])) {
                     $_SESSION[$cat] = null;
                 }
-                $session = & $_SESSION[$cat];
+                $session = &$_SESSION[$cat];
             } else {
                 if (!isset($_SESSION[$cat]) || !is_array($_SESSION[$cat])) {
-                    $_SESSION[$cat] = array();
+                    $_SESSION[$cat] = [];
                 }
                 if (!isset($_SESSION[$cat][$name])) {
                     $_SESSION[$cat][$name] = null;
                 }
-                $session = & $_SESSION[$cat][$name];
+                $session = &$_SESSION[$cat][$name];
             }
         }
         return $session;
     }
 
     /**
-     * base64 decode of session val
+     * Base64 decode of session val
      *
      * @param $data
      *
@@ -229,7 +230,7 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
             $closed = true;
             $this->start();
         }
-        $session = & $this->getSessionRef($key);
+        $session = &$this->getSessionRef($key);
         if ($this->base64encode) {
             $data = $this->encodeData($data);
         }
@@ -243,7 +244,7 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
     }
 
     /**
-     * base64 encode for session val
+     * Base64 encode for session val
      *
      * @param $data
      *
@@ -295,13 +296,11 @@ class CManager_File_Connector_ElFinder_Session implements CManager_File_Connecto
     }
 
     /**
-     * sessioin error handler (Only for suppression of error at session start)
+     * Session error handler (Only for suppression of error at session start)
      *
      * @param $errno
      * @param $errstr
      */
-    protected function session_start_error($errno, $errstr) {
-        
+    protected function sessionStartError($errno, $errstr) {
     }
-
 }

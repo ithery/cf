@@ -1,23 +1,16 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Intervention\Image\ImageManagerStatic as InterventionImage;
 
 /** @mixin CImage_Manipulations */
 class CImage_Image {
-
     protected $pathToImage = '';
 
     /** @var string|null */
     protected $temporaryDirectory = null;
 
-    
-    protected $imageDriver='gd';
+    protected $imageDriver = 'gd';
+
     /**
      * @param string $pathToImage
      *
@@ -95,7 +88,6 @@ class CImage_Image {
     }
 
     /**
-     * 
      * @return CImage_ManipulationSequence
      */
     public function getManipulationSequence() {
@@ -157,5 +149,4 @@ class CImage_Image {
         $this->manipulations->$name(...$arguments);
         return $this;
     }
-
 }

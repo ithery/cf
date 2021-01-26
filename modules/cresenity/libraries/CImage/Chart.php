@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 30, 2019, 2:17:11 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 30, 2019, 2:17:11 AM
  */
 class CImage_Chart {
-
     public static function createData() {
         return new CImage_Chart_Data();
     }
@@ -17,6 +17,11 @@ class CImage_Chart {
         return new CImage_Chart_Image($xSize, $ySize, $dataSet, $transparentBackground);
     }
 
-  
+    public static function createPie(CImage_Chart_Image $image, CImage_Chart_Data $data) {
+        return new CImage_Chart_Pie($image, $data);
+    }
 
+    public static function createProcessor($options) {
+        return new CImage_Chart_Processor($options);
+    }
 }

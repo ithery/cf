@@ -1,17 +1,87 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
-/**
- * CF process control file, loaded by the front controller.
- * 
- * $Id: Bootstrap.php 4409 2009-06-06 00:48:26Z zombor $
- *
- * @package    Core
- * @author     CF Team
- * @copyright  (c) 2007 CF Team
- * @license    http://kohanaphp.com/license.html
- */
+<?php
 
-define('CF_VERSION',  '1.0');
-define('CF_CODENAME', 'CF1.0');
+if (isset($_COOKIE['cf-strict'])) {
+    error_reporting(E_ALL);
+}
+date_default_timezone_set('Asia/Jakarta');
+
+//define all constant needed by framework
+//we using if because it is maybe already defined in old index.php
+
+if (!defined('DS')) {
+    define('DS', DIRECTORY_SEPARATOR);
+}
+/**
+ * Default php file extension
+ */
+if (!defined('EXT')) {
+    define('EXT', '.php');
+}
+
+if (!defined('DOCROOT')) {
+    $docroot = realpath(dirname(__FILE__) . DS . '..' . DS . '..' . DS);
+    define('DOCROOT', $docroot . DS);
+
+    define('KOHANA', DOCROOT . 'index.php');
+
+    // If the front controller is a symlink, change to the real docroot
+    is_link(KOHANA) and chdir(dirname(realpath(__FILE__)));
+}
+
+if (!defined('SYSPATH')) {
+    $sysPath = realpath(DOCROOT . 'system');
+    define('SYSPATH', $sysPath . DS);
+}
+
+if (!defined('MODPATH')) {
+    $modPath = realpath(DOCROOT . 'modules');
+    define('MODPATH', $modPath . DS);
+}
+
+if (!defined('APPPATH')) {
+    $appPath = realpath(DOCROOT . 'application');
+    $file = DOCROOT . 'data' . DIRECTORY_SEPARATOR . 'domain' . DIRECTORY_SEPARATOR;
+    $domain = '';
+    if (PHP_SAPI === 'cli') {
+        if (defined('CFCLI') || defined('CFTesting')) {
+            if (file_exists(DOCROOT . 'data' . DS . 'current-domain')) {
+                $domain = file_get_contents(DOCROOT . 'data' . DS . 'current-domain');
+            }
+        } else {
+            // Command line requires a bit of hacking
+            if (isset($_SERVER['argv'][2])) {
+                $domain = $_SERVER['argv'][2];
+            }
+        }
+    } else {
+        if (isset($_SERVER['SERVER_NAME'])) {
+            $domain = $_SERVER['SERVER_NAME'];
+        }
+    }
+    if (strlen($domain) > 0) {
+        $file .= $domain . EXT;
+
+        if (file_exists($file)) {
+            $data = require_once $file;
+
+            $appCode = $data['app_code'];
+
+            //$appPath = realpath(DOCROOT . 'application' . DS . $appCode);
+        }
+    }
+    define('APPPATH', $appPath . DS);
+}
+
+if (!defined('IN_PRODUCTION')) {
+    define('IN_PRODUCTION', false);
+}
+
+//try to load data domain
+
+//end of constant from index
+
+define('CF_VERSION', '1.1');
+define('CF_CODENAME', 'CF1.1');
 
 // Test of CF is running in Windows
 define('CF_IS_WIN', DIRECTORY_SEPARATOR === '\\');
@@ -20,42 +90,37 @@ define('CF_IS_WIN', DIRECTORY_SEPARATOR === '\\');
 define('SYSTEM_BENCHMARK', 'system_benchmark');
 
 // Load benchmarking support
-require SYSPATH.'core/CFBenchmark'.EXT;
+require SYSPATH . 'core/CFBenchmark' . EXT;
 
 // Start total_execution
-CFBenchmark::start(SYSTEM_BENCHMARK.'_total_execution');
+CFBenchmark::start(SYSTEM_BENCHMARK . '_total_execution');
 
-// Start kohana_loading
-CFBenchmark::start(SYSTEM_BENCHMARK.'_cf_loading');
+// Start CF Loading
+CFBenchmark::start(SYSTEM_BENCHMARK . '_cf_loading');
 
 // Load core files
-require SYSPATH.'core/utf8'.EXT;
-require SYSPATH.'core/CFEvent'.EXT;
-require SYSPATH.'core/CFData'.EXT;
-require SYSPATH.'core/CFRouter'.EXT;
-require SYSPATH.'core/CFConsole'.EXT;
-require SYSPATH.'core/CF'.EXT;
+require SYSPATH . 'core/utf8' . EXT;
+require SYSPATH . 'core/CFEvent' . EXT;
+require SYSPATH . 'core/CFData' . EXT;
+require SYSPATH . 'core/CFRouter' . EXT;
+require SYSPATH . 'core/CFConsole' . EXT;
+require SYSPATH . 'core/CFHTTP' . EXT;
+require SYSPATH . 'core/CFDeprecatedTrait' . EXT;
+require SYSPATH . 'core/CF' . EXT;
 
 // Prepare the environment
 CF::setup();
 
-// End kohana_loading
-CFBenchmark::stop(SYSTEM_BENCHMARK.'_cf_loading');
+// End CF Loading
+CFBenchmark::stop(SYSTEM_BENCHMARK . '_cf_loading');
 
-// Start system_initialization
-CFBenchmark::start(SYSTEM_BENCHMARK.'_system_initialization');
+if (!CF::isTesting()) {
+    if (defined('CFCLI')) {
+        CFConsole::execute();
+    } else {
+        CFHTTP::execute();
+    }
+}
 
-// Prepare the system
-CFEvent::run('system.ready');
-
-// Determine routing
-CFEvent::run('system.routing');
-
-// End system_initialization
-CFBenchmark::stop(SYSTEM_BENCHMARK.'_system_initialization');
-
-// Make the magic happen!
-CFEvent::run('system.execute');
-
-// Clean up and exit
-CFEvent::run('system.shutdown');
+// stop total_execution
+CFBenchmark::stop(SYSTEM_BENCHMARK . '_total_execution');

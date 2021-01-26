@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 13, 2018, 10:51:31 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 13, 2018, 10:51:31 AM
  */
 final class CHelper {
-
     /**
-     * 
      * @return \CHelper_File
      */
     public static function file() {
@@ -18,7 +17,6 @@ final class CHelper {
     }
 
     /**
-     * 
      * @return \CHelper_Formatter
      */
     public static function formatter() {
@@ -26,7 +24,6 @@ final class CHelper {
     }
 
     /**
-     * 
      * @return \CHelper_Base64
      */
     public static function base64() {
@@ -34,7 +31,6 @@ final class CHelper {
     }
 
     /**
-     * 
      * @return \CHelper_JSON
      */
     public static function json() {
@@ -42,7 +38,6 @@ final class CHelper {
     }
 
     /**
-     * 
      * @return \CHelper_Request
      */
     public static function request() {
@@ -50,7 +45,6 @@ final class CHelper {
     }
 
     /**
-     * 
      * @return \CHelper_Transform
      */
     public static function transform() {
@@ -58,11 +52,9 @@ final class CHelper {
     }
 
     /**
-     * 
      * @return \CHelper_Closure
      */
     public static function closure() {
         return new CHelper_Closure();
     }
-
 }

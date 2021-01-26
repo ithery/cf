@@ -7,11 +7,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\TextUI\XmlConfiguration\PHPUnit;
 
 use function class_exists;
 use function sprintf;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 use PHPUnit\Framework\TestListener;
 use PHPUnit\Runner\Hook;
 use ReflectionClass;
@@ -20,10 +21,8 @@ use ReflectionException;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class ExtensionHandler
-{
-    public function createHookInstance(Extension $extension)
-    {
+final class ExtensionHandler {
+    public function createHookInstance(Extension $extension) {
         $object = $this->createInstance($extension);
 
         if (!$object instanceof Hook) {
@@ -38,8 +37,7 @@ final class ExtensionHandler
         return $object;
     }
 
-    public function createTestListenerInstance(Extension $extension)
-    {
+    public function createTestListenerInstance(Extension $extension) {
         $object = $this->createInstance($extension);
 
         if (!$object instanceof TestListener) {
@@ -54,8 +52,7 @@ final class ExtensionHandler
         return $object;
     }
 
-    private function createInstance(Extension $extension)
-    {
+    private function createInstance(Extension $extension) {
         $this->ensureClassExists($extension);
 
         try {
@@ -78,8 +75,7 @@ final class ExtensionHandler
     /**
      * @throws Exception
      */
-    private function ensureClassExists(Extension $extension)
-    {
+    private function ensureClassExists(Extension $extension) {
         if (class_exists($extension->className(), false)) {
             return;
         }

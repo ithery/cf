@@ -2,10 +2,8 @@
 
 /**
  * Database exceptions.
- *
  */
 class CDatabase_Exception extends CException {
-
     /**
      * @param string $method
      *
@@ -17,8 +15,9 @@ class CDatabase_Exception extends CException {
 
     public static function invalidPlatformSpecified() {
         return new self(
-                "Invalid 'platform' option specified, need to give an instance of " .
-                "\Doctrine\DBAL\Platforms\AbstractPlatform.");
+            "Invalid 'platform' option specified, need to give an instance of "
+                . "\Doctrine\DBAL\Platforms\AbstractPlatform."
+        );
     }
 
     /**
@@ -27,16 +26,20 @@ class CDatabase_Exception extends CException {
     public static function invalidPlatformType($invalidPlatform) {
         if (\is_object($invalidPlatform)) {
             return new self(
-                    sprintf(
-                            "Option 'platform' must be a subtype of '%s', instance of '%s' given", AbstractPlatform::class, \get_class($invalidPlatform)
-                    )
+                sprintf(
+                    "Option 'platform' must be a subtype of '%s', instance of '%s' given",
+                    AbstractPlatform::class,
+                    \get_class($invalidPlatform)
+                )
             );
         }
 
         return new self(
-                sprintf(
-                        "Option 'platform' must be an object and subtype of '%s'. Got '%s'", AbstractPlatform::class, \gettype($invalidPlatform)
-                )
+            sprintf(
+                "Option 'platform' must be an object and subtype of '%s'. Got '%s'",
+                AbstractPlatform::class,
+                \gettype($invalidPlatform)
+            )
         );
     }
 
@@ -50,10 +53,12 @@ class CDatabase_Exception extends CException {
      */
     public static function invalidPlatformVersionSpecified($version, $expectedFormat) {
         return new self(
-                sprintf(
-                        'Invalid platform version "%s" specified. ' .
-                        'The platform version has to be specified in the format: "%s".', $version, $expectedFormat
-                )
+            sprintf(
+                'Invalid platform version "%s" specified. '
+                        . 'The platform version has to be specified in the format: "%s".',
+                $version,
+                $expectedFormat
+            )
         );
     }
 
@@ -62,8 +67,8 @@ class CDatabase_Exception extends CException {
      */
     public static function invalidPdoInstance() {
         return new self(
-                "The 'pdo' option was used in DriverManager::getConnection() but no " .
-                "instance of PDO was given."
+            "The 'pdo' option was used in DriverManager::getConnection() but no "
+                . 'instance of PDO was given.'
         );
     }
 
@@ -75,15 +80,16 @@ class CDatabase_Exception extends CException {
     public static function driverRequired($url = null) {
         if ($url) {
             return new self(
-                    sprintf(
-                            "The options 'driver' or 'driverClass' are mandatory if a connection URL without scheme " .
-                            "is given to DriverManager::getConnection(). Given URL: %s", $url
-                    )
+                sprintf(
+                    "The options 'driver' or 'driverClass' are mandatory if a connection URL without scheme "
+                            . 'is given to DriverManager::getConnection(). Given URL: %s',
+                    $url
+                )
             );
         }
 
-        return new self("The options 'driver' or 'driverClass' are mandatory if no PDO " .
-                "instance is given to DriverManager::getConnection().");
+        return new self("The options 'driver' or 'driverClass' are mandatory if no PDO "
+                . 'instance is given to DriverManager::getConnection().');
     }
 
     /**
@@ -93,8 +99,8 @@ class CDatabase_Exception extends CException {
      * @return CDatabase_Exception
      */
     public static function unknownDriver($unknownDriverName, array $knownDrivers) {
-        return new self("The given 'driver' " . $unknownDriverName . " is unknown, " .
-                "Doctrine currently supports only the following drivers: " . implode(", ", $knownDrivers));
+        return new self("The given 'driver' " . $unknownDriverName . ' is unknown, '
+                . 'Doctrine currently supports only the following drivers: ' . implode(', ', $knownDrivers));
     }
 
     /**
@@ -108,7 +114,7 @@ class CDatabase_Exception extends CException {
     public static function driverExceptionDuringQuery(Driver $driver, \Exception $driverEx, $sql, array $params = []) {
         $msg = "An exception occurred while executing '" . $sql . "'";
         if ($params) {
-            $msg .= " with params " . self::formatParameters($params);
+            $msg .= ' with params ' . self::formatParameters($params);
         }
         $msg .= ":\n\n" . $driverEx->getMessage();
 
@@ -122,12 +128,13 @@ class CDatabase_Exception extends CException {
      * @return CDatabase_Exception
      */
     public static function driverException(Driver $driver, \Exception $driverEx) {
-        return static::wrapException($driver, $driverEx, "An exception occurred in driver: " . $driverEx->getMessage());
+        return static::wrapException($driver, $driverEx, 'An exception occurred in driver: ' . $driverEx->getMessage());
     }
 
     /**
      * @param \Doctrine\DBAL\Driver $driver
      * @param \Exception            $driverEx
+     * @param mixed                 $msg
      *
      * @return CDatabase_Exception
      */
@@ -139,7 +146,7 @@ class CDatabase_Exception extends CException {
             return $driver->convertException($msg, $driverEx);
         }
 
-        return new self($msg, 0, $driverEx);
+        return new self($msg, [], 0, $driverEx);
     }
 
     /**
@@ -152,19 +159,19 @@ class CDatabase_Exception extends CException {
      */
     private static function formatParameters(array $params) {
         return '[' . implode(', ', array_map(function ($param) {
-                            if (is_resource($param)) {
-                                return (string) $param;
-                            }
+            if (is_resource($param)) {
+                return (string) $param;
+            }
 
-                            $json = @json_encode($param);
+            $json = @json_encode($param);
 
-                            if (!is_string($json) || $json == 'null' && is_string($param)) {
-                                // JSON encoding failed, this is not a UTF-8 string.
-                                return '"\x' . implode('\x', str_split(bin2hex($param), 2)) . '"';
-                            }
+            if (!is_string($json) || $json == 'null' && is_string($param)) {
+                // JSON encoding failed, this is not a UTF-8 string.
+                return '"\x' . implode('\x', str_split(bin2hex($param), 2)) . '"';
+            }
 
-                            return $json;
-                        }, $params)) . ']';
+            return $json;
+        }, $params)) . ']';
     }
 
     /**
@@ -173,8 +180,8 @@ class CDatabase_Exception extends CException {
      * @return CDatabase_Exception
      */
     public static function invalidWrapperClass($wrapperClass) {
-        return new self("The given 'wrapperClass' " . $wrapperClass . " has to be a " .
-                "subtype of \Doctrine\DBAL\Connection.");
+        return new self("The given 'wrapperClass' " . $wrapperClass . ' has to be a '
+                . "subtype of \Doctrine\DBAL\Connection.");
     }
 
     /**
@@ -183,8 +190,8 @@ class CDatabase_Exception extends CException {
      * @return CDatabase_Exception
      */
     public static function invalidDriverClass($driverClass) {
-        return new self("The given 'driverClass' " . $driverClass . " has to implement the " .
-                "\Doctrine\DBAL\Driver interface.");
+        return new self("The given 'driverClass' " . $driverClass . ' has to implement the '
+                . "\Doctrine\DBAL\Driver interface.");
     }
 
     /**
@@ -193,7 +200,7 @@ class CDatabase_Exception extends CException {
      * @return CDatabase_Exception
      */
     public static function invalidTableName($tableName) {
-        return new self("Invalid table name specified: " . $tableName);
+        return new self('Invalid table name specified: ' . $tableName);
     }
 
     /**
@@ -202,14 +209,14 @@ class CDatabase_Exception extends CException {
      * @return CDatabase_Exception
      */
     public static function noColumnsSpecifiedForTable($tableName) {
-        return new self("No columns specified for table " . $tableName);
+        return new self('No columns specified for table ' . $tableName);
     }
 
     /**
      * @return CDatabase_Exception
      */
     public static function limitOffsetInvalid() {
-        return new self("Invalid Offset in Limit Query, it has to be larger than or equal to 0.");
+        return new self('Invalid Offset in Limit Query, it has to be larger than or equal to 0.');
     }
 
     /**
@@ -227,13 +234,14 @@ class CDatabase_Exception extends CException {
      * @return CDatabase_Exception
      */
     public static function unknownColumnType($name) {
-        return new self('Unknown column type "' . $name . '" requested. Any Doctrine type that you use has ' .
-                'to be registered with \Doctrine\DBAL\Types\Type::addType(). You can get a list of all the ' .
-                'known types with \Doctrine\DBAL\Types\Type::getTypesMap(). If this error occurs during database ' .
-                'introspection then you might have forgotten to register all database types for a Doctrine Type. Use ' .
-                'AbstractPlatform#registerDoctrineTypeMapping() or have your custom types implement ' .
-                'Type#getMappedDatabaseTypes(). If the type name is empty you might ' .
-                'have a problem with the cache or forgot some mapping information.'
+        return new self(
+            'Unknown column type "' . $name . '" requested. Any Doctrine type that you use has '
+                . 'to be registered with \Doctrine\DBAL\Types\Type::addType(). You can get a list of all the '
+                . 'known types with \Doctrine\DBAL\Types\Type::getTypesMap(). If this error occurs during database '
+                . 'introspection then you might have forgotten to register all database types for a Doctrine Type. Use '
+                . 'AbstractPlatform#registerDoctrineTypeMapping() or have your custom types implement '
+                . 'Type#getMappedDatabaseTypes(). If the type name is empty you might '
+                . 'have a problem with the cache or forgot some mapping information.'
         );
     }
 
@@ -245,5 +253,4 @@ class CDatabase_Exception extends CException {
     public static function typeNotFound($name) {
         return new self('Type to be overwritten ' . $name . ' does not exist.');
     }
-
 }

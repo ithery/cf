@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CResources_Event_Conversion_WillStart {
-
     use CQueue_Trait_SerializesModels;
 
     /** @var CApp_Model_Interface_ResourceInterface */
@@ -24,5 +17,4 @@ class CResources_Event_Conversion_WillStart {
         $this->conversion = $conversion;
         $this->copiedOriginalFile = $copiedOriginalFile;
     }
-
 }

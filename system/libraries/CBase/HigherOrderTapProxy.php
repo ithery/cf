@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CBase_HigherOrderTapProxy {
-
     /**
      * The target being tapped.
      *
@@ -18,7 +11,8 @@ class CBase_HigherOrderTapProxy {
     /**
      * Create a new tap proxy instance.
      *
-     * @param  mixed  $target
+     * @param mixed $target
+     *
      * @return void
      */
     public function __construct($target) {
@@ -28,13 +22,13 @@ class CBase_HigherOrderTapProxy {
     /**
      * Dynamically pass method calls to the target.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters) {
         $this->target->{$method}(...$parameters);
         return $this->target;
     }
-
 }

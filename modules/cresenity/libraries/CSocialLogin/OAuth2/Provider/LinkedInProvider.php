@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 16, 2019, 5:08:39 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 16, 2019, 5:08:39 PM
  */
 class CSocialLogin_OAuth2_Provider_LinkedInProvider extends CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_OAuth2_ProviderInterface {
-
     /**
      * The scopes being requested.
      *
@@ -40,7 +40,8 @@ class CSocialLogin_OAuth2_Provider_LinkedInProvider extends CSocialLogin_OAuth2_
     /**
      * Get the POST fields for the token request.
      *
-     * @param  string  $code
+     * @param string $code
+     *
      * @return array
      */
     protected function getTokenFields($code) {
@@ -59,7 +60,8 @@ class CSocialLogin_OAuth2_Provider_LinkedInProvider extends CSocialLogin_OAuth2_
     /**
      * Get the basic profile fields for the user.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return array
      */
     protected function getBasicProfile($token) {
@@ -76,7 +78,8 @@ class CSocialLogin_OAuth2_Provider_LinkedInProvider extends CSocialLogin_OAuth2_
     /**
      * Get the email address for the user.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return array
      */
     protected function getEmailAddress($token) {
@@ -99,21 +102,20 @@ class CSocialLogin_OAuth2_Provider_LinkedInProvider extends CSocialLogin_OAuth2_
         $lastName = carr::get($user, 'lastName.localized.' . $preferredLocale);
         $images = (array) carr::get($user, 'profilePicture.displayImage~.elements', []);
         $avatar = carr::first(carr::where($images, function ($image) {
-                            return $image['data']['com.linkedin.digitalmedia.mediaartifact.StillImage']['storageSize']['width'] === 100;
-                        }));
+            return $image['data']['com.linkedin.digitalmedia.mediaartifact.StillImage']['storageSize']['width'] === 100;
+        }));
         $originalAvatar = carr::first(carr::where($images, function ($image) {
-                            return $image['data']['com.linkedin.digitalmedia.mediaartifact.StillImage']['storageSize']['width'] === 800;
-                        }));
+            return $image['data']['com.linkedin.digitalmedia.mediaartifact.StillImage']['storageSize']['width'] === 800;
+        }));
         return (new CSocialLogin_OAuth2_User)->setRaw($user)->map([
-                    'id' => $user['id'],
-                    'nickname' => null,
-                    'name' => $firstName . ' ' . $lastName,
-                    'first_name' => $firstName,
-                    'last_name' => $lastName,
-                    'email' => carr::get($user, 'emailAddress'),
-                    'avatar' => carr::get($avatar, 'identifiers.0.identifier'),
-                    'avatar_original' => carr::get($originalAvatar, 'identifiers.0.identifier'),
+            'id' => $user['id'],
+            'nickname' => null,
+            'name' => $firstName . ' ' . $lastName,
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => carr::get($user, 'emailAddress'),
+            'avatar' => carr::get($avatar, 'identifiers.0.identifier'),
+            'avatar_original' => carr::get($originalAvatar, 'identifiers.0.identifier'),
         ]);
     }
-
 }

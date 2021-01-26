@@ -1,23 +1,24 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CModel_HasResource_HasResourceTrait {
-
-    /** @var array */
+    /**
+     * @var array
+     */
     public $resourceConversions = [];
 
-    /** @var array */
+    /**
+     * @var array
+     */
     public $resourceCollections = [];
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $deletePreservingResource = false;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $unAttachedResourceLibraryItems = [];
 
     public static function bootHasResourceTrait() {
@@ -25,7 +26,7 @@ trait CModel_HasResource_HasResourceTrait {
             if ($entity->shouldDeletePreservingResource()) {
                 return;
             }
-            if (in_array(CModel_SoftDelete_SoftDeleteTrait::class, CF::class_uses_recursive($entity))) {
+            if (in_array(CModel_SoftDelete_SoftDeleteTrait::class, c::classUsesRecursive($entity))) {
                 if (!$entity->forceDeleting) {
                     return;
                 }
@@ -101,8 +102,8 @@ trait CModel_HasResource_HasResourceTrait {
     /**
      * Add a remote file to the resourcelibrary.
      *
-     * @param string $url
-     * @param string|array ...$allowedMimeTypes
+     * //@param string       $url
+     * //@param string|array ...$allowedMimeTypes
      *
      * @return CModel_HasResource_FileAdder_FileAdder
      *
@@ -128,19 +129,19 @@ trait CModel_HasResource_HasResourceTrait {
             $filename = "{$filename}.{$resourceExtension[1]}";
         }
         $file = CModel_HasResource_FileAdder_FileAdderFactory::create($this, $temporaryFile)
-                ->usingName(pathinfo($filename, PATHINFO_FILENAME))
-                ->usingFileName($filename);
-        ;
+            ->usingName(pathinfo($filename, PATHINFO_FILENAME))
+            ->usingFileName($filename);
+
         return $file;
     }
 
     /**
      * Add a base64 encoded file to the resourcelibrary.
      *
-     * @param string $base64data
-     * @param string|array ...$allowedMimeTypes
+     * //@param string       $base64data
+     * //@param string|array ...$allowedMimeTypes
      *
-     * @throws InvalidBase64Data
+     * @throws CResources_Exception_FileCannotBeAdded_InvalidBase64Data
      * @throws CResources_Exception_FileCannotBeAdded
      *
      * @return CModel_HasResource_FileAdder_FileAdder
@@ -156,11 +157,11 @@ trait CModel_HasResource_HasResourceTrait {
         }
         // strict mode filters for non-base64 alphabet characters
         if (base64_decode($base64data, true) === false) {
-            throw InvalidBase64Data::create();
+            throw CResources_Exception_FileCannotBeAdded_InvalidBase64Data::create();
         }
         // decoding and then reencoding should not change the data
         if (base64_encode(base64_decode($base64data)) !== $base64data) {
-            throw InvalidBase64Data::create();
+            throw CResources_Exception_FileCannotBeAdded_InvalidBase64Data::create();
         }
         $binaryData = base64_decode($base64data);
         // temporarily store the decoded data on the filesystem to be able to pass it to the fileAdder
@@ -183,10 +184,11 @@ trait CModel_HasResource_HasResourceTrait {
         return $this->addResource($file)->preservingOriginal();
     }
 
-    /*
+    /**
      * Determine if there is resource in the given collection.
+     *
+     * @param mixed $collectionName
      */
-
     public function hasResource($collectionName = 'default') {
         return count($this->getResource($collectionName)) ? true : false;
     }
@@ -194,7 +196,7 @@ trait CModel_HasResource_HasResourceTrait {
     /**
      * Get resource collection by its collectionName.
      *
-     * @param string $collectionName
+     * @param string         $collectionName
      * @param array|callable $filters
      *
      * @return CCollection
@@ -210,12 +212,14 @@ trait CModel_HasResource_HasResourceTrait {
         return $resource->first();
     }
 
-    /*
+    /**
      * Get the url of the image for the given conversionName
      * for first resource for the given collectionName.
      * If no profile is given, return the source's url.
+     *
+     * @param mixed $collectionName
+     * @param mixed $conversionName
      */
-
     public function getFirstResourceUrl($collectionName = 'default', $conversionName = '') {
         $resource = $this->getFirstResource($collectionName);
         if (!$resource) {
@@ -224,12 +228,14 @@ trait CModel_HasResource_HasResourceTrait {
         return $resource->getUrl($conversionName);
     }
 
-    /*
+    /**
      * Get the url of the image for the given conversionName
      * for first resource for the given collectionName.
      * If no profile is given, return the source's full url.
+     *
+     * @param mixed $collectionName
+     * @param mixed $conversionName
      */
-
     public function getFirstResourceFullUrl($collectionName = 'default', $conversionName = '') {
         $resource = $this->getFirstResource($collectionName);
         if (!$resource) {
@@ -238,12 +244,14 @@ trait CModel_HasResource_HasResourceTrait {
         return $resource->getFullUrl($conversionName);
     }
 
-    /*
+    /**
      * Get the url of the image for the given conversionName
      * for first resource for the given collectionName.
      * If no profile is given, return the source's url.
+     *
+     * @param mixed $collectionName
+     * @param mixed $conversionName
      */
-
     public function getFirstTemporaryUrl(DateTimeInterface $expiration, $collectionName = 'default', $conversionName = '') {
         $resource = $this->getFirstResource($collectionName);
         if (!$resource) {
@@ -252,12 +260,14 @@ trait CModel_HasResource_HasResourceTrait {
         return $resource->getTemporaryUrl($expiration, $conversionName);
     }
 
-    /*
+    /**
      * Get the url of the image for the given conversionName
      * for first resource for the given collectionName.
      * If no profile is given, return the source's url.
+     *
+     * @param mixed $collectionName
+     * @param mixed $conversionName
      */
-
     public function getFirstResourcePath($collectionName = 'default', $conversionName = '') {
         $resource = $this->getFirstResource($collectionName);
         if (!$resource) {
@@ -269,40 +279,41 @@ trait CModel_HasResource_HasResourceTrait {
     /**
      * Update a resource collection by deleting and inserting again with new values.
      *
-     * @param array $newResourceArray
+     * @param array  $newResourceArray
      * @param string $collectionName
      *
      * @return CCollection
      *
-     * @throws \Spatie\ResourceLibrary\Exceptions\ResourceCannotBeUpdated
+     * @throws \CResources_Exception_ResourceCannotBeUpdated
      */
     public function updateResource(array $newResourceArray, $collectionName = 'default') {
         $this->removeResourceItemsNotPresentInArray($newResourceArray, $collectionName);
-        return CF::collect($newResourceArray)
-                        ->map(function (array $newResourceItem) use ($collectionName) {
-                            static $orderColumn = 1;
-                            $resourceClass = config('resourcelibrary.resource_model');
-                            $currentResource = $resourceClass::findOrFail($newResourceItem['id']);
-                            if ($currentResource->collection_name !== $collectionName) {
-                                throw ResourceCannotBeUpdated::doesNotBelongToCollection($collectionName, $currentResource);
-                            }
-                            if (array_key_exists('name', $newResourceItem)) {
-                                $currentResource->name = $newResourceItem['name'];
-                            }
-                            if (array_key_exists('custom_properties', $newResourceItem)) {
-                                $currentResource->custom_properties = $newResourceItem['custom_properties'];
-                            }
-                            $currentResource->order_column = $orderColumn++;
-                            $currentResource->save();
-                            return $currentResource;
-                        });
+        return c::collect($newResourceArray)
+            ->map(function (array $newResourceItem) use ($collectionName) {
+                static $orderColumn = 1;
+                $resourceClass = CF::config('resource.resource_model');
+                /** @var CApp_Model_Interface_ResourceInterface|CModel $resourceClass */
+                $currentResource = $resourceClass::findOrFail($newResourceItem['id']);
+                if ($currentResource->collection_name !== $collectionName) {
+                    throw CResources_Exception_ResourceCannotBeUpdated::doesNotBelongToCollection($collectionName, $currentResource);
+                }
+                if (array_key_exists('name', $newResourceItem)) {
+                    $currentResource->name = $newResourceItem['name'];
+                }
+                if (array_key_exists('custom_properties', $newResourceItem)) {
+                    $currentResource->custom_properties = $newResourceItem['custom_properties'];
+                }
+                $currentResource->order_column = $orderColumn++;
+                $currentResource->save();
+                return $currentResource;
+            });
     }
 
     protected function removeResourceItemsNotPresentInArray(array $newResourceArray, $collectionName = 'default') {
         $this->getResource($collectionName)
-                ->reject(function (Resource $currentResourceItem) use ($newResourceArray) {
-                    return in_array($currentResourceItem->id, array_column($newResourceArray, 'id'));
-                })
+            ->reject(function (CApp_Model_Interface_ResourceInterface $currentResourceItem) use ($newResourceArray) {
+                return in_array($currentResourceItem->id, array_column($newResourceArray, 'id'));
+            })
         ->each->delete();
     }
 
@@ -315,7 +326,7 @@ trait CModel_HasResource_HasResourceTrait {
      */
     public function clearResourceCollection($collectionName = 'default') {
         $this->getResource($collectionName)->each->delete();
-        event(new CollectionHasBeenCleared($this, $collectionName));
+        c::event(new CollectionHasBeenCleared($this, $collectionName));
         if ($this->resourceIsPreloaded()) {
             unset($this->resource);
         }
@@ -325,26 +336,25 @@ trait CModel_HasResource_HasResourceTrait {
     /**
      * Remove all resource in the given collection except some.
      *
-     * @param string $collectionName
+     * @param string                                                                   $collectionName
      * @param \Spatie\ResourceLibrary\Models\Resource[]|\Illuminate\Support\Collection $excludedResource
      *
      * @return $this
      */
     public function clearResourceCollectionExcept($collectionName = 'default', $excludedResource = []) {
         if ($excludedResource instanceof CApp_Model_Interface_ResourceInterface) {
-            $excludedResource = CF::collect()->push($excludedResource);
+            $excludedResource = c::collect()->push($excludedResource);
         }
-        $excludedResource = CF::collect($excludedResource);
+        $excludedResource = c::collect($excludedResource);
 
         if ($excludedResource->isEmpty()) {
             return $this->clearResourceCollection($collectionName);
         }
 
         $this->getResource($collectionName)
-                ->reject(function (CApp_Model_Interface_ResourceInterface $resource) use ($excludedResource) {
-
-                    return $excludedResource->where('resource_id', $resource->resource_id)->count();
-                })
+            ->reject(function (CApp_Model_Interface_ResourceInterface $resource) use ($excludedResource) {
+                return $excludedResource->where('resource_id', $resource->resource_id)->count();
+            })
         ->each->delete();
         if ($this->resourceIsPreloaded()) {
             unset($this->resource);
@@ -358,7 +368,7 @@ trait CModel_HasResource_HasResourceTrait {
      *
      * @param int|\Spatie\ResourceLibrary\Models\Resource $resourceId
      *
-     * @throws \Spatie\ResourceLibrary\Exceptions\ResourceCannotBeDeleted
+     * @throws \CResources_Exception_ResourceCannotBeDeleted
      */
     public function deleteResource($resourceId) {
         if ($resourceId instanceof CApp_Model_Interface_ResourceInterface) {
@@ -366,15 +376,16 @@ trait CModel_HasResource_HasResourceTrait {
         }
         $resource = $this->resource->find($resourceId);
         if (!$resource) {
-            throw ResourceCannotBeDeleted::doesNotBelongToModel($resourceId, $this);
+            throw CResources_Exception_ResourceCannotBeDeleted::doesNotBelongToModel($resourceId, $this);
         }
         $resource->delete();
     }
 
-    /*
+    /**
      * Add a conversion.
+     *
+     * @param mixed $name
      */
-
     public function addResourceConversion($name) {
         $conversion = CResources_Conversion::create($name);
         $this->resourceConversions[] = $conversion;
@@ -418,17 +429,16 @@ trait CModel_HasResource_HasResourceTrait {
      * @return mixed
      */
     public function loadResource($collectionName) {
-        $collection = $this->exists ? $this->resource : CF::collect($this->unAttachedResourceLibraryItems)->pluck('resource');
+        $collection = $this->exists ? $this->resource : c::collect($this->unAttachedResourceLibraryItems)->pluck('resource');
         $values = $collection
-                ->filter(function (CApp_Model_Interface_ResourceInterface $resourceItem) use ($collectionName) {
-                    if ($collectionName == '') {
-                        return true;
-                    }
-                    return $resourceItem->collection_name === $collectionName;
-                })
-                ->sortBy('order_column')
-                ->values();
-
+            ->filter(function (CApp_Model_Interface_ResourceInterface $resourceItem) use ($collectionName) {
+                if ($collectionName == '') {
+                    return true;
+                }
+                return $resourceItem->collection_name === $collectionName;
+            })
+            ->sortBy('order_column')
+            ->values();
 
         return $values;
     }
@@ -445,10 +455,11 @@ trait CModel_HasResource_HasResourceTrait {
     }
 
     /**
-     * 
-     * @param string $file
-     * @param string ..$allowedMimeTypes
+     * //@param string $file
+     * //@param string ..$allowedMimeTypes
+     *
      * @return type
+     *
      * @throws type
      */
     protected function guardAgainstInvalidMimeType() {
@@ -459,30 +470,29 @@ trait CModel_HasResource_HasResourceTrait {
         if (empty($allowedMimeTypes)) {
             return;
         }
-        $validation = Validator::make(
-                        ['file' => new File($file)], ['file' => 'mimetypes:' . implode(',', $allowedMimeTypes)]
+        $validation = CValidation::factory()->make(
+            ['file' => new File($file)],
+            ['file' => 'mimetypes:' . implode(',', $allowedMimeTypes)]
         );
         if ($validation->fails()) {
-            throw MimeTypeNotAllowed::create($file, $allowedMimeTypes);
+            throw CResources_Exception_FileCannotBeAdded_MimeTypeNotAllowed::create($file, $allowedMimeTypes);
         }
     }
 
     public function registerResourceConversions(CApp_Model_Interface_ResourceInterface $resource = null) {
-        
     }
 
     public function registerResourceCollections() {
-        
     }
 
     public function registerAllResourceConversions(CApp_Model_Interface_ResourceInterface $resource = null) {
         $this->registerResourceCollections();
-        CF::collect($this->resourceCollections)->each(function (CResources_ResourceCollection $resourceCollection) use ($resource) {
+        c::collect($this->resourceCollections)->each(function (CResources_ResourceCollection $resourceCollection) use ($resource) {
             $actualResourceConversions = $this->resourceConversions;
             $this->resourceConversions = [];
-            call_user_func_array($resourceCollection->resourceConversionRegistrations, array($resource));
+            call_user_func_array($resourceCollection->resourceConversionRegistrations, [$resource]);
 
-            $preparedResourceConversions = CF::collect($this->resourceConversions)
+            $preparedResourceConversions = c::collect($this->resourceConversions)
                     ->each(function (CResources_Conversion $conversion) use ($resourceCollection) {
                         $conversion->performOnCollections($resourceCollection->name);
                     })
@@ -492,5 +502,4 @@ trait CModel_HasResource_HasResourceTrait {
         });
         $this->registerResourceConversions($resource);
     }
-
 }

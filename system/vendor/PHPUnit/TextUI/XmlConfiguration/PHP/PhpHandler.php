@@ -7,8 +7,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI\XmlConfiguration;
 
+namespace PHPUnit\TextUI\XmlConfiguration\PHP;
+
+use PHPUnit\TextUI\XmlConfiguration\Filesystem\DirectoryCollection;
 use const PATH_SEPARATOR;
 use function constant;
 use function define;
@@ -22,10 +24,8 @@ use function putenv;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class PhpHandler
-{
-    public function handle(Php $configuration)
-    {
+final class PhpHandler {
+    public function handle(Php $configuration) {
         $this->handleIncludePaths($configuration->includePaths());
         $this->handleIniSettings($configuration->iniSettings());
         $this->handleConstants($configuration->constants());
@@ -39,8 +39,7 @@ final class PhpHandler
         $this->handleVariables('_REQUEST', $configuration->requestVariables());
     }
 
-    private function handleIncludePaths(DirectoryCollection $includePaths)
-    {
+    private function handleIncludePaths(DirectoryCollection $includePaths) {
         if (!$includePaths->isEmpty()) {
             $includePathsAsStrings = [];
 
@@ -50,15 +49,14 @@ final class PhpHandler
 
             ini_set(
                 'include_path',
-                implode(PATH_SEPARATOR, $includePathsAsStrings) .
-                PATH_SEPARATOR .
-                ini_get('include_path')
+                implode(PATH_SEPARATOR, $includePathsAsStrings)
+                . PATH_SEPARATOR
+                . ini_get('include_path')
             );
         }
     }
 
-    private function handleIniSettings(IniSettingCollection $iniSettings)
-    {
+    private function handleIniSettings(IniSettingCollection $iniSettings) {
         foreach ($iniSettings as $iniSetting) {
             $value = $iniSetting->value();
 
@@ -70,8 +68,7 @@ final class PhpHandler
         }
     }
 
-    private function handleConstants(ConstantCollection $constants)
-    {
+    private function handleConstants(ConstantCollection $constants) {
         foreach ($constants as $constant) {
             if (!defined($constant->name())) {
                 define($constant->name(), $constant->value());
@@ -79,31 +76,27 @@ final class PhpHandler
         }
     }
 
-    private function handleGlobalVariables(VariableCollection $variables)
-    {
+    private function handleGlobalVariables(VariableCollection $variables) {
         foreach ($variables as $variable) {
             $GLOBALS[$variable->name()] = $variable->value();
         }
     }
 
-    private function handleServerVariables(VariableCollection $variables)
-    {
+    private function handleServerVariables(VariableCollection $variables) {
         foreach ($variables as $variable) {
             $_SERVER[$variable->name()] = $variable->value();
         }
     }
 
-    private function handleVariables($target, VariableCollection $variables)
-    {
+    private function handleVariables($target, VariableCollection $variables) {
         foreach ($variables as $variable) {
             $GLOBALS[$target][$variable->name()] = $variable->value();
         }
     }
 
-    private function handleEnvVariables(VariableCollection $variables)
-    {
+    private function handleEnvVariables(VariableCollection $variables) {
         foreach ($variables as $variable) {
-            $name  = $variable->name();
+            $name = $variable->name();
             $value = $variable->value();
             $force = $variable->force();
 

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 26, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Aug 26, 2020
  */
 class CRunner_FFMpeg_Media {
-
     /**
      * @var \ProtoneMedia\LaravelFFMpeg\Filesystem\Disk
      */
@@ -82,8 +82,8 @@ class CRunner_FFMpeg_Media {
             $this->temporaryDirectory = $this->getDisk()->getTemporaryDirectory();
         }
 
-        return app('filesystem')->createLocalDriver(
-                        ['root' => $this->temporaryDirectory->path()]
+        return CStorage::instance()->createLocalDriver(
+            ['root' => $this->temporaryDirectory->path()]
         );
     }
 
@@ -133,5 +133,4 @@ class CRunner_FFMpeg_Media {
 
         return $this;
     }
-
 }

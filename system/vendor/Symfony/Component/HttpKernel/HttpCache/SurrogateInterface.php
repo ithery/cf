@@ -64,7 +64,7 @@ interface SurrogateInterface
      *
      * @return string
      */
-    public function renderIncludeTag(string $uri, string $alt = null, bool $ignoreErrors = true, string $comment = '');
+    public function renderIncludeTag($uri, $alt = null, bool $ignoreErrors = true, $comment = '');
 
     /**
      * Replaces a Response Surrogate tags with the included resource content.
@@ -83,5 +83,5 @@ interface SurrogateInterface
      * @throws \RuntimeException
      * @throws \Exception
      */
-    public function handle(HttpCache $cache, string $uri, string $alt, bool $ignoreErrors);
+    public function handle(HttpCache $cache, $uri, $alt, bool $ignoreErrors);
 }

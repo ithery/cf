@@ -1,14 +1,25 @@
+// https://www.json.org/json-en.html
 Prism.languages.json = {
-	'property': /"(?:\\.|[^\\"\r\n])*"(?=\s*:)/i,
+	'property': {
+		pattern: /"(?:\\.|[^\\"\r\n])*"(?=\s*:)/,
+		greedy: true
+	},
 	'string': {
 		pattern: /"(?:\\.|[^\\"\r\n])*"(?!\s*:)/,
 		greedy: true
 	},
-	'number': /-?\d+\.?\d*([Ee][+-]?\d+)?/,
+	'comment': {
+		pattern: /\/\/.*|\/\*[\s\S]*?(?:\*\/|$)/,
+		greedy: true
+	},
+	'number': /-?\b\d+(?:\.\d+)?(?:e[+-]?\d+)?\b/i,
 	'punctuation': /[{}[\],]/,
-	'operator': /:/g,
-	'boolean': /\b(?:true|false)\b/i,
-	'null': /\bnull\b/i
+	'operator': /:/,
+	'boolean': /\b(?:true|false)\b/,
+	'null': {
+		pattern: /\bnull\b/,
+		alias: 'keyword'
+	}
 };
 
-Prism.languages.jsonp = Prism.languages.json;
+Prism.languages.webmanifest = Prism.languages.json;

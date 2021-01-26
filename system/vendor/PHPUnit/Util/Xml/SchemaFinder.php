@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Util\Xml;
 
 use function defined;
@@ -17,16 +18,21 @@ use PHPUnit\Runner\Version;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class SchemaFinder
-{
+final class SchemaFinder {
     /**
      * @throws Exception
+     *
+     * @param mixed $version
      */
-    public function find($version)
-    {
+    public function find($version) {
         if ($version === Version::series()) {
             $filename = $this->path() . 'phpunit.xsd';
         } else {
+            echo (new Exception())->getTraceAsString();
+
+            echo $version;
+            echo Version::series();
+            die;
             $filename = $this->path() . 'schema/' . $version . '.xsd';
         }
 
@@ -42,8 +48,7 @@ final class SchemaFinder
         return $filename;
     }
 
-    private function path()
-    {
+    private function path() {
         if (defined('__PHPUNIT_PHAR_ROOT__')) {
             return __PHPUNIT_PHAR_ROOT__ . '/';
         }

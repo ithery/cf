@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 28, 2019, 10:16:36 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 28, 2019, 10:16:36 AM
  */
 class CSocialLogin_OAuth2_Provider_InstagramProvider extends CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_OAuth2_ProviderInterface {
-
     /**
      * Unique Provider Identifier.
      */
@@ -29,7 +29,8 @@ class CSocialLogin_OAuth2_Provider_InstagramProvider extends CSocialLogin_OAuth2
      */
     protected function getAuthUrl($state) {
         return $this->buildAuthUrlFromBase(
-                        'https://api.instagram.com/oauth/authorize', $state
+            'https://api.instagram.com/oauth/authorize',
+            $state
         );
     }
 
@@ -51,12 +52,14 @@ class CSocialLogin_OAuth2_Provider_InstagramProvider extends CSocialLogin_OAuth2
         $signature = $this->generateSignature($endpoint, $query);
         $query['sig'] = $signature;
         $response = $this->getHttpClient()->get(
-                'https://api.instagram.com/v1/users/self', [
-            'query' => $query,
-            'headers' => [
-                'Accept' => 'application/json',
-            ],
-        ]);
+            'https://api.instagram.com/v1/users/self',
+            [
+                'query' => $query,
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+            ]
+        );
         return json_decode($response->getBody()->getContents(), true)['data'];
     }
 
@@ -65,11 +68,11 @@ class CSocialLogin_OAuth2_Provider_InstagramProvider extends CSocialLogin_OAuth2
      */
     protected function mapUserToObject(array $user) {
         return (new CSocialLogin_OAuth2_User())->setRaw($user)->map([
-                    'id' => $user['id'],
-                    'nickname' => $user['username'],
-                    'name' => $user['full_name'],
-                    'email' => null,
-                    'avatar' => $user['profile_picture'],
+            'id' => $user['id'],
+            'nickname' => $user['username'],
+            'name' => $user['full_name'],
+            'email' => null,
+            'avatar' => $user['profile_picture'],
         ]);
     }
 
@@ -95,9 +98,9 @@ class CSocialLogin_OAuth2_Provider_InstagramProvider extends CSocialLogin_OAuth2
 
     /**
      * Allows compatibility for signed API requests.
-     * 
-     * @param string @endpoint
-     * @param array $params
+     *
+     * @param string $endpoint
+     * @param array  $params
      *
      * @return string
      */
@@ -110,5 +113,4 @@ class CSocialLogin_OAuth2_Provider_InstagramProvider extends CSocialLogin_OAuth2
         $signing_key = $this->clientSecret;
         return hash_hmac('sha256', $sig, $signing_key, false);
     }
-
 }

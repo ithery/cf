@@ -1,24 +1,24 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Jun 1, 2018, 12:11:34 PM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use \CApp_Navigation_Helper as Helper;
 
 class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface {
-
-    protected $roleNavs = array();
+    protected $roleNavs = [];
     protected $roleId = null;
     protected $appId = null;
     protected $navs = null;
 
-    public function __construct($options = array()) {
+    public function __construct($options = []) {
         $app = CApp::instance();
-        $db = CDatabase::instance();
 
         $roleId = carr::get($options, 'role_id');
         $appId = carr::get($options, 'app_id');
@@ -26,8 +26,9 @@ class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface {
 
         if ($roleId == null) {
             $role = $app->role();
-            if ($role != null)
+            if ($role != null) {
                 $roleId = $role->role_id;
+            }
         }
         if ($appId == null) {
             $appId = CF::appId();
@@ -42,12 +43,17 @@ class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface {
 
         $this->navs = $navs;
 
-        $q = "select nav from role_nav where role_id=" . $db->escape($roleId) . " and app_id=" . $db->escape($appId);
-        if ($roleId == null) {
-            $q = "select nav from role_nav where role_id is null and app_id=" . $db->escape($appId);
-        }
-        
-        $this->roleNavs = cdbutils::get_array($q);
-    }
+        $this->roleNavs = [];
 
+        if (!CApp::isAdministrator()) {
+            if (CApp::instance()->isLoginRequired()) {
+                $db = CDatabase::instance();
+                $q = 'select nav from role_nav where role_id=' . $db->escape($roleId) . ' and app_id=' . $db->escape($appId);
+                if ($roleId == null) {
+                    $q = 'select nav from role_nav where role_id is null and app_id=' . $db->escape($appId);
+                }
+                $this->roleNavs = cdbutils::get_array($q);
+            }
+        }
+    }
 }

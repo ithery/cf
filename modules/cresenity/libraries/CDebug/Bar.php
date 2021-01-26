@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 1:04:27 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 1:04:27 PM
  */
 class CDebug_Bar extends CDebug_AbstractBar {
-
     /**
      * True when booted.
      *
@@ -23,7 +23,7 @@ class CDebug_Bar extends CDebug_AbstractBar {
      */
     protected $enabled;
 
-    public function __construct($options = array()) {
+    public function __construct($options = []) {
         parent::__construct($options);
     }
 
@@ -54,24 +54,35 @@ class CDebug_Bar extends CDebug_AbstractBar {
             return;
         }
 
+        $timeDataCollector = new CDebug_DataCollector_TimeDataCollector();
+
         $this->addCollector(new CDebug_DataCollector_PhpInfoCollector());
         $this->addCollector(new CDebug_DataCollector_MemoryCollector());
         $this->addCollector(new CDebug_DataCollector_LocalizationCollector());
         $this->addCollector(new CDebug_DataCollector_MessagesCollector());
+        $this->addCollector(new CDebug_DataCollector_EventCollector());
         $this->addCollector(new CDebug_DataCollector_RequestDataCollector());
-        $this->addCollector(new CDebug_DataCollector_TimeDataCollector());
+        $this->addCollector($timeDataCollector);
         $this->addCollector(new CDebug_DataCollector_FilesCollector());
         $this->addCollector(new CDebug_DataCollector_RenderableCollector());
 
-        $queryCollector = new CDebug_DataCollector_QueryCollector();
-
+        $queryCollector = new CDebug_DataCollector_QueryCollector($timeDataCollector);
 
         $queryCollector->setRenderSqlWithParams(true);
         $this->addCollector($queryCollector);
 
         $this->addCollector(new CDebug_DataCollector_ExceptionsCollector());
-        $this->startMeasure('application', 'Application');
+        $this->addCollector(new CDebug_DataCollector_ModelCollector());
 
+        CFBenchmark::onStopCallback(function ($name, $data) use ($timeDataCollector) {
+            $timeDataCollector->addMeasure($name, carr::get($data, 'start'), carr::get($data, 'stop'));
+        });
+        $completedBenchmarks = CFBenchmark::completed();
+        foreach ($completedBenchmarks as $name => $data) {
+            $timeDataCollector->addMeasure($name, carr::get($data, 'start'), carr::get($data, 'stop'));
+        }
+
+        $this->startMeasure('application', 'Application');
 
         //if (CHelper::request()->isAjax()) {
         //$this->sendDataInHeaders(true);
@@ -88,12 +99,12 @@ class CDebug_Bar extends CDebug_AbstractBar {
     /**
      * Starts a measure
      *
-     * @param string $name Internal name, used to stop the measure
+     * @param string $name  Internal name, used to stop the measure
      * @param string $label Public name
      */
     public function startMeasure($name, $label = null) {
         if ($this->hasCollector('time')) {
-            /* @var CDebug_DataCollector_TimeDataCollector $collector  */
+            /** @var CDebug_DataCollector_TimeDataCollector $collector  */
             $collector = $this->getCollector('time');
             $collector->startMeasure($name, $label);
         }
@@ -103,6 +114,7 @@ class CDebug_Bar extends CDebug_AbstractBar {
      * Adds an exception to be profiled in the debug bar
      *
      * @param Exception $e
+     *
      * @deprecated in favor of addThrowable
      */
     public function addException(Exception $e) {
@@ -116,10 +128,9 @@ class CDebug_Bar extends CDebug_AbstractBar {
      */
     public function addThrowable($e) {
         if ($this->hasCollector('exceptions')) {
-            /** @var \DebugBar\DataCollector\ExceptionsCollector $collector */
+            /** @var CDebug_DataCollector_ExceptionsCollector $collector */
             $collector = $this->getCollector('exceptions');
             $collector->addThrowable($e);
         }
     }
-
 }

@@ -32,7 +32,7 @@ class FileLinkFormatter
     /**
      * @param string|\Closure $urlFormat the URL format, or a closure that returns it on-demand
      */
-    public function __construct($fileLinkFormat = null, RequestStack $requestStack = null, string $baseDir = null, $urlFormat = null)
+    public function __construct($fileLinkFormat = null, RequestStack $requestStack = null, $baseDir = null, $urlFormat = null)
     {
         $fileLinkFormat = $fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');
         if ($fileLinkFormat && !\is_array($fileLinkFormat)) {
@@ -46,7 +46,7 @@ class FileLinkFormatter
         $this->urlFormat = $urlFormat;
     }
 
-    public function format(string $file, int $line)
+    public function format($file, $line)
     {
         if ($fmt = $this->getFileLinkFormat()) {
             for ($i = 1; isset($fmt[$i]); ++$i) {
@@ -65,7 +65,7 @@ class FileLinkFormatter
     /**
      * @internal
      */
-    public function __sleep(): array
+    public function __sleep()
     {
         $this->fileLinkFormat = $this->getFileLinkFormat();
 
@@ -75,7 +75,7 @@ class FileLinkFormatter
     /**
      * @internal
      */
-    public static function generateUrlFormat(UrlGeneratorInterface $router, string $routeName, string $queryString): ?string
+    public static function generateUrlFormat(UrlGeneratorInterface $router, $routeName, $queryString)
     {
         try {
             return $router->generate($routeName).$queryString;

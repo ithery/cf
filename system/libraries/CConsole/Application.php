@@ -1,11 +1,5 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
@@ -18,10 +12,7 @@ use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 
-class CConsole_Application extends SymfonyApplication implements CConsole_ApplicationInterface
-{
-   
-
+class CConsole_Application extends SymfonyApplication implements CConsole_ApplicationInterface {
     /**
      * The output from the previous command.
      *
@@ -46,14 +37,14 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
     /**
      * Create a new Artisan console application.
      *
-     * @param  CEvent_DispatcherInterface  $events
+     * @param CEvent_DispatcherInterface $events
+     *
      * @return void
      */
-    public function __construct(CEvent_DispatcherInterface $events=null)
-    {
+    public function __construct(CEvent_DispatcherInterface $events = null) {
         parent::__construct('CF Framework', CF_VERSION);
 
-        if($events == null) {
+        if ($events == null) {
             $events = CEvent::dispatcher();
         }
         $this->events = $events;
@@ -68,16 +59,16 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
     /**
      * {@inheritdoc}
      */
-    public function run(InputInterface $input = null, OutputInterface $output = null)
-    {
+    public function run(InputInterface $input = null, OutputInterface $output = null) {
         $commandName = $this->getCommandName(
             $input = $input ?: new ArgvInput
         );
 
-        
         $this->events->fire(
             new CConsole_Event_CommandStarting(
-                $commandName, $input, $output = $output ?: new ConsoleOutput
+                $commandName,
+                $input,
+                $output = $output ?: new ConsoleOutput
             )
         );
 
@@ -95,40 +86,38 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
      *
      * @return string
      */
-    public static function phpBinary()
-    {
-        return ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
+    public static function phpBinary() {
+        return CBase_ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
     }
 
     /**
-     * Determine the proper Artisan executable.
+     * Determine the proper CF executable.
      *
      * @return string
      */
-    public static function artisanBinary()
-    {
-        return defined('CFCLI_BINARY') ? ProcessUtils::escapeArgument(CFCLI_BINARY) : 'cf';
+    public static function cfBinary() {
+        return defined('CFCLI_BINARY') ? CBase_ProcessUtils::escapeArgument(CFCLI_BINARY) : 'cf';
     }
 
     /**
      * Format the given command as a fully-qualified executable command.
      *
-     * @param  string  $string
+     * @param string $string
+     *
      * @return string
      */
-    public static function formatCommandString($string)
-    {
-        return sprintf('%s %s %s', static::phpBinary(), static::artisanBinary(), $string);
+    public static function formatCommandString($string) {
+        return sprintf('%s %s %s', static::phpBinary(), static::cfBinary(), $string);
     }
 
     /**
      * Register a console "starting" bootstrapper.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return void
      */
-    public static function starting(Closure $callback)
-    {
+    public static function starting(Closure $callback) {
         static::$bootstrappers[] = $callback;
     }
 
@@ -137,10 +126,8 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
      *
      * @return void
      */
-    protected function bootstrap()
-    {
+    protected function bootstrap() {
         foreach (static::$bootstrappers as $bootstrapper) {
-            
             $bootstrapper($this);
         }
     }
@@ -150,28 +137,27 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
      *
      * @return void
      */
-    public static function forgetBootstrappers()
-    {
+    public static function forgetBootstrappers() {
         static::$bootstrappers = [];
     }
 
     /**
      * Run an Artisan console command by name.
      *
-     * @param  string  $command
-     * @param  array  $parameters
-     * @param  \Symfony\Component\Console\Output\OutputInterface|null  $outputBuffer
+     * @param string                                                 $command
+     * @param array                                                  $parameters
+     * @param \Symfony\Component\Console\Output\OutputInterface|null $outputBuffer
+     *
      * @return int
      *
      * @throws \Symfony\Component\Console\Exception\CommandNotFoundException
      */
-    public function call($command, array $parameters = [], $outputBuffer = null)
-    {
+    public function call($command, array $parameters = [], $outputBuffer = null) {
         if (is_subclass_of($command, SymfonyCommand::class)) {
             $command = CContainer::getInstance()->make($command)->getName();
         }
 
-        if (! $this->has($command)) {
+        if (!$this->has($command)) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $command));
         }
 
@@ -193,56 +179,53 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
      *
      * @return string
      */
-    public function output()
-    {
+    public function output() {
         return $this->lastOutput && method_exists($this->lastOutput, 'fetch')
-                        ? $this->lastOutput->fetch()
-                        : '';
+            ? $this->lastOutput->fetch()
+            : '';
     }
 
     /**
      * Add a command to the console.
      *
-     * @param  \Symfony\Component\Console\Command\Command  $command
+     * @param \Symfony\Component\Console\Command\Command $command
+     *
      * @return \Symfony\Component\Console\Command\Command
      */
-    public function add(SymfonyCommand $command)
-    {
-        
-
+    public function add(SymfonyCommand $command) {
         return $this->addToParent($command);
     }
 
     /**
      * Add the command to the parent instance.
      *
-     * @param  \Symfony\Component\Console\Command\Command  $command
+     * @param \Symfony\Component\Console\Command\Command $command
+     *
      * @return \Symfony\Component\Console\Command\Command
      */
-    protected function addToParent(SymfonyCommand $command)
-    {
+    protected function addToParent(SymfonyCommand $command) {
         return parent::add($command);
     }
 
     /**
      * Add a command, resolving through the application.
      *
-     * @param  string  $command
+     * @param string $command
+     *
      * @return \Symfony\Component\Console\Command\Command
      */
-    public function resolve($command)
-    {
+    public function resolve($command) {
         return $this->add(CContainer::getInstance()->make($command));
     }
 
     /**
      * Resolve an array of commands through the application.
      *
-     * @param  array|mixed  $commands
+     * @param array|mixed $commands
+     *
      * @return $this
      */
-    public function resolveCommands($commands)
-    {
+    public function resolveCommands($commands) {
         $commands = is_array($commands) ? $commands : func_get_args();
 
         foreach ($commands as $command) {
@@ -259,8 +242,7 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
      *
      * @return \Symfony\Component\Console\Input\InputDefinition
      */
-    protected function getDefaultInputDefinition()
-    {
+    protected function getDefaultInputDefinition() {
         return CF::tap(parent::getDefaultInputDefinition(), function ($definition) {
             $definition->addOption($this->getEnvironmentOption());
         });
@@ -271,12 +253,9 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
      *
      * @return \Symfony\Component\Console\Input\InputOption
      */
-    protected function getEnvironmentOption()
-    {
+    protected function getEnvironmentOption() {
         $message = 'The environment the command should run under';
 
         return new InputOption('--env', null, InputOption::VALUE_OPTIONAL, $message);
     }
-
- 
 }

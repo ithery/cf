@@ -1,23 +1,17 @@
 <?php
 
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\SkipsOnError;
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithValidation;
-use Maatwebsite\Excel\Exceptions\RowSkippedException;
-use Maatwebsite\Excel\Validators\RowValidator;
-use Maatwebsite\Excel\Validators\ValidationException;
+
 use Throwable;
 
-class ModelManager
-{
+class ModelManager {
+
     /**
      * @var array
      */
@@ -31,8 +25,7 @@ class ModelManager
     /**
      * @param RowValidator $validator
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->validator = CExporter_Validator_RowValidator::instance();
     }
 
@@ -40,8 +33,7 @@ class ModelManager
      * @param int   $row
      * @param array $attributes
      */
-    public function add( $row, array $attributes)
-    {
+    public function add($row, array $attributes) {
         $this->rows[$row] = $attributes;
     }
 
@@ -51,9 +43,8 @@ class ModelManager
      *
      * @throws ValidationException
      */
-    public function flush(ToModel $import, bool $massInsert = false)
-    {
-        if ($import instanceof WithValidation) {
+    public function flush(CExporter_Concern_ToModel $import, bool $massInsert = false) {
+        if ($import instanceof CExporter_Concern_WithValidation) {
             $this->validateRows($import);
         }
 
@@ -72,63 +63,60 @@ class ModelManager
      *
      * @return Model[]|Collection
      */
-    public function toModels(ToModel $import, array $attributes): Collection
-    {
+    public function toModels(CExporter_Concern_ToModel $import, array $attributes) {
         $model = $import->model($attributes);
 
         if (null !== $model) {
-            return \is_array($model) ? new Collection($model) : new Collection([$model]);
+            return \is_array($model) ? new CCollection($model) : new CCollection([$model]);
         }
 
-        return new Collection([]);
+        return new CCollection([]);
     }
 
     /**
      * @param ToModel $import
      */
-    private function massFlush(ToModel $import)
-    {
+    private function massFlush(CExporter_Concern_ToModel $import) {
         $this->rows()
-             ->flatMap(function (array $attributes) use ($import) {
-                 return $this->toModels($import, $attributes);
-             })
-             ->mapToGroups(function ($model) {
-                 return [\get_class($model) => $this->prepare($model)->getAttributes()];
-             })
-             ->each(function (Collection $models, string $model) use ($import) {
-                 try {
-                     /* @var Model $model */
-                     $model::query()->insert($models->toArray());
-                 } catch (Throwable $e) {
-                     if ($import instanceof SkipsOnError) {
-                         $import->onError($e);
-                     } else {
-                         throw $e;
-                     }
-                 }
-             });
-    }
-
-    /**
-     * @param ToModel $import
-     */
-    private function singleFlush(ToModel $import)
-    {
-        $this
-            ->rows()
-            ->each(function (array $attributes) use ($import) {
-                $this->toModels($import, $attributes)->each(function (Model $model) use ($import) {
+                ->flatMap(function (array $attributes) use ($import) {
+                    return $this->toModels($import, $attributes);
+                })
+                ->mapToGroups(function ($model) {
+                    return [\get_class($model) => $this->prepare($model)->getAttributes()];
+                })
+                ->each(function (CCollection $models, string $model) use ($import) {
                     try {
-                        $model->saveOrFail();
+                        /* @var Model $model */
+                        $model::query()->insert($models->toArray());
                     } catch (Throwable $e) {
-                        if ($import instanceof SkipsOnError) {
+                        if ($import instanceof CExporter_Concern_SkipsOnError) {
                             $import->onError($e);
                         } else {
                             throw $e;
                         }
                     }
                 });
-            });
+    }
+
+    /**
+     * @param ToModel $import
+     */
+    private function singleFlush(CExporter_Concern_ToModel $import) {
+        $this
+                ->rows()
+                ->each(function (array $attributes) use ($import) {
+                    $this->toModels($import, $attributes)->each(function (Model $model) use ($import) {
+                        try {
+                            $model->saveOrFail();
+                        } catch (Throwable $e) {
+                            if ($import instanceof SkipsOnError) {
+                                $import->onError($e);
+                            } else {
+                                throw $e;
+                            }
+                        }
+                    });
+                });
     }
 
     /**
@@ -136,8 +124,7 @@ class ModelManager
      *
      * @return Model
      */
-    private function prepare(Model $model): Model
-    {
+    private function prepare(CModel $model) {
         if ($model->usesTimestamps()) {
             $time = $model->freshTimestamp();
 
@@ -160,15 +147,14 @@ class ModelManager
     }
 
     /**
-     * @param WithValidation $import
+     * @param CExporter_Concern_WithValidation $import
      *
-     * @throws ValidationException
+     * @throws CExporter_Validator_ValidationException
      */
-    private function validateRows(WithValidation $import)
-    {
+    private function validateRows(CExporter_Concern_WithValidation $import) {
         try {
             $this->validator->validate($this->rows, $import);
-        } catch (RowSkippedException $e) {
+        } catch (CExporter_Exception_RowSkippedException $e) {
             foreach ($e->skippedRows() as $row) {
                 unset($this->rows[$row]);
             }
@@ -176,10 +162,10 @@ class ModelManager
     }
 
     /**
-     * @return Collection
+     * @return CCollection
      */
-    private function rows(): Collection
-    {
-        return new Collection($this->rows);
+    private function rows() {
+        return new CCollection($this->rows);
     }
+
 }

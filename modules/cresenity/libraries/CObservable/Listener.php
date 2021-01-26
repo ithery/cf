@@ -1,30 +1,31 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 3:43:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 3:43:55 PM
  */
 class CObservable_Listener extends CObservable_ListenerAbstract {
-
     use CTrait_Compat_Listener;
 
     protected $confirm;
+
     protected $confirm_message;
+
     protected $no_double;
 
     public function __construct($owner, $event = 'click') {
         parent::__construct($owner);
         $this->confirm = false;
-        $this->confirm_message = "";
+        $this->confirm_message = '';
         $this->no_double = false;
         $this->event = $event;
     }
 
     public static function factory($owner, $event) {
-
         return new CObservable_Listener($owner, $event);
     }
 
@@ -53,26 +54,25 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
             var clicked = thiselm.attr('data-clicked');
         ";
         if ($this->no_double) {
-            $startScript .= "
+            $startScript .= '
                 if(clicked) return false;
-            ";
+            ';
         }
         $startScript .= "
             thiselm.attr('data-clicked','1');
         ";
-        $handlersScript = "";
+        $handlersScript = '';
         foreach ($this->handlers as $handler) {
             $handlersScript .= $handler->js();
         }
-        $confirmStartScript = "";
-        $confirmEndScript = "";
+        $confirmStartScript = '';
+        $confirmEndScript = '';
         if ($this->confirm) {
-
             $confirm_message = $this->confirm_message;
             if (strlen($confirm_message) == 0) {
-                $confirm_message = clang::__("Are you sure ?");
+                $confirm_message = clang::__('Are you sure ?');
             }
-            $confirmStartScript = "	
+            $confirmStartScript = "
                 bootbox.confirm('" . $confirm_message . "', function(confirmed) {
                     if(confirmed) {
             ";
@@ -95,13 +95,13 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
         $compiledJs = $startScript . $confirmStartScript . $handlersScript . $confirmEndScript;
         return $compiledJs;
     }
-    
+
     public function js($indent = 0) {
         $js = new CStringBuilder();
         $js->setIndent($indent);
 
         $compiledJs = $this->getBodyJs();
-        
+
         $eventParameterImploded = implode(',', $this->eventParameters);
         if ($this->event == 'lazyload') {
             $js->append("
@@ -112,19 +112,18 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
                     });
                     jQuery(window).scroll(function() {
                         if (jQuery('#" . $this->owner . "')[0].getBoundingClientRect().top < (jQuery(window).scrollTop() + jQuery(window).height())) {
-                                " . $compiledJs . "
+                                " . $compiledJs . '
                             }
                     });
-                ");
+                ');
         } else {
             $js->append("
-                    jQuery('#" . $this->owner . "')." . $this->event . "(function(" . $eventParameterImploded . ") {
-                        " . $compiledJs . "
+                    jQuery('#" . $this->owner . "')." . $this->event . '(function(' . $eventParameterImploded . ') {
+                        ' . $compiledJs . '
                     });
-                ");
+                ');
         }
 
         return $js->text();
     }
-
 }

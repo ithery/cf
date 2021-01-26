@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 final class CComparator_Differ_Calculator_TimeEfficientCalculator extends CComparator_Differ_AbstractCalculator {
-
     /**
      * {@inheritdoc}
      */
@@ -27,7 +20,9 @@ final class CComparator_Differ_Calculator_TimeEfficientCalculator extends CCompa
             for ($j = 1; $j <= $toLength; ++$j) {
                 $o = ($j * $width) + $i;
                 $matrix[$o] = \max(
-                        $matrix[$o - 1], $matrix[$o - $width], $from[$i - 1] === $to[$j - 1] ? $matrix[$o - $width - 1] + 1 : 0
+                    $matrix[$o - 1],
+                    $matrix[$o - $width],
+                    $from[$i - 1] === $to[$j - 1] ? $matrix[$o - $width - 1] + 1 : 0
                 );
             }
         }
@@ -49,5 +44,4 @@ final class CComparator_Differ_Calculator_TimeEfficientCalculator extends CCompa
         }
         return \array_reverse($common);
     }
-
 }

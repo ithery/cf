@@ -1,11 +1,9 @@
 <?php
 
-
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CConsole_Event_CommandFinished
-{
+class CConsole_Event_CommandFinished {
     /**
      * The command name.
      *
@@ -37,14 +35,14 @@ class CConsole_Event_CommandFinished
     /**
      * Create a new event instance.
      *
-     * @param  string  $command
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @param  int  $exitCode
+     * @param string                                            $command
+     * @param \Symfony\Component\Console\Input\InputInterface   $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param int                                               $exitCode
+     *
      * @return void
      */
-    public function __construct($command, InputInterface $input, OutputInterface $output, $exitCode)
-    {
+    public function __construct($command, InputInterface $input, OutputInterface $output, $exitCode) {
         $this->input = $input;
         $this->output = $output;
         $this->command = $command;

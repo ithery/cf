@@ -4,8 +4,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 8:57:18 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ * @since Aug 18, 2018, 8:57:18 AM
  */
 abstract class CDatabase_Platform {
 
@@ -116,7 +116,7 @@ abstract class CDatabase_Platform {
      * Constructor.
      */
     public function __construct() {
-        
+
     }
 
     /**

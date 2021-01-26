@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_AbstractRecaptcha {
     /* -----------------------------------------------------------------
       |  Properties
@@ -27,15 +21,16 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Get script source link.
      *
-     * @param  string|null  $callbackName
+     * @param string|null $callbackName
      *
      * @return string
      */
     public function getScriptSrc($callbackName = null) {
         $queries = [];
 
-        if ($this->hasLang())
+        if ($this->hasLang()) {
             carr::set($queries, 'hl', $this->lang);
+        }
 
         if ($this->hasCallbackName($callbackName)) {
             carr::set($queries, 'onload', $callbackName);
@@ -53,15 +48,16 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Display Captcha.
      *
-     * @param  string|null  $name
-     * @param  array        $attributes
+     * @param string|null $name
+     * @param array       $attributes
      *
      * @return CElement_Element_Div
      */
     public function display($name = null, array $attributes = []) {
         $div = new CElement_Element_Div();
         $div->setAttrFromArray(array_merge(
-                        static::prepareNameAttribute($name), $this->prepareAttributes($attributes)
+            static::prepareNameAttribute($name),
+            $this->prepareAttributes($attributes)
         ));
 
         return $div->html();
@@ -70,44 +66,47 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Display image Captcha.
      *
-     * @param  string|null  $name
-     * @param  array        $attributes
+     * @param string|null $name
+     * @param array       $attributes
      *
      * @return CElement_Element_Div
      */
     public function image($name = null, array $attributes = []) {
         return $this->display($name, array_merge(
-                                $attributes, ['data-type' => 'image']
+            $attributes,
+            ['data-type' => 'image']
         ));
     }
 
     /**
      * Display audio Captcha.
      *
-     * @param  string|null  $name
-     * @param  array        $attributes
+     * @param string|null $name
+     * @param array       $attributes
      *
      * @return \Arcanedev\Html\Elements\Div
      */
     public function audio($name = null, array $attributes = []) {
         return $this->display($name, array_merge(
-                                $attributes, ['data-type' => 'audio']
+            $attributes,
+            ['data-type' => 'audio']
         ));
     }
 
     /**
      * Display an invisible Captcha (bind the challenge to a button).
      *
-     * @param  string  $value
-     * @param  array   $attributes
+     * @param string $value
+     * @param array  $attributes
+     * @param mixed  $dataCallback
      *
      * @return CApp_Element_Button
      */
-    public function button($value, array $attributes = [], $dataCallback='onSubmit') {
-
+    public function button($value, array $attributes = [], $dataCallback = 'onSubmit') {
         $button = new CElement_Element_Button();
         $button->setAttrFromArray(array_merge(
-                        ['data-callback' => $dataCallback], $this->prepareAttributes($attributes)
+            ['data-callback' => $dataCallback],
+            $this->prepareAttributes($attributes)
         ))->add($value);
         return $button->html();
     }
@@ -115,9 +114,9 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Get script tag.
      *
-     * @param  string|null  $callbackName
+     * @param string|null $callbackName
      *
-     * @return String
+     * @return string
      */
     public function script($callbackName = null) {
         $script = '';
@@ -129,8 +128,6 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
 
         return $script;
     }
-    
-    
 
     /**
      * Get the NoCaptcha API Script.
@@ -177,17 +174,17 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Get script tag with a callback function.
      *
-     * @param  array   $captchas
-     * @param  string  $callbackName
+     * @param array  $captchas
+     * @param string $callbackName
      *
-     * @return \Illuminate\Support\HtmlString
+     * @return string
      */
     public function scriptWithCallback(array $captchas, $callbackName = 'captchaRenderCallback') {
-        $script = $this->script($callbackName)->toHtml();
+        $script = $this->script($callbackName);
 
         if (!empty($script) && !empty($captchas)) {
             $script = implode(PHP_EOL, [
-                $this->getApiScript()->toHtml(),
+                $this->getApiScript(),
                 '<script>',
                 "var $callbackName = function() {",
                 $this->renderCaptchas($captchas),
@@ -203,14 +200,14 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Rendering captchas with callback function.
      *
-     * @param  array  $captchas
+     * @param array $captchas
      *
      * @return string
      */
     private function renderCaptchas(array $captchas) {
-        return implode(PHP_EOL, array_map(function($captcha) {
-                    return "if (document.getElementById('{$captcha}')) { window.noCaptcha.render('{$captcha}', '{$this->siteKey}'); }";
-                }, $captchas));
+        return implode(PHP_EOL, array_map(function ($captcha) {
+            return "if (document.getElementById('{$captcha}')) { window.noCaptcha.render('{$captcha}', '{$this->siteKey}'); }";
+        }, $captchas));
     }
 
     /* -----------------------------------------------------------------
@@ -221,7 +218,7 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Check if callback is not empty.
      *
-     * @param  string|null  $callbackName
+     * @param string|null $callbackName
      *
      * @return bool
      */
@@ -237,7 +234,7 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Parse the response.
      *
-     * @param  string  $json
+     * @param string $json
      *
      * @return CVendor_Google_Recaptcha_Http_AbstractResponse|mixed
      */
@@ -248,13 +245,14 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Prepare the attributes.
      *
-     * @param  array  $attributes
+     * @param array $attributes
      *
      * @return array
      */
     private function prepareAttributes(array $attributes) {
         $attributes = array_merge(
-                ['class' => 'g-recaptcha', 'data-sitekey' => $this->siteKey], array_filter($attributes)
+            ['class' => 'g-recaptcha', 'data-sitekey' => $this->siteKey],
+            array_filter($attributes)
         );
 
         self::checkDataAttribute($attributes, 'data-type', ['image', 'audio'], 'image');
@@ -268,10 +266,10 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Check the `data-*` attribute.
      *
-     * @param  array   $attributes
-     * @param  string  $name
-     * @param  array   $supported
-     * @param  string  $default
+     * @param array  $attributes
+     * @param string $name
+     * @param array  $supported
+     * @param string $default
      */
     private static function checkDataAttribute(array &$attributes, $name, array $supported, $default) {
         $attribute = isset($attributes[$name]) ? $attributes[$name] : null;
@@ -286,23 +284,23 @@ class CVendor_Google_Recaptcha_RecaptchaV2 extends CVendor_Google_Recaptcha_Abst
     /**
      * Prepare the name and id attributes.
      *
-     * @param  string|null  $name
+     * @param string|null $name
      *
      * @return array
      *
      * @throws \Arcanedev\NoCaptcha\Exceptions\InvalidArgumentException
      */
     protected static function prepareNameAttribute($name) {
-        if (is_null($name))
+        if (is_null($name)) {
             return [];
+        }
 
         if ($name === CVendor_Google_Recaptcha_AbstractRecaptcha::CAPTCHA_NAME) {
             throw new CVendor_Google_Recaptcha_Exception_InvalidArgumentException(
-            'The captcha name must be different from "' . CVendor_Google_Recaptcha_AbstractRecaptcha::CAPTCHA_NAME . '".'
+                'The captcha name must be different from "' . CVendor_Google_Recaptcha_AbstractRecaptcha::CAPTCHA_NAME . '".'
             );
         }
 
         return array_combine(['id', 'name'], [$name, $name]);
     }
-
 }

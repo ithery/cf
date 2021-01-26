@@ -1,20 +1,14 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of Checkbox
  *
  * @author Alvin
- * @since Mar 14, 2018, 15:35:24 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 14, 2018, 15:35:24 PM
  */
 class CElement_FormInput_Checkbox_Switcher extends CElement_FormInput_Checkbox {
-
     public function __construct($id) {
         parent::__construct($id);
 
@@ -26,7 +20,7 @@ class CElement_FormInput_Checkbox_Switcher extends CElement_FormInput_Checkbox {
     }
 
     public function html($indent = 0) {
-        $checked = "";
+        $checked = '';
         if ($this->checked) {
             $checked = ' checked="checked"';
         }
@@ -47,7 +41,4 @@ class CElement_FormInput_Checkbox_Switcher extends CElement_FormInput_Checkbox {
 
         return $html;
     }
-
-  
-
 }

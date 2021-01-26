@@ -1,42 +1,41 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Mar 12, 2019, 3:17:44 PM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class CDaemon {
-
     /**
      * @var array
      */
     protected $config = [];
 
     /**
-     *
      * @var CDaemon_Helper
      */
     protected $helper;
 
     /**
-     *
      * @var CDaemon_ServiceAbstract
      */
     protected static $runningService = null;
 
     public static function cliRunner($parameter = null) {
-
         $argv = carr::get($_SERVER, 'argv');
         if ($parameter == null) {
             $parameter = $argv[3];
         }
         parse_str($parameter, $config);
         $cls = carr::get($config, 'serviceClass');
-        /** @var CJob_Exception $job */
+        /* @var CJob_Exception $job */
         $serviceName = carr::get($config, 'serviceName', $cls);
         $cmd = carr::get($config, 'command');
         $pidFile = carr::get($config, 'pidFile');
@@ -55,7 +54,6 @@ class CDaemon {
             throw new Exception('error on create dir ' . $dirLogFile);
         }
 
-
         self::$runningService = new $cls($serviceName, $config);
 
         switch ($cmd) {
@@ -65,7 +63,7 @@ class CDaemon {
             case 'reload':
             case 'status':
             case 'kill':
-                call_user_func(array(self::$runningService, $cmd));
+                call_user_func([self::$runningService, $cmd]);
                 break;
             default:
                 $service->showHelp();
@@ -74,7 +72,6 @@ class CDaemon {
     }
 
     /**
-     * 
      * @return CDaemon_ServiceAbstract
      */
     public static function getRunningService() {
@@ -155,10 +152,6 @@ class CDaemon {
         }
     }
 
-    /**
-     * @param string $job
-     * @param array  $config
-     */
     protected function runUnix() {
         $command = $this->getExecutableCommand();
         $binary = $this->getPhpBinary();
@@ -166,16 +159,21 @@ class CDaemon {
 
         $commandToExecute = "NSS_STRICT_NOFORK=DISABLED $binary $command 1> $output 2>&1 &";
 
-        //cdbg::dd($commandToExecute);
-        exec($commandToExecute);
-        
-        
+        if (defined('CFCLI')) {
+            $process = new Process($commandToExecute);
+            $process->run();
+            $result = $process->getOutput();
+        } else {
+            exec($commandToExecute);
+        }
     }
 
     // @codeCoverageIgnoreStart
+
     /**
-     * @param string $job
-     * @param array  $config
+     * Run windows
+     *
+     * @return void
      */
     protected function runWindows() {
         // Run in background (non-blocking). From
@@ -183,14 +181,12 @@ class CDaemon {
         $binary = $this->getPhpBinary();
         $command = $this->getExecutableCommand();
 
-        pclose(popen("start \"blah\" /B \"$binary\" $command", "r"));
+        pclose(popen("start \"blah\" /B \"$binary\" $command", 'r'));
     }
 
     // @codeCoverageIgnoreEnd
+
     /**
-     * @param string $job
-     * @param array  $config
-     *
      * @return string
      */
     protected function getExecutableCommand() {
@@ -226,6 +222,7 @@ class CDaemon {
 
     public function getPid() {
         $pidFile = carr::get($this->config, 'pidFile');
+
         if ($pidFile && file_exists($pidFile)) {
             return file_get_contents($pidFile);
         }
@@ -236,14 +233,24 @@ class CDaemon {
         $result = '';
         if ($pid = $this->getPid()) {
             $pid = trim($pid);
-            $result = shell_exec('ps x | grep "' . $pid . '" | grep "' . carr::get($this->config, 'serviceName') . '" | grep -v "grep"');
+
+            $command = 'ps x | grep "' . $pid . '" | grep "'
+                . carr::get($this->config, 'serviceName')
+                . '" | grep -v "grep"';
+
+            if (defined('CFCLI')) {
+                $process = new Process($command);
+                $process->run();
+                $result = $process->getOutput();
+            } else {
+                $result = shell_exec($command);
+            }
         }
 
         return strlen(trim($result)) > 0;
     }
 
     /**
-     * 
      * @return CDaemon_Factory
      */
     public static function factory() {
@@ -252,7 +259,7 @@ class CDaemon {
 
     /**
      * Shortcut function to log the current running service
-     * 
+     *
      * @param string $msg
      */
     public static function log($msg) {
@@ -261,5 +268,4 @@ class CDaemon {
             $runningService->log($msg);
         }
     }
-
 }

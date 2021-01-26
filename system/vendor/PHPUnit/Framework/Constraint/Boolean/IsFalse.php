@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of PHPUnit.
  *
@@ -7,18 +8,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
+
+namespace PHPUnit\Framework\Constraint\Boolean;
+
+use PHPUnit\Framework\Constraint\Constraint;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class IsFalse extends Constraint
-{
+final class IsFalse extends Constraint {
+
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString()
-    {
+    public function toString() {
         return 'is false';
     }
 
@@ -28,8 +31,8 @@ final class IsFalse extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other)
-    {
+    protected function matches($other) {
         return $other === false;
     }
+
 }

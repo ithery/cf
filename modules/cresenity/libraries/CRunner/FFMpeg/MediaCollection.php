@@ -1,18 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 26, 2020 
- * @license Ittron Global Teknologi
- */
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @mixin CCollection
  */
 class CRunner_FFMpeg_MediaCollection {
-
     use CTrait_ForwardsCalls;
 
     /**
@@ -42,5 +35,4 @@ class CRunner_FFMpeg_MediaCollection {
     public function __call($method, $parameters) {
         return $this->forwardCallTo($this->collection(), $method, $parameters);
     }
-
 }

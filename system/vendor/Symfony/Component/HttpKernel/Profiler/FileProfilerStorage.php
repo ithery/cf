@@ -32,7 +32,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
      *
      * @throws \RuntimeException
      */
-    public function __construct(string $dsn)
+    public function __construct($dsn)
     {
         if (0 !== strpos($dsn, 'file:')) {
             throw new \RuntimeException(sprintf('Please check your configuration. You are trying to use FileStorage with an invalid dsn "%s". The expected format is "file:/path/to/the/storage/folder".', $dsn));
@@ -47,7 +47,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function find(?string $ip, ?string $url, ?int $limit, ?string $method, int $start = null, int $end = null, string $statusCode = null): array
+    public function find($ip, $url, $limit, $method, $start = null, $end = null, $statusCode = null)
     {
         $file = $this->getIndexFilename();
 
@@ -113,7 +113,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function read(string $token): ?Profile
+    public function read($token)
     {
         if (!$token || !file_exists($file = $this->getFilename($token))) {
             return null;
@@ -131,7 +131,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
      *
      * @throws \RuntimeException
      */
-    public function write(Profile $profile): bool
+    public function write(Profile $profile)
     {
         $file = $this->getFilename($profile->getToken());
 
@@ -202,7 +202,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
      *
      * @return string The profile filename
      */
-    protected function getFilename(string $token)
+    protected function getFilename($token)
     {
         // Uses 4 last characters, because first are mostly the same.
         $folderA = substr($token, -2, 2);
@@ -268,7 +268,7 @@ class FileProfilerStorage implements ProfilerStorageInterface
         return '' === $line ? null : $line;
     }
 
-    protected function createProfileFromData(string $token, array $data, Profile $parent = null)
+    protected function createProfileFromData($token, array $data, Profile $parent = null)
     {
         $profile = new Profile($token);
         $profile->setIp($data['ip']);

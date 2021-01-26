@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\TextUI;
 
 use const PHP_EOL;
@@ -28,7 +29,7 @@ use function range;
 use function realpath;
 use function sprintf;
 use function time;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 use PHPUnit\Framework\TestResult;
 use PHPUnit\Framework\TestSuite;
 use PHPUnit\Runner\Hook\AfterLastTestHook;
@@ -52,7 +53,7 @@ use PHPUnit\TextUI\XmlConfiguration\CodeCoverage\FilterMapper;
 use PHPUnit\TextUI\XmlConfiguration\Configuration;
 use PHPUnit\TextUI\XmlConfiguration\PHPUnit\ExtensionHandler;
 use PHPUnit\TextUI\XmlConfiguration\Loader;
-use PHPUnit\TextUI\XmlConfiguration\PhpHandler;
+use PHPUnit\TextUI\XmlConfiguration\PHP\PhpHandler;
 use PHPUnit\Util\Filesystem;
 use PHPUnit\Util\Log\JUnit;
 use PHPUnit\Util\Log\TeamCity;
@@ -67,7 +68,7 @@ use ReflectionClass;
 use ReflectionException;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use SebastianBergmann\CodeCoverage\Driver\Selector;
-use SebastianBergmann\CodeCoverage\Exception as CodeCoverageException;
+use SebastianBergmann\CodeCoverage\Exception\Exception as CodeCoverageException;
 use SebastianBergmann\CodeCoverage\Filter as CodeCoverageFilter;
 use SebastianBergmann\CodeCoverage\Report\Clover as CloverReport;
 use SebastianBergmann\CodeCoverage\Report\Cobertura as CoberturaReport;
@@ -84,8 +85,7 @@ use SebastianBergmann\Timer\Timer;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class TestRunner extends BaseTestRunner
-{
+final class TestRunner extends BaseTestRunner {
     const SUCCESS_EXIT = 0;
 
     const FAILURE_EXIT = 1;
@@ -127,24 +127,24 @@ final class TestRunner extends BaseTestRunner
      */
     private $timer;
 
-    public function __construct(TestSuiteLoader $loader = null, CodeCoverageFilter $filter = null)
-    {
+    public function __construct(TestSuiteLoader $loader = null, CodeCoverageFilter $filter = null) {
         if ($filter === null) {
             $filter = new CodeCoverageFilter;
         }
 
         $this->codeCoverageFilter = $filter;
-        $this->loader             = $loader;
-        $this->timer              = new Timer;
+        $this->loader = $loader;
+        $this->timer = new Timer;
     }
 
     /**
      * @throws \PHPUnit\Runner\Exception
      * @throws \PHPUnit\TextUI\XmlConfiguration\Exception
      * @throws Exception
+     *
+     * @param mixed $exit
      */
-    public function run(TestSuite $suite, array $arguments = [], array $warnings = [], $exit = true)
-    {
+    public function run(TestSuite $suite, array $arguments = [], array $warnings = [], $exit = true) {
         if (isset($arguments['configuration'])) {
             $GLOBALS['__PHPUNIT_CONFIGURATION_FILE'] = $arguments['configuration'];
         }
@@ -152,7 +152,7 @@ final class TestRunner extends BaseTestRunner
         $this->handleConfiguration($arguments);
 
         if (is_int($arguments['columns']) && $arguments['columns'] < 16) {
-            $arguments['columns']   = 16;
+            $arguments['columns'] = 16;
             $tooFewColumnsRequested = true;
         }
 
@@ -228,7 +228,7 @@ final class TestRunner extends BaseTestRunner
 
         $result = $this->createTestResult();
 
-        $listener       = new TestListenerAdapter;
+        $listener = new TestListenerAdapter;
         $listenerNeeded = false;
 
         foreach ($this->extensions as $extension) {
@@ -242,7 +242,7 @@ final class TestRunner extends BaseTestRunner
         if ($listenerNeeded) {
             $result->addListener($listener);
         }
-        
+
         unset($listener, $listenerNeeded);
 
         if (!$arguments['convertDeprecationsToExceptions']) {
@@ -288,11 +288,11 @@ final class TestRunner extends BaseTestRunner
         if ($arguments['stopOnDefect']) {
             $result->stopOnDefect(true);
         }
-        
+
         if ($arguments['registerMockObjectsFromTestArgumentsRecursively']) {
             $result->setRegisterMockObjectsFromTestArgumentsRecursively(true);
         }
-        
+
         if ($this->printer === null) {
             if (isset($arguments['printer'])) {
                 if ($arguments['printer'] instanceof ResultPrinter) {
@@ -317,7 +317,6 @@ final class TestRunner extends BaseTestRunner
                 }
             } else {
                 $this->printer = $this->createPrinter(DefaultResultPrinter::class, $arguments);
-                
             }
         }
 
@@ -328,8 +327,6 @@ final class TestRunner extends BaseTestRunner
             $this->printer->setShowProgressAnimation(!$arguments['noInteraction']);
         }
 
-        
-        
         $this->printer->write(
             Version::getVersionString() . "\n"
         );
@@ -343,8 +340,8 @@ final class TestRunner extends BaseTestRunner
         $result->addListener($this->printer);
 
         $coverageFilterFromConfigurationFile = false;
-        $coverageFilterFromOption            = false;
-        $codeCoverageReports                 = 0;
+        $coverageFilterFromOption = false;
+        $codeCoverageReports = 0;
 
         if (isset($arguments['testdoxHTMLFile'])) {
             $result->addListener(
@@ -450,8 +447,8 @@ final class TestRunner extends BaseTestRunner
 
         if ($codeCoverageReports > 0) {
             try {
-                if (isset($codeCoverageConfiguration) &&
-                    ($codeCoverageConfiguration->pathCoverage() || (isset($arguments['pathCoverage']) && $arguments['pathCoverage'] === true))) {
+                if (isset($codeCoverageConfiguration)
+                    && ($codeCoverageConfiguration->pathCoverage() || (isset($arguments['pathCoverage']) && $arguments['pathCoverage'] === true))) {
                     $codeCoverageDriver = (new Selector)->forLineAndPathCoverage($this->codeCoverageFilter);
                 } else {
                     $codeCoverageDriver = (new Selector)->forLineCoverage($this->codeCoverageFilter);
@@ -546,7 +543,7 @@ final class TestRunner extends BaseTestRunner
                 );
             }
 
-            if(isset($arguments['loadedExtensions'])) {
+            if (isset($arguments['loadedExtensions'])) {
                 foreach ($arguments['loadedExtensions'] as $extension) {
                     $this->writeMessage(
                         'Extension',
@@ -555,7 +552,7 @@ final class TestRunner extends BaseTestRunner
                 }
             }
 
-            if(isset($arguments['notLoadedExtensions'])) {
+            if (isset($arguments['notLoadedExtensions'])) {
                 foreach ($arguments['notLoadedExtensions'] as $extension) {
                     $this->writeMessage(
                         'Extension',
@@ -769,10 +766,10 @@ final class TestRunner extends BaseTestRunner
             if (isset($arguments['coverageText'])) {
                 if ($arguments['coverageText'] === 'php://stdout') {
                     $outputStream = $this->printer;
-                    $colors       = $arguments['colors'] && $arguments['colors'] !== DefaultResultPrinter::COLOR_NEVER;
+                    $colors = $arguments['colors'] && $arguments['colors'] !== DefaultResultPrinter::COLOR_NEVER;
                 } else {
                     $outputStream = new Printer($arguments['coverageText']);
-                    $colors       = false;
+                    $colors = false;
                 }
 
                 $processor = new TextReport(
@@ -843,8 +840,7 @@ final class TestRunner extends BaseTestRunner
     /**
      * Returns the loader to be used.
      */
-    public function getLoader()
-    {
+    public function getLoader() {
         if ($this->loader === null) {
             $this->loader = new StandardTestSuiteLoader;
         }
@@ -852,29 +848,27 @@ final class TestRunner extends BaseTestRunner
         return $this->loader;
     }
 
-    public function addExtension(Hook $extension)
-    {
+    public function addExtension(Hook $extension) {
         $this->extensions[] = $extension;
     }
 
     /**
      * Override to define how to handle a failed loading of
      * a test suite.
+     *
+     * @param mixed $message
      */
-    protected function runFailed($message)
-    {
+    protected function runFailed($message) {
         $this->write($message . PHP_EOL);
 
         exit(self::FAILURE_EXIT);
     }
 
-    private function createTestResult()
-    {
+    private function createTestResult() {
         return new TestResult;
     }
 
-    private function write($buffer)
-    {
+    private function write($buffer) {
         if (PHP_SAPI !== 'cli' && PHP_SAPI !== 'phpdbg') {
             $buffer = htmlspecialchars($buffer);
         }
@@ -890,8 +884,7 @@ final class TestRunner extends BaseTestRunner
      * @throws Exception
      * @throws \PHPUnit\TextUI\XmlConfiguration\Exception
      */
-    private function handleConfiguration(array &$arguments)
-    {
+    private function handleConfiguration(array &$arguments) {
         if (!isset($arguments['configurationObject']) && isset($arguments['configuration'])) {
             $arguments['configurationObject'] = (new Loader)->load($arguments['configuration']);
         }
@@ -939,9 +932,9 @@ final class TestRunner extends BaseTestRunner
                 }
 
                 if (!isset($arguments['coverageText']) && $codeCoverageConfiguration->hasText()) {
-                    $arguments['coverageText']                   = $codeCoverageConfiguration->text()->target()->path();
+                    $arguments['coverageText'] = $codeCoverageConfiguration->text()->target()->path();
                     $arguments['coverageTextShowUncoveredFiles'] = $codeCoverageConfiguration->text()->showUncoveredFiles();
-                    $arguments['coverageTextShowOnlySummary']    = $codeCoverageConfiguration->text()->showOnlySummary();
+                    $arguments['coverageTextShowOnlySummary'] = $codeCoverageConfiguration->text()->showOnlySummary();
                 }
 
                 if (!isset($arguments['coverageXml']) && $codeCoverageConfiguration->hasXml()) {
@@ -1088,7 +1081,7 @@ final class TestRunner extends BaseTestRunner
 
         $extensionHandler = new ExtensionHandler;
 
-        if(isset($arguments['extensions'])) {
+        if (isset($arguments['extensions'])) {
             foreach ($arguments['extensions'] as $extension) {
                 $this->addExtension($extensionHandler->createHookInstance($extension));
             }
@@ -1146,13 +1139,12 @@ final class TestRunner extends BaseTestRunner
         $arguments['verbose'] = isset($arguments['verbose']) ? $arguments['verbose'] : false;
     }
 
-    private function processSuiteFilters(TestSuite $suite, array $arguments)
-    {
-        if (!$arguments['filter'] &&
-            empty($arguments['groups']) &&
-            empty($arguments['excludeGroups']) &&
-            empty($arguments['testsCovering']) &&
-            empty($arguments['testsUsing'])) {
+    private function processSuiteFilters(TestSuite $suite, array $arguments) {
+        if (!$arguments['filter']
+            && empty($arguments['groups'])
+            && empty($arguments['excludeGroups'])
+            && empty($arguments['testsCovering'])
+            && empty($arguments['testsUsing'])) {
             return;
         }
 
@@ -1206,8 +1198,7 @@ final class TestRunner extends BaseTestRunner
         $suite->injectFilter($filterFactory);
     }
 
-    private function writeMessage($type, $message)
-    {
+    private function writeMessage($type, $message) {
         if (!$this->messagePrinted) {
             $this->write("\n");
         }
@@ -1223,10 +1214,7 @@ final class TestRunner extends BaseTestRunner
         $this->messagePrinted = true;
     }
 
-    private function createPrinter($class, array $arguments)
-    {
-        
-        
+    private function createPrinter($class, array $arguments) {
         $object = new $class(
             (isset($arguments['stderr']) && $arguments['stderr'] === true) ? 'php://stderr' : null,
             $arguments['verbose'],
@@ -1236,14 +1224,12 @@ final class TestRunner extends BaseTestRunner
             $arguments['reverseList']
         );
 
-        
         assert($object instanceof ResultPrinter);
 
         return $object;
     }
 
-    private function codeCoverageGenerationStart($format)
-    {
+    private function codeCoverageGenerationStart($format) {
         $this->printer->write(
             sprintf(
                 "\nGenerating code coverage report in %s format ... ",
@@ -1254,8 +1240,7 @@ final class TestRunner extends BaseTestRunner
         $this->timer->start();
     }
 
-    private function codeCoverageGenerationSucceeded()
-    {
+    private function codeCoverageGenerationSucceeded() {
         $this->printer->write(
             sprintf(
                 "done [%s]\n",
@@ -1264,8 +1249,7 @@ final class TestRunner extends BaseTestRunner
         );
     }
 
-    private function codeCoverageGenerationFailed(\Exception $e)
-    {
+    private function codeCoverageGenerationFailed(\Exception $e) {
         $this->printer->write(
             sprintf(
                 "failed [%s]\n%s\n",

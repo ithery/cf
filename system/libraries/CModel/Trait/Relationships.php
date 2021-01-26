@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Dec 25, 2017, 10:08:50 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Dec 25, 2017, 10:08:50 PM
  */
 trait CModel_Trait_Relationships {
-
     /**
      * The loaded relationships for the model.
      *
@@ -36,9 +36,10 @@ trait CModel_Trait_Relationships {
     /**
      * Define a one-to-one relationship.
      *
-     * @param  string  $related
-     * @param  string  $foreignKey
-     * @param  string  $localKey
+     * @param string $related
+     * @param string $foreignKey
+     * @param string $localKey
+     *
      * @return CModel_Relation_HasOne
      */
     public function hasOne($related, $foreignKey = null, $localKey = null) {
@@ -54,11 +55,12 @@ trait CModel_Trait_Relationships {
     /**
      * Define a polymorphic one-to-one relationship.
      *
-     * @param  string  $related
-     * @param  string  $name
-     * @param  string  $type
-     * @param  string  $id
-     * @param  string  $localKey
+     * @param string $related
+     * @param string $name
+     * @param string $type
+     * @param string $id
+     * @param string $localKey
+     *
      * @return CModel_Relation_MorphOne
      */
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null) {
@@ -76,10 +78,11 @@ trait CModel_Trait_Relationships {
     /**
      * Define an inverse one-to-one or many relationship.
      *
-     * @param  string  $related
-     * @param  string  $foreignKey
-     * @param  string  $ownerKey
-     * @param  string  $relation
+     * @param string $related
+     * @param string $foreignKey
+     * @param string $ownerKey
+     * @param string $relation
+     *
      * @return CModel_Relation_BelongsTo
      */
     public function belongsTo($related, $foreignKey = null, $ownerKey = null, $relation = null) {
@@ -96,7 +99,6 @@ trait CModel_Trait_Relationships {
         // foreign key name by using the name of the relationship function, which
         // when combined with an "_id" should conventionally match the columns.
         if (is_null($foreignKey)) {
-
             $foreignKey = $instance->getKeyName();
         }
 
@@ -106,16 +108,21 @@ trait CModel_Trait_Relationships {
         $ownerKey = $ownerKey ?: $instance->getKeyName();
 
         return new CModel_Relation_BelongsTo(
-                $instance->newQuery(), $this, $foreignKey, $ownerKey, $relation
+            $instance->newQuery(),
+            $this,
+            $foreignKey,
+            $ownerKey,
+            $relation
         );
     }
 
     /**
      * Define a polymorphic, inverse one-to-one or many relationship.
      *
-     * @param  string  $name
-     * @param  string  $type
-     * @param  string  $id
+     * @param string $name
+     * @param string $type
+     * @param string $id
+     *
      * @return CModel_Relation_MorphTo
      */
     public function morphTo($name = null, $type = null, $id = null) {
@@ -125,7 +132,9 @@ trait CModel_Trait_Relationships {
         $name = $name ?: $this->guessBelongsToRelation();
 
         list($type, $id) = $this->getMorphs(
-                cstr::snake($name), $type, $id
+            cstr::snake($name),
+            $type,
+            $id
         );
 
         // If the type value is null it is probably safe to assume we're eager loading
@@ -137,40 +146,53 @@ trait CModel_Trait_Relationships {
     /**
      * Define a polymorphic, inverse one-to-one or many relationship.
      *
-     * @param  string  $name
-     * @param  string  $type
-     * @param  string  $id
+     * @param string $name
+     * @param string $type
+     * @param string $id
+     *
      * @return CModel_Relation_MorphTo
      */
     protected function morphEagerTo($name, $type, $id) {
         return new CModel_Relation_MorphTo(
-                $this->newQuery()->setEagerLoads([]), $this, $id, null, $type, $name
+            $this->newQuery()->setEagerLoads([]),
+            $this,
+            $id,
+            null,
+            $type,
+            $name
         );
     }
 
     /**
      * Define a polymorphic, inverse one-to-one or many relationship.
      *
-     * @param  string  $target
-     * @param  string  $name
-     * @param  string  $type
-     * @param  string  $id
+     * @param string $target
+     * @param string $name
+     * @param string $type
+     * @param string $id
+     *
      * @return CModel_Relation_MorphTo
      */
     protected function morphInstanceTo($target, $name, $type, $id) {
         $instance = $this->newRelatedInstance(
-                static::getActualClassNameForMorph($target)
+            static::getActualClassNameForMorph($target)
         );
 
         return new CModel_Relation_MorphTo(
-                $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
+            $instance->newQuery(),
+            $this,
+            $id,
+            $instance->getKeyName(),
+            $type,
+            $name
         );
     }
 
     /**
      * Retrieve the actual class name for a given morph class.
      *
-     * @param  string  $class
+     * @param string $class
+     *
      * @return string
      */
     public static function getActualClassNameForMorph($class) {
@@ -191,9 +213,10 @@ trait CModel_Trait_Relationships {
     /**
      * Define a one-to-many relationship.
      *
-     * @param  string  $related
-     * @param  string  $foreignKey
-     * @param  string  $localKey
+     * @param string $related
+     * @param string $foreignKey
+     * @param string $localKey
+     *
      * @return CModel_Relation_HasMany
      */
     public function hasMany($related, $foreignKey = null, $localKey = null) {
@@ -204,19 +227,23 @@ trait CModel_Trait_Relationships {
         $localKey = $localKey ?: $this->getKeyName();
 
         return new CModel_Relation_HasMany(
-                $instance->newQuery(), $this, $instance->getTable() . '.' . $foreignKey, $localKey
+            $instance->newQuery(),
+            $this,
+            $instance->getTable() . '.' . $foreignKey,
+            $localKey
         );
     }
 
     /**
      * Define a has-many-through relationship.
      *
-     * @param  string  $related
-     * @param  string  $through
-     * @param  string|null  $firstKey
-     * @param  string|null  $secondKey
-     * @param  string|null  $localKey
-     * @param  string|null  $secondLocalKey
+     * @param string      $related
+     * @param string      $through
+     * @param string|null $firstKey
+     * @param string|null $secondKey
+     * @param string|null $localKey
+     * @param string|null $secondLocalKey
+     *
      * @return CModel_Relation_HasManyThrough
      */
     public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null) {
@@ -238,11 +265,12 @@ trait CModel_Trait_Relationships {
     /**
      * Define a polymorphic one-to-many relationship.
      *
-     * @param  string  $related
-     * @param  string  $name
-     * @param  string  $type
-     * @param  string  $id
-     * @param  string  $localKey
+     * @param string $related
+     * @param string $name
+     * @param string $type
+     * @param string $id
+     * @param string $localKey
+     *
      * @return CModel_Relation_MorphMany
      */
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null) {
@@ -263,13 +291,14 @@ trait CModel_Trait_Relationships {
     /**
      * Define a many-to-many relationship.
      *
-     * @param  string  $related
-     * @param  string  $table
-     * @param  string  $foreignPivotKey
-     * @param  string  $relatedPivotKey
-     * @param  string  $parentKey
-     * @param  string  $relatedKey
-     * @param  string  $relation
+     * @param string $related
+     * @param string $table
+     * @param string $foreignPivotKey
+     * @param string $relatedPivotKey
+     * @param string $parentKey
+     * @param string $relatedKey
+     * @param string $relation
+     *
      * @return CModel_Relation_BelongsToMany
      */
     public function belongsToMany($related, $table = null, $foreignPivotKey = null, $relatedPivotKey = null, $parentKey = null, $relatedKey = null, $relation = null) {
@@ -297,21 +326,29 @@ trait CModel_Trait_Relationships {
         }
 
         return new CModel_Relation_BelongsToMany(
-                $instance->newQuery(), $this, $table, $foreignPivotKey, $relatedPivotKey, $parentKey ?: $this->getKeyName(), $relatedKey ?: $instance->getKeyName(), $relation
+            $instance->newQuery(),
+            $this,
+            $table,
+            $foreignPivotKey,
+            $relatedPivotKey,
+            $parentKey ?: $this->getKeyName(),
+            $relatedKey ?: $instance->getKeyName(),
+            $relation
         );
     }
 
     /**
      * Define a polymorphic many-to-many relationship.
      *
-     * @param  string  $related
-     * @param  string  $name
-     * @param  string  $table
-     * @param  string  $foreignPivotKey
-     * @param  string  $relatedPivotKey
-     * @param  string  $parentKey
-     * @param  string  $relatedKey
-     * @param  bool  $inverse
+     * @param string $related
+     * @param string $name
+     * @param string $table
+     * @param string $foreignPivotKey
+     * @param string $relatedPivotKey
+     * @param string $parentKey
+     * @param string $relatedKey
+     * @param bool   $inverse
+     *
      * @return CModel_Relation_MorphToMany
      */
     public function morphToMany($related, $name, $table = null, $foreignPivotKey = null, $relatedPivotKey = null, $parentKey = null, $relatedKey = null, $inverse = false) {
@@ -332,20 +369,30 @@ trait CModel_Trait_Relationships {
         $table = $table ?: cstr::plural($name);
 
         return new CModel_Relation_MorphToMany(
-                $instance->newQuery(), $this, $name, $table, $foreignPivotKey, $relatedPivotKey, $parentKey ?: $this->getKeyName(), $relatedKey ?: $instance->getKeyName(), $caller, $inverse
+            $instance->newQuery(),
+            $this,
+            $name,
+            $table,
+            $foreignPivotKey,
+            $relatedPivotKey,
+            $parentKey ?: $this->getKeyName(),
+            $relatedKey ?: $instance->getKeyName(),
+            $caller,
+            $inverse
         );
     }
 
     /**
      * Define a polymorphic, inverse many-to-many relationship.
      *
-     * @param  string  $related
-     * @param  string  $name
-     * @param  string  $table
-     * @param  string  $foreignPivotKey
-     * @param  string  $relatedPivotKey
-     * @param  string  $parentKey
-     * @param  string  $relatedKey
+     * @param string $related
+     * @param string $name
+     * @param string $table
+     * @param string $foreignPivotKey
+     * @param string $relatedPivotKey
+     * @param string $parentKey
+     * @param string $relatedKey
+     *
      * @return CModel_Relation_MorphToMany
      */
     public function morphedByMany($related, $name, $table = null, $foreignPivotKey = null, $relatedPivotKey = null, $parentKey = null, $relatedKey = null) {
@@ -357,7 +404,14 @@ trait CModel_Trait_Relationships {
         $relatedPivotKey = $relatedPivotKey ?: $name . '_id';
 
         return $this->morphToMany(
-                        $related, $name, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, true
+            $related,
+            $name,
+            $table,
+            $foreignPivotKey,
+            $relatedPivotKey,
+            $parentKey,
+            $relatedKey,
+            true
         );
     }
 
@@ -368,8 +422,8 @@ trait CModel_Trait_Relationships {
      */
     protected function guessBelongsToManyRelation() {
         $caller = carr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) {
-                    return !in_array($trace['function'], CModel::$manyMethods);
-                });
+            return !in_array($trace['function'], CModel::$manyMethods);
+        });
 
         return !is_null($caller) ? $caller['function'] : null;
     }
@@ -377,7 +431,8 @@ trait CModel_Trait_Relationships {
     /**
      * Get the joining table name for a many-to-many relation.
      *
-     * @param  string  $related
+     * @param string $related
+     *
      * @return string
      */
     public function joiningTable($related) {
@@ -385,8 +440,8 @@ trait CModel_Trait_Relationships {
         // sorted alphabetically and concatenated with an underscore, so we can
         // just sort the models and join them together to get the table name.
         $models = [
-            cstr::snake(CF::class_basename($related)),
-            cstr::snake(CF::class_basename($this)),
+            cstr::snake(c::classBasename($related)),
+            cstr::snake(c::classBasename($this)),
         ];
 
         // Now that we have the model names in an array we can just sort them and
@@ -400,7 +455,8 @@ trait CModel_Trait_Relationships {
     /**
      * Determine if the model touches a given relation.
      *
-     * @param  string  $relation
+     * @param string $relation
+     *
      * @return bool
      */
     public function touches($relation) {
@@ -421,7 +477,7 @@ trait CModel_Trait_Relationships {
 
                 $this->$relation->touchOwners();
             } elseif ($this->$relation instanceof CCollection) {
-                $this->$relation->each(function (Model $relation) {
+                $this->$relation->each(function (CModel $relation) {
                     $relation->touchOwners();
                 });
             }
@@ -431,9 +487,10 @@ trait CModel_Trait_Relationships {
     /**
      * Get the polymorphic relationship columns.
      *
-     * @param  string  $name
-     * @param  string  $type
-     * @param  string  $id
+     * @param string $name
+     * @param string $type
+     * @param string $id
+     *
      * @return array
      */
     protected function getMorphs($name, $type, $id) {
@@ -447,7 +504,7 @@ trait CModel_Trait_Relationships {
      */
     public function getMorphClass() {
         $morphMap = CModel_Relation::morphMap();
-        
+
         if (!empty($morphMap) && in_array(static::class, $morphMap)) {
             return array_search(static::class, $morphMap, true);
         }
@@ -458,14 +515,14 @@ trait CModel_Trait_Relationships {
     /**
      * Create a new model instance for a related model.
      *
-     * @param  string  $class
+     * @param string $class
+     *
      * @return mixed
      */
     protected function newRelatedInstance($class) {
-
         return CF::tap(new $class, function ($instance) {
-                    //do nothing
-                });
+            //do nothing
+        });
     }
 
     /**
@@ -480,7 +537,8 @@ trait CModel_Trait_Relationships {
     /**
      * Get a specified relationship.
      *
-     * @param  string  $relation
+     * @param string $relation
+     *
      * @return mixed
      */
     public function getRelation($relation) {
@@ -490,7 +548,8 @@ trait CModel_Trait_Relationships {
     /**
      * Determine if the given relation is loaded.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function relationLoaded($key) {
@@ -500,8 +559,9 @@ trait CModel_Trait_Relationships {
     /**
      * Set the specific relationship in the model.
      *
-     * @param  string  $relation
-     * @param  mixed  $value
+     * @param string $relation
+     * @param mixed  $value
+     *
      * @return $this
      */
     public function setRelation($relation, $value) {
@@ -513,7 +573,8 @@ trait CModel_Trait_Relationships {
     /**
      * Set the entire relations array on the model.
      *
-     * @param  array  $relations
+     * @param array $relations
+     *
      * @return $this
      */
     public function setRelations(array $relations) {
@@ -534,7 +595,8 @@ trait CModel_Trait_Relationships {
     /**
      * Set the relationships that are touched on save.
      *
-     * @param  array  $touches
+     * @param array $touches
+     *
      * @return $this
      */
     public function setTouchedRelations(array $touches) {
@@ -542,5 +604,4 @@ trait CModel_Trait_Relationships {
 
         return $this;
     }
-
 }

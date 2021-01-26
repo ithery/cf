@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWhenResolvedInterface {
-
     use CValidation_ValidatesWhenResolvedTrait;
 
     /**
@@ -20,7 +13,7 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
     /**
      * The redirector instance.
      *
-     * @var \Illuminate\Routing\Redirector
+     * @var CHTTP_Redirector
      */
     protected $redirector;
 
@@ -55,7 +48,7 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
     /**
      * Get the validator instance for the request.
      *
-     * @return \Illuminate\Contracts\Validation\Validator
+     * @return CValidation_Validator
      */
     protected function getValidatorInstance() {
         $factory = $this->container->make(ValidationFactory::class);
@@ -76,12 +69,16 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
     /**
      * Create the default validator instance.
      *
-     * @param  \Illuminate\Contracts\Validation\Factory  $factory
-     * @return \Illuminate\Contracts\Validation\Validator
+     * @param CValidation_Factory $factory
+     *
+     * @return CValidation_Validator
      */
-    protected function createDefaultValidator(ValidationFactory $factory) {
+    protected function createDefaultValidator(CValidation_Factory $factory) {
         return $factory->make(
-                        $this->validationData(), $this->container->call([$this, 'rules']), $this->messages(), $this->attributes()
+            $this->validationData(),
+            $this->container->call([$this, 'rules']),
+            $this->messages(),
+            $this->attributes()
         );
     }
 
@@ -97,15 +94,16 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
     /**
      * Handle a failed validation attempt.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
+     * @param CValidation_Validator $validator
+     *
      * @return void
      *
-     * @throws \Illuminate\Validation\ValidationException
+     * @throws \CValidation_Exception
      */
-    protected function failedValidation(Validator $validator) {
-        throw (new ValidationException($validator))
-                ->errorBag($this->errorBag)
-                ->redirectTo($this->getRedirectUrl());
+    protected function failedValidation(CValidation_Validator $validator) {
+        throw (new CValidation_Exception($validator))
+            ->errorBag($this->errorBag)
+            ->redirectTo($this->getRedirectUrl());
     }
 
     /**
@@ -145,10 +143,10 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
      *
      * @return void
      *
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws CAuth_Exception_AuthorizationException
      */
     protected function failedAuthorization() {
-        throw new AuthorizationException('This action is unauthorized.');
+        throw new CAuth_Exception_AuthorizationException('This action is unauthorized.');
     }
 
     /**
@@ -159,9 +157,9 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
     public function validated() {
         $rules = $this->container->call([$this, 'rules']);
 
-        return $this->only(collect($rules)->keys()->map(function ($rule) {
-                            return explode('.', $rule)[0];
-                        })->unique()->toArray());
+        return $this->only(c::collect($rules)->keys()->map(function ($rule) {
+            return explode('.', $rule)[0];
+        })->unique()->toArray());
     }
 
     /**
@@ -185,10 +183,11 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
     /**
      * Set the Redirector instance.
      *
-     * @param  \Illuminate\Routing\Redirector  $redirector
+     * @param CHTTP_Redirector $redirector
+     *
      * @return $this
      */
-    public function setRedirector(Redirector $redirector) {
+    public function setRedirector(CHTTP_Redirector $redirector) {
         $this->redirector = $redirector;
 
         return $this;
@@ -197,7 +196,8 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
     /**
      * Set the container implementation.
      *
-     * @param  CContainer_Container  $container
+     * @param CContainer_Container $container
+     *
      * @return $this
      */
     public function setContainer(CContainer_Container $container) {
@@ -205,5 +205,4 @@ class CHTTP_FormRequest extends CHTTP_Request implements CValidation_ValidatesWh
 
         return $this;
     }
-
 }

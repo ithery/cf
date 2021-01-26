@@ -7,14 +7,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI\XmlConfiguration;
+
+namespace PHPUnit\TextUI\XmlConfiguration\PHP;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  * @psalm-immutable
  */
-final class IniSetting
-{
+final class IniSetting {
     /**
      * @var string
      */
@@ -25,19 +25,16 @@ final class IniSetting
      */
     private $value;
 
-    public function __construct($name, $value)
-    {
-        $this->name  = $name;
+    public function __construct($name, $value) {
+        $this->name = $name;
         $this->value = $value;
     }
 
-    public function name()
-    {
+    public function name() {
         return $this->name;
     }
 
-    public function value()
-    {
+    public function value() {
         return $this->value;
     }
 }

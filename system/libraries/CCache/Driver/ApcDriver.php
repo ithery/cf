@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 5:01:57 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 5:01:57 AM
  */
 class CCache_Driver_ApcDriver extends CCache_DriverTaggableAbstract {
-
     use CCache_Trait_RetrievesMultipleKeys;
 
     /**
@@ -28,7 +28,8 @@ class CCache_Driver_ApcDriver extends CCache_DriverTaggableAbstract {
     /**
      * Create a new APC store.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return void
      */
     public function __construct($options) {
@@ -39,7 +40,8 @@ class CCache_Driver_ApcDriver extends CCache_DriverTaggableAbstract {
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return mixed
      */
     public function get($key) {
@@ -52,9 +54,10 @@ class CCache_Driver_ApcDriver extends CCache_DriverTaggableAbstract {
     /**
      * Store an item in the cache for a given number of seconds.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int  $seconds
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
      * @return bool
      */
     public function put($key, $value, $seconds) {
@@ -64,8 +67,9 @@ class CCache_Driver_ApcDriver extends CCache_DriverTaggableAbstract {
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int|bool
      */
     public function increment($key, $value = 1) {
@@ -75,8 +79,9 @@ class CCache_Driver_ApcDriver extends CCache_DriverTaggableAbstract {
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int|bool
      */
     public function decrement($key, $value = 1) {
@@ -86,8 +91,9 @@ class CCache_Driver_ApcDriver extends CCache_DriverTaggableAbstract {
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return bool
      */
     public function forever($key, $value) {
@@ -97,7 +103,8 @@ class CCache_Driver_ApcDriver extends CCache_DriverTaggableAbstract {
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function forget($key) {
@@ -121,5 +128,4 @@ class CCache_Driver_ApcDriver extends CCache_DriverTaggableAbstract {
     public function getPrefix() {
         return $this->prefix;
     }
-
 }

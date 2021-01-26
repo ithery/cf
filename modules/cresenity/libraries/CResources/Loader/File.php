@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CResources_Loader_File extends CResources_LoaderAbstract {
-
     protected $appCode = '';
     protected $orgCode = '';
     protected $resourceName = '';
@@ -16,12 +9,12 @@ class CResources_Loader_File extends CResources_LoaderAbstract {
     protected $s3Options = null;
     protected $s3Object = null;
 
-    public function __construct($resourceName, $options = array()) {
+    public function __construct($resourceName, $options = []) {
         $appCode = carr::get($options, 'app_code');
         $orgCode = carr::get($options, 'org_code');
         $type = carr::get($options, 'type');
         if (strlen($appCode) == 0) {
-            $appCode = CF::app_code();
+            $appCode = CF::appCode();
         }
         $s3Options = carr::get($options, 's3_options');
 
@@ -41,7 +34,7 @@ class CResources_Loader_File extends CResources_LoaderAbstract {
     protected function getBasePath($sizeName = null) {
         $filename = $this->resourceName;
         $temp = '';
-        $arrName = explode("_", $this->resourceName);
+        $arrName = explode('_', $this->resourceName);
         //org_code
         if (isset($arrName[0])) {
             $temp .= $arrName[0] . DS;
@@ -66,8 +59,7 @@ class CResources_Loader_File extends CResources_LoaderAbstract {
     }
 
     public function getUrl($encoded = false) {
-
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? 'https' : 'http';
 
         $baseUrl = curl::base(false, $protocol);
         if ($this->s3Object != null) {
@@ -77,7 +69,7 @@ class CResources_Loader_File extends CResources_LoaderAbstract {
         if (!$encoded) {
             $path = $baseUrl . 'application/' . $this->appCode . '/' . (strlen($this->orgCode) > 0 ? $this->orgCode : 'default') . '/resources/';
             $temp = '';
-            $arr_name = explode("_", $this->resourceName);
+            $arr_name = explode('_', $this->resourceName);
             //org_code
             if (isset($arr_name[0])) {
                 $temp .= rawurlencode($arr_name[0]) . '/';
@@ -122,7 +114,7 @@ class CResources_Loader_File extends CResources_LoaderAbstract {
             $basePath = $this->getBasePath();
             $path = trim(trim(dirname($basePath), '/'), DS);
 
-            $resultSave = $s3Object->upload($path, file_get_contents($path), $this->resourceName);
+            $resultSave = $this->s3Object->upload($path, file_get_contents($path), $this->resourceName);
             if ($resultSave) {
                 //@unlink($fullPath);
             }
@@ -130,5 +122,4 @@ class CResources_Loader_File extends CResources_LoaderAbstract {
 
         return $resultSave;
     }
-
 }

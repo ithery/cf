@@ -1,27 +1,19 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CParser_HtmlParser_TokenizerCallbackTrait {
-
     public function onattribdata($value) {
         $this->attributeValue .= $value;
     }
 
     public function onattribend() {
         if ($this->dispatcher->hasListeners(CParser_HtmlParser_Event_OnAttribute::class)) {
-
             $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnAttribute($this->attributeName, $this->attributeValue));
         }
         if (is_array($this->attributes) && !array_key_exists($this->attributeName, $this->attributes)) {
             $this->attributes[$this->attributeName] = $this->attributeValue;
         }
-        $this->attributeName = "";
-        $this->attributeValue = "";
+        $this->attributeName = '';
+        $this->attributeValue = '';
     }
 
     public function onattribname($name) {
@@ -32,17 +24,18 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
     }
 
     public function oncdata($data) {
-        $this . updatePosition(1);
+        $this->updatePosition(1);
         if ($this->getOption('xmlMode') || $this->getOption('recognizeCDATA')) {
             $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnCdataStart());
             $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnText($data));
             $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnCdataEnd());
         } else {
-            $this->oncomment('[CDATA[' . $value . ']]');
+            $this->oncomment('[CDATA[' . $data . ']]');
         }
     }
 
     public function onclosetag($name) {
+        /** @var CParser_HtmlParser $this */
         $this->updatePosition(1);
         if ($this->lowerCaseTagNames) {
             $name = strtolower($name);
@@ -69,11 +62,11 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
                         $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnCloseTag($lastStack));
                     }
                 }
-            } else if ($name === "p" && !$this . getOption('xmlMode')) {
+            } elseif ($name === 'p' && !$this->getOption('xmlMode')) {
                 $this->onopentagname($name);
                 $this->closeCurrentTag();
             }
-        } else if (!$this . getOption('xmlMode') && ($name === "br" || $name === "p")) {
+        } elseif (!$this->getOption('xmlMode') && ($name === 'br' || $name === 'p')) {
             $this->onopentagname($name);
             $this->closeCurrentTag();
         }
@@ -111,25 +104,25 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
     }
 
     public function onopentagend() {
+        /** @var CParser_HtmlParser $this */
         $this->updatePosition(1);
         if (is_array($this->attributes)) {
             if ($this->dispatcher->hasListeners(CParser_HtmlParser_Event_OnOpenTag::class)) {
-
                 $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnOpenTag($this->tagname, $this->attributes));
             }
             $this->attributes = null;
         }
-        if (
-                !$this->getOption('xmlMode') &&
-                $this->dispatcher->hasListeners(CParser_HtmlParser_Event_OnCloseTag::class) &&
-                in_array($this->tagname, static::$voidElements)
+        if (!$this->getOption('xmlMode')
+            && $this->dispatcher->hasListeners(CParser_HtmlParser_Event_OnCloseTag::class)
+            && in_array($this->tagname, static::$voidElements)
         ) {
             $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnCloseTag($this->tagname));
         }
-        $this->tagname = "";
+        $this->tagname = '';
     }
 
     public function onopentagname($name) {
+        /** @var CParser_HtmlParser $this */
         if ($this->lowerCaseTagNames) {
             $name = strtolower($name);
         }
@@ -151,13 +144,13 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
             $this->stack[] = $name;
             if (in_array($name, static::$foreignContextElements)) {
                 $this->foreignContext[] = true;
-            } else if (in_array($name, static::$htmlIntegrationElements)) {
+            } elseif (in_array($name, static::$htmlIntegrationElements)) {
                 $this->foreignContext[] = false;
             }
         }
         $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnOpenTagName($name));
         if ($this->dispatcher->hasListeners(CParser_HtmlParser_Event_OnOpenTag::class)) {
-            $this->attributes = array();
+            $this->attributes = [];
         }
     }
 
@@ -170,10 +163,9 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
 
     public function onselfclosingtag() {
         $lastForeignContext = carr::get($this->foreignContext, count($this->foreignContext) - 1, false);
-        if (
-                $this->getOption('xmlMode') ||
-                $this->getOption('recognizeSelfClosing') ||
-                $lastForeignContext
+        if ($this->getOption('xmlMode')
+            || $this->getOption('recognizeSelfClosing')
+            || $lastForeignContext
         ) {
             $this->closeCurrentTag();
         } else {
@@ -187,5 +179,4 @@ trait CParser_HtmlParser_TokenizerCallbackTrait {
         $this->endIndex--;
         $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnText($value));
     }
-
 }

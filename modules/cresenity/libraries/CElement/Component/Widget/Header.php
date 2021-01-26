@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 20, 2018, 1:45:20 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 20, 2018, 1:45:20 AM
  */
 class CElement_Component_Widget_Header extends CElement_Element {
-
     use CTrait_Element_Property_Icon,
         CTrait_Element_Property_Title;
 
     /**
-     *
      * @var CElement_List_ActionList
      */
     protected $actions;
@@ -23,10 +22,10 @@ class CElement_Component_Widget_Header extends CElement_Element {
     protected $switcherBehaviour = 'hide';
     protected $switcherBlockMessage = '';
 
-    public function __construct($id = "", $tag = "div") {
+    public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
-        $this->icon = "";
-        $this->title = "";
+        $this->icon = '';
+        $this->title = '';
         $this->titleWrapper = $this->addDiv()->addClass('widget-title-wrapper');
     }
 
@@ -39,7 +38,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
         return $this->actions;
     }
 
-    public function addAction($id = "") {
+    public function addAction($id = '') {
         $action = CElement_Factory::createComponent('Action', $id);
         $this->actions()->add($action);
         return $action;
@@ -59,7 +58,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
     public function addSwitcher($id = null) {
         if ($this->switcher == null) {
             $this->switcherWrapper = $this->addDiv()->addClass('widget-switcher-wrapper pull-right');
-            $this->switcher = CFactory::create_control($id, 'switcher');
+            $this->switcher = CFactory::createControl($id, 'switcher');
             $this->switcherWrapper->add($this->switcher);
         }
         return $this->switcher;
@@ -85,7 +84,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
         if ($this->haveSwitcher()) {
             if ($this->switcherBehaviour == 'block') {
                 $js->appendln('
-                    var blockMessage = "'.$this->switcherBlockMessage.'";
+                    var blockMessage = "' . $this->switcherBlockMessage . '";
                     if (jQuery("#' . $this->switcher->id . '").prop("checked")) {
                         cresenity.unblockElement(jQuery("#' . $this->parent->id . '").find(".widget-content"));
                     } else {
@@ -121,5 +120,4 @@ class CElement_Component_Widget_Header extends CElement_Element {
         $js->append($this->jsChild($js->get_indent()));
         return $js->text();
     }
-
 }

@@ -1,18 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @since Aug 18, 2018, 10:43:47 AM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
+ /**
+  * @author Hery Kurniawan
+  * @license Ittron Global Teknologi <ittron.co.id>
+  *
+  * @since Aug 18, 2018, 10:43:47 AM
+  */
 
-/**
+ use \Doctrine\Common\Cache\Cache;
+
+ /**
  * Configuration container for the CDatabase.
  */
 class CDatabase_Configuration {
-
     /**
      * The attributes that are contained in the configuration.
      * Values are default values.
@@ -110,5 +112,4 @@ class CDatabase_Configuration {
     public function getAutoCommit() {
         return isset($this->_attributes['autoCommit']) ? $this->_attributes['autoCommit'] : true;
     }
-
 }

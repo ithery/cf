@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 3:06:31 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 3:06:31 PM
  */
 trait CTracker_RepositoryManager_AgentTrait {
-
     /**
-     *
      * @var CTracker_Repository_Agent
      */
     protected $agentRepository;
@@ -39,5 +38,4 @@ trait CTracker_RepositoryManager_AgentTrait {
     public function getCurrentUserAgent() {
         return $this->userAgentParser->originalUserAgent;
     }
-
 }

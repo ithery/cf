@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 3:25:25 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 3:25:25 PM
  */
 trait CModel_Validating_ValidatingTrait {
-
     use CModel_Validating_Injector_UniqueInjectorTrait;
 
     /**
@@ -54,7 +54,8 @@ trait CModel_Validating_ValidatingTrait {
     /**
      * Set whether the model should attempt validation on saving.
      *
-     * @param  bool $value
+     * @param bool $value
+     *
      * @return void
      */
     public function setValidating($value) {
@@ -75,8 +76,10 @@ trait CModel_Validating_ValidatingTrait {
      * Set whether the model should raise an exception or
      * return a boolean on a failed validation.
      *
-     * @param  bool $value
+     * @param bool $value
+     *
      * @return void
+     *
      * @throws InvalidArgumentException
      */
     public function setThrowValidationExceptions($value) {
@@ -97,8 +100,10 @@ trait CModel_Validating_ValidatingTrait {
      * Set the model to add unique identifier to rules when performing
      * validation.
      *
-     * @param  bool $value
+     * @param bool $value
+     *
      * @return void
+     *
      * @throws InvalidArgumentException
      */
     public function setInjectUniqueIdentifier($value) {
@@ -174,7 +179,8 @@ trait CModel_Validating_ValidatingTrait {
     /**
      * Set the validating attribute names.
      *
-     * @param  array  $attributeNames
+     * @param array $attributeNames
+     *
      * @return void
      */
     public function setValidationAttributeNames(array $attributeNames = null) {
@@ -212,7 +218,8 @@ trait CModel_Validating_ValidatingTrait {
     /**
      * Set the global validation rules.
      *
-     * @param  array $rules
+     * @param array $rules
+     *
      * @return void
      */
     public function setRules(array $rules = null) {
@@ -222,16 +229,17 @@ trait CModel_Validating_ValidatingTrait {
     /**
      * Get the validation error messages from the model.
      *
-     * @return \Illuminate\Support\MessageBag
+     * @return CBase_MessageBag
      */
     public function getErrors() {
-        return $this->validationErrors ?: new MessageBag;
+        return $this->validationErrors ?: new CBase_MessageBag;
     }
 
     /**
      * Set the error messages.
      *
-     * @param  CValidation_MessageBag $validationErrors
+     * @param CValidation_MessageBag $validationErrors
+     *
      * @return void
      */
     public function setErrors(CValidation_MessageBag $validationErrors) {
@@ -252,6 +260,7 @@ trait CModel_Validating_ValidatingTrait {
      * Returns if the model is valid, otherwise throws an exception.
      *
      * @return bool
+     *
      * @throws \Watson\Validating\ValidationException
      */
     public function isValidOrFail() {
@@ -273,7 +282,8 @@ trait CModel_Validating_ValidatingTrait {
     /**
      * Force the model to be saved without undergoing validation.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return bool
      */
     public function forceSave(array $options = []) {
@@ -288,8 +298,10 @@ trait CModel_Validating_ValidatingTrait {
      * Perform a one-off save that will raise an exception on validation error
      * instead of returning a boolean (which is the default behaviour).
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return bool
+     *
      * @throws \Throwable
      */
     public function saveOrFail(array $options = []) {
@@ -302,8 +314,10 @@ trait CModel_Validating_ValidatingTrait {
     /**
      * Call the parent save or fail method provided by Eloquent.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return bool
+     *
      * @throws \Throwable
      */
     public function parentSaveOrFail($options) {
@@ -314,7 +328,8 @@ trait CModel_Validating_ValidatingTrait {
      * Perform a one-off save that will return a boolean on
      * validation error instead of raising an exception.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return bool
      */
     public function saveOrReturn(array $options = []) {
@@ -327,7 +342,8 @@ trait CModel_Validating_ValidatingTrait {
      * @return CValidation_Factory
      */
     public function getValidator() {
-        return $this->validator ?: CValidation_Factory::instance();;
+        return $this->validator ?: CValidation_Factory::instance();
+        ;
     }
 
     /**
@@ -342,7 +358,8 @@ trait CModel_Validating_ValidatingTrait {
     /**
      * Make a Validator instance for a given ruleset.
      *
-     * @param  array $rules
+     * @param array $rules
+     *
      * @return CValidation_Validator
      */
     protected function makeValidator($rules = []) {
@@ -364,8 +381,10 @@ trait CModel_Validating_ValidatingTrait {
      * or not it passes and setting the error messages on the
      * model if required.
      *
-     * @param  array $rules
+     * @param array $rules
+     *
      * @return bool
+     *
      * @throws CModel_Validating_ValidationException
      */
     protected function performValidation($rules = []) {
@@ -405,7 +424,8 @@ trait CModel_Validating_ValidatingTrait {
      * primary key to the unique rules so that the validation
      * will work as expected.
      *
-     * @param  array $rules
+     * @param array $rules
+     *
      * @return array
      */
     protected function injectUniqueIdentifierToRules(array $rules) {
@@ -419,7 +439,8 @@ trait CModel_Validating_ValidatingTrait {
                     $validationRule = array_shift($parameters);
                     if ($method = $this->getUniqueIdentifierInjectorMethod($validationRule)) {
                         $rule = call_user_func_array(
-                                [$this, $method], [explode(',', carr::head($parameters)), $field]
+                            [$this, $method],
+                            [explode(',', carr::head($parameters)), $field]
                         );
                     }
                 }
@@ -432,7 +453,8 @@ trait CModel_Validating_ValidatingTrait {
      * Get the dynamic method name for a unique identifier injector rule if it
      * exists, otherwise return false.
      *
-     * @param  string $validationRule
+     * @param string $validationRule
+     *
      * @return mixed
      */
     protected function getUniqueIdentifierInjectorMethod($validationRule) {
@@ -449,7 +471,7 @@ trait CModel_Validating_ValidatingTrait {
      */
     public static function validating($callback) {
         $name = static::class;
-        
+
         static::registerModelEvent('validating', $callback);
     }
 
@@ -463,5 +485,4 @@ trait CModel_Validating_ValidatingTrait {
     public static function validated($callback) {
         static::registerModelEvent('validated', $callback);
     }
-
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 11, 2019, 3:52:37 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 11, 2019, 3:52:37 AM
  */
 interface CStorage_FilesystemInterface {
-
     /**
      * The public visibility setting.
      *
@@ -26,7 +26,8 @@ interface CStorage_FilesystemInterface {
     /**
      * Determine if a file exists.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public function exists($path);
@@ -34,7 +35,8 @@ interface CStorage_FilesystemInterface {
     /**
      * Get the contents of a file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
@@ -44,7 +46,8 @@ interface CStorage_FilesystemInterface {
     /**
      * Get a resource to read the file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return resource|null The path resource or null on failure.
      *
      * @throws FileNotFoundException
@@ -54,9 +57,10 @@ interface CStorage_FilesystemInterface {
     /**
      * Write the contents of a file.
      *
-     * @param  string  $path
-     * @param  string|resource  $contents
-     * @param  mixed  $options
+     * @param string          $path
+     * @param string|resource $contents
+     * @param mixed           $options
+     *
      * @return bool
      */
     public function put($path, $contents, $options = []);
@@ -64,9 +68,10 @@ interface CStorage_FilesystemInterface {
     /**
      * Write a new file using a stream.
      *
-     * @param  string  $path
-     * @param  resource $resource
-     * @param  array  $options
+     * @param string   $path
+     * @param resource $resource
+     * @param array    $options
+     *
      * @return bool
      *
      * @throws \InvalidArgumentException If $resource is not a file handle.
@@ -77,7 +82,8 @@ interface CStorage_FilesystemInterface {
     /**
      * Get the visibility for the given path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function getVisibility($path);
@@ -85,8 +91,9 @@ interface CStorage_FilesystemInterface {
     /**
      * Set the visibility for the given path.
      *
-     * @param  string  $path
-     * @param  string  $visibility
+     * @param string $path
+     * @param string $visibility
+     *
      * @return bool
      */
     public function setVisibility($path, $visibility);
@@ -94,8 +101,9 @@ interface CStorage_FilesystemInterface {
     /**
      * Prepend to a file.
      *
-     * @param  string  $path
-     * @param  string  $data
+     * @param string $path
+     * @param string $data
+     *
      * @return bool
      */
     public function prepend($path, $data);
@@ -103,8 +111,9 @@ interface CStorage_FilesystemInterface {
     /**
      * Append to a file.
      *
-     * @param  string  $path
-     * @param  string  $data
+     * @param string $path
+     * @param string $data
+     *
      * @return bool
      */
     public function append($path, $data);
@@ -112,7 +121,8 @@ interface CStorage_FilesystemInterface {
     /**
      * Delete the file at a given path.
      *
-     * @param  string|array  $paths
+     * @param string|array $paths
+     *
      * @return bool
      */
     public function delete($paths);
@@ -120,8 +130,9 @@ interface CStorage_FilesystemInterface {
     /**
      * Copy a file to a new location.
      *
-     * @param  string  $from
-     * @param  string  $to
+     * @param string $from
+     * @param string $to
+     *
      * @return bool
      */
     public function copy($from, $to);
@@ -129,8 +140,9 @@ interface CStorage_FilesystemInterface {
     /**
      * Move a file to a new location.
      *
-     * @param  string  $from
-     * @param  string  $to
+     * @param string $from
+     * @param string $to
+     *
      * @return bool
      */
     public function move($from, $to);
@@ -138,7 +150,8 @@ interface CStorage_FilesystemInterface {
     /**
      * Get the file size of a given file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return int
      */
     public function size($path);
@@ -146,7 +159,8 @@ interface CStorage_FilesystemInterface {
     /**
      * Get the file's last modification time.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return int
      */
     public function lastModified($path);
@@ -154,8 +168,9 @@ interface CStorage_FilesystemInterface {
     /**
      * Get an array of all files in a directory.
      *
-     * @param  string|null  $directory
-     * @param  bool  $recursive
+     * @param string|null $directory
+     * @param bool        $recursive
+     *
      * @return array
      */
     public function files($directory = null, $recursive = false);
@@ -163,7 +178,8 @@ interface CStorage_FilesystemInterface {
     /**
      * Get all of the files from the given directory (recursive).
      *
-     * @param  string|null  $directory
+     * @param string|null $directory
+     *
      * @return array
      */
     public function allFiles($directory = null);
@@ -171,8 +187,9 @@ interface CStorage_FilesystemInterface {
     /**
      * Get all of the directories within a given directory.
      *
-     * @param  string|null  $directory
-     * @param  bool  $recursive
+     * @param string|null $directory
+     * @param bool        $recursive
+     *
      * @return array
      */
     public function directories($directory = null, $recursive = false);
@@ -180,7 +197,8 @@ interface CStorage_FilesystemInterface {
     /**
      * Get all (recursive) of the directories within a given directory.
      *
-     * @param  string|null  $directory
+     * @param string|null $directory
+     *
      * @return array
      */
     public function allDirectories($directory = null);
@@ -188,7 +206,8 @@ interface CStorage_FilesystemInterface {
     /**
      * Create a directory.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public function makeDirectory($path);
@@ -196,7 +215,8 @@ interface CStorage_FilesystemInterface {
     /**
      * Recursively delete a directory.
      *
-     * @param  string  $directory
+     * @param string $directory
+     *
      * @return bool
      */
     public function deleteDirectory($directory);

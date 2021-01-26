@@ -144,7 +144,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * @return string
      */
     protected function compileJoins(CDatabase_Query_Builder $query, $joins) {
-        return CF::collect($joins)->map(function ($join) use ($query) {
+        return c::collect($joins)->map(function ($join) use ($query) {
                     $table = $this->wrapTable($join->table);
 
                     return trim("{$join->type} join {$table} {$this->compileWheres($join)}");
@@ -632,7 +632,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
         // We need to build a list of parameter place-holders of values that are bound
         // to the query. Each insert should have the exact same amount of parameter
         // bindings so we will loop through the record and parameterize them all.
-        $parameters = CF::collect($values)->map(function ($record) {
+        $parameters = c::collect($values)->map(function ($record) {
                     return '(' . $this->parameterize($record) . ')';
                 })->implode(', ');
 

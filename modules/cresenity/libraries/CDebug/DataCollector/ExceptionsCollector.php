@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 5:03:16 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 5:03:16 PM
  */
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
@@ -13,14 +14,14 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
  * Collects info about exceptions
  */
 class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
-
-    protected $exceptions = array();
+    protected $exceptions = [];
     protected $chainExceptions = false;
 
     /**
      * Adds an exception to be profiled in the debug bar
      *
      * @param Exception $e
+     *
      * @deprecated in favor on addThrowable
      */
     public function addException(Exception $e) {
@@ -58,17 +59,19 @@ class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector impl
     }
 
     public function collect() {
-        return array(
+        return [
             'count' => count($this->exceptions),
-            'exceptions' => array_map(array($this, 'formatThrowableData'), $this->exceptions)
-        );
+            'exceptions' => array_map([$this, 'formatThrowableData'], $this->exceptions)
+        ];
     }
 
     /**
      * Returns exception data as an array
      *
      * @param Exception $e
+     *
      * @return array
+     *
      * @deprecated in favor on formatThrowableData
      */
     public function formatExceptionData(Exception $e) {
@@ -79,6 +82,7 @@ class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector impl
      * Returns Throwable data as an array
      *
      * @param \Throwable $e
+     *
      * @return array
      */
     public function formatThrowableData($e) {
@@ -88,9 +92,9 @@ class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector impl
             $start = $e->getLine() - 4;
             $lines = array_slice($lines, $start < 0 ? 0 : $start, 7);
         } else {
-            $lines = array("Cannot open the file ($filePath) in which the exception occurred ");
+            $lines = ["Cannot open the file ($filePath) in which the exception occurred "];
         }
-        return array(
+        return [
             'type' => get_class($e),
             'message' => $e->getMessage(),
             'code' => $e->getCode(),
@@ -98,7 +102,7 @@ class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector impl
             'line' => $e->getLine(),
             'surrounding_lines' => $lines,
             'xdebug_link' => $this->getXdebugLink($filePath, $e->getLine())
-        );
+        ];
     }
 
     /**
@@ -112,18 +116,17 @@ class CDebug_DataCollector_ExceptionsCollector extends CDebug_DataCollector impl
      * @return array
      */
     public function getWidgets() {
-        return array(
-            'exceptions' => array(
+        return [
+            'exceptions' => [
                 'icon' => 'bug',
                 'widget' => 'PhpDebugBar.Widgets.ExceptionsWidget',
                 'map' => 'exceptions.exceptions',
                 'default' => '[]'
-            ),
-            'exceptions:badge' => array(
+            ],
+            'exceptions:badge' => [
                 'map' => 'exceptions.count',
                 'default' => 'null'
-            )
-        );
+            ]
+        ];
     }
-
 }

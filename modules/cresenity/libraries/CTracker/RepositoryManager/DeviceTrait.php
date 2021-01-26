@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 3:37:09 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 3:37:09 AM
  */
 trait CTracker_RepositoryManager_DeviceTrait {
-
     /**
-     *
      * @var CTracker_Repository_Device
      */
     protected $deviceRepository;
@@ -20,7 +19,6 @@ trait CTracker_RepositoryManager_DeviceTrait {
     }
 
     public function findOrCreateDevice($data) {
-
         return $this->deviceRepository->findOrCreate($data, ['kind', 'model', 'platform', 'platform_version']);
     }
 
@@ -28,5 +26,4 @@ trait CTracker_RepositoryManager_DeviceTrait {
         $properties = CTracker::populator()->get('device');
         return $properties;
     }
-
 }

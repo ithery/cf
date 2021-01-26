@@ -1,6 +1,6 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Remote url/file helper.
@@ -8,15 +8,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * $Id: remote.php 3769 2008-12-15 00:48:56Z zombor $
  *
  * @package    Core
+ *
  * @author     Kohana Team
  * @copyright  (c) 2007-2008 Kohana Team
  * @license    http://kohanaphp.com/license.html
  */
 class remote {
-
     public static function status($url) {
-        if (!valid::url($url, 'http'))
-            return FALSE;
+        if (!cvalid::url($url, 'http')) {
+            return false;
+        }
 
         // Get the hostname and path
         $url = parse_url($url);
@@ -29,8 +30,9 @@ class remote {
         // Open a remote connection
         $remote = fsockopen($url['host'], 80, $errno, $errstr, 5);
 
-        if (!is_resource($remote))
-            return FALSE;
+        if (!is_resource($remote)) {
+            return false;
+        }
 
         // Set CRLF
         $CRLF = "\r\n";
@@ -48,7 +50,7 @@ class remote {
             // Get the line
             $line = trim(fgets($remote, 512));
 
-            if ($line !== '' AND preg_match('#^HTTP/1\.[01] (\d{3})#', $line, $matches)) {
+            if ($line !== '' and preg_match('#^HTTP/1\.[01] (\d{3})#', $line, $matches)) {
                 // Response code found
                 $response = (int) $matches[1];
 
@@ -59,9 +61,8 @@ class remote {
         // Close the connection
         fclose($remote);
 
-        return isset($response) ? $response : FALSE;
+        return isset($response) ? $response : false;
     }
-
 }
 
 // End remote

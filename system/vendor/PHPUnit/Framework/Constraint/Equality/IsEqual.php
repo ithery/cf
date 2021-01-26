@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of PHPUnit.
  *
@@ -7,21 +8,23 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
+
+namespace PHPUnit\Framework\Constraint\Equality;
 
 use function is_string;
 use function sprintf;
 use function strpos;
 use function trim;
-use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\Exception\ExpectationFailedException;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Comparator\Factory as ComparatorFactory;
+use PHPUnit\Framework\Constraint\Constraint;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class IsEqual extends Constraint
-{
+final class IsEqual extends Constraint {
+
     /**
      * @var mixed
      */
@@ -42,12 +45,11 @@ final class IsEqual extends Constraint
      */
     private $ignoreCase;
 
-    public function __construct($value, $delta = 0.0, $canonicalize = false, $ignoreCase = false)
-    {
-        $this->value        = $value;
-        $this->delta        = $delta;
+    public function __construct($value, $delta = 0.0, $canonicalize = false, $ignoreCase = false) {
+        $this->value = $value;
+        $this->delta = $delta;
         $this->canonicalize = $canonicalize;
-        $this->ignoreCase   = $ignoreCase;
+        $this->ignoreCase = $ignoreCase;
     }
 
     /**
@@ -64,8 +66,7 @@ final class IsEqual extends Constraint
      *
      * @return bool
      */
-    public function evaluate($other, $description = '', $returnResult = false)
-    {
+    public function evaluate($other, $description = '', $returnResult = false) {
         // If $this->value and $other are identical, they are also equal.
         // This is the most common path and will allow us to skip
         // initialization of all the comparators.
@@ -77,16 +78,11 @@ final class IsEqual extends Constraint
 
         try {
             $comparator = $comparatorFactory->getComparatorFor(
-                $this->value,
-                $other
+                    $this->value, $other
             );
 
             $comparator->assertEquals(
-                $this->value,
-                $other,
-                $this->delta,
-                $this->canonicalize,
-                $this->ignoreCase
+                    $this->value, $other, $this->delta, $this->canonicalize, $this->ignoreCase
             );
         } catch (ComparisonFailure $f) {
             if ($returnResult) {
@@ -94,8 +90,7 @@ final class IsEqual extends Constraint
             }
 
             throw new ExpectationFailedException(
-                trim($description . "\n" . $f->getMessage()),
-                $f
+            trim($description . "\n" . $f->getMessage()), $f
             );
         }
 
@@ -107,8 +102,7 @@ final class IsEqual extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function toString()
-    {
+    public function toString() {
         $delta = '';
 
         if (is_string($this->value)) {
@@ -117,22 +111,19 @@ final class IsEqual extends Constraint
             }
 
             return sprintf(
-                "is equal to '%s'",
-                $this->value
+                    "is equal to '%s'", $this->value
             );
         }
 
         if ($this->delta != 0) {
             $delta = sprintf(
-                ' with delta <%F>',
-                $this->delta
+                    ' with delta <%F>', $this->delta
             );
         }
 
         return sprintf(
-            'is equal to %s%s',
-            $this->exporter()->export($this->value),
-            $delta
+                'is equal to %s%s', $this->exporter()->export($this->value), $delta
         );
     }
+
 }

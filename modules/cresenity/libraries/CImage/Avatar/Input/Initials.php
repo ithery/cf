@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 2:25:18 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 2:25:18 AM
  */
 class CImage_Avatar_Input_Initials {
-
     public $name;
     public $length;
     public $size;
@@ -39,7 +39,7 @@ class CImage_Avatar_Input_Initials {
         $this->name = $this->getRequest('name', 'John Doe');
         $this->size = (int) $this->getRequest('size', 64);
 
-        $this->background = $this->getRequest('background', CColor::fromString($this->name,array('luminosity' => 'dark'))->toHex());
+        $this->background = $this->getRequest('background', CColor::fromString($this->name, ['luminosity' => 'dark'])->toHex());
         $this->color = $this->getRequest('color', '#fff');
         $this->length = (int) $this->getRequest('length', 2);
         $this->fontSize = (double) $this->getRequest('font-size', 0.5);
@@ -113,5 +113,4 @@ class CImage_Avatar_Input_Initials {
     private function getRequest($key, $default = null) {
         return carr::get($this->request, $key, $default);
     }
-
 }

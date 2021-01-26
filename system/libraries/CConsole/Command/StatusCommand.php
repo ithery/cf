@@ -21,7 +21,7 @@ class CConsole_Command_StatusCommand extends CConsole_Command {
        
         $domain = CConsole::domain();
         if($domain==null) {
-            $this->error('Domain not set, please set with php cf domain {domain}');
+            $this->error('Domain not set, please set with php cf domain:switch {domain}');
         }
         
         $this->info('Domain: '.$domain);

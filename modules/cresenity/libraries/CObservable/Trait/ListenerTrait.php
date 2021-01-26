@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 20, 2019, 11:02:05 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 20, 2019, 11:02:05 AM
  */
 trait CObservable_Trait_ListenerTrait {
-
     /**
-     *
      * @var CObservable_Listener[]
      */
     protected $listeners;
@@ -20,8 +19,8 @@ trait CObservable_Trait_ListenerTrait {
     }
 
     /**
-     * 
      * @param string $event
+     *
      * @return CObservable_Listener
      */
     public function addListener($event) {
@@ -55,7 +54,6 @@ trait CObservable_Trait_ListenerTrait {
     }
 
     /**
-     * 
      * @return CObservable_Listener_ClickListener
      */
     public function onClickListener() {
@@ -66,7 +64,6 @@ trait CObservable_Trait_ListenerTrait {
     }
 
     /**
-     * 
      * @return CObservable_Listener_ChangeListener
      */
     public function onChangeListener() {
@@ -77,7 +74,6 @@ trait CObservable_Trait_ListenerTrait {
     }
 
     /**
-     * 
      * @return CObservable_Listener_MouseUpListener
      */
     public function onMouseUpListener() {
@@ -86,9 +82,8 @@ trait CObservable_Trait_ListenerTrait {
         }
         return $this->listeners['mouseUp'];
     }
-    
+
     /**
-     * 
      * @return CObservable_Listener_MouseUpListener
      */
     public function onMouseDownListener() {
@@ -97,5 +92,4 @@ trait CObservable_Trait_ListenerTrait {
         }
         return $this->listeners['mouseDown'];
     }
-
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 30, 2019, 5:39:26 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 30, 2019, 5:39:26 AM
  */
 interface CResources_LoaderInterface {
-
     /**
      * @return string path of current resource
      */

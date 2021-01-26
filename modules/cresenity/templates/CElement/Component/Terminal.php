@@ -27,7 +27,7 @@ if(!isset($ajaxMethod)) {
                 term.echo(response);
             },
             error: function (xhr, status, error) {
-                term.error('[AJAX] ' + status + ' - Server reponse is: \n' + xhr.responseText);
+                term.error('[TERMINAL] ' + status + ' - Server reponse is: \n' + xhr.responseText);
                 term.resume();
             },
             complete: function () {

@@ -1,16 +1,11 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Carbon\Carbon;
 
 class CBackup_HouseKeeping_Strategy_DefaultStrategy extends CBackup_HouseKeeping_AbstractStrategy {
-
-    /** @var \CBackup_Record */
+    /**
+     * @var \CBackup_Record
+     */
     protected $newestBackup;
 
     public function deleteOldBackups(CBackup_RecordCollection $backups) {
@@ -21,8 +16,8 @@ class CBackup_HouseKeeping_Strategy_DefaultStrategy extends CBackup_HouseKeeping
 
         $backupsPerPeriod = $dateRanges->map(function (CBackup_HouseKeeping_Period $period) use ($backups) {
             return $backups->filter(function (CBackup_Record $backup) use ($period) {
-                        return $backup->date()->between($period->startDate(), $period->endDate());
-                    });
+                return $backup->date()->between($period->startDate(), $period->endDate());
+            });
         });
 
         $backupsPerPeriod['daily'] = $this->groupByDateFormat($backupsPerPeriod['daily'], 'Ymd');
@@ -30,8 +25,6 @@ class CBackup_HouseKeeping_Strategy_DefaultStrategy extends CBackup_HouseKeeping
         $backupsPerPeriod['monthly'] = $this->groupByDateFormat($backupsPerPeriod['monthly'], 'Ym');
         $backupsPerPeriod['yearly'] = $this->groupByDateFormat($backupsPerPeriod['yearly'], 'Y');
 
-
-        
         $this->removeBackupsForAllPeriodsExceptOne($backupsPerPeriod);
 
         $this->removeBackupsOlderThan($dateRanges['yearly']->endDate(), $backups);
@@ -40,48 +33,49 @@ class CBackup_HouseKeeping_Strategy_DefaultStrategy extends CBackup_HouseKeeping
     }
 
     /**
-     * 
      * @return CCollection
      */
     protected function calculateDateRanges() {
         $config = CBackup::getConfig('house_keeping.default_strategy');
 
-
-
         $daily = new CBackup_HouseKeeping_Period(
-                Carbon::now()->subDays($config['keep_all_backups_for_days']), Carbon::now()
-                        ->subDays($config['keep_all_backups_for_days'])
-                        ->subDays($config['keep_daily_backups_for_days'])
+            Carbon::now()->subDays($config['keep_all_backups_for_days']),
+            Carbon::now()
+                ->subDays($config['keep_all_backups_for_days'])
+                ->subDays($config['keep_daily_backups_for_days'])
         );
 
         $weekly = new CBackup_HouseKeeping_Period(
-                $daily->endDate(), $daily->endDate()
-                        ->subWeeks($config['keep_weekly_backups_for_weeks'])
+            $daily->endDate(),
+            $daily->endDate()
+                ->subWeeks($config['keep_weekly_backups_for_weeks'])
         );
 
         $monthly = new CBackup_HouseKeeping_Period(
-                $weekly->endDate(), $weekly->endDate()
-                        ->subMonths($config['keep_monthly_backups_for_months'])
+            $weekly->endDate(),
+            $weekly->endDate()
+                ->subMonths($config['keep_monthly_backups_for_months'])
         );
 
         $yearly = new CBackup_HouseKeeping_Period(
-                $monthly->endDate(), $monthly->endDate()
-                        ->subYears($config['keep_yearly_backups_for_years'])
+            $monthly->endDate(),
+            $monthly->endDate()
+                ->subYears($config['keep_yearly_backups_for_years'])
         );
 
         return c::collect(compact('daily', 'weekly', 'monthly', 'yearly'));
     }
 
     /**
-     * 
      * @param CCollection $backups
-     * @param string $dateFormat
+     * @param string      $dateFormat
+     *
      * @return CCollection
      */
     protected function groupByDateFormat(CCollection $backups, $dateFormat) {
         return $backups->groupBy(function (CBackup_Record $backup) use ($dateFormat) {
-                    return $backup->date()->format($dateFormat);
-                });
+            return $backup->date()->format($dateFormat);
+        });
     }
 
     protected function removeBackupsForAllPeriodsExceptOne(CCollection $backupsPerPeriod) {
@@ -116,5 +110,4 @@ class CBackup_HouseKeeping_Strategy_DefaultStrategy extends CBackup_HouseKeeping
 
         $this->removeOldBackupsUntilUsingLessThanMaximumStorage($backups);
     }
-
 }

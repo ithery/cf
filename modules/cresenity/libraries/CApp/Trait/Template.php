@@ -1,32 +1,31 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 10, 2019, 12:34:27 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 10, 2019, 12:34:27 AM
  */
 trait CApp_Trait_Template {
-
     protected $templateName;
     protected $templateData;
     protected $htmlOutput = '';
     protected $jsOutput = '';
     protected $onBeforeParse = null;
-    protected $sections = array();
+    protected $sections = [];
     private $sectionJs = '';
     protected $skeleton = '';
 
     /**
-     *
      * @var array
      */
-    protected $helpers = array();
+    protected $helpers = [];
 
     /**
-     * 
      * @param string $name
+     *
      * @return $this
      */
     public function setTemplate($name) {
@@ -35,8 +34,8 @@ trait CApp_Trait_Template {
     }
 
     /**
-     * 
      * @param string $name
+     *
      * @return $this
      */
     public function setSkeleton($name) {
@@ -50,8 +49,9 @@ trait CApp_Trait_Template {
 
     /**
      * Retrieve section which declared on this template as CApp Element
-     * 
+     *
      * @param string $sectionName
+     *
      * @return CElement_PseudoElement
      */
     public function section($sectionName) {
@@ -100,15 +100,14 @@ trait CApp_Trait_Template {
             $isSkeleton = true;
             $templateName = $this->skeleton;
         }
-        $outputJs = "";
+        $outputJs = '';
         $templateJs = '';
         $viewPath = $this->getTemplatePath($templateName);
         $view = new CTemplate($viewPath);
-        $view->setBlockRoutingCallback(array($this, 'getTemplatePath'));
+        $view->setBlockRoutingCallback([$this, 'getTemplatePath']);
         $helpers = $view->getHelpers();
         if ($isSkeleton) {
             $helpers->set('template', function () use ($templateJs) {
-
                 $result = $this->parseTemplate(true);
                 $html = carr::get($result, 'html');
                 $js = carr::get($result, 'js');
@@ -118,7 +117,6 @@ trait CApp_Trait_Template {
         }
 
         $helpers->set('content', function () {
-
             return $this->htmlChild();
         });
         $helpers->set('htmlContent', function () {
@@ -133,10 +131,13 @@ trait CApp_Trait_Template {
             }
             return $this->js();
         });
+
         $helpers->set('element', function () {
             return $this;
         });
-
+        $helpers->set('component', function ($componentName) {
+            return CApp::component()->getHtml($componentName);
+        });
         $helpers->set('section', function ($sectionName) {
             $section = $this->section($sectionName);
             if ($this instanceof CElement) {
@@ -162,10 +163,10 @@ trait CApp_Trait_Template {
         }
         $outputHtml = preg_replace('#<script>(.*?)</script>#is', '', $output);
 
-        return array(
+        return [
             'html' => $outputHtml,
             'js' => $outputJs,
-        );
+        ];
     }
 
     private function collectHtmlJsOnce() {
@@ -176,10 +177,16 @@ trait CApp_Trait_Template {
     }
 
     protected function collectHtmlJs() {
-
-
-        $resultContent = $this->parseTemplate();
-
+        $obLevel = ob_get_level();
+        $resultContent = '';
+        try {
+            $resultContent = $this->parseTemplate();
+        } catch (Exception $ex) {
+            while (ob_get_level() > $obLevel) {
+                ob_end_clean();
+            }
+            throw $ex;
+        }
 
         $this->htmlOutput = carr::get($resultContent, 'html', '');
         $this->jsOutput = carr::get($resultContent, 'js', '');
@@ -188,7 +195,7 @@ trait CApp_Trait_Template {
         $this->jsOutput .= $this->sectionJs;
         if ($this instanceof CElement) {
             $this->jsOutput .= parent::jsChild();
-        } else if ($this instanceof CRenderable) {
+        } elseif ($this instanceof CRenderable) {
             $this->jsOutput .= parent::js();
         }
         return true;
@@ -208,5 +215,4 @@ trait CApp_Trait_Template {
         $this->collectHtmlJsOnce();
         return $this->jsOutput;
     }
-
 }

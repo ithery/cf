@@ -1,24 +1,24 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 17, 2019, 11:31:24 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 17, 2019, 11:31:24 PM
  */
 abstract class CObservable_ListenerAbstract {
-
     use CObservable_Listener_Trait_HandlerTrait;
 
     protected $owner;
     protected $handlers;
     protected $event;
-    protected $eventParameters = array();
+    protected $eventParameters = [];
 
     public function __construct($owner) {
         $this->owner = $owner;
-        $this->handlers = array();
+        $this->handlers = [];
     }
 
     public function getEvent() {
@@ -47,19 +47,17 @@ abstract class CObservable_ListenerAbstract {
     }
 
     /**
-     * 
      * @param type $param
      */
     public function setHandlerUrlParam($param) {
-
         foreach ($this->handlers as $handler) {
             $handler->setUrlParam($param);
         }
     }
 
     /**
-     * 
      * @param string $handlerName
+     *
      * @return CObservable_Listener_Handler
      */
     public function addHandler($handlerName) {
@@ -107,5 +105,4 @@ abstract class CObservable_ListenerAbstract {
         $this->handlers[] = $handler;
         return $handler;
     }
-
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 28, 2019, 3:10:38 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jul 28, 2019, 3:10:38 AM
  */
 trait CModel_Relation_Trait_AsPivot {
-
     /**
      * The parent model of the relationship.
      *
@@ -33,10 +33,11 @@ trait CModel_Relation_Trait_AsPivot {
     /**
      * Create a new pivot model instance.
      *
-     * @param  CModel  $parent
-     * @param  array   $attributes
-     * @param  string  $table
-     * @param  bool    $exists
+     * @param CModel $parent
+     * @param array  $attributes
+     * @param string $table
+     * @param bool   $exists
+     *
      * @return static
      */
     public static function fromAttributes(CModel $parent, $attributes, $table, $exists = false) {
@@ -46,9 +47,9 @@ trait CModel_Relation_Trait_AsPivot {
         // for the instance. This allows it work for any intermediate tables for the
         // many to many relationship that are defined by this developer's classes.
         $instance->setConnection($parent->getConnectionName())
-                ->setTable($table)
-                ->forceFill($attributes)
-                ->syncOriginal();
+            ->setTable($table)
+            ->forceFill($attributes)
+            ->syncOriginal();
         // We store off the parent instance so we will access the timestamp column names
         // for the model, since the pivot model timestamps aren't easily configurable
         // from the developer's point of view. We can use the parents to get these.
@@ -60,10 +61,11 @@ trait CModel_Relation_Trait_AsPivot {
     /**
      * Create a new pivot model from raw values returned from a query.
      *
-     * @param  CModel  $parent
-     * @param  array   $attributes
-     * @param  string  $table
-     * @param  bool    $exists
+     * @param CModel $parent
+     * @param array  $attributes
+     * @param string $table
+     * @param bool   $exists
+     *
      * @return static
      */
     public static function fromRawAttributes(CModel $parent, $attributes, $table, $exists = false) {
@@ -76,7 +78,8 @@ trait CModel_Relation_Trait_AsPivot {
     /**
      * Set the keys for a save update query.
      *
-     * @param  CModel_Query  $query
+     * @param CModel_Query $query
+     *
      * @return CModel_Query
      */
     protected function setKeysForSaveQuery(CModel_Query $query) {
@@ -84,10 +87,12 @@ trait CModel_Relation_Trait_AsPivot {
             return parent::setKeysForSaveQuery($query);
         }
         $query->where($this->foreignKey, $this->getOriginal(
-                        $this->foreignKey, $this->getAttribute($this->foreignKey)
+            $this->foreignKey,
+            $this->getAttribute($this->foreignKey)
         ));
         return $query->where($this->relatedKey, $this->getOriginal(
-                                $this->relatedKey, $this->getAttribute($this->relatedKey)
+            $this->relatedKey,
+            $this->getAttribute($this->relatedKey)
         ));
     }
 
@@ -104,7 +109,7 @@ trait CModel_Relation_Trait_AsPivot {
             return 0;
         }
         $this->touchOwners();
-        return tap($this->getDeleteQuery()->delete(), function () {
+        return c::tap($this->getDeleteQuery()->delete(), function () {
             $this->fireModelEvent('deleted', false);
         });
     }
@@ -116,8 +121,8 @@ trait CModel_Relation_Trait_AsPivot {
      */
     protected function getDeleteQuery() {
         return $this->newQueryWithoutRelationships()->where([
-                    $this->foreignKey => $this->getOriginal($this->foreignKey, $this->getAttribute($this->foreignKey)),
-                    $this->relatedKey => $this->getOriginal($this->relatedKey, $this->getAttribute($this->relatedKey)),
+            $this->foreignKey => $this->getOriginal($this->foreignKey, $this->getAttribute($this->foreignKey)),
+            $this->relatedKey => $this->getOriginal($this->relatedKey, $this->getAttribute($this->relatedKey)),
         ]);
     }
 
@@ -129,7 +134,9 @@ trait CModel_Relation_Trait_AsPivot {
     public function getTable() {
         if (!isset($this->table)) {
             $this->setTable(str_replace(
-                            '\\', '', Str::snake(Str::singular(class_basename($this)))
+                '\\',
+                '',
+                cstr::snake(cstr::singular(c::classBasename($this)))
             ));
         }
         return $this->table;
@@ -165,8 +172,9 @@ trait CModel_Relation_Trait_AsPivot {
     /**
      * Set the key names for the pivot model instance.
      *
-     * @param  string  $foreignKey
-     * @param  string  $relatedKey
+     * @param string $foreignKey
+     * @param string $relatedKey
+     *
      * @return $this
      */
     public function setPivotKeys($foreignKey, $relatedKey) {
@@ -179,6 +187,7 @@ trait CModel_Relation_Trait_AsPivot {
      * Determine if the pivot model or given attributes has timestamp attributes.
      *
      * @param  $attributes  array|null
+     *
      * @return bool
      */
     public function hasTimestampAttributes($attributes = null) {
@@ -213,37 +222,43 @@ trait CModel_Relation_Trait_AsPivot {
             return $this->getKey();
         }
         return sprintf(
-                '%s:%s:%s:%s', $this->foreignKey, $this->getAttribute($this->foreignKey), $this->relatedKey, $this->getAttribute($this->relatedKey)
+            '%s:%s:%s:%s',
+            $this->foreignKey,
+            $this->getAttribute($this->foreignKey),
+            $this->relatedKey,
+            $this->getAttribute($this->relatedKey)
         );
     }
 
     /**
      * Get a new query to restore one or more models by their queueable IDs.
      *
-     * @param  int[]|string[]|string  $ids
+     * @param int[]|string[]|string $ids
+     *
      * @return CModel_Query
      */
     public function newQueryForRestoration($ids) {
         if (is_array($ids)) {
             return $this->newQueryForCollectionRestoration($ids);
         }
-        if (!Str::contains($ids, ':')) {
+        if (!cstr::contains($ids, ':')) {
             return parent::newQueryForRestoration($ids);
         }
         $segments = explode(':', $ids);
         return $this->newQueryWithoutScopes()
-                        ->where($segments[0], $segments[1])
-                        ->where($segments[2], $segments[3]);
+            ->where($segments[0], $segments[1])
+            ->where($segments[2], $segments[3]);
     }
 
     /**
      * Get a new query to restore multiple models by their queueable IDs.
      *
-     * @param  int[]|string[]  $ids
+     * @param int[]|string[] $ids
+     *
      * @return CModel_Query
      */
     protected function newQueryForCollectionRestoration(array $ids) {
-        if (!Str::contains($ids[0], ':')) {
+        if (!cstr::contains($ids[0], ':')) {
             return parent::newQueryForRestoration($ids);
         }
         $query = $this->newQueryWithoutScopes();
@@ -251,10 +266,9 @@ trait CModel_Relation_Trait_AsPivot {
             $segments = explode(':', $id);
             $query->orWhere(function ($query) use ($segments) {
                 return $query->where($segments[0], $segments[1])
-                                ->where($segments[2], $segments[3]);
+                    ->where($segments[2], $segments[3]);
             });
         }
         return $query;
     }
-
 }

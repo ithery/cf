@@ -7,7 +7,10 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since Oct 30, 2020 
  * @license Ittron Global Teknologi
  */
-
 class CApp_Element extends CObservable {
-    
+
+    public function __construct($id = "") {
+        parent::__construct($id);
+    }
+
 }

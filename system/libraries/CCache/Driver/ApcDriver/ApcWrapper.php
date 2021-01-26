@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 5:10:02 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 5:10:02 AM
  */
 class CCache_Driver_ApcDriver_ApcWrapper {
-
     /**
      * Indicates if APCu is supported.
      *
@@ -28,7 +28,8 @@ class CCache_Driver_ApcDriver_ApcWrapper {
     /**
      * Get an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function get($key) {
@@ -38,9 +39,10 @@ class CCache_Driver_ApcDriver_ApcWrapper {
     /**
      * Store an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  int     $seconds
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
      * @return array|bool
      */
     public function put($key, $value, $seconds) {
@@ -50,8 +52,9 @@ class CCache_Driver_ApcDriver_ApcWrapper {
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int|bool
      */
     public function increment($key, $value) {
@@ -61,8 +64,9 @@ class CCache_Driver_ApcDriver_ApcWrapper {
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int|bool
      */
     public function decrement($key, $value) {
@@ -72,7 +76,8 @@ class CCache_Driver_ApcDriver_ApcWrapper {
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function delete($key) {
@@ -87,5 +92,4 @@ class CCache_Driver_ApcDriver_ApcWrapper {
     public function flush() {
         return $this->apcu ? apcu_clear_cache() : apc_clear_cache('user');
     }
-
 }

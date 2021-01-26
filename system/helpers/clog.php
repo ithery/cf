@@ -1,7 +1,7 @@
 <?php
-
+//@codingStandardsIgnoreStart
 class clog {
-
+    //@codingStandardsIgnoreEnd
     public static function login($user_id) {
         $app = CApp::instance();
         $app_id = $app->app_id();
@@ -17,7 +17,7 @@ class clog {
         $data = array(
             "login_date" => date("Y-m-d H:i:s"),
             "org_id" => $org_id,
-            "user_agent" => CF::user_agent(),
+            "user_agent" => CF::userAgent(),
             "browser" => $browser,
             "browser_version" => $browser_version,
             "platform" => $platform,
@@ -43,7 +43,7 @@ class clog {
         $data = array(
             "login_fail_date" => date("Y-m-d H:i:s"),
             "org_id" => null,
-            "user_agent" => CF::user_agent(),
+            "user_agent" => CF::userAgent(),
             "username" => $username,
             "password" => $password,
             "error_message" => $error_message,
@@ -76,7 +76,7 @@ class clog {
             "print_date" => date("Y-m-d H:i:s"),
             "org_id" => $org_id,
             "session_id" => CSession::instance()->id(),
-            "user_agent" => CF::user_agent(),
+            "user_agent" => CF::userAgent(),
             "browser" => $browser,
             "browser_version" => $browser_version,
             "platform" => $platform,
@@ -156,7 +156,7 @@ class clog {
             "activity_date" => date("Y-m-d H:i:s"),
             "org_id" => $org_id,
             "session_id" => CSession::instance()->id(),
-            "user_agent" => CF::user_agent(),
+            "user_agent" => CF::userAgent(),
             "browser" => $browser,
             "browser_version" => $browser_version,
             "platform" => $platform,
@@ -245,14 +245,14 @@ class clog {
 
     /**
      * This function is used for log for any statement. <br/>
-     * Here is inline an example: 
+     * Here is inline an example:
      * <pre>
      *  <code>
      *      <?php clog::write('Test');?>
      *  </code>
      * </pre>
-     * 
-     * @param array/string $options     
+     *
+     * @param array/string $options
      * @return boolean
      */
     public static function write($options) {
@@ -272,7 +272,7 @@ class clog {
               $clogger_instance->set_level($level);
               if (strlen($path) > 0)
               $clogger_instance->set_additional_path($path);
-             * 
+             *
              */
             $param['path'] = $path;
         }

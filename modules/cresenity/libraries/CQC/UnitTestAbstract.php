@@ -11,6 +11,8 @@ use \PHPUnit\Framework\TestCase;
 
 abstract class CQC_UnitTestAbstract extends TestCase {
 
+    
+    use CQC_UnitTest_Trait_HttpRequestTrait;
     /**
      *
      * @var CQC_UnitTest_AssertResultCollection

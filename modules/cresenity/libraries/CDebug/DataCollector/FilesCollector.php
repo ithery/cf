@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 4:18:26 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 4:18:26 PM
  */
 class CDebug_DataCollector_FilesCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
-
     const BASE_PATH = DOCROOT;
 
     /**
@@ -20,7 +20,6 @@ class CDebug_DataCollector_FilesCollector extends CDebug_DataCollector implement
         $included = [];
 
         foreach ($files as $file) {
-
             $included[] = [
                 'message' => "'" . $this->stripBasePath($file) . "',",
                 // Use PHP syntax so we can copy-paste to compile config file.
@@ -29,7 +28,7 @@ class CDebug_DataCollector_FilesCollector extends CDebug_DataCollector implement
         }
         // First the included files, then those that are going to be compiled.
         $messages = $included;
-       
+
         return [
             'messages' => $messages,
             'count' => count($included),
@@ -49,6 +48,7 @@ class CDebug_DataCollector_FilesCollector extends CDebug_DataCollector implement
      * Remove the basePath from the paths, so they are relative to the base
      *
      * @param $path
+     *
      * @return string
      */
     protected function stripBasePath($path) {
@@ -62,14 +62,14 @@ class CDebug_DataCollector_FilesCollector extends CDebug_DataCollector implement
         $name = $this->getName();
         return [
             "$name" => [
-                "icon" => "files-o",
-                "widget" => "PhpDebugBar.Widgets.MessagesWidget",
-                "map" => "$name.messages",
-                "default" => "{}"
+                'icon' => 'files-o',
+                'widget' => 'PhpDebugBar.Widgets.MessagesWidget',
+                'map' => "$name.messages",
+                'default' => '{}'
             ],
             "$name:badge" => [
-                "map" => "$name.count",
-                "default" => "null"
+                'map' => "$name.count",
+                'default' => 'null'
             ]
         ];
     }
@@ -80,5 +80,4 @@ class CDebug_DataCollector_FilesCollector extends CDebug_DataCollector implement
     public function getName() {
         return 'files';
     }
-
 }

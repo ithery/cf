@@ -1,48 +1,74 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-class CApp extends CObservable {
-
+/**
+ * @mixin CElement
+ *
+ * @method CElement_Component_Form addForm($id=null)
+ */
+class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
     use CTrait_Compat_App,
+        CTrait_Macroable,
+        CTrait_RequestInfoTrait,
+        CApp_Concern_Navigation,
+        CApp_Concern_ManageStackTrait,
         CApp_Trait_App_Breadcrumb,
+        CApp_Trait_App_Variables,
+        CApp_Trait_App_View,
         CApp_Trait_App_Renderer,
         CApp_Trait_App_Auth,
+        CApp_Trait_App_Bootstrap,
         CApp_Trait_App_Title;
 
-    private $content = "";
-    private $js = "";
-    private $custom_js = "";
-    private $custom_header = "";
-    private $custom_footer = "";
-    private $custom_data = array();
-    private $signup = false;
-    private $activation = false;
-    private $resend = false;
-    private $_store = null;
-    private $_org = null;
-    private $_admin = null;
-    private $_member = null;
-    public static $_instance = null;
-    protected $rendered = false;
-    private $header_body = '';
-    private $additional_head = '';
-    private $ajaxData = array();
-    private $renderMessage = true;
-    private $keepMessage = false;
-    private $viewName = 'cpage';
-    private $viewLoginName = 'ccore/login';
-    protected static $viewCallback;
-    protected $renderer;
-    protected $element;
+    private $content = '';
 
-    public function setViewCallback(callable $viewCallback) {
-        self::$viewCallback = $viewCallback;
-    }
+    private $js = '';
+
+    private $custom_js = '';
+
+    private $custom_header = '';
+
+    private $custom_footer = '';
+
+    private $custom_data = [];
+
+    private $signup = false;
+
+    private $activation = false;
+
+    private $resend = false;
+
+    private $org = null;
+
+    public static $instance = null;
+
+    private $header_body = '';
+
+    private $additional_head = '';
+
+    private $ajaxData = [];
+
+    private $renderMessage = true;
+
+    private $keepMessage = false;
+
+    private $useRequireJs = false;
+
+    private static $haveScrollToTop = null;
+
+    protected $renderer;
+
+    private static $renderingElement;
 
     /**
-     * 
+     * @var CApp_Element
+     */
+    protected $element;
+
+    /**
      * @param string $domain
+     *
      * @return CApp_Navigation
      */
     public static function navigation($domain = null) {
@@ -50,8 +76,8 @@ class CApp extends CObservable {
     }
 
     /**
-     * 
      * @param string $domain
+     *
      * @return CApp_Api
      */
     public static function api($domain = null) {
@@ -59,7 +85,6 @@ class CApp extends CObservable {
     }
 
     /**
-     * 
      * @return CApp_SEO
      */
     public static function seo() {
@@ -67,17 +92,18 @@ class CApp extends CObservable {
     }
 
     /**
-     * 
      * @param string $domain
+     * @param mixed  $options
+     *
      * @return CApp_Remote
      */
-    public static function remote($domain = null, $options = array()) {
+    public static function remote($domain = null, $options = []) {
         return CApp_Remote::instance($domain, $options);
     }
 
     /**
-     * 
      * @param string $modelName
+     *
      * @return CApp_Model
      */
     public static function model($modelName) {
@@ -86,8 +112,8 @@ class CApp extends CObservable {
     }
 
     /**
-     * 
      * @param string $domain
+     *
      * @return CApp_Navigation
      */
     public static function nav($domain = null) {
@@ -95,11 +121,14 @@ class CApp extends CObservable {
     }
 
     public static function isAjax() {
-        return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
+        return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
+    }
+
+    public static function auth() {
+        return CApp_Auth::instance();
     }
 
     /**
-     * 
      * @return CApp_Temp
      */
     public static function temp() {
@@ -107,19 +136,24 @@ class CApp extends CObservable {
     }
 
     /**
-     * 
      * @return CApp_Data
      */
     public static function data() {
         return new CApp_Data();
     }
 
-    public static function getTranslation($message, $params = array(), $lang = null) {
-        return CApp_Lang::__($message, $params, $lang);
+    public static function getTranslation($message, $params = [], $lang = null) {
+        return CF::lang($message, $params, $lang);
+    }
+
+    public static function component() {
+        return CComponent_Manager::instance();
     }
 
     /**
-     * 
+     * @param null|mixed $domain
+     * @param null|mixed $dbName
+     *
      * @return CDatabase
      */
     public static function db($domain = null, $dbName = null) {
@@ -143,56 +177,44 @@ class CApp extends CObservable {
         $this->keepMessage = $bool;
     }
 
+    /**
+     * Get Translator instance
+     *
+     * @return CTranslation_Translator
+     */
     public function translator() {
-        return new CApp_Translation_Translator(new CApp_Translation_Loader_ArrayLoader(), 'en');
+        return CTranslation::translator();
     }
 
     public function validate(array $data, array $rules, array $messages = [], array $customAttributes = []) {
-        $translator = $this->translator();
-        $validation = new CApp_Validation($translator);
+        $validation = CValidation::factory();
         return $validation->validate($data, $rules, $messages, $customAttributes);
     }
 
     public function __construct($domain = null) {
+        $this->element = new CApp_Element();
 
-        parent::__construct();
+        $this->org = corg::get(CF::orgCode());
 
-
-        $this->_org = corg::get(CF::orgCode());
-
-
-        //$this->renderer = new CApp_Renderer($this);
-
-        if (isset($_COOKIE['capp-profiler'])) {
-            new Profiler();
-        }
-
-        $db = CDatabase::instance();
-
-        if (isset($_COOKIE['capp-debugbar'])) {
-            CDebug::bar()->enable();
-        }
         //we load another configuration for this app
         //org configuration
         if (strlen(CF::orgCode()) > 0) {
-            $orgBootFile = DOCROOT . "application" . DS . $this->code() . DS . CF::orgCode() . DS . CF::orgCode() . EXT;
+            $orgBootFile = DOCROOT . 'application' . DS . $this->code() . DS . CF::orgCode() . DS . CF::orgCode() . EXT;
             if (file_exists($orgBootFile)) {
-                include($orgBootFile);
+                include $orgBootFile;
             }
         }
 
-
-        $appBootFile = DOCROOT . "application" . DS . $this->code() . DS . $this->code() . EXT;
+        $appBootFile = DOCROOT . 'application' . DS . $this->code() . DS . $this->code() . EXT;
 
         if (file_exists($appBootFile)) {
-            include($appBootFile);
+            include $appBootFile;
         }
-
 
         $org = $this->org();
 
-        if (ccfg::get("set_timezone")) {
-            $timezone = ccfg::get("default_timezone");
+        if (ccfg::get('set_timezone')) {
+            $timezone = ccfg::get('default_timezone');
             if ($org != null) {
                 //$timezone = $org->timezone;
             }
@@ -200,17 +222,16 @@ class CApp extends CObservable {
             date_default_timezone_set($timezone);
         }
 
-        $this->id = "capp";
+        $this->id = 'capp';
         //check login
 
-
-        if (ccfg::get("update_last_request")) {
+        if (ccfg::get('update_last_request')) {
             $user = $this->user();
             if ($user != null) {
-                if (!is_array($user)) {
+                if (!is_array($user) && is_object($user)) {
                     //update last request
                     $db = $this->db();
-                    $db->update("users", array("last_request" => date("Y-m-d H:i:s")), array("user_id" => $user->user_id));
+                    $db->update('users', ['last_request' => date('Y-m-d H:i:s')], ['user_id' => $user->user_id]);
                 }
             }
         }
@@ -237,25 +258,25 @@ class CApp extends CObservable {
     }
 
     public function controller() {
-        return CF::instance();
+        return CHTTP::kernel()->controller();
     }
 
     public static function config($path, $domain = null) {
         return CApp_Config::get($path, $domain);
     }
 
-    public function set_header_body($header_body) {
-        $this->header_body = $header_body;
-        return $this;
-    }
-
-    public function isAdmin() {
-        return $this->appId() == 0;
+    /**
+     * @deprecated
+     *
+     * @return bool
+     */
+    public static function isAdmin() {
+        return static::isAdministrator();
     }
 
     /**
-     * 
-     * @param boolean $install
+     * @param bool $install
+     *
      * @return CApp
      */
     public static function factory($install = false) {
@@ -264,21 +285,21 @@ class CApp extends CObservable {
     }
 
     /**
-     * 
-     * @param boolean $install
+     * @param null|string $domain
+     *
      * @return CApp
      */
     public static function instance($domain = null) {
         if ($domain == null) {
             $domain = CF::domain();
         }
-        if (self::$_instance == null) {
-            self::$_instance = array();
+        if (self::$instance == null) {
+            self::$instance = [];
         }
-        if (!isset(self::$_instance[$domain])) {
-            self::$_instance[$domain] = new CApp($domain);
+        if (!isset(self::$instance[$domain])) {
+            self::$instance[$domain] = new CApp($domain);
         }
-        return self::$_instance[$domain];
+        return self::$instance[$domain];
     }
 
     public function signup($bool = true) {
@@ -299,10 +320,6 @@ class CApp extends CObservable {
     public function addCustomJs($js) {
         $this->custom_js .= $js;
         return $this;
-    }
-
-    public function set_view_html() {
-        
     }
 
     public function registerCoreModules() {
@@ -338,173 +355,59 @@ class CApp extends CObservable {
         $manager->registerThemeModule('block-ui');
     }
 
-    public function set_additional_head($str) {
-        $this->additional_head = $str;
-    }
-
-    public function rendered() {
-        return $this->rendered;
-    }
-
     public function reset() {
         $this->rendered = false;
-        $this->renderable = new CCollection();
+        $this->element->clear();
         return $this;
     }
 
-    public function render() {
-
-        if ($this->rendered) {
-            throw new CException('CApp already Rendered' . cdbg::getTraceString());
-        }
-        $this->rendered = true;
-
-        $this->registerCoreModules();
-
-
-        CFEvent::run('CApp.beforeRender');
-
-        if (crequest::is_ajax()) {
-            return $this->json();
-        }
-        $v = null;
-
-        $viewName = $this->viewName;
-        if (ccfg::get("install")) {
-            $viewName = 'cinstall/page';
-        } else if ($this->signup) {
-            $viewName = 'ccore/signup';
-        } else if ($this->resend) {
-            $viewName = 'ccore/resend_activation';
-        } else if ($this->activation) {
-            $viewName = 'ccore/activation';
-        } else if (!$this->isUserLogin() && $this->config("have_user_login") && $this->loginRequired) {
-            $viewName = $this->viewLoginName;
-        } else if (!$this->isUserLogin() && $this->config("have_static_login") && $this->loginRequired) {
-            $viewName = 'ccore/static_login';
-        }
-
-        if (self::$viewCallback != null && is_callable(self::$viewCallback)) {
-            $viewName = self::$viewCallback($viewName);
-        }
-
-        $themePath = CManager::theme()->getThemePath();
-
-        if (CView::exists($themePath . $viewName)) {
-            $v = CView::factory($themePath . $viewName);
-        }
-        if ($v == null) {
-            if (!CView::exists($viewName)) {
-                throw new CApp_Exception('view :viewName not exists', array(':viewName' => $viewName));
-            }
-            $v = CView::factory($viewName);
-        }
-
-
-        $viewData = $this->getViewData();
-        $v->set($viewData);
-
-
-
-        return $v->render();
+    /**
+     * Alias of setCustomData
+     *
+     * @param string $key
+     * @param string $value
+     *
+     * @return CApp
+     */
+    public function addCustomData($key, $value) {
+        return $this->setCustomData($key, $value);
     }
 
-    public function addCustomData($key, $value) {
+    public function setCustomData($key, $value = null) {
+        if (is_array($key)) {
+            $this->custom_data = $key;
+            return $this;
+        }
         if (!is_array($this->custom_data)) {
-            $this->custom_data = array();
+            $this->custom_data = [];
         }
         $this->custom_data[$key] = $value;
         return $this;
     }
 
-    public function setCustomData($data) {
-        $this->custom_data = $data;
-        return $this;
-    }
-
-    public function get_all_js() {
-        $cs = CClientScript::instance();
-        $this->js = parent::js();
-        $additional_js = '';
-        $js = "";
-        $vjs = CView::factory('ccore/js');
-        $js .= PHP_EOL . $vjs->render();
-
-        $js .= PHP_EOL . $this->js . $additional_js;
-
-        $js = $cs->renderJsRequire($js);
-
-        if (ccfg::get("minify_js")) {
-            $js = CJSMin::minify($js);
+    public function getCustomData($key = null, $default = null) {
+        if ($key === null) {
+            return $this->custom_data;
         }
-
-        return $js;
-    }
-
-    public function admin() {
-        if ($this->_admin == null) {
-            $session = CSession::instance();
-            $admin = $session->get("admin");
-            if (!$admin)
-                $admin = null;
-            $this->_admin = $admin;
-        }
-        return $this->_admin;
-    }
-
-    public function member() {
-        if ($this->_member = null) {
-            $session = CSession::instance();
-            $member = $session->get("member");
-            if (!$member)
-                $member = null;
-            $this->_member = $member;
-        }
-        return $this->_member;
+        return carr::get($this->custom_data, $key, $default);
     }
 
     public function org() {
-
-        if ($this->_org == null) {
+        if ($this->org == null) {
             $role = $this->role();
             if ($role != null) {
-                $this->_org = corg::get($role->org_id);
+                $this->org = corg::get($role->org_id);
             }
         }
-        return $this->_org;
+        return $this->org;
     }
 
     public function orgId() {
         $org = $this->org();
-        if ($org == null)
+        if ($org == null) {
             return null;
-        return $org->org_id;
-    }
-
-    public function is_admin_login() {
-        return $this->admin() != null;
-    }
-
-    public function is_member_login() {
-        return $this->member() != null;
-    }
-
-    public function store() {
-        if ($this->_store == null) {
-            $store_id = CF::store_id();
-
-            if ($store_id != "") {
-                $this->_store = cstore::get(CF::orgCode(), CF::store_code());
-            }
         }
-        return $this->_store;
-    }
-
-    public function store_id() {
-        $store = $this->store();
-        if ($store == null)
-            return null;
-        return $store->store_id;
+        return $org->org_id;
     }
 
     public function getRoleChildList($roleId = null, $orgId = null, $type = null) {
@@ -516,13 +419,12 @@ class CApp extends CObservable {
         }
 
         $nodes = self::model('Roles')->getDescendantsTree($roleId, $orgId, $type);
-        $childList = array();
+        $childList = [];
 
         $traverse = function ($childs) use (&$traverse, &$childList) {
             foreach ($childs as $child) {
-
                 $depth = carr::get($child, 'depth');
-                $childList[$child["role_id"]] = cutils::indent($depth, "&nbsp;&nbsp;") . $child["name"];
+                $childList[$child['role_id']] = cutils::indent($depth, '&nbsp;&nbsp;') . $child['name'];
                 $traverse($child->getChildren);
             }
         };
@@ -532,110 +434,9 @@ class CApp extends CObservable {
         return $childList;
     }
 
-    public static function exceptionHandler($exception, $message = NULL, $file = NULL, $line = NULL) {
-
-
-        if ($exception instanceof \Pheanstalk\Exception\ServerException) {
-            return;
-        }
-        try {
-            $app = CApp::instance();
-            $org = $app->org();
-
-            // PHP errors have 5 args, always
-            $PHP_ERROR = (func_num_args() === 5);
-
-            // Test to see if errors should be displayed
-            if ($PHP_ERROR AND ( error_reporting() & $exception) === 0)
-                return;
-
-            // Error handling will use exactly 5 args, every time
-            if ($PHP_ERROR) {
-                $code = $exception;
-                $type = 'PHP Error';
-            } else {
-                $code = $exception->getCode();
-                $type = get_class($exception);
-                $message = $exception->getMessage();
-                $file = $exception->getFile();
-                $line = $exception->getLine();
-            }
-
-            if (is_numeric($code)) {
-                $codes = CF::lang('errors');
-
-                if (!empty($codes[$code])) {
-                    list($level, $error, $description) = $codes[$code];
-                } else {
-                    $level = 1;
-                    $error = $PHP_ERROR ? 'Unknown Error' : get_class($exception);
-                    $description = '';
-                }
-            } else {
-                // Custom error message, this will never be logged
-                $level = 5;
-                $error = $code;
-                $description = '';
-            }
-
-            // Remove the DOCROOT from the path, as a security precaution
-            $file = str_replace('\\', '/', realpath($file));
-            $file = preg_replace('|^' . preg_quote(DOCROOT) . '|', '', $file);
-
-
-            if ($PHP_ERROR) {
-                $description = CF::lang('errors.' . E_RECOVERABLE_ERROR);
-                $description = is_array($description) ? $description[2] : '';
-            }
-
-
-            // Test if display_errors is on
-            $trace = false;
-            $traceArray = false;
-            if ($line != FALSE) {
-                // Remove the first entry of debug_backtrace(), it is the exception_handler call
-                $traceArray = $PHP_ERROR ? array_slice(debug_backtrace(), 1) : $exception->getTrace();
-
-                // Beautify backtrace
-                $trace = CF::backtrace($traceArray);
-            }
-
-            if (!($exception instanceof CF_404_Exception)) {
-                $v = CView::factory('cmail/error_mail');
-                $v->error = $error;
-                $v->description = $description;
-                $v->file = $file;
-                $v->line = $line;
-                $v->trace = $trace;
-                $v->message = $message;
-                $html = $v->render();
-                $configCollector = CConfig::instance('collector');
-                if ($configCollector->get('exception')) {
-                    if ($PHP_ERROR) {
-                        CCollector::error($exception, $message, $file, $line, '');
-                    } else {
-                        CCollector::exception($exception);
-                    }
-                } else {
-                    cmail::error_mail($html);
-                }
-            }
-
-
-            if ($PHP_ERROR) {
-                CF::exception_handler($exception, $message, $file, $line, '');
-            } else {
-                CF::exception_handler($exception, $message, $file, $line);
-            }
-        } catch (Exception $e) {
-            CF::exception_handler($exception, $message, $file, $line);
-        }
-    }
-
-    //override function json
-    public function json() {
-        $data = array();
-        $data["title"] = $this->title;
+    public function toArray() {
+        $data = [];
+        $data['title'] = $this->title;
         $message = '';
         $messageOrig = '';
         if (!$this->keepMessage) {
@@ -644,36 +445,43 @@ class CApp extends CObservable {
                 $message = $messageOrig;
             }
         }
-        $data["html"] = $message . $this->html();
+        $data['html'] = $message . $this->html();
         $asset = CManager::asset();
         $js = $this->js();
 
-        if ($asset->isUseRequireJs()) {
-            $js = $asset->renderJsRequire($js);
-        } else {
-            $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
-        }
-        if (ccfg::get("minify_js")) {
-            $js = CJSMin::minify($js);
-        }
-        $data["js"] = cbase64::encode($js);
-        $data["css_require"] = $asset->getAllCssFileUrl();
-        $data["message"] = $messageOrig;
-        $data["ajaxData"] = $this->ajaxData;
+        $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
+        $data['js'] = base64_encode($js);
+        $data['css_require'] = $asset->getAllCssFileUrl();
+        $data['message'] = $messageOrig;
+        $data['ajaxData'] = $this->ajaxData;
         $data['html'] = mb_convert_encoding($data['html'], 'UTF-8', 'UTF-8');
-        return cjson::encode($data);
-    }
-
-    public function setViewName($viewName) {
-        $this->viewName = $viewName;
-    }
-
-    public function setViewLoginName($viewLoginName) {
-        $this->viewLoginName = $viewLoginName;
+        return $data;
     }
 
     /**
-     * 
+     * Get the collection of items as JSON.
+     *
+     * @param int $options
+     *
+     * @return string
+     */
+    public function toJson($options = 0) {
+        $data = $this->toArray();
+        return json_encode($data, $options);
+    }
+
+    /**
+     * Alias of toJson
+     *
+     * @param int $options
+     *
+     * @return string
+     */
+    public function json($options = 0) {
+        return $this->toJson($options);
+    }
+
+    /**
      * @return void
      */
     public function __destruct() {
@@ -682,13 +490,59 @@ class CApp extends CObservable {
         }
     }
 
-    public static function sendExceptionEmail($email, Exception $exception) {
-
-
-        if (!($exception instanceof CF_404_Exception)) {
-
-            $html = CApp_ErrorHandler::sendExceptionEmail($email, $exception);
+    public static function sendExceptionEmail(Exception $exception, $email = null) {
+        if (!($exception instanceof CHTTP_Exception_NotFoundHttpException)) {
+            $html = CApp_ErrorHandler::sendExceptionEmail($exception, $email);
         }
     }
 
+    public function __call($method, $parameters) {
+        if (method_exists($this->element, $method)) {
+            return call_user_func_array([$this->element, $method], $parameters);
+        }
+        if ($this->element->hasMacro($method)) {
+            return call_user_func_array([$this->element, $method], $parameters);
+        }
+
+        throw new Exception('undefined method on CApp: ' . $method);
+    }
+
+    /**
+     * @param CHTTP_Request $request
+     *
+     * @return CHTTP_Response
+     */
+    public function toResponse($request) {
+        if (c::request()->ajax()) {
+            return c::response()->json($this);
+        }
+        return CHTTP::createResponse($this->render());
+    }
+
+    public static function isAdministrator() {
+        return carr::first(explode('/', trim(CFRouter::getUri(), '/'))) == 'administrator';
+    }
+
+    public static function setTheme($theme) {
+        CManager::theme()->setTheme($theme);
+    }
+
+    public static function renderingElement() {
+        return static::$renderingElement;
+    }
+
+    public static function setRenderingElement($element) {
+        static::$renderingElement = $element;
+    }
+
+    public static function setHaveScrollToTop($bool = true) {
+        static::$haveScrollToTop = $bool;
+    }
+
+    public static function haveScrollToTop() {
+        if (static::$haveScrollToTop === null) {
+            static::$haveScrollToTop = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
+        }
+        return static::$haveScrollToTop;
+    }
 }

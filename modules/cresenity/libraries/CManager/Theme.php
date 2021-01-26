@@ -6,13 +6,12 @@
  * @author Hery
  */
 class CManager_Theme {
-
     /**
-     *
      * @var callable
      */
     protected static $themeCallback;
-    protected static $themeData = array();
+    protected static $themeData = [];
+    protected static $theme = null;
 
     public static function setThemeCallback(callable $themeCallback) {
         self::$themeCallback = $themeCallback;
@@ -27,7 +26,7 @@ class CManager_Theme {
     }
 
     public static function getCurrentTheme() {
-        $theme = CSession::instance()->get('theme');
+        $theme = CSession::instance()->get('theme', static::$theme);
         if ($theme == null) {
             $theme = self::getDefaultTheme();
             if ($theme == null) {
@@ -42,6 +41,7 @@ class CManager_Theme {
     }
 
     public static function setTheme($theme) {
+        static::$theme = $theme;
         CSession::instance()->set('theme', $theme);
     }
 
@@ -50,9 +50,9 @@ class CManager_Theme {
             $theme = self::getCurrentTheme();
         }
         if (!isset(self::$themeData[$theme])) {
-            $themeFile = CF::get_file('themes', $theme);
+            $themeFile = CF::getFile('themes', $theme);
             $themeAllData = null;
-            if (file_exists($themeFile)) {
+            if (CFile::exists($themeFile)) {
                 $themeAllData = include $themeFile;
             }
             self::$themeData[$theme] = $themeAllData;
@@ -69,16 +69,23 @@ class CManager_Theme {
         return self::$themeData[$theme];
     }
 
-    public static function getData($key,$default=null) {
+    public static function getData($key, $default = null) {
         $themeAllData = self::getThemeData();
-        $themeData = carr::get($themeAllData, 'data',$default);
-        return carr::get($themeData, $key,$default);
+        $themeData = carr::get($themeAllData, 'data', $default);
+        return carr::get($themeData, $key, $default);
     }
 
+    /**
+     * Get Theme Path
+     *
+     * @return string
+     *
+     * @deprecated 1.1
+     */
     public static function getThemePath() {
         $themePath = '';
         $theme = self::getCurrentTheme();
-        $themeFile = CF::get_file('themes', $theme);
+        $themeFile = CF::getFile('themes', $theme);
         if (file_exists($themeFile)) {
             $themeData = include $themeFile;
             $themePath = carr::get($themeData, 'theme_path');
@@ -90,5 +97,4 @@ class CManager_Theme {
         }
         return $themePath;
     }
-
 }

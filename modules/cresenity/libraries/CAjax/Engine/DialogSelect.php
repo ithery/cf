@@ -1,14 +1,8 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @since Jun 15, 2018, 12:46:23 AM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 class CAjax_Engine_DialogSelect extends CAjax_Engine {
-
     public function execute() {
         $input = $this->input;
         $data = $this->ajaxMethod->getData();
@@ -50,7 +44,7 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
             $total = count($model->items());
 
             foreach ($model->items() as $item) {
-                $arr = array();
+                $arr = [];
                 foreach ($itemTemplateVariables as $varKey => $variable) {
                     switch ($variable) {
                         case 'name':
@@ -58,7 +52,7 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
                                 $arr[$variable] = $format;
                                 preg_match_all("/{(\w*)}/", $format, $matches);
                                 foreach ($matches[1] as $key => $match) {
-                                    $arr[$variable] = str_replace("{" . $match . "}", $item->{$match}, $arr[$variable]);
+                                    $arr[$variable] = str_replace('{' . $match . '}', $item->{$match}, $arr[$variable]);
                                 }
                             } else {
                                 $arr[$variable] = $item->{$varKey};
@@ -118,11 +112,10 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
             $data['result'] .= $template->render();
         }
 
-        $result = array();
-        $result["data"] = $data;
-        $result["total"] = $total;
+        $result = [];
+        $result['data'] = $data;
+        $result['total'] = $total;
 
         return json_encode($result);
     }
-
 }

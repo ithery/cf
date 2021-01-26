@@ -1,27 +1,28 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 23, 2018, 1:39:40 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 23, 2018, 1:39:40 AM
  */
 
 /**
  * Handler to list and open saved dataset
  */
 class CDebug_Bar_OpenHandler {
-
     protected $debugBar;
 
     /**
      * @param CDebug_Bar $debugBar
+     *
      * @throws CDebug_Bar_Exception
      */
     public function __construct(CDebug_Bar $debugBar) {
         if (!$debugBar->isDataPersisted()) {
-            throw new CDebug_Bar_Exception("DebugBar must have a storage backend to use OpenHandler");
+            throw new CDebug_Bar_Exception('DebugBar must have a storage backend to use OpenHandler');
         }
         $this->debugBar = $debugBar;
     }
@@ -29,10 +30,12 @@ class CDebug_Bar_OpenHandler {
     /**
      * Handles the current request
      *
-     * @param array $request Request data
-     * @param bool $echo
-     * @param bool $sendHeader
+     * @param array $request    Request data
+     * @param bool  $echo
+     * @param bool  $sendHeader
+     *
      * @return string
+     *
      * @throws CDebug_Bar_Exception
      */
     public function handle($request = null, $echo = true, $sendHeader = true) {
@@ -42,16 +45,16 @@ class CDebug_Bar_OpenHandler {
         $op = 'find';
         if (isset($request['op'])) {
             $op = $request['op'];
-            if (!in_array($op, array('find', 'get', 'clear'))) {
+            if (!in_array($op, ['find', 'get', 'clear'])) {
                 throw new CDebug_Bar_Exception("Invalid operation '{$request['op']}'");
             }
         }
         if ($sendHeader) {
-            $this->debugBar->getHttpDriver()->setHeaders(array(
+            $this->debugBar->getHttpDriver()->setHeaders([
                 'Content-Type' => 'application/json'
-            ));
+            ]);
         }
-        $response = json_encode(call_user_func(array($this, $op), $request));
+        $response = json_encode(call_user_func([$this, $op], $request));
         if ($echo) {
             echo $response;
         }
@@ -60,7 +63,9 @@ class CDebug_Bar_OpenHandler {
 
     /**
      * Find operation
+     *
      * @param $request
+     *
      * @return array
      */
     protected function find($request) {
@@ -72,8 +77,8 @@ class CDebug_Bar_OpenHandler {
         if (isset($request['offset'])) {
             $offset = $request['offset'];
         }
-        $filters = array();
-        foreach (array('utime', 'datetime', 'ip', 'uri', 'method') as $key) {
+        $filters = [];
+        foreach (['utime', 'datetime', 'ip', 'uri', 'method'] as $key) {
             if (isset($request[$key])) {
                 $filters[$key] = $request[$key];
             }
@@ -83,8 +88,11 @@ class CDebug_Bar_OpenHandler {
 
     /**
      * Get operation
+     *
      * @param $request
+     *
      * @return array
+     *
      * @throws CDebug_Bar_Exception
      */
     protected function get($request) {
@@ -96,10 +104,11 @@ class CDebug_Bar_OpenHandler {
 
     /**
      * Clear operation
+     *
+     * @param mixed $request
      */
     protected function clear($request) {
         $this->debugBar->getStorage()->clear();
-        return array('success' => true);
+        return ['success' => true];
     }
-
 }

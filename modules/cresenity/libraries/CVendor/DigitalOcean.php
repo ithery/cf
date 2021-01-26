@@ -1,19 +1,11 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use DigitalOceanV2\Adapter\GuzzleAdapter;
 use DigitalOceanV2\DigitalOceanV2;
 
 class CVendor_DigitalOcean {
-
     /**
-     *
-     * @var \DigitalOceanV2\DigitalOceanV2 
+     * @var \DigitalOceanV2\DigitalOceanV2
      */
     protected $do;
 
@@ -27,11 +19,9 @@ class CVendor_DigitalOcean {
     }
 
     /**
-     * 
      * @return \DigitalOceanV2\DigitalOceanV2
      */
     public function getObject() {
         return $this->do;
     }
-
 }

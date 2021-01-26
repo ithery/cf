@@ -1,20 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 6, 2019, 7:25:37 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 6, 2019, 7:25:37 AM
  */
 class CResources_Repository {
-
-    /** @var CApp_Model_Interface_ResourceInterface */
+    /** @var CApp_Model_Interface_ResourceInterface|CModel */
     protected $model;
 
     /** @param CApp_Model_Interface_ResourceInterface $model */
-    public function __construct(CApp_Model_Interface_ResourceInterface $model=null) {
-        if($model==null) {
+    public function __construct(CApp_Model_Interface_ResourceInterface $model = null) {
+        if ($model == null) {
             $model = new CApp_Model_Resource();
         }
         $this->model = $model;
@@ -24,8 +24,8 @@ class CResources_Repository {
      * Get all resource in the collection.
      *
      * @param CModel_HasResourceInterface $model
-     * @param string $collectionName
-     * @param array|callable $filter
+     * @param string                      $collectionName
+     * @param array|callable              $filter
      *
      * @return CCollection
      */
@@ -36,7 +36,7 @@ class CResources_Repository {
     /**
      * Apply given filters on resource.
      *
-     * @param CCollection $resource
+     * @param CCollection    $resource
      * @param array|callable $filter
      *
      * @return CCollection
@@ -62,15 +62,15 @@ class CResources_Repository {
 
     public function getByModelTypeAndCollectionName($modelType, $collectionName) {
         return $this->model
-                        ->where('model_type', $modelType)
-                        ->where('collection_name', $collectionName)
-                        ->get();
+            ->where('model_type', $modelType)
+            ->where('collection_name', $collectionName)
+            ->get();
     }
 
     public function getByCollectionName($collectionName) {
         return $this->model
-                        ->where('collection_name', $collectionName)
-                        ->get();
+            ->where('collection_name', $collectionName)
+            ->get();
     }
 
     /**
@@ -93,5 +93,4 @@ class CResources_Repository {
             return true;
         };
     }
-
 }
