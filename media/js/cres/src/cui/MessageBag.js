@@ -1,46 +1,46 @@
 
 export default class MessageBag {
     constructor() {
-        this.bag = {}
+        this.bag = {};
     }
 
     add(name, thing) {
-        if (! this.bag[name]) {
-            this.bag[name] = []
+        if (!this.bag[name]) {
+            this.bag[name] = [];
         }
 
-        this.bag[name].push(thing)
+        this.bag[name].push(thing);
     }
 
     push(name, thing) {
-        this.add(name, thing)
+        this.add(name, thing);
     }
 
     first(name) {
-        if (! this.bag[name]) return null
+        if (!this.bag[name]) {return null;}
 
-        return this.bag[name][0]
+        return this.bag[name][0];
     }
 
     last(name) {
-        return this.bag[name].slice(-1)[0]
+        return this.bag[name].slice(-1)[0];
     }
 
     get(name) {
-        return this.bag[name]
+        return this.bag[name];
     }
 
     shift(name) {
-        return this.bag[name].shift()
+        return this.bag[name].shift();
     }
 
     call(name, ...params) {
         (this.listeners[name] || []).forEach(callback => {
-            callback(...params)
-        })
+            callback(...params);
+        });
     }
 
     has(name) {
-        return Object.keys(this.listeners).includes(name)
+        return Object.keys(this.listeners).includes(name);
     }
 }

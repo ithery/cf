@@ -1,24 +1,24 @@
 
 export default class MessageBus {
     constructor() {
-        this.listeners = {}
+        this.listeners = {};
     }
 
     register(name, callback) {
-        if (! this.listeners[name]) {
-            this.listeners[name] = []
+        if (!this.listeners[name]) {
+            this.listeners[name] = [];
         }
 
-        this.listeners[name].push(callback)
+        this.listeners[name].push(callback);
     }
 
     call(name, ...params) {
         (this.listeners[name] || []).forEach(callback => {
-            callback(...params)
-        })
+            callback(...params);
+        });
     }
 
     has(name) {
-        return Object.keys(this.listeners).includes(name)
+        return Object.keys(this.listeners).includes(name);
     }
 }
