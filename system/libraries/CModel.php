@@ -74,7 +74,8 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         CModel_Trait_Event,
         CModel_Trait_GlobalScopes,
         CModel_Trait_HidesAttributes,
-        CModel_Trait_Timestamps;
+        CModel_Trait_Timestamps,
+        CTrait_ForwardsCalls;
 
     /**
      * The connection name for the model.
@@ -277,11 +278,20 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
             static::$booted[static::class] = true;
 
             $this->fireModelEvent('booting', false);
-
+            static::booting();
             static::boot();
-
+            static::booted();
             $this->fireModelEvent('booted', false);
         }
+    }
+
+    /**
+     * Perform any actions required before the model boots.
+     *
+     * @return void
+     */
+    protected static function booting() {
+        //
     }
 
     /**
@@ -312,6 +322,15 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     }
 
     /**
+     * Perform any actions required after the model boots.
+     *
+     * @return void
+     */
+    protected static function booted() {
+        //
+    }
+
+    /**
      * Clear the list of booted models so they will be re-booted.
      *
      * @return void
@@ -320,6 +339,17 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         static::$booted = [];
 
         static::$globalScopes = [];
+    }
+
+    /**
+     * Remove the table name from a given key.
+     *
+     * @param string $key
+     *
+     * @return string
+     */
+    protected function removeTableFromKey($key) {
+        return cstr::contains($key, '.') ? carr::last(explode('.', $key)) : $key;
     }
 
     /**
@@ -342,7 +372,11 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
             } elseif ($totallyGuarded) {
-                throw new CModel_Exception_MassAssignment($key);
+                throw new CModel_Exception_MassAssignment(sprintf(
+                    'Add [%s] to fillable property to allow mass assignment on [%s].',
+                    $key,
+                    get_class($this)
+                ));
             }
         }
 
@@ -363,14 +397,18 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     }
 
     /**
-     * Remove the table name from a given key.
+     * Qualify the given column name by the model's table.
      *
-     * @param string $key
+     * @param string $column
      *
      * @return string
      */
-    protected function removeTableFromKey($key) {
-        return cstr::contains($key, '.') ? carr::last(explode('.', $key)) : $key;
+    public function qualifyColumn($column) {
+        if (cstr::contains($column, '.')) {
+            return $column;
+        }
+
+        return $this->getTable() . '.' . $column;
     }
 
     /**
@@ -389,6 +427,12 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
 
         $model->exists = $exists;
 
+        $model->setConnection($this->getConnectionName());
+
+        $model->setTable($this->getTable());
+
+        $model->mergeCasts($this->casts);
+
         return $model;
     }
 
@@ -404,6 +448,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         $model = $this->newInstance([], true);
 
         $model->setRawAttributes((array) $attributes, true);
+        $model->setConnection($connection ?: $this->getConnectionName());
         $model->fireModelEvent('retrieved', false);
 
         return $model;
@@ -414,7 +459,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param string|null $connection
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
     public static function on($connection = null) {
         // First we will just create a fresh instance of this model, and then we can
@@ -430,7 +475,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Begin querying the model on the write connection.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return CDatabae_Query_Builder
      */
     public static function onWriteConnection() {
         $instance = new static;
@@ -446,7 +491,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return CModel_COllection|static[]
      */
     public static function all($columns = ['*']) {
-        return (new static)->newQuery()->get(
+        return static::query()->get(
             is_array($columns) ? $columns : func_get_args()
         );
     }
@@ -459,7 +504,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return CModel_Query|static
      */
     public static function with($relations) {
-        return (new static)->newQuery()->with(
+        return static::query()->with(
             is_string($relations) ? func_get_args() : $relations
         );
     }
@@ -472,7 +517,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return $this
      */
     public function load($relations) {
-        $query = $this->newQuery()->with(
+        $query = $this->newQueryWithoutRelationships()->with(
             is_string($relations) ? func_get_args() : $relations
         );
 
@@ -933,7 +978,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return CModel_Query
      */
     public function newQueryWithoutRelationships() {
-        return $this->registerGlobalScopes($this->newModelQuery($this->newBaseQueryBuilder())->setModel($this));
+        return $this->registerGlobalScopes($this->newModelQuery());
     }
 
     /**
@@ -1278,7 +1323,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return string
      */
     public function getQualifiedKeyName() {
-        return $this->getTable() . '.' . $this->getKeyName();
+        return $this->qualifyColumn($this->getKeyName());
     }
 
     /**
@@ -1545,49 +1590,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      */
     public function __call($method, $parameters) {
         if (in_array($method, ['increment', 'decrement'])) {
-            $class = new ReflectionClass(get_class($this));
-
-            try {
-                // Load the controller method
-                $method_object = $class->getMethod($method);
-            } catch (ReflectionException $e) {
-                // Use __call instead
-                $method_object = $class->getMethod('__call');
-
-                // Use arguments in __call format
-                $parameters = [$method, $parameters];
-            }
-
-            return $method_object->invokeArgs($this, $parameters);
+            return $this->$method(...$parameters);
         }
-
-        try {
-            $query = $this->newQuery();
-
-            $class = new ReflectionClass(get_class($query));
-
-            try {
-                // Load the controller method
-                $method_object = $class->getMethod($method);
-            } catch (ReflectionException $e) {
-                // Use __call instead
-                $method_object = $class->getMethod('__call');
-
-                // Use arguments in __call format
-                $parameters = [$method, $parameters];
-            }
-
-            return $method_object->invokeArgs($query, $parameters);
-        } catch (BadMethodCallException $e) {
-            try {
-                throw new Exception('404');
-            } catch (Exception $ex) {
-                cdbg::var_dump(nl2br($ex->getTraceAsString()));
-            }
-            throw new BadMethodCallException(
-                sprintf('Call to undefined method %s::%s()' . $e->getMessage(), get_class($this), $method)
-            );
-        }
+        return $this->forwardCallTo($this->newQuery(), $method, $parameters);
     }
 
     /**
@@ -1599,20 +1604,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return mixed
      */
     public static function __callStatic($method, $parameters) {
-        $class = new ReflectionClass(get_called_class());
-        $object = $class->newInstance();
-
-        try {
-            // Load the controller method
-            $method_object = $class->getMethod($method);
-        } catch (ReflectionException $e) {
-            // Use __call instead
-            $method_object = $class->getMethod('__call');
-
-            // Use arguments in __call format
-            $parameters = [$method, $parameters];
-        }
-        return $method_object->invokeArgs($object, $parameters);
+        return (new static)->$method(...$parameters);
     }
 
     /**
