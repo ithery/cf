@@ -936,7 +936,7 @@ var Cresenity = function () {
                 targetOptions.dataAddition = JSON.parse(target.attr('data-data-addition'));
             }
         }
-        
+
         let settings = $.extend({
             // These are the defaults.
             method: 'get',
@@ -954,8 +954,8 @@ var Cresenity = function () {
 
         var method = settings.method;
         var selector = settings.selector;
-        
-        
+
+
         var blockOptions = {
             blockType: settings.blockType
         };
@@ -1429,9 +1429,9 @@ var Cresenity = function () {
 
         // recycle the name of the style attribute
         var name;
-        
+
         var element = $(selector);
-        
+
         // if it's a limited list, no need to run through the entire style object
         if (only && only instanceof Array) {
 
@@ -1456,7 +1456,7 @@ var Cresenity = function () {
                     var pattern = /\-([a-z])/g;
                     var uc = function (a, b) {
                         return b.toUpperCase();
-                    };			
+                    };
                     var camelize = function(string){
                         return string.replace(pattern, uc);
                     };
@@ -1512,7 +1512,7 @@ var Cresenity = function () {
         return product;
 
     }
-    
+
     this.createPlaceholderElement = (selector,root,depth) => {
         depth = parseInt(depth);
         if(!Number.isInteger(depth)) {
@@ -1522,24 +1522,24 @@ var Cresenity = function () {
         if(element.length==0) {
             return null;
         }
-        
+
         root = root || element;
         var newElement = element.clone().empty();
         newElement.removeAttr('id');
         newElement.removeAttr('data-block-html');
         newElement.removeClass();
-        
-        
-        
-        
+
+
+
+
         if(!(element.is(':visible'))) {
             return null;
         }
-        
-        
+
+
         var styles = this.getStyles(element);
-        
-        
+
+
         if(depth>0) {
             //newElement.addClass('remove-after');
             //newElement.addClass('remove-before');
@@ -1553,12 +1553,12 @@ var Cresenity = function () {
                 styles['left']=''+relativeX+'px';
                 styles['backgroundColor']='#ced4da';
             }
-        } 
-        
+        }
+
         styles['border'] = '0';
         styles['borderRadius'] = '0';
         styles['overflow'] = 'hidden';
-        
+
         switch(element.prop("tagName").toLowerCase()) {
             case 'ul':
                 //styles['listStyle']='none';
@@ -1576,13 +1576,13 @@ var Cresenity = function () {
         }
         if(depth==0) {
             styles['position'] = 'relative';
-       
+
         }
         newElement.css(styles);
         if(depth==0) {
             newElement.addClass('capp-ph-item');
             newElement.attr('style', function(i,s) { return (s || '') + 'margin: 0 !important;' });
-            
+
         }
         element.children().each((idx,item) => {
             var newChild = this.createPlaceholderElement(item,root,depth+1);
@@ -1592,7 +1592,7 @@ var Cresenity = function () {
         });
         return newElement;
     }
-    
+
     this.blockPage = function (options) {
         var settings = $.extend({
             innerMessage: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>',
@@ -1611,7 +1611,7 @@ var Cresenity = function () {
             }
         });
     };
-    
+
     this.unblockPage = function () {
         $.unblockUI();
     };
@@ -1620,15 +1620,15 @@ var Cresenity = function () {
             innerMessage: '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>',
             blockType:'default'
         }, options);
-        
+
         var blockMessage = settings.innerMessage;
         var blockType = settings.blockType || 'default';
         var cssConfig = {
                 backgroundColor: 'transparent',
                 border: '0'
         };
-        
-        
+
+
         overlayCssConfig = {
             backgroundColor: '#fff',
             opacity: 0.8
@@ -1640,7 +1640,7 @@ var Cresenity = function () {
             cssConfig.top='0px';
             overlayCssConfig.opacity = 1;
         }
-        
+
         $(selector).block({
             message: blockMessage,
             css: cssConfig,
@@ -1803,7 +1803,7 @@ var Cresenity = function () {
                         cresenity.reload(reloadOptions)
                         $(this).addClass('capp-reloaded');
                     }
-                    
+
                 });
                 $('body').attr('data-reload-initialized', '1');
             })(this);

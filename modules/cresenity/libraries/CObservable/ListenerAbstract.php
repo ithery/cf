@@ -12,8 +12,11 @@ abstract class CObservable_ListenerAbstract {
     use CObservable_Listener_Trait_HandlerTrait;
 
     protected $owner;
+
     protected $handlers;
+
     protected $event;
+
     protected $eventParameters = [];
 
     public function __construct($owner) {

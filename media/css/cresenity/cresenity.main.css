@@ -38,8 +38,8 @@ body {
     font: 13px/1.7em 'Open Sans';
 }
 
-p { 
-    font: 13px/1.7em 'Open Sans'; 	
+p {
+    font: 13px/1.7em 'Open Sans';
 }
 
 a:hover {
@@ -130,7 +130,7 @@ textarea {
 
     background: #292929;
 
-    border-bottom: 1px solid #121212;	
+    border-bottom: 1px solid #121212;
 
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
@@ -143,7 +143,7 @@ textarea {
 
 .navbar .nav a {
     /* font-size: 11px; */
-    font-size: 12px; 
+    font-size: 12px;
 
 }
 
@@ -176,7 +176,7 @@ textarea {
 
 .subnavbar {
     /* margin-bottom: 2.5em; */
-    margin-bottom: 0.5em; 
+    margin-bottom: 0.5em;
 
     border-top: 1px solid #595959;
 }
@@ -301,7 +301,7 @@ textarea {
 
 .subnavbar .dropdown-menu .dropdown-submenu ul::after {
     display:none;
-} 
+}
 
 .subnavbar .dropdown-menu::before {
     content: '';
@@ -595,7 +595,7 @@ textarea {
     width: 16px;
     height: 16px;
     display: inline-block;
-    margin: -2px 0 0 !important; 
+    margin: -2px 0 0 !important;
     border-right: 1px solid #dddddd;
     margin-right: 10px;
     padding: 10px;
@@ -977,7 +977,7 @@ textarea {
     margin: 0 !important;
 }
 
-.nopadding {	
+.nopadding {
     padding: 0 !important;
 }
 .nopadding .table {
@@ -1401,7 +1401,7 @@ border-top: 1px solid #bbb;
 }
 
 .invalid {
-    -webkit-animation: invalid 1s infinite !important; /* Safari 4+ */ 
+    -webkit-animation: invalid 1s infinite !important; /* Safari 4+ */
     -moz-animation:    invalid 1s infinite !important; /* Fx 5+ */
     -o-animation:      invalid 1s infinite !important; /* Opera 12+ */
     animation:         invalid 1s infinite !important; /* IE 10+ */
@@ -1410,7 +1410,7 @@ border-top: 1px solid #bbb;
 
 .dashboard-widget .widget-content {
     height:300px;
-}	
+}
 
 
 .quotation-details .control-group {
@@ -1512,7 +1512,7 @@ border-top: 1px solid #bbb;
 
 body .modal{
     width: 80%; /* respsonsive width */
-    margin-left:-40%; /* width/2) */ 
+    margin-left:-40%; /* width/2) */
 }
 
 
@@ -1523,5 +1523,3 @@ body .modal{
 .note-editable {
     height:300px;
 }
-
-

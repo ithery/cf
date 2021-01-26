@@ -17,6 +17,7 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
         CObservable_Listener_Handler_Trait_ParamHandlerTrait;
 
     protected $content;
+
     protected $param;
 
     public function __construct($listener) {
