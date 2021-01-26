@@ -13,9 +13,11 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
         CObservable_Listener_Handler_Trait_TargetHandlerTrait,
         CObservable_Listener_Handler_Trait_SelectorHandlerTrait,
         CObservable_Listener_Handler_Trait_AjaxHandlerTrait,
+        CObservable_Listener_Handler_Trait_BlockerHandlerTrait,
         CObservable_Listener_Handler_Trait_ParamHandlerTrait;
 
     protected $content;
+
     protected $param;
 
     public function __construct($listener) {
@@ -45,6 +47,7 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
         $jsOptions .= "url:'" . $generatedUrl . "',";
         $jsOptions .= "method:'" . $this->method . "',";
         $jsOptions .= 'dataAddition:' . $dataAddition . ',';
+        $jsOptions .= "blockType:'" . $this->getBlockerType() . "',";
 
         $jsOptions .= '}';
 
