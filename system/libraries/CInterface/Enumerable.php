@@ -53,7 +53,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @return static
      */
-    public static function empty();
+    public static function createEmpty();
 
     /**
      * Get all items in the enumerable.
