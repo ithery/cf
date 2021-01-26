@@ -5,7 +5,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @author Hery Kurniawan
  */
-
 trait CModel_Trait_Attributes {
     /**
      * The model's attributes.
@@ -445,6 +444,19 @@ trait CModel_Trait_Attributes {
     }
 
     /**
+     * Merge new casts with existing casts on the model.
+     *
+     * @param array $casts
+     *
+     * @return $this
+     */
+    public function mergeCasts($casts) {
+        $this->casts = array_merge($this->casts, $casts);
+
+        return $this;
+    }
+
+    /**
      * Cast an attribute to a native PHP type.
      *
      * @param string $key
@@ -783,6 +795,7 @@ trait CModel_Trait_Attributes {
      * @return array
      */
     public function getDates() {
+        /** @var CModel $this */
         $defaults = [static::CREATED, static::UPDATED];
 
         return $this->usesTimestamps() ? array_unique(array_merge($this->dates, $defaults)) : $this->dates;
