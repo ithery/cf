@@ -1,18 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 12, 2019, 3:49:01 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 12, 2019, 3:49:01 AM
  */
 class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerator {
-
     public $fieldsFillable;
+
     public $fieldsHidden;
+
     public $fieldsCast;
+
     public $fieldsDate;
+
     public $columns;
 
     public function __construct() {
@@ -21,7 +25,7 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
 
     public function generate($options = []) {
         if (!is_array($options)) {
-            $options = array();
+            $options = [];
         }
         $this->mergeOptions($options);
         $this->fixOptions();
@@ -32,7 +36,7 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
         }
         // generate the file name for the model based on the table name
         $filename = cstr::studly($table);
-        $db = CDatabase::instance($this->option('database'),null,CF::domain());
+        $db = CDatabase::instance($this->option('database'), null, CF::domain());
         $schemaManager = $db->getSchemaManager();
         $columns = $schemaManager->listTableColumns($table);
         $columnNames = array_keys($columns);
@@ -46,7 +50,6 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
             'hidden' => [],
             'casts' => [],
         ];
-
 
         $descQuery = 'describe ' . $table;
         $resultDesc = $db->query($descQuery);
@@ -71,10 +74,11 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
     }
 
     /**
-     * replaces the class name in the stub.
+     * Replaces the class name in the stub.
      *
      * @param string $stub      stub content
      * @param string $tableName the name of the table to make as the class
+     * @param mixed  $prefix
      *
      * @return string stub content
      */
@@ -86,7 +90,7 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
     }
 
     /**
-     * replaces the module information.
+     * Replaces the module information.
      *
      * @param string $stub             stub content
      * @param array  $modelInformation array (key => value)
@@ -137,14 +141,14 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
     }
 
     /**
-     * returns the stub to use to generate the class.
+     * Returns the stub to use to generate the class.
      */
     public function getStub() {
         return DOCROOT . 'modules/cresenity/data/stub/generator/model.stub';
     }
 
     /**
-     * returns all the options that the user specified.
+     * Returns all the options that the user specified.
      */
     protected function fixOptions() {
         // debug
@@ -154,7 +158,7 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
     }
 
     /**
-     * reset all variables to be filled again when using multiple
+     * Reset all variables to be filled again when using multiple
      */
     public function resetFields() {
         $this->fieldsFillable = '';
@@ -162,5 +166,4 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
         $this->fieldsCast = '';
         $this->fieldsDate = '';
     }
-
 }

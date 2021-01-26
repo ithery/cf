@@ -1,15 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 16, 2019, 3:59:10 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jul 16, 2019, 3:59:10 PM
  */
 class CApp_Utils {
-
-    function lipsum($number_of_characters = false) {
+    public function lipsum($number_of_characters = false) {
         if ($number_of_characters == false) {
             $number_of_characters = 100;
         }
@@ -30,5 +30,4 @@ class CApp_Utils {
         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vestibulum vestibulum metus. Integer ultrices ultricies pellentesque. Nulla gravida nisl a magna gravida ullamcorper. Vestibulum accumsan eros vel massa euismod in aliquam felis suscipit. Ut et purus enim, id congue ante. Mauris magna lectus, varius porta pellentesque quis, dignissim in est. Nulla facilisi. Nullam in malesuada mauris. Ut fermentum orci neque. Aliquam accumsan justo a lacus vestibulum fermentum. Donec molestie, quam id adipiscing viverra, massa velit aliquam enim, vitae dapibus turpis libero id augue. Quisque mi magna, mollis vel tincidunt nec, adipiscing sed metus. Maecenas tincidunt augue quis felis dapibus nec elementum justo fringilla. Sed eget massa at sapien tincidunt porta eu id sapien.';
         return character_limiter($lipsum, $number_of_characters, '');
     }
-
 }

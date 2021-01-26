@@ -1,18 +1,11 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of Tag
  *
  * @author Ecko
  */
 class CApp_OpenGraph_Tag {
-
     /**
      * The name of the tag
      *
@@ -36,7 +29,7 @@ class CApp_OpenGraph_Tag {
 
     /**
      * Constructor call.
-     * 
+     *
      * @param string $name     The name of the tag
      * @param mixed  $value    The value of the tag
      * @param bool   $prefixed Add the "og"-prefix?
@@ -63,7 +56,7 @@ class CApp_OpenGraph_Tag {
 
     /**
      * Sets an object attribute to a value.
-     * 
+     *
      * @param string $name  The name of the object attribute
      * @param mixed  $value The value of the object attribute
      */
@@ -71,7 +64,6 @@ class CApp_OpenGraph_Tag {
         // Convert values
         switch ($name) {
             case 'name':
-            // no break here
             case 'value':
                 $value = (string) $value;
                 break;
@@ -81,5 +73,4 @@ class CApp_OpenGraph_Tag {
         }
         $this->$name = $value;
     }
-
 }

@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 12, 2019, 3:48:50 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 12, 2019, 3:48:50 AM
  */
 class CApp_Project_AbstractGenerator {
-
     protected $options;
 
     public function __construct() {
-        $this->options = array();
+        $this->options = [];
     }
 
     protected function mergeOptions($options) {
@@ -23,5 +23,4 @@ class CApp_Project_AbstractGenerator {
     public function option($key) {
         return carr::get($this->options, $key);
     }
-
 }
