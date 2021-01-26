@@ -1,23 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 1:30:41 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 17, 2018, 1:30:41 AM
  */
 trait CTrait_Element_Behavior_Editable {
-
     /**
-     *
      * @var bool
      */
     protected $editable;
 
     /**
-     * 
      * @param bool $bool
+     *
      * @return $this
      */
     public function setEditable($bool = true) {
@@ -26,7 +25,6 @@ trait CTrait_Element_Behavior_Editable {
     }
 
     /**
-     * 
      * @return bool
      */
     public function getEditable() {
@@ -34,11 +32,9 @@ trait CTrait_Element_Behavior_Editable {
     }
 
     /**
-     * 
      * @return bool
      */
     public function isEditable() {
         return $this->editable == true;
     }
-
 }

@@ -6,11 +6,14 @@
  * @author Hery
  */
 trait CTrait_Element_Handler_ReloadHandler {
-
+    /**
+     * Reload Handler
+     *
+     * @var CObservable_Listener_Handler_ReloadHandler
+     */
     protected $reloadHandler;
 
     /**
-     * 
      * @return CObservable_Listener_Handler_ReloadHandler
      */
     public function reloadHandler() {
@@ -23,15 +26,13 @@ trait CTrait_Element_Handler_ReloadHandler {
         }
         return $this->reloadHandler;
     }
-    
-    
+
     public function bootBuildReloadHandler() {
-        if($this->reloadHandler) {
+        if ($this->reloadHandler) {
             $attributes = $this->reloadHandler->toAttributeArray();
-            foreach($attributes as $key=>$value) {
-                $this->setAttr('data-'.cstr::snake($key, "-"),c::html($value,ENT_QUOTES));
+            foreach ($attributes as $key => $value) {
+                $this->setAttr('data-' . cstr::snake($key, '-'), c::html($value, ENT_QUOTES));
             }
         }
     }
-
 }
