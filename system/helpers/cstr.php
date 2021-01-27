@@ -8,6 +8,7 @@ use Ramsey\Uuid\UuidFactory;
 // @codingStandardsIgnoreStart
 class cstr {
     // @codingStandardsIgnoreEnd
+
     /**
      * The cache of snake-cased words.
      *
@@ -378,6 +379,22 @@ class cstr {
      */
     public static function plural($value, $count = 2) {
         return CPluralizer::plural($value, $count);
+    }
+
+    /**
+     * Pluralize the last word of an English, studly caps case string.
+     *
+     * @param string $value
+     * @param int    $count
+     *
+     * @return string
+     */
+    public static function pluralStudly($value, $count = 2) {
+        $parts = preg_split('/(.)(?=[A-Z])/u', $value, -1, PREG_SPLIT_DELIM_CAPTURE);
+
+        $lastWord = array_pop($parts);
+
+        return implode('', $parts) . self::plural($lastWord, $count);
     }
 
     /**
@@ -788,10 +805,10 @@ class cstr {
     /**
      * Splits `string` into an array of its words.
      *
-     * @param string $string  The string to inspect.
-     * @param string $pattern The pattern to match words.
+     * @param string $string  the string to inspect
+     * @param string $pattern the pattern to match words
      *
-     * @return array Returns the words of `string`.
+     * @return array returns the words of `string`
      *
      * @example
      * <code>
@@ -822,9 +839,9 @@ class cstr {
     /**
      * Splits a Unicode `string` into an array of its words.
      *
-     * @param string $string The string to inspect.
+     * @param string $string the string to inspect
      *
-     * @return array Returns the words of `string`.
+     * @return array returns the words of `string`
      */
     public static function unicodeWords($string) {
         $rsAstralRange = '\\x{e800}-\\x{efff}';
@@ -894,9 +911,9 @@ class cstr {
      * Escapes the `RegExp` special characters "^", "$", "\", ".", "*", "+",
      * "?", "(", ")", "[", "]", "{", "}", and "|" in `string`.
      *
-     * @param string $string The string to escape.
+     * @param string $string the string to escape
      *
-     * @return string Returns the escaped string.
+     * @return string returns the escaped string
      *
      * @example
      * <code>
