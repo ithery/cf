@@ -1,7 +1,8 @@
 <?php
 
 class CModel_Relation_MorphOne extends CModel_Relation_MorphOneOrMany {
-    use CModel_Relation_Trait_SupportsDefaultModels;
+    use CModel_Relation_Trait_ComparesRelatedModels,
+        CModel_Relation_Trait_SupportsDefaultModels;
 
     /**
      * Get the results of the relationship.
@@ -9,6 +10,10 @@ class CModel_Relation_MorphOne extends CModel_Relation_MorphOneOrMany {
      * @return mixed
      */
     public function getResults() {
+        if (is_null($this->getParentKey())) {
+            return $this->getDefaultFor($this->parent);
+        }
+
         return $this->query->first() ?: $this->getDefaultFor($this->parent);
     }
 
@@ -52,5 +57,16 @@ class CModel_Relation_MorphOne extends CModel_Relation_MorphOneOrMany {
         return $this->related->newInstance()
             ->setAttribute($this->getForeignKeyName(), $parent->{$this->localKey})
             ->setAttribute($this->getMorphType(), $this->morphClass);
+    }
+
+    /**
+     * Get the value of the model's foreign key.
+     *
+     * @param \CModel $model
+     *
+     * @return mixed
+     */
+    protected function getRelatedKeyFrom(CModel $model) {
+        return $model->getAttribute($this->getForeignKeyName());
     }
 }

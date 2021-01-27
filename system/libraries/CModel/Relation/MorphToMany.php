@@ -76,7 +76,7 @@ class CModel_Relation_MorphToMany extends CModel_Relation_BelongsToMany {
     protected function addWhereConstraints() {
         parent::addWhereConstraints();
 
-        $this->query->where($this->table . '.' . $this->morphType, $this->morphClass);
+        $this->query->where($this->qualifyPivotColumn($this->morphType), $this->morphClass);
 
         return $this;
     }
@@ -91,7 +91,7 @@ class CModel_Relation_MorphToMany extends CModel_Relation_BelongsToMany {
     public function addEagerConstraints(array $models) {
         parent::addEagerConstraints($models);
 
-        $this->query->where($this->table . '.' . $this->morphType, $this->morphClass);
+        $this->query->where($this->qualifyPivotColumn($this->morphType), $this->morphClass);
     }
 
     /**
@@ -121,7 +121,7 @@ class CModel_Relation_MorphToMany extends CModel_Relation_BelongsToMany {
      */
     public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
         return parent::getRelationExistenceQuery($query, $parentQuery, $columns)->where(
-            $this->table . '.' . $this->morphType,
+            $this->qualifyPivotColumn($this->morphType),
             $this->morphClass
         );
     }
@@ -129,7 +129,7 @@ class CModel_Relation_MorphToMany extends CModel_Relation_BelongsToMany {
     /**
      * Create a new query builder for the pivot table.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \CDatabase_Query_Builder
      */
     protected function newPivotQuery() {
         return parent::newPivotQuery()->where($this->morphType, $this->morphClass);
@@ -141,7 +141,7 @@ class CModel_Relation_MorphToMany extends CModel_Relation_BelongsToMany {
      * @param array $attributes
      * @param bool  $exists
      *
-     * @return \Illuminate\Database\Eloquent\Relations\Pivot
+     * @return CModel_Relation_Pivot
      */
     public function newPivot(array $attributes = [], $exists = false) {
         $using = $this->using;
@@ -154,6 +154,21 @@ class CModel_Relation_MorphToMany extends CModel_Relation_BelongsToMany {
             ->setMorphClass($this->morphClass);
 
         return $pivot;
+    }
+
+    /**
+     * Get the pivot columns for the relation.
+     *
+     * "pivot_" is prefixed at each column for easy removal later.
+     *
+     * @return array
+     */
+    protected function aliasedPivotColumns() {
+        $defaults = [$this->foreignPivotKey, $this->relatedPivotKey, $this->morphType];
+
+        return c::collect(array_merge($defaults, $this->pivotColumns))->map(function ($column) {
+            return $this->qualifyPivotColumn($column) . ' as pivot_' . $column;
+        })->unique()->all();
     }
 
     /**
@@ -172,5 +187,14 @@ class CModel_Relation_MorphToMany extends CModel_Relation_BelongsToMany {
      */
     public function getMorphClass() {
         return $this->morphClass;
+    }
+
+    /**
+     * Get the indicator for a reverse relationship.
+     *
+     * @return bool
+     */
+    public function getInverse() {
+        return $this->inverse;
     }
 }

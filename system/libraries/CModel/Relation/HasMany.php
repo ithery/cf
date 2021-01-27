@@ -7,7 +7,9 @@ class CModel_Relation_HasMany extends CModel_Relation_HasOneOrMany {
      * @return mixed
      */
     public function getResults() {
-        return $this->query->get();
+        return !is_null($this->getParentKey())
+            ? $this->query->get()
+            : $this->related->newCollection();
     }
 
     /**

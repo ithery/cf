@@ -7,7 +7,9 @@ class CModel_Relation_MorphMany extends CModel_Relation_MorphOneOrMany {
      * @return mixed
      */
     public function getResults() {
-        return $this->query->get();
+        return !is_null($this->getParentKey())
+            ? $this->query->get()
+            : $this->related->newCollection();
     }
 
     /**

@@ -60,19 +60,6 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
     }
 
     /**
-     * Attach a model instance to the parent model.
-     *
-     * @param CModel $model
-     *
-     * @return CModel
-     */
-    public function save(CModel $model) {
-        $model->setAttribute($this->getMorphType(), $this->morphClass);
-
-        return parent::save($model);
-    }
-
-    /**
      * Set the foreign ID and type for creating a related model.
      *
      * @param CModel $model
@@ -96,7 +83,7 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
      */
     public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
         return parent::getRelationExistenceQuery($query, $parentQuery, $columns)->where(
-            $this->morphType,
+            $query->qualifyColumn($this->getMorphType()),
             $this->morphClass
         );
     }
@@ -116,7 +103,7 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
      * @return string
      */
     public function getMorphType() {
-        return carr::last(explode('.', $this->morphType));
+        return c::last(explode('.', $this->morphType));
     }
 
     /**

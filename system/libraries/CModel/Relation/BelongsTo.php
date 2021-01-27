@@ -4,10 +4,13 @@
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 class CModel_Relation_BelongsTo extends CModel_Relation {
-    use CModel_Relation_Trait_SupportsDefaultModels;
+    use CModel_Relation_Trait_ComparesRelatedModels,
+        CModel_Relation_Trait_SupportsDefaultModels;
 
     /**
      * The child model instance of the relation.
+     *
+     * @var CModel
      */
     protected $child;
 
@@ -30,7 +33,7 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
      *
      * @var string
      */
-    protected $relation;
+    protected $relationName;
 
     /**
      * Create a new belongs to relationship instance.
@@ -39,13 +42,13 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
      * @param CModel       $child
      * @param string       $foreignKey
      * @param string       $ownerKey
-     * @param string       $relation
+     * @param string       $relationName
      *
      * @return void
      */
-    public function __construct(CModel_Query $query, CModel $child, $foreignKey, $ownerKey, $relation) {
+    public function __construct(CModel_Query $query, CModel $child, $foreignKey, $ownerKey, $relationName) {
         $this->ownerKey = $ownerKey;
-        $this->relation = $relation;
+        $this->relationName = $relationName;
         $this->foreignKey = $foreignKey;
 
         // In the underlying base relationship class, this variable is referred to as
@@ -62,6 +65,10 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
      * @return mixed
      */
     public function getResults() {
+        if (is_null($this->child->{$this->foreignKey})) {
+            return $this->getDefaultFor($this->parent);
+        }
+
         return $this->query->first() ?: $this->getDefaultFor($this->parent);
     }
 
@@ -94,7 +101,9 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
         // our eagerly loading query so it returns the proper models from execution.
         $key = $this->related->getTable() . '.' . $this->ownerKey;
 
-        $this->query->whereIn($key, $this->getEagerModelKeys($models));
+        $whereIn = $this->whereInMethod($this->related, $this->ownerKey);
+
+        $this->query->{$whereIn}($key, $this->getEagerModelKeys($models));
     }
 
     /**
@@ -114,13 +123,6 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
             if (!is_null($value = $model->{$this->foreignKey})) {
                 $keys[] = $value;
             }
-        }
-
-        // If there are no keys that were not null we will just return an array with null
-        // so this query wont fail plus returns zero results, which should be what the
-        // developer expects to happen in this situation. Otherwise we'll sort them.
-        if (count($keys) === 0) {
-            return [null];
         }
 
         sort($keys);
@@ -193,9 +195,9 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Associate the model instance to the given parent.
      *
-     * @param CModel|int|string $model
+     * @param \CModel|int|string $model
      *
-     * @return CModel
+     * @return \CModel
      */
     public function associate($model) {
         $ownerKey = $model instanceof CModel ? $model->getAttribute($this->ownerKey) : $model;
@@ -203,7 +205,9 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
         $this->child->setAttribute($this->foreignKey, $ownerKey);
 
         if ($model instanceof CModel) {
-            $this->child->setRelation($this->relation, $model);
+            $this->child->setRelation($this->relationName, $model);
+        } else {
+            $this->child->unsetRelation($this->relationName);
         }
 
         return $this->child;
@@ -212,12 +216,21 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     /**
      * Dissociate previously associated model from the given parent.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \CModel
      */
     public function dissociate() {
         $this->child->setAttribute($this->foreignKey, null);
 
-        return $this->child->setRelation($this->relation, null);
+        return $this->child->setRelation($this->relationName, null);
+    }
+
+    /**
+     * Alias of "dissociate" method.
+     *
+     * @return CModel
+     */
+    public function disassociate() {
+        return $this->dissociate();
     }
 
     /**
@@ -235,9 +248,9 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
         }
 
         return $query->select($columns)->whereColumn(
-            $this->getQualifiedForeignKey(),
+            $this->getQualifiedForeignKeyName(),
             '=',
-            $query->getModel()->getTable() . '.' . $this->ownerKey
+            $query->qualifyColumn($this->ownerKey)
         );
     }
 
@@ -258,9 +271,9 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
         $query->getModel()->setTable($hash);
 
         return $query->whereColumn(
-            $hash . '.' . $query->getModel()->getKeyName(),
+            $hash . '.' . $this->ownerKey,
             '=',
-            $this->getQualifiedForeignKey()
+            $this->getQualifiedForeignKeyName()
         );
     }
 
@@ -271,7 +284,7 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
      */
     protected function relationHasIncrementingId() {
         return $this->related->getIncrementing()
-                && $this->related->getKeyType() === 'int';
+            && in_array($this->related->getKeyType(), ['int', 'integer']);
     }
 
     /**
@@ -286,11 +299,20 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     }
 
     /**
+     * Get the child of the relationship.
+     *
+     * @return CModel
+     */
+    public function getChild() {
+        return $this->child;
+    }
+
+    /**
      * Get the foreign key of the relationship.
      *
      * @return string
      */
-    public function getForeignKey() {
+    public function getForeignKeyName() {
         return $this->foreignKey;
     }
 
@@ -299,8 +321,17 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
      *
      * @return string
      */
-    public function getQualifiedForeignKey() {
-        return $this->child->getTable() . '.' . $this->foreignKey;
+    public function getQualifiedForeignKeyName() {
+        return $this->child->qualifyColumn($this->foreignKey);
+    }
+
+    /**
+     * Get the key value of the child's foreign key.
+     *
+     * @return mixed
+     */
+    public function getParentKey() {
+        return $this->child->{$this->foreignKey};
     }
 
     /**
@@ -308,7 +339,7 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
      *
      * @return string
      */
-    public function getOwnerKey() {
+    public function getOwnerKeyName() {
         return $this->ownerKey;
     }
 
@@ -318,7 +349,18 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
      * @return string
      */
     public function getQualifiedOwnerKeyName() {
-        return $this->related->getTable() . '.' . $this->ownerKey;
+        return $this->related->qualifyColumn($this->ownerKey);
+    }
+
+    /**
+     * Get the value of the model's associated key.
+     *
+     * @param CModel $model
+     *
+     * @return mixed
+     */
+    protected function getRelatedKeyFrom(CModel $model) {
+        return $model->{$this->ownerKey};
     }
 
     /**
@@ -326,7 +368,7 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
      *
      * @return string
      */
-    public function getRelation() {
-        return $this->relation;
+    public function getRelationName() {
+        return $this->relationName;
     }
 }

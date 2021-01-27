@@ -643,14 +643,14 @@ class CModel_Query {
     }
 
     /**
-     * Get a generator for the given query.
+     * Get a lazy collection for the given query.
      *
-     * @return \Generator
+     * @return CBase_LazyCollection
      */
     public function cursor() {
-        foreach ($this->applyScopes()->query->cursor() as $record) {
-            yield $this->model->newFromBuilder($record);
-        }
+        return $this->applyScopes()->query->cursor()->map(function ($record) {
+            return $this->newModelInstance()->newFromBuilder($record);
+        });
     }
 
     /**
@@ -795,7 +795,7 @@ class CModel_Query {
      * @return CModel|$this
      */
     public function create(array $attributes = []) {
-        return CF::tap($this->newModelInstance($attributes), function ($instance) {
+        return c::tap($this->newModelInstance($attributes), function ($instance) {
             if ($instance->status == null) {
                 $instance->status = 1;
             }

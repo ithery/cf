@@ -1,7 +1,8 @@
 <?php
 
 class CModel_Relation_HasOne extends CModel_Relation_HasOneOrMany {
-    use CModel_Relation_Trait_SupportsDefaultModels;
+    use CModel_Relation_Trait_ComparesRelatedModels,
+        CModel_Relation_Trait_SupportsDefaultModels;
 
     /**
      * Get the results of the relationship.
@@ -9,6 +10,10 @@ class CModel_Relation_HasOne extends CModel_Relation_HasOneOrMany {
      * @return mixed
      */
     public function getResults() {
+        if (is_null($this->getParentKey())) {
+            return $this->getDefaultFor($this->parent);
+        }
+
         return $this->query->first() ?: $this->getDefaultFor($this->parent);
     }
 
@@ -53,5 +58,16 @@ class CModel_Relation_HasOne extends CModel_Relation_HasOneOrMany {
             $this->getForeignKeyName(),
             $parent->{$this->localKey}
         );
+    }
+
+    /**
+     * Get the value of the model's foreign key.
+     *
+     * @param CModel $model
+     *
+     * @return mixed
+     */
+    protected function getRelatedKeyFrom(CModel $model) {
+        return $model->getAttribute($this->getForeignKeyName());
     }
 }

@@ -42,7 +42,9 @@ trait CModel_Relation_Trait_AsPivot {
      */
     public static function fromAttributes(CModel $parent, $attributes, $table, $exists = false) {
         $instance = new static;
+
         $instance->timestamps = $instance->hasTimestampAttributes($attributes);
+
         // The pivot model is a "dynamic" model since we will set the tables dynamically
         // for the instance. This allows it work for any intermediate tables for the
         // many to many relationship that are defined by this developer's classes.
@@ -50,11 +52,14 @@ trait CModel_Relation_Trait_AsPivot {
             ->setTable($table)
             ->forceFill($attributes)
             ->syncOriginal();
+
         // We store off the parent instance so we will access the timestamp column names
         // for the model, since the pivot model timestamps aren't easily configurable
         // from the developer's point of view. We can use the parents to get these.
         $instance->pivotParent = $parent;
+
         $instance->exists = $exists;
+
         return $instance;
     }
 
@@ -70,19 +75,22 @@ trait CModel_Relation_Trait_AsPivot {
      */
     public static function fromRawAttributes(CModel $parent, $attributes, $table, $exists = false) {
         $instance = static::fromAttributes($parent, [], $table, $exists);
+
         $instance->timestamps = $instance->hasTimestampAttributes($attributes);
+
         $instance->setRawAttributes($attributes, true);
+
         return $instance;
     }
 
     /**
-     * Set the keys for a save update query.
+     * Set the keys for a select query.
      *
      * @param CModel_Query $query
      *
      * @return CModel_Query
      */
-    protected function setKeysForSaveQuery(CModel_Query $query) {
+    protected function setKeysForSelectQuery(CModel_Query $query) {
         if (isset($this->attributes[$this->getKeyName()])) {
             return parent::setKeysForSaveQuery($query);
         }
@@ -94,6 +102,17 @@ trait CModel_Relation_Trait_AsPivot {
             $this->relatedKey,
             $this->getAttribute($this->relatedKey)
         ));
+    }
+
+    /**
+     * Set the keys for a save update query.
+     *
+     * @param CModel_Query $query
+     *
+     * @return CModel_Query
+     */
+    protected function setKeysForSaveQuery(CModel_Query $query) {
+        return $this->setKeysForSelectQuery($query);
     }
 
     /**
@@ -110,6 +129,7 @@ trait CModel_Relation_Trait_AsPivot {
         }
         $this->touchOwners();
         return c::tap($this->getDeleteQuery()->delete(), function () {
+            $this->exists = false;
             $this->fireModelEvent('deleted', false);
         });
     }
@@ -258,6 +278,7 @@ trait CModel_Relation_Trait_AsPivot {
      * @return CModel_Query
      */
     protected function newQueryForCollectionRestoration(array $ids) {
+        $ids = array_values($ids);
         if (!cstr::contains($ids[0], ':')) {
             return parent::newQueryForRestoration($ids);
         }
@@ -270,5 +291,17 @@ trait CModel_Relation_Trait_AsPivot {
             });
         }
         return $query;
+    }
+
+    /**
+     * Unset all the loaded relations for the instance.
+     *
+     * @return $this
+     */
+    public function unsetRelations() {
+        $this->pivotParent = null;
+        $this->relations = [];
+
+        return $this;
     }
 }
