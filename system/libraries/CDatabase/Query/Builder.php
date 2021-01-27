@@ -9,7 +9,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Dec 17, 2017, 1:21:50 PM
  */
 class CDatabase_Query_Builder {
-    use CDatabase_Trait_Builder;
+    use CDatabase_Trait_Builder,
+        CDatabase_Trait_ExplainsQueries,
+        CTrait_ForwardsCalls;
+    use CTrait_Macroable {
+        __call as macroCall;
+    }
 
     /**
      * The current connection
@@ -42,9 +47,11 @@ class CDatabase_Query_Builder {
         'from' => [],
         'join' => [],
         'where' => [],
+        'groupBy' => [],
         'having' => [],
         'order' => [],
         'union' => [],
+        'unionOrder' => [],
     ];
 
     /**
@@ -166,12 +173,19 @@ class CDatabase_Query_Builder {
      */
     public $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
-        'like', 'like binary', 'not like', 'between', 'ilike',
+        'like', 'like binary', 'not like', 'ilike',
         '&', '|', '^', '<<', '>>',
-        'rlike', 'regexp', 'not regexp',
+        'rlike', 'not rlike', 'regexp', 'not regexp',
         '~', '~*', '!~', '!~*', 'similar to',
         'not similar to', 'not ilike', '~~*', '!~~*',
     ];
+
+    /**
+     * Whether use write pdo for select.
+     *
+     * @var bool
+     */
+    public $useWritePdo = false;
 
     public function __construct(CDatabase $db = null) {
         if ($db == null) {
@@ -195,7 +209,16 @@ class CDatabase_Query_Builder {
      * @return $this
      */
     public function select($columns = ['*']) {
-        $this->columns = is_array($columns) ? $columns : func_get_args();
+        $this->columns = [];
+        $this->bindings['select'] = [];
+        $columns = is_array($columns) ? $columns : func_get_args();
+        foreach ($columns as $as => $column) {
+            if (is_string($as) && $this->isQueryable($column)) {
+                $this->selectSub($column, $as);
+            } else {
+                $this->columns[] = $column;
+            }
+        }
 
         return $this;
     }
@@ -938,6 +961,97 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Add a "where in raw" clause for integer values to the query.
+     *
+     * @param string                      $column
+     * @param \CInterface_Arrayable|array $values
+     * @param string                      $boolean
+     * @param bool                        $not
+     *
+     * @return $this
+     */
+    public function whereIntegerInRaw($column, $values, $boolean = 'and', $not = false) {
+        $type = $not ? 'NotInRaw' : 'InRaw';
+
+        if ($values instanceof CInterface_Arrayable) {
+            $values = $values->toArray();
+        }
+
+        foreach ($values as &$value) {
+            $value = (int) $value;
+        }
+
+        $this->wheres[] = compact('type', 'column', 'values', 'boolean');
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where in raw" clause for integer values to the query.
+     *
+     * @param string                      $column
+     * @param \CInterface_Arrayable|array $values
+     *
+     * @return $this
+     */
+    public function orWhereIntegerInRaw($column, $values) {
+        return $this->whereIntegerInRaw($column, $values, 'or');
+    }
+
+    /**
+     * Add a "where not in raw" clause for integer values to the query.
+     *
+     * @param string                      $column
+     * @param \CInterface_Arrayable|array $values
+     * @param string                      $boolean
+     *
+     * @return $this
+     */
+    public function whereIntegerNotInRaw($column, $values, $boolean = 'and') {
+        return $this->whereIntegerInRaw($column, $values, $boolean, true);
+    }
+
+    /**
+     * Add an "or where not in raw" clause for integer values to the query.
+     *
+     * @param string                      $column
+     * @param \CInterface_Arrayable|array $values
+     *
+     * @return $this
+     */
+    public function orWhereIntegerNotInRaw($column, $values) {
+        return $this->whereIntegerNotInRaw($column, $values, 'or');
+    }
+
+    /**
+     * Add a "where null" clause to the query.
+     *
+     * @param string $column
+     * @param string $boolean
+     * @param bool   $not
+     *
+     * @return $this
+     */
+    public function whereNull($column, $boolean = 'and', $not = false) {
+        $type = $not ? 'NotNull' : 'Null';
+
+        $this->wheres[] = compact('type', 'column', 'boolean');
+
+        return $this;
+    }
+
+    /**
+     * Add an "or where null" clause to the query.
+     *
+     * @param string $column
+     *
+     * @return $this
+     */
+    public function orWhereNull($column) {
+        return $this->whereNull($column, 'or');
+    }
+
+    /**
      * Add a where in with a sub-select to the query.
      *
      * @param string   $column
@@ -980,34 +1094,6 @@ class CDatabase_Query_Builder {
         $this->addBinding($query->getBindings(), 'where');
 
         return $this;
-    }
-
-    /**
-     * Add a "where null" clause to the query.
-     *
-     * @param string $column
-     * @param string $boolean
-     * @param bool   $not
-     *
-     * @return $this
-     */
-    public function whereNull($column, $boolean = 'and', $not = false) {
-        $type = $not ? 'NotNull' : 'Null';
-
-        $this->wheres[] = compact('type', 'column', 'boolean');
-
-        return $this;
-    }
-
-    /**
-     * Add an "or where null" clause to the query.
-     *
-     * @param string $column
-     *
-     * @return \CDatabase_Query_Builder|static
-     */
-    public function orWhereNull($column) {
-        return $this->whereNull($column, 'or');
     }
 
     /**
@@ -2128,6 +2214,20 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * Determine if the value is a query builder instance or a Closure.
+     *
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    protected function isQueryable($value) {
+        return $value instanceof self
+               || $value instanceof CModel_Query
+               || $value instanceof CModel_Relation
+               || $value instanceof Closure;
+    }
+
+    /**
      * Clone the query without the given properties.
      *
      * @param array $except
@@ -2135,7 +2235,7 @@ class CDatabase_Query_Builder {
      * @return static
      */
     public function cloneWithout(array $except) {
-        return CF::tap(clone $this, function ($clone) use ($except) {
+        return c::tap(clone $this, function ($clone) use ($except) {
             foreach ($except as $property) {
                 $clone->{$property} = null;
             }
@@ -2150,7 +2250,7 @@ class CDatabase_Query_Builder {
      * @return static
      */
     public function cloneWithoutBindings(array $except) {
-        return CF::tap(clone $this, function ($clone) use ($except) {
+        return c::tap(clone $this, function ($clone) use ($except) {
             foreach ($except as $type) {
                 $clone->bindings[$type] = [];
             }
@@ -2514,6 +2614,24 @@ class CDatabase_Query_Builder {
      */
     public function dd() {
         cdbg::dd($this->toSql(), $this->getBindings());
+    }
+
+    /**
+     * Get a lazy collection for the given query.
+     *
+     * @return \CBase_LazyCollection
+     */
+    public function cursor() {
+        if (is_null($this->columns)) {
+            $this->columns = ['*'];
+        }
+
+        return new CBase_LazyCollection(function () {
+            $result = $this->db->query($this->toSql(), $this->getBindings());
+            foreach ($result as $row) {
+                yield $row;
+            }
+        });
     }
 
     /**

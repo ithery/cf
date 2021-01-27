@@ -60,6 +60,80 @@ trait CDatabase_Trait_Builder {
     }
 
     /**
+     * Chunk the results of a query by comparing IDs.
+     *
+     * @param int         $count
+     * @param callable    $callback
+     * @param string|null $column
+     * @param string|null $alias
+     *
+     * @return bool
+     */
+    public function chunkById($count, callable $callback, $column = null, $alias = null) {
+        if ($column == null) {
+            $column = $this->defaultKeyName();
+        }
+
+        if ($alias == null) {
+            $alias = $column;
+        }
+
+        $lastId = null;
+
+        $page = 1;
+
+        do {
+            $clone = clone $this;
+
+            // We'll execute the query for the given page and get the results. If there are
+            // no results we can just break and return from here. When there are results
+            // we will call the callback with the current chunk of these results here.
+            $results = $clone->forPageAfterId($count, $lastId, $column)->get();
+
+            $countResults = $results->count();
+
+            if ($countResults == 0) {
+                break;
+            }
+
+            // On each chunk result set, we will pass them to the callback and then let the
+            // developer take care of everything within the callback, which allows us to
+            // keep the memory low for spinning through large result sets for working.
+            if ($callback($results, $page) === false) {
+                return false;
+            }
+
+            $lastId = $results->last()->{$alias};
+
+            unset($results);
+
+            $page++;
+        } while ($countResults == $count);
+
+        return true;
+    }
+
+    /**
+     * Execute a callback over each item while chunking by ID.
+     *
+     * @param callable    $callback
+     * @param int         $count
+     * @param string|null $column
+     * @param string|null $alias
+     *
+     * @return bool
+     */
+    public function eachById(callable $callback, $count = 1000, $column = null, $alias = null) {
+        return $this->chunkById($count, function ($results, $page) use ($callback, $count) {
+            foreach ($results as $key => $value) {
+                if ($callback($value, (($page - 1) * $count) + $key) === false) {
+                    return false;
+                }
+            }
+        }, $column, $alias);
+    }
+
+    /**
      * Execute the query and get the first result.
      *
      * @param array $columns
@@ -71,13 +145,37 @@ trait CDatabase_Trait_Builder {
     }
 
     /**
+     * Execute the query and get the first result if it's the sole matching record.
+     *
+     * @param array|string $columns
+     *
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     *
+     * @throws \CDatabase_Exception_RecordsNotFoundException
+     * @throws \CDatabase_Exception_MultipleRecordsFoundException
+     */
+    public function sole($columns = ['*']) {
+        $result = $this->take(2)->get($columns);
+
+        if ($result->isEmpty()) {
+            throw new CDatabase_Exception_RecordsNotFoundException;
+        }
+
+        if ($result->count() > 1) {
+            throw new CDatabase_Exception_MultipleRecordsFoundException;
+        }
+
+        return $result->first();
+    }
+
+    /**
      * Apply the callback's query changes if the given "value" is true.
      *
      * @param mixed    $value
      * @param callable $callback
      * @param callable $default
      *
-     * @return mixed
+     * @return mixed|$this
      */
     public function when($value, $callback, $default = null) {
         if ($value) {
@@ -93,7 +191,7 @@ trait CDatabase_Trait_Builder {
      *
      * @param \Closure $callback
      *
-     * @return CDatabase_Query_Builder
+     * @return $this
      */
     public function tap($callback) {
         return $this->when(true, $callback);
