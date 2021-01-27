@@ -4,6 +4,8 @@
  * @mixin CModel_Query
  */
 abstract class CModel_Relation {
+    use CTrait_ForwardsCalls;
+
     /**
      * The model query builder instance.
      *
@@ -209,7 +211,7 @@ abstract class CModel_Relation {
     protected function getKeys(array $models, $key = null) {
         return c::collect($models)->map(function ($value) use ($key) {
             return $key ? $value->getAttribute($key) : $value->getKey();
-        })->values()->unique()->sort()->all();
+        })->values()->unique(null, true)->sort()->all();
     }
 
     /**
@@ -251,7 +253,7 @@ abstract class CModel_Relation {
     /**
      * Get the related model of the relation.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \CModel
      */
     public function getRelated() {
         return $this->related;
@@ -282,6 +284,21 @@ abstract class CModel_Relation {
      */
     public function relatedUpdatedAt() {
         return $this->related->getUpdatedAtColumn();
+    }
+
+    /**
+     * Get the name of the "where in" method for eager loading.
+     *
+     * @param \CModel $model
+     * @param string  $key
+     *
+     * @return string
+     */
+    protected function whereInMethod(CModel $model, $key) {
+        return $model->getKeyName() === c::last(explode('.', $key))
+                    && in_array($model->getKeyType(), ['int', 'integer'])
+                        ? 'whereIntegerInRaw'
+                        : 'whereIn';
     }
 
     /**
@@ -339,20 +356,7 @@ abstract class CModel_Relation {
      * @return mixed
      */
     public function __call($method, $parameters) {
-        $class = new ReflectionClass(get_class($this->query));
-
-        try {
-            // Load the controller method
-            $method_object = $class->getMethod($method);
-        } catch (ReflectionException $e) {
-            // Use __call instead
-            $method_object = $class->getMethod('__call');
-
-            // Use arguments in __call format
-            $parameters = [$method, $parameters];
-        }
-
-        $result = $method_object->invokeArgs($this->query, $parameters);
+        $result = $this->forwardCallTo($this->query, $method, $parameters);
 
         //$result = $this->query->{$method}(...$parameters);
 
