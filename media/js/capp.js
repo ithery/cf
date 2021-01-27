@@ -946,7 +946,7 @@ let Cresenity = function () {
             if (typeof settings.onBlock == 'function') {
                 settings.onBlock($(element));
             } else {
-                window.cresenity.blockElement($(element));
+                window.cresenity.blockElement($(element), blockOptions);
             }
 
             $(element).data('xhr', $.ajax({
