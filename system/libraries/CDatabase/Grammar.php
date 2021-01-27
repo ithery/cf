@@ -1,7 +1,6 @@
 <?php
 
 abstract class CDatabase_Grammar {
-
     /**
      * The grammar table prefix.
      *
@@ -12,7 +11,8 @@ abstract class CDatabase_Grammar {
     /**
      * Wrap an array of values.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return array
      */
     public function wrapArray(array $values) {
@@ -22,7 +22,8 @@ abstract class CDatabase_Grammar {
     /**
      * Wrap a table in keyword identifiers.
      *
-     * @param  CDatabase_Query_Expression|string  $table
+     * @param CDatabase_Query_Expression|string $table
+     *
      * @return string
      */
     public function wrapTable($table) {
@@ -36,8 +37,9 @@ abstract class CDatabase_Grammar {
     /**
      * Wrap a value in keyword identifiers.
      *
-     * @param  CDatabase_Query_Expression|string  $value
-     * @param  bool    $prefixAlias
+     * @param CDatabase_Query_Expression|string $value
+     * @param bool                              $prefixAlias
+     *
      * @return string
      */
     public function wrap($value, $prefixAlias = false) {
@@ -58,8 +60,9 @@ abstract class CDatabase_Grammar {
     /**
      * Wrap a value that has an alias.
      *
-     * @param  string  $value
-     * @param  bool  $prefixAlias
+     * @param string $value
+     * @param bool   $prefixAlias
+     *
      * @return string
      */
     protected function wrapAliasedValue($value, $prefixAlias = false) {
@@ -72,28 +75,28 @@ abstract class CDatabase_Grammar {
             $segments[1] = $this->tablePrefix . $segments[1];
         }
 
-        return $this->wrap(
-                        $segments[0]) . ' as ' . $this->wrapValue($segments[1]
-        );
+        return $this->wrap($segments[0]) . ' as ' . $this->wrapValue($segments[1]);
     }
 
     /**
      * Wrap the given value segments.
      *
-     * @param  array  $segments
+     * @param array $segments
+     *
      * @return string
      */
     protected function wrapSegments($segments) {
         $collection = c::collect($segments);
         return $collection->map(function ($segment, $key) use ($segments) {
-                    return $key == 0 && count($segments) > 1 ? $this->wrapTable($segment) : $this->wrapValue($segment);
-                })->implode('.');
+            return $key == 0 && count($segments) > 1 ? $this->wrapTable($segment) : $this->wrapValue($segment);
+        })->implode('.');
     }
 
     /**
      * Wrap a single string in keyword identifiers.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function wrapValue($value) {
@@ -107,7 +110,8 @@ abstract class CDatabase_Grammar {
     /**
      * Convert an array of column names into a delimited string.
      *
-     * @param  array   $columns
+     * @param array $columns
+     *
      * @return string
      */
     public function columnize(array $columns) {
@@ -117,7 +121,8 @@ abstract class CDatabase_Grammar {
     /**
      * Create query parameter place-holders for an array.
      *
-     * @param  array   $values
+     * @param array $values
+     *
      * @return string
      */
     public function parameterize(array $values) {
@@ -127,7 +132,8 @@ abstract class CDatabase_Grammar {
     /**
      * Get the appropriate query parameter place-holder for a value.
      *
-     * @param  mixed   $value
+     * @param mixed $value
+     *
      * @return string
      */
     public function parameter($value) {
@@ -137,7 +143,8 @@ abstract class CDatabase_Grammar {
     /**
      * Determine if the given value is a raw expression.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return bool
      */
     public function isExpression($value) {
@@ -147,7 +154,8 @@ abstract class CDatabase_Grammar {
     /**
      * Get the value of a raw expression.
      *
-     * @param  CDatabase_Query_Expression  $expression
+     * @param CDatabase_Query_Expression $expression
+     *
      * @return string
      */
     public function getValue($expression) {
@@ -175,7 +183,8 @@ abstract class CDatabase_Grammar {
     /**
      * Set the grammar's table prefix.
      *
-     * @param  string  $prefix
+     * @param string $prefix
+     *
      * @return $this
      */
     public function setTablePrefix($prefix) {
@@ -183,5 +192,4 @@ abstract class CDatabase_Grammar {
 
         return $this;
     }
-
 }

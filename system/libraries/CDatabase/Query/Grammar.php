@@ -1,7 +1,6 @@
 <?php
 
 class CDatabase_Query_Grammar extends CDatabase_Grammar {
-
     /**
      * The grammar specific operators.
      *
@@ -32,7 +31,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a select query into SQL.
      *
-     * @param  CDatabase_Query_Builder  $query
+     * @param CDatabase_Query_Builder $query
+     *
      * @return string
      */
     public function compileSelect(CDatabase_Query_Builder $query) {
@@ -52,9 +52,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
         // To compile the query, we'll spin through each component of the query and
         // see if that component exists. If it does we'll just call the compiler
         // function for the component which is responsible for making the SQL.
-        $sql = trim($this->concatenate(
-                        $this->compileComponents($query))
-        );
+        $sql = trim($this->concatenate($this->compileComponents($query)));
 
         $query->columns = $original;
 
@@ -64,7 +62,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the components necessary for a select clause.
      *
-     * @param  CDatabase_Query_Builder  $query
+     * @param CDatabase_Query_Builder $query
+     *
      * @return array
      */
     protected function compileComponents(CDatabase_Query_Builder $query) {
@@ -81,15 +80,15 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
             }
         }
 
-
         return $sql;
     }
 
     /**
      * Compile an aggregated select clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $aggregate
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $aggregate
+     *
      * @return string
      */
     protected function compileAggregate(CDatabase_Query_Builder $query, $aggregate) {
@@ -108,8 +107,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the "select *" portion of the query.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $columns
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $columns
+     *
      * @return string|null
      */
     protected function compileColumns(CDatabase_Query_Builder $query, $columns) {
@@ -128,8 +128,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the "from" portion of the query.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  string  $table
+     * @param CDatabase_Query_Builder $query
+     * @param string                  $table
+     *
      * @return string
      */
     protected function compileFrom(CDatabase_Query_Builder $query, $table) {
@@ -139,22 +140,24 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the "join" portions of the query.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $joins
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $joins
+     *
      * @return string
      */
     protected function compileJoins(CDatabase_Query_Builder $query, $joins) {
         return c::collect($joins)->map(function ($join) use ($query) {
-                    $table = $this->wrapTable($join->table);
+            $table = $this->wrapTable($join->table);
 
-                    return trim("{$join->type} join {$table} {$this->compileWheres($join)}");
-                })->implode(' ');
+            return trim("{$join->type} join {$table} {$this->compileWheres($join)}");
+        })->implode(' ');
     }
 
     /**
      * Compile the "where" portions of the query.
      *
-     * @param  CDatabase_Query_Builder  $query
+     * @param CDatabase_Query_Builder $query
+     *
      * @return string
      */
     protected function compileWheres(CDatabase_Query_Builder $query) {
@@ -178,21 +181,23 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Get an array of all the where clauses for the query.
      *
-     * @param  CDatabase_Query_Builder  $query
+     * @param CDatabase_Query_Builder $query
+     *
      * @return array
      */
     protected function compileWheresToArray($query) {
         $collection = new CCollection($query->wheres);
         return $collection->map(function ($where) use ($query) {
-                    return $where['boolean'] . ' ' . $this->{"where{$where['type']}"}($query, $where);
-                })->all();
+            return $where['boolean'] . ' ' . $this->{"where{$where['type']}"}($query, $where);
+        })->all();
     }
 
     /**
      * Format the where clause statements into one string.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $sql
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $sql
+     *
      * @return string
      */
     protected function concatenateWhereClauses($query, $sql) {
@@ -204,8 +209,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a raw where clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereRaw(CDatabase_Query_Builder $query, $where) {
@@ -215,8 +221,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a basic where clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereBasic(CDatabase_Query_Builder $query, $where) {
@@ -228,8 +235,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a "where in" clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereIn(CDatabase_Query_Builder $query, $where) {
@@ -243,8 +251,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a "where not in" clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereNotIn(CDatabase_Query_Builder $query, $where) {
@@ -258,8 +267,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a where in sub-select clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereInSub(CDatabase_Query_Builder $query, $where) {
@@ -269,8 +279,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a where not in sub-select clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereNotInSub(CDatabase_Query_Builder $query, $where) {
@@ -280,8 +291,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a "where null" clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereNull(CDatabase_Query_Builder $query, $where) {
@@ -291,8 +303,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a "where not null" clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereNotNull(CDatabase_Query_Builder $query, $where) {
@@ -302,8 +315,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a "between" where clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereBetween(CDatabase_Query_Builder $query, $where) {
@@ -315,8 +329,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a "where date" clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereDate(CDatabase_Query_Builder $query, $where) {
@@ -326,8 +341,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a "where time" clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereTime(CDatabase_Query_Builder $query, $where) {
@@ -337,8 +353,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a "where day" clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereDay(CDatabase_Query_Builder $query, $where) {
@@ -348,8 +365,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a "where month" clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereMonth(CDatabase_Query_Builder $query, $where) {
@@ -359,8 +377,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a "where year" clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereYear(CDatabase_Query_Builder $query, $where) {
@@ -370,9 +389,10 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a date based where clause.
      *
-     * @param  string  $type
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param string                  $type
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function dateBasedWhere($type, CDatabase_Query_Builder $query, $where) {
@@ -384,8 +404,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a where clause comparing two columns..
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereColumn(CDatabase_Query_Builder $query, $where) {
@@ -395,8 +416,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a nested where clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereNested(CDatabase_Query_Builder $query, $where) {
@@ -411,8 +433,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a where condition with a sub-select.
      *
-     * @param  CDatabase_Query_Builder $query
-     * @param  array   $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereSub(CDatabase_Query_Builder $query, $where) {
@@ -424,8 +447,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a where exists clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereExists(CDatabase_Query_Builder $query, $where) {
@@ -435,8 +459,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a where exists clause.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $where
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $where
+     *
      * @return string
      */
     protected function whereNotExists(CDatabase_Query_Builder $query, $where) {
@@ -446,8 +471,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the "group by" portions of the query.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $groups
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $groups
+     *
      * @return string
      */
     protected function compileGroups(CDatabase_Query_Builder $query, $groups) {
@@ -457,8 +483,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the "having" portions of the query.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $havings
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $havings
+     *
      * @return string
      */
     protected function compileHavings(CDatabase_Query_Builder $query, $havings) {
@@ -470,7 +497,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a single having clause.
      *
-     * @param  array   $having
+     * @param array $having
+     *
      * @return string
      */
     protected function compileHaving(array $having) {
@@ -487,7 +515,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a basic having clause.
      *
-     * @param  array   $having
+     * @param array $having
+     *
      * @return string
      */
     protected function compileBasicHaving($having) {
@@ -501,8 +530,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the "order by" portions of the query.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $orders
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $orders
+     *
      * @return string
      */
     protected function compileOrders(CDatabase_Query_Builder $query, $orders) {
@@ -516,8 +546,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the query orders to an array.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $orders
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $orders
+     *
      * @return array
      */
     protected function compileOrdersToArray(CDatabase_Query_Builder $query, $orders) {
@@ -529,7 +560,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the random statement into SQL.
      *
-     * @param  string  $seed
+     * @param string $seed
+     *
      * @return string
      */
     public function compileRandom($seed) {
@@ -539,8 +571,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the "limit" portions of the query.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  int  $limit
+     * @param CDatabase_Query_Builder $query
+     * @param int                     $limit
+     *
      * @return string
      */
     protected function compileLimit(CDatabase_Query_Builder $query, $limit) {
@@ -550,8 +583,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the "offset" portions of the query.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  int  $offset
+     * @param CDatabase_Query_Builder $query
+     * @param int                     $offset
+     *
      * @return string
      */
     protected function compileOffset(CDatabase_Query_Builder $query, $offset) {
@@ -561,7 +595,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the "union" queries attached to the main query.
      *
-     * @param  CDatabase_Query_Builder  $query
+     * @param CDatabase_Query_Builder $query
+     *
      * @return string
      */
     protected function compileUnions(CDatabase_Query_Builder $query) {
@@ -589,7 +624,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a single union statement.
      *
-     * @param  array  $union
+     * @param array $union
+     *
      * @return string
      */
     protected function compileUnion(array $union) {
@@ -601,7 +637,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile an exists statement into SQL.
      *
-     * @param  CDatabase_Query_Builder  $query
+     * @param CDatabase_Query_Builder $query
+     *
      * @return string
      */
     public function compileExists(CDatabase_Query_Builder $query) {
@@ -613,8 +650,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile an insert statement into SQL.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $values
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $values
+     *
      * @return string
      */
     public function compileInsert(CDatabase_Query_Builder $query, array $values) {
@@ -633,8 +671,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
         // to the query. Each insert should have the exact same amount of parameter
         // bindings so we will loop through the record and parameterize them all.
         $parameters = c::collect($values)->map(function ($record) {
-                    return '(' . $this->parameterize($record) . ')';
-                })->implode(', ');
+            return '(' . $this->parameterize($record) . ')';
+        })->implode(', ');
 
         return "insert into $table ($columns) values $parameters";
     }
@@ -642,9 +680,10 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile an insert and get ID statement into SQL.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array   $values
-     * @param  string  $sequence
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $values
+     * @param string                  $sequence
+     *
      * @return string
      */
     public function compileInsertGetId(CDatabase_Query_Builder $query, $values, $sequence) {
@@ -654,8 +693,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile an update statement into SQL.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $values
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $values
+     *
      * @return string
      */
     public function compileUpdate(CDatabase_Query_Builder $query, $values) {
@@ -664,9 +704,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
         // Each one of the columns in the update statements needs to be wrapped in the
         // keyword identifiers, also a place-holder needs to be created for each of
         // the values in the list of bindings so we can make the sets statements.
-        $columns = collect($values)->map(function ($value, $key) {
-                    return $this->wrap($key) . ' = ' . $this->parameter($value);
-                })->implode(', ');
+        $columns = c::collect($values)->map(function ($value, $key) {
+            return $this->wrap($key) . ' = ' . $this->parameter($value);
+        })->implode(', ');
 
         // If the query has any "join" clauses, we will setup the joins on the builder
         // and compile them so we can attach them to this update, as update queries
@@ -688,22 +728,24 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Prepare the bindings for an update statement.
      *
-     * @param  array  $bindings
-     * @param  array  $values
+     * @param array $bindings
+     * @param array $values
+     *
      * @return array
      */
     public function prepareBindingsForUpdate(array $bindings, array $values) {
         $cleanBindings = carr::except($bindings, ['join', 'select']);
 
         return array_values(
-                array_merge($bindings['join'], $values, carr::flatten($cleanBindings))
+            array_merge($bindings['join'], $values, carr::flatten($cleanBindings))
         );
     }
 
     /**
      * Compile a delete statement into SQL.
      *
-     * @param  CDatabase_Query_Builder  $query
+     * @param CDatabase_Query_Builder $query
+     *
      * @return string
      */
     public function compileDelete(CDatabase_Query_Builder $query) {
@@ -715,7 +757,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Prepare the bindings for a delete statement.
      *
-     * @param  array  $bindings
+     * @param array $bindings
+     *
      * @return array
      */
     public function prepareBindingsForDelete(array $bindings) {
@@ -725,7 +768,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile a truncate table statement into SQL.
      *
-     * @param  CDatabase_Query_Builder  $query
+     * @param CDatabase_Query_Builder $query
+     *
      * @return array
      */
     public function compileTruncate(CDatabase_Query_Builder $query) {
@@ -735,8 +779,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the lock into SQL.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  bool|string  $value
+     * @param CDatabase_Query_Builder $query
+     * @param bool|string             $value
+     *
      * @return string
      */
     protected function compileLock(CDatabase_Query_Builder $query, $value) {
@@ -755,7 +800,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the SQL statement to define a savepoint.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     public function compileSavepoint($name) {
@@ -765,7 +811,8 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Compile the SQL statement to execute a savepoint rollback.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     public function compileSavepointRollBack($name) {
@@ -775,19 +822,21 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     /**
      * Concatenate an array of segments, removing empties.
      *
-     * @param  array   $segments
+     * @param array $segments
+     *
      * @return string
      */
     protected function concatenate($segments) {
         return implode(' ', array_filter($segments, function ($value) {
-                    return (string) $value !== '';
-                }));
+            return (string) $value !== '';
+        }));
     }
 
     /**
      * Remove the leading boolean from a statement.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function removeLeadingBoolean($value) {
@@ -802,5 +851,4 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     public function getOperators() {
         return $this->operators;
     }
-
 }
