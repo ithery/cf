@@ -472,7 +472,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         }
 
         return function ($item) use ($key, $operator, $value) {
-            $retrieved = CF::get($item, $key);
+            $retrieved = c::get($item, $key);
 
             $strings = array_filter([$retrieved, $value], function ($value) {
                 return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
@@ -662,7 +662,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
             return $this->items[$key];
         }
 
-        return CF::value($default);
+        return c::value($default);
     }
 
     /**
