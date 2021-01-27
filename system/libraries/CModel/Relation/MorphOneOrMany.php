@@ -1,7 +1,6 @@
 <?php
 
 abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMany {
-
     /**
      * The foreign key type for the relationship.
      *
@@ -19,16 +18,17 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
     /**
      * Create a new morph one or many relationship instance.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel  $parent
-     * @param  string  $type
-     * @param  string  $id
-     * @param  string  $localKey
+     * @param CModel_Query $query
+     * @param CModel       $parent
+     * @param string       $type
+     * @param string       $id
+     * @param string       $localKey
+     *
      * @return void
      */
     public function __construct(CModel_Query $query, CModel $parent, $type, $id, $localKey) {
         $this->morphType = $type;
-        
+
         $this->morphClass = $parent->getMorphClass();
         parent::__construct($query, $parent, $id, $localKey);
     }
@@ -49,7 +49,8 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param  array  $models
+     * @param array $models
+     *
      * @return void
      */
     public function addEagerConstraints(array $models) {
@@ -61,7 +62,8 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
     /**
      * Attach a model instance to the parent model.
      *
-     * @param  CModel  $model
+     * @param CModel $model
+     *
      * @return CModel
      */
     public function save(CModel $model) {
@@ -73,7 +75,8 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
     /**
      * Set the foreign ID and type for creating a related model.
      *
-     * @param  CModel  $model
+     * @param CModel $model
+     *
      * @return void
      */
     protected function setForeignAttributesForCreate(CModel $model) {
@@ -85,14 +88,16 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
     /**
      * Get the relationship query.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel_Query  $parentQuery
-     * @param  array|mixed  $columns
+     * @param CModel_Query $query
+     * @param CModel_Query $parentQuery
+     * @param array|mixed  $columns
+     *
      * @return CModel_Query
      */
     public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
         return parent::getRelationExistenceQuery($query, $parentQuery, $columns)->where(
-                        $this->morphType, $this->morphClass
+            $this->morphType,
+            $this->morphClass
         );
     }
 
@@ -122,5 +127,4 @@ abstract class CModel_Relation_MorphOneOrMany extends CModel_Relation_HasOneOrMa
     public function getMorphClass() {
         return $this->morphClass;
     }
-
 }

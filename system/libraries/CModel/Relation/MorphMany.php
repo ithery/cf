@@ -1,7 +1,6 @@
 <?php
 
 class CModel_Relation_MorphMany extends CModel_Relation_MorphOneOrMany {
-
     /**
      * Get the results of the relationship.
      *
@@ -14,8 +13,9 @@ class CModel_Relation_MorphMany extends CModel_Relation_MorphOneOrMany {
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
-     * @param  string  $relation
+     * @param array  $models
+     * @param string $relation
+     *
      * @return array
      */
     public function initRelation(array $models, $relation) {
@@ -29,13 +29,13 @@ class CModel_Relation_MorphMany extends CModel_Relation_MorphOneOrMany {
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array   $models
-     * @param  CModel_Collection  $results
-     * @param  string  $relation
+     * @param array             $models
+     * @param CModel_Collection $results
+     * @param string            $relation
+     *
      * @return array
      */
     public function match(array $models, CModel_Collection $results, $relation) {
         return $this->matchMany($models, $results, $relation);
     }
-
 }
