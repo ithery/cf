@@ -44,13 +44,6 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     protected $secondLocalKey;
 
     /**
-     * The count of self joins.
-     *
-     * @var int
-     */
-    protected static $selfJoinCount = 0;
-
-    /**
      * Create a new has many through relationship instance.
      *
      * @param \CModel_Query $query
@@ -462,15 +455,6 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
             '=',
             $this->getQualifiedFirstKeyName()
         );
-    }
-
-    /**
-     * Get a relationship join table hash.
-     *
-     * @return string
-     */
-    public function getRelationCountHash() {
-        return 'laravel_reserved_' . static::$selfJoinCount++;
     }
 
     /**

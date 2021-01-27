@@ -33,13 +33,6 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
     protected $relation;
 
     /**
-     * The count of self joins.
-     *
-     * @var int
-     */
-    protected static $selfJoinCount = 0;
-
-    /**
      * Create a new belongs to relationship instance.
      *
      * @param CModel_Query $query
@@ -269,15 +262,6 @@ class CModel_Relation_BelongsTo extends CModel_Relation {
             '=',
             $this->getQualifiedForeignKey()
         );
-    }
-
-    /**
-     * Get a relationship join table hash.
-     *
-     * @return string
-     */
-    public function getRelationCountHash() {
-        return 'laravel_reserved_' . static::$selfJoinCount++;
     }
 
     /**

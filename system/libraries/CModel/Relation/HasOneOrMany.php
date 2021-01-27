@@ -16,13 +16,6 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
     protected $localKey;
 
     /**
-     * The count of self joins.
-     *
-     * @var int
-     */
-    protected static $selfJoinCount = 0;
-
-    /**
      * Create a new has one or many relationship instance.
      *
      * @param CModel_Query $query
@@ -353,15 +346,6 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
             '=',
             $hash . '.' . $this->getForeignKeyName()
         );
-    }
-
-    /**
-     * Get a relationship join table hash.
-     *
-     * @return string
-     */
-    public function getRelationCountHash() {
-        return 'laravel_reserved_' . static::$selfJoinCount++;
     }
 
     /**

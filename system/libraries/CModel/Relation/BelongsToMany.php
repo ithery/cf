@@ -102,13 +102,6 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     protected $accessor = 'pivot';
 
     /**
-     * The count of self joins.
-     *
-     * @var int
-     */
-    protected static $selfJoinCount = 0;
-
-    /**
      * Create a new belongs to many relationship instance.
      *
      * @param CModel_Query $query
@@ -851,15 +844,6 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      */
     public function getExistenceCompareKey() {
         return $this->getQualifiedForeignPivotKeyName();
-    }
-
-    /**
-     * Get a relationship join table hash.
-     *
-     * @return string
-     */
-    public function getRelationCountHash() {
-        return 'laravel_reserved_' . static::$selfJoinCount++;
     }
 
     /**
