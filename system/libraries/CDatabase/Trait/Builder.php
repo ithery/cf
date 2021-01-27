@@ -254,16 +254,4 @@ trait CDatabase_Trait_Builder {
             'options'
         ));
     }
-
-    /**
-     * Set the limit and offset for a given page.
-     *
-     * @param int $page
-     * @param int $perPage
-     *
-     * @return CDatabase_Query_Builder|static
-     */
-    public function forPage($page, $perPage = 15) {
-        return $this->skip(($page - 1) * $perPage)->take($perPage);
-    }
 }

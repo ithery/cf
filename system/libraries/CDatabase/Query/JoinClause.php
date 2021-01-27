@@ -1,8 +1,6 @@
 <?php
 
-
-class CDatabase_Query_JoinClause extends CDatabase_Query_Builder
-{
+class CDatabase_Query_JoinClause extends CDatabase_Query_Builder {
     /**
      * The type of join being performed.
      *
@@ -27,19 +25,21 @@ class CDatabase_Query_JoinClause extends CDatabase_Query_Builder
     /**
      * Create a new join clause instance.
      *
-     * @param  CDatabase_Query_Builder $parentQuery
-     * @param  string  $type
-     * @param  string  $table
+     * @param CDatabase_Query_Builder $parentQuery
+     * @param string                  $type
+     * @param string                  $table
+     *
      * @return void
      */
-    public function __construct(CDatabase_Query_Builder $parentQuery, $type, $table)
-    {
+    public function __construct(CDatabase_Query_Builder $parentQuery, $type, $table) {
         $this->type = $type;
         $this->table = $table;
         $this->parentQuery = $parentQuery;
 
         parent::__construct(
-            $parentQuery->getConnection(), $parentQuery->getGrammar(), $parentQuery->getProcessor()
+            $parentQuery->getConnection(),
+            $parentQuery->getGrammar(),
+            $parentQuery->getProcessor()
         );
     }
 
@@ -55,16 +55,16 @@ class CDatabase_Query_JoinClause extends CDatabase_Query_Builder
      *
      * on `contacts`.`user_id` = `users`.`id`  and `contacts`.`info_id` = `info`.`id`
      *
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
-     * @param  string  $boolean
+     * @param \Closure|string $first
+     * @param string|null     $operator
+     * @param string|null     $second
+     * @param string          $boolean
+     *
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function on($first, $operator = null, $second = null, $boolean = 'and')
-    {
+    public function on($first, $operator = null, $second = null, $boolean = 'and') {
         if ($first instanceof Closure) {
             return $this->whereNested($first, $boolean);
         }
@@ -75,13 +75,13 @@ class CDatabase_Query_JoinClause extends CDatabase_Query_Builder
     /**
      * Add an "or on" clause to the join.
      *
-     * @param  \Closure|string  $first
-     * @param  string|null  $operator
-     * @param  string|null  $second
+     * @param \Closure|string $first
+     * @param string|null     $operator
+     * @param string|null     $second
+     *
      * @return \Illuminate\Database\Query\JoinClause
      */
-    public function orOn($first, $operator = null, $second = null)
-    {
+    public function orOn($first, $operator = null, $second = null) {
         return $this->on($first, $operator, $second, 'or');
     }
 
@@ -90,8 +90,7 @@ class CDatabase_Query_JoinClause extends CDatabase_Query_Builder
      *
      * @return \Illuminate\Database\Query\JoinClause
      */
-    public function newQuery()
-    {
+    public function newQuery() {
         return new static($this->parentQuery, $this->type, $this->table);
     }
 
@@ -100,8 +99,7 @@ class CDatabase_Query_JoinClause extends CDatabase_Query_Builder
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    protected function forSubQuery()
-    {
+    protected function forSubQuery() {
         return $this->parentQuery->newQuery();
     }
 }

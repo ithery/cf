@@ -141,6 +141,21 @@ abstract class CDatabase_Grammar {
     }
 
     /**
+     * Quote the given string literal.
+     *
+     * @param string|array $value
+     *
+     * @return string
+     */
+    public function quoteString($value) {
+        if (is_array($value)) {
+            return implode(', ', array_map([$this, __FUNCTION__], $value));
+        }
+
+        return "'$value'";
+    }
+
+    /**
      * Determine if the given value is a raw expression.
      *
      * @param mixed $value

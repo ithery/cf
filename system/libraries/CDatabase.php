@@ -373,13 +373,13 @@ class CDatabase {
     /**
      * Runs a query into the driver and returns the result.
      *
-     * @param   string  SQL query to execute
-     * @param mixed $sql
-     * @param mixed $bindings
+     * @param string $sql        SQL query to execute
+     * @param array  $bindings
+     * @param bool   $useReadPdo
      *
      * @return CDatabase_Result
      */
-    public function query($sql = '', $bindings = [], Closure $callback = null) {
+    public function query($sql = '', $bindings = [], $useReadPdo = true) {
         if ($sql == '') {
             return false;
         }

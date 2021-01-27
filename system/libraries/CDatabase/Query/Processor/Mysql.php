@@ -1,11 +1,11 @@
 <?php
 
 class CDatabase_Query_Processor_MySql extends CDatabase_Query_Processor {
-
     /**
      * Process the results of a column listing query.
      *
-     * @param  array  $results
+     * @param array $results
+     *
      * @return array
      */
     public function processColumnListing($results) {
@@ -14,5 +14,4 @@ class CDatabase_Query_Processor_MySql extends CDatabase_Query_Processor {
             return $obj->column_name;
         }, $results);
     }
-
 }
