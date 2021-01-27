@@ -1,11 +1,11 @@
 <?php
 
 interface CDatabase_ResolverInterface {
-
     /**
      * Get a database connection instance.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return CDatabase
      */
     public function connection($name = null);
@@ -20,7 +20,8 @@ interface CDatabase_ResolverInterface {
     /**
      * Set the default connection name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return void
      */
     public function setDefaultConnection($name);
