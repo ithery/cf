@@ -451,7 +451,7 @@ class CModel_Query {
      *
      * @param array $columns
      *
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     * @return \CModel_Collection|static[]
      */
     public function get($columns = ['*']) {
         $builder = $this->applyScopes();

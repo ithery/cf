@@ -23,22 +23,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CModel[] getModels($columns = ['*']) Get the hydrated models without eager loading.
  * @method array eagerLoadRelations(array $models) Eager load the relationships for the models.
  * @method array loadRelation(array $models, $name, Closure $constraints) Eagerly load the relationship on a set of models.
- * @method CModel_Query where($column, $operator = null, $value = null, $boolean = 'and') Add a basic where clause to the query.
- * @method CModel_Query orWhere($column, $operator = null, $value = null) Add an "or where" clause to the query.
- * @method CModel_Query has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
- * @method CDatabase_Query_Builder where($column, $operator = null, $value = null)
- * @method CDatabase_Query_Builder whereRaw($sql, array $bindings = [])
- * @method CDatabase_Query_Builder whereBetween($column, array $values)
- * @method CDatabase_Query_Builder whereNotBetween($column, array $values)
- * @method CDatabase_Query_Builder whereNested(Closure $callback)
- * @method CDatabase_Query_Builder addNestedWhereQuery($query)
- * @method CDatabase_Query_Builder whereExists(Closure $callback)
- * @method CDatabase_Query_Builder whereNotExists(Closure $callback)
- * @method CDatabase_Query_Builder whereIn($column, $values)
- * @method CDatabase_Query_Builder whereNotIn($column, $values)
- * @method CDatabase_Query_Builder whereNull($column)
- * @method CDatabase_Query_Builder whereNotNull($column)
- * @method static CDatabase_Query_Builder where($column, $operator = null, $value = null)
+ * @method static CModel_Query where($column, $operator = null, $value = null, $boolean = 'and') Add a basic where clause to the query.
+ * @method static CModel_Query orWhere($column, $operator = null, $value = null) Add an "or where" clause to the query.
+ * @method static CModel_Query has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
  * @method static CDatabase_Query_Builder whereRaw($sql, array $bindings = [])
  * @method static CDatabase_Query_Builder whereBetween($column, array $values)
  * @method static CDatabase_Query_Builder whereNotBetween($column, array $values)
@@ -50,7 +37,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static CDatabase_Query_Builder whereNotIn($column, $values)
  * @method static CDatabase_Query_Builder whereNull($column)
  * @method static CDatabase_Query_Builder whereNotNull($column)
- * @method CDatabase_Query_Builder orWhere($column, $operator = null, $value = null)
  * @method CDatabase_Query_Builder orWhereRaw($sql, array $bindings = [])
  * @method CDatabase_Query_Builder orWhereBetween($column, array $values)
  * @method CDatabase_Query_Builder orWhereNotBetween($column, array $values)
@@ -258,6 +244,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array $attributes
      *
      * @return void
+     * @throws CModel_Exception_MassAssignment
      */
     public function __construct(array $attributes = []) {
         $this->primaryKey = $this->table . '_id';
@@ -389,6 +376,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array $attributes
      *
      * @return $this
+     * @throws CModel_Exception_MassAssignment
      */
     public function forceFill(array $attributes) {
         return static::unguarded(function () use ($attributes) {
@@ -415,9 +403,10 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * Create a new instance of the given model.
      *
      * @param array $attributes
-     * @param bool  $exists
+     * @param bool $exists
      *
      * @return static
+     * @throws CModel_Exception_MassAssignment
      */
     public function newInstance($attributes = [], $exists = false) {
         // This method just provides a convenient way for us to generate fresh model
@@ -439,10 +428,11 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Create a new model instance that is existing.
      *
-     * @param array       $attributes
+     * @param array $attributes
      * @param string|null $connection
      *
      * @return static
+     * @throws CModel_Exception_MassAssignment
      */
     public function newFromBuilder($attributes = [], $connection = null) {
         $model = $this->newInstance([], true);
@@ -475,7 +465,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Begin querying the model on the write connection.
      *
-     * @return CDatabae_Query_Builder
+     * @return CDatabase_Query_Builder
      */
     public static function onWriteConnection() {
         $instance = new static;
@@ -545,10 +535,11 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * Increment a column's value by a given amount.
      *
      * @param string $column
-     * @param int    $amount
-     * @param array  $extra
+     * @param int $amount
+     * @param array $extra
      *
      * @return int
+     * @throws CModel_Exception_MassAssignment
      */
     public function increment($column, $amount = 1, array $extra = []) {
         return $this->incrementOrDecrement($column, $amount, $extra, 'increment');
@@ -558,10 +549,11 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * Decrement a column's value by a given amount.
      *
      * @param string $column
-     * @param int    $amount
-     * @param array  $extra
+     * @param int $amount
+     * @param array $extra
      *
      * @return int
+     * @throws CModel_Exception_MassAssignment
      */
     public function decrement($column, $amount = 1, array $extra = []) {
         return $this->incrementOrDecrement($column, $amount, $extra, 'decrement');
@@ -571,11 +563,12 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * Run the increment or decrement method on the model.
      *
      * @param string $column
-     * @param int    $amount
-     * @param array  $extra
+     * @param int $amount
+     * @param array $extra
      * @param string $method
      *
      * @return int
+     * @throws CModel_Exception_MassAssignment
      */
     protected function incrementOrDecrement($column, $amount, $extra, $method) {
         $query = $this->newQuery();
@@ -596,11 +589,12 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * Increment the underlying attribute value and sync with original.
      *
      * @param string $column
-     * @param int    $amount
-     * @param array  $extra
+     * @param int $amount
+     * @param array $extra
      * @param string $method
      *
      * @return void
+     * @throws CModel_Exception_MassAssignment
      */
     protected function incrementOrDecrementAttributeValue($column, $amount, $extra, $method) {
         $this->{$column} = $this->{$column} + ($method == 'increment' ? $amount : $amount * -1);
@@ -617,6 +611,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array $options
      *
      * @return bool
+     * @throws CModel_Exception_MassAssignment
      */
     public function update(array $attributes = [], array $options = []) {
         if (!$this->exists) {
@@ -910,7 +905,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         // immediately and not do anything else. Otherwise, we will continue with a
         // deletion process on the model, firing the proper events, and so forth.
         if (!$this->exists) {
-            return;
+            return null;
         }
 
         if ($this->fireModelEvent('deleting') === false) {
@@ -938,6 +933,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * This method protects developers from running forceDelete when trait is missing.
      *
      * @return bool|null
+     * @throws Exception
      */
     public function forceDelete() {
         return $this->delete();
@@ -957,7 +953,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Begin querying the model.
      *
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @return CModel_Query
      */
     public static function query() {
         return (new static)->newQuery();
@@ -1136,7 +1132,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      */
     public function fresh($with = []) {
         if (!$this->exists) {
-            return;
+            return null;
         }
 
         return $this->newQueryWithoutScopes()
@@ -1167,7 +1163,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param array|null $except
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \CModel
      */
     public function replicate(array $except = null) {
         $defaults = [
@@ -1191,7 +1187,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Determine if two models have the same ID and belong to the same table.
      *
-     * @param \Illuminate\Database\Eloquent\Model|null $model
+     * @param \CModel|null $model
      *
      * @return bool
      */
@@ -1205,7 +1201,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Determine if two models are not the same.
      *
-     * @param \Illuminate\Database\Eloquent\Model|null $model
+     * @param \CModel|null $model
      *
      * @return bool
      */
@@ -1447,7 +1443,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param mixed $value
      *
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return \CModel|null
      */
     public function resolveRouteBinding($value) {
         return $this->where($this->getRouteKeyName(), $value)->first();
