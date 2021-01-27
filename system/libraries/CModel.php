@@ -9,7 +9,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Class TBModel
  *
- * @method CModel|CModel_Collection|null find($id, $columns = ['*']) Find a model by its primary key.
+ * @method static CModel|CModel_Collection|null find($id, $columns = ['*']) Find a model by its primary key.
  * @method static CModel_Collection findMany($ids, $columns = ['*']) Find a model by its primary key.
  * @method static CModel|CModel_Collection|$this findOrFail($id, $columns = ['*']) Find a model by its primary key or throw an exception.
  * @method CModel|CModel_Query|null first($columns = ['*']) Execute the query and get the first result.
