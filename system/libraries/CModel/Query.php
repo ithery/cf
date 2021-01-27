@@ -56,6 +56,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CModel_Query join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
  * @method CModel_Query select($columns = ['*'])
  * @method CModel_Query groupBy(...$groups)
+ * @method CModel_Query newQuery()
+ * @method CModel_Query from($table)
+ * @method CModel_Query leftJoinSub($query, $as, $first, $operator = null, $second = null)
+ * @method CModel_Query addSelect($column)
+ * @method CModel_Query selectRaw($expression, array $bindings = [])
+ * @method CModel_Query orderBy($column, $direction = 'asc')
  */
 class CModel_Query {
     use CDatabase_Trait_Builder,
