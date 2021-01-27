@@ -1278,6 +1278,17 @@ class CModel_Query {
     }
 
     /**
+     * Qualify the given column name by the model's table.
+     *
+     * @param string|CDatabase_Query_Expression $column
+     *
+     * @return string
+     */
+    public function qualifyColumn($column) {
+        return $this->model->qualifyColumn($column);
+    }
+
+    /**
      * Get the given macro by name.
      *
      * @param string $name
