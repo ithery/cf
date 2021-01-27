@@ -534,7 +534,7 @@ class CDatabase_Query_Builder {
             return $this->join($table, $first, $operator, $second, 'cross');
         }
 
-        $this->joins[] = new JoinClause($this, 'cross', $table);
+        $this->joins[] = new CDatabase_Query_JoinClause($this, 'cross', $table);
 
         return $this;
     }
@@ -1685,7 +1685,7 @@ class CDatabase_Query_Builder {
      *
      * @param array $columns
      *
-     * @return \Illuminate\Database\Eloquent\Model|static|null
+     * @return CModel|static|null
      */
     public function first($columns = ['*']) {
         return $this->take(1)->get($columns)->first();
