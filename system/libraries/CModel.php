@@ -7,6 +7,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 
 /**
+ * Class TBModel
+ *
  * @method CModel|CModel_Collection|null find($id, $columns = ['*']) Find a model by its primary key.
  * @method static CModel_Collection findMany($ids, $columns = ['*']) Find a model by its primary key.
  * @method static CModel|CModel_Collection|$this findOrFail($id, $columns = ['*']) Find a model by its primary key or throw an exception.
@@ -50,8 +52,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CDatabase_Query_Builder whereDay($column, $operator, $value)
  * @method CDatabase_Query_Builder whereMonth($column, $operator, $value)
  * @method CDatabase_Query_Builder whereYear($column, $operator, $value)
- *
- * Class TBModel
  */
 abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_Jsonable, CQueue_QueueableEntityInterface {
     use CModel_Trait_GuardsAttributes,
@@ -244,6 +244,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array $attributes
      *
      * @return void
+     *
      * @throws CModel_Exception_MassAssignment
      */
     public function __construct(array $attributes = []) {
@@ -376,6 +377,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array $attributes
      *
      * @return $this
+     *
      * @throws CModel_Exception_MassAssignment
      */
     public function forceFill(array $attributes) {
@@ -403,9 +405,10 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * Create a new instance of the given model.
      *
      * @param array $attributes
-     * @param bool $exists
+     * @param bool  $exists
      *
      * @return static
+     *
      * @throws CModel_Exception_MassAssignment
      */
     public function newInstance($attributes = [], $exists = false) {
@@ -428,10 +431,11 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Create a new model instance that is existing.
      *
-     * @param array $attributes
+     * @param array       $attributes
      * @param string|null $connection
      *
      * @return static
+     *
      * @throws CModel_Exception_MassAssignment
      */
     public function newFromBuilder($attributes = [], $connection = null) {
@@ -535,10 +539,11 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * Increment a column's value by a given amount.
      *
      * @param string $column
-     * @param int $amount
-     * @param array $extra
+     * @param int    $amount
+     * @param array  $extra
      *
      * @return int
+     *
      * @throws CModel_Exception_MassAssignment
      */
     public function increment($column, $amount = 1, array $extra = []) {
@@ -549,10 +554,11 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * Decrement a column's value by a given amount.
      *
      * @param string $column
-     * @param int $amount
-     * @param array $extra
+     * @param int    $amount
+     * @param array  $extra
      *
      * @return int
+     *
      * @throws CModel_Exception_MassAssignment
      */
     public function decrement($column, $amount = 1, array $extra = []) {
@@ -563,11 +569,12 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * Run the increment or decrement method on the model.
      *
      * @param string $column
-     * @param int $amount
-     * @param array $extra
+     * @param int    $amount
+     * @param array  $extra
      * @param string $method
      *
      * @return int
+     *
      * @throws CModel_Exception_MassAssignment
      */
     protected function incrementOrDecrement($column, $amount, $extra, $method) {
@@ -589,11 +596,12 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * Increment the underlying attribute value and sync with original.
      *
      * @param string $column
-     * @param int $amount
-     * @param array $extra
+     * @param int    $amount
+     * @param array  $extra
      * @param string $method
      *
      * @return void
+     *
      * @throws CModel_Exception_MassAssignment
      */
     protected function incrementOrDecrementAttributeValue($column, $amount, $extra, $method) {
@@ -611,6 +619,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array $options
      *
      * @return bool
+     *
      * @throws CModel_Exception_MassAssignment
      */
     public function update(array $attributes = [], array $options = []) {
@@ -933,6 +942,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * This method protects developers from running forceDelete when trait is missing.
      *
      * @return bool|null
+     *
      * @throws Exception
      */
     public function forceDelete() {

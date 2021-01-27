@@ -84,6 +84,7 @@
     <exclude-pattern>*/src/Standards/*/Tests/*\.(inc|css|js)$</exclude-pattern>
     <exclude-pattern>*/tests/Core/*/*\.(inc|css|js)$</exclude-pattern>
     <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/vendor/*\.(css|js)</exclude-pattern>
     <exclude-pattern>*/*.blade.php</exclude-pattern>
 
     <rule ref="Internal.NoCodeFound">
