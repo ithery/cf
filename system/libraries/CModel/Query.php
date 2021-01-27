@@ -10,7 +10,52 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 
 /**
- * @mixin CDatabase_Query_Builder
+ * Class CModel_Query
+ *
+ * @method static CModel|CModel_Collection|static|null find($id, $columns = ['*']) Find a model by its primary key.
+ * @method static CModel_Collection findMany($ids, $columns = ['*']) Find a model by its primary key.
+ * @method static CModel|CModel_Collection|static findOrFail($id, $columns = ['*']) Find a model by its primary key or throw an exception.
+ * @method static CModel|CModel_Query|static|null first($columns = ['*']) Execute the query and get the first result.
+ * @method static CModel|CModel_Query|static firstOrFail($columns = ['*']) Execute the query and get the first result or throw an exception.
+ * @method static CModel_Collection|CModel_Query[]|static[] get($columns = ['*']) Execute the query as a "select" statement.
+ * @method mixed value($column) Get a single column's value from the first result of a query.
+ * @method mixed pluck($column) Get a single column's value from the first result of a query.
+ * @method void chunk($count, callable $callback) Chunk the results of the query.
+ * @method \CCollection lists($column, $key = null) Get an array with the values of a given column.
+ * @method void onDelete(Closure $callback) Register a replacement for the default delete function.
+ * @method CModel[] getModels($columns = ['*']) Get the hydrated models without eager loading.
+ * @method array eagerLoadRelations(array $models) Eager load the relationships for the models.
+ * @method array loadRelation(array $models, $name, Closure $constraints) Eagerly load the relationship on a set of models.
+ * @method static CModel_Query where($column, $operator = null, $value = null, $boolean = 'and') Add a basic where clause to the query.
+ * @method static CModel_Query orWhere($column, $operator = null, $value = null) Add an "or where" clause to the query.
+ * @method static CModel_Query has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
+ * @method static CDatabase_Query_Builder whereRaw($sql, array $bindings = [])
+ * @method static CDatabase_Query_Builder whereBetween($column, array $values)
+ * @method static CDatabase_Query_Builder whereNotBetween($column, array $values)
+ * @method static CDatabase_Query_Builder whereNested(Closure $callback)
+ * @method static CDatabase_Query_Builder addNestedWhereQuery($query)
+ * @method static CDatabase_Query_Builder whereExists(Closure $callback)
+ * @method static CDatabase_Query_Builder whereNotExists(Closure $callback)
+ * @method static CDatabase_Query_Builder whereIn($column, $values)
+ * @method static CDatabase_Query_Builder whereNotIn($column, $values)
+ * @method static CDatabase_Query_Builder whereNull($column)
+ * @method static CDatabase_Query_Builder whereNotNull($column)
+ * @method CModel_Query orWhereRaw($sql, array $bindings = [])
+ * @method CModel_Query orWhereBetween($column, array $values)
+ * @method CModel_Query orWhereNotBetween($column, array $values)
+ * @method CModel_Query orWhereExists(Closure $callback)
+ * @method CModel_Query orWhereNotExists(Closure $callback)
+ * @method CModel_Query orWhereIn($column, $values)
+ * @method CModel_Query orWhereNotIn($column, $values)
+ * @method CModel_Query orWhereNull($column)
+ * @method CModel_Query orWhereNotNull($column)
+ * @method CModel_Query whereDate($column, $operator, $value)
+ * @method CModel_Query whereDay($column, $operator, $value)
+ * @method CModel_Query whereMonth($column, $operator, $value)
+ * @method CModel_Query whereYear($column, $operator, $value)
+ * @method CModel_Query join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+ * @method CModel_Query select($columns = ['*'])
+ * @method CModel_Query groupBy(...$groups)
  */
 class CModel_Query {
     use CDatabase_Trait_Builder,

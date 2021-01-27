@@ -7,7 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 
 /**
- * Class TBModel
+ * Class CModel
  *
  * @method static CModel|CModel_Collection|static|null find($id, $columns = ['*']) Find a model by its primary key.
  * @method static CModel_Collection findMany($ids, $columns = ['*']) Find a model by its primary key.
@@ -39,19 +39,22 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static CDatabase_Query_Builder whereNotIn($column, $values)
  * @method static CDatabase_Query_Builder whereNull($column)
  * @method static CDatabase_Query_Builder whereNotNull($column)
- * @method CDatabase_Query_Builder orWhereRaw($sql, array $bindings = [])
- * @method CDatabase_Query_Builder orWhereBetween($column, array $values)
- * @method CDatabase_Query_Builder orWhereNotBetween($column, array $values)
- * @method CDatabase_Query_Builder orWhereExists(Closure $callback)
- * @method CDatabase_Query_Builder orWhereNotExists(Closure $callback)
- * @method CDatabase_Query_Builder orWhereIn($column, $values)
- * @method CDatabase_Query_Builder orWhereNotIn($column, $values)
- * @method CDatabase_Query_Builder orWhereNull($column)
- * @method CDatabase_Query_Builder orWhereNotNull($column)
- * @method CDatabase_Query_Builder whereDate($column, $operator, $value)
- * @method CDatabase_Query_Builder whereDay($column, $operator, $value)
- * @method CDatabase_Query_Builder whereMonth($column, $operator, $value)
- * @method CDatabase_Query_Builder whereYear($column, $operator, $value)
+ * @method CModel_Query orWhereRaw($sql, array $bindings = [])
+ * @method CModel_Query orWhereBetween($column, array $values)
+ * @method CModel_Query orWhereNotBetween($column, array $values)
+ * @method CModel_Query orWhereExists(Closure $callback)
+ * @method CModel_Query orWhereNotExists(Closure $callback)
+ * @method CModel_Query orWhereIn($column, $values)
+ * @method CModel_Query orWhereNotIn($column, $values)
+ * @method CModel_Query orWhereNull($column)
+ * @method CModel_Query orWhereNotNull($column)
+ * @method CModel_Query whereDate($column, $operator, $value)
+ * @method CModel_Query whereDay($column, $operator, $value)
+ * @method CModel_Query whereMonth($column, $operator, $value)
+ * @method CModel_Query whereYear($column, $operator, $value)
+ * @method CModel_Query join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+ * @method CModel_Query select($columns = ['*'])
+ * @method CModel_Query groupBy(...$groups)
  */
 abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_Jsonable, CQueue_QueueableEntityInterface {
     use CModel_Trait_GuardsAttributes,
