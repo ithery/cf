@@ -1,9 +1,14 @@
 <?php
 
+/**
+ * Helper ctemp
+ *
+ * @deprecated 1.2 use CTemporary
+ */
+// @codingStandardsIgnoreStart
 class ctemp {
-
     public static function get_directory() {
-        $path = DOCROOT . "temp" . DIRECTORY_SEPARATOR;
+        $path = DOCROOT . 'temp' . DIRECTORY_SEPARATOR;
         if (!is_dir($path)) {
             mkdir($path);
         }
@@ -36,11 +41,12 @@ class ctemp {
         $path = ctemp::makefolder($path, $main_folder);
         $basefile = basename($filename);
         for ($i = 0; $i < $depth; $i++) {
-            $c = "_";
+            $c = '_';
             if (strlen($basefile) > ($i + 1)) {
                 $c = substr($basefile, $i + 8, 1);
-                if (strlen($c) == 0)
-                    $c = "_";
+                if (strlen($c) == 0) {
+                    $c = '_';
+                }
                 $path = ctemp::makefolder($path, $c);
             }
         }
@@ -49,8 +55,7 @@ class ctemp {
     }
 
     public static function get_url($folder, $filename) {
-        return CTemporary::getUrl($folder,$filename);
-     
+        return CTemporary::getUrl($folder, $filename);
     }
-
 }
+// @codingStandardsIgnoreEnd
