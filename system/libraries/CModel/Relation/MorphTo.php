@@ -124,10 +124,10 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
             ->mergeConstraintsFrom($this->getQuery())
             ->with(array_merge(
                 $this->getQuery()->getEagerLoads(),
-                (array) ($this->morphableEagerLoads[get_class($instance)] ?? [])
+                (array) (carr::get($this->morphableEagerLoads, get_class($instance), []))
             ))
             ->withCount(
-                (array) ($this->morphableEagerLoadCounts[get_class($instance)] ?? [])
+                (array) (carr::get($this->morphableEagerLoadCounts, get_class($instance), []))
             );
 
         if ($callback = carr::get($this->morphableConstraints, get_class($instance), null)) {
@@ -200,7 +200,7 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
             $ownerKey = !is_null($this->ownerKey) ? $result->{$this->ownerKey} : $result->getKey();
             if (isset($this->dictionary[$type][$ownerKey])) {
                 foreach ($this->dictionary[$type][$ownerKey] as $model) {
-                    $model->setRelation($this->relation, $result);
+                    $model->setRelation($this->relationName, $result);
                 }
             }
         }

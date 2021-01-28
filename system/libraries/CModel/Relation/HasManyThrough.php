@@ -98,7 +98,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
 
         if ($this->throughParentSoftDeletes()) {
             $query->withGlobalScope('SoftDeletableHasManyThrough', function ($query) {
-                $query->whereNull($this->throughParent->getQualifiedDeletedAtColumn());
+                $query->where($this->throughParent->getQualifiedStatusColumn(), '>', 0);
             });
         }
     }
