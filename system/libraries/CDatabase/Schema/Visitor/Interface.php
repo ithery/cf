@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 1:41:17 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 1:41:17 PM
  */
 
 /**
  * Schema Visitor used for Validation or Generation purposes.
  */
 interface CDatabase_Schema_Visitor_Interface {
-
     /**
      * @param CDatabase_Schema $schema
      *

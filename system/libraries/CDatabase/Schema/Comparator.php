@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 12:11:17 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 12:11:17 PM
  */
 
 /**
  * Compares two Schemas and return an instance of SchemaDiff.
- *
  */
 class CDatabase_Schema_Comparator {
-
     /**
      * @param CDatabase_Schema $fromSchema
      * @param CDatabase_Schema $toSchema
@@ -58,14 +57,10 @@ class CDatabase_Schema_Comparator {
             $diff->removedNamespaces[$namespace] = $namespace;
         }
 
-
-
         foreach ($toSchema->getTables() as $table) {
             $tableName = $table->getShortestName($toSchema->getName());
 
-
             if (!$fromSchema->hasTable($tableName)) {
-
                 $diff->newTables[$tableName] = $toSchema->getTable($tableName);
             } else {
                 $tableDifferences = $this->diffTable($fromSchema->getTable($tableName), $toSchema->getTable($tableName));
@@ -256,7 +251,6 @@ class CDatabase_Schema_Comparator {
                 continue;
             }
 
-
             $tableDifferences->changedIndexes[$indexName] = $table2Index;
             $changes++;
         }
@@ -313,7 +307,6 @@ class CDatabase_Schema_Comparator {
             if (count($candidateColumns) !== 1) {
                 continue;
             }
-
 
             list($removedColumn, $addedColumn) = $candidateColumns[0];
             $removedColumnName = strtolower($removedColumn->getName());
@@ -440,8 +433,8 @@ class CDatabase_Schema_Comparator {
             $changedProperties[] = 'default';
         }
 
-        if (($properties1['type'] instanceof CDatabase_Type_StringType && !$properties1['type'] instanceof CDatabase_Type_GuidType) ||
-                $properties1['type'] instanceof CDatabase_Type_BinaryType
+        if (($properties1['type'] instanceof CDatabase_Type_StringType && !$properties1['type'] instanceof CDatabase_Type_GuidType)
+                || $properties1['type'] instanceof CDatabase_Type_BinaryType
         ) {
             // check if value of length is set at all, default value assumed otherwise.
             $length1 = $properties1['length'] ?: 255;
@@ -463,9 +456,9 @@ class CDatabase_Schema_Comparator {
         }
 
         // A null value and an empty string are actually equal for a comment so they should not trigger a change.
-        if ($properties1['comment'] !== $properties2['comment'] &&
-                !($properties1['comment'] === null && $properties2['comment'] === '') &&
-                !($properties2['comment'] === null && $properties1['comment'] === '')
+        if ($properties1['comment'] !== $properties2['comment']
+                && !($properties1['comment'] === null && $properties2['comment'] === '')
+                && !($properties2['comment'] === null && $properties1['comment'] === '')
         ) {
             $changedProperties[] = 'comment';
         }
@@ -521,5 +514,4 @@ class CDatabase_Schema_Comparator {
     public function diffIndex(CDatabase_Schema_Index $index1, CDatabase_Schema_Index $index2) {
         return !($index1->isFullfilledBy($index2) && $index2->isFullfilledBy($index1));
     }
-
 }

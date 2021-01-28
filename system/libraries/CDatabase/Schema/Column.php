@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:41:09 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:41:09 AM
  */
 
 /**
  * Object representation of a database column.
- *
  */
 class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
-
     /**
      * @var CDatabase_Type
      */
@@ -99,13 +98,14 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
      */
     public function setOptions(array $options) {
         foreach ($options as $name => $value) {
-            $method = "set" . $name;
+            $method = 'set' . $name;
             if (!method_exists($this, $method)) {
                 // next major: throw an exception
                 @trigger_error(sprintf(
-                                        'The "%s" column option is not supported,' .
-                                        ' setting it is deprecated and will cause an error in Doctrine 3.0', $name
-                                ), E_USER_DEPRECATED);
+                    'The "%s" column option is not supported,'
+                                        . ' setting it is deprecated and will cause an error in Doctrine 3.0',
+                    $name
+                ), E_USER_DEPRECATED);
 
                 continue;
             }
@@ -438,7 +438,6 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
             'autoincrement' => $this->_autoincrement,
             'columnDefinition' => $this->_columnDefinition,
             'comment' => $this->_comment,
-                ], $this->_platformOptions, $this->_customSchemaOptions);
+        ], $this->_platformOptions, $this->_customSchemaOptions);
     }
-
 }

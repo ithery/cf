@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 12:32:57 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 12:32:57 PM
  */
 
 /**
  * Sequence structure.
- *
  */
 class CDatabase_Schema_Sequence extends CDatabase_AbstractAsset {
-
     /**
      * @var int
      */
@@ -138,5 +137,4 @@ class CDatabase_Schema_Sequence extends CDatabase_AbstractAsset {
     public function visit(CDatabase_Schema_Visitor_Interface $visitor) {
         $visitor->acceptSequence($this);
     }
-
 }

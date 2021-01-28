@@ -1,68 +1,66 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-class CRedis_Limiter_ConcurrencyLimiter
-{
+class CRedis_Limiter_ConcurrencyLimiter {
     /**
      * The Redis factory implementation.
      *
      * @var CRedis_AbstractConnection
      */
     protected $redis;
+
     /**
      * The name of the limiter.
      *
      * @var string
      */
     protected $name;
+
     /**
      * The allowed number of concurrent tasks.
      *
      * @var int
      */
     protected $maxLocks;
+
     /**
      * The number of seconds a slot should be maintained.
      *
      * @var int
      */
     protected $releaseAfter;
+
     /**
      * Create a new concurrency limiter instance.
      *
-     * @param  CRedis_AbstractConnection  $redis
-     * @param  string  $name
-     * @param  int  $maxLocks
-     * @param  int  $releaseAfter
+     * @param CRedis_AbstractConnection $redis
+     * @param string                    $name
+     * @param int                       $maxLocks
+     * @param int                       $releaseAfter
+     *
      * @return void
      */
-    public function __construct($redis, $name, $maxLocks, $releaseAfter)
-    {
+    public function __construct($redis, $name, $maxLocks, $releaseAfter) {
         $this->name = $name;
         $this->redis = $redis;
         $this->maxLocks = $maxLocks;
         $this->releaseAfter = $releaseAfter;
     }
+
     /**
      * Attempt to acquire the lock for the given number of seconds.
      *
-     * @param  int  $timeout
-     * @param  callable|null  $callback
+     * @param int           $timeout
+     * @param callable|null $callback
+     *
      * @return bool
      *
      * @throws CRedis_Exception_LimiterTimeoutException
      * @throws \Exception
      */
-    public function block($timeout, $callback = null)
-    {
+    public function block($timeout, $callback = null) {
         $starting = time();
         $id = cstr::random(20);
-        while (! $slot = $this->acquire($id)) {
+        while (!$slot = $this->acquire($id)) {
             if (time() - $timeout >= $starting) {
                 throw new CRedis_Exception_LimiterTimeoutException;
             }
@@ -70,7 +68,7 @@ class CRedis_Limiter_ConcurrencyLimiter
         }
         if (is_callable($callback)) {
             try {
-                return tap($callback(), function () use ($slot, $id) {
+                return c::tap($callback(), function () use ($slot, $id) {
                     $this->release($slot, $id);
                 });
             } catch (Exception $exception) {
@@ -80,22 +78,24 @@ class CRedis_Limiter_ConcurrencyLimiter
         }
         return true;
     }
+
     /**
      * Attempt to acquire the lock.
      *
-     * @param  string  $id  A unique identifier for this lock
+     * @param string $id A unique identifier for this lock
+     *
      * @return mixed
      */
-    protected function acquire($id)
-    {
+    protected function acquire($id) {
         $slots = array_map(function ($i) {
-            return $this->name.$i;
+            return $this->name . $i;
         }, range(1, $this->maxLocks));
         return $this->redis->eval(...array_merge(
             [$this->lockScript(), count($slots)],
             array_merge($slots, [$this->name, $this->releaseAfter, $id])
         ));
     }
+
     /**
      * Get the Lua script for acquiring a lock.
      *
@@ -106,8 +106,7 @@ class CRedis_Limiter_ConcurrencyLimiter
      *
      * @return string
      */
-    protected function lockScript()
-    {
+    protected function lockScript() {
         return <<<'LUA'
 for index, value in pairs(redis.call('mget', unpack(KEYS))) do
     if not value then
@@ -117,17 +116,19 @@ for index, value in pairs(redis.call('mget', unpack(KEYS))) do
 end
 LUA;
     }
+
     /**
      * Release the lock.
      *
-     * @param  string  $key
-     * @param  string  $id
+     * @param string $key
+     * @param string $id
+     *
      * @return void
      */
-    protected function release($key, $id)
-    {
+    protected function release($key, $id) {
         $this->redis->eval($this->releaseScript(), 1, $key, $id);
     }
+
     /**
      * Get the Lua script to atomically release a lock.
      *
@@ -136,8 +137,7 @@ LUA;
      *
      * @return string
      */
-    protected function releaseScript()
-    {
+    protected function releaseScript() {
         return <<<'LUA'
 if redis.call('get', KEYS[1]) == ARGV[1]
 then

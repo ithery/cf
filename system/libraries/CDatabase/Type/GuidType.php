@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:09:44 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:09:44 AM
  */
 
 /**
  * Represents a GUID/UUID datatype (both are actually synonyms) in the database.
- *
  */
 class CDatabase_Type_GuidType extends CDatabase_Type_StringType {
-
     /**
      * {@inheritdoc}
      */
@@ -34,5 +33,4 @@ class CDatabase_Type_GuidType extends CDatabase_Type_StringType {
     public function requiresSQLCommentHint(CDatabase_Platform $platform) {
         return !$platform->hasNativeGuidType();
     }
-
 }

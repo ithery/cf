@@ -1,36 +1,52 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 3:18:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 3:18:55 PM
  */
 class CModel_HasSlug_SlugOptions {
-
-    /** @var array|callable */
+    /**
+     * @var array|callable
+     */
     public $generateSlugFrom;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     public $slugField;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     public $generateUniqueSlugs = true;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     public $maximumLength = 250;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     public $generateSlugsOnCreate = true;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     public $generateSlugsOnUpdate = true;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     public $slugSeparator = '-';
 
-    /** @var string */
+    /**
+     * @var string
+     */
     public $slugLanguage = 'en';
 
     public static function create() {
@@ -84,5 +100,4 @@ class CModel_HasSlug_SlugOptions {
         $this->slugLanguage = $language;
         return $this;
     }
-
 }

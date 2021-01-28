@@ -46,8 +46,8 @@ class CDatabase_Exception extends CException {
     /**
      * Returns a new instance for an invalid specified platform version.
      *
-     * @param string $version        The invalid platform version given.
-     * @param string $expectedFormat The expected platform version format.
+     * @param string $version        the invalid platform version given
+     * @param string $expectedFormat the expected platform version format
      *
      * @return DBALException
      */
@@ -73,7 +73,7 @@ class CDatabase_Exception extends CException {
     }
 
     /**
-     * @param string|null $url The URL that was provided in the connection parameters (if any).
+     * @param string|null $url the URL that was provided in the connection parameters (if any)
      *
      * @return CDatabase_Exception
      */

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:06:44 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:06:44 AM
  */
 class CDatabase_Type_JsonType extends CDatabase_Type {
-
     /**
      * {@inheritdoc}
      */
@@ -67,5 +67,4 @@ class CDatabase_Type_JsonType extends CDatabase_Type {
     public function requiresSQLCommentHint(CDatabase_Platform $platform) {
         return !$platform->hasNativeJsonType();
     }
-
 }
