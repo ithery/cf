@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 8:46:25 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 8:46:25 AM
  */
 abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implements CDatabase_Driver_VersionAwarePlatformInterface, CDatabase_Driver_ServerInfoAwareInterface {
-
     /**
      * {@inheritdoc}
      */
@@ -17,13 +17,14 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
 
         $dbname = carr::path($params, 'connection.database');
         if ($dbname == null) {
-            $dbname = $conn->query('SELECT DATABASE()')->fetchColumn();
+            $dbname = $db->query('SELECT DATABASE()')->fetchColumn();
         }
         return $dbname;
     }
 
     /**
      * {@inheritdoc}
+     *
      * @return CDatabase_Platform_Mysql
      */
     public function getDatabasePlatform() {
@@ -59,14 +60,18 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
      * that starts with the prefix '5.5.5-'
      *
      * @param string $versionString Version string as returned by mariadb server, i.e. '5.5.5-Mariadb-10.0.8-xenial'
+     *
      * @throws CDatabase_Exception
      */
     private function getMariaDbMysqlVersionNumber($versionString) {
         if (!preg_match(
-                        '/^(?:5\.5\.5-)?(mariadb-)?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)/i', $versionString, $versionParts
-                )) {
+            '/^(?:5\.5\.5-)?(mariadb-)?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)/i',
+            $versionString,
+            $versionParts
+        )) {
             throw CDatabase_Exception::invalidPlatformVersionSpecified(
-                    $versionString, '^(?:5\.5\.5-)?(mariadb-)?<major_version>.<minor_version>.<patch_version>'
+                $versionString,
+                '^(?:5\.5\.5-)?(mariadb-)?<major_version>.<minor_version>.<patch_version>'
             );
         }
 
@@ -78,14 +83,18 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
      * returned by Oracle MySQL servers.
      *
      * @param string $versionString Version string returned by the driver, i.e. '5.7.10'
+     *
      * @throws CDatabase_Exception
      */
     private function getOracleMysqlVersionNumber($versionString) {
         if (!preg_match(
-                        '/^(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>\d+))?)?/', $versionString, $versionParts
-                )) {
+            '/^(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>\d+))?)?/',
+            $versionString,
+            $versionParts
+        )) {
             throw CDatabase_Exception::invalidPlatformVersionSpecified(
-                    $versionString, '<major_version>.<minor_version>.<patch_version>'
+                $versionString,
+                '<major_version>.<minor_version>.<patch_version>'
             );
         }
         $majorVersion = $versionParts['major'];
@@ -96,5 +105,4 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
         }
         return $majorVersion . '.' . $minorVersion . '.' . $patchVersion;
     }
-
 }

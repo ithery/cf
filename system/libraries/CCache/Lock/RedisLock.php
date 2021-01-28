@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CCache_Lock_RedisLock extends CCache_LockAbstract {
-
     /**
      * The Redis factory implementation.
      *
@@ -17,10 +16,11 @@ class CCache_Lock_RedisLock extends CCache_LockAbstract {
     /**
      * Create a new lock instance.
      *
-     * @param  CRedis_AbstractConnection  $redis
-     * @param  string  $name
-     * @param  int  $seconds
-     * @param  string|null  $owner
+     * @param CRedis_AbstractConnection $redis
+     * @param string                    $name
+     * @param int                       $seconds
+     * @param string|null               $owner
+     *
      * @return void
      */
     public function __construct($redis, $name, $seconds, $owner = null) {
@@ -68,5 +68,4 @@ class CCache_Lock_RedisLock extends CCache_LockAbstract {
     protected function getCurrentOwner() {
         return $this->redis->get($this->name);
     }
-
 }

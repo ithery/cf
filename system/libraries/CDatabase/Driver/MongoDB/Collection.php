@@ -1,38 +1,42 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Oct 21, 2019, 11:06:42 PM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use MongoDB\BSON\ObjectID;
 use MongoDB\Collection as MongoCollection;
 
 class CDatabase_Driver_MongoDB_Collection {
-
     /**
      * The driver instance.
+     *
      * @var CDatabase_Driver_MongoDB
      */
     protected $driver;
 
     /**
      * The connection instance.
+     *
      * @var CDatabase
      */
     protected $connection;
 
     /**
      * The MongoCollection instance..
+     *
      * @var MongoCollection
      */
     protected $collection;
 
     /**
      * @param CDatabase_Driver_MongoDB $connection
-     * @param MongoCollection $collection
+     * @param MongoCollection          $collection
      */
     public function __construct(CDatabase_Driver_MongoDB $driver, MongoCollection $collection) {
         $this->driver = $driver;
@@ -41,8 +45,10 @@ class CDatabase_Driver_MongoDB_Collection {
 
     /**
      * Handle dynamic method calls.
+     *
      * @param string $method
-     * @param array $parameters
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters) {
@@ -80,5 +86,4 @@ class CDatabase_Driver_MongoDB_Collection {
         }
         return $result;
     }
-
 }
