@@ -1,7 +1,6 @@
 <?php
 
 class CDatabase_Event_OnQueryExecuted {
-
     /**
      * The SQL query that was executed.
      *
@@ -33,10 +32,12 @@ class CDatabase_Event_OnQueryExecuted {
     /**
      * Create a new event instance.
      *
-     * @param  string  $sql
-     * @param  array  $bindings
-     * @param  float  $time
-     * @param  string  $connection
+     * @param string    $sql
+     * @param array     $bindings
+     * @param float     $time
+     * @param int       $rowsCount
+     * @param CDatabase $db
+     *
      * @return void
      */
     public function __construct($sql, $bindings, $time, $rowsCount, $db) {
@@ -47,5 +48,4 @@ class CDatabase_Event_OnQueryExecuted {
         $this->connection = $db;
         $this->connectionName = $db->getName();
     }
-
 }
