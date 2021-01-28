@@ -122,7 +122,7 @@ abstract class CDatabase_Schema_Manager {
      * of a table. We're a RDBMS specifies more details these are held
      * in the platformDetails array.
      *
-     * @param string      $table    The name of the table.
+     * @param string      $table    the name of the table
      * @param string|null $database
      *
      * @return \Doctrine\DBAL\Schema\Column[]
@@ -144,7 +144,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * Keys of the portable indexes list are all lower-cased.
      *
-     * @param string $table The name of the table.
+     * @param string $table the name of the table
      *
      * @return \Doctrine\DBAL\Schema\Index[]
      */
@@ -261,7 +261,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Lists the foreign keys for the given table.
      *
-     * @param string      $table    The name of the table.
+     * @param string      $table    the name of the table
      * @param string|null $database
      *
      * @return \Doctrine\DBAL\Schema\ForeignKeyConstraint[]
@@ -283,7 +283,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * NOTE: You can not drop the database this SchemaManager is currently connected to.
      *
-     * @param string $database The name of the database to drop.
+     * @param string $database the name of the database to drop
      *
      * @return void
      */
@@ -294,7 +294,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops the given table.
      *
-     * @param string $tableName The name of the table to drop.
+     * @param string $tableName the name of the table to drop
      *
      * @return void
      */
@@ -305,8 +305,8 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops the index from the given table.
      *
-     * @param \Doctrine\DBAL\Schema\Index|string $index The name of the index.
-     * @param \Doctrine\DBAL\Schema\Table|string $table The name of the table.
+     * @param \Doctrine\DBAL\Schema\Index|string $index the name of the index
+     * @param \Doctrine\DBAL\Schema\Table|string $table the name of the table
      *
      * @return void
      */
@@ -322,7 +322,7 @@ abstract class CDatabase_Schema_Manager {
      * Drops the constraint from the given table.
      *
      * @param \Doctrine\DBAL\Schema\Constraint   $constraint
-     * @param \Doctrine\DBAL\Schema\Table|string $table      The name of the table.
+     * @param \Doctrine\DBAL\Schema\Table|string $table      the name of the table
      *
      * @return void
      */
@@ -333,8 +333,8 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops a foreign key from a table.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint|string $foreignKey The name of the foreign key.
-     * @param \Doctrine\DBAL\Schema\Table|string                $table      The name of the table with the foreign key.
+     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint|string $foreignKey the name of the foreign key
+     * @param \Doctrine\DBAL\Schema\Table|string                $table      the name of the table with the foreign key
      *
      * @return void
      */
@@ -345,7 +345,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops a sequence with a given name.
      *
-     * @param string $name The name of the sequence to drop.
+     * @param string $name the name of the sequence to drop
      *
      * @return void
      */
@@ -356,7 +356,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops a view.
      *
-     * @param string $name The name of the view.
+     * @param string $name the name of the view
      *
      * @return void
      */
@@ -369,7 +369,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Creates a new database.
      *
-     * @param string $database The name of the database to create.
+     * @param string $database the name of the database to create
      *
      * @return void
      */
@@ -396,7 +396,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return void
      *
-     * @throws \Doctrine\DBAL\ConnectionException If something fails at database level.
+     * @throws \Doctrine\DBAL\ConnectionException if something fails at database level
      */
     public function createSequence($sequence) {
         $this->_execSql($this->platform->getCreateSequenceSQL($sequence));
@@ -418,7 +418,7 @@ abstract class CDatabase_Schema_Manager {
      * Creates a new index on a table.
      *
      * @param \Doctrine\DBAL\Schema\Index        $index
-     * @param \Doctrine\DBAL\Schema\Table|string $table The name of the table on which the index is to be created.
+     * @param \Doctrine\DBAL\Schema\Table|string $table the name of the table on which the index is to be created
      *
      * @return void
      */
@@ -429,8 +429,8 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Creates a new foreign key.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey The ForeignKey instance.
-     * @param \Doctrine\DBAL\Schema\Table|string         $table      The name of the table on which the foreign key is to be created.
+     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey the ForeignKey instance
+     * @param \Doctrine\DBAL\Schema\Table|string         $table      the name of the table on which the foreign key is to be created
      *
      * @return void
      */
@@ -471,7 +471,7 @@ abstract class CDatabase_Schema_Manager {
      * Drops and creates a new index on a table.
      *
      * @param \Doctrine\DBAL\Schema\Index        $index
-     * @param \Doctrine\DBAL\Schema\Table|string $table The name of the table on which the index is to be created.
+     * @param \Doctrine\DBAL\Schema\Table|string $table the name of the table on which the index is to be created
      *
      * @return void
      */
@@ -483,8 +483,8 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and creates a new foreign key.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey An associative array that defines properties of the foreign key to be created.
-     * @param \Doctrine\DBAL\Schema\Table|string         $table      The name of the table on which the foreign key is to be created.
+     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey an associative array that defines properties of the foreign key to be created
+     * @param \Doctrine\DBAL\Schema\Table|string         $table      the name of the table on which the foreign key is to be created
      *
      * @return void
      */
@@ -500,7 +500,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return void
      *
-     * @throws \Doctrine\DBAL\ConnectionException If something fails at database level.
+     * @throws \Doctrine\DBAL\ConnectionException if something fails at database level
      */
     public function dropAndCreateSequence(Sequence $sequence) {
         $this->tryMethod('dropSequence', $sequence->getQuotedName($this->platform));
@@ -522,7 +522,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and creates a new database.
      *
-     * @param string $database The name of the database to create.
+     * @param string $database the name of the database to create
      *
      * @return void
      */
@@ -564,8 +564,8 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Renames a given table to another name.
      *
-     * @param string $name    The current name of the table.
-     * @param string $newName The new name of the table.
+     * @param string $name    the current name of the table
+     * @param string $newName the new name of the table
      *
      * @return void
      */
@@ -601,7 +601,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Converts a list of namespace names from the native DBMS data definition to a portable Doctrine definition.
      *
-     * @param array $namespaces The list of namespace names in the native DBMS data definition.
+     * @param array $namespaces the list of namespace names in the native DBMS data definition
      *
      * @return array
      */
@@ -627,7 +627,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Converts a namespace definition from the native DBMS data definition to a portable Doctrine definition.
      *
-     * @param array $namespace The native DBMS namespace definition.
+     * @param array $namespace the native DBMS namespace definition
      *
      * @return mixed
      */
@@ -717,7 +717,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * The name of the created column instance however is kept in its case.
      *
-     * @param string $table        The name of the table.
+     * @param string $table        the name of the table
      * @param string $database
      * @param array  $tableColumns
      *

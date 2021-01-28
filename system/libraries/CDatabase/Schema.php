@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 7:37:37 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 7:37:37 AM
  */
 class CDatabase_Schema extends CDatabase_AbstractAsset {
-
     /**
      * The namespaces in this schema.
      *
@@ -32,10 +32,10 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     protected $_schemaConfig = false;
 
     /**
-     * @param CDatabase_Schema_Table[]          $tables
-     * @param CDatabase_Schema_Sequence[]       $sequences
-     * @param CDatabase_Schema_Config           $schemaConfig
-     * @param array                             $namespaces
+     * @param CDatabase_Schema_Table[]    $tables
+     * @param CDatabase_Schema_Sequence[] $sequences
+     * @param CDatabase_Schema_Config     $schemaConfig
+     * @param array                       $namespaces
      */
     public function __construct(array $tables = [], array $sequences = [], CDatabase_Schema_Config $schemaConfig = null, array $namespaces = []) {
         if ($schemaConfig == null) {
@@ -112,7 +112,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * Returns the namespaces of this schema.
      *
-     * @return array A list of namespace names.
+     * @return array a list of namespace names
      */
     public function getNamespaces() {
         return $this->namespaces;
@@ -150,10 +150,9 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      */
     private function getFullQualifiedAssetName($name) {
         $name = $this->getUnquotedAssetName($name);
-       
 
-        if (strpos($name, ".") === false) {
-            $name = $this->getName() . "." . $name;
+        if (strpos($name, '.') === false) {
+            $name = $this->getName() . '.' . $name;
         }
         return strtolower($name);
     }
@@ -161,7 +160,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * Returns the unquoted representation of a given asset name.
      *
-     * @param string $assetName Quoted or unquoted representation of an asset name.
+     * @param string $assetName quoted or unquoted representation of an asset name
      *
      * @return string
      */
@@ -244,9 +243,9 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * Creates a new namespace.
      *
-     * @param string $namespaceName The name of the namespace to create.
+     * @param string $namespaceName the name of the namespace to create
      *
-     * @return CDatabase_Schema_Schema This schema instance.
+     * @return CDatabase_Schema_Schema this schema instance
      *
      * @throws SchemaException
      */
@@ -370,8 +369,8 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @param CDatabase_Schema_Schema              $toSchema
-     * @param CDatabase_Platform $platform
+     * @param CDatabase_Schema_Schema $toSchema
+     * @param CDatabase_Platform      $platform
      *
      * @return array
      */
@@ -383,8 +382,8 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @param CDatabase_Schema              $fromSchema
-     * @param CDatabase_Platform            $platform
+     * @param CDatabase_Schema   $fromSchema
+     * @param CDatabase_Platform $platform
      *
      * @return array
      */
@@ -431,5 +430,4 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
             $this->_sequences[$k] = clone $sequence;
         }
     }
-
 }

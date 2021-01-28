@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:54:17 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:54:17 AM
  */
 class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabase_Schema_Constraint {
-
     /**
      * Asset identifier instances of the column names the index is associated with.
      * array($columnName => Identifier)
@@ -79,7 +79,7 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
         if (is_string($column)) {
             $this->_columns[$column] = new CDatabase_Schema_Identifier($column);
         } else {
-            throw new \InvalidArgumentException("Expecting a string as Index Column");
+            throw new \InvalidArgumentException('Expecting a string as Index Column');
         }
     }
 
@@ -297,6 +297,7 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
 
     /**
      * Return whether the two indexes have the same partial index
+     *
      * @param CDatabase_Schema_Index $other
      *
      * @return bool
@@ -308,5 +309,4 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
 
         return !$this->hasOption('where') && !$other->hasOption('where');
     }
-
 }

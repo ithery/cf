@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
-
     /**
      * The Redis client.
      *
@@ -32,9 +25,10 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Subscribe to a set of given channels for messages.
      *
-     * @param  array|string  $channels
-     * @param  \Closure  $callback
-     * @param  string  $method
+     * @param array|string $channels
+     * @param \Closure     $callback
+     * @param string       $method
+     *
      * @return void
      */
     abstract public function createSubscription($channels, Closure $callback, $method = 'subscribe');
@@ -42,7 +36,8 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Funnel a callback for a maximum number of simultaneous executions.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return CRedis_Limiter_ConcurrencyLimiterBuilder
      */
     public function funnel($name) {
@@ -52,7 +47,8 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Throttle a callback for a maximum number of executions over a given duration.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return CRedis_Limiter_DurationLimiterBuilder
      */
     public function throttle($name) {
@@ -71,8 +67,9 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Subscribe to a set of given channels for messages.
      *
-     * @param  array|string  $channels
-     * @param  \Closure  $callback
+     * @param array|string $channels
+     * @param \Closure     $callback
+     *
      * @return void
      */
     public function subscribe($channels, Closure $callback) {
@@ -82,8 +79,9 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Subscribe to a set of given channels with wildcards.
      *
-     * @param  array|string  $channels
-     * @param  \Closure  $callback
+     * @param array|string $channels
+     * @param \Closure     $callback
+     *
      * @return void
      */
     public function psubscribe($channels, Closure $callback) {
@@ -93,8 +91,9 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Run a command against the Redis database.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function command($method, array $parameters = []) {
@@ -110,7 +109,8 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Fire the given event if possible.
      *
-     * @param  mixed  $event
+     * @param mixed $event
+     *
      * @return void
      */
     protected function event($event) {
@@ -122,7 +122,8 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Register a Redis command listener with the connection.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return void
      */
     public function listen(Closure $callback) {
@@ -143,7 +144,8 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Set the connections name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return $this
      */
     public function setName($name) {
@@ -163,7 +165,8 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Set the event dispatcher instance on the connection.
      *
-     * @param  CEvent_Dispatcher  $events
+     * @param CEvent_Dispatcher $events
+     *
      * @return void
      */
     public function setEventDispatcher(CEvent_Dispatcher $events) {
@@ -182,12 +185,12 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Pass other method calls down to the underlying client.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters) {
         return $this->command($method, $parameters);
     }
-
 }

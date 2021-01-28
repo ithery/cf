@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 3:41:22 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 3:41:22 PM
  */
 
 /**
  * Represents the change of a column.
  */
 class CDatabase_Schema_Column_Diff {
-
     /**
      * @var string
      */
@@ -34,10 +34,10 @@ class CDatabase_Schema_Column_Diff {
     public $fromColumn;
 
     /**
-     * @param string                    $oldColumnName
-     * @param CDatabase_Schema_Column   $column
-     * @param string[]                  $changedProperties
-     * @param CDatabase_Schema_Column   $fromColumn
+     * @param string                  $oldColumnName
+     * @param CDatabase_Schema_Column $column
+     * @param string[]                $changedProperties
+     * @param CDatabase_Schema_Column $fromColumn
      */
     public function __construct($oldColumnName, CDatabase_Schema_Column $column, array $changedProperties = [], Column $fromColumn = null) {
         $this->oldColumnName = $oldColumnName;
@@ -63,5 +63,4 @@ class CDatabase_Schema_Column_Diff {
 
         return new CDatabase_Schema_Identifier($this->oldColumnName, $quote);
     }
-
 }

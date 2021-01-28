@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:09:44 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:09:44 AM
  */
 
 /**
  * Type that maps interval string to a PHP DateInterval Object.
  */
 class CDatabase_Type_DateIntervalType extends CDatabase_Type {
-
     const FORMAT = '%RP%YY%MM%DDT%HH%IM%SS';
 
     /**
@@ -80,5 +80,4 @@ class CDatabase_Type_DateIntervalType extends CDatabase_Type {
     public function requiresSQLCommentHint(CDatabase_Platform $platform) {
         return true;
     }
-
 }

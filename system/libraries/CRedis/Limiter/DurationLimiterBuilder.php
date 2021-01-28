@@ -1,19 +1,12 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CRedis_Limiter_DurationLimiterBuilder {
-
     use CTrait_Helper_InteractsWithTime;
 
     /**
      * The Redis connection.
      *
-     * @var \Illuminate\Redis\Connections\Connection
+     * @var CRedis_ConnectionInterface
      */
     public $connection;
 
@@ -48,8 +41,9 @@ class CRedis_Limiter_DurationLimiterBuilder {
     /**
      * Create a new builder instance.
      *
-     * @param  \Illuminate\Redis\Connections\Connection  $connection
-     * @param  string  $name
+     * @param \Illuminate\Redis\Connections\Connection $connection
+     * @param string                                   $name
+     *
      * @return void
      */
     public function __construct($connection, $name) {
@@ -60,7 +54,8 @@ class CRedis_Limiter_DurationLimiterBuilder {
     /**
      * Set the maximum number of locks that can obtained per time window.
      *
-     * @param  int  $maxLocks
+     * @param int $maxLocks
+     *
      * @return $this
      */
     public function allow($maxLocks) {
@@ -71,7 +66,8 @@ class CRedis_Limiter_DurationLimiterBuilder {
     /**
      * Set the amount of time the lock window is maintained.
      *
-     * @param  int  $decay
+     * @param int $decay
+     *
      * @return $this
      */
     public function every($decay) {
@@ -82,7 +78,8 @@ class CRedis_Limiter_DurationLimiterBuilder {
     /**
      * Set the amount of time to block until a lock is available.
      *
-     * @param  int  $timeout
+     * @param int $timeout
+     *
      * @return $this
      */
     public function block($timeout) {
@@ -93,8 +90,9 @@ class CRedis_Limiter_DurationLimiterBuilder {
     /**
      * Execute the given callback if a lock is obtained, otherwise call the failure callback.
      *
-     * @param  callable  $callback
-     * @param  callable|null  $failure
+     * @param callable      $callback
+     * @param callable|null $failure
+     *
      * @return mixed
      *
      * @throws CRedis_Exception_LimiterTimeoutException
@@ -102,8 +100,11 @@ class CRedis_Limiter_DurationLimiterBuilder {
     public function then(callable $callback, callable $failure = null) {
         try {
             return (new CRedis_Limiter_DurationLimiter(
-                    $this->connection, $this->name, $this->maxLocks, $this->decay
-                    ))->block($this->timeout, $callback);
+                $this->connection,
+                $this->name,
+                $this->maxLocks,
+                $this->decay
+            ))->block($this->timeout, $callback);
         } catch (CRedis_Exception_LimiterTimeoutException $e) {
             if ($failure) {
                 return $failure($e);
@@ -111,5 +112,4 @@ class CRedis_Limiter_DurationLimiterBuilder {
             throw $e;
         }
     }
-
 }

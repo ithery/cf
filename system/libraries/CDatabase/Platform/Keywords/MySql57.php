@@ -1,29 +1,20 @@
 <?php
 
-defined('SYSPATH') or die('No direct access allowed.');
-
 /**
- * @author Hery Kurniawan
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Aug 18, 2018, 11:45:22 AM
+ * MySQL 5.7 reserved keywords list.
  */
-
-/**
- * MariaDb reserved keywords list.
- *
- * @link https://mariadb.com/kb/en/the-mariadb-library/reserved-words/
- */
-final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Keywords_Mysql {
+class CDatabase_Platform_Keywords_MySql57 extends CDatabase_Platform_Keywords_MySql {
     /**
      * {@inheritdoc}
      */
     public function getName() {
-        return 'MariaDb102';
+        return 'MySQL57';
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @link http://dev.mysql.com/doc/mysqld-version-reference/en/mysqld-version-reference-reservedwords-5-7.html
      */
     protected function getKeywords() {
         return [
@@ -89,7 +80,6 @@ final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Ke
             'ELSEIF',
             'ENCLOSED',
             'ESCAPED',
-            'EXCEPT',
             'EXISTS',
             'EXIT',
             'EXPLAIN',
@@ -105,7 +95,6 @@ final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Ke
             'FULLTEXT',
             'GENERATED',
             'GET',
-            'GENERAL',
             'GRANT',
             'GROUP',
             'HAVING',
@@ -115,7 +104,6 @@ final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Ke
             'HOUR_SECOND',
             'IF',
             'IGNORE',
-            'IGNORE_SERVER_IDS',
             'IN',
             'INDEX',
             'INFILE',
@@ -130,7 +118,6 @@ final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Ke
             'INT4',
             'INT8',
             'INTEGER',
-            'INTERSECT',
             'INTERVAL',
             'INTO',
             'IO_AFTER_GTIDS',
@@ -158,7 +145,6 @@ final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Ke
             'LOOP',
             'LOW_PRIORITY',
             'MASTER_BIND',
-            'MASTER_HEARTBEAT_PERIOD',
             'MASTER_SSL_VERIFY_SERVER_CERT',
             'MATCH',
             'MAXVALUE',
@@ -185,7 +171,6 @@ final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Ke
             'OUT',
             'OUTER',
             'OUTFILE',
-            'OVER',
             'PARTITION',
             'PRECISION',
             'PRIMARY',
@@ -196,7 +181,6 @@ final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Ke
             'READ_WRITE',
             'READS',
             'REAL',
-            'RECURSIVE',
             'REFERENCES',
             'REGEXP',
             'RELEASE',
@@ -207,11 +191,9 @@ final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Ke
             'RESIGNAL',
             'RESTRICT',
             'RETURN',
-            'RETURNING',
             'REVOKE',
             'RIGHT',
             'RLIKE',
-            'ROWS',
             'SCHEMA',
             'SCHEMAS',
             'SECOND_MICROSECOND',
@@ -221,7 +203,6 @@ final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Ke
             'SET',
             'SHOW',
             'SIGNAL',
-            'SLOW',
             'SMALLINT',
             'SPATIAL',
             'SPECIFIC',
@@ -267,7 +248,6 @@ final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Ke
             'WHEN',
             'WHERE',
             'WHILE',
-            'WINDOW',
             'WITH',
             'WRITE',
             'XOR',

@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:09:44 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:09:44 AM
  */
 
 /**
@@ -23,10 +24,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * attached with a timezone such as Europe/Berlin gets saved into the database with
  * the offset and re-created from persistence with only the offset, not the original timezone
  * attached.
- *
  */
 class CDatabase_Type_DateTimeTzType extends CDatabase_Type implements CDatabase_Type_Interface_PhpDateTimeMappingTypeInterface {
-
     /**
      * {@inheritdoc}
      */
@@ -71,5 +70,4 @@ class CDatabase_Type_DateTimeTzType extends CDatabase_Type implements CDatabase_
 
         return $val;
     }
-
 }

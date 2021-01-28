@@ -1,50 +1,41 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
-
     // Database connection
+
     /**
-     *
      * @var \MongoDB\Client
      */
     protected $mongoClient;
+
     protected $mongoDatabase;
+
     // Data fetching types
     protected $fetchType = 'object';
+
     protected $returnType = stdClass::class;
+
     protected $cursorArray = [];
 
     /**
      * Sets up the result variables.
      *
-     * @param  object    database link
-     * @param  boolean   return objects or arrays
-     * @param  string    SQL query that was run
+     * @param \MongoDB\Client   $mongoClient   client
+     * @param \MongoDB\Database $mongoDatabase database link
+     * @param bool              $object        return objects or arrays
+     * @param string            $sql           SQL query that was run
      */
-    public function __construct(\MongoDB\Client $mongoClient, \MongoDB\Database $mongoDatabase, $object = true, $sql) {
-
-
+    public function __construct(\MongoDB\Client $mongoClient, \MongoDB\Database $mongoDatabase, $object, $sql) {
         $this->mongoClient = $mongoClient;
         $this->mongoDatabase = $mongoDatabase;
 
         $this->result = $this->getCursor($sql);
-        if(!($this->result instanceof \MongoDB\Driver\Cursor)) {
-           
-            
-            $this->result=[carr::wrap($this->result)];
+        if (!($this->result instanceof \MongoDB\Driver\Cursor)) {
+            $this->result = [carr::wrap($this->result)];
             $this->cursorArray = $this->result;
         }
 
-
         $this->result($object);
-
-
 
         // Store the SQL
         $this->sql = $sql;
@@ -59,16 +50,15 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
         }
     }
 
-    public function result($object = TRUE, $type = stdClass::class) {
+    public function result($object = true, $type = stdClass::class) {
         $this->fetchType = ((bool) $object) ? 'object' : 'array';
-
 
         // This check has to be outside the previous statement, because we do not
         // know the state of fetch_type when $object = NULL
         // NOTE - The class set by $type must be defined before fetching the result,
         // autoloading is disabled to save a lot of stupid overhead.
         if ($this->fetchType == 'object') {
-            $this->returnType = (is_string($type) AND CF::auto_load($type)) ? $type : 'stdClass';
+            $this->returnType = (is_string($type) and CF::autoLoad($type)) ? $type : 'stdClass';
         } else {
             $this->returnType = $type;
         }
@@ -77,14 +67,14 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
     }
 
     /**
-     * 
+     * @param null|mixed $object
+     * @param mixed      $type
+     *
      * @return array
      */
-    protected function getCursorArray($object = NULL, $type = stdClass::class) {
+    protected function getCursorArray($object = null, $type = stdClass::class) {
         if ($this->cursorArray == null) {
-
             if ($object !== null) {
-
                 $this->result($object, $type);
             }
 
@@ -94,7 +84,7 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
         return $this->cursorArray;
     }
 
-    public function as_array($object = NULL, $type = stdClass::class) {
+    public function as_array($object = null, $type = stdClass::class) {
         return $this->result_array($object, $type);
     }
 
@@ -110,13 +100,12 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
         return $options;
     }
 
-    public function result_array($object = NULL, $type = stdClass::class) {
-
+    public function result_array($object = null, $type = stdClass::class) {
         return json_decode(json_encode($this->getCursorArray($object, $type)), true);
     }
 
     public function list_fields() {
-        $field_names = array();
+        $field_names = [];
         while ($field = $this->result->fetch_field()) {
             $field_names[] = $field->name;
         }
@@ -129,16 +118,16 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
             // Set the current row to the offset
             $this->current_row = $offset;
 
-            return TRUE;
+            return true;
         }
 
-        return FALSE;
+        return false;
     }
 
     public function offsetGet($offset) {
-        if (!$this->seek($offset))
-            return FALSE;
-
+        if (!$this->seek($offset)) {
+            return false;
+        }
 
         $record = carr::get($this->getCursorArray(), $offset);
         if ($this->fetchType == 'array' && !is_array($record)) {
@@ -155,12 +144,10 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
     }
 
     protected function getCursor($sql) {
-
         $options = [];
 
         $cursor = null;
-        
-        
+
         $rawSql = $sql;
         if (is_string($sql)) {
             if (cstr::startsWith($sql, 'db.')) {
@@ -178,16 +165,15 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
                         throw new CDatabase_Exception('Invalid mongo parameter to execute:' . $sql);
                     }
                 }
-                
+
                 $cursor = $this->getCollection($collectionName)->$method($parameters, $options);
-                
-                if($cursor==null) {
-                    switch($method) {
-                        case"count":
-                            $cursor = [[0]]; 
+
+                if ($cursor == null) {
+                    switch ($method) {
+                        case'count':
+                            $cursor = [[0]];
                     }
                 }
-               
             }
         }
         if (is_array($sql)) {
@@ -201,7 +187,6 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
     }
 
     /**
-     * 
      * @return \MongoDB\Client
      */
     public function getMongoClient() {
@@ -209,7 +194,6 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
     }
 
     /**
-     * 
      * @return \MongoDB\Driver\Manager
      */
     public function getMongoManager() {
@@ -217,7 +201,6 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
     }
 
     /**
-     * 
      * @return \MongoDB\Driver\Server
      */
     public function getMongoServer() {
@@ -225,7 +208,6 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
     }
 
     /**
-     * 
      * @return \MongoDB\Database
      */
     public function getMongoDatabase() {
@@ -234,7 +216,9 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
 
     /**
      * Get a MongoDB collection.
+     *
      * @param string $name
+     *
      * @return Collection
      */
     public function getCollection($name) {
@@ -250,16 +234,17 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
 
     /**
      * ArrayAccess: offsetExists
+     *
+     * @param mixed $offset
      */
     public function offsetExists($offset) {
         if ($this->count() > 0) {
             $min = 0;
             $max = $this->count() - 1;
 
-            return !($offset < $min OR $offset > $max);
+            return !($offset < $min or $offset > $max);
         }
 
-        return FALSE;
+        return false;
     }
-
 }
