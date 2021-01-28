@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CRedis_Limiter_ConcurrencyLimiterBuilder {
-
     use CTrait_Helper_InteractsWithTime;
 
     /**
@@ -48,8 +41,9 @@ class CRedis_Limiter_ConcurrencyLimiterBuilder {
     /**
      * Create a new builder instance.
      *
-     * @param  CRedis_AbstractConnection  $connection
-     * @param  string  $name
+     * @param CRedis_AbstractConnection $connection
+     * @param string                    $name
+     *
      * @return void
      */
     public function __construct($connection, $name) {
@@ -60,7 +54,8 @@ class CRedis_Limiter_ConcurrencyLimiterBuilder {
     /**
      * Set the maximum number of locks that can obtained per time window.
      *
-     * @param  int  $maxLocks
+     * @param int $maxLocks
+     *
      * @return $this
      */
     public function limit($maxLocks) {
@@ -71,7 +66,8 @@ class CRedis_Limiter_ConcurrencyLimiterBuilder {
     /**
      * Set the number of seconds until the lock will be released.
      *
-     * @param  int  $releaseAfter
+     * @param int $releaseAfter
+     *
      * @return $this
      */
     public function releaseAfter($releaseAfter) {
@@ -82,7 +78,8 @@ class CRedis_Limiter_ConcurrencyLimiterBuilder {
     /**
      * Set the amount of time to block until a lock is available.
      *
-     * @param  int  $timeout
+     * @param int $timeout
+     *
      * @return $this
      */
     public function block($timeout) {
@@ -93,17 +90,21 @@ class CRedis_Limiter_ConcurrencyLimiterBuilder {
     /**
      * Execute the given callback if a lock is obtained, otherwise call the failure callback.
      *
-     * @param  callable  $callback
-     * @param  callable|null  $failure
+     * @param callable      $callback
+     * @param callable|null $failure
+     *
      * @return mixed
      *
      * @throws CRedis_Exception_LimiterTimeoutException
      */
     public function then(callable $callback, callable $failure = null) {
         try {
-            return (new ConcurrencyLimiter(
-                    $this->connection, $this->name, $this->maxLocks, $this->releaseAfter
-                    ))->block($this->timeout, $callback);
+            return (new CRedis_Limiter_ConcurrencyLimiter(
+                $this->connection,
+                $this->name,
+                $this->maxLocks,
+                $this->releaseAfter
+            ))->block($this->timeout, $callback);
         } catch (CRedis_Exception_LimiterTimeoutException $e) {
             if ($failure) {
                 return $failure($e);
@@ -111,5 +112,4 @@ class CRedis_Limiter_ConcurrencyLimiterBuilder {
             throw $e;
         }
     }
-
 }

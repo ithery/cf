@@ -23,14 +23,12 @@ trait CModel_HasSlug_HasSlugTrait {
         // Auto generate slugs early before validation
         if (static::usesValidating()) {
             static::validating(function (CModel $model) {
-
                 if ($model->exists && $model->getSlugOptions()->generateSlugsOnUpdate) {
                     $model->generateSlugOnUpdate();
                 } elseif (!$model->exists && $model->getSlugOptions()->generateSlugsOnCreate) {
                     $model->generateSlugOnCreate();
                 }
             });
-
         } else {
             static::creating(function (CModel $model) {
                 $model->generateSlugOnCreate();
