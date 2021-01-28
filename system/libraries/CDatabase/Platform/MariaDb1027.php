@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 8:46:25 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 8:46:25 AM
  */
 final class CDatabase_Platform_MariaDb1027 extends CDatabase_Platform_Mysql {
-
     /**
      * {@inheritdoc}
      */
@@ -40,5 +40,4 @@ final class CDatabase_Platform_MariaDb1027 extends CDatabase_Platform_Mysql {
 
         $this->doctrineTypeMapping['json'] = CDatabase_Type::JSON;
     }
-
 }
