@@ -4,10 +4,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Aug 18, 2018, 10:57:55 AM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 
 /**
@@ -17,30 +16,55 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 abstract class CDatabase_Type {
     const TARRAY = 'array';
+
     const SIMPLE_ARRAY = 'simple_array';
+
     const JSON_ARRAY = 'json_array';
+
     const JSON = 'json';
+
     const BIGINT = 'bigint';
+
     const BOOLEAN = 'boolean';
+
     const DATETIME = 'datetime';
+
     const DATETIME_IMMUTABLE = 'datetime_immutable';
+
     const DATETIMETZ = 'datetimetz';
+
     const DATETIMETZ_IMMUTABLE = 'datetimetz_immutable';
+
     const DATE = 'date';
+
     const DATE_IMMUTABLE = 'date_immutable';
+
     const TIME = 'time';
+
     const TIME_IMMUTABLE = 'time_immutable';
+
     const DECIMAL = 'decimal';
+
     const INTEGER = 'integer';
+
     const OBJECT = 'object';
+
     const SMALLINT = 'smallint';
+
     const STRING = 'string';
+
     const TEXT = 'text';
+
     const BINARY = 'binary';
+
     const BLOB = 'blob';
+
     const FLOAT = 'float';
+
     const GUID = 'guid';
+
     const DATEINTERVAL = 'dateinterval';
+
     const ENUM = 'enum';
 
     /**
@@ -94,10 +118,10 @@ abstract class CDatabase_Type {
      * Converts a value from its PHP representation to its database representation
      * of this type.
      *
-     * @param mixed              $value    The value to convert.
-     * @param CDatabase_Platform $platform The currently used database platform.
+     * @param mixed              $value    the value to convert
+     * @param CDatabase_Platform $platform the currently used database platform
      *
-     * @return mixed The database representation of the value.
+     * @return mixed the database representation of the value
      */
     public function convertToDatabaseValue($value, CDatabase_Platform $platform) {
         return $value;
@@ -107,10 +131,10 @@ abstract class CDatabase_Type {
      * Converts a value from its database representation to its PHP representation
      * of this type.
      *
-     * @param mixed              $value    The value to convert.
-     * @param CDatabase_Platform $platform The currently used database platform.
+     * @param mixed              $value    the value to convert
+     * @param CDatabase_Platform $platform the currently used database platform
      *
-     * @return mixed The PHP representation of the value.
+     * @return mixed the PHP representation of the value
      */
     public function convertToPHPValue($value, CDatabase_Platform $platform) {
         return $value;
@@ -132,8 +156,8 @@ abstract class CDatabase_Type {
     /**
      * Gets the SQL declaration snippet for a field of this type.
      *
-     * @param array               $fieldDeclaration The field declaration.
-     * @param \CDatabase_Platform $platform         The currently used database platform.
+     * @param array               $fieldDeclaration the field declaration
+     * @param \CDatabase_Platform $platform         the currently used database platform
      *
      * @return string
      */
@@ -152,7 +176,7 @@ abstract class CDatabase_Type {
      * Factory method to create type instances.
      * Type instances are implemented as flyweights.
      *
-     * @param string $name The name of the type (as returned by getName()).
+     * @param string $name the name of the type (as returned by getName())
      *
      * @return CDatabase_Type
      *
@@ -173,7 +197,7 @@ abstract class CDatabase_Type {
      * Adds a custom type to the type map.
      *
      * @param string $name      The name of the type. This should correspond to what getName() returns.
-     * @param string $className The class name of the custom type.
+     * @param string $className the class name of the custom type
      *
      * @return void
      *
@@ -190,9 +214,9 @@ abstract class CDatabase_Type {
     /**
      * Checks if exists support for a type.
      *
-     * @param string $name The name of the type.
+     * @param string $name the name of the type
      *
-     * @return bool TRUE if type is supported; FALSE otherwise.
+     * @return bool TRUE if type is supported; FALSE otherwise
      */
     public static function hasType($name) {
         return isset(self::$_typesMap[$name]);

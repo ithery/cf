@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:13:12 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:13:12 AM
  */
 
 /**
@@ -13,37 +14,32 @@ defined('SYSPATH') OR die('No direct access allowed.');
  *
  * @author robo
  */
-class CDatabase_Type_SmallIntType extends CDatabase_Type implements CDatabase_Type_Interface_PhpIntegerMappingTypeInterface
-{
+class CDatabase_Type_SmallIntType extends CDatabase_Type implements CDatabase_Type_Interface_PhpIntegerMappingTypeInterface {
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
+    public function getName() {
         return CDatabase_Type::SMALLINT;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSQLDeclaration(array $fieldDeclaration, CDatabase_Platform $platform)
-    {
+    public function getSQLDeclaration(array $fieldDeclaration, CDatabase_Platform $platform) {
         return $platform->getSmallIntTypeDeclarationSQL($fieldDeclaration);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function convertToPHPValue($value, CDatabase_Platform $platform)
-    {
+    public function convertToPHPValue($value, CDatabase_Platform $platform) {
         return (null === $value) ? null : (int) $value;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getBindingType()
-    {
+    public function getBindingType() {
         return CDatabase_ParameterType::INTEGER;
     }
 }

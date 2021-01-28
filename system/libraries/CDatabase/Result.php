@@ -6,13 +6,19 @@
 abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAccess, Iterator, Countable {
     // Result resource, insert id, and SQL
     protected $result;
+
     protected $insert_id;
+
     protected $sql;
+
     // Current and total rows
     protected $current_row = 0;
+
     protected $total_rows = 0;
+
     // Fetch function and return type
     protected $fetch_type;
+
     protected $return_type;
 
     /**
@@ -65,7 +71,7 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
      *
      * @param int $offset
      *
-     * @return boolean
+     * @return bool
      */
     abstract public function seek($offset);
 

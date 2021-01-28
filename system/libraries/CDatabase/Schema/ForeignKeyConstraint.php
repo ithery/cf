@@ -1,23 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan
- * @since Aug 18, 2018, 12:35:33 PM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * An abstraction class for a foreign key constraint.
  *
+ * @author Hery Kurniawan
  * @author Benjamin Eberlei <kontakt@beberlei.de>
  * @author Steve Müller <st.mueller@dzh-online.de>
- * @link   www.doctrine-project.org
- * @since  2.0
+ * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 12:35:33 PM
  */
 class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset implements CDatabase_Schema_Constraint {
-
     /**
      * Instance of the referencing table the foreign key constraint is associated with.
      *
@@ -49,18 +44,18 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
     protected $_foreignColumnNames;
 
     /**
-     * @var array Options associated with the foreign key constraint.
+     * @var array options associated with the foreign key constraint
      */
     protected $_options;
 
     /**
      * Initializes the foreign key constraint.
      *
-     * @param array                         $localColumnNames   Names of the referencing table columns.
-     * @param CDatabase_Schema_Table|string $foreignTableName   Referenced table.
-     * @param array                         $foreignColumnNames Names of the referenced table columns.
-     * @param string|null                   $name               Name of the foreign key constraint.
-     * @param array                         $options            Options associated with the foreign key constraint.
+     * @param array                         $localColumnNames   names of the referencing table columns
+     * @param CDatabase_Schema_Table|string $foreignTableName   referenced table
+     * @param array                         $foreignColumnNames names of the referenced table columns
+     * @param string|null                   $name               name of the foreign key constraint
+     * @param array                         $options            options associated with the foreign key constraint
      */
     public function __construct(array $localColumnNames, $foreignTableName, array $foreignColumnNames, $name = null, array $options = []) {
         $this->_setName($name);
@@ -93,7 +88,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * Sets the Table instance of the referencing table
      * the foreign key constraint is associated with.
      *
-     * @param CDatabase_Schema_Table $table Instance of the referencing table.
+     * @param CDatabase_Schema_Table $table instance of the referencing table
      *
      * @return void
      */
@@ -126,7 +121,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * is a keyword reserved by the platform.
      * Otherwise the plain unquoted value as inserted is returned.
      *
-     * @param CDatabase_Platform $platform The platform to use for quotation.
+     * @param CDatabase_Platform $platform the platform to use for quotation
      *
      * @return array
      */
@@ -175,7 +170,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * is a keyword reserved by the platform.
      * Otherwise the plain unquoted value as inserted is returned.
      *
-     * @param CDatabase_Platform $platform The platform to use for quotation.
+     * @param CDatabase_Platform $platform the platform to use for quotation
      *
      * @see getQuotedLocalColumns
      *
@@ -201,7 +196,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @return string
      */
     public function getUnqualifiedForeignTableName() {
-        $parts = explode(".", $this->_foreignTableName->getName());
+        $parts = explode('.', $this->_foreignTableName->getName());
 
         return strtolower(end($parts));
     }
@@ -214,7 +209,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * is a keyword reserved by the platform.
      * Otherwise the plain unquoted value as inserted is returned.
      *
-     * @param CDatabase_Platform $platform The platform to use for quotation.
+     * @param CDatabase_Platform $platform the platform to use for quotation
      *
      * @return string
      */
@@ -240,7 +235,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * is a keyword reserved by the platform.
      * Otherwise the plain unquoted value as inserted is returned.
      *
-     * @param CDatabase_Platform $platform The platform to use for quotation.
+     * @param CDatabase_Platform $platform the platform to use for quotation
      *
      * @return array
      */
@@ -258,7 +253,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * Returns whether or not a given option
      * is associated with the foreign key constraint.
      *
-     * @param string $name Name of the option to check.
+     * @param string $name name of the option to check
      *
      * @return bool
      */
@@ -269,7 +264,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
     /**
      * Returns an option associated with the foreign key constraint.
      *
-     * @param string $name Name of the option the foreign key constraint is associated with.
+     * @param string $name name of the option the foreign key constraint is associated with
      *
      * @return mixed
      */
@@ -310,7 +305,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * Returns the referential action for a given database operation
      * on the referenced table the foreign key constraint is associated with.
      *
-     * @param string $event Name of the database operation/event to return the referential action for.
+     * @param string $event name of the database operation/event to return the referential action for
      *
      * @return string|null
      */
@@ -332,7 +327,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * Returns `true` if at least one of this foreign key's local columns
      * matches one of the given index's columns, `false` otherwise.
      *
-     * @param CDatabase_Schema_Index $index The index to be checked against.
+     * @param CDatabase_Schema_Index $index the index to be checked against
      *
      * @return bool
      */
@@ -347,5 +342,4 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
 
         return false;
     }
-
 }

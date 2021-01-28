@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 3:07:42 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 3:07:42 PM
  */
 
 /**
  * Type that maps an SQL DECIMAL to a PHP string.
- *
  */
 class CDatabase_Type_EnumType extends CDatabase_Type {
-
     /**
      * @var string
      */
@@ -31,8 +30,8 @@ class CDatabase_Type_EnumType extends CDatabase_Type {
     /**
      * Gets the SQL declaration snippet for a field of this type.
      *
-     * @param array $fieldDeclaration The field declaration.
-     * @param AbstractPlatform $platform The currently used database platform.
+     * @param array            $fieldDeclaration The field declaration.
+     * @param AbstractPlatform $platform         The currently used database platform.
      *
      * @return string
      */
@@ -41,9 +40,11 @@ class CDatabase_Type_EnumType extends CDatabase_Type {
     }
 
     /**
-     * @param string|null $value
+     * @param string|null      $value
      * @param AbstractPlatform $platform
+     *
      * @return mixed
+     *
      * @throws InvalidArgumentException
      */
     public function convertToPHPValue($value, CDatabase_Platform $platform) {
@@ -64,7 +65,10 @@ class CDatabase_Type_EnumType extends CDatabase_Type {
             /** @var callable $toArray */
             $toArray = [$this->enumClass, 'toArray'];
             throw new InvalidArgumentException(\sprintf(
-                    'The value "%s" is not valid for the enum "%s". Expected one of ["%s"]', $value, $this->enumClass, \implode('", "', $toArray())
+                'The value "%s" is not valid for the enum "%s". Expected one of ["%s"]',
+                $value,
+                $this->enumClass,
+                \implode('", "', $toArray())
             ));
         }
         return new $this->enumClass($value);
@@ -85,8 +89,9 @@ class CDatabase_Type_EnumType extends CDatabase_Type {
     }
 
     /**
-     * @param string $typeNameOrEnumClass
+     * @param string      $typeNameOrEnumClass
      * @param string|null $enumClass
+     *
      * @throws InvalidArgumentException
      * @throws DBALException
      */
@@ -95,7 +100,9 @@ class CDatabase_Type_EnumType extends CDatabase_Type {
         $enumClass = $enumClass ?: $typeNameOrEnumClass;
         if (!\is_subclass_of($enumClass, Enum::class)) {
             throw new InvalidArgumentException(\sprintf(
-                    'Provided enum class "%s" is not valid. Enums must extend "%s"', $enumClass, Enum::class
+                'Provided enum class "%s" is not valid. Enums must extend "%s"',
+                $enumClass,
+                Enum::class
             ));
         }
         // Register and customize the type
@@ -108,6 +115,7 @@ class CDatabase_Type_EnumType extends CDatabase_Type {
 
     /**
      * @param array $types
+     *
      * @throws InvalidArgumentException
      * @throws DBALException
      */
@@ -120,10 +128,10 @@ class CDatabase_Type_EnumType extends CDatabase_Type {
 
     /**
      * @param AbstractPlatform $platform
-     * @return boolean
+     *
+     * @return bool
      */
     public function requiresSQLCommentHint(CDatabase_Platform $platform) {
         return true;
     }
-
 }

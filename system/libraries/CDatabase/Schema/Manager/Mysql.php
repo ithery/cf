@@ -1,15 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 8:09:14 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 8:09:14 AM
  */
 class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
-
-    	    	
     public function getDatabaseRowCount() {
         $databaseName = $this->db->getDatabaseName();
         return $this->db->getValue('
@@ -19,6 +18,7 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
     	    	GROUP BY table_schema
     	    ');
     }
+
     public function getDatabaseSize() {
         $databaseName = $this->db->getDatabaseName();
         return $this->db->getValue('
@@ -28,7 +28,7 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
     	    	GROUP BY table_schema
     	    ');
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -214,7 +214,10 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
         }
         if ($columnDefault[0] === "'") {
             return stripslashes(
-                    str_replace("''", "'", preg_replace('/^\'(.*)\'$/', '$1', $columnDefault)
+                str_replace(
+                        "''",
+                        "'",
+                        preg_replace('/^\'(.*)\'$/', '$1', $columnDefault)
                     )
             );
         }
@@ -237,10 +240,10 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
         foreach ($tableForeignKeys as $value) {
             $value = array_change_key_case($value, CASE_LOWER);
             if (!isset($list[$value['constraint_name']])) {
-                if (!isset($value['delete_rule']) || $value['delete_rule'] === "RESTRICT") {
+                if (!isset($value['delete_rule']) || $value['delete_rule'] === 'RESTRICT') {
                     $value['delete_rule'] = null;
                 }
-                if (!isset($value['update_rule']) || $value['update_rule'] === "RESTRICT") {
+                if (!isset($value['update_rule']) || $value['update_rule'] === 'RESTRICT') {
                     $value['update_rule'] = null;
                 }
 
@@ -260,14 +263,17 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
         $result = [];
         foreach ($list as $constraint) {
             $result[] = new CDatabase_Schema_ForeignKeyConstraint(
-                    array_values($constraint['local']), $constraint['foreignTable'], array_values($constraint['foreign']), $constraint['name'], [
-                'onDelete' => $constraint['onDelete'],
-                'onUpdate' => $constraint['onUpdate'],
-                    ]
+                array_values($constraint['local']),
+                $constraint['foreignTable'],
+                array_values($constraint['foreign']),
+                $constraint['name'],
+                [
+                    'onDelete' => $constraint['onDelete'],
+                    'onUpdate' => $constraint['onUpdate'],
+                ]
             );
         }
 
         return $result;
     }
-
 }
