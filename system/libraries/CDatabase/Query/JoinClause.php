@@ -18,7 +18,7 @@ class CDatabase_Query_JoinClause extends CDatabase_Query_Builder {
     /**
      * The parent query builder instance.
      *
-     * @var \Illuminate\Database\Query\Builder
+     * @var CDatabase_Query_Builder
      */
     private $parentQuery;
 
@@ -79,7 +79,7 @@ class CDatabase_Query_JoinClause extends CDatabase_Query_Builder {
      * @param string|null     $operator
      * @param string|null     $second
      *
-     * @return \Illuminate\Database\Query\JoinClause
+     * @return CDatabase_Query_JoinClause
      */
     public function orOn($first, $operator = null, $second = null) {
         return $this->on($first, $operator, $second, 'or');
@@ -88,7 +88,7 @@ class CDatabase_Query_JoinClause extends CDatabase_Query_Builder {
     /**
      * Get a new instance of the join clause builder.
      *
-     * @return \Illuminate\Database\Query\JoinClause
+     * @return CDatabase_Query_JoinClause
      */
     public function newQuery() {
         return new static($this->parentQuery, $this->type, $this->table);
@@ -97,7 +97,7 @@ class CDatabase_Query_JoinClause extends CDatabase_Query_Builder {
     /**
      * Create a new query instance for sub-query.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return CDatabase_Query_Builder
      */
     protected function forSubQuery() {
         return $this->parentQuery->newQuery();
