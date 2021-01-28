@@ -222,7 +222,7 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
             $this->morphType,
             $model instanceof CModel ? $model->getMorphClass() : null
         );
-        return $this->parent->setRelation($this->relation, $model);
+        return $this->parent->setRelation($this->relationName, $model);
     }
 
     /**
