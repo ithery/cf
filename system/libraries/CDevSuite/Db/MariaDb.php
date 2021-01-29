@@ -147,6 +147,7 @@ abstract class CDevSuite_Db_MariaDb {
         if (!$this->files->isDir($mariaDbDirectory = CDevSuite::homePath() . '/MariaDb')) {
             $this->files->mkdirAsUser($mariaDbDirectory);
         }
+        CDevSuite::info($this->getSocketPath());
         $this->files->putAsUser($this->mariaDbIniFile(), str_replace(
             ['MARIADB_SOCKET_PATH'],
             [$this->getSocketPath()],
