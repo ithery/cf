@@ -6,9 +6,10 @@
  * @author Hery
  */
 abstract class CDevSuite_DnsMasq {
-
     public $cli;
+
     public $files;
+
     public $configuration;
 
     /**
@@ -23,13 +24,15 @@ abstract class CDevSuite_DnsMasq {
     /**
      * Install and configure DnsMasq.
      *
+     * @param string $tld
+     *
      * @return void
      */
     abstract public function install($tld = 'test');
 
     /**
      * Forcefully uninstall dnsmasq.
-     * 
+     *
      * @return void
      */
     abstract public function uninstall();

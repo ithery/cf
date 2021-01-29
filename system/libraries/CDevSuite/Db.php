@@ -7,6 +7,7 @@
  */
 class CDevSuite_Db {
     public $files;
+
     protected $mariaDb;
 
     /**
@@ -247,6 +248,11 @@ class CDevSuite_Db {
         }
     }
 
+    /**
+     * Return Maria DB instance
+     *
+     * @return CDevSuite_Db_MariaDb
+     */
     public function mariaDb() {
         if ($this->mariaDb == null) {
             switch (CServer::getOS()) {

@@ -7,6 +7,7 @@
  */
 class CDevSuite_Linux_Db_MariaDB extends CDevSuite_Db_MariaDb {
     public $pm;
+
     public $sm;
 
     /**

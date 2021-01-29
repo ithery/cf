@@ -2,6 +2,7 @@
 
 class CFConsole {
     private static $commands = [];
+
     private static $defaultCommands = [
         CConsole_Command_Domain_DomainListCommand::class,
         CConsole_Command_Domain_DomainCreateCommand::class,
@@ -29,6 +30,7 @@ class CFConsole {
         CConsole_Command_DevSuite_DevSuiteRestartCommand::class,
         CConsole_Command_DevSuite_DevSuiteStopCommand::class,
         CConsole_Command_DevSuite_DevSuiteDbInstallCommand::class,
+        CConsole_Command_DevSuite_DevSuiteDbStartCommand::class,
         CConsole_Command_DevSuite_DevSuiteDbUninstallCommand::class,
         CConsole_Command_DevSuite_DevSuiteDbListCommand::class,
         CConsole_Command_DevSuite_DevSuiteDbCreateCommand::class,

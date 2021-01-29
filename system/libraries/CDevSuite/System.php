@@ -6,13 +6,12 @@
  * @author Hery
  */
 abstract class CDevSuite_System {
-
     public $cli;
+
     public $files;
 
     /**
      * Create a new System instance.
-     *
      */
     public function __construct() {
         $this->cli = CDevSuite::commandLine();
@@ -38,5 +37,4 @@ abstract class CDevSuite_System {
                         })
                         ->values()->all();
     }
-
 }

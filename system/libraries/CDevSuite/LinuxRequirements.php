@@ -1,23 +1,18 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CDevSuite_LinuxRequirements {
-
     public $cli;
+
     public $files;
+
     public $ignoreSELinux = false;
+
     public $devsuiteBin = '/usr/local/bin/devsuite';
+
     public $sudoers = '/etc/sudoers.d/devsuite';
 
     /**
      * Create a new Warning instance.
-     *
-     * @param CommandLine $cli
      */
     public function __construct() {
         $this->cli = CDevSuite::commandLine();
@@ -28,6 +23,7 @@ class CDevSuite_LinuxRequirements {
      * Determine if SELinux check should be skipped
      *
      * @param bool $ignore
+     *
      * @return $this
      */
     public function setIgnoreSELinux($ignore = true) {
@@ -52,7 +48,7 @@ class CDevSuite_LinuxRequirements {
      */
     public function homePathIsInsideRoot() {
         if (strpos(CDevSuite::homePath(), '/root/') === 0) {
-            throw new RuntimeException("devsuite home directory is inside /root");
+            throw new RuntimeException('devsuite home directory is inside /root');
         }
     }
 
@@ -68,11 +64,10 @@ class CDevSuite_LinuxRequirements {
 
         if (preg_match('@SELinux status:(\s+)enabled@', $output) && preg_match('@Current mode:(\s+)enforcing@', $output)
         ) {
-            throw new RuntimeException("SELinux is in enforcing mode");
+            throw new RuntimeException('SELinux is in enforcing mode');
         }
     }
 
-  
     /**
      * Unlink the Valet Bash script from the user's local bin
      * and the sudoers.d entry
@@ -84,14 +79,12 @@ class CDevSuite_LinuxRequirements {
         $this->files->unlink($this->sudoers);
     }
 
-    
-     /**
+    /**
      * Get the paths to all of the DevSuite extensions.
      *
      * @return array
      */
-    public function extensions()
-    {
+    public function extensions() {
         if (!$this->files->isDir(CDevSuite::homePath() . '/Extensions')) {
             return [];
         }
@@ -105,5 +98,4 @@ class CDevSuite_LinuxRequirements {
             })
             ->values()->all();
     }
-
 }

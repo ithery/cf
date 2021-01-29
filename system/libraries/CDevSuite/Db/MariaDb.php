@@ -52,7 +52,7 @@ abstract class CDevSuite_Db_MariaDb {
     abstract public function restart();
 
     /**
-     * get ini file location
+     * Get ini file location
      *
      * @return string
      */
@@ -147,8 +147,16 @@ abstract class CDevSuite_Db_MariaDb {
         if (!$this->files->isDir($mariaDbDirectory = CDevSuite::homePath() . '/MariaDb')) {
             $this->files->mkdirAsUser($mariaDbDirectory);
         }
-        $this->files->putAsUser($this->mariaDbIniFile(), $this->files->get(CDevSuite::stubsPath() . 'my.mariadb.ini'));
+        $this->files->putAsUser($this->mariaDbIniFile(), str_replace(
+            ['MARIADB_SOCKET_PATH'],
+            [$this->getSocketPath()],
+            $this->files->get(CDevSuite::stubsPath() . 'my.mariadb.ini')
+        ));
 
         $this->files->putAsUser($mariaDbDirectory . '/.keep', "\n");
+    }
+
+    public function getSocketPath() {
+        return '/tmp/mariadb.sock';
     }
 }

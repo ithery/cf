@@ -18,9 +18,6 @@ class CDevSuite_Winsw {
 
     /**
      * Create a new WinSW instance.
-     *
-     * @param CommandLine $cli
-     * @param Filesystem  $files
      */
     public function __construct() {
         $this->cli = CDevSuite::commandLine();

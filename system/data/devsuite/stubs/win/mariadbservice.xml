@@ -3,7 +3,7 @@
   <name>devsuite_mariadb</name>
   <description>DevSuite MariaDB by CF</description>
   <executable>MARIADB_PATH\bin\mysqld.exe</executable>
-  <arguments>--console</arguments>
+  <arguments>--console --defaults-extra-file=MARIADB_INI_FILE</arguments>
   <logpath>DEVSUITE_HOME_PATH\Log\</logpath>
   <logmode>reset</logmode>
   <onfailure action="restart"/>
