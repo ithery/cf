@@ -19,11 +19,6 @@ class Controller_Docs extends CController {
         $app = CApp::instance();
         $app->setLoginRequired(false);
         $app->setTheme('cresenity-docs');
-        $app->setView('docs');
-        $app->setNav('docs');
-        $app->setNavRenderer(function ($navs) {
-            return c::view('docs.nav', ['navs' => $navs])->render();
-        });
     }
 
     public function index() {
@@ -60,6 +55,15 @@ class Controller_Docs extends CController {
 
         $app->add($html);
         $app->setView('docs');
+
+        $app->setNav('docs');
+        $app->setNavRenderer(function ($navs) use ($category, $page) {
+            return c::view('docs.nav', [
+                'navs' => $navs,
+                'category' => $category,
+                'page' => $page,
+            ])->render();
+        });
         return $app;
     }
 
