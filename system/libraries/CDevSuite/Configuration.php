@@ -119,7 +119,7 @@ abstract class CDevSuite_Configuration {
      */
     public function removePath($path) {
         if ($path == CDevSuite::homePath() . '/Sites') {
-            info("Cannot remove this directory because this is where DevSuite stores its site definitions.\nRun [devsuite paths] for a list of parked paths.");
+            CDevSuite::info("Cannot remove this directory because this is where DevSuite stores its site definitions.\nRun [devsuite paths] for a list of parked paths.");
             die();
         }
 
@@ -221,7 +221,8 @@ abstract class CDevSuite_Configuration {
      * @return void
      */
     public function createDriversDirectory() {
-        if ($this->files->isDir($driversDirectory = CDevSuite::homePath() . '/Drivers')) {
+        $driversDirectory = CDevSuite::homePath() . '/Drivers';
+        if ($this->files->isDir($driversDirectory)) {
             return;
         }
 
@@ -231,5 +232,14 @@ abstract class CDevSuite_Configuration {
             $driversDirectory . '/SampleDevSuiteDriver.php',
             $this->files->get(CDevSuite::stubsPath() . 'SampleDevSuiteDriver.php')
         );
+    }
+
+    /**
+     * Create the DevSuite configuration directory.
+     *
+     * @return void
+     */
+    public function createConfigurationDirectory() {
+        $this->files->ensureDirExists(CDevSuite::homePath(), CDevSuite::user());
     }
 }

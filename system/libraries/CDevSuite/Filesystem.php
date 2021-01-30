@@ -423,4 +423,48 @@ class CDevSuite_Filesystem {
     public function deleteDirectory($directory) {
         return CFile::deleteDirectory($directory);
     }
+
+    /**
+     * Delete the specified file or directory with files.
+     *
+     * @param string $files
+     *
+     * @return void
+     */
+    public function remove($files) {
+        $files = iterator_to_array($this->toIterator($files));
+        $files = array_reverse($files);
+        foreach ($files as $file) {
+            if (!file_exists($file) && !is_link($file)) {
+                continue;
+            }
+
+            if (is_dir($file) && !is_link($file)) {
+                $this->remove(new \FilesystemIterator($file));
+
+                if (true !== @rmdir($file)) {
+                    throw new \Exception(sprintf('Failed to remove directory "%s".', $file));
+                }
+            } else {
+                // https://bugs.php.net/bug.php?id=52176
+                if ('\\' === DIRECTORY_SEPARATOR && is_dir($file)) {
+                    if (true !== @rmdir($file)) {
+                        throw new \Exception(sprintf('Failed to remove file "%s".', $file));
+                    }
+                } else {
+                    if (true !== @unlink($file)) {
+                        throw new \Exception(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
+                    }
+                }
+            }
+        }
+    }
+
+    protected function toIterator($files) {
+        if (!$files instanceof \Traversable) {
+            $files = new \ArrayObject(is_array($files) ? $files : [$files]);
+        }
+
+        return $files;
+    }
 }
