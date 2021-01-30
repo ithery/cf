@@ -744,7 +744,7 @@ class CModel_Query {
      * @param string   $pageName
      * @param int|null $page
      *
-     * @return CPagination_LengthAwarePaginatorInterface
+     * @return CPagination_LengthAwarePaginator
      *
      * @throws \InvalidArgumentException
      */

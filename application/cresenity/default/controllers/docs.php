@@ -1,18 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Dec 5, 2020 
+ *
+ * @since Dec 5, 2020
+ *
  * @license Ittron Global Teknologi
  */
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
 
-Class Controller_Docs extends CController {
-
+class Controller_Docs extends CController {
     public function __construct() {
         parent::__construct();
         $app = CApp::instance();
@@ -20,8 +21,8 @@ Class Controller_Docs extends CController {
         $app->setTheme('cresenity-docs');
         $app->setView('docs');
         $app->setNav('docs');
-        $app->setNavRenderer(function($navs) {
-            return c::view('docs.nav',['navs'=>$navs])->render();
+        $app->setNavRenderer(function ($navs) {
+            return c::view('docs.nav', ['navs' => $navs])->render();
         });
     }
 
@@ -62,8 +63,7 @@ Class Controller_Docs extends CController {
         return $app;
     }
 
-    
-    public function __call($method,$args) {
-        return $this->page($method,carr::first($args));
+    public function __call($method, $args) {
+        return $this->page($method, carr::first($args));
     }
 }
