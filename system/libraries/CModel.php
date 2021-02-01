@@ -25,10 +25,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CModel[] getModels($columns = ['*']) Get the hydrated models without eager loading.
  * @method array eagerLoadRelations(array $models) Eager load the relationships for the models.
  * @method array loadRelation(array $models, $name, Closure $constraints) Eagerly load the relationship on a set of models.
- * @method static CModel_Query where($column, $operator = null, $value = null, $boolean = 'and') Add a basic where clause to the query.
- * @method static CModel_Query orWhere($column, $operator = null, $value = null) Add an "or where" clause to the query.
- * @method static CModel_Query has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
- * @method static CModel_Query whereRaw($sql, array $bindings = [])
+ * @method static CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and') Add a basic where clause to the query.
+ * @method static CModel_Query|static orWhere($column, $operator = null, $value = null) Add an "or where" clause to the query.
+ * @method static CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
+ * @method static CModel_Query|static whereRaw($sql, array $bindings = [])
  * @method static CModel_Query whereBetween($column, array $values)
  * @method static CModel_Query whereNotBetween($column, array $values)
  * @method static CModel_Query whereNested(Closure $callback)

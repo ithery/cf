@@ -29,7 +29,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static CModel_Query where($column, $operator = null, $value = null, $boolean = 'and') Add a basic where clause to the query.
  * @method static CModel_Query orWhere($column, $operator = null, $value = null) Add an "or where" clause to the query.
  * @method static CModel_Query has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
- * @method static CDatabase_Query_Builder whereRaw($sql, array $bindings = [])
+ * @method static CDatabase_Query_Builder|static whereRaw($sql, array $bindings = [])
  * @method static CDatabase_Query_Builder whereBetween($column, array $values)
  * @method static CDatabase_Query_Builder whereNotBetween($column, array $values)
  * @method static CDatabase_Query_Builder whereNested(Closure $callback)
