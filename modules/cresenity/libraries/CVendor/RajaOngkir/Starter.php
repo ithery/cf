@@ -1,19 +1,13 @@
 <?php
 
-/**
- *
- */
-class CVendor_RajaOngkir_Starter extends CVendor_RajaOngkir
-{
-    public function __construct()
-    {
+class CVendor_RajaOngkir_Starter extends CVendor_RajaOngkir {
+    public function __construct() {
         parent::__construct();
         $this->url = 'https://api.rajaongkir.com/starter/';
         // $this->url = '68.183.25.19/starter/';
     }
 
-    public function getProvince($provinceID = '')
-    {
+    public function getProvince($provinceID = '') {
         $method = 'GET';
         $options = [
             'id' => $provinceID,
@@ -42,8 +36,7 @@ class CVendor_RajaOngkir_Starter extends CVendor_RajaOngkir
         }
     }
 
-    public function getCity($provinceID = '', $cityID = '')
-    {
+    public function getCity($provinceID = '', $cityID = '') {
         $method = 'GET';
         $options = [
             'id' => $cityID,
