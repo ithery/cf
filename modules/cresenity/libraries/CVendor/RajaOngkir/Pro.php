@@ -8,7 +8,8 @@ class CVendor_RajaOngkir_Pro extends CVendor_RajaOngkir
 	public function __construct()
 	{
 		parent::__construct();
-		$this->url = 'https://pro.rajaongkir.com/api/';
+		// $this->url = 'https://pro.rajaongkir.com/api/';
+		$this->url = '64.227.6.154/api/';
 	}
 
 	public function getProvince($provinceID = '') {

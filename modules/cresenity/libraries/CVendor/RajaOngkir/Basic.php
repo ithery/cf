@@ -9,6 +9,7 @@ class CVendor_RajaOngkir_Basic extends CVendor_RajaOngkir
 	{
 		parent::__construct();
 		$this->url = 'https://api.rajaongkir.com/basic/';
+		// $this->url = '68.183.25.19/basic/';
 	}
 
 	public function getProvince($provinceID = '') {
