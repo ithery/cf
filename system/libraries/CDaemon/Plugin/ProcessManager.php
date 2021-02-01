@@ -59,6 +59,9 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
      * @return void
      */
     public function teardown() {
+        if (!isset($this->service)) {
+            return;
+        }
         if ($this->service == null) {
             return;
         }

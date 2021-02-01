@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 16, 2019, 4:04:42 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 16, 2019, 4:04:42 AM
  */
 class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_PluginInterface {
-
     /**
      * Each SHM block has a header with needed metadata.
      */
@@ -26,7 +26,8 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
 
     /**
      * A handle to the IPC message queue
-     * @var Resource
+     *
+     * @var resource
      */
     public $queue;
 
@@ -35,14 +36,17 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
      * This should be a `protected` property but in a few instances in this class closures are used in a way that
      * really makes a lot of sense and they need access. I think these issues will be fixed with the improvements
      * to $this lexical scoping in PHP5.4
-     * @var Resource
+     *
+     * @var resource
      */
     public $shm;
 
     /**
      * How big, at any time, can the IPC shared memory allocation be.
      * Default is 5MB. Will need to be increased if you are passing large datasets as Arguments or Return values.
+     *
      * @example Allocate shared memory using $this->malloc();
+     *
      * @var float
      */
     protected $memoryAllocation;
@@ -50,7 +54,8 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     /**
      * Under-allocated shared memory is perhaps the largest possible cause of Worker failures, so if the Mediator believes
      * the memory is under-allocated it will set this variable and write the warning to the event log
-     * @var Boolean
+     *
+     * @var bool
      */
     protected $memoryAllocationWarning = false;
 
@@ -70,6 +75,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
 
     /**
      * Called on Construct or Init
+     *
      * @return void
      */
     public function setup() {
@@ -87,22 +93,24 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
 
     /**
      * Called on Destruct
+     *
      * @return void
      */
     public function teardown() {
-        
     }
 
     /**
      * This is called during object construction to validate any dependencies
-     * @return Array  Return array of error messages (Think stuff like "GD Library Extension Required" or "Cannot open /tmp for Writing") or an empty array
+     *
+     * @return array Return array of error messages (Think stuff like "GD Library Extension Required" or "Cannot open /tmp for Writing") or an empty array
      */
-    public function checkEnvironment(array $errors = array()) {
+    public function checkEnvironment(array $errors = []) {
         return $errors;
     }
 
     /**
      * Setup the channels used by IPC -- A SysV Message Queue for message headers and a Shared Memory block for the payload.
+     *
      * @return void
      */
     private function setupIpc() {
@@ -112,24 +120,28 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
 
     /**
      * Write and Verify the SHM header
+     *
      * @return void
+     *
      * @throws Exception
      */
     private function setupShm() {
         // Write a header to the shared memory block
         if (!shm_has_var($this->shm, self::HEADER_ADDRESS)) {
-            $header = array(
+            $header = [
                 'version' => CDaemon_Worker_MediatorAbstract::VERSION,
                 'memoryAllocation' => $this->memoryAllocation,
-            );
-            if (!shm_put_var($this->shm, self::HEADER_ADDRESS, $header))
+            ];
+            if (!shm_put_var($this->shm, self::HEADER_ADDRESS, $header)) {
                 throw new Exception(__METHOD__ . " Failed. Could Not Read Header. If this problem persists, try manually cleaning your system's SysV Shared Memory allocations.\nYou can use built-in tools on the linux commandline or a helper script shipped with PHP Simple Daemon. ");
+            }
         }
         // Check memory allocation and warn the user if their malloc() is not actually applicable (eg they changed the malloc but used --recoverworkers)
         $header = shm_get_var($this->shm, self::HEADER_ADDRESS);
-        if ($header['memoryAllocation'] <> $this->memoryAllocation)
-            $this->mediator->log('Warning: Seems you\'ve using --recoverworkers after making a change to the worker malloc memory limit. To apply this change you will have to restart the daemon without the --recoverworkers option.' .
-                    PHP_EOL . 'The existing memory_limit is ' . $header['memoryAllocation'] . ' bytes.');
+        if ($header['memoryAllocation'] <> $this->memoryAllocation) {
+            $this->mediator->log('Warning: Seems you\'ve using --recoverworkers after making a change to the worker malloc memory limit. To apply this change you will have to restart the daemon without the --recoverworkers option.'
+                    . PHP_EOL . 'The existing memory_limit is ' . $header['memoryAllocation'] . ' bytes.');
+        }
         // If we're trying to recover previous messages/shm, scan the shared memory block for call structs and import them
         // @todo if we keep this functionality, we need to at least remove it as a CLI option implemented by CDaemon_ServiceAbstract because this will not apply to other Via conveyances
         if ($this->mediator->service->isParent() && $this->mediator->service->isRecoverWorkers()) {
@@ -165,18 +177,21 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
      *
      * Part of the Daemon API - Use from your Daemon to allocate shared memory used among all worker processes.
      *
-     * @default 1 MB
+     * default 1 MB
+     *
      * @param $bytes
+     *
      * @throws Exception
+     *
      * @return int
      */
     public function malloc($bytes = null) {
         if ($bytes !== null) {
             if (!is_int($bytes)) {
-                throw new Exception(__METHOD__ . " Failed. Could not set SHM allocation size. Expected Integer. Given: " . gettype($bytes));
+                throw new Exception(__METHOD__ . ' Failed. Could not set SHM allocation size. Expected Integer. Given: ' . gettype($bytes));
             }
             if (is_resource($this->shm)) {
-                throw new Exception(__METHOD__ . " Failed. Can Not Re-Allocate SHM Size. You will have to restart the daemon without the --recoverworkers option to resize.");
+                throw new Exception(__METHOD__ . ' Failed. Can Not Re-Allocate SHM Size. You will have to restart the daemon without the --recoverworkers option to resize.');
             }
             $this->memoryAllocation = $bytes;
         }
@@ -185,31 +200,35 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
 
     /**
      * Puts the message on the queue
-     * @param $message_type
-     * @param $message
-     * @return boolean
+     *
+     * @param CDaemon_Worker_Call $call
+     *
+     * @return bool
      */
     public function put(CDaemon_Worker_Call $call) {
         $that = $this;
         switch ($call->status) {
             case CDaemon_Worker_MediatorAbstract::UNCALLED:
             case CDaemon_Worker_MediatorAbstract::RETURNED:
-                $encoder = function($call) use ($that) {
+                $encoder = function ($call) use ($that) {
                     shm_put_var($that->shm, $call->id, $call);
                     return shm_has_var($that->shm, $call->id);
                 };
                 break;
             default:
-                $encoder = function($call) {
+                $encoder = function ($call) {
                     return true;
                 };
         }
         $error_code = null;
-        if ($encoder($call))
-            if (msg_send($this->queue, $call->queue(), $call->header(), true, false, $error_code))
+        if ($encoder($call)) {
+            if (msg_send($this->queue, $call->queue(), $call->header(), true, false, $error_code)) {
                 return true;
-        if ($error_code === null)
+            }
+        }
+        if ($error_code === null) {
             $error_code = self::ERROR_UNKNOWN;
+        }
         $call->errors++;
         if ($this->error($error_code, $call->errors) && $call->errors < 3) {
             $this->mediator->log("SysV::put() Failed for call_id {$call->id}: Retrying. Error Code: " . $error_code);
@@ -220,7 +239,10 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
 
     /**
      * Retrieves a message from the queue
+     *
      * @param $desired_type
+     * @param mixed $blocking
+     *
      * @return CDaemon_Worker_Call
      */
     public function get($desired_type, $blocking = false) {
@@ -232,18 +254,19 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
             return false;
         }
         $that = $this;
-        CDaemon::log('SysV Get Message:'.json_encode($message));
+        CDaemon::log('SysV Get Message:' . json_encode($message));
         switch ($message['status']) {
             case CDaemon_Worker_MediatorAbstract::UNCALLED:
-                $decoder = function($message) use($that) {
+                $decoder = function ($message) use ($that) {
                     $call = shm_get_var($that->shm, $message['call_id']);
-                    if ($message['microtime'] < $call->time[CDaemon_Worker_MediatorAbstract::UNCALLED])    // Has been requeued - Cancel this call
+                    if ($message['microtime'] < $call->time[CDaemon_Worker_MediatorAbstract::UNCALLED]) {    // Has been requeued - Cancel this call
                         $call->cancelled();
+                    }
                     return $call;
                 };
                 break;
             case CDaemon_Worker_MediatorAbstract::RETURNED:
-                $decoder = function($message) use($that) {
+                $decoder = function ($message) use ($that) {
                     $call = shm_get_var($that->shm, $message['call_id']);
                     if ($call && $call->status == $message['status']) {
                         @shm_remove_var($that->shm, $message['call_id']);
@@ -252,7 +275,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                 };
                 break;
             default:
-                $decoder = function($message) use($that) {
+                $decoder = function ($message) use ($that) {
                     $call = $that->mediator->getStruct($message['call_id']);
                     // If we don't have a local copy of $call the most likely scenario is a --recoverworkers situation.
                     // Create a placeholder. We'll get a full copy of the struct when it's returned from the worker
@@ -269,26 +292,28 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
         do {
             $call = $decoder($message);
         } while (empty($call) && $this->error(null, $tries) && $tries++ < 3);
-        if (!is_object($call))
-            throw new Exception(__METHOD__ . " Failed. Could Not Decode Message: " . print_r($message, true));
+        if (!is_object($call)) {
+            throw new Exception(__METHOD__ . ' Failed. Could Not Decode Message: ' . print_r($message, true));
+        }
         if (!$this->memoryAllocationWarning && $call->size > ($this->memoryAllocation / 50)) {
             $this->memoryAllocationWarning = true;
             $suggested_size = $call->size * 60;
-            $this->mediator->log("WARNING: The memory allocated to this worker is too low and may lead to out-of-shared-memory errors.\n" .
-                    "         Based on this job, the memory allocation should be at least {$suggested_size} bytes. Current allocation: {$this->memoryAllocation} bytes.");
+            $this->mediator->log("WARNING: The memory allocated to this worker is too low and may lead to out-of-shared-memory errors.\n"
+                    . "         Based on this job, the memory allocation should be at least {$suggested_size} bytes. Current allocation: {$this->memoryAllocation} bytes.");
         }
         return $call;
     }
 
     /**
      * The state of the queue -- The number of pending messages, memory consumption, errors, etc.
-     * @return Array with some subset of these keys: messages, memoryAllocation, error_count
+     *
+     * @return array with some subset of these keys: messages, memoryAllocation, error_count
      */
     public function state() {
-        $out = array(
+        $out = [
             'messages' => null,
             'memoryAllocation' => null,
-        );
+        ];
         $stat = @msg_stat_queue($this->queue);
         if (is_array($stat)) {
             $out['messages'] = $stat['msg_qnum'];
@@ -302,7 +327,8 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
 
     /**
      * Drop any pending messages in the queue
-     * @return boolean
+     *
+     * @return bool
      */
     public function purge() {
         $this->purge_mq();
@@ -313,11 +339,13 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     /**
      * The interface forces us to expose a purge() method -- but SysV separates the queue from the payloads
      * so implement these methods to give us finer control while error handling.
+     *
      * @return void
      */
     private function purge_shm() {
-        if (!is_resource($this->shm))
+        if (!is_resource($this->shm)) {
             $this->setupIpc();
+        }
         @shm_remove($this->shm);
         @shm_detach($this->shm);
         $this->shm = null;
@@ -326,6 +354,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
     /**
      * The interface forces us to expose a purge() method -- but SysV separates the queue from the payloads
      * so implement these methods to give us finer control while error handling.
+     *
      * @return void
      */
     private function purge_mq() {
@@ -338,15 +367,17 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
 
     /**
      * Handle IPC Errors
+     *
      * @param $error
-     * @param int $try    Inform error() of repeated failures of the same $error_code
-     * @return boolean  Returns true if the operation should be retried.
+     * @param int $try Inform error() of repeated failures of the same $error_code
+     *
+     * @return bool returns true if the operation should be retried
      */
     public function error($error, $try = 1) {
         // Create an array of random, moderate size and verify it can be written to shared memory
         // Return boolean
         $that = $this;
-        $test = function() use($that) {
+        $test = function () use ($that) {
             $arr = array_fill(0, mt_rand(10, 100), mt_rand(1000, 1000 * 1000));
             $key = mt_rand(1000 * 1000, 2000 * 1000);
             @shm_put_var($that->shm, $key, $arr);
@@ -369,10 +400,11 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                 $this->mediator->countError('communication');
                 $this->mediator->log('Permission Denied: Cannot connect to message queue');
                 $this->purge_mq();
-                if ($this->mediator->service->isParent())
+                if ($this->mediator->service->isParent()) {
                     usleep($this->mediator->backoff(100000, $try));
-                else
+                } else {
                     sleep($this->mediator->backoff(3, $try));
+                }
                 $this->setupIpc();
                 return true;
                 break;
@@ -406,19 +438,20 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                 usleep($this->mediator->backoff(20000, $try));
                 // Test writing to shared memory using an array that should come to a few kilobytes.
                 for ($i = 0; $i < 2; $i++) {
-                    if ($test())
+                    if ($test()) {
                         return true;
+                    }
                     // Re-attach the shared memory and try the diagnostic again
                     $this->setupIpc();
                 }
-                $this->mediator->log("IPC DIAG: Re-Connect failed to solve the problem.");
+                $this->mediator->log('IPC DIAG: Re-Connect failed to solve the problem.');
                 if (!$this->mediator->service->isParent()) {
                     break;
                 }
                 // Attempt to re-connect the shared memory
                 // See if we can read what's in shared memory and re-write it later
-                $items_to_copy = array();
-                $itemsToCall = array();
+                $items_to_copy = [];
+                $itemsToCall = [];
                 for ($i = 0; $i < $this->mediator->callCount; $i++) {
                     $call = @shm_get_var($this->shm, $i);
                     if (!is_object($call)) {
@@ -437,16 +470,18 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                     }
                     $items_to_copy[$i] = $call;
                 }
-                $this->mediator->log("IPC DIAG: Preparing to clean SHM and Reconnect...");
+                $this->mediator->log('IPC DIAG: Preparing to clean SHM and Reconnect...');
                 for ($i = 0; $i < 2; $i++) {
                     $this->purge_shm();
                     $this->setupIpc();
-                    if (!empty($items_to_copy))
-                        foreach ($items_to_copy as $key => $value)
+                    if (!empty($items_to_copy)) {
+                        foreach ($items_to_copy as $key => $value) {
                             @shm_put_var($this->shm, $key, $value);
+                        }
+                    }
                     if (!$test()) {
                         if (empty($items_to_copy)) {
-                            $this->mediator->fatal_error("Shared Memory Failure: Unable to proceed.");
+                            $this->mediator->fatal_error('Shared Memory Failure: Unable to proceed.');
                         } else {
                             $this->mediator->log('IPC DIAG: Purging items from shared memory: ' . implode(', ', array_keys($items_to_copy)));
                             unset($items_to_copy);
@@ -458,8 +493,9 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
                 }
                 return true;
             default:
-                if ($error)
+                if ($error) {
                     $this->mediator->log("Message Queue Error {$error}: " . posix_strerror($error));
+                }
                 if ($this->mediator->service->isParent()) {
                     usleep($this->mediator->backoff(100000, $try));
                 } else {
@@ -473,6 +509,9 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
 
     /**
      * Drop the single message
+     *
+     * @param mixed $call_id
+     *
      * @return void
      */
     public function drop($call_id) {
@@ -483,6 +522,7 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
 
     /**
      * Remove and release shared memory and message queue resources
+     *
      * @return mixed
      */
     public function release() {
@@ -493,5 +533,4 @@ class CDaemon_Worker_Via_SysV implements CDaemon_Worker_ViaInterface, CDaemon_Pl
             @msg_remove_queue($this->queue);
         }
     }
-
 }

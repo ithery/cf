@@ -39,7 +39,7 @@ class CDaemon_Service {
     /**
      * Process ID
      *
-     * @var integer
+     * @var int
      */
     private $pid;
 
@@ -177,8 +177,8 @@ class CDaemon_Service {
     /**
      * Combination getter/setter for the $pid property.
      *
-     * @param boolean $setValue
-     * @param mixed   $pid
+     * @param bool  $setValue
+     * @param mixed $pid
      *
      * @return int
      */
