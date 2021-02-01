@@ -12,45 +12,65 @@ use Symfony\Component\Process\Process;
 
 abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     protected $serviceName;
+
     protected $config;
+
     protected $startTime;
+
     protected $shutdown = false;
+
     protected $parent = true;
+
     protected $parentPid = null;
+
     protected $isRecoverWorkers = false;
+
     protected $isDebugWorkers = false;
 
     /**
      * @var string
      */
     protected $pidFile = null;
+
     protected $stdout = false;
+
     protected $debug = true;
+
     protected $terminateLimit = 20;
+
     protected $sizeToRotate = '500KB';
 
     /**
      * The application will attempt to restart itself it encounters a recoverable fatal error after it's been running
      * for at least this many seconds. Prevents killing the server with process forking if the error occurs at startup.
      *
-     * @var integer
+     * @var int
      */
     const MIN_RESTART_SECONDS = 10;
 
     /**
      * Events can be attached to each state using the on() method
      *
-     * @var integer
+     * @var int
      */
     const ON_ERROR = 0;    // error() or fatalError() is called
+
     const ON_SIGNAL = 1;    // the daemon has received a signal
+
     const ON_INIT = 2;    // the library has completed initialization, your setup() method is about to be called. Note: Not Available to Worker code.
+
     const ON_PREEXECUTE = 3;    // inside the event loop, right before your execute() method
+
     const ON_POSTEXECUTE = 4;    // and right after
+
     const ON_FORK = 5;    // in a background process right after it has been forked from the daemon
+
     const ON_PIDCHANGE = 6;    // whenever the pid changes -- in a background process for example
+
     const ON_IDLE = 7;    // called when there is idle time at the end of a loopInterval, or at the idleProbability when loopInterval isn't used
+
     const ON_REAP = 8;    // notification from the OS that a child process of this application has exited
+
     const ON_SHUTDOWN = 10;   // called at the top of the destructor
 
     /**
@@ -66,7 +86,6 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @var float The interval in Seconds
      */
-
     protected $loopInterval = null;
 
     /**
@@ -95,15 +114,16 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * @example $this->autoRestartInterval = 43200;   // Daemon will be restarted twice per day
      * @example $this->autoRestartInterval = 86400;   // Daemon will be restarted once per day
      *
-     * @var integer The interval in Seconds
+     * @var int The interval in Seconds
      */
     protected $autoRestartInterval = 43200;
+
     protected $isDaemonContinueOnFatalError = false;
 
     /**
      * Process ID
      *
-     * @var integer
+     * @var int
      */
     private $pid;
 
@@ -302,7 +322,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
             $handle = @fopen($pidFile, 'w');
             if (!$handle) {
-                $this->showHelp('Unable to write PID to ' . $this->pidFile);
+                $this->fatalError('Unable to write PID to ' . $this->pidFile);
             }
             fwrite($handle, $this->pid);
             fclose($handle);
@@ -454,11 +474,11 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *    it's Core_IWorker. The setup() and teardown() methods defined in the interfaces are natural places to handle
      *    database connections, etc.
      *
-     * @param callable|CDaemon_TaskAbstract $task A valid PHP callback or closure.
+     * @param callable|CDaemon_TaskAbstract $task a valid PHP callback or closure
      *
      * @link https://github.com/shaneharter/PHP-Daemon/wiki/Tasks
      *
-     * @return Core_Lib_Process|boolean Return a newly created Process object or false on failure
+     * @return Core_Lib_Process|bool Return a newly created Process object or false on failure
      */
     public function task($task) {
         if ($this->shutdown) {
@@ -622,7 +642,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     /**
      * When a signal is sent to the process it'll be handled here
      *
-     * @param integer $signal
+     * @param int $signal
      *
      * @return void
      */
@@ -666,7 +686,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     /**
      * Get the fully qualified command used to start (and restart) the daemon
      *
-     * @param string $options An options string to use in place of whatever options were present when the daemon was started.
+     * @param string $options an options string to use in place of whatever options were present when the daemon was started
      *
      * @return string
      */
@@ -757,7 +777,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     /**
      * Time the execution loop and sleep an appropriate amount of time.
      *
-     * @param boolean $start
+     * @param bool $start
      *
      * @return mixed
      */
@@ -816,7 +836,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      * If this is in daemon mode, provide an auto-restart feature.
      * This is designed to allow us to get a fresh stack, fresh memory allocation, etc.
      *
-     * @return boolean|void
+     * @return bool|void
      */
     private function autoRestart() {
         if ($this->autoRestartInterval === null) {
@@ -1068,7 +1088,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     /**
      * Return the running time in Seconds
      *
-     * @return integer
+     * @return int
      */
     public function runtime() {
         return time() - $this->startTime;
@@ -1080,7 +1100,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
      *
      * @param int $last Limit the working set to the last n iteration
      *
-     * @return array A list as array(duration, idle) averages.
+     * @return array a list as array(duration, idle) averages
      */
     public function statsMean($last = 100) {
         if (count($this->stats) < $last) {
@@ -1132,7 +1152,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     /**
      * Setter for the $loopInterval property.
      *
-     * @param boolean $setValue
+     * @param bool $setValue
      *
      * @return int|null
      */
@@ -1162,7 +1182,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
     /**
      * Combination getter/setter for the $pid property.
      *
-     * @param boolean $setValue
+     * @param bool $setValue
      *
      * @return int
      */

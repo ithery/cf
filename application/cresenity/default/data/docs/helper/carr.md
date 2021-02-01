@@ -27,5 +27,12 @@ $isAccessible = carr::accessible(new stdClass);
 ```
 
 
-# title
-`carr::add` method adds a given key / value pair to an array if the given key doesn't already exist in the array or is set to null:
+### carr::get
+`carr::get` method untuk mendapatkan value dari suatu array.
+value yang didapatkan bisa bersifat nested dengan menggunakan dot notation
+
+```php
+$array = ['products' => ['desk' => ['price' => 100]]];
+
+$price = carr::get($array, 'products.desk.price');
+```

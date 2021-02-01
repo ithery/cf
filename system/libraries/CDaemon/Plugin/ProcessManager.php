@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 12, 2019, 6:02:29 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 12, 2019, 6:02:29 PM
  */
 class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
-
     /**
      * The length (in seconds) of the rolling window used to detect process churn
      */
@@ -27,13 +27,14 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
     /**
      * @var CDaemon_Process[]
      */
-    public $processes = array();
+    public $processes = [];
 
     /**
      * Array of failed forks -- reaped within in expected_min_ttl
-     * @var Array   Numeric key, the value is the time the failure occurred
+     *
+     * @var array Numeric key, the value is the time the failure occurred
      */
-    private $failures = array();
+    private $failures = [];
 
     public function __construct(CDaemon_ServiceAbstract $service) {
         $this->service = $service;
@@ -45,27 +46,31 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
 
     /**
      * Called on Construct or Init
+     *
      * @return void
      */
     public function setup() {
-        $this->service->on(CDaemon_ServiceAbstract::ON_IDLE, array($this, 'reap'), 30);
+        $this->service->on(CDaemon_ServiceAbstract::ON_IDLE, [$this, 'reap'], 30);
     }
 
     /**
      * Called on Destruct
+     *
      * @return void
      */
     public function teardown() {
-        if($this->service==null) {
+        if ($this->service == null) {
             return;
         }
         if ($this->service && !$this->service->isParent()) {
             return;
         }
         while ($this->count() > 0) {
-            foreach ($this->processes() as $pid => $process)
-                if ($message = $process->stop())
+            foreach ($this->processes() as $pid => $process) {
+                if ($message = $process->stop()) {
                     $this->service->log($message);
+                }
+            }
             $this->reap(false);
             usleep(250000);
         }
@@ -75,68 +80,86 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
     /**
      * This is called during object construction to validate any dependencies
      * NOTE: At a minimum you should ensure that if $errors is not empty that you pass it along as the return value.
-     * @return Array  Return array of error messages (Think stuff like "GD Library Extension Required" or "Cannot open /tmp for Writing") or an empty array
+     *
+     * @return array Return array of error messages (Think stuff like "GD Library Extension Required" or "Cannot open /tmp for Writing") or an empty array
      */
-    public function checkEnvironment(Array $errors = array()) {
-        if (!$this->service instanceof CDaemon_ServiceAbstract)
-            $errors[] = "Invalid reference to Application Object";
+    public function checkEnvironment(array $errors = []) {
+        if (!$this->service instanceof CDaemon_ServiceAbstract) {
+            $errors[] = 'Invalid reference to Application Object';
+        }
         return $errors;
     }
 
     /**
      * Return the number of processes, optionall by $group
+     *
      * @param $group
+     *
      * @return int
      */
     public function count($group = null) {
-        if ($group)
-            if (isset($this->processes[$group]))
+        if ($group) {
+            if (isset($this->processes[$group])) {
                 return count($this->processes[$group]);
-            else
+            } else {
                 return 0;
+            }
+        }
         // Sum processes across all process groups
         $count = 0;
-        foreach ($this->processes as $process_group)
+        foreach ($this->processes as $process_group) {
             $count += count($process_group);
+        }
         return $count;
     }
 
     /**
      * The $processes array is hierarchical by process group. This will return a flat array of processes.
+     *
      * @param null $group
+     *
      * @return CDaemon_Process[]
      */
     public function processes($group = null) {
-        if ($group)
-            if (isset($this->processes[$group]))
+        if ($group) {
+            if (isset($this->processes[$group])) {
                 return $this->processes[$group];
-            else
-                return array();
+            } else {
+                return [];
+            }
+        }
         // List processes across all process groups
-        $list = array();
-        foreach ($this->processes as $process_group)
-            $list += $process_group;
+        $list = [];
+        foreach ($this->processes as $processGroup) {
+            $list[] = $processGroup;
+        }
         return $list;
     }
 
     /**
      * Return a single process by its pid
+     *
      * @param $pid
+     *
      * @return CDaemon_Process
      */
     public function process($pid) {
-        foreach ($this->processes as $process_group)
-            if (isset($process_group[$pid]))
+        foreach ($this->processes as $process_group) {
+            if (isset($process_group[$pid])) {
                 return $process_group[$pid];
+            }
+        }
         return null;
     }
 
     /**
      * Fork a new process, optionally within the supplied process $group.
+     *
      * @param null $group
-     * @return bool|CDaemon_Process    On failure, will return false. On success, a CDaemon_Process object will be
-     *         returned to the caller in the original (parent) process, and True will be returned to the caller in the
-     *         new (child) process.
+     *
+     * @return bool|CDaemon_Process On failure, will return false. On success, a CDaemon_Process object will be
+     *                              returned to the caller in the original (parent) process, and True will be returned to the caller in the
+     *                              new (child) process.
      */
     public function fork($group = null) {
         $pid = pcntl_fork();
@@ -146,16 +169,17 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
                 return false;
             case 0:
                 // Child Process
-                @ pcntl_setpriority(1);
-                $this->service->dispatch(array(CDaemon_ServiceAbstract::ON_FORK));
+                @pcntl_setpriority(1);
+                $this->service->dispatch([CDaemon_ServiceAbstract::ON_FORK]);
                 return true;
             default:
                 // Parent Process - Return the pid of the newly created Task
                 $proc = new CDaemon_Process();
                 $proc->pid = $pid;
                 $proc->group = $group;
-                if (!isset($this->processes[$group]))
-                    $this->processes[$group] = array();
+                if (!isset($this->processes[$group])) {
+                    $this->processes[$group] = [];
+                }
                 $this->processes[$group][$pid] = $proc;
                 return $proc;
         }
@@ -163,30 +187,36 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
 
     /**
      * Maintain the worker process map and notify the worker of an exited process.
-     * @param bool $block   When true, method will block waiting for an exit signal
+     *
+     * @param bool $block When true, method will block waiting for an exit signal
+     *
      * @return void
      */
     public function reap($block = false) {
         $map = $this->processes();
         while (true) {
-            $pid = pcntl_wait($status, ($block === true && $this->service->is('parent')) ? NULL : WNOHANG);
-            if (!$pid || !isset($map[$pid]))
+            $pid = pcntl_wait($status, ($block === true && $this->service->isParent()) ? null : WNOHANG);
+            if (!$pid || !isset($map[$pid])) {
                 break;
+            }
             $alias = $map[$pid]->group;
             $process = $this->processes[$alias][$pid];
-            $this->service->dispatch(array(CDaemon_ServiceAbstract::ON_REAP), array($process, $status));
+            $this->service->dispatch([CDaemon_ServiceAbstract::ON_REAP], [$process, $status]);
             unset($this->processes[$alias][$pid]);
             // Keep track of process churn -- failures within a processes min_ttl
             // If too many failures of new processes occur inside a given interval, that's a problem.
             // Raise a fatal error to prevent runaway process forking which can be very damaging to a server
-            if ($this->service->isShutdown() || $process->runtime() >= $process->min_ttl)
+            if ($this->service->isShutdown() || $process->runtime() >= $process->min_ttl) {
                 continue;
-            foreach ($this->failures as $key => $failure_time)
-                if ($failure_time + self::CHURN_WINDOW < time())
+            }
+            foreach ($this->failures as $key => $failure_time) {
+                if ($failure_time + self::CHURN_WINDOW < time()) {
                     unset($this->failures[$key]);
-            if (count($this->failures) > self::CHURN_LIMIT)
-                $this->service->fatal_error("Recently forked processes are continuously failing. See error log for additional details.");
+                }
+            }
+            if (count($this->failures) > self::CHURN_LIMIT) {
+                $this->service->fatalError('Recently forked processes are continuously failing. See error log for additional details.');
+            }
         }
     }
-
 }
