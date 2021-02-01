@@ -23,9 +23,11 @@ class CDevSuite_Brew {
         'php70',
         'php56'
     ];
+
     const LATEST_PHP_VERSION = 'php@7.4';
 
     public $cli;
+
     public $files;
 
     /**

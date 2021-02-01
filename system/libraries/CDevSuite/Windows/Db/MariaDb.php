@@ -19,7 +19,7 @@ class CDevSuite_Windows_Db_MariaDb extends CDevSuite_Db_MariaDb {
     }
 
     public function install() {
-        $this->installConfiguration();
+        $this->installMariaDbDirectory();
         $this->installService();
     }
 
@@ -49,9 +49,10 @@ class CDevSuite_Windows_Db_MariaDb extends CDevSuite_Db_MariaDb {
     public function installService() {
         $this->uninstall();
         $mysqldPath = $this->path() . DS . 'bin' . DS . 'mysqld.exe';
-        $mysqlIniPath = realpath(CDevSuite::binPath() . 'mariadb') . '/devsuite/my.mariadb.ini';
+        $mysqlIniPath = $this->mariaDbIniFile();
         $this->winsw->install(static::SERVICE, [
             'MARIADB_PATH' => realpath(CDevSuite::binPath() . 'mariadb'),
+            'MARIADB_INI_FILE' => $mysqlIniPath,
         ]);
     }
 
@@ -75,5 +76,9 @@ class CDevSuite_Windows_Db_MariaDb extends CDevSuite_Db_MariaDb {
             return '';
         }
         return $path;
+    }
+
+    public function getSocketPath() {
+        return realpath(CDevSuite::binPath() . 'mariadb') . '/devsuite/mariadb/mariadb.sock';
     }
 }

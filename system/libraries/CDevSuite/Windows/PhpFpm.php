@@ -9,7 +9,9 @@ use Symfony\Component\Process\Process;
 
 class CDevSuite_Windows_PhpFpm extends CDevSuite_PhpFpm {
     public $cli;
+
     public $files;
+
     public $winsw;
 
     const SERVICE = 'phpfpmservice';

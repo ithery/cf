@@ -5,8 +5,7 @@
  *
  * @author Hery
  */
-Class Controller_Legacy extends CController {
-
+class Controller_Legacy extends CController {
     public function __construct() {
         $app = CApp::instance();
         $app->setNav('legacy');
@@ -23,11 +22,11 @@ Class Controller_Legacy extends CController {
         $div = $widget->add_div();
         $div->add('<p>This is for testing purpose only when cresenity run on legacy framework (Cresenity 1.0 with old themes)</p>');
         $div->add('<p>This is theme now is deprecated and not supportable anymore, <strong>please do not use this template anymore</strong></p>');
-        
+
         return $app;
     }
 
-    public function element($method=null) {
+    public function element($method = null) {
         $app = CApp::instance();
 
         return $app;

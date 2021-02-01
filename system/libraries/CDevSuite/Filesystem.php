@@ -1,20 +1,14 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CDevSuite_Filesystem {
-
     /**
      * Determine if the given path is a directory.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
-    function isDir($path) {
+    public function isDir($path) {
         return is_dir($path);
     }
 
@@ -24,6 +18,7 @@ class CDevSuite_Filesystem {
      * @param string      $path
      * @param string|null $owner
      * @param int         $mode
+     *
      * @return void
      */
     public function mkdir($path, $owner = null, $mode = 0755) {
@@ -63,7 +58,7 @@ class CDevSuite_Filesystem {
     }
 
     public function renameAsRoot($oldname, $newname) {
-        $command = sprintf("sudo mv %s %s", $oldname, $newname);
+        $command = sprintf('sudo mv %s %s', $oldname, $newname);
         CDevSuite::commandLine()->run($command);
     }
 
@@ -88,6 +83,7 @@ class CDevSuite_Filesystem {
      *
      * @param string $path
      * @param int    $mode
+     *
      * @return void
      */
     public function mkdirAsUser($path, $mode = 0755) {
@@ -97,8 +93,9 @@ class CDevSuite_Filesystem {
     /**
      * Touch the given path.
      *
-     * @param  string  $path
-     * @param  string|null  $owner
+     * @param string      $path
+     * @param string|null $owner
+     *
      * @return string
      */
     public function touch($path, $owner = null) {
@@ -114,7 +111,8 @@ class CDevSuite_Filesystem {
     /**
      * Touch the given path as the non-root user.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return void
      */
     public function touchAsUser($path) {
@@ -124,7 +122,8 @@ class CDevSuite_Filesystem {
     /**
      * Determine if the given file exists.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public function exists($path) {
@@ -134,7 +133,8 @@ class CDevSuite_Filesystem {
     /**
      * Read the contents of the given file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function get($path) {
@@ -144,9 +144,10 @@ class CDevSuite_Filesystem {
     /**
      * Write to the given file.
      *
-     * @param  string  $path
-     * @param  string  $contents
-     * @param  string|null  $owner
+     * @param string      $path
+     * @param string      $contents
+     * @param string|null $owner
+     *
      * @return void
      */
     public function put($path, $contents, $owner = null) {
@@ -160,8 +161,9 @@ class CDevSuite_Filesystem {
     /**
      * Write to the given file as the non-root user.
      *
-     * @param  string  $path
-     * @param  string  $contents
+     * @param string $path
+     * @param string $contents
+     *
      * @return void
      */
     public function putAsUser($path, $contents) {
@@ -180,9 +182,10 @@ class CDevSuite_Filesystem {
     /**
      * Append the contents to the given file.
      *
-     * @param  string  $path
-     * @param  string  $contents
-     * @param  string|null  $owner
+     * @param string      $path
+     * @param string      $contents
+     * @param string|null $owner
+     *
      * @return void
      */
     public function append($path, $contents, $owner = null) {
@@ -198,6 +201,7 @@ class CDevSuite_Filesystem {
      *
      * @param string $path
      * @param string $contents
+     *
      * @return void
      */
     public function appendAsUser($path, $contents) {
@@ -234,6 +238,7 @@ class CDevSuite_Filesystem {
      *
      * @param string $from
      * @param string $to
+     *
      * @return void
      */
     public function copyAsUser($from, $to) {
@@ -247,6 +252,7 @@ class CDevSuite_Filesystem {
      *
      * @param string $target
      * @param string $link
+     *
      * @return void
      */
     public function symlink($target, $link) {
@@ -262,6 +268,7 @@ class CDevSuite_Filesystem {
      *
      * @param string $target
      * @param string $link
+     *
      * @return void
      */
     public function symlinkAsRoot($target, $link) {
@@ -269,7 +276,7 @@ class CDevSuite_Filesystem {
             $this->unlinkAsRoot($link);
         }
 
-        $command = sprintf("sudo ln -snf %s %s", $target, $link);
+        $command = sprintf('sudo ln -snf %s %s', $target, $link);
         CDevSuite::commandLine()->run($command);
     }
 
@@ -280,6 +287,7 @@ class CDevSuite_Filesystem {
      *
      * @param string $target
      * @param string $link
+     *
      * @return void
      */
     public function symlinkAsUser($target, $link) {
@@ -294,6 +302,7 @@ class CDevSuite_Filesystem {
      * Delete the file at the given path.
      *
      * @param string $path
+     *
      * @return void
      */
     public function unlink($path) {
@@ -306,11 +315,12 @@ class CDevSuite_Filesystem {
      * Delete the file at the given path.
      *
      * @param string $path
+     *
      * @return void
      */
     public function unlinkAsRoot($path) {
         if (file_exists($path) || is_link($path)) {
-            $command = sprintf("sudo rm %s -f", $path);
+            $command = sprintf('sudo rm %s -f', $path);
             CDevSuite::commandLine()->run($command);
         }
     }
@@ -339,6 +349,7 @@ class CDevSuite_Filesystem {
      * Resolve the given path.
      *
      * @param string $path
+     *
      * @return string
      */
     public function realpath($path) {
@@ -349,6 +360,7 @@ class CDevSuite_Filesystem {
      * Determine if the given path is a symbolic link.
      *
      * @param string $path
+     *
      * @return bool
      */
     public function isLink($path) {
@@ -370,6 +382,7 @@ class CDevSuite_Filesystem {
      * Determine if the given path is a broken symbolic link.
      *
      * @param string $path
+     *
      * @return bool
      */
     public function isBrokenLink($path) {
@@ -397,17 +410,61 @@ class CDevSuite_Filesystem {
      * Scan the given directory path.
      *
      * @param string $path
+     *
      * @return array
      */
     public function scandir($path) {
         return c::collect(scandir($path))
-                        ->reject(function ($file) {
-                            return in_array($file, ['.', '..']);
-                        })->values()->all();
+            ->reject(function ($file) {
+                return in_array($file, ['.', '..']);
+            })->values()->all();
     }
 
     public function deleteDirectory($directory) {
         return CFile::deleteDirectory($directory);
     }
 
+    /**
+     * Delete the specified file or directory with files.
+     *
+     * @param string $files
+     *
+     * @return void
+     */
+    public function remove($files) {
+        $files = iterator_to_array($this->toIterator($files));
+        $files = array_reverse($files);
+        foreach ($files as $file) {
+            if (!file_exists($file) && !is_link($file)) {
+                continue;
+            }
+
+            if (is_dir($file) && !is_link($file)) {
+                $this->remove(new \FilesystemIterator($file));
+
+                if (true !== @rmdir($file)) {
+                    throw new \Exception(sprintf('Failed to remove directory "%s".', $file));
+                }
+            } else {
+                // https://bugs.php.net/bug.php?id=52176
+                if ('\\' === DIRECTORY_SEPARATOR && is_dir($file)) {
+                    if (true !== @rmdir($file)) {
+                        throw new \Exception(sprintf('Failed to remove file "%s".', $file));
+                    }
+                } else {
+                    if (true !== @unlink($file)) {
+                        throw new \Exception(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
+                    }
+                }
+            }
+        }
+    }
+
+    protected function toIterator($files) {
+        if (!$files instanceof \Traversable) {
+            $files = new \ArrayObject(is_array($files) ? $files : [$files]);
+        }
+
+        return $files;
+    }
 }

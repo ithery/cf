@@ -103,7 +103,7 @@ class CDevSuite_ServiceManager_LinuxService extends CDevSuite_ServiceManager {
      *
      * @param mixed $service Service name
      *
-     * @return boolean
+     * @return bool
      */
     public function disabled($service) {
         $service = $this->getRealService($service);

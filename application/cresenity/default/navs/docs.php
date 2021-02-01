@@ -43,6 +43,22 @@ return [
         ]
     ],
     [
+        'name' => 'helper',
+        'label' => c::__('Helpers'),
+        'subnav' => [
+            [
+                'name' => 'helper.c',
+                'label' => c::__('c'),
+                'uri' => 'docs/helper/c',
+            ],
+            [
+                'name' => 'helper.carr',
+                'label' => c::__('carr'),
+                'uri' => 'docs/helper/carr',
+            ]
+        ]
+    ],
+    [
         'name' => 'component',
         'label' => c::__('Components'),
         'subnav' => [

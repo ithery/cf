@@ -112,8 +112,6 @@ class CDevSuite_Windows_Nginx extends CDevSuite_Nginx {
         $tld = $this->configuration->read()['tld'];
 
         $this->site->resecureForNewTld($tld, $tld);
-
-
     }
 
     /**
@@ -122,13 +120,11 @@ class CDevSuite_Windows_Nginx extends CDevSuite_Nginx {
      * @return void
      */
     public function installService() {
-
         $this->uninstall();
 
         $this->winsw->install(static::SERVICE, [
             'NGINX_PATH' => realpath(CDevSuite::binPath() . 'nginx'),
         ]);
-
     }
 
     /**
