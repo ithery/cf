@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 10, 2019, 1:01:29 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 10, 2019, 1:01:29 AM
  */
 trait CEvent_Trait_Dispatchable {
-
     protected static $dispatcher;
 
     protected static function getDispatcher() {
@@ -25,7 +25,7 @@ trait CEvent_Trait_Dispatchable {
      */
     public static function dispatch() {
         $dispatcher = self::getDispatcher();
-        return call_user_func_array(array($dispatcher, 'dispatch'), func_get_args());
+        return call_user_func_array([$dispatcher, 'dispatch'], func_get_args());
     }
 
     /**
@@ -35,7 +35,7 @@ trait CEvent_Trait_Dispatchable {
      */
     public static function listen() {
         $dispatcher = self::getDispatcher();
-        return call_user_func_array(array($dispatcher, 'listen'), func_get_args());
+        return call_user_func_array([$dispatcher, 'listen'], func_get_args());
     }
 
     /**
@@ -46,5 +46,4 @@ trait CEvent_Trait_Dispatchable {
     public static function broadcast() {
         return broadcast(new static(...func_get_args()));
     }
-
 }

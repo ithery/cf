@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 16, 2019, 6:06:40 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 16, 2019, 6:06:40 AM
  */
 
 /**
  * AsyncTcpConnection.
  */
 class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connection_TcpConnection {
-
     /**
      * Emitted when socket connection is successfully established.
      *
@@ -81,7 +81,7 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
      *
      * @var array
      */
-    protected static $_builtinTransports = array(
+    protected static $_builtinTransports = [
         'tcp' => 'tcp',
         'udp' => 'udp',
         'unix' => 'unix',
@@ -89,13 +89,14 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
         'sslv2' => 'sslv2',
         'sslv3' => 'sslv3',
         'tls' => 'tls'
-    );
+    ];
 
     /**
      * Construct.
      *
      * @param string $remote_address
-     * @param array $context_option
+     * @param array  $context_option
+     *
      * @throws Exception
      */
     public function __construct($remote_address, $context_option = null) {
@@ -141,7 +142,7 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
             $this->transport = self::$_builtinTransports[$scheme];
         }
         // For statistics.
-        self::$statistics['connection_count'] ++;
+        self::$statistics['connection_count']++;
         $this->maxSendBufferSize = self::$defaultMaxSendBufferSize;
         $this->_contextOption = $context_option;
         static::$connections[$this->_id] = $this;
@@ -153,8 +154,8 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
      * @return void
      */
     public function connect() {
-        if ($this->status !== self::STATUS_INITIAL && $this->status !== self::STATUS_CLOSING &&
-                $this->status !== self::STATUS_CLOSED) {
+        if ($this->status !== self::STATUS_INITIAL && $this->status !== self::STATUS_CLOSING
+                && $this->status !== self::STATUS_CLOSED) {
             return;
         }
         $this->status = self::STATUS_CONNECTING;
@@ -182,10 +183,10 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
             return;
         }
         // Add socket to global event loop waiting connection is successfully established or faild.
-        Worker::$globalEvent->add($this->_socket, EventInterface::EV_WRITE, array($this, 'checkConnection'));
+        Worker::$globalEvent->add($this->_socket, EventInterface::EV_WRITE, [$this, 'checkConnection']);
         // For windows.
         if (DIRECTORY_SEPARATOR === '\\') {
-            Worker::$globalEvent->add($this->_socket, EventInterface::EV_EXCEPT, array($this, 'checkConnection'));
+            Worker::$globalEvent->add($this->_socket, EventInterface::EV_EXCEPT, [$this, 'checkConnection']);
         }
     }
 
@@ -193,6 +194,7 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
      * Reconnect.
      *
      * @param int $after
+     *
      * @return void
      */
     public function reconnect($after = 0) {
@@ -202,7 +204,7 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
             Timer::del($this->_reconnectTimer);
         }
         if ($after > 0) {
-            $this->_reconnectTimer = Timer::add($after, array($this, 'connect'), null, false);
+            $this->_reconnectTimer = Timer::add($after, [$this, 'connect'], null, false);
             return;
         }
         $this->connect();
@@ -240,6 +242,7 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
      *
      * @param int    $code
      * @param string $msg
+     *
      * @return void
      */
     protected function emitError($code, $msg) {
@@ -261,6 +264,7 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
      * Check connection is successfully established or faild.
      *
      * @param resource $socket
+     *
      * @return void
      */
     public function checkConnection() {
@@ -293,11 +297,11 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
             } else {
                 // There are some data waiting to send.
                 if ($this->_sendBuffer) {
-                    Worker::$globalEvent->add($this->_socket, EventInterface::EV_WRITE, array($this, 'baseWrite'));
+                    Worker::$globalEvent->add($this->_socket, EventInterface::EV_WRITE, [$this, 'baseWrite']);
                 }
             }
             // Register a listener waiting read event.
-            Worker::$globalEvent->add($this->_socket, EventInterface::EV_READ, array($this, 'baseRead'));
+            Worker::$globalEvent->add($this->_socket, EventInterface::EV_READ, [$this, 'baseRead']);
             $this->status = self::STATUS_ESTABLISHED;
             $this->_remoteAddress = $address;
             // Try to emit onConnect callback.
@@ -315,7 +319,7 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
             // Try to emit protocol::onConnect
             if (method_exists($this->protocol, 'onConnect')) {
                 try {
-                    call_user_func(array($this->protocol, 'onConnect'), $this);
+                    call_user_func([$this->protocol, 'onConnect'], $this);
                 } catch (\Exception $e) {
                     Worker::log($e);
                     exit(250);
@@ -335,5 +339,4 @@ class CDaemon_Worker_Connection_AsyncTcpConnection extends CDaemon_Worker_Connec
             }
         }
     }
-
 }
