@@ -1,20 +1,26 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 12, 2019, 5:38:20 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 12, 2019, 5:38:20 PM
  */
 class CDaemon_Process {
-
     public $pid;
+
     public $group;
+
     public $microtime;
+
     public $job;
+
     public $timeout = 60;
+
     public $min_ttl = 5;
+
     private $stop_time = null;
 
     public function __construct() {
@@ -25,20 +31,22 @@ class CDaemon_Process {
         return microtime(true) - $this->microtime;
     }
 
-    public function running(Core_Worker_Call $call) {
+    public function running(CDaemon_Worker_Call $call) {
         $this->calls[] = $call->id;
     }
 
     public function timeout() {
-        if ($this->timeout > 0)
+        if ($this->timeout > 0) {
             $timeout = min($this->timeout, 60);
-        else
+        } else {
             $timeout = 30;
+        }
         return $timeout;
     }
 
     /**
      * Stop the process, using whatever means necessary, and possibly return a textual description
+     *
      * @return bool|string
      */
     public function stop() {
@@ -56,5 +64,4 @@ class CDaemon_Process {
     public function kill() {
         @posix_kill($this->pid, SIGKILL);
     }
-
 }
