@@ -66,7 +66,7 @@ class CDaemon {
                 call_user_func([self::$runningService, $cmd]);
                 break;
             default:
-                $service->showHelp();
+                self::$runningService->showHelp();
                 break;
         }
     }
