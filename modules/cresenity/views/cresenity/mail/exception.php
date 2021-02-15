@@ -75,6 +75,7 @@ $httpReferer = carr::get($_SERVER, 'HTTP_REFERER', '');
                                         <p><strong>Controller</strong>:<?php echo crouter::controller(); ?></p>
                                         <p><strong>Method</strong>:<?php echo crouter::method(); ?></p>
                                         <p><strong>Referer</strong>:<?php echo $httpReferer; ?></p>
+                                        <p><strong>Post Data</strong>:<?php echo json_encode($_POST); ?></p>
                                         <h3><?php echo c::e($error) ?></h3>
                                         <p><?php echo c::e($description) ?></p>
                                         <?php if (!empty($line) and !empty($file)): ?>
