@@ -38,7 +38,7 @@ class CNotification_Message_Zenziva extends CNotification_MessageAbstract {
         $curl->setRawPost($post);
         $response = $curl->exec()->response();
 
-        if (!preg_match('#<status>0</status>#ims', $response, $matches)) {
+        if (preg_match('#<status>0</status>#ims', $response, $matches)) {
             $exceptionRequest = new Exception('Error from SMS Response:' . $response);
             throw $exceptionRequest;
         }
