@@ -14,7 +14,6 @@ class cdbg {
      * A collapse icon, using in the dump_var function to allow collapsing
      * an array or object
      *
-     *
      * @since   1.0.000
      * @static
      *
@@ -25,7 +24,6 @@ class cdbg {
     /**
      * A collapse icon, using in the dump_var function to allow collapsing
      * an array or object
-     *
      *
      * @since   1.0.000
      * @static
