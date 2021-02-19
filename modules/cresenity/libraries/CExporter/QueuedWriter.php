@@ -7,9 +7,7 @@
  */
 
 class CExporter_QueuedWriter {
-
     /**
-     *
      * @var CExporter_QueuedWriter
      */
     protected static $instance;
@@ -29,8 +27,6 @@ class CExporter_QueuedWriter {
      */
     protected $temporaryFileFactory;
 
-    /**
-     */
     private function __construct() {
         $this->writer = CExporter_Writer::instance();
         $this->chunkSize = CExporter::config()->get('exports.chunk_size', 1000);
@@ -59,16 +55,19 @@ class CExporter_QueuedWriter {
         $jobs = $this->buildExportJobs($export, $temporaryFile, $writerType);
 
         $jobs->push(new CExporter_TaskQueue_StoreQueuedExport(
-                $temporaryFile, $filePath, $disk, $diskOptions
+            $temporaryFile,
+            $filePath,
+            $disk,
+            $diskOptions
         ));
 
         return CExporter_TaskQueue_QueueExport::withChain($jobs->toArray())->dispatch($export, $temporaryFile, $writerType);
     }
 
     /**
-     * @param object        $export
+     * @param object                       $export
      * @param CExporter_File_TemporaryFile $temporaryFile
-     * @param string        $writerType
+     * @param string                       $writerType
      *
      * @return CCollection
      */
@@ -96,32 +95,36 @@ class CExporter_QueuedWriter {
 
     /**
      * @param CExporter_Concern_FromCollection $export
-     * @param CExporter_File_TemporaryFile  $temporaryFile
-     * @param string         $writerType
-     * @param int            $sheetIndex
+     * @param CExporter_File_TemporaryFile     $temporaryFile
+     * @param string                           $writerType
+     * @param int                              $sheetIndex
      *
      * @return CCollection
      */
     private function exportCollection(CExporter_Concern_FromCollection $export, CExporter_File_TemporaryFile $temporaryFile, $writerType, $sheetIndex) {
         return $export
-                        ->collection()
-                        ->chunk($this->getChunkSize($export))
-                        ->map(function ($rows) use ($writerType, $temporaryFile, $sheetIndex, $export) {
-                            if ($rows instanceof Traversable) {
-                                $rows = iterator_to_array($rows);
-                            }
+            ->collection()
+            ->chunk($this->getChunkSize($export))
+            ->map(function ($rows) use ($writerType, $temporaryFile, $sheetIndex, $export) {
+                if ($rows instanceof Traversable) {
+                    $rows = iterator_to_array($rows);
+                }
 
-                            return new CExporter_TaskQueue_AppendDataToSheet(
-                                    $export, $temporaryFile, $writerType, $sheetIndex, $rows
-                            );
-                        });
+                return new CExporter_TaskQueue_AppendDataToSheet(
+                    $export,
+                    $temporaryFile,
+                    $writerType,
+                    $sheetIndex,
+                    $rows
+                );
+            });
     }
 
     /**
-     * @param CExporter_Concern_FromQuery     $export
+     * @param CExporter_Concern_FromQuery  $export
      * @param CExporter_File_TemporaryFile $temporaryFile
-     * @param string        $writerType
-     * @param int           $sheetIndex
+     * @param string                       $writerType
+     * @param int                          $sheetIndex
      *
      * @return CCollection
      */
@@ -135,7 +138,12 @@ class CExporter_QueuedWriter {
 
         for ($page = 1; $page <= $spins; $page++) {
             $jobs->push(new CExporter_TaskQueue_AppendQueryToSheet(
-                    $export, $temporaryFile, $writerType, $sheetIndex, $page, $this->getChunkSize($export)
+                $export,
+                $temporaryFile,
+                $writerType,
+                $sheetIndex,
+                $page,
+                $this->getChunkSize($export)
             ));
         }
 
@@ -143,17 +151,20 @@ class CExporter_QueuedWriter {
     }
 
     /**
-     * @param CExporter_Concern_FromView     $export
+     * @param CExporter_Concern_FromView   $export
      * @param CExporter_File_TemporaryFile $temporaryFile
-     * @param string        $writerType
-     * @param int           $sheetIndex
+     * @param string                       $writerType
+     * @param int                          $sheetIndex
      *
      * @return CCollection
      */
     private function exportView(CExporter_Concern_FromView $export, TemporarCExporter_File_TemporaryFileyFile $temporaryFile, $writerType, $sheetIndex) {
         $jobs = new CCollection();
         $jobs->push(new CExporter_TaskQueue_AppendViewToSheet(
-                $export, $temporaryFile, $writerType, $sheetIndex
+            $export,
+            $temporaryFile,
+            $writerType,
+            $sheetIndex
         ));
 
         return $jobs;
@@ -171,5 +182,4 @@ class CExporter_QueuedWriter {
 
         return $this->chunkSize;
     }
-
 }
