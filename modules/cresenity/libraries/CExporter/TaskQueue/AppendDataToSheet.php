@@ -9,7 +9,7 @@ class CExporter_TaskQueue_AppendDataToSheet extends CQueue_AbstractTask {
     public $data = [];
 
     /**
-     * @var string
+     * @var CExporter_File_TemporaryFile
      */
     public $temporaryFile;
 
@@ -62,10 +62,13 @@ class CExporter_TaskQueue_AppendDataToSheet extends CQueue_AbstractTask {
 
         $sheet = $writer->getSheetByIndex($this->sheetIndex);
         CDaemon::log('append row');
-        CDaemon::log(json_encode($this->data));
+        //CDaemon::log(json_encode($this->data));
         $sheet->appendRows($this->data, $this->sheetExport);
         CDaemon::log('end append row');
 
+        CDaemon::log('write excel');
         $writer->write($this->sheetExport, $this->temporaryFile, $this->writerType);
+        CDaemon::log('end write excel');
+        CDaemon::log('Memory Usage:' . memory_get_usage());
     }
 }

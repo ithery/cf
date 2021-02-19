@@ -11,12 +11,10 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class CExporter_Writer {
-
     use CExporter_Trait_DelegatedMacroableTrait;
     use CExporter_Trait_HasEventBusTrait;
 
     /**
-     *
      * @var CExporter_Writer
      */
     protected static $instance;
@@ -36,9 +34,6 @@ class CExporter_Writer {
      */
     protected $temporaryFileFactory;
 
-    /**
-     * @param CExporter_File_TemporaryFileFactory $temporaryFileFactory
-     */
     private function __construct() {
         $this->temporaryFileFactory = CExporter_File_TemporaryFileFactory::instance();
 
@@ -57,11 +52,10 @@ class CExporter_Writer {
      * @param string $writerType
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
+     *
      * @return TemporaryFile
      */
     public function export($export, $writerType) {
-        
-        
         $this->open($export);
 
         $sheetExports = [$export];
@@ -107,10 +101,11 @@ class CExporter_Writer {
 
     /**
      * @param CExporter_File_TemporaryFile $tempFile
-     * @param string        $writerType
+     * @param string                       $writerType
      *
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
-     * @return Writer
+     *
+     * @return CExporter_Writer
      */
     public function reopen(CExporter_File_TemporaryFile $tempFile, $writerType) {
         $reader = IOFactory::createReader($writerType);
@@ -126,6 +121,7 @@ class CExporter_Writer {
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     *
      * @return CExporter_File_TemporaryFile
      */
     public function write($export, CExporter_File_TemporaryFile $temporaryFile, $writerType) {
@@ -136,20 +132,22 @@ class CExporter_Writer {
         $this->raise(new CExporter_Event_BeforeWriting($this, $this->exportable));
 
         $writer = CExporter_WriterFactory::make(
-                        $writerType, $this->spreadsheet, $export
+            $writerType,
+            $this->spreadsheet,
+            $export
         );
-        
+
         $writer->save(
-                $path = $temporaryFile->getLocalPath()
+            $path = $temporaryFile->getLocalPath()
         );
-        
+
         if ($temporaryFile instanceof CExporter_File_RemoteTemporaryFile) {
             $temporaryFile->updateRemote();
         }
 
         $this->spreadsheet->disconnectWorksheets();
         unset($this->spreadsheet);
-        
+
         return $temporaryFile;
     }
 
@@ -157,6 +155,7 @@ class CExporter_Writer {
      * @param int|null $sheetIndex
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
+     *
      * @return CExporter_Sheet
      */
     public function addNewSheet($sheetIndex = null) {
@@ -184,6 +183,7 @@ class CExporter_Writer {
      * @param int $sheetIndex
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
+     *
      * @return CExporter_Sheet
      */
     public function getSheetByIndex($sheetIndex) {
@@ -198,5 +198,4 @@ class CExporter_Writer {
     public function hasConcern($concern) {
         return $this->exportable instanceof $concern;
     }
-
 }

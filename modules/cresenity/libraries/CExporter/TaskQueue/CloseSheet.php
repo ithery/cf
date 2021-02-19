@@ -44,7 +44,9 @@ class CExporter_TaskQueue_CloseSheet extends CQueue_AbstractTask {
         if (!$this->temporaryFile->exists()) {
             return;
         }
-
+        CDaemon::log('Start Close Sheet');
+        CDaemon::log('File:' . $this->temporaryFile->getLocalPath());
+        CDaemon::log('Memory Usage:' . memory_get_usage());
         $writer = CExporter::writer();
         $writer = $writer->reopen(
             $this->temporaryFile,
@@ -56,9 +58,10 @@ class CExporter_TaskQueue_CloseSheet extends CQueue_AbstractTask {
         if ($this->sheetExport instanceof CExporter_Concern_WithEvents) {
             $sheet->registerListeners($this->sheetExport->registerEvents());
         }
-
+        CDaemon::log('close sheet');
+        CDaemon::log('Memory Usage:' . memory_get_usage());
         $sheet->close($this->sheetExport);
-
+        CDaemon::log('end close sheet');
         $writer->write(
             $this->sheetExport,
             $this->temporaryFile,
