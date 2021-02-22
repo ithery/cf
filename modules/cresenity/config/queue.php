@@ -1,15 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Nov 4, 2019, 7:41:46 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Nov 4, 2019, 7:41:46 PM
  */
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Default Queue Connection Name
@@ -37,7 +37,6 @@ return [
     */
 
     'connections' => [
-
         'sync' => [
             'driver' => 'sync',
         ],
@@ -63,7 +62,7 @@ return [
             'key' => 'AKIAJX24UYWYMZS4BT4Q',
             'secret' => 'TX0c2zNIHZQ1zNTXD0FRTYKGWn5c7ZO3ONKPKzeg',
             'prefix' => 'https://sqs.ap-southeast-1.amazonaws.com/847969917871', //'https://sqs.us-east-1.amazonaws.com/your-account-id'),
-            'queue' => 'tribelio-common-queue',// 'your-queue-name'),
+            'queue' => 'tribelio-common-queue', // 'your-queue-name'),
             'region' => 'ap-southeast-1', //, 'us-east-1'),
         ],
 
@@ -74,7 +73,6 @@ return [
             'retry_after' => 90,
             'block_for' => null,
         ],
-
     ],
 
     /*
@@ -93,5 +91,4 @@ return [
         'connection' => 'default',
         'table' => 'queue_failed',
     ],
-
 ];

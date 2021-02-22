@@ -1,6 +1,6 @@
 <?php
 
-defined("SYSPATH") or die("No direct script access.");
+defined('SYSPATH') or die('No direct script access.');
 /**
  * @package  Database
  *
@@ -23,43 +23,43 @@ defined("SYSPATH") or die("No direct script access.");
  *  table_prefix  - Database table prefix
  *  object        - Enable or disable object results
  *  cache         - Enable or disable query caching
- * 	escape        - Enable automatic query builder escaping
+ *  escape        - Enable automatic query builder escaping
  */
-return array(
-    'default' => array(
-        'benchmark' => FALSE,
-        'persistent' => FALSE,
-        'connection' => array(
+return [
+    'default' => [
+        'benchmark' => false,
+        'persistent' => false,
+        'connection' => [
             'type' => 'mysqli',
             'user' => 'root',
             'pass' => 'rodex0909',
             'host' => '192.168.1.222',
-            'port' => FALSE,
-            'socket' => FALSE,
+            'port' => false,
+            'socket' => false,
             'database' => 'torsapi3'
-        ),
+        ],
         'character_set' => 'utf8',
         'table_prefix' => '',
-        'object' => TRUE,
-        'cache' => FALSE,
-        'escape' => TRUE,
-    ),
-//    'mongo' => array(
-//        'benchmark' => TRUE,
-//        'persistent' => FALSE,
-//        'connection' => array(
-//            'type' => 'mongodb',
-//            'user' => 'tribelio',
-//            'pass' => 'system.online',
-//            'host' => 'services.ittron.co.id',
-//            'port' => FALSE,
-//            'socket' => FALSE,
-//            'database' => 'tribelio'
-//        ),
-//        'character_set' => 'utf8mb4',
-//        'table_prefix' => '',
-//        'object' => TRUE,
-//        'cache' => FALSE,
-//        'escape' => TRUE
-//    ),
-);
+        'object' => true,
+        'cache' => false,
+        'escape' => true,
+    ],
+    //    'mongo' => array(
+    //        'benchmark' => TRUE,
+    //        'persistent' => FALSE,
+    //        'connection' => array(
+    //            'type' => 'mongodb',
+    //            'user' => 'tribelio',
+    //            'pass' => 'system.online',
+    //            'host' => 'services.ittron.co.id',
+    //            'port' => FALSE,
+    //            'socket' => FALSE,
+    //            'database' => 'tribelio'
+    //        ),
+    //        'character_set' => 'utf8mb4',
+    //        'table_prefix' => '',
+    //        'object' => TRUE,
+    //        'cache' => FALSE,
+    //        'escape' => TRUE
+    //    ),
+];

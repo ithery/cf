@@ -1,13 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 2, 2019, 12:31:21 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 2, 2019, 12:31:21 AM
  */
-return array(
+return [
     /*
      * The disk on which to store added files and derived images by default. Choose
      * one or more of the disks you've configured in config/filesystems.php.
@@ -28,10 +29,10 @@ return array(
      */
     'resource_model' => 'CApp_Model_Resource',
     's3' => [
-    /*
+        /*
      * The domain that should be prepended when generating urls.
      */
-    //'domain' => 'https://' . env('AWS_BUCKET') . '.s3.amazonaws.com',
+        //'domain' => 'https://' . env('AWS_BUCKET') . '.s3.amazonaws.com',
     ],
     'remote' => [
         /*
@@ -60,11 +61,11 @@ return array(
          * This ensures that the browser can already determine the correct layout.
          */
         'use_tiny_placeholders' => true,
-    /*
+        /*
      * This class will generate the tiny placeholder used for progressive image loading. By default
      * the medialibrary will use a tiny blurred jpg image.
      */
-    //'tiny_placeholder_generator' => Spatie\MediaLibrary\ResponsiveImages\TinyPlaceholderGenerator\Blurred::class,
+        //'tiny_placeholder_generator' => Spatie\MediaLibrary\ResponsiveImages\TinyPlaceholderGenerator\Blurred::class,
     ],
     /*
      * When urls to files get generated, this class will be called. Leave empty
@@ -85,31 +86,31 @@ return array(
             '--strip-all', // this strips out all text information such as comments and EXIF data
             '--all-progressive', // this will make sure the resulting image is a progressive one
         ],
-//        CImage_Optimizer_Pngquant::class => [
-//            '--force', // required parameter for this package
-//        ],
-//        CImage_Optimizer_Optipng::class => [
-//            '-i0', // this will result in a non-interlaced, progressive scanned image
-//            '-o2', // this set the optimization level to two (multiple IDAT compression trials)
-//            '-quiet', // required parameter for this package
-//        ],
-//        CImage_Optimizer_Svgo::class => [
-//            '--disable=cleanupIDs', // disabling because it is known to cause troubles
-//        ],
-//        CImage_Optimizer_Gifsicle::class => [
-//            '-b', // required parameter for this package
-//            '-O3', // this produces the slowest but best results
-//        ],
+        //        CImage_Optimizer_Pngquant::class => [
+        //            '--force', // required parameter for this package
+        //        ],
+        //        CImage_Optimizer_Optipng::class => [
+        //            '-i0', // this will result in a non-interlaced, progressive scanned image
+        //            '-o2', // this set the optimization level to two (multiple IDAT compression trials)
+        //            '-quiet', // required parameter for this package
+        //        ],
+        //        CImage_Optimizer_Svgo::class => [
+        //            '--disable=cleanupIDs', // disabling because it is known to cause troubles
+        //        ],
+        //        CImage_Optimizer_Gifsicle::class => [
+        //            '-b', // required parameter for this package
+        //            '-O3', // this produces the slowest but best results
+        //        ],
     ],
     /*
      * These generators will be used to create an image of media files.
      */
     'image_generators' => [
         CResources_ImageGenerator_FileType_ImageType::class,
-//        CResources_ImageGenerator_FileType_WebpType::class,
-//        CResources_ImageGenerator_FileType_PdfType::class,
-//        CResources_ImageGenerator_FileType_SvgType::class,
-//        CResources_ImageGenerator_FileType_VideoType::class,
+        //        CResources_ImageGenerator_FileType_WebpType::class,
+        //        CResources_ImageGenerator_FileType_PdfType::class,
+        //        CResources_ImageGenerator_FileType_SvgType::class,
+        //        CResources_ImageGenerator_FileType_VideoType::class,
     ],
     /*
      * The engine that should perform the image conversions.
@@ -136,4 +137,4 @@ return array(
         'perform_conversions' => CResources_TaskQueue_PerformConversions::class,
         'generate_responsive_images' => CResources_TaskQueue_PerformConversions_GenerateResponsiveImages::class,
     ],
-);
+];
