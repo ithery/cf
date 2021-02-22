@@ -9,7 +9,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Class CModel
  *
- * @method static CModel|CModel_Collection|static|null find($id, $columns = ['*']) Find a model by its primary key.
+ * @method static CModel|static|null find($id, $columns = ['*']) Find a model by its primary key.
  * @method static CModel_Collection findMany($ids, $columns = ['*']) Find a model by its primary key.
  * @method static CModel|CModel_Collection|static findOrFail($id, $columns = ['*']) Find a model by its primary key or throw an exception.
  * @method static CModel|CModel_Query|static|null first($columns = ['*']) Execute the query and get the first result.
@@ -29,37 +29,37 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static CModel_Query|static orWhere($column, $operator = null, $value = null) Add an "or where" clause to the query.
  * @method static CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
  * @method static CModel_Query|static whereRaw($sql, array $bindings = [])
- * @method static CModel_Query whereBetween($column, array $values)
- * @method static CModel_Query whereNotBetween($column, array $values)
- * @method static CModel_Query whereNested(Closure $callback)
- * @method static CModel_Query addNestedWhereQuery($query)
- * @method static CModel_Query whereExists(Closure $callback)
- * @method static CModel_Query whereNotExists(Closure $callback)
- * @method static CModel_Query whereIn($column, $values)
- * @method static CModel_Query whereNotIn($column, $values)
- * @method static CModel_Query whereNull($column)
- * @method static CModel_Query whereNotNull($column)
- * @method static CModel_Query orWhereRaw($sql, array $bindings = [])
- * @method static CModel_Query orWhereBetween($column, array $values)
- * @method static CModel_Query orWhereNotBetween($column, array $values)
- * @method static CModel_Query orWhereExists(Closure $callback)
- * @method static CModel_Query orWhereNotExists(Closure $callback)
- * @method static CModel_Query orWhereIn($column, $values)
- * @method static CModel_Query orWhereNotIn($column, $values)
- * @method static CModel_Query orWhereNull($column)
- * @method static CModel_Query orWhereNotNull($column)
- * @method static CModel_Query whereDate($column, $operator, $value)
- * @method static CModel_Query whereDay($column, $operator, $value)
- * @method static CModel_Query whereMonth($column, $operator, $value)
- * @method static CModel_Query whereYear($column, $operator, $value)
- * @method static CModel_Query join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
- * @method static CModel_Query select($columns = ['*'])
- * @method static CModel_Query groupBy(...$groups)
- * @method static CModel_Query from($table)
- * @method static CModel_Query leftJoinSub($query, $as, $first, $operator = null, $second = null)
- * @method static Cmodel_Query addSelect($column)
- * @method static CModel_Query selectRaw($expression, array $bindings = [])
- * @method static CModel_Query orderBy($column, $direction = 'asc')
+ * @method static CModel_Query|static whereBetween($column, array $values)
+ * @method static CModel_Query|static whereNotBetween($column, array $values)
+ * @method static CModel_Query|static whereNested(Closure $callback)
+ * @method static CModel_Query|static addNestedWhereQuery($query)
+ * @method static CModel_Query|static whereExists(Closure $callback)
+ * @method static CModel_Query|static whereNotExists(Closure $callback)
+ * @method static CModel_Query|static whereIn($column, $values)
+ * @method static CModel_Query|static whereNotIn($column, $values)
+ * @method static CModel_Query|static whereNull($column)
+ * @method static CModel_Query|static whereNotNull($column)
+ * @method static CModel_Query|static orWhereRaw($sql, array $bindings = [])
+ * @method static CModel_Query|static orWhereBetween($column, array $values)
+ * @method static CModel_Query|static orWhereNotBetween($column, array $values)
+ * @method static CModel_Query|static orWhereExists(Closure $callback)
+ * @method static CModel_Query|static orWhereNotExists(Closure $callback)
+ * @method static CModel_Query|static orWhereIn($column, $values)
+ * @method static CModel_Query|static orWhereNotIn($column, $values)
+ * @method static CModel_Query|static orWhereNull($column)
+ * @method static CModel_Query|static orWhereNotNull($column)
+ * @method static CModel_Query|static whereDate($column, $operator, $value)
+ * @method static CModel_Query|static whereDay($column, $operator, $value)
+ * @method static CModel_Query|static whereMonth($column, $operator, $value)
+ * @method static CModel_Query|static whereYear($column, $operator, $value)
+ * @method static CModel_Query|static join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+ * @method static CModel_Query|static select($columns = ['*'])
+ * @method static CModel_Query|static groupBy(...$groups)
+ * @method static CModel_Query|static from($table)
+ * @method static CModel_Query|static leftJoinSub($query, $as, $first, $operator = null, $second = null)
+ * @method static Cmodel_Query|static addSelect($column)
+ * @method static CModel_Query|static selectRaw($expression, array $bindings = [])
+ * @method static CModel_Query|static orderBy($column, $direction = 'asc')
  */
 abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_Jsonable, CQueue_QueueableEntityInterface {
     use CModel_Trait_GuardsAttributes,
@@ -971,7 +971,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Begin querying the model.
      *
-     * @return CModel_Query
+     * @return CModel_Query|static
      */
     public static function query() {
         return (new static)->newQuery();

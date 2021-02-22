@@ -26,9 +26,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CModel[] getModels($columns = ['*']) Get the hydrated models without eager loading.
  * @method array eagerLoadRelations(array $models) Eager load the relationships for the models.
  * @method array loadRelation(array $models, $name, Closure $constraints) Eagerly load the relationship on a set of models.
- * @method static CModel_Query where($column, $operator = null, $value = null, $boolean = 'and') Add a basic where clause to the query.
- * @method static CModel_Query orWhere($column, $operator = null, $value = null) Add an "or where" clause to the query.
- * @method static CModel_Query has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
+ * @method static CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and') Add a basic where clause to the query.
+ * @method static CModel_Query|static orWhere($column, $operator = null, $value = null) Add an "or where" clause to the query.
+ * @method static CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
  * @method static CDatabase_Query_Builder|static whereRaw($sql, array $bindings = [])
  * @method static CDatabase_Query_Builder whereBetween($column, array $values)
  * @method static CDatabase_Query_Builder whereNotBetween($column, array $values)
@@ -40,28 +40,28 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static CDatabase_Query_Builder whereNotIn($column, $values)
  * @method static CDatabase_Query_Builder whereNull($column)
  * @method static CDatabase_Query_Builder whereNotNull($column)
- * @method CModel_Query orWhereRaw($sql, array $bindings = [])
- * @method CModel_Query orWhereBetween($column, array $values)
- * @method CModel_Query orWhereNotBetween($column, array $values)
- * @method CModel_Query orWhereExists(Closure $callback)
- * @method CModel_Query orWhereNotExists(Closure $callback)
- * @method CModel_Query orWhereIn($column, $values)
- * @method CModel_Query orWhereNotIn($column, $values)
- * @method CModel_Query orWhereNull($column)
- * @method CModel_Query orWhereNotNull($column)
- * @method CModel_Query whereDate($column, $operator, $value)
- * @method CModel_Query whereDay($column, $operator, $value)
- * @method CModel_Query whereMonth($column, $operator, $value)
- * @method CModel_Query whereYear($column, $operator, $value)
- * @method CModel_Query join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
- * @method CModel_Query select($columns = ['*'])
- * @method CModel_Query groupBy(...$groups)
- * @method CModel_Query newQuery()
- * @method CModel_Query from($table)
- * @method CModel_Query leftJoinSub($query, $as, $first, $operator = null, $second = null)
- * @method CModel_Query addSelect($column)
- * @method CModel_Query selectRaw($expression, array $bindings = [])
- * @method CModel_Query orderBy($column, $direction = 'asc')
+ * @method CModel_Query|static orWhereRaw($sql, array $bindings = [])
+ * @method CModel_Query|static orWhereBetween($column, array $values)
+ * @method CModel_Query|static orWhereNotBetween($column, array $values)
+ * @method CModel_Query|static orWhereExists(Closure $callback)
+ * @method CModel_Query|static orWhereNotExists(Closure $callback)
+ * @method CModel_Query|static orWhereIn($column, $values)
+ * @method CModel_Query|static orWhereNotIn($column, $values)
+ * @method CModel_Query|static orWhereNull($column)
+ * @method CModel_Query|static orWhereNotNull($column)
+ * @method CModel_Query|static whereDate($column, $operator, $value)
+ * @method CModel_Query|static whereDay($column, $operator, $value)
+ * @method CModel_Query|static whereMonth($column, $operator, $value)
+ * @method CModel_Query|static whereYear($column, $operator, $value)
+ * @method CModel_Query|static join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+ * @method CModel_Query|static select($columns = ['*'])
+ * @method CModel_Query|static groupBy(...$groups)
+ * @method CModel_Query|static newQuery()
+ * @method CModel_Query|static from($table)
+ * @method CModel_Query|static leftJoinSub($query, $as, $first, $operator = null, $second = null)
+ * @method CModel_Query|static addSelect($column)
+ * @method CModel_Query|static selectRaw($expression, array $bindings = [])
+ * @method CModel_Query|static orderBy($column, $direction = 'asc')
  */
 class CModel_Query {
     use CDatabase_Trait_Builder,

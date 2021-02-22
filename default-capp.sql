@@ -113,6 +113,7 @@ CREATE TABLE IF NOT EXISTS `org` (
   `email` varchar(100) DEFAULT NULL,
   `phone` varchar(50) DEFAULT NULL,
   `contact_person` varchar(50) DEFAULT NULL,
+  `auth_type` varchar(50) DEFAULT 'dev',
   `created` datetime DEFAULT NULL,
   `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
