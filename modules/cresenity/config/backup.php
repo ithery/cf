@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 return [
     'backup' => [
         /*
@@ -111,18 +105,18 @@ return [
      */
     'notifications' => [
         'notifications' => [
-//            \Spatie\Backup\Notifications\Notifications\BackupHasFailed::class => ['mail'],
-//            \Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFound::class => ['mail'],
-//            \Spatie\Backup\Notifications\Notifications\CleanupHasFailed::class => ['mail'],
-//            \Spatie\Backup\Notifications\Notifications\BackupWasSuccessful::class => ['mail'],
-//            \Spatie\Backup\Notifications\Notifications\HealthyBackupWasFound::class => ['mail'],
-//            \Spatie\Backup\Notifications\Notifications\CleanupWasSuccessful::class => ['mail'],
+            //            \Spatie\Backup\Notifications\Notifications\BackupHasFailed::class => ['mail'],
+            //            \Spatie\Backup\Notifications\Notifications\UnhealthyBackupWasFound::class => ['mail'],
+            //            \Spatie\Backup\Notifications\Notifications\CleanupHasFailed::class => ['mail'],
+            //            \Spatie\Backup\Notifications\Notifications\BackupWasSuccessful::class => ['mail'],
+            //            \Spatie\Backup\Notifications\Notifications\HealthyBackupWasFound::class => ['mail'],
+            //            \Spatie\Backup\Notifications\Notifications\CleanupWasSuccessful::class => ['mail'],
         ],
         /*
          * Here you can specify the notifiable to which the notifications should be sent. The default
          * notifiable will use the variables specified in this config file.
          */
-//        'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
+        //        'notifiable' => \Spatie\Backup\Notifications\Notifiable::class,
         'mail' => [
             'to' => 'hery@ittron.co.id',
             'from' => [
@@ -154,16 +148,15 @@ return [
                 CBackup_Monitor_HealthCheck_MaximumStorageInMegabytes::class => 5000,
             ],
         ],
-    /*
-      [
-      'name' => 'name of the second app',
-      'disks' => ['local', 's3'],
-      'health_checks' => [
-      \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
-      \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class => 5000,
-      ],
-      ],
-     */
+
+        // [
+        //     'name' => 'name of the second app',
+        //     'disks' => ['local', 's3'],
+        //     'health_checks' => [
+        //         \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumAgeInDays::class => 1,
+        //         \Spatie\Backup\Tasks\Monitor\HealthChecks\MaximumStorageInMegabytes::class => 5000,
+        //     ],
+        // ],
     ],
     'cleanup' => [
         /*
@@ -175,7 +168,7 @@ return [
          * No matter how you configure it the default strategy will never
          * delete the newest backup.
          */
-//        'strategy' => \Spatie\Backup\Tasks\Cleanup\Strategies\DefaultStrategy::class,
+        //        'strategy' => \Spatie\Backup\Tasks\Cleanup\Strategies\DefaultStrategy::class,
         'default_strategy' => [
             /*
              * The number of days for which backups must be kept.
