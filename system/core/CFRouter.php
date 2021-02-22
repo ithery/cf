@@ -6,20 +6,35 @@ use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class CFRouter {
     protected static $routesRuntime = [];
+
     protected static $routes;
+
     public static $current_uri = '';
+
     public static $query_string = '';
+
     public static $complete_uri = '';
+
     public static $routed_uri = '';
+
     public static $url_suffix = '';
+
     public static $segments;
+
     public static $rsegments;
+
     public static $controller;
+
     public static $controller_dir;
+
     public static $controller_dir_ucfirst;
+
     public static $controller_path;
+
     public static $method = 'index';
+
     public static $arguments = [];
+
     public static $routeData = [];
 
     /**
@@ -32,6 +47,7 @@ class CFRouter {
 
         if (self::$controller === null) {
             // No controller was found, so no page can be rendered
+
             CF::show404();
         }
     }
