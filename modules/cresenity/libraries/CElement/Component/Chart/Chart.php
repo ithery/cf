@@ -1,15 +1,11 @@
 <?php
 
-/**
- * 
- */
 class CElement_Component_Chart_Chart extends CElement_Component_Chart {
-
     public function __construct() {
         parent::__construct();
         $this->wrapper = $this->addCanvas()->addClass('cchart cchart-chart');
         CManager::instance()->registerModule('chartjs');
-        $this->options = array();
+        $this->options = [];
     }
 
     protected function build() {
@@ -40,28 +36,28 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
             $color = carr::get($value, 'color') ?: $randColor;
             $backgroundColor = carr::get($value, 'backgroundColor') ?: $this->getColor($randColor, 0.2);
             $tension = carr::get($value, 'tension');
-            //$backgroundColor = $this->getColor($color, 0.2);
-            if (is_array($dataset['data'])) {
-                $color=[];
-                $backgroundColor=[];
-                foreach ($dataset['data'] as $k => $v) {
-                    $randColor = $this->getColor();
-                    $colorTemp = carr::get($value, 'color');
-                    $backgroundColorTemp = carr::get($value, 'backgroundColor');
-                    if(is_array($colorTemp)) {
-                        $colorTemp = carr::get($colorTemp,$k);
-                    }
-                    if(is_array($backgroundColorTemp)) {
-                        $backgroundColorTemp = carr::get($backgroundColorTemp,$k);
-                    }
-                    
-                    $color[] = $colorTemp;
-                    if(strlen($backgroundColorTemp)==0) {
-                        $backgroundColorTemp=$this->getColor($colorTemp, 0.2);
-                    }
-                    $backgroundColor[] = $backgroundColorTemp;
-                }
-            }
+            // $backgroundColor = $this->getColor($color, 0.2);
+            // if (is_array($dataset['data'])) {
+            //     $color=[];
+            //     $backgroundColor=[];
+            //     foreach ($dataset['data'] as $k => $v) {
+            //         $randColor = $this->getColor();
+            //         $colorTemp = carr::get($value, 'color');
+            //         $backgroundColorTemp = carr::get($value, 'backgroundColor');
+            //         if(is_array($colorTemp)) {
+            //             $colorTemp = carr::get($colorTemp,$k);
+            //         }
+            //         if(is_array($backgroundColorTemp)) {
+            //             $backgroundColorTemp = carr::get($backgroundColorTemp,$k);
+            //         }
+
+            //         $color[] = $colorTemp;
+            //         if(strlen($backgroundColorTemp)==0) {
+            //             $backgroundColorTemp=$this->getColor($colorTemp, 0.2);
+            //         }
+            //         $backgroundColor[] = $backgroundColorTemp;
+            //     }
+            // }
             $dataset['borderColor'] = $color;
             $dataset['backgroundColor'] = $backgroundColor;
             if (strlen($tension) > 0) {
@@ -100,15 +96,14 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
 	    ")->br();
 
         if ($this->width) {
-            $js->append("chart" . $this->wrapper->id . ".canvas.parentNode.style.width = '" . $this->width . "px';")->br();
+            $js->append('chart' . $this->wrapper->id . ".canvas.parentNode.style.width = '" . $this->width . "px';")->br();
         }
         if ($this->height) {
-            $js->append("chart" . $this->wrapper->id . ".canvas.parentNode.style.height = '" . $this->height . "px';")->br();
+            $js->append('chart' . $this->wrapper->id . ".canvas.parentNode.style.height = '" . $this->height . "px';")->br();
         }
-        
-        $js->append("$('#" . $this->wrapper->id . "').data('capp-chart',chart" . $this->wrapper->id . ");");
+
+        $js->append("$('#" . $this->wrapper->id . "').data('capp-chart',chart" . $this->wrapper->id . ');');
 
         return $js->text();
     }
-
 }
