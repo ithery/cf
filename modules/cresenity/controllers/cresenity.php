@@ -444,4 +444,23 @@ class Controller_Cresenity extends CController {
         $method = carr::get($args, 0);
         $parameters = array_slice($args, 1);
     }
+
+    public function symlink($appCode) {
+        $appDir = DOCROOT . 'application' . DS . $appCode;
+        if (is_dir($appDir)) {
+            //valid appCode, we will create the symlink for this appCode
+            $linkMap = ['media'];
+            foreach ($linkMap as $folder) {
+                $publicLink = DOCROOT . 'public' . DS . 'application' . DS . $appCode . DS . 'default' . DS . $folder;
+                $targetFolder = DOCROOT . 'application' . DS . $appCode . DS . 'default' . DS . $folder;
+                $publicFolder = dirname($publicLink);
+                if (!is_dir($publicLink)) {
+                    CFile::makeDirectory($publicFolder, 0755, true);
+                }
+                if (!file_exists($publicLink)) {
+                    symlink($targetFolder, $publicLink);
+                }
+            }
+        }
+    }
 }
