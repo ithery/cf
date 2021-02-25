@@ -7,19 +7,33 @@
  */
 abstract class CApi_MethodAbstract implements CInterface_Arrayable {
     protected $errCode = 0;
+
     protected $errMessage = '';
+
     protected $data = [];
+
     protected $request;
+
     protected $lang = null;
+
     protected $sessionId = null;
+
     protected $session;
+
     protected $sessionOptions = [
         'driver' => 'File',
         'expiration' => null,
     ];
+
+    protected $orgId;
+
     protected $sessionIdParameter = 'sessionId';
 
-    public function __construct() {
+    public function __construct($orgId = null) {
+        if ($orgId == null) {
+            $orgId = CF::orgId();
+        }
+        $this->orgId = $orgId;
     }
 
     abstract public function execute();
