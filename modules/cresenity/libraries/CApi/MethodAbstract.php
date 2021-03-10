@@ -82,7 +82,7 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
     }
 
     /**
-     * @return XCApi_SessionAbstract
+     * @return CApi_Session
      */
     public function session() {
         if ($this->session == null) {
