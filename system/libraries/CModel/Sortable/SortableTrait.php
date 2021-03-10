@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 31, 2019, 6:18:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 31, 2019, 6:18:55 PM
  */
 trait CModel_Sortable_SortableTrait {
-
     public static function bootSortableTrait() {
         static::creating(function ($model) {
             $traitUses = c::traitUsesRecursive($model);
@@ -36,12 +36,12 @@ trait CModel_Sortable_SortableTrait {
     /**
      * Let's be nice and provide an ordered scope.
      *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string $direction
+     * @param CModel_Query $query
+     * @param string       $direction
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return CDatabase_Query_Builder
      */
-    public function scopeOrdered(Builder $query, $direction = 'asc') {
+    public function scopeOrdered(CModel_Query $query, $direction = 'asc') {
         return $query->orderBy($this->determineOrderColumnName(), $direction);
     }
 
@@ -52,7 +52,7 @@ trait CModel_Sortable_SortableTrait {
      * A starting order number can be optionally supplied (defaults to 1).
      *
      * @param array|\ArrayAccess $ids
-     * @param int $startOrder
+     * @param int                $startOrder
      */
     public static function setNewOrder($ids, $startOrder = 1) {
         if (!is_array($ids) && !$ids instanceof ArrayAccess) {
@@ -62,20 +62,18 @@ trait CModel_Sortable_SortableTrait {
         $orderColumnName = $model->determineOrderColumnName();
         $primaryKeyColumn = $model->getKeyName();
         foreach ($ids as $id) {
-            static::withoutGlobalScope(SoftDeletingScope::class)
-                    ->where($primaryKeyColumn, $id)
-                    ->update([$orderColumnName => $startOrder++]);
+            static::withoutGlobalScope(CModel_SoftDelete_Scope::class)
+                ->where($primaryKeyColumn, $id)
+                ->update([$orderColumnName => $startOrder++]);
         }
     }
 
-    /*
+    /**
      * Determine the column name of the order column.
      */
-
     protected function determineOrderColumnName() {
-        if (
-                isset($this->sortable['order_column_name']) &&
-                !empty($this->sortable['order_column_name'])
+        if (isset($this->sortable['order_column_name'])
+            && !empty($this->sortable['order_column_name'])
         ) {
             return $this->sortable['order_column_name'];
         }
@@ -97,9 +95,9 @@ trait CModel_Sortable_SortableTrait {
     public function moveOrderDown() {
         $orderColumnName = $this->determineOrderColumnName();
         $swapWithModel = $this->buildSortQuery()->limit(1)
-                ->ordered()
-                ->where($orderColumnName, '>', $this->$orderColumnName)
-                ->first();
+            ->ordered()
+            ->where($orderColumnName, '>', $this->$orderColumnName)
+            ->first();
         if (!$swapWithModel) {
             return $this;
         }
@@ -114,9 +112,9 @@ trait CModel_Sortable_SortableTrait {
     public function moveOrderUp() {
         $orderColumnName = $this->determineOrderColumnName();
         $swapWithModel = $this->buildSortQuery()->limit(1)
-                ->ordered('desc')
-                ->where($orderColumnName, '<', $this->$orderColumnName)
-                ->first();
+            ->ordered('desc')
+            ->where($orderColumnName, '<', $this->$orderColumnName)
+            ->first();
         if (!$swapWithModel) {
             return $this;
         }
@@ -126,11 +124,12 @@ trait CModel_Sortable_SortableTrait {
     /**
      * Swap the order of this model with the order of another model.
      *
-     * @param \Spatie\EloquentSortable\Sortable $otherModel
+     * @param CModel_Sortable_SortableInterface $otherModel
      *
      * @return $this
      */
-    public function swapOrderWithModel(Sortable $otherModel) {
+    public function swapOrderWithModel(CModel_Sortable_SortableInterface $otherModel) {
+        /** @var $this $otherModel * */
         $orderColumnName = $this->determineOrderColumnName();
         $oldOrderOfOtherModel = $otherModel->$orderColumnName;
         $otherModel->$orderColumnName = $this->$orderColumnName;
@@ -143,10 +142,11 @@ trait CModel_Sortable_SortableTrait {
     /**
      * Swap the order of two models.
      *
-     * @param \Spatie\EloquentSortable\Sortable $model
-     * @param \Spatie\EloquentSortable\Sortable $otherModel
+     * @param CModel_Sortable_SortableInterface $model
+     * @param CModel_Sortable_SortableInterface $otherModel
      */
-    public static function swapOrder(Sortable $model, Sortable $otherModel) {
+    public static function swapOrder(CModel_Sortable_SortableInterface $model, CModel_Sortable_SortableInterface $otherModel) {
+        /** @var $this $model * */
         $model->swapOrderWithModel($otherModel);
     }
 
@@ -157,8 +157,8 @@ trait CModel_Sortable_SortableTrait {
      */
     public function moveToStart() {
         $firstModel = $this->buildSortQuery()->limit(1)
-                ->ordered()
-                ->first();
+            ->ordered()
+            ->first();
         if ($firstModel->id === $this->id) {
             return $this;
         }
@@ -184,8 +184,8 @@ trait CModel_Sortable_SortableTrait {
         $this->$orderColumnName = $maxOrder;
         $this->save();
         $this->buildSortQuery()->where($this->getKeyName(), '!=', $this->id)
-                ->where($orderColumnName, '>', $oldOrder)
-                ->decrement($orderColumnName);
+            ->where($orderColumnName, '>', $oldOrder)
+            ->decrement($orderColumnName);
         return $this;
     }
 
@@ -197,5 +197,4 @@ trait CModel_Sortable_SortableTrait {
     public function buildSortQuery() {
         return static::query();
     }
-
 }
