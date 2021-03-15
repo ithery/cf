@@ -510,6 +510,36 @@ class CVendor_Xendit {
         return $responseObject;
     }
 
+    public function createEWalletCharge($externalId, $ewalletType, $amount, $options = []) {
+        $curl = curl_init();
+        $headers = [];
+        $headers[] = 'Content-Type: application/json';
+        $endPoint = $this->server_domain . '/ewallets/charges';
+
+        $data['reference_id'] = $externalId;
+        $data['currency'] = carr::get($options, 'currency', 'IDR');
+        $data['checkout_method'] = carr::get($options, 'ONE_TIME_PAYMENT');
+        $data['amount'] = $amount;
+        $data['channel_code'] = $ewalletType;
+
+        if (!empty($options['channel_properties'])) {
+            $data['channel_properties'] = carr::get($options, 'channel_properties');
+        }
+
+        $payload = json_encode($data);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
+        curl_setopt($curl, CURLOPT_URL, $endPoint);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $responseObject = json_decode($response, true);
+        return $responseObject;
+    }
+
     public function createRetail($external_id, $retail_outlet_name, $name, $amount, $options = []) {
         $curl = curl_init();
         $headers = [];
