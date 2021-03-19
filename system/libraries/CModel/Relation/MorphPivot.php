@@ -28,7 +28,21 @@ class CModel_Relation_MorphPivot extends CModel_Relation_Pivot {
      */
     protected function setKeysForSaveQuery(CModel_Query $query) {
         $query->where($this->morphType, $this->morphClass);
+
         return parent::setKeysForSaveQuery($query);
+    }
+
+    /**
+     * Set the keys for a select query.
+     *
+     * @param CModel_Query $query
+     *
+     * @return CModel_Query
+     */
+    protected function setKeysForSelectQuery($query) {
+        $query->where($this->morphType, $this->morphClass);
+
+        return parent::setKeysForSelectQuery($query);
     }
 
     /**
@@ -37,9 +51,17 @@ class CModel_Relation_MorphPivot extends CModel_Relation_Pivot {
      * @return int
      */
     public function delete() {
+        if (isset($this->attributes[$this->getKeyName()])) {
+            return (int) parent::delete();
+        }
+        if ($this->fireModelEvent('deleting') === false) {
+            return 0;
+        }
         $query = $this->getDeleteQuery();
         $query->where($this->morphType, $this->morphClass);
-        return $query->delete();
+        return c::tap($query->delete(), function () {
+            $this->fireModelEvent('deleted', false);
+        });
     }
 
     /**
@@ -115,6 +137,7 @@ class CModel_Relation_MorphPivot extends CModel_Relation_Pivot {
      * @return CModel_Query
      */
     protected function newQueryForCollectionRestoration(array $ids) {
+        $ids = array_values($ids);
         if (!cstr::contains($ids[0], ':')) {
             return parent::newQueryForRestoration($ids);
         }

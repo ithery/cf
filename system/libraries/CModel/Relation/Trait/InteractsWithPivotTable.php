@@ -58,7 +58,7 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
     /**
      * Sync the intermediate tables with a list of IDs without detaching.
      *
-     * @param CModel_Collection|CCollection|array $ids
+     * @param CCollection|CModel|array $ids
      *
      * @return array
      */
@@ -69,8 +69,8 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
     /**
      * Sync the intermediate tables with a list of IDs or collection of models.
      *
-     * @param CModel_Collection|CCollection|array $ids
-     * @param bool                                $detaching
+     * @param CCollection|CModel|array $ids
+     * @param bool                     $detaching
      *
      * @return array
      */
@@ -82,9 +82,8 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
         // First we need to attach any of the associated models that are not currently
         // in this joining table. We'll spin through the given IDs, checking to see
         // if they exist in the array of current ones, and if not we will insert.
-        $current = $this->newPivotQuery()->pluck(
-            $this->relatedPivotKey
-        )->all();
+        $current = $this->getCurrentlyAttachedPivots()
+            ->pluck($this->relatedPivotKey)->all();
 
         $detach = array_diff($current, array_keys(
             $records = $this->formatRecordsList($this->parseIds($ids))
@@ -117,6 +116,21 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
         }
 
         return $changes;
+    }
+
+    /**
+     * Sync the intermediate tables with a list of IDs or collection of models with the given pivot values.
+     *
+     * @param \CCollection|\CModel|array $ids
+     * @param array                      $values
+     * @param bool                       $detaching
+     *
+     * @return array
+     */
+    public function syncWithPivotValues($ids, array $values, $detaching = true) {
+        return $this->sync(c::collect($this->parseIds($ids))->mapWithKeys(function ($id) use ($values) {
+            return [$id => $values];
+        }), $detaching);
     }
 
     /**
@@ -170,6 +184,34 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
     }
 
     /**
+     * Update an existing pivot record on the table via a custom class.
+     *
+     * @param mixed $id
+     * @param array $attributes
+     * @param bool  $touch
+     *
+     * @return int
+     */
+    protected function updateExistingPivotUsingCustomClass($id, array $attributes, $touch) {
+        $pivot = $this->getCurrentlyAttachedPivots()
+            ->where($this->foreignPivotKey, $this->parent->{$this->parentKey})
+            ->where($this->relatedPivotKey, $this->parseId($id))
+            ->first();
+
+        $updated = $pivot ? $pivot->fill($attributes)->isDirty() : false;
+
+        if ($updated) {
+            $pivot->save();
+        }
+
+        if ($touch) {
+            $this->touchIfTouching();
+        }
+
+        return (int) $updated;
+    }
+
+    /**
      * Update an existing pivot record on the table.
      *
      * @param mixed $id
@@ -179,11 +221,19 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
      * @return int
      */
     public function updateExistingPivot($id, array $attributes, $touch = true) {
+        if ($this->using
+            && empty($this->pivotWheres)
+            && empty($this->pivotWhereIns)
+            && empty($this->pivotWhereNulls)
+        ) {
+            return $this->updateExistingPivotUsingCustomClass($id, $attributes, $touch);
+        }
+
         if (in_array($this->updatedAt(), $this->pivotColumns)) {
             $attributes = $this->addTimestampsToAttachment($attributes, true);
         }
 
-        $updated = $this->newPivotStatementForId($id)->update(
+        $updated = $this->newPivotStatementForId($this->parseId($id))->update(
             $this->castAttributes($attributes)
         );
 
@@ -204,16 +254,39 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
      * @return void
      */
     public function attach($id, array $attributes = [], $touch = true) {
-        // Here we will insert the attachment records into the pivot table. Once we have
-        // inserted the records, we will touch the relationships if necessary and the
-        // function will return. We can parse the IDs before inserting the records.
-        $this->newPivotStatement()->insert($this->formatAttachRecords(
-            $this->parseIds($id),
-            $attributes
-        ));
+        if ($this->using) {
+            $this->attachUsingCustomClass($id, $attributes);
+        } else {
+            // Here we will insert the attachment records into the pivot table. Once we have
+            // inserted the records, we will touch the relationships if necessary and the
+            // function will return. We can parse the IDs before inserting the records.
+            $this->newPivotStatement()->insert($this->formatAttachRecords(
+                $this->parseIds($id),
+                $attributes
+            ));
+        }
 
         if ($touch) {
             $this->touchIfTouching();
+        }
+    }
+
+    /**
+     * Attach a model to the parent using a custom class.
+     *
+     * @param mixed $id
+     * @param array $attributes
+     *
+     * @return void
+     */
+    protected function attachUsingCustomClass($id, array $attributes) {
+        $records = $this->formatAttachRecords(
+            $this->parseIds($id),
+            $attributes
+        );
+
+        foreach ($records as $record) {
+            $this->newPivot($record, false)->save();
         }
     }
 
@@ -298,6 +371,10 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
             $record = $this->addTimestampsToAttachment($record);
         }
 
+        foreach ($this->pivotValues as $value) {
+            $record[$value['column']] = $value['value'];
+        }
+
         return $record;
     }
 
@@ -311,6 +388,12 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
      */
     protected function addTimestampsToAttachment(array $record, $exists = false) {
         $fresh = $this->parent->freshTimestamp();
+
+        if ($this->using) {
+            $pivotModel = new $this->using;
+
+            $fresh = $fresh->format($pivotModel->getDateFormat());
+        }
 
         if (!$exists && $this->hasPivotColumn($this->createdAt())) {
             $record[$this->createdAt()] = $fresh;
@@ -343,25 +426,34 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
      * @return int
      */
     public function detach($ids = null, $touch = true) {
-        $query = $this->newPivotQuery();
+        if ($this->using
+            && !empty($ids)
+            && empty($this->pivotWheres)
+            && empty($this->pivotWhereIns)
+            && empty($this->pivotWhereNulls)
+        ) {
+            $results = $this->detachUsingCustomClass($ids);
+        } else {
+            $query = $this->newPivotQuery();
 
-        // If associated IDs were passed to the method we will only delete those
-        // associations, otherwise all of the association ties will be broken.
-        // We'll return the numbers of affected rows when we do the deletes.
-        if (!is_null($ids)) {
-            $ids = $this->parseIds($ids);
+            // If associated IDs were passed to the method we will only delete those
+            // associations, otherwise all of the association ties will be broken.
+            // We'll return the numbers of affected rows when we do the deletes.
+            if (!is_null($ids)) {
+                $ids = $this->parseIds($ids);
 
-            if (empty($ids)) {
-                return 0;
+                if (empty($ids)) {
+                    return 0;
+                }
+
+                $query->whereIn($this->relatedPivotKey, (array) $ids);
             }
 
-            $query->whereIn($this->relatedPivotKey, (array) $ids);
+            // Once we have all of the conditions set on the statement, we are ready
+            // to run the delete on the pivot table. Then, if the touch parameter
+            // is true, we will go ahead and touch all related models to sync.
+            $results = $query->delete();
         }
-
-        // Once we have all of the conditions set on the statement, we are ready
-        // to run the delete on the pivot table. Then, if the touch parameter
-        // is true, we will go ahead and touch all related models to sync.
-        $results = $query->delete();
 
         if ($touch) {
             $this->touchIfTouching();
@@ -371,12 +463,47 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
     }
 
     /**
+     * Detach models from the relationship using a custom class.
+     *
+     * @param mixed $ids
+     *
+     * @return int
+     */
+    protected function detachUsingCustomClass($ids) {
+        $results = 0;
+
+        foreach ($this->parseIds($ids) as $id) {
+            $results += $this->newPivot([
+                $this->foreignPivotKey => $this->parent->{$this->parentKey},
+                $this->relatedPivotKey => $id,
+            ], true)->delete();
+        }
+
+        return $results;
+    }
+
+    /**
+     * Get the pivot models that are currently attached.
+     *
+     * @return CCollection
+     */
+    protected function getCurrentlyAttachedPivots() {
+        return $this->newPivotQuery()->get()->map(function ($record) {
+            $class = $this->using ?: CModel_Relation_Pivot::class;
+
+            $pivot = $class::fromRawAttributes($this->parent, (array) $record, $this->getTable(), true);
+
+            return $pivot->setPivotKeys($this->foreignPivotKey, $this->relatedPivotKey);
+        });
+    }
+
+    /**
      * Create a new pivot model instance.
      *
      * @param array $attributes
      * @param bool  $exists
      *
-     * @return \Illuminate\Database\Eloquent\Relations\Pivot
+     * @return \CModel_Relation_Pivot
      */
     public function newPivot(array $attributes = [], $exists = false) {
         $pivot = $this->related->newPivot(
@@ -395,7 +522,7 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
      *
      * @param array $attributes
      *
-     * @return \Illuminate\Database\Eloquent\Relations\Pivot
+     * @return \CModel_Relation_Pivot
      */
     public function newExistingPivot(array $attributes = []) {
         return $this->newPivot($attributes, true);
@@ -404,7 +531,7 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
     /**
      * Get a new plain query builder for the pivot table.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \CDatabase_Query_Builder
      */
     public function newPivotStatement() {
         return $this->query->getQuery()->newQuery()->from($this->table);
@@ -415,16 +542,16 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
      *
      * @param mixed $id
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \CDatabase_Query_Builder
      */
     public function newPivotStatementForId($id) {
-        return $this->newPivotQuery()->where($this->relatedPivotKey, $id);
+        return $this->newPivotQuery()->whereIn($this->relatedPivotKey, $this->parseIds($id));
     }
 
     /**
      * Create a new query builder for the pivot table.
      *
-     * @return \Illuminate\Database\Query\Builder
+     * @return \CDatabase_Query_Builder
      */
     protected function newPivotQuery() {
         $query = $this->newPivotStatement();
@@ -435,6 +562,9 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
 
         foreach ($this->pivotWhereIns as $arguments) {
             call_user_func_array([$query, 'whereIn'], $arguments);
+        }
+        foreach ($this->pivotWhereNulls as $arguments) {
+            call_user_func_array([$query, 'whereNull'], $arguments);
         }
 
         return $query->where($this->foreignPivotKey, $this->parent->{$this->parentKey});
@@ -465,11 +595,11 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
      */
     protected function parseIds($value) {
         if ($value instanceof CModel) {
-            return [$value->getKey()];
+            return [$value->{$this->relatedKey}];
         }
 
         if ($value instanceof CModel_Collection) {
-            return $value->modelKeys();
+            return $value->pluck($this->relatedKey)->all();
         }
 
         if ($value instanceof CCollection) {
@@ -480,6 +610,17 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
     }
 
     /**
+     * Get the ID from the given mixed value.
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     */
+    protected function parseId($value) {
+        return $value instanceof CModel ? $value->{$this->relatedKey} : $value;
+    }
+
+    /**
      * Cast the given keys to integers if they are numeric and string otherwise.
      *
      * @param array $keys
@@ -487,7 +628,7 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
      * @return array
      */
     protected function castKeys(array $keys) {
-        return (array) array_map(function ($v) {
+        return array_map(function ($v) {
             return $this->castKey($v);
         }, $keys);
     }
@@ -500,7 +641,10 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
      * @return mixed
      */
     protected function castKey($key) {
-        return is_numeric($key) ? (int) $key : (string) $key;
+        return $this->getTypeSwapValue(
+            $this->related->getKeyType(),
+            $key
+        );
     }
 
     /**
@@ -511,6 +655,32 @@ trait CModel_Relation_Trait_InteractsWithPivotTable {
      * @return array
      */
     protected function castAttributes($attributes) {
-        return $this->using ? $this->newPivot()->fill($attributes)->getAttributes() : $attributes;
+        return $this->using
+            ? $this->newPivot()->fill($attributes)->getAttributes()
+            : $attributes;
+    }
+
+    /**
+     * Converts a given value to a given type value.
+     *
+     * @param string $type
+     * @param mixed  $value
+     *
+     * @return mixed
+     */
+    protected function getTypeSwapValue($type, $value) {
+        switch (strtolower($type)) {
+            case 'int':
+            case 'integer':
+                return (int) $value;
+            case 'real':
+            case 'float':
+            case 'double':
+                return (float) $value;
+            case 'string':
+                return (string) $value;
+            default:
+                return $value;
+        }
     }
 }

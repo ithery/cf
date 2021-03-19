@@ -1018,6 +1018,8 @@ final class CF {
      * @param callable|null $callback
      *
      * @return mixed
+     *
+     * @deprecated
      */
     public static function tap($value, $callback = null) {
         return c::tap($value, $callback);

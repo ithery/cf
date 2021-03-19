@@ -33,6 +33,27 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
     protected $macroBuffer = [];
 
     /**
+     * A map of relations to load for each individual morph type.
+     *
+     * @var array
+     */
+    protected $morphableEagerLoads = [];
+
+    /**
+     * A map of relationship counts to load for each individual morph type.
+     *
+     * @var array
+     */
+    protected $morphableEagerLoadCounts = [];
+
+    /**
+     * A map of constraints to apply for each individual morph type.
+     *
+     * @var array
+     */
+    protected $morphableConstraints = [];
+
+    /**
      * Create a new morph to relationship instance.
      *
      * @param CModel_Query $query
@@ -101,10 +122,23 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
         $ownerKey = $this->ownerKey ? $this->ownerKey : $instance->getKeyName();
         $query = $this->replayMacros($instance->newQuery())
             ->mergeConstraintsFrom($this->getQuery())
-            ->with($this->getQuery()->getEagerLoads());
-        return $query->whereIn(
+            ->with(array_merge(
+                $this->getQuery()->getEagerLoads(),
+                (array) (carr::get($this->morphableEagerLoads, get_class($instance), []))
+            ))
+            ->withCount(
+                (array) (carr::get($this->morphableEagerLoadCounts, get_class($instance), []))
+            );
+
+        if ($callback = carr::get($this->morphableConstraints, get_class($instance), null)) {
+            $callback($query);
+        }
+
+        $whereIn = $this->whereInMethod($instance, $ownerKey);
+
+        return $query->{$whereIn}(
             $instance->getTable() . '.' . $ownerKey,
-            $this->gatherKeysByType($type)
+            $this->gatherKeysByType($type, $instance->getKeyType())
         )->get();
     }
 
@@ -112,13 +146,16 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
      * Gather all of the foreign keys for a given type.
      *
      * @param string $type
+     * @param string $keyType
      *
      * @return array
      */
-    protected function gatherKeysByType($type) {
-        return c::collect($this->dictionary[$type])->map(function ($models) {
-            return carr::head($models)->{$this->foreignKey};
-        })->values()->unique()->all();
+    protected function gatherKeysByType($type, $keyType) {
+        return $keyType !== 'string'
+        ? array_keys($this->dictionary[$type])
+        : array_map(function ($modelId) {
+            return (string) $modelId;
+        }, array_keys($this->dictionary[$type]));
     }
 
     /**
@@ -130,7 +167,11 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
      */
     public function createModelByType($type) {
         $class = CModel::getActualClassNameForMorph($type);
-        return new $class;
+        return c::tap(new $class, function ($instance) {
+            if (!$instance->getConnectionName()) {
+                $instance->setConnection($this->getConnection()->getName());
+            }
+        });
     }
 
     /**
@@ -159,7 +200,7 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
             $ownerKey = !is_null($this->ownerKey) ? $result->{$this->ownerKey} : $result->getKey();
             if (isset($this->dictionary[$type][$ownerKey])) {
                 foreach ($this->dictionary[$type][$ownerKey] as $model) {
-                    $model->setRelation($this->relation, $result);
+                    $model->setRelation($this->relationName, $result);
                 }
             }
         }
@@ -181,7 +222,7 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
             $this->morphType,
             $model instanceof CModel ? $model->getMorphClass() : null
         );
-        return $this->parent->setRelation($this->relation, $model);
+        return $this->parent->setRelation($this->relationName, $model);
     }
 
     /**
@@ -192,7 +233,7 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
     public function dissociate() {
         $this->parent->setAttribute($this->foreignKey, null);
         $this->parent->setAttribute($this->morphType, null);
-        return $this->parent->setRelation($this->relation, null);
+        return $this->parent->setRelation($this->relationName, null);
     }
 
     /**
@@ -233,6 +274,54 @@ class CModel_Relation_MorphTo extends CModel_Relation_BelongsTo {
      */
     public function getDictionary() {
         return $this->dictionary;
+    }
+
+    /**
+     * Specify which relations to load for a given morph type.
+     *
+     * @param array $with
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphTo
+     */
+    public function morphWith(array $with) {
+        $this->morphableEagerLoads = array_merge(
+            $this->morphableEagerLoads,
+            $with
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify which relationship counts to load for a given morph type.
+     *
+     * @param array $withCount
+     *
+     * @return CModel_Relation_MorphTo
+     */
+    public function morphWithCount(array $withCount) {
+        $this->morphableEagerLoadCounts = array_merge(
+            $this->morphableEagerLoadCounts,
+            $withCount
+        );
+
+        return $this;
+    }
+
+    /**
+     * Specify constraints on the query for a given morph types.
+     *
+     * @param array $callbacks
+     *
+     * @return CModel_Relation_MorphTo
+     */
+    public function constrain(array $callbacks) {
+        $this->morphableConstraints = array_merge(
+            $this->morphableConstraints,
+            $callbacks
+        );
+
+        return $this;
     }
 
     /**

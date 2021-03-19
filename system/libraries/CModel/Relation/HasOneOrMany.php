@@ -16,13 +16,6 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
     protected $localKey;
 
     /**
-     * The count of self joins.
-     *
-     * @var int
-     */
-    protected static $selfJoinCount = 0;
-
-    /**
      * Create a new has one or many relationship instance.
      *
      * @param CModel_Query $query
@@ -53,6 +46,23 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
     }
 
     /**
+     * Create and return an un-saved instances of the related models.
+     *
+     * @param iterable $records
+     *
+     * @return CModel_Collection
+     */
+    public function makeMany($records) {
+        $instances = $this->related->newCollection();
+
+        foreach ($records as $record) {
+            $instances->push($this->make($record));
+        }
+
+        return $instances;
+    }
+
+    /**
      * Set the base constraints on the relation query.
      *
      * @return void
@@ -73,7 +83,9 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      * @return void
      */
     public function addEagerConstraints(array $models) {
-        $this->query->whereIn(
+        $whereIn = $this->whereInMethod($this->parent, $this->localKey);
+
+        $this->query->{$whereIn}(
             $this->foreignKey,
             $this->getKeys($models, $this->localKey)
         );
@@ -247,9 +259,9 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
     /**
      * Attach a collection of models to the parent instance.
      *
-     * @param \Traversable|array $models
+     * @param iterable|array $models
      *
-     * @return \Traversable|array
+     * @return iterable|array
      */
     public function saveMany($models) {
         foreach ($models as $model) {
@@ -267,7 +279,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      * @return CModel
      */
     public function create(array $attributes = []) {
-        return CF::tap($this->related->newInstance($attributes), function ($instance) {
+        return c::tap($this->related->newInstance($attributes), function ($instance) {
             $this->setForeignAttributesForCreate($instance);
 
             $instance->save();
@@ -300,21 +312,6 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      */
     protected function setForeignAttributesForCreate(CModel $model) {
         $model->setAttribute($this->getForeignKeyName(), $this->getParentKey());
-    }
-
-    /**
-     * Perform an update on all the related models.
-     *
-     * @param array $attributes
-     *
-     * @return int
-     */
-    public function update(array $attributes) {
-        if ($this->related->usesTimestamps()) {
-            $attributes[$this->relatedUpdatedAt()] = $this->related->freshTimestampString();
-        }
-
-        return $this->query->update($attributes);
     }
 
     /**
@@ -356,15 +353,6 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
     }
 
     /**
-     * Get a relationship join table hash.
-     *
-     * @return string
-     */
-    public function getRelationCountHash() {
-        return 'laravel_reserved_' . static::$selfJoinCount++;
-    }
-
-    /**
      * Get the key for comparing against the parent key in "has" query.
      *
      * @return string
@@ -388,7 +376,7 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      * @return string
      */
     public function getQualifiedParentKeyName() {
-        return $this->parent->getTable() . '.' . $this->localKey;
+        return $this->parent->qualifyColumn($this->localKey);
     }
 
     /**
@@ -409,5 +397,14 @@ abstract class CModel_Relation_HasOneOrMany extends CModel_Relation {
      */
     public function getQualifiedForeignKeyName() {
         return $this->foreignKey;
+    }
+
+    /**
+     * Get the local key for the relationship.
+     *
+     * @return string
+     */
+    public function getLocalKeyName() {
+        return $this->localKey;
     }
 }

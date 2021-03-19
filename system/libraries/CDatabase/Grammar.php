@@ -75,11 +75,7 @@ abstract class CDatabase_Grammar {
             $segments[1] = $this->tablePrefix . $segments[1];
         }
 
-        return $this->wrap(
-            $segments[0]
-        ) . ' as ' . $this->wrapValue(
-                            $segments[1]
-                        );
+        return $this->wrap($segments[0]) . ' as ' . $this->wrapValue($segments[1]);
     }
 
     /**
@@ -142,6 +138,21 @@ abstract class CDatabase_Grammar {
      */
     public function parameter($value) {
         return $this->isExpression($value) ? $this->getValue($value) : '?';
+    }
+
+    /**
+     * Quote the given string literal.
+     *
+     * @param string|array $value
+     *
+     * @return string
+     */
+    public function quoteString($value) {
+        if (is_array($value)) {
+            return implode(', ', array_map([$this, __FUNCTION__], $value));
+        }
+
+        return "'$value'";
     }
 
     /**

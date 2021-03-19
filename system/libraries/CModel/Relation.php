@@ -42,6 +42,13 @@ abstract class CModel_Relation {
     public static $morphMap = [];
 
     /**
+     * The count of self joins.
+     *
+     * @var int
+     */
+    protected static $selfJoinCount = 0;
+
+    /**
      * Create a new relation instance.
      *
      * @param CModel_Query $query
@@ -198,6 +205,17 @@ abstract class CModel_Relation {
             '=',
             $this->getExistenceCompareKey()
         );
+    }
+
+    /**
+     * Get a relationship join table hash.
+     *
+     * @param bool $incrementJoinCount
+     *
+     * @return string
+     */
+    public function getRelationCountHash($incrementJoinCount = true) {
+        return 'laravel_reserved_' . ($incrementJoinCount ? static::$selfJoinCount++ : static::$selfJoinCount);
     }
 
     /**
