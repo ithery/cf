@@ -117,4 +117,17 @@ trait CApi_Trait_MethodValidateRequestTrait {
             }
         }
     }
+
+    public function validateRequestMatch($key, $keyToMatch, $message = null) {
+        $val = null;
+        if ($this->errCode == 0) {
+            $val = carr::get($this->request(), $key);
+            $valToMatch = carr::get($this->request(), $keyToMatch);
+            if ($val != $valToMatch) {
+                $this->errCode++;
+                $this->errMessage = $message ?: $this->lang('Parameter :key and :keyToMatch is not match', [':key' => $key, ':keyToMatch' => $keyToMatch]);
+            }
+        }
+        return $val;
+    }
 }

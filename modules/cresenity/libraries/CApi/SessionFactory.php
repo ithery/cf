@@ -6,7 +6,6 @@
  *
  * @since May 30, 2020
  */
-
 final class CApi_SessionFactory {
     private static $instance;
 
@@ -35,6 +34,14 @@ final class CApi_SessionFactory {
         return static::getSession($sessionId, $options);
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param string $sessionId
+     * @param array  $options
+     *
+     * @return CApi_Session
+     */
     public static function getSession($sessionId, $options = []) {
         $driver = carr::get($options, 'driver', CApi::SESSION_DRIVER_FILE);
         $session = new CApi_Session(static::createDriver($driver, $options), $sessionId);
