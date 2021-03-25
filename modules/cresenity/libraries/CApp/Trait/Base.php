@@ -242,7 +242,7 @@ trait CApp_Trait_Base {
      * @param Closure $callback
      * @return CCarbon
      */
-    public static function travelTo($date, Closure $callback = null): CCarbon {
+    public static function travelTo($date, Closure $callback = null) {
         CCarbon::setTestNow($date);
 
         if ($callback) {
@@ -259,7 +259,7 @@ trait CApp_Trait_Base {
      *
      * @return CCarbon
      */
-    public static function travelBack(): CCarbon {
+    public static function travelBack() {
         CCarbon::setTestNow();
 
         return CCarbon::now();
@@ -272,7 +272,7 @@ trait CApp_Trait_Base {
      * @param Closure $callback
      * @return void
      */
-    public static function travelEach($dates, Closure $callback): void {
+    public static function travelEach($dates, Closure $callback) {
         foreach ($dates as $date) {
             CCarbon::setTestNow($date);
 
