@@ -236,6 +236,53 @@ trait CApp_Trait_Base {
     }
 
     /**
+     * Travel to a given date time.
+     *
+     * @param mixed $date
+     * @param Closure $callback
+     * @return CCarbon
+     */
+    public static function travelTo($date, Closure $callback = null): CCarbon {
+        CCarbon::setTestNow($date);
+
+        if ($callback) {
+            $callback();
+
+            self::travelBack();
+        }
+
+        return CCarbon::now();
+    }
+
+    /**
+     * Travel back to the current date time.
+     *
+     * @return CCarbon
+     */
+    public static function travelBack(): CCarbon {
+        CCarbon::setTestNow();
+
+        return CCarbon::now();
+    }
+
+    /**
+     * Travel to each date given.
+     *
+     * @param mixed $dates
+     * @param Closure $callback
+     * @return void
+     */
+    public static function travelEach($dates, Closure $callback): void {
+        foreach ($dates as $date) {
+            CCarbon::setTestNow($date);
+
+            $callback();
+        }
+
+        self::travelBack();
+    }
+
+    /**
      * @return array
      */
     public static function defaultInsert() {
