@@ -232,7 +232,7 @@ trait CApp_Trait_Base {
      * @return string
      */
     public static function now($format = 'Y-m-d H:i:s') {
-        return date($format);
+        return c::now()->format($format);
     }
 
     /**
