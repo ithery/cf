@@ -22,11 +22,11 @@ trait CApp_Model_Trait_Roles {
      * @return CModel_Relation_BelongsTo
      */
     public function org() {
-        return $this->belongsTo('CApp_Model_Org');
+        return $this->belongsTo(CApp_Model_Org::class);
     }
 
     public function rolePermission() {
-        return $this->hasMany('CApp_Model_RolePermission', 'role_id', 'role_id');
+        return $this->hasMany(CApp_Model_RolePermission::class, 'role_id', 'role_id');
     }
 
     public function getDescendantsTree($rootId = null, $orgId = null, $type = null) {

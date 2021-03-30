@@ -20,13 +20,13 @@ trait CApp_Model_Trait_RolePermission {
      * @return CModel_Relation_BelongsTo
      */
     public function org() {
-        return $this->belongsTo('CApp_Model_Org');
+        return $this->belongsTo(CApp_Model_Org::class);
     }
 
     /**
      * @return CModel_Relation_BelongsTo
      */
     public function roles() {
-        return $this->belongsTo('CMModel_Roles');
+        return $this->belongsTo(CApp_Model_Roles::class);
     }
 }

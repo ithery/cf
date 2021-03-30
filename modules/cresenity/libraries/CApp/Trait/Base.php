@@ -23,7 +23,7 @@ trait CApp_Trait_Base {
     /**
      * Alias of $_GET
      *
-     * @return type
+     * @return array
      */
     public static function getRequestGet() {
         return $_GET;
@@ -32,7 +32,7 @@ trait CApp_Trait_Base {
     /**
      * Alias of $_POST
      *
-     * @return type
+     * @return array
      */
     public static function getRequestPost() {
         return $_POST;
@@ -41,7 +41,7 @@ trait CApp_Trait_Base {
     /**
      * Alias of $_FILES
      *
-     * @return type
+     * @return array
      */
     public static function getRequestFiles() {
         return $_FILES;
