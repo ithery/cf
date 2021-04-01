@@ -518,13 +518,10 @@ class CVendor_Xendit {
 
         $data['reference_id'] = $externalId;
         $data['currency'] = carr::get($options, 'currency', 'IDR');
-        $data['checkout_method'] = carr::get($options, 'ONE_TIME_PAYMENT');
+        $data['checkout_method'] = 'ONE_TIME_PAYMENT';
         $data['amount'] = $amount;
         $data['channel_code'] = $ewalletType;
-
-        if (!empty($options['channel_properties'])) {
-            $data['channel_properties'] = carr::get($options, 'channel_properties');
-        }
+        $data['channel_properties'] = carr::get($options, 'channel_properties');
 
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
