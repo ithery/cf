@@ -1,23 +1,19 @@
 <?php
 
-/**
- *
- * @author Raymond Sugiarto
- * @since  Dec 12, 2014
- * @license http://piposystem.com Piposystem
- */
+//@codingStandardsIgnoreStart
 class cdate {
+    //@codingStandardsIgnoreEnd
 
-    public static function age($birthday, $return_year = true) {
-
-        $diff_year = (date("md", strtotime($birthday)) > date("md") ? (date("Y") - date("Y", strtotime($birthday)) - 1) : (date("Y") - date("Y", strtotime($birthday))));
-        $diff_month = (date("d", strtotime($birthday)) > date("d") ? (date("m") - date("m", strtotime($birthday)) - 1) : (date("m") - date("m", strtotime($birthday))));
-        $result = $diff_year;
-        if ($return_year !== true) {
-            $result = ($diff_year * 12) + $diff_month;
-            echo $birthday . "::" . $result . "===";
-        }
-        return $result;
+    /**
+     * Calculate Age
+     *
+     * @param string $birthday
+     *
+     * @return void
+     */
+    public static function age($birthday) {
+        $diffYear = (date('md', strtotime($birthday)) > date('md') ? (date('Y') - date('Y', strtotime($birthday)) - 1) : (date('Y') - date('Y', strtotime($birthday))));
+        $diffMonth = (date('d', strtotime($birthday)) > date('d') ? (date('m') - date('m', strtotime($birthday)) - 1) : (date('m') - date('m', strtotime($birthday))));
+        return $diffYear;
     }
-
 }
