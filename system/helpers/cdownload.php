@@ -1,31 +1,25 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * Download helper class.
- *
- * $Id: download.php 3769 2008-12-15 00:48:56Z zombor $
- *
- * @package    Core
- * @author     Kohana Team
- * @copyright  (c) 2007-2008 Kohana Team
- * @license    http://kohanaphp.com/license.html
- */
-class download {
+// @codingStandardsIgnoreStart
+class cdownload {
+    //@codingStandardsIgnoreEnd
 
     /**
      * Force a download of a file to the user's browser. This function is
      * binary-safe and will work with any MIME type that Kohana is aware of.
      *
-     * @param   string  a file path or file name
-     * @param   mixed   data to be sent if the filename does not exist
-     * @param   string  suggested filename to display in the download
-     * @return  void
+     * @param string $filename a file path or file name
+     * @param mixed  $data     data to be sent if the filename does not exist
+     * @param string $nicename suggested filename to display in the download
+     *
+     * @return void
      */
-    public static function force($filename = NULL, $data = NULL, $nicename = NULL) {
-        if (empty($filename))
-            return FALSE;
+    public static function force($filename = null, $data = null, $nicename = null) {
+        if (empty($filename)) {
+            return false;
+        }
 
         if (is_file($filename)) {
             // Get the real path
@@ -51,23 +45,23 @@ class download {
         }
 
         // Get the mime type of the file
-        $mime = Kohana::config('mimes.' . $extension);
+        $mime = CF::config('mimes.' . $extension);
 
         if (empty($mime)) {
             // Set a default mime if none was found
-            $mime = array('application/octet-stream');
+            $mime = ['application/octet-stream'];
         }
-
         // Generate the server headers
-        header('Content-Type: ' . $mime[0]);
+        //header('Content-Type: '.$mime[0]);
+        header('Content-Type: application/octet-stream');
         header('Content-Disposition: attachment; filename="' . (empty($nicename) ? $filename : $nicename) . '"');
-        header('Content-Transfer-Encoding: binary');
+        //header('Content-Transfer-Encoding: binary');
         header('Content-Length: ' . sprintf('%d', $filesize));
 
         // More caching prevention
         header('Expires: 0');
 
-        if (Kohana::user_agent('browser') === 'Internet Explorer') {
+        if (CF::user_agent('browser') === 'Internet Explorer') {
             // Send IE headers
             header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
             header('Pragma: public');
@@ -75,25 +69,27 @@ class download {
             // Send normal headers
             header('Pragma: no-cache');
         }
-
         // Clear the output buffer
-        Kohana::close_buffers(FALSE);
+        // CF::close_buffers(FALSE);
 
         if (isset($filepath)) {
-            // Open the file
-            $handle = fopen($filepath, 'rb');
+            //echo $filepath;
+            $data = file_get_contents($filepath);
+            echo $data;
 
+        // Open the file
+            //$handle = fopen($filepath, 'rb');
             // Send the file data
-            fpassthru($handle);
-
+            //fpassthru($handle);
             // Close the file
-            fclose($handle);
+            //fclose($handle);
         } else {
             // Send the file data
             echo $data;
         }
-    }
 
+        exit;
+    }
 }
 
 // End download
