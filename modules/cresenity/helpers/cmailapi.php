@@ -1,8 +1,8 @@
 <?php
 
+//@codingStandardsIgnoreStart
 class cmailapi {
-
-    public static function sendgridv3($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+    public static function sendgridv3($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
         $smtp_password = carr::get($options, 'smtp_password');
         $smtp_host = carr::get($options, 'smtp_host');
         if (!$smtp_password) {
@@ -31,9 +31,9 @@ class cmailapi {
         $mail = new CVendor_SendGrid_Mail_Mail();
         $mail->setFrom($smtp_from, $smtp_from_name);
 
-        $toSendGrid = array();
+        $toSendGrid = [];
         if (!is_array($to)) {
-            $to = array($to);
+            $to = [$to];
         }
         foreach ($to as $toItem) {
             $toName = '';
@@ -45,7 +45,7 @@ class cmailapi {
             $mail->addTo($toEmail, $toName);
         }
         $mail->setSubject($subject);
-        $mail->addContent("text/html", $message);
+        $mail->addContent('text/html', $message);
 
         if (!is_array($attachments)) {
             $attachments = [];
@@ -55,21 +55,19 @@ class cmailapi {
         foreach ($attachments as $att) {
             $disk = '';
             if (is_array($att)) {
-                $path = carr::get($att, "path");
+                $path = carr::get($att, 'path');
                 $filename = basename($path);
-                $attachmentFilename = carr::get($att, "filename");
-                $type = carr::get($att, "type");
-                $disk = carr::get($att, "disk");
+                $attachmentFilename = carr::get($att, 'filename');
+                $type = carr::get($att, 'type');
+                $disk = carr::get($att, 'disk');
             } else {
                 $path = $att;
                 $filename = basename($att);
                 $attachmentFilename = $filename;
-                $type = "";
+                $type = '';
             }
 
-
             if (strlen($type) == 0) {
-
                 $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
                 $type = 'application/text';
@@ -93,14 +91,12 @@ class cmailapi {
             $attachment = new CVendor_SendGrid_Mail_Attachment();
             $attachment->setContent(base64_encode($content));
             $attachment->setType($type);
-            $attachment->setDisposition("attachment");
+            $attachment->setDisposition('attachment');
             $attachment->setFilename($attachmentFilename);
             $mail->addAttachment($attachment);
         }
 
-
         $sg = new CVendor_SendGrid($sendgrid_apikey);
-
 
         //cdbg::var_dump(json_encode($mail, JSON_PRETTY_PRINT));
 
@@ -111,7 +107,7 @@ class cmailapi {
         return $response;
     }
 
-    public static function sendgridv3bak($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+    public static function sendgridv3bak($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
         $smtp_password = carr::get($options, 'smtp_password');
         $smtp_host = carr::get($options, 'smtp_host');
         if (!$smtp_password) {
@@ -139,9 +135,9 @@ class cmailapi {
 //        }
         $from = new CSendGrid_Email($smtp_from_name, $smtp_from);
 
-        $toSendGrid = array();
+        $toSendGrid = [];
         if (!is_array($to)) {
-            $to = array($to);
+            $to = [$to];
         }
         foreach ($to as $toItem) {
             $toName = '';
@@ -152,29 +148,26 @@ class cmailapi {
             }
             $toSendGrid[] = new CSendGrid_Email($toName, $toEmail);
         }
-        $content = new CSendGrid_Content("text/html", $message);
-
+        $content = new CSendGrid_Content('text/html', $message);
 
         $subjectPreview = carr::get($options, 'subject_preview');
         $mail = new CSendGrid_Mail($from, $subject, $toSendGrid, $content);
         foreach ($attachments as $att) {
             $disk = '';
             if (is_array($att)) {
-                $path = carr::get($att, "path");
+                $path = carr::get($att, 'path');
                 $filename = basename($path);
-                $attachmentFilename = carr::get($att, "filename");
-                $type = carr::get($att, "type");
-                $disk = carr::get($att, "disk");
+                $attachmentFilename = carr::get($att, 'filename');
+                $type = carr::get($att, 'type');
+                $disk = carr::get($att, 'disk');
             } else {
                 $path = $att;
                 $filename = basename($att);
                 $attachmentFilename = $filename;
-                $type = "";
+                $type = '';
             }
 
-
             if (strlen($type) == 0) {
-
                 $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
                 $type = 'application/text';
@@ -198,14 +191,12 @@ class cmailapi {
             $attachment = new CSendGrid_Attachment();
             $attachment->setContent(base64_encode($content));
             $attachment->setType($type);
-            $attachment->setDisposition("attachment");
+            $attachment->setDisposition('attachment');
             $attachment->setFilename($attachmentFilename);
             $mail->addAttachment($attachment);
         }
 
-
         $sg = new CSendGrid($sendgrid_apikey);
-
 
         //cdbg::var_dump(json_encode($mail, JSON_PRETTY_PRINT));
 
@@ -217,7 +208,7 @@ class cmailapi {
         return $response;
     }
 
-    public static function sendgrid($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+    public static function sendgrid($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
         //$sendgrid_apikey = "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";
 
         $smtp_password = carr::get($options, 'smtp_password');
@@ -251,9 +242,9 @@ class cmailapi {
           );
          */
 
-        $files = array();
+        $files = [];
 
-        $params = array(
+        $params = [
             'to' => $to,
             'cc' => $cc,
             'bcc' => $bcc,
@@ -261,22 +252,19 @@ class cmailapi {
             'fromname' => $smtp_from_name,
             'subject' => $subject . '',
             'html' => $message,
-        );
-
+        ];
 
         $request = $url . 'api/mail.send.json';
-
-
 
         // Generate curl request
         $session = curl_init($request);
         // Tell PHP not to use SSLv3 (instead opting for TLS)
         curl_setopt($session, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
-        curl_setopt($session, CURLOPT_HTTPHEADER, array('Authorization: Bearer ' . $sendgrid_apikey));
+        curl_setopt($session, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $sendgrid_apikey]);
         // Tell curl to use HTTP POST
         curl_setopt($session, CURLOPT_POST, true);
         // Tell curl that this is the body of the POST
-        curl_setopt($session, CURLOPT_POSTFIELDS, curl::as_post_string($params));
+        curl_setopt($session, CURLOPT_POSTFIELDS, curl::asPostString($params));
         // Tell curl not to return headers, but do return the response
         curl_setopt($session, CURLOPT_HEADER, false);
         curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
@@ -295,7 +283,7 @@ class cmailapi {
         return $response_array;
     }
 
-    public static function mailgun($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
+    public static function mailgun($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
         //$sendgrid_apikey = "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";
         //public key: pubkey-c338bfc1568e4d6e79331119e6c56645
         //private key: key-5f194bedfdade1fa513910895857d447
@@ -320,7 +308,6 @@ class cmailapi {
             $smtp_from_name = ccfg::get('smtp_from_name');
         }
 
-
         $smtp_domain = carr::get($options, 'smtp_domain');
         if ($smtp_domain == null) {
             $smtp_domain = ccfg::get('smtp_domain');
@@ -338,15 +325,14 @@ class cmailapi {
           );
          */
 
-        $files = array();
+        $files = [];
 
-        $params = array(
+        $params = [
             'to' => $to,
             'from' => $smtp_from,
             'subject' => $subject . '',
             'html' => $message,
-        );
-
+        ];
 
         if (count($cc) > 0) {
             $params['cc'] = $cc;
@@ -354,7 +340,6 @@ class cmailapi {
         if (count($bcc) > 0) {
             $params['bcc'] = $bcc;
         }
-
 
         if (isset($_GET['debug2'])) {
             cdbg::var_dump($url);
@@ -368,7 +353,7 @@ class cmailapi {
         // Tell curl to use HTTP POST
         curl_setopt($session, CURLOPT_POST, true);
         // Tell curl that this is the body of the POST
-        curl_setopt($session, CURLOPT_POSTFIELDS, curl::as_post_string($params));
+        curl_setopt($session, CURLOPT_POSTFIELDS, curl::asPostString($params));
         // Tell curl not to return headers, but do return the response
         curl_setopt($session, CURLOPT_HEADER, false);
         curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
@@ -387,8 +372,7 @@ class cmailapi {
         return $response_array;
     }
 
-    public static function elasticemail($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
-
+    public static function elasticemail($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
         $smtp_password = carr::get($options, 'smtp_password');
         $smtp_host = carr::get($options, 'smtp_host');
         if (!$smtp_password) {
@@ -414,19 +398,19 @@ class cmailapi {
 
         try {
             if (!is_array($to)) {
-                $to = array($to);
+                $to = [$to];
             }
             if (!is_array($cc)) {
-                $cc = array($cc);
+                $cc = [$cc];
             }
             if (!is_array($bcc)) {
-                $bcc = array($bcc);
+                $bcc = [$bcc];
             }
 
-            $to_implode = implode(";", $to);
-            $cc_implode = implode(";", $cc);
-            $bcc_implode = implode(";", $bcc);
-            $post = array('from' => $smtp_from,
+            $to_implode = implode(';', $to);
+            $cc_implode = implode(';', $cc);
+            $bcc_implode = implode(';', $bcc);
+            $post = ['from' => $smtp_from,
                 'fromName' => $smtp_from_name,
                 'apikey' => $smtp_password,
                 'subject' => $subject . '[API]',
@@ -435,17 +419,17 @@ class cmailapi {
                 'msgBcc' => $bcc_implode,
                 'bodyHtml' => $message,
                 'isTransactional' => true
-            );
+            ];
 
             $ch = curl_init();
-            curl_setopt_array($ch, array(
+            curl_setopt_array($ch, [
                 CURLOPT_URL => $url,
                 CURLOPT_POST => true,
                 CURLOPT_POSTFIELDS => $post,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HEADER => false,
                 CURLOPT_SSL_VERIFYPEER => false
-            ));
+            ]);
 
             $response = curl_exec($ch);
             curl_close($ch);
@@ -460,9 +444,7 @@ class cmailapi {
         return true;
     }
 
-    public static function postmark($to, $subject, $message, $attachments = array(), $cc = array(), $bcc = array(), $options = array()) {
-
-
+    public static function postmark($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
         $smtp_password = carr::get($options, 'smtp_password');
         $smtp_host = carr::get($options, 'smtp_host');
         if (!$smtp_password) {
@@ -488,19 +470,19 @@ class cmailapi {
 
         try {
             if (!is_array($to)) {
-                $to = array($to);
+                $to = [$to];
             }
             if (!is_array($cc)) {
-                $cc = array($cc);
+                $cc = [$cc];
             }
             if (!is_array($bcc)) {
-                $bcc = array($bcc);
+                $bcc = [$bcc];
             }
 
-            $to_implode = implode(",", $to);
-            $cc_implode = implode(",", $cc);
-            $bcc_implode = implode(",", $bcc);
-            $post = array();
+            $to_implode = implode(',', $to);
+            $cc_implode = implode(',', $cc);
+            $bcc_implode = implode(',', $bcc);
+            $post = [];
             $post['From'] = $smtp_from;
             $post['To'] = $to_implode;
             $post['Cc'] = $cc_implode;
@@ -514,22 +496,20 @@ class cmailapi {
             $json = json_encode($post);
             cdbg::var_dump($json);
             $ch = curl_init();
-            curl_setopt_array($ch, array(
+            curl_setopt_array($ch, [
                 CURLOPT_URL => $url,
                 CURLOPT_CUSTOMREQUEST => 'POST',
                 CURLOPT_POSTFIELDS => $json,
                 CURLOPT_RETURNTRANSFER => true,
                 CURLOPT_HEADER => false,
                 CURLOPT_SSL_VERIFYPEER => false,
-                CURLOPT_HTTPHEADER => array(
+                CURLOPT_HTTPHEADER => [
                     'User-Agent: Postmark-PHP (PHP Version:' . $version . ', OS:' . $os . ')',
                     'Accept: application/json',
                     'Content-Type: application/json',
                     'X-Postmark-Server-Token:' . $smtp_password
-                ),
-            ));
-
-
+                ],
+            ]);
 
             $response = curl_exec($ch);
             curl_close($ch);
@@ -544,5 +524,4 @@ class cmailapi {
         }
         return true;
     }
-
 }

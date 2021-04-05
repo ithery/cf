@@ -12,7 +12,7 @@ class clog {
      */
     public static function login($user_id) {
         $app = CApp::instance();
-        $app_id = $app->app_id();
+        $app_id = $app->appId();
         $db = CDatabase::instance();
         $ip_address = crequest::remote_address();
         $session_id = CSession::instance()->id();
@@ -21,7 +21,7 @@ class clog {
         $platform = crequest::platform();
         $platform_version = crequest::platform_version();
         $user = cuser::get($user_id);
-        $org_id = CF::org_id();
+        $org_id = CF::orgId();
         $data = [
             'login_date' => date('Y-m-d H:i:s'),
             'org_id' => $org_id,
@@ -40,7 +40,7 @@ class clog {
 
     public static function login_fail($username, $password, $error_message) {
         $app = CApp::instance();
-        $app_id = $app->app_id();
+        $app_id = $app->appId();
         $db = CDatabase::instance();
         $ip_address = crequest::remote_address();
         $session_id = CSession::instance()->id();
@@ -152,7 +152,7 @@ class clog {
                 }
             }
         }
-        $org_id = CF::org_id();
+        $org_id = CF::orgId();
         if ($org_id == null) {
             $user = cuser::get($user_id);
             if ($user != null) {

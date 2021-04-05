@@ -61,7 +61,7 @@ class cdownload {
         // More caching prevention
         header('Expires: 0');
 
-        if (CF::user_agent('browser') === 'Internet Explorer') {
+        if (CF::userAgent('browser') === 'Internet Explorer') {
             // Send IE headers
             header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
             header('Pragma: public');
@@ -76,13 +76,6 @@ class cdownload {
             //echo $filepath;
             $data = file_get_contents($filepath);
             echo $data;
-
-        // Open the file
-            //$handle = fopen($filepath, 'rb');
-            // Send the file data
-            //fpassthru($handle);
-            // Close the file
-            //fclose($handle);
         } else {
             // Send the file data
             echo $data;

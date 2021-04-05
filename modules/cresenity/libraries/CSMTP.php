@@ -5,21 +5,21 @@ defined('SYSPATH') or die('No direct access allowed.');
  * CSMTP. Helper class to make smtp mail creation easier.
  *
  * @package    CLibrary
+ *
  * @author     Hery Kurniawan
  * @website    http://www.cresenitytech.com/
+ *
  * @license    NA
  */
-require_once dirname(__FILE__) . "/Lib/phpmailer/class.phpmailer.php";
-require_once dirname(__FILE__) . "/Lib/phpmailer/class.smtp.php";
-require_once dirname(__FILE__) . "/Lib/phpmailer/class.pop3.php";
+require_once dirname(__FILE__) . '/Lib/phpmailer/class.phpmailer.php';
+require_once dirname(__FILE__) . '/Lib/phpmailer/class.smtp.php';
+require_once dirname(__FILE__) . '/Lib/phpmailer/class.pop3.php';
 
+//@codingStandardsIgnoreStart
 class CSMTP {
-
     private $smtp;
 
     public function __construct() {
-
-
         $this->smtp = new PHPMailer();
         $this->smtp->IsSMTP();
         $this->smtp->CharSet = 'UTF-8';
@@ -30,7 +30,7 @@ class CSMTP {
         $this->smtp->IsHTML(false);
     }
 
-    public static function factory($headers = array()) {
+    public static function factory($headers = []) {
         $s = new CSMTP();
         return $s;
     }
@@ -76,8 +76,9 @@ class CSMTP {
 
     public function set_html($bool) {
         $this->smtp->IsHTML($bool);
-        if ($bool)
-            $this->smtp->AltBody = "To view the message, please use an HTML compatible email viewer!";
+        if ($bool) {
+            $this->smtp->AltBody = 'To view the message, please use an HTML compatible email viewer!';
+        }
     }
 
     public function set_charset($charset) {
@@ -100,54 +101,59 @@ class CSMTP {
         return $this;
     }
 
-    public function set_from($from_email, $from_name = "") {
-        if (strlen($from_name) == 0)
+    public function set_from($from_email, $from_name = '') {
+        if (strlen($from_name) == 0) {
             $from_name = $from_email;
+        }
         $this->smtp->setFrom($from_email, $from_name);
         return $this;
     }
 
-    public function add_reply_to($email, $name = "") {
-        if (strlen($name) == 0)
+    public function add_reply_to($email, $name = '') {
+        if (strlen($name) == 0) {
             $name = $email;
+        }
         $this->smtp->AddReplyTo($email, $name);
         return $this;
     }
 
-    public function add_attachment($path, $name = "") {
+    public function add_attachment($path, $name = '') {
         $this->smtp->AddAttachment($path, $name);
         return $this;
     }
 
-    public function add_attachment_string($str, $filename = "", $encoding = 'base64', $type = 'application/octet-stream') {
+    public function add_attachment_string($str, $filename = '', $encoding = 'base64', $type = 'application/octet-stream') {
         $this->smtp->AddStringAttachment($str, $filename, $encoding, $type);
         return $this;
     }
 
-    public function add_to($email, $name = "") {
-        if (strlen($name) == 0)
+    public function add_to($email, $name = '') {
+        if (strlen($name) == 0) {
             $name = $email;
+        }
         $this->smtp->AddAddress($email, $name);
         return $this;
     }
 
-    public function add_cc($email, $name = "") {
-        if (strlen($name) == 0)
+    public function add_cc($email, $name = '') {
+        if (strlen($name) == 0) {
             $name = $email;
+        }
         $this->smtp->AddCC($email, $name);
         return $this;
     }
 
-    public function add_bcc($email, $name = "") {
-        if (strlen($name) == 0)
+    public function add_bcc($email, $name = '') {
+        if (strlen($name) == 0) {
             $name = $email;
+        }
         $this->smtp->AddBCC($email, $name);
         return $this;
     }
 
     public function send() {
-        if (!$this->smtp->Send())
+        if (!$this->smtp->Send()) {
             throw new Exception($this->smtp->ErrorInfo);
+        }
     }
-
 }
