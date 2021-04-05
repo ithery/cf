@@ -1,25 +1,30 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 12:50:57 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 12:50:57 PM
  */
 use \Carbon\Carbon;
 
 class CPeriod {
-
-    
     const INTERVAL_MONTH = 'month';
+
     const INTERVAL_DAY = 'day';
+
     const INTERVAL_HOUR = 'hour';
-    
-    /** @var \Carbon\Carbon */
+
+    /**
+     * @var \Carbon\Carbon
+     */
     public $startDate;
 
-    /** @var \Carbon\Carbon */
+    /**
+     * @var \Carbon\Carbon
+     */
     public $endDate;
 
     public static function create($startDate, $endDate) {
@@ -160,7 +165,6 @@ class CPeriod {
     }
 
     /**
-     * 
      * @return \Carbon\Carbon
      */
     public function getEndDate() {
@@ -168,7 +172,6 @@ class CPeriod {
     }
 
     /**
-     * 
      * @return \Carbon\Carbon
      */
     public function getStartDate() {
@@ -178,5 +181,4 @@ class CPeriod {
     public function toArray() {
         return [$this->startDate, $this->endDate];
     }
-
 }
