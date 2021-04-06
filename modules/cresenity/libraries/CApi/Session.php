@@ -60,7 +60,7 @@ class CApi_Session {
     }
 
     public function __destruct() {
-        //$this->save();
+        $this->save();
     }
 
     public function driver() {
