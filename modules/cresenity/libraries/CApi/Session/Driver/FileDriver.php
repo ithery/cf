@@ -22,7 +22,9 @@ class CApi_Session_Driver_FileDriver extends CApi_Session_DriverAbstract {
     public function read($id) {
         $path = $this->getFilePath($id);
         if (file_exists($path)) {
-            return include $path;
+            return json_decode(file_get_contents($path), true);
+
+            //return include $path;
         }
         return [];
     }
@@ -36,10 +38,11 @@ class CApi_Session_Driver_FileDriver extends CApi_Session_DriverAbstract {
         if (!is_dir($dir)) {
             @mkdir($dir, 0755, true);
         }
-        CFile::putPhpValue($path, $data);
+        CFile::put($path, json_encode($data), true);
+        //CFile::putPhpValue($path, $data);
     }
 
-    protected function getFilePath($sessionId) {
+    public function getFilePath($sessionId) {
         $strYmd = substr($sessionId, 0, 8);
         $strH = substr($sessionId, 8, 2);
         $sessionPath = rtrim($this->basePath(), '/') . '/' . $strYmd . '/' . $strH . '/';

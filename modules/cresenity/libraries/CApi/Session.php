@@ -33,6 +33,7 @@ class CApi_Session {
     }
 
     public function set($key, $val, $save = true) {
+
         $this->data[$key] = $val;
         if ($save) {
             $this->save();
@@ -41,9 +42,7 @@ class CApi_Session {
     }
 
     public function save() {
-        $this->driver->write($this->sessionId, $this->data);
-
-        return $this;
+        return $this->driver->write($this->sessionId, $this->data);
     }
 
     public function exists() {
@@ -62,5 +61,9 @@ class CApi_Session {
 
     public function __destruct() {
         $this->save();
+    }
+
+    public function driver() {
+        return $this->driver;
     }
 }
