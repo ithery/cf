@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Jul 7, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Jul 7, 2020
  */
 trait CTrait_Controller_Application_Server_PhpInfo {
-
     public function phpinfo() {
         $app = CApp::instance();
 
-        $app->title(clang::__("PHP Info"));
+        $app->title(clang::__('PHP Info'));
 
         $html = CView::factory('admin/page/phpinfo/html');
         $html = $html->render();
@@ -23,5 +23,4 @@ trait CTrait_Controller_Application_Server_PhpInfo {
 
         echo $app->render();
     }
-
 }
