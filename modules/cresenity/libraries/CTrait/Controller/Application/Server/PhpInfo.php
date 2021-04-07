@@ -14,12 +14,9 @@ trait CTrait_Controller_Application_Server_PhpInfo {
 
         $app->title(clang::__('PHP Info'));
 
-        $html = CView::factory('admin/page/phpinfo/html');
+        $html = CView::factory('cresenity/phpinfo/index');
         $html = $html->render();
-        $js = CView::factory('admin/page/phpinfo/js');
-        $js = $js->render();
         $app->add($html);
-        $app->addJs($js);
 
         echo $app->render();
     }
