@@ -341,9 +341,6 @@ class cmailapi {
             $params['bcc'] = $bcc;
         }
 
-        if (isset($_GET['debug2'])) {
-            cdbg::var_dump($url);
-        }
         // Generate curl request
         $session = curl_init($url);
         curl_setopt($session, CURLOPT_SSL_VERIFYPEER, false);
@@ -494,7 +491,6 @@ class cmailapi {
             $os = PHP_OS;
 
             $json = json_encode($post);
-            cdbg::var_dump($json);
             $ch = curl_init();
             curl_setopt_array($ch, [
                 CURLOPT_URL => $url,
@@ -513,8 +509,6 @@ class cmailapi {
 
             $response = curl_exec($ch);
             curl_close($ch);
-            cdbg::var_dump($response);
-            die;
             $response_array = json_decode($response, true);
             if (!carr::get($response_array, 'success')) {
                 throw new Exception('Fail to send mail, API Response:' . $response);
