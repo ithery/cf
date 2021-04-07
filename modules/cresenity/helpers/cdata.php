@@ -1,13 +1,13 @@
 <?php
 
+//@codingStandardsIgnoreStart
 class cdata {
-
     public static function path() {
         $dir = DOCROOT . 'data' . DIRECTORY_SEPARATOR . '';
         return $dir;
     }
 
-    public static function get($data_name, $folder = "") {
+    public static function get($data_name, $folder = '') {
         $file = cdata::path();
         if (strlen($folder) > 0) {
             $folder = explode('/', $folder);
@@ -19,14 +19,15 @@ class cdata {
             }
         }
         $file .= $data_name;
-        if (!file_exists($file . EXT))
+        if (!file_exists($file . EXT)) {
             return null;
+        }
         return cphp::load_value($file . EXT);
         //$content = file_get_contents($file);
         //return cjson::decode($content);
     }
 
-    public static function set($data_name, $data, $folder = "") {
+    public static function set($data_name, $data, $folder = '') {
         $file = cdata::path();
         if (strlen($folder) > 0) {
             $folder = explode('/', $folder);
@@ -47,7 +48,7 @@ class cdata {
         return true;
     }
 
-    public static function delete($data_name, $folder = "") {
+    public static function delete($data_name, $folder = '') {
         $file = cdata::path();
         if (strlen($folder) > 0) {
             $folder = explode('/', $folder);
@@ -66,5 +67,4 @@ class cdata {
             unlink($file);
         }
     }
-
 }
