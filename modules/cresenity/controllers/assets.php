@@ -1,6 +1,6 @@
 <?php
 
-class Assets_Controller extends CController {
+class Controller_Assets extends CController {
     public function __construct() {
         parent::__construct();
     }
