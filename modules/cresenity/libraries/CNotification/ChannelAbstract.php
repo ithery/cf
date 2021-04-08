@@ -2,6 +2,7 @@
 
 abstract class CNotification_ChannelAbstract implements CNotification_ChannelInterface {
     protected static $channelName;
+
     protected $config;
 
     public function __construct($config = []) {
@@ -58,6 +59,12 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
                     $result = $this->handleMessage($value, $logNotificationModel);
                     $vendorResponse = $result;
                     if (is_array($vendorResponse) || is_object($vendorResponse)) {
+                        if (is_array($vendorResponse)) {
+                            $vendorResponse['headerResponse'] = $result->headers(true);
+                        }
+                        if (is_object($vendorResponse)) {
+                            $vendorResponse->headerResponse = $result->headers(true);
+                        }
                         $vendorResponse = json_encode($vendorResponse);
                     }
 
