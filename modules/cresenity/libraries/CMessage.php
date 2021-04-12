@@ -1,38 +1,39 @@
 <?php
 
-class CMessage extends CElement {
-    protected $type;
+ //@codingStandardsIgnoreStart
+ class CMessage extends CElement {
+     protected $type;
 
-    protected $message;
+     protected $message;
 
-    public function __construct($id = '') {
-        parent::__construct($id);
+     public function __construct($id = '') {
+         parent::__construct($id);
 
-        $this->type = 'error';
-        $this->message = '';
-    }
+         $this->type = 'error';
+         $this->message = '';
+     }
 
-    public function set_type($type) {
-        $this->type = $type;
-        return $this;
-    }
+     public function set_type($type) {
+         $this->type = $type;
+         return $this;
+     }
 
-    public function set_message($msg) {
-        $this->message = $msg;
-        return $this;
-    }
+     public function set_message($msg) {
+         $this->message = $msg;
+         return $this;
+     }
 
-    public static function factory($id = '') {
-        return new CMessage($id);
-    }
+     public static function factory($id = '') {
+         return new CMessage($id);
+     }
 
-    public function html($indent = 0) {
-        $html = new CStringBuilder();
-        $html->set_indent($indent);
-        $class = '';
-        $icon = '';
-        $header = '';
-        switch ($this->type) {
+     public function html($indent = 0) {
+         $html = new CStringBuilder();
+         $html->setIndent($indent);
+         $class = '';
+         $icon = '';
+         $header = '';
+         switch ($this->type) {
             case 'warning':
                 $icon = 'fa-warning';
                 $class = ' alert-warning';
@@ -57,21 +58,21 @@ class CMessage extends CElement {
                 $header = clang::__('Error') . '!';
                 break;
         }
-        $html->appendln('<div class="alert alert-dismissible ' . $class . '" role="alert">')->inc_indent()->br();
-        if ($this->bootstrap == '3.3') {
-            $html->appendln('<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>')->br();
-            $html->appendln('<h4><i class="icon fa ' . $icon . '"></i>' . $header . '</h4>')->br();
-            $html->appendln($this->message)->br();
-        } else {
-            $html->appendln('<a href="#" class="close" data-dismiss="alert">&times;</a>')->br();
-            $html->appendln('<strong>' . $header . '</strong> ' . $this->message)->br();
-        }
+         $html->appendln('<div class="alert alert-dismissible ' . $class . '" role="alert">')->incIndent()->br();
+         if ($this->bootstrap == '3.3') {
+             $html->appendln('<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>')->br();
+             $html->appendln('<h4><i class="icon fa ' . $icon . '"></i>' . $header . '</h4>')->br();
+             $html->appendln($this->message)->br();
+         } else {
+             $html->appendln('<a href="#" class="close" data-dismiss="alert">&times;</a>')->br();
+             $html->appendln('<strong>' . $header . '</strong> ' . $this->message)->br();
+         }
 
-        $html->dec_indent()->appendln('</div>')->br();
-        return $html->text();
-    }
+         $html->decIndent()->appendln('</div>')->br();
+         return $html->text();
+     }
 
-    public function js($indent = 0) {
-        return '';
-    }
-}
+     public function js($indent = 0) {
+         return '';
+     }
+ }

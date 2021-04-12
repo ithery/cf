@@ -1,31 +1,31 @@
 <?php
 
 class CObserver {
+    private static $instance;
 
-    private static $_instance;
     private $obj_list;
+
     private $autoid;
 
     private function __construct() {
-
-        $this->obj_list = array();
+        $this->obj_list = [];
         $this->autoid = 0;
     }
 
     public static function instance() {
-        if (self::$_instance == null) {
-            self::$_instance = new CObserver();
+        if (self::$instance == null) {
+            self::$instance = new CObserver();
         }
-        return self::$_instance;
+        return self::$instance;
     }
 
-    public static function objects() {
+    public function objects() {
         return $this->obj_list;
     }
 
     public function newId() {
         $uniqid = uniqid(time(), true);
-        $uniqid = str_replace(".", "", $uniqid);
+        $uniqid = str_replace('.', '', $uniqid);
         return $uniqid;
     }
 
@@ -38,12 +38,10 @@ class CObserver {
     }
 
     public function add(CObject $obj) {
-
         if (array_key_exists($obj->id(), $this->obj_list)) {
-            throw new CException("Object :object_id is exists.", array(':object_id' => $obj->id()));
+            throw new CException('Object :object_id is exists.', [':object_id' => $obj->id()]);
         }
 
         $this->obj_list[$obj->id()] = $obj;
     }
-
 }
