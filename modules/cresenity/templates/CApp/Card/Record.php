@@ -1,10 +1,11 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 13, 2018, 9:30:04 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 13, 2018, 9:30:04 AM
  */
 if (!isset($title)) {
     $title = '[EMPTY TITLE]';
@@ -36,7 +37,7 @@ if (!isset($description)) {
     $description = '';
 }
 if (!isset($dropdown_menu)) {
-    $dropdown_menu = array();
+    $dropdown_menu = [];
 }
 ?>
 
@@ -48,7 +49,7 @@ if (!isset($dropdown_menu)) {
             <div class="card-title-elements ml-md-auto">
                 <?php if (strlen($edit_link) > 0): ?>
                     <a href="<?php echo $edit_link; ?>" class="btn btn-xs btn-outline-primary">
-                        <span class="ion ion-md-create"></span> 
+                        <span class="ion ion-md-create"></span>
                         EDIT
                     </a>
                 <?php endif; ?>
@@ -78,8 +79,8 @@ if (!isset($dropdown_menu)) {
                         <i class="ion ion-ios-more"></i>
                     </button>
                     <div class="dropdown-menu dropdown-menu-right" id="new-users-dropdown-menu" x-placement="bottom-end" >
-                        <?php
-                        foreach ($dropdown_menu as $menu):
+                        <?php foreach ($dropdown_menu as $menu): ?>
+                            <?php
                             $url = carr::get($menu, 'url');
                             $label = carr::get($menu, 'label');
                             ?>

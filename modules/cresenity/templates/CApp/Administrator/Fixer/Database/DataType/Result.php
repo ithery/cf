@@ -1,10 +1,11 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 13, 2019, 1:30:16 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 13, 2019, 1:30:16 AM
  */
 ?>
 
@@ -39,7 +40,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                         card.find('.card-body').append(alert);
                     } else {
                         card.fadeOut('slow',function(){
-                            
+
                         });
                     }
                 },

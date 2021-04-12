@@ -1,10 +1,11 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 13, 2018, 9:52:34 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 13, 2018, 9:52:34 AM
  */
 //generate uniqid
 $uniqid = uniqid(time());
@@ -13,10 +14,10 @@ if (!$manager->isRegisteredModule('chartjs')) {
     $manager->registerModule('chartjs');
 }
 if (!isset($chart) || !is_array($chart)) {
-    $chart = array();
+    $chart = [];
 }
 if (!isset($properties) || !is_array($properties)) {
-    $properties = array();
+    $properties = [];
 }
 $chartPercent = carr::get($chart, 'percent');
 $chartColor = carr::get($chart, 'color');
@@ -31,10 +32,11 @@ $chartColor = carr::get($chart, 'color');
                 <div class="font-weight-semibold mb-3"><?php echo $title; ?></div>
                 <?php
                 $iProp = 0;
-                foreach ($properties as $prop) :
-                    $propClass = "";
+                foreach ($properties as $prop): ?>
+                    <?php
+                    $propClass = '';
                     if ($iProp < count($properties)) {
-                        $propClass = "mb-1";
+                        $propClass = 'mb-1';
                     }
                     $label = carr::get($prop, 'label');
                     $value = carr::get($prop, 'value');
