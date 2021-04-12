@@ -13,10 +13,10 @@ trait CTrait_Compat_Element_FormInput_Text {
     /**
      * @deprecated, please use setPlaceholder
      *
-     * @param type  $placeholder
-     * @param mixed $lang
+     * @param string $placeholder
+     * @param mixed  $lang
      *
-     * @return type
+     * @return $this
      */
     public function set_placeholder($placeholder, $lang = true) {
         return $this->setPlaceholder($placeholder, $lang);

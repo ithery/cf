@@ -1,18 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
+//@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_FormInput_SelectSearch {
-
     protected $format_selection;
+
     protected $format_result;
+
     protected $key_field;
+
     protected $search_field;
-    
+
     protected $auto_select;
+
     protected $min_input_length;
+
     protected $dropdown_classes;
-    
 
     public function set_multiple($bool) {
         return $this->setMultiple($bool);
@@ -23,12 +27,12 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
     }
 
     public function set_auto_select($bool) {
-        $this->auto_select=$bool;
+        $this->auto_select = $bool;
         return $this->setAutoSelect($bool);
     }
 
     public function set_min_input_length($min_input_length) {
-        $this->min_input_length=$min_input_length;
+        $this->min_input_length = $min_input_length;
         return $this->setMinInputLength($min_input_length);
     }
 
@@ -76,5 +80,4 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
     public function create_ajax_url() {
         return $this->createAjaxUrl();
     }
-
 }

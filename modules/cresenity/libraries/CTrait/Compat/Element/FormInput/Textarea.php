@@ -1,33 +1,39 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 3, 2018, 10:51:38 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 3, 2018, 10:51:38 AM
  */
+//@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_FormInput_Textarea {
-
     /**
-     * @deprecated since version 1.2
+     * @param mixed $col
+     *
+     * @deprecated since version 1.2, use setCol
      */
     public function set_col($col) {
         return $this->setCol($col);
     }
 
     /**
-     * @deprecated since version 1.2
+     * @param mixed $row
+     *
+     * @deprecated since version 1.2 , use setRow
      */
     public function set_row($row) {
-        return $this->setCol($row);
+        return $this->setRow($row);
     }
 
     /**
-     * @deprecated since version 1.2
+     * @param mixed $placeholder
+     *
+     * @deprecated since version 1.2, use setPlaceholder
      */
     public function set_placeholder($placeholder) {
         return $this->setPlaceholder($placeholder);
     }
-
 }
