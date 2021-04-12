@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 19, 2018, 5:06:18 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 19, 2018, 5:06:18 AM
  */
 class CGitlab_ApiV3_SystemHooks extends CGitlab_Api {
-
     /**
      * @return mixed
      */
@@ -18,16 +18,18 @@ class CGitlab_ApiV3_SystemHooks extends CGitlab_Api {
 
     /**
      * @param string $url
+     *
      * @return mixed
      */
     public function create($url) {
-        return $this->post('hooks', array(
-                    'url' => $url
-        ));
+        return $this->post('hooks', [
+            'url' => $url
+        ]);
     }
 
     /**
      * @param int $id
+     *
      * @return mixed
      */
     public function test($id) {
@@ -36,10 +38,10 @@ class CGitlab_ApiV3_SystemHooks extends CGitlab_Api {
 
     /**
      * @param int $id
+     *
      * @return mixed
      */
     public function remove($id) {
         return $this->delete('hooks/' . $this->encodePath($id));
     }
-
 }
