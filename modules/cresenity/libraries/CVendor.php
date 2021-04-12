@@ -1,21 +1,14 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use GuzzleHttp\Client as GuzzleClient;
 use Http\Adapter\Guzzle6\Client as GuzzleAdapter;
 use Http\Client\Common\HttpMethodsClient as HttpClient;
 use Http\Message\MessageFactory\GuzzleMessageFactory;
 
 class CVendor {
-
     /**
-     * 
      * @param string $accessToken
+     *
      * @return \CVendor_DigitalOcean
      */
     public static function digitalOcean($accessToken) {
@@ -23,8 +16,8 @@ class CVendor {
     }
 
     /**
-     * 
      * @param array $options
+     *
      * @return \CVendor_OneSignal
      */
     public static function oneSignal($options) {
@@ -42,10 +35,8 @@ class CVendor {
             $config->setUserAuthKey($userKey);
         }
 
-
-
         $guzzle = new GuzzleClient([// http://docs.guzzlephp.org/en/stable/quickstart.html
-                // ..config
+            // ..config
         ]);
 
         $client = new HttpClient(new GuzzleAdapter($guzzle), new GuzzleMessageFactory());
@@ -80,8 +71,8 @@ class CVendor {
     }
 
     /**
-     * 
      * @param array $environment
+     *
      * @return \CVendor_GoSend
      */
     public static function goSend($environment = 'production') {
@@ -89,8 +80,8 @@ class CVendor {
     }
 
     /**
-     * 
      * @param array $options
+     *
      * @return \CVendor_Namecheap
      */
     public static function namecheap($options) {
@@ -98,8 +89,8 @@ class CVendor {
     }
 
     /**
-     * 
      * @param array $options
+     *
      * @return CVendor_LetsEncrypt
      */
     public static function letsEncrypt($options) {
@@ -107,8 +98,8 @@ class CVendor {
     }
 
     /**
-     * 
      * @param type $options
+     *
      * @return \CVendor_Xendit
      */
     public static function xendit($options) {
@@ -116,8 +107,8 @@ class CVendor {
     }
 
     /**
-     * 
      * @param type $options
+     *
      * @return \CVendor_Odoo_Client
      */
     public static function odoo($options) {
@@ -127,12 +118,12 @@ class CVendor {
     /**
      * [zenziva description]
      *
+     * @param string $username [description]
+     * @param string $password [description]
+     *
      * @method zenziva
      *
-     * @param  string  $username [description]
-     * @param  string  $password [description]
-     *
-     * @return CVendor_Zenziva            [description]
+     * @return CVendor_Zenziva [description]
      */
     public static function zenziva($username, $password) {
         return new CVendor_Zenziva($username, $password);
@@ -141,41 +132,39 @@ class CVendor {
     /**
      * [kredivo description]
      *
+     * @param string $serverKey   [<description>]
+     * @param string $environment [<description>]
+     *
      * @method kredivo
      *
-     * @param string    $serverKey [<description>]
-     * @param string    $environment [<description>]
-     * 
-     * @return CVendor_Kredivo  [description]
+     * @return CVendor_Kredivo [description]
      */
     public static function kredivo($serverKey, $environment = 'production') {
         return new CVendor_Kredivo($environment, $serverKey);
     }
 
     /**
-     * 
      * @param string $apiKey
-     * @param array $options
+     * @param array  $options
+     *
      * @return \CVendor_SendGrid
      */
-    public static function sendGrid($apiKey=null, $options = []) {
+    public static function sendGrid($apiKey = null, $options = []) {
         if (strlen($apiKey) == 0) {
             $apiKey = ccfg::get('smtp_password');
-            
         }
-        
+
         return new CVendor_SendGrid($apiKey, $options);
     }
 
     /**
-     * 
      * @param string $apiKey
      * @param string $apiSecret
-     * @param array $options
+     * @param array  $options
+     *
      * @return \CVendor_Nexmo
      */
     public static function nexmo($apiKey, $apiSecret, $options = []) {
-
         if (strlen($apiKey) == 0) {
             $apiKey = CF::config('vendor.nexmo.key');
         }
@@ -183,28 +172,24 @@ class CVendor {
             $apiSecret = CF::config('vendor.nexmo.secret');
         }
         if (!is_array($options)) {
-            $options = array();
+            $options = [];
         }
         if (!isset($options['from'])) {
             $options['from'] = CF::config('vendor.nexmo.from');
         }
         return new CVendor_Nexmo($apiKey, $apiSecret, $options);
     }
-    
-    
+
     /**
-     * 
-    * @param array $options
+     * @param array $options
+     *
      * @return \CVendor_Firebase
      */
     public static function firebase($options = null) {
-
-       
         if (!is_array($options)) {
             $options = CF::config('vendor.firebase');
         }
-        
+
         return new CVendor_Firebase($options);
     }
-
 }
