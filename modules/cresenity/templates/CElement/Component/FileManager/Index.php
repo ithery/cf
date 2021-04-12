@@ -1,10 +1,11 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 11, 2019, 12:53:38 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 11, 2019, 12:53:38 AM
  */
 ?>
 <div class="capp-fm">
@@ -188,21 +189,21 @@ defined('SYSPATH') OR die('No direct access allowed.');
         }
     }
     $(document).on('hidden.bs.modal', function() {
-	checkModal();
+        checkModal();
     });
     $("[data-dismiss-modal=dialog]").click(function(){
         $('#dialog').modal('hide');
-                
-        
-        
+
+
+
     });
     $("[data-dismiss-modal=notify]").click(function(){
         $('#notify').modal('hide');
-        
+
     });
     $("[data-dismiss-modal=uploadModal]").click(function(){
         $('#uploadModal').modal('hide');
-        
+
     });
     var lang = <?php echo json_encode($fm->getTranslation()); ?>;
     var config = {};

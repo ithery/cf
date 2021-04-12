@@ -1,13 +1,13 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Oct 7, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Oct 7, 2020
  */
-
 ?>
 
 
@@ -30,16 +30,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 
 <script>
-   
+
 
         $('#<?php echo $this->element()->id(); ?>-action').click(function(e){
             var containerId = '<?php echo $this->element()->id(); ?>';
             var baseUrl = '<?php echo $controllerUrl; ?>';
             $('#'+containerId+'-result').empty();
-            
-            
+
+
             var className = $(this).attr('data-class');
-            
+
             var currentElement = $('<div>').addClass('pb-1 mb-3');
             var loadingHtml = '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div><div class="sk-rect sk-rect2"></div><div class="sk-rect sk-rect3"></div><div class="sk-rect sk-rect4"></div><div class="sk-rect sk-rect5"></div></div>';
             var elementStatus = $('<div>').addClass('db-connection-status float-right');
@@ -51,7 +51,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
             currentElement.append(elementInfo);
             currentElement.append('<br/>');
             currentElement.append(elementError);
-            
+
             var url = baseUrl+'check/'+className;
             $('#' + containerId+'-result').append(currentElement);
 
@@ -81,7 +81,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                             badgeElement.append('OK');
                             elementStatus.html('').append(badgeElement);
                         }
-                        
+
                     }
                 },
                 error: function (xhr, ajaxOptions, thrownError) {
@@ -91,7 +91,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     elementError.html(thrownError).removeClass('d-none');
                 },
                 complete: function () {
-                    
+
 
                 },
             });
