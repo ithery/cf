@@ -1,5 +1,5 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 ?>
 
@@ -79,4 +79,3 @@ defined('SYSPATH') OR die('No direct access allowed.');
         $(this).val("");
     });
 </script>
-

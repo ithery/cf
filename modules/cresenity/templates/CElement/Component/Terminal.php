@@ -1,13 +1,14 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 14, 2018, 8:23:43 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 14, 2018, 8:23:43 PM
  */
-if(!isset($ajaxMethod)) {
-    $ajaxMethod='post';
+if (!isset($ajaxMethod)) {
+    $ajaxMethod = 'post';
 }
 ?>
 
