@@ -1,38 +1,39 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 13, 2019, 7:38:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 13, 2019, 7:38:34 PM
  */
 use Carbon\Carbon;
 
 trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
-
     protected $predefinedRanges;
 
     public function resetRange() {
-        $this->predefinedRanges = array();
+        $this->predefinedRanges = [];
         return $this;
     }
 
     public function addRange($label, $dateStart, $dateEnd) {
-        $this->predefinedRanges[] = array(
-            "label" => $label,
-            "dateStart" => $dateStart,
-            "dateEnd" => $dateEnd,
-        );
+        $this->predefinedRanges[] = [
+            'label' => $label,
+            'dateStart' => $dateStart,
+            'dateEnd' => $dateEnd,
+        ];
         return $this;
     }
 
     public function addRangeLifeTime($label = 'Life Time') {
-        $dateStart =  Carbon::createFromTimestamp(0);
+        $dateStart = Carbon::createFromTimestamp(0);
         $dateEnd = Carbon::now();
         $this->addRange($label, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
         return $this;
     }
+
     public function addRangeToday($label = 'Today') {
         $dateStart = Carbon::now();
         $dateEnd = Carbon::now();
@@ -81,7 +82,7 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         $this->addRange($label, $dateStart->format($this->dateFormat), $dateEnd->format($this->dateFormat));
         return $this;
     }
-    
+
     public function addRangeThisMonth($label = 'This Month') {
         $dateStart = Carbon::now()->modify('first day of this month');
         $dateEnd = Carbon::now()->modify('last day of this month');
@@ -110,5 +111,4 @@ trait CElement_FormInput_Trait_PredefinedDateRangeTrait {
         $this->addRangeLastMonth();
         return $this;
     }
-
 }

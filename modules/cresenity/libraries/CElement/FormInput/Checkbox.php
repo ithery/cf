@@ -13,9 +13,13 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
         CTrait_Element_Property_Label;
 
     protected $checked = '';
+
     protected $applyjs = '';
+
     protected $display_inline = '';
+
     protected $label_wrap;
+
     protected $style = '';
 
     public function __construct($id) {
@@ -60,7 +64,7 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $disabled = '';
         $checked = '';
         if ($this->checked) {
@@ -98,7 +102,7 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
             }
         }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
@@ -127,7 +131,7 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
 
     public function js($indent = 0) {
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         $js->append(parent::js($indent))->br();
         if ($this->applyjs == 'uniform') {
             //$js->append("$('#".$this->id."').uniform();")->br();
