@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 9:00:18 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 9:00:18 PM
  */
 final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
-
     /**
      * The address or text that should be geocoded.
      *
@@ -173,5 +173,4 @@ final class CGeo_Query_GeocodeQuery implements CGeo_Interface_QueryInterface {
             'data' => $this->getAllData(),
         ]));
     }
-
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 8:04:37 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 8:04:37 PM
  */
 abstract class CGeo_Provider implements CGeo_Interface_ProviderInterface {
-
     /**
      * Returns the results for the 'localhost' special case.
      *
@@ -16,10 +16,9 @@ abstract class CGeo_Provider implements CGeo_Interface_ProviderInterface {
      */
     protected function getLocationForLocalhost() {
         return CGeo_Model_Address::createFromArray([
-                    'providedBy' => $this->getName(),
-                    'locality' => 'localhost',
-                    'country' => 'localhost',
+            'providedBy' => $this->getName(),
+            'locality' => 'localhost',
+            'country' => 'localhost',
         ]);
     }
-
 }

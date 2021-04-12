@@ -1,22 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 7:27:08 PM
  * @license Ittron Global Teknologi <ittron.co.id>
- */
-
-/**
- * Interface for Distance Calculator Classes
  *
- * @author   Marcus Jaschen <mjaschen@gmail.com>
- * @license  https://opensource.org/licenses/MIT
- * @link     https://github.com/mjaschen/phpgeo
+ * @since Aug 18, 2018, 7:27:08 PM
  */
 interface CGeo_Location_Distance_DistanceInterface {
-
     /**
      * @param CGeo_Location_Coordinate $point1
      * @param CGeo_Location_Coordinate $point2

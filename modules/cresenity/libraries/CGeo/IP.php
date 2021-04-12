@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 7:05:13 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 7:05:13 PM
  */
 class CGeo_IP {
-
     /**
      * Remote Machine IP address.
      *
@@ -17,7 +17,7 @@ class CGeo_IP {
     protected $remote_ip = null;
 
     /**
-     * options of CGeo_IP.
+     * Options of CGeo_IP.
      *
      * @var array
      */
@@ -26,9 +26,9 @@ class CGeo_IP {
     /**
      * Create a new Geo_IP instance.
      *
-     * @param array        $options
+     * @param array $options
      */
-    public function __construct($options = array()) {
+    public function __construct($options = []) {
         // Set IP
         $this->remote_ip = $this->getClientIP();
         $this->options = $options;
@@ -52,6 +52,7 @@ class CGeo_IP {
      * @param string $ip
      *
      * @return CGeo_Model_AddressCollection
+     *
      * @throws \Exception
      */
     private function find($ip = null) {
@@ -68,7 +69,6 @@ class CGeo_IP {
 
                 return $location;
             } catch (\Exception $e) {
-
                 throw $e;
             }
         }
@@ -78,11 +78,13 @@ class CGeo_IP {
     /**
      * Get provider instance.
      *
+     * @param null|mixed $providerClass
+     *
      * @return CGeo_Provider
+     *
      * @throws Exception
      */
     public function getProvider($providerClass = null) {
-
         if ($providerClass == null) {
             $providerClass = 'CGeo_Provider_GeoIP2';
         }
@@ -93,7 +95,7 @@ class CGeo_IP {
         // Create service instance
         $adapter = new \Http\Adapter\Guzzle6\Client();
         switch ($providerClass) {
-            case'CGeo_Provider_GeoIP2':
+            case 'CGeo_Provider_GeoIP2':
                 $databaseFile = DOCROOT . 'modules/cresenity/data/GeoLite2/Country.mmdb';
                 $adapter = new CGeo_Provider_GeoIP2_Adapter(new \GeoIp2\Database\Reader($databaseFile), CGeo_Provider_GeoIP2_Adapter::GEOIP2_MODEL_COUNTRY);
                 break;
@@ -143,5 +145,4 @@ class CGeo_IP {
         }
         return true;
     }
-
 }

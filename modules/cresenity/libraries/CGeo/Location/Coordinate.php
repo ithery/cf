@@ -1,10 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Aug 18, 2018, 7:23:39 PM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 /**
@@ -12,20 +14,14 @@ defined('SYSPATH') OR die('No direct access allowed.');
  *
  * @author    Marcus Jaschen <mjaschen@gmail.com>
  * @license   https://opensource.org/licenses/MIT
+ *
  * @link      https://github.com/mjaschen/phpgeo
  */
 
-namespace Location;
-
-use Location\Distance\DistanceInterface;
-use Location\Formatter\Coordinate\FormatterInterface;
-
 /**
  * Coordinate Implementation
- *
  */
 class CGeo_Location_Coordinate implements CGeo_Location_GeometryInterface {
-
     /**
      * @var float
      */
@@ -42,8 +38,8 @@ class CGeo_Location_Coordinate implements CGeo_Location_GeometryInterface {
     protected $ellipsoid;
 
     /**
-     * @param float $lat -90.0 .. +90.0
-     * @param float $lng -180.0 .. +180.0
+     * @param float     $lat       -90.0 .. +90.0
+     * @param float     $lng       -180.0 .. +180.0
      * @param Ellipsoid $ellipsoid if omitted, WGS-84 is used
      *
      * @throws \InvalidArgumentException
@@ -99,7 +95,7 @@ class CGeo_Location_Coordinate implements CGeo_Location_GeometryInterface {
      * and this coordinate.
      *
      * @param CGeo_Location_Coordinate $coordinate
-     * @param DistanceInterface $calculator instance of distance calculation class
+     * @param DistanceInterface        $calculator instance of distance calculation class
      *
      * @return float
      */
@@ -157,5 +153,4 @@ class CGeo_Location_Coordinate implements CGeo_Location_GeometryInterface {
         }
         return true;
     }
-
 }

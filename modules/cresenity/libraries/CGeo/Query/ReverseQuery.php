@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 9:06:21 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 9:06:21 PM
  */
 final class CGeo_Query_ReverseQuery implements CGeo_Interface_QueryInterface {
-
     /**
      * @var CGeo_Model_Coordinates
      */
@@ -155,5 +155,4 @@ final class CGeo_Query_ReverseQuery implements CGeo_Interface_QueryInterface {
             'data' => $this->getAllData(),
         ]));
     }
-
 }
