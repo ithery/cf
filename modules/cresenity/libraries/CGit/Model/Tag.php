@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 3, 2019, 1:42:33 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 3, 2019, 1:42:33 PM
  */
 class CGit_Model_Tag extends CGit_Model_GitObject {
-
     protected $name;
 
     public function getName() {
@@ -23,5 +23,4 @@ class CGit_Model_Tag extends CGit_Model_GitObject {
     public function isTag() {
         return true;
     }
-
 }

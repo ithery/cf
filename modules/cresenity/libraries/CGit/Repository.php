@@ -1,18 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 24, 2019, 1:47:37 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 24, 2019, 1:47:37 AM
  */
 class CGit_Repository {
-
     protected $path;
+
     protected $client;
+
     protected $commitsHaveBeenParsed = false;
-    protected $statistics = array();
+
+    protected $statistics = [];
 
     public function __construct($path, CGit_Client $client) {
         $this->setPath($path);
@@ -20,7 +23,7 @@ class CGit_Repository {
     }
 
     /**
-     * @param  bool $value
+     * @param bool $value
      */
     public function setCommitsHaveBeenParsed($value) {
         $this->commitsHaveBeenParsed = $value;
@@ -35,6 +38,8 @@ class CGit_Repository {
 
     /**
      * Create a new git repository.
+     *
+     * @param null|mixed $bare
      */
     public function create($bare = null) {
         mkdir($this->getPath());
@@ -74,7 +79,7 @@ class CGit_Repository {
      */
     public function addStatistics($statistics) {
         if (!is_array($statistics)) {
-            $statistics = array($statistics);
+            $statistics = [$statistics];
         }
         foreach ($statistics as $statistic) {
             $reflect = new \ReflectionClass($statistic);
@@ -185,7 +190,7 @@ class CGit_Repository {
      * @return array List of branches
      */
     public function getBranches() {
-        static $cache = array();
+        static $cache = [];
         if (array_key_exists($this->path, $cache)) {
             return $cache[$this->path];
         }
@@ -208,7 +213,7 @@ class CGit_Repository {
      * Return the current repository branch.
      *
      * @return mixed current repository branch as a string, or NULL if in
-     * detached HEAD state
+     *               detached HEAD state
      */
     public function getCurrentBranch() {
         $branches = $this->getClient()->run($this, 'branch');
@@ -226,7 +231,7 @@ class CGit_Repository {
     /**
      * Check if a specified branch exists.
      *
-     * @param  string  $branch Branch to be checked
+     * @param string $branch Branch to be checked
      *
      * @return bool True if the branch exists
      */
@@ -248,7 +253,8 @@ class CGit_Repository {
     /**
      * Create a new repository tag.
      *
-     * @param string $tag Tag name
+     * @param string     $tag     Tag name
+     * @param null|mixed $message
      */
     public function createTag($tag, $message = null) {
         $command = 'tag';
@@ -265,7 +271,7 @@ class CGit_Repository {
      * @return array List of tags
      */
     public function getTags() {
-        static $cache = array();
+        static $cache = [];
         if (array_key_exists($this->path, $cache)) {
             return $cache[$this->path];
         }
@@ -280,6 +286,8 @@ class CGit_Repository {
 
     /**
      * Show the amount of commits on the repository.
+     *
+     * @param null|mixed $file
      *
      * @return int Total number of commits
      */
@@ -296,6 +304,8 @@ class CGit_Repository {
     /**
      * Show the repository commit log.
      *
+     * @param null|mixed $file
+     *
      * @return array Commit log
      */
     public function getCommits($file = null) {
@@ -305,7 +315,7 @@ class CGit_Repository {
         }
         $logs = $this->getPrettyFormat($command);
         foreach ($logs as $log) {
-            $commit = new Commit();
+            $commit = new CGit_Model_Commit();
             $commit->importData($log);
             $commits[] = $commit;
             foreach ($this->statistics as $statistic) {
@@ -319,9 +329,9 @@ class CGit_Repository {
     /**
      * Show the data from a specific commit.
      *
-     * @param  string $commitHash Hash of the specific commit to read data
+     * @param string $commitHash Hash of the specific commit to read data
      *
-     * @return array  Commit data
+     * @return array Commit data
      */
     public function getCommit($commitHash) {
         if (version_compare($this->getClient()->getVersion(), '1.8.4', '>=')) {
@@ -337,7 +347,7 @@ class CGit_Repository {
         // Read commit metadata
         $format = new PrettyFormat();
         $data = $format->parse($commitInfo);
-        $commit = new Commit();
+        $commit = new CGit_Model_Commit();
         $commit->importData($data[0]);
         if (empty($logs[1])) {
             $logs = explode("\n", $this->getClient()->run($this, 'diff ' . $commitHash . '~1..' . $commitHash));
@@ -349,12 +359,12 @@ class CGit_Repository {
     /**
      * Read diff logs and generate a collection of diffs.
      *
-     * @param array $logs  Array of log rows
+     * @param array $logs Array of log rows
      *
-     * @return array       Array of diffs
+     * @return array Array of diffs
      */
     public function readDiffLogs(array $logs) {
-        $diffs = array();
+        $diffs = [];
         $lineNumOld = 0;
         $lineNumNew = 0;
         foreach ($logs as $log) {
@@ -362,7 +372,7 @@ class CGit_Repository {
                 if (isset($diff)) {
                     $diffs[] = $diff;
                 }
-                $diff = new Diff();
+                $diff = new CGit_Model_Commit_Diff();
                 if (preg_match('/^diff --[\S]+ a\/?(.+) b\/?/', $log, $name)) {
                     $diff->setFile($name[1]);
                 }
@@ -382,7 +392,7 @@ class CGit_Repository {
             }
             // Handle binary files properly.
             if ('Binary' === substr($log, 0, 6)) {
-                $m = array();
+                $m = [];
                 if (preg_match('/Binary files (.+) and (.+) differ/', $log, $m)) {
                     $diff->setOld($m[1]);
                     $diff->setNew("    {$m[2]}");
@@ -424,10 +434,10 @@ class CGit_Repository {
      * Get the current HEAD.
      *
      * @param $default Optional branch to default to if in detached HEAD state.
-     * If not passed, just grabs the first branch listed.
+     *                 If not passed, just grabs the first branch listed.
      *
      * @return string the name of the HEAD branch, or a backup option if
-     * in detached HEAD state
+     *                in detached HEAD state
      */
     public function getHead($default = null) {
         $file = '';
@@ -438,7 +448,7 @@ class CGit_Repository {
         }
         // Find first existing branch
         foreach (explode("\n", $file) as $line) {
-            $m = array();
+            $m = [];
             if (preg_match('#ref:\srefs/heads/(.+)#', $line, $m)) {
                 if ($this->hasBranch($m[1])) {
                     return $m[1];
@@ -461,7 +471,7 @@ class CGit_Repository {
     /**
      * Extract the tree hash for a given branch or tree reference.
      *
-     * @param  string $branch
+     * @param string $branch
      *
      * @return string
      */
@@ -474,9 +484,9 @@ class CGit_Repository {
     /**
      * Get the Tree for the provided folder.
      *
-     * @param  string $tree Folder that will be parsed
+     * @param string $tree Folder that will be parsed
      *
-     * @return CGit_Model_Tree   Instance of Tree for the provided folder
+     * @return CGit_Model_Tree Instance of Tree for the provided folder
      */
     public function getTree($tree) {
         $tree = new CGit_Model_Tree($tree, $this);
@@ -487,9 +497,9 @@ class CGit_Repository {
     /**
      * Get the Blob for the provided file.
      *
-     * @param  string $blob File that will be parsed
+     * @param string $blob File that will be parsed
      *
-     * @return CGit_Model_Blob   Instance of Blob for the provided file
+     * @return CGit_Model_Blob Instance of Blob for the provided file
      */
     public function getBlob($blob) {
         return new CGit_Model_Blob($blob, $this);
@@ -498,12 +508,12 @@ class CGit_Repository {
     /**
      * Blames the provided file and parses the output.
      *
-     * @param  string $file File that will be blamed
+     * @param string $file File that will be blamed
      *
-     * @return array  Commits hashes containing the lines
+     * @return array Commits hashes containing the lines
      */
     public function getBlame($file) {
-        $blame = array();
+        $blame = [];
         $logs = $this->getClient()->run($this, "blame -s $file");
         $logs = explode("\n", $logs);
         $i = 0;
@@ -516,7 +526,7 @@ class CGit_Repository {
             $currentCommit = $match[1][0];
             if ($currentCommit != $previousCommit) {
                 $i++;
-                $blame[$i] = array('line' => '', 'commit' => $currentCommit);
+                $blame[$i] = ['line' => '', 'commit' => $currentCommit];
             }
             $blame[$i]['line'] .= PHP_EOL . $match[3][0];
             $previousCommit = $currentCommit;
@@ -564,14 +574,13 @@ class CGit_Repository {
     /**
      * Get and parse the output of a git command with a XML-based pretty format.
      *
-     * @param  string $command Command to be run by git
+     * @param string $command Command to be run by git
      *
-     * @return array  Parsed command output
+     * @return array Parsed command output
      */
     public function getPrettyFormat($command) {
         $output = $this->getClient()->run($this, $command);
         $format = new PrettyFormat();
         return $format->parse($output);
     }
-
 }

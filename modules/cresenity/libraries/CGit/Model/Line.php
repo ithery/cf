@@ -1,15 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 3, 2019, 1:42:04 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 3, 2019, 1:42:04 PM
  */
 class CGit_Model_Line extends CGit_ModelAbstract {
-
     protected $line;
+
     protected $type;
 
     public function __construct($data) {
@@ -44,5 +45,4 @@ class CGit_Model_Line extends CGit_ModelAbstract {
         $this->type = $type;
         return $this;
     }
-
 }

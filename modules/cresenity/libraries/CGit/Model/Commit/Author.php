@@ -1,15 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 3, 2019, 1:43:01 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 3, 2019, 1:43:01 PM
  */
 class CGit_Model_Commit_Author extends CGit_ModelAbstract {
-
     protected $name;
+
     protected $email;
 
     public function __construct($name, $email) {
@@ -32,5 +33,4 @@ class CGit_Model_Commit_Author extends CGit_ModelAbstract {
     public function setEmail($email) {
         $this->email = $email;
     }
-
 }
