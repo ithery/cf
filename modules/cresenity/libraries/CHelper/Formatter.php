@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 4:20:36 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 4:20:36 PM
  */
 class CHelper_Formatter {
-
     public static function formatDatetime($time, $format = null) {
         if (strlen($time) == 0) {
             return $time;
@@ -33,7 +33,7 @@ class CHelper_Formatter {
     }
 
     public static function formatSize($bytes) {
-        $si_prefix = array('B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
+        $si_prefix = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
         $base = 1024;
         $class = min((int) log($bytes, $base), count($si_prefix) - 1);
         if (pow($base, $class) == 0) {
@@ -45,9 +45,8 @@ class CHelper_Formatter {
     public static function formatNumber($number) {
         return ctransform::thousand_separator($number);
     }
-    
-    public static function formatCurrency($number) {
-        return ctransform::thousand_separator($number,2);
-    }
 
+    public static function formatCurrency($number) {
+        return ctransform::thousand_separator($number, 2);
+    }
 }

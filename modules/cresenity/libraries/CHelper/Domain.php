@@ -1,22 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 16, 2019, 12:55:09 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 16, 2019, 12:55:09 AM
  */
 class CHelper_Domain {
-
     public static function getTopLevelDomain($domain) {
         $domainParts = explode('.', $domain);
 
-
-
         while (count($domainParts) > 1) {
             $previousDomainParts = $domainParts;
-
 
             array_shift($previousDomainParts);
             $currentDomain = implode('.', $previousDomainParts);
@@ -46,7 +43,7 @@ class CHelper_Domain {
         $tlds = static::getTLDs();
 
         /**
-         * direct hit
+         * Direct hit
          */
         if (in_array($domain, $tlds)) {
             return true;
@@ -73,14 +70,13 @@ class CHelper_Domain {
     }
 
     public static function getTLDs() {
-        static $mozillaTlds = array();
+        static $mozillaTlds = [];
 
         if (empty($mozillaTlds)) {
             $tldFile = CF::findFile('data', 'tldlist');
-            $mozillaTlds = include ($tldFile);
+            $mozillaTlds = include $tldFile;
         }
 
         return $mozillaTlds;
     }
-
 }
