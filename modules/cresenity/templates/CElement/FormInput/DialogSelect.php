@@ -257,13 +257,13 @@
             if (!modalDialog.hasClass('dialog-select-initialized')) {
                 addLoading(modalDialog, '.dialog-select-item-list');
                 modalDialog.addClass('dialog-select-initialized');
-                ajaxLoadItemList < ? = $id ? > (modalDialog)();
+                ajaxLoadItemList<?= $id ?> (modalDialog)();
             }
         });
 
         modalDialog.find('.dialog-select-search input').keyup(function () {
             addLoading(modalDialog, '.dialog-select-item-list');
-            delay(ajaxLoadItemList < ? = $id ? > (modalDialog, $(this).val().trim()), time);
+            delay(ajaxLoadItemList<?= $id ?> (modalDialog, $(this).val().trim()), time);
         });
 
         modalDialog.find('.close').click(function (e) {
