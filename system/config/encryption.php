@@ -1,4 +1,5 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php
+defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @package  Encrypt
  *
@@ -17,15 +18,15 @@
  *  mode   - MCrypt encryption mode. By default, MCRYPT_MODE_NOFB is used. This mode
  *           offers initialization vector support, is suited to short strings, and
  *           produces the shortest encrypted output.
+ *
  *           @see http://php.net/mcrypt
  *
  *  cipher - MCrypt encryption cipher. By default, the MCRYPT_RIJNDAEL_128 cipher is used.
  *           This is also known as 128-bit AES.
  *           @see http://php.net/mcrypt
  */
-$config['default'] = array
-(
-	'key'    => 'K0H@NA+PHP_7hE-SW!FtFraM3w0R|<',
-	'mode'   => MCRYPT_MODE_NOFB,
-	'cipher' => MCRYPT_RIJNDAEL_128
-);
+$config['default'] = [
+    'key' => 'K0H@NA+PHP_7hE-SW!FtFraM3w0R|<',
+    'mode' => MCRYPT_MODE_NOFB,
+    'cipher' => MCRYPT_RIJNDAEL_128
+];
