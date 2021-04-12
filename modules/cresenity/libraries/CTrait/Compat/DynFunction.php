@@ -1,14 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 9, 2019, 2:40:03 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 9, 2019, 2:40:03 AM
  */
+//@codingStandardsIgnoreStart
 trait CTrait_Compat_DynFunction {
-
     public function set_function($func) {
         return $this->setFunction($func);
     }
@@ -28,5 +29,4 @@ trait CTrait_Compat_DynFunction {
     public function set_require($p) {
         return $this->setRequire($p);
     }
-
 }
