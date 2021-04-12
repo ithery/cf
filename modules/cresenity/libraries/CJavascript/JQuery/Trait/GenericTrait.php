@@ -1,18 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 2, 2018, 12:49:09 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 2, 2018, 12:49:09 AM
  */
 trait CJavascript_JQuery_Trait_GenericTrait {
-
     abstract public function addEvent($element, $js, $event, $preventDefault = false, $stopPropagation = false);
 
     /**
      * Execute a generic jQuery call with a value.
+     *
      * @param string $jQueryCall
      * @param string $element
      * @param string $param
@@ -23,8 +24,9 @@ trait CJavascript_JQuery_Trait_GenericTrait {
         if ($param !== null) {
             $param = CJavascript_Helper_Javascript::prepValue($param);
             $str = "$({$element}).{$jQueryCall}({$param});";
-        } else
+        } else {
             $str = "$({$element}).{$jQueryCall}();";
+        }
 
         $this->addScript($str);
         return $str;
@@ -32,12 +34,14 @@ trait CJavascript_JQuery_Trait_GenericTrait {
 
     /**
      * Execute a generic jQuery call with 2 elements.
+     *
      * @param string $jQueryCall
      * @param string $to
      * @param string $element
+     *
      * @return string
      */
-    public function genericCallElement($jQueryCall, $to = 'this', $element) {
+    public function genericCallElement($jQueryCall, $to = 'this', $element = '') {
         $to = $this->getSelector($to);
         $to = CJavascript_Helper_Javascript::prepElement($to);
         $element = CJavascript_Helper_Javascript::prepElement($element);
@@ -49,12 +53,12 @@ trait CJavascript_JQuery_Trait_GenericTrait {
 
     /**
      * Get or set the value of an attribute for the first element in the set of matched elements or set one or more attributes for every matched element.
+     *
      * @param string $element
      * @param string $attributeName
      * @param string $value
-
      */
-    public function attr($element = 'this', $attributeName, $value = "") {
+    public function attr($element = 'this', $attributeName = '', $value = '') {
         $element = $this->getSelector($element);
         $element = CJavascript_Helper_Javascript::prepElement($element);
         if (isset($value)) {
@@ -70,13 +74,14 @@ trait CJavascript_JQuery_Trait_GenericTrait {
     /**
      * Outputs a javascript library animate event
      *
-     * @param string $element element
+     * @param string       $element element
      * @param array|string $params
-     * @param string $speed One of 'slow', 'normal', 'fast', or time in milliseconds
-     * @param string $extra
+     * @param string       $speed   One of 'slow', 'normal', 'fast', or time in milliseconds
+     * @param string       $extra
+     *
      * @return string
      */
-    public function animate($element = 'this', $params = array(), $speed = '', $extra = '') {
+    public function animate($element = 'this', $params = [], $speed = '', $extra = '') {
         $element = $this->getSelector($element);
         $element = CJavascript_Helper_Javascript::prepElement($element);
         $speed = $this->validateSpeed($speed);
@@ -93,20 +98,21 @@ trait CJavascript_JQuery_Trait_GenericTrait {
         if ($extra != '') {
             $extra = ', ' . $extra;
         }
-        $str = "$({$element}).animate({\n$animations\n\t\t}" . $speed . $extra . ");";
+        $str = "$({$element}).animate({\n$animations\n\t\t}" . $speed . $extra . ');';
 
         $this->addScript($str);
         return $str;
     }
 
     /**
-     * show or hide with effect
+     * Show or hide with effect
      *
      * @param string $action
-     * @param string $element element
-     * @param string $speed One of 'slow', 'normal', 'fast', or time in milliseconds
-     * @param string $callback Javascript callback function
-     * @param boolean $immediatly defers the execution if set to false
+     * @param string $element    element
+     * @param string $speed      One of 'slow', 'normal', 'fast', or time in milliseconds
+     * @param string $callback   Javascript callback function
+     * @param bool   $immediatly defers the execution if set to false
+     *
      * @return string
      */
     protected function showHideWithEffect($action, $element = 'this', $speed = '', $callback = '', $immediatly = false) {
@@ -123,9 +129,10 @@ trait CJavascript_JQuery_Trait_GenericTrait {
 
     /**
      * Execute all handlers and behaviors attached to the matched elements for the given event.
+     *
      * @param string $element
      * @param string $event
-     * @param boolean $immediatly defers the execution if set to false
+     * @param bool   $immediatly defers the execution if set to false
      */
     public function trigger($element = 'this', $event = 'click', $immediatly = false) {
         $element = $this->getSelector($element);
@@ -139,8 +146,9 @@ trait CJavascript_JQuery_Trait_GenericTrait {
     /**
      * Table Sorter Plugin
      *
-     * @param string $table table name
+     * @param string $table   table name
      * @param string $options plugin location
+     *
      * @return string
      */
     public function tablesorter($table = '', $options = '') {
@@ -150,44 +158,48 @@ trait CJavascript_JQuery_Trait_GenericTrait {
 
     /**
      * Call the JQuery method $jqueryCall on $element with parameters $param
+     *
      * @param string $element
      * @param string $jqueryCall
-     * @param mixed $param
+     * @param mixed  $param
      * @param string $jsCallback javascript code to execute after the jquery call
+     *
      * @return string
      */
-    private function doJQuery($element, $jqueryCall, $param = "", $jsCallback = "") {
+    private function doJQuery($element, $jqueryCall, $param = '', $jsCallback = '') {
         $element = $this->getSelector($element);
         $param = CJavascript_Helper_Javascript::prepValue($param);
-        $callback = "";
-        if ($jsCallback != "") {
+        $callback = '';
+        if ($jsCallback != '') {
             $callback = ", function(event){\n{$jsCallback}\n}";
         }
-        $script = "$(" . CJavascript_Helper_Javascript::prepElement($element) . ")." . $jqueryCall . "(" . $param . $callback . ");\n";
+        $script = '$(' . CJavascript_Helper_Javascript::prepElement($element) . ').' . $jqueryCall . '(' . $param . $callback . ");\n";
         $this->addScript($script);
         return $script;
     }
 
     /**
-     *
-     * @param string $event
-     * @param string $element
-     * @param string $elementToModify
-     * @param string $jqueryCall
+     * @param string       $event
+     * @param string       $element
+     * @param string       $elementToModify
+     * @param string       $jqueryCall
      * @param string|array $param
-     * @param boolean $preventDefault
-     * @param boolean $stopPropagation
-     * @param string $jsCallback javascript code to execute after the jquery call
+     * @param bool         $preventDefault
+     * @param bool         $stopPropagation
+     * @param string       $jsCallback      javascript code to execute after the jquery call
+     *
      * @return string
      */
-    private function doJQueryOn($event, $element, $elementToModify, $jqueryCall, $param = "", $preventDefault = false, $stopPropagation = false, $jsCallback = "") {
+    private function doJQueryOn($event, $element, $elementToModify, $jqueryCall, $param = '', $preventDefault = false, $stopPropagation = false, $jsCallback = '') {
         return $this->addEvent($element, $this->doJQuery($elementToModify, $jqueryCall, $param, $jsCallback), $event, $preventDefault, $stopPropagation);
     }
 
     /**
      * Executes the code $js
+     *
      * @param string $js Code to execute
-     * @return String
+     *
+     * @return string
      */
     public function exec($js) {
         $script = $js . "\n";
@@ -197,9 +209,10 @@ trait CJavascript_JQuery_Trait_GenericTrait {
 
     /**
      * Executes the code $js
+     *
      * @param string $js Code to execute
-     * @param boolean $immediatly delayed if false
-     * @return String
+     *
+     * @return string
      */
     public function execAtLast($js) {
         $script = $js . "\n";
@@ -209,13 +222,15 @@ trait CJavascript_JQuery_Trait_GenericTrait {
 
     /**
      * Executes the javascript code $js when $event fires on $element
+     *
      * @param string $event
      * @param string $element
-     * @param string $js Code to execute
-     * @param array $parameters default : array("preventDefault"=>false,"stopPropagation"=>false,"immediatly"=>true)
-     * @return String
+     * @param string $js         Code to execute
+     * @param array  $parameters default : array("preventDefault"=>false,"stopPropagation"=>false,"immediatly"=>true)
+     *
+     * @return string
      */
-    public function execOn($event, $element, $js, $parameters = array()) {
+    public function execOn($event, $element, $js, $parameters = []) {
         $stopPropagation = false;
         $preventDefault = false;
         $immediatly = true;
@@ -224,7 +239,7 @@ trait CJavascript_JQuery_Trait_GenericTrait {
         return $script;
     }
 
-    public function setJsonToElement($json, $elementClass = "_element") {
+    public function setJsonToElement($json, $elementClass = '_element') {
         $retour = "var data={$json};"
                 . "\n\tdata=($.isPlainObject(data))?data:JSON.parse(data);"
                 . "\n\tvar pk=data['pk'];var object=data['object'];"
@@ -240,28 +255,30 @@ trait CJavascript_JQuery_Trait_GenericTrait {
 
     /**
      * Sets an element draggable (HTML5 drag and drop)
-     * @param string $element The element selector
-     * @param array $parameters default : array("attr"=>"id","preventDefault"=>false,"stopPropagation"=>false,"immediatly"=>true)
+     *
+     * @param string $element    The element selector
+     * @param array  $parameters default : array("attr"=>"id","preventDefault"=>false,"stopPropagation"=>false,"immediatly"=>true)
      */
     public function setDraggable($element, $parameters = []) {
-        $attr = "id";
+        $attr = 'id';
         extract($parameters);
-        $script = $this->addEvent($element, CJavascript_Helper_Javascript::draggable($attr), "dragstart", $parameters);
+        $script = $this->addEvent($element, CJavascript_Helper_Javascript::draggable($attr), 'dragstart', $parameters);
         return $script;
     }
 
     /**
      * Declares an element as a drop zone (HTML5 drag and drop)
-     * @param string $element The element selector
-     * @param array $parameters default : array("attr"=>"id","stopPropagation"=>false,"immediatly"=>true,"jqueryDone"=>"append")
+     *
+     * @param string $element    The element selector
+     * @param array  $parameters default : array("attr"=>"id","stopPropagation"=>false,"immediatly"=>true,"jqueryDone"=>"append")
      * @param string $jsCallback the js script to call when element is dropped
      */
-    public function asDropZone($element, $jsCallback = "", $parameters = []) {
+    public function asDropZone($element, $jsCallback = '', $parameters = []) {
         $stopPropagation = false;
-        $jqueryDone = "append";
-        $script = $this->addEvent($element, '', "dragover", true, $stopPropagation);
+        $jqueryDone = 'append';
+        $script = $this->addEvent($element, '', 'dragover', true, $stopPropagation);
         extract($parameters);
-        $script .= $this->addEvent($element, CJavascript_Helper_Javascript::dropZone($jqueryDone, $jsCallback), "drop", true, $stopPropagation);
+        $script .= $this->addEvent($element, CJavascript_Helper_Javascript::dropZone($jqueryDone, $jsCallback), 'drop', true, $stopPropagation);
         return $script;
     }
 
@@ -280,5 +297,4 @@ trait CJavascript_JQuery_Trait_GenericTrait {
     public function clearInterval($globalName, $immediatly = true) {
         return $this->exec("if(window.{$globalName}){clearInterval(window.{$globalName});}");
     }
-
 }

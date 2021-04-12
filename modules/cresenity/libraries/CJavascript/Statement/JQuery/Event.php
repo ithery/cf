@@ -1,26 +1,31 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 2, 2018, 9:24:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 2, 2018, 9:24:30 PM
  */
 class CJavascript_Statement_JQuery_Event implements CJavascript_Statement_JQuery_CompilableInterface {
+    protected $jqueryEvents = [
+        'bind', 'blur', 'change', 'click', 'dblclick', 'delegate', 'die', 'error', 'focus', 'focusin', 'focusout', 'hover', 'keydown', 'keypress', 'keyup', 'live', 'load', 'mousedown', 'mousseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'off', 'on', 'one', 'ready', 'resize', 'scroll', 'select', 'submit', 'toggle', 'trigger', 'triggerHandler', 'undind', 'undelegate', 'unload'
+    ];
 
-    protected $jqueryEvents = array(
-        "bind", "blur", "change", "click", "dblclick", "delegate", "die", "error", "focus", "focusin", "focusout", "hover", "keydown", "keypress", "keyup", "live", "load", "mousedown", "mousseenter", "mouseleave", "mousemove", "mouseout", "mouseover", "mouseup", "off", "on", "one", "ready", "resize", "scroll", "select", "submit", "toggle", "trigger", "triggerHandler", "undind", "undelegate", "unload"
-    );
     protected $name;
+
     protected $js;
+
     protected $preventDefault;
+
     protected $stopPropagation;
+
     protected $retFalse;
 
     public function __construct($eventName, $js, $options) {
         $retFalse = carr::get($options, 'retFalse', true);
-        $preventDefault = carr::get($options, 'preventDefault', FALSE);
+        $preventDefault = carr::get($options, 'preventDefault', false);
         $stopPropagation = carr::get($options, 'stopPropagation', false);
         $this->name = $eventName;
 
@@ -37,8 +42,8 @@ class CJavascript_Statement_JQuery_Event implements CJavascript_Statement_JQuery
     public function compile() {
         $statements = $this->js;
 
-         if (!is_array($statements)) {
-            $statements = array($statements);
+        if (!is_array($statements)) {
+            $statements = [$statements];
         }
         $js = '';
         foreach ($statements as $statement) {
@@ -48,7 +53,6 @@ class CJavascript_Statement_JQuery_Event implements CJavascript_Statement_JQuery
             $js .= $statement;
         }
 
-        
         if (\is_array($js)) {
             $js = implode("\n\t\t", $js);
         }
@@ -64,8 +68,7 @@ class CJavascript_Statement_JQuery_Event implements CJavascript_Statement_JQuery
         } else {
             $event = ".{$this->name}(function(event){\n\t\t{$js}\n\t});\n";
         }
-        
+
         return $event;
     }
-
 }

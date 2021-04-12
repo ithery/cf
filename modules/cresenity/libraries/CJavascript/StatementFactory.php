@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 2, 2018, 11:02:36 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 2, 2018, 11:02:36 PM
  */
 class CJavascript_StatementFactory {
-
     public static function createJQuery($selector = 'this') {
         return new CJavascript_Statement_JQuery($selector);
     }
@@ -18,8 +18,8 @@ class CJavascript_StatementFactory {
     }
 
     /**
-     * 
      * @param string $js
+     *
      * @return CJavascript_Statement_Raw
      */
     public static function createRaw($js) {
@@ -27,13 +27,12 @@ class CJavascript_StatementFactory {
     }
 
     /**
-     * 
      * @param string $functionName
-     * @param array $functionParameter
+     * @param array  $functionParameter
+     *
      * @return CJavascript_Statement_Function
      */
-    public static function createFunction($functionName, $functionParameter = array()) {
+    public static function createFunction($functionName, $functionParameter = []) {
         return new CJavascript_Statement_Function($functionName, $functionParameter);
     }
-
 }

@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 1:27:17 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 1:27:17 PM
  */
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class CJavascript_Validation_MessageParser {
-
     use CJavascript_Validation_Trait_UseDelegatedValidatorTrait;
 
     /**
@@ -28,6 +28,7 @@ class CJavascript_Validation_MessageParser {
      * @param string $attribute
      * @param string $rule
      * @param array  $parameters
+     *
      * @return mixed
      */
     public function getMessage($attribute, $rule, $parameters) {
@@ -45,6 +46,7 @@ class CJavascript_Validation_MessageParser {
      * @param string $attribute
      * @param string $rule
      * @param $parameters
+     *
      * @return array
      */
     protected function fakeValidationData($attribute, $rule, $parameters) {
@@ -60,6 +62,7 @@ class CJavascript_Validation_MessageParser {
      * @param $data
      * @param $rule
      * @param $parameters
+     *
      * @return void
      */
     private function fakeRequiredIfData($data, $rule, $parameters) {
@@ -76,6 +79,7 @@ class CJavascript_Validation_MessageParser {
      *
      * @param $data
      * @param $attribute
+     *
      * @return void
      */
     private function fakeFileData($data, $attribute) {
@@ -95,5 +99,4 @@ class CJavascript_Validation_MessageParser {
     protected function createUploadedFile() {
         return new UploadedFile('fakefile', 'fakefile', null, null, UPLOAD_ERR_NO_FILE, true);
     }
-
 }

@@ -1,26 +1,25 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 2, 2018, 8:32:13 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 2, 2018, 8:32:13 PM
  */
 class CJavascript_Statement_JQuery_Method implements CJavascript_Statement_JQuery_CompilableInterface {
-
     protected $name;
 
     /**
-     *
      * @var array
      */
     protected $parameters;
 
-    public function __construct($name, $parameters = array()) {
+    public function __construct($name, $parameters = []) {
         $this->name = $name;
         if (!is_array($parameters)) {
-            $parameters = array($parameters);
+            $parameters = [$parameters];
         }
         $this->parameters = $parameters;
     }
@@ -39,7 +38,7 @@ class CJavascript_Statement_JQuery_Method implements CJavascript_Statement_JQuer
         $params = $this->getParameters();
         $paramPrepared = '';
         if (is_array($params) && count($params) > 0) {
-            $preps = array();
+            $preps = [];
             foreach ($params as $param) {
                 $needQuoted = true;
 
@@ -53,20 +52,19 @@ class CJavascript_Statement_JQuery_Method implements CJavascript_Statement_JQuer
                     $needQuoted = false;
                 }
                 if (\is_array($param)) {
-                    $param = implode(",", $param);
+                    $param = implode(',', $param);
                     $needQuoted = false;
                 }
                 if ($needQuoted) {
-                    $param = \str_replace(["\\", "\""], ["\\\\", "\\\""], $param);
+                    $param = \str_replace(['\\', '"'], ['\\\\', '\\"'], $param);
                     $param = '"' . $param . '"';
                 }
-                $param = trim($param, "%");
+                $param = trim($param, '%');
                 $preps[] = $param;
             }
-            $paramPrepared = implode(",", $preps);
+            $paramPrepared = implode(',', $preps);
         }
         $str .= ".{$jQueryCall}({$paramPrepared})";
         return $str;
     }
-
 }

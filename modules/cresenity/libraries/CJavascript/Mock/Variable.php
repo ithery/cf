@@ -1,15 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 3, 2018, 3:15:46 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 3, 2018, 3:15:46 AM
  */
 class CJavascript_Mock_Variable {
+    protected $propStack = [];
 
-    protected $propStack = array();
     protected $varName = null;
 
     public function __construct($varName) {
@@ -19,8 +20,8 @@ class CJavascript_Mock_Variable {
     public function __get($name) {
         $cloned = clone $this;
         return $cloned->addProp($name);
-       
     }
+
     public function addProp($name) {
         $this->propStack[] = $name;
         return $this;
@@ -37,5 +38,4 @@ class CJavascript_Mock_Variable {
     public function __toString() {
         return $this->getScript();
     }
-
 }

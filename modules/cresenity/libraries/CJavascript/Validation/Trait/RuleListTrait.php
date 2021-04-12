@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 1:29:10 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 1:29:10 PM
  */
 trait CJavascript_Validation_Trait_RuleListTrait {
-
     /**
      *  Rules validated with Javascript.
      *
@@ -20,7 +20,7 @@ trait CJavascript_Validation_Trait_RuleListTrait {
         'In', 'InArray', 'Integer', 'Ip', 'Json', 'Max', 'Mimes', 'Mimetypes', 'Min', 'NotIn', 'Nullable',
         'Numeric', 'Regex', 'Required', 'RequiredIf', 'RequiredUnless', 'RequiredWith', 'RequiredWithAll',
         'RequiredWithout', 'RequiredWithoutAll', 'Same', 'Size', 'Sometimes',
-        'String', 'Timezone', 'Url',];
+        'String', 'Timezone', 'Url', ];
 
     /**
      * Rules validated in Server-Side.
@@ -47,6 +47,7 @@ trait CJavascript_Validation_Trait_RuleListTrait {
      * Returns if rule is validated using Javascript.
      *
      * @param $rule
+     *
      * @return bool
      */
     protected function isImplemented($rule) {
@@ -57,17 +58,19 @@ trait CJavascript_Validation_Trait_RuleListTrait {
      * Check if rule must be validated in server-side.
      *
      * @param $rule
+     *
      * @return bool
      */
     protected function isRemoteRule($rule) {
-        return in_array($rule, $this->serverRules) ||
-                !in_array($rule, $this->clientRules);
+        return in_array($rule, $this->serverRules)
+                || !in_array($rule, $this->clientRules);
     }
 
     /**
      * Check if rule disables rule processing.
      *
      * @param $rule
+     *
      * @return bool
      */
     protected function isDisableRule($rule) {
@@ -78,6 +81,7 @@ trait CJavascript_Validation_Trait_RuleListTrait {
      * Check if rules should be validated.
      *
      * @param $rules
+     *
      * @return bool
      */
     protected function validationDisabled($rules) {
@@ -89,10 +93,10 @@ trait CJavascript_Validation_Trait_RuleListTrait {
      * Check if rules is for input file type.
      *
      * @param $rule
+     *
      * @return bool
      */
     protected function isFileRule($rule) {
         return in_array($rule, $this->fileRules);
     }
-
 }

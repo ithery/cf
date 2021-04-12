@@ -1,18 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 1:21:13 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 1:21:13 PM
  */
 trait CJavascript_Validation_Trait_AccessProtectedTrait {
-
     /**
      * Create closure to call inaccessible method.
      *
      * @param $instance
+     *
      * @return \Closure
      */
     protected function createProtectedCaller($instance) {
@@ -28,6 +29,7 @@ trait CJavascript_Validation_Trait_AccessProtectedTrait {
      *
      * @param $instance
      * @param $property
+     *
      * @return \Closure
      */
     protected function getProtected($instance, $property) {
@@ -44,6 +46,7 @@ trait CJavascript_Validation_Trait_AccessProtectedTrait {
      * @param object|\Closure $instance
      * @param $method
      * @param $args
+     *
      * @return mixed
      */
     protected function callProtected($instance, $method, $args = []) {
@@ -52,5 +55,4 @@ trait CJavascript_Validation_Trait_AccessProtectedTrait {
         }
         return call_user_func($instance, $method, $args);
     }
-
 }

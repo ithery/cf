@@ -1,18 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 1:30:26 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 1:30:26 PM
  */
 trait CJavascript_Validation_Trait_JavascriptRulesTrait {
-
     /**
      * Handles multidimensional attribute names.
      *
      * @param string $attribute
+     *
      * @return string
      */
     abstract protected function getAttributeName($attribute);
@@ -21,6 +22,7 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      * Parse named parameters to $key => $value items.
      *
      * @param array $parameters
+     *
      * @return array
      */
     abstract public function parseNamedParameters($parameters);
@@ -30,6 +32,7 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      *
      * @param $attribute
      * @param array $parameters
+     *
      * @return array
      */
     protected function ruleConfirmed($attribute, array $parameters) {
@@ -43,6 +46,7 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      *
      * @param $attribute
      * @param array $parameters
+     *
      * @return array
      */
     protected function ruleAfter($attribute, array $parameters) {
@@ -57,6 +61,7 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      *
      * @param $attribute
      * @param array $parameters
+     *
      * @return array
      */
     protected function ruleBefore($attribute, array $parameters) {
@@ -67,7 +72,8 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      * Validate that two attributes match.
      *
      * @param string $attribute
-     * @param array $parameters
+     * @param array  $parameters
+     *
      * @return array
      */
     protected function ruleSame($attribute, array $parameters) {
@@ -79,7 +85,8 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      * Validate that an attribute is different from another attribute.
      *
      * @param string $attribute
-     * @param array $parameters
+     * @param array  $parameters
+     *
      * @return array
      */
     protected function ruleDifferent($attribute, array $parameters) {
@@ -90,7 +97,8 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      * Validate that an attribute exists when any other attribute exists.
      *
      * @param string $attribute
-     * @param mixed $parameters
+     * @param mixed  $parameters
+     *
      * @return array
      */
     protected function ruleRequiredWith($attribute, array $parameters) {
@@ -102,7 +110,8 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      * Validate that an attribute exists when all other attributes exists.
      *
      * @param string $attribute
-     * @param mixed $parameters
+     * @param mixed  $parameters
+     *
      * @return array
      */
     protected function ruleRequiredWithAll($attribute, array $parameters) {
@@ -113,7 +122,8 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      * Validate that an attribute exists when another attribute does not.
      *
      * @param string $attribute
-     * @param mixed $parameters
+     * @param mixed  $parameters
+     *
      * @return array
      */
     protected function ruleRequiredWithout($attribute, array $parameters) {
@@ -124,7 +134,8 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      * Validate that an attribute exists when all other attributes do not.
      *
      * @param string $attribute
-     * @param mixed $parameters
+     * @param mixed  $parameters
+     *
      * @return array
      */
     protected function ruleRequiredWithoutAll($attribute, array $parameters) {
@@ -135,7 +146,8 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      * Validate that an attribute exists when another attribute has a given value.
      *
      * @param string $attribute
-     * @param mixed $parameters
+     * @param mixed  $parameters
+     *
      * @return array
      */
     protected function ruleRequiredIf($attribute, array $parameters) {
@@ -147,7 +159,8 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      * Validate that an attribute exists when another attribute does not have a given value.
      *
      * @param string $attribute
-     * @param mixed $parameters
+     * @param mixed  $parameters
+     *
      * @return array
      */
     protected function ruleRequiredUnless($attribute, array $parameters) {
@@ -158,7 +171,8 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      * Validate that the values of an attribute is in another attribute.
      *
      * @param string $attribute
-     * @param mixed $parameters
+     * @param mixed  $parameters
+     *
      * @return array
      */
     protected function ruleInArray($attribute, array $parameters) {
@@ -169,7 +183,8 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      * Validate the dimensions of an image matches the given values.
      *
      * @param string $attribute
-     * @param array $parameters
+     * @param array  $parameters
+     *
      * @return array
      */
     protected function ruleDimensions($attribute, $parameters) {
@@ -181,12 +196,12 @@ trait CJavascript_Validation_Trait_JavascriptRulesTrait {
      * Validate an attribute is unique among other values.
      *
      * @param string $attribute
-     * @param array $parameters
+     * @param array  $parameters
+     *
      * @return array
      */
     protected function ruleDistinct($attribute, array $parameters) {
         $parameters[0] = $attribute;
         return $this->ruleRequiredIf($attribute, $parameters);
     }
-
 }
