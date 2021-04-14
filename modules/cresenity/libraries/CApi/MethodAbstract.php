@@ -29,10 +29,12 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
 
     protected $sessionIdParameter = 'sessionId';
 
-    public function __construct($orgId = null) {
+    public function __construct($orgId = null, $sessionId = null, $request = null) {
         if ($orgId == null) {
             $orgId = CF::orgId();
         }
+        $this->request = $request;
+        $this->sessionId = $sessionId;
         $this->orgId = $orgId;
     }
 
