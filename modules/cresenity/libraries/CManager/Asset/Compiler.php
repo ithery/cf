@@ -1,46 +1,50 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Jul 30, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Jul 30, 2020
  */
 class CManager_Asset_Compiler {
-
     use CTrait_HasOptions;
 
     protected $files;
+
     protected $outFile;
+
     protected $type;
+
     protected $maxImportSize;
 
     /**
      * The last modified time of the newest Asset in the Assets array
+     *
      * @var int
      */
     protected $lastModTimeNewestAsset = 0;
 
     /**
-     * The last modified time of the compiled Asset 
+     * The last modified time of the compiled Asset
+     *
      * @var int
      */
     protected $lastModTimeCompiledAsset = 0;
+
     protected $separator = "\n";
 
     public function __construct(array $files, $options = []) {
-
-        $files = carr::map($files, function($script) {
-                    return preg_replace('/\?.*/', '', $script);
-                });
+        $files = carr::map($files, function ($script) {
+            return preg_replace('/\?.*/', '', $script);
+        });
 
         $this->files = $files;
         $this->options = $options;
         $this->type = carr::get($options, 'type');
 
         $this->outFile = carr::get($options, 'outFile');
-
 
         if ($this->type == null) {
             $this->determineType();
@@ -58,7 +62,7 @@ class CManager_Asset_Compiler {
     }
 
     protected function determineOutFile() {
-        $this->outFile = DOCROOT . 'compiled/asset/' . $this->type . '/' . md5(implode(":", $this->files)) . '.' . $this->type;
+        $this->outFile = DOCROOT . 'compiled/asset/' . $this->type . '/' . md5(implode(':', $this->files)) . '.' . $this->type;
     }
 
     protected function determineLastModified() {
@@ -111,13 +115,11 @@ class CManager_Asset_Compiler {
                 }
 
                 if ($this->type == 'js') {
-
                     if (CF::config('assets.js.minify')) {
                         $minifier = $this->createJsMinifier();
                         $compiledOutput = $minifier->execute($compiledOutput);
                     }
                 }
-
 
                 file_put_contents($this->outFile, $this->separator . $compiledOutput, FILE_APPEND);
             }
@@ -132,7 +134,7 @@ class CManager_Asset_Compiler {
      * (e.g. ../../images/image.gif, if the new CSS file is 1 folder deeper).
      *
      * @param CManager_Asset_Compiler_PathConverter $converter Relative path converter
-     * @param string             $content   The CSS content to update relative urls for
+     * @param string                                $content   The CSS content to update relative urls for
      *
      * @return string
      */
@@ -148,7 +150,7 @@ class CManager_Asset_Compiler {
          * recent PCRE version. That's why I'm doing 2 separate regular
          * expressions & combining the matches after executing of both.
          */
-        $relativeRegexes = array(
+        $relativeRegexes = [
             // url(xxx)
             '/
             # open url()
@@ -179,18 +181,18 @@ class CManager_Asset_Compiler {
                 # close path enclosure
                 (?P=quotes)
             /ix',
-        );
+        ];
 
         // find all relative urls in css
-        $matches = array();
+        $matches = [];
         foreach ($relativeRegexes as $relativeRegex) {
             if (preg_match_all($relativeRegex, $content, $regexMatches, PREG_SET_ORDER)) {
                 $matches = array_merge($matches, $regexMatches);
             }
         }
 
-        $search = array();
-        $replace = array();
+        $search = [];
+        $replace = [];
 
         // loop all urls
         foreach ($matches as $match) {
@@ -266,7 +268,6 @@ class CManager_Asset_Compiler {
     }
 
     /**
-     * 
      * @return \CManager_Asset_Compiler_Minify_MinifyCss
      */
     protected function createCssMinifier() {
@@ -274,11 +275,9 @@ class CManager_Asset_Compiler {
     }
 
     /**
-     * 
      * @return \CManager_Asset_Compiler_Minify_MinifyJs
      */
     protected function createJsMinifier() {
         return new CManager_Asset_Compiler_Minify_MinifyJs();
     }
-
 }
