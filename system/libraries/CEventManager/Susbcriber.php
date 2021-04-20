@@ -1,10 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Aug 18, 2018, 9:16:21 AM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 
@@ -15,7 +17,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * returned events.
  */
 interface CEventManager_Subscriber {
-
     /**
      * Returns an array of events this subscriber wants to listen to.
      *

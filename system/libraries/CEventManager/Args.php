@@ -1,10 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Aug 18, 2018, 9:15:24 AM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 
@@ -16,7 +18,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * instance can be obtained through {@link getEmptyInstance}.
  */
 class CEventManager_Args {
-
     /**
      * Single instance of EventArgs.
      *
@@ -34,7 +35,6 @@ class CEventManager_Args {
      * (otherwise there would be instances for every dispatched in the abovementioned form).
      *
      * @see EventManager::dispatchEvent
-     *
      * @link https://msdn.microsoft.com/en-us/library/system.eventargs.aspx
      *
      * @return CEventManager_Args
@@ -46,5 +46,4 @@ class CEventManager_Args {
 
         return self::$_emptyEventArgsInstance;
     }
-
 }
