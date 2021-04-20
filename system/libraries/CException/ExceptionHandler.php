@@ -182,7 +182,6 @@ s    * @return void
 
         if ($this->isHttpException($e)) {
             if ($e instanceof CHTTP_Exception_RedirectHttpException) {
-
                 return c::redirect($e->getUri(), $e->getStatusCode());
             }
 
@@ -256,8 +255,8 @@ s    * @return void
     /**
      * Create a response object from the given validation exception.
      *
-     * @param CValidation_Exception    $e
-     * @param \CHTTP_Request $request
+     * @param CValidation_Exception $e
+     * @param \CHTTP_Request        $request
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
@@ -301,7 +300,7 @@ s    * @return void
      * Prepare a response for the given exception.
      *
      * @param \CHTTP_Request $request
-     * @param \Exception               $e
+     * @param \Exception     $e
      *
      * @return \Symfony\Component\HttpFoundation\Response
      */
