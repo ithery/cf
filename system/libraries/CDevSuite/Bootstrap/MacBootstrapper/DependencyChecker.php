@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Bootstrap_MacBootstrapper_DependencyChecker extends CDevSuite_Bootstrap_Bootstrapper {
-
     public function bootstrap() {
         /**
          * Check the system's compatibility with DevSuite.
@@ -20,7 +19,7 @@ class CDevSuite_Bootstrap_MacBootstrapper_DependencyChecker extends CDevSuite_Bo
         }
 
         if (version_compare(PHP_VERSION, '5.6.0', '<')) {
-            echo "DevSuite requires PHP 5.6 or later.";
+            echo 'DevSuite requires PHP 5.6 or later.';
 
             exit(1);
         }
@@ -30,8 +29,7 @@ class CDevSuite_Bootstrap_MacBootstrapper_DependencyChecker extends CDevSuite_Bo
 
             exit(1);
         }
-        
+
         define('BREW_PREFIX', CDevSuite::commandLine()->runAsUser('printf $(brew --prefix)'));
     }
-
 }
