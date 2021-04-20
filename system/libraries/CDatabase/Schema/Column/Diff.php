@@ -29,7 +29,7 @@ class CDatabase_Schema_Column_Diff {
     public $changedProperties = [];
 
     /**
-     * @var Column
+     * @var CDatabase_Schema_Column
      */
     public $fromColumn;
 
@@ -39,7 +39,7 @@ class CDatabase_Schema_Column_Diff {
      * @param string[]                $changedProperties
      * @param CDatabase_Schema_Column $fromColumn
      */
-    public function __construct($oldColumnName, CDatabase_Schema_Column $column, array $changedProperties = [], Column $fromColumn = null) {
+    public function __construct($oldColumnName, CDatabase_Schema_Column $column, array $changedProperties = [], CDatabase_Schema_Column $fromColumn = null) {
         $this->oldColumnName = $oldColumnName;
         $this->column = $column;
         $this->changedProperties = $changedProperties;

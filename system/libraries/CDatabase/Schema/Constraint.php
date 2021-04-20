@@ -41,7 +41,7 @@ interface CDatabase_Schema_Constraint {
      * is a keyword reserved by the platform.
      * Otherwise the plain unquoted value as inserted is returned.
      *
-     * @param \Doctrine\DBAL\Platforms\AbstractPlatform $platform the platform to use for quotation
+     * @param \CDatabase_Platform $platform the platform to use for quotation
      *
      * @return array
      */

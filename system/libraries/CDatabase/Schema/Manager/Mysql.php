@@ -33,7 +33,7 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
      * {@inheritdoc}
      */
     protected function _getPortableViewDefinition($view) {
-        return new View($view['TABLE_NAME'], $view['VIEW_DEFINITION']);
+        return new CView_View($view['TABLE_NAME'], $view['VIEW_DEFINITION']);
     }
 
     /**
@@ -215,10 +215,10 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
         if ($columnDefault[0] === "'") {
             return stripslashes(
                 str_replace(
-                        "''",
-                        "'",
-                        preg_replace('/^\'(.*)\'$/', '$1', $columnDefault)
-                    )
+                    "''",
+                    "'",
+                    preg_replace('/^\'(.*)\'$/', '$1', $columnDefault)
+                )
             );
         }
         switch ($columnDefault) {

@@ -970,7 +970,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateAddSecondsExpression($date, $seconds) {
-        return $this->getDateArithmeticIntervalExpression($date, '+', $seconds, DateIntervalUnit::SECOND);
+        return $this->getDateArithmeticIntervalExpression($date, '+', $seconds, CDatabase_Platform_DateIntervalUnit::SECOND);
     }
 
     /**
@@ -984,7 +984,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateSubSecondsExpression($date, $seconds) {
-        return $this->getDateArithmeticIntervalExpression($date, '-', $seconds, DateIntervalUnit::SECOND);
+        return $this->getDateArithmeticIntervalExpression($date, '-', $seconds, CDatabase_Platform_DateIntervalUnit::SECOND);
     }
 
     /**
@@ -998,7 +998,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateAddMinutesExpression($date, $minutes) {
-        return $this->getDateArithmeticIntervalExpression($date, '+', $minutes, DateIntervalUnit::MINUTE);
+        return $this->getDateArithmeticIntervalExpression($date, '+', $minutes, CDatabase_Platform_DateIntervalUnit::MINUTE);
     }
 
     /**
@@ -1012,7 +1012,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateSubMinutesExpression($date, $minutes) {
-        return $this->getDateArithmeticIntervalExpression($date, '-', $minutes, DateIntervalUnit::MINUTE);
+        return $this->getDateArithmeticIntervalExpression($date, '-', $minutes, CDatabase_Platform_DateIntervalUnit::MINUTE);
     }
 
     /**
@@ -1026,7 +1026,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateAddHourExpression($date, $hours) {
-        return $this->getDateArithmeticIntervalExpression($date, '+', $hours, DateIntervalUnit::HOUR);
+        return $this->getDateArithmeticIntervalExpression($date, '+', $hours, CDatabase_Platform_DateIntervalUnit::HOUR);
     }
 
     /**
@@ -1040,7 +1040,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateSubHourExpression($date, $hours) {
-        return $this->getDateArithmeticIntervalExpression($date, '-', $hours, DateIntervalUnit::HOUR);
+        return $this->getDateArithmeticIntervalExpression($date, '-', $hours, CDatabase_Platform_DateIntervalUnit::HOUR);
     }
 
     /**
@@ -1054,7 +1054,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateAddDaysExpression($date, $days) {
-        return $this->getDateArithmeticIntervalExpression($date, '+', $days, DateIntervalUnit::DAY);
+        return $this->getDateArithmeticIntervalExpression($date, '+', $days, CDatabase_Platform_DateIntervalUnit::DAY);
     }
 
     /**
@@ -1068,7 +1068,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateSubDaysExpression($date, $days) {
-        return $this->getDateArithmeticIntervalExpression($date, '-', $days, DateIntervalUnit::DAY);
+        return $this->getDateArithmeticIntervalExpression($date, '-', $days, CDatabase_Platform_DateIntervalUnit::DAY);
     }
 
     /**
@@ -1082,7 +1082,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateAddWeeksExpression($date, $weeks) {
-        return $this->getDateArithmeticIntervalExpression($date, '+', $weeks, DateIntervalUnit::WEEK);
+        return $this->getDateArithmeticIntervalExpression($date, '+', $weeks, CDatabase_Platform_DateIntervalUnit::WEEK);
     }
 
     /**
@@ -1096,7 +1096,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateSubWeeksExpression($date, $weeks) {
-        return $this->getDateArithmeticIntervalExpression($date, '-', $weeks, DateIntervalUnit::WEEK);
+        return $this->getDateArithmeticIntervalExpression($date, '-', $weeks, CDatabase_Platform_DateIntervalUnit::WEEK);
     }
 
     /**
@@ -1110,7 +1110,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateAddMonthExpression($date, $months) {
-        return $this->getDateArithmeticIntervalExpression($date, '+', $months, DateIntervalUnit::MONTH);
+        return $this->getDateArithmeticIntervalExpression($date, '+', $months, CDatabase_Platform_DateIntervalUnit::MONTH);
     }
 
     /**
@@ -1124,7 +1124,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateSubMonthExpression($date, $months) {
-        return $this->getDateArithmeticIntervalExpression($date, '-', $months, DateIntervalUnit::MONTH);
+        return $this->getDateArithmeticIntervalExpression($date, '-', $months, CDatabase_Platform_DateIntervalUnit::MONTH);
     }
 
     /**
@@ -1138,7 +1138,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateAddQuartersExpression($date, $quarters) {
-        return $this->getDateArithmeticIntervalExpression($date, '+', $quarters, DateIntervalUnit::QUARTER);
+        return $this->getDateArithmeticIntervalExpression($date, '+', $quarters, CDatabase_Platform_DateIntervalUnit::QUARTER);
     }
 
     /**
@@ -1152,7 +1152,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateSubQuartersExpression($date, $quarters) {
-        return $this->getDateArithmeticIntervalExpression($date, '-', $quarters, DateIntervalUnit::QUARTER);
+        return $this->getDateArithmeticIntervalExpression($date, '-', $quarters, CDatabase_Platform_DateIntervalUnit::QUARTER);
     }
 
     /**
@@ -1166,7 +1166,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateAddYearsExpression($date, $years) {
-        return $this->getDateArithmeticIntervalExpression($date, '+', $years, DateIntervalUnit::YEAR);
+        return $this->getDateArithmeticIntervalExpression($date, '+', $years, CDatabase_Platform_DateIntervalUnit::YEAR);
     }
 
     /**
@@ -1180,7 +1180,7 @@ abstract class CDatabase_Platform {
      * @throws CDatabase_Exception if not supported on this platform
      */
     public function getDateSubYearsExpression($date, $years) {
-        return $this->getDateArithmeticIntervalExpression($date, '-', $years, DateIntervalUnit::YEAR);
+        return $this->getDateArithmeticIntervalExpression($date, '-', $years, CDatabase_Platform_DateIntervalUnit::YEAR);
     }
 
     /**
@@ -1585,7 +1585,7 @@ abstract class CDatabase_Platform {
      *
      * @throws CDatabase_Exception if not supported on this platform
      */
-    public function getCreateSequenceSQL(Sequence $sequence) {
+    public function getCreateSequenceSQL(CDatabase_Schema_Sequence $sequence) {
         throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
@@ -1598,7 +1598,7 @@ abstract class CDatabase_Platform {
      *
      * @throws CDatabase_Exception if not supported on this platform
      */
-    public function getAlterSequenceSQL(Sequence $sequence) {
+    public function getAlterSequenceSQL(CDatabase_Schema_Sequence $sequence) {
         throw CDatabase_Exception::notSupported(__METHOD__);
     }
 
@@ -2000,11 +2000,11 @@ abstract class CDatabase_Platform {
     /**
      * Common code for alter table statement generation that updates the changed Index and Foreign Key definitions.
      *
-     * @param CDatabase_Schema_TableDiff $diff
+     * @param CDatabase_Schema_Table_Diff $diff
      *
      * @return array
      */
-    protected function _getAlterTableIndexForeignKeySQL(TableDiff $diff) {
+    protected function _getAlterTableIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
         return array_merge($this->getPreAlterTableIndexForeignKeySQL($diff), $this->getPostAlterTableIndexForeignKeySQL($diff));
     }
 
@@ -2017,23 +2017,26 @@ abstract class CDatabase_Platform {
      *                      of the field being declared as array indexes. Currently, the types
      *                      of supported field properties are as follows:
      *
-     *      length
-     *          Integer value that determines the maximum length of the text
-     *          field. If this argument is missing the field should be
-     *          declared to have the longest length allowed by the DBMS.
+     *                      length
+     *                      Integer value that determines the maximum length of the text
+     *                      field. If this argument is missing the field should be
+     *                      declared to have the longest length allowed by the DBMS.
      *
-     *      default
-     *          Text value to be used as default for this field.
+     *                      default
+     *                      Text value to be used as default for this field.
      *
-     *      notnull
-     *          Boolean flag that indicates whether this field is constrained
-     *          to not be set to null.
-     *      charset
-     *          Text value with the default CHARACTER SET for this field.
-     *      collation
-     *          Text value with the default COLLATION for this field.
-     *      unique
-     *          unique constraint
+     *                      notnull
+     *                      Boolean flag that indicates whether this field is constrained
+     *                      to not be set to null.
+     *
+     *                      charset
+     *                      Text value with the default CHARACTER SET for this field.
+     *
+     *                      collation
+     *                      Text value with the default COLLATION for this field.
+     *
+     *                      unique
+     *                      unique constraint
      *
      * @return string
      */
@@ -2209,7 +2212,7 @@ abstract class CDatabase_Platform {
      */
     public function getUniqueConstraintDeclarationSQL($name, Index $index) {
         $columns = $index->getQuotedColumns($this);
-        $name = new Identifier($name);
+        $name = new CDatabase_Schema_Identifier($name);
 
         if (count($columns) === 0) {
             throw new \InvalidArgumentException("Incomplete definition. 'columns' required.");
@@ -2261,7 +2264,7 @@ abstract class CDatabase_Platform {
      * Obtains DBMS specific SQL code portion needed to set an index
      * declaration to be used in statements like CREATE TABLE.
      *
-     *  @param mixed[]|CDatabase_Schema_Index $columnsOrIndex array declaration is deprecated, prefer passing Index to this method
+     * @param mixed[]|CDatabase_Schema_Index $columnsOrIndex array declaration is deprecated, prefer passing Index to this method
      *
      * @return string
      */
@@ -2832,7 +2835,7 @@ abstract class CDatabase_Platform {
      * @see TransactionIsolationLevel
      */
     public function getDefaultTransactionIsolationLevel() {
-        return TransactionIsolationLevel::READ_COMMITTED;
+        return CDatabase_TransactionIsolationLevel::READ_COMMITTED;
     }
 
     /* supports*() methods */
@@ -3143,14 +3146,14 @@ abstract class CDatabase_Platform {
         $offset = (int) $offset;
 
         if ($offset < 0) {
-            throw new DBALException(sprintf(
+            throw new CDatabase_Exception(sprintf(
                 'Offset must be a positive integer or zero, %d given',
                 $offset
             ));
         }
 
         if ($offset > 0 && !$this->supportsLimitOffset()) {
-            throw new DBALException(sprintf(
+            throw new CDatabase_Exception(sprintf(
                 'Platform %s does not support offset values in limit queries.',
                 $this->getName()
             ));
