@@ -1,18 +1,11 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Class to manage file rotation
  *
  * @package CLogger\Rotator
  */
 class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
-
     /**
      * Number of copies to keep, defaults to 10
      *
@@ -49,15 +42,17 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
      * Set the filesize to rotate files on
      *
      * @param string $size Define as an number with a string suffix indicating the unit measurement, e.g. 5MB
+     *
      * @return CLogger_Rotator_Rotate
+     *
      * @throws CLogger_Rotator_Exception_RotateException
      */
     public function size($size) {
         if (!preg_match('/^(\d+)\s?(B|KB|MB|GB)$/i', $size, $m)) {
-            throw new CLogger_Rotator_Exception_RotateException("You must define size in the format 10B|KB|MB|GB");
+            throw new CLogger_Rotator_Exception_RotateException('You must define size in the format 10B|KB|MB|GB');
         }
         if ($m[1] === 0) {
-            throw new CLogger_Rotator_Exception_RotateException("You must define a non-zero size to rotate files on");
+            throw new CLogger_Rotator_Exception_RotateException('You must define a non-zero size to rotate files on');
         }
         switch (strtoupper($m[2])) {
             case 'B':
@@ -101,8 +96,11 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
     /**
      * Run the file rotation
      *
+     * @param bool $checkSize
+     *
      * @return array Array of files which have been rotated
-     * @throws FilenameFormatException
+     *
+     * @throws CLogger_Rotator_Exception_FilenameFormatException
      * @throws RotateException
      */
     public function run($checkSize = true) {
@@ -113,6 +111,7 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
         $dir = new CLogger_Rotator_DirectoryIterator($this->getFilenameFormat()->getPath());
         $dir->setFilenameFormat($this->getFilenameFormat());
         foreach ($dir as $file) {
+            /** @var CLogger_Rotator_DirectoryIterator $file */
             if ($file->isFile() && $file->isMatch()) {
                 if ($checkSize) {
                     // Skip if rotate size specified and initial matched file doesn't exceed this
@@ -154,5 +153,4 @@ class CLogger_Rotator_Rotate extends CLogger_Rotator_AbstractRotate {
         }
         return $rotated;
     }
-
 }

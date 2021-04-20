@@ -1,24 +1,17 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 abstract class CLogger_Rotator_AbstractRotate {
-
     /**
      * The filename format we're matching against
      *
-     * @var FilenameFormat
+     * @var CLogger_Rotator_FilenameFormat
      */
     protected $filenameFormat;
 
     /**
      * Do we run this as a dry-run, i.e. not actually delete any files?
      *
-     * @var boolean
+     * @var bool
      */
     protected $dryRun = false;
 
@@ -45,7 +38,7 @@ abstract class CLogger_Rotator_AbstractRotate {
     /**
      * Return the filename format we're matching
      *
-     * @return FilenameFormat
+     * @return CLogger_Rotator_FilenameFormat
      */
     public function getFilenameFormat() {
         return $this->filenameFormat;
@@ -77,5 +70,4 @@ abstract class CLogger_Rotator_AbstractRotate {
     public function isDryRun() {
         return $this->dryRun;
     }
-
 }

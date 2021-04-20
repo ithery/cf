@@ -1,18 +1,11 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Class to manage file deletion
  *
  * @package CLogger\Rotator
  */
 class CLogger_Rotator_Delete extends CLogger_Rotator_AbstractRotate {
-
     /**
      * Current date & time for file comparison purposes
      *
@@ -57,11 +50,12 @@ class CLogger_Rotator_Delete extends CLogger_Rotator_AbstractRotate {
      * If you don't do this you cannot recursively delete a folder, this is for safety!
      *
      * @param string $path Folder path
+     *
      * @throws RotateException
      */
     public function addSafeRecursiveDeletePath($path) {
         if (!file_exists($path) || !is_dir($path)) {
-            throw new CLogger_Rotator_Exception_RotateException("Cannot set path as a safe recursive delete path since does not exist or is not a folder");
+            throw new CLogger_Rotator_Exception_RotateException('Cannot set path as a safe recursive delete path since does not exist or is not a folder');
         }
         $this->safeRecursiveDeletePaths[] = $path;
     }
@@ -72,7 +66,9 @@ class CLogger_Rotator_Delete extends CLogger_Rotator_AbstractRotate {
      * If you try to delete a folder containing files, you must add the path via addSafeRecursiveDeletePath()
      *
      * @param $path
+     *
      * @return array Array of deleted files
+     *
      * @throws RotateException
      */
     protected function delete($path) {
@@ -93,14 +89,16 @@ class CLogger_Rotator_Delete extends CLogger_Rotator_AbstractRotate {
      * otherwise this function will fail
      *
      * @param $folderPath
+     *
      * @return array Array of deleted files
+     *
      * @throws RotateException
      */
     protected function recursiveDeleteFolder($folderPath) {
         $deleted = [];
         $folderPath = realpath($folderPath);
         if (!is_dir($folderPath)) {
-            throw new CLogger_Rotator_Exception_RotateException("Path $path is not a folder");
+            throw new CLogger_Rotator_Exception_RotateException("Path $folderPath is not a folder");
         }
         $safeToDelete = false;
         foreach ($this->safeRecursiveDeletePaths as $safePath) {
@@ -109,10 +107,11 @@ class CLogger_Rotator_Delete extends CLogger_Rotator_AbstractRotate {
             }
         }
         if (!$safeToDelete) {
-            throw new RotateException("It is not safe to perform a recursive delete on path: $folderPath");
+            throw new CLogger_Rotator_Exception_RotateException("It is not safe to perform a recursive delete on path: $folderPath");
         }
         $dir = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($folderPath, \RecursiveDirectoryIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST
+            new \RecursiveDirectoryIterator($folderPath, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
         );
         foreach ($dir as $file) {
             if (!$this->isDryRun()) {
@@ -142,7 +141,9 @@ class CLogger_Rotator_Delete extends CLogger_Rotator_AbstractRotate {
      * For example delete all files with a filename date pattern of payment.2016-01-01.log over 3 months old
      *
      * @param mixed $timePeriod DateInterval object, or time interval supported by DateInterval::createFromDateString, e.g. 3 months
+     *
      * @return array Array of deleted files
+     *
      * @throws FilenameFormatException
      * @throws RotateException
      */
@@ -158,9 +159,10 @@ class CLogger_Rotator_Delete extends CLogger_Rotator_AbstractRotate {
         }
         $oldestDate = clone $this->getNow();
         $oldestDate = $oldestDate->sub($interval);
-        $dir = new DirectoryIterator($this->getFilenameFormat()->getPath());
+        $dir = new CLogger_Rotator_DirectoryIterator($this->getFilenameFormat()->getPath());
         $dir->setFilenameFormat($this->getFilenameFormat());
         foreach ($dir as $file) {
+            /** @var CLogger_Rotator_DirectoryIterator $file */
             if (!$file->isDot() && $file->isMatch()) {
                 if ($file->getFilenameDate() < $oldestDate) {
                     if (!$this->isDryRun()) {
@@ -181,7 +183,9 @@ class CLogger_Rotator_Delete extends CLogger_Rotator_AbstractRotate {
      * For example delete all files over 3 months old.
      *
      * @param mixed $timePeriod DateInterval object, or time interval supported by DateInterval::createFromDateString, e.g. 3 months
+     *
      * @return array Array of deleted files
+     *
      * @throws FilenameFormatException
      * @throws RotateException
      */
@@ -200,6 +204,7 @@ class CLogger_Rotator_Delete extends CLogger_Rotator_AbstractRotate {
         $dir = new CLogger_Rotator_DirectoryIterator($this->getFilenameFormat()->getPath());
         $dir->setFilenameFormat($this->getFilenameFormat());
         foreach ($dir as $file) {
+            /** @var CLogger_Rotator_DirectoryIterator $file */
             if (!$file->isDot() && $file->isMatch()) {
                 $fileDate = new DateTime();
                 $fileDate->setTimestamp($file->getMTime());
@@ -233,7 +238,9 @@ class CLogger_Rotator_Delete extends CLogger_Rotator_AbstractRotate {
      * }
      *
      * @param callable $callback
+     *
      * @return array Array of deleted files
+     *
      * @throws FilenameFormatException
      * @throws RotateException
      */
@@ -242,9 +249,10 @@ class CLogger_Rotator_Delete extends CLogger_Rotator_AbstractRotate {
             throw new CLogger_Rotator_Exception_FilenameFormatException('You must set a filename format to match files against');
         }
         $deleted = [];
-        $dir = new DirectoryIterator($this->getFilenameFormat()->getPath());
+        $dir = new CLogger_Rotator_DirectoryIterator($this->getFilenameFormat()->getPath());
         $dir->setFilenameFormat($this->getFilenameFormat());
         foreach ($dir as $file) {
+            /** @var CLogger_Rotator_DirectoryIterator $file */
             if (!$file->isDot() && $file->isMatch()) {
                 if ($callback($file)) {
                     if (!$this->isDryRun()) {
@@ -258,5 +266,4 @@ class CLogger_Rotator_Delete extends CLogger_Rotator_AbstractRotate {
         }
         return $deleted;
     }
-
 }

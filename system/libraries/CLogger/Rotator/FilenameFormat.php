@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CLogger_Rotator_FilenameFormat {
-
     /**
      * Path to files to rotate / delete
      *
@@ -40,12 +33,13 @@ class CLogger_Rotator_FilenameFormat {
      * Constructor
      *
      * @param string $filenameFormat Filename format to match files against
-     * @throws FilenameFormatException
+     *
+     * @throws CLogger_Rotator_Exception_FilenameFormatException
      */
     public function __construct($filenameFormat) {
         $this->path = dirname($filenameFormat);
         if (!is_dir($this->path) || !is_readable($this->path)) {
-            throw new FilenameFormatException("Directory path does not exist or is not readable at: " . strip_tags($filenameFormat));
+            throw new CLogger_Rotator_Exception_FilenameFormatException('Directory path does not exist or is not readable at: ' . strip_tags($filenameFormat));
         }
         $this->filenamePattern = basename($filenameFormat);
         $this->filenameRegex = $this->extractRegex($this->filenamePattern);
@@ -59,12 +53,14 @@ class CLogger_Rotator_FilenameFormat {
      * Any date format supported by DateTime::createFromFormat is allowed (excluding the Timezone identifier 'e' and whitespace and separator characters)
      *
      * @param string $filename
+     *
      * @return string Regex pattern for matching files (with the ungreedy modifier set)
-     * @throws FilenameFormatException
+     *
+     * @throws CLogger_Rotator_Exception_FilenameFormatException
      */
     public function extractRegex($filename) {
         if (strpos('/', $filename) !== false) {
-            throw new FilenameFormatException("Filename part cannot contain '/' character");
+            throw new CLogger_Rotator_Exception_FilenameFormatException("Filename part cannot contain '/' character");
         }
         $escape = [
             '/\./' => '\.',
@@ -81,7 +77,7 @@ class CLogger_Rotator_FilenameFormat {
             $dateFormat = $m[1];
             $validDateFormat = 'djDlSzFMmnYyaAghGHisuOPTU';
             if (!empty(array_diff(str_split($dateFormat), str_split($validDateFormat)))) {
-                throw new FilenameFormatException("Date format is not valid: $dateFormat");
+                throw new CLogger_Rotator_Exception_FilenameFormatException("Date format is not valid: $dateFormat");
             }
             $this->dateFormat = $dateFormat;
             $pattern = preg_replace('/{[^}]+}/', '([^.]+)', $pattern);
@@ -133,5 +129,4 @@ class CLogger_Rotator_FilenameFormat {
     public function getDateFormat() {
         return $this->dateFormat;
     }
-
 }
