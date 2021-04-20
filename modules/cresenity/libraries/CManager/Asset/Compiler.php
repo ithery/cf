@@ -124,6 +124,7 @@ class CManager_Asset_Compiler {
                 file_put_contents($this->outFile, $this->separator . $compiledOutput, FILE_APPEND);
             }
         }
+
         return $this->outFile . '?v=' . filemtime($this->outFile);
     }
 

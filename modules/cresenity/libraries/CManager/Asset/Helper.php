@@ -23,7 +23,9 @@ class CManager_Asset_Helper {
 
         if (CF::config('assets.css.versioning')) {
             $separator = parse_url($file, PHP_URL_QUERY) ? '&' : '?';
-            $file .= $separator . 'v=' . filemtime($path);
+            $interval = CF::config('assets.css.interval', 0);
+            $version = static::getFileVersion($path, $interval);
+            $file .= $separator . 'v=' . $version;
         }
 
         return $file;
@@ -43,9 +45,21 @@ class CManager_Asset_Helper {
 
         if (CF::config('assets.js.versioning')) {
             $separator = parse_url($file, PHP_URL_QUERY) ? '&' : '?';
-            $file .= $separator . 'v=' . filemtime($path);
+            $interval = CF::config('assets.js.interval', 0);
+            $version = static::getFileVersion($path, $interval);
+            $file .= $separator . 'v=' . $version;
         }
 
         return $file;
+    }
+
+    public static function getFileVersion($file, $interval = 0) {
+        $version = filemtime($file);
+        if ($interval) {
+            $roundVar = $interval * 60;
+            $mod = $version % $roundVar;
+            $version = $version - $mod;
+        }
+        return $version;
     }
 }
