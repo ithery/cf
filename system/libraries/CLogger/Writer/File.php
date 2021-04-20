@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct script access.');
+defined('SYSPATH') or die('No direct script access.');
 
 /**
  * File log writer. Writes out messages and stores them in a YYYY/MM directory.
  */
 class CLogger_Writer_File extends CLogger_Writer {
-
     /**
-     * @var  string  Directory to place log files in
+     * @var string Directory to place log files in
      */
-    protected $_directory;
+    protected $directory;
 
     /**
      * Creates a new file logger. Checks that the directory exists and
@@ -18,11 +17,11 @@ class CLogger_Writer_File extends CLogger_Writer {
      *
      *     $writer = new Log_File($directory);
      *
-     * @param   string  $directory  log directory
-     * @return  void
+     * @param mixed $options
+     *
+     * @return void
      */
     public function __construct($options) {
-
         $basicPath = DOCROOT;
 
         $dir = $basicPath . 'logs' . DS;
@@ -31,7 +30,7 @@ class CLogger_Writer_File extends CLogger_Writer {
             // Set permissions (must be manually set to fix umask issues)
             chmod($dir, 02777);
         }
-        
+
         $appCode = CF::appCode();
         if (strlen($appCode) > 0) {
             $dir .= $appCode . DS;
@@ -45,7 +44,6 @@ class CLogger_Writer_File extends CLogger_Writer {
         $path = carr::get($options, 'path');
         if (!is_dir($dir . ltrim($path, '/'))) {
             if (!is_dir($dir)) {
-
                 mkdir($dir, 02777);
                 // Set permissions (must be manually set to fix umask issues)
                 chmod($dir, 02777);
@@ -66,13 +64,12 @@ class CLogger_Writer_File extends CLogger_Writer {
             }
         }
 
-
-        if (!is_dir($dir) OR ! is_writable($dir)) {
-            throw new CException('Directory :dir must be writable', array(':dir' => $path));
+        if (!is_dir($dir) or !is_writable($dir)) {
+            throw new CException('Directory :dir must be writable', [':dir' => $path]);
         }
 
         // Determine the directory path
-        $this->_directory = realpath($dir) . DIRECTORY_SEPARATOR;
+        $this->directory = realpath($dir) . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -82,14 +79,15 @@ class CLogger_Writer_File extends CLogger_Writer {
      *
      *     $writer->write($messages);
      *
-     * @param   array   $messages
-     * @return  void
+     * @param array $messages
+     *
+     * @return void
      */
     public function write(array $messages) {
         // Set the yearly directory name
         $date = date('Y-m-d');
-        list($year, $month, $day) = explode("-", $date);
-        $directory = $this->_directory . $year;
+        list($year, $month, $day) = explode('-', $date);
+        $directory = $this->directory . $year;
 
         if (!is_dir($directory)) {
             // Create the yearly directory
@@ -123,11 +121,10 @@ class CLogger_Writer_File extends CLogger_Writer {
 
         foreach ($messages as $message) {
             // Write each message into the log file
-            file_put_contents($filename, PHP_EOL . $this->format_message($message), FILE_APPEND);
+            file_put_contents($filename, PHP_EOL . $this->formatMessage($message), FILE_APPEND);
         }
 
         $rotator = CLogger_Rotator::createRotate($filename);
         $rotator->run();
     }
-
 }
