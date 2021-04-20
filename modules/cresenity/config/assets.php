@@ -15,6 +15,7 @@ return [
         'minify' => false,
         'filters' => [],
         'versioning' => false,
+        'interval' => 0, // in minutes
     ],
     'js' => [
         'compile' => false,
@@ -22,5 +23,6 @@ return [
         'disk' => 'local',
         'filters' => [],
         'versioning' => false,
+        'interval' => 0, // in minutes
     ],
 ];
