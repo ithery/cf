@@ -45,6 +45,6 @@ class CNotification_Message_Zenziva extends CNotification_MessageAbstract {
         $return = [];
         $return['request'] = $url;
         $return['response'] = $response;
-        return $return;
+        // return $return;
     }
 }
