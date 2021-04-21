@@ -14,27 +14,27 @@ trait CTrait_Compat_Database {
     /**
      * @return string
      *
-     * @deprecated since version 1.2
+     * @deprecated since version 1.2 use driverName
      */
     public function driver_name() {
         return $this->driverName();
     }
 
     /**
-     * @deprecated
-     *
      * @param string $str
      *
      * @return string
+     *
+     * @deprecated use escapeLike
      */
     public function escape_like($str) {
         return $this->escapeLike($str);
     }
 
     /**
-     * @deprecated since version 1.2
-     *
      * @return bool
+     *
+     * @deprecated since version 1.2 use inTransaction
      */
     public function in_transaction() {
         return $this->inTransaction();
@@ -43,9 +43,10 @@ trait CTrait_Compat_Database {
     /**
      * Returns the last query run.
      *
-     * @deprecated
      *
      * @return string SQL
+     *
+     * @deprecated use lastQuery
      */
     public function last_query() {
         return $this->lastQuery();
@@ -58,6 +59,8 @@ trait CTrait_Compat_Database {
      * @param mixed $str
      *
      * @return string
+     *
+     * @deprecated use escapeStr
      */
     public function escape_str($str) {
         return $this->escapeStr($str);
@@ -70,6 +73,8 @@ trait CTrait_Compat_Database {
      * @param mixed $table
      *
      * @return string
+     *
+     * @deprecated use escapeTable
      */
     public function escape_table($table) {
         return $this->escapeTable($table);
@@ -82,6 +87,8 @@ trait CTrait_Compat_Database {
      * @param mixed $table
      *
      * @return string
+     *
+     * @deprecated use escapeColumn
      */
     public function escape_column($table) {
         return $this->escapeColumn($table);
@@ -96,6 +103,8 @@ trait CTrait_Compat_Database {
      * @param mixed $prefix
      *
      * @return bool
+     *
+     * @deprecated use tableExists
      */
     public function table_exists($table_name, $prefix = true) {
         return $this->tableExists($table_name, $prefix);
@@ -105,6 +114,8 @@ trait CTrait_Compat_Database {
      * Lists all the tables in the current database.
      *
      * @return array
+     *
+     * @deprecated use listTables
      */
     public function list_tables() {
         return $this->listTables();
@@ -134,7 +145,7 @@ trait CTrait_Compat_Database {
      *
      * @return Database_Core this Database object
      *
-     * @deprecated
+     * @deprecated use model or query builder
      */
     public function orregex($field, $match = '') {
         $fields = is_array($field) ? $field : [$field => $match];
@@ -157,7 +168,7 @@ trait CTrait_Compat_Database {
      *
      * @return Database_Core this Database object
      *
-     * @deprecated
+     * @deprecated use model or query builder
      */
     public function notregex($field, $match = '') {
         $fields = is_array($field) ? $field : [$field => $match];
@@ -180,7 +191,7 @@ trait CTrait_Compat_Database {
      *
      * @return Database_Core this Database object
      *
-     * @deprecated
+     * @deprecated use model or query builder
      */
     public function ornotregex($field, $match = '') {
         $fields = is_array($field) ? $field : [$field => $match];
@@ -201,7 +212,7 @@ trait CTrait_Compat_Database {
      *
      * @return Database_Core this Database object
      *
-     * @deprecated
+     * @deprecated use model or query builder
      */
     public function groupby($by) {
         if (!is_array($by)) {
@@ -236,7 +247,7 @@ trait CTrait_Compat_Database {
      *
      * @return Database_Core this Database object
      *
-     * @deprecated
+     * @deprecated use model or query builder
      */
     public function having($key, $value = '', $quote = true) {
         $this->having[] = $this->driver->where($key, $value, 'AND', count($this->having), true);
@@ -255,7 +266,7 @@ trait CTrait_Compat_Database {
      *
      * @return Database_Core this Database object
      *
-     * @deprecated
+     * @deprecated use model or query builder
      */
     public function orhaving($key, $value = '', $quote = true) {
         $this->having[] = $this->driver->where($key, $value, 'OR', count($this->having), true);
@@ -272,7 +283,7 @@ trait CTrait_Compat_Database {
      *
      * @return Database_Core this Database object
      *
-     * @deprecated
+     * @deprecated use model or query builder
      */
     public function orderby($orderby, $direction = null) {
         if (!is_array($orderby)) {
@@ -308,7 +319,7 @@ trait CTrait_Compat_Database {
      *
      * @return CDatabase this Database object
      *
-     * @deprecated
+     * @deprecated use model or query builder
      */
     public function limit($limit, $offset = null) {
         $this->limit = (int) $limit;
@@ -405,7 +416,7 @@ trait CTrait_Compat_Database {
      *
      * @return CDatabase_Result
      *
-     * @deprecated 1.1
+     * @deprecated 1.1 use model or query builder
      */
     public function get($table = '', $limit = null, $offset = null) {
         if ($table != '') {
@@ -437,7 +448,7 @@ trait CTrait_Compat_Database {
      *
      * @return CDatabase this Database object
      *
-     * @deprecated 1.1
+     * @deprecated 1.1 use model or query builder
      */
     public function getwhere($table = '', $where = null, $limit = null, $offset = null) {
         if ($table != '') {
