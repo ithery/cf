@@ -71,7 +71,7 @@ class CCurl {
         return $this->handle != null;
     }
 
-    private function __destruct() {
+    public function __destruct() {
         if ($this->opened()) {
             $this->close();
         }
