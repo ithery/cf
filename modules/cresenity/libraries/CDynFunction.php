@@ -1,13 +1,15 @@
 <?php
 
 class CDynFunction {
-
     use CTrait_Compat_DynFunction;
 
-    public $func = "";
-    public $params = array();
-    public $requires = array();
-    public $type = "defined"; //defined,class,
+    public $func = '';
+
+    public $params = [];
+
+    public $requires = [];
+
+    public $type = 'defined'; //defined,class,
 
     private function __construct($func) {
         CCollector::deprecated();
@@ -42,9 +44,9 @@ class CDynFunction {
         return $this;
     }
 
-    public function execute($args = array()) {
+    public function execute($args = []) {
         if (!is_array($args)) {
-            $args = array($args);
+            $args = [$args];
         }
         foreach ($this->requires as $r) {
             require_once $r;
@@ -80,14 +82,14 @@ class CDynFunction {
         }
         if ($error == 0) {
             //not the function name, let check it if it is function from ctransform class
-            if (is_callable(array('ctransform', $this->func))) {
-                return call_user_func_array(array('ctransform', $this->func), $params);
+            if (is_callable(['ctransform', $this->func])) {
+                return call_user_func_array(['ctransform', $this->func], $params);
             }
         }
         if ($error == 0) {
             //it is not method from ctransform class, try the other class if it is found ::
-            if (is_string($this->func) && strpos($this->func, "::") !== false) {
-                return call_user_func_array(explode("::", $this->func), $params);
+            if (is_string($this->func) && strpos($this->func, '::') !== false) {
+                return call_user_func_array(explode('::', $this->func), $params);
             }
         }
         if ($error == 0) {
@@ -108,12 +110,9 @@ class CDynFunction {
             if (!is_string($functionName)) {
                 $functionName = 'Unknown';
             }
-            throw new CException('function :function is not callable', array(':function' => $functionName));
+            throw new CException('function :function is not callable', [':function' => $functionName]);
         }
         //last return this name of function
         return $this->func;
     }
-
 }
-
-?>

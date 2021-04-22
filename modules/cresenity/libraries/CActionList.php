@@ -1,14 +1,13 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * 
- * @deprecated this class is deprecated
  * @author Hery Kurniawan
- * @since Nov 12, 2017, 3:32:00 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Nov 12, 2017, 3:32:00 AM
+ * @deprecated this class is deprecated, use CElement_List_ActionList
  */
 class CActionList extends CElement_List_ActionList {
-    
 }

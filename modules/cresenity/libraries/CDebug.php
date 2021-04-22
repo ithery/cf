@@ -4,10 +4,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Aug 22, 2018, 1:03:54 PM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 
 use OpenTracing\GlobalTracer;
