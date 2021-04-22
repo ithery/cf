@@ -4,19 +4,33 @@ class CCurl {
     use CTrait_Compat_Curl;
 
     private $handle;
+
     private $options;
+
     private $autoinit;
+
     private $last_followed;
+
     private $caseless;
+
     private $headers;
+
     private $last_status;
+
     private $last_response;
+
     private $last_response_body;
+
     private $last_response_header;
+
     private $url;
+
     private $engine;
+
     private $soap_action;
+
     private $http_user_agent;
+
     private $post_data;
 
     private function __construct($url = null, $engine = 'curl') {
@@ -39,7 +53,7 @@ class CCurl {
         }
     }
 
-    private function clear_last_exec() {
+    private function clearLastExec() {
         $this->last_status = [];
         $this->last_followed = [];
         $this->last_caseless = [];
@@ -57,22 +71,22 @@ class CCurl {
         return $this->handle != null;
     }
 
-    private function __destroy() {
+    private function __destruct() {
         if ($this->opened()) {
             $this->close();
         }
     }
 
-    public function set_soap_action($action) {
+    public function setSoapAction($action) {
         $this->soap_action = $action;
         return $this;
     }
 
-    public function get_info($opt = 0) {
+    public function getInfo($opt = 0) {
         return curl_getinfo($this->handle, $opt);
     }
 
-    public function set_engine($engine) {
+    public function setEngine($engine) {
         $this->engine = $engine;
         return $this;
     }
@@ -114,6 +128,13 @@ class CCurl {
         return $this;
     }
 
+    /**
+     * Get value from key
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
     public function getOpt($key) {
         if (isset($this->options[$key])) {
             return $this->options[$key];
@@ -132,7 +153,7 @@ class CCurl {
 
     public function exec($exec = true) {
         //clear last exec
-        $this->clear_last_exec();
+        $this->clearLastExec();
 
         //open curl connection
         if (!$this->opened()) {
@@ -141,11 +162,12 @@ class CCurl {
         //set default options
 
         if ($this->engine == 'soapclient') {
-            $request = $this->get_opt(CURLOPT_POSTFIELDS);
-
-            $this->last_response_body = $this->last_response = $this->handle->__doRequest($request, $this->url, $this->soap_action, 1);
-
-            return true;
+            $request = $this->getOpt(CURLOPT_POSTFIELDS);
+            if ($this->handle != null) {
+                $this->last_response_body = $this->last_response = $this->handle->__doRequest($request, $this->url, $this->soap_action, 1);
+                return true;
+            }
+            return false;
         }
 
         curl_setopt($this->handle, CURLOPT_TIMEOUT, 3000);
@@ -178,7 +200,7 @@ class CCurl {
             }
 
             //no error, we try parse the header
-            if ($this->get_opt(CURLOPT_HEADER)) {
+            if ($this->getOpt(CURLOPT_HEADER)) {
                 $this->last_followed = [];
                 $rv = $result;
 
@@ -188,7 +210,7 @@ class CCurl {
                     $rv = $arr[1];
                 }
                 $this->last_response_header = $arr[0];
-                $this->parse_header($this->last_response_header);
+                $this->parseHeader($this->last_response_header);
 
                 $this->last_response_body = $arr[1];
             }
@@ -196,7 +218,14 @@ class CCurl {
         return $this;
     }
 
-    public function parse_header($header_str = null) {
+    /**
+     * Parse Header
+     *
+     * @param string $header_str
+     *
+     * @return void
+     */
+    public function parseHeader($header_str = null) {
         if ($header_str == null) {
             $header_str = $this->last_response_header;
         }
@@ -227,7 +256,7 @@ class CCurl {
         }
     }
 
-    public function get_status($key = null) {
+    public function getStatus($key = null) {
         if (empty($this->last_status)) {
             return false;
         }
@@ -240,7 +269,7 @@ class CCurl {
         }
     }
 
-    public function get_http_code() {
+    public function getHttpCode() {
         $httpcode = 0;
         switch ($this->engine) {
             case 'curl':
@@ -254,7 +283,7 @@ class CCurl {
         return $httpcode;
     }
 
-    public function get_header($caseless = null) {
+    public function getHeader($caseless = null) {
         if (empty($this->last_headers)) {
             return false;
         }
@@ -271,19 +300,19 @@ class CCurl {
         }
     }
 
-    public function get_followed_headers() {
+    public function getFollowedHeaders() {
         $arr = [];
         if ($this->last_followed) {
             foreach ($this->last_followed as $ah) {
                 $arr[] = explode("\r\n", $ah);
-            };
+            }
             return $arr;
         }
 
         return $arr;
     }
 
-    public function has_error() {
+    public function hasError() {
         if (isset($this->last_status['error'])) {
             return (empty($this->last_status['error']) ? false : $this->last_status['error']);
         } else {
@@ -295,9 +324,7 @@ class CCurl {
         return $this->last_response_body;
     }
 
-    //opt helper function
-
-    public function set_cookies_file($filename) {
+    public function setCookiesFile($filename) {
         $this->set_opt(CURLOPT_COOKIEJAR, $filename);
         $this->set_opt(CURLOPT_COOKIEFILE, $filename);
         return $this;
