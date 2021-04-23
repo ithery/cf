@@ -734,7 +734,7 @@ final class CF {
     public static function cliDomain() {
         $domain = null;
         if (file_exists(static::CFCLI_CURRENT_DOMAIN_FILE)) {
-            $domain = file_get_contents(static::CFCLI_CURRENT_DOMAIN_FILE);
+            $domain = trim(file_get_contents(static::CFCLI_CURRENT_DOMAIN_FILE));
         }
         return $domain;
     }
@@ -894,6 +894,7 @@ final class CF {
      */
     public static function data($domain = null) {
         $domain = $domain == null ? self::domain() : $domain;
+
         if (!isset(self::$data[$domain])) {
             self::$data[$domain] = CFData::domain($domain);
             if (self::$data[$domain] == null) {
