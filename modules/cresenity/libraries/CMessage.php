@@ -51,10 +51,7 @@
                 break;
             default:
                 $icon = 'fa-ban';
-                $class = ' alert-error';
-                if ($this->bootstrap >= 3) {
-                    $class = ' alert-danger';
-                }
+                $class = ' alert-error alert-danger';
                 $header = clang::__('Error') . '!';
                 break;
         }

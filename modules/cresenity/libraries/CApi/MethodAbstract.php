@@ -34,6 +34,7 @@ abstract class CApi_MethodAbstract implements CInterface_Arrayable {
             $orgId = CF::orgId();
         }
         $this->request = $request;
+
         $this->sessionId = $sessionId;
         $this->orgId = $orgId;
     }
