@@ -406,14 +406,16 @@ final class CF {
      * @param string $directory
      * @param string $filename
      * @param string $domain
+     * @param mixed  $force_reload
      *
      * @return string[]
      */
-    public static function getFiles($directory, $filename, $domain = null) {
+    public static function getFiles($directory, $filename, $domain = null, $force_reload = false) {
         if ($domain == null) {
             $domain = CF::domain();
         }
-        $include_paths = CF::paths($domain);
+
+        $include_paths = CF::paths($domain, $force_reload);
 
         $result = [];
         foreach ($include_paths as $path) {
@@ -460,6 +462,7 @@ final class CF {
             $org_code = CF::orgCode($domain);
             $app_code = CF::appCode($domain);
             $sharedAppCode = CF::getSharedApp($domain);
+
             $modules = CF::modules($domain);
             //when this domain is org
             if (strlen($org_code) > 0) {

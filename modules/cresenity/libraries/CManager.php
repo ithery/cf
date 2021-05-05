@@ -6,14 +6,23 @@ final class CManager {
     use CTrait_Compat_Manager;
 
     private static $instance;
+
     protected $controls = [];
+
     protected $controls_code = [];
+
     protected $elements = [];
+
     protected $elements_code = [];
+
     protected $is_mobile = false;
+
     protected $mobile_path = '';
+
     protected $theme_data = null;
+
     protected static $langObjectCallback = null;
+
     protected static $useRequireJs = false;
 
     /**
@@ -47,16 +56,16 @@ final class CManager {
     }
 
     public function __construct() {
-        $this->is_mobile = ccfg::get('is_mobile');
+        $this->is_mobile = false;
         $this->mobile_path = '';
 
         //$theme = ccfg::get('theme');
         //if ($theme == null) $theme = 'cresenity';
-        $theme = static::theme()->getCurrentTheme();
-        $theme_file = CF::getFile('themes', $theme);
-        if (file_exists($theme_file)) {
-            $this->theme_data = include $theme_file;
-        }
+        // $theme = static::theme()->getCurrentTheme();
+        // $theme_file = CF::getFile('themes', $theme);
+        // if (file_exists($theme_file)) {
+        //     $this->theme_data = include $theme_file;
+        // }
     }
 
     /**
@@ -106,7 +115,7 @@ final class CManager {
      * @param string $module
      * @param array  $data   optional
      *
-     * @return boolean
+     * @return bool
      */
     public static function registerModule($module, $data = []) {
         if (!empty($data)) {
@@ -136,7 +145,7 @@ final class CManager {
     /**
      * @param string $module
      *
-     * @return boolean
+     * @return bool
      */
     public static function unregisterModule($module) {
         return CClientModules::instance()->unregisterModule($module);
@@ -154,7 +163,7 @@ final class CManager {
      * @param string $class
      * @param string $code_path
      *
-     * @return boolean
+     * @return bool
      *
      * @throws CException
      */
@@ -176,7 +185,7 @@ final class CManager {
      * @param string $class
      * @param string $code_path optional
      *
-     * @return boolean true if no error
+     * @return bool true if no error
      *
      * @throws CException
      */
@@ -196,7 +205,7 @@ final class CManager {
     /**
      * @param string $type
      *
-     * @return boolean
+     * @return bool
      */
     public function isRegisteredControl($type) {
         return isset($this->controls[$type]);
@@ -212,7 +221,7 @@ final class CManager {
     /**
      * @param string $type
      *
-     * @return boolean
+     * @return bool
      */
     public function isRegisteredElement($type) {
         return isset($this->elements[$type]);
