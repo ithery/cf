@@ -348,7 +348,7 @@ class CFRouter {
     /**
      * Attempts to determine the current URI using CLI, GET, PATH_INFO, ORIG_PATH_INFO, or PHP_SELF.
      *
-     * @return void
+     * @return string
      */
     public static function findUri() {
         self::$current_uri = self::getUri();
