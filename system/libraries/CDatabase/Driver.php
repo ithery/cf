@@ -95,16 +95,11 @@ abstract class CDatabase_Driver {
     /**
      * Builds a WHERE portion of a query.
      *
-     * @param   mixed    key
-     * @param   string   value
-     * @param   string   type
-     * @param   int      number of where clauses
-     * @param   bool  escape the value
-     * @param mixed $key
-     * @param mixed $value
-     * @param mixed $type
-     * @param mixed $num_wheres
-     * @param mixed $quote
+     * @param mixed  $key        key
+     * @param string $value      value
+     * @param string $type       type
+     * @param int    $num_wheres number of where clauses
+     * @param bool   $quote      escape the value
      *
      * @return string
      */
@@ -146,16 +141,11 @@ abstract class CDatabase_Driver {
     /**
      * Builds a LIKE portion of a query.
      *
-     * @param   mixed    field name
-     * @param   string   value to match with field
-     * @param   bool  add wildcards before and after the match
-     * @param   string   clause type (AND or OR)
-     * @param   int      number of likes
-     * @param mixed $field
-     * @param mixed $match
-     * @param mixed $auto
-     * @param mixed $type
-     * @param mixed $num_likes
+     * @param mixed  $field     field name
+     * @param string $match     value to match with field
+     * @param bool   $auto      add wildcards before and after the match
+     * @param string $type      clause type (AND or OR)
+     * @param int    $num_likes number of likes
      *
      * @return string
      */
@@ -175,15 +165,11 @@ abstract class CDatabase_Driver {
     /**
      * Builds a NOT LIKE portion of a query.
      *
-     * @param   mixed   field name
-     * @param   string  value to match with field
-     * @param   string  clause type (AND or OR)
-     * @param   int     number of likes
-     * @param mixed $field
-     * @param mixed $match
-     * @param mixed $auto
-     * @param mixed $type
-     * @param mixed $num_likes
+     * @param mixed  $field     field name
+     * @param string $match     value to match with field
+     * @param mixed  $auto      add wildcards before and after the match
+     * @param string $type      clause type (AND or OR)
+     * @param int    $num_likes number of likes
      *
      * @return string
      */
@@ -203,14 +189,10 @@ abstract class CDatabase_Driver {
     /**
      * Builds a REGEX portion of a query.
      *
-     * @param   string   field name
-     * @param   string   value to match with field
-     * @param   string   clause type (AND or OR)
-     * @param   int  number of regexes
-     * @param mixed $field
-     * @param mixed $match
-     * @param mixed $type
-     * @param mixed $num_regexs
+     * @param string $field      field name
+     * @param string $match      value to match with field
+     * @param string $type       clause type (AND or OR)
+     * @param int    $num_regexs number of regexes
      *
      * @return string
      */
@@ -221,14 +203,10 @@ abstract class CDatabase_Driver {
     /**
      * Builds a NOT REGEX portion of a query.
      *
-     * @param   string   field name
-     * @param   string   value to match with field
-     * @param   string   clause type (AND or OR)
-     * @param   int  number of regexes
-     * @param mixed $field
-     * @param mixed $match
-     * @param mixed $type
-     * @param mixed $num_regexs
+     * @param string $field      field name
+     * @param string $match      value to match with field
+     * @param string $type       clause type (AND or OR)
+     * @param int    $num_regexs number of regexes
      *
      * @return string
      */
@@ -239,12 +217,9 @@ abstract class CDatabase_Driver {
     /**
      * Builds an INSERT query.
      *
-     * @param   string  table name
-     * @param   array   keys
-     * @param   array   values
-     * @param mixed $table
-     * @param mixed $keys
-     * @param mixed $values
+     * @param string $table  table name
+     * @param array  $keys   keys
+     * @param array  $values values
      *
      * @return string
      */
@@ -259,12 +234,9 @@ abstract class CDatabase_Driver {
     /**
      * Builds a MERGE portion of a query.
      *
-     * @param   string  table name
-     * @param   array   keys
-     * @param   array   values
-     * @param mixed $table
-     * @param mixed $keys
-     * @param mixed $values
+     * @param string $table  table name
+     * @param array  $keys   keys
+     * @param array  $values values
      *
      * @return string
      */
@@ -275,10 +247,8 @@ abstract class CDatabase_Driver {
     /**
      * Builds a LIMIT portion of a query.
      *
-     * @param   int  limit
-     * @param   int  offset
-     * @param mixed $limit
-     * @param mixed $offset
+     * @param int $limit  limit
+     * @param int $offset offset
      *
      * @return string
      */
@@ -300,8 +270,7 @@ abstract class CDatabase_Driver {
      *  Generates a query string based on which functions were used.
      *  Should not be called directly, the get() function calls it.
      *
-     * @param   array   select query values
-     * @param mixed $database
+     * @param array $database select query values
      *
      * @return string
      */
@@ -321,8 +290,7 @@ abstract class CDatabase_Driver {
     /**
      * Escapes any input value.
      *
-     * @param   mixed   value to escape
-     * @param mixed $value
+     * @param mixed $value value to escape
      *
      * @return string
      */
@@ -394,8 +362,7 @@ abstract class CDatabase_Driver {
     /**
      * Fetches SQL type information about a field, in a generic format.
      *
-     * @param   string  field datatype
-     * @param mixed $str
+     * @param string $str field datatype
      *
      * @return array
      */
@@ -445,8 +412,7 @@ abstract class CDatabase_Driver {
     /**
      * Clears the internal query cache.
      *
-     * @param  string  SQL query
-     * @param null|mixed $sql
+     * @param string $sql SQL query
      */
     public function clear_cache($sql = null) {
         if (empty($sql)) {
