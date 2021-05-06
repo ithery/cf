@@ -6,7 +6,13 @@ defined('SYSPATH') or die('No direct access allowed.');
  * MySQLi Database Driver
  */
 class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
-    // Database connection link
+    use CTrait_Compat_Database_Driver_Mysqli;
+
+    /**
+     * Database connection link
+     *
+     * @var mysqli
+     */
     protected $link;
 
     protected $dbConfig;
@@ -60,7 +66,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
             // Make the connection and select the database
             if ($this->link = new mysqli($host, $user, $pass, $database, $port)) {
                 if ($charset = $this->dbConfig['character_set']) {
-                    $this->set_charset($charset);
+                    $this->setCharset($charset);
                 }
 
                 // Clear password after successful connect
@@ -106,13 +112,13 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         return new CDatabase_Driver_Mysqli_Result($this->link, $this->dbConfig['object'], $sql);
     }
 
-    public function set_charset($charset) {
+    public function setCharset($charset) {
         if ($this->link->set_charset($charset) === false) {
-            throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $this->show_error()]);
+            throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $this->showError()]);
         }
     }
 
-    public function escape_table($table) {
+    public function escapeTable($table) {
         if (!$this->dbConfig['escape']) {
             return $table;
         }
@@ -130,7 +136,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         return '`' . str_replace('.', '`.`', $table) . '`';
     }
 
-    public function escape_column($column) {
+    public function escapeColumn($column) {
         if (!$this->dbConfig['escape']) {
             return $column;
         }
@@ -142,9 +148,9 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         // This matches any functions we support to SELECT.
         if (preg_match('/(avg|count|sum|max|min)\(\s*(.*)\s*\)(\s*as\s*(.+)?)?/i', $column, $matches)) {
             if (count($matches) == 3) {
-                return $matches[1] . '(' . $this->escape_column($matches[2]) . ')';
+                return $matches[1] . '(' . $this->escapeColumn($matches[2]) . ')';
             } elseif (count($matches) == 5) {
-                return $matches[1] . '(' . $this->escape_column($matches[2]) . ') AS ' . $this->escape_column($matches[2]);
+                return $matches[1] . '(' . $this->escapeColumn($matches[2]) . ') AS ' . $this->escapeColumn($matches[2]);
             }
         }
 
@@ -181,77 +187,28 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     public function regex($field, $match, $type, $num_regexs) {
         $prefix = ($num_regexs == 0) ? '' : $type;
 
-        return $prefix . ' ' . $this->escape_column($field) . ' REGEXP \'' . $this->escape_str($match) . '\'';
+        return $prefix . ' ' . $this->escapeColumn($field) . ' REGEXP \'' . $this->escapeStr($match) . '\'';
     }
 
     public function notregex($field, $match, $type, $num_regexs) {
         $prefix = $num_regexs == 0 ? '' : $type;
 
-        return $prefix . ' ' . $this->escape_column($field) . ' NOT REGEXP \'' . $this->escape_str($match) . '\'';
+        return $prefix . ' ' . $this->escapeColumn($field) . ' NOT REGEXP \'' . $this->escapeStr($match) . '\'';
     }
 
     public function merge($table, $keys, $values) {
         // Escape the column names
         foreach ($keys as $key => $value) {
-            $keys[$key] = $this->escape_column($value);
+            $keys[$key] = $this->escapeColumn($value);
         }
-        return 'REPLACE INTO ' . $this->escape_table($table) . ' (' . implode(', ', $keys) . ') VALUES (' . implode(', ', $values) . ')';
+        return 'REPLACE INTO ' . $this->escapeTable($table) . ' (' . implode(', ', $keys) . ') VALUES (' . implode(', ', $values) . ')';
     }
 
     public function limit($limit, $offset = 0) {
         return 'LIMIT ' . $offset . ', ' . $limit;
     }
 
-    public function compile_select($database) {
-        $sql = ($database['distinct'] == true) ? 'SELECT DISTINCT ' : 'SELECT ';
-        $sql .= (count($database['select']) > 0) ? implode(', ', $database['select']) : '*';
-
-        if (count($database['from']) > 0) {
-            // Escape the tables
-            $froms = [];
-            foreach ($database['from'] as $from) {
-                $froms[] = $this->escape_column($from);
-            }
-            $sql .= "\nFROM (";
-            $sql .= implode(', ', $froms) . ')';
-        }
-
-        if (count($database['join']) > 0) {
-            foreach ($database['join'] as $join) {
-                $sql .= "\n" . $join['type'] . 'JOIN ' . implode(', ', $join['tables']) . ' ON ' . $join['conditions'];
-            }
-        }
-
-        if (count($database['where']) > 0) {
-            $sql .= "\nWHERE ";
-        }
-
-        $sql .= implode("\n", $database['where']);
-
-        if (count($database['groupby']) > 0) {
-            $sql .= "\nGROUP BY ";
-            $sql .= implode(', ', $database['groupby']);
-        }
-
-        if (count($database['having']) > 0) {
-            $sql .= "\nHAVING ";
-            $sql .= implode("\n", $database['having']);
-        }
-
-        if (count($database['orderby']) > 0) {
-            $sql .= "\nORDER BY ";
-            $sql .= implode(', ', $database['orderby']);
-        }
-
-        if (is_numeric($database['limit'])) {
-            $sql .= "\n";
-            $sql .= $this->limit($database['limit'], $database['offset']);
-        }
-
-        return $sql;
-    }
-
-    public function escape_str($str) {
+    public function escapeStr($str) {
         if (!$this->dbConfig['escape']) {
             return $str;
         }
@@ -261,10 +218,10 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         return $this->link->real_escape_string($str);
     }
 
-    public function list_tables() {
+    public function listTables() {
         $tables = [];
 
-        if ($query = $this->query('SHOW TABLES FROM ' . $this->escape_table($this->dbConfig['connection']['database']))) {
+        if ($query = $this->query('SHOW TABLES FROM ' . $this->escapeTable($this->dbConfig['connection']['database']))) {
             foreach ($query->result(false) as $row) {
                 $tables[] = current($row);
             }
@@ -273,14 +230,14 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         return $tables;
     }
 
-    public function show_error() {
+    public function showError() {
         return $this->link->error;
     }
 
-    public function list_fields($table) {
+    public function listFields($table) {
         $result = null;
 
-        foreach ($this->field_data($table) as $row) {
+        foreach ($this->fieldData($table) as $row) {
             // Make an associative array
             $result[$row->Field] = $this->sql_type($row->Type);
 
@@ -302,8 +259,8 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         return $result;
     }
 
-    public function field_data($table) {
-        $result = $this->query('SHOW COLUMNS FROM ' . $this->escape_table($table));
+    public function fieldData($table) {
+        $result = $this->query('SHOW COLUMNS FROM ' . $this->escapeTable($table));
 
         return $result->result_array(true);
     }
