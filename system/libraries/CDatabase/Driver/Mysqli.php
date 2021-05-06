@@ -95,7 +95,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         $this->link or $this->reconnect();
         // Only cache if it's turned on, and only cache if it's not a write statement
         if ($this->dbConfig['cache'] and !preg_match('#\b(?:INSERT|UPDATE|REPLACE|SET|DELETE|TRUNCATE)\b#i', $sql)) {
-            $hash = $this->query_hash($sql);
+            $hash = $this->queryHash($sql);
 
             if (!isset($this->query_cache[$hash])) {
                 // Set the cached object
@@ -239,7 +239,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
 
         foreach ($this->fieldData($table) as $row) {
             // Make an associative array
-            $result[$row->Field] = $this->sql_type($row->Type);
+            $result[$row->Field] = $this->sqlType($row->Type);
 
             if ($row->Key === 'PRI' and $row->Extra === 'auto_increment') {
                 // For sequenced (AUTO_INCREMENT) tables
@@ -262,7 +262,7 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
     public function fieldData($table) {
         $result = $this->query('SHOW COLUMNS FROM ' . $this->escapeTable($table));
 
-        return $result->result_array(true);
+        return $result->resultArray(true);
     }
 
     /**

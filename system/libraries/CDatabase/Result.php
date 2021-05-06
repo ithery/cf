@@ -59,14 +59,14 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
      *
      * @return array
      */
-    abstract public function result_array($object = null, $type = false);
+    abstract public function resultArray($object = null, $type = false);
 
     /**
      * Gets the fields of an already run query.
      *
      * @return array
      */
-    abstract public function list_fields();
+    abstract public function listFields();
 
     /**
      * Seek to an offset in the results.

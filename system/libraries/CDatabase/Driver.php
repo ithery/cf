@@ -6,6 +6,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * Database API driver
  */
 abstract class CDatabase_Driver {
+    use CTrait_Compat_Database_Driver;
+
     protected $query_cache;
 
     /**
@@ -46,7 +48,7 @@ abstract class CDatabase_Driver {
      * @return string
      */
     public function delete($table, $where) {
-        return 'DELETE FROM ' . $this->escape_table($table) . ' WHERE ' . implode(' ', $where);
+        return 'DELETE FROM ' . $this->escapeTable($table) . ' WHERE ' . implode(' ', $where);
     }
 
     /**
@@ -60,9 +62,9 @@ abstract class CDatabase_Driver {
      */
     public function update($table, $values, $where) {
         foreach ($values as $key => $val) {
-            $valstr[] = $this->escape_column($key) . ' = ' . $val;
+            $valstr[] = $this->escapeColumn($key) . ' = ' . $val;
         }
-        return 'UPDATE ' . $this->escape_table($table) . ' SET ' . implode(', ', $valstr) . ' WHERE ' . implode(' ', $where);
+        return 'UPDATE ' . $this->escapeTable($table) . ' SET ' . implode(', ', $valstr) . ' WHERE ' . implode(' ', $where);
     }
 
     /**
@@ -70,7 +72,7 @@ abstract class CDatabase_Driver {
      *
      * @param string $charset character set to use
      */
-    public function set_charset($charset) {
+    public function setCharset($charset) {
         throw new CDatabase_Exception('The method you called, :method, is not supported by this driver', [':method', __FUNCTION__]);
     }
 
@@ -81,7 +83,7 @@ abstract class CDatabase_Driver {
      *
      * @return string
      */
-    abstract public function escape_table($table);
+    abstract public function escapeTable($table);
 
     /**
      * Escape a column/field name, has support for special commands.
@@ -90,7 +92,7 @@ abstract class CDatabase_Driver {
      *
      * @return string
      */
-    abstract public function escape_column($column);
+    abstract public function escapeColumn($column);
 
     /**
      * Builds a WHERE portion of a query.
@@ -110,24 +112,24 @@ abstract class CDatabase_Driver {
             $value = '';
         } else {
             if ($value === null) {
-                if (!$this->has_operator($key)) {
+                if (!$this->hasOperator($key)) {
                     $key .= ' IS';
                 }
 
                 $value = ' NULL';
             } elseif (is_bool($value)) {
-                if (!$this->has_operator($key)) {
+                if (!$this->hasOperator($key)) {
                     $key .= ' =';
                 }
 
                 $value = ($value == true) ? ' 1' : ' 0';
             } else {
-                if (!$this->has_operator($key) and !empty($key)) {
-                    $key = $this->escape_column($key) . ' =';
+                if (!$this->hasOperator($key) and !empty($key)) {
+                    $key = $this->escapeColumn($key) . ' =';
                 } else {
                     preg_match('/^(.+?)([<>!=]+|\bIS(?:\s+NULL))\s*$/i', $key, $matches);
                     if (isset($matches[1]) and isset($matches[2])) {
-                        $key = $this->escape_column(trim($matches[1])) . ' ' . trim($matches[2]);
+                        $key = $this->escapeColumn(trim($matches[1])) . ' ' . trim($matches[2]);
                     }
                 }
 
@@ -152,14 +154,14 @@ abstract class CDatabase_Driver {
     public function like($field, $match, $auto, $type, $num_likes) {
         $prefix = ($num_likes == 0) ? '' : $type;
 
-        $match = $this->escape_str($match);
+        $match = $this->escapeStr($match);
 
         if ($auto === true) {
             // Add the start and end quotes
             $match = '%' . str_replace('%', '\\%', $match) . '%';
         }
 
-        return $prefix . ' ' . $this->escape_column($field) . ' LIKE \'' . $match . '\'';
+        return $prefix . ' ' . $this->escapeColumn($field) . ' LIKE \'' . $match . '\'';
     }
 
     /**
@@ -176,14 +178,14 @@ abstract class CDatabase_Driver {
     public function notlike($field, $match, $auto, $type, $num_likes) {
         $prefix = ($num_likes == 0) ? '' : $type;
 
-        $match = $this->escape_str($match);
+        $match = $this->escapeStr($match);
 
         if ($auto === true) {
             // Add the start and end quotes
             $match = '%' . $match . '%';
         }
 
-        return $prefix . ' ' . $this->escape_column($field) . ' NOT LIKE \'' . $match . '\'';
+        return $prefix . ' ' . $this->escapeColumn($field) . ' NOT LIKE \'' . $match . '\'';
     }
 
     /**
@@ -226,9 +228,9 @@ abstract class CDatabase_Driver {
     public function insert($table, $keys, $values) {
         // Escape the column names
         foreach ($keys as $key => $value) {
-            $keys[$key] = $this->escape_column($value);
+            $keys[$key] = $this->escapeColumn($value);
         }
-        return 'INSERT INTO ' . $this->escape_table($table) . ' (' . implode(', ', $keys) . ') VALUES (' . implode(', ', $values) . ')';
+        return 'INSERT INTO ' . $this->escapeTable($table) . ' (' . implode(', ', $keys) . ') VALUES (' . implode(', ', $values) . ')';
     }
 
     /**
@@ -261,20 +263,9 @@ abstract class CDatabase_Driver {
      *
      * @return CDatabase_Stmt
      */
-    public function stmt_prepare($sql = '') {
+    public function stmtPrepare($sql = '') {
         throw new CDatabase_Exception('The method you called, :method, is not supported by this driver', [':method', __FUNCTION__]);
     }
-
-    /**
-     *  Compiles the SELECT statement.
-     *  Generates a query string based on which functions were used.
-     *  Should not be called directly, the get() function calls it.
-     *
-     * @param array $database select query values
-     *
-     * @return string
-     */
-    abstract public function compile_select($database);
 
     /**
      * Determines if the string has an arithmetic operator in it.
@@ -283,7 +274,7 @@ abstract class CDatabase_Driver {
      *
      * @return bool
      */
-    public function has_operator($str) {
+    public function hasOperator($str) {
         return (bool) preg_match('/[<>!=]|\sIS(?:\s+NOT\s+)?\b|BETWEEN/i', trim($str));
     }
 
@@ -301,7 +292,7 @@ abstract class CDatabase_Driver {
 
         switch (gettype($value)) {
             case 'string':
-                $value = '\'' . $this->escape_str($value) . '\'';
+                $value = '\'' . $this->escapeStr($value) . '\'';
                 break;
             case 'boolean':
                 $value = (int) $value;
@@ -325,14 +316,14 @@ abstract class CDatabase_Driver {
      *
      * @return string
      */
-    abstract public function escape_str($str);
+    abstract public function escapeStr($str);
 
     /**
      * Lists all tables in the database.
      *
      * @return array
      */
-    abstract public function list_tables();
+    abstract public function listTables();
 
     /**
      * Lists all fields in a table.
@@ -341,14 +332,14 @@ abstract class CDatabase_Driver {
      *
      * @return array
      */
-    abstract public function list_fields($table);
+    abstract public function listFields($table);
 
     /**
      * Returns the last database error.
      *
      * @return string
      */
-    abstract public function show_error();
+    abstract public function showError();
 
     /**
      * Returns field data about a table.
@@ -357,7 +348,7 @@ abstract class CDatabase_Driver {
      *
      * @return array
      */
-    abstract public function field_data($table);
+    abstract public function fieldData($table);
 
     /**
      * Fetches SQL type information about a field, in a generic format.
@@ -366,7 +357,7 @@ abstract class CDatabase_Driver {
      *
      * @return array
      */
-    protected function sql_type($str) {
+    protected function sqlType($str) {
         static $sql_types;
 
         if ($sql_types === null) {
@@ -414,11 +405,11 @@ abstract class CDatabase_Driver {
      *
      * @param string $sql SQL query
      */
-    public function clear_cache($sql = null) {
+    public function clearCache($sql = null) {
         if (empty($sql)) {
             $this->query_cache = [];
         } else {
-            unset($this->query_cache[$this->query_hash($sql)]);
+            unset($this->query_cache[$this->queryHash($sql)]);
         }
 
         CF::log('debug', 'Database cache cleared: ' . get_class($this));
@@ -432,7 +423,7 @@ abstract class CDatabase_Driver {
      *
      * @return string
      */
-    protected function query_hash($sql) {
+    protected function queryHash($sql) {
         return sha1(str_replace("\n", ' ', trim($sql)));
     }
 
