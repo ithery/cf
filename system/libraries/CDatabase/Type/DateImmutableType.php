@@ -32,7 +32,7 @@ class CDatabase_Type_DateImmutableType extends CDatabase_Type_DateType {
             return $value->format($platform->getDateFormatString());
         }
 
-        throw ConversionException::conversionFailedInvalidType(
+        throw CDatabase_Schema_Exception_ConversionException::conversionFailedInvalidType(
             $value,
             $this->getName(),
             ['null', \DateTimeImmutable::class]
@@ -50,7 +50,7 @@ class CDatabase_Type_DateImmutableType extends CDatabase_Type_DateType {
         $dateTime = \DateTimeImmutable::createFromFormat('!' . $platform->getDateFormatString(), $value);
 
         if (!$dateTime) {
-            throw ConversionException::conversionFailedFormat(
+            throw CDatabase_Schema_Exception_ConversionException::conversionFailedFormat(
                 $value,
                 $this->getName(),
                 $platform->getDateFormatString()
