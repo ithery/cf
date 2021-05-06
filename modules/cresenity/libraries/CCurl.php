@@ -3,6 +3,11 @@
 class CCurl {
     use CTrait_Compat_Curl;
 
+    /**
+     * CurlHandle
+     *
+     * @var CurlHandle|mixed
+     */
     private $handle;
 
     private $options;
@@ -320,6 +325,11 @@ class CCurl {
         }
     }
 
+    /**
+     * Get last response
+     *
+     * @return string
+     */
     public function response() {
         return $this->last_response_body;
     }
