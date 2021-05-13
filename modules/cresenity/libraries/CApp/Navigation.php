@@ -13,7 +13,9 @@ use CApp_Navigation_Helper as Helper;
 
 class CApp_Navigation {
     public static $instance = [];
+
     protected static $accessCallback = [];
+
     protected static $activeCallback = [];
 
     /**
@@ -105,7 +107,7 @@ class CApp_Navigation {
         return $app->renderNavigation();
     }
 
-    public function filterNavWithAccess($navs = null, $level = 0, &$child = 0, $domain = null) {
+    public static function filterNavWithAccess($navs = null, $level = 0, &$child = 0, $domain = null) {
         if ($domain == null) {
             $domain = CF::domain();
         }
@@ -142,7 +144,7 @@ class CApp_Navigation {
             $haveSubnav = isset($d['subnav']) && is_array($d['subnav']);
             $subnavArray = [];
             if ($haveSubnav) {
-                $subnavArray = $this->filterNavWithAccess(carr::get($d, 'subnav', []), $level + 1, $child);
+                $subnavArray = static::filterNavWithAccess(carr::get($d, 'subnav', []), $level + 1, $child);
                 $clonedNav['subnav'] = $subnavArray;
             }
 

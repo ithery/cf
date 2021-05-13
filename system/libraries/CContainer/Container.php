@@ -1098,7 +1098,7 @@ class CContainer_Container implements ArrayAccess, CContainer_ContainerInterface
     /**
      * Set the globally available instance of the container.
      *
-     * @return static
+     * @return CContainer_Container
      */
     public static function getInstance() {
         if (is_null(static::$instance)) {

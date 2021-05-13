@@ -1,30 +1,30 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 11, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Aug 11, 2020
  */
 
 use Psr\Cache\CacheItemInterface;
 
 abstract class CManager_Asset_Compiler_MinifyAbstract {
-
     /**
      * The data to be minified.
      *
      * @var string[]
      */
-    protected $data = array();
+    protected $data = [];
 
     /**
      * Array of patterns to match.
      *
      * @var string[]
      */
-    protected $patterns = array();
+    protected $patterns = [];
 
     /**
      * This array will hold content of strings and regular expressions that have
@@ -33,7 +33,7 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
      *
      * @var string[]
      */
-    public $extracted = array();
+    public $extracted = [];
 
     /**
      * Init the minify class - optionally, code may be passed along already.
@@ -41,7 +41,7 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
     public function __construct(/* $data = null, ... */) {
         // it's possible to add the source through the constructor as well ;)
         if (func_num_args()) {
-            call_user_func_array(array($this, 'add'), func_get_args());
+            call_user_func_array([$this, 'add'], func_get_args());
         }
     }
 
@@ -57,12 +57,12 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
         // not used (we're using func_get_args instead to support overloading),
         // but it still needs to be defined because it makes no sense to have
         // this function without argument :)
-        $args = array($data) + func_get_args();
+        $args = [$data] + func_get_args();
 
         // this method can be overloaded
         foreach ($args as $data) {
             if (is_array($data)) {
-                call_user_func_array(array($this, 'add'), $data);
+                call_user_func_array([$this, 'add'], $data);
                 continue;
             }
 
@@ -75,7 +75,7 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
 
             // replace CR linefeeds etc.
             // @see https://github.com/matthiasmullie/minify/pull/139
-            $value = str_replace(array("\r\n", "\r"), "\n", $value);
+            $value = str_replace(["\r\n", "\r"], "\n", $value);
 
             // store data
             $this->data[$key] = $value;
@@ -90,7 +90,7 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
      * @param string|string[] $data
      *
      * @return static
-     * 
+     *
      * @throws IOException
      */
     public function addFile($data /* $data = null, ... */) {
@@ -98,12 +98,12 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
         // not used (we're using func_get_args instead to support overloading),
         // but it still needs to be defined because it makes no sense to have
         // this function without argument :)
-        $args = array($data) + func_get_args();
+        $args = [$data] + func_get_args();
 
         // this method can be overloaded
         foreach ($args as $path) {
             if (is_array($path)) {
-                call_user_func_array(array($this, 'addFile'), $path);
+                call_user_func_array([$this, 'addFile'], $path);
                 continue;
             }
 
@@ -176,7 +176,8 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
     /**
      * Minify the data.
      *
-     * @param string $path Path to write the data to
+     * @param string $path    Path to write the data to
+     * @param mixed  $content
      *
      * @return string The minified data
      */
@@ -229,7 +230,7 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
         // study the pattern, we'll execute it more than once
         $pattern .= 'S';
 
-        $this->patterns[] = array($pattern, $replacement);
+        $this->patterns[] = [$pattern, $replacement];
     }
 
     /**
@@ -247,7 +248,7 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
     protected function replace($content) {
         $processed = '';
         $positions = array_fill(0, count($this->patterns), -1);
-        $matches = array();
+        $matches = [];
 
         while ($content) {
             // find first match for all patterns
@@ -408,7 +409,7 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
 
         $content = strtr($content, $this->extracted);
 
-        $this->extracted = array();
+        $this->extracted = [];
 
         return $content;
     }
@@ -424,9 +425,9 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
         $parsed = parse_url($path);
         if (
         // file is elsewhere
-                isset($parsed['host']) ||
+                isset($parsed['host'])
                 // file responds to queries (may change, or need to bypass cache)
-                isset($parsed['query'])
+                || isset($parsed['query'])
         ) {
             return false;
         }
@@ -465,5 +466,4 @@ abstract class CManager_Asset_Compiler_MinifyAbstract {
             throw new IOException('The file "' . $path . '" could not be written to. Check your disk space and file permissions.');
         }
     }
-
 }

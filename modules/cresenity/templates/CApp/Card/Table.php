@@ -1,19 +1,20 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 13, 2018, 10:31:24 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 13, 2018, 10:31:24 AM
  */
 if (!isset($title)) {
     $title = '[EMPTY TITLE]';
 }
 if (!isset($columns)) {
-    $columns = array();
+    $columns = [];
 }
 if (!isset($rows)) {
-    $rows = array();
+    $rows = [];
 }
 if (!isset($headers)) {
     $headers = '';

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 1:16:28 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 1:16:28 PM
  */
 class CJavascript_Validation_ValidatorHandler {
-
     use CJavascript_Validation_Trait_UseDelegatedValidatorTrait;
 
     /**
@@ -36,7 +36,7 @@ class CJavascript_Validation_ValidatorHandler {
     /**
      * Create a new JsValidation instance.
      *
-     * @param RuleParser $rules
+     * @param RuleParser    $rules
      * @param MessageParser $messages
      */
     public function __construct(CJavascript_Validation_RuleParser $rules, CJavascript_Validation_MessageParser $messages) {
@@ -49,9 +49,10 @@ class CJavascript_Validation_ValidatorHandler {
      * Sets delegated Validator instance.
      *
      * @param \Proengsoft\JsValidation\Support\DelegatedValidator $validator
+     *
      * @return void
      */
-    public function setDelegatedValidator(DelegatedValidator $validator) {
+    public function setDelegatedValidator(CJavascript_Validation_ValidatorDelegated $validator) {
         $this->validator = $validator;
         $this->rules->setDelegatedValidator($validator);
         $this->messages->setDelegatedValidator($validator);
@@ -61,6 +62,7 @@ class CJavascript_Validation_ValidatorHandler {
      * Enable or disables remote validations.
      *
      * @param bool $enabled
+     *
      * @return void
      */
     public function setRemote($enabled) {
@@ -90,6 +92,7 @@ class CJavascript_Validation_ValidatorHandler {
      * @param $attribute
      * @param $rules
      * @param bool $includeRemote
+     *
      * @return array
      */
     protected function jsConvertRules($attribute, $rules, $includeRemote) {
@@ -112,16 +115,18 @@ class CJavascript_Validation_ValidatorHandler {
      *
      * @param $jsRule
      * @param bool $includeRemote
+     *
      * @return bool
      */
     protected function isValidatable($jsRule, $includeRemote) {
-        return $jsRule && ($includeRemote || $jsRule !== RuleParser::REMOTE_RULE);
+        return $jsRule && ($includeRemote || $jsRule !== CJavascript_Validation_RuleParser::REMOTE_RULE);
     }
 
     /**
      * Check if JS Validation is disabled for attribute.
      *
      * @param $attribute
+     *
      * @return bool
      */
     public function jsValidationEnabled($attribute) {
@@ -145,8 +150,9 @@ class CJavascript_Validation_ValidatorHandler {
     /**
      * Validate Conditional Validations using Ajax in specified fields.
      *
-     * @param string $attribute
+     * @param string       $attribute
      * @param string|array $rules
+     *
      * @return void
      */
     public function sometimes($attribute, $rules = []) {
@@ -156,5 +162,4 @@ class CJavascript_Validation_ValidatorHandler {
         $this->validator->sometimes($attribute, $rules, $callback);
         $this->rules->addConditionalRules($attribute, (array) $rules);
     }
-
 }

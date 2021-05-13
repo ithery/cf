@@ -4,6 +4,8 @@
  * CDatabase_Result
  */
 abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAccess, Iterator, Countable {
+    use CTrait_Compat_Database_Result;
+
     // Result resource, insert id, and SQL
     protected $result;
 
@@ -33,9 +35,9 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     /**
      * Returns the insert id from the result.
      *
-     * @return mixed
+     * @return int
      */
-    public function insert_id() {
+    public function insertId() {
         return $this->insert_id;
     }
 
@@ -57,14 +59,14 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
      *
      * @return array
      */
-    abstract public function result_array($object = null, $type = false);
+    abstract public function resultArray($object = null, $type = false);
 
     /**
      * Gets the fields of an already run query.
      *
      * @return array
      */
-    abstract public function list_fields();
+    abstract public function listFields();
 
     /**
      * Seek to an offset in the results.

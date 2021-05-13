@@ -1,10 +1,11 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 12, 2019, 12:01:17 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 12, 2019, 12:01:17 AM
  */
 ?>
 <div class="row no-gutters">
@@ -31,7 +32,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     2:3
                 </label>
                 <label class="btn btn-info btn-aspectRatio" onclick="changeAspectRatio(this, null)">
-<?php echo clang::__('filemanager.btn-crop-free'); ?>
+                    <?php echo clang::__('filemanager.btn-crop-free'); ?>
                 </label>
             </div>
             <br>
@@ -77,12 +78,12 @@ defined('SYSPATH') OR die('No direct access allowed.');
         };
         $image.cropper(options);
     });
-    
+
     $('.btn-aspectRatio').click(function(e){
         var ratioWidth = parseFloat($(this).attr('data-aspect-width'));
         var ratioHeight = parseFloat($(this).attr('data-aspect-width'));
         var aspectRatio = ratioWidth/ratioHeight;
-        
+
         options.aspectRatio = aspectRatio;
         $('.btn-aspectRatio.active').removeClass('active');
         $(this).addClass('active');
@@ -90,7 +91,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
         $image.cropper('destroy').cropper(options);
         return false;
     });
-  
+
 
     $('.btn-cropper-perform-crop').click(function (e) {
         window.cfm.performFmRequest('cropImage', {

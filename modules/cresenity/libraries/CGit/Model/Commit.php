@@ -1,32 +1,39 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 3, 2019, 1:43:38 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 3, 2019, 1:43:38 PM
  */
-
-
-class CGit_Model_Commit extends CGit_Model_GitObject
-{
+class CGit_Model_Commit extends CGit_Model_GitObject {
     protected $shortHash;
+
     protected $treeHash;
+
     protected $parentsHash;
+
     protected $author;
+
     protected $date;
+
     protected $commiter;
+
     protected $commiterDate;
+
     protected $message;
+
     protected $body;
+
     protected $diffs;
-    public function importData(array $data)
-    {
+
+    public function importData(array $data) {
         $this->setHash($data['hash']);
         $this->setShortHash($data['short_hash']);
         $this->setTreeHash($data['tree']);
-        $this->setParentsHash(isset($data['parents']) ? array_filter(explode(' ', $data['parents'])) : array());
+        $this->setParentsHash(isset($data['parents']) ? array_filter(explode(' ', $data['parents'])) : []);
         $this->setAuthor(
             new CGit_Model_Commit_Author($data['author'], $data['author_email'])
         );
@@ -44,102 +51,102 @@ class CGit_Model_Commit extends CGit_Model_GitObject
             $this->setBody($data['body']);
         }
     }
-    public function getShortHash()
-    {
+
+    public function getShortHash() {
         return $this->shortHash;
     }
-    public function setShortHash($shortHash)
-    {
+
+    public function setShortHash($shortHash) {
         $this->shortHash = $shortHash;
         return $this;
     }
-    public function getTreeHash()
-    {
+
+    public function getTreeHash() {
         return $this->treeHash;
     }
-    public function setTreeHash($treeHash)
-    {
+
+    public function setTreeHash($treeHash) {
         $this->treeHash = $treeHash;
         return $this;
     }
-    public function getParentsHash()
-    {
+
+    public function getParentsHash() {
         return $this->parentsHash;
     }
-    public function setParentsHash($parentsHash)
-    {
+
+    public function setParentsHash($parentsHash) {
         $this->parentsHash = $parentsHash;
         return $this;
     }
-    public function getAuthor()
-    {
+
+    public function getAuthor() {
         return $this->author;
     }
-    public function setAuthor($author)
-    {
+
+    public function setAuthor($author) {
         $this->author = $author;
         return $this;
     }
-    public function getDate()
-    {
+
+    public function getDate() {
         return $this->date;
     }
-    public function setDate($date)
-    {
+
+    public function setDate($date) {
         $this->date = $date;
         return $this;
     }
-    public function getCommiter()
-    {
+
+    public function getCommiter() {
         return $this->commiter;
     }
-    public function setCommiter($commiter)
-    {
+
+    public function setCommiter($commiter) {
         $this->commiter = $commiter;
         return $this;
     }
-    public function getCommiterDate()
-    {
+
+    public function getCommiterDate() {
         return $this->commiterDate;
     }
-    public function setCommiterDate($commiterDate)
-    {
+
+    public function setCommiterDate($commiterDate) {
         $this->commiterDate = $commiterDate;
         return $this;
     }
-    public function getMessage()
-    {
+
+    public function getMessage() {
         return $this->message;
     }
-    public function setMessage($message)
-    {
+
+    public function setMessage($message) {
         $this->message = $message;
         return $this;
     }
-    public function getBody()
-    {
+
+    public function getBody() {
         return $this->body;
     }
-    public function setBody($body)
-    {
+
+    public function setBody($body) {
         $this->body = $body;
         return $this;
     }
-    public function getDiffs()
-    {
+
+    public function getDiffs() {
         return $this->diffs;
     }
-    public function setDiffs($diffs)
-    {
+
+    public function setDiffs($diffs) {
         $this->diffs = $diffs;
         return $this;
     }
-    public function getChangedFiles()
-    {
+
+    public function getChangedFiles() {
         return sizeof($this->diffs);
     }
-    public function isCommit()
-    {
+
+    public function isCommit() {
         return true;
     }
 }

@@ -43,7 +43,7 @@ class CDatabase_Type_DateIntervalType extends CDatabase_Type {
             return $value->format(self::FORMAT);
         }
 
-        throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'DateInterval']);
+        throw CDatabase_Schema_Exception_ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'DateInterval']);
     }
 
     /**
@@ -70,7 +70,7 @@ class CDatabase_Type_DateIntervalType extends CDatabase_Type {
 
             return $interval;
         } catch (\Exception $exception) {
-            throw ConversionException::conversionFailedFormat($value, $this->getName(), self::FORMAT, $exception);
+            throw CDatabase_Schema_Exception_ConversionException::conversionFailedFormat($value, $this->getName(), self::FORMAT, $exception);
         }
     }
 

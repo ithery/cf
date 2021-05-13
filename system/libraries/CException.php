@@ -26,10 +26,10 @@ class CException extends Exception {
      *     throw new CException('Something went terrible wrong, :user',
      *         array(':user' => $user));
      *
-     * @param string         $message   error message
-     * @param array          $variables translation variables
-     * @param integer|string $code      the exception code
-     * @param Exception      $previous  Previous exception
+     * @param string     $message   error message
+     * @param array      $variables translation variables
+     * @param int|string $code      the exception code
+     * @param Exception  $previous  Previous exception
      *
      * @return void
      */
@@ -77,7 +77,9 @@ class CException extends Exception {
      *
      * @return void
      */
+    // @codingStandardsIgnoreStart
     public function send_headers() {
+        // @codingStandardsIgnoreEnd
         // Send the 500 header
         header('HTTP/1.1 500 Internal Server Error');
     }

@@ -1,35 +1,29 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
-/**
- * @package  Database
- *
- * SQL data types. If there are missing values, please report them:
- *
- * @link  http://trac.kohanaphp.com/newticket
- */
-$config = array
-(
-	'tinyint'			=> array('type' => 'int', 'max' => 127),
-	'smallint'			=> array('type' => 'int', 'max' => 32767),
-	'mediumint'			=> array('type' => 'int', 'max' => 8388607),
-	'int'				=> array('type' => 'int', 'max' => 2147483647),
-	'integer'			=> array('type' => 'int', 'max' => 2147483647),
-	'bigint'			=> array('type' => 'int', 'max' => 9223372036854775807),
-	'float'				=> array('type' => 'float'),
-	'float unsigned'	=> array('type' => 'float', 'min' => 0),
-	'boolean'			=> array('type' => 'boolean'),
-	'time'				=> array('type' => 'string', 'format' => '00:00:00'),
-	'time with time zone' => array('type' => 'string'),
-	'date'				=> array('type' => 'string', 'format' => '0000-00-00'),
-	'year'				=> array('type' => 'string', 'format' => '0000'),
-	'datetime'			=> array('type' => 'string', 'format' => '0000-00-00 00:00:00'),
-	'timestamp with time zone' => array('type' => 'string'),
-	'char'				=> array('type' => 'string', 'exact' => TRUE),
-	'binary'			=> array('type' => 'string', 'binary' => TRUE, 'exact' => TRUE),
-	'varchar'			=> array('type' => 'string'),
-	'varbinary'			=> array('type' => 'string', 'binary' => TRUE),
-	'blob'				=> array('type' => 'string', 'binary' => TRUE),
-	'text'				=> array('type' => 'string')
-);
+<?php
+defined('SYSPATH') or die('No direct access allowed.');
+
+$config = [
+    'tinyint' => ['type' => 'int', 'max' => 127],
+    'smallint' => ['type' => 'int', 'max' => 32767],
+    'mediumint' => ['type' => 'int', 'max' => 8388607],
+    'int' => ['type' => 'int', 'max' => 2147483647],
+    'integer' => ['type' => 'int', 'max' => 2147483647],
+    'bigint' => ['type' => 'int', 'max' => 9223372036854775807],
+    'float' => ['type' => 'float'],
+    'float unsigned' => ['type' => 'float', 'min' => 0],
+    'boolean' => ['type' => 'boolean'],
+    'time' => ['type' => 'string', 'format' => '00:00:00'],
+    'time with time zone' => ['type' => 'string'],
+    'date' => ['type' => 'string', 'format' => '0000-00-00'],
+    'year' => ['type' => 'string', 'format' => '0000'],
+    'datetime' => ['type' => 'string', 'format' => '0000-00-00 00:00:00'],
+    'timestamp with time zone' => ['type' => 'string'],
+    'char' => ['type' => 'string', 'exact' => true],
+    'binary' => ['type' => 'string', 'binary' => true, 'exact' => true],
+    'varchar' => ['type' => 'string'],
+    'varbinary' => ['type' => 'string', 'binary' => true],
+    'blob' => ['type' => 'string', 'binary' => true],
+    'text' => ['type' => 'string']
+];
 
 // DOUBLE
 $config['double'] = $config['double precision'] = $config['decimal'] = $config['real'] = $config['numeric'] = $config['float'];

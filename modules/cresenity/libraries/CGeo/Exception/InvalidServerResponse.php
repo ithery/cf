@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 8:03:27 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 8:03:27 PM
  */
 
 /**
  * When the geocoder server returns something that we cannot process.
  */
-final class CGeo_Exception_InvalidServerResponse extends \RuntimeException implements CGeo_Exception {
-
+final class CGeo_Exception_InvalidServerResponse extends \RuntimeException implements CGeo_Interface_ExceptionInterface {
     /**
      * @param string $query
      * @param int    $code
@@ -31,5 +31,4 @@ final class CGeo_Exception_InvalidServerResponse extends \RuntimeException imple
     public static function emptyResponse($query) {
         return new self(sprintf('The geocoder server returned an empty response for query "%s".', $query));
     }
-
 }

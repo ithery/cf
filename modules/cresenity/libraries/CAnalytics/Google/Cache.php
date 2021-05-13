@@ -1,28 +1,28 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 12:54:00 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 12:54:00 PM
  */
 class CAnalytics_Google_Cache extends CCache_Repository {
-
     protected $config;
 
-    public function __construct($options = array()) {
+    public function __construct($options = []) {
         $this->config = CTracker_Config::instance();
         if ($options == null || empty($options)) {
-            $options = array(
+            $options = [
                 'driver' => 'File',
-                'options' => array(
+                'options' => [
                     'engine' => 'Temp',
-                    'options' => array(
+                    'options' => [
                         'directory' => 'CAnalytics/Google'
-                    ),
-                ),
-            );
+                    ],
+                ],
+            ];
         }
         parent::__construct($options);
     }
@@ -69,6 +69,8 @@ class CAnalytics_Google_Cache extends CCache_Repository {
 
     /**
      * @param string $identifier
+     * @param mixed  $attributes
+     * @param mixed  $keys
      */
     public function findCached($attributes, $keys, $identifier = null) {
         if (!$this->config->isCacheEnabled()) {
@@ -98,5 +100,4 @@ class CAnalytics_Google_Cache extends CCache_Repository {
             return $this->set($cacheKey, $model);
         }
     }
-
 }

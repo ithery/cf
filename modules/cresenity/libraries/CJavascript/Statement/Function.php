@@ -1,19 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 2, 2018, 9:26:43 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 2, 2018, 9:26:43 PM
  */
 class CJavascript_Statement_Function extends CJavascript_Statement {
+    protected $bodyStatements = [];
 
-    protected $bodyStatements = array();
     protected $functionName = '';
-    protected $parameters = array();
 
-    public function __construct($functionName = '', $functionParameters = array()) {
+    protected $parameters = [];
+
+    public function __construct($functionName = '', $functionParameters = []) {
         $this->functionName = $functionName;
         $this->parameters = $functionParameters;
     }
@@ -23,7 +25,7 @@ class CJavascript_Statement_Function extends CJavascript_Statement {
     }
 
     public function getStatement() {
-        $implodedParameters = implode(",", $this->parameters);
+        $implodedParameters = implode(',', $this->parameters);
         $str = 'function ' . $this->functionName . '(' . $implodedParameters . ') {';
         foreach ($this->bodyStatement as $statement) {
             if ($statement instanceof CJavascript_Statement) {
@@ -34,5 +36,4 @@ class CJavascript_Statement_Function extends CJavascript_Statement {
         $str .= '}';
         return $str;
     }
-
 }

@@ -36,7 +36,7 @@ class CDatabase_Type_BinaryType extends CDatabase_Type {
         }
 
         if (!is_resource($value)) {
-            throw ConversionException::conversionFailed($value, self::BINARY);
+            throw CDatabase_Schema_Exception_ConversionException::conversionFailed($value, self::BINARY);
         }
 
         return $value;

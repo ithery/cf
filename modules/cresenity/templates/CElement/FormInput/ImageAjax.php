@@ -1,10 +1,11 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jan 13, 2018, 10:58:37 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jan 13, 2018, 10:58:37 AM
  */
 //sanitize maxWidth
 $suffixWidth = '';
@@ -207,4 +208,3 @@ $maxHeight .= $suffixHeight;
         $(this).val("");
     });
 </script>
-

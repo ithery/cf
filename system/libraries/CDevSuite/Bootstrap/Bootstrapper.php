@@ -6,6 +6,5 @@
  * @author Hery
  */
 abstract class CDevSuite_Bootstrap_Bootstrapper {
-
-    public abstract function bootstrap();
+    abstract public function bootstrap();
 }

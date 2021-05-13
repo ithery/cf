@@ -1,7 +1,7 @@
 <?php
 
 class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
-    // Database connection
+    use CTrait_Compat_Database_Driver_MongoDB_Result;
 
     /**
      * @var \MongoDB\Client
@@ -84,10 +84,6 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
         return $this->cursorArray;
     }
 
-    public function as_array($object = null, $type = stdClass::class) {
-        return $this->result_array($object, $type);
-    }
-
     public function getTypeMap() {
         $options = [];
 
@@ -100,11 +96,11 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
         return $options;
     }
 
-    public function result_array($object = null, $type = stdClass::class) {
+    public function resultArray($object = null, $type = stdClass::class) {
         return json_decode(json_encode($this->getCursorArray($object, $type)), true);
     }
 
-    public function list_fields() {
+    public function listFields() {
         $field_names = [];
         while ($field = $this->result->fetch_field()) {
             $field_names[] = $field->name;
@@ -140,7 +136,7 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
      * {@inheritdoc}
      */
     public function fetchAll($fetchMode = null, $fetchArgument = null, $ctorArgs = null) {
-        return $this->result_array(false);
+        return $this->resultArray(false);
     }
 
     protected function getCursor($sql) {
@@ -170,7 +166,7 @@ class CDatabase_Driver_MongoDB_Result extends CDatabase_Result {
 
                 if ($cursor == null) {
                     switch ($method) {
-                        case'count':
+                        case 'count':
                             $cursor = [[0]];
                     }
                 }

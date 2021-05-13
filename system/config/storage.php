@@ -1,12 +1,7 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @since Aug 11, 2019, 3:42:24 AM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
 return [
     /*
       |--------------------------------------------------------------------------
@@ -53,20 +48,20 @@ return [
             'url' => curl::httpbase() . 'public',
             'visibility' => 'public',
         ],
-//        's3' => [
-//            'driver' => 's3',
-//            'key' => env('AWS_ACCESS_KEY_ID'),
-//            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-//            'region' => env('AWS_DEFAULT_REGION'),
-//            'bucket' => env('AWS_BUCKET'),
-//            'url' => env('AWS_URL'),
-//        ],
-//        'google' => [
-//            'driver' => 'google',
-//            'clientId' => env("GOOGLE_CLIENT_ID"),
-//            'clientSecret' => env("GOOGLE_CLIENT_SECRET"),
-//            'refreshToken' => env("GOOGLE_REFRESH_TOKEN"),
-//            'folderId' => env("GOOGLE_DRIVE_FOLDER_ID"),
-//        ],
+        //        's3' => [
+        //            'driver' => 's3',
+        //            'key' => env('AWS_ACCESS_KEY_ID'),
+        //            'secret' => env('AWS_SECRET_ACCESS_KEY'),
+        //            'region' => env('AWS_DEFAULT_REGION'),
+        //            'bucket' => env('AWS_BUCKET'),
+        //            'url' => env('AWS_URL'),
+        //        ],
+        //        'google' => [
+        //            'driver' => 'google',
+        //            'clientId' => env("GOOGLE_CLIENT_ID"),
+        //            'clientSecret' => env("GOOGLE_CLIENT_SECRET"),
+        //            'refreshToken' => env("GOOGLE_REFRESH_TOKEN"),
+        //            'folderId' => env("GOOGLE_DRIVE_FOLDER_ID"),
+        //        ],
     ],
 ];
