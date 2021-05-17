@@ -16,7 +16,7 @@ class Controller_Users extends CController {
         $actions->add_action()->set_label(' ' . clang::__('Add') . ' ' . clang::__('Users'))->set_icon('plus')->set_link(curl::base() . 'users/add/');
 
         if ($role == null) {
-            CF::show404();
+            return CF::show404();
         }
         $db = CDatabase::instance();
         $table = $app->add_table('users_table');
