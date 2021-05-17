@@ -129,7 +129,7 @@ class Controller_Roles extends CController {
                 if ($error == 0) {
                     $qcheck = 'select * from roles where name=' . $db->escape($name) . ' and status>0 ';
                     if (strlen($org_id) > 0) {
-                        $qcheck .= 'and org_id=' . $db->escape($org_id) ;
+                        $qcheck .= 'and org_id=' . $db->escape($org_id);
                     }
 
                     if ($is_add == 0) {
@@ -314,7 +314,7 @@ class Controller_Roles extends CController {
     public function ordering() {
         $app = CApp::instance();
         $app->title(clang::__('Change Order'));
-        $app->add_breadcrumb(clang::__('Roles'), curl::base() . 'roles');
+        $app->addBreadcrumb(clang::__('Roles'), curl::base() . 'roles');
         $user = $app->user();
         $role = $app->role();
         $app_role_id = $role->role_id;
@@ -326,7 +326,7 @@ class Controller_Roles extends CController {
         if ($post != null) {
             $error = 0;
             $data = $post['data_order'];
-            $data = cjson::decode($data);
+            $data = CHelper::json()->decode($data);
 
             try {
                 $db->begin();
@@ -335,9 +335,6 @@ class Controller_Roles extends CController {
                 }
                 $this->update_recursive($data, $app_role_id);
                 $q = 'select * from roles where parent_id is null ';
-                if (strlen($org_id) > 0) {
-                    $q .= ' and org_id=' . $db->escape($org_id) . ' ';
-                }
 
                 $r = $db->query($q);
                 $left = 1;

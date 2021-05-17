@@ -42,21 +42,19 @@ class Controller_Tools_Language extends CController {
         $list = clang::get_lang_list();
 
         $select = $form->add_field()->set_label('Language')->add_control('language', 'select')
-                        ->set_list($list)->set_value($language);
+            ->set_list($list)->set_value($language);
         $select->add_listener('change')->add_handler('reload')->set_target('lang-wrapper')
-                ->add_param_input(['language'])
-                ->set_url(curl::base() . 'tools/language/load_language');
+            ->add_param_input(['language'])
+            ->set_url(curl::base() . 'tools/language/load_language');
         $select->add_listener('ready')->add_handler('reload')->set_target('lang-wrapper')
-                ->add_param_input(['language'])
-                ->set_url(curl::base() . 'tools/language/load_language');
-//            $form->add_action_list()->add_action()->set_label(clang::__('Save'))
-//                    ->add_class('btn btn-success')->set_submit(true);
+            ->add_param_input(['language'])
+            ->set_url(curl::base() . 'tools/language/load_language');
         $form->add_div()->custom_css('color', 'red')
-                ->add('** Leave default blank to remove a row');
+            ->add('** Leave default blank to remove a row');
         $form->add_div('lang-wrapper');
         $form->add_control('submit', 'hidden')->set_value(true);
         $form->add_action_list()->add_action()->set_label(clang::__('Save'))
-                ->add_class('btn btn-success')->set_submit(true);
+            ->add_class('btn btn-success')->set_submit(true);
         $app->add('
             <style>
                 .show-grid {
@@ -88,15 +86,15 @@ class Controller_Tools_Language extends CController {
             if ($file != null) {
                 $languages = include $file;
             }
-//                $widget->add($languages);
+            //                $widget->add($languages);
             $lang_content = $widget->add_div()->add_class('row-fluid show-grid title')
-                    ->custom_css('background-color', '#757575')
-                    ->custom_css('color', '#FAFAFA');
+                ->custom_css('background-color', '#757575')
+                ->custom_css('color', '#FAFAFA');
             $header_action_add = $widget->add_header_action('')->set_label('Add New Lang')
-                            ->set_icon('plus')->add_class('btn-warning');
+                ->set_icon('plus')->add_class('btn-warning');
             $header_action_add->add_listener('click')->add_handler('append')
-                    ->set_target('widget-container')
-                    ->set_url(curl::base() . 'tools/language/add_new_row');
+                ->set_target('widget-container')
+                ->set_url(curl::base() . 'tools/language/add_new_row');
 
             $lang_content->add_div()->add_class('span5')->add('<h4>Default</h4>')
                     ->custom_css('text-align', 'center');
