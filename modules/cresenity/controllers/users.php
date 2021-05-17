@@ -2,7 +2,7 @@
 
     defined('SYSPATH') or die('No direct access allowed.');
 
-class Users_Controller extends CController {
+class Controller_Users extends CController {
     public function index() {
         $app = CApp::instance();
         $app->title(clang::__('Users'));
