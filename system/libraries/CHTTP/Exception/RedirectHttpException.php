@@ -4,12 +4,11 @@
 class CHTTP_Exception_RedirectHttpException extends CHTTP_Exception_HttpException {
     protected $uri;
 
-
-    public function getUri(){
+    public function getUri() {
         return $this->uri;
     }
 
     public function setUri($uri) {
-        $this->uri=$uri;
+        $this->uri = $uri;
     }
 }
