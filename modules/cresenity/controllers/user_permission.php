@@ -124,7 +124,7 @@ class Controller_User_Permission extends CController {
                         }
                     }
                 }
-            } catch (Kohana_Exception $e) {
+            } catch (Exception $e) {
                 $error++;
                 $error_message = clang::__('Error, call administrator') . '... ' . $e->getMessage();
             }
