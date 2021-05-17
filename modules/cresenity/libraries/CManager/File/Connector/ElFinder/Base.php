@@ -3252,8 +3252,7 @@ class CManager_File_Connector_ElFinder_Base {
     /**
      * Return root - file's owner
      *
-     * @param  string  file hash
-     * @param mixed $hash
+     * @param  string $hash file hash
      *
      * @return elFinderVolumeDriver|bool (false)
      *

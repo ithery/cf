@@ -515,8 +515,7 @@ trait CManager_File_Connector_ElFinder_Concern_Filesystem {
      *  - uplMaxSize   - if $args[init]
      *  - error        - on failed
      *
-     * @param  array  command arguments
-     * @param mixed $args
+     * @param array $args command arguments
      *
      * @return array
      *
@@ -636,8 +635,7 @@ trait CManager_File_Connector_ElFinder_Concern_Filesystem {
     /**
      * Return dir files names list
      *
-     * @param  array  command arguments
-     * @param mixed $args
+     * @param array $args command arguments
      *
      * @return array
      *
@@ -648,7 +646,7 @@ trait CManager_File_Connector_ElFinder_Concern_Filesystem {
         $intersect = isset($args['intersect']) ? $args['intersect'] : [];
 
         if (($volume = $this->volume($target)) == false || ($list = $volume->ls($target, $intersect)) === false) {
-            return ['error' => $this->error(self::ERROR_OPEN, '#' . $target)];
+            return ['error' => $this->error(CManager_File_Connector_ElFinder_Base::ERROR_OPEN, '#' . $target)];
         }
         return ['list' => $list];
     }
@@ -656,8 +654,7 @@ trait CManager_File_Connector_ElFinder_Concern_Filesystem {
     /**
      * Return subdirs for required directory
      *
-     * @param  array  command arguments
-     * @param mixed $args
+     * @param array $args command arguments
      *
      * @return array
      *
@@ -667,7 +664,7 @@ trait CManager_File_Connector_ElFinder_Concern_Filesystem {
         $target = $args['target'];
 
         if (($volume = $this->volume($target)) == false || ($tree = $volume->tree($target)) == false) {
-            return ['error' => $this->error(self::ERROR_OPEN, '#' . $target)];
+            return ['error' => $this->error(CManager_File_Connector_ElFinder_Base::ERROR_OPEN, '#' . $target)];
         }
 
         return ['tree' => $tree];
@@ -676,8 +673,7 @@ trait CManager_File_Connector_ElFinder_Concern_Filesystem {
     /**
      * Return parents dir for required directory
      *
-     * @param  array  command arguments
-     * @param mixed $args
+     * @param array $args command arguments
      *
      * @return array
      *
@@ -690,7 +686,7 @@ trait CManager_File_Connector_ElFinder_Concern_Filesystem {
         $until = $args['until'];
 
         if (($volume = $this->volume($target)) == false || ($tree = $volume->parents($target, false, $until)) == false) {
-            return ['error' => $this->error(self::ERROR_OPEN, '#' . $target)];
+            return ['error' => $this->error(CManager_File_Connector_ElFinder_Base::ERROR_OPEN, '#' . $target)];
         }
 
         return ['tree' => $tree];
@@ -699,8 +695,7 @@ trait CManager_File_Connector_ElFinder_Concern_Filesystem {
     /**
      * Return new created thumbnails list
      *
-     * @param  array  command arguments
-     * @param mixed $args
+     * @param array $args command arguments
      *
      * @return array
      *
@@ -728,8 +723,7 @@ trait CManager_File_Connector_ElFinder_Concern_Filesystem {
      * 1st: Return srrsy contains download archive file info
      * 2nd: Return array contains opened file pointer, root itself and required headers
      *
-     * @param  array  command arguments
-     * @param mixed $args
+     * @param array $args command arguments
      *
      * @return array
      *
@@ -744,7 +738,7 @@ trait CManager_File_Connector_ElFinder_Concern_Filesystem {
 
         if (!$download) {
             //1st: Return array contains download archive file info
-            $error = [self::ERROR_ARCHIVE];
+            $error = [CManager_File_Connector_ElFinder_Base::ERROR_ARCHIVE];
             if (($volume = $this->volume($targets[0])) !== false) {
                 if ($dlres = $volume->zipdl($targets)) {
                     $path = $dlres['path'];
