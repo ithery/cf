@@ -161,6 +161,13 @@ class CPeriod {
         $startCloned = clone $start;
         $method = 'add' . ucfirst($interval) . 's';
         $end = $startCloned->{$method}($count);
+        if (strtolower($interval) == 'month') {
+            if ($start->format('d') != $end->format('d')) {
+                if ((int) $end->format('d') === 1) {
+                    $end = $end->subMonths(1)->endOfMonth();
+                }
+            }
+        }
         return new static($start, $end);
     }
 
