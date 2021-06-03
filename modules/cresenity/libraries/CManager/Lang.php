@@ -48,7 +48,9 @@ class CManager_Lang implements CManager_LangInterface {
         $translation = CManager_Lang_Data::getLangDataTranslation($lang, $message);
         if ($translation === null) {
             //save to default language
-            CManager_Lang_Data::addLangDataTranslation(static::DEFAULT_LANG, $message, $message);
+            if (CF::config('lang.auto_add', false)) {
+                CManager_Lang_Data::addLangDataTranslation(static::DEFAULT_LANG, $message, $message);
+            }
             $translation = $message;
         }
         if (is_array($params)) {
