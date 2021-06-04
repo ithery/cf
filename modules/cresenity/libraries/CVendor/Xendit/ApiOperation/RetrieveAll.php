@@ -6,8 +6,8 @@ trait CVendor_Xendit_ApiOperation_RetrieveAll {
      *
      * @return array
      */
-    public static function retrieveAll() {
-        $url = static::classUrl();
-        return static::_request('GET', $url, []);
+    public function retrieveAll() {
+        $url = $this->classUrl();
+        return $this->request('GET', $url, []);
     }
 }

@@ -1,6 +1,33 @@
 <?php
 
-trait CVendor_Xendit_ApiOperation_Request {
+abstract class CVendor_Xendit_Base {
+    protected $apiRequestor;
+
+    public function __construct(CVendor_Xendit_ApiRequestor $apiRequestor) {
+        $this->apiRequestor = $apiRequestor;
+    }
+
+    /**
+     * Instantiate base URL
+     *
+     * @return string
+     */
+    abstract protected function classUrl();
+
+    /**
+     * Instantiate required params for Create
+     *
+     * @return array
+     */
+    abstract protected function createReqParams();
+
+    /**
+     * Instantiate required params for Update
+     *
+     * @return array
+     */
+    abstract protected function updateReqParams();
+
     /**
      * Parameters validation
      *
@@ -8,17 +35,19 @@ trait CVendor_Xendit_ApiOperation_Request {
      * @param array $requiredParams required parameters
      *
      * @return void
+     *
+     * @throws CVendor_Xendit_Exception_InvalidArgumentException
      */
-    protected static function validateParams($params = [], $requiredParams = []) {
+    protected function validateParams($params = [], $requiredParams = []) {
         $currParams = array_diff_key(array_flip($requiredParams), $params);
         if ($params && !is_array($params)) {
             $message = 'You must pass an array as params.';
-            throw new InvalidArgumentException($message);
+            throw new CVendor_Xendit_Exception_InvalidArgumentException($message);
         }
         if (count($currParams) > 0) {
             $message = 'You must pass required parameters on your params. '
             . 'Check https://xendit.github.io/apireference/ for more information.';
-            throw new InvalidArgumentException($message);
+            throw new CVendor_Xendit_Exception_InvalidArgumentException($message);
         }
     }
 
@@ -33,7 +62,7 @@ trait CVendor_Xendit_ApiOperation_Request {
      *
      * @throws CVendor_Xendit_Exception_ApiException
      */
-    protected static function request(
+    protected function request(
         $method,
         $url,
         $params = []
@@ -60,7 +89,7 @@ trait CVendor_Xendit_ApiOperation_Request {
             $headers['X-API-VERSION'] = $params['X-API-VERSION'];
         }
 
-        $requestor = CVendor_Xendit_ApiRequestor::instance();
+        $requestor = $this->apiRequestor;
         return $requestor->request($method, $url, $params, $headers);
     }
 }

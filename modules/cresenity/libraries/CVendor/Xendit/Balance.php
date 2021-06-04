@@ -1,7 +1,27 @@
 <?php
 
-class Balance {
-    use CVendor_Xendit_ApiOperation_Request;
+class CVendor_Xendit_Balance extends CVendor_Xendit_Base {
+    public function classUrl() {
+        return  '/balance';
+    }
+
+    /**
+     * Instantiate required params for Create
+     *
+     * @return array
+     */
+    public function createReqParams() {
+        return [];
+    }
+
+    /**
+     * Instantiate required params for Update
+     *
+     * @return array
+     */
+    public function updateReqParams() {
+        return [];
+    }
 
     /**
      * Available account type
@@ -37,9 +57,9 @@ class Balance {
      *
      * @throws CVendor_Xendit_Exception_ApiException
      */
-    public static function getBalance($accountType = null) {
+    public function getBalance($accountType = null) {
         self::validateAccountType($accountType);
-        $url = '/balance?account_type=' . $accountType;
-        return static::request('GET', $url);
+        $url = $this->classUrl() . '?account_type=' . $accountType;
+        return $this->request('GET', $url);
     }
 }

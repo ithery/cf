@@ -9,9 +9,40 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since May 17, 2019, 7:55:48 PM
  */
 class CVendor_Xendit {
+    protected $factory;
+
+    protected $libVersion;
+
+    const VERSION = '2.5.0';
+
     public function __construct($options) {
         $this->server_domain = 'https://api.xendit.co';
         $this->secret_api_key = $options['secret_api_key'];
+        $this->libVersion = carr::get($options, 'version', self::VERSION);
+    }
+
+    public function getLibVersion() {
+        return $this->libVersion;
+    }
+
+    public function getSecretApiKey() {
+        return $this->secret_api_key;
+    }
+
+    public function getServerDomain() {
+        return $this->server_domain;
+    }
+
+    /**
+     * Get Xendit Factory
+     *
+     * @return CVendor_Xendit_Factory
+     */
+    public function factory() {
+        if ($this->factory == null) {
+            $this->factory = new CVendor_Xendit_Factory($this);
+        }
+        return $this->factory;
     }
 
     public function createInvoice($external_id, $amount, $payer_email, $description, $invoice_options = null) {

@@ -1,16 +1,5 @@
 <?php
 
-/**
- * Trait Create
- *
- * @category Trait
- * @package  Xendit\ApiOperations
- *
- * @author   Ellen <ellen@xendit.co>
- * @license  https://opensource.org/licenses/MIT MIT License
- *
- * @link     https://api.xendit.co
- */
 trait CVendor_Xendit_ApiOperation_Create {
     /**
      * Send a create request
@@ -19,11 +8,11 @@ trait CVendor_Xendit_ApiOperation_Create {
      *
      * @return array
      */
-    public static function create($params = []) {
-        self::validateParams($params, static::createReqParams());
+    public function create($params = []) {
+        $this->validateParams($params, $this->createReqParams());
 
-        $url = static::classUrl();
+        $url = $this->classUrl();
 
-        return static::_request('POST', $url, $params);
+        return $this->request('POST', $url, $params);
     }
 }
