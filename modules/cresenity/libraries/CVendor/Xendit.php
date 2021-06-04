@@ -45,29 +45,16 @@ class CVendor_Xendit {
         return $this->factory;
     }
 
-    public function createInvoice($external_id, $amount, $payer_email, $description, $invoice_options = null) {
-        $curl = curl_init();
-        $headers = [];
-        $headers[] = 'Content-Type: application/json';
-        $end_point = $this->server_domain . '/v2/invoices';
+    public function createInvoice($external_id, $amount, $payer_email, $description, $invoiceOptions = []) {
         $data['external_id'] = $external_id;
         $data['amount'] = (int) $amount;
         $data['payer_email'] = $payer_email;
         $data['description'] = $description;
-        if (!empty($invoice_options['callback_virtual_account_id'])) {
-            $data['callback_virtual_account_id'] = $invoice_options['callback_virtual_account_id'];
+
+        if (!isset($invoiceOptions['callback_virtual_account_id']) && !empty($invoiceOptions['callback_virtual_account_id'])) {
+            $data['callback_virtual_account_id'] = $invoiceOptions['callback_virtual_account_id'];
         }
-        $payload = json_encode($data);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
-        curl_setopt($curl, CURLOPT_URL, $end_point);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $responseObject = json_decode($response, true);
-        return $responseObject;
+        return $this->factory()->invoice()->create($data);
     }
 
     public function createDisbursement($external_id, $amount, $bank_code, $account_holder_name, $account_number, $disbursement_options = null) {
