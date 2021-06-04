@@ -87,19 +87,11 @@ class CVendor_Xendit {
         return $responseObject;
     }
 
+    /**
+     * @return array
+     */
     public function getVirtualAccountBanks() {
-        $curl = curl_init();
-        $headers = [];
-        $headers[] = 'Content-Type: application/json';
-        $end_point = $this->server_domain . '/available_virtual_account_banks';
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
-        curl_setopt($curl, CURLOPT_URL, $end_point);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $responseObject = json_decode($response, true);
-        return $responseObject;
+        return $this->factory()->virtualAccount()->getVABanks();
     }
 
     public function createCallbackVirtualAccount($external_id, $bank_code, $name, $virtual_account_number = null, $options = []) {
