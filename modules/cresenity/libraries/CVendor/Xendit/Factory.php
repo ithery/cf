@@ -38,4 +38,16 @@ class CVendor_Xendit_Factory {
     public function cardlessCredit() {
         return new CVendor_Xendit_CardlessCredit($this->apiRequestor);
     }
+
+    public function promotion() {
+        return new CVendor_Xendit_Promotion($this->apiRequestor);
+    }
+
+    public function payout() {
+        return new CVendor_Xendit_Payout($this->apiRequestor);
+    }
+
+    public function invoice() {
+        return new CVendor_Xendit_Invoice($this->apiRequestor);
+    }
 }

@@ -267,19 +267,19 @@ class CVendor_Xendit {
         return $responseObject;
     }
 
-    public function getBalance() {
-        $curl = curl_init();
-        $headers = [];
-        $headers[] = 'Content-Type: application/json';
-        $end_point = $this->server_domain . '/balance';
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
-        curl_setopt($curl, CURLOPT_URL, $end_point);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $responseObject = json_decode($response, true);
-        return $responseObject;
+    /**
+     * Send GET request to retrieve data
+     *
+     * @param string $accountType account type (CASH|HOLDING|TAX)
+     *
+     * @return array[
+     *                'balance' => int
+     *                ]
+     *
+     * @throws CVendor_Xendit_Exception_ApiException
+     */
+    public function getBalance($accountType = 'CASH') {
+        return $this->factory()->balance()->getBalance($accountType);
     }
 
     public function captureCreditCardPayment($external_id, $token_id, $amount, $capture_options = null) {
