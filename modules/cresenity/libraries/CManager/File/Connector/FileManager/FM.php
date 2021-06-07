@@ -9,14 +9,28 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Aug 11, 2019, 2:08:47 AM
  */
 class CManager_File_Connector_FileManager_FM {
-    use CEvent_Trait_Dispatchable;
-
     protected $config = [];
 
     public function __construct($config = []) {
         $this->config = $config;
 
         $this->dispatch(new CManager_File_Connector_FileManager_Event_ManagerInitialized($this));
+    }
+
+    /**
+     * Dispatch an event and call the listeners.
+     *
+     * //@param string|object $event
+     * //@param mixed         $payload
+     * //@param bool          $halt
+     *
+     * @return array|null
+     */
+    public static function dispatch() {
+        $args = func_get_args();
+        $event = carr::get($args, 0);
+        $payload = array_slice($args, 1);
+        CEvent::dispatcher()->dispatch($event, $payload);
     }
 
     public function path() {
