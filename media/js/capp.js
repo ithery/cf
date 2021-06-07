@@ -756,6 +756,9 @@ let Cresenity = function () {
             return url;
         };
     };
+    this.ui = {
+        start: () => {}
+    };
 
     this.url = new Url(this);
     this.base64 = new Base64(this);
@@ -2231,6 +2234,7 @@ if (!window.cresenity) {
         },
         append: function (id_target, url, method, data_addition) {
             if (!method) {method = 'get';}
+            // eslint-disable-next-line no-unused-vars
             let xhr = jQuery('#' + id_target).data('xhr');
             url = $.cresenity.url.replace_param(url);
             if (typeof data_addition == 'undefined') {data_addition = {};}
@@ -2274,6 +2278,7 @@ if (!window.cresenity) {
         },
         prepend: function (id_target, url, method, data_addition) {
             if (!method) {method = 'get';}
+            // eslint-disable-next-line no-unused-vars
             let xhr = jQuery('#' + id_target).data('xhr');
             url = $.cresenity.url.replace_param(url);
             if (typeof data_addition == 'undefined') {data_addition = {};}
