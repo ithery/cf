@@ -1,16 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Aug 11, 2019, 9:39:32 PM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use CManager_File_Connector_FileManager_FM as FM;
 
 class CManager_File_Connector_FileManager_Controller_DeleteController extends CManager_File_Connector_FileManager_AbstractController {
-
     /**
      * Get list of folders as json to populate treeview.
      *
@@ -52,5 +53,4 @@ class CManager_File_Connector_FileManager_Controller_DeleteController extends CM
         }
         echo parent::$successResponse;
     }
-
 }
