@@ -12,11 +12,7 @@ class ctemp {
     }
 
     public static function makedir($path) {
-        if (!is_dir($path)) {
-            mkdir($path);
-        }
-
-        return $path;
+        return CTemporary::makeDir($path);
     }
 
     public static function makefolder($path, $folder) {
