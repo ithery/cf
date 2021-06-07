@@ -1,22 +1,36 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 11, 2019, 2:08:47 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 11, 2019, 2:08:47 AM
  */
 class CManager_File_Connector_FileManager_FM {
-
-    use CEvent_Trait_Dispatchable;
-
-    protected $config = array();
+    protected $config = [];
 
     public function __construct($config = []) {
         $this->config = $config;
 
         $this->dispatch(new CManager_File_Connector_FileManager_Event_ManagerInitialized($this));
+    }
+
+    /**
+     * Dispatch an event and call the listeners.
+     *
+     * //@param string|object $event
+     * //@param mixed         $payload
+     * //@param bool          $halt
+     *
+     * @return array|null
+     */
+    public static function dispatch() {
+        $args = func_get_args();
+        $event = carr::get($args, 0);
+        $payload = array_slice($args, 1);
+        CEvent::dispatcher()->dispatch($event, $payload);
     }
 
     public function path() {
@@ -28,7 +42,6 @@ class CManager_File_Connector_FileManager_FM {
     }
 
     public function config($key, $default = null) {
-        
         return carr::get($this->config, $key, CF::config('filemanager.' . $key, $default));
     }
 
@@ -58,7 +71,8 @@ class CManager_File_Connector_FileManager_FM {
     /**
      * Translate file name to make it compatible on Windows.
      *
-     * @param  string  $input  Any string.
+     * @param string $input any string
+     *
      * @return string
      */
     public function translateFromUtf8($input) {
@@ -129,25 +143,21 @@ class CManager_File_Connector_FileManager_FM {
     }
 
     public function getStorage($storagePath) {
-
-
         return new CManager_File_Connector_FileManager_FM_StorageRepository($storagePath, $this);
     }
 
     public function getCategoryName() {
-       
         $type = $this->currentFmType();
-        $categoryName =  $this->config('folder_categories.' . $type . '.folder_name', 'files');
+        $categoryName = $this->config('folder_categories.' . $type . '.folder_name', 'files');
         $rootPath = ltrim($this->config('root_path'), '/');
         if (strlen($rootPath) > 0) {
             $rootPath = rtrim($rootPath) . '/' . rtrim($categoryName, '/');
         }
-       
-        return $rootPath; 
+
+        return $rootPath;
     }
 
     public function getRootFolder($type = null) {
-
         return '/';
     }
 
@@ -157,7 +167,7 @@ class CManager_File_Connector_FileManager_FM {
             return call_user_func($config);
         }
         if (class_exists($config)) {
-            return app()->make($config)->userField();
+            // return app()->make($config)->userField();
         }
         $app = CApp::instance();
         $user = $app->user();
@@ -180,8 +190,9 @@ class CManager_File_Connector_FileManager_FM {
     /**
      * Shorter function of getting localized error message..
      *
-     * @param  mixed  $error_type  Key of message in lang file.
-     * @param  mixed  $variables   Variables the message needs.
+     * @param mixed $error_type key of message in lang file
+     * @param mixed $variables  variables the message needs
+     *
      * @return string
      */
     public function error($error_type, $variables = []) {
@@ -191,7 +202,8 @@ class CManager_File_Connector_FileManager_FM {
     /**
      * Get only the file name.
      *
-     * @param  string  $path  Real path of a file.
+     * @param string $path real path of a file
+     *
      * @return string
      */
     public function getNameFromPath($path) {
@@ -211,8 +223,6 @@ class CManager_File_Connector_FileManager_FM {
     }
 
     public function connectorUrl() {
-
         return $this->config('connector_url', curl::base() . 'cresenity/connector/fm');
     }
-
 }
