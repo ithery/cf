@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CMage_FieldBase {
-
     /**
      * Indicates if the element should be shown on the index view.
      *
@@ -137,5 +130,4 @@ class CMage_FieldBase {
 
         return $this;
     }
-
 }
