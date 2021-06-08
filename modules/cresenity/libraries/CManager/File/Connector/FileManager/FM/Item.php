@@ -1,19 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 11, 2019, 5:32:56 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 11, 2019, 5:32:56 AM
  */
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class CManager_File_Connector_FileManager_FM_Item {
-
     private $fmPath;
+
     private $helper;
+
     private $columns = ['name', 'url', 'time', 'icon', 'is_file', 'is_image', 'thumb_url'];
+
     public $attributes = [];
 
     public function __construct(CManager_File_Connector_FileManager_FM_Path $fmPath, CManager_File_Connector_FileManager_FM $helper) {
@@ -45,7 +48,6 @@ class CManager_File_Connector_FileManager_FM_Item {
     }
 
     public function isDirectory() {
-        
         return $this->fmPath->isDirectory();
     }
 
@@ -56,7 +58,6 @@ class CManager_File_Connector_FileManager_FM_Item {
     /**
      * Check a file is image or not.
      *
-     * @param  mixed  $file  Real path of a file or instance of UploadedFile.
      * @return bool
      */
     public function isImage() {
@@ -69,11 +70,10 @@ class CManager_File_Connector_FileManager_FM_Item {
     /**
      * Get mime type of a file.
      *
-     * @param  mixed  $file  Real path of a file or instance of UploadedFile.
      * @return string
      */
-    // TODO: uploaded file
     public function mimeType() {
+        // TODO: uploaded file
         // if ($file instanceof UploadedFile) {
         //     return $file->getMimeType();
         // }
@@ -104,7 +104,7 @@ class CManager_File_Connector_FileManager_FM_Item {
 
     public function thumbUrl() {
         if ($this->isDirectory()) {
-            return curl::httpbase().'modules/cresenity/media/img/filemanager/folder.png';
+            return curl::httpbase() . 'modules/cresenity/media/img/filemanager/folder.png';
         }
         if ($this->isImage()) {
             return $this->fmPath->thumb($this->hasThumb())->url(true);
@@ -124,7 +124,7 @@ class CManager_File_Connector_FileManager_FM_Item {
 
     public function type() {
         if ($this->isDirectory()) {
-            return trans(Lfm::PACKAGE_NAME . '::lfm.type-folder');
+            return c::trans('filemanager.type-folder');
         }
         if ($this->isImage()) {
             return $this->mimeType();
@@ -162,8 +162,9 @@ class CManager_File_Connector_FileManager_FM_Item {
     /**
      * Make file size readable.
      *
-     * @param  int  $bytes     File size in bytes.
-     * @param  int  $decimals  Decimals.
+     * @param int $bytes    file size in bytes
+     * @param int $decimals decimals
+     *
      * @return string
      */
     public function humanFilesize($bytes, $decimals = 2) {
@@ -171,5 +172,4 @@ class CManager_File_Connector_FileManager_FM_Item {
         $factor = floor((strlen($bytes) - 1) / 3);
         return sprintf("%.{$decimals}f %s", $bytes / pow(1024, $factor), @$size[$factor]);
     }
-
 }
