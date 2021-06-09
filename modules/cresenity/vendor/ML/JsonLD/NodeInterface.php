@@ -14,31 +14,31 @@ namespace ML\JsonLD;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-interface NodeInterface
-{
+interface NodeInterface {
     /**
      * Get ID
      *
-     * @return string|null The ID of the node or null.
+     * @return string|null the ID of the node or null
      */
     public function getId();
 
     /**
      * Set the node type
      *
-     * @param null|NodeInterface|array[NodeInterface] The type(s) of this node.
+     * @param null|NodeInterface|array[NodeInterface] The type(s) of this node
+     * @param mixed $type
      *
      * @return self
      *
-     * @throws \InvalidArgumentException If type is not null, a Node or an
-     *                                   array of Nodes.
+     * @throws \InvalidArgumentException if type is not null, a Node or an
+     *                                   array of Nodes
      */
     public function setType($type);
 
     /**
      * Add a type to this node
      *
-     * @param NodeInterface The type to add.
+     * @param NodeInterface the type to add
      *
      * @return self
      */
@@ -47,7 +47,7 @@ interface NodeInterface
     /**
      * Remove a type from this node
      *
-     * @param NodeInterface The type to remove.
+     * @param NodeInterface the type to remove
      *
      * @return self
      */
@@ -56,7 +56,7 @@ interface NodeInterface
     /**
      * Get node type
      *
-     * @return null|NodeInterface|NodeInterface[] Returns the type(s) of this node.
+     * @return null|NodeInterface|NodeInterface[] returns the type(s) of this node
      */
     public function getType();
 
@@ -64,18 +64,19 @@ interface NodeInterface
      * Get the nodes which have this node as their type
      *
      * This will return all nodes that link to this Node instance via the
+     *
      * @type (rdf:type) property.
      *
-     * @return NodeInterface[] Returns the node(s) having this node as their
-     *                         type.
+     * @return NodeInterface[] returns the node(s) having this node as their
+     *                         type
      */
     public function getNodesWithThisType();
 
     /**
      * Get the graph the node belongs to
      *
-     * @return null|GraphInterface Returns the graph the node belongs to or
-     *                             null if the node doesn't belong to any graph.
+     * @return null|GraphInterface returns the graph the node belongs to or
+     *                             null if the node doesn't belong to any graph
      */
     public function getGraph();
 
@@ -96,7 +97,7 @@ interface NodeInterface
      * therefore a node identifier with the prefix <code>_:</code> or no
      * identifier at all.
      *
-     * @return bool Returns true if the node is a blank node, otherwise false.
+     * @return bool returns true if the node is a blank node, otherwise false
      */
     public function isBlankNode();
 
@@ -108,15 +109,15 @@ interface NodeInterface
      * If the referenced node is already part of another graph a copy of the
      * node will be created and added to the graph.
      *
-     * @param string $property The name of the property.
+     * @param string $property the name of the property
      * @param mixed  $value    The value of the property. This MUST NOT be
      *                         an array. Use null to remove the property.
      *
      * @return self
      *
-     * @throws \InvalidArgumentException If value is an array or an object
+     * @throws \InvalidArgumentException if value is an array or an object
      *                                   which is neither a language-tagged
-     *                                   string nor a typed value or a node.
+     *                                   string nor a typed value or a node
      */
     public function setProperty($property, $value);
 
@@ -131,22 +132,22 @@ interface NodeInterface
      * If the referenced node is already part of another graph a copy of the
      * node will be created and added to the graph.
      *
-     * @param string $property The name of the property.
+     * @param string $property the name of the property
      * @param mixed  $value    The value of the property. This MUST NOT be
      *                         an array.
      *
      * @return self
      *
-     * @throws \InvalidArgumentException If value is an array or an object
+     * @throws \InvalidArgumentException if value is an array or an object
      *                                   which is neither a language-tagged
-     *                                   string nor a typed value or a node.
+     *                                   string nor a typed value or a node
      */
     public function addPropertyValue($property, $value);
 
     /**
      * Removes a property and all it's values
      *
-     * @param string $property The name of the property to remove.
+     * @param string $property the name of the property to remove
      *
      * @return self
      */
@@ -155,7 +156,7 @@ interface NodeInterface
     /**
      * Removes a property value
      *
-     * @param string $property The name of the property.
+     * @param string $property the name of the property
      * @param mixed  $value    The value of the property. This MUST NOT be
      *                         an array.
      *
@@ -175,10 +176,10 @@ interface NodeInterface
     /**
      * Get the value of a property
      *
-     * @param string $property The name of the property.
+     * @param string $property the name of the property
      *
-     * @return mixed Returns the value of the property or null if the
-     *               property doesn't exist.
+     * @return mixed returns the value of the property or null if the
+     *               property doesn't exist
      */
     public function getProperty($property);
 
@@ -198,21 +199,21 @@ interface NodeInterface
      * This will return all nodes that link to this Node instance via the
      * specified property.
      *
-     * @param string $property The name of the reverse property.
+     * @param string $property the name of the reverse property
      *
-     * @return null|NodeInterface|NodeInterface[] Returns the node(s) pointing
+     * @return null|NodeInterface|NodeInterface[] returns the node(s) pointing
      *                                            to this instance via the specified
-     *                                            property or null if no such node exists.
+     *                                            property or null if no such node exists
      */
     public function getReverseProperty($property);
 
     /**
      * Compares this node object to the specified value.
      *
-     * @param mixed $other The value this instance should be compared to.
+     * @param mixed $other the value this instance should be compared to
      *
-     * @return bool Returns true if the passed value is the same as this
-     *              instance; false otherwise.
+     * @return bool returns true if the passed value is the same as this
+     *              instance; false otherwise
      */
     public function equals(NodeInterface $other);
 }

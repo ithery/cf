@@ -10,27 +10,28 @@ use Psr\Http\Message\UriFactoryInterface;
 use RuntimeException;
 
 abstract class FactoryDiscovery {
-
     const REQUEST = [
-        'Laminas\Diactoros\RequestFactory',
-        'GuzzleHttp\Psr7\HttpFactory',
-        'Slim\Psr7\Factory\RequestFactory',
-        'Nyholm\Psr7\Factory\Psr17Factory',
-        'Sunrise\Http\Message\RequestFactory',
+        '\Laminas\Diactoros\RequestFactory',
+        '\GuzzleHttp\Psr7\HttpFactory',
+        '\Slim\Psr7\Factory\RequestFactory',
+        '\Nyholm\Psr7\Factory\Psr17Factory',
+        '\Sunrise\Http\Message\RequestFactory',
     ];
+
     const RESPONSE = [
-        'Laminas\Diactoros\ResponseFactory',
-        'GuzzleHttp\Psr7\HttpFactory',
-        'Slim\Psr7\Factory\ResponseFactory',
-        'Nyholm\Psr7\Factory\Psr17Factory',
-        'Sunrise\Http\Message\ResponseFactory',
+        '\Laminas\Diactoros\ResponseFactory',
+        '\GuzzleHttp\Psr7\HttpFactory',
+        '\Slim\Psr7\Factory\ResponseFactory',
+        '\Nyholm\Psr7\Factory\Psr17Factory',
+        '\Sunrise\Http\Message\ResponseFactory',
     ];
+
     const URI = [
-        'Laminas\Diactoros\UriFactory',
-        'GuzzleHttp\Psr7\HttpFactory',
-        'Slim\Psr7\Factory\UriFactory',
-        'Nyholm\Psr7\Factory\Psr17Factory',
-        'Sunrise\Http\Message\UriFactory',
+        '\Laminas\Diactoros\UriFactory',
+        '\GuzzleHttp\Psr7\HttpFactory',
+        '\Slim\Psr7\Factory\UriFactory',
+        '\Nyholm\Psr7\Factory\Psr17Factory',
+        '\Sunrise\Http\Message\UriFactory',
     ];
 
     public static function getRequestFactory() {
@@ -64,5 +65,4 @@ abstract class FactoryDiscovery {
 
         return null;
     }
-
 }

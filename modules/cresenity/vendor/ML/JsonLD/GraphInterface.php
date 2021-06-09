@@ -14,8 +14,7 @@ namespace ML\JsonLD;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-interface GraphInterface
-{
+interface GraphInterface {
     /**
      * Creates a new node which is linked to this document
      *
@@ -26,13 +25,13 @@ interface GraphInterface
      * If there exists already a node with the passed ID in the document,
      * that node will be returned instead of creating a new one.
      *
-     * @param null|string $id              The ID of the node.
-     * @param bool        $preserveBnodeId If set to false, blank nodes are
+     * @param null|string $id              the ID of the node
+     * @param bool        $preserveBnodeId if set to false, blank nodes are
      *                                     relabeled to avoid collisions;
      *                                     otherwise the blank node identifier
-     *                                     is preserved.
+     *                                     is preserved
      *
-     * @return Node The newly created node.
+     * @return Node the newly created node
      */
     public function createNode($id = null, $preserveBnodeId = false);
 
@@ -42,7 +41,7 @@ interface GraphInterface
      * This will also eliminate all references to the node within the
      * document.
      *
-     * @param NodeInterface $node The node to remove from the document.
+     * @param NodeInterface $node the node to remove from the document
      *
      * @return self
      */
@@ -51,17 +50,17 @@ interface GraphInterface
     /**
      * Get all nodes
      *
-     * @return Node[] Returns an array containing all nodes defined in the
-     *                document.
+     * @return Node[] returns an array containing all nodes defined in the
+     *                document
      */
     public function getNodes();
 
     /**
      * Get a node by ID
      *
-     * @param string $id The ID of the node to retrieve.
+     * @param string $id the ID of the node to retrieve
      *
-     * @return Node|null Returns the node if found; null otherwise.
+     * @return Node|null returns the node if found; null otherwise
      */
     public function getNode($id);
 
@@ -70,8 +69,8 @@ interface GraphInterface
      *
      * @param string|Node $type The type
      *
-     * @return Node[] Returns an array containing all nodes of the specified
-     *                type in the document.
+     * @return Node[] returns an array containing all nodes of the specified
+     *                type in the document
      */
     public function getNodesByType($type);
 
@@ -84,17 +83,17 @@ interface GraphInterface
      *                        which is part of the document will be passed
      *                        instead of a string.
      *
-     * @return bool Returns true if the document contains a node with the
-     *              specified ID; false otherwise.
+     * @return bool returns true if the document contains a node with the
+     *              specified ID; false otherwise
      */
     public function containsNode($id);
 
     /**
      * Get the document the node belongs to
      *
-     * @return null|DocumentInterface Returns the document the node belongs
+     * @return null|DocumentInterface returns the document the node belongs
      *                                to or null if the node doesn't belong
-     *                                to any document.
+     *                                to any document
      */
     public function getDocument();
 
@@ -108,8 +107,8 @@ interface GraphInterface
     /**
      * Merges the specified graph into the current graph
      *
-     * @param GraphInterface $graph The graph that should be merged into the
-     *                              current graph.
+     * @param GraphInterface $graph the graph that should be merged into the
+     *                              current graph
      *
      * @return self
      */

@@ -16,14 +16,13 @@ namespace ML\JsonLD;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-interface DocumentFactoryInterface
-{
+interface DocumentFactoryInterface {
     /**
      * Creates a new document
      *
-     * @param null|string $iri The document's IRI.
+     * @param null|string $iri the document's IRI
      *
-     * @return DocumentInterface The document.
+     * @return DocumentInterface the document
      */
     public function createDocument($iri = null);
 }

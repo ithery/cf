@@ -16,8 +16,7 @@ use ML\JsonLD\Quad;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-class InvalidQuadException extends \RuntimeException
-{
+class InvalidQuadException extends \RuntimeException {
     /**
      * The quad that triggered this exception
      *
@@ -28,12 +27,11 @@ class InvalidQuadException extends \RuntimeException
     /**
      * Constructor.
      *
-     * @param string    $message  The error message
-     * @param Quad      $quad     The quad
+     * @param string          $message  The error message
+     * @param Quad            $quad     The quad
      * @param null|\Exception $previous The previous exception
      */
-    public function __construct($message, $quad, \Exception $previous = null)
-    {
+    public function __construct($message, $quad, \Exception $previous = null) {
         $this->quad = $quad;
 
         parent::__construct($this->message, 0, $previous);
@@ -42,20 +40,18 @@ class InvalidQuadException extends \RuntimeException
     /**
      * Gets the quad
      *
-     * @return Quad The quad.
+     * @return Quad the quad
      */
-    public function getQuad()
-    {
+    public function getQuad() {
         return $this->quad;
     }
 
     /**
      * Sets the quad
      *
-     * @param Quad $quad The quad.
+     * @param Quad $quad the quad
      */
-    public function setQuad($quad)
-    {
+    public function setQuad($quad) {
         $this->quad = $quad;
     }
 }

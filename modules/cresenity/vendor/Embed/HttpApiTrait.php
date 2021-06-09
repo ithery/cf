@@ -8,7 +8,6 @@ use Exception;
 use Psr\Http\Message\UriInterface;
 
 trait HttpApiTrait {
-
     use ApiTrait;
 
     private $endpoint;
@@ -28,5 +27,4 @@ trait HttpApiTrait {
             return [];
         }
     }
-
 }

@@ -16,17 +16,16 @@ use ML\IRI\IRI;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-class Graph implements GraphInterface, JsonLdSerializable
-{
+class Graph implements GraphInterface, JsonLdSerializable {
     /**
-     * @var DocumentInterface The document this graph belongs to.
+     * @var DocumentInterface the document this graph belongs to
      */
     private $document;
 
     /**
      * @var array An associative array holding all nodes in the graph
      */
-    protected $nodes = array();
+    protected $nodes = [];
 
     /**
      * A term map containing terms/prefixes mapped to IRIs. This is similar
@@ -34,7 +33,7 @@ class Graph implements GraphInterface, JsonLdSerializable
      *
      * @var array
      */
-    protected $termMap = array();
+    protected $termMap = [];
 
     /**
      * @var int Blank node counter
@@ -44,18 +43,16 @@ class Graph implements GraphInterface, JsonLdSerializable
     /**
      * Constructor
      *
-     * @param null|DocumentInterface $document The document the graph belongs to.
+     * @param null|DocumentInterface $document the document the graph belongs to
      */
-    public function __construct(DocumentInterface $document = null)
-    {
+    public function __construct(DocumentInterface $document = null) {
         $this->document = $document;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createNode($id = null, $preserveBnodeId = false)
-    {
+    public function createNode($id = null, $preserveBnodeId = false) {
         if (!is_string($id) || (!$preserveBnodeId && ('_:' === substr($id, 0, 2)))) {
             $id = $this->createBlankNodeId();
         } else {
@@ -71,8 +68,7 @@ class Graph implements GraphInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function removeNode(NodeInterface $node)
-    {
+    public function removeNode(NodeInterface $node) {
         if ($node->getGraph() === $this) {
             $node->removeFromGraph();
         }
@@ -91,16 +87,14 @@ class Graph implements GraphInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function getNodes()
-    {
+    public function getNodes() {
         return array_values($this->nodes);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getNode($id)
-    {
+    public function getNode($id) {
         if (!((strlen($id) >= 2) && ('_:' === substr($id, 0, 2)))) {
             $id = (string) $this->resolveIri($id);
         }
@@ -113,11 +107,10 @@ class Graph implements GraphInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function getNodesByType($type)
-    {
+    public function getNodesByType($type) {
         if (is_string($type)) {
             if (null === ($type = $this->getNode($type))) {
-                return array();
+                return [];
             }
         }
 
@@ -127,8 +120,7 @@ class Graph implements GraphInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function containsNode($id)
-    {
+    public function containsNode($id) {
         $node = $id;
 
         if ($node instanceof Node) {
@@ -155,16 +147,14 @@ class Graph implements GraphInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function getDocument()
-    {
+    public function getDocument() {
         return $this->document;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function removeFromDocument()
-    {
+    public function removeFromDocument() {
         $doc = $this->document;
         $this->document = null;
 
@@ -176,10 +166,9 @@ class Graph implements GraphInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function merge(GraphInterface $graph)
-    {
+    public function merge(GraphInterface $graph) {
         $nodes = $graph->getNodes();
-        $bnodeMap = array();
+        $bnodeMap = [];
 
         foreach ($nodes as $node) {
             if ($node->isBlankNode()) {
@@ -193,7 +182,7 @@ class Graph implements GraphInterface, JsonLdSerializable
 
             foreach ($node->getProperties() as $property => $values) {
                 if (false === is_array($values)) {
-                    $values = array($values);
+                    $values = [$values];
                 }
 
                 foreach ($values as $val) {
@@ -226,8 +215,7 @@ class Graph implements GraphInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function toJsonLd($useNativeTypes = true)
-    {
+    public function toJsonLd($useNativeTypes = true) {
         // Bring nodes into a deterministic order
         $nodes = $this->nodes;
         ksort($nodes);
@@ -243,10 +231,9 @@ class Graph implements GraphInterface, JsonLdSerializable
     /**
      * Create a new blank node identifier unique to the document.
      *
-     * @return string The new blank node identifier.
+     * @return string the new blank node identifier
      */
-    protected function createBlankNodeId()
-    {
+    protected function createBlankNodeId() {
         return '_:b' . $this->blankNodeCounter++;
     }
 
@@ -258,10 +245,9 @@ class Graph implements GraphInterface, JsonLdSerializable
      *
      * @param string|IRI $iri The (relative) IRI to resolve
      *
-     * @return IRI The resolved IRI.
+     * @return IRI the resolved IRI
      */
-    protected function resolveIri($iri)
-    {
+    protected function resolveIri($iri) {
         if (null === $this->document) {
             $base = new IRI();
         } else {

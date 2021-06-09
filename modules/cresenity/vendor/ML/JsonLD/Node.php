@@ -16,13 +16,14 @@ use stdClass as JsonObject;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-class Node implements NodeInterface, JsonLdSerializable
-{
-    /** The @type constant. */
+class Node implements NodeInterface, JsonLdSerializable {
+    /**
+     * The @type constant.
+     */
     const TYPE = '@type';
 
     /**
-     * @var GraphInterface The graph the node belongs to.
+     * @var GraphInterface the graph the node belongs to
      */
     private $graph;
 
@@ -34,7 +35,7 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * @var array An associative array holding all properties of the node except it's ID
      */
-    private $properties = array();
+    private $properties = [];
 
     /**
      * An associative array holding all reverse properties of this node, i.e.,
@@ -42,16 +43,15 @@ class Node implements NodeInterface, JsonLdSerializable
      *
      * @var array
      */
-    private $revProperties = array();
+    private $revProperties = [];
 
     /**
      * Constructor
      *
-     * @param GraphInterface $graph The graph the node belongs to.
-     * @param null|string    $id    The ID of the node.
+     * @param GraphInterface $graph the graph the node belongs to
+     * @param null|string    $id    the ID of the node
      */
-    public function __construct(GraphInterface $graph, $id = null)
-    {
+    public function __construct(GraphInterface $graph, $id = null) {
         $this->graph = $graph;
         $this->id = $id;
     }
@@ -59,16 +59,14 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function getId()
-    {
+    public function getId() {
         return $this->id;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setType($type)
-    {
+    public function setType($type) {
         if ((null !== $type) && !($type instanceof NodeInterface)) {
             if (is_array($type)) {
                 foreach ($type as $val) {
@@ -89,8 +87,7 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function addType(NodeInterface $type)
-    {
+    public function addType(NodeInterface $type) {
         $this->addPropertyValue(self::TYPE, $type);
 
         return $this;
@@ -99,8 +96,7 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function removeType(NodeInterface $type)
-    {
+    public function removeType(NodeInterface $type) {
         $this->removePropertyValue(self::TYPE, $type);
 
         return $this;
@@ -109,36 +105,32 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function getType()
-    {
+    public function getType() {
         return $this->getProperty(self::TYPE);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getNodesWithThisType()
-    {
+    public function getNodesWithThisType() {
         if (null === ($nodes = $this->getReverseProperty(self::TYPE))) {
-            return array();
+            return [];
         }
 
-        return (is_array($nodes)) ? $nodes : array($nodes);
+        return (is_array($nodes)) ? $nodes : [$nodes];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getGraph()
-    {
+    public function getGraph() {
         return $this->graph;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function removeFromGraph()
-    {
+    public function removeFromGraph() {
         // Remove other node's properties and reverse properties pointing to
         // this node
         foreach ($this->revProperties as $property => $nodes) {
@@ -149,7 +141,7 @@ class Node implements NodeInterface, JsonLdSerializable
 
         foreach ($this->properties as $property => $values) {
             if (!is_array($values)) {
-                $values = array($values);
+                $values = [$values];
             }
 
             foreach ($values as $value) {
@@ -170,20 +162,18 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function isBlankNode()
-    {
+    public function isBlankNode() {
         return ((null === $this->id) || ('_:' === substr($this->id, 0, 2)));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setProperty($property, $value)
-    {
+    public function setProperty($property, $value) {
         if (null === $value) {
             $this->removeProperty($property);
         } else {
-            $this->doMergeIntoProperty((string) $property, array(), $value);
+            $this->doMergeIntoProperty((string) $property, [], $value);
         }
 
         return $this;
@@ -192,14 +182,13 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function addPropertyValue($property, $value)
-    {
+    public function addPropertyValue($property, $value) {
         $existing = (isset($this->properties[(string) $property]))
             ? $this->properties[(string) $property]
-            : array();
+            : [];
 
         if (!is_array($existing)) {
-            $existing = array($existing);
+            $existing = [$existing];
         }
 
         $this->doMergeIntoProperty((string) $property, $existing, $value);
@@ -210,17 +199,16 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * Merge a value into a set of existing values.
      *
-     * @param string $property       The name of the property.
-     * @param array  $existingValues The existing values.
+     * @param string $property       the name of the property
+     * @param array  $existingValues the existing values
      * @param mixed  $value          The value to merge into the existing
      *                               values. This MUST NOT be an array.
      *
-     * @throws \InvalidArgumentException If value is an array or an object
+     * @throws \InvalidArgumentException if value is an array or an object
      *                                   which is neither a language-tagged
-     *                                   string nor a typed value or a node.
+     *                                   string nor a typed value or a node
      */
-    private function doMergeIntoProperty($property, $existingValues, $value)
-    {
+    private function doMergeIntoProperty($property, $existingValues, $value) {
         // TODO: Handle lists!
 
         if (null === $value) {
@@ -257,15 +245,14 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function removeProperty($property)
-    {
+    public function removeProperty($property) {
         if (!isset($this->properties[(string) $property])) {
             return $this;
         }
 
         $values = is_array($this->properties[(string) $property])
             ? $this->properties[(string) $property]
-            : array($this->properties[(string) $property]);
+            : [$this->properties[(string) $property]];
 
         foreach ($values as $value) {
             if ($value instanceof NodeInterface) {
@@ -281,18 +268,17 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function removePropertyValue($property, $value)
-    {
+    public function removePropertyValue($property, $value) {
         if (!$this->isValidPropertyValue($value) || !isset($this->properties[(string) $property])) {
             return $this;
         }
 
         $normalizedValue = $this->normalizePropertyValue($value);
 
-        $values =& $this->properties[(string) $property];
+        $values = &$this->properties[(string) $property];
 
         if (!is_array($this->properties[(string) $property])) {
-            $values = array($values);
+            $values = [$values];
         }
 
         for ($i = 0, $length = count($values); $i < $length; $i++) {
@@ -322,16 +308,14 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function getProperties()
-    {
+    public function getProperties() {
         return $this->properties;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getProperty($property)
-    {
+    public function getProperty($property) {
         return (isset($this->properties[(string) $property]))
             ? $this->properties[(string) $property]
             : null;
@@ -340,9 +324,8 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function getReverseProperties()
-    {
-        $result = array();
+    public function getReverseProperties() {
+        $result = [];
         foreach ($this->revProperties as $key => $nodes) {
             $result[$key] = array_values($nodes);
         }
@@ -353,8 +336,7 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function getReverseProperty($property)
-    {
+    public function getReverseProperty($property) {
         if (!isset($this->revProperties[(string) $property])) {
             return null;
         }
@@ -369,16 +351,14 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function equals(NodeInterface $other)
-    {
+    public function equals(NodeInterface $other) {
         return $this === $other;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function toJsonLd($useNativeTypes = true)
-    {
+    public function toJsonLd($useNativeTypes = true) {
         $node = new \stdClass();
 
         // Only label blank nodes if other nodes point to it
@@ -390,11 +370,11 @@ class Node implements NodeInterface, JsonLdSerializable
 
         foreach ($properties as $prop => $values) {
             if (false === is_array($values)) {
-                $values = array($values);
+                $values = [$values];
             }
 
             if (self::TYPE === $prop) {
-                $node->{'@type'} = array();
+                $node->{'@type'} = [];
                 foreach ($values as $val) {
                     $node->{'@type'}[] = $val->getId();
                 }
@@ -402,7 +382,7 @@ class Node implements NodeInterface, JsonLdSerializable
                 continue;
             }
 
-            $node->{$prop} = array();
+            $node->{$prop} = [];
 
             foreach ($values as $value) {
                 if ($value instanceof NodeInterface) {
@@ -417,7 +397,6 @@ class Node implements NodeInterface, JsonLdSerializable
                     $node->{$prop}[] = $val;
                 }
             }
-
         }
 
         return $node;
@@ -426,24 +405,22 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * Add a reverse property.
      *
-     * @param string        $property The name of the property.
-     * @param NodeInterface $node     The node which has a property pointing
-     *                                to this node instance.
+     * @param string        $property the name of the property
+     * @param NodeInterface $node     the node which has a property pointing
+     *                                to this node instance
      */
-    protected function addReverseProperty($property, NodeInterface $node)
-    {
+    protected function addReverseProperty($property, NodeInterface $node) {
         $this->revProperties[$property][$node->getId()] = $node;
     }
 
     /**
      * Remove a reverse property.
      *
-     * @param string        $property The name of the property.
-     * @param NodeInterface $node     The node which has a property pointing
-     *                                to this node instance.
+     * @param string        $property the name of the property
+     * @param NodeInterface $node     the node which has a property pointing
+     *                                to this node instance
      */
-    protected function removeReverseProperty($property, NodeInterface $node)
-    {
+    protected function removeReverseProperty($property, NodeInterface $node) {
         unset($this->revProperties[$property][$node->getId()]);
 
         if (0 === count($this->revProperties[$property])) {
@@ -454,33 +431,31 @@ class Node implements NodeInterface, JsonLdSerializable
     /**
      * Checks whether a value is a valid property value.
      *
-     * @param mixed $value The value to check.
+     * @param mixed $value the value to check
      *
-     * @return bool Returns true if the value is a valid property value;
-     *              false otherwise.
+     * @return bool returns true if the value is a valid property value;
+     *              false otherwise
      */
-    protected function isValidPropertyValue($value)
-    {
-        return (is_scalar($value) ||
-               (is_object($value) &&
-                ((($value instanceof NodeInterface) && ($value->getGraph() === $this->graph)) ||
-                 ($value instanceof Value))));
+    protected function isValidPropertyValue($value) {
+        return (is_scalar($value)
+               || (is_object($value)
+                && ((($value instanceof NodeInterface) && ($value->getGraph() === $this->graph))
+                 || ($value instanceof Value))));
     }
 
     /**
      * Normalizes a property value by converting scalars to Value objects.
      *
-     * @param  mixed $value The value to normalize.
+     * @param mixed $value the value to normalize
      *
-     * @return NodeInterface|Value The normalized value.
+     * @return NodeInterface|Value the normalized value
      */
-    protected function normalizePropertyValue($value)
-    {
+    protected function normalizePropertyValue($value) {
         if (false === is_scalar($value)) {
             return $value;
         }
 
-        return Value::fromJsonLd((object) array('@value' => $value));
+        return Value::fromJsonLd((object) ['@value' => $value]);
     }
 
     /**
@@ -489,13 +464,12 @@ class Node implements NodeInterface, JsonLdSerializable
      * Scalars and nodes are checked for identity, value objects for
      * equality.
      *
-     * @param mixed $value1 Value 1.
-     * @param mixed $value2 Value 2.
+     * @param mixed $value1 value 1
+     * @param mixed $value2 value 2
      *
-     * @return bool Returns true if the two values are equals; otherwise false.
+     * @return bool returns true if the two values are equals; otherwise false
      */
-    protected function equalValues($value1, $value2)
-    {
+    protected function equalValues($value1, $value2) {
         if (gettype($value1) !== gettype($value2)) {
             return false;
         }

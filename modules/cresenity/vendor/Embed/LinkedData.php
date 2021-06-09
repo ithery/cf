@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Embed;
 
 use Exception;
@@ -11,7 +10,6 @@ use ML\JsonLD\Node;
 use Throwable;
 
 class LinkedData {
-
     use ApiTrait;
 
     private $document;
@@ -76,7 +74,7 @@ class LinkedData {
 
     private static function detectValue($value) {
         if (is_array($value)) {
-            return array_map(function($val) {
+            return array_map(function ($val) {
                 return self::detectValue($val);
             }, array_values($value));
         }
@@ -91,5 +89,4 @@ class LinkedData {
 
         return $value->getValue();
     }
-
 }

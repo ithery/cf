@@ -5,7 +5,6 @@
 namespace Embed\Detectors;
 
 class Languages extends Detector {
-
     /**
      * @return \Psr\Http\Message\UriInterface[]
      */
@@ -26,5 +25,4 @@ class Languages extends Detector {
 
         return $languages;
     }
-
 }

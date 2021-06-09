@@ -16,8 +16,7 @@ use stdClass as JsonObject;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-final class LanguageTaggedString extends Value
-{
+final class LanguageTaggedString extends Value {
     /**
      * The language code associated with the string. Language codes are tags
      * according to {@link http://tools.ietf.org/html/bcp47 BCP47}.
@@ -29,11 +28,10 @@ final class LanguageTaggedString extends Value
     /**
      * Constructor
      *
-     * @param string $value    The string's value.
-     * @param string $language The string's language.
+     * @param string $value    the string's value
+     * @param string $language the string's language
      */
-    public function __construct($value, $language)
-    {
+    public function __construct($value, $language) {
         $this->setValue($value);
         $this->setLanguage($language);
     }
@@ -41,15 +39,14 @@ final class LanguageTaggedString extends Value
     /**
      * Set the language
      *
-     * @param string $language The language.
+     * @param string $language the language
      *
      * @return self
      *
      * @throws \InvalidArgumentException If the language is not a string. No
      *                                   further checks are currently done.
      */
-    public function setLanguage($language)
-    {
+    public function setLanguage($language) {
         if (!is_string($language)) {
             throw new \InvalidArgumentException('language must be a string.');
         }
@@ -62,18 +59,16 @@ final class LanguageTaggedString extends Value
     /**
      * Get the language
      *
-     * @return string The language.
+     * @return string the language
      */
-    public function getLanguage()
-    {
+    public function getLanguage() {
         return $this->language;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function toJsonLd($useNativeTypes = true)
-    {
+    public function toJsonLd($useNativeTypes = true) {
         $result = new JsonObject();
         $result->{'@value'} = $this->value;
         $result->{'@language'} = $this->language;
@@ -84,8 +79,7 @@ final class LanguageTaggedString extends Value
     /**
      * {@inheritdoc}
      */
-    public function equals($other)
-    {
+    public function equals($other) {
         if (get_class($this) !== get_class($other)) {
             return false;
         }

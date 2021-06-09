@@ -16,21 +16,20 @@ namespace ML\JsonLD;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-interface JsonLdSerializable
-{
+interface JsonLdSerializable {
     /**
      * Convert to expanded and flattened JSON-LD
      *
      * The result can then be serialized to JSON-LD by {@see JsonLD::toString()}.
      *
-     * @param boolean $useNativeTypes If set to true, native types are used
-     *                                for xsd:integer, xsd:double, and
-     *                                xsd:boolean, otherwise typed strings
-     *                                will be used instead.
+     * @param bool $useNativeTypes if set to true, native types are used
+     *                             for xsd:integer, xsd:double, and
+     *                             xsd:boolean, otherwise typed strings
+     *                             will be used instead
      *
-     * @return mixed Returns data which can be serialized by
+     * @return mixed returns data which can be serialized by
      *               {@see JsonLD::toString()} (which is a value of any type
-     *               other than a resource) to expanded JSON-LD.
+     *               other than a resource) to expanded JSON-LD
      *
      * @see JsonLD::toString()
      */

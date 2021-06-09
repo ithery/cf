@@ -12,7 +12,6 @@ use SimpleXMLElement;
 use DOMXPath;
 
 class Parser {
-
     public static function stringify(DOMNode $node) {
         if ($node instanceof DOMDocument) {
             return $node->saveHTML($node);
@@ -39,9 +38,9 @@ class Parser {
             $httpEquiv = $httpEquiv ? self::stringify($httpEquiv) : null;
 
             $html = preg_replace(
-                    '/<head[^>]*>/',
-                    '<head>' . $charset . $httpEquiv,
-                    $html
+                '/<head[^>]*>/',
+                '<head>' . $charset . $httpEquiv,
+                $html
             );
 
             return self::createDOMDocument($html);
@@ -82,5 +81,4 @@ class Parser {
 
         return $document;
     }
-
 }

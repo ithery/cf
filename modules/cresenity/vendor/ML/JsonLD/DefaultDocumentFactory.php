@@ -16,13 +16,11 @@ namespace ML\JsonLD;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-class DefaultDocumentFactory implements DocumentFactoryInterface
-{
+class DefaultDocumentFactory implements DocumentFactoryInterface {
     /**
      * {@inheritdoc}
      */
-    public function createDocument($iri = null)
-    {
+    public function createDocument($iri = null) {
         return new Document($iri);
     }
 }

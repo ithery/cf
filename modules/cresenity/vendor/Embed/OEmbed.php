@@ -61,7 +61,11 @@ class OEmbed {
 
         // Add configured OEmbed query parameters
         parse_str($endpoint->getQuery(), $query);
-        $query = array_merge($query, $this->extractor->getSetting('oembed:query_parameters') ?? []);
+        $extractorSetting = $this->extractor->getSetting('oembed:query_parameters');
+        if ($extractorSetting == null) {
+            $extractorSetting = [];
+        }
+        $query = array_merge($query, $extractorSetting);
         $endpoint = $endpoint->withQuery(http_build_query($query));
 
         return $endpoint;
@@ -92,8 +96,8 @@ class OEmbed {
         }
 
         return $this->extractor->getCrawler()
-                        ->createUri($endpoint)
-                        ->withQuery(http_build_query($this->getOembedQueryParameters($url)));
+            ->createUri($endpoint)
+            ->withQuery(http_build_query($this->getOembedQueryParameters($url)));
     }
 
     private static function searchEndpoint(array $providers, $url) {

@@ -19,8 +19,7 @@ use ML\IRI\IRI;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-class Document implements DocumentInterface, JsonLdSerializable
-{
+class Document implements DocumentInterface, JsonLdSerializable {
     /**
      * @var IRI The document's IRI
      */
@@ -34,7 +33,7 @@ class Document implements DocumentInterface, JsonLdSerializable
     /**
      * @var array An associative array holding all named graphs in the document
      */
-    protected $namedGraphs = array();
+    protected $namedGraphs = [];
 
     /**
      * Parses a JSON-LD document and returns it as a Document
@@ -55,15 +54,14 @@ class Document implements DocumentInterface, JsonLdSerializable
      *
      *   - <em>base</em>     The base IRI of the input document.
      *
-     * @param string|array|JsonObject $document The JSON-LD document to process.
-     * @param null|array|JsonObject   $options  Options to configure the processing.
+     * @param string|array|JsonObject $document the JSON-LD document to process
+     * @param null|array|JsonObject   $options  options to configure the processing
      *
-     * @return Document The parsed JSON-LD document.
+     * @return Document the parsed JSON-LD document
      *
-     * @throws ParseException If the JSON-LD input document is invalid.
+     * @throws ParseException if the JSON-LD input document is invalid
      */
-    public static function load($document, $options = null)
-    {
+    public static function load($document, $options = null) {
         return JsonLD::getDocument($document, $options);
     }
 
@@ -72,8 +70,7 @@ class Document implements DocumentInterface, JsonLdSerializable
      *
      * @param null|string|IRI $iri The document's IRI
      */
-    public function __construct($iri = null)
-    {
+    public function __construct($iri = null) {
         $this->iri = new IRI($iri);
         $this->defaultGraph = new Graph($this);
     }
@@ -81,8 +78,7 @@ class Document implements DocumentInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function setIri($iri)
-    {
+    public function setIri($iri) {
         $this->iri = new IRI($iri);
 
         return $this;
@@ -91,16 +87,14 @@ class Document implements DocumentInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function getIri($asObject = false)
-    {
+    public function getIri($asObject = false) {
         return ($asObject) ? $this->iri : (string) $this->iri;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createGraph($name)
-    {
+    public function createGraph($name) {
         $name = (string) $this->iri->resolve($name);
 
         if (isset($this->namedGraphs[$name])) {
@@ -113,8 +107,7 @@ class Document implements DocumentInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function getGraph($name = null)
-    {
+    public function getGraph($name = null) {
         if (null === $name) {
             return $this->defaultGraph;
         }
@@ -129,16 +122,14 @@ class Document implements DocumentInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function getGraphNames()
-    {
+    public function getGraphNames() {
         return array_keys($this->namedGraphs);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function containsGraph($name)
-    {
+    public function containsGraph($name) {
         $name = (string) $this->iri->resolve($name);
 
         return isset($this->namedGraphs[$name]);
@@ -147,15 +138,13 @@ class Document implements DocumentInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function removeGraph($graph = null)
-    {
+    public function removeGraph($graph = null) {
         // The default graph can't be "removed", it can just be reset
         if (null === $graph) {
             $this->defaultGraph = new Graph($this);
 
             return $this;
         }
-
 
         if ($graph instanceof GraphInterface) {
             foreach ($this->namedGraphs as $n => $g) {
@@ -182,8 +171,7 @@ class Document implements DocumentInterface, JsonLdSerializable
     /**
      * {@inheritdoc}
      */
-    public function toJsonLd($useNativeTypes = true)
-    {
+    public function toJsonLd($useNativeTypes = true) {
         $defGraph = $this->defaultGraph->toJsonLd($useNativeTypes);
 
         if (0 === count($this->namedGraphs)) {
@@ -201,6 +189,6 @@ class Document implements DocumentInterface, JsonLdSerializable
         $document = new JsonObject();
         $document->{'@graph'} = $defGraph;
 
-        return array($document);
+        return [$document];
     }
 }

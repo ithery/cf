@@ -9,8 +9,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class Embed {
-
     private $crawler;
+
     private $extractorFactory;
 
     public function __construct(Crawler $crawler = null, ExtractorFactory $extractorFactory = null) {
@@ -18,12 +18,10 @@ class Embed {
         $this->extractorFactory = $extractorFactory ?: new ExtractorFactory();
     }
 
-    public function get( $url) {
+    public function get($url) {
         $request = $this->crawler->createRequest('GET', $url);
         $response = $this->crawler->sendRequest($request);
 
-        
-        
         return $this->extract($request, $response);
     }
 
@@ -31,7 +29,7 @@ class Embed {
      * @return Extractor[]
      */
     public function getMulti(...$urls) {
-        $requests = array_map(function($url) {
+        $requests = array_map(function ($url) {
             return $this->crawler->createRequest('GET', $url);
         }, $urls);
 
@@ -54,6 +52,13 @@ class Embed {
         return $this->extractorFactory;
     }
 
+    /**
+     * @param RequestInterface  $request
+     * @param ResponseInterface $response
+     * @param bool              $redirect
+     *
+     * @return Extractor
+     */
     private function extract(RequestInterface $request, ResponseInterface $response, $redirect = true) {
         $uri = $this->crawler->getResponseUri($response) ?: $request->getUri();
 
@@ -77,7 +82,11 @@ class Embed {
         return $extractor->redirect !== null;
     }
 
-    
+    /**
+     * @param string $url
+     *
+     * @return Extractor
+     */
     public static function create($url) {
         return (new Embed())->get($url);
     }

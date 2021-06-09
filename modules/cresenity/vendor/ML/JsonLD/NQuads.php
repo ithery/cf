@@ -17,13 +17,11 @@ use ML\IRI\IRI;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-class NQuads implements QuadSerializerInterface, QuadParserInterface
-{
+class NQuads implements QuadSerializerInterface, QuadParserInterface {
     /**
      * {@inheritdoc}
      */
-    public function serialize(array $quads)
-    {
+    public function serialize(array $quads) {
         $result = '';
         foreach ($quads as $quad) {
             $result .= ('_' === $quad->getSubject()->getScheme())
@@ -42,9 +40,10 @@ class NQuads implements QuadSerializerInterface, QuadParserInterface
                     : '<' . $quad->getObject() . '>';
             } else {
                 $result .= '"' . str_replace(
-                    array("\n", '"'),
-                    array('\n', '\"'),
-                    $quad->getObject()->getValue()) . '"';
+                    ["\n", '"'],
+                    ['\n', '\"'],
+                    $quad->getObject()->getValue()
+                ) . '"';
                 $result .= ($quad->getObject() instanceof TypedValue)
                     ? (RdfConstants::XSD_STRING === $quad->getObject()->getType())
                         ? ''
@@ -55,8 +54,8 @@ class NQuads implements QuadSerializerInterface, QuadParserInterface
 
             if ($quad->getGraph()) {
                 $result .= ('_' === $quad->getGraph()->getScheme())
-                    ? $quad->getGraph() :
-                    '<' . $quad->getGraph() . '>';
+                    ? $quad->getGraph()
+                    : '<' . $quad->getGraph() . '>';
                 $result .= ' ';
             }
             $result .= ".\n";
@@ -71,11 +70,10 @@ class NQuads implements QuadSerializerInterface, QuadParserInterface
      * This method is heavily based on DigitalBazaar's implementation used
      * in their {@link https://github.com/digitalbazaar/php-json-ld php-json-ld}.
      *
-     * @throws InvalidQuadException If an invalid quad that can't be parsed is
-     *                              encountered.
+     * @throws InvalidQuadException if an invalid quad that can't be parsed is
+     *                              encountered
      */
-    public function parse($input)
-    {
+    public function parse($input) {
         // define partial regexes
         $iri = '(?:<([^>]*)>)';
         $bnode = '(_:(?:[A-Za-z0-9]+))';
@@ -84,7 +82,7 @@ class NQuads implements QuadSerializerInterface, QuadParserInterface
         $language = '(?:@([a-z]+(?:-[a-z0-9]+)*))';
         $literal = "(?:$plain(?:$datatype|$language)?)";
         $ws = '[ \\t]';
-        $comment = "#.*";
+        $comment = '#.*';
 
         $subject = "(?:$iri|$bnode)$ws+";
         $property = "$iri$ws+";
@@ -97,7 +95,7 @@ class NQuads implements QuadSerializerInterface, QuadParserInterface
         $ignoreRegex = "/^$ws*(?:$comment)?$/";
 
         // build RDF statements
-        $statements = array();
+        $statements = [];
 
         // split N-Quad input into lines
         $lines = preg_split($eoln, $input);
@@ -140,8 +138,8 @@ class NQuads implements QuadSerializerInterface, QuadParserInterface
                 $object = new IRI($match[5]);  // bnode
             } else {
                 $unescaped = str_replace(
-                    array('\"', '\t', '\n', '\r', '\\\\'),
-                    array('"', "\t", "\n", "\r", '\\'),
+                    ['\"', '\t', '\n', '\r', '\\\\'],
+                    ['"', "\t", "\n", "\r", '\\'],
                     $match[6]
                 );
 

@@ -16,14 +16,13 @@ use ML\JsonLD\Exception\JsonLdException;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-interface DocumentLoaderInterface
-{
+interface DocumentLoaderInterface {
     /**
      * Load a (remote) document or context
      *
-     * @param string $url The URL or path of the document to load.
+     * @param string $url the URL or path of the document to load
      *
-     * @return RemoteDocument The loaded document.
+     * @return RemoteDocument the loaded document
      *
      * @throws JsonLdException
      */

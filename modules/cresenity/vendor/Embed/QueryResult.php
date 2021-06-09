@@ -12,8 +12,8 @@ use Psr\Http\Message\UriInterface;
 require_once dirname(__FILE__) . '/functions.php';
 
 class QueryResult {
-
     private $extractor;
+
     private $nodes = [];
 
     public function __construct(DOMNodeList $result, Extractor $extractor) {
@@ -49,9 +49,9 @@ class QueryResult {
         $nodes = $this->nodes();
 
         return array_filter(
-                array_map(function($node) use ($attrribute) {
-                    return $attribute ? self::getAttribute($node, $attribute) : $node->nodeValue;
-                }, $nodes)
+            array_map(function ($node) use ($attribute) {
+                return $attribute ? self::getAttribute($node, $attribute) : $node->nodeValue;
+            }, $nodes)
         );
     }
 
@@ -62,9 +62,8 @@ class QueryResult {
     }
 
     public function strAll($attribute = null) {
-        return array_filter(array_map(function($value) {
+        return array_filter(array_map(function ($value) {
             return clean($value);
-            
         }, $this->getAll($attribute)));
     }
 
@@ -83,7 +82,7 @@ class QueryResult {
 
         try {
             return $this->extractor->resolveUri($value);
-        } catch (Exception $error) {
+        } catch (\Exception $error) {
             //do nothing
         }
         return null;
@@ -103,5 +102,4 @@ class QueryResult {
 
         return null;
     }
-
 }

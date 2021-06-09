@@ -30,12 +30,15 @@ use ML\IRI\IRI;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-class JsonLD
-{
-    /** Identifier for the default graph */
+class JsonLD {
+    /**
+     * Identifier for the default graph
+     */
     const DEFAULT_GRAPH = '@default';
 
-    /** Identifier for the merged graph */
+    /**
+     * Identifier for the merged graph
+     */
     const MERGED_GRAPH = '@merged';
 
     private static $documentLoader = null;
@@ -72,17 +75,16 @@ class JsonLD
      * The options parameter might be passed as associative array or as
      * object.
      *
-     * @param string|JsonObject|array $input   The JSON-LD document to process.
-     * @param null|array|JsonObject   $options Options to configure the processing.
+     * @param string|JsonObject|array $input   the JSON-LD document to process
+     * @param null|array|JsonObject   $options options to configure the processing
      *
-     * @return Document The parsed JSON-LD document.
+     * @return Document the parsed JSON-LD document
      *
      * @throws JsonLdException
      *
      * @api
      */
-    public static function getDocument($input, $options = null)
-    {
+    public static function getDocument($input, $options = null) {
         $options = self::mergeOptions($options);
 
         $input = self::expand($input, $options);
@@ -121,22 +123,21 @@ class JsonLD
      * The options parameter might be passed as associative array or as
      * object.
      *
-     * @param string|JsonObject|array $input   The JSON-LD document to expand.
-     * @param null|array|JsonObject   $options Options to configure the expansion
-     *                                         process.
+     * @param string|JsonObject|array $input   the JSON-LD document to expand
+     * @param null|array|JsonObject   $options options to configure the expansion
+     *                                         process
      *
-     * @return array The expanded JSON-LD document.
+     * @return array the expanded JSON-LD document
      *
      * @throws JsonLdException
      *
      * @api
      */
-    public static function expand($input, $options = null)
-    {
+    public static function expand($input, $options = null) {
         $options = self::mergeOptions($options);
 
         $processor = new Processor($options);
-        $activectx = array('@base' => null);
+        $activectx = ['@base' => null];
 
         if (is_string($input)) {
             $remoteDocument = $options->documentLoader->loadDocument($input);
@@ -165,7 +166,7 @@ class JsonLD
         }
 
         if (false === is_array($input)) {
-            $input = (null === $input) ? array() : array($input);
+            $input = (null === $input) ? [] : [$input];
         }
 
         return $input;
@@ -209,20 +210,19 @@ class JsonLD
      * The options parameter might be passed as associative array or as
      * object.
      *
-     * @param string|JsonObject|array      $input   The JSON-LD document to
-     *                                              compact.
-     * @param null|string|JsonObject|array $context The context.
-     * @param null|array|JsonObject        $options Options to configure the
-     *                                              compaction process.
+     * @param string|JsonObject|array      $input   the JSON-LD document to
+     *                                              compact
+     * @param null|string|JsonObject|array $context the context
+     * @param null|array|JsonObject        $options options to configure the
+     *                                              compaction process
      *
-     * @return JsonObject The compacted JSON-LD document.
+     * @return JsonObject the compacted JSON-LD document
      *
      * @throws JsonLdException
      *
      * @api
      */
-    public static function compact($input, $context = null, $options = null)
-    {
+    public static function compact($input, $context = null, $options = null) {
         $options = self::mergeOptions($options);
 
         $expanded = self::expand($input, $options);
@@ -236,22 +236,21 @@ class JsonLD
      * In contrast to {@link compact()}, this method assumes that the input
      * has already been expanded.
      *
-     * @param array                        $input       The JSON-LD document to
-     *                                                  compact.
-     * @param null|string|JsonObject|array $context     The context.
-     * @param JsonObject                   $options     Options to configure the
-     *                                                  compaction process.
-     * @param bool                         $alwaysGraph If set to true, the resulting
+     * @param array                        $input       the JSON-LD document to
+     *                                                  compact
+     * @param null|string|JsonObject|array $context     the context
+     * @param JsonObject                   $options     options to configure the
+     *                                                  compaction process
+     * @param bool                         $alwaysGraph if set to true, the resulting
      *                                                  document will always explicitly
      *                                                  contain the default graph at
-     *                                                  the top-level.
+     *                                                  the top-level
      *
-     * @return JsonObject The compacted JSON-LD document.
+     * @return JsonObject the compacted JSON-LD document
      *
      * @throws JsonLdException
      */
-    private static function doCompact($input, $context, $options, $alwaysGraph = false)
-    {
+    private static function doCompact($input, $context, $options, $alwaysGraph = false) {
         if (is_string($context)) {
             $context = $options->documentLoader->loadDocument($context)->document;
         }
@@ -266,7 +265,7 @@ class JsonLD
             $context = null;
         }
 
-        $activectx = array('@base' => $options->base);
+        $activectx = ['@base' => $options->base];
         $processor = new Processor($options);
 
         $processor->processContext($context, $activectx);
@@ -287,7 +286,7 @@ class JsonLD
             }
 
             if (false === is_array($input)) {
-                $input = array($input);
+                $input = [$input];
             }
         }
 
@@ -335,22 +334,21 @@ class JsonLD
      * The options parameter might be passed as associative array or as
      * object.
      *
-     * @param string|JsonObject|array      $input   The JSON-LD document to flatten.
+     * @param string|JsonObject|array      $input   the JSON-LD document to flatten
      * @param null|string|JsonObject|array $context The context to compact the
      *                                              flattened document. If
      *                                              <em>null</em> is passed, the
      *                                              result will not be compacted.
-     * @param null|array|JsonObject        $options Options to configure the
-     *                                              flattening process.
+     * @param null|array|JsonObject        $options options to configure the
+     *                                              flattening process
      *
-     * @return JsonObject The flattened JSON-LD document.
+     * @return JsonObject the flattened JSON-LD document
      *
      * @throws JsonLdException
      *
      * @api
      */
-    public static function flatten($input, $context = null, $options = null)
-    {
+    public static function flatten($input, $context = null, $options = null) {
         $options = self::mergeOptions($options);
 
         $input = self::expand($input, $options);
@@ -394,18 +392,17 @@ class JsonLD
      * The options parameter might be passed as associative array or as
      * object.
      *
-     * @param string|JsonObject|array $input   The JSON-LD document to expand.
-     * @param null|array|JsonObject   $options Options to configure the expansion
-     *                                         process.
+     * @param string|JsonObject|array $input   the JSON-LD document to expand
+     * @param null|array|JsonObject   $options options to configure the expansion
+     *                                         process
      *
-     * @return Quad[] The extracted quads.
+     * @return Quad[] the extracted quads
      *
      * @throws JsonLdException
      *
      * @api
      */
-    public static function toRdf($input, $options = null)
-    {
+    public static function toRdf($input, $options = null) {
         $options = self::mergeOptions($options);
 
         $expanded = self::expand($input, $options);
@@ -445,19 +442,18 @@ class JsonLD
      * The options parameter might be passed as associative array or as
      * object.
      *
-     * @param Quad[]                $quads   Array of quads.
-     * @param null|array|JsonObject $options Options to configure the expansion
-     *                                       process.
+     * @param Quad[]                $quads   array of quads
+     * @param null|array|JsonObject $options options to configure the expansion
+     *                                       process
      *
-     * @return array The JSON-LD document in expanded form.
+     * @return array the JSON-LD document in expanded form
      *
-     * @throws InvalidQuadException If an invalid quad was detected.
-     * @throws JsonLdException      If converting the quads to a JSON-LD document failed.
+     * @throws InvalidQuadException if an invalid quad was detected
+     * @throws JsonLdException      if converting the quads to a JSON-LD document failed
      *
      * @api
      */
-    public static function fromRdf(array $quads, $options = null)
-    {
+    public static function fromRdf(array $quads, $options = null) {
         $options = self::mergeOptions($options);
 
         $processor = new Processor($options);
@@ -503,19 +499,18 @@ class JsonLD
      * The options parameter might be passed as associative array or as
      * object.
      *
-     * @param string|JsonObject|array $input   The JSON-LD document to compact.
-     * @param string|JsonObject       $frame   The frame.
-     * @param null|array|JsonObject   $options Options to configure the framing
-     *                                         process.
+     * @param string|JsonObject|array $input   the JSON-LD document to compact
+     * @param string|JsonObject       $frame   the frame
+     * @param null|array|JsonObject   $options options to configure the framing
+     *                                         process
      *
-     * @return JsonObject The framed JSON-LD document.
+     * @return JsonObject the framed JSON-LD document
      *
      * @throws JsonLdException
      *
      * @api
      */
-    public static function frame($input, $frame, $options = null)
-    {
+    public static function frame($input, $frame, $options = null) {
         $options = self::mergeOptions($options);
 
         $input = self::expand($input, $options);
@@ -540,7 +535,7 @@ class JsonLD
         }
 
         // Expand the frame
-        $processor->expand($frame, array(), null, true);
+        $processor->expand($frame, [], null, true);
 
         // and optimize away default graph (@graph as the only property at the top-level object)
         if (is_object($frame) && property_exists($frame, '@graph') && (1 === count(get_object_vars($frame)))) {
@@ -548,7 +543,7 @@ class JsonLD
         }
 
         if (false === is_array($frame)) {
-            $frame = array($frame);
+            $frame = [$frame];
         }
 
         // Frame the input document
@@ -568,14 +563,13 @@ class JsonLD
      *     $prettyString = JsonLD::toString($compacted, true);
      *     print($prettyString);
      *
-     * @param mixed $value  The value to convert.
+     * @param mixed $value  the value to convert
      * @param bool  $pretty Use whitespace in returned string to format it
      *                      (this just works in PHP >=5.4)?
      *
      * @return string
      */
-    public static function toString($value, $pretty = false)
-    {
+    public static function toString($value, $pretty = false) {
         $options = 0;
 
         if (PHP_VERSION_ID >= 50400) {
@@ -604,13 +598,12 @@ class JsonLD
     /**
      * Merge the passed options with the options' default values.
      *
-     * @param null|array|JsonObject $options The options.
+     * @param null|array|JsonObject $options the options
      *
-     * @return JsonObject The merged options.
+     * @return JsonObject the merged options
      */
-    private static function mergeOptions($options)
-    {
-        $result = (object) array(
+    private static function mergeOptions($options) {
+        $result = (object) [
             'base' => null,
             'expandContext' => null,
             'compactArrays' => true,
@@ -621,7 +614,7 @@ class JsonLD
             'produceGeneralizedRdf' => false,
             'documentFactory' => null,
             'documentLoader' => new FileGetContentsLoader()
-        );
+        ];
 
         if (is_array($options) || is_object($options)) {
             $options = (object) $options;
@@ -652,12 +645,12 @@ class JsonLD
             if (property_exists($options, 'produceGeneralizedRdf') && is_bool($options->produceGeneralizedRdf)) {
                 $result->produceGeneralizedRdf = $options->produceGeneralizedRdf;
             }
-            if (property_exists($options, 'documentFactory') &&
-                ($options->documentFactory instanceof DocumentFactoryInterface)) {
+            if (property_exists($options, 'documentFactory')
+                && ($options->documentFactory instanceof DocumentFactoryInterface)) {
                 $result->documentFactory = $options->documentFactory;
             }
-            if (property_exists($options, 'documentLoader') &&
-                ($options->documentLoader instanceof DocumentLoaderInterface)) {
+            if (property_exists($options, 'documentLoader')
+                && ($options->documentLoader instanceof DocumentLoaderInterface)) {
                 $result->documentLoader = $options->documentLoader;
             } elseif (null !== self::$documentLoader) {
                 $result->documentLoader = self::$documentLoader;
@@ -685,8 +678,7 @@ class JsonLD
      *
      * @param DocumentLoaderInterface $documentLoader
      */
-    public static function setDefaultDocumentLoader(DocumentLoaderInterface $documentLoader)
-    {
+    public static function setDefaultDocumentLoader(DocumentLoaderInterface $documentLoader) {
         self::$documentLoader = $documentLoader;
     }
 }

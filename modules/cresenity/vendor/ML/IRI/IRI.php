@@ -16,8 +16,7 @@ namespace ML\IRI;
  *
  * @link http://tools.ietf.org/html/rfc3987 RFC3987
  */
-class IRI
-{
+class IRI {
     /**
      * The scheme
      *
@@ -67,18 +66,16 @@ class IRI
      */
     private $fragment = null;
 
-
     /**
      * Constructor
      *
-     * @param null|string|IRI $iri The IRI.
+     * @param null|string|IRI $iri the IRI
      *
-     * @throws \InvalidArgumentException If an invalid IRI is passed.
+     * @throws \InvalidArgumentException if an invalid IRI is passed
      *
      * @api
      */
-    public function __construct($iri = null)
-    {
+    public function __construct($iri = null) {
         if (null === $iri) {
             return;
         } elseif (is_string($iri)) {
@@ -93,8 +90,8 @@ class IRI
             $this->fragment = $iri->fragment;
         } else {
             throw new \InvalidArgumentException(
-                'Expecting a string or an IRI, got ' .
-                (is_object($iri) ? get_class($iri) : gettype($iri))
+                'Expecting a string or an IRI, got '
+                . (is_object($iri) ? get_class($iri) : gettype($iri))
             );
         }
     }
@@ -102,24 +99,21 @@ class IRI
     /**
      * Get the scheme
      *
-     * @return string|null Returns the scheme or null if not set.
+     * @return string|null returns the scheme or null if not set
      */
-    public function getScheme()
-    {
+    public function getScheme() {
         return $this->scheme;
     }
 
     /**
      * Get the authority
      *
-     * @return string|null Returns the authority or null if not set.
+     * @return string|null returns the authority or null if not set
      */
-    public function getAuthority()
-    {
+    public function getAuthority() {
         $authority = null;
 
         if (null !== $this->host) {
-
             if (null !== $this->userinfo) {
                 $authority .= $this->userinfo . '@';
             }
@@ -135,72 +129,65 @@ class IRI
     /**
      * Get the user information
      *
-     * @return string|null Returns the user information or null if not set.
+     * @return string|null returns the user information or null if not set
      */
-    public function getUserInfo()
-    {
+    public function getUserInfo() {
         return $this->userinfo;
     }
 
     /**
      * Get the host
      *
-     * @return string|null Returns the host or null if not set.
+     * @return string|null returns the host or null if not set
      */
-    public function getHost()
-    {
+    public function getHost() {
         return $this->host;
     }
 
     /**
      * Get the port
      *
-     * @return string|null Returns the port or null if not set.
+     * @return string|null returns the port or null if not set
      */
-    public function getPort()
-    {
+    public function getPort() {
         return $this->port;
     }
 
     /**
      * Get the path
      *
-     * @return string Returns the path which might be empty.
+     * @return string returns the path which might be empty
      */
-    public function getPath()
-    {
+    public function getPath() {
         return $this->path;
     }
 
     /**
      * Get the query component
      *
-     * @return string|null Returns the query component or null if not set.
+     * @return string|null returns the query component or null if not set
      */
-    public function getQuery()
-    {
+    public function getQuery() {
         return $this->query;
     }
 
     /**
      * Get the fragment identifier
      *
-     * @return string|null Returns the fragment identifier or null if not set.
+     * @return string|null returns the fragment identifier or null if not set
      */
-    public function getFragment()
-    {
+    public function getFragment() {
         return $this->fragment;
     }
 
     /**
      * Find out whether the IRI is absolute
      *
-     * @return bool Returns true if the IRI is absolute, false otherwise.
+     * @return bool returns true if the IRI is absolute, false otherwise
      *
      * @api
      */
-    public function isAbsolute()
-    {
+    public function isAbsolute() {
         return (null !== $this->scheme);
     }
 
@@ -209,19 +196,18 @@ class IRI
      *
      * @return IRI The absolute IRI, i.e., without fragment identifier
      *
-     * @throws \UnexpectedValueException If the IRI is a relative IRI.
+     * @throws \UnexpectedValueException if the IRI is a relative IRI
      *
      * @link http://tools.ietf.org/html/rfc3987#section-2.2 RFC3987 absolute-IRI
      *
      * @api
      */
-    public function getAbsoluteIri()
-    {
+    public function getAbsoluteIri() {
         if (false === $this->isAbsolute()) {
             throw new \UnexpectedValueException('Cannot get the absolute IRI of a relative IRI.');
         }
 
-        $absolute  = clone $this;
+        $absolute = clone $this;
         $absolute->fragment = null;
 
         return $absolute;
@@ -230,14 +216,13 @@ class IRI
     /**
      * Check whether the passed IRI is equal
      *
-     * @param IRI|string $iri IRI to compare to this instance.
+     * @param IRI|string $iri IRI to compare to this instance
      *
-     * @return bool Returns true if the two IRIs are equal, false otherwise.
+     * @return bool returns true if the two IRIs are equal, false otherwise
      *
      * @api
      */
-    public function equals($iri)
-    {
+    public function equals($iri) {
         // Make sure both instances are strings
         return ($this->__toString() === (string)$iri);
     }
@@ -245,19 +230,18 @@ class IRI
     /**
      * Resolve a (relative) IRI reference against this IRI
      *
-     * @param IRI|string $reference The (relative) IRI reference that should
-     *                              be resolved against this IRI.
+     * @param IRI|string $reference the (relative) IRI reference that should
+     *                              be resolved against this IRI
      *
-     * @return IRI The resolved IRI.
+     * @return IRI the resolved IRI
      *
-     * @throws \InvalidArgumentException If an invalid IRI is passed.
+     * @throws \InvalidArgumentException if an invalid IRI is passed
      *
      * @link http://tools.ietf.org/html/rfc3986#section-5.2
      *
      * @api
      */
-    public function resolve($reference)
-    {
+    public function resolve($reference) {
         $reference = new IRI($reference);
 
         $scheme = null;
@@ -311,7 +295,6 @@ class IRI
 
         $fragment = $reference->fragment;
 
-
         // The Component Recomposition algorithm as specified by RFC3986
         // see: http://tools.ietf.org/html/rfc3986#section-5.3
         $result = '';
@@ -340,20 +323,20 @@ class IRI
     /**
      * Transform this IRI to a IRI reference relative to the passed base IRI
      *
-     * @param IRI|string $base The (relative) IRI reference that should be
-     *                         be used as base IRI.
+     * @param IRI|string $base the (relative) IRI reference that should be
+     *                         be used as base IRI
      * @param bool             Defines whether schema-relative IRIs such
      *                         as `//example.com` should be created (`true`)
      *                         or not (`false`).
+     * @param mixed $schemaRelative
      *
-     * @return IRI The IRI reference relative to the passed base IRI.
+     * @return IRI the IRI reference relative to the passed base IRI
      *
-     * @throws \InvalidArgumentException If an invalid IRI is passed.
+     * @throws \InvalidArgumentException if an invalid IRI is passed
      *
      * @api
      */
-    public function relativeTo($base, $schemaRelative = false)
-    {
+    public function relativeTo($base, $schemaRelative = false) {
         if (false === ($base instanceof IRI)) {
             $base = new IRI($base);
         }
@@ -378,7 +361,7 @@ class IRI
         $relative->port = null;
 
         // Compare path
-        $baseSegments     = explode('/', $base->path);
+        $baseSegments = explode('/', $base->path);
         $relativeSegments = explode('/', $relative->path);
         $len = min(count($baseSegments), count($relativeSegments)) - 1;  // do not move beyond last segment
 
@@ -394,9 +377,9 @@ class IRI
             $relative->path .= str_repeat('../', $numBaseSegments);
         }
 
-        if (($baseSegments[$pos] !== $relativeSegments[$pos]) ||
-            ((null === $relative->query) && (null === $relative->fragment)) ||
-            ($base->path === '')) {
+        if (($baseSegments[$pos] !== $relativeSegments[$pos])
+            || ((null === $relative->query) && (null === $relative->fragment))
+            || ($base->path === '')) {
             // if the two paths differ or if there's neither a query component nor a fragment
             // or there is no base path, we need to consider this IRI's path
 
@@ -432,19 +415,19 @@ class IRI
      * {@link IRI::relativeTo()} method if the base IRI stays the same while
      * the IRIs to convert to relative IRI references change.
      *
-     * @param  string|IRI $iri The IRI to convert to a relative reference
+     * @param string|IRI $iri The IRI to convert to a relative reference
      * @param bool             Defines whether schema-relative IRIs such
      *                         as `//example.com` should be created (`true`)
      *                         or not (`false`).
+     * @param mixed $schemaRelative
      *
-     * @throws \InvalidArgumentException If an invalid IRI is passed.
+     * @throws \InvalidArgumentException if an invalid IRI is passed
      *
      * @see \ML\IRI\IRI::relativeTo()
      *
-     * @return IRI      The relative IRI reference
+     * @return IRI The relative IRI reference
      */
-    public function baseFor($iri, $schemaRelative = false)
-    {
+    public function baseFor($iri, $schemaRelative = false) {
         if (false === ($iri instanceof IRI)) {
             $iri = new IRI($iri);
         }
@@ -455,12 +438,11 @@ class IRI
     /**
      * Get a string representation of this IRI object
      *
-     * @return string A string representation of this IRI instance.
+     * @return string a string representation of this IRI instance
      *
      * @api
      */
-    public function __toString()
-    {
+    public function __toString() {
         $result = '';
 
         if ($this->scheme) {
@@ -490,15 +472,14 @@ class IRI
      * This is done according to
      * {@link http://tools.ietf.org/html/rfc3986#section-3.1 RFC3986}.
      *
-     * @param string $iri The IRI to parse.
+     * @param string $iri the IRI to parse
      */
-    protected function parse($iri)
-    {
+    protected function parse($iri) {
         // Parse IRI by using the regular expression as specified by
         // http://tools.ietf.org/html/rfc3986#appendix-B
-        $regex = '|^((?P<scheme>[^:/?#]+):)?' .
-                    '((?P<doubleslash>//)(?P<authority>[^/?#]*))?(?P<path>[^?#]*)' .
-                    '((?P<querydef>\?)(?P<query>[^#]*))?(#(?P<fragment>.*))?|';
+        $regex = '|^((?P<scheme>[^:/?#]+):)?'
+                    . '((?P<doubleslash>//)(?P<authority>[^/?#]*))?(?P<path>[^?#]*)'
+                    . '((?P<querydef>\?)(?P<query>[^#]*))?(#(?P<fragment>.*))?|';
         preg_match($regex, $iri, $match);
 
         // Extract scheme
@@ -522,9 +503,9 @@ class IRI
 
                 // Split authority into host and port
                 $hostEnd = 0;
-                if ((strlen($authority) > 0) &&
-                    ('[' === $authority[0]) &&
-                    (false !== ($pos = strpos($authority, ']')))) {
+                if ((strlen($authority) > 0)
+                    && ('[' === $authority[0])
+                    && (false !== ($pos = strpos($authority, ']')))) {
                     $hostEnd = $pos;
                 }
 
@@ -558,14 +539,13 @@ class IRI
      * This method removes the special "." and ".." complete path segments
      * from an IRI.
      *
-     * @param string $input The IRI from which dot segments should be removed.
+     * @param string $input the IRI from which dot segments should be removed
      *
-     * @return string The IRI with all dot-segments removed.
+     * @return string the IRI with all dot-segments removed
      *
      * @link http://tools.ietf.org/html/rfc3986#section-5.2.4
      */
-    private static function removeDotSegments($input)
-    {
+    private static function removeDotSegments($input) {
         $output = '';
 
         while (strlen($input) > 0) {

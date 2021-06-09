@@ -16,8 +16,7 @@ use ML\IRI\IRI;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-class Quad
-{
+class Quad {
     /**
      * The subject
      *
@@ -49,15 +48,14 @@ class Quad
     /**
      * Constructor
      *
-     * @param IRI       $subject  The subject.
-     * @param IRI       $property The property.
-     * @param Value|IRI $object   The object.
-     * @param null|IRI  $graph    The graph.
+     * @param IRI       $subject  the subject
+     * @param IRI       $property the property
+     * @param Value|IRI $object   the object
+     * @param null|IRI  $graph    the graph
      *
      * @throws InvalidArgumentException If the object parameter has a wrong type
      */
-    public function __construct(IRI $subject, IRI $property, $object, IRI $graph = null)
-    {
+    public function __construct(IRI $subject, IRI $property, $object, IRI $graph = null) {
         $this->subject = $subject;
         $this->property = $property;
         $this->setObject($object);  // use setter which checks the type
@@ -69,8 +67,7 @@ class Quad
      *
      * @param IRI $subject The subject
      */
-    public function setSubject(IRI $subject)
-    {
+    public function setSubject(IRI $subject) {
         $this->subject = $subject;
     }
 
@@ -79,8 +76,7 @@ class Quad
      *
      * @return IRI The subject
      */
-    public function getSubject()
-    {
+    public function getSubject() {
         return $this->subject;
     }
 
@@ -89,8 +85,7 @@ class Quad
      *
      * @param IRI $property The property
      */
-    public function setProperty(IRI $property)
-    {
+    public function setProperty(IRI $property) {
         $this->property = $property;
     }
 
@@ -99,8 +94,7 @@ class Quad
      *
      * @return IRI The property
      */
-    public function getProperty()
-    {
+    public function getProperty() {
         return $this->property;
     }
 
@@ -109,10 +103,9 @@ class Quad
      *
      * @param IRI|Value $object The object
      *
-     * @throws InvalidArgumentException If object is of wrong type.
+     * @throws InvalidArgumentException if object is of wrong type
      */
-    public function setObject($object)
-    {
+    public function setObject($object) {
         if (!($object instanceof IRI) && !($object instanceof Value)) {
             throw new \InvalidArgumentException('Object must be an IRI or Value object');
         }
@@ -125,8 +118,7 @@ class Quad
      *
      * @return IRI|Value The object
      */
-    public function getObject()
-    {
+    public function getObject() {
         return $this->object;
     }
 
@@ -135,8 +127,7 @@ class Quad
      *
      * @param null|IRI $graph The graph
      */
-    public function setGraph(IRI $graph = null)
-    {
+    public function setGraph(IRI $graph = null) {
         $this->graph = $graph;
     }
 
@@ -145,8 +136,7 @@ class Quad
      *
      * @return IRI The graph
      */
-    public function getGraph()
-    {
+    public function getGraph() {
         return $this->graph;
     }
 }

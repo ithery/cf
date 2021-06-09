@@ -36,6 +36,13 @@ class ExtractorFactory {
 
     private $settings;
 
+    public function __construct(array $settings = []) {
+        if ($settings == null) {
+            $settings = [];
+        }
+        $this->settings = $settings;
+    }
+
     /**
      * @param UriInterface      $uri
      * @param RequestInterface  $request

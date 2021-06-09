@@ -5,7 +5,6 @@
 namespace Embed;
 
 class Metas {
-
     use ApiTrait;
 
     protected function fetchData() {
@@ -39,5 +38,4 @@ class Metas {
 
         return null;
     }
-
 }

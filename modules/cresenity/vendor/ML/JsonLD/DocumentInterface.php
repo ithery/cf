@@ -16,12 +16,12 @@ use ML\IRI\IRI;
  *
  * @author Markus Lanthaler <mail@markus-lanthaler.com>
  */
-interface DocumentInterface
-{
+interface DocumentInterface {
     /**
      * Set the document's IRI
      *
-     * @param string|IRI The IRI.
+     * @param string|IRI the IRI
+     * @param mixed $iri
      *
      * @return self
      */
@@ -30,10 +30,10 @@ interface DocumentInterface
     /**
      * Get the document's IRI
      *
-     * @param boolean $asObject If set to true, the return value will be an
-     *                          {@link IRI} object; otherwise a string.
+     * @param bool $asObject if set to true, the return value will be an
+     *                       {@link IRI} object; otherwise a string
      *
-     * @return string|IRI The document's IRI (might be empty).
+     * @return string|IRI the document's IRI (might be empty)
      */
     public function getIri($asObject = false);
 
@@ -43,9 +43,9 @@ interface DocumentInterface
      * If there exists already a graph with the passed name in the document,
      * that graph will be returned instead of creating a new one.
      *
-     * @param string|IRI $name The graph's name.
+     * @param string|IRI $name the graph's name
      *
-     * @return GraphInterface The newly created graph.
+     * @return GraphInterface the newly created graph
      */
     public function createGraph($name);
 
@@ -55,24 +55,24 @@ interface DocumentInterface
      * @param null|string $name The name of the graph to retrieve. If null
      *                          is passed, the default will be returned.
      *
-     * @return GraphInterface|null Returns the graph if found; null otherwise.
+     * @return GraphInterface|null returns the graph if found; null otherwise
      */
     public function getGraph($name = null);
 
     /**
      * Get graph names
      *
-     * @return string[] Returns the names of all graphs in the document.
+     * @return string[] returns the names of all graphs in the document
      */
     public function getGraphNames();
 
     /**
      * Check whether the document contains a graph with the specified name
      *
-     * @param string $name The graph name.
+     * @param string $name the graph name
      *
-     * @return bool Returns true if the document contains a graph with the
-     *              specified name; false otherwise.
+     * @return bool returns true if the document contains a graph with the
+     *              specified name; false otherwise
      */
     public function containsGraph($name);
 

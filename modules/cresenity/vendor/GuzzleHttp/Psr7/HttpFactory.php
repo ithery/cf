@@ -24,14 +24,18 @@ use Psr\Http\Message\UriInterface;
  * and inject the instance of this class multiple times.
  */
 final class HttpFactory implements
-RequestFactoryInterface, ResponseFactoryInterface, ServerRequestFactoryInterface, StreamFactoryInterface, UploadedFileFactoryInterface, UriFactoryInterface {
-
+RequestFactoryInterface,
+    ResponseFactoryInterface,
+    ServerRequestFactoryInterface,
+    StreamFactoryInterface,
+    UploadedFileFactoryInterface,
+    UriFactoryInterface {
     public function createUploadedFile(
-            StreamInterface $stream,
-            $size = null,
-            $error = \UPLOAD_ERR_OK,
-            $clientFilename = null,
-            $clientMediaType = null
+        StreamInterface $stream,
+        $size = null,
+        $error = \UPLOAD_ERR_OK,
+        $clientFilename = null,
+        $clientMediaType = null
     ) {
         if ($size === null) {
             $size = $stream->getSize();
@@ -85,5 +89,4 @@ RequestFactoryInterface, ResponseFactoryInterface, ServerRequestFactoryInterface
     public function createUri($uri = '') {
         return new Uri($uri);
     }
-
 }
