@@ -1,24 +1,22 @@
 <?php
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Embed\Adapters\ImageShack;
 
 use function Embed\getDirectory;
 use Embed\HttpApiTrait;
-use function Embed\match;
+use function Embed\matchPath;
 
-class Api
-{
+class Api {
     use HttpApiTrait;
 
-    protected function fetchData(): array
-    {
+    protected function fetchData(): array {
         $uri = $this->extractor->getUri();
 
-        if (!match('/i/*', $uri->getPath())) {
+        if (!matchPath('/i/*', $uri->getPath())) {
             $uri = $this->extractor->getRequest()->getUri();
 
-            if (!match('/i/*', $uri->getPath())) {
+            if (!matchPath('/i/*', $uri->getPath())) {
                 return [];
             }
         }

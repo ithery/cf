@@ -6,11 +6,10 @@ namespace Embed\Adapters\Youtube\Detectors;
 
 use Embed\Detectors\Feeds as Detector;
 use function Embed\getDirectory;
-use function Embed\match;
+use function Embed\matchPath;
 use Psr\Http\Message\UriInterface;
 
 class Feeds extends Detector {
-
     /**
      * @return UriInterface[]
      */
@@ -21,7 +20,7 @@ class Feeds extends Detector {
     private function fallback() {
         $uri = $this->extractor->getUri();
 
-        if (!match('/channel/*', $uri->getPath())) {
+        if (!matchPath('/channel/*', $uri->getPath())) {
             return [];
         }
 
@@ -30,5 +29,4 @@ class Feeds extends Detector {
 
         return [$feed];
     }
-
 }

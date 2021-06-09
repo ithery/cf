@@ -6,10 +6,9 @@ use function Embed\cleanPath;
 use Embed\Detectors\Code as Detector;
 use Embed\EmbedCode;
 use function Embed\html;
-use function Embed\match;
+use function Embed\matchPath;
 
 class Code extends Detector {
-
     public function detect() {
         return parent::detect() ?: $this->fallback();
     }
@@ -17,7 +16,7 @@ class Code extends Detector {
     private function fallback() {
         $uri = $this->extractor->getUri();
 
-        if (!match('/audio/*', $uri->getPath())) {
+        if (!matchPath('/audio/*', $uri->getPath())) {
             return null;
         }
 
@@ -34,5 +33,4 @@ class Code extends Detector {
 
         return new EmbedCode($html, null, 360);
     }
-
 }
