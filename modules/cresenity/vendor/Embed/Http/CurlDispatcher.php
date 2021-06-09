@@ -13,12 +13,18 @@ use Psr\Http\Message\ResponseInterface;
  * Class to fetch html pages
  */
 final class CurlDispatcher {
-
     private $request;
+
     private $curl;
+
     private $headers = [];
+
+    private $isBinary = false;
+
     private $body;
+
     private $error = null;
+
     private $settings;
 
     /**
@@ -69,7 +75,7 @@ final class CurlDispatcher {
 
         curl_multi_close($multi);
 
-        return array_map(function($connection) use ($responseFactory) {
+        return array_map(function ($connection) use ($responseFactory) {
             return $connection->exec($responseFactory);
         }, $connections);
     }
@@ -144,6 +150,11 @@ final class CurlDispatcher {
             return;
         }
 
+        if ($this->isBinary && $code === CURLE_WRITE_ERROR) {
+            // The write callback aborted the request to prevent a download of the binary file
+            return;
+        }
+
         throw new NetworkException($message, $code, $this->request);
     }
 
@@ -167,6 +178,9 @@ final class CurlDispatcher {
             $name = strtolower($matches[1]);
             $value = trim($matches[2]);
             $this->headers[] = [$name, $value];
+            if ($name === 'content-type') {
+                $this->isBinary = !preg_match('/(text|html|json)/', strtolower($value));
+            }
         } elseif ($this->headers) {
             //$key = \array_key_last($this->headers);
             $key = null;
@@ -180,11 +194,13 @@ final class CurlDispatcher {
     }
 
     private function writeBody($curl, $string) {
+        if ($this->isBinary) {
+            return -1;
+        }
         if (!$this->body) {
             $this->body = fopen('php://temp', 'w+');
         }
 
         return fwrite($this->body, $string);
     }
-
 }

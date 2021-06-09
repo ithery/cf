@@ -31,6 +31,9 @@ function html($tagName, array $attributes, $content = null) {
         }
     }
 
+    if ($tagName === 'img') {
+        return "${html} />";
+    }
     return "{$html}>{$content}</{$tagName}>";
 }
 

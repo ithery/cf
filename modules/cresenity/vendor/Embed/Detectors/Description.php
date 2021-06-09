@@ -5,13 +5,23 @@
 namespace Embed\Detectors;
 
 class Description extends Detector {
-
     public function detect() {
         $oembed = $this->extractor->getOEmbed();
         $metas = $this->extractor->getMetas();
         $ld = $this->extractor->getLinkedData();
 
-        return $oembed->str('description') ?: $metas->str('og:description', 'twitter:description', 'lp:description', 'description') ?: $ld->str('description');
+        return $oembed->str('description')
+            ?: $metas->str(
+                'og:description',
+                'twitter:description',
+                'lp:description',
+                'description',
+                'article:description',
+                'dcterms.description',
+                'sailthru.description',
+                'excerpt',
+                'article.summary'
+            )
+            ?: $ld->str('description');
     }
-
 }
