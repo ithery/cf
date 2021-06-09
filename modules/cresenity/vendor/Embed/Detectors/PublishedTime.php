@@ -7,32 +7,39 @@ namespace Embed\Detectors;
 use Datetime;
 
 class PublishedTime extends Detector {
-
     public function detect() {
         $oembed = $this->extractor->getOEmbed();
         $metas = $this->extractor->getMetas();
         $ld = $this->extractor->getLinkedData();
 
-        return $oembed->time('pubdate') ?: $metas->time(
-                        'article:published_time',
-                        'created',
-                        'date',
-                        'datepublished',
-                        'music:release_date',
-                        'video:release_date',
-                        'newsrepublic:publish_date'
-                ) ?: $ld->time('pagePublished') ?: $this->detectFromPath() ?: $metas->time(
-                        'pagerender',
-                        'pub_date',
-                        'publication-date',
-                        'lp.article:published_time',
-                        'lp.article:modified_time',
-                        'publish-date',
-                        'rc.datecreation',
-                        'timestamp',
-                        'sailthru.date',
-                        'article:modified_time'
-        );
+        return $oembed->time('pubdate')
+            ?: $metas->time(
+                'article:published_time',
+                'created',
+                'date',
+                'datepublished',
+                'music:release_date',
+                'video:release_date',
+                'newsrepublic:publish_date'
+            )
+            ?: $ld->time(
+                'pagePublished',
+                'datePublished'
+            )
+            ?: $this->detectFromPath()
+            ?: $metas->time(
+                'pagerender',
+                'pub_date',
+                'publication-date',
+                'lp.article:published_time',
+                'lp.article:modified_time',
+                'publish-date',
+                'rc.datecreation',
+                'timestamp',
+                'sailthru.date',
+                'article:modified_time',
+                'dcterms.date'
+            );
     }
 
     /**
@@ -48,5 +55,4 @@ class PublishedTime extends Detector {
 
         return null;
     }
-
 }

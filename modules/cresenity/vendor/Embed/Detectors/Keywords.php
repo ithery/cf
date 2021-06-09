@@ -5,7 +5,6 @@
 namespace Embed\Detectors;
 
 class Keywords extends Detector {
-
     public function detect() {
         $tags = [];
         $metas = $this->extractor->getMetas();
@@ -18,6 +17,7 @@ class Keywords extends Detector {
             'og:video:tag',
             'og:book:tag',
             'lp.article:section',
+            'dcterms.subject'
         ];
 
         foreach ($types as $type) {
@@ -42,13 +42,18 @@ class Keywords extends Detector {
         return $tags;
     }
 
+    /**
+     * @param array $keywords
+     *
+     * @return array
+     */
     private static function toArray(array $keywords) {
         $all = [];
 
         foreach ($keywords as $keyword) {
             $tags = explode(',', $keyword);
             $tags = array_map('trim', $tags);
-            $tags = array_filter($tags, function($value) {
+            $tags = array_filter($tags, function ($value) {
                 return !empty($value) && substr($value, -3) !== '...';
             });
 
@@ -57,5 +62,4 @@ class Keywords extends Detector {
 
         return $all;
     }
-
 }
