@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 28, 2019, 3:10:38 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jul 28, 2019, 3:10:38 AM
  */
 class CModel_Relation_Pivot extends CModel {
-
     use CModel_Relation_Trait_AsPivot;
 
     /**
@@ -24,5 +24,4 @@ class CModel_Relation_Pivot extends CModel {
      * @var array
      */
     protected $guarded = [];
-
 }

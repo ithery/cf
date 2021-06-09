@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
@@ -14,6 +8,7 @@ trait CDevSuite_Trait_ConsoleTrait {
      * Output the given text to the console.
      *
      * @param string $output
+     *
      * @return void
      */
 
@@ -28,6 +23,7 @@ trait CDevSuite_Trait_ConsoleTrait {
      * Output the given text to the console.
      *
      * @param string $output
+     *
      * @return void
      */
     public static function info($output) {
@@ -39,6 +35,7 @@ trait CDevSuite_Trait_ConsoleTrait {
      * Output the given text to the console.
      *
      * @param string $output
+     *
      * @return void
      */
     public static function warning($output) {
@@ -50,6 +47,7 @@ trait CDevSuite_Trait_ConsoleTrait {
      * Output the given text to the console.
      *
      * @param string $output
+     *
      * @return void
      */
     public static function error($output) {
@@ -71,6 +69,7 @@ trait CDevSuite_Trait_ConsoleTrait {
      *
      * @param array $headers
      * @param array $rows
+     *
      * @return void
      */
     public static function table(array $headers = [], array $rows = []) {
@@ -81,6 +80,7 @@ trait CDevSuite_Trait_ConsoleTrait {
      * Output the given text to the console.
      *
      * @param string $output
+     *
      * @return void
      */
     public static function output($output) {
@@ -94,7 +94,8 @@ trait CDevSuite_Trait_ConsoleTrait {
      * Confirm the given text to the console.
      *
      * @param string $output
-     * @param bool $default
+     * @param bool   $default
+     *
      * @return void
      */
     public static function confirm($output, $default = true) {
@@ -102,7 +103,6 @@ trait CDevSuite_Trait_ConsoleTrait {
     }
 
     /**
-     * 
      * @return \CConsole_OutputStyle
      */
     protected static function getOutputStyle() {
@@ -136,5 +136,4 @@ trait CDevSuite_Trait_ConsoleTrait {
     public static function progressFinish() {
         static::getOutputStyle()->progressFinish();
     }
-
 }

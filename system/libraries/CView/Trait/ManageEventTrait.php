@@ -6,12 +6,12 @@
  * @author Hery
  */
 trait CView_Trait_ManageEventTrait {
-
     /**
      * Register a view creator event.
      *
-     * @param  array|string  $views
-     * @param  \Closure|string  $callback
+     * @param array|string    $views
+     * @param \Closure|string $callback
+     *
      * @return array
      */
     public function creator($views, $callback) {
@@ -27,7 +27,8 @@ trait CView_Trait_ManageEventTrait {
     /**
      * Register multiple view composers via an array.
      *
-     * @param  array  $composers
+     * @param array $composers
+     *
      * @return array
      */
     public function composers(array $composers) {
@@ -43,8 +44,9 @@ trait CView_Trait_ManageEventTrait {
     /**
      * Register a view composer event.
      *
-     * @param  array|string  $views
-     * @param  \Closure|string  $callback
+     * @param array|string    $views
+     * @param \Closure|string $callback
+     *
      * @return array
      */
     public function composer($views, $callback) {
@@ -60,9 +62,10 @@ trait CView_Trait_ManageEventTrait {
     /**
      * Add an event for a given view.
      *
-     * @param  string  $view
-     * @param  \Closure|string  $callback
-     * @param  string  $prefix
+     * @param string          $view
+     * @param \Closure|string $callback
+     * @param string          $prefix
+     *
      * @return \Closure|null
      */
     protected function addViewEvent($view, $callback, $prefix = 'composing: ') {
@@ -80,9 +83,10 @@ trait CView_Trait_ManageEventTrait {
     /**
      * Register a class based view composer.
      *
-     * @param  string  $view
-     * @param  string  $class
-     * @param  string  $prefix
+     * @param string $view
+     * @param string $class
+     * @param string $prefix
+     *
      * @return \Closure
      */
     protected function addClassEvent($view, $class, $prefix) {
@@ -92,7 +96,8 @@ trait CView_Trait_ManageEventTrait {
         // classes from the application IoC container then call the compose method
         // on the instance. This allows for convenient, testable view composers.
         $callback = $this->buildClassEventCallback(
-                $class, $prefix
+            $class,
+            $prefix
         );
 
         $this->addEventListener($name, $callback);
@@ -103,8 +108,9 @@ trait CView_Trait_ManageEventTrait {
     /**
      * Build a class based container callback Closure.
      *
-     * @param  string  $class
-     * @param  string  $prefix
+     * @param string $class
+     * @param string $prefix
+     *
      * @return \Closure
      */
     protected function buildClassEventCallback($class, $prefix) {
@@ -121,8 +127,9 @@ trait CView_Trait_ManageEventTrait {
     /**
      * Parse a class based composer name.
      *
-     * @param  string  $class
-     * @param  string  $prefix
+     * @param string $class
+     * @param string $prefix
+     *
      * @return array
      */
     protected function parseClassEvent($class, $prefix) {
@@ -132,7 +139,8 @@ trait CView_Trait_ManageEventTrait {
     /**
      * Determine the class event method based on the given prefix.
      *
-     * @param  string  $prefix
+     * @param string $prefix
+     *
      * @return string
      */
     protected function classEventMethodForPrefix($prefix) {
@@ -142,8 +150,9 @@ trait CView_Trait_ManageEventTrait {
     /**
      * Add a listener to the event dispatcher.
      *
-     * @param  string  $name
-     * @param  \Closure  $callback
+     * @param string   $name
+     * @param \Closure $callback
+     *
      * @return void
      */
     protected function addEventListener($name, $callback) {
@@ -159,7 +168,8 @@ trait CView_Trait_ManageEventTrait {
     /**
      * Call the composer for a given view.
      *
-     * @param  CView_View  $view
+     * @param CView_View $view
+     *
      * @return void
      */
     public function callComposer(CView_View $view) {
@@ -169,11 +179,11 @@ trait CView_Trait_ManageEventTrait {
     /**
      * Call the creator for a given view.
      *
-     * @param  CView_View  $view
+     * @param CView_View $view
+     *
      * @return void
      */
     public function callCreator(CView_View $view) {
         $this->events->dispatch('creating: ' . $view->name(), [$view]);
     }
-
 }

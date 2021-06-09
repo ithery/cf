@@ -6,18 +6,19 @@
  * @author Hery
  */
 class CManager_Lang implements CManager_LangInterface {
-
     const LANG_SESSION_NAME = '_CAPP_LANG';
+
     const DEFAULT_LANG = 'id';
 
-    public static function __($message, $params = array(), $lang = null) {
+    //@codingStandardsIgnoreStart
+    public static function __($message, $params = [], $lang = null) {
+        //@codingStandardsIgnoreEnd
         if ($lang == null) {
             $lang = static::getLang();
         }
 
         //get translation
         $translation = static::getTranslation($message, $params, $lang);
-
 
         return $translation;
     }
@@ -39,7 +40,7 @@ class CManager_Lang implements CManager_LangInterface {
         return $lang;
     }
 
-    public static function getTranslation($message, $params = array(), $lang = null) {
+    public static function getTranslation($message, $params = [], $lang = null) {
         if ($lang == null) {
             $lang = static::getLang();
         }
@@ -47,7 +48,9 @@ class CManager_Lang implements CManager_LangInterface {
         $translation = CManager_Lang_Data::getLangDataTranslation($lang, $message);
         if ($translation === null) {
             //save to default language
-            CManager_Lang_Data::addLangDataTranslation(static::DEFAULT_LANG, $message, $message);
+            if (CF::config('lang.auto_add', false)) {
+                CManager_Lang_Data::addLangDataTranslation(static::DEFAULT_LANG, $message, $message);
+            }
             $translation = $message;
         }
         if (is_array($params)) {
@@ -57,12 +60,12 @@ class CManager_Lang implements CManager_LangInterface {
     }
 
     public static function getLangAvailable() {
-        $langAvailable = array(
+        $langAvailable = [
             'id' => 'Indonesian',
             'en' => 'English',
             'ms' => 'Malaysia',
             'zh' => 'Chinese',
-        );
+        ];
         return $langAvailable;
     }
 
@@ -77,5 +80,4 @@ class CManager_Lang implements CManager_LangInterface {
         $langAvailable = static::getLangAvailable();
         return carr::get($langAvailable, $langKey, null);
     }
-
 }

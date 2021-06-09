@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 5:27:46 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 5:27:46 PM
  */
 
 /**
@@ -15,10 +16,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
 use Symfony\Component\VarDumper\Dumper\HtmlDumper;
 
 class CDebug_DataFormatter_DebugBarVarDumper_DebugBarHtmlDumper extends HtmlDumper {
-
     public function getDumpHeaderByDebugBar() {
         // getDumpHeader is protected:
         return str_replace('pre.sf-dump', '.phpdebugbar pre.sf-dump', $this->getDumpHeader());
     }
-
 }

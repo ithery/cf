@@ -34,13 +34,13 @@ trait CComponent_Concern_HandlesActionsTrait
 
                 // Get existing data from model property.
                 $results = [];
-                $results[$targetKey] = data_get($this->{$propertyName}, $targetKey, []);
+                $results[$targetKey] = CF::get($this->{$propertyName}, $targetKey, []);
 
                 // Merge in new data.
                 CF::set($results, $keyName, $value);
 
                 // Re-assign data to model.
-                CFF::set($this->{$propertyName}, $targetKey, $results[$targetKey]);
+                CF::set($this->{$propertyName}, $targetKey, $results[$targetKey]);
             } else {
                 $this->{$name} = $value;
             }

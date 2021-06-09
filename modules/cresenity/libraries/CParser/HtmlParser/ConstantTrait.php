@@ -1,70 +1,63 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CParser_HtmlParser_ConstantTrait {
-
-    protected static $formTags = array(
-        "input",
-        "option",
-        "optgroup",
-        "select",
-        "button",
-        "datalist",
-        "textarea"
-    );
-    protected static $pTag = array(
-        "p",
-    );
+    protected static $formTags = [
+        'input',
+        'option',
+        'optgroup',
+        'select',
+        'button',
+        'datalist',
+        'textarea'
+    ];
+    protected static $pTag = [
+        'p',
+    ];
     protected static $openImpliesClose = [];
     protected static $voidElements = [
-        "area",
-        "base",
-        "basefont",
-        "br",
-        "col",
-        "command",
-        "embed",
-        "frame",
-        "hr",
-        "img",
-        "input",
-        "isindex",
-        "keygen",
-        "link",
-        "meta",
-        "param",
-        "source",
-        "track",
-        "wbr"
+        'area',
+        'base',
+        'basefont',
+        'br',
+        'col',
+        'command',
+        'embed',
+        'frame',
+        'hr',
+        'img',
+        'input',
+        'isindex',
+        'keygen',
+        'link',
+        'meta',
+        'param',
+        'source',
+        'track',
+        'wbr'
     ];
     protected static $foreignContextElements = [
-        "math",
-        "svg",
+        'math',
+        'svg',
     ];
     protected static $htmlIntegrationElements = [
-        "mi",
-        "mo",
-        "mn",
-        "ms",
-        "mtext",
-        "annotation-xml",
-        "foreignObject",
-        "desc",
-        "title"
+        'mi',
+        'mo',
+        'mn',
+        'ms',
+        'mtext',
+        'annotation-xml',
+        'foreignObject',
+        'desc',
+        'title'
     ];
 
     protected static function rebuildConstant() {
         static::$openImpliesClose = [
-            'tr' => ["tr", "th", "td"],
-            'th' => ["th"],
-            'td' => ["thead", "th", "td"],
-            'body' => ["head", "link", "script"],
-            'li' => ["li"],
+            'tr' => ['tr', 'th', 'td'],
+            'th' => ['th'],
+            'td' => ['thead', 'th', 'td'],
+            'body' => ['head', 'link', 'script'],
+            'li' => ['li'],
             'p' => static::$pTag,
             'h1' => static::$pTag,
             'h2' => static::$pTag,
@@ -78,10 +71,10 @@ trait CParser_HtmlParser_ConstantTrait {
             'button' => static::$formTags,
             'datalist' => static::$formTags,
             'textarea' => static::$formTags,
-            'option' => ["option"],
-            'optgroup' => ["optgroup", "option"],
-            'dd' => ["dt", "dd"],
-            'dt' => ["dt", "dd"],
+            'option' => ['option'],
+            'optgroup' => ['optgroup', 'option'],
+            'dd' => ['dt', 'dd'],
+            'dt' => ['dt', 'dd'],
             'address' => static::$pTag,
             'article' => static::$pTag,
             'aside' => static::$pTag,
@@ -103,11 +96,10 @@ trait CParser_HtmlParser_ConstantTrait {
             'section' => static::$pTag,
             'table' => static::$pTag,
             'ul' => static::$pTag,
-            'rt' => ["rt", "rp"],
-            'rp' => ["rt", "rp"],
-            'tbody' => ["thead", "tbody"],
-            'tfoot' => ["thead", "tbody"]
+            'rt' => ['rt', 'rp'],
+            'rp' => ['rt', 'rp'],
+            'tbody' => ['thead', 'tbody'],
+            'tfoot' => ['thead', 'tbody']
         ];
     }
-
 }

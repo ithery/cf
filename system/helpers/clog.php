@@ -1,7 +1,7 @@
 <?php
-
+//@codingStandardsIgnoreStart
 class clog {
-
+    //@codingStandardsIgnoreEnd
     public static function login($user_id) {
         $app = CApp::instance();
         $app_id = $app->app_id();
@@ -245,14 +245,14 @@ class clog {
 
     /**
      * This function is used for log for any statement. <br/>
-     * Here is inline an example: 
+     * Here is inline an example:
      * <pre>
      *  <code>
      *      <?php clog::write('Test');?>
      *  </code>
      * </pre>
-     * 
-     * @param array/string $options     
+     *
+     * @param array/string $options
      * @return boolean
      */
     public static function write($options) {
@@ -272,7 +272,7 @@ class clog {
               $clogger_instance->set_level($level);
               if (strlen($path) > 0)
               $clogger_instance->set_additional_path($path);
-             * 
+             *
              */
             $param['path'] = $path;
         }

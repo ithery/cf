@@ -1,14 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 28, 2020 
- * @license Ittron Global Teknologi
  */
 final class CDomain {
-
     public static function path() {
         $dir = DOCROOT . 'data' . DS . 'domain' . DS;
         return $dir;
@@ -48,5 +45,4 @@ final class CDomain {
             CFile::delete($domain);
         }
     }
-
 }

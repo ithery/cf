@@ -1,20 +1,14 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Predis\Command\ServerFlushDatabase;
 use Predis\Connection\Aggregate\ClusterInterface;
 
 /**
  * @mixin \Predis\Client
+ *
  * @deprecated Predis is no longer maintained by its original author
  */
 class CRedis_Connection_PredisConnection extends CRedis_AbstractConnection {
-
     /**
      * The Predis client.
      *
@@ -25,7 +19,8 @@ class CRedis_Connection_PredisConnection extends CRedis_AbstractConnection {
     /**
      * Create a new Predis connection.
      *
-     * @param  \Predis\Client  $client
+     * @param \Predis\Client $client
+     *
      * @return void
      */
     public function __construct($client) {
@@ -35,9 +30,10 @@ class CRedis_Connection_PredisConnection extends CRedis_AbstractConnection {
     /**
      * Subscribe to a set of given channels for messages.
      *
-     * @param  array|string  $channels
-     * @param  \Closure  $callback
-     * @param  string  $method
+     * @param array|string $channels
+     * @param \Closure     $callback
+     * @param string       $method
+     *
      * @return void
      */
     public function createSubscription($channels, Closure $callback, $method = 'subscribe') {
@@ -64,5 +60,4 @@ class CRedis_Connection_PredisConnection extends CRedis_AbstractConnection {
             $node->executeCommand(new ServerFlushDatabase);
         }
     }
-
 }

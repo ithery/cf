@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CHTTP_Event_RequestHandled {
-
     /**
      * The request instance.
      *
@@ -24,13 +23,13 @@ class CHTTP_Event_RequestHandled {
     /**
      * Create a new event instance.
      *
-     * @param  CHTTP_Request  $request
-     * @param  CHTTP_Response  $response
+     * @param CHTTP_Request  $request
+     * @param CHTTP_Response $response
+     *
      * @return void
      */
     public function __construct($request, $response) {
         $this->request = $request;
         $this->response = $response;
     }
-
 }

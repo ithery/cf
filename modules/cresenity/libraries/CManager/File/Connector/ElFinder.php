@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 27, 2019, 2:50:02 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 27, 2019, 2:50:02 PM
  */
 use CManager_File_Connector_ElFinder_Base as ElFinder;
 
 class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
-
     /**
-     * elFinder instance
+     * ElFinder instance
      *
      * @var elFinder
      * */
@@ -23,12 +23,13 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
      *
      * @var array
      * */
-    protected $options = array();
+    protected $options = [];
 
     /**
      * Must be use output($data) $data['header']
      *
      * @var string
+     *
      * @deprecated
      * */
     protected $header = '';
@@ -54,13 +55,12 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
      * @param bool $debug
      */
     public function __construct(CManager_File_ConfigAbstract $config, $debug = false) {
-
         parent::__construct($config);
 
         $elFinder = new CManager_File_Connector_ElFinder_Base($config->getConfig());
 
         $this->elFinder = $elFinder;
-        $this->reqMethod = strtoupper($_SERVER["REQUEST_METHOD"]);
+        $this->reqMethod = strtoupper($_SERVER['REQUEST_METHOD']);
         if ($debug) {
             self::$contentType = 'Content-Type: text/plain; charset=utf-8';
         }
@@ -69,9 +69,11 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
     /**
      * Execute elFinder command and output result
      *
+     * @param null|mixed $method
+     *
      * @return void
+     *
      * @throws Exception
-     * @author Dmitry (dio) Levashov
      */
     public function run($method = null) {
         $isPost = $this->reqMethod === 'POST';
@@ -81,7 +83,7 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
             // for max_input_vars and supports IE XDomainRequest()
             $parts = explode('&', $rawPostData);
             if (!$src || $maxInputVars < count($parts)) {
-                $src = array();
+                $src = [];
                 foreach ($parts as $part) {
                     list($key, $value) = array_pad(explode('=', $part), 2, '');
                     $key = rawurldecode($key);
@@ -89,7 +91,7 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
                         $key = $m[1];
                         $idx = $m[2];
                         if (!isset($src[$key])) {
-                            $src[$key] = array();
+                            $src[$key] = [];
                         }
                         if ($idx) {
                             $src[$key][$idx] = rawurldecode($value);
@@ -106,29 +108,29 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
         }
 
         if (isset($src['targets']) && $this->elFinder->maxTargets && count($src['targets']) > $this->elFinder->maxTargets) {
-            $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_MAX_TARGTES)));
+            $this->output(['error' => $this->elFinder->error(elFinder::ERROR_MAX_TARGTES)]);
         }
 
         $cmd = isset($src['cmd']) ? $src['cmd'] : '';
-        $args = array();
+        $args = [];
 
         if (!function_exists('json_encode')) {
             $error = $this->elFinder->error(elFinder::ERROR_CONF, elFinder::ERROR_CONF_NO_JSON);
-            $this->output(array('error' => '{"error":["' . implode('","', $error) . '"]}', 'raw' => true));
+            $this->output(['error' => '{"error":["' . implode('","', $error) . '"]}', 'raw' => true]);
         }
 
         if (!$this->elFinder->loaded()) {
-            $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_CONF, elFinder::ERROR_CONF_NO_VOL), 'debug' => $this->elFinder->mountErrors));
+            $this->output(['error' => $this->elFinder->error(elFinder::ERROR_CONF, elFinder::ERROR_CONF_NO_VOL), 'debug' => $this->elFinder->mountErrors]);
         }
 
         // telepat_mode: on
         if (!$cmd && $isPost) {
-            $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_UPLOAD, elFinder::ERROR_UPLOAD_TOTAL_SIZE), 'header' => 'Content-Type: text/html'));
+            $this->output(['error' => $this->elFinder->error(elFinder::ERROR_UPLOAD, elFinder::ERROR_UPLOAD_TOTAL_SIZE), 'header' => 'Content-Type: text/html']);
         }
         // telepat_mode: off
 
         if (!$this->elFinder->commandExists($cmd)) {
-            $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_UNKNOWN_CMD)));
+            $this->output(['error' => $this->elFinder->error(elFinder::ERROR_UNKNOWN_CMD)]);
         }
 
         // collect required arguments to exec command
@@ -138,7 +140,7 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
                 if (isset($_FILES)) {
                     $hasFiles = true;
                 } elseif ($req) {
-                    $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_INV_PARAMS, $cmd)));
+                    $this->output(['error' => $this->elFinder->error(elFinder::ERROR_INV_PARAMS, $cmd)]);
                 }
             } else {
                 $arg = isset($src[$name]) ? $src[$name] : '';
@@ -147,7 +149,7 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
                     $arg = trim($arg);
                 }
                 if ($req && $arg === '') {
-                    $this->output(array('error' => $this->elFinder->error(elFinder::ERROR_INV_PARAMS, $cmd)));
+                    $this->output(['error' => $this->elFinder->error(elFinder::ERROR_INV_PARAMS, $cmd)]);
                 }
                 $args[$name] = $arg;
             }
@@ -162,7 +164,7 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
 
         try {
             $this->output($this->elFinder->exec($cmd, $args));
-        } catch (elFinderAbortException $e) {
+        } catch (CManager_File_Connector_ElFinder_Exception_AbortException $e) {
             // connection aborted
             // unlock session data for multiple access
             $this->elFinder->getSession()->close();
@@ -170,7 +172,6 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
             header('HTTP/1.0 204 No Content');
             // clear output buffer
             while (ob_get_level() && ob_end_clean()) {
-                
             }
             exit();
         }
@@ -182,7 +183,9 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
      * @param  array  data to output
      *
      * @return void
+     *
      * @throws elFinderAbortException
+     *
      * @author Dmitry (dio) Levashov
      */
     protected function output(array $data) {
@@ -206,7 +209,6 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
 
             // clear output buffer
             while (ob_get_level() && ob_end_clean()) {
-                
             }
 
             $toEnd = true;
@@ -298,19 +300,25 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
     /**
      * Remove null & stripslashes applies on "magic_quotes_gpc"
      *
-     * @param  mixed $args
+     * @param mixed $args
      *
      * @return mixed
+     *
      * @author Naoki Sawada
      */
     protected function input_filter($args) {
-        static $magic_quotes_gpc = NULL;
+        static $magic_quotes_gpc = null;
 
-        if ($magic_quotes_gpc === NULL)
-            $magic_quotes_gpc = (version_compare(PHP_VERSION, '5.4', '<') && get_magic_quotes_gpc());
+        if ($magic_quotes_gpc === null) {
+            if (function_exists('get_magic_quotes_gpc')) {
+                $magic_quotes_gpc = (version_compare(PHP_VERSION, '5.4', '<') && get_magic_quotes_gpc());
+            } else {
+                $magic_quotes_gpc = false;
+            }
+        }
 
         if (is_array($args)) {
-            return array_map(array(& $this, 'input_filter'), $args);
+            return array_map([&$this, 'input_filter'], $args);
         }
         $res = str_replace("\0", '', $args);
         $magic_quotes_gpc && ($res = stripslashes($res));
@@ -357,7 +365,6 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
 
         // clear output buffer
         while (ob_get_level() && ob_end_clean()) {
-            
         }
 
         header('Content-Length: ' . strlen($out));
@@ -366,5 +373,4 @@ class CManager_File_Connector_ElFinder extends CManager_File_ConnectorAbstract {
 
         flush();
     }
-
 }

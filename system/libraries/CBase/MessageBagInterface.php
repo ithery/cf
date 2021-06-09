@@ -1,14 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
- * @license Ittron Global Teknologi
  */
 interface CBase_MessageBagInterface extends CInterface_Arrayable {
-
     /**
      * Get the keys present in the message bag.
      *
@@ -19,8 +16,9 @@ interface CBase_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Add a message to the bag.
      *
-     * @param  string  $key
-     * @param  string  $message
+     * @param string $key
+     * @param string $message
+     *
      * @return $this
      */
     public function add($key, $message);
@@ -28,7 +26,8 @@ interface CBase_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Merge a new array of messages into the bag.
      *
-     * @param  CApp_Message_Contract_MessageProviderInterface|array  $messages
+     * @param CApp_Message_Contract_MessageProviderInterface|array $messages
+     *
      * @return $this
      */
     public function merge($messages);
@@ -36,7 +35,8 @@ interface CBase_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Determine if messages exist for a given key.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return bool
      */
     public function has($key);
@@ -44,8 +44,9 @@ interface CBase_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Get the first message from the bag for a given key.
      *
-     * @param  string  $key
-     * @param  string  $format
+     * @param string $key
+     * @param string $format
+     *
      * @return string
      */
     public function first($key = null, $format = null);
@@ -53,8 +54,9 @@ interface CBase_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Get all of the messages from the bag for a given key.
      *
-     * @param  string  $key
-     * @param  string  $format
+     * @param string $key
+     * @param string $format
+     *
      * @return array
      */
     public function get($key, $format = null);
@@ -62,7 +64,8 @@ interface CBase_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Get all of the messages for every key in the bag.
      *
-     * @param  string  $format
+     * @param string $format
+     *
      * @return array
      */
     public function all($format = null);
@@ -84,7 +87,8 @@ interface CBase_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Set the default message format.
      *
-     * @param  string  $format
+     * @param string $format
+     *
      * @return $this
      */
     public function setFormat($format = ':message');

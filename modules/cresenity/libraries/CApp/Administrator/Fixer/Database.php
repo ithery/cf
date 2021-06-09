@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CApp_Administrator_Fixer_Database {
-
     public static function sqlCollation($table) {
         $db = CDatabase::instance();
         $schemaManager = $db->getSchemaManager();
@@ -24,9 +17,9 @@ class CApp_Administrator_Fixer_Database {
             $columnSchema = $tableSchema->getColumn($column);
 
             if (in_array($columnSchema->getType()->getName(), [CDatabase_Type::STRING, CDatabase_Type::TEXT])) {
-                $targetOptions = array(
+                $targetOptions = [
                     'unsigned' => true,
-                );
+                ];
                 $targetColumnSchema = clone $columnSchema;
                 $targetColumnSchema->setPlatformOption('collation', 'utf8mb4_unicode_ci');
                 // See if column has changed properties in table 2.
@@ -64,17 +57,17 @@ class CApp_Administrator_Fixer_Database {
         $addedColumns = [];
 
         if (!in_array('created', $columns)) {
-            $options = array();
+            $options = [];
             $options['default'] = 'NULL';
             $newColumn = new CDatabase_Schema_Column('created', CDatabase_Type::getType(CDatabase_Type::DATETIME), $options);
-            $newColumn->setDefault(NULL);
+            $newColumn->setDefault(null);
             $newColumn->setNotnull(false);
             $tableDifferences->addedColumns[] = $newColumn;
             $changes++;
         } else {
             $columnSchema = $tableSchema->getColumn('created');
             $targetColumnSchema = clone $columnSchema;
-            $targetColumnSchema->setDefault(NULL);
+            $targetColumnSchema->setDefault(null);
             $targetColumnSchema->setNotnull(false);
             $changedProperties = $comparator->diffColumn($columnSchema, $targetColumnSchema);
 
@@ -87,9 +80,9 @@ class CApp_Administrator_Fixer_Database {
         }
 
         if (!in_array('createdby', $columns)) {
-            $options = array();
+            $options = [];
             $newColumn = new CDatabase_Schema_Column('createdby', CDatabase_Type::getType(CDatabase_Type::STRING), $options);
-            $newColumn->setDefault(NULL);
+            $newColumn->setDefault(null);
             $newColumn->setNotnull(false);
             $newColumn->setLength(255);
             $newColumn->setPlatformOption('collation', 'utf8mb4_unicode_ci');
@@ -98,7 +91,7 @@ class CApp_Administrator_Fixer_Database {
         } else {
             $columnSchema = $tableSchema->getColumn('createdby');
             $targetColumnSchema = clone $columnSchema;
-            $targetColumnSchema->setDefault(NULL);
+            $targetColumnSchema->setDefault(null);
             $targetColumnSchema->setNotnull(false);
             $targetColumnSchema->setLength(255);
             $targetColumnSchema->setPlatformOption('collation', 'utf8mb4_unicode_ci');
@@ -112,19 +105,18 @@ class CApp_Administrator_Fixer_Database {
             }
         }
 
-
         if (!in_array('updated', $columns)) {
-            $options = array();
+            $options = [];
             $options['default'] = 'NULL';
             $newColumn = new CDatabase_Schema_Column('updated', CDatabase_Type::getType(CDatabase_Type::DATETIME), $options);
-            $newColumn->setDefault(NULL);
+            $newColumn->setDefault(null);
             $newColumn->setNotnull(false);
             $tableDifferences->addedColumns[] = $newColumn;
             $changes++;
         } else {
             $columnSchema = $tableSchema->getColumn('updated');
             $targetColumnSchema = clone $columnSchema;
-            $targetColumnSchema->setDefault(NULL);
+            $targetColumnSchema->setDefault(null);
             $targetColumnSchema->setNotnull(false);
             $changedProperties = $comparator->diffColumn($columnSchema, $targetColumnSchema);
 
@@ -137,9 +129,9 @@ class CApp_Administrator_Fixer_Database {
         }
 
         if (!in_array('updatedby', $columns)) {
-            $options = array();
+            $options = [];
             $newColumn = new CDatabase_Schema_Column('updatedby', CDatabase_Type::getType(CDatabase_Type::STRING), $options);
-            $newColumn->setDefault(NULL);
+            $newColumn->setDefault(null);
             $newColumn->setNotnull(false);
             $newColumn->setLength(255);
             $newColumn->setPlatformOption('collation', 'utf8mb4_unicode_ci');
@@ -148,7 +140,7 @@ class CApp_Administrator_Fixer_Database {
         } else {
             $columnSchema = $tableSchema->getColumn('updatedby');
             $targetColumnSchema = clone $columnSchema;
-            $targetColumnSchema->setDefault(NULL);
+            $targetColumnSchema->setDefault(null);
             $targetColumnSchema->setNotnull(false);
             $targetColumnSchema->setLength(255);
             $targetColumnSchema->setPlatformOption('collation', 'utf8mb4_unicode_ci');
@@ -163,17 +155,17 @@ class CApp_Administrator_Fixer_Database {
         }
 
         if (!in_array('deleted', $columns)) {
-            $options = array();
+            $options = [];
             $options['default'] = 'NULL';
             $newColumn = new CDatabase_Schema_Column('deleted', CDatabase_Type::getType(CDatabase_Type::DATETIME), $options);
-            $newColumn->setDefault(NULL);
+            $newColumn->setDefault(null);
             $newColumn->setNotnull(false);
             $tableDifferences->addedColumns[] = $newColumn;
             $changes++;
         } else {
             $columnSchema = $tableSchema->getColumn('deleted');
             $targetColumnSchema = clone $columnSchema;
-            $targetColumnSchema->setDefault(NULL);
+            $targetColumnSchema->setDefault(null);
             $targetColumnSchema->setNotnull(false);
             $changedProperties = $comparator->diffColumn($columnSchema, $targetColumnSchema);
 
@@ -186,9 +178,9 @@ class CApp_Administrator_Fixer_Database {
         }
 
         if (!in_array('deletedby', $columns)) {
-            $options = array();
+            $options = [];
             $newColumn = new CDatabase_Schema_Column('deletedby', CDatabase_Type::getType(CDatabase_Type::STRING), $options);
-            $newColumn->setDefault(NULL);
+            $newColumn->setDefault(null);
             $newColumn->setNotnull(false);
             $newColumn->setLength(255);
             $newColumn->setPlatformOption('collation', 'utf8mb4_unicode_ci');
@@ -197,7 +189,7 @@ class CApp_Administrator_Fixer_Database {
         } else {
             $columnSchema = $tableSchema->getColumn('deletedby');
             $targetColumnSchema = clone $columnSchema;
-            $targetColumnSchema->setDefault(NULL);
+            $targetColumnSchema->setDefault(null);
             $targetColumnSchema->setNotnull(false);
             $targetColumnSchema->setLength(255);
             $targetColumnSchema->setPlatformOption('collation', 'utf8mb4_unicode_ci');
@@ -212,7 +204,7 @@ class CApp_Administrator_Fixer_Database {
         }
 
         if (!in_array('status', $columns)) {
-            $options = array();
+            $options = [];
             $newColumn = new CDatabase_Schema_Column('status', CDatabase_Type::getType(CDatabase_Type::INTEGER), $options);
             $newColumn->setDefault(1);
             $newColumn->setNotnull(true);
@@ -258,13 +250,12 @@ class CApp_Administrator_Fixer_Database {
         foreach ($columns as $column) {
             $columnSchema = $tableSchema->getColumn($column);
 
-
             if (cstr::endsWith($column, '_id')) {
-                $targetOptions = array(
+                $targetOptions = [
                     'unsigned' => true,
-                );
+                ];
 
-                if (!in_array($columnSchema->getType()->getName(), array(CDatabase_Type::INTEGER, CDatabase_Type::SMALLINT, CDatabase_Type::BIGINT))) {
+                if (!in_array($columnSchema->getType()->getName(), [CDatabase_Type::INTEGER, CDatabase_Type::SMALLINT, CDatabase_Type::BIGINT])) {
                     continue;
                 }
 
@@ -274,7 +265,6 @@ class CApp_Administrator_Fixer_Database {
                 if (in_array($table, ['pushnotif_queue', 'pushnotif_queue_member']) && $column == 'reg_id') {
                     continue;
                 }
-
 
                 if (in_array($table, ['log_activity', 'log_session', 'log_login', 'log_login_fail']) && $column == 'session_id') {
                     continue;
@@ -333,7 +323,7 @@ class CApp_Administrator_Fixer_Database {
                     continue;
                 }
 
-                if (!in_array($columnSchema->getType()->getName(), array(CDatabase_Type::INTEGER, CDatabase_Type::SMALLINT, CDatabase_Type::BIGINT))) {
+                if (!in_array($columnSchema->getType()->getName(), [CDatabase_Type::INTEGER, CDatabase_Type::SMALLINT, CDatabase_Type::BIGINT])) {
                     continue;
                 }
                 if ($table == 'cloud_messaging' && $column == 'registration_id') {
@@ -342,7 +332,6 @@ class CApp_Administrator_Fixer_Database {
                 if (in_array($table, ['pushnotif_queue', 'pushnotif_queue_member']) && $column == 'reg_id') {
                     continue;
                 }
-
 
                 if (in_array($table, ['log_activity', 'log_session', 'log_login', 'log_login_fail']) && $column == 'session_id') {
                     continue;
@@ -357,14 +346,11 @@ class CApp_Administrator_Fixer_Database {
 
                 $haveForeign = false;
 
-
                 foreach ($foreignKeys as $foreignKey) {
-
-                    if ($foreignKey->getLocalTable()->getName() == $table && $foreignKey->getLocalColumns() == array($column)) {
+                    if ($foreignKey->getLocalTable()->getName() == $table && $foreignKey->getLocalColumns() == [$column]) {
                         //already have foreign key
-                        $targetForeignKey = new CDatabase_Schema_ForeignKeyConstraint(array($column), $tableRelation, array($column), $foreignKey->getName(), array("onUpdate" => "RESTRICT", "onDelete" => "RESTRICT"));
+                        $targetForeignKey = new CDatabase_Schema_ForeignKeyConstraint([$column], $tableRelation, [$column], $foreignKey->getName(), ['onUpdate' => 'RESTRICT', 'onDelete' => 'RESTRICT']);
                         if ($comparator->diffForeignKey($targetForeignKey, $foreignKey)) {
-
                             $tableDifferences->changedForeignKeys[] = $targetForeignKey;
                             $changes++;
                         }
@@ -376,7 +362,7 @@ class CApp_Administrator_Fixer_Database {
                     continue;
                 }
 
-                $fkConstraint = new CDatabase_Schema_ForeignKeyConstraint(array($column), $tableRelation, array($column), null, array("onUpdate" => "RESTRICT", "onDelete" => "RESTRICT"));
+                $fkConstraint = new CDatabase_Schema_ForeignKeyConstraint([$column], $tableRelation, [$column], null, ['onUpdate' => 'RESTRICT', 'onDelete' => 'RESTRICT']);
 
                 $tableDifferences->addedForeignKeys[] = $fkConstraint;
                 $changes++;
@@ -390,5 +376,4 @@ class CApp_Administrator_Fixer_Database {
         }
         return $sql;
     }
-
 }

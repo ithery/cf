@@ -8,9 +8,10 @@
 use Symfony\Component\Process\Process;
 
 class CDevSuite_Windows_PhpFpm extends CDevSuite_PhpFpm {
-
     public $cli;
+
     public $files;
+
     public $winsw;
 
     const SERVICE = 'phpfpmservice';
@@ -33,9 +34,6 @@ class CDevSuite_Windows_PhpFpm extends CDevSuite_PhpFpm {
      */
     public function install() {
         $this->uninstall();
-
-        
-        
         $this->winsw->install(static::SERVICE, ['PHP_PATH' => $this->findPhpPath()]);
 
         $this->restart();
@@ -80,5 +78,4 @@ class CDevSuite_Windows_PhpFpm extends CDevSuite_PhpFpm {
 
         return pathinfo(explode("\n", $php)[0], PATHINFO_DIRNAME);
     }
-
 }

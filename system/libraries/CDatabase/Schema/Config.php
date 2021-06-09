@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 12:03:49 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 12:03:49 PM
  */
 
 /**
  * Configuration for a Schema.
- *
  */
 class CDatabase_Schema_Config {
-
     /**
      * @var bool
      */
@@ -78,7 +77,7 @@ class CDatabase_Schema_Config {
     /**
      * Sets the default namespace name of schema objects.
      *
-     * @param string $name The value to set.
+     * @param string $name the value to set
      *
      * @return void
      */
@@ -104,5 +103,4 @@ class CDatabase_Schema_Config {
     public function setDefaultTableOptions(array $defaultTableOptions) {
         $this->defaultTableOptions = $defaultTableOptions;
     }
-
 }

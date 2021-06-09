@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter {
-
     use CExporter_Trait_RegistersCustomConcernsTrait;
 
     const ACTION_STORE = 'store';
@@ -30,11 +23,11 @@ class CExporter {
      * @param object      $export
      * @param string      $filePath
      * @param string|null $disk
-     * @param string      $writerType
-     * @param mixed       $diskOptions
+     * @param mixed       $options
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     *
      * @return bool
      */
     public static function store($export, $filePath, $options = []) {
@@ -45,17 +38,15 @@ class CExporter {
 
         $export = CExporter_ExportableDetector::toExportable($export);
 
-
-
         if ($queued) {
             return static::queue($export, $filePath, $diskName, $writerType, $diskOptions);
         }
 
         $temporaryFile = static::export($export, $filePath, $writerType);
 
-
         $exported = static::storage()->disk($diskName, $diskOptions)->copy(
-                $temporaryFile, $filePath
+            $temporaryFile,
+            $filePath
         );
 
         $temporaryFile->delete();
@@ -71,6 +62,7 @@ class CExporter {
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     *
      * @return void
      */
     public static function download($export, $fileName, $writerType = null, array $headers = []) {
@@ -85,10 +77,10 @@ class CExporter {
      * @param string      $writerType
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
+     *
      * @return TemporaryFile
      */
     protected static function export($export, $fileName, $writerType = null) {
-
         $writerType = CExporter_FileTypeDetector::detectStrict($fileName, $writerType);
         $export = CExporter_ExportableDetector::toExportable($export);
         return static::writer()->export($export, $writerType);
@@ -99,15 +91,13 @@ class CExporter {
     }
 
     /**
-     * 
      * @return CExporter_Writer
      */
     public static function writer() {
         return CExporter_Writer::instance();
     }
-    
+
     /**
-     * 
      * @return CExporter_QueuedWriter
      */
     public static function queuedWriter() {
@@ -115,7 +105,6 @@ class CExporter {
     }
 
     /**
-     * 
      * @return CExporter_Storage
      */
     public static function storage() {
@@ -184,30 +173,74 @@ class CExporter {
         $writerType = CExporter_FileTypeDetector::detectStrict($filePath, $writerType);
         $export = CExporter_ExportableDetector::toExportable($export);
         return static::queuedWriter()->store(
-                        $export, $filePath, $disk, $writerType, $diskOptions
+            $export,
+            $filePath,
+            $disk,
+            $writerType,
+            $diskOptions
         );
     }
-    
+
     public static function queueAjax($ajaxMethod, $filePath, $disk = null, $writerType = null, $diskOptions = []) {
-        
         $filename = $ajaxMethod . '.tmp';
-        $file = CTemporary::getPath("ajax", $filename);
+        $file = CTemporary::getPath('ajax', $filename);
         $disk = CTemporary::disk();
         if (!$disk->exists($file)) {
-            throw new CException('failed to get temporary file :filename', array(':filename' => $file));
+            throw new CException('failed to get temporary file :filename', [':filename' => $file]);
         }
         $json = $disk->get($file);
 
         $data = json_decode($json, true);
-        
+
+        $args = [];
         $ajaxMethod = CAjax::createMethod($json)->setArgs($args);
         $response = $ajaxMethod->executeEngine();
-        
+
         $writerType = CExporter_FileTypeDetector::detectStrict($filePath, $writerType);
-        $export = CExporter_ExportableDetector::toExportable($export);
+        $export = CExporter_ExportableDetector::toExportable($data);
         return static::queuedWriter()->store(
-                        $export, $filePath, $disk, $writerType, $diskOptions
+            $export,
+            $filePath,
+            $disk,
+            $writerType,
+            $diskOptions
         );
     }
 
+    public static function makePath($folder, $filename) {
+        $depth = 5;
+        $path = self::getDirectory();
+        $path = self::makefolder($path, $folder);
+        $basefile = basename($filename);
+        for ($i = 0; $i < $depth; $i++) {
+            $c = '_';
+            if (strlen($basefile) > ($i + 1)) {
+                $c = substr($basefile, $i, 1);
+                if (strlen($c) == 0) {
+                    $c = '_';
+                }
+                $path = self::makefolder($path, $c);
+            }
+        }
+
+        return $path . $filename;
+    }
+
+    public static function getDirectory() {
+        $path = DOCROOT . 'export' . DIRECTORY_SEPARATOR;
+        if (!is_dir($path)) {
+            mkdir($path);
+        }
+
+        return $path;
+    }
+
+    public static function makefolder($path, $folder) {
+        $path = $path . $folder . DIRECTORY_SEPARATOR;
+        if (!is_dir($path)) {
+            mkdir($path);
+        }
+
+        return $path;
+    }
 }

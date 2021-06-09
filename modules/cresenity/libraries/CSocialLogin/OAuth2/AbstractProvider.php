@@ -1,17 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 15, 2019, 8:01:24 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 15, 2019, 8:01:24 PM
  */
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 
 abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_AbstractProvider {
-
     /**
      * The HTTP Client instance.
      *
@@ -85,10 +85,11 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Create a new provider instance.
      *
-     * @param  string  $clientId
-     * @param  string  $clientSecret
-     * @param  string  $redirectUrl
-     * @param  array  $guzzle
+     * @param string $clientId
+     * @param string $clientSecret
+     * @param string $redirectUrl
+     * @param array  $guzzle
+     *
      * @return void
      */
     public function __construct($clientId, $clientSecret, $redirectUrl, $guzzle = []) {
@@ -102,7 +103,8 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Get the authentication URL for the provider.
      *
-     * @param  string  $state
+     * @param string $state
+     *
      * @return string
      */
     abstract protected function getAuthUrl($state);
@@ -117,7 +119,8 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Get the raw user for the given access token.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return array
      */
     abstract protected function getUserByToken($token);
@@ -125,7 +128,8 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Map the raw user array to a Socialite User instance.
      *
-     * @param  array  $user
+     * @param array $user
+     *
      * @return CSocialLogin_OAuth2_User
      */
     abstract protected function mapUserToObject(array $user);
@@ -146,8 +150,9 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Get the authentication URL for the provider.
      *
-     * @param  string  $url
-     * @param  string  $state
+     * @param string $url
+     * @param string $state
+     *
      * @return string
      */
     protected function buildAuthUrlFromBase($url, $state) {
@@ -157,7 +162,8 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Get the GET parameters for the code request.
      *
-     * @param  string|null  $state
+     * @param string|null $state
+     *
      * @return array
      */
     protected function getCodeFields($state = null) {
@@ -176,8 +182,9 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Format the given scopes.
      *
-     * @param  array  $scopes
-     * @param  string  $scopeSeparator
+     * @param array  $scopes
+     * @param string $scopeSeparator
+     *
      * @return string
      */
     protected function formatScopes(array $scopes, $scopeSeparator) {
@@ -193,17 +200,18 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
         }
         $response = $this->getAccessTokenResponse($this->getCode());
         $user = $this->mapUserToObject($this->getUserByToken(
-                        $token = carr::get($response, 'access_token')
+            $token = carr::get($response, 'access_token')
         ));
         return $user->setToken($token)
-                        ->setRefreshToken(carr::get($response, 'refresh_token'))
-                        ->setExpiresIn(carr::get($response, 'expires_in'));
+            ->setRefreshToken(carr::get($response, 'refresh_token'))
+            ->setExpiresIn(carr::get($response, 'expires_in'));
     }
 
     /**
      * Get a Social User instance from a known access token.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return CSocialLogin_OAuth2_User
      */
     public function userFromToken($token) {
@@ -228,11 +236,11 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Get the access token response for the given code.
      *
-     * @param  string  $code
+     * @param string $code
+     *
      * @return array
      */
     public function getAccessTokenResponse($code) {
-
         $postKey = (version_compare(ClientInterface::VERSION, '6') === 1) ? 'form_params' : 'body';
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
             'headers' => ['Accept' => 'application/json'],
@@ -244,7 +252,8 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Get the POST fields for the token request.
      *
-     * @param  string  $code
+     * @param string $code
+     *
      * @return array
      */
     protected function getTokenFields($code) {
@@ -268,7 +277,8 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Merge the scopes of the requested access.
      *
-     * @param  array|string  $scopes
+     * @param array|string $scopes
+     *
      * @return $this
      */
     public function scopes($scopes) {
@@ -279,7 +289,8 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Set the scopes of the requested access.
      *
-     * @param  array|string  $scopes
+     * @param array|string $scopes
+     *
      * @return $this
      */
     public function setScopes($scopes) {
@@ -299,7 +310,8 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Set the redirect URL.
      *
-     * @param  string  $url
+     * @param string $url
+     *
      * @return $this
      */
     public function redirectUrl($url) {
@@ -322,7 +334,8 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Set the Guzzle HTTP client instance.
      *
-     * @param  \GuzzleHttp\Client  $client
+     * @param \GuzzleHttp\Client $client
+     *
      * @return $this
      */
     public function setHttpClient(Client $client) {
@@ -333,10 +346,11 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Set the request instance.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param CHTTP_Request $request
+     *
      * @return $this
      */
-    public function setRequest(Request $request) {
+    public function setRequest(CHTTP_Request $request) {
         $this->request = $request;
         return $this;
     }
@@ -381,7 +395,8 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
     /**
      * Set the custom parameters of the request.
      *
-     * @param  array  $parameters
+     * @param array $parameters
+     *
      * @return $this
      */
     public function with(array $parameters) {
@@ -389,12 +404,12 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
         return $this;
     }
 
-    function jwtEncode($data) {
+    public function jwtEncode($data) {
         $encoded = strtr(base64_encode($data), '+/', '-_');
         return rtrim($encoded, '=');
     }
 
-    function jwtGenerateSecretKey($keyId, $teamId, $clientId, $key) {
+    public function jwtGenerateSecretKey($keyId, $teamId, $clientId, $key) {
         $header = [
             'alg' => 'ES256',
             'kid' => $keyId
@@ -408,16 +423,17 @@ abstract class CSocialLogin_OAuth2_AbstractProvider extends CSocialLogin_Abstrac
         ];
 
         $privKey = openssl_pkey_get_private($key);
-        if (!$privKey)
+        if (!$privKey) {
             return false;
+        }
 
         $payload = encode(json_encode($header)) . '.' . encode(json_encode($body));
         $signature = '';
         $success = openssl_sign($payloads, $signature, $privKey, OPENSSL_ALGO_SHA256);
-        if (!$success)
+        if (!$success) {
             return false;
+        }
 
         return $payload . '.' . encode($signature);
     }
-
 }

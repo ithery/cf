@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 6:13:48 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 6:13:48 AM
  */
 class CQueue_Job_DatabaseJobRecord {
-
     use CTrait_Helper_InteractsWithTime;
 
     /**
@@ -21,7 +21,8 @@ class CQueue_Job_DatabaseJobRecord {
     /**
      * Create a new job record instance.
      *
-     * @param  \stdClass  $record
+     * @param \stdClass $record
+     *
      * @return void
      */
     public function __construct($record) {
@@ -51,13 +52,11 @@ class CQueue_Job_DatabaseJobRecord {
     /**
      * Dynamically access the underlying job information.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function __get($key) {
         return $this->record->{$key};
     }
-
-   
-
 }

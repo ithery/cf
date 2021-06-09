@@ -9,7 +9,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 
 class CHTTP_RedirectResponse extends BaseRedirectResponse {
-
     use CTrait_ForwardsCalls,
         CHTTP_Trait_ResponseTrait,
         CTrait_Macroable {
@@ -26,15 +25,16 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     /**
      * Flash a piece of data to the session.
      *
-     * @param  string|array  $key
-     * @param  mixed  $value
+     * @param string|array $key
+     * @param mixed        $value
+     *
      * @return $this
      */
     public function with($key, $value = null) {
         $key = is_array($key) ? $key : [$key => $value];
 
         foreach ($key as $k => $v) {
-            $this->session->flash($k, $v);
+            $this->session()->flash($k, $v);
         }
 
         return $this;
@@ -43,7 +43,8 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     /**
      * Add multiple cookies to the response.
      *
-     * @param  array  $cookies
+     * @param array $cookies
+     *
      * @return $this
      */
     public function withCookies(array $cookies) {
@@ -57,12 +58,13 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     /**
      * Flash an array of input to the session.
      *
-     * @param  array|null  $input
+     * @param array|null $input
+     *
      * @return $this
      */
     public function withInput(array $input = null) {
-        $this->session->flashInput($this->removeFilesFromInput(
-                        !is_null($input) ? $input : $this->request->input()
+        $this->session()->flashInput($this->removeFilesFromInput(
+            !is_null($input) ? $input : $this->request->input()
         ));
 
         return $this;
@@ -71,7 +73,8 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     /**
      * Remove all uploaded files form the given input array.
      *
-     * @param  array  $input
+     * @param array $input
+     *
      * @return array
      */
     protected function removeFilesFromInput(array $input) {
@@ -109,21 +112,23 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     /**
      * Flash a container of errors to the session.
      *
-     * @param  \Illuminate\Contracts\Support\MessageProvider|array|string  $provider
-     * @param  string  $key
+     * @param CBase_MessageProvider|array|string $provider
+     * @param string                             $key
+     *
      * @return $this
      */
     public function withErrors($provider, $key = 'default') {
         $value = $this->parseErrors($provider);
 
-        $errors = $this->session->get('errors', new ViewErrorBag);
+        $errors = $this->session()->get('errors', new CBase_ViewErrorBag);
 
-        if (!$errors instanceof ViewErrorBag) {
-            $errors = new ViewErrorBag;
+        if (!$errors instanceof CBase_ViewErrorBag) {
+            $errors = new CBase_ViewErrorBag;
         }
 
-        $this->session->flash(
-                'errors', $errors->put($key, $value)
+        $this->session()->flash(
+            'errors',
+            $errors->put($key, $value)
         );
 
         return $this;
@@ -132,12 +137,13 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     /**
      * Add a fragment identifier to the URL.
      *
-     * @param  string  $fragment
+     * @param string $fragment
+     *
      * @return $this
      */
     public function withFragment($fragment) {
         return $this->withoutFragment()
-                        ->setTargetUrl($this->getTargetUrl() . '#' . Str::after($fragment, '#'));
+            ->setTargetUrl($this->getTargetUrl() . '#' . cstr::after($fragment, '#'));
     }
 
     /**
@@ -146,21 +152,22 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
      * @return $this
      */
     public function withoutFragment() {
-        return $this->setTargetUrl(Str::before($this->getTargetUrl(), '#'));
+        return $this->setTargetUrl(cstr::before($this->getTargetUrl(), '#'));
     }
 
     /**
      * Parse the given errors into an appropriate value.
      *
-     * @param  \Illuminate\Contracts\Support\MessageProvider|array|string  $provider
-     * @return \Illuminate\Support\MessageBag
+     * @param CBase_MessageProviderInterface|array|string $provider
+     *
+     * @return CBase_MessageBag
      */
     protected function parseErrors($provider) {
-        if ($provider instanceof MessageProvider) {
+        if ($provider instanceof CBase_MessageProviderInterface) {
             return $provider->getMessageBag();
         }
 
-        return new MessageBag((array) $provider);
+        return new CBase_MessageBag((array) $provider);
     }
 
     /**
@@ -175,7 +182,7 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     /**
      * Get the request instance.
      *
-     * @return \Illuminate\Http\Request|null
+     * @return CHTTP_Request|null
      */
     public function getRequest() {
         return $this->request;
@@ -184,7 +191,8 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     /**
      * Set the request instance.
      *
-     * @param  CHTTP_Request  $request
+     * @param CHTTP_Request $request
+     *
      * @return void
      */
     public function setRequest(CHTTP_Request $request) {
@@ -194,8 +202,9 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
     /**
      * Dynamically bind flash data in the session.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      *
      * @throws \BadMethodCallException
@@ -206,10 +215,18 @@ class CHTTP_RedirectResponse extends BaseRedirectResponse {
         }
 
         if (cstr::startsWith($method, 'with')) {
-            return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
+            return $this->with(cstr::snake(substr($method, 4)), $parameters[0]);
         }
 
         static::throwBadMethodCallException($method);
     }
 
+    /**
+     * Get session instance
+     *
+     * @return CSession
+     */
+    public function session() {
+        return CSession::instance();
+    }
 }

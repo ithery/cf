@@ -1,30 +1,27 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 15, 2019, 11:29:51 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 15, 2019, 11:29:51 PM
  */
 use LEClient\LEClient;
 
 class CVendor_LetsEncrypt {
-
     /**
-     *
-     * @var CVendor_LetsEncrypt 
+     * @var CVendor_LetsEncrypt
      */
     private static $instance;
 
     /**
-     *
-     * @var LEClient\LEClient 
+     * @var LEClient\LEClient
      */
     private $client;
 
     /**
-     *
      * @var array
      */
     private $config;
@@ -99,7 +96,7 @@ class CVendor_LetsEncrypt {
         if (!$this->haveCertificate()) {
             return false;
         }
-        $data = array();
+        $data = [];
         $orderDataFile = $this->certificateKeys . 'orderData';
         if (!file_exists($orderDataFile)) {
             $orderFile = $this->certificateKeys . 'order';
@@ -126,11 +123,9 @@ class CVendor_LetsEncrypt {
     }
 
     /**
-     * 
      * @return LEClient\LEClient
      */
     public function client() {
         return $this->client;
     }
-
 }

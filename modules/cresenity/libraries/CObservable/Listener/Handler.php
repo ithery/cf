@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 3:50:35 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 3:50:35 PM
  */
 abstract class CObservable_Listener_Handler {
-
     use CTrait_Compat_Handler_Driver;
 
     const TYPE_REMOVE = 'remove';
@@ -24,16 +24,18 @@ abstract class CObservable_Listener_Handler {
     protected $handlers;
     protected $driver;
     protected $listener;
-    protected $handlerListeners = array();
+    protected $handlerListeners = [];
 
     /**
-     * event from listener
+     * Event from listener
+     *
      * @var string
      */
     protected $event;
 
     /**
-     * id element of owner this event listener
+     * Id element of owner this event listener
+     *
      * @var string
      */
     protected $owner;
@@ -60,5 +62,5 @@ abstract class CObservable_Listener_Handler {
         return null;
     }
 
-    abstract function js();
+    abstract public function js();
 }

@@ -1,21 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 10:18:30 PM
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Mime\MimeTypes;
-class CFile {
 
+class CFile {
     /**
      * Check if a file exists in a path or url.
      *
      * @param string $file → path or file url
+     *
      * @return bool
      */
     public static function exists($file) {
@@ -39,8 +38,8 @@ class CFile {
      * If the script is killed before the write is complete, only the temporary
      * trash file will be corrupted.
      *
-     * @param string $filename     Filename to write the data to.
-     * @param string $data         Data to write to file.
+     * @param string $path         Filename to write the data to.
+     * @param string $contents     Data to write to file.
      * @param string $atomicSuffix Lets you optionally provide a different
      *                             suffix for the temporary file.
      *
@@ -65,9 +64,10 @@ class CFile {
     /**
      * Write the contents of a file.
      *
-     * @param  string  $path
-     * @param  string  $contents
-     * @param  bool  $lock
+     * @param string $path
+     * @param string $contents
+     * @param bool   $lock
+     *
      * @return int|bool
      */
     public static function put($path, $contents, $lock = false) {
@@ -77,8 +77,9 @@ class CFile {
     /**
      * Get the contents of a file.
      *
-     * @param  string  $path
-     * @param  bool  $lock
+     * @param string $path
+     * @param bool   $lock
+     *
      * @return string
      *
      * @throws CFile_Exception_FileNotFoundException
@@ -87,13 +88,14 @@ class CFile {
         if (static::isFile($path)) {
             return $lock ? static::sharedGet($path) : file_get_contents($path);
         }
-        throw new CFile_Exception_FileNotFoundException("File does not exist at path {$path}");
+        throw new CStorage_Exception_FileNotFoundException("File does not exist at path {$path}");
     }
 
     /**
      * Delete the file at a given path.
      *
-     * @param  string|array  $paths
+     * @param string|array $paths
+     *
      * @return bool
      */
     public static function delete($paths) {
@@ -114,10 +116,11 @@ class CFile {
     /**
      * Create a directory.
      *
-     * @param  string  $path
-     * @param  int     $mode
-     * @param  bool    $recursive
-     * @param  bool    $force
+     * @param string $path
+     * @param int    $mode
+     * @param bool   $recursive
+     * @param bool   $force
+     *
      * @return bool
      */
     public static function makeDirectory($path, $mode = 0755, $recursive = false, $force = false) {
@@ -130,7 +133,8 @@ class CFile {
     /**
      * Get the file's last modification time.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return int
      */
     public static function lastModified($path) {
@@ -140,9 +144,10 @@ class CFile {
     /**
      * Give the diff of time modified file and given time parameters
      * Use current time if parameter $time not passed
-     * 
-     * @param string $file
-     * @param string|int $time 
+     *
+     * @param string     $filename
+     * @param string|int $time
+     *
      * @return int diff in second
      */
     public static function lastModifiedDiff($filename, $time = null) {
@@ -158,7 +163,8 @@ class CFile {
     /**
      * Determine if the given path is a file.
      *
-     * @param  string  $file
+     * @param string $file
+     *
      * @return bool
      */
     public static function isFile($file) {
@@ -168,7 +174,8 @@ class CFile {
     /**
      * Get contents of a file with shared access.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public static function sharedGet($path) {
@@ -192,7 +199,8 @@ class CFile {
     /**
      * Get the file size of a given file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return int
      */
     public static function size($path) {
@@ -200,7 +208,7 @@ class CFile {
         $filesize = filesize($path);
         if ($filesize == 0 && static::exists($path)) {
             //try to get another method
-            $fp = fopen($path, "rb");
+            $fp = fopen($path, 'rb');
             fseek($fp, 0, SEEK_END);
             $filesize = ftell($fp);
             fclose($fp);
@@ -211,7 +219,8 @@ class CFile {
     /**
      * Determine if the given path is a directory.
      *
-     * @param  string  $directory
+     * @param string $directory
+     *
      * @return bool
      */
     public static function isDirectory($directory) {
@@ -221,7 +230,8 @@ class CFile {
     /**
      * Determine if the given path is readable.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public static function isReadable($path) {
@@ -231,7 +241,8 @@ class CFile {
     /**
      * Determine if the given path is writable.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public static function isWritable($path) {
@@ -241,7 +252,8 @@ class CFile {
     /**
      * Get the file type of a given file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public static function type($path) {
@@ -251,7 +263,8 @@ class CFile {
     /**
      * Extract the file name from a file path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public static function name($path) {
@@ -261,7 +274,8 @@ class CFile {
     /**
      * Extract the trailing name component from a file path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public static function basename($path) {
@@ -271,7 +285,8 @@ class CFile {
     /**
      * Extract the parent directory from a file path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public static function dirname($path) {
@@ -281,7 +296,8 @@ class CFile {
     /**
      * Extract the file extension from a file path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public static function extension($path) {
@@ -291,7 +307,8 @@ class CFile {
     /**
      * Get the mime-type of a given file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string|false
      */
     public static function mimeType($path) {
@@ -301,7 +318,8 @@ class CFile {
     /**
      * Get all of the directories within a given directory.
      *
-     * @param  string  $directory
+     * @param string $directory
+     *
      * @return array
      */
     public static function directories($directory) {
@@ -317,8 +335,9 @@ class CFile {
      *
      * The directory itself may be optionally preserved.
      *
-     * @param  string  $directory
-     * @param  bool    $preserve
+     * @param string $directory
+     * @param bool   $preserve
+     *
      * @return bool
      */
     public static function deleteDirectory($directory, $preserve = false) {
@@ -332,11 +351,10 @@ class CFile {
             // keep iterating through each file until the directory is cleaned.
             if ($item->isDir() && !$item->isLink()) {
                 static::deleteDirectory($item->getPathname());
-            }
-            // If the item is just a file, we can go ahead and delete it since we're
-            // just looping through and waxing all of the files in this directory
-            // and calling directories recursively, so we delete the real path.
-            else {
+            } else {
+                // If the item is just a file, we can go ahead and delete it since we're
+                // just looping through and waxing all of the files in this directory
+                // and calling directories recursively, so we delete the real path.
                 static::delete($item->getPathname());
             }
         }
@@ -349,7 +367,8 @@ class CFile {
     /**
      * Remove all of the directories within a given directory.
      *
-     * @param  string  $directory
+     * @param string $directory
+     *
      * @return bool
      */
     public static function deleteDirectories($directory) {
@@ -366,7 +385,8 @@ class CFile {
     /**
      * Empty the specified directory of all files and folders.
      *
-     * @param  string  $directory
+     * @param string $directory
+     *
      * @return bool
      */
     public static function cleanDirectory($directory) {
@@ -376,8 +396,9 @@ class CFile {
     /**
      * Get the returned value of a file.
      *
-     * @param  string  $path
-     * @param  array  $data
+     * @param string $path
+     * @param array  $data
+     *
      * @return mixed
      *
      * @throws CStorage_Exception_FileNotFoundException
@@ -393,13 +414,12 @@ class CFile {
             };
             return $function();
         }
-        
 
         throw new CStorage_Exception_FileNotFoundException("File does not exist at path {$path}");
     }
 
     public static function phpValue($val, $level = 0) {
-        $indentString = "    ";
+        $indentString = '    ';
         $str = '';
         $eol = PHP_EOL;
         $indent = str_repeat($indentString, $level);
@@ -409,13 +429,13 @@ class CFile {
             foreach ($val as $k => $v) {
                 $str .= $indent2 . "'" . addslashes($k) . "'=>";
                 $str .= static::phpValue($v, $level + 1);
-                $str .= "," . $eol;
+                $str .= ',' . $eol;
             }
             $str .= $indent . ')';
-        } else if (is_null($val)) {
+        } elseif (is_null($val)) {
             $str .= 'NULL';
-        } else if (is_bool($val)) {
-            $str .= ($val === TRUE ? "TRUE" : "FALSE");
+        } elseif (is_bool($val)) {
+            $str .= ($val === true ? 'TRUE' : 'FALSE');
         } else {
             $str .= "'" . addslashes($val) . "'";
         }
@@ -428,18 +448,17 @@ class CFile {
         return static::put($filename, $val, $lock);
     }
 
-    
     /**
      * Get all of the files from the given directory (recursive).
      *
-     * @param  string  $directory
-     * @param  bool  $hidden
+     * @param string $directory
+     * @param bool   $hidden
+     *
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
-    public static function allFiles($directory, $hidden = false)
-    {
+    public static function allFiles($directory, $hidden = false) {
         return iterator_to_array(
-            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->sortByName(),
+            Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->sortByName(),
             false
         );
     }

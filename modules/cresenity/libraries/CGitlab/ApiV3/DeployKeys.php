@@ -1,31 +1,32 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 19, 2018, 5:03:50 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 19, 2018, 5:03:50 AM
  */
 class CGitlab_ApiV3_DeployKeys extends CGitlab_Api {
-
     const ORDER_BY = 'id';
+
     const SORT = 'asc';
 
     /**
-     * @param int $page
-     * @param int $per_page
+     * @param int    $page
+     * @param int    $per_page
      * @param string $order_by
      * @param string $sort
+     *
      * @return mixed
      */
     public function all($page = 1, $per_page = self::PER_PAGE, $order_by = self::ORDER_BY, $sort = self::SORT) {
-        return $this->get('deploy_keys', array(
-                    'page' => $page,
-                    'per_page' => $per_page,
-                    'order_by' => $order_by,
-                    'sort' => $sort
-        ));
+        return $this->get('deploy_keys', [
+            'page' => $page,
+            'per_page' => $per_page,
+            'order_by' => $order_by,
+            'sort' => $sort
+        ]);
     }
-
 }

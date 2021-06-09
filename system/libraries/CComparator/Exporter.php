@@ -1,13 +1,6 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-class CComparator_Exporter
-{
+class CComparator_Exporter {
     /**
      * Exports a value as a string
      *
@@ -21,26 +14,26 @@ class CComparator_Exporter
      *  - Carriage returns and newlines are normalized to \n
      *  - Recursion and repeated rendering is treated properly
      *
-     * @param int $indentation The indentation level of the 2nd+ line
+     * @param int   $indentation The indentation level of the 2nd+ line
+     * @param mixed $value
      *
      * @return string
      */
-    public function export($value, $indentation = 0)
-    {
+    public function export($value, $indentation = 0) {
         return $this->recursiveExport($value, $indentation);
     }
+
     /**
-     * @param array<mixed> $data
-     * @param CBase_RecursionContext      $context
+     * @param array<mixed>           $data
+     * @param CBase_RecursionContext $context
      *
      * @return string
      */
-    public function shortenedRecursiveExport(&$data, CBase_RecursionContext $context = null)
-    {
-        $result   = [];
+    public function shortenedRecursiveExport(&$data, CBase_RecursionContext $context = null) {
+        $result = [];
         $exporter = new self();
         if (!$context) {
-            $context = new Context;
+            $context = new CBase_RecursionContext;
         }
         $array = $data;
         $context->add($data);
@@ -60,6 +53,7 @@ class CComparator_Exporter
         }
         return \implode(', ', $result);
     }
+
     /**
      * Exports a value into a single-line string
      *
@@ -69,12 +63,13 @@ class CComparator_Exporter
      * Newlines are replaced by the visible string '\n'.
      * Contents of arrays and objects (if any) are replaced by '...'.
      *
+     * @param mixed $value
+     *
      * @return string
      *
      * @see    CComparator_Exporter::export
      */
-    public function shortenedExport($value)
-    {
+    public function shortenedExport($value) {
         if (\is_string($value)) {
             $string = \str_replace("\n", '', $this->export($value));
             if (\function_exists('mb_strlen')) {
@@ -103,14 +98,16 @@ class CComparator_Exporter
         }
         return $this->export($value);
     }
+
     /**
      * Converts an object to an array containing all of its private, protected
      * and public properties.
      *
+     * @param mixed $value
+     *
      * @return array
      */
-    public function toArray($value)
-    {
+    public function toArray($value) {
         if (!\is_object($value)) {
             return (array) $value;
         }
@@ -148,19 +145,19 @@ class CComparator_Exporter
         }
         return $array;
     }
+
     /**
      * Recursive implementation of export
      *
-     * @param mixed                                       $value       The value to export
-     * @param int                                         $indentation The indentation level of the 2nd+ line
+     * @param mixed                  $value       The value to export
+     * @param int                    $indentation The indentation level of the 2nd+ line
      * @param CBase_RecursionContext $processed   Previously processed objects
      *
      * @return string
      *
      * @see    CComparator_Exporter::export
      */
-    protected function recursiveExport(&$value, $indentation, $processed = null)
-    {
+    protected function recursiveExport(&$value, $indentation, $processed = null) {
         if ($value === null) {
             return 'null';
         }
@@ -185,8 +182,8 @@ class CComparator_Exporter
             if (\preg_match('/[^\x09-\x0d\x1b\x20-\xff]/', $value)) {
                 return 'Binary String: 0x' . \bin2hex($value);
             }
-            return "'" .
-            \str_replace(
+            return "'"
+            . \str_replace(
                 '<lf>',
                 "\n",
                 \str_replace(
@@ -194,8 +191,8 @@ class CComparator_Exporter
                     ['\r\n<lf>', '\n\r<lf>', '\r<lf>', '\n<lf>'],
                     $value
                 )
-            ) .
-            "'";
+            )
+            . "'";
         }
         $whitespace = \str_repeat(' ', (int)(4 * $indentation));
         if (!$processed) {
@@ -205,8 +202,8 @@ class CComparator_Exporter
             if (($key = $processed->contains($value)) !== false) {
                 return 'Array &' . $key;
             }
-            $array  = $value;
-            $key    = $processed->add($value);
+            $array = $value;
+            $key = $processed->add($value);
             $values = '';
             if (\count($array) > 0) {
                 foreach ($array as $k => $v) {
@@ -226,9 +223,9 @@ class CComparator_Exporter
             if ($hash = $processed->contains($value)) {
                 return \sprintf('%s Object &%s', $class, $hash);
             }
-            $hash   = $processed->add($value);
+            $hash = $processed->add($value);
             $values = '';
-            $array  = $this->toArray($value);
+            $array = $this->toArray($value);
             if (\count($array) > 0) {
                 foreach ($array as $k => $v) {
                     $values .= \sprintf(

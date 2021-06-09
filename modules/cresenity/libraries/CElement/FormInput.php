@@ -1,21 +1,14 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Description of FormInput
+ * Description of CElement_FormInput
  *
  * @author Hery
  */
 class CElement_FormInput extends CElement_Element {
-
     use CTrait_Compat_Element_FormInput;
 
-    protected $transforms = array();
+    protected $transforms = [];
     protected $name;
     protected $type;
     protected $submit_onchange;
@@ -27,24 +20,23 @@ class CElement_FormInput extends CElement_Element {
     protected $disabled;
     protected $readonly;
 
-    public function __construct($id = "") {
-
+    public function __construct($id = '') {
         parent::__construct($id);
 
-        $this->type = "text";
-        $this->tag = "input";
+        $this->type = 'text';
+        $this->tag = 'input';
         $this->name = $id;
 
         //sanitize name
-        $this->id = str_replace("[", "", $this->id);
-        $this->id = str_replace("]", "", $this->id);
+        $this->id = str_replace('[', '', $this->id);
+        $this->id = str_replace(']', '', $this->id);
 
         $this->submit_onchange = false;
         $this->ajax = false;
-        $this->size = "medium";
-        $this->value = "";
-        $this->disabled = "";
-        $this->list = array();
+        $this->size = 'medium';
+        $this->value = '';
+        $this->disabled = '';
+        $this->list = [];
         $this->validation = CFormValidation::factory();
     }
 
@@ -77,15 +69,14 @@ class CElement_FormInput extends CElement_Element {
         return $this->id;
     }
 
-    public function addTransform($name, $args = array()) {
+    public function addTransform($name, $args = []) {
         $func = CDynFunction::factory($name);
         if (!is_array($args)) {
-            $args = array($args);
+            $args = [$args];
         }
         foreach ($args as $arg) {
             $func->add_param($arg);
         }
-
 
         $this->transforms[] = $func;
         return $this;
@@ -106,9 +97,10 @@ class CElement_FormInput extends CElement_Element {
         return $this;
     }
 
-    public function addValidation($name, $value = "") {
-        if (strlen($value) == 0)
+    public function addValidation($name, $value = '') {
+        if (strlen($value) == 0) {
             $value = $name;
+        }
         $this->validation->add_validation($name, $value);
         return $this;
     }
@@ -144,12 +136,12 @@ class CElement_FormInput extends CElement_Element {
     }
 
     public function toArray() {
-        $data = array();
+        $data = [];
         if ($this->disabled) {
-            $data['attr']['disabled'] = "disabled";
+            $data['attr']['disabled'] = 'disabled';
         }
         if ($this->readonly) {
-            $data['attr']['readonly'] = "readonly";
+            $data['attr']['readonly'] = 'readonly';
         }
         if (strlen($this->name) > 0) {
             $data['attr']['name'] = $this->name;
@@ -162,29 +154,29 @@ class CElement_FormInput extends CElement_Element {
         parent::build();
         $this->setAttr('value', $this->value);
         if ($this->readonly) {
-            $this->setAttr('readonly', "readonly");
+            $this->setAttr('readonly', 'readonly');
         }
         if ($this->disabled) {
-            $this->setAttr('disabled', "disabled");
+            $this->setAttr('disabled', 'disabled');
         }
     }
 
     public function js($indent = 0) {
-        $js = "";
+        $js = '';
         if ($this->submit_onchange) {
-            if ($this->type == "date") {
+            if ($this->type == 'date') {
                 $js .= "
 						$('#" . $this->id . "').on('changeDate',function() {
 							$(this).closest('form').submit();
 						});
-					
+
 					";
             }
             $js .= "
 					$('#" . $this->id . "').on('change',function() {
 						$(this).closest('form').submit();
 					});
-				
+
 				";
         }
         $js .= $this->js_child($indent);
@@ -196,5 +188,4 @@ class CElement_FormInput extends CElement_Element {
         $nameAttr = ' name="' . $this->name . '"';
         return $htmlAttr . $nameAttr;
     }
-
 }

@@ -1,12 +1,11 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-
-$username = "";
-$password = "";
-if (isset($_GET["demo"])) {
-    $username = "demo";
-    $password = "demo";
+$username = '';
+$password = '';
+if (isset($_GET['demo'])) {
+    $username = 'demo';
+    $password = 'demo';
 }
 ?>
 <!DOCTYPE html>

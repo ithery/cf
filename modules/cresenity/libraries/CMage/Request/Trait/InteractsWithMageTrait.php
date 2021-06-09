@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CMage_Request_Trait_InteractsWithMageTrait {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -24,7 +17,7 @@ trait CMage_Request_Trait_InteractsWithMageTrait {
      */
     public function rules() {
         return [
-                //
+            //
         ];
     }
 
@@ -45,9 +38,9 @@ trait CMage_Request_Trait_InteractsWithMageTrait {
      * @return mixed
      */
     public function resource() {
-        return tap(Nova::resourceForKey($this->resource), function ($resource) {
-            abort_if(is_null($resource), 404);
-            abort_if(!$resource::authorizedToViewAny($this), 403);
+        return c::tap(Nova::resourceForKey($this->resource), function ($resource) {
+            c::abortIf(is_null($resource), 404);
+            c::abortIf(!$resource::authorizedToViewAny($this), 403);
         });
     }
 
@@ -65,7 +58,8 @@ trait CMage_Request_Trait_InteractsWithMageTrait {
     /**
      * Find the resource model instance for the request.
      *
-     * @param  mixed|null  $resourceId
+     * @param mixed|null $resourceId
+     *
      * @return \Laravel\Nova\Resource
      */
     public function findResourceOrFail($resourceId = null) {
@@ -75,7 +69,8 @@ trait CMage_Request_Trait_InteractsWithMageTrait {
     /**
      * Find the model instance for the request.
      *
-     * @param  mixed|null  $resourceId
+     * @param mixed|null $resourceId
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function findModelOrFail($resourceId = null) {
@@ -91,7 +86,8 @@ trait CMage_Request_Trait_InteractsWithMageTrait {
     /**
      * Get the query to find the model instance for the request.
      *
-     * @param  mixed|null  $resourceId
+     * @param mixed|null $resourceId
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function findModelQuery($resourceId = null) {
@@ -101,7 +97,8 @@ trait CMage_Request_Trait_InteractsWithMageTrait {
     /**
      * Get a new instance of the resource being requested.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param \Illuminate\Database\Eloquent\Model $model
+     *
      * @return \Laravel\Nova\Resource
      */
     public function newResourceWith($model) {
@@ -138,5 +135,4 @@ trait CMage_Request_Trait_InteractsWithMageTrait {
 
         return $resource::newModel();
     }
-
 }

@@ -1,17 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 7, 2018, 2:01:51 AM
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
-
     /**
      * The SSH gateway implementation.
      *
@@ -64,12 +61,13 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     /**
      * Create a new SSH connection instance.
      *
-     * @param string                              $name
-     * @param string                              $host
-     * @param string                              $username
-     * @param array                               $auth
-     * @param CRemote_SSH_GatewayInterface        $gateway
-     * @param int                                 $timeout
+     * @param string                       $name
+     * @param string                       $host
+     * @param string                       $username
+     * @param array                        $auth
+     * @param CRemote_SSH_GatewayInterface $gateway
+     * @param int                          $timeout
+     * @param mixed                        $port
      */
     public function __construct($name, $host, $port, $username, array $auth, CRemote_SSH_GatewayInterface $gateway = null, $timeout = 10) {
         $this->name = $name;
@@ -130,7 +128,7 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
      * Run a set of commands against the connection (blocking).
      *
      * @param string|array $commands
-     * @param \Closure     $callback
+     * @param mixed        $timeout
      *
      * @return $this
      */
@@ -139,7 +137,6 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
         // they can be run. Once we have the commands formatted and the server is
         // ready to go we will just fire off these commands against the server.
         $gateway = $this->getGateway();
-
 
         return $gateway->runBlocking($this->formatCommands($commands), $timeout);
     }
@@ -319,6 +316,8 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     /**
      * Set the time out of current gateway.
      *
+     * @param int $second
+     *
      * @return int|bool
      */
     public function setTimeout($second) {
@@ -333,5 +332,4 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     public function getTimeout() {
         return $this->gateway->getTimeout();
     }
-
 }

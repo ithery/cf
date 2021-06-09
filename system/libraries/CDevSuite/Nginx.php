@@ -6,21 +6,17 @@
  * @author Hery
  */
 abstract class CDevSuite_Nginx {
-
     /**
-     *
      * @var CDevSuite_CommandLine
      */
     public $cli;
 
     /**
-     *
      * @var CDevSuite_Filesystem
      */
     public $files;
 
     /**
-     *
      * @var CDevSuite_Configuration
      */
     public $configuration;

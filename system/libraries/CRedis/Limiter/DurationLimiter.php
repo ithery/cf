@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CRedis_Limiter_DurationLimiter {
-
     /**
      * The Redis factory implementation.
      *
@@ -53,10 +46,11 @@ class CRedis_Limiter_DurationLimiter {
     /**
      * Create a new duration limiter instance.
      *
-     * @param  CRedis_AbstractConnection  $redis
-     * @param  string  $name
-     * @param  int  $maxLocks
-     * @param  int  $decay
+     * @param CRedis_AbstractConnection $redis
+     * @param string                    $name
+     * @param int                       $maxLocks
+     * @param int                       $decay
+     *
      * @return void
      */
     public function __construct($redis, $name, $maxLocks, $decay) {
@@ -69,8 +63,9 @@ class CRedis_Limiter_DurationLimiter {
     /**
      * Attempt to acquire the lock for the given number of seconds.
      *
-     * @param  int  $timeout
-     * @param  callable|null  $callback
+     * @param int           $timeout
+     * @param callable|null $callback
+     *
      * @return mixed
      *
      * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
@@ -96,7 +91,13 @@ class CRedis_Limiter_DurationLimiter {
      */
     public function acquire() {
         $results = $this->redis->eval(
-                $this->luaScript(), 1, $this->name, microtime(true), time(), $this->decay, $this->maxLocks
+            $this->luaScript(),
+            1,
+            $this->name,
+            microtime(true),
+            time(),
+            $this->decay,
+            $this->maxLocks
         );
         $this->decaysAt = $results[1];
         $this->remaining = max(0, $results[2]);
@@ -133,5 +134,4 @@ end
 return {reset(), ARGV[2] + ARGV[3], ARGV[4] - 1}
 LUA;
     }
-
 }

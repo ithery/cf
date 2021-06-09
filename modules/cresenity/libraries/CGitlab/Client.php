@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 19, 2018, 3:46:59 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 19, 2018, 3:46:59 AM
  */
 class CGitlab_Client {
-
     /**
      * Constant for authentication method. Indicates the default, but deprecated
      * login with username and token in URL.
@@ -30,28 +30,28 @@ class CGitlab_Client {
     /**
      * @var array
      */
-    private $options = array(
+    private $options = [
         'user_agent' => 'php-gitlab-api',
         'timeout' => 60
-    );
+    ];
 
     /**
-     *
      * @var string
      */
     protected $gitUrl;
 
     /**
-     *
      * @var CCurl
      */
     protected $curl;
+
     protected $token;
+
     protected $authMethod;
+
     protected $sudo;
 
     public function __construct($gitUrl) {
-
         $this->gitUrl = $gitUrl;
         $this->curl = CCurl::factory($this->gitUrl);
         $this->curl->setTimeout(6000);
@@ -117,7 +117,7 @@ class CGitlab_Client {
     /**
      * {@inheritDoc}
      */
-    protected function request($path, array $parameters = array(), $httpMethod = 'GET', array $headers = array(), array $files = array()) {
+    protected function request($path, array $parameters = [], $httpMethod = 'GET', array $headers = [], array $files = []) {
         $path = trim($this->gitUrl . $path, '/');
 
         // Skip by default
@@ -125,7 +125,7 @@ class CGitlab_Client {
             return;
         }
 
-        $headers = array();
+        $headers = [];
         switch ($this->authMethod) {
             case self::AUTH_HTTP_TOKEN:
                 $headers[] = 'PRIVATE-TOKEN: ' . $this->token;
@@ -135,9 +135,9 @@ class CGitlab_Client {
                 break;
             case self::AUTH_URL_TOKEN:
                 $url = $path;
-                $query = array(
+                $query = [
                     'private_token' => $this->token
-                );
+                ];
                 if (!is_null($this->sudo)) {
                     $query['sudo'] = $this->sudo;
                 }
@@ -159,47 +159,44 @@ class CGitlab_Client {
 
         $response = $this->curl->exec()->response();
 
-
-
         return $response;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function get($path, array $parameters = array(), array $headers = array()) {
+    public function get($path, array $parameters = [], array $headers = []) {
         if (0 < count($parameters)) {
             $path .= (false === strpos($path, '?') ? '?' : '&') . http_build_query($parameters, '', '&');
         }
-        return $this->request($path, array(), 'GET', $headers);
+        return $this->request($path, [], 'GET', $headers);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function post($path, array $parameters = array(), array $headers = array(), array $files = array()) {
+    public function post($path, array $parameters = [], array $headers = [], array $files = []) {
         return $this->request($path, $parameters, 'POST', $headers, $files);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function patch($path, array $parameters = array(), array $headers = array()) {
+    public function patch($path, array $parameters = [], array $headers = []) {
         return $this->request($path, $parameters, 'PATCH', $headers);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function delete($path, array $parameters = array(), array $headers = array()) {
+    public function delete($path, array $parameters = [], array $headers = []) {
         return $this->request($path, $parameters, 'DELETE', $headers);
     }
 
     /**
      * {@inheritDoc}
      */
-    public function put($path, array $parameters = array(), array $headers = array()) {
+    public function put($path, array $parameters = [], array $headers = []) {
         return $this->request($path, $parameters, 'PUT', $headers);
     }
-
 }

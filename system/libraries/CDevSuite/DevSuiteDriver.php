@@ -5,10 +5,7 @@
  *
  * @author Hery
  */
-
-
-abstract class CDevSuite_DevSuiteDriver
-{
+abstract class CDevSuite_DevSuiteDriver {
     /**
      * Determine if the driver serves the request.
      *
@@ -51,15 +48,14 @@ abstract class CDevSuite_DevSuiteDriver
      *
      * @return CDevSuite_DevSuiteDriver|null
      */
-    public static function assign($sitePath, $siteName, $uri)
-    {
+    public static function assign($sitePath, $siteName, $uri) {
         $drivers = [];
 
         if ($customSiteDriver = static::customSiteDriver($sitePath)) {
             $drivers[] = $customSiteDriver;
         }
 
-        $drivers = array_merge($drivers, static::driversIn(DEVSUITE_HOME_PATH.'/Drivers'));
+        $drivers = array_merge($drivers, static::driversIn(DEVSUITE_HOME_PATH . '/Drivers'));
 
         $drivers[] = CDevSuite_Driver_BasicDevSuiteDriver::class;
 
@@ -79,13 +75,12 @@ abstract class CDevSuite_DevSuiteDriver
      *
      * @return string
      */
-    public static function customSiteDriver($sitePath)
-    {
-        if (! file_exists($sitePath.'/LocalDevSuiteDriver.php')) {
+    public static function customSiteDriver($sitePath) {
+        if (!file_exists($sitePath . '/LocalDevSuiteDriver.php')) {
             return;
         }
 
-        require_once $sitePath.'/LocalDevSuiteDriver.php';
+        require_once $sitePath . '/LocalDevSuiteDriver.php';
 
         return 'LocalDevSuiteDriver';
     }
@@ -97,9 +92,8 @@ abstract class CDevSuite_DevSuiteDriver
      *
      * @return array
      */
-    public static function driversIn($path)
-    {
-        if (! is_dir($path)) {
+    public static function driversIn($path) {
+        if (!is_dir($path)) {
             return [];
         }
 
@@ -125,8 +119,7 @@ abstract class CDevSuite_DevSuiteDriver
      *
      * @return string
      */
-    public function mutateUri($uri)
-    {
+    public function mutateUri($uri) {
         return $uri;
     }
 
@@ -140,8 +133,7 @@ abstract class CDevSuite_DevSuiteDriver
      *
      * @return void
      */
-    public function serveStaticFile($staticFilePath, $sitePath, $siteName, $uri)
-    {
+    public function serveStaticFile($staticFilePath, $sitePath, $siteName, $uri) {
         /*
          * Back story...
          *
@@ -160,7 +152,7 @@ abstract class CDevSuite_DevSuiteDriver
         header('Content-Type: text/html');
         header_remove('Content-Type');
 
-        header('X-Accel-Redirect: /'.CDevSuite::staticPrefix().'/'.$staticFilePath);
+        header('X-Accel-Redirect: /' . CDevSuite::staticPrefix() . '/' . $staticFilePath);
     }
 
     /**
@@ -170,23 +162,22 @@ abstract class CDevSuite_DevSuiteDriver
      *
      * @return bool
      */
-    protected function isActualFile($path)
-    {
-        return ! is_dir($path) && file_exists($path);
+    protected function isActualFile($path) {
+        return !is_dir($path) && file_exists($path);
     }
 
     /**
      * Load server environment variables if available.
      * Processes any '*' entries first, and then adds site-specific entries.
      *
-     * @param  string  $sitePath
-     * @param  string  $siteName
+     * @param string $sitePath
+     * @param string $siteName
+     *
      * @return void
      */
-    public function loadServerEnvironmentVariables($sitePath, $siteName)
-    {
-        $varFilePath = $sitePath.'/.devsuite-env.php';
-        if (! file_exists($varFilePath)) {
+    public function loadServerEnvironmentVariables($sitePath, $siteName) {
+        $varFilePath = $sitePath . '/.devsuite-env.php';
+        if (!file_exists($varFilePath)) {
             return;
         }
 
@@ -199,12 +190,12 @@ abstract class CDevSuite_DevSuiteDriver
         }
 
         foreach ($variablesToSet as $key => $value) {
-            if (! is_string($key)) {
+            if (!is_string($key)) {
                 continue;
             }
             $_SERVER[$key] = $value;
             $_ENV[$key] = $value;
-            putenv($key.'='.$value);
+            putenv($key . '=' . $value);
         }
     }
 }

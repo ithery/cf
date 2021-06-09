@@ -1,21 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
-
-
 
 use Dotenv\Repository\Adapter\PutenvAdapter;
 use Dotenv\Repository\RepositoryBuilder;
 use PhpOption\Option;
 
-class CEnv
-{
+class CEnv {
     /**
      * Indicates if the putenv adapter is enabled.
      *
@@ -35,8 +33,7 @@ class CEnv
      *
      * @return void
      */
-    public static function enablePutenv()
-    {
+    public static function enablePutenv() {
         static::$putenv = true;
         static::$repository = null;
     }
@@ -46,8 +43,7 @@ class CEnv
      *
      * @return void
      */
-    public static function disablePutenv()
-    {
+    public static function disablePutenv() {
         static::$putenv = false;
         static::$repository = null;
     }
@@ -57,8 +53,7 @@ class CEnv
      *
      * @return \Dotenv\Repository\RepositoryInterface
      */
-    public static function getRepository()
-    {
+    public static function getRepository() {
         if (static::$repository === null) {
             $builder = RepositoryBuilder::createWithDefaultAdapters();
 
@@ -75,12 +70,12 @@ class CEnv
     /**
      * Gets the value of an environment variable.
      *
-     * @param  string  $key
-     * @param  mixed  $default
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
-    public static function get($key, $default = null)
-    {
+    public static function get($key, $default = null) {
         return Option::fromValue(static::getRepository()->get($key))
             ->map(function ($value) {
                 switch (strtolower($value)) {

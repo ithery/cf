@@ -1,14 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 final class CVendor_Firebase_Messaging_Messages implements Countable, IteratorAggregate {
-
-    /** @var Message[] */
+    /** @var CVendor_Firebase_Messaging_MessageInterface[] */
     private $messages;
 
     public function __construct(CVendor_Firebase_Messaging_MessageInterface ...$messages) {
@@ -18,7 +11,7 @@ final class CVendor_Firebase_Messaging_Messages implements Countable, IteratorAg
     /**
      * @codeCoverageIgnore
      *
-     * @return Generator|Message[]
+     * @return Generator|CVendor_Firebase_Messaging_MessageInterface[]
      */
     public function getIterator() {
         return new ArrayIterator($this->messages);
@@ -27,5 +20,4 @@ final class CVendor_Firebase_Messaging_Messages implements Countable, IteratorAg
     public function count() {
         return \count($this->messages);
     }
-
 }

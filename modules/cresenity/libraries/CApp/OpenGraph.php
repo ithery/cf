@@ -1,19 +1,12 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
 use CApp_OpenGraph_Tag as OpenGraphTag;
+
 /**
  * Library that assists in building Open Graph meta tags.
  * Open Graph protocol official docs: http://ogp.me/
  */
 class CApp_OpenGraph {
-
     /**
      * The version number
      */
@@ -47,7 +40,7 @@ class CApp_OpenGraph {
 
     /**
      * Constructor call
-     * 
+     *
      * @param bool $validate Enable validation?
      */
     public function __construct($validate = false) {
@@ -57,10 +50,11 @@ class CApp_OpenGraph {
 
     /**
      * Creates and returns a new open graph tag object.
-     * 
-     * @param  string $name     The name of the tag
-     * @param  mixed  $value    The value of the tag
-     * @param  bool   $prefixed Add the "og"-prefix?
+     *
+     * @param string $name     The name of the tag
+     * @param mixed  $value    The value of the tag
+     * @param bool   $prefixed Add the "og"-prefix?
+     *
      * @return OpenGraphTag
      */
     protected function createTag($name, $value, $prefixed = true) {
@@ -69,7 +63,7 @@ class CApp_OpenGraph {
 
     /**
      * Getter for the validation mode.
-     * 
+     *
      * @return bool
      */
     public function valid() {
@@ -79,7 +73,8 @@ class CApp_OpenGraph {
     /**
      * Setter for the validation mode.
      *
-     * @param  bool $validate
+     * @param bool $validate
+     *
      * @return OpenGraph
      */
     public function validate($validate = true) {
@@ -89,7 +84,7 @@ class CApp_OpenGraph {
 
     /**
      * Getter for the tags.
-     * 
+     *
      * @return OpenGraphTag[]
      */
     public function tags() {
@@ -99,8 +94,9 @@ class CApp_OpenGraph {
     /**
      * True if at least one tag with the given name exists.
      * It's possible that a tag has multiple values.
-     * 
-     * @param  string $name
+     *
+     * @param string $name
+     *
      * @return bool
      */
     public function has($name) {
@@ -114,8 +110,9 @@ class CApp_OpenGraph {
 
     /**
      * Remove all tags with the given name
-     * 
-     * @param  string  $name
+     *
+     * @param string $name
+     *
      * @return OpenGraph
      */
     public function forget($name) {
@@ -139,10 +136,11 @@ class CApp_OpenGraph {
 
     /**
      * Adds a custom tag to the list of tags
-     * 
+     *
      * @param string $name     The name of the tag
      * @param mixed  $value    The value of the tag
      * @param bool   $prefixed Add the "og"-prefix?
+     *
      * @return OpenGraph
      */
     public function tag($name, $value, $prefixed = true) {
@@ -153,11 +151,12 @@ class CApp_OpenGraph {
 
     /**
      * Adds attribute tags to the list of tags
-     * 
+     *
      * @param string   $tagName    The name of the base tag
      * @param array    $attributes Array with attributes (pairs of name and value)
      * @param string[] $valid      Array with names of valid attributes
      * @param bool     $prefixed   Add the "og"-prefix?
+     *
      * @return OpenGraph
      */
     public function attributes($tagName, array $attributes = [], array $valid = [], $prefixed = true) {
@@ -175,10 +174,11 @@ class CApp_OpenGraph {
 
     /**
      * Shortcut for attributes() with $prefixed = false
-     * 
+     *
      * @param string   $tagName    The name of the base tag
      * @param array    $attributes Array with attributes (pairs of name and value)
      * @param string[] $valid      Array with names of valid attributes
+     *
      * @return OpenGraph
      */
     public function unprefixedAttributes($tagName, array $attributes = [], array $valid = []) {
@@ -187,14 +187,15 @@ class CApp_OpenGraph {
 
     /**
      * Adds a title tag
-     * 
-     * @param  string $title
+     *
+     * @param string $title
+     *
      * @return OpenGraph
      */
     public function title($title) {
         $title = trim($title);
-        if ($this->validate and ! $title) {
-            throw new Exception("Open Graph: Invalid title (empty)");
+        if ($this->validate and !$title) {
+            throw new Exception('Open Graph: Invalid title (empty)');
         }
         $this->forget('title');
         $this->tags[] = $this->createTag('title', strip_tags($title));
@@ -203,8 +204,9 @@ class CApp_OpenGraph {
 
     /**
      * Adds a type tag.
-     * 
-     * @param  string $type
+     *
+     * @param string $type
+     *
      * @return OpenGraph
      */
     public function type($type) {
@@ -222,7 +224,7 @@ class CApp_OpenGraph {
             'profile',
             'website',
         ];
-        if ($this->validate and ! in_array($type, $types)) {
+        if ($this->validate and !in_array($type, $types)) {
             throw new Exception("Open Graph: Invalid type '{$type}' (unknown type)");
         }
         $this->forget('type');
@@ -233,19 +235,20 @@ class CApp_OpenGraph {
     /**
      * Adds an image tag.
      * If the URL is relative it's converted to an absolute one.
-     * 
-     * @param  string     $imageFile  The URL of the image file
-     * @param  array|null $attributes Array with additional attributes (pairs of name and value)
+     *
+     * @param string     $imageFile  The URL of the image file
+     * @param array|null $attributes Array with additional attributes (pairs of name and value)
+     *
      * @return OpenGraph
      */
     public function image($imageFile, array $attributes = null) {
-        if ($this->validate and ! $imageFile) {
-            throw new Exception("Open Graph: Invalid image URL (empty)");
+        if ($this->validate and !$imageFile) {
+            throw new Exception('Open Graph: Invalid image URL (empty)');
         }
         if (strpos($imageFile, '://') === false and function_exists('asset')) {
             $imageFile = asset($imageFile);
         }
-        if ($this->validate and ! filter_var($imageFile, FILTER_VALIDATE_URL)) {
+        if ($this->validate and !filter_var($imageFile, FILTER_VALIDATE_URL)) {
             throw new Exception("Open Graph: Invalid image URL '{$imageFile}'");
         }
         $this->tags[] = $this->createTag('image', $imageFile);
@@ -263,10 +266,11 @@ class CApp_OpenGraph {
 
     /**
      * Adds a description tag
-     * 
-     * @param  string $description The description text
-     * @param  int    $description If the text is longer than this it is shortened
-     * @return OpenGraph
+     *
+     * @param string $description The description text
+     * @param int    $maxLength   If the text is longer than this it is shortened
+     *
+     * @return CApp_OpenGraph
      */
     public function description($description, $maxLength = 250) {
         $description = trim(strip_tags($description));
@@ -283,8 +287,9 @@ class CApp_OpenGraph {
 
     /**
      * Adds a URL tag
-     * 
-     * @param  string $url
+     *
+     * @param string $url
+     *
      * @return OpenGraph
      */
     public function url($url = null) {
@@ -306,7 +311,7 @@ class CApp_OpenGraph {
             $safeRequestURI = htmlentities(strip_tags(urldecode($requestUri)));
             $url .= "{$httpHost}{$safeRequestURI}";
         }
-        if ($this->validate and ! filter_var($url, FILTER_VALIDATE_URL)) {
+        if ($this->validate and !filter_var($url, FILTER_VALIDATE_URL)) {
             throw new Exception("Open Graph: Invalid URL '{$url}'");
         }
         $this->forget('url');
@@ -316,13 +321,14 @@ class CApp_OpenGraph {
 
     /**
      * Adds a locale tag
-     * 
-     * @param  string $locale
+     *
+     * @param string $locale
+     *
      * @return OpenGraph
      */
     public function locale($locale) {
-        if ($this->validate and ! $locale) {
-            throw new Exception("Open Graph: Invalid locale (none set)");
+        if ($this->validate and !$locale) {
+            throw new Exception('Open Graph: Invalid locale (none set)');
         }
         $this->forget('locale');
         $this->tags[] = $this->createTag('locale', $locale);
@@ -331,8 +337,9 @@ class CApp_OpenGraph {
 
     /**
      * Adds locale:alternate tags
-     * 
-     * @param  string[] $locales An array of alternative locales
+     *
+     * @param string[] $locales An array of alternative locales
+     *
      * @return OpenGraph
      */
     public function localeAlternate(array $locales = []) {
@@ -341,7 +348,7 @@ class CApp_OpenGraph {
         }
 
         foreach ($locales as $key => $locale) {
-            if ($this->validate and ! $locale) {
+            if ($this->validate and !$locale) {
                 throw new Exception("Open Graph: Invalid locale (item key: {$key})");
             }
             $this->tags[] = $this->createTag('locale:alternate', $locale);
@@ -351,13 +358,14 @@ class CApp_OpenGraph {
 
     /**
      * Adds a site_name tag
-     * 
-     * @param  string $siteName
+     *
+     * @param string $siteName
+     *
      * @return OpenGraph
      */
     public function siteName($siteName) {
-        if ($this->validate and ! $siteName) {
-            throw new Exception("Open Graph: Invalid site_name (empty)");
+        if ($this->validate and !$siteName) {
+            throw new Exception('Open Graph: Invalid site_name (empty)');
         }
         $this->forget('site_name');
         $this->tags[] = $this->createTag('site_name', $siteName);
@@ -366,8 +374,9 @@ class CApp_OpenGraph {
 
     /**
      * Adds a determiner tag.
-     * 
-     * @param  string $determiner
+     *
+     * @param string $determiner
+     *
      * @return OpenGraph
      */
     public function determiner($determiner = '') {
@@ -378,7 +387,7 @@ class CApp_OpenGraph {
             'auto',
             ''
         ];
-        if ($this->validate and ! in_array($determiner, $enum)) {
+        if ($this->validate and !in_array($determiner, $enum)) {
             throw new Exception("Open Graph: Invalid determiner '{$determiner}' (unkown value)");
         }
         $this->tags[] = $this->createTag('determiner', $determiner);
@@ -388,19 +397,20 @@ class CApp_OpenGraph {
     /**
      * Adds an audio tag.
      * If the URL is relative its converted to an absolute one.
-     * 
-     * @param  string     $audioFile  The URL of the video file
-     * @param  array|null $attributes Array with additional attributes (pairs of name and value)
+     *
+     * @param string     $audioFile  The URL of the video file
+     * @param array|null $attributes Array with additional attributes (pairs of name and value)
+     *
      * @return OpenGraph
      */
     public function audio($audioFile, array $attributes = null) {
-        if ($this->validate and ! $audioFile) {
-            throw new Exception("Open Graph: Invalid audio URL (empty)");
+        if ($this->validate and !$audioFile) {
+            throw new Exception('Open Graph: Invalid audio URL (empty)');
         }
         if (strpos($audioFile, '://') === false and function_exists('asset')) {
             $audioFile = asset($audioFile);
         }
-        if ($this->validate and ! filter_var($audioFile, FILTER_VALIDATE_URL)) {
+        if ($this->validate and !filter_var($audioFile, FILTER_VALIDATE_URL)) {
             throw new Exception("Open Graph: Invalid audio URL '{$audioFile}'");
         }
         $this->tags[] = $this->createTag('audio', $audioFile);
@@ -451,19 +461,20 @@ class CApp_OpenGraph {
     /**
      * Adds a video tag
      * If the URL is relative its converted to an absolute one.
-     * 
-     * @param  string     $videoFile  The URL of the video file
-     * @param  array|null $attributes Array with additional attributes (pairs of name and value)
+     *
+     * @param string     $videoFile  The URL of the video file
+     * @param array|null $attributes Array with additional attributes (pairs of name and value)
+     *
      * @return OpenGraph
      */
     public function video($videoFile, array $attributes = null) {
-        if ($this->validate and ! $videoFile) {
-            throw new Exception("Open Graph: Invalid video URL (empty)");
+        if ($this->validate and !$videoFile) {
+            throw new Exception('Open Graph: Invalid video URL (empty)');
         }
         if (strpos($videoFile, '://') === false and function_exists('asset')) {
             $videoFile = asset($videoFile);
         }
-        if ($this->validate and ! filter_var($videoFile, FILTER_VALIDATE_URL)) {
+        if ($this->validate and !filter_var($videoFile, FILTER_VALIDATE_URL)) {
             throw new Exception("Open Graph: Invalid video URL '{$videoFile}'");
         }
         $this->tags[] = $this->createTag('video', $videoFile);
@@ -475,7 +486,7 @@ class CApp_OpenGraph {
                 'height',
             ];
             $tag = $this->lastTag('type');
-            if ($tag and starts_with($tag->value, 'video.')) {
+            if ($tag and cstr::startsWith($tag->value, 'video.')) {
                 $specialValid = [
                     'actor',
                     'role',
@@ -497,8 +508,9 @@ class CApp_OpenGraph {
 
     /**
      * Adds article attributes
-     * 
-     * @param  array  $attributes Array with attributes (pairs of name and value)
+     *
+     * @param array $attributes Array with attributes (pairs of name and value)
+     *
      * @return OpenGraph
      */
     public function article(array $attributes = []) {
@@ -520,8 +532,9 @@ class CApp_OpenGraph {
 
     /**
      * Adds book attributes
-     * 
-     * @param  array  $attributes Array with attributes (pairs of name and value)
+     *
+     * @param array $attributes Array with attributes (pairs of name and value)
+     *
      * @return OpenGraph
      */
     public function book(array $attributes = []) {
@@ -541,8 +554,9 @@ class CApp_OpenGraph {
 
     /**
      * Adds profile attributes
-     * 
-     * @param  array  $attributes Array with attributes (pairs of name and value)
+     *
+     * @param array $attributes Array with attributes (pairs of name and value)
+     *
      * @return OpenGraph
      */
     public function profile(array $attributes = []) {
@@ -562,8 +576,9 @@ class CApp_OpenGraph {
 
     /**
      * Set a template string for the render method.
-     * 
-     * @param  string $template The template string
+     *
+     * @param string $template The template string
+     *
      * @return OpenGraph
      */
     public function template($template) {
@@ -573,7 +588,7 @@ class CApp_OpenGraph {
 
     /**
      * Returns the Open Graph tags rendered as HTML
-     * 
+     *
      * @return string
      */
     public function renderTags() {
@@ -591,7 +606,7 @@ class CApp_OpenGraph {
 
     /**
      * Same as renderTags()
-     * 
+     *
      * @return string
      */
     public function __toString() {
@@ -600,9 +615,10 @@ class CApp_OpenGraph {
 
     /**
      * Returns the last tag in the lists of tags with matching name
-     * 
-     * @param  string            $name The name of the tag
-     * @return OpenGraphTag|null       Returns the tag object or null
+     *
+     * @param string $name The name of the tag
+     *
+     * @return OpenGraphTag|null Returns the tag object or null
      */
     public function lastTag($name) {
         $lastTag = null;
@@ -616,8 +632,9 @@ class CApp_OpenGraph {
 
     /**
      * Converts a DateTime object to a string (ISO 8601)
-     * 
-     * @param  string|DateTime $date The date (string or DateTime)
+     *
+     * @param string|DateTime $date The date (string or DateTime)
+     *
      * @return string
      */
     protected function convertDate($date) {
@@ -626,5 +643,4 @@ class CApp_OpenGraph {
         }
         return $date;
     }
-
 }

@@ -6,7 +6,6 @@
  * @author Hery
  */
 trait CView_Trait_ManageStackTrait {
-
     /**
      * All of the finished, captured push sections.
      *
@@ -31,8 +30,9 @@ trait CView_Trait_ManageStackTrait {
     /**
      * Start injecting content into a push section.
      *
-     * @param  string  $section
-     * @param  string  $content
+     * @param string $section
+     * @param string $content
+     *
      * @return void
      */
     public function startPush($section, $content = '') {
@@ -55,7 +55,7 @@ trait CView_Trait_ManageStackTrait {
     public function stopPush() {
         if (empty($this->pushStack)) {
             throw new InvalidArgumentException('Cannot end a push stack without first starting one.');
-        }   
+        }
 
         return c::tap(array_pop($this->pushStack), function ($last) {
             $this->extendPush($last, ob_get_clean());
@@ -65,8 +65,9 @@ trait CView_Trait_ManageStackTrait {
     /**
      * Append content to a given push section.
      *
-     * @param  string  $section
-     * @param  string  $content
+     * @param string $section
+     * @param string $content
+     *
      * @return void
      */
     protected function extendPush($section, $content) {
@@ -84,8 +85,9 @@ trait CView_Trait_ManageStackTrait {
     /**
      * Start prepending content into a push section.
      *
-     * @param  string  $section
-     * @param  string  $content
+     * @param string $section
+     * @param string $content
+     *
      * @return void
      */
     public function startPrepend($section, $content = '') {
@@ -110,7 +112,7 @@ trait CView_Trait_ManageStackTrait {
             throw new InvalidArgumentException('Cannot end a prepend operation without first starting one.');
         }
 
-        return tap(array_pop($this->pushStack), function ($last) {
+        return c::tap(array_pop($this->pushStack), function ($last) {
             $this->extendPrepend($last, ob_get_clean());
         });
     }
@@ -118,8 +120,9 @@ trait CView_Trait_ManageStackTrait {
     /**
      * Prepend content to a given stack.
      *
-     * @param  string  $section
-     * @param  string  $content
+     * @param string $section
+     * @param string $content
+     *
      * @return void
      */
     protected function extendPrepend($section, $content) {
@@ -137,8 +140,9 @@ trait CView_Trait_ManageStackTrait {
     /**
      * Get the string contents of a push section.
      *
-     * @param  string  $section
-     * @param  string  $default
+     * @param string $section
+     * @param string $default
+     *
      * @return string
      */
     public function yieldPushContent($section, $default = '') {
@@ -169,5 +173,4 @@ trait CView_Trait_ManageStackTrait {
         $this->prepends = [];
         $this->pushStack = [];
     }
-
 }

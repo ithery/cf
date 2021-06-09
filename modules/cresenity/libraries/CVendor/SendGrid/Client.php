@@ -1,17 +1,12 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- *
  * Class Client
+ *
  * @package SendGrid
- * @version 3.9.5
- * 
+ *
+ * @version Release:3.9.5
+ *
  * Quickly and easily access any REST or REST-like API.
  *
  * @method CVendor_SendGrid_Response get($body = null, $query = null, $headers = null)
@@ -19,7 +14,6 @@
  * @method CVendor_SendGrid_Response patch($body = null, $query = null, $headers = null)
  * @method CVendor_SendGrid_Response put($body = null, $query = null, $headers = null)
  * @method CVendor_SendGrid_Response delete($body = null, $query = null, $headers = null)
- *
  * @method CVendor_SendGrid_Client version($value)
  * @method CVendor_SendGrid_Client|Response send()
  *
@@ -157,7 +151,6 @@
  * Missed any? Simply add them by doing: @method Client method()
  */
 class CVendor_SendGrid_Client {
-
     const TOO_MANY_REQUESTS_HTTP_CODE = 429;
 
     /**
@@ -210,12 +203,12 @@ class CVendor_SendGrid_Client {
     /**
      * Initialize the client
      *
-     * @param string  $host          the base url (e.g. https://api.sendgrid.com)
-     * @param array   $headers       global request headers
-     * @param string  $version       api version (configurable) - this is specific to the SendGrid API
-     * @param array   $path          holds the segments of the url path
-     * @param array   $curlOptions   extra options to set during curl initialization
-     * @param bool    $retryOnLimit  set default retry on limit flag
+     * @param string $host         the base url (e.g. https://api.sendgrid.com)
+     * @param array  $headers      global request headers
+     * @param string $version      api version (configurable) - this is specific to the SendGrid API
+     * @param array  $path         holds the segments of the url path
+     * @param array  $curlOptions  extra options to set during curl initialization
+     * @param bool   $retryOnLimit set default retry on limit flag
      */
     public function __construct($host, $headers = null, $version = null, $path = null, $curlOptions = null, $retryOnLimit = false) {
         $this->host = $host;
@@ -322,8 +315,8 @@ class CVendor_SendGrid_Client {
      * this function does not mutate any private variables
      *
      * @param string $method
-     * @param array $body
-     * @param array $headers
+     * @param array  $body
+     * @param array  $headers
      *
      * @return array
      */
@@ -334,15 +327,14 @@ class CVendor_SendGrid_Client {
             CURLOPT_CUSTOMREQUEST => strtoupper($method),
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_FAILONERROR => false
-                ] + $this->curlOptions;
-        
+        ] + $this->curlOptions;
+
         if (isset($headers)) {
             $headers = array_merge($this->headers, $headers);
-            
         } else {
             $headers = $this->headers;
         }
-        
+
         if (isset($body)) {
             $encodedBody = json_encode($body);
             $options[CURLOPT_POSTFIELDS] = $encodedBody;
@@ -355,8 +347,8 @@ class CVendor_SendGrid_Client {
 
     /**
      * @param array $requestData
-     *      e.g. ['method' => 'POST', 'url' => 'www.example.com', 'body' => 'test body', 'headers' => []]
-     * @param bool $retryOnLimit
+     *                            e.g. ['method' => 'POST', 'url' => 'www.example.com', 'body' => 'test body', 'headers' => []]
+     * @param bool  $retryOnLimit
      *
      * @return array
      */
@@ -386,7 +378,7 @@ class CVendor_SendGrid_Client {
     /**
      * Prepare response object
      *
-     * @param resource $channel  the curl resource
+     * @param resource $channel the curl resource
      * @param string   $content
      *
      * @return CVendor_SendGrid_Response object
@@ -432,21 +424,21 @@ class CVendor_SendGrid_Client {
      * @param bool   $retryOnLimit should retry if rate limit is reach?
      *
      * @return CVendor_SendGrid_Response object
+     *
      * @throws CVendor_SendGrid_Exception_InvalidRequest
      */
     public function makeRequest($method, $url, $body = null, $headers = null, $retryOnLimit = false) {
         $channel = curl_init($url);
 
-        
         $options = $this->createCurlOptions($method, $body, $headers);
-        
+
         curl_setopt_array($channel, $options);
         $content = curl_exec($channel);
 
         if ($content === false) {
             throw new CVendor_SendGrid_Exception_InvalidRequest(curl_error($channel), curl_errno($channel));
         }
-        
+
         $response = $this->parseResponse($channel, $content);
 
         if ($response->statusCode() === self::TOO_MANY_REQUESTS_HTTP_CODE && $retryOnLimit) {
@@ -483,7 +475,6 @@ class CVendor_SendGrid_Client {
         $responses = [];
         $sleepDurations = 0;
         foreach ($channels as $id => $channel) {
-
             $content = curl_multi_getcontent($channel);
             $response = $this->parseResponse($channel, $content);
 
@@ -525,7 +516,7 @@ class CVendor_SendGrid_Client {
         if (isset($name)) {
             $this->path[] = $name;
         }
-        
+
         $client = new static($this->host, $this->headers, $this->version, $this->path);
         $client->setCurlOptions($this->curlOptions);
         $client->setRetryOnLimit($this->retryOnLimit);
@@ -562,7 +553,7 @@ class CVendor_SendGrid_Client {
             $url = $this->buildUrl($queryParams);
             $headers = isset($args[2]) ? $args[2] : null;
             $retryOnLimit = isset($args[3]) ? $args[3] : $this->retryOnLimit;
-            
+
             if ($this->isConcurrentRequest) {
                 // save request to be sent later
                 $requestData = ['method' => $name, 'url' => $url, 'body' => $body, 'headers' => $headers];
@@ -572,8 +563,7 @@ class CVendor_SendGrid_Client {
 
             return $this->makeRequest($name, $url, $body, $headers, $retryOnLimit);
         }
-        
+
         return $this->_($name);
     }
-
 }

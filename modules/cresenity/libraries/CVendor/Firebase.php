@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Google\Auth\Credentials\GCECredentials;
 use Google\Auth\Credentials\ServiceAccountCredentials;
 use Google\Auth\Middleware\AuthTokenMiddleware;
@@ -42,6 +36,7 @@ class CVendor_Firebase {
      * @var array
      */
     protected $httpClientMiddlewares = [];
+
     public function __construct($config = []) {
         $this->config = $config;
     }
@@ -59,7 +54,6 @@ class CVendor_Firebase {
             }
         }
 
-
         if (!$this->serviceAccount) {
             throw new CVendor_Firebase_Exception_LogicException('No service account has been configured.');
         }
@@ -71,18 +65,18 @@ class CVendor_Firebase {
         $projectId = $this->getServiceAccount()->getProjectId();
 
         $messagingApiClient = new CVendor_Firebase_Messaging_ApiClient(
-                $this->createApiClient([
-                    'base_uri' => 'https://fcm.googleapis.com/v1/projects/' . $projectId,
-                ])
+            $this->createApiClient([
+                'base_uri' => 'https://fcm.googleapis.com/v1/projects/' . $projectId,
+            ])
         );
 
         $appInstanceApiClient = new CVendor_Firebase_Messaging_AppInstanceApiClient(
-                $this->createApiClient([
-                    'base_uri' => 'https://iid.googleapis.com',
-                    'headers' => [
-                        'access_token_auth' => 'true',
-                    ],
-                ])
+            $this->createApiClient([
+                'base_uri' => 'https://iid.googleapis.com',
+                'headers' => [
+                    'access_token_auth' => 'true',
+                ],
+            ])
         );
 
         return new CVendor_Firebase_Messaging($messagingApiClient, $appInstanceApiClient, $projectId);
@@ -117,10 +111,10 @@ class CVendor_Firebase {
         return new Client($config);
     }
 
-    protected function createGoogleAuthTokenMiddleware()
-    {
+    protected function createGoogleAuthTokenMiddleware() {
         $serviceAccount = $this->getServiceAccount();
 
+        // @codeCoverageIgnoreStart
         if ($serviceAccount->hasClientId() && $serviceAccount->hasPrivateKey()) {
             $credentials = new ServiceAccountCredentials(self::API_CLIENT_SCOPES, [
                 'client_email' => $serviceAccount->getClientEmail(),
@@ -128,17 +122,13 @@ class CVendor_Firebase {
                 'private_key' => $serviceAccount->getPrivateKey(),
             ]);
         } elseif ((new GcpMetadata())->isAvailable()) {
-            // @codeCoverageIgnoreStart
             // We can't test this programatically when not on GCE/GCP
             $credentials = new GCECredentials();
-        // @codeCoverageIgnoreEnd
         } else {
             throw new RuntimeException('Unable to determine credentials.');
         }
+        // @codeCoverageIgnoreEnd
 
         return new AuthTokenMiddleware($credentials);
     }
-    
-    
-    
 }

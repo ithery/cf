@@ -6,15 +6,14 @@
  * @author Hery
  */
 class CDevSuite_Ssh {
-
     public $files;
 
     /**
      * Create a new Nginx instance.
+     *
      * @return void
      */
-    function __construct() {
-
+    public function __construct() {
         $this->files = CDevSuite::filesystem();
     }
 
@@ -34,8 +33,6 @@ class CDevSuite_Ssh {
     }
 
     public function create($name, $configuration) {
-
-
         if (!$this->isCanConnect($configuration)) {
             CDevSuite::info('Error when connecting to:' . $name . ', please check your configuration');
             return false;
@@ -51,14 +48,15 @@ class CDevSuite_Ssh {
     /**
      * Write the given configuration to disk.
      *
-     * @param array $config
+     * @param mixed $data
      *
      * @return void
      */
     public function write($data) {
         $this->files->putAsUser($this->path(), json_encode(
-                        $data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-                ) . PHP_EOL);
+            $data,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        ) . PHP_EOL);
     }
 
     /**
@@ -74,16 +72,15 @@ class CDevSuite_Ssh {
     public function getTableData() {
         $data = $this->read();
 
-
         return c::collect($data)->map(function ($item, $key) {
-                    return [
-                        'key' => $key,
-                        'host' => carr::get($item, 'host') . ':' . carr::get($item, 'port'),
-                        'type' => carr::get($item, 'passwordType'),
-                        'user' => carr::get($item, 'user'),
-                        'password' => carr::get($item, 'password'),
-                    ];
-                });
+            return [
+                'key' => $key,
+                'host' => carr::get($item, 'host') . ':' . carr::get($item, 'port'),
+                'type' => carr::get($item, 'passwordType'),
+                'user' => carr::get($item, 'user'),
+                'password' => carr::get($item, 'password'),
+            ];
+        });
     }
 
     public function exists($key) {
@@ -98,9 +95,6 @@ class CDevSuite_Ssh {
     }
 
     public function isCanConnect($key) {
-
-
-
         try {
             $ssh = $this->getRemoteSsh($key);
             $output = $ssh->run('ls')->output();
@@ -129,13 +123,13 @@ class CDevSuite_Ssh {
         $port = carr::get($configArray, 'port');
         $passwordType = carr::get($configArray, 'passwordType');
 
-        $config = array(
+        $config = [
             'host' => $host,
             'name' => $host,
             'username' => $username,
             'port' => $port,
             'authentication_type' => $passwordType == 'password' ? 'prompt' : 'pubkey',
-        );
+        ];
         if ($passwordType == 'password') {
             $config['password'] = $password;
         }
@@ -145,5 +139,4 @@ class CDevSuite_Ssh {
         }
         return $config;
     }
-
 }

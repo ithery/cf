@@ -1,20 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 11:27:09 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 11:27:09 AM
  */
 interface CTranslation_TranslatorInterface {
-
     /**
      * Get the translation for a given key.
      *
-     * @param  string  $key
-     * @param  array   $replace
-     * @param  string  $locale
+     * @param string $key
+     * @param array  $replace
+     * @param string $locale
+     *
      * @return mixed
      */
     public function trans($key, array $replace = [], $locale = null);
@@ -22,10 +23,11 @@ interface CTranslation_TranslatorInterface {
     /**
      * Get a translation according to an integer value.
      *
-     * @param  string  $key
-     * @param  int|array|\Countable  $number
-     * @param  array   $replace
-     * @param  string  $locale
+     * @param string               $key
+     * @param int|array|\Countable $number
+     * @param array                $replace
+     * @param string               $locale
+     *
      * @return string
      */
     public function transChoice($key, $number, array $replace = [], $locale = null);
@@ -40,7 +42,8 @@ interface CTranslation_TranslatorInterface {
     /**
      * Set the default locale.
      *
-     * @param  string  $locale
+     * @param string $locale
+     *
      * @return void
      */
     public function setLocale($locale);

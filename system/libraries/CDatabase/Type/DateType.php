@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:09:44 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:09:44 AM
  */
 
 /**
  * Type that maps an SQL DATE to a PHP Date object.
  */
 class CDatabase_Type_DateType extends CDatabase_Type {
-
     /**
      * {@inheritdoc}
      */
@@ -39,7 +39,7 @@ class CDatabase_Type_DateType extends CDatabase_Type {
             return $value->format($platform->getDateFormatString());
         }
 
-        throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'DateTime']);
+        throw CDatabase_Schema_Exception_ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'DateTime']);
     }
 
     /**
@@ -52,10 +52,9 @@ class CDatabase_Type_DateType extends CDatabase_Type {
 
         $val = \DateTime::createFromFormat('!' . $platform->getDateFormatString(), $value);
         if (!$val) {
-            throw ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateFormatString());
+            throw CDatabase_Schema_Exception_ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateFormatString());
         }
 
         return $val;
     }
-
 }

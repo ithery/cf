@@ -1,6 +1,6 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Input library.
@@ -8,16 +8,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * $Id: Input.php 4346 2009-05-11 17:08:15Z zombor $
  *
  * @package    Core
+ *
  * @author     Kohana Team
  * @copyright  (c) 2007-2008 Kohana Team
  * @license    http://kohanaphp.com/license.html
  */
 class Input {
-
     // Enable or disable automatic XSS cleaning
-    protected $use_xss_clean = FALSE;
+    protected $use_xss_clean = false;
     // Are magic quotes enabled?
-    protected $magic_quotes_gpc = FALSE;
+    protected $magic_quotes_gpc = false;
     // IP address of current user
     public $ip_address;
     // Input singleton
@@ -30,10 +30,10 @@ class Input {
      * Retrieve a singleton instance of Input. This will always be the first
      * created instance of this class.
      *
-     * @return  object
+     * @return object
      */
     public static function instance() {
-        if (Input::$instance === NULL) {
+        if (Input::$instance === null) {
             // Create a new instance
             return new Input;
         }
@@ -45,7 +45,7 @@ class Input {
      * Sanitizes global GET, POST and COOKIE data. Also takes care of
      * magic_quotes and register_globals, if they have been enabled.
      *
-     * @return  void
+     * @return void
      */
     public function __construct() {
         // Use XSS clean?
@@ -54,7 +54,7 @@ class Input {
         $this->originalGet = $_GET;
         $this->originalFiles = $_FILES;
 
-        if (Input::$instance === NULL) {
+        if (Input::$instance === null) {
             // magic_quotes_runtime is enabled
             if (@get_magic_quotes_runtime()) {
                 set_magic_quotes_runtime(0);
@@ -63,7 +63,7 @@ class Input {
 
             // magic_quotes_gpc is enabled
             if (@get_magic_quotes_gpc()) {
-                $this->magic_quotes_gpc = TRUE;
+                $this->magic_quotes_gpc = true;
                 CF::log(CLogger::DEBUG, 'Disable magic_quotes_gpc! It is evil and deprecated: http://php.net/magic_quotes');
             }
 
@@ -75,15 +75,15 @@ class Input {
                 }
 
                 // Destroy the REQUEST global
-                $_REQUEST = array();
+                $_REQUEST = [];
 
                 // These globals are standard and should not be removed
-                $preserve = array('GLOBALS', '_REQUEST', '_GET', '_POST', '_FILES', '_COOKIE', '_SERVER', '_ENV', '_SESSION');
+                $preserve = ['GLOBALS', '_REQUEST', '_GET', '_POST', '_FILES', '_COOKIE', '_SERVER', '_ENV', '_SESSION'];
 
                 // This loop has the same effect as disabling register_globals
                 foreach (array_diff(array_keys($GLOBALS), $preserve) as $key) {
                     global $$key;
-                    $$key = NULL;
+                    $$key = null;
 
                     // Unset the global variable
                     unset($GLOBALS[$key], $$key);
@@ -99,7 +99,7 @@ class Input {
                     $_GET[$this->clean_input_keys($key)] = $this->clean_input_data($val);
                 }
             } else {
-                $_GET = array();
+                $_GET = [];
             }
 
             if (is_array($_POST)) {
@@ -108,21 +108,21 @@ class Input {
                     $_POST[$this->clean_input_keys($key)] = $this->clean_input_data($val);
                 }
             } else {
-                $_POST = array();
+                $_POST = [];
             }
 
             if (is_array($_COOKIE)) {
                 foreach ($_COOKIE as $key => $val) {
                     // Ignore special attributes in RFC2109 compliant cookies
-                    if ($key == '$Version' OR $key == '$Path' OR $key == '$Domain')
+                    if ($key == '$Version' or $key == '$Path' or $key == '$Domain') {
                         continue;
+                    }
 
                     // Sanitize $_COOKIE
                     $_COOKIE[$this->clean_input_keys($key)] = $this->clean_input_data($val);
                 }
-            }
-            else {
-                $_COOKIE = array();
+            } else {
+                $_COOKIE = [];
             }
 
             // Create a singleton
@@ -135,23 +135,28 @@ class Input {
     public function originalGetData() {
         return $this->originalGet;
     }
+
     public function originalPostData() {
         return $this->originalPost;
     }
+
     public function originalFilesData() {
         return $this->originalPost;
     }
-    
-    
+
     /**
      * Fetch an item from the $_GET array.
      *
      * @param   string   key to find
      * @param   mixed    default value
      * @param   boolean  XSS clean the value
-     * @return  mixed
+     * @param mixed      $key
+     * @param null|mixed $default
+     * @param mixed      $xss_clean
+     *
+     * @return mixed
      */
-    public function get($key = array(), $default = NULL, $xss_clean = FALSE) {
+    public function get($key = [], $default = null, $xss_clean = false) {
         return $this->search_array($_GET, $key, $default, $xss_clean);
     }
 
@@ -161,9 +166,13 @@ class Input {
      * @param   string   key to find
      * @param   mixed    default value
      * @param   boolean  XSS clean the value
-     * @return  mixed
+     * @param mixed      $key
+     * @param null|mixed $default
+     * @param mixed      $xss_clean
+     *
+     * @return mixed
      */
-    public function post($key = array(), $default = NULL, $xss_clean = FALSE) {
+    public function post($key = [], $default = null, $xss_clean = false) {
         return $this->search_array($_POST, $key, $default, $xss_clean);
     }
 
@@ -173,9 +182,13 @@ class Input {
      * @param   string   key to find
      * @param   mixed    default value
      * @param   boolean  XSS clean the value
-     * @return  mixed
+     * @param mixed      $key
+     * @param null|mixed $default
+     * @param mixed      $xss_clean
+     *
+     * @return mixed
      */
-    public function cookie($key = array(), $default = NULL, $xss_clean = FALSE) {
+    public function cookie($key = [], $default = null, $xss_clean = false) {
         return $this->search_array($_COOKIE, $key, $default, $xss_clean);
     }
 
@@ -185,9 +198,13 @@ class Input {
      * @param   string   key to find
      * @param   mixed    default value
      * @param   boolean  XSS clean the value
-     * @return  mixed
+     * @param mixed      $key
+     * @param null|mixed $default
+     * @param mixed      $xss_clean
+     *
+     * @return mixed
      */
-    public function server($key = array(), $default = NULL, $xss_clean = FALSE) {
+    public function server($key = [], $default = null, $xss_clean = false) {
         return $this->search_array($_SERVER, $key, $default, $xss_clean);
     }
 
@@ -198,19 +215,26 @@ class Input {
      * @param   string   key to find
      * @param   mixed    default value
      * @param   boolean  XSS clean the value
-     * @return  mixed
+     * @param mixed      $array
+     * @param mixed      $key
+     * @param null|mixed $default
+     * @param mixed      $xss_clean
+     *
+     * @return mixed
      */
-    protected function search_array($array, $key, $default = NULL, $xss_clean = FALSE) {
-        if ($key === array())
+    protected function search_array($array, $key, $default = null, $xss_clean = false) {
+        if ($key === []) {
             return $array;
+        }
 
-        if (!isset($array[$key]))
+        if (!isset($array[$key])) {
             return $default;
+        }
 
         // Get the value
         $value = $array[$key];
 
-        if ($this->use_xss_clean === FALSE AND $xss_clean === TRUE) {
+        if ($this->use_xss_clean === false and $xss_clean === true) {
             // XSS clean the value
             $value = $this->xss_clean($value);
         }
@@ -219,16 +243,41 @@ class Input {
     }
 
     /**
+     * Validate IP
+     *
+     * @param   string   IP address
+     * @param   boolean  allow IPv6 addresses
+     * @param   boolean  allow private IP networks
+     * @param mixed $ip
+     * @param mixed $ipv6
+     * @param mixed $allowPrivate
+     *
+     * @return boolean
+     */
+    public function isValidIp($ip, $ipv6 = false, $allowPrivate = true) {
+        // By default do not allow private and reserved range IPs
+        $flags = FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE;
+        if ($allowPrivate === true) {
+            $flags = FILTER_FLAG_NO_RES_RANGE;
+        }
+
+        if ($ipv6 === true) {
+            return (bool) filter_var($ip, FILTER_VALIDATE_IP, $flags);
+        }
+        return (bool) filter_var($ip, FILTER_VALIDATE_IP, $flags | FILTER_FLAG_IPV4);
+    }
+
+    /**
      * Fetch the IP Address.
      *
      * @return string
      */
     public function ip_address() {
-        if ($this->ip_address !== NULL)
+        if ($this->ip_address !== null) {
             return $this->ip_address;
-
+        }
         // Server keys that could contain the client IP address
-        $keys = array('HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP', 'REMOTE_ADDR');
+        $keys = ['HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP', 'REMOTE_ADDR'];
 
         foreach ($keys as $key) {
             if ($ip = $this->server($key)) {
@@ -239,11 +288,11 @@ class Input {
             }
         }
 
-        if ($comma = strrpos($this->ip_address, ',') !== FALSE) {
+        if ($comma = strrpos($this->ip_address, ',') !== false) {
             $this->ip_address = substr($this->ip_address, $comma + 1);
         }
 
-        if (!valid::ip($this->ip_address)) {
+        if (!$this->isValidIp($this->ip_address)) {
             // Use an empty IP
             $this->ip_address = '0.0.0.0';
         }
@@ -260,11 +309,13 @@ class Input {
      *
      * @param   string  data to clean
      * @param   string  xss_clean method to use ('htmlpurifier' or defaults to built-in method)
-     * @return  string
+     * @param mixed      $data
+     * @param null|mixed $tool
+     *
+     * @return string
      */
-    public function xss_clean($data, $tool = NULL) {
-
-        if ($tool === NULL) {
+    public function xss_clean($data, $tool = null) {
+        if ($tool === null) {
             // Use the default tool
             $tool = CF::$global_xss_filtering;
         }
@@ -278,10 +329,11 @@ class Input {
         }
 
         // Do not clean empty strings
-        if (trim($data) === '')
+        if (trim($data) === '') {
             return $data;
+        }
 
-        if ($tool === TRUE) {
+        if ($tool === true) {
             // NOTE: This is necessary because switch is NOT type-sensative!
             $tool = 'default';
         }
@@ -292,7 +344,7 @@ class Input {
                 require_once DOCROOT . 'system/vendor/HTMLPurifier.auto.php';
 
                 $config = HTMLPurifier_Config::createDefault();
-                $config->set('URI.AllowedSchemes', array('http' => true, 'https' => true, 'mailto' => true, 'data' => true));
+                $config->set('URI.AllowedSchemes', ['http' => true, 'https' => true, 'mailto' => true, 'data' => true]);
 
                 $def = $config->getHTMLDefinition(true);
                 $def->addAttribute('span', 'data-member-id', 'Number');
@@ -334,7 +386,7 @@ class Input {
                 // | Author: Christian Stocker <chregu@bitflux.ch>                        |
                 // +----------------------------------------------------------------------+
                 //
-				// Kohana Modifications:
+                // Kohana Modifications:
                 // * Changed double quotes to single quotes, changed indenting and spacing
                 // * Removed magic_quotes stuff
                 // * Increased regex readability:
@@ -347,7 +399,7 @@ class Input {
                 //   * Split up alternation alternatives
                 //   * Made some quantifiers possessive
                 // Fix &entity\n;
-                $data = str_replace(array('&amp;', '&lt;', '&gt;'), array('&amp;amp;', '&amp;lt;', '&amp;gt;'), $data);
+                $data = str_replace(['&amp;', '&lt;', '&gt;'], ['&amp;amp;', '&amp;lt;', '&amp;gt;'], $data);
                 $data = preg_replace('/(&#*\w+)[\x00-\x20]+;/u', '$1;', $data);
                 $data = preg_replace('/(&#x*[0-9A-F]+);*/iu', '$1;', $data);
                 $data = html_entity_decode($data, ENT_COMPAT, 'UTF-8');
@@ -379,7 +431,6 @@ class Input {
                 break;
         }
 
-
         return $data;
     }
 
@@ -388,7 +439,9 @@ class Input {
      * key name strings, to prevent malicious exploitation.
      *
      * @param   string  string to clean
-     * @return  string
+     * @param mixed $str
+     *
+     * @return string
      */
     public function clean_input_keys($str) {
         //$chars = PCRE_UNICODE_PROPERTIES ? '\pL' : 'a-zA-Z';
@@ -404,11 +457,13 @@ class Input {
      * characters to "\n".
      *
      * @param   unknown_type  string to clean
-     * @return  string
+     * @param mixed $str
+     *
+     * @return string
      */
     public function clean_input_data($str) {
         if (is_array($str)) {
-            $new_array = array();
+            $new_array = [];
             foreach ($str as $key => $val) {
                 // Recursion!
                 $new_array[$this->clean_input_keys($key)] = $this->clean_input_data($val);
@@ -416,23 +471,22 @@ class Input {
             return $new_array;
         }
 
-        if ($this->magic_quotes_gpc === TRUE) {
+        if ($this->magic_quotes_gpc === true) {
             // Remove annoying magic quotes
             $str = stripslashes($str);
         }
 
-        if ($this->use_xss_clean === TRUE) {
+        if ($this->use_xss_clean === true) {
             $str = $this->xss_clean($str);
         }
 
-        if (strpos($str, "\r") !== FALSE) {
+        if (strpos($str, "\r") !== false) {
             // Standardize newlines
-            $str = str_replace(array("\r\n", "\r"), "\n", $str);
+            $str = str_replace(["\r\n", "\r"], "\n", $str);
         }
 
         return $str;
     }
-
 }
 
 // End Input Class

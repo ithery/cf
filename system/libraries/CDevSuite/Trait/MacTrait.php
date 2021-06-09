@@ -2,20 +2,18 @@
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 15, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 15, 2020
  */
 trait CDevSuite_Trait_MacTrait {
-
     /**
-     *
      * @var CDevSuite_Brew
      */
     protected static $brew;
     protected $macDevSuiteBin = '/usr/local/bin/devsuite';
 
     /**
-     * 
      * @return CDevSuite_Brew
      */
     public static function brew() {
@@ -24,5 +22,4 @@ trait CDevSuite_Trait_MacTrait {
         }
         return static::$brew;
     }
-
 }

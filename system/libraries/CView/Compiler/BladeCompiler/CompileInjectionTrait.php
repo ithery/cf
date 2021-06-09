@@ -6,16 +6,15 @@
  * @author Hery
  */
 
-
 trait CView_Compiler_BladeCompiler_CompileInjectionTrait {
     /**
      * Compile the inject statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
-    protected function compileInject($expression)
-    {
+    protected function compileInject($expression) {
         $segments = explode(',', preg_replace("/[\(\)\\\"\']/", '', $expression));
 
         $variable = trim($segments[0]);

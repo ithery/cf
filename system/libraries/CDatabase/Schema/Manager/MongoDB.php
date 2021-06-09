@@ -1,20 +1,12 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use \MongoDB\Client;
 
 class CDatabase_Schema_Manager_MongoDB extends CDatabase_Schema_Manager {
-
     public function listTables() {
-
         $database = $this->getMongoDatabase();
         $tables = $database->listCollections();
-        return c::collect($tables)->map(function($item){
+        return c::collect($tables)->map(function ($item) {
             return $item->getName();
         });
     }
@@ -23,7 +15,7 @@ class CDatabase_Schema_Manager_MongoDB extends CDatabase_Schema_Manager {
         $databaseName = $this->db->getDatabaseName();
         $client = $this->getMongoClient();
         $database = $client->selectDatabase($databaseName);
-        $cursor = $database->command(['dbstats'=>[]]);
+        $cursor = $database->command(['dbstats' => []]);
         $stats = $cursor->toArray()[0];
         return $stats->objects;
     }
@@ -51,16 +43,14 @@ class CDatabase_Schema_Manager_MongoDB extends CDatabase_Schema_Manager {
         $databases = $client->listDatabases();
 
         return c::collect($databases)->map(function ($item) {
-                    return carr::get($item, 'name');
-                });
+            return carr::get($item, 'name');
+        });
     }
 
     protected function _getPortableTableColumnDefinition($tableColumn) {
-        
     }
 
     /**
-     * 
      * @return \MongoDB\Client
      */
     public function getMongoClient() {
@@ -68,11 +58,9 @@ class CDatabase_Schema_Manager_MongoDB extends CDatabase_Schema_Manager {
     }
 
     /**
-     * 
      * @return \MongoDB\Database
      */
     public function getMongoDatabase() {
         return $this->db->driver()->getMongoDatabase();
     }
-
 }

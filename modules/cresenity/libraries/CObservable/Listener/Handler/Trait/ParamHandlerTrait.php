@@ -1,20 +1,15 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
-
     protected $paramInputs;
+
     protected $paramInputsByName;
+
     protected $paramRequest;
 
     public function addParamInput($inputs) {
         if (!is_array($inputs)) {
-            $inputs = array($inputs);
+            $inputs = [$inputs];
         }
         foreach ($inputs as $inp) {
             $this->paramInputs[] = $inp;
@@ -24,7 +19,7 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
 
     public function addParamRequest($paramRequest) {
         if (!is_array($paramRequest)) {
-            $paramRequest = array($paramRequest);
+            $paramRequest = [$paramRequest];
         }
         foreach ($paramRequest as $reqK => $reqV) {
             $this->paramRequest[$reqK] = $reqV;
@@ -34,7 +29,7 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
 
     public function addParamInputByName($inputs) {
         if (!is_array($inputs)) {
-            $inputs = array($inputs);
+            $inputs = [$inputs];
         }
         foreach ($inputs as $k => $inp) {
             $this->paramInputsByName[$k] = $inp;
@@ -57,7 +52,7 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
                 if (strlen($dataAddition) > 0) {
                     $dataAddition .= ',';
                 }
-                $dataAddition .= "'" . $inp . "':$.cresenity.value('#" . $inp . "')";
+                $dataAddition .= "'" . $inp . "':cresenity.value('#" . $inp . "')";
             }
         }
         if (is_array($this->paramInputsByName)) {
@@ -65,11 +60,10 @@ trait CObservable_Listener_Handler_Trait_ParamHandlerTrait {
                 if (strlen($dataAddition) > 0) {
                     $dataAddition .= ',';
                 }
-                $dataAddition .= "'" . $k . "':$.cresenity.value('" . $inp . "')";
+                $dataAddition .= "'" . $k . "':cresenity.value('" . $inp . "')";
             }
         }
         $dataAddition = '{' . $dataAddition . '}';
         return $dataAddition;
     }
-
 }

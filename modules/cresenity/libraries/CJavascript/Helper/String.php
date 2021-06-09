@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 2, 2018, 12:52:44 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 2, 2018, 12:52:44 AM
  */
 class CJavascript_Helper_String {
-
     public static function contains($hay, $needle) {
         return strpos($hay, $needle) !== false;
     }
@@ -22,11 +22,11 @@ class CJavascript_Helper_String {
     }
 
     public static function isNull($s) {
-        return (!isset($s) || NULL === $s || "" === $s);
+        return (!isset($s) || null === $s || '' === $s);
     }
 
     public static function isNotNull($s) {
-        return (isset($s) && NULL !== $s && "" !== $s);
+        return (isset($s) && null !== $s && '' !== $s);
     }
 
     public static function isBoolean($value) {
@@ -41,7 +41,7 @@ class CJavascript_Helper_String {
         return $value == 0 || !$value;
     }
 
-    public static function camelCaseToSeparated($input, $separator = " ") {
+    public static function camelCaseToSeparated($input, $separator = ' ') {
         return strtolower(preg_replace('/(?<!^)[A-Z]/', $separator . '$0', $input));
     }
 
@@ -60,26 +60,26 @@ class CJavascript_Helper_String {
         return self::replaceAtLast($s, $fromLast, $toLast);
     }
 
-    public static function getValueBetween(&$str, $before = "{{", $after = "}}") {
+    public static function getValueBetween(&$str, $before = '{{', $after = '}}') {
         $matches = [];
         $result = null;
         $_before = \preg_quote($before);
         $_after = \preg_quote($after);
         if (\preg_match('/' . $_before . '(.*?)' . $_after . '/s', $str, $matches) === 1) {
             $result = $matches[1];
-            $str = \str_replace($before . $result . $after, "", $str);
+            $str = \str_replace($before . $result . $after, '', $str);
         }
         return $result;
     }
 
     public static function doubleBackSlashes($value) {
-        if (is_string($value))
-            return str_replace("\\", "\\\\", $value);
+        if (is_string($value)) {
+            return str_replace('\\', '\\\\', $value);
+        }
         return $value;
     }
 
     public static function cleanIdentifier($id) {
         return preg_replace('/[^a-zA-Z0-9\-]/s', '', $id);
     }
-
 }

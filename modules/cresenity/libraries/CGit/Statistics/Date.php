@@ -1,22 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 3, 2019, 1:46:04 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 3, 2019, 1:46:04 PM
  */
 
 /**
  * Aggregate statistics based on day.
  */
 class CGit_Statistics_Date extends CCollection implements CGit_StatisticsInterface {
-
     /**
-     * @param Commit $commit
+     * @param CGit_Model_Commit $commit
      */
-    public function addCommit(Commit $commit) {
+    public function addCommit(CGit_Model_Commit $commit) {
         $day = $commit->getCommiterDate()->format('Y-m-d');
         $this->items[$day][] = $commit;
     }
@@ -24,5 +24,4 @@ class CGit_Statistics_Date extends CCollection implements CGit_StatisticsInterfa
     public function sortCommits() {
         ksort($this->items);
     }
-
 }

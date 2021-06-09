@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CVendor_OneSignal_Devices {
-
     const DEVICES_LIMIT = 300;
     const IOS = 0;
     const ANDROID = 1;
@@ -62,7 +55,7 @@ class CVendor_OneSignal_Devices {
             'app_id' => $this->api->getConfig()->getApplicationId(),
         ];
         return $this->api->request('GET', '/players?' . http_build_query($query), [
-                    'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
+            'Authorization' => 'Basic ' . $this->api->getConfig()->getApplicationAuthKey(),
         ]);
     }
 
@@ -150,5 +143,4 @@ class CVendor_OneSignal_Devices {
         ];
         return $this->api->request('POST', $url, $headers, json_encode($body));
     }
-
 }

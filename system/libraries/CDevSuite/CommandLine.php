@@ -9,7 +9,6 @@
 use Symfony\Component\Process\Process;
 
 abstract class CDevSuite_CommandLine {
-
     /**
      * Simple global function to run commands.
      *
@@ -24,13 +23,13 @@ abstract class CDevSuite_CommandLine {
     /**
      * Run the given command.
      *
-     * @param  string  $command
-     * @param  callable $onError
+     * @param string|array $command
+     * @param callable     $onError
+     *
      * @return string
      */
     public function runCommand($command, callable $onError = null) {
-        $onError = $onError ? : function () {
-            
+        $onError = $onError ?: function () {
         };
 
         // Symfony's 4.x Process component has deprecated passing a command string
@@ -58,6 +57,7 @@ abstract class CDevSuite_CommandLine {
      * Pass the command to the command line and display the output.
      *
      * @param string $command
+     *
      * @return void
      */
     public function passthru($command) {
@@ -67,7 +67,8 @@ abstract class CDevSuite_CommandLine {
     /**
      * Simple global function to run commands.
      *
-     * @param  string  $command
+     * @param string $command
+     *
      * @return void
      */
     public function quietlyAsUser($command) {
@@ -77,8 +78,9 @@ abstract class CDevSuite_CommandLine {
     /**
      * Run the given command as the non-root user.
      *
-     * @param string   $command
-     * @param callable $onError
+     * @param string|array $command
+     * @param callable     $onError
+     *
      * @return string
      */
     public function run($command, callable $onError = null) {
@@ -88,12 +90,30 @@ abstract class CDevSuite_CommandLine {
     /**
      * Run the given command.
      *
-     * @param  string  $command
-     * @param  callable $onError
+     * @param string   $command
+     * @param callable $onError
+     *
      * @return string
      */
     public function runAsUser($command, callable $onError = null) {
         return $this->runCommand('sudo -u "' . CDevSuite::user() . '" ' . $command, $onError);
     }
 
+    /**
+     * Run the given command and die if fails.
+     *
+     * @param string|array $command
+     * @param callable     $onError
+     *
+     * @return string
+     */
+    public function runOrDie($command, callable $onError = null) {
+        return $this->run($command, function ($code, $output) use ($onError) {
+            if ($onError) {
+                $onError($code, $output);
+            }
+
+            exit;
+        });
+    }
 }

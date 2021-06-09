@@ -1,14 +1,8 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Divider extends CEmail_Builder_Component_BodyComponent {
-
     protected static $tagName = 'c-divider';
     protected static $endingTag = true;
     protected static $tagOmission = true;
@@ -33,10 +27,9 @@ class CEmail_Builder_Component_BodyComponent_Divider extends CEmail_Builder_Comp
     ];
 
     public function getStyles() {
-       
-        $borderTop = implode(' ', carr::map(['style', 'width', 'color'], function($attr) {
-                    return $this->getAttribute('border-' . $attr);
-                }));
+        $borderTop = implode(' ', carr::map(['style', 'width', 'color'], function ($attr) {
+            return $this->getAttribute('border-' . $attr);
+        }));
         $p = [
             'border-top' => $borderTop,
             'font-size' => '1px',
@@ -46,7 +39,6 @@ class CEmail_Builder_Component_BodyComponent_Divider extends CEmail_Builder_Comp
 
         $outlook = $p;
         $outlook['width'] = $this->getOutlookWidth();
-
 
         return [
             'p' => $p,
@@ -74,14 +66,13 @@ class CEmail_Builder_Component_BodyComponent_Divider extends CEmail_Builder_Comp
     }
 
     public function renderAfter() {
-        $attr = array();
+        $attr = [];
         $attr['align'] = 'center';
         $attr['border'] = '0';
         $attr['cellpadding'] = '0';
         $attr['cellspacing'] = '0';
         $attr['style'] = 'outlook';
         $attr['role'] = 'presentation';
-
 
         $attr['width'] = $this->getOutlookWidth();
         return '
@@ -96,13 +87,12 @@ class CEmail_Builder_Component_BodyComponent_Divider extends CEmail_Builder_Comp
       <![endif]-->
     ';
     }
-    
+
     public function render() {
-        
-    return '
-      <p '.$this->htmlAttributes(['style'=>'p']).'>
+        return '
+      <p ' . $this->htmlAttributes(['style' => 'p']) . '>
       </p>
-      '.$this->renderAfter().'
+      ' . $this->renderAfter() . '
     ';
-  }
+    }
 }

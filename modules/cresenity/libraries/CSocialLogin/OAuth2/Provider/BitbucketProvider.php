@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 16, 2019, 5:11:08 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 16, 2019, 5:11:08 PM
  */
 use GuzzleHttp\ClientInterface;
 
 class CSocialLogin_OAuth2_Provider_BitbucketProvider extends CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_OAuth2_ProviderInterface {
-
     /**
      * The scopes being requested.
      *
@@ -55,7 +55,8 @@ class CSocialLogin_OAuth2_Provider_BitbucketProvider extends CSocialLogin_OAuth2
     /**
      * Get the email for the given access token.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return string|null
      */
     protected function getEmailByToken($token) {
@@ -78,18 +79,19 @@ class CSocialLogin_OAuth2_Provider_BitbucketProvider extends CSocialLogin_OAuth2
      */
     protected function mapUserToObject(array $user) {
         return (new CSocialLogin_OAuth2_User)->setRaw($user)->map([
-                    'id' => $user['uuid'],
-                    'nickname' => $user['username'],
-                    'name' => carr::get($user, 'display_name'),
-                    'email' => carr::get($user, 'email'),
-                    'avatar' => carr::get($user, 'links.avatar.href'),
+            'id' => $user['uuid'],
+            'nickname' => $user['username'],
+            'name' => carr::get($user, 'display_name'),
+            'email' => carr::get($user, 'email'),
+            'avatar' => carr::get($user, 'links.avatar.href'),
         ]);
     }
 
     /**
      * Get the access token for the given code.
      *
-     * @param  string  $code
+     * @param string $code
+     *
      * @return string
      */
     public function getAccessToken($code) {
@@ -105,11 +107,11 @@ class CSocialLogin_OAuth2_Provider_BitbucketProvider extends CSocialLogin_OAuth2
     /**
      * Get the POST fields for the token request.
      *
-     * @param  string  $code
+     * @param string $code
+     *
      * @return array
      */
     protected function getTokenFields($code) {
         return parent::getTokenFields($code) + ['grant_type' => 'authorization_code'];
     }
-
 }

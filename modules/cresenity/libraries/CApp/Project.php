@@ -1,17 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 12, 2019, 3:29:17 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 12, 2019, 3:29:17 AM
  */
 class CApp_Project {
-
     /**
-     * 
      * @param type $type
+     *
      * @return \CApp_Project_AbstractGenerator
      */
     private static function generator($type) {
@@ -20,11 +20,9 @@ class CApp_Project {
     }
 
     /**
-     * 
      * @return CApp_Project_Generator_ModelGenerator
      */
     public static function modelGenerator() {
         return static::generator('Model');
     }
-
 }

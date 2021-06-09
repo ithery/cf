@@ -6,11 +6,11 @@
  * @author Hery
  */
 class CView_Helper {
-
     /**
      * Normalize the given view name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     public static function normalize($name) {
@@ -24,5 +24,4 @@ class CView_Helper {
 
         return $namespace . $delimiter . str_replace('/', '.', $name);
     }
-
 }

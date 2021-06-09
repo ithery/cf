@@ -6,13 +6,13 @@
  * @author Hery
  */
 class CDevSuite_Bootstrap {
-
     protected $booted = false;
+
     protected $bootstrapper;
+
     protected static $instance;
 
     /**
-     * 
      * @return CDevSuite_Bootstrap
      */
     public static function instance() {
@@ -23,7 +23,6 @@ class CDevSuite_Bootstrap {
     }
 
     /**
-     * 
      * @return array
      */
     protected function getBootstrapperClass() {
@@ -39,21 +38,18 @@ class CDevSuite_Bootstrap {
             case CServer::OS_LINUX:
                 $bootstrapper[] = CDevSuite_Bootstrap_LinuxBootstrapper_DependencyChecker::class;
                 break;
-            
-            
         }
         $bootstrapper[] = CDevSuite_Bootstrap_PruneBootstrapper::class;
-        
+
         return $bootstrapper;
     }
 
     public function bootstrap() {
         if (!$this->booted) {
-
-            $this->bootstrapper = c::collect($this->getBootstrapperClass())->map(function($class){
-               return c::tap(new $class(),function($bootstrapper) {
-                   $bootstrapper->bootstrap();
-               }) ;
+            $this->bootstrapper = c::collect($this->getBootstrapperClass())->map(function ($class) {
+                return c::tap(new $class(), function ($bootstrapper) {
+                    $bootstrapper->bootstrap();
+                });
             });
             /*
              * Relocate config dir to ~/.config/devsuite/ if found in old location.
@@ -61,5 +57,4 @@ class CDevSuite_Bootstrap {
             $this->booted = true;
         }
     }
-
 }

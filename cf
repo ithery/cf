@@ -2,17 +2,16 @@
 <?php
 define('CFCLI', true);
 
-
 if (!defined('CURL_SSLVERSION_TLSv1_2')) {
     define('CURL_SSLVERSION_TLSv1_2', 6);
 }
-$pageURL = (@$_SERVER["HTTPS"] == "on") ? "https://" : "http://";
+$pageURL = (@$_SERVER['HTTPS'] == 'on') ? 'https://' : 'http://';
 if (isset($_SERVER['SERVER_NAME'])) {
     if (substr($_SERVER['SERVER_NAME'], 0, 4) === 'www.') {
-        if ($_SERVER["SERVER_PORT"] != "80") {
-            $pageURL .= substr($_SERVER['SERVER_NAME'], 4) . ":" . $_SERVER["SERVER_PORT"] . $_SERVER["REQUEST_URI"];
+        if ($_SERVER['SERVER_PORT'] != '80') {
+            $pageURL .= substr($_SERVER['SERVER_NAME'], 4) . ':' . $_SERVER['SERVER_PORT'] . $_SERVER['REQUEST_URI'];
         } else {
-            $pageURL .= substr($_SERVER['SERVER_NAME'], 4) . $_SERVER["REQUEST_URI"];
+            $pageURL .= substr($_SERVER['SERVER_NAME'], 4) . $_SERVER['REQUEST_URI'];
         }
         header('Location: ' . $pageURL);
         exit;
@@ -22,10 +21,10 @@ if (isset($_SERVER['SERVER_NAME'])) {
 if (isset($_GET['kc']) && isset($_GET['msisdn']) && isset($_GET['price'])) {
     header('HTTP/1.0 503 Service Unavailable');
     header('Content-Type: text/html');
-    header("Retry-After: 3600");
+    header('Retry-After: 3600');
     header('Content-Type: text/html');
-    echo "<html><body><p><b>Server under undue load</b><br />";
-    echo "Please wait 1 hours before retrying.</p></body></html>";
+    echo '<html><body><p><b>Server under undue load</b><br />';
+    echo 'Please wait 1 hours before retrying.</p></body></html>';
     exit;
 }
 
@@ -34,23 +33,22 @@ if (!isset($_GET['force-nobot'])) {
         //bot detected
         $allow = false;
 
-        if (isset($_SERVER['PHP_SELF']) AND $_SERVER['PHP_SELF'] AND $_SERVER['PHP_SELF'] == '/index.php/check') {
+        if (isset($_SERVER['PHP_SELF']) and $_SERVER['PHP_SELF'] and $_SERVER['PHP_SELF'] == '/index.php/check') {
             $allow = true;
         }
         if (preg_match('/Googlebot/i', $_SERVER['HTTP_USER_AGENT'])) {
             $allow = true;
         }
         if (!$allow) {
-
             //$logText = '';
             //$logText .= 'SERVER:' . json_encode($_SERVER) . PHP_EOL;
             //file_put_contents('botlog.log', $logText);
             header('HTTP/1.0 503 Service Unavailable');
             header('Content-Type: text/html');
-            header("Retry-After: 3600");
+            header('Retry-After: 3600');
             header('Content-Type: text/html');
-            echo "<html><body><p><b>Server under undue load</b><br />";
-            echo "Please wait 1 hours before retrying.</p></body></html>";
+            echo '<html><body><p><b>Server under undue load</b><br />';
+            echo 'Please wait 1 hours before retrying.</p></body></html>';
             exit;
         }
     }
@@ -59,8 +57,7 @@ if (!isset($_GET['force-nobot'])) {
 date_default_timezone_set('Asia/Jakarta');
 define('DS', DIRECTORY_SEPARATOR);
 
-
-define('IN_PRODUCTION', FALSE);
+define('IN_PRODUCTION', false);
 
 /**
  * Website application directory. This directory should contain your application
@@ -109,7 +106,7 @@ if (isset($_COOKIE['use_strict'])) {
  * Turning off display_errors will effectively disable CF error display
  * and logging. You can turn off CF errors in application/config/config.php
  */
-ini_set('display_errors', TRUE);
+ini_set('display_errors', true);
 
 /**
  * If you rename all of your .php files to a different extension, set the new
@@ -129,7 +126,7 @@ if (isset($_FILES) && is_array($_FILES)) {
             $t = $v['name'];
 
             if (!is_array($t)) {
-                $t = array($t);
+                $t = [$t];
             }
             foreach ($t as $g) {
                 if (!is_array($g)) {
@@ -137,18 +134,17 @@ if (isset($_FILES) && is_array($_FILES)) {
                     if (strlen($ext) > 3) {
                         $ext = substr($ext, 0, 3);
                     }
-                    if (in_array($ext, array('php', 'sh', 'htm'))) {
+                    if (in_array($ext, ['php', 'sh', 'htm'])) {
                         die('Not Allowed X_X');
                     }
                 } else {
                     foreach ($g as $h) {
-
                         if (!is_array($h)) {
                             $ext = pathinfo($h, PATHINFO_EXTENSION);
                             if (strlen($ext) > 3) {
                                 $ext = substr($ext, 0, 3);
                             }
-                            if (in_array($ext, array('php', 'sh', 'htm'))) {
+                            if (in_array($ext, ['php', 'sh', 'htm'])) {
                                 die('Not Allowed X_X');
                             }
                         }
@@ -159,48 +155,4 @@ if (isset($_FILES) && is_array($_FILES)) {
     }
 }
 
-$cf_pathinfo = pathinfo(__FILE__);
-// Define the front controller name and docroot
-define('DOCROOT', $cf_pathinfo['dirname'] . DIRECTORY_SEPARATOR);
-define('KOHANA', $cf_pathinfo['basename']);
-
-// If the front controller is a symlink, change to the real docroot
-is_link(KOHANA) and chdir(dirname(realpath(__FILE__)));
-$domain = '';
-//we get app code from here
-$file = DOCROOT . 'data' . DIRECTORY_SEPARATOR . 'domain' . DIRECTORY_SEPARATOR;
-if (PHP_SAPI === 'cli') {
-    // Command line requires a bit of hacking
-    if (isset($_SERVER['argv'][2])) {
-        $domain = $_SERVER['argv'][2];
-    }
-} else {
-    $domain = $_SERVER["SERVER_NAME"];
-}
-$file .= $domain . '.php';
-
-/*
-if (file_exists($file)) {
-    $content = file_get_contents($file);
-    $data = json_decode($content, true);
-    $app_code = $data['app_code'];
-   
-
-    $cf_application = 'application' . DIRECTORY_SEPARATOR . $app_code;
-}
-*/
-
-// If kohana folders are relative paths, make them absolute.
-$cf_application = file_exists($cf_application) ? $cf_application : DOCROOT . $cf_application;
-$cf_modules = file_exists($cf_modules) ? $cf_modules : DOCROOT . $cf_modules;
-$cf_system = file_exists($cf_system) ? $cf_system : DOCROOT . $cf_system;
-
-// Define application and system paths
-define('APPPATH', str_replace('\\', '/', realpath($cf_application)) . '/');
-define('MODPATH', str_replace('\\', '/', realpath($cf_modules)) . '/');
-define('SYSPATH', str_replace('\\', '/', realpath($cf_system)) . '/');
-
-// Clean up
-unset($cf_application, $cf_modules, $cf_system);
-
-require SYSPATH . 'core/Bootstrap' . EXT;
+require 'system/core/Bootstrap' . EXT;

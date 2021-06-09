@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 4:14:29 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 4:14:29 AM
  */
 class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
-
     /**
      * The database connection instance.
      *
@@ -40,14 +40,14 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * Create a new database queue instance.
      *
-     * @param  CDatabase  $database
-     * @param  string  $table
-     * @param  string  $default
-     * @param  int  $retryAfter
+     * @param CDatabase $database
+     * @param string    $table
+     * @param string    $default
+     * @param int       $retryAfter
+     *
      * @return void
      */
     public function __construct(CDatabase $database, $table, $default = 'default', $retryAfter = 60) {
-
         $this->table = $table;
         $this->default = $default;
         $this->database = $database;
@@ -57,35 +57,40 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * Get the size of the queue.
      *
-     * @param  string|null  $queue
+     * @param string|null $queue
+     *
      * @return int
      */
     public function size($queue = null) {
         return $this->database->table($this->table)
-                        ->where('queue', $this->getQueue($queue))
-                        ->count();
+            ->where('queue', $this->getQueue($queue))
+            ->count();
     }
 
     /**
      * Push a new job onto the queue.
      *
-     * @param  string  $job
-     * @param  mixed   $data
-     * @param  string|null  $queue
+     * @param string      $job
+     * @param mixed       $data
+     * @param string|null $queue
+     *
      * @return mixed
      */
     public function push($job, $data = '', $queue = null) {
         return $this->pushToDatabase($queue, $this->createPayload(
-                                $job, $this->getQueue($queue), $data
+            $job,
+            $this->getQueue($queue),
+            $data
         ));
     }
 
     /**
      * Push a raw payload onto the queue.
      *
-     * @param  string  $payload
-     * @param  string|null  $queue
-     * @param  array   $options
+     * @param string      $payload
+     * @param string|null $queue
+     * @param array       $options
+     *
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = []) {
@@ -95,42 +100,47 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * Push a new job onto the queue after a delay.
      *
-     * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  string  $job
-     * @param  mixed   $data
-     * @param  string|null  $queue
+     * @param \DateTimeInterface|\DateInterval|int $delay
+     * @param string                               $job
+     * @param mixed                                $data
+     * @param string|null                          $queue
+     *
      * @return void
      */
     public function later($delay, $job, $data = '', $queue = null) {
         return $this->pushToDatabase($queue, $this->createPayload(
-                                $job, $this->getQueue($queue), $data
-                        ), $delay);
+            $job,
+            $this->getQueue($queue),
+            $data
+        ), $delay);
     }
 
     /**
      * Push an array of jobs onto the queue.
      *
-     * @param  array   $jobs
-     * @param  mixed   $data
-     * @param  string|null  $queue
+     * @param array       $jobs
+     * @param mixed       $data
+     * @param string|null $queue
+     *
      * @return mixed
      */
     public function bulk($jobs, $data = '', $queue = null) {
         $queue = $this->getQueue($queue);
         $availableAt = $this->availableAt();
-        return $this->database->table($this->table)->insert(collect((array) $jobs)->map(
-                                function ($job) use ($queue, $data, $availableAt) {
-                            return $this->buildDatabaseRecord($queue, $this->createPayload($job, $this->getQueue($queue), $data), $availableAt);
-                        }
-                        )->all());
+        return $this->database->table($this->table)->insert(c::collect((array) $jobs)->map(
+            function ($job) use ($queue, $data, $availableAt) {
+                return $this->buildDatabaseRecord($queue, $this->createPayload($job, $this->getQueue($queue), $data), $availableAt);
+            }
+        )->all());
     }
 
     /**
      * Release a reserved job back onto the queue.
      *
-     * @param  string  $queue
-     * @param  CQueue_Job_DatabaseJobRecord  $job
-     * @param  int  $delay
+     * @param string                       $queue
+     * @param CQueue_Job_DatabaseJobRecord $job
+     * @param int                          $delay
+     *
      * @return mixed
      */
     public function release($queue, $job, $delay) {
@@ -140,26 +150,30 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * Push a raw payload to the database with a given delay.
      *
-     * @param  string|null  $queue
-     * @param  string  $payload
-     * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  int  $attempts
+     * @param string|null                          $queue
+     * @param string                               $payload
+     * @param \DateTimeInterface|\DateInterval|int $delay
+     * @param int                                  $attempts
+     *
      * @return mixed
      */
     protected function pushToDatabase($queue, $payload, $delay = 0, $attempts = 0) {
-
         return $this->database->table($this->table)->insertGetId($this->buildDatabaseRecord(
-                                $this->getQueue($queue), $payload, $this->availableAt($delay), $attempts
+            $this->getQueue($queue),
+            $payload,
+            $this->availableAt($delay),
+            $attempts
         ));
     }
 
     /**
      * Create an array to insert for the given job.
      *
-     * @param  string|null  $queue
-     * @param  string  $payload
-     * @param  int  $availableAt
-     * @param  int  $attempts
+     * @param string|null $queue
+     * @param string      $payload
+     * @param int         $availableAt
+     * @param int         $attempts
+     *
      * @return array
      */
     protected function buildDatabaseRecord($queue, $payload, $availableAt, $attempts = 0) {
@@ -179,7 +193,8 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string|null  $queue
+     * @param string|null $queue
+     *
      * @return \Illuminate\Contracts\Queue\Job|null
      *
      * @throws \Exception|\Throwable
@@ -187,28 +202,29 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     public function pop($queue = null) {
         $queue = $this->getQueue($queue);
         return $this->database->transaction(function () use ($queue) {
-                    if ($job = $this->getNextAvailableJob($queue)) {
-                        return $this->marshalJob($queue, $job);
-                    }
-                });
+            if ($job = $this->getNextAvailableJob($queue)) {
+                return $this->marshalJob($queue, $job);
+            }
+        });
     }
 
     /**
      * Get the next available job for the queue.
      *
-     * @param  string|null  $queue
+     * @param string|null $queue
+     *
      * @return \Illuminate\Queue\Jobs\DatabaseJobRecord|null
      */
     protected function getNextAvailableJob($queue) {
         $job = $this->database->table($this->table)
-                ->lockForUpdate()
-                ->where('name', $this->getQueue($queue))
-                ->where(function ($query) {
-                    $this->isAvailable($query);
-                    $this->isReservedButExpired($query);
-                })
-                ->orderBy('created', 'asc')
-                ->first();
+            ->lockForUpdate()
+            ->where('name', $this->getQueue($queue))
+            ->where(function ($query) {
+                $this->isAvailable($query);
+                $this->isReservedButExpired($query);
+            })
+            ->orderBy('created', 'asc')
+            ->first();
 
         return $job ? new CQueue_Job_DatabaseJobRecord((object) $job) : null;
     }
@@ -216,21 +232,23 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * Modify the query to check for available jobs.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param \Illuminate\Database\Query\Builder $query
+     *
      * @return void
      */
     protected function isAvailable($query) {
         $query->where(function ($query) {
             $dateCurrentTime = date('Y-m-d H:i:s', $this->currentTime());
             $query->whereNull('reserved_at')
-                    ->where('available_at', '<=', $dateCurrentTime);
+                ->where('available_at', '<=', $dateCurrentTime);
         });
     }
 
     /**
      * Modify the query to check for jobs that are reserved but have expired.
      *
-     * @param  CDatabase_Query_Builder  $query
+     * @param CDatabase_Query_Builder $query
+     *
      * @return void
      */
     protected function isReservedButExpired($query) {
@@ -244,27 +262,31 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * Marshal the reserved job into a DatabaseJob instance.
      *
-     * @param  string  $queue
-     * @param  CQueue_Job_DatabaseJobRecord  $job
+     * @param string                       $queue
+     * @param CQueue_Job_DatabaseJobRecord $job
+     *
      * @return CQueue_Job_DatabaseJob
      */
     protected function marshalJob($queue, $job) {
-
         $job = $this->markJobAsReserved($job);
 
         return new CQueue_Job_DatabaseJob(
-                $this->container, $this, $job, $this->connectionName, $queue
+            $this->container,
+            $this,
+            $job,
+            $this->connectionName,
+            $queue
         );
     }
 
     /**
      * Mark the given job ID as reserved.
      *
-     * @param  CDatabase_Job_DatabaseJobRecord  $job
+     * @param CDatabase_Job_DatabaseJobRecord $job
+     *
      * @return CDatabase_Job_DatabaseJobRecord
      */
     protected function markJobAsReserved($job) {
-
         $this->database->table($this->table)->where($this->primaryKey(), $job->{$this->primaryKey()})->update([
             'reserved_at' => date('Y-m-d H:i:s', $job->touch()),
             'attempts' => $job->increment(),
@@ -275,8 +297,9 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * Delete a reserved job from the queue.
      *
-     * @param  string  $queue
-     * @param  string  $id
+     * @param string $queue
+     * @param string $id
+     *
      * @return void
      *
      * @throws \Exception|\Throwable
@@ -292,7 +315,8 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * Get the queue or return the default.
      *
-     * @param  string|null  $queue
+     * @param string|null $queue
+     *
      * @return string
      */
     public function getQueue($queue) {
@@ -311,5 +335,4 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     public function primaryKey() {
         return CQueue::primaryKey($this->database, $this->table);
     }
-
 }

@@ -1,14 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CBackup_Monitor_HealthCheck_MaximumAgeInDays extends CBackup_Monitor_AbstractHealthCheck {
-
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $days;
 
     public function __construct($days = 1) {
@@ -17,11 +12,13 @@ class CBackup_Monitor_HealthCheck_MaximumAgeInDays extends CBackup_Monitor_Abstr
 
     public function checkHealth(CBackup_BackupDestination $backupDestination) {
         $this->failIf(
-                $this->hasNoBackups($backupDestination), clang::__('backup:.unhealthy_backup_found_empty')
+            $this->hasNoBackups($backupDestination),
+            clang::__('backup:.unhealthy_backup_found_empty')
         );
         $newestBackup = $backupDestination->backups()->newest();
         $this->failIf(
-                $this->isTooOld($newestBackup), clang::__('backup.unhealthy_backup_found_old', [':date' => $newestBackup->date()->format('Y/m/d h:i:s')])
+            $this->isTooOld($newestBackup),
+            clang::__('backup.unhealthy_backup_found_old', [':date' => $newestBackup->date()->format('Y/m/d h:i:s')])
         );
     }
 
@@ -38,5 +35,4 @@ class CBackup_Monitor_HealthCheck_MaximumAgeInDays extends CBackup_Monitor_Abstr
         }
         return true;
     }
-
 }

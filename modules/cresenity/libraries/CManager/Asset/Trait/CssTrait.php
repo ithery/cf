@@ -1,24 +1,24 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2018, 1:41:33 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2018, 1:41:33 AM
  */
 trait CManager_Asset_Trait_CssTrait {
-
     public function fullpathCssFile($file) {
         foreach ($this->mediaPaths as $dir) {
             $path = $dir . 'css' . DS . $file;
-            
+
             if (file_exists($path)) {
                 return $path;
             }
         }
         $dirs = CF::getDirs('media');
-        
+
         foreach ($dirs as $dir) {
             $path = $dir . 'css' . DS . $file;
 
@@ -26,28 +26,28 @@ trait CManager_Asset_Trait_CssTrait {
                 return $path;
             }
         }
-        $path = DOCROOT . "media" . DS . 'css' . DS;
+        $path = DOCROOT . 'media' . DS . 'css' . DS;
         return $path . $file;
     }
 
     public function getAllCssFileUrl() {
         $files = $this->cssFiles();
 
-        $urls = array();
+        $urls = [];
         foreach ($files as $f) {
             $urls[] = CManager_Asset_Helper::urlCssFile($f);
         }
         return $urls;
     }
 
-    public function registerCssFiles($files, $pos = "head") {
-        $files = $files !== null ? (is_array($files) ? $files : array($files)) : array();
+    public function registerCssFiles($files, $pos = 'head') {
+        $files = $files !== null ? (is_array($files) ? $files : [$files]) : [];
         foreach ($files as $file) {
             $this->registerCssFile($file, $pos);
         }
     }
 
-    public function registerCssFile($file, $pos = "head") {
+    public function registerCssFile($file, $pos = 'head') {
         $dir_file = $file;
         $css_version = '';
 
@@ -57,7 +57,6 @@ trait CManager_Asset_Trait_CssTrait {
         }
         if (strpos($dir_file, 'http') !== false) {
             $css_file = $dir_file;
-            // do nothing
         } else {
             $css_file = $this->fullpathCssFile($dir_file);
             if (!file_exists($css_file)) {
@@ -73,7 +72,7 @@ trait CManager_Asset_Trait_CssTrait {
 
     public function unregisterCssFiles($files, $pos = null) {
         if (!is_array($files)) {
-            $files = array($files);
+            $files = [$files];
         }
         foreach ($files as $file) {
             $this->unregisterCssFile($file, $pos);
@@ -87,7 +86,7 @@ trait CManager_Asset_Trait_CssTrait {
             $pos = self::allAvailablePos();
         }
         if (!is_array($pos)) {
-            $pos = array($pos);
+            $pos = [$pos];
         }
         foreach ($pos as $p) {
             $cssFiles = &$this->scripts[$p]['css_file'];
@@ -100,7 +99,7 @@ trait CManager_Asset_Trait_CssTrait {
     }
 
     public function cssFiles() {
-        $cssFileArray = array();
+        $cssFileArray = [];
         foreach ($this->scripts as $script) {
             foreach ($script['css_file'] as $k) {
                 $cssFileArray[] = $k;
@@ -108,5 +107,4 @@ trait CManager_Asset_Trait_CssTrait {
         }
         return $cssFileArray;
     }
-
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 3:35:44 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 3:35:44 PM
  */
 interface CValidation_MessageBagInterface extends CInterface_Arrayable {
-
     /**
      * Get the keys present in the message bag.
      *
@@ -19,8 +19,9 @@ interface CValidation_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Add a message to the bag.
      *
-     * @param  string  $key
-     * @param  string  $message
+     * @param string $key
+     * @param string $message
+     *
      * @return $this
      */
     public function add($key, $message);
@@ -28,7 +29,8 @@ interface CValidation_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Merge a new array of messages into the bag.
      *
-     * @param  \Illuminate\Contracts\Support\MessageProvider|array  $messages
+     * @param \Illuminate\Contracts\Support\MessageProvider|array $messages
+     *
      * @return $this
      */
     public function merge($messages);
@@ -36,7 +38,8 @@ interface CValidation_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Determine if messages exist for a given key.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return bool
      */
     public function has($key);
@@ -44,8 +47,9 @@ interface CValidation_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Get the first message from the bag for a given key.
      *
-     * @param  string|null  $key
-     * @param  string|null  $format
+     * @param string|null $key
+     * @param string|null $format
+     *
      * @return string
      */
     public function first($key = null, $format = null);
@@ -53,8 +57,9 @@ interface CValidation_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Get all of the messages from the bag for a given key.
      *
-     * @param  string  $key
-     * @param  string|null  $format
+     * @param string      $key
+     * @param string|null $format
+     *
      * @return array
      */
     public function get($key, $format = null);
@@ -62,7 +67,8 @@ interface CValidation_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Get all of the messages for every key in the bag.
      *
-     * @param  string|null  $format
+     * @param string|null $format
+     *
      * @return array
      */
     public function all($format = null);
@@ -84,7 +90,8 @@ interface CValidation_MessageBagInterface extends CInterface_Arrayable {
     /**
      * Set the default message format.
      *
-     * @param  string  $format
+     * @param string $format
+     *
      * @return $this
      */
     public function setFormat($format = ':message');

@@ -1,18 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 28, 2019, 9:48:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 28, 2019, 9:48:55 PM
  */
 class CModel_Search_SearchableAttribute {
-
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $attribute;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $partial;
 
     public function __construct($attribute, $partial = true) {
@@ -30,10 +34,10 @@ class CModel_Search_SearchableAttribute {
 
     public static function createMany(array $attributes) {
         return c::collect($attributes)
-                        ->map(function ($attribute) {
-                            return new self($attribute);
-                        })
-                        ->toArray();
+            ->map(function ($attribute) {
+                return new self($attribute);
+            })
+            ->toArray();
     }
 
     public function getAttribute() {
@@ -43,5 +47,4 @@ class CModel_Search_SearchableAttribute {
     public function isPartial() {
         return $this->partial;
     }
-
 }

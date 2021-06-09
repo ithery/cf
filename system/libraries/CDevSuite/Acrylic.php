@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Acrylic {
-
     protected $cli;
     protected $files;
 
@@ -50,9 +49,9 @@ class CDevSuite_Acrylic {
     public function createHostsFile($tld) {
         $contents = $this->files->get(CDevSuite::stubsPath() . 'AcrylicHosts.txt');
 
-
         $this->files->put(
-                $this->path() . '/AcrylicHosts.txt', str_replace(['DEVSUITE_TLD', 'DEVSUITE_HOME_PATH'], [$tld, rtrim(CDevSuite::homePath(), '/')], $contents)
+            $this->path() . '/AcrylicHosts.txt',
+            str_replace(['DEVSUITE_TLD', 'DEVSUITE_HOME_PATH'], [$tld, rtrim(CDevSuite::homePath(), '/')], $contents)
         );
 
         $customConfigPath = CDevSuite::homePath() . '/AcrylicHosts.txt';
@@ -76,7 +75,8 @@ class CDevSuite_Acrylic {
     /**
      * Update the tld used by Acrylic DNS.
      *
-     * @param  string $tld
+     * @param string $tld
+     *
      * @return void
      */
     public function updateTld($tld) {
@@ -150,5 +150,4 @@ class CDevSuite_Acrylic {
     public function path() {
         return str_replace(DIRECTORY_SEPARATOR, '/', realpath(CDevSuite::binPath() . 'acrylic/'));
     }
-
 }

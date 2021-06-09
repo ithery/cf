@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Windows_Configuration extends CDevSuite_Configuration {
-
     /**
      * Install the DevSuite configuration file.
      *
@@ -55,5 +54,4 @@ class CDevSuite_Windows_Configuration extends CDevSuite_Configuration {
     public function uninstall() {
         //do nothing on windows
     }
-
 }

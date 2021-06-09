@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:16:36 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:16:36 AM
  */
 
 /**
  * Contains statement parameter types.
  */
 final class CDatabase_ParameterType {
-
     /**
      * Represents the SQL NULL data type.
      *
@@ -57,7 +57,5 @@ final class CDatabase_ParameterType {
      * This class cannot be instantiated.
      */
     private function __construct() {
-        
     }
-
 }

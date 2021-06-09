@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 12, 2019, 8:02:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 12, 2019, 8:02:34 PM
  */
 class CValidation_Rule_Unique {
-
     use CValidation_Rule_Trait_DatabaseTrait;
 
     /**
@@ -28,8 +28,9 @@ class CValidation_Rule_Unique {
     /**
      * Ignore the given ID during the unique check.
      *
-     * @param  mixed  $id
-     * @param  string|null  $idColumn
+     * @param mixed       $id
+     * @param string|null $idColumn
+     *
      * @return $this
      */
     public function ignore($id, $idColumn = null) {
@@ -46,8 +47,9 @@ class CValidation_Rule_Unique {
     /**
      * Ignore the given model during the unique check.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @param  string|null  $idColumn
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param string|null                         $idColumn
+     *
      * @return $this
      */
     public function ignoreModel($model, $idColumn = null) {
@@ -63,8 +65,13 @@ class CValidation_Rule_Unique {
      * @return string
      */
     public function __toString() {
-        return rtrim(sprintf('unique:%s,%s,%s,%s,%s', $this->table, $this->column, $this->ignore ? '"' . $this->ignore . '"' : 'NULL', $this->idColumn, $this->formatWheres()
-                ), ',');
+        return rtrim(sprintf(
+            'unique:%s,%s,%s,%s,%s',
+            $this->table,
+            $this->column,
+            $this->ignore ? '"' . $this->ignore . '"' : 'NULL',
+            $this->idColumn,
+            $this->formatWheres()
+        ), ',');
     }
-
 }

@@ -1,17 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 12, 2019, 12:38:55 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 12, 2019, 12:38:55 AM
  */
 use CManager_File_Connector_FileManager_FM as FM;
 use Intervention\Image\ImageManager;
 
 class CManager_File_Connector_FileManager_Controller_ResizeController extends CManager_File_Connector_FileManager_AbstractController {
-
     /**
      * Get list of folders as json to populate treeview.
      *
@@ -46,15 +46,14 @@ class CManager_File_Connector_FileManager_Controller_ResizeController extends CM
         }
 
         $app->addTemplate()->setTemplate('CElement/Component/FileManager/Resizer')
-                ->setVar('fm', $fm)
-                ->setVar('img', $fm->path()->pretty($image))
-                ->setVar('height', number_format($height, 0))
-                ->setVar('width', $width)
-                ->setVar('original_height', $original_height)
-                ->setVar('original_width', $original_width)
-                ->setVar('scaled', $scaled)
-                ->setVar('ratio', $ratio);
+            ->setVar('fm', $fm)
+            ->setVar('img', $fm->path()->pretty($image))
+            ->setVar('height', number_format($height, 0))
+            ->setVar('width', $width)
+            ->setVar('original_height', $original_height)
+            ->setVar('original_width', $original_width)
+            ->setVar('scaled', $scaled)
+            ->setVar('ratio', $ratio);
         echo $app->render();
     }
-
 }

@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 1:05:06 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 1:05:06 PM
  */
 
 /**
  * Event used when the SQL query for dropping tables are generated inside CDatabase_Platform.
  */
 class CDatabase_Event_Schema_OnDropTable extends CDatabase_Event_Schema {
-
     /**
      * @var string|CDatabase_Schema_Table
      */
@@ -29,8 +29,8 @@ class CDatabase_Event_Schema_OnDropTable extends CDatabase_Event_Schema {
     private $_sql = null;
 
     /**
-     * @param string|CDatabase_Schema_Table        $table
-     * @param CDatabase_Platform $platform
+     * @param string|CDatabase_Schema_Table $table
+     * @param CDatabase_Platform            $platform
      *
      * @throws \InvalidArgumentException
      */
@@ -72,5 +72,4 @@ class CDatabase_Event_Schema_OnDropTable extends CDatabase_Event_Schema {
     public function getSql() {
         return $this->_sql;
     }
-
 }

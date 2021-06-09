@@ -184,10 +184,10 @@ class CBase_String {
      *
      * @param  string  $delimiter
      * @param  int  $limit
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     public function explode($delimiter, $limit = PHP_INT_MAX) {
-        return collect(explode($delimiter, $this->value, $limit));
+        return c::collect(explode($delimiter, $this->value, $limit));
     }
 
     /**
@@ -196,16 +196,16 @@ class CBase_String {
      * @param  string|int  $pattern
      * @param  int  $limit
      * @param  int  $flags
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     public function split($pattern, $limit = -1, $flags = 0) {
         if (filter_var($pattern, FILTER_VALIDATE_INT) !== false) {
-            return collect(mb_str_split($this->value, $pattern));
+            return c::collect(mb_str_split($this->value, $pattern));
         }
 
         $segments = preg_split($pattern, $this->value, $limit, $flags);
 
-        return !empty($segments) ? collect($segments) : collect();
+        return !empty($segments) ? c::collect($segments) : c::collect();
     }
 
     /**
@@ -314,7 +314,7 @@ class CBase_String {
      * Get the string matching the given pattern.
      *
      * @param  string  $pattern
-     * @return \Illuminate\Support\Collection
+     * @return CCollection
      */
     public function matchAll($pattern) {
         preg_match_all($pattern, $this->value, $matches);

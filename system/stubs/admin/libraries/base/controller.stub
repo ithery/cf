@@ -1,0 +1,10 @@
+<?php
+
+defined('SYSPATH') or die('No direct script access.');
+
+class {prefix}Admin_Controller extends {prefix}Controller  {
+    public function __construct() {
+        parent::__construct();
+        CManager::setTheme('{theme}');
+    }
+}

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 14, 2019, 7:00:37 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 14, 2019, 7:00:37 PM
  */
 trait CModel_SoftDelete_SoftDeleteTrait {
-
     /**
      * Indicates if the model is currently force deleting.
      *
@@ -46,7 +46,6 @@ trait CModel_SoftDelete_SoftDeleteTrait {
      * @return mixed
      */
     protected function performDeleteOnModel() {
-
         if ($this->forceDeleting) {
             $this->exists = false;
 
@@ -126,7 +125,8 @@ trait CModel_SoftDelete_SoftDeleteTrait {
     /**
      * Register a restoring model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function restoring($callback) {
@@ -136,7 +136,8 @@ trait CModel_SoftDelete_SoftDeleteTrait {
     /**
      * Register a restored model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function restored($callback) {
@@ -169,5 +170,4 @@ trait CModel_SoftDelete_SoftDeleteTrait {
     public function getQualifiedStatusColumn() {
         return $this->getTable() . '.' . $this->getStatusColumn();
     }
-
 }

@@ -1,13 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
+//@codingStandardsIgnoreStart
 class CParser_HtmlParser_Tokenizer_State {
-
     const Text = 1;
     const BeforeTagName = 2; //after <
     const InTagName = 3;
@@ -69,5 +63,6 @@ class CParser_HtmlParser_Tokenizer_State {
     const InNamedEntity = 53;
     const InNumericEntity = 54;
     const InHexEntity = 55; //X
-
 }
+
+//@codingStandardsIgnoreEnd

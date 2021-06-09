@@ -6,7 +6,6 @@
  * @author Hery
  */
 abstract class CView_CompilerAbstract {
-
     /**
      * Get the cache path for the compiled views.
      *
@@ -17,13 +16,12 @@ abstract class CView_CompilerAbstract {
     /**
      * Create a new compiler instance.
      *
-     * @param  string  $cachePath
      * @return void
      *
      * @throws \InvalidArgumentException
      */
     public function __construct() {
-        $this->cachePath = DOCROOT . 'temp' . DS . 'views' . DS . 'blade';
+        $this->cachePath = CF::config('view.compiled');
         if (!CFile::isDirectory($this->cachePath)) {
             CFile::makeDirectory($this->cachePath, $mode = 0755, $recursive = true);
         }
@@ -32,7 +30,8 @@ abstract class CView_CompilerAbstract {
     /**
      * Get the path to the compiled version of a view.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function getCompiledPath($path) {
@@ -42,7 +41,8 @@ abstract class CView_CompilerAbstract {
     /**
      * Determine if the view at the given path is expired.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public function isExpired($path) {
@@ -57,5 +57,4 @@ abstract class CView_CompilerAbstract {
 
         return CFile::lastModified($path) >= CFile::lastModified($compiled);
     }
-
 }

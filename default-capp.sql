@@ -113,6 +113,7 @@ CREATE TABLE IF NOT EXISTS `org` (
   `email` varchar(100) DEFAULT NULL,
   `phone` varchar(50) DEFAULT NULL,
   `contact_person` varchar(50) DEFAULT NULL,
+  `auth_type` varchar(50) DEFAULT 'dev',
   `created` datetime DEFAULT NULL,
   `createdby` varchar(50) DEFAULT NULL,
   `updated` datetime DEFAULT NULL,
@@ -378,8 +379,6 @@ CREATE TABLE `queue_failed` (
   PRIMARY KEY (`queue_failed_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-/*!40000 ALTER TABLE `var_user` DISABLE KEYS */;
-/*!40000 ALTER TABLE `var_user` ENABLE KEYS */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

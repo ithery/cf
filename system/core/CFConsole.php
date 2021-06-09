@@ -1,14 +1,8 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CFConsole {
-
     private static $commands = [];
+
     private static $defaultCommands = [
         CConsole_Command_Domain_DomainListCommand::class,
         CConsole_Command_Domain_DomainCreateCommand::class,
@@ -36,6 +30,7 @@ class CFConsole {
         CConsole_Command_DevSuite_DevSuiteRestartCommand::class,
         CConsole_Command_DevSuite_DevSuiteStopCommand::class,
         CConsole_Command_DevSuite_DevSuiteDbInstallCommand::class,
+        CConsole_Command_DevSuite_DevSuiteDbStartCommand::class,
         CConsole_Command_DevSuite_DevSuiteDbUninstallCommand::class,
         CConsole_Command_DevSuite_DevSuiteDbListCommand::class,
         CConsole_Command_DevSuite_DevSuiteDbCreateCommand::class,
@@ -53,12 +48,13 @@ class CFConsole {
         CConsole_Command_Make_MakeThemeCommand::class,
         CConsole_Command_App_AppCreateCommand::class,
         CConsole_Command_App_AppPresetCommand::class,
+        CConsole_Command_App_AppPresetAdminCommand::class,
         CConsole_Command_App_AppCodeCommand::class,
+        CConsole_Command_TestInstallCommand::class,
         CConsole_Command_TestCommand::class,
     ];
 
     public static function execute() {
-
         $kernel = new CConsole_Kernel();
 
         $commands = array_merge(static::$defaultCommands, static::$commands);
@@ -67,11 +63,11 @@ class CFConsole {
         });
 
         $status = $kernel->handle(
-                $input = new Symfony\Component\Console\Input\ArgvInput, new Symfony\Component\Console\Output\ConsoleOutput
+            $input = new Symfony\Component\Console\Input\ArgvInput,
+            new Symfony\Component\Console\Output\ConsoleOutput
         );
 
         $kernel->terminate($input, $status);
-
 
         exit($status);
     }
@@ -86,5 +82,4 @@ class CFConsole {
             static::$commands[] = $class;
         }
     }
-
 }

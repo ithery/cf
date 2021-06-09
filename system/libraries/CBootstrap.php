@@ -3,24 +3,20 @@
 /**
  * Description of CBoostrap
  *
- * @author Hery
+ * @author Hery <hery@ittron.co.id>
  */
 class CBootstrap {
-
     /**
-     *
      * @var CBootstrap
      */
     protected static $instance = null;
 
     /**
-     *
      * @var string[]
      */
     protected $bootsrapperClass = [];
 
     /**
-     *
      * @var string[]
      */
     protected $defaultBootstrapperClass = [
@@ -28,14 +24,12 @@ class CBootstrap {
     ];
 
     /**
-     *
      * @var CBootstrap_BootstrapperAbstract[]
      */
     protected $bootstrapper;
     protected $booted;
 
     /**
-     * 
      * @return CBootstrap
      */
     public static function instance() {
@@ -53,7 +47,6 @@ class CBootstrap {
     }
 
     /**
-     * 
      * @return array
      */
     protected function getBootstrapperClass() {
@@ -61,18 +54,14 @@ class CBootstrap {
     }
 
     public function boot() {
-
         if (!$this->booted) {
-
             //we boot all bootstrapper
-            $this->bootstrapper = c::collect($this->getBootstrapperClass())->map(function($item) {
-
-                        return c::tap((new $item), function($bootstrapper) {
-                                    $this->bootstrapper[] = $bootstrapper;
-                                    $bootstrapper->bootstrap();
-                                });
-                    })->all();
-
+            $this->bootstrapper = c::collect($this->getBootstrapperClass())->map(function ($item) {
+                return c::tap((new $item), function ($bootstrapper) {
+                    $this->bootstrapper[] = $bootstrapper;
+                    $bootstrapper->bootstrap();
+                });
+            })->all();
 
             $this->booted = true;
         }
@@ -86,5 +75,4 @@ class CBootstrap {
         }
         return $this;
     }
-
 }

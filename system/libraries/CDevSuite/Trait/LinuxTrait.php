@@ -6,15 +6,12 @@
  * @author Hery
  */
 trait CDevSuite_Trait_LinuxTrait {
-
     /**
-     *
      * @var CDevSuite_LinuxRequirements
      */
     protected static $linuxRequirements;
 
     /**
-     * 
      * @return CDevSuite_LinuxRequirements
      */
     public static function linuxRequirements() {
@@ -23,5 +20,4 @@ trait CDevSuite_Trait_LinuxTrait {
         }
         return static::$linuxRequirements;
     }
-
 }

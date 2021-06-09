@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 12, 2019, 8:00:01 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 12, 2019, 8:00:01 PM
  */
 trait CValidation_Rule_Trait_DatabaseTrait {
-
     /**
      * The table to run the query against.
      *
@@ -40,8 +40,9 @@ trait CValidation_Rule_Trait_DatabaseTrait {
     /**
      * Create a new rule instance.
      *
-     * @param  string  $table
-     * @param  string  $column
+     * @param string $table
+     * @param string $column
+     *
      * @return void
      */
     public function __construct($table, $column = 'NULL') {
@@ -52,8 +53,9 @@ trait CValidation_Rule_Trait_DatabaseTrait {
     /**
      * Set a "where" constraint on the query.
      *
-     * @param  string|\Closure  $column
-     * @param  array|string|null  $value
+     * @param string|\Closure   $column
+     * @param array|string|null $value
+     *
      * @return $this
      */
     public function where($column, $value = null) {
@@ -73,8 +75,9 @@ trait CValidation_Rule_Trait_DatabaseTrait {
     /**
      * Set a "where not" constraint on the query.
      *
-     * @param  string  $column
-     * @param  array|string  $value
+     * @param string       $column
+     * @param array|string $value
+     *
      * @return $this
      */
     public function whereNot($column, $value) {
@@ -88,7 +91,8 @@ trait CValidation_Rule_Trait_DatabaseTrait {
     /**
      * Set a "where null" constraint on the query.
      *
-     * @param  string  $column
+     * @param string $column
+     *
      * @return $this
      */
     public function whereNull($column) {
@@ -98,7 +102,8 @@ trait CValidation_Rule_Trait_DatabaseTrait {
     /**
      * Set a "where not null" constraint on the query.
      *
-     * @param  string  $column
+     * @param string $column
+     *
      * @return $this
      */
     public function whereNotNull($column) {
@@ -108,33 +113,36 @@ trait CValidation_Rule_Trait_DatabaseTrait {
     /**
      * Set a "where in" constraint on the query.
      *
-     * @param  string  $column
-     * @param  array  $values
+     * @param string $column
+     * @param array  $values
+     *
      * @return $this
      */
     public function whereIn($column, array $values) {
         return $this->where(function ($query) use ($column, $values) {
-                    $query->whereIn($column, $values);
-                });
+            $query->whereIn($column, $values);
+        });
     }
 
     /**
      * Set a "where not in" constraint on the query.
      *
-     * @param  string  $column
-     * @param  array  $values
+     * @param string $column
+     * @param array  $values
+     *
      * @return $this
      */
     public function whereNotIn($column, array $values) {
         return $this->where(function ($query) use ($column, $values) {
-                    $query->whereNotIn($column, $values);
-                });
+            $query->whereNotIn($column, $values);
+        });
     }
 
     /**
      * Register a custom query callback.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return $this
      */
     public function using(Closure $callback) {
@@ -158,9 +166,8 @@ trait CValidation_Rule_Trait_DatabaseTrait {
      * @return string
      */
     protected function formatWheres() {
-        return CF::collect($this->wheres)->map(function ($where) {
-                    return $where['column'] . ',' . $where['value'];
-                })->implode(',');
+        return c::collect($this->wheres)->map(function ($where) {
+            return $where['column'] . ',' . $where['value'];
+        })->implode(',');
     }
-
 }

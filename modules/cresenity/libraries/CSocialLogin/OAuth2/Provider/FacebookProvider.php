@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 16, 2019, 4:52:04 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 16, 2019, 4:52:04 PM
  */
 use GuzzleHttp\ClientInterface;
 
 class CSocialLogin_OAuth2_Provider_FacebookProvider extends CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_OAuth2_ProviderInterface {
-
     /**
      * The base Facebook Graph URL.
      *
@@ -102,13 +102,13 @@ class CSocialLogin_OAuth2_Provider_FacebookProvider extends CSocialLogin_OAuth2_
     protected function mapUserToObject(array $user) {
         $avatarUrl = $this->graphUrl . '/' . $this->version . '/' . $user['id'] . '/picture';
         return (new CSocialLogin_OAuth2_User())->setRaw($user)->map([
-                    'id' => $user['id'],
-                    'nickname' => null,
-                    'name' => isset($user['name']) ? $user['name'] : null,
-                    'email' => isset($user['email']) ? $user['email'] : null,
-                    'avatar' => $avatarUrl . '?type=normal',
-                    'avatar_original' => $avatarUrl . '?width=1920',
-                    'profileUrl' => isset($user['link']) ? $user['link'] : null,
+            'id' => $user['id'],
+            'nickname' => null,
+            'name' => isset($user['name']) ? $user['name'] : null,
+            'email' => isset($user['email']) ? $user['email'] : null,
+            'avatar' => $avatarUrl . '?type=normal',
+            'avatar_original' => $avatarUrl . '?width=1920',
+            'profileUrl' => isset($user['link']) ? $user['link'] : null,
         ]);
     }
 
@@ -129,7 +129,8 @@ class CSocialLogin_OAuth2_Provider_FacebookProvider extends CSocialLogin_OAuth2_
     /**
      * Set the user fields to request from Facebook.
      *
-     * @param  array  $fields
+     * @param array $fields
+     *
      * @return $this
      */
     public function fields(array $fields) {
@@ -156,5 +157,4 @@ class CSocialLogin_OAuth2_Provider_FacebookProvider extends CSocialLogin_OAuth2_
         $this->reRequest = true;
         return $this;
     }
-
 }

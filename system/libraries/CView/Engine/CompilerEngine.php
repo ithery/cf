@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
-
     /**
      * The Blade compiler instance.
      *
@@ -24,7 +23,6 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
     /**
      * Create a new compiler engine instance.
      *
-     * @param  CView_CompilerAbstract  $compiler
      * @return void
      */
     public function __construct() {
@@ -35,8 +33,9 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
     /**
      * Get the evaluated contents of the view.
      *
-     * @param  string  $path
-     * @param  array  $data
+     * @param string $path
+     * @param array  $data
+     *
      * @return string
      */
     public function get($path, array $data = []) {
@@ -62,8 +61,9 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
     /**
      * Handle a view exception.
      *
-     * @param  \Throwable  $e
-     * @param  int  $obLevel
+     * @param \Throwable $e
+     * @param int        $obLevel
+     *
      * @return void
      *
      * @throws \Throwable
@@ -77,7 +77,8 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
     /**
      * Get the exception message for an exception.
      *
-     * @param  \Throwable  $e
+     * @param \Throwable $e
+     *
      * @return string
      */
     protected function getMessage($e) {
@@ -92,5 +93,4 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
     public function getCompiler() {
         return $this->compiler;
     }
-
 }

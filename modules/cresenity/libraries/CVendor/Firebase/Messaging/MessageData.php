@@ -1,20 +1,12 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 final class CVendor_Firebase_Messaging_MessageData implements \JsonSerializable {
-
     /**
      * @var array
      */
     private $data = [];
 
     private function __construct() {
-        
     }
 
     public static function fromArray(array $data) {
@@ -38,5 +30,4 @@ final class CVendor_Firebase_Messaging_MessageData implements \JsonSerializable 
     private static function isStringable($value) {
         return \is_scalar($value) || (\is_object($value) && \method_exists($value, '__toString'));
     }
-
 }

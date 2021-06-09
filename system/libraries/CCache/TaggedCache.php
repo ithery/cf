@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Jul 28, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Jul 28, 2020
  */
 class CCache_TaggedCache extends CCache_Repository {
-
     use CCache_Trait_RetrievesMultipleKeys {
         putMany as putManyAlias;
     }
@@ -16,15 +16,16 @@ class CCache_TaggedCache extends CCache_Repository {
     /**
      * The tag set instance.
      *
-     * @var \Illuminate\Cache\TagSet
+     * @var CCache_TagSet
      */
     protected $tags;
 
     /**
      * Create a new tagged cache instance.
      *
-     * @param  CCache_DriverAbstract  $driver
-     * @param  CCache_TagSet  $tags
+     * @param CCache_DriverAbstract $driver
+     * @param CCache_TagSet         $tags
+     *
      * @return void
      */
     public function __construct(CCache_DriverAbstract $driver, CCache_TagSet $tags) {
@@ -36,8 +37,9 @@ class CCache_TaggedCache extends CCache_Repository {
     /**
      * Store multiple items in the cache for a given number of seconds.
      *
-     * @param  array  $values
-     * @param  int|null  $ttl
+     * @param array    $values
+     * @param int|null $ttl
+     *
      * @return bool
      */
     public function putMany(array $values, $ttl = null) {
@@ -51,8 +53,9 @@ class CCache_TaggedCache extends CCache_Repository {
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function increment($key, $value = 1) {
@@ -62,8 +65,9 @@ class CCache_TaggedCache extends CCache_Repository {
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function decrement($key, $value = 1) {
@@ -91,7 +95,8 @@ class CCache_TaggedCache extends CCache_Repository {
     /**
      * Get a fully qualified key for a tagged item.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return string
      */
     public function taggedItemKey($key) {
@@ -101,7 +106,8 @@ class CCache_TaggedCache extends CCache_Repository {
     /**
      * Fire an event for this cache instance.
      *
-     * @param  string  $event
+     * @param string $event
+     *
      * @return void
      */
     protected function event($event) {
@@ -116,5 +122,4 @@ class CCache_TaggedCache extends CCache_Repository {
     public function getTags() {
         return $this->tags;
     }
-
 }

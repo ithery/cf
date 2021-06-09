@@ -1,48 +1,54 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Oct 21, 2019, 9:20:25 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Oct 21, 2019, 9:20:25 PM
  */
 use MongoDB\BSON\Binary;
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
 
 abstract class CModel_MongoDB_Model extends CModel {
-
     use CModel_MongoDB_Trait_HybridRelationsTrait;
     use CModel_MongoDB_Trait_EmbedsRelationsTrait;
 
     /**
      * The collection associated with the model.
+     *
      * @var string
      */
     protected $collection;
 
     /**
      * The primary key for the model.
+     *
      * @var string
      */
     protected $primaryKey = '_id';
 
     /**
      * The primary key type.
+     *
      * @var string
      */
     protected $keyType = 'string';
 
     /**
      * The parent relation instance.
-     * @var Relation
+     *
+     * @var CModel_Relation
      */
     protected $parentRelation;
 
     /**
      * Custom accessor for the model's id.
+     *
      * @param mixed $value
+     *
      * @return mixed
      */
     public function getIdAttribute($value = null) {
@@ -151,8 +157,8 @@ abstract class CModel_MongoDB_Model extends CModel {
         if ($key == '_id' && is_string($value)) {
             $builder = $this->newBaseQueryBuilder();
             $value = $builder->convertKey($value);
-        } // Support keys in dot notation.
-        elseif (cstr::contains($key, '.')) {
+        } elseif (cstr::contains($key, '.')) {
+            // Support keys in dot notation.
             if (in_array($key, $this->getDates()) && $value) {
                 $value = $this->fromDateTime($value);
             }
@@ -221,7 +227,9 @@ abstract class CModel_MongoDB_Model extends CModel {
 
     /**
      * Remove one or more fields.
+     *
      * @param mixed $columns
+     *
      * @return int
      */
     public function drop($columns) {
@@ -256,8 +264,10 @@ abstract class CModel_MongoDB_Model extends CModel {
 
     /**
      * Remove one or more values from an array.
+     *
      * @param string $column
-     * @param mixed $values
+     * @param mixed  $values
+     *
      * @return mixed
      */
     public function pull($column, $values) {
@@ -270,9 +280,10 @@ abstract class CModel_MongoDB_Model extends CModel {
 
     /**
      * Append one or more values to the underlying attribute value and sync with original.
+     *
      * @param string $column
-     * @param array $values
-     * @param bool $unique
+     * @param array  $values
+     * @param bool   $unique
      */
     protected function pushAttributeValues($column, array $values, $unique = false) {
         $current = $this->getAttributeFromArray($column) ?: [];
@@ -289,8 +300,9 @@ abstract class CModel_MongoDB_Model extends CModel {
 
     /**
      * Remove one or more values to the underlying attribute value and sync with original.
+     *
      * @param string $column
-     * @param array $values
+     * @param array  $values
      */
     protected function pullAttributeValues($column, array $values) {
         $current = $this->getAttributeFromArray($column) ?: [];
@@ -310,20 +322,22 @@ abstract class CModel_MongoDB_Model extends CModel {
      * @inheritdoc
      */
     public function getForeignKey() {
-        return cstr::snake(CF::class_basename($this)) . '_' . ltrim($this->primaryKey, '_');
+        return cstr::snake(c::classBasename($this)) . '_' . ltrim($this->primaryKey, '_');
     }
 
     /**
      * Set the parent relation.
-     * @param \Illuminate\Database\Eloquent\Relations\Relation $relation
+     *
+     * @param CModel_Relation $relation
      */
-    public function setParentRelation(Relation $relation) {
+    public function setParentRelation(CModel_Relation $relation) {
         $this->parentRelation = $relation;
     }
 
     /**
      * Get the parent relation.
-     * @return \Illuminate\Database\Eloquent\Relations\Relation
+     *
+     * @return CModel_Relation
      */
     public function getParentRelation() {
         return $this->parentRelation;
@@ -354,6 +368,7 @@ abstract class CModel_MongoDB_Model extends CModel {
 
     /**
      * Get the queueable relationships for the entity.
+     *
      * @return array
      */
     public function getQueueableRelations() {
@@ -378,6 +393,7 @@ abstract class CModel_MongoDB_Model extends CModel {
 
     /**
      * Get loaded relations for the instance without parent.
+     *
      * @return array
      */
     protected function getRelationsWithoutParent() {
@@ -391,14 +407,15 @@ abstract class CModel_MongoDB_Model extends CModel {
     /**
      * Insert the given attributes and set the ID on the model.
      *
-     * @param  CModel_Query  $query
-     * @param  array  $attributes
+     * @param CModel_Query $query
+     * @param array        $attributes
+     *
      * @return void
      */
     protected function insertAndSetId(CModel_Query $query, $attributes) {
         if ($this->usesSoftDelete()) {
             if ((!isset($attributes['status'])) || $attributes['status'] === null) {
-                $attributes['status'] = "1";
+                $attributes['status'] = '1';
             }
         }
         parent::insertAndSetId($query, $attributes);
@@ -414,5 +431,4 @@ abstract class CModel_MongoDB_Model extends CModel {
         }
         return parent::__call($method, $parameters);
     }
-
 }

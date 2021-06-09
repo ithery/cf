@@ -1,7 +1,23 @@
-import Cresenity from '@/Cresenity'
+// eslint-disable-next-line no-extend-native
+String.prototype.contains = function (a) {
+    return !!~this.indexOf(a);
+};
 
-window.cresenity = new Cresenity();
-window.cresenity.init();
-document.addEventListener("DOMContentLoaded", function() {
-    window.cresenity.ui.start();
-});
+// eslint-disable-next-line no-extend-native
+String.prototype.toNumber = function () {
+    let n = parseFloat(this);
+    if (!isNaN(n)) {
+        return n;
+    }
+    return 0;
+};
+
+
+import './index.css';
+import Cresenity from '@/Cresenity';
+
+window.Cresenity = Cresenity;
+if (!window.cresenity) {
+    window.cresenity = new Cresenity();
+    window.cresenity.init();
+}

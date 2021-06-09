@@ -1,22 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2019, 12:02:21 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2019, 12:02:21 PM
  */
 
 trait CApp_Trait_VarTrait {
-
     protected static $globalVars;
     protected static $vars;
 
     public static function getGlobalVar($key, $default = null) {
         if (!isset(self::$globalVars[$key])) {
             $db = CDatabase::instance();
-            $value = cdbutils::get_value("select `value` from var where org_id is null and `key`= " . $db->escape($key));
+            $value = cdbutils::get_value('select `value` from var where org_id is null and `key`= ' . $db->escape($key));
             if ($value == null) {
                 $value = $default;
             }
@@ -27,7 +27,7 @@ trait CApp_Trait_VarTrait {
 
     public static function setGlobalVar($key, $val) {
         $db = CDatabase::instance();
-        $row = cdbutils::get_row("select * from var where org_id is null and `key` = " . $db->escape($key));
+        $row = cdbutils::get_row('select * from var where org_id is null and `key` = ' . $db->escape($key));
         $data['value'] = $val;
         if ($row == null) {
             $data['key'] = $key;
@@ -39,7 +39,7 @@ trait CApp_Trait_VarTrait {
         } else {
             $data['updated'] = CApp_Base::now();
             $data['updatedby'] = CApp_Base::username();
-            $db->update('var', $data, array('var_id' => $row->var_id));
+            $db->update('var', $data, ['var_id' => $row->var_id]);
         }
         self::$globalVars[$key] = $val;
         return true;
@@ -50,11 +50,11 @@ trait CApp_Trait_VarTrait {
             $orgId = CApp_Base::orgId();
         }
         if (!isset(self::$vars[$orgId])) {
-            self::$vars[$orgId] = array();
+            self::$vars[$orgId] = [];
         }
         if (!isset(self::$vars[$orgId][$key])) {
             $db = CDatabase::instance();
-            $value = cdbutils::get_value("select `value` from var where org_id = " . $db->escape($orgId) . " and `key`= " . $db->escape($key));
+            $value = cdbutils::get_value('select `value` from var where org_id = ' . $db->escape($orgId) . ' and `key`= ' . $db->escape($key));
             if ($value == null) {
                 $value = $default;
             }
@@ -69,10 +69,10 @@ trait CApp_Trait_VarTrait {
             $orgId = CApp_Base::orgId();
         }
         $db = CDatabase::instance();
-        $row = cdbutils::get_row("select * from var where org_id = " . $db->escape($orgId) . " and `key` = " . $db->escape($key));
+        $row = cdbutils::get_row('select * from var where org_id = ' . $db->escape($orgId) . ' and `key` = ' . $db->escape($key));
         $data['value'] = $val;
         if (!isset(self::$vars[$orgId])) {
-            self::$vars[$orgId] = array();
+            self::$vars[$orgId] = [];
         }
 
         if ($row == null) {
@@ -85,10 +85,9 @@ trait CApp_Trait_VarTrait {
         } else {
             $data['updated'] = CApp_Base::now();
             $data['updatedby'] = CApp_Base::username();
-            $db->update('var', $data, array('var_id' => $row->var_id));
+            $db->update('var', $data, ['var_id' => $row->var_id]);
         }
         self::$vars[$orgId][$key] = $val;
         return true;
     }
-
 }

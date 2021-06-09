@@ -1,12 +1,13 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * base64 helper class.
+ * Base64 helper class.
  */
-class cbase64 {
 
+//@codingStandardsIgnoreStart
+class cbase64 {
     public static function encode($data) {
         return base64_encode($data);
     }
@@ -15,13 +16,10 @@ class cbase64 {
         return base64_decode($data);
     }
 
-    function is_encoded() {
+    public function is_encoded($data) {
         if (preg_match('%^[a-zA-Z0-9/+]*={0,2}$%', $data)) {
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
-
 }
-
-// End cbase64

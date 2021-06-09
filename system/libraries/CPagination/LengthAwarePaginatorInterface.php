@@ -1,19 +1,12 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
-interface CPagination_LengthAwarePaginatorInterface extends CPagination_PaginatorInterface
-{
+interface CPagination_LengthAwarePaginatorInterface extends CPagination_PaginatorInterface {
     /**
      * Create a range of pagination URLs.
      *
-     * @param  int  $start
-     * @param  int  $end
+     * @param int $start
+     * @param int $end
+     *
      * @return array
      */
     public function getUrlRange($start, $end);

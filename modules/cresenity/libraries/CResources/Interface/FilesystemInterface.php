@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 2, 2019, 1:58:45 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 2, 2019, 1:58:45 AM
  */
 interface CResources_Interface_FilesystemInterface {
-
     /**
      * The public visibility setting.
      *
@@ -26,7 +26,8 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Determine if a file exists.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public function exists($path);
@@ -34,7 +35,8 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Get the contents of a file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
@@ -44,9 +46,10 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Write the contents of a file.
      *
-     * @param  string  $path
-     * @param  string|resource  $contents
-     * @param  mixed  $options
+     * @param string          $path
+     * @param string|resource $contents
+     * @param mixed           $options
+     *
      * @return bool
      */
     public function put($path, $contents, $options = []);
@@ -54,7 +57,8 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Get the visibility for the given path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function getVisibility($path);
@@ -62,8 +66,9 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Set the visibility for the given path.
      *
-     * @param  string  $path
-     * @param  string  $visibility
+     * @param string $path
+     * @param string $visibility
+     *
      * @return void
      */
     public function setVisibility($path, $visibility);
@@ -71,8 +76,9 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Prepend to a file.
      *
-     * @param  string  $path
-     * @param  string  $data
+     * @param string $path
+     * @param string $data
+     *
      * @return int
      */
     public function prepend($path, $data);
@@ -80,8 +86,9 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Append to a file.
      *
-     * @param  string  $path
-     * @param  string  $data
+     * @param string $path
+     * @param string $data
+     *
      * @return int
      */
     public function append($path, $data);
@@ -89,7 +96,8 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Delete the file at a given path.
      *
-     * @param  string|array  $paths
+     * @param string|array $paths
+     *
      * @return bool
      */
     public function delete($paths);
@@ -97,8 +105,9 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Copy a file to a new location.
      *
-     * @param  string  $from
-     * @param  string  $to
+     * @param string $from
+     * @param string $to
+     *
      * @return bool
      */
     public function copy($from, $to);
@@ -106,8 +115,9 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Move a file to a new location.
      *
-     * @param  string  $from
-     * @param  string  $to
+     * @param string $from
+     * @param string $to
+     *
      * @return bool
      */
     public function move($from, $to);
@@ -115,7 +125,8 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Get the file size of a given file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return int
      */
     public function size($path);
@@ -123,7 +134,8 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Get the file's last modification time.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return int
      */
     public function lastModified($path);
@@ -131,8 +143,9 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Get an array of all files in a directory.
      *
-     * @param  string|null  $directory
-     * @param  bool  $recursive
+     * @param string|null $directory
+     * @param bool        $recursive
+     *
      * @return array
      */
     public function files($directory = null, $recursive = false);
@@ -140,7 +153,8 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Get all of the files from the given directory (recursive).
      *
-     * @param  string|null  $directory
+     * @param string|null $directory
+     *
      * @return array
      */
     public function allFiles($directory = null);
@@ -148,8 +162,9 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Get all of the directories within a given directory.
      *
-     * @param  string|null  $directory
-     * @param  bool  $recursive
+     * @param string|null $directory
+     * @param bool        $recursive
+     *
      * @return array
      */
     public function directories($directory = null, $recursive = false);
@@ -157,7 +172,8 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Get all (recursive) of the directories within a given directory.
      *
-     * @param  string|null  $directory
+     * @param string|null $directory
+     *
      * @return array
      */
     public function allDirectories($directory = null);
@@ -165,7 +181,8 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Create a directory.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public function makeDirectory($path);
@@ -173,7 +190,8 @@ interface CResources_Interface_FilesystemInterface {
     /**
      * Recursively delete a directory.
      *
-     * @param  string  $directory
+     * @param string $directory
+     *
      * @return bool
      */
     public function deleteDirectory($directory);

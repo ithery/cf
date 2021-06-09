@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 1:00:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 1:00:30 PM
  */
 
 /**
  * Event used when SQL queries for renaming table columns are generated inside CDatabase_Platform.
  */
 class CDatabase_Event_Schema_OnAlterTableRenameColumn extends CDatabase_Event_Schema {
-
     /**
      * @var string
      */
@@ -39,10 +39,10 @@ class CDatabase_Event_Schema_OnAlterTableRenameColumn extends CDatabase_Event_Sc
     private $_sql = [];
 
     /**
-     * @param string                            $oldColumnName
-     * @param CDatabase_Schema_Column           $column
-     * @param CDatabase_Schema_Table_Diff       $tableDiff
-     * @param CDatabase_Platform                $platform
+     * @param string                      $oldColumnName
+     * @param CDatabase_Schema_Column     $column
+     * @param CDatabase_Schema_Table_Diff $tableDiff
+     * @param CDatabase_Platform          $platform
      */
     public function __construct($oldColumnName, CDatabase_Schema_Column $column, CDatabase_Schema_Table_Diff $tableDiff, CDatabase_Platform $platform) {
         $this->_oldColumnName = $oldColumnName;
@@ -99,5 +99,4 @@ class CDatabase_Event_Schema_OnAlterTableRenameColumn extends CDatabase_Event_Sc
     public function getSql() {
         return $this->_sql;
     }
-
 }

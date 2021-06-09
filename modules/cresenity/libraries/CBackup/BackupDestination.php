@@ -1,26 +1,31 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+use Carbon\Carbon;
 
 class CBackup_BackupDestination {
-
-    /** @var CStorage_Adapter */
+    /**
+     * @var CStorage_Adapter
+     */
     protected $disk;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $diskName;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $backupName;
 
-    /** @var Exception */
+    /**
+     * @var Exception
+     */
     public $connectionError;
 
-    /** @var null|\Spatie\Backup\BackupDestination\BackupCollection */
+    /**
+     * @var null|\CBackup_RecordCollection
+     */
     protected $backupCollectionCache = null;
 
     public function __construct(CStorage_Adapter $disk = null, $backupName, $diskName) {
@@ -64,7 +69,9 @@ class CBackup_BackupDestination {
         $destination = $this->backupName . '/' . pathinfo($file, PATHINFO_BASENAME);
         $handle = fopen($file, 'r+');
         $this->disk->getDriver()->writeStream(
-                $destination, $handle, $this->getDiskOptions()
+            $destination,
+            $handle,
+            $this->getDiskOptions()
         );
         if (is_resource($handle)) {
             fclose($handle);
@@ -82,7 +89,8 @@ class CBackup_BackupDestination {
         }
         $files = is_null($this->disk) ? [] : $this->disk->allFiles($this->backupName);
         return $this->backupCollectionCache = CBackup_RecordCollection::createFromFiles(
-                        $this->disk, $files
+            $this->disk,
+            $files
         );
     }
 
@@ -131,6 +139,4 @@ class CBackup_BackupDestination {
         $this->backupCollectionCache = null;
         return $this;
     }
-
- 
 }

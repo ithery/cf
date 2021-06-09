@@ -17,4 +17,12 @@ class CRouting {
         return CRouting_UrlGenerator::instance();
     }
 
+    /**
+     * 
+     * @return CRouting_Router
+     */
+    public static function router() {
+        return CRouting_Router::instance();
+    }
+
 }

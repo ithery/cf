@@ -1,22 +1,26 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 3, 2019, 1:44:25 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 3, 2019, 1:44:25 PM
  */
 class CGit_Model_Commit_Diff extends CGit_ModelAbstract {
-
     protected $lines;
+
     protected $index;
+
     protected $old;
+
     protected $new;
+
     protected $file;
 
     public function addLine($line, $oldNo, $newNo) {
-        $this->lines[] = new DiffLine($line, $oldNo, $newNo);
+        $this->lines[] = new CGit_Model_Commit_DiffLine($line, $oldNo, $newNo);
     }
 
     public function getLines() {
@@ -54,5 +58,4 @@ class CGit_Model_Commit_Diff extends CGit_ModelAbstract {
     public function getFile() {
         return $this->file;
     }
-
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 6:02:05 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 6:02:05 AM
  */
 class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInterface {
-
     /**
      * The database queue instance.
      *
@@ -26,20 +26,20 @@ class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInt
     /**
      * Create a new job instance.
      *
-     * @param  CContainer_Container  $container
-     * @param  CQueue_Queue_DatabaseQueue  $database
-     * @param  \stdClass  $job
-     * @param  string  $connectionName
-     * @param  string  $queue
+     * @param CContainer_Container       $container
+     * @param CQueue_Queue_DatabaseQueue $database
+     * @param \stdClass                  $job
+     * @param string                     $connectionName
+     * @param string                     $queue
+     *
      * @return void
      */
-    
+
     /**
      * The database primary Key
      *
      * @var \stdClass
      */
-  
     public function __construct(CContainer_Container $container, CQueue_Queue_DatabaseQueue $database, $job, $connectionName, $queue) {
         $this->job = $job;
         $this->queue = $queue;
@@ -51,7 +51,8 @@ class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInt
     /**
      * Release the job back into the queue.
      *
-     * @param  int  $delay
+     * @param int $delay
+     *
      * @return mixed
      */
     public function release($delay = 0) {
@@ -96,5 +97,4 @@ class CQueue_Job_DatabaseJob extends CQueue_AbstractJob implements CQueue_JobInt
     public function getRawBody() {
         return $this->job->payload;
     }
-
 }

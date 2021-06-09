@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Deploy_TaskContainer {
-
     /**
      * All of the registered servers.
      *
@@ -89,8 +88,9 @@ class CDevSuite_Deploy_TaskContainer {
      *
      * No data is needed.
      *
-     * @param  string  $path
-     * @param  CDevSuite_Deploy_Compiler  $compiler
+     * @param string                    $path
+     * @param CDevSuite_Deploy_Compiler $compiler
+     *
      * @return void
      */
     public function loadServers($path, CDevSuite_Deploy_Compiler $compiler) {
@@ -100,10 +100,11 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Load the Envoy file into the container.
      *
-     * @param  string  $__path
-     * @param  CDevSuite_Deploy_Compiler  $__compiler
-     * @param  array  $__data
-     * @param  bool  $__serversOnly
+     * @param string                    $__path
+     * @param CDevSuite_Deploy_Compiler $__compiler
+     * @param array                     $__data
+     * @param bool                      $__serversOnly
+     *
      * @return void
      */
     public function load($__path, CDevSuite_Deploy_Compiler $__compiler, array $__data = [], $__serversOnly = false) {
@@ -113,7 +114,9 @@ class CDevSuite_Deploy_TaskContainer {
         // into the current scope so it can register tasks in this task container that
         // is also in the current scope. We will extract this other data into scope.
         $__envoyPath = $this->writeCompiledDeployFile(
-                $__compiler, $__path, $__serversOnly
+            $__compiler,
+            $__path,
+            $__serversOnly
         );
 
         $__container = $this;
@@ -135,19 +138,20 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Write the compiled Envoy file to disk.
      *
-     * @param  CDevSuite_Deploy_Compiler  $compiler
-     * @param  string  $path
-     * @param  bool  $serversOnly
+     * @param CDevSuite_Deploy_Compiler $compiler
+     * @param string                    $path
+     * @param bool                      $serversOnly
+     *
      * @return string
      */
     protected function writeCompiledDeployFile($compiler, $path, $serversOnly) {
-        $deployPath = DOCROOT.'temp/deploy/blade/' . '/deploy' . md5_file($path) . '.php';
-        if(!is_dir(dirname($deployPath))) {
-            CFile::makeDirectory(dirname($deployPath),0755,true);
+        $deployPath = DOCROOT . 'temp/deploy/blade/' . '/deploy' . md5_file($path) . '.php';
+        if (!is_dir(dirname($deployPath))) {
+            CFile::makeDirectory(dirname($deployPath), 0755, true);
         }
         file_put_contents(
-                $deployPath,
-                $compiler->compile(file_get_contents($path), $serversOnly)
+            $deployPath,
+            $compiler->compile(file_get_contents($path), $serversOnly)
         );
 
         return $deployPath;
@@ -165,7 +169,7 @@ class CDevSuite_Deploy_TaskContainer {
             };
 
             $script = $this->trimSpaces(
-                    preg_replace_callback("/(\s*)@run\('(.*)'\)/", $callback, $script)
+                preg_replace_callback("/(\s*)@run\('(.*)'\)/", $callback, $script)
             );
         }
     }
@@ -173,7 +177,8 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Register the array of servers with the container.
      *
-     * @param  array  $servers
+     * @param array $servers
+     *
      * @return void
      */
     public function servers(array $servers) {
@@ -183,7 +188,8 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Get the IP address for a server.
      *
-     * @param  string  $server
+     * @param string $server
+     *
      * @return string|null
      *
      * @throws \Exception
@@ -217,14 +223,15 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Import the given file into the container.
      *
-     * @param  string  $file
-     * @param  array  $data
+     * @param string $file
+     * @param array  $data
+     *
      * @return void
      */
     public function import($file, array $data = []) {
         $data = carr::except($data, [
-                    '__path', '__dir', '__compiler', '__data', '__serversOnly',
-                    '__envoyPath', '__container', 'this',
+            '__path', '__dir', '__compiler', '__data', '__serversOnly',
+            '__envoyPath', '__container', 'this',
         ]);
 
         if (($path = $this->resolveImportPath($file)) === false) {
@@ -237,7 +244,8 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Resolve the import path for the given file.
      *
-     * @param  string  $file
+     * @param string $file
+     *
      * @return string|bool
      */
     protected function resolveImportPath($file) {
@@ -257,8 +265,9 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Share the given piece of data across all tasks.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function share($key, $value) {
@@ -277,7 +286,8 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Get the given macro from the container.
      *
-     * @param  string  $macro
+     * @param string $macro
+     *
      * @return array|null
      */
     public function getMacro($macro) {
@@ -287,7 +297,8 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Get the macro options for the given macro.
      *
-     * @param  string  $macro
+     * @param string $macro
+     *
      * @return array
      */
     public function getMacroOptions($macro) {
@@ -306,9 +317,10 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Get a Task instance by the given name.
      *
-     * @param  string  $task
-     * @param  array  $macroOptions
-     * @return \Laravel\Envoy\Task
+     * @param string $task
+     * @param array  $macroOptions
+     *
+     * @return \CDevSuite_Deploy_Task
      *
      * @throws \Exception
      */
@@ -331,7 +343,8 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Get the task options for the given task.
      *
-     * @param  string  $task
+     * @param string $task
+     *
      * @return array
      */
     public function getTaskOptions($task) {
@@ -341,7 +354,8 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Get the IP addresses of the servers specified on the options.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return array
      */
     protected function getServers(array $options) {
@@ -350,15 +364,16 @@ class CDevSuite_Deploy_TaskContainer {
         }
 
         return carr::flatten(array_map(function ($name) {
-                            return $this->getServer($name);
-                        }, (array) $options['on']));
+            return $this->getServer($name);
+        }, (array) $options['on']));
     }
 
     /**
      * Begin defining a macro.
      *
-     * @param  string  $macro
-     * @param  array  $options
+     * @param string $macro
+     * @param array  $options
+     *
      * @return void
      */
     public function startMacro($macro, array $options = []) {
@@ -381,8 +396,9 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Begin defining a task.
      *
-     * @param  string  $task
-     * @param  array  $options
+     * @param string $task
+     * @param array  $options
+     *
      * @return void
      */
     public function startTask($task, array $options = []) {
@@ -394,7 +410,8 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Merge the option array over the default options.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return array
      */
     protected function mergeDefaultOptions(array $options) {
@@ -421,7 +438,8 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Register an after-task callback.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return void
      */
     public function after(Closure $callback) {
@@ -440,7 +458,8 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Register an finished-task callback.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return void
      */
     public function finished(Closure $callback) {
@@ -459,7 +478,8 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Register an error-task callback.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return void
      */
     public function error(Closure $callback) {
@@ -478,11 +498,11 @@ class CDevSuite_Deploy_TaskContainer {
     /**
      * Remove the leading space from the lines of a value.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function trimSpaces($value) {
         return implode(PHP_EOL, array_map('trim', explode(PHP_EOL, $value)));
     }
-
 }

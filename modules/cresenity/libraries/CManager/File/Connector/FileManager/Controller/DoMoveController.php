@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 11, 2019, 10:02:39 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 11, 2019, 10:02:39 PM
  */
 use CManager_File_Connector_FileManager_FM as FM;
 
 class CManager_File_Connector_FileManager_Controller_DoMoveController extends CManager_File_Connector_FileManager_AbstractController {
-
     /**
      * Get list of folders as json to populate treeview.
      *
@@ -39,8 +39,7 @@ class CManager_File_Connector_FileManager_Controller_DoMoveController extends CM
             } else {
                 $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileWasMoving($old_file->path(), $new_file->path()));
             }
-        };
+        }
         echo parent::$successResponse;
     }
-
 }

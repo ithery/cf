@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CTemporary_Instance {
-
     protected static $instance;
 
     public static function instance($disk = null) {
@@ -29,7 +22,6 @@ class CTemporary_Instance {
     }
 
     public function disk() {
-
         return CStorage::instance()->disk($this->disk);
     }
 
@@ -38,29 +30,27 @@ class CTemporary_Instance {
     }
 
     /**
-     * 
      * @param string $folder
-     * @param type $filename
+     * @param type   $filename
+     * @param mixed  $content
+     *
      * @return string
      */
     public function put($content, $folder = null, $filename = null) {
         if ($folder == null) {
-            $folder = "default";
+            $folder = 'default';
         }
         if ($filename == null) {
             $filename = date('Ymd') . cutils::randmd5();
         }
-
-
 
         $file = CTemporary::getPath($folder, $filename);
         $this->disk()->put($file, $content);
         return $file;
     }
 
-    public function getDirectory() {
-            $path = DOCROOT . "temp" . DIRECTORY_SEPARATOR;
-
+    public function getDirectory($folder = null) {
+        $path = DOCROOT . 'temp' . DIRECTORY_SEPARATOR;
 
         if ($folder != null) {
             $path .= $folder . DIRECTORY_SEPARATOR;
@@ -71,5 +61,4 @@ class CTemporary_Instance {
         }
         return $path;
     }
-
 }

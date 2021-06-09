@@ -1,7 +1,6 @@
 <?php
 
 class CVendor_Shipper {
-
     private $key = 'c46eacd847a2ab8d4459d3e54c8694dc';
     private $url;
     private $curl;
@@ -63,7 +62,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/merchants?apiKey=' . $this->key,
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -98,7 +97,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/merchants?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -145,7 +144,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/merchants/' . $merchantId . '?apiKey=' . $this->key,
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -195,7 +194,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/subscriptions?apiKey=' . $this->key,
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -226,7 +225,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/countries?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -257,7 +256,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/provinces?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -293,7 +292,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/cities?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -324,7 +323,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/suburbs?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -355,7 +354,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/areas?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -385,7 +384,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/details/' . $value . '?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -410,32 +409,32 @@ class CVendor_Shipper {
     /**
      * Retrieve every rates based on the submitted query string parameters. This endpoint requires area ID for its o and d parameter
      *
+     * @param integer $origin      origin area ID. Obtained from getAreas.
+     * @param integer $destination destination area ID. Obtained from getAreas.
+     * @param integer $weight      package's weight (float in kilograms e.g. 1.5). The allowance for each logistic will be calculated automatically.
+     * @param integer $length      package's length (integer in centimeter e.g 10)
+     * @param integer $width       package's width (integer in centimeter e.g 10)
+     * @param integer $height      package's height (integer in centimeter e.g 10)
+     * @param integer $value       package's value/price (integer in IDR e.g 100000)
+     * @param integer $type        package type ID (1 for documents; 2 for small packages[DEFAULT]; and 3 for medium-sized packages)
+     * @param integer $cod         is this a Cash on Delivery shipment? (1 for yes; 0 for no[DEFAULT])
+     * @param integer $order       is this a Rate Checking only or is this for a valid Transaction Order? (1 for yes; 0 for no[DEFAULT])
+     *
      * @method getDomesticRates
      *
-     * @param  integer           $origin      origin area ID. Obtained from getAreas.
-     * @param  integer           $destination destination area ID. Obtained from getAreas.
-     * @param  integer           $weight      package's weight (float in kilograms e.g. 1.5). The allowance for each logistic will be 												 calculated automatically.
-     * @param  integer           $length      package's length (integer in centimeter e.g 10)
-     * @param  integer           $width       package's width (integer in centimeter e.g 10)
-     * @param  integer           $height      package's height (integer in centimeter e.g 10)
-     * @param  integer           $value       package's value/price (integer in IDR e.g 100000)
-     * @param  integer           $type        package type ID (1 for documents; 2 for small packages[DEFAULT]; and 3 for medium-sized packages)
-     * @param  integer           $cod         is this a Cash on Delivery shipment? (1 for yes; 0 for no[DEFAULT])
-     * @param  integer           $order       is this a Rate Checking only or is this for a valid Transaction Order?																 (1 for yes; 0 for no[DEFAULT])
-     *
-     * @return Object                        JSON Results
+     * @return object JSON Results
      */
     public function getDomesticRates(
-    $origin
-    , $destination
-    , $weight
-    , $length
-    , $width
-    , $height
-    , $value
-    , $type = 2
-    , $cod = 0
-    , $order = 0
+        $origin,
+        $destination,
+        $weight,
+        $length,
+        $width,
+        $height,
+        $value,
+        $type = 2,
+        $cod = 0,
+        $order = 0
     ) {
         $method = 'GET';
         $options = [
@@ -454,7 +453,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/domesticRates?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -479,28 +478,28 @@ class CVendor_Shipper {
     /**
      * Retrieve rate for International shipment
      *
+     * @param integer $destination destination country ID. Obtained from getCountries.
+     * @param integer $weight      package's weight (double in kilograms e.g. 1.40).
+     * @param integer $length      package's length (integer in centimeter e.g 10)
+     * @param integer $width       package's width (integer in centimeter e.g 10)
+     * @param integer $height      package's height (integer in centimeter e.g 10)
+     * @param integer $value       package's value/price (integer in IDR e.g 100000)
+     * @param integer $type        package type ID (1 for documents; 2 for small parcels[DEFAULT]; and 3 for medium-sized parcels)
+     * @param integer $order       is this a Rate Checking only or is this for a valid Transaction Order? (1 for yes; 0 for no[DEFAULT])
+     *
      * @method getDomesticRates
      *
-     * @param  integer           $destination destination country ID. Obtained from getCountries.
-     * @param  integer           $weight      package's weight (double in kilograms e.g. 1.40).
-     * @param  integer           $length      package's length (integer in centimeter e.g 10)
-     * @param  integer           $width       package's width (integer in centimeter e.g 10)
-     * @param  integer           $height      package's height (integer in centimeter e.g 10)
-     * @param  integer           $value       package's value/price (integer in IDR e.g 100000)
-     * @param  integer           $type        package type ID (1 for documents; 2 for small parcels[DEFAULT]; and 3 for medium-sized parcels)
-     * @param  integer           $order       is this a Rate Checking only or is this for a valid Transaction Order?																 (1 for yes; 0 for no[DEFAULT])
-     *
-     * @return Object                         JSON Results
+     * @return object JSON Results
      */
     public function getInternationalRates(
-    $destination
-    , $weight
-    , $length
-    , $width
-    , $height
-    , $value
-    , $type = 2
-    , $order = 0
+        $destination,
+        $weight,
+        $length,
+        $width,
+        $height,
+        $value,
+        $type = 2,
+        $order = 0
     ) {
         $method = 'GET';
         $options = [
@@ -517,7 +516,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/intlRates?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -545,58 +544,58 @@ class CVendor_Shipper {
      * The id returned is not our tracking ID.
      * You need to retrieve the tracking ID from getOrder and use that as actual order ID.
      *
+     * @param integer       $origin               origin area ID
+     * @param integer       $destination          destination area ID
+     * @param float/integer $weight               package's weight
+     * @param float/integer $length               package's length
+     * @param float/integer $width                package's width
+     * @param float/integer $height               package's height
+     * @param integer       $value                item's price (IDR e.g. 100000)
+     * @param integer       $rateId               rate ID as you choose from rate search result
+     * @param string        $consignerName        consigner's name
+     * @param string        $consignerPhoneNumber consigner's phone number (with country code)
+     * @param string        $originAddress        origin address
+     * @param string        $originDirection      hints of the location e.g. in front of drug store K-12, etc (can be empty)
+     * @param string        $consigneeName        consignee's name
+     * @param string        $consigneePhoneNumber consignee's phone number (with country code)
+     * @param string        $destinationAddress   destination address
+     * @param string        $destinationDirection hints of the location e.g. in front of drug store K-1, etc (can be empty)
+     * @param string        $itemName             item name - ie: Shoes
+     * @param string        $contents             item description - ie: One pair of red shoes
+     * @param integer       $useInsurance         is Insurance needed? (1 for yes; 0 for no). If compulsory insurance is flagged by system, then this does not make any difference
+     * @param integer       $packageType          package type ID (1 for documents; 2 for small packages; 3 for medium-sized packages)
+     * @param string        $externalId           the merchant's self-tailored order ID (optional - Unique)
+     * @param string        $paymentType          payment type for the user's orders. Valid values are currently cash and the default value : postpay (optional)
+     * @param integer       $cod                  is this a COD order? Please note there is a fee for COD Order. Accepted paymentType for COD is postpay. (1 for yes; 0 for no [default])
+     *
      * @method domesticOrder
      *
-     * @param  integer        		$origin               origin area ID
-     * @param  integer        		$destination          destination area ID
-     * @param  float/integer        $weight               package's weight
-     * @param  float/integer        $length               package's length
-     * @param  float/integer        $width                package's width
-     * @param  float/integer        $height               package's height
-     * @param  integer        		$value                item's price (IDR e.g. 100000)
-     * @param  integer        		$rateId               rate ID as you choose from rate search result
-     * @param  string        		$consignerName        consigner's name
-     * @param  string        		$consignerPhoneNumber consigner's phone number (with country code)
-     * @param  string        		$originAddress        origin address
-     * @param  string        		$originDirection      hints of the location e.g. in front of drug store K-12, etc (can be empty)
-     * @param  string        		$consigneeName        consignee's name
-     * @param  string        		$consigneePhoneNumber consignee's phone number (with country code)
-     * @param  string        		$destinationAddress   destination address
-     * @param  string        		$destinationDirection hints of the location e.g. in front of drug store K-1, etc (can be empty)
-     * @param  string        		$itemName             item name - ie: Shoes
-     * @param  string        		$contents             item description - ie: One pair of red shoes
-     * @param  integer        		$useInsurance         is Insurance needed? (1 for yes; 0 for no). If compulsory insurance is flagged														 by system, then this does not make any difference
-     * @param  integer        		$packageType          package type ID (1 for documents; 2 for small packages; 3 for medium-sized packages)
-     * @param  string        		$externalId           the merchant's self-tailored order ID (optional - Unique)
-     * @param  string        		$paymentType          payment type for the user's orders.																									 Valid values are currently cash and the default value : postpay (optional)
-     * @param  integer        		$cod                  is this a COD order? Please note there is a fee for COD Order.																		 Accepted paymentType for COD is postpay. (1 for yes; 0 for no [default])
-     *
-     * @return Object                                     JSON Results
+     * @return object JSON Results
      */
     public function domesticOrder(
-    $origin
-    , $destination
-    , $weight = ''
-    , $length = ''
-    , $width = ''
-    , $height = ''
-    , $value
-    , $rateId
-    , $consignerName = ''
-    , $consignerPhoneNumber = ''
-    , $originAddress
-    , $originDirection = ''
-    , $consigneeName
-    , $consigneePhoneNumber
-    , $destinationAddress
-    , $destinationDirection = ''
-    , $itemName
-    , $contents = ''
-    , $useInsurance = 0
-    , $packageType
-    , $externalId = ''
-    , $paymentType = 'postpay'
-    , $cod = 0
+        $origin,
+        $destination,
+        $weight = '',
+        $length = '',
+        $width = '',
+        $height = '',
+        $value = null,
+        $rateId = null,
+        $consignerName = '',
+        $consignerPhoneNumber = '',
+        $originAddress = null,
+        $originDirection = '',
+        $consigneeName = null,
+        $consigneePhoneNumber = null,
+        $destinationAddress = null,
+        $destinationDirection = '',
+        $itemName = null,
+        $contents = '',
+        $useInsurance = 0,
+        $packageType = null,
+        $externalId = '',
+        $paymentType = 'postpay',
+        $cod = 0
     ) {
         $method = 'POST';
         $options = [
@@ -647,7 +646,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/orders/domestics?apiKey=' . $this->key,
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -676,66 +675,66 @@ class CVendor_Shipper {
      * The id returned is not our tracking ID.
      * You need to retrieve the tracking ID from getOrder and use that as actual order ID.
      *
+     * @param integer       $origin               origin area ID
+     * @param integer       $destination          destination country ID
+     * @param float/integer $weight               package's weight
+     * @param float/integer $length               package's length
+     * @param float/integer $width                package's width
+     * @param float/integer $height               package's height
+     * @param integer       $value                item's price (IDR e.g. 100000)
+     * @param integer       $rateId               rate ID as you choose from rate search result
+     * @param string        $consignerName        consigner's name
+     * @param string        $consignerPhoneNumber consigner's phone number (with country code)
+     * @param string        $originAddress        origin address
+     * @param string        $originDirection      hints of the location e.g. in front of drug store K-12, etc (can be empty)
+     * @param string        $consigneeName        consignee's name
+     * @param string        $consigneePhoneNumber consignee's phone number (with country code)
+     * @param string        $destinationAddress   destination address
+     * @param string        $destinationDirection hints of the location e.g. in front of drug store K-1, etc (can be empty)
+     * @param string        $destinationArea      destination area (can be empty)
+     * @param string        $destinationSuburb    destination suburb (can be empty)
+     * @param string        $destinationCity      destination city (can be empty)
+     * @param string        $destinationProvince  destination province (can be empty)
+     * @param string        $destinationPostcode  destination postcode (can be empty)
+     * @param string        $itemName             item name - ie: Shoes
+     * @param string        $contents             item description - ie: One pair of red shoes
+     * @param integer       $useInsurance         is Insurance needed? (1 for yes; 0 for no). If compulsory insurance is flagged by system, then this does not make any difference
+     * @param integer       $packageType          package type ID (1 for documents; 2 for small packages; 3 for medium-sized packages)
+     * @param string        $externalId           the merchant's self-tailored order ID (optional - Unique)
+     * @param string        $paymentType          payment type for the user's orders. Valid values are currently cash and the default value : postpay (optional)
+     *
      * @method internationalOrder
      *
-     * @param  integer        		$origin               origin area ID
-     * @param  integer        		$destination          destination country ID
-     * @param  float/integer        $weight               package's weight
-     * @param  float/integer        $length               package's length
-     * @param  float/integer        $width                package's width
-     * @param  float/integer        $height               package's height
-     * @param  integer        		$value                item's price (IDR e.g. 100000)
-     * @param  integer        		$rateId               rate ID as you choose from rate search result
-     * @param  string        		$consignerName        consigner's name
-     * @param  string        		$consignerPhoneNumber consigner's phone number (with country code)
-     * @param  string        		$originAddress        origin address
-     * @param  string        		$originDirection      hints of the location e.g. in front of drug store K-12, etc (can be empty)
-     * @param  string        		$consigneeName        consignee's name
-     * @param  string        		$consigneePhoneNumber consignee's phone number (with country code)
-     * @param  string        		$destinationAddress   destination address
-     * @param  string        		$destinationDirection hints of the location e.g. in front of drug store K-1, etc (can be empty)
-     * @param  string				$destinationArea	  destination area (can be empty)
-     * @param  string				$destinationSuburb	  destination suburb (can be empty)
-     * @param  string				$destinationCity	  destination city (can be empty)
-     * @param  string				$destinationProvince  destination province (can be empty)
-     * @param  string				$destinationPostcode  destination postcode (can be empty)
-     * @param  string        		$itemName             item name - ie: Shoes
-     * @param  string        		$contents             item description - ie: One pair of red shoes
-     * @param  integer        		$useInsurance         is Insurance needed? (1 for yes; 0 for no). If compulsory insurance is flagged														 by system, then this does not make any difference
-     * @param  integer        		$packageType          package type ID (1 for documents; 2 for small packages; 3 for medium-sized packages)
-     * @param  string        		$externalId           the merchant's self-tailored order ID (optional - Unique)
-     * @param  string        		$paymentType          payment type for the user's orders.																									 Valid values are currently cash and the default value : postpay (optional)
-     *
-     * @return Object                                     JSON Results
+     * @return object JSON Results
      */
     public function internationalOrder(
-    $origin
-    , $destination
-    , $weight = ''
-    , $length = ''
-    , $width = ''
-    , $height = ''
-    , $value
-    , $rateId
-    , $consignerName = ''
-    , $consignerPhoneNumber = ''
-    , $originAddress
-    , $originDirection = ''
-    , $consigneeName
-    , $consigneePhoneNumber
-    , $destinationAddress
-    , $destinationDirection = ''
-    , $destinationArea
-    , $destinationSuburb
-    , $destinationCity
-    , $destinationProvince
-    , $destinationPostcode
-    , $itemName
-    , $contents = ''
-    , $useInsurance = 0
-    , $packageType
-    , $externalId = ''
-    , $paymentType = 'postpay'
+        $origin,
+        $destination,
+        $weight = '',
+        $length = '',
+        $width = '',
+        $height = '',
+        $value = null,
+        $rateId = null,
+        $consignerName = '',
+        $consignerPhoneNumber = '',
+        $originAddress = null,
+        $originDirection = '',
+        $consigneeName = null,
+        $consigneePhoneNumber = null,
+        $destinationAddress = null,
+        $destinationDirection = '',
+        $destinationArea = null,
+        $destinationSuburb = null,
+        $destinationCity = null,
+        $destinationProvince = null,
+        $destinationPostcode = null,
+        $itemName = null,
+        $contents = '',
+        $useInsurance = 0,
+        $packageType = null,
+        $externalId = '',
+        $paymentType = 'postpay'
     ) {
         $method = 'POST';
         $options = [
@@ -790,7 +789,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/orders/internationals',
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -816,11 +815,11 @@ class CVendor_Shipper {
     /**
      * Retrieves tracking ID of the order with the provided ID
      *
+     * @param integer $orderId the ID retrieved after creating the order
+     *
      * @method getOrder
      *
-     * @param  integer   $orderId	the ID retrieved after creating the order
-     *
-     * @return Object            	JSON Results
+     * @return object JSON Results
      */
     public function getOrder($orderId) {
         $method = 'GET';
@@ -831,7 +830,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/orders?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -856,12 +855,12 @@ class CVendor_Shipper {
     /**
      * Activate/deactivate an order. Such activation will initiate Shipper’s pickup process.
      *
+     * @param string  $orderId order ID obtained from Order Creation or order tracking ID
+     * @param integer $active  integer (0 for order deactivation and 1 for its activation)
+     *
      * @method orderActivation
      *
-     * @param  string          	$orderId	order ID obtained from Order Creation or order tracking ID
-     * @param  integer          $active  	integer (0 for order deactivation and 1 for its activation)
-     *
-     * @return Object                   	JSON Results
+     * @return object JSON Results
      */
     public function orderActivation($orderId, $active) {
         $method = 'PUT';
@@ -871,7 +870,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/activations/' . $orderId . '?apiKey=' . $this->key,
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -897,11 +896,11 @@ class CVendor_Shipper {
     /**
      * Retrieves an order’s detail
      *
+     * @param string $orderId order ID obtained from Order Creation or order tracking ID
+     *
      * @method getOrderDetail
      *
-     * @param  string         $orderId       order ID obtained from Order Creation or order tracking ID
-     *
-     * @return Object                        JSON Result
+     * @return object JSON Result
      */
     public function getOrderDetail($orderId) {
         $method = 'GET';
@@ -911,7 +910,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/orders/' . $orderId . '?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -936,12 +935,12 @@ class CVendor_Shipper {
     /**
      * Retrieve Label Checksum from getOrderDetail
      *
+     * @param string $orderId       order ID obatined from Order Creation or order tracking ID
+     * @param string $labelChecksum labelChecksum obtained from getOrderDetail
+     *
      * @method getLabelChecksum
      *
-     * @param  string           $orderId       order ID obatined from Order Creation or order tracking ID
-     * @param  string           $labelChecksum labelChecksum obtained from getOrderDetail
-     *
-     * @return string                          Label Checksum URL
+     * @return string Label Checksum URL
      */
     public function getLabelChecksum($orderId, $labelChecksum) {
         if ($this->environment == 'dev' || $this->environment == 'development') {
@@ -953,11 +952,11 @@ class CVendor_Shipper {
     /**
      * Generate Airway Bill number of the order with the provided external ID or the order ID (you must provide either one of those)
      *
+     * @param array $options eid (external ID) or oid (order ID)
+     *
      * @method generateAWB
      *
-     * @param  array      $options    eid (external ID) or oid (order ID)
-     *
-     * @return Object                  JSON Results
+     * @return object JSON Results
      */
     public function generateAWB($options) {
         $method = 'GET';
@@ -980,7 +979,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/awbs/generate?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -1005,11 +1004,11 @@ class CVendor_Shipper {
     /**
      * Retrieves Airway Bill number of the order with the provided external ID or the order ID (you must provide either one of those)
      *
+     * @param array $options eid (external ID) or oid (order ID)
+     *
      * @method getAWB
      *
-     * @param  array      $options    eid (external ID) or oid (order ID)
-     *
-     * @return Object                  JSON Results
+     * @return object JSON Results
      */
     public function getAWB($options) {
         $method = 'GET';
@@ -1032,7 +1031,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/awbs?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -1057,12 +1056,12 @@ class CVendor_Shipper {
     /**
      * Updates an order’s AWB number
      *
+     * @param string $orderId   order ID obtained from Order Creation or order tracking ID
+     * @param string $awbNumber airway bill number
+     *
      * @method updateAWB
      *
-     * @param  string    $orderId   order ID obtained from Order Creation or order tracking ID
-     * @param  string    $awbNumber airway bill number
-     *
-     * @return Object               JSON Results
+     * @return object JSON Results
      */
     public function updateAWB($orderId, $awbNumber) {
         $method = 'PUT';
@@ -1072,7 +1071,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/awbs/' . $orderId . '?apiKey=' . $this->key,
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -1098,15 +1097,15 @@ class CVendor_Shipper {
     /**
      * Update an order’s package’s weight and dimension.
      *
+     * @param string  $orderId order ID obtained from Order Creation or order tracking ID
+     * @param integer $weight  [description]
+     * @param integer $length  [description]
+     * @param integer $height  [description]
+     * @param integer $width   [description]
+     *
      * @method updateOrder
      *
-     * @param  string      $orderId order ID obtained from Order Creation or order tracking ID
-     * @param  integer      $weight  [description]
-     * @param  integer      $length  [description]
-     * @param  integer      $height  [description]
-     * @param  integer      $width   [description]
-     *
-     * @return Object               JSON Results
+     * @return object JSON Results
      */
     public function updateOrder($orderId, $weight, $length, $height, $width) {
         $method = 'PUT';
@@ -1119,7 +1118,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/orders/' . $orderId . '?apiKey=' . $this->key,
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -1145,11 +1144,11 @@ class CVendor_Shipper {
     /**
      * Cancel an order.
      *
+     * @param string $orderId order ID obtained from Order Creation or order tracking ID
+     *
      * @method cancelOrder
      *
-     * @param  string      $orderId  order ID obtained from Order Creation or order tracking ID
-     *
-     * @return Object               JSON Results
+     * @return object JSON Results
      */
     public function cancelOrder($orderId) {
         $method = 'PUT';
@@ -1159,7 +1158,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/orders/' . $orderId . '/cancel/?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -1184,12 +1183,12 @@ class CVendor_Shipper {
     /**
      * Update subscription data in orders so you can determine which orders have the benefit of subscription.
      *
+     * @param string $orderId order ID or order tracking ID
+     * @param array  $options customAWB or autoTrack
+     *
      * @method updateSubscription
      *
-     * @param  string             $orderId    order ID or order tracking ID
-     * @param  array      		  $options    customAWB or autoTrack
-     *
-     * @return Object                        JSON Results
+     * @return object JSON Results
      */
     public function updateSubscription($orderId, $options) {
         $method = 'PUT';
@@ -1212,7 +1211,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/subscriptions/' . $orderId . '?apiKey=' . $this->key,
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -1243,16 +1242,16 @@ class CVendor_Shipper {
      * The orders are those that are sent by the user.
      * Date format is UTC time.
      *
+     * @param string $merchantId merchant’s ID
+     * @param string $phone      consigner’s phone number with country code e.g. +6281112343231
+     * @param string $limit      how many orders will be displayed in single response. Default value : 20.
+     * @param string $startDate  retrieve orders created at and after the date in UTC time (YYYY-MM-DDThh:mm:ss+00:00).
+     * @param string $endDate    retrieve orders created at and before the date in UTC time (YYYY-MM-DDThh:mm:ss+00:00).
+     * @param string $page       page number to be shown from total number of possible pages in this request (totalRecord / limit)
+     *
      * @method getOrderHistory
      *
-     * @param  string          $merchantId merchant’s ID
-     * @param  string          $phone      consigner’s phone number with country code e.g. +6281112343231
-     * @param  string          $limit      how many orders will be displayed in single response. Default value : 20.
-     * @param  string          $startDate  retrieve orders created at and after the date in UTC time (YYYY-MM-DDThh:mm:ss+00:00).
-     * @param  string          $endDate    retrieve orders created at and before the date in UTC time (YYYY-MM-DDThh:mm:ss+00:00).
-     * @param  string          $page       page number to be shown from total number of possible pages in this request (totalRecord / limit) 
-     *
-     * @return Object                      JSON Results
+     * @return object JSON Results
      */
     public function getOrderHistory($merchantId = '', $phone = '', $limit = '', $startDate = '', $endDate = '', $page = '') {
         $method = 'GET';
@@ -1260,7 +1259,7 @@ class CVendor_Shipper {
             'apiKey' => $this->key,
         ];
 
-        if ($merchantID) {
+        if ($merchantId) {
             $options['merchantID'] = $merchantId;
         }
         if ($phone) {
@@ -1281,7 +1280,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/histories/orders?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -1306,11 +1305,11 @@ class CVendor_Shipper {
     /**
      * Retrieve every available logistic in a city.
      *
+     * @param integer $cityId City ID
+     *
      * @method getLogistics
      *
-     * @param  integer       $cityId City ID
-     *
-     * @return Object               JSON Results
+     * @return object JSON Results
      */
     public function getLogistics($cityId) {
         $method = 'GET';
@@ -1320,7 +1319,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/logistics/' . $cityId . '?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -1347,7 +1346,7 @@ class CVendor_Shipper {
      *
      * @method track
      *
-     * @return Object JSON Results
+     * @return object JSON Results
      */
     public function track() {
         $method = 'GET';
@@ -1357,7 +1356,7 @@ class CVendor_Shipper {
 
         curl_setopt_array($this->curl, [
             CURLOPT_URL => $this->url . 'public/v1/logistics/status?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => TRUE,
+            CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 30,
@@ -1384,10 +1383,9 @@ class CVendor_Shipper {
     }
 
     private function error($err) {
-        return (Object) [
-                    'status' => 'fail',
-                    'data' => $err,
+        return (object) [
+            'status' => 'fail',
+            'data' => $err,
         ];
     }
-
 }

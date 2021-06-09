@@ -1,10 +1,11 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 12, 2019, 12:42:33 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 12, 2019, 12:42:33 AM
  */
 ?>
 
@@ -85,16 +86,19 @@ defined('SYSPATH') OR die('No direct access allowed.');
 <script>
     $(document).ready(function () {
         renderResizedValues($("#width_display").val(), $("#height_display").val());
-        $("#resize").resizable({
-        aspectRatio: <?php echo $fm->config('resize_aspectRatio')?'true':'false'; ?>,
-        <?php if ($fm->config('resize_containment')): ?>
-        containment: "#containment",
-        <?php endif; ?>
-        handles: "n, e, s, w, se, sw, ne, nw",
-                resize: function (event, ui) {
+        let resizeAspectRatio = <?php echo $fm->config('resize_aspectRatio') ? 'true' : 'false'; ?>;
+        let resizeOption = {
+            aspectRatio: resizeAspectRatio,
+            handles: "n, e, s, w, se, sw, ne, nw",
+            resize: function (event, ui) {
                 renderResizedValues(ui.size.width, ui.size.height);
-                }
-        });
+            }
+        };
+
+        <?php if ($fm->config('resize_containment')): ?>
+            resizeOption.containment= "#containment";
+        <?php endif; ?>
+        $("#resize").resizable(resizeOption);
     });
     $('#width_display, #height_display').change(function () {
         var newWidth = $("#width_display").val();

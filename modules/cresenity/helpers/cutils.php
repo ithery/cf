@@ -1,9 +1,9 @@
 <?php
 
+//@codingStandardsIgnoreStart
 class cutils {
-
     public static function indent($n, $char = "\t") {
-        $res = "";
+        $res = '';
         for ($i = 0; $i < $n; $i++) {
             $res .= $char;
         }
@@ -14,27 +14,27 @@ class cutils {
         return "\r\n";
     }
 
-    function add_date($givendate, $day = 0, $mth = 0, $yr = 0) {
+    public function add_date($givendate, $day = 0, $mth = 0, $yr = 0) {
         $cd = strtotime($givendate);
         $newdate = date('Y-m-d h:i:s', mktime(date('h', $cd), date('i', $cd), date('s', $cd), date('m', $cd) + $mth, date('d', $cd) + $day, date('Y', $cd) + $yr));
         return $newdate;
     }
 
-    public static function get_month($strdate = "") {
+    public static function get_month($strdate = '') {
         if (strlen($strdate) > 0) {
             return date('m', strtotime($strdate));
         }
         return date('m');
     }
 
-    public static function get_year($strdate = "") {
+    public static function get_year($strdate = '') {
         if (strlen($strdate) > 0) {
             return date('Y', strtotime($strdate));
         }
         return date('Y');
     }
 
-    public static function get_day($strdate = "") {
+    public static function get_day($strdate = '') {
         if (strlen($strdate) > 0) {
             return date('d', strtotime($strdate));
         }
@@ -42,25 +42,27 @@ class cutils {
     }
 
     public static function get_short_day_name($day, $month, $year) {
-        $value = "";
+        $value = '';
         $timestamp = mktime(0, 0, 0, $month, $day, $year);
-        $value = date("D", $timestamp);
+        $value = date('D', $timestamp);
         return $value;
     }
 
     public static function day_count($month = '', $year = '') {
-        if (empty($month))
+        if (empty($month)) {
             $month = date('m');
-        if (empty($year))
+        }
+        if (empty($year)) {
             $year = date('Y');
+        }
         return date('d', mktime(0, 0, 0, $month + 1, 0, $year));
     }
 
     public static function begin_date_month() {
-        $d1 = "1";
+        $d1 = '1';
         $m1 = Date('m');
         $y1 = Date('Y');
-        $date1 = $y1 . "-" . $m1 . "-" . $d1;
+        $date1 = $y1 . '-' . $m1 . '-' . $d1;
         $date_format = ccfg::get('date_formatted');
         if ($date_format != null) {
             $date1 = date($date_format, strtotime($date1));
@@ -72,7 +74,7 @@ class cutils {
         $d2 = cutils::day_count();
         $m2 = Date('m');
         $y2 = Date('Y');
-        $date2 = $y2 . "-" . $m2 . "-" . $d2;
+        $date2 = $y2 . '-' . $m2 . '-' . $d2;
         $date_format = ccfg::get('date_formatted');
         if ($date_format != null) {
             $date2 = date($date_format, strtotime($date2));
@@ -87,7 +89,7 @@ class cutils {
     }
 
     public static function format_filesize($size) {
-        $unit = array('b', 'kb', 'mb', 'gb', 'tb', 'pb');
+        $unit = ['b', 'kb', 'mb', 'gb', 'tb', 'pb'];
 
         return @round($size / pow(1024, ($i = floor(log($size, 1024)))), 2) . ' ' . $unit[$i];
     }
@@ -97,10 +99,11 @@ class cutils {
     }
 
     public static function get_under_1000($val) {
-        $C_NUMBER = Array('', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan');
+        $C_NUMBER = ['', 'Satu', 'Dua', 'Tiga', 'Empat', 'Lima', 'Enam', 'Tujuh', 'Delapan', 'Sembilan'];
         $res = '';
-        if ($val >= 1000)
+        if ($val >= 1000) {
             return $res;
+        }
         //process hundred
         $tempv = $val;
         if ($tempv >= 100) {
@@ -116,28 +119,27 @@ class cutils {
             if (floor($tempv / 10) == 1) {
                 if ($tempv % 10 == 0) {
                     $res .= ' Sepuluh';
-                } else if ($tempv % 10 == 1) {
+                } elseif ($tempv % 10 == 1) {
                     $res .= ' Sebelas';
                 } else {
                     $res .= ' ' . $C_NUMBER[$tempv % 10] . ' Belas';
                 }
             } else {
                 $res .= ' ' . $C_NUMBER[floor($tempv / 10)] . ' Puluh';
-                if ($tempv % 10 > 0)
+                if ($tempv % 10 > 0) {
                     $res .= ' ' . $C_NUMBER[$tempv % 10];
+                }
             }
         } else {
-            if ($tempv % 10 > 0)
+            if ($tempv % 10 > 0) {
                 $res .= ' ' . $C_NUMBER[$tempv % 10];
+            }
         }
         $res = trim($res);
         return $res;
     }
 
     public static function indonesian_currency_string($val) {
-
-
-
         $res = '';
         $tempval = $val;
         if ($tempval >= 1000000000000) {
@@ -155,7 +157,7 @@ class cutils {
             $res = $res . ' ' . self::get_under_1000($temp_under_1000) . ' Juta';
         }
         $tempval = $val % 1000000;
-//		if (floor($val / 1000) > 0)  {
+        //		if (floor($val / 1000) > 0)  {
         if ($tempval >= 1000) {
             $temp_under_1000 = floor($tempval / 1000);
             if ($temp_under_1000 == 1) {
@@ -171,16 +173,16 @@ class cutils {
     }
 
     public static function day_list() {
-        $day = array();
+        $day = [];
         for ($i = 1; $i <= 31; $i++) {
-            $day["" . $i] = $i;
+            $day['' . $i] = $i;
         }
         return $day;
     }
 
     public static function day_name_list() {
         $timestamp = strtotime('next Sunday');
-        $day_list = array();
+        $day_list = [];
         for ($i = 0; $i < 7; $i++) {
             $day_list[] = strftime('%A', $timestamp);
             $timestamp = strtotime('+1 day', $timestamp);
@@ -197,38 +199,40 @@ class cutils {
         if (isset($list[$month])) {
             return $list[$month];
         }
-        return "Unknown";
+        return 'Unknown';
     }
 
-    public static function year_list($start = "", $end = "") {
-        if (strlen($start) == 0)
-            $start = "1900";
-        if (strlen($end) == 0)
-            $end = cutils::get_year();
-        if ($start > $end) {
-            return array();
+    public static function year_list($start = '', $end = '') {
+        if (strlen($start) == 0) {
+            $start = '1900';
         }
-        $list = array();
+        if (strlen($end) == 0) {
+            $end = cutils::get_year();
+        }
+        if ($start > $end) {
+            return [];
+        }
+        $list = [];
         for ($i = $start; $i <= $end; $i++) {
             $list[$i] = $i;
         }
         return $list;
     }
 
-    public static function sanitize_msisdn($msisdn, $prefix = "62") {
+    public static function sanitize_msisdn($msisdn, $prefix = '62') {
         $ret = $msisdn;
         if (strlen($ret) > 0) {
-            if (substr($ret, 0, 1) == "+") {
+            if (substr($ret, 0, 1) == '+') {
                 $ret = substr($ret, 1);
             }
-            if (substr($ret, 0, 1) == "0") {
+            if (substr($ret, 0, 1) == '0') {
                 $ret = $prefix . substr($ret, 1);
             }
         }
         return $ret;
     }
 
-    public static function sanitize($string = '', $is_filename = FALSE) {
+    public static function sanitize($string = '', $is_filename = false) {
         // Replace all weird characters with dashes
         $string = preg_replace('/[^\w\-' . ($is_filename ? '~_\.' : '') . ']+/u', '-', $string);
 
@@ -237,42 +241,43 @@ class cutils {
     }
 
     public static function month_romawi($bln) {
-        $result = "";
+        $result = '';
         switch ($bln) {
-            case "1": $result = "I";
+            case '1': $result = 'I';
                 break;
-            case "2": $result = "II";
+            case '2': $result = 'II';
                 break;
-            case "3": $result = "III";
+            case '3': $result = 'III';
                 break;
-            case "4": $result = "IV";
+            case '4': $result = 'IV';
                 break;
-            case "5": $result = "V";
+            case '5': $result = 'V';
                 break;
-            case "6": $result = "VI";
+            case '6': $result = 'VI';
                 break;
-            case "7": $result = "VII";
+            case '7': $result = 'VII';
                 break;
-            case "8": $result = "VIII";
+            case '8': $result = 'VIII';
                 break;
-            case "9": $result = "IX";
+            case '9': $result = 'IX';
                 break;
-            case "10": $result = "X";
+            case '10': $result = 'X';
                 break;
-            case "11": $result = "XI";
+            case '11': $result = 'XI';
                 break;
-            case "12": $result = "XII";
+            case '12': $result = 'XII';
                 break;
         }
         return $result;
     }
 
     public static function trim_csv($text) {
-        if ($text == null)
-            $text = "";
-        $text = str_replace("\r\n", "", $text);
-        $text = str_replace("\r", "", $text);
-        $text = str_replace("\n", "", $text);
+        if ($text == null) {
+            $text = '';
+        }
+        $text = str_replace("\r\n", '', $text);
+        $text = str_replace("\r", '', $text);
+        $text = str_replace("\n", '', $text);
         return $text;
     }
 
@@ -280,10 +285,12 @@ class cutils {
         if ($to == '') {
             $to = time();
         }
-        if (is_string($from))
+        if (is_string($from)) {
             $from = strtotime($from);
-        if (is_string($to))
+        }
+        if (is_string($to)) {
             $to = strtotime($to);
+        }
         $from = new DateTime(date('Y-m-d H:i:s', $from));
         $to = new DateTime(date('Y-m-d H:i:s', $to));
         $seconds = (($to->format('U') - $from->format('U')));
@@ -299,10 +306,12 @@ class cutils {
         if ($to == '') {
             $to = time();
         }
-        if (is_string($from))
+        if (is_string($from)) {
             $from = strtotime($from);
-        if (is_string($to))
+        }
+        if (is_string($to)) {
             $to = strtotime($to);
+        }
         $from = new DateTime(date('Y-m-d H:i:s', $from));
         $to = new DateTime(date('Y-m-d H:i:s', $to));
         $seconds = (($to->format('U') - $from->format('U')));
@@ -318,10 +327,12 @@ class cutils {
         if ($to == '') {
             $to = time();
         }
-        if (is_string($from))
+        if (is_string($from)) {
             $from = strtotime($from);
-        if (is_string($to))
+        }
+        if (is_string($to)) {
             $to = strtotime($to);
+        }
         $from = new DateTime(date('Y-m-d H:i:s', $from));
         $to = new DateTime(date('Y-m-d H:i:s', $to));
         $seconds = (($to->format('U') - $from->format('U')));
@@ -337,10 +348,12 @@ class cutils {
         if ($to == '') {
             $to = time();
         }
-        if (is_string($from))
+        if (is_string($from)) {
             $from = strtotime($from);
-        if (is_string($to))
+        }
+        if (is_string($to)) {
             $to = strtotime($to);
+        }
         $from = new DateTime(date('Y-m-d H:i:s', $from));
         $to = new DateTime(date('Y-m-d H:i:s', $to));
         $seconds = (($to->format('U') - $from->format('U')));
@@ -356,10 +369,12 @@ class cutils {
         if ($to == '') {
             $to = time();
         }
-        if (is_string($from))
+        if (is_string($from)) {
             $from = strtotime($from);
-        if (is_string($to))
+        }
+        if (is_string($to)) {
             $to = strtotime($to);
+        }
         $from = new DateTime(date('Y-m-d H:i:s', $from));
         $to = new DateTime(date('Y-m-d H:i:s', $to));
         $seconds = (($to->format('U') - $from->format('U')));
@@ -375,10 +390,12 @@ class cutils {
         if ($to == '') {
             $to = time();
         }
-        if (is_string($from))
+        if (is_string($from)) {
             $from = strtotime($from);
-        if (is_string($to))
+        }
+        if (is_string($to)) {
             $to = strtotime($to);
+        }
         $from = new DateTime(date('Y-m-d H:i:s', $from));
         $to = new DateTime(date('Y-m-d H:i:s', $to));
         $seconds = (($to->format('U') - $from->format('U')));
@@ -387,16 +404,18 @@ class cutils {
         $days = (($to->format('U') - $from->format('U')) / (60 * 60 * 24));
         $months = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30));
         $years = (($to->format('U') - $from->format('U')) / (60 * 60 * 24 * 30 * 12));
-        return $second;
+        return $seconds;
     }
 
     /**
      * Converts a unix timestamp to a relative time string, such as "3 days ago"
      * or "2 weeks ago".
      *
-     * @param  int    $from   The date to use as a starting point
-     * @param  int    $to     The date to compare to, defaults to now
-     * @param  string $suffix The string to add to the end, defaults to " ago"
+     * @param int    $from    The date to use as a starting point
+     * @param int    $to      The date to compare to, defaults to now
+     * @param string $suffix  The string to add to the end, defaults to " ago"
+     * @param mixed  $as_text
+     *
      * @return string
      */
     public static function human_time_diff($from, $to = '', $as_text = false, $suffix = ' ago') {
@@ -404,11 +423,12 @@ class cutils {
             $to = time();
         }
 
-        if (is_string($from))
+        if (is_string($from)) {
             $from = strtotime($from);
-        if (is_string($to))
+        }
+        if (is_string($to)) {
             $to = strtotime($to);
-
+        }
 
         $from = new \DateTime(date('Y-m-d H:i:s', $from));
         $to = new \DateTime(date('Y-m-d H:i:s', $to));
@@ -458,7 +478,8 @@ class cutils {
      *
      * Part of the IntToWords Project.
      *
-     * @param  int|float $number The number to convert into text
+     * @param int|float $number The number to convert into text
+     *
      * @return string
      */
     public static function number_to_word($number) {
@@ -487,7 +508,7 @@ class cutils {
             $number = str_pad($number, 60, '0', STR_PAD_LEFT);
             $group = rtrim(chunk_split($number, 3, ' '), ' ');
             $groups = explode(' ', $group);
-            $groups2 = array();
+            $groups2 = [];
 
             foreach ($groups as $group) {
                 $group[1] = isset($group[1]) ? $group[1] : null;
@@ -639,7 +660,9 @@ class cutils {
 
     /**
      * @param $digit
+     *
      * @return string
+     *
      * @throws \LogicException
      */
     protected static function numberToWordConvertDigit($digit) {
@@ -668,5 +691,5 @@ class cutils {
                 throw new \LogicException('Not a number');
         }
     }
-
 }
+//@codingStandardsIgnoreEnd

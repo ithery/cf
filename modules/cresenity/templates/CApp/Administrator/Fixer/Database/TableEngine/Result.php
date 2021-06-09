@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 23, 2019, 2:36:50 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 23, 2019, 2:36:50 AM
  */
 ?>
 

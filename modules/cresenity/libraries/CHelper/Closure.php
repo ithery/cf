@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 3, 2019, 12:42:11 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 3, 2019, 12:42:11 AM
  */
 use SuperClosure\SerializableClosure;
 
 class CHelper_Closure {
-
     public static function serializeClosure($callback) {
         if ($callback instanceof \Closure) {
             $callback = new SuperClosure\SerializableClosure($callback);
@@ -29,5 +29,4 @@ class CHelper_Closure {
         }
         return $callback;
     }
-
 }

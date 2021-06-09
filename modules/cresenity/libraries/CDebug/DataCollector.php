@@ -1,13 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 2:34:59 PM
  * @license Ittron Global Teknologi <ittron.co.id>
- */
-/*
+ *
+ * @since Aug 22, 2018, 2:34:59 PM
  * This file is part of the DebugBar package.
  *
  * (c) 2013 Maxime Bouroumeau-Fuseau
@@ -20,14 +19,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * Abstract class for data collectors
  */
 abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInterface {
-
     private static $defaultDataFormatter;
     private static $defaultVarDumper;
     protected $dataFormater;
     protected $varDumper;
     protected $xdebugLinkTemplate = '';
     protected $xdebugShouldUseAjax = false;
-    protected $xdebugReplacements = array();
+    protected $xdebugReplacements = [];
 
     /**
      * Sets the default data formater instance used by all collectors subclassing this class
@@ -54,6 +52,7 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
      * Sets the data formater instance used by this collector
      *
      * @param CDebug_Interface_DataFormatterInterface $formater
+     *
      * @return $this
      */
     public function setDataFormatter(CDebug_Interface_DataFormatterInterface $formater) {
@@ -78,9 +77,10 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
      * @param int    $line
      *
      * @return array {
-     * @var string   $url
-     * @var bool     $ajax should be used to open the url instead of a normal links
-     * }
+     *
+     * @var string $url
+     * @var bool   $ajax should be used to open the url instead of a normal links
+     *             }
      */
     public function getXdebugLink($file, $line = 1) {
         if (count($this->xdebugReplacements)) {
@@ -116,10 +116,11 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
     /**
      * Sets the variable dumper instance used by this collector
      *
-     * @param DebugBarVarDumper $varDumper
+     * @param CDebug_DataFormatter_DebugBarVarDumper $varDumper
+     *
      * @return $this
      */
-    public function setVarDumper(DebugBarVarDumper $varDumper) {
+    public function setVarDumper(CDebug_DataFormatter_DebugBarVarDumper $varDumper) {
         $this->varDumper = $varDumper;
         return $this;
     }
@@ -138,6 +139,8 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
     }
 
     /**
+     * @param mixed $var
+     *
      * @deprecated
      */
     public function formatVar($var) {
@@ -145,6 +148,8 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
     }
 
     /**
+     * @param mixed $seconds
+     *
      * @deprecated
      */
     public function formatDuration($seconds) {
@@ -152,6 +157,9 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
     }
 
     /**
+     * @param mixed $size
+     * @param mixed $precision
+     *
      * @deprecated
      */
     public function formatBytes($size, $precision = 2) {
@@ -170,7 +178,7 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
 
     /**
      * @param string $xdebugLinkTemplate
-     * @param bool $shouldUseAjax
+     * @param bool   $shouldUseAjax
      */
     public function setXdebugLinkTemplate($xdebugLinkTemplate, $shouldUseAjax = false) {
         if ($xdebugLinkTemplate === 'idea') {
@@ -190,7 +198,7 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
     }
 
     /**
-     * returns an array of filename-replacements
+     * Returns an array of filename-replacements
      *
      * this is useful f.e. when using vagrant or remote servers,
      * where the path of the file is different between server and
@@ -213,4 +221,39 @@ abstract class CDebug_DataCollector implements CDebug_Interface_DataCollectorInt
         $this->xdebugReplacements[$serverPath] = $replacement;
     }
 
+    /**
+     * Shorten the path by removing the relative links and base dir
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    protected function normalizeFilename($path) {
+        if (file_exists($path)) {
+            $path = realpath($path);
+        }
+        return str_replace(DOCROOT, '', $path);
+    }
+
+    /**
+     * Check if the given file is to be excluded from analysis
+     *
+     * @param string $file
+     *
+     * @return bool
+     */
+    protected function fileIsInExcludedPath($file) {
+        $excludedPaths = [
+            '/system/core/',
+            '/system/libraries/',
+            '/modules/cresenity/libraries/CDebug/',
+        ];
+        $normalizedPath = str_replace('\\', '/', $file);
+        foreach ($excludedPaths as $excludedPath) {
+            if (strpos($normalizedPath, $excludedPath) !== false) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

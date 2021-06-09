@@ -1,37 +1,47 @@
 <?php
 
 class CNestable extends CElement_Element {
-
     use CTrait_Compat_Element_Nestable,
         CTrait_Element_ActionList_Row;
 
     protected $data;
+
     protected $id_key;
+
     protected $value_key;
+
     protected $applyjs;
+
     protected $input;
+
     protected $action_style;
+
     protected $displayCallbackFunc;
+
     protected $filterActionCallbackFunc;
+
     protected $requires;
+
     protected $checkbox;
+
     protected $disable_dnd;
+
     protected $js_cell;
 
     public function __construct($id) {
         parent::__construct($id);
 
         CClientModules::instance()->register_module('jquery.nestable');
-        $this->data = array();
+        $this->data = [];
         $this->applyjs = true;
         $this->input = '';
         $this->rowActionList = CElement_Factory::createList('ActionList');
         $this->action_style = 'btn-icon-group';
         $this->rowActionList->setStyle('btn-icon-group');
         $this->displayCallbackFunc = false;
-        $this->filterActionCallbackFunc = "";
+        $this->filterActionCallbackFunc = '';
         $this->checkbox = false;
-        $this->requires = array();
+        $this->requires = [];
         $this->js_cell = '';
     }
 
@@ -39,7 +49,7 @@ class CNestable extends CElement_Element {
         return new CNestable($id);
     }
 
-    public function displayCallbackFunc($func, $require = "") {
+    public function displayCallbackFunc($func, $require = '') {
         $this->displayCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
@@ -47,7 +57,7 @@ class CNestable extends CElement_Element {
         return $this;
     }
 
-    public function filterActionCallbackFunc($func, $require = "") {
+    public function filterActionCallbackFunc($func, $require = '') {
         $this->filterActionCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
@@ -60,7 +70,7 @@ class CNestable extends CElement_Element {
         return $this;
     }
 
-    public function setDataFromArray($array = array()) {
+    public function setDataFromArray($array = []) {
         $this->data = $array;
         return $this;
     }
@@ -101,7 +111,6 @@ class CNestable extends CElement_Element {
 
         $html->appendln('<div id="' . $this->id . '" class="dd nestable">')->inc_indent();
         if (count($this->data) > 0) {
-
             $depth_before = -1;
             $in = 0;
             foreach ($this->data as $d) {
@@ -124,7 +133,7 @@ class CNestable extends CElement_Element {
 
                 $html->appendln('<div class="dd-handle">')->inc_indent();
                 if ($this->checkbox) {
-                    $html->appendln('<input id="cb_' . $d[$this->id_key] . '" name="cb[' . $d[$this->id_key] . ']" data-parent-id="' . $d["parent_id"] . '" type="checkbox" value="' . $d[$this->id_key] . '"/>')->inc_indent();
+                    $html->appendln('<input id="cb_' . $d[$this->id_key] . '" name="cb[' . $d[$this->id_key] . ']" data-parent-id="' . $d['parent_id'] . '" type="checkbox" value="' . $d[$this->id_key] . '"/>')->inc_indent();
                 }
                 $val = $d[$this->value_key];
                 $new_v = $val;
@@ -139,18 +148,17 @@ class CNestable extends CElement_Element {
                 $html->appendln($new_v);
                 $html->dec_indent()->appendln('</div>');
                 if ($this->have_action()) {
-
                     foreach ($d as $k => $v) {
                         $jsparam[$k] = $v;
                     }
-                    $jsparam["param1"] = $d[$this->id_key];
-                    $this->rowActionList->add_class("pull-right");
-                    if ($this->action_style == "btn-dropdown") {
-                        $this->rowActionList->add_class("pull-right");
+                    $jsparam['param1'] = $d[$this->id_key];
+                    $this->rowActionList->add_class('pull-right');
+                    if ($this->action_style == 'btn-dropdown') {
+                        $this->rowActionList->add_class('pull-right');
                     }
                     $this->rowActionList->regenerateId(true);
-                    $this->rowActionList->apply("jsparam", $jsparam);
-                    $this->rowActionList->apply("set_handler_url_param", $jsparam);
+                    $this->rowActionList->apply('jsparam', $jsparam);
+                    $this->rowActionList->apply('set_handler_url_param', $jsparam);
 
                     if (($this->filterActionCallbackFunc) != null) {
                         $actions = $this->rowActionList->childs();
@@ -170,7 +178,6 @@ class CNestable extends CElement_Element {
                     $this->js_cell .= $this->rowActionList->js();
                     $html->appendln($this->rowActionList->html($html->get_indent()));
                 }
-
 
                 $depth_before = $depth;
             }
@@ -207,8 +214,6 @@ class CNestable extends CElement_Element {
     }
 
     public function js($indent = 0) {
-
-
         $js = new CStringBuilder();
         $js->set_indent($indent);
         if ($this->applyjs) {
@@ -248,11 +253,9 @@ class CNestable extends CElement_Element {
             }
         }
 
-
         $js->append($this->js_cell)->br();
 
         $js->append($this->js_child($indent))->br();
         return $js->text();
     }
-
 }

@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 10:32:11 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 10:32:11 AM
  */
 
 /**
@@ -13,10 +14,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
  *
  * This encapsulation hack is necessary to keep a consistent state of the database schema. Say we have a list of tables
  * array($tableName => Table($tableName)); if you want to rename the table, you have to make sure
- *
  */
 abstract class CDatabase_AbstractAsset {
-
     /**
      * @var string
      */
@@ -47,9 +46,8 @@ abstract class CDatabase_AbstractAsset {
             $name = $this->trimQuotes($name);
         }
 
-
-        if (strpos($name, ".") !== false) {
-            $parts = explode(".", $name);
+        if (strpos($name, '.') !== false) {
+            $parts = explode('.', $name);
             $this->_namespace = $parts[0];
             $name = $parts[1];
         }
@@ -112,7 +110,7 @@ abstract class CDatabase_AbstractAsset {
     public function getFullQualifiedName($defaultNamespaceName) {
         $name = $this->getName();
         if (!$this->_namespace) {
-            $name = $defaultNamespaceName . "." . $name;
+            $name = $defaultNamespaceName . '.' . $name;
         }
 
         return strtolower($name);
@@ -155,9 +153,8 @@ abstract class CDatabase_AbstractAsset {
      * @return string
      */
     public function getName() {
-
         if ($this->_namespace) {
-            return $this->_namespace . "." . $this->_name;
+            return $this->_namespace . '.' . $this->_name;
         }
 
         return $this->_name;
@@ -173,12 +170,12 @@ abstract class CDatabase_AbstractAsset {
      */
     public function getQuotedName(CDatabase_Platform $platform) {
         $keywords = $platform->getReservedKeywordsList();
-        $parts = explode(".", $this->getName());
+        $parts = explode('.', $this->getName());
         foreach ($parts as $k => $v) {
             $parts[$k] = ($this->_quoted || $keywords->isKeyword($v)) ? $platform->quoteIdentifier($v) : $v;
         }
 
-        return implode(".", $parts);
+        return implode('.', $parts);
     }
 
     /**
@@ -195,11 +192,10 @@ abstract class CDatabase_AbstractAsset {
      * @return string
      */
     protected function _generateIdentifierName($columnNames, $prefix = '', $maxSize = 30) {
-        $hash = implode("", array_map(function ($column) {
-                    return dechex(crc32($column));
-                }, $columnNames));
+        $hash = implode('', array_map(function ($column) {
+            return dechex(crc32($column));
+        }, $columnNames));
 
         return strtoupper(substr($prefix . '_' . $hash, 0, $maxSize));
     }
-
 }

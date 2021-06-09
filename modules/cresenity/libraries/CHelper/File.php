@@ -1,20 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 14, 2018, 5:11:09 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 14, 2018, 5:11:09 AM
  */
 use Symfony\Component\Finder\Finder;
 
 class CHelper_File {
-
     /**
      * Determine if a file or directory exists.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public static function exists($path) {
@@ -24,24 +25,26 @@ class CHelper_File {
     /**
      * Get the contents of a file.
      *
-     * @param  string  $path
-     * @param  bool  $lock
+     * @param string $path
+     * @param bool   $lock
+     *
      * @return string
      *
-     * @throws CApp_Exception_FileNotFoundException
+     * @throws CStorage_Exception_FileNotFoundException
      */
     public static function get($path, $lock = false) {
         if (self::isFile($path)) {
             return $lock ? self::sharedGet($path) : file_get_contents($path);
         }
 
-        throw new CApp_Exception_FileNotFoundException("File does not exist at path :path", array(':path' => $path));
+        throw new CStorage_Exception_FileNotFoundException('File does not exist at path :path', [':path' => $path]);
     }
 
     /**
      * Get contents of a file with shared access.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public static function sharedGet($path) {
@@ -69,23 +72,25 @@ class CHelper_File {
     /**
      * Get the returned value of a file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return mixed
      *
-     * @throws CApp_Exception_FileNotFoundException
+     * @throws CStorage_Exception_FileNotFoundException
      */
     public static function getRequire($path) {
         if (self::isFile($path)) {
             return require $path;
         }
 
-        throw new CApp_Exception_FileNotFoundException("File does not exist at path :path", array(':path' => $path));
+        throw new CStorage_Exception_FileNotFoundException('File does not exist at path :path', [':path' => $path]);
     }
 
     /**
      * Require the given file once.
      *
-     * @param  string  $file
+     * @param string $file
+     *
      * @return mixed
      */
     public static function requireOnce($file) {
@@ -95,7 +100,8 @@ class CHelper_File {
     /**
      * Get the MD5 hash of the file at the given path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public static function hash($path) {
@@ -105,9 +111,10 @@ class CHelper_File {
     /**
      * Write the contents of a file.
      *
-     * @param  string  $path
-     * @param  string  $contents
-     * @param  bool  $lock
+     * @param string $path
+     * @param string $contents
+     * @param bool   $lock
+     *
      * @return int
      */
     public static function put($path, $contents, $lock = false) {
@@ -117,8 +124,9 @@ class CHelper_File {
     /**
      * Prepend to a file.
      *
-     * @param  string  $path
-     * @param  string  $data
+     * @param string $path
+     * @param string $data
+     *
      * @return int
      */
     public static function prepend($path, $data) {
@@ -132,8 +140,9 @@ class CHelper_File {
     /**
      * Append to a file.
      *
-     * @param  string  $path
-     * @param  string  $data
+     * @param string $path
+     * @param string $data
+     *
      * @return int
      */
     public static function append($path, $data) {
@@ -143,8 +152,9 @@ class CHelper_File {
     /**
      * Get or set UNIX mode of a file or directory.
      *
-     * @param  string  $path
-     * @param  int  $mode
+     * @param string $path
+     * @param int    $mode
+     *
      * @return mixed
      */
     public static function chmod($path, $mode = null) {
@@ -158,7 +168,8 @@ class CHelper_File {
     /**
      * Delete the file at a given path.
      *
-     * @param  string|array  $paths
+     * @param string|array $paths
+     *
      * @return bool
      */
     public static function delete($paths) {
@@ -182,8 +193,9 @@ class CHelper_File {
     /**
      * Move a file to a new location.
      *
-     * @param  string  $path
-     * @param  string  $target
+     * @param string $path
+     * @param string $target
+     *
      * @return bool
      */
     public static function move($path, $target) {
@@ -193,8 +205,9 @@ class CHelper_File {
     /**
      * Copy a file to a new location.
      *
-     * @param  string  $path
-     * @param  string  $target
+     * @param string $path
+     * @param string $target
+     *
      * @return bool
      */
     public static function copy($path, $target) {
@@ -204,12 +217,13 @@ class CHelper_File {
     /**
      * Create a hard link to the target file or directory.
      *
-     * @param  string  $target
-     * @param  string  $link
+     * @param string $target
+     * @param string $link
+     *
      * @return void
      */
     public static function link($target, $link) {
-        if (!windows_os()) {
+        if (!CServer::isWindows()) {
             return symlink($target, $link);
         }
 
@@ -221,7 +235,8 @@ class CHelper_File {
     /**
      * Extract the file name from a file path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public static function name($path) {
@@ -231,7 +246,8 @@ class CHelper_File {
     /**
      * Extract the trailing name component from a file path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public static function basename($path) {
@@ -241,7 +257,8 @@ class CHelper_File {
     /**
      * Extract the parent directory from a file path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public static function dirname($path) {
@@ -251,7 +268,8 @@ class CHelper_File {
     /**
      * Extract the file extension from a file path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public static function extension($path) {
@@ -261,7 +279,8 @@ class CHelper_File {
     /**
      * Get the file type of a given file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public static function type($path) {
@@ -271,7 +290,8 @@ class CHelper_File {
     /**
      * Get the mime-type of a given file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string|false
      */
     public static function mimeType($path) {
@@ -281,7 +301,8 @@ class CHelper_File {
     /**
      * Get the file size of a given file.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return int
      */
     public static function size($path) {
@@ -291,7 +312,8 @@ class CHelper_File {
     /**
      * Get the file's last modification time.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return int
      */
     public static function lastModified($path) {
@@ -301,7 +323,8 @@ class CHelper_File {
     /**
      * Determine if the given path is a directory.
      *
-     * @param  string  $directory
+     * @param string $directory
+     *
      * @return bool
      */
     public static function isDirectory($directory) {
@@ -311,7 +334,8 @@ class CHelper_File {
     /**
      * Determine if the given path is readable.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public static function isReadable($path) {
@@ -321,7 +345,8 @@ class CHelper_File {
     /**
      * Determine if the given path is writable.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public static function isWritable($path) {
@@ -331,7 +356,8 @@ class CHelper_File {
     /**
      * Determine if the given path is a file.
      *
-     * @param  string  $file
+     * @param string $file
+     *
      * @return bool
      */
     public static function isFile($file) {
@@ -341,8 +367,9 @@ class CHelper_File {
     /**
      * Find path names matching a given pattern.
      *
-     * @param  string  $pattern
-     * @param  int     $flags
+     * @param string $pattern
+     * @param int    $flags
+     *
      * @return array
      */
     public static function glob($pattern, $flags = 0) {
@@ -352,35 +379,38 @@ class CHelper_File {
     /**
      * Get an array of all files in a directory.
      *
-     * @param  string  $directory
-     * @param  bool  $hidden
+     * @param string $directory
+     * @param bool   $hidden
+     *
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
     public static function files($directory, $hidden = false) {
-
         return iterator_to_array(
-                Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->depth(0), false
+            Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->depth(0),
+            false
         );
     }
 
     /**
      * Get all of the files from the given directory (recursive).
      *
-     * @param  string  $directory
-     * @param  bool  $hidden
+     * @param string $directory
+     * @param bool   $hidden
+     *
      * @return \Symfony\Component\Finder\SplFileInfo[]
      */
     public static function allFiles($directory, $hidden = false) {
-
         return iterator_to_array(
-                Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory), false
+            Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory),
+            false
         );
     }
 
     /**
      * Get all of the directories within a given directory.
      *
-     * @param  string  $directory
+     * @param string $directory
+     *
      * @return array
      */
     public static function directories($directory) {
@@ -396,10 +426,11 @@ class CHelper_File {
     /**
      * Create a directory.
      *
-     * @param  string  $path
-     * @param  int     $mode
-     * @param  bool    $recursive
-     * @param  bool    $force
+     * @param string $path
+     * @param int    $mode
+     * @param bool   $recursive
+     * @param bool   $force
+     *
      * @return bool
      */
     public static function makeDirectory($path, $mode = 0755, $recursive = false, $force = false) {
@@ -413,9 +444,10 @@ class CHelper_File {
     /**
      * Move a directory.
      *
-     * @param  string  $from
-     * @param  string  $to
-     * @param  bool  $overwrite
+     * @param string $from
+     * @param string $to
+     * @param bool   $overwrite
+     *
      * @return bool
      */
     public static function moveDirectory($from, $to, $overwrite = false) {
@@ -431,9 +463,10 @@ class CHelper_File {
     /**
      * Copy a directory from one location to another.
      *
-     * @param  string  $directory
-     * @param  string  $destination
-     * @param  int     $options
+     * @param string $directory
+     * @param string $destination
+     * @param int    $options
+     *
      * @return bool
      */
     public static function copyDirectory($directory, $destination, $options = null) {
@@ -464,12 +497,10 @@ class CHelper_File {
                 if (!self::copyDirectory($path, $target, $options)) {
                     return false;
                 }
-            }
-
-            // If the current items is just a regular file, we will just copy this to the new
-            // location and keep looping. If for some reason the copy fails we'll bail out
-            // and return false, so the developer is aware that the copy process failed.
-            else {
+            } else {
+                // If the current items is just a regular file, we will just copy this to the new
+                // location and keep looping. If for some reason the copy fails we'll bail out
+                // and return false, so the developer is aware that the copy process failed.
                 if (!self::copy($item->getPathname(), $target)) {
                     return false;
                 }
@@ -484,8 +515,9 @@ class CHelper_File {
      *
      * The directory itself may be optionally preserved.
      *
-     * @param  string  $directory
-     * @param  bool    $preserve
+     * @param string $directory
+     * @param bool   $preserve
+     *
      * @return bool
      */
     public static function deleteDirectory($directory, $preserve = false) {
@@ -501,12 +533,10 @@ class CHelper_File {
             // keep iterating through each file until the directory is cleaned.
             if ($item->isDir() && !$item->isLink()) {
                 self::deleteDirectory($item->getPathname());
-            }
-
-            // If the item is just a file, we can go ahead and delete it since we're
-            // just looping through and waxing all of the files in this directory
-            // and calling directories recursively, so we delete the real path.
-            else {
+            } else {
+                // If the item is just a file, we can go ahead and delete it since we're
+                // just looping through and waxing all of the files in this directory
+                // and calling directories recursively, so we delete the real path.
                 self::delete($item->getPathname());
             }
         }
@@ -521,11 +551,11 @@ class CHelper_File {
     /**
      * Empty the specified directory of all files and folders.
      *
-     * @param  string  $directory
+     * @param string $directory
+     *
      * @return bool
      */
     public static function cleanDirectory($directory) {
         return self::deleteDirectory($directory, true);
     }
-
 }

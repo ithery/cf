@@ -7,7 +7,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI\XmlConfiguration;
+
+namespace PHPUnit\TextUI\XmlConfiguration\TestSuite;
 
 use function count;
 use function iterator_count;
@@ -17,8 +18,7 @@ use Iterator;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class TestFileCollectionIterator implements Countable, Iterator
-{
+final class TestFileCollectionIterator implements Countable, Iterator {
     /**
      * @var TestFile[]
      */
@@ -29,38 +29,31 @@ final class TestFileCollectionIterator implements Countable, Iterator
      */
     private $position;
 
-    public function __construct(TestFileCollection $files)
-    {
+    public function __construct(TestFileCollection $files) {
         $this->files = $files->asArray();
     }
 
-    public function count()
-    {
+    public function count() {
         return iterator_count($this);
     }
 
-    public function rewind()
-    {
+    public function rewind() {
         $this->position = 0;
     }
 
-    public function valid()
-    {
+    public function valid() {
         return $this->position < count($this->files);
     }
 
-    public function key()
-    {
+    public function key() {
         return $this->position;
     }
 
-    public function current()
-    {
+    public function current() {
         return $this->files[$this->position];
     }
 
-    public function next()
-    {
+    public function next() {
         $this->position++;
     }
 }

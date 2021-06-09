@@ -1,21 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 class CSpan extends CElement_Element {
-
     protected $col;
     protected $size;
 
-    public function __construct($id = "") {
-
+    public function __construct($id = '') {
         parent::__construct($id);
 
         $this->size = 'md';
         $this->col = 12;
     }
 
-    public static function factory($id = "") {
+    public static function factory($id = '') {
         return new CSpan($id);
     }
 
@@ -32,7 +30,7 @@ class CSpan extends CElement_Element {
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
-        $disabled = "";
+        $disabled = '';
         if ($this->bootstrap == '3.3') {
             $html->appendln('<div class="col-' . $this->size . '-' . $this->col . '">');
         } else {
@@ -43,5 +41,4 @@ class CSpan extends CElement_Element {
 
         return $html->text();
     }
-
 }

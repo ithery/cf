@@ -1,44 +1,48 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 3:05:45 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 3:05:45 PM
  */
 class CServer_Error {
-
     /**
-     * holds the instance of this class
+     * Holds the instance of this class
      *
      * @static
+     *
      * @var CServer_Error
      */
     private static $instance;
 
     /**
-     * holds the error messages
+     * Holds the error messages
+     *
      * @var array
      */
-    private $errList = array();
+    private $errList = [];
 
     /**
-     * current number ob errors
+     * Current number ob errors
+     *
      * @var integer
      */
     private $errCount = 0;
 
     /**
-     * initalize some used vars
+     * Initalize some used vars
      */
     private function __construct() {
         $this->errCount = 0;
-        $this->errList = array();
+        $this->errList = [];
     }
 
     /**
      * Singleton function
+     *
      * @return CServer_Error instance of the class
      */
     public static function instance() {
@@ -50,16 +54,16 @@ class CServer_Error {
     }
 
     /**
-     * triggers an error when somebody tries to clone the object
+     * Triggers an error when somebody tries to clone the object
      *
      * @return void
      */
     public function __clone() {
-        throw new CException("Can't be cloned", array(), E_USER_ERROR);
+        throw new CException("Can't be cloned", [], E_USER_ERROR);
     }
 
     /**
-     * adds an CServer error to the internal list
+     * Adds an CServer error to the internal list
      *
      * @param string $strCommand Command, which cause the Error
      * @param string $strMessage additional Message, to describe the Error
@@ -71,7 +75,7 @@ class CServer_Error {
     }
 
     /**
-     * adds an error to the internal list
+     * Adds an error to the internal list
      *
      * @param string $strCommand Command, which cause the Error
      * @param string $strMessage message, that describe the Error
@@ -86,7 +90,7 @@ class CServer_Error {
     }
 
     /**
-     * add a config error to the internal list
+     * Add a config error to the internal list
      *
      * @param string $strCommand Command, which cause the Error
      * @param string $strMessage additional Message, to describe the Error
@@ -94,11 +98,11 @@ class CServer_Error {
      * @return void
      */
     public function addConfigError($strCommand, $strMessage) {
-        $this->addErrorTrace($strCommand, "Wrong Value in server.php for " . $strMessage);
+        $this->addErrorTrace($strCommand, 'Wrong Value in server.php for ' . $strMessage);
     }
 
     /**
-     * add a php error to the internal list
+     * Add a php error to the internal list
      *
      * @param string $strCommand Command, which cause the Error
      * @param string $strMessage additional Message, to describe the Error
@@ -110,7 +114,7 @@ class CServer_Error {
     }
 
     /**
-     * adds a waraning to the internal list
+     * Adds a waraning to the internal list
      *
      * @param string $strMessage Warning message to display
      *
@@ -118,12 +122,12 @@ class CServer_Error {
      */
     public function addWarning($strMessage) {
         $index = count($this->errList) + 1;
-        $this->errList[$index]['command'] = "WARN";
+        $this->errList[$index]['command'] = 'WARN';
         $this->errList[$index]['message'] = $strMessage;
     }
 
     /**
-     * check if errors exists
+     * Check if errors exists
      *
      * @return boolean true if are errors logged, false if not
      */
@@ -132,25 +136,26 @@ class CServer_Error {
     }
 
     /**
-     * generate a function backtrace for error diagnostic, function is genearally based on code submitted in the php reference page
+     * Generate a function backtrace for error diagnostic, function is genearally based on code submitted in the php reference page
+     *
      * @param string $strMessage additional message to display
+     *
      * @return string formatted string of the backtrace
      */
     private function trace($strMessage) {
         $arrTrace = array_reverse(debug_backtrace());
         $strFunc = '';
         $strBacktrace = htmlspecialchars($strMessage) . "\n\n";
-       
-             
+
         foreach ($arrTrace as $val) {
             // avoid the last line, which says the error is from the error class
             if ($val == $arrTrace[count($arrTrace) - 1]) {
                 break;
             }
-            if(!isset($val['file'])) {
+            if (!isset($val['file'])) {
                 continue;
             }
-            $strBacktrace .= str_replace(DOCROOT, ".", carr::get($val, 'file')) . ' on line ' . $val['line'];
+            $strBacktrace .= str_replace(DOCROOT, '.', carr::get($val, 'file')) . ' on line ' . $val['line'];
             if ($strFunc) {
                 $strBacktrace .= ' in function ' . $strFunc;
             }
@@ -176,14 +181,16 @@ class CServer_Error {
     }
 
     /**
-     * convert some special vars into better readable output
+     * Convert some special vars into better readable output
+     *
      * @param mixed $var value, which should be formatted
+     *
      * @return string formatted string
      */
     private function printVar($var) {
         if (is_string($var)) {
-            $search = array("\x00", "\x0a", "\x0d", "\x1a", "\x09");
-            $replace = array('\0', '\n', '\r', '\Z', '\t');
+            $search = ["\x00", "\x0a", "\x0d", "\x1a", "\x09"];
+            $replace = ['\0', '\n', '\r', '\Z', '\t'];
 
             return ('"' . str_replace($search, $replace, $var) . '"');
         } elseif (is_bool($var)) {
@@ -206,5 +213,4 @@ class CServer_Error {
         // anything else, just let php try to print it
         return (var_export($var, true));
     }
-
 }

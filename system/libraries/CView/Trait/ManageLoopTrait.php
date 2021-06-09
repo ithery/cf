@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 28, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 28, 2020
  */
 trait CView_Trait_ManageLoopTrait {
-
     /**
      * The stack of in-progress loops.
      *
@@ -19,7 +19,8 @@ trait CView_Trait_ManageLoopTrait {
     /**
      * Add new loop to the stack.
      *
-     * @param  \Countable|array  $data
+     * @param \Countable|array $data
+     *
      * @return void
      */
     public function addLoop($data) {
@@ -88,5 +89,4 @@ trait CView_Trait_ManageLoopTrait {
     public function getLoopStack() {
         return $this->loopsStack;
     }
-
 }

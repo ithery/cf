@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CConsole_Command_Daemon_DaemonStopCommand extends CConsole_Command {
-
     /**
      * The name and signature of the console command.
      *
@@ -28,7 +27,6 @@ class CConsole_Command_Daemon_DaemonStopCommand extends CConsole_Command {
         if ($errCode == 0) {
             $this->info('Stopping ' . $class);
             try {
-
                 $started = $daemonManager->stop($class);
 
                 $this->info('Daemon ' . $class . ' is stopped now');
@@ -38,7 +36,6 @@ class CConsole_Command_Daemon_DaemonStopCommand extends CConsole_Command {
             }
         }
 
-
         if ($errCode > 0) {
             $this->error($errMessage);
             return 1;
@@ -46,5 +43,4 @@ class CConsole_Command_Daemon_DaemonStopCommand extends CConsole_Command {
 
         return 0;
     }
-
 }

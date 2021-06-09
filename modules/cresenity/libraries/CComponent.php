@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 abstract class CComponent {
-
     use CTrait_Macroable {
         __call as macroCall;
     }
@@ -21,10 +21,15 @@ abstract class CComponent {
         CComponent_Concern_InteractsWithPropertiesTrait;
 
     public $id;
+
     protected $queryString = [];
+
     protected $computedPropertyCache = [];
+
     protected $initialLayoutConfiguration = [];
+
     protected $shouldSkipRender = false;
+
     protected $preRenderedView;
 
     public function __construct($id = null) {
@@ -33,31 +38,31 @@ abstract class CComponent {
         $this->ensureIdPropertyIsntOverridden();
     }
 
-    public function __invoke(CContainer_Container $container, Route $route) {
+    public function __invoke(CContainer_Container $container, CRouting_Route $route) {
         $componentParams = (new ImplicitRouteBinding($container))
                 ->resolveAllParameters($route, $this);
 
         $manager = CComponent_LifecycleManager::fromInitialInstance($this)
-                ->initialHydrate()
-                ->mount($componentParams)
-                ->renderToView();
+            ->initialHydrate()
+            ->mount($componentParams)
+            ->renderToView();
 
         $layoutType = isset($this->initialLayoutConfiguration['type']) ? $this->initialLayoutConfiguration['type'] : 'component';
 
         return CView::factory()->file(__DIR__ . "/Macros/livewire-view-{$layoutType}.blade.php", [
-                    'view' => isset($this->initialLayoutConfiguration['view']) ? $this->initialLayoutConfiguration['view'] : 'layouts.app',
-                    'params' => isset($this->initialLayoutConfiguration['params']) ? $this->initialLayoutConfiguration['params'] : [],
-                    'slotOrSection' => isset($this->initialLayoutConfiguration['slotOrSection']) ? $this->initialLayoutConfiguration['slotOrSection'] : [
+            'view' => isset($this->initialLayoutConfiguration['view']) ? $this->initialLayoutConfiguration['view'] : 'layouts.app',
+            'params' => isset($this->initialLayoutConfiguration['params']) ? $this->initialLayoutConfiguration['params'] : [],
+            'slotOrSection' => isset($this->initialLayoutConfiguration['slotOrSection']) ? $this->initialLayoutConfiguration['slotOrSection'] : [
                 'extends' => 'content', 'component' => 'default',
-                    ][$layoutType],
-                    'manager' => $manager,
+            ][$layoutType],
+            'manager' => $manager,
         ]);
     }
 
     protected function ensureIdPropertyIsntOverridden() {
         c::throwIf(
-                array_key_exists('id', $this->getPublicPropertiesDefinedBySubClass()),
-                new CComponent_Exception_CannotUseReservedComponentProperties('id', $this::getName())
+            array_key_exists('id', $this->getPublicPropertiesDefinedBySubClass()),
+            new CComponent_Exception_CannotUseReservedComponentProperties('id', $this::getName())
         );
     }
 
@@ -70,17 +75,16 @@ abstract class CComponent {
     }
 
     public static function getName() {
-        /**
+        /*
         $namespace = c::collect(explode('.', str_replace(['/', '\\'], '.', c::config('component.class_namespace', 'App\\Http\\Livewire'))))
                 ->map([cstr::class, 'kebab'])
                 ->implode('.');
-                * 
          */
         $namespace = '';
         $fullName = c::collect(explode('.', str_replace(['/', '\\'], '.', static::class)))
-                ->map([cstr::class, 'kebab'])
-                ->implode('.');
-        
+            ->map([cstr::class, 'kebab'])
+            ->implode('.');
+
         if (cstr::startsWith($fullName, $namespace)) {
             return (string) cstr::substr($fullName, strlen($namespace) + 1);
         }
@@ -102,11 +106,13 @@ abstract class CComponent {
         $view = method_exists($this, 'render') ? CContainer::getInstance()->call([$this, 'render']) : CView::factory("component.{$this::getName()}");
 
         if (is_string($view)) {
-            $view = CView_Factory::instance()->make(CreateBladeView::fromString($view));
+            $view = CView_Factory::instance()->make(CComponent_CreateBladeView::fromString($view));
         }
 
-        c::throwUnless($view instanceof CView_View,
-                new \Exception('"render" method on [' . get_class($this) . '] must return instance of [' . CView_View::class . ']'));
+        c::throwUnless(
+            $view instanceof CView_View,
+            new \Exception('"render" method on [' . get_class($this) . '] must return instance of [' . CView_View::class . ']')
+        );
 
         // Get the layout config from the view.
         if ($view->livewireLayout) {
@@ -119,8 +125,9 @@ abstract class CComponent {
     }
 
     public function output($errors = null) {
-        if ($this->shouldSkipRender)
+        if ($this->shouldSkipRender) {
             return null;
+        }
 
         $view = $this->preRenderedView;
 
@@ -133,22 +140,22 @@ abstract class CComponent {
         $engine->startComponentRendering($this);
 
         $this->setErrorBag(
-                $errorBag = $errors ?: carr::get($view->getData(),'errors',$this->getErrorBag())
+            $errorBag = $errors ?: carr::get($view->getData(), 'errors', $this->getErrorBag())
         );
 
-        $previouslySharedErrors = carr::get(CView::factory()->getShared(),'errors',new CBase_ViewErrorBag);
-        $previouslySharedInstance = carr::get(CView::factory()->getShared(),'_instance', null);
+        $previouslySharedErrors = carr::get(CView::factory()->getShared(), 'errors', new CBase_ViewErrorBag);
+        $previouslySharedInstance = carr::get(CView::factory()->getShared(), '_instance', null);
 
         $errors = (new CBase_ViewErrorBag)->put('default', $errorBag);
 
         $errors->getBag('default')->merge(
-                $previouslySharedErrors->getBag('default')
+            $previouslySharedErrors->getBag('default')
         );
 
         $view->with([
             'errors' => $errors,
             '_instance' => $this,
-                ] + $this->getPublicPropertiesDefinedBySubClass());
+        ] + $this->getPublicPropertiesDefinedBySubClass());
 
         CView::factory()->share('errors', $errors);
         CView::factory()->share('_instance', $this);
@@ -171,7 +178,7 @@ abstract class CComponent {
                 $this->$key = $this->reindexArrayWithNumericKeysOtherwiseJavaScriptWillMessWithTheOrder($value);
             }
 
-            if ($value instanceof EloquentCollection) {
+            if ($value instanceof CModel_Collection) {
                 // Preserve collection items order by reindexing underlying array.
                 $this->$key = $value->values();
             }
@@ -186,7 +193,7 @@ abstract class CComponent {
 
         $keys = is_array($key) ? $key : func_get_args();
 
-        collect($keys)->each(function ($i) {
+        c::collect($keys)->each(function ($i) {
             if (isset($this->computedPropertyCache[$i])) {
                 unset($this->computedPropertyCache[$i]);
             }
@@ -201,15 +208,17 @@ abstract class CComponent {
                 return $this->computedPropertyCache[$property];
             }
 
-            return $this->computedPropertyCache[$property] = app()->call([$this, $computedMethodName]);
+            return $this->computedPropertyCache[$property] = CContainer::getInstance()->call([$this, $computedMethodName]);
         }
 
         throw new CComponent_Exception_PropertyNotFoundException($property, static::getName());
     }
 
     public function __call($method, $params) {
-        if (
-                in_array($method, ['mount', 'hydrate', 'dehydrate', 'updating', 'updated']) || c::str($method)->startsWith(['updating', 'updated', 'hydrate', 'dehydrate'])
+        if (in_array(
+            $method,
+            ['mount', 'hydrate', 'dehydrate', 'updating', 'updated']
+        ) || c::str($method)->startsWith(['updating', 'updated', 'hydrate', 'dehydrate'])
         ) {
             // Eat calls to the lifecycle hooks if the dev didn't define them.
             return;
@@ -220,8 +229,9 @@ abstract class CComponent {
         }
 
         throw new BadMethodCallException(sprintf(
-                        'Method %s::%s does not exist.', static::class, $method
+            'Method %s::%s does not exist.',
+            static::class,
+            $method
         ));
     }
-
 }

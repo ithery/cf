@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CPagination_Paginator extends CPagination_AbstractPaginator implements CInterface_Arrayable, ArrayAccess, Countable, IteratorAggregate, CInterface_Jsonable, JsonSerializable, CPagination_PaginatorInterface {
-
     /**
      * Determine if there are more items in the data source.
      *
@@ -18,10 +11,11 @@ class CPagination_Paginator extends CPagination_AbstractPaginator implements CIn
     /**
      * Create a new paginator instance.
      *
-     * @param  mixed  $items
-     * @param  int  $perPage
-     * @param  int|null  $currentPage
-     * @param  array  $options (path, query, fragment, pageName)
+     * @param mixed    $items
+     * @param int      $perPage
+     * @param int|null $currentPage
+     * @param array    $options     (path, query, fragment, pageName)
+     *
      * @return void
      */
     public function __construct($items, $perPage, $currentPage = null, array $options = []) {
@@ -39,7 +33,8 @@ class CPagination_Paginator extends CPagination_AbstractPaginator implements CIn
     /**
      * Get the current page for the request.
      *
-     * @param  int  $currentPage
+     * @param int $currentPage
+     *
      * @return int
      */
     protected function setCurrentPage($currentPage) {
@@ -51,7 +46,8 @@ class CPagination_Paginator extends CPagination_AbstractPaginator implements CIn
     /**
      * Set the items for the paginator.
      *
-     * @param  mixed  $items
+     * @param mixed $items
+     *
      * @return void
      */
     protected function setItems($items) {
@@ -76,8 +72,9 @@ class CPagination_Paginator extends CPagination_AbstractPaginator implements CIn
     /**
      * Render the paginator using the given view.
      *
-     * @param  string|null  $view
-     * @param  array  $data
+     * @param string|null $view
+     * @param array       $data
+     *
      * @return string
      */
     public function links($view = null, $data = []) {
@@ -87,22 +84,24 @@ class CPagination_Paginator extends CPagination_AbstractPaginator implements CIn
     /**
      * Render the paginator using the given view.
      *
-     * @param  string|null  $view
-     * @param  array  $data
+     * @param string|null $view
+     * @param array       $data
+     *
      * @return string
      */
     public function render($view = null, $data = []) {
         return new CBase_HtmlString(
-                static::viewFactory()->make($view ?: static::$defaultSimpleView, array_merge($data, [
-                    'paginator' => $this,
-                ]))->render()
+            static::viewFactory()->make($view ?: static::$defaultSimpleView, array_merge($data, [
+                'paginator' => $this,
+            ]))->render()
         );
     }
 
     /**
      * Manually indicate that the paginator does have more pages.
      *
-     * @param  bool  $value
+     * @param bool $value
+     *
      * @return $this
      */
     public function hasMorePagesWhen($value = true) {
@@ -150,11 +149,11 @@ class CPagination_Paginator extends CPagination_AbstractPaginator implements CIn
     /**
      * Convert the object to its JSON representation.
      *
-     * @param  int  $options
+     * @param int $options
+     *
      * @return string
      */
     public function toJson($options = 0) {
         return json_encode($this->jsonSerialize(), $options);
     }
-
 }

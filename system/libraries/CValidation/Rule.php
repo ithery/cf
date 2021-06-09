@@ -1,18 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 12, 2019, 7:56:27 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 12, 2019, 7:56:27 PM
  */
 class CValidation_Rule {
-
     /**
      * Get a dimensions constraint builder instance.
      *
-     * @param  array  $constraints
+     * @param array $constraints
+     *
      * @return CValidation_Rule_Dimension
      */
     public static function dimensions(array $constraints = []) {
@@ -22,8 +23,9 @@ class CValidation_Rule {
     /**
      * Get a exists constraint builder instance.
      *
-     * @param  string  $table
-     * @param  string  $column
+     * @param string $table
+     * @param string $column
+     *
      * @return CValidation_Rule_Exists
      */
     public static function exists($table, $column = 'NULL') {
@@ -33,7 +35,8 @@ class CValidation_Rule {
     /**
      * Get an in constraint builder instance.
      *
-     * @param  array|string|CCollection  $values
+     * @param array|string|CCollection $values
+     *
      * @return CValidation_Rule_In
      */
     public static function in($values) {
@@ -47,7 +50,8 @@ class CValidation_Rule {
     /**
      * Get a not_in constraint builder instance.
      *
-     * @param  array|string|CCollection  $values
+     * @param array|string|CCollection $values
+     *
      * @return CValidation_Rule_NotIn
      */
     public static function notIn($values) {
@@ -61,7 +65,8 @@ class CValidation_Rule {
     /**
      * Get a required_if constraint builder instance.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     *
      * @return CValidation_Rule_RequiredIf
      */
     public static function requiredIf($callback) {
@@ -71,12 +76,12 @@ class CValidation_Rule {
     /**
      * Get a unique constraint builder instance.
      *
-     * @param  string  $table
-     * @param  string  $column
+     * @param string $table
+     * @param string $column
+     *
      * @return CValidation_Rule_Unique
      */
     public static function unique($table, $column = 'NULL') {
         return new CValidation_Rule_Unique($table, $column);
     }
-
 }

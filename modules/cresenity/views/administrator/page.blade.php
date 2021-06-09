@@ -1,10 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
+ *
+ * @since Nov 29, 2020
+ *
  * @license Ittron Global Teknologi
  */
 
@@ -18,14 +20,14 @@ if ($user) {
 }
 
 $appImageUrl = curl::base() . 'media/img/cresenity-logo.png';
-$appTitle = ccfg::get("title");
+$appTitle = ccfg::get('title');
 ?>
 <!DOCTYPE html>
 <html class="no-js material-style layout-navbar-fixed layout-fixed" lang="<?php echo clang::getlang(); ?>" >
     <head>
         <meta charset="utf-8">
         <title>@CAppPageTitle</title>
-        
+
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="shortcut icon" href="<?php echo curl::base(); ?>media/img/favico.png">
         @CAppStyles
@@ -47,13 +49,13 @@ $appTitle = ccfg::get("title");
                             </span>
                             <a href="home/index.php" class="brand-name sidenav-text font-weight-normal ml-2"><?php echo $appTitle; ?></a>
 
-                        </div>    
+                        </div>
 
 
                         <div class="sidenav-divider mt-0"></div>
                         <div class="sidenav-inner py-1 ps">
                             <?php
-                            echo CApp::navigation()->render(array('engine' => 'SideNav'));
+                            echo CApp::navigation()->render(['engine' => 'SideNav']);
                             ?>
                         </div> <!-- /sidebar-collapse -->
                     </nav> <!-- /nav -->
@@ -77,7 +79,7 @@ $appTitle = ccfg::get("title");
                         <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#layout-navbar-collapse" aria-expanded="false">
                             <span class="navbar-toggler-icon"></span>
                         </button>
-                        <div class="navbar-collapse collapse " id="layout-navbar-collapse" style="">
+                        <div class="navbar-collapse collapse " id="layout-navbar-collapse">
                             <!-- Divider -->
                             <hr class="d-lg-none w-100 my-2">
 
@@ -122,58 +124,30 @@ $appTitle = ccfg::get("title");
                         <div class="main-inner container-fluid flex-grow-1 container-p-y">
                             <div class="row page-heading">
                                 <div class="col-lg-12">
-                                    <?php
-                                    if ($show_title):
-                                        $needShowTitle = true;
-                                        ?>
+                                    <div class="bg-lightest container-m--x container-m--y mb-3">
+                                        <ol class="breadcrumb text-big container-p-x py-3 m-0">
+                                            <li class="breadcrumb-item">
+                                                <a href="<?php echo curl::base(); ?>" class="tip-bottom" data-original-title="Go to Home"><i class="ion ion-ios-home"></i></a>
+                                            </li>
+                                            <?php foreach ($breadcrumb as $k => $b) : ?>
+                                                <li class="breadcrumb-item">
+                                                    <a href="<?php echo $b ?>" class=""><?php echo $k; ?></a>
+                                                </li>
 
-                                        <?php if ($show_breadcrumb): ?>
-                                            <?php
-                                            if ($breadcrumb == "")
-                                                $breadcrumb = $title;
-                                            if (!is_array($breadcrumb))
-                                                $breadcrumb = array();
-                                            if (count($breadcrumb) > 0) {
-                                                $needShowTitle = true;
-                                            }
-                                            if (CFRouter::$controller != "home"):
-                                                ?>
-                                                <div class="bg-lightest container-m--x container-m--y mb-3">
-                                                    <ol class="breadcrumb text-big container-p-x py-3 m-0">
-                                                        <li class="breadcrumb-item">
-                                                            <a href="<?php echo curl::base(); ?>" class="tip-bottom" data-original-title="Go to Home"><i class="ion ion-ios-home"></i></a>
-                                                        </li>
-
-
-                                                        <?php foreach ($breadcrumb as $k => $b) : ?>
-                                                            <li class="breadcrumb-item">
-                                                                <a href="<?php echo $b ?>" class=""><?php echo $k; ?></a>
-                                                            </li>
-
-                                                        <?php endforeach; ?>
-                                                        <li class="breadcrumb-item active">
-                                                            <?php echo $title ?>
-                                                        </li>
-                                                    </ol>
-                                                    <hr class="m-0">
-                                                </div>
-                                                <?php
-                                            endif;
-                                            ?>
-                                        <?php endif; ?>
-                                        <?php if ($needShowTitle): ?>
-                                            <h4 class="font-weight-bold py-3 mb-4">    
+                                            <?php endforeach; ?>
+                                            <li class="breadcrumb-item active">
                                                 <?php echo $title ?>
-                                            </h4>
-                                        <?php endif; ?>
-                                    <?php endif; ?>
+                                            </li>
+                                        </ol>
+                                        <hr class="m-0">
+                                    </div>
 
 
-
-
+                                    <h4 class="font-weight-bold py-3 mb-4">
+                                        <?php echo $title ?>
+                                    </h4>
                                 </div>
-                                <div class="col-lg-2">
-                                </div>
+
                             </div>
 
                             <?php
@@ -187,9 +161,9 @@ $appTitle = ccfg::get("title");
                                     <div class="col-lg-12">
                                         <?php if (!$showNavigation): ?>
                                             <div class="container">
-                                            <?php endif; ?>
-                                            <?php echo $content; ?>
-                                            <?php if (!$showNavigation): ?>
+                                        <?php endif; ?>
+                                        <?php echo $content; ?>
+                                        <?php if (!$showNavigation): ?>
                                             </div>
                                         <?php endif; ?>
                                     </div>
@@ -219,7 +193,7 @@ $appTitle = ccfg::get("title");
             <div class="layout-overlay layout-sidenav-toggle"></div>
         </div><!-- /layout-wrapper -->
         @CAppScripts
-        
+
     </body>
 </html>
 s

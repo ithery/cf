@@ -1,15 +1,8 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Symfony\Component\CssSelector\Node\Specificity;
 
 final class CParser_Css_Property {
-
     /**
      * @var string
      */
@@ -27,6 +20,7 @@ final class CParser_Css_Property {
 
     /**
      * Property constructor.
+     *
      * @param string           $name
      * @param string           $value
      * @param Specificity|null $specificity
@@ -80,8 +74,9 @@ final class CParser_Css_Property {
      */
     public function toString() {
         return sprintf(
-                '%1$s: %2$s;', $this->name, $this->value
+            '%1$s: %2$s;',
+            $this->name,
+            $this->value
         );
     }
-
 }

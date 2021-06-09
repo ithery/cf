@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 30, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 30, 2020
  */
 class CPagination_UrlWindow {
-
     /**
      * The paginator implementation.
      *
@@ -19,7 +19,8 @@ class CPagination_UrlWindow {
     /**
      * Create a new URL window instance.
      *
-     * @param  CPagination_LengthAwarePaginatorInterface  $paginator
+     * @param CPagination_LengthAwarePaginatorInterface $paginator
+     *
      * @return void
      */
     public function __construct(CPagination_PaginatorInterface $paginator) {
@@ -29,7 +30,8 @@ class CPagination_UrlWindow {
     /**
      * Create a new URL window instance.
      *
-     * @param  CPagination_LengthAwarePaginatorInterface  $paginator
+     * @param CPagination_LengthAwarePaginatorInterface $paginator
+     *
      * @return array
      */
     public static function make(CPagination_LengthAwarePaginatorInterface $paginator) {
@@ -67,7 +69,8 @@ class CPagination_UrlWindow {
     /**
      * Create a URL slider links.
      *
-     * @param  int  $onEachSide
+     * @param int $onEachSide
+     *
      * @return array
      */
     protected function getUrlSlider($onEachSide) {
@@ -82,12 +85,10 @@ class CPagination_UrlWindow {
         // links in this list, since we will not have room to create a full slider.
         if ($this->currentPage() <= $window) {
             return $this->getSliderTooCloseToBeginning($window, $onEachSide);
-        }
-
-        // If the current page is close to the ending of the page range we will just get
-        // this first couple pages, followed by a larger window of these ending pages
-        // since we're too close to the end of the list to create a full on slider.
-        elseif ($this->currentPage() > ($this->lastPage() - $window)) {
+        } elseif ($this->currentPage() > ($this->lastPage() - $window)) {
+            // If the current page is close to the ending of the page range we will just get
+            // this first couple pages, followed by a larger window of these ending pages
+            // since we're too close to the end of the list to create a full on slider.
             return $this->getSliderTooCloseToEnding($window, $onEachSide);
         }
 
@@ -100,8 +101,9 @@ class CPagination_UrlWindow {
     /**
      * Get the slider of URLs when too close to beginning of window.
      *
-     * @param  int  $window
-     * @param  int  $onEachSide
+     * @param int $window
+     * @param int $onEachSide
+     *
      * @return array
      */
     protected function getSliderTooCloseToBeginning($window, $onEachSide) {
@@ -115,14 +117,15 @@ class CPagination_UrlWindow {
     /**
      * Get the slider of URLs when too close to ending of window.
      *
-     * @param  int  $window
-     * @param  int  $onEachSide
+     * @param int $window
+     * @param int $onEachSide
+     *
      * @return array
      */
     protected function getSliderTooCloseToEnding($window, $onEachSide) {
         $last = $this->paginator->getUrlRange(
-                $this->lastPage() - ($window + ($onEachSide - 1)),
-                $this->lastPage()
+            $this->lastPage() - ($window + ($onEachSide - 1)),
+            $this->lastPage()
         );
 
         return [
@@ -135,7 +138,8 @@ class CPagination_UrlWindow {
     /**
      * Get the slider of URLs when a full slider can be made.
      *
-     * @param  int  $onEachSide
+     * @param int $onEachSide
+     *
      * @return array
      */
     protected function getFullSlider($onEachSide) {
@@ -149,13 +153,14 @@ class CPagination_UrlWindow {
     /**
      * Get the page range for the current page window.
      *
-     * @param  int  $onEachSide
+     * @param int $onEachSide
+     *
      * @return array
      */
     public function getAdjacentUrlRange($onEachSide) {
         return $this->paginator->getUrlRange(
-                        $this->currentPage() - $onEachSide,
-                        $this->currentPage() + $onEachSide
+            $this->currentPage() - $onEachSide,
+            $this->currentPage() + $onEachSide
         );
     }
 
@@ -175,8 +180,8 @@ class CPagination_UrlWindow {
      */
     public function getFinish() {
         return $this->paginator->getUrlRange(
-                        $this->lastPage() - 1,
-                        $this->lastPage()
+            $this->lastPage() - 1,
+            $this->lastPage()
         );
     }
 
@@ -206,5 +211,4 @@ class CPagination_UrlWindow {
     protected function lastPage() {
         return $this->paginator->lastPage();
     }
-
 }

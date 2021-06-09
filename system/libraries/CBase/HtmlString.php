@@ -1,14 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 28, 2020 
- * @license Ittron Global Teknologi
  */
 class CBase_HtmlString implements CInterface_Htmlable {
-
     /**
      * The HTML string.
      *
@@ -19,7 +16,8 @@ class CBase_HtmlString implements CInterface_Htmlable {
     /**
      * Create a new HTML string instance.
      *
-     * @param  string  $html
+     * @param string $html
+     *
      * @return void
      */
     public function __construct($html = '') {
@@ -61,5 +59,4 @@ class CBase_HtmlString implements CInterface_Htmlable {
     public function __toString() {
         return $this->toHtml();
     }
-
 }

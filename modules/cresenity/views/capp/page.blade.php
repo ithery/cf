@@ -16,269 +16,179 @@ $app = CApp::instance();
 $org = $app->org();
 ?>
 <!DOCTYPE html>
-<html class="no-js" lang="<?php echo clang::getlang(); ?>" >
+<html class="no-js material-style" lang="{{ str_replace('_', '-', CF::getLocale()) }}" >
     <head>
         <meta charset="utf-8">
-        <title><?php echo $title; ?></title>
-        <?php echo $head_client_script; ?>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="shortcut icon" href="<?php echo curl::base(); ?>media/img/favico.png">
+        <title>@CAppPageTitle</title>
 
-        <link href="<?php echo curl::base(); ?>ccore/css/<?php echo $css_hash; ?>" rel="stylesheet">
-        <?php echo $additional_head; ?>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="">
+        @CAppStyles
     </head>
     <body>
-        <?php echo $custom_header; ?>
-        <?php echo $begin_client_script; ?>
-        <div class="navbar navbar-fixed-top">
 
-            <div class="navbar-inner">
+        <div id="wrapper" class="layout-wrapper layout-2">
+            <div class="layout-inner">
 
-                <div class="container">
-
-                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </a>
-
-                    <a class="brand" href="<?php echo curl::base(); ?>">
-                        <?php
-                        $web_title = ccfg::get("title");
-                        //if($org!=null) $web_title = strtoupper($org->name);
-                        echo $web_title;
-                        ?>			
-                    </a>		
-                    <span id="servertime">
-                    </span>
-                    <div class="nav-collapse">
-                        <ul class="nav pull-right">
-                            <?php if (ccfg::get('top_menu_cashier')): ?>
-                                <li >
-                                    <a href="<?php echo curl::base(); ?>retail/sales" id="">
-                                        <i class="icon-th"></i>
-                                        <span>Cashier</span>
-                                    </a>
-                                </li>
-                            <?php endif; ?>
-                            <li >
-                                <a href="javascript:void(0)" id="toggle-fullscreen">
-                                    <i class="icon-fullscreen"></i>
-
-                                </a>
-                            </li>
-                            <li >
-                                <?php
-                                $show_nav = cvariable::get('NAV_MENU_SHOW', $user_id);
-                                if ($show_nav == null)
-                                    $show_nav = true;
-                                if ($show_nav):
-                                    ?>
-                                    <a href="javascript:void(0)" id="toggle-subnavbar">
-                                        <i class="icon-th"></i>
-                                        <span>Hide</span>
-                                    </a>
-                                <?php else: ?>
-                                    <a href="javascript:void(0)" id="toggle-subnavbar">
-                                        <i class="icon-th"></i>
-                                        <span>Show</span>
-                                    </a>
-
-                                <?php endif; ?>
-
-                            </li>
-                            <?php if (ccfg::get("multilang")): ?>
-                                <li class="dropdown">
-
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                        <img style="padding-right:5px;display:inline-block;margin-top:-3px;" src="<?php echo curl::base(); ?>media/img/flags/<?php echo clang::getlang(); ?>.gif" />
-                                        <?php echo clang::current_lang_name(); ?>
-                                        <b class="caret"></b>
-                                    </a>
-
-                                    <ul class="dropdown-menu">
-                                        <?php
-                                        $list = clang::get_lang_list();
-                                        foreach ($list as $k => $v) {
-                                            $active = "";
-                                            if ($k == clang::getlang())
-                                                $active = "active";
-                                            $img = '<img style="padding-right:10px;display:inline-block;margin-top:-3px;" src="' . curl::base() . 'media/img/flags/' . $k . '.gif" />';
-                                            echo '<li class="' . $active . '"><a href="' . curl::base() . 'cresenity/change_lang/' . $k . '" hreflang="' . $k . '">' . $img . ' ' . $v . '</a></li>';
-                                        }
-                                        ?>
-
-                                    </ul>
-
-                                </li>
-                            <?php endif; ?>
-                            <?php if (ccfg::get("change_theme")): ?>
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                        <?php echo clang::__('Theme'); ?> <b class="caret"></b>
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <?php
-                                        $theme_list = ctheme::get_theme_list();
-                                        foreach ($theme_list as $k => $v) {
-                                            if ($k != ctheme::get_current_theme()) {
-                                                echo '<li><a href="' . curl::base() . 'cresenity/change_theme/' . $k . '">' . $v . '</a></li>';
-                                            }
-                                        }
-                                        ?>
-                                    </ul>
-                                </li>
-                            <?php endif; ?>
-                            <li class="dropdown">
-
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    <i class="icon-user"></i> 
-                                    <?php echo $username; ?>
-                                    <b class="caret"></b>
-                                </a>
-
-                                <ul class="dropdown-menu">
-                                    <!--
-                                    <li><a href="javascript:;">My Profile</a></li>
-                                    <li><a href="javascript:;">My Groups</a></li>
-                                    <li class="divider"></li>
-                                    -->
-                                    <li><a href="<?php echo curl::base(); ?>account/profile"><i class="icon icon-user"></i>&nbsp;&nbsp;<?php echo clang::__('My Profile'); ?></a></li>
-                                    <li><a href="<?php echo curl::base(); ?>account/settings"><i class="icon icon-wrench"></i>&nbsp;&nbsp;<?php echo clang::__('My Settings'); ?></a></li>
-                                    <li class="divider"></li>
-                                    <li><a href="<?php echo curl::base(); ?>account/change_password"><i class="icon icon-key"></i>&nbsp;&nbsp;<?php echo clang::__('Change Password'); ?></a></li>
-                                    <li><a href="<?php echo curl::base(); ?>cresenity/logout"><i class="icon icon-signout"></i>&nbsp;&nbsp;<?php echo clang::__('Logout'); ?></a></li>
-                                </ul>
-
-                            </li>
-                        </ul>
-                        <!--
-                        <form class="navbar-search pull-right">
-                                <input type="text" class="search-query" placeholder="Search">
-                        </form>
-                        -->
-                    </div><!--/.nav-collapse -->	
-
-                </div> <!-- /container -->
-
-            </div> <!-- /navbar-inner -->
-
-        </div> <!-- /navbar -->
-
-        <div class="subnavbar" id="subnavbar" <?php if (!$show_nav) echo 'style="display:none"'; ?>>
-
-            <div class="subnavbar-inner">
-
-                <div class="container">
-                    <?php
-                    //echo cmenu::populate_menu($role_id);
-                    echo CNavigation::instance()->render();
-                    ?>
-
-
-                </div> <!-- /container -->
-
-            </div> <!-- /subnavbar-inner -->
-
-        </div> <!-- /subnavbar -->
-
-        <div class="main">
-
-            <div class="main-inner">
-
-                <div id="container" class="container">
-
-
-                    <!--
-                    <div class="btn-group" style="width: auto; ">
-                            <a class="btn btn-large tip-bottom" data-original-title="Manage Files"><i class="icon-file"></i></a>
-                            <a class="btn btn-large tip-bottom" data-original-title="Manage Users"><i class="icon-user"></i></a>
-                            <a class="btn btn-large tip-bottom" data-original-title="Manage Comments"><i class="icon-comment"></i><span class="label label-important">5</span></a>
-                            <a class="btn btn-large tip-bottom" data-original-title="Manage Orders"><i class="icon-shopping-cart"></i></a>
+                <nav id="layout-sidenav" class="layout-sidenav sidenav sidenav-vertical bg-sidenav-theme navbar-default navbar-static-side layout-color-white" role="navigation">
+                    <div class="brand">
+                        <span class="brand-logo">
+                            <img src="" />
+                        </span>
+                        <a href="<?php echo curl::base() . "admin"; ?>"
+                           class="brand-name sidenav-text font-weight-normal ml-2">
+                            @CAppTitle
+                        </a>
                     </div>
-                    -->
-                    <!--
-                    <div class="container-fluid">
-                    -->
-                    <?php if ($show_title): ?>
-                        <h1><?php echo $title ?></h1>
-                    <?php endif; ?>
-                    <?php if ($show_breadcrumb): ?>
-                        <?php
-                        if ($breadcrumb == "")
-                            $breadcrumb = $title;
-                        if (!is_array($breadcrumb))
-                            $breadcrumb = array();
-                        if (CFRouter::$controller != "home"):
-                            ?>
-                            <div id="breadcrumb">
-                                <a href="<?php echo curl::base(); ?>" class="tip-left" data-original-title="Go to Home"><i class="icon-home"></i> Home</a>
-                                <?php foreach ($breadcrumb as $k => $b) : ?>
-                                    <a href="<?php echo $b ?>" class=""><?php echo $k; ?></a>
-                                <?php endforeach; ?>
-                                <a href="javascript:;" class="current"><?php echo $title; ?></a>
+                    <div class="sidenav-divider mt-0"></div>
+                    <div class="sidenav-inner py-1 ps">
+                        @CAppNav
+                    </div> <!-- /sidebar-collapse -->
+                </nav> <!-- /nav -->
+
+
+                <div id="page-wrapper" class="layout-container">
+
+                    <nav class="layout-navbar navbar navbar-expand-lg align-items-lg-center container-p-x bg-navbar-theme font-color-white" id="layout-navbar">
+                        <a href="<?php echo curl::base(); ?>" class="navbar-brand brand d-lg-none py-0">
+                            <span class="brand-logo">
+                                <img src="" />
+                            </span>
+                            <span class="brand-name font-weight-normal ml-2">@CAppTitle</span>
+                        </a>
+                        <div class="layout-sidenav-toggle navbar-nav align-items-lg-center mr-auto">
+                            <a class="nav-item nav-link px-0 ml-2 ml-lg-0" href="javascript:void(0)">
+                                <i class="ion ion-md-menu text-large align-middle"></i>
+                            </a>
+                        </div>
+
+                        <button class="navbar-toggler collapsed" type="button" data-toggle="collapse" data-target="#layout-navbar-collapse" aria-expanded="false">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+
+                        <span class="ml-3">
+                          
+                        </span>
+                        <div class="navbar-nav align-items-lg-center ml-auto">
+
+                            <div class="navbar-collapse collapse" id="layout-navbar-collapse" style="">
+
+                                <a href="javascript:void(0)" class="layout-sidenav-toggle sidenav-link text-large"></a>
+                                <!-- Divider -->
+                                <hr class="d-lg-none w-100 my-2">
+                                <div class="navbar-nav align-items-lg-center ml-auto">
+                                    <span id="servertime"></span>
+
+
+                                    <!--
+                                <div class="navbar-messages nav-item  mr-lg-3">
+                                    <a id="toggle-fullscreen" class="nav-link hide-arrow" href="#" >
+                                        <i class="ion ion-ios-expand navbar-icon align-middle"></i>
+                                        <span class="d-lg-none align-middle">&nbsp; Fullscreen</span>
+                                    </a>
+                                </div>
+                                    -->
+
+
+                                    <div class="navbar-user nav-item dropdown dropdown-pull-right">
+                                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                                            <span class="d-inline-flex flex-lg-row-reverse align-items-center align-middle">
+                                                <i class="ion ion-ios-person"></i>
+                                                <span class="px-1 mr-lg-2 ml-2 ml-lg-0"><?php echo $username; ?></span>
+                                            </span>
+                                        </a>
+
+                                        <div class="dropdown-menu pull-right">
+
+                                            <li><a href="<?php echo curl::base(); ?>admin/account/password/change"><i class="fas fa-key"></i>&nbsp;&nbsp;<?php echo clang::__('Change Password'); ?></a></li>
+
+                                            <li><a href="<?php echo curl::base(); ?>admin/auth/logout"><i class="fas fa-sign-out-alt"></i>&nbsp;&nbsp;<?php echo clang::__('Logout'); ?></a></li>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div><!--/.nav-collapse -->	
+                        </div>
+
+
+                    </nav> <!-- /navbar -->
+
+
+                    <div class="main layout-content">
+                        <div class="main-inner container-fluid flex-grow-1 container-p-y">
+                            <div class="row page-heading">
+                                <div class="col-lg-12">
+                                    <?php if ($show_breadcrumb): ?>
+                                        <?php
+                                        if ($breadcrumb == "")
+                                            $breadcrumb = $title;
+                                        if (!is_array($breadcrumb))
+                                            $breadcrumb = array();
+                                        if (CFRouter::$controller != "home"):
+                                            ?>
+                                            <div class="bg-lightest container-m--x container-m--y mb-3">
+                                                <ol class="breadcrumb text-big container-p-x py-3 m-0">
+                                                    <li class="breadcrumb-item">
+                                                        <a href="<?php echo curl::base() . "admin"; ?>" class="tip-bottom" data-original-title="Go to Home"><i class="ion ion-ios-home"></i></a>
+                                                    </li>
+                                                    <?php foreach ($breadcrumb as $k => $b) : ?>
+                                                        <li class="breadcrumb-item">
+                                                            <a href="<?php echo $b ?>" class=""><?php echo $k; ?></a>
+                                                        </li>
+                                                    <?php endforeach; ?>
+                                                    <li class="breadcrumb-item active">
+                                                        <a href="javascript:;" class="active"><strong><?php echo $title; ?></strong></a>
+                                                    </li>
+                                                </ol>
+                                                <hr class="m-0">
+                                            </div>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                    <?php if ($show_title): ?>
+                                        <h4 class="font-weight-bold py-3 mb-4"><?php echo $title ?></h4>
+                                    <?php endif; ?>
+
+                                </div>
                             </div>
+
                             <?php
-                        endif;
-                        ?>
-                    <?php endif; ?>
-                    <?php
-                    $msg = cmsg::flash_all();
-                    if (strlen($msg) > 0) {
-                        echo '<div class="row-fluid"><div class="span12">' . $msg . '</div></div>';
-                    }
-                    ?>
+                            $msg = cmsg::flash_all();
+                            if (strlen($msg) > 0) {
+                                echo '<div class="row-fluid"><div class="span12">' . $msg . '</div></div>';
+                            }
+                            ?>
+                            <div class="wrapper wrapper-content">
+                                <div class="row">
+                                    <div class="col-lg-12">
 
+                                        <div class="container">
 
-                    <?php echo $content; ?>
+                                            @CAppContent
 
-                    <?php defined('SYSPATH') OR die('No direct access allowed.'); ?>
+                                        </div>
 
+                                    </div>
+                                </div>
+                            </div>
 
-                </div>
+                        </div>
+                    </div>
+
+                    <div class="layout-footer footer bg-footer-theme">
+                        <div class="container-fluid d-flex flex-wrap justify-content-between text-center container-p-x pb-3">
+                            <div class="pt-3">
+                                <span class="footer-text font-weight-bolder">
+                                    &copy; <?php echo date('Y'); ?> <?php echo CF::codeName(); ?> V<?php echo CF::version(); ?>
+                                </span>
+                            </div> <!-- /span12 -->
+                        </div>
+                        <div></div> <!-- /row -->
+
+                    </div> <!-- /footer -->
+                </div><!-- /page-wrapper -->
             </div>
-        </div>
-        <div class="footer">
-            <div class="footer-inner">
-                <div class="container">
-                    <div class="row">
-                        <div class="span12">
-                            &copy; 2017 <a href="http://ittron.co.id">Ittron Global Technology</a>.
-                        </div> <!-- /span12 -->
-                    </div> <!-- /row -->
-                </div> <!-- /container -->
-            </div> <!-- /footer-inner -->
-        </div> <!-- /footer -->
-
-        <script src="<?php echo curl::base(); ?>media/js/require.js"></script>
-        <!-- Load javascript here -->
-
-        <?php echo $end_client_script; ?>
-
-        <script language="javascript">
-
-<?php
-echo $js;
-echo $ready_client_script;
-?>
-
-            if (window) {
-                window.onload = function () {
-<?php echo $load_client_script; ?>
-                }
-            }
-<?php echo $custom_js ?>
-        </script>
-        <?php echo $custom_footer; ?>
+            <div class="layout-overlay layout-sidenav-toggle"></div>
+        </div><!-- /wrapper -->  
+        @CAppScripts
     </body>
 </html>
-<?php
-if (ccfg::get("log_request")) {
-    $user = CApp::instance()->user();
-    if ($user != null) {
-
-        clog::request($user->user_id);
-    }
-}
-?>
-				

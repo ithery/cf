@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CConsole_Command_Make_MakeConfigCommand extends CConsole_Command {
-
     /**
      * The name and signature of the console command.
      *
@@ -45,31 +44,29 @@ class CConsole_Command_Make_MakeConfigCommand extends CConsole_Command {
             $option = carr::get($arrayOptionValue, $key);
 
             $defaultOption = CF::config($config . '.' . $key);
-            if($key=='title' && $config=='app') {
+            if ($key == 'title' && $config == 'app') {
                 $defaultOption = CF::appCode();
             }
             if ($option == null) {
-
-
                 if (!carr::get($allOption, 'no-interaction', false)) {
                     //try to get the option
-                    $option = $this->ask($key, var_export($defaultOption,true));
+                    $option = $this->ask($key, var_export($defaultOption, true));
                 }
             }
 
             if ($option != null) {
                 if (is_string($defaultOption)) {
-                    if (!cstr::startsWith($option, ["'", "\""])) {
+                    if (!cstr::startsWith($option, ["'", '"'])) {
                         $option = "'" . $option . "'";
                     }
                 }
                 if (is_bool($defaultOption) && is_string($option)) {
-                    $option = var_export(filter_var($option, FILTER_VALIDATE_BOOLEAN),true);
+                    $option = var_export(filter_var($option, FILTER_VALIDATE_BOOLEAN), true);
                 }
             }
 
             if ($option == null) {
-                $option = var_export($defaultOption,true);
+                $option = var_export($defaultOption, true);
             }
             $content = str_replace('{' . $key . '}', $option, $content);
         }
@@ -78,5 +75,4 @@ class CConsole_Command_Make_MakeConfigCommand extends CConsole_Command {
 
         $this->info('Config ' . $config . ' created on:' . $configFile);
     }
-
 }

@@ -1,25 +1,17 @@
 <?php
 
-// namespace Illuminate\Database\Eloquent\Relations;
-// use Illuminate\Database\Eloquent\Model;
-// use Illuminate\Database\Eloquent\Builder;
-// use Illuminate\Database\Eloquent\Collection;
-// use Illuminate\Database\Eloquent\SoftDeletes;
-// use Illuminate\Database\Eloquent\ModelNotFoundException;
-
 class CModel_Relation_HasManyThrough extends CModel_Relation {
-
     /**
      * The "through" parent model instance.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var \CModel
      */
     protected $throughParent;
 
     /**
      * The far parent model instance.
      *
-     * @var \Illuminate\Database\Eloquent\Model
+     * @var \CModel
      */
     protected $farParent;
 
@@ -52,22 +44,16 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     protected $secondLocalKey;
 
     /**
-     * The count of self joins.
-     *
-     * @var int
-     */
-    protected static $selfJoinCount = 0;
-
-    /**
      * Create a new has many through relationship instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Model  $farParent
-     * @param  \Illuminate\Database\Eloquent\Model  $throughParent
-     * @param  string  $firstKey
-     * @param  string  $secondKey
-     * @param  string  $localKey
-     * @param  string  $secondLocalKey
+     * @param \CModel_Query $query
+     * @param \CModel       $farParent
+     * @param \CModel       $throughParent
+     * @param string        $firstKey
+     * @param string        $secondKey
+     * @param string        $localKey
+     * @param string        $secondLocalKey
+     *
      * @return void
      */
     public function __construct(CModel_Query $query, CModel $farParent, CModel $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey) {
@@ -99,10 +85,11 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     /**
      * Set the join clause on the query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder|null  $query
+     * @param CModel_Query|null $query
+     *
      * @return void
      */
-    protected function performJoin(Builder $query = null) {
+    protected function performJoin(CModel_Query $query = null) {
         $query = $query ?: $this->query;
 
         $farKey = $this->getQualifiedFarKeyName();
@@ -110,7 +97,9 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
         $query->join($this->throughParent->getTable(), $this->getQualifiedParentKeyName(), '=', $farKey);
 
         if ($this->throughParentSoftDeletes()) {
-            $query->where($this->throughParent->getQualifiedStatusColumn(), '>', 0);
+            $query->withGlobalScope('SoftDeletableHasManyThrough', function ($query) {
+                $query->where($this->throughParent->getQualifiedStatusColumn(), '>', 0);
+            });
         }
     }
 
@@ -120,7 +109,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @return string
      */
     public function getQualifiedParentKeyName() {
-        return $this->parent->getTable() . '.' . $this->secondLocalKey;
+        return $this->parent->qualifyColumn($this->secondLocalKey);
     }
 
     /**
@@ -130,27 +119,43 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      */
     public function throughParentSoftDeletes() {
         return in_array(CModel_SoftDelete_SoftDeleteTrait::class, c::classUsesRecursive(
-                        get_class($this->throughParent)
+            $this->throughParent
         ));
+    }
+
+    /**
+     * Indicate that trashed "through" parents should be included in the query.
+     *
+     * @return $this
+     */
+    public function withTrashedParents() {
+        $this->query->withoutGlobalScope('SoftDeletableHasManyThrough');
+
+        return $this;
     }
 
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param  array  $models
+     * @param array $models
+     *
      * @return void
      */
     public function addEagerConstraints(array $models) {
-        $this->query->whereIn(
-                $this->getQualifiedFirstKeyName(), $this->getKeys($models, $this->localKey)
+        $whereIn = $this->whereInMethod($this->farParent, $this->localKey);
+
+        $this->query->{$whereIn}(
+            $this->getQualifiedFirstKeyName(),
+            $this->getKeys($models, $this->localKey)
         );
     }
 
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array   $models
-     * @param  string  $relation
+     * @param array  $models
+     * @param string $relation
+     *
      * @return array
      */
     public function initRelation(array $models, $relation) {
@@ -164,9 +169,10 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array   $models
-     * @param  CModel_Collection  $results
-     * @param  string  $relation
+     * @param array             $models
+     * @param CModel_Collection $results
+     * @param string            $relation
+     *
      * @return array
      */
     public function match(array $models, CModel_Collection $results, $relation) {
@@ -178,7 +184,8 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
         foreach ($models as $model) {
             if (isset($dictionary[$key = $model->getAttribute($this->localKey)])) {
                 $model->setRelation(
-                        $relation, $this->related->newCollection($dictionary[$key])
+                    $relation,
+                    $this->related->newCollection($dictionary[$key])
                 );
             }
         }
@@ -189,7 +196,8 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     /**
      * Build model dictionary keyed by the relation's foreign key.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection  $results
+     * @param \CModel_Collection $results
+     *
      * @return array
      */
     protected function buildDictionary(CModel_Collection $results) {
@@ -199,7 +207,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
         // relationship as this will allow us to quickly access all of the related
         // models without having to do nested looping which will be quite slow.
         foreach ($results as $result) {
-            $dictionary[$result->{$this->firstKey}][] = $result;
+            $dictionary[$result->model_through_key][] = $result;
         }
 
         return $dictionary;
@@ -208,8 +216,9 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     /**
      * Get the first related model record matching the attributes or instantiate it.
      *
-     * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param array $attributes
+     *
+     * @return \CModel
      */
     public function firstOrNew(array $attributes) {
         if (is_null($instance = $this->where($attributes)->first())) {
@@ -222,9 +231,10 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     /**
      * Create or update a related record matching the attributes, and fill it with values.
      *
-     * @param  array  $attributes
-     * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param array $attributes
+     * @param array $values
+     *
+     * @return \CModel
      */
     public function updateOrCreate(array $attributes, array $values = []) {
         $instance = $this->firstOrNew($attributes);
@@ -235,9 +245,24 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     }
 
     /**
+     * Add a basic where clause to the query, and return the first result.
+     *
+     * @param \Closure|string|array $column
+     * @param mixed                 $operator
+     * @param mixed                 $value
+     * @param string                $boolean
+     *
+     * @return \CModel|static
+     */
+    public function firstWhere($column, $operator = null, $value = null, $boolean = 'and') {
+        return $this->where($column, $operator, $value, $boolean)->first();
+    }
+
+    /**
      * Execute the query and get the first related model.
      *
-     * @param  array   $columns
+     * @param array $columns
+     *
      * @return mixed
      */
     public function first($columns = ['*']) {
@@ -249,65 +274,74 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     /**
      * Execute the query and get the first result or throw an exception.
      *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @param array $columns
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @return CModel|static
+     *
+     * @throws CModel_Exception_ModelNotFound
      */
     public function firstOrFail($columns = ['*']) {
         if (!is_null($model = $this->first($columns))) {
             return $model;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->related));
+        throw (new CModel_Exception_ModelNotFound)->setModel(get_class($this->related));
     }
 
     /**
      * Find a related model by its primary key.
      *
-     * @param  mixed  $id
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|null
+     * @param mixed $id
+     * @param array $columns
+     *
+     * @return \CModel|\CModel_Collection|null
      */
     public function find($id, $columns = ['*']) {
-        if (is_array($id)) {
+        if (is_array($id) || $id instanceof CInterface_Arrayable) {
             return $this->findMany($id, $columns);
         }
 
         return $this->where(
-                        $this->getRelated()->getQualifiedKeyName(), '=', $id
-                )->first($columns);
+            $this->getRelated()->getQualifiedKeyName(),
+            '=',
+            $id
+        )->first($columns);
     }
 
     /**
      * Find multiple related models by their primary keys.
      *
-     * @param  mixed  $ids
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @param mixed $ids
+     * @param array $columns
+     *
+     * @return \CModel_Collection
      */
     public function findMany($ids, $columns = ['*']) {
+        $ids = $ids instanceof CInterface_Arrayable ? $ids->toArray() : $ids;
         if (empty($ids)) {
             return $this->getRelated()->newCollection();
         }
 
         return $this->whereIn(
-                        $this->getRelated()->getQualifiedKeyName(), $ids
-                )->get($columns);
+            $this->getRelated()->getQualifiedKeyName(),
+            $ids
+        )->get($columns);
     }
 
     /**
      * Find a related model by its primary key or throw an exception.
      *
-     * @param  mixed  $id
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @param mixed $id
+     * @param array $columns
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @return \CModel|\CModel_Collection
+     *
+     * @throws \CModel_Exception_ModelNotFound
      */
     public function findOrFail($id, $columns = ['*']) {
         $result = $this->find($id, $columns);
 
+        $id = $id instanceof CInterface_Arrayable ? $id->toArray() : $id;
         if (is_array($id)) {
             if (count($result) == count(array_unique($id))) {
                 return $result;
@@ -316,7 +350,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
             return $result;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->related));
+        throw (new CModel_Exception_ModelNotFound)->setModel(get_class($this->related), $id);
     }
 
     /**
@@ -325,26 +359,22 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @return mixed
      */
     public function getResults() {
-        return $this->get();
+        return !is_null($this->farParent->{$this->localKey})
+            ? $this->get()
+            : $this->related->newCollection();
     }
 
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @param array $columns
+     *
+     * @return CModel_Collection
      */
     public function get($columns = ['*']) {
-        // First we'll add the proper select columns onto the query so it is run with
-        // the proper columns. Then, we will get the results and hydrate out pivot
-        // models with the result of those columns as a separate model relation.
-        $columns = $this->query->getQuery()->columns ? [] : $columns;
+        $builder = $this->prepareQueryBuilder($columns);
 
-        $builder = $this->query->applyScopes();
-
-        $models = $builder->addSelect(
-                        $this->shouldSelect($columns)
-                )->getModels();
+        $models = $builder->getModels();
 
         // If we actually found models we will also eager load any relationships that
         // have been specified as needing to be eager loaded. This will solve the
@@ -359,11 +389,12 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     /**
      * Get a paginator for the "select" statement.
      *
-     * @param  int  $perPage
-     * @param  array  $columns
-     * @param  string  $pageName
-     * @param  int  $page
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @param int    $perPage
+     * @param array  $columns
+     * @param string $pageName
+     * @param int    $page
+     *
+     * @return CPagination_LengthAwarePaginator
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
         $this->query->addSelect($this->shouldSelect($columns));
@@ -374,11 +405,12 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     /**
      * Paginate the given query into a simple paginator.
      *
-     * @param  int  $perPage
-     * @param  array  $columns
-     * @param  string  $pageName
-     * @param  int|null  $page
-     * @return \Illuminate\Contracts\Pagination\Paginator
+     * @param int      $perPage
+     * @param array    $columns
+     * @param string   $pageName
+     * @param int|null $page
+     *
+     * @return CPagination_Paginator
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) {
         $this->query->addSelect($this->shouldSelect($columns));
@@ -389,7 +421,8 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     /**
      * Set the select clause for the relation query.
      *
-     * @param  array  $columns
+     * @param array $columns
+     *
      * @return array
      */
     protected function shouldSelect(array $columns = ['*']) {
@@ -397,15 +430,91 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
             $columns = [$this->related->getTable() . '.*'];
         }
 
-        return array_merge($columns, [$this->getQualifiedFirstKeyName()]);
+        return array_merge($columns, [$this->getQualifiedFirstKeyName() . ' as model_through_key']);
+    }
+
+    /**
+     * Chunk the results of the query.
+     *
+     * @param int      $count
+     * @param callable $callback
+     *
+     * @return bool
+     */
+    public function chunk($count, callable $callback) {
+        return $this->prepareQueryBuilder()->chunk($count, $callback);
+    }
+
+    /**
+     * Chunk the results of a query by comparing numeric IDs.
+     *
+     * @param int         $count
+     * @param callable    $callback
+     * @param string|null $column
+     * @param string|null $alias
+     *
+     * @return bool
+     */
+    public function chunkById($count, callable $callback, $column = null, $alias = null) {
+        if ($column == null) {
+            $column = $this->getRelated()->getQualifiedKeyName();
+        }
+        if ($alias == null) {
+            $alias = $this->getRelated()->getKeyName();
+        }
+
+        return $this->prepareQueryBuilder()->chunkById($count, $callback, $column, $alias);
+    }
+
+    /**
+     * Get a generator for the given query.
+     *
+     * @return \Generator
+     */
+    public function cursor() {
+        return $this->prepareQueryBuilder()->cursor();
+    }
+
+    /**
+     * Execute a callback over each item while chunking.
+     *
+     * @param callable $callback
+     * @param int      $count
+     *
+     * @return bool
+     */
+    public function each(callable $callback, $count = 1000) {
+        return $this->chunk($count, function ($results) use ($callback) {
+            foreach ($results as $key => $value) {
+                if ($callback($value, $key) === false) {
+                    return false;
+                }
+            }
+        });
+    }
+
+    /**
+     * Prepare the query builder for query execution.
+     *
+     * @param array $columns
+     *
+     * @return \CModel_Query
+     */
+    protected function prepareQueryBuilder($columns = ['*']) {
+        $builder = $this->query->applyScopes();
+
+        return $builder->addSelect(
+            $this->shouldSelect($builder->getQuery()->columns ? [] : $columns)
+        );
     }
 
     /**
      * Add the constraints for a relationship query.
      *
-     * @param  CModel_Query  $query
-     * @param  CModel_Query  $parentQuery
-     * @param  array|mixed  $columns
+     * @param CModel_Query $query
+     * @param CModel_Query $parentQuery
+     * @param array|mixed  $columns
+     *
      * @return CModel_Query
      */
     public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
@@ -413,22 +522,29 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
             return $this->getRelationExistenceQueryForSelfRelation($query, $parentQuery, $columns);
         }
 
+        if ($parentQuery->getQuery()->from === $this->throughParent->getTable()) {
+            return $this->getRelationExistenceQueryForThroughSelfRelation($query, $parentQuery, $columns);
+        }
+
         $this->performJoin($query);
 
         return $query->select($columns)->whereColumn(
-                        $this->getQualifiedLocalKeyName(), '=', $this->getQualifiedFirstKeyName()
+            $this->getQualifiedLocalKeyName(),
+            '=',
+            $this->getQualifiedFirstKeyName()
         );
     }
 
     /**
      * Add the constraints for a relationship query on the same table.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
-     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
-     * @param  array|mixed  $columns
-     * @return \Illuminate\Database\Eloquent\Builder
+     * @param CModel_Query $query
+     * @param CModel_Query $parentQuery
+     * @param array|mixed  $columns
+     *
+     * @return CModel_Query
      */
-    public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*']) {
+    public function getRelationExistenceQueryForSelfRelation(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
         $query->from($query->getModel()->getTable() . ' as ' . $hash = $this->getRelationCountHash());
 
         $query->join($this->throughParent->getTable(), $this->getQualifiedParentKeyName(), '=', $hash . '.' . $this->secondLocalKey);
@@ -440,17 +556,35 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
         $query->getModel()->setTable($hash);
 
         return $query->select($columns)->whereColumn(
-                        $parentQuery->getQuery()->from . '.' . $query->getModel()->getKeyName(), '=', $this->getQualifiedFirstKeyName()
+            $parentQuery->getQuery()->from . '.' . $this->localKey,
+            '=',
+            $this->getQualifiedFirstKeyName()
         );
     }
 
     /**
-     * Get a relationship join table hash.
+     * Add the constraints for a relationship query on the same table as the through parent.
      *
-     * @return string
+     * @param CModel_Query $query
+     * @param CModel_Query $parentQuery
+     * @param array|mixed  $columns
+     *
+     * @return CModel_Query
      */
-    public function getRelationCountHash() {
-        return 'laravel_reserved_' . static::$selfJoinCount++;
+    public function getRelationExistenceQueryForThroughSelfRelation(CModel_Query $query, CModel_Query $parentQuery, $columns = ['*']) {
+        $table = $this->throughParent->getTable() . ' as ' . $hash = $this->getRelationCountHash();
+
+        $query->join($table, $hash . '.' . $this->secondLocalKey, '=', $this->getQualifiedFarKeyName());
+
+        if ($this->throughParentSoftDeletes()) {
+            $query->where($this->throughParent->getQualifiedStatusColumn(), '>', 0);
+        }
+
+        return $query->select($columns)->whereColumn(
+            $parentQuery->getQuery()->from . '.' . $this->localKey,
+            '=',
+            $hash . '.' . $this->firstKey
+        );
     }
 
     /**
@@ -463,12 +597,30 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     }
 
     /**
+     * Get the foreign key on the "through" model.
+     *
+     * @return string
+     */
+    public function getFirstKeyName() {
+        return $this->firstKey;
+    }
+
+    /**
      * Get the qualified foreign key on the "through" model.
      *
      * @return string
      */
     public function getQualifiedFirstKeyName() {
-        return $this->throughParent->getTable() . '.' . $this->firstKey;
+        return $this->throughParent->qualifyColumn($this->firstKey);
+    }
+
+    /**
+     * Get the foreign key on the related model.
+     *
+     * @return string
+     */
+    public function getForeignKeyName() {
+        return $this->secondKey;
     }
 
     /**
@@ -477,7 +629,16 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @return string
      */
     public function getQualifiedForeignKeyName() {
-        return $this->related->getTable() . '.' . $this->secondKey;
+        return $this->related->qualifyColumn($this->secondKey);
+    }
+
+    /**
+     * Get the local key on the far parent model.
+     *
+     * @return string
+     */
+    public function getLocalKeyName() {
+        return $this->localKey;
     }
 
     /**
@@ -486,7 +647,15 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @return string
      */
     public function getQualifiedLocalKeyName() {
-        return $this->farParent->getTable() . '.' . $this->localKey;
+        return $this->farParent->qualifyColumn($this->localKey);
     }
 
+    /**
+     * Get the local key on the intermediary model.
+     *
+     * @return string
+     */
+    public function getSecondLocalKeyName() {
+        return $this->secondLocalKey;
+    }
 }

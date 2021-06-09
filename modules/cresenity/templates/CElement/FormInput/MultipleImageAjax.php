@@ -1,10 +1,11 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jan 13, 2018, 10:58:37 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jan 13, 2018, 10:58:37 AM
  */
 ?>
 <style>
@@ -111,8 +112,8 @@ defined('SYSPATH') OR die('No direct access allowed.');
     </div>
     <div id="<?php echo $id ?>_description" class="multi-image-ajax-description"><?php echo clang::__('Click or Drop Files On Box Below')?></div>
     <div id="<?php echo $id ?>" class="row control-fileupload multi-image-ajax">
-        <?php
-        foreach ($files as $f) :
+        <?php foreach ($files as $f):  ?>
+            <?php
             $input_name = carr::get($f, 'input_name');
             $input_value = carr::get($f, 'input_value');
             $file_url = carr::get($f, 'file_url');
@@ -122,13 +123,13 @@ defined('SYSPATH') OR die('No direct access allowed.');
                     <img src="<?php echo $file_url; ?>" />
                     <input type="hidden" name="<?php echo $name; ?>[<?php echo $input_name; ?>]" value="<?php echo $input_value; ?>">
                 </div>
-                <?php
-                foreach ($customControl as $cc) :
+                <?php foreach ($customControl as $cc): ?>
+                    <?php
                     $control = carr::get($cc, 'control');
                     $control_name = carr::get($cc, 'input_name');
                     $control_label = carr::get($cc, 'input_label');
                     //get value
-                    $control_value_array = carr::get($customControlValue, $input_name, array());
+                    $control_value_array = carr::get($customControlValue, $input_name, []);
                     $control_value = carr::get($control_value_array, $control_name);
                     ?>
                     <div class="div-custom-control">
@@ -299,25 +300,23 @@ defined('SYSPATH') OR die('No direct access allowed.');
                 var div_cc;
                 var cc_label;
                 var cc;
-<?php
-foreach ($customControl as $cc):
-    $control = carr::get($cc, 'control');
-    $control_name = carr::get($cc, 'input_name');
-    $control_label = carr::get($cc, 'input_label');
-    ?>
+                <?php foreach ($customControl as $cc): ?>
+                    <?php
+                    $control = carr::get($cc, 'control');
+                    $control_name = carr::get($cc, 'input_name');
+                    $control_label = carr::get($cc, 'input_label');
+                    ?>
                     div_cc = $("<div>").addClass("div-custom-control");
                     cc_label = $("<label>").html("<?php echo $control_label; ?> :");
                     cc = $("<input type=\"<?php echo $control; ?>\" name=\"<?php echo $name; ?>_custom_control[" + index + "][<?php echo $control_name; ?>]\">");
                     div_cc.append(cc_label);
                     div_cc.append(cc);
                     div.append(div_cc);
-<?php endforeach; ?>
-
-<?php if ($removeLink): ?>
-
+                <?php endforeach; ?>
+                <?php if ($removeLink): ?>
                     var remove = $("<a>").addClass("multi-image-ajax-remove").html("Remove");
                     div.append(remove);
-<?php endif; ?>
+                <?php endif; ?>
                 div.append("<img class=\"multi-image-ajax-loading\" src=\"<?php echo curl::base(); ?>media/img/ring.gif\" />");
                 fileList.append(div.addClass("loading"));
                 fileUploadRemove();
@@ -434,11 +433,4 @@ foreach ($customControl as $cc):
         }); // end of document ready
     })(jQuery); // end of jQuery name space
 
-
-
-
-
-
-
 </script>
-

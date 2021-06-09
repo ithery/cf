@@ -6,35 +6,34 @@
  * @author Hery
  */
 class CProfiler_TableRenderer {
-
-    protected $columns = array();
-    protected $rows = array();
+    protected $columns = [];
+    protected $rows = [];
 
     /**
      * Add column to table.
      *
-     * @param  string  CSS class
-     * @param  string  CSS style
+     * @param mixed $class
+     * @param mixed $style
      */
     public function addColumn($class = '', $style = '') {
-        $this->columns[] = array('class' => $class, 'style' => $style);
+        $this->columns[] = ['class' => $class, 'style' => $style];
     }
 
     /**
      * Add row to table.
      *
-     * @param  array   data to go in table cells
-     * @param  string  CSS class
-     * @param  string  CSS style
+     * @param mixed $data  data to go in table cells
+     * @param mixed $class CSS class
+     * @param mixed $style CSS style
      */
     public function addRow($data, $class = '', $style = '') {
-        $this->rows[] = array('data' => $data, 'class' => $class, 'style' => $style);
+        $this->rows[] = ['data' => $data, 'class' => $class, 'style' => $style];
     }
 
     /**
      * Render table.
      *
-     * @return  string
+     * @return string
      */
     public function render() {
         $rows = $this->rows;
@@ -43,7 +42,6 @@ class CProfiler_TableRenderer {
         $html = '';
         $html .= '<table class="kp-table">';
         foreach ($rows as $row) {
-
             $class = empty($row['class']) ? '' : ' class="' . $row['class'] . '"';
             $style = empty($row['style']) ? '' : ' style="' . $row['style'] . '"';
             $html .= '<tr' . $class . $style . '>';
@@ -51,7 +49,7 @@ class CProfiler_TableRenderer {
                 $class = empty($column['class']) ? '' : ' class="' . $column['class'] . '"';
                 $style = empty($column['style']) ? '' : ' style="' . $column['style'] . '"';
                 $value = $row['data'][$index];
-                $value = (is_array($value) OR is_object($value)) ? '<pre>' . c::e(print_r($value, TRUE)) . '</pre>' : c::e($value);
+                $value = (is_array($value) or is_object($value)) ? '<pre>' . c::e(print_r($value, true)) . '</pre>' : c::e($value);
                 $html .= '<td' . $style . $class . '>' . $value . '</td>';
             }
             $html .= '</tr>';
@@ -59,5 +57,4 @@ class CProfiler_TableRenderer {
         $html .= '</table>';
         return $html;
     }
-
 }

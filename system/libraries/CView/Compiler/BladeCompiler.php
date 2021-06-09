@@ -6,14 +6,15 @@
  * @author Hery
  */
 class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
-
     use CView_Compiler_BladeCompiler_CompileCommentTrait,
+        CView_Compiler_BladeCompiler_CompileComponentTrait,
+        CView_Compiler_BladeCompiler_CompileConditionalTrait,
+        CView_Compiler_BladeCompiler_CompileErrorTrait,
+        CView_Compiler_BladeCompiler_CompileHelperTrait,
         CView_Compiler_BladeCompiler_CompileEchoTrait,
         CView_Compiler_BladeCompiler_CompileLayoutTrait,
         CView_Compiler_BladeCompiler_CompileRawPhpTrait,
         CView_Compiler_BladeCompiler_CompileLoopTrait,
-        CView_Compiler_BladeCompiler_CompileConditionalTrait,
-        CView_Compiler_BladeCompiler_CompileErrorTrait,
         CView_Compiler_BladeCompiler_CompileIncludeTrait,
         CView_Compiler_BladeCompiler_CompileInjectionTrait,
         CView_Compiler_BladeCompiler_CompileStackTrait;
@@ -147,13 +148,11 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     protected $compilesComponentTags = true;
 
     /**
-     *
      * @var CView_Compiler_BladeCompiler
      */
     private static $instance;
 
     /**
-     * 
      * @return CView_Compiler_BladeCompiler
      */
     public static function instance() {
@@ -166,7 +165,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Compile the view at the given path.
      *
-     * @param  string|null  $path
+     * @param string|null $path
+     *
      * @return void
      */
     public function compile($path = null) {
@@ -182,7 +182,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
             }
 
             CFile::put(
-                    $this->getCompiledPath($this->getPath()), $contents
+                $this->getCompiledPath($this->getPath()),
+                $contents
             );
         }
     }
@@ -190,7 +191,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Append the file path to the compiled string.
      *
-     * @param  string  $contents
+     * @param string $contents
+     *
      * @return string
      */
     protected function appendFilePath($contents) {
@@ -206,15 +208,16 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Get the open and closing PHP tag tokens from the given string.
      *
-     * @param  string  $contents
-     * @return \Illuminate\Support\Collection
+     * @param string $contents
+     *
+     * @return CCollection
      */
     protected function getOpenAndClosingPhpTokens($contents) {
-        return CF::collect(token_get_all($contents))
-                        ->pluck(0)
-                        ->filter(function ($token) {
-                            return in_array($token, [T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO, T_CLOSE_TAG]);
-                        });
+        return c::collect(token_get_all($contents))
+            ->pluck(0)
+            ->filter(function ($token) {
+                return in_array($token, [T_OPEN_TAG, T_OPEN_TAG_WITH_ECHO, T_CLOSE_TAG]);
+            });
     }
 
     /**
@@ -229,7 +232,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Set the path currently being compiled.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return void
      */
     public function setPath($path) {
@@ -239,7 +243,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Compile the given Blade template contents.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public function compileString($value) {
@@ -249,7 +254,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
         // step which compiles the component Blade tags into @component directives
         // that may be used by Blade. Then we should call any other precompilers.
         $value = $this->compileComponentTags(
-                $this->compileComments($this->storeUncompiledBlocks($value))
+            $this->compileComments($this->storeUncompiledBlocks($value))
         );
 
         foreach ($this->precompilers as $precompiler) {
@@ -280,7 +285,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Store the blocks that do not receive compilation.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function storeUncompiledBlocks($value) {
@@ -298,7 +304,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Store the verbatim blocks and replace them with a temporary placeholder.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function storeVerbatimBlocks($value) {
@@ -310,7 +317,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Store the PHP blocks and replace them with a temporary placeholder.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function storePhpBlocks($value) {
@@ -322,19 +330,21 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Store a raw block and return a unique raw placeholder.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function storeRawBlock($value) {
         return $this->getRawPlaceholder(
-                        array_push($this->rawBlocks, $value) - 1
+            array_push($this->rawBlocks, $value) - 1
         );
     }
 
     /**
      * Compile the component tags.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileComponentTags($value) {
@@ -343,14 +353,17 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
         }
 
         return (new CView_Compiler_ComponentTagCompiler(
-                        $this->classComponentAliases, $this->classComponentNamespaces, $this
-                ))->compile($value);
+            $this->classComponentAliases,
+            $this->classComponentNamespaces,
+            $this
+        ))->compile($value);
     }
 
     /**
      * Replace the raw placeholders with the original code stored in the raw blocks.
      *
-     * @param  string  $result
+     * @param string $result
+     *
      * @return string
      */
     protected function restoreRawContent($result) {
@@ -366,7 +379,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Get a placeholder to temporary mark the position of raw blocks.
      *
-     * @param  int|string  $replace
+     * @param int|string $replace
+     *
      * @return string
      */
     protected function getRawPlaceholder($replace) {
@@ -376,7 +390,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Add the stored footers onto the given content.
      *
-     * @param  string  $result
+     * @param string $result
+     *
      * @return string
      */
     protected function addFooters($result) {
@@ -387,7 +402,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Parse the tokens from the template.
      *
-     * @param  array  $token
+     * @param array $token
+     *
      * @return string
      */
     protected function parseToken($token) {
@@ -405,7 +421,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Execute the user defined extensions.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileExtensions($value) {
@@ -419,21 +436,25 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Compile Blade statements that start with "@".
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileStatements($value) {
         return preg_replace_callback(
-                '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x', function ($match) {
-            return $this->compileStatement($match);
-        }, $value
+            '/\B@(@?\w+(?:::\w+)?)([ \t]*)(\( ( (?>[^()]+) | (?3) )* \))?/x',
+            function ($match) {
+                return $this->compileStatement($match);
+            },
+            $value
         );
     }
 
     /**
      * Compile a single Blade @ statement.
      *
-     * @param  array  $match
+     * @param array $match
+     *
      * @return string
      */
     protected function compileStatement($match) {
@@ -451,8 +472,9 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Call the given directive with the given value.
      *
-     * @param  string  $name
-     * @param  string|null  $value
+     * @param string      $name
+     * @param string|null $value
+     *
      * @return string
      */
     protected function callCustomDirective($name, $value) {
@@ -466,7 +488,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Strip the parentheses from the given expression.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     public function stripParentheses($expression) {
@@ -480,7 +503,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Register a custom Blade compiler.
      *
-     * @param  callable  $compiler
+     * @param callable $compiler
+     *
      * @return void
      */
     public function extend(callable $compiler) {
@@ -499,11 +523,12 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Register an "if" statement directive.
      *
-     * @param  string  $name
-     * @param  callable  $callback
+     * @param string   $name
+     * @param callable $callback
+     *
      * @return void
      */
-    public function _if($name, callable $callback) {
+    public function aliasIf($name, callable $callback) {
         $this->conditions[$name] = $callback;
 
         $this->directive($name, function ($expression) use ($name) {
@@ -526,8 +551,9 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Check the result of a condition.
      *
-     * @param  string  $name
-     * @param  array  $parameters
+     * @param string $name
+     * @param array  $parameters
+     *
      * @return bool
      */
     public function check($name, ...$parameters) {
@@ -537,9 +563,10 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Register a class-based component alias directive.
      *
-     * @param  string  $class
-     * @param  string|null  $alias
-     * @param  string  $prefix
+     * @param string      $class
+     * @param string|null $alias
+     * @param string      $prefix
+     *
      * @return void
      */
     public function component($class, $alias = null, $prefix = '') {
@@ -548,9 +575,9 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
         }
 
         if (is_null($alias)) {
-            $alias = cstr::contains($class, '\\View\\Components\\') ? collect(explode('\\', cstr::after($class, '\\View\\Components\\')))->map(function ($segment) {
-                        return cstr::kebab($segment);
-                    })->implode(':') : cstr::kebab(class_basename($class));
+            $alias = cstr::contains($class, '\\View\\Components\\') ? c::collect(explode('\\', cstr::after($class, '\\View\\Components\\')))->map(function ($segment) {
+                return cstr::kebab($segment);
+            })->implode(':') : cstr::kebab(c::classBasename($class));
         }
 
         if (!empty($prefix)) {
@@ -563,8 +590,9 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Register an array of class-based components.
      *
-     * @param  array  $components
-     * @param  string  $prefix
+     * @param array  $components
+     * @param string $prefix
+     *
      * @return void
      */
     public function components(array $components, $prefix = '') {
@@ -589,8 +617,9 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Register a class-based component namespace.
      *
-     * @param  string  $namespace
-     * @param  string  $prefix
+     * @param string $namespace
+     * @param string $prefix
+     *
      * @return void
      */
     public function componentNamespace($namespace, $prefix) {
@@ -609,8 +638,9 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Register a component alias directive.
      *
-     * @param  string  $path
-     * @param  string|null  $alias
+     * @param string      $path
+     * @param string|null $alias
+     *
      * @return void
      */
     public function aliasComponent($path, $alias = null) {
@@ -628,19 +658,9 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Register an include alias directive.
      *
-     * @param  string  $path
-     * @param  string|null  $alias
-     * @return void
-     */
-    public function _include($path, $alias = null) {
-        $this->aliasInclude($path, $alias);
-    }
-
-    /**
-     * Register an include alias directive.
+     * @param string      $path
+     * @param string|null $alias
      *
-     * @param  string  $path
-     * @param  string|null  $alias
      * @return void
      */
     public function aliasInclude($path, $alias = null) {
@@ -656,8 +676,9 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Register a handler for custom directives.
      *
-     * @param  string  $name
-     * @param  callable  $handler
+     * @param string   $name
+     * @param callable $handler
+     *
      * @return void
      *
      * @throws \InvalidArgumentException
@@ -682,7 +703,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Register a new precompiler.
      *
-     * @param  callable  $precompiler
+     * @param callable $precompiler
+     *
      * @return void
      */
     public function precompiler(callable $precompiler) {
@@ -692,7 +714,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     /**
      * Set the echo format to be used by the compiler.
      *
-     * @param  string  $format
+     * @param string $format
+     *
      * @return void
      */
     public function setEchoFormat($format) {
@@ -725,5 +748,4 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
     public function withoutComponentTags() {
         $this->compilesComponentTags = false;
     }
-
 }

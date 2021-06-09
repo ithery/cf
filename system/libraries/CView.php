@@ -1,9 +1,8 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 class CView {
-
     /**
      * Hint path delimiter value.
      *
@@ -21,12 +20,13 @@ class CView {
     /**
      * Creates a new CView using the given parameters.
      *
-     * @param   string  view name
-     * @param   array   pre-load data
-     * @param   string  type of file: html, css, js, etc.
-     * @return  object
+     * @param null|mixed $name
+     * @param mixed      $data
+     * @param mixed      $mergeData
+     *
+     * @return CView_Factory|CView_View
      */
-    public static function factory($name = NULL, $data = [], $mergeData = []) {
+    public static function factory($name = null, $data = [], $mergeData = []) {
         if ($name == null) {
             return CView_Factory::instance();
         }
@@ -37,8 +37,9 @@ class CView {
     /**
      * Check a CView is exists.
      *
-     * @param   string  view name
-     * @return  boolean
+     * @param string $name
+     *
+     * @return bool
      */
     public static function exists($name) {
         return CView_Factory::instance()->exists($name);
@@ -48,10 +49,13 @@ class CView {
         return CView_Compiler_BladeCompiler::instance();
     }
 
+    public static function finder() {
+        return CView_Finder::instance();
+    }
+
     public static function engineResolver() {
         return CView_EngineResolver::instance();
     }
-
 }
 
 // End CView

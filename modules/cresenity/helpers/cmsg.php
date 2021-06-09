@@ -1,14 +1,13 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
-
+defined('SYSPATH') or die('No direct access allowed.');
+//@codingStandardsIgnoreStart
 class cmsg {
-
     public static function add($type, $message) {
         $session = CSession::instance();
         $msgs = $session->get('cmsg_' . $type);
         if (!is_array($msgs)) {
-            $msgs = array();
+            $msgs = [];
         }
         $msgs[] = $message;
         $session->set('cmsg_' . $type, $msgs);
@@ -33,14 +32,15 @@ class cmsg {
 
     public static function flash($type) {
         $msgs = cmsg::get($type);
-        $message = "";
+        $message = '';
         if (is_array($msgs)) {
             foreach ($msgs as $msg) {
-                $message .= "<p>" . $msg . "</p>";
+                $message .= '<p>' . $msg . '</p>';
             }
-        } else if (is_string($msgs)) {
-            if (strlen($msgs) > 0)
+        } elseif (is_string($msgs)) {
+            if (strlen($msgs) > 0) {
                 $message = $msgs;
+            }
         }
         cmsg::clear($type);
         if (strlen($message) > 0) {
@@ -50,7 +50,7 @@ class cmsg {
     }
 
     public static function flash_all() {
-        return cmsg::flash("error") . cmsg::flash("warning") . cmsg::flash("info") . cmsg::flash("success");
+        return cmsg::flash('error') . cmsg::flash('warning') . cmsg::flash('info') . cmsg::flash('success');
     }
-
 }
+ //@codingStandardsIgnoreEnd

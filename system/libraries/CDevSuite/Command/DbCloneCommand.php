@@ -7,7 +7,6 @@
  */
 
 class CDevSuite_Command_DbCloneCommand extends CDevSuite_CommandAbstract {
-
     public function getSignatureArguments() {
         return '{--from=} {--to=}';
     }
@@ -19,5 +18,4 @@ class CDevSuite_Command_DbCloneCommand extends CDevSuite_CommandAbstract {
         CDevSuite::db()->existsOrExit($to);
         CDevSuite::db()->cloneDatabase($from, $to);
     }
-
 }

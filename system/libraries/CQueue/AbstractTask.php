@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 6:06:41 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 6:06:41 AM
  */
 abstract class CQueue_AbstractTask implements CQueue_ShouldQueueInterface {
-
     use CQueue_Trait_DispatchableTrait;
     use CQueue_Trait_QueueableTrait;
     use CQueue_Trait_InteractsWithQueue;
@@ -16,7 +16,7 @@ abstract class CQueue_AbstractTask implements CQueue_ShouldQueueInterface {
 
     /**
      * Shortcut function to log the current running service
-     * 
+     *
      * @param string $msg
      */
     public static function logDaemon($msg) {
@@ -26,5 +26,4 @@ abstract class CQueue_AbstractTask implements CQueue_ShouldQueueInterface {
     public static function isDaemon() {
         return CDaemon::getRunningService() != null;
     }
-
 }

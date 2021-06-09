@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CConsole_Command_Daemon_DaemonStatusCommand extends CConsole_Command {
-
     /**
      * The name and signature of the console command.
      *
@@ -29,9 +28,6 @@ class CConsole_Command_Daemon_DaemonStatusCommand extends CConsole_Command {
             $this->info($class . ' is stopped');
         }
 
-
-
         return 0;
     }
-
 }

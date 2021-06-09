@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CEmail_Builder_Type_Adapter_ColorAdapter extends CEmail_Builder_Type_AbstractAdapter {
-
     const MATCHER = '/^color/im';
     const TYPE = 'color';
 
@@ -164,9 +157,7 @@ class CEmail_Builder_Type_Adapter_ColorAdapter extends CEmail_Builder_Type_Abstr
     ];
 
     public function __construct($typeConfig, $value) {
-
         parent::__construct($typeConfig, $value);
-
 
         $this->matchers = [
             '/rgba\(\d{1,3},\s?\d{1,3},\s?\d{1,3},\s?\d(\.\d{1,3})?\)/i',
@@ -188,5 +179,4 @@ class CEmail_Builder_Type_Adapter_ColorAdapter extends CEmail_Builder_Type_Abstr
         }
         return $this->value;
     }
-
 }
