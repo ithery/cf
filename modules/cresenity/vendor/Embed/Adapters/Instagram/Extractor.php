@@ -1,6 +1,6 @@
 <?php
 
-namespace Embed\Adapters\Facebook;
+namespace Embed\Adapters\Instagram;
 
 use Embed\Extractor as Base;
 use Embed\Http\Crawler;
@@ -11,7 +11,7 @@ use Psr\Http\Message\UriInterface;
 class Extractor extends Base {
     public function __construct(UriInterface $uri, RequestInterface $request, ResponseInterface $response, Crawler $crawler) {
         parent::__construct($uri, $request, $response, $crawler);
+
         $this->oembed = new OEmbed($this);
-        $this->title = new Detectors\Title($this);
     }
 }

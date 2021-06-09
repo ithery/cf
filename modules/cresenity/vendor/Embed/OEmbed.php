@@ -9,10 +9,10 @@ use Psr\Http\Message\UriInterface;
 use SimpleXMLElement;
 
 class OEmbed {
-
     use HttpApiTrait;
 
     private static $providers;
+
     private $defaults = [];
 
     private static function getProviders() {
@@ -49,8 +49,22 @@ class OEmbed {
 
     private function detectEndpoint() {
         $document = $this->extractor->getDocument();
+        $endpoint = $document->link('alternate', ['type' => 'application/json+oembed'])
+        ?: $document->link('alternate', ['type' => 'text/json+oembed'])
+        ?: $document->link('alternate', ['type' => 'application/xml+oembed'])
+        ?: $document->link('alternate', ['type' => 'text/xml+oembed'])
+        ?: null;
 
-        return $document->link('alternate', ['type' => 'application/json+oembed']) ?: $document->link('alternate', ['type' => 'text/json+oembed']) ?: $document->link('alternate', ['type' => 'application/xml+oembed']) ?: $document->link('alternate', ['type' => 'text/xml+oembed']) ?: $this->detectEndpointFromProviders();
+        if ($endpoint === null) {
+            return $this->detectEndpointFromProviders();
+        }
+
+        // Add configured OEmbed query parameters
+        parse_str($endpoint->getQuery(), $query);
+        $query = array_merge($query, $this->extractor->getSetting('oembed:query_parameters') ?? []);
+        $endpoint = $endpoint->withQuery(http_build_query($query));
+
+        return $endpoint;
     }
 
     private function detectEndpointFromProviders() {
@@ -144,5 +158,4 @@ class OEmbed {
             return [];
         }
     }
-
 }

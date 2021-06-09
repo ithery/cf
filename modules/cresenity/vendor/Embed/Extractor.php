@@ -31,43 +31,106 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 
-
-
 require_once dirname(__FILE__) . '/functions.php';
 
 /**
  * Class to extract the info
+ *
+ * @property string|null          $authorName
+ * @property UriInterface|null    $authorUrl
+ * @property string|null          $cms
+ * @property EmbedCode|null       $code
+ * @property string|null          $description
+ * @property UriInterface         $favicon
+ * @property array|UriInterface[] $feeds
+ * @property UriInterface|null    $icon
+ * @property UriInterface|null    $image
+ * @property array|string[]       $keywords
+ * @property string|null          $language
+ * @property array|UriInterface[] $languages
+ * @property string|null          $license
+ * @property string               $providerName
+ * @property UriInterface         $providerUrl
+ * @property DateTime|null        $publishedTime
+ * @property UriInterface|null    $redirect
+ * @property string|null          $title
+ * @property UriInterface         $url
  */
 class Extractor {
-
+    /**
+     * @var RequestInterface
+     */
     private $request;
+
+    /**
+     * @var ResponseInterface
+     */
     private $response;
+
+    /**
+     * @var UriInterface
+     */
     private $uri;
+
+    /**
+     * @var Crawler
+     */
     private $crawler;
-    private $document;
+
+    /**
+     * @var Document
+     */
+    protected $document;
+
+    /**
+     * @var OEmbed
+     */
     private $oembed;
-    private $linkedData;
-    private $metas;
+
+    protected $linkedData;
+
+    protected $metas;
+
     private $settings = [];
+
     private $customDetectors = [];
+
     protected $authorName;
+
     protected $authorUrl;
+
     protected $cms;
+
     protected $code;
+
     protected $description;
+
     protected $favicon;
+
     protected $feeds;
+
     protected $icon;
+
     protected $image;
+
     protected $keywords;
+
     protected $language;
+
     protected $languages;
+
     protected $license;
+
     protected $providerName;
+
     protected $providerUrl;
+
     protected $publishedTime;
+
     protected $redirect;
+
     protected $title;
+
     protected $url;
 
     public function __construct(UriInterface $uri, RequestInterface $request, ResponseInterface $response, Crawler $crawler) {
@@ -105,7 +168,7 @@ class Extractor {
     }
 
     public function __get($name) {
-        $detector = isset($this->customDetectors[$name]) ? $this->customDetectors[$name] : property_exists($this, $name) ? $this->$name : null;
+        $detector = isset($this->customDetectors[$name]) ? $this->customDetectors[$name] : (property_exists($this, $name) ? $this->$name : null);
 
         if (!$detector || !($detector instanceof Detector)) {
             throw new DomainException(sprintf('Invalid key "%s". No detector found for this value', $name));
@@ -180,5 +243,4 @@ class Extractor {
     public function getCrawler() {
         return $this->crawler;
     }
-
 }

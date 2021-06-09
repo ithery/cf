@@ -10,8 +10,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 
 class ExtractorFactory {
-
     private $default = Extractor::class;
+
     private $adapters = [
         'slides.com' => Adapters\Slides\Extractor::class,
         'pinterest.com' => Adapters\Pinterest\Extractor::class,
@@ -19,29 +19,46 @@ class ExtractorFactory {
         'snipplr.com' => Adapters\Snipplr\Extractor::class,
         'play.cadenaser.com' => Adapters\CadenaSer\Extractor::class,
         'ideone.com' => Adapters\Ideone\Extractor::class,
-        'github.com' => Adapters\Github\Extractor::class,
         'gist.github.com' => Adapters\Gist\Extractor::class,
-        'en.wikipedia.org' => Adapters\Wikipedia\Extractor::class,
-        'es.wikipedia.org' => Adapters\Wikipedia\Extractor::class,
-        'gl.wikipedia.org' => Adapters\Wikipedia\Extractor::class,
+        'github.com' => Adapters\Github\Extractor::class,
+        'wikipedia.org' => Adapters\Wikipedia\Extractor::class,
         'archive.org' => Adapters\Archive\Extractor::class,
         'sassmeister.com' => Adapters\Sassmeister\Extractor::class,
         'facebook.com' => Adapters\Facebook\Extractor::class,
+        'instagram.com' => Adapters\Instagram\Extractor::class,
         'imageshack.com' => Adapters\ImageShack\Extractor::class,
-        'imagizer.imageshack.com' => Adapters\ImageShack\Extractor::class,
         'youtube.com' => Adapters\Youtube\Extractor::class,
         'twitch.tv' => Adapters\Twitch\Extractor::class,
+        'bandcamp.com' => Adapters\Bandcamp\Extractor::class,
     ];
+
     private $customDetectors = [];
 
+    private $settings;
+
+    /**
+     * @param UriInterface      $uri
+     * @param RequestInterface  $request
+     * @param ResponseInterface $response
+     * @param Crawler           $crawler
+     *
+     * @return Extractor
+     */
     public function createExtractor(UriInterface $uri, RequestInterface $request, ResponseInterface $response, Crawler $crawler) {
         $host = $uri->getHost();
-        $host = str_replace('www.', '', $host);
+        $class = $this->default;
 
-        $class = isset($this->adapters[$host]) ? $this->adapters[$host] : $this->default;
+        foreach ($this->adapters as $adapterHost => $adapter) {
+            if (substr($host, -strlen($adapterHost)) === $adapterHost) {
+                $class = $adapter;
+                break;
+            }
+        }
 
+        /** @var Extractor $extractor */
         $extractor = new $class($uri, $request, $response, $crawler);
-        
+        $extractor->setSettings($this->settings);
+
         foreach ($this->customDetectors as $name => $detector) {
             $extractor->addDetector($name, new $detector($extractor));
         }
@@ -65,4 +82,7 @@ class ExtractorFactory {
         $this->default = $class;
     }
 
+    public function setSettings($settings) {
+        $this->settings = $settings;
+    }
 }
