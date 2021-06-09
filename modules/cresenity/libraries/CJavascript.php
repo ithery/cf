@@ -1,20 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 11:38:45 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 11:38:45 PM
  */
 class CJavascript {
-
     /**
-     *
      * @var CJavascript_Statement[]
      */
-    protected static $statements = array();
-    protected static $deferredStatements = array();
+    protected static $statements = [];
+
+    protected static $deferredStatements = [];
+
     protected static $deferredStack = -1;
 
     public static function compile() {
@@ -32,16 +33,15 @@ class CJavascript {
     }
 
     public static function getDeferredStatements() {
-
         if (!isset(self::$deferredStatements[self::$deferredStack])) {
-            self::$deferredStatements[self::$deferredStack] = array();
+            self::$deferredStatements[self::$deferredStack] = [];
         }
 
         return self::$deferredStatements[self::$deferredStack];
     }
 
     public static function addStatement(CJavascript_Statement $statement) {
-        if(self::$deferredStack>=0) {
+        if (self::$deferredStack >= 0) {
             return self::addDeferredStatement($statement);
         }
         self::$statements[$statement->hash()] = $statement;
@@ -49,7 +49,7 @@ class CJavascript {
 
     public static function addDeferredStatement(CJavascript_Statement $statement) {
         if (!isset(self::$deferredStatements[self::$deferredStack])) {
-            self::$deferredStatements[self::$deferredStack] = array();
+            self::$deferredStatements[self::$deferredStack] = [];
         }
         self::$deferredStatements[self::$deferredStack][$statement->hash()] = $statement;
     }
@@ -62,7 +62,7 @@ class CJavascript {
 
     public static function removeDeferredStatement(CJavascript_Statement $statement, $allStack = true) {
         if (!isset(self::$deferredStatements[self::$deferredStack])) {
-            self::$deferredStatements[self::$deferredStack] = array();
+            self::$deferredStatements[self::$deferredStack] = [];
         }
         if ($allStack) {
             for ($i = 0; $i <= self::$deferredStack; $i++) {
@@ -78,14 +78,14 @@ class CJavascript {
     }
 
     public static function clearStatement() {
-        self::$statements = array();
+        self::$statements = [];
     }
 
     public static function clearDeferredStatement() {
         if (!isset(self::$deferredStatements[self::$deferredStack])) {
-            self::$deferredStatements[self::$deferredStack] = array();
+            self::$deferredStatements[self::$deferredStack] = [];
         }
-        self::$deferredStatements[self::$deferredStack] = array();
+        self::$deferredStatements[self::$deferredStack] = [];
     }
 
     public static function popDeferredStack() {
@@ -95,7 +95,7 @@ class CJavascript {
     }
 
     public static function pushDeferredStack() {
-        self::$deferredStatements[++self::$deferredStack] = array();
+        self::$deferredStatements[++self::$deferredStack] = [];
         return self::getDeferredStatements();
     }
 
@@ -108,8 +108,8 @@ class CJavascript {
     }
 
     /**
-     * 
      * @param string $selector
+     *
      * @return CJavascript_Statement_JQuery
      */
     public static function jqueryStatement($selector = 'this') {
@@ -117,9 +117,9 @@ class CJavascript {
     }
 
     /**
-     * 
      * @param string $varName
      * @param string $varValue
+     *
      * @return CJavascript_Statement_Variable
      */
     public static function variableStatement($varName, $varValue = null) {
@@ -127,8 +127,8 @@ class CJavascript {
     }
 
     /**
-     * 
      * @param string $js
+     *
      * @return CJavascript_Statement_Raw
      */
     public static function rawStatement($js) {
@@ -136,13 +136,12 @@ class CJavascript {
     }
 
     /**
-     * 
      * @param string $functionName
-     * @param array $functionParameter
+     * @param array  $functionParameter
+     *
      * @return CJavascript_Statement_Function
      */
-    public static function functionStatement($functionName, $functionParameter = array()) {
+    public static function functionStatement($functionName, $functionParameter = []) {
         return CJavascript_StatementFactory::createFunction($functionName, $functionParameter);
     }
-
 }

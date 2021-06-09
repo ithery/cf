@@ -1,48 +1,52 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 4:01:05 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 4:01:05 PM
  */
 abstract class CObservable_Listener_Handler_Driver implements CObservable_Listener_Handler_DriverInterface {
-
     use CTrait_Compat_Handler_Driver;
 
     /**
-     * url for ajax handler type
-     * @var string $url
+     * Url for ajax handler type
+     *
+     * @var string
      */
     protected $url;
 
     /**
-     *
-     * @var string $urlParam
+     * @var array
      */
     protected $urlParam;
 
     /**
-     * name of the driver
+     * Name of the driver
+     *
      * @var string
      */
     protected $name;
 
     /**
-     * event from listener
+     * Event from listener
+     *
      * @var string
      */
     protected $event;
 
     /**
-     * id element of owner this event listener
+     * Id element of owner this event listener
+     *
      * @var string
      */
     protected $owner;
 
     /**
-     * id of handler targeted renderable
+     * Id of handler targeted renderable
+     *
      * @var string
      */
     protected $target;
@@ -51,8 +55,8 @@ abstract class CObservable_Listener_Handler_Driver implements CObservable_Listen
         $this->name = $name;
         $this->event = $event;
         $this->owner = $owner;
-        $this->url = "";
-        $this->urlParam = array();
+        $this->url = '';
+        $this->urlParam = [];
         $this->target = null;
     }
 
@@ -84,7 +88,7 @@ abstract class CObservable_Listener_Handler_Driver implements CObservable_Listen
     }
 
     public function addUrlParam($k, $urlParam) {
-        $this->urlParam[$k] = $url_param;
+        $this->urlParam[$k] = $urlParam;
         return $this;
     }
 
@@ -93,8 +97,8 @@ abstract class CObservable_Listener_Handler_Driver implements CObservable_Listen
 
         if (strlen($link) == 0) {
             $ajax_url = CAjaxMethod::factory()->set_type('handler_' . $this->name)
-                    ->set_data('json', $this->content->json())
-                    ->makeurl();
+                ->set_data('json', $this->content->json())
+                ->makeurl();
             $link = $ajax_url;
         }
 
@@ -110,5 +114,4 @@ abstract class CObservable_Listener_Handler_Driver implements CObservable_Listen
         }
         return $link;
     }
-
 }

@@ -1,15 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 2, 2018, 10:38:57 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 2, 2018, 10:38:57 PM
  */
 trait CObservable_Javascript_JQuery_Trait_AjaxTrait {
-
-    public function ajax($options = array()) {
+    public function ajax($options = []) {
         $success = carr::get($options, 'success', null);
         if ($success != null) {
             if ($success instanceof Closure) {
@@ -20,16 +20,15 @@ trait CObservable_Javascript_JQuery_Trait_AjaxTrait {
 
         //error
         $error = carr::get($options, 'error', null);
-        if($error != null) {
-             if ($error instanceof Closure) {
+        if ($error != null) {
+            if ($error instanceof Closure) {
                 $jqXHR = new CJavascript_Mock_Variable('jqXhr');
                 $textStatus = new CJavascript_Mock_Variable('textStatus');
                 $errorThrown = new CJavascript_Mock_Variable('errorThrown');
-                $error = $this->javascript->runClosure($error, $jqXHR, $textStatus,$errorThrown);
+                $error = $this->javascript->runClosure($error, $jqXHR, $textStatus, $errorThrown);
             }
         }
 
-        
         $this->filterArgs($success);
         $this->filterArgs($error);
         $options['success'] = $success;
@@ -40,5 +39,4 @@ trait CObservable_Javascript_JQuery_Trait_AjaxTrait {
 
         return $this;
     }
-
 }
