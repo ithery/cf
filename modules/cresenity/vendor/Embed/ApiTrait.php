@@ -9,7 +9,7 @@ use Psr\Http\Message\UriInterface;
 require_once dirname(__FILE__) . '/functions.php';
 
 trait ApiTrait {
-    private $extractor;
+    protected $extractor;
 
     private $data;
 

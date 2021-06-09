@@ -47,7 +47,7 @@ class OEmbed {
         return $this->extractJSON((string) $response->getBody());
     }
 
-    private function detectEndpoint() {
+    protected function detectEndpoint() {
         $document = $this->extractor->getDocument();
         $endpoint = $document->link('alternate', ['type' => 'application/json+oembed'])
         ?: $document->link('alternate', ['type' => 'text/json+oembed'])

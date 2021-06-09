@@ -85,7 +85,7 @@ class Extractor {
     /**
      * @var OEmbed
      */
-    private $oembed;
+    protected $oembed;
 
     protected $linkedData;
 
