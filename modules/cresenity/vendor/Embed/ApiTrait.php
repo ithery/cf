@@ -9,8 +9,8 @@ use Psr\Http\Message\UriInterface;
 require_once dirname(__FILE__) . '/functions.php';
 
 trait ApiTrait {
-
     private $extractor;
+
     private $data;
 
     public function __construct(Extractor $extractor) {
@@ -52,8 +52,8 @@ trait ApiTrait {
     public function strAll(...$keys) {
         $all = (array) $this->get(...$keys);
         return array_filter(array_map(function ($value) {
-                    return clean($value);
-                }, $all));
+            return clean($value);
+        }, $all));
     }
 
     public function html(...$keys) {
@@ -81,7 +81,7 @@ trait ApiTrait {
 
         try {
             return $url ? $this->extractor->resolveUri($url) : null;
-        } catch (Throwable $error) {
+        } catch (\Exception $error) {
             return null;
         }
     }

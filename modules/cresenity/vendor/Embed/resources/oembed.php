@@ -7,6 +7,9 @@ return [
     'https://api.abraia.me/oembed' => [
         '|^https?://store\\.abraia\\.me/.*$|i',
     ],
+    'https://secure.actblue.com/cf/oembed' => [
+        '|^https?://secure\\.actblue\\.com/donate/.*$|i',
+    ],
     'http://play.adpaths.com/oembed/*' => [
         '|^https?://play\\.adpaths\\.com/experience/.*$|i',
     ],
@@ -27,6 +30,10 @@ return [
     ],
     'http://animoto.com/oembeds/create' => [
         '|^https?://animoto\\.com/play/.*$|i',
+    ],
+    'https://api.anniemusic.app/api/v1/oembed' => [
+        '|^https?://anniemusic\\.app/t/.*$|i',
+        '|^https?://anniemusic\\.app/p/.*$|i',
     ],
     'https://display.apester.com/oembed' => [
         '|^https?://renderer\\.apester\\.com/v2/.*\\?preview\\=true&iframe_preview\\=true$|i',
@@ -50,9 +57,6 @@ return [
         '|^https?://audiomack\\.com/.*/song/.*$|i',
         '|^https?://audiomack\\.com/.*/album/.*$|i',
         '|^https?://audiomack\\.com/.*/playlist/.*$|i',
-    ],
-    'http://audiosnaps.com/service/oembed' => [
-        '|^https?://audiosnaps\\.com/k/.*$|i',
     ],
     'https://stage-embed.avocode.com/api/oembed' => [
         '|^https?://app\\.avocode\\.com/view/.*$|i',
@@ -101,6 +105,12 @@ return [
     'http://view.ceros.com/oembed' => [
         '|^https?://view\\.ceros\\.com/.*$|i',
     ],
+    'https://www.chainflix.net/video/oembed' => [
+        '|^https?://chainflix\\.net/video/.*$|i',
+        '|^https?://chainflix\\.net/video/embed/.*$|i',
+        '|^https?://.*\\.chainflix\\.net/video/.*$|i',
+        '|^https?://.*\\.chainflix\\.net/video/embed/.*$|i',
+    ],
     'http://embed.chartblocks.com/1.0/oembed' => [
         '|^https?://public\\.chartblocks\\.com/c/.*$|i',
     ],
@@ -123,7 +133,7 @@ return [
     'https://codehs.com/api/sharedprogram/*/oembed/' => [
         '|^https?://codehs\\.com/editor/share_abacus/.*$|i',
     ],
-    'http://codepen.io/api/oembed' => [
+    'https://codepen.io/api/oembed' => [
         '|^https?://codepen\\.io/.*$|i',
     ],
     'https://codepoints.net/api/v1/oembed' => [
@@ -147,12 +157,15 @@ return [
     'http://crowdranking.com/api/oembed.json' => [
         '|^https?://crowdranking\\.com/.*/.*$|i',
     ],
+    'https://gql.cueup.io/oembed' => [
+        '|^https?://cueup\\.io/user/.*/sounds/.*$|i',
+    ],
+    'https://app.customerdb.com/embed' => [
+        '|^https?://app\\.customerdb\\.com/share/.*$|i',
+    ],
     'https://staging.cyranosystems.com/oembed' => [
         '|^https?://staging\\.cyranosystems\\.com/msg/.*$|i',
         '|^https?://app\\.cyranosystems\\.com/msg/.*$|i',
-    ],
-    'http://api.dailymile.com/oembed?format=json' => [
-        '|^https?://www\\.dailymile\\.com/people/.*/entries/.*$|i',
     ],
     'https://www.dailymotion.com/services/oembed' => [
         '|^https?://www\\.dailymotion\\.com/video/.*$|i',
@@ -218,25 +231,31 @@ return [
     'https://ethfiddle.com/services/oembed/' => [
         '|^https?://ethfiddle\\.com/.*$|i',
     ],
+    'https://oembed.ex.co/item' => [
+        '|^https?://app\\.ex\\.co/stories/.*$|i',
+        '|^https?://www\\.playbuzz\\.com/.*$|i',
+    ],
     'https://eyrie.io/v1/oembed' => [
         '|^https?://eyrie\\.io/board/.*$|i',
         '|^https?://eyrie\\.io/sparkfun/.*$|i',
     ],
-    'https://www.facebook.com/plugins/post/oembed.json' => [
+    'https://graph.facebook.com/v9.0/oembed_post' => [
         '|^https?://www\\.facebook\\.com/.*/posts/.*$|i',
-        '|^https?://www\\.facebook\\.com/photos/.*$|i',
-        '|^https?://www\\.facebook\\.com/.*/photos/.*$|i',
-        '|^https?://www\\.facebook\\.com/photo\\.php.*$|i',
-        '|^https?://www\\.facebook\\.com/photo\\.php$|i',
         '|^https?://www\\.facebook\\.com/.*/activity/.*$|i',
-        '|^https?://www\\.facebook\\.com/permalink\\.php$|i',
+        '|^https?://www\\.facebook\\.com/photo\\.php\\?fbid\\=.*$|i',
+        '|^https?://www\\.facebook\\.com/photos/.*$|i',
+        '|^https?://www\\.facebook\\.com/permalink\\.php\\?story_fbid\\=.*$|i',
         '|^https?://www\\.facebook\\.com/media/set\\?set\\=.*$|i',
         '|^https?://www\\.facebook\\.com/questions/.*$|i',
         '|^https?://www\\.facebook\\.com/notes/.*/.*/.*$|i',
     ],
-    'https://www.facebook.com/plugins/video/oembed.json' => [
+    'https://graph.facebook.com/v9.0/oembed_video' => [
         '|^https?://www\\.facebook\\.com/.*/videos/.*$|i',
-        '|^https?://www\\.facebook\\.com/video\\.php$|i',
+        '|^https?://www\\.facebook\\.com/video\\.php\\?id\\=.*$|i',
+        '|^https?://www\\.facebook\\.com/video\\.php\\?v\\=.*$|i',
+    ],
+    'https://graph.facebook.com/v9.0/oembed_page' => [
+        '|^https?://www\\.facebook\\.com/.*$|i',
     ],
     'https://app.getfader.com/api/oembed' => [
         '|^https?://app\\.getfader\\.com/projects/.*/publish$|i',
@@ -266,9 +285,6 @@ return [
     'https://app.flourish.studio/api/v1/oembed' => [
         '|^https?://public\\.flourish\\.studio/visualisation/.*$|i',
         '|^https?://public\\.flourish\\.studio/story/.*$|i',
-    ],
-    'https://oembed.fontself.com/' => [
-        '|^https?://catapult\\.fontself\\.com/.*$|i',
     ],
     'https://fiso.foxsports.com.au/oembed' => [
         '|^https?://fiso\\.foxsports\\.com\\.au/isomorphic\\-widget/.*$|i',
@@ -315,6 +331,12 @@ return [
     'https://gloria.tv/oembed/' => [
         '|^https?://gloria\\.tv/.*$|i',
     ],
+    'https://app.gong.io/oembed' => [
+        '|^https?://app\\.gong\\.io/call\\?id\\=.*$|i',
+    ],
+    'http://api.grain.co/_/api/oembed' => [
+        '|^https?://grain\\.co/highlight/.*$|i',
+    ],
     'https://api.luminery.com/oembed' => [
         '|^https?://gtchannel\\.com/watch/.*$|i',
     ],
@@ -328,9 +350,15 @@ return [
     'https://player.hihaho.com/services/oembed/*' => [
         '|^https?://player\\.hihaho\\.com/.*$|i',
     ],
+    'https://www.hippovideo.io/services/oembed' => [
+        '|^https?://.*\\.hippovideo\\.io/.*$|i',
+    ],
     'https://homey.app/api/oembed/flow' => [
         '|^https?://homey\\.app/f/.*$|i',
         '|^https?://homey\\.app/.*/flow/.*$|i',
+    ],
+    'https://hostedbyyou.com/api/oembed' => [
+        '|^https?://hostedbyyou\\.com/event/.*$|i',
     ],
     'http://huffduffer.com/oembed' => [
         '|^https?://huffduffer\\.com/.*/.*$|i',
@@ -366,7 +394,7 @@ return [
     'http://api.inphood.com/oembed' => [
         '|^https?://.*\\.inphood\\.com/.*$|i',
     ],
-    'https://api.instagram.com/oembed' => [
+    'https://graph.facebook.com/v9.0/instagram_oembed' => [
         '|^https?://instagram\\.com/.*/p/.*,$|i',
         '|^https?://www\\.instagram\\.com/.*/p/.*,$|i',
         '|^https?://instagram\\.com/p/.*$|i',
@@ -378,8 +406,8 @@ return [
         '|^https?://www\\.instagram\\.com/tv/.*$|i',
         '|^https?://www\\.instagr\\.am/tv/.*$|i',
     ],
-    'https://www.isnare.com/oembed/' => [
-        '|^https?://www\\.isnare\\.com/.*$|i',
+    'https://www.insticator.com/oembed' => [
+        '|^https?://ppa\\.insticator\\.com/embed\\-unit/.*$|i',
     ],
     'https://issuu.com/oembed' => [
         '|^https?://issuu\\.com/.*/docs/.*$|i',
@@ -391,6 +419,9 @@ return [
         '|^https?://jovian\\.ml/.*$|i',
         '|^https?://jovian\\.ml/viewer.*$|i',
         '|^https?://.*\\.jovian\\.ml/.*$|i',
+        '|^https?://jovian\\.ai/.*$|i',
+        '|^https?://jovian\\.ai/viewer.*$|i',
+        '|^https?://.*\\.jovian\\.ai/.*$|i',
     ],
     'https://tv.kakao.com/oembed' => [
         '|^https?://tv\\.kakao\\.com/channel/.*/cliplink/.*$|i',
@@ -415,6 +446,10 @@ return [
     'http://www.kitchenbowl.com/oembed' => [
         '|^https?://www\\.kitchenbowl\\.com/recipe/.*$|i',
     ],
+    'https://api.kmdr.sh/services/oembed' => [
+        '|^https?://app\\.kmdr\\.sh/h/.*$|i',
+        '|^https?://app\\.kmdr\\.sh/history/.*$|i',
+    ],
     'https://jdr.knacki.info/oembed' => [
         '|^https?://jdr\\.knacki\\.info/meuh/.*$|i',
     ],
@@ -423,6 +458,9 @@ return [
     ],
     'http://learningapps.org/oembed.php' => [
         '|^https?://learningapps\\.org/.*$|i',
+    ],
+    'https://umotion-test.univ-lemans.fr/oembed' => [
+        '|^https?://umotion\\-test\\.univ\\-lemans\\.fr/video/.*$|i',
     ],
     'https://pod.univ-lille.fr/oembed' => [
         '|^https?://pod\\.univ\\-lille\\.fr/video/.*$|i',
@@ -437,6 +475,9 @@ return [
     ],
     'https://app.ludus.one/oembed' => [
         '|^https?://app\\.ludus\\.one/.*$|i',
+    ],
+    'https://admin.lumiere.is/api/services/oembed' => [
+        '|^https?://.*\\.lumiere\\.is/v/.*$|i',
     ],
     'http://mathembed.com/oembed' => [
         '|^https?://mathembed\\.com/latex\\?inputText\\=.*$|i',
@@ -473,6 +514,13 @@ return [
     'https://web.microsoftstream.com/oembed' => [
         '|^https?://.*\\.microsoftstream\\.com/video/.*$|i',
         '|^https?://.*\\.microsoftstream\\.com/channel/.*$|i',
+    ],
+    'https://oembed.minervaknows.com' => [
+        '|^https?://www\\.minervaknows\\.com/featured\\-recipes/.*$|i',
+        '|^https?://www\\.minervaknows\\.com/themes/.*$|i',
+        '|^https?://www\\.minervaknows\\.com/themes/.*/recipes/.*$|i',
+        '|^https?://app\\.minervaknows\\.com/recipes/.*$|i',
+        '|^https?://app\\.minervaknows\\.com/recipes/.*/follow$|i',
     ],
     'https://www.mixcloud.com/oembed/' => [
         '|^https?://www\\.mixcloud\\.com/.*/.*/$|i',
@@ -516,6 +564,14 @@ return [
     'http://www.nfb.ca/remote/services/oembed/' => [
         '|^https?://.*\\.nfb\\.ca/film/.*$|i',
     ],
+    'https://oembed.nopaste.ml' => [
+        '|^https?://nopaste\\.ml/.*$|i',
+    ],
+    'https://api.observablehq.com/oembed' => [
+        '|^https?://observablehq\\.com/@.*/.*$|i',
+        '|^https?://observablehq\\.com/d/.*$|i',
+        '|^https?://observablehq\\.com/embed/.*$|i',
+    ],
     'https://www.odds.com.au/api/oembed/' => [
         '|^https?://www\\.odds\\.com\\.au/.*$|i',
         '|^https?://odds\\.com\\.au/.*$|i',
@@ -535,6 +591,9 @@ return [
     ],
     'https://omniscope.me/_global_/oembed/json' => [
         '|^https?://omniscope\\.me/.*$|i',
+    ],
+    'https://omny.fm/oembed' => [
+        '|^https?://omny\\.fm/shows/.*$|i',
     ],
     'http://on.aol.com/api' => [
         '|^https?://on\\.aol\\.com/video/.*$|i',
@@ -573,7 +632,7 @@ return [
         '|^https?://www\\.pingvp\\.com/.*$|i',
     ],
     'https://tools.pinpoll.com/oembed' => [
-        '|^https?://tools\\.pinpoll\\.com/.*$|i',
+        '|^https?://tools\\.pinpoll\\.com/embed/.*$|i',
     ],
     'https://store.pixdor.com/oembed' => [
         '|^https?://store\\.pixdor\\.com/place\\-marker\\-widget/.*/show$|i',
@@ -600,6 +659,10 @@ return [
         '|^https?://posixion\\.com/question/.*$|i',
         '|^https?://posixion\\.com/.*/question/.*$|i',
     ],
+    'https://prezi.com/v/oembed' => [
+        '|^https?://prezi\\.com/v/.*$|i',
+        '|^https?://.*\\.prezi\\.com/v/.*$|i',
+    ],
     'https://oembed.qualifio.com/' => [
         '|^https?://qualifio\\.com/.*$|i',
     ],
@@ -615,8 +678,11 @@ return [
         '|^https?://www\\.radiopublic\\.com/.*$|i',
         '|^https?://.*\\.radiopublic\\.com/.*\'$|i',
     ],
-    'https://rapidengage.com/api/oembed' => [
-        '|^https?://rapidengage\\.com/s/.*$|i',
+    'https://animatron.com/oembed' => [
+        '|^https?://www\\.rcvis\\.com/v/.*$|i',
+        '|^https?://www\\.rcvis\\.com/visualize\\=.*$|i',
+        '|^https?://www\\.rcvis\\.com/ve/.*$|i',
+        '|^https?://www\\.rcvis\\.com/visualizeEmbedded\\=.*$|i',
     ],
     'https://www.reddit.com/oembed' => [
         '|^https?://reddit\\.com/r/.*/comments/.*/.*$|i',
@@ -651,6 +717,9 @@ return [
     'https://embed.runkit.com/oembed' => [
         '|^https?://embed\\.runkit\\.com/.*,$|i',
     ],
+    'https://octopus.saooti.com/oembed' => [
+        '|^https?://octopus\\.saooti\\.com/main/pub/podcast/.*$|i',
+    ],
     'http://videos.sapo.pt/oembed' => [
         '|^https?://videos\\.sapo\\.pt/.*$|i',
     ],
@@ -682,6 +751,10 @@ return [
         '|^https?://shoudio\\.com/.*$|i',
         '|^https?://shoud\\.io/.*$|i',
     ],
+    'https://api.getshow.io/oembed.json' => [
+        '|^https?://app\\.getshow\\.io/iframe/.*$|i',
+        '|^https?://.*\\.getshow\\.io/share/.*$|i',
+    ],
     'https://showtheway.io/oembed' => [
         '|^https?://showtheway\\.io/to/.*$|i',
     ],
@@ -692,10 +765,10 @@ return [
         '|^https?://onsizzle\\.com/i/.*$|i',
     ],
     'http://sketchfab.com/oembed' => [
-        '|^https?://sketchfab\\.com/models/.*$|i',
+        '|^https?://sketchfab\\.com/.*models/.*$|i',
         '|^https?://sketchfab\\.com/.*/folders/.*$|i',
     ],
-    'http://www.slideshare.net/api/oembed/2' => [
+    'https://www.slideshare.net/api/oembed/2' => [
         '|^https?://www\\.slideshare\\.net/.*/.*$|i',
         '|^https?://fr\\.slideshare\\.net/.*/.*$|i',
         '|^https?://de\\.slideshare\\.net/.*/.*$|i',
@@ -717,10 +790,7 @@ return [
     ],
     'https://soundcloud.com/oembed' => [
         '|^https?://soundcloud\\.com/.*$|i',
-    ],
-    'https://play.soundsgood.co/oembed' => [
-        '|^https?://play\\.soundsgood\\.co/playlist/.*$|i',
-        '|^https?://soundsgood\\.co/playlist/.*$|i',
+        '|^https?://soundcloud\\.app\\.goog\\.gl/.*$|i',
     ],
     'https://speakerdeck.com/oembed.json' => [
         '|^https?://speakerdeck\\.com/.*/.*$|i',
@@ -743,6 +813,13 @@ return [
     ],
     'https://content.streamonecloud.net/oembed' => [
         '|^https?://content\\.streamonecloud\\.net/embed/.*$|i',
+    ],
+    'https://subscribi.io/api/oembed' => [
+        '|^https?://subscribi\\.io/api/oembed.*$|i',
+    ],
+    'https://www.sudomemo.net/oembed' => [
+        '|^https?://www\\.sudomemo\\.net/watch/.*$|i',
+        '|^https?://flipnot\\.es/.*$|i',
     ],
     'https://www.sutori.com/api/oembed' => [
         '|^https?://www\\.sutori\\.com/story/.*$|i',
@@ -782,6 +859,12 @@ return [
     'http://www.topy.se/oembed/' => [
         '|^https?://www\\.topy\\.se/image/.*$|i',
     ],
+    'https://oembed.tourhero.com/' => [
+        '|^https?://www\\.tourhero\\.com/.*$|i',
+    ],
+    'https://www.tumblr.com/oembed/1.0' => [
+        '|^https?://.*\\.tumblr\\.com/post/.*$|i',
+    ],
     'https://www.tuxx.be/services/oembed' => [
         '|^https?://www\\.tuxx\\.be/.*$|i',
     ],
@@ -789,14 +872,11 @@ return [
         '|^https?://play\\.tvcf\\.co\\.kr/.*$|i',
         '|^https?://.*\\.tvcf\\.co\\.kr/.*$|i',
     ],
-    'https://api.twitch.tv/v5/oembed' => [
-        '|^https?://clips\\.twitch\\.tv/.*$|i',
-        '|^https?://www\\.twitch\\.tv/.*$|i',
-        '|^https?://twitch\\.tv/.*$|i',
-    ],
     'https://publish.twitter.com/oembed' => [
         '|^https?://twitter\\.com/.*/status/.*$|i',
         '|^https?://.*\\.twitter\\.com/.*/status/.*$|i',
+        '|^https?://twitter\\.com/.*/moments/.*$|i',
+        '|^https?://.*\\.twitter\\.com/.*/moments/.*$|i',
     ],
     'https://play.typecast.ai/oembed' => [
         '|^https?://play\\.typecast\\.ai/s/.*$|i',
@@ -818,6 +898,9 @@ return [
     'https://mais.uol.com.br/apiuol/v3/oembed/view' => [
         '|^https?://.*\\.uol\\.com\\.br/view/.*$|i',
         '|^https?://.*\\.uol\\.com\\.br/video/.*$|i',
+    ],
+    'https://api.uppy.jp/v1/oembed' => [
+        '|^https?://app\\.uppy\\.jp/_shares/video/.*$|i',
     ],
     'http://www.ustream.tv/oembed' => [
         '|^https?://.*\\.ustream\\.tv/.*$|i',
@@ -910,6 +993,9 @@ return [
     ],
     'https://wokwi.com/api/oembed' => [
         '|^https?://wokwi\\.com/share/.*$|i',
+    ],
+    'https://www.wolframcloud.com/oembed' => [
+        '|^https?://.*\\.wolframcloud\\.com/.*$|i',
     ],
     'http://www.wootled.com/oembed' => [
         '|^https?://www\\.wootled\\.com/.*$|i',
