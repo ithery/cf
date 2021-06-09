@@ -406,14 +406,16 @@ final class CF {
      * @param string $directory
      * @param string $filename
      * @param string $domain
+     * @param mixed  $force_reload
      *
      * @return string[]
      */
-    public static function getFiles($directory, $filename, $domain = null) {
+    public static function getFiles($directory, $filename, $domain = null, $force_reload = false) {
         if ($domain == null) {
             $domain = CF::domain();
         }
-        $include_paths = CF::paths($domain);
+
+        $include_paths = CF::paths($domain, $force_reload);
 
         $result = [];
         foreach ($include_paths as $path) {
@@ -460,6 +462,7 @@ final class CF {
             $org_code = CF::orgCode($domain);
             $app_code = CF::appCode($domain);
             $sharedAppCode = CF::getSharedApp($domain);
+
             $modules = CF::modules($domain);
             //when this domain is org
             if (strlen($org_code) > 0) {
@@ -496,7 +499,7 @@ final class CF {
      * @param null|mixed $default
      * @param mixed      $required
      *
-     * @return array|CConfig
+     * @return array|CConfig|mixed
      */
     public static function config($group, $default = null, $required = true) {
         $path = null;
@@ -734,7 +737,7 @@ final class CF {
     public static function cliDomain() {
         $domain = null;
         if (file_exists(static::CFCLI_CURRENT_DOMAIN_FILE)) {
-            $domain = file_get_contents(static::CFCLI_CURRENT_DOMAIN_FILE);
+            $domain = trim(file_get_contents(static::CFCLI_CURRENT_DOMAIN_FILE));
         }
         return $domain;
     }
@@ -894,6 +897,7 @@ final class CF {
      */
     public static function data($domain = null) {
         $domain = $domain == null ? self::domain() : $domain;
+
         if (!isset(self::$data[$domain])) {
             self::$data[$domain] = CFData::domain($domain);
             if (self::$data[$domain] == null) {

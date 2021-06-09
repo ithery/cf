@@ -32,8 +32,8 @@
         "unicodeCodePointEscapes": true,
         "globalReturn": true,
         "jsx": true,
-        "experimentalObjectRestSpread": true
-
+        "experimentalObjectRestSpread": true,
+        "ecmaVersion": 8
     },
 
     "ignorePatterns": ["**/media/assets/*.js"],

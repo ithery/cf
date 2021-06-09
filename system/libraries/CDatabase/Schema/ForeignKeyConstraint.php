@@ -6,8 +6,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  * An abstraction class for a foreign key constraint.
  *
  * @author Hery Kurniawan
- * @author Benjamin Eberlei <kontakt@beberlei.de>
- * @author Steve Müller <st.mueller@dzh-online.de>
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Aug 18, 2018, 12:35:33 PM

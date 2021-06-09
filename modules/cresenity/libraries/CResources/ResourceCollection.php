@@ -20,6 +20,11 @@ class CResources_ResourceCollection {
     public $diskName = '';
 
     /**
+     * @var string
+     */
+    public $conversionsDiskName = '';
+
+    /**
      * @var callable
      */
     public $resourceConversionRegistrations;
@@ -30,7 +35,7 @@ class CResources_ResourceCollection {
     public $acceptsFile;
 
     /**
-     * @var array $acceptsMimeTypes
+     * @var array
      */
     public $acceptsMimeTypes = [];
 
@@ -69,6 +74,12 @@ class CResources_ResourceCollection {
 
     public function useDisk($diskName) {
         $this->diskName = $diskName;
+        return $this;
+    }
+
+    public function storeConversionsOnDisk($conversionsDiskName) {
+        $this->conversionsDiskName = $conversionsDiskName;
+
         return $this;
     }
 

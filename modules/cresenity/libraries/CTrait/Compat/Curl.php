@@ -38,6 +38,15 @@ trait CTrait_Compat_Curl {
         return $this->setOpt($key, $value, $overwrite);
     }
 
+    /**
+     * Get value from key
+     *
+     * @param string $key
+     *
+     * @return mixed
+     *
+     * @deprecated use getOpt
+     */
     public function get_opt($key) {
         return $this->getOpt($key);
     }
@@ -72,6 +81,55 @@ trait CTrait_Compat_Curl {
 
     public function get_post_data() {
         return $this->getPostData();
+    }
+
+    /**
+     * Parse Header
+     *
+     * @param string $header_str
+     *
+     * @return void
+     *
+     * @deprecated use parseHeader
+     */
+    public function parse_header($header_str = null) {
+        return $this->parseHeader($header_str);
+    }
+
+    public function get_info($opt = 0) {
+        return $this->getInfo($opt);
+    }
+
+    public function set_engine($engine) {
+        return $this->setEngine($engine);
+    }
+
+    public function get_status($key = null) {
+        return $this->getStatus($key);
+    }
+
+    public function get_http_code() {
+        return $this->getHttpCode();
+    }
+
+    public function get_header($caseless = null) {
+        return $this->getHeader($caseless);
+    }
+
+    public function get_followed_headers() {
+        return $this->getFollowedHeaders();
+    }
+
+    public function has_error() {
+        return $this->hasError();
+    }
+
+    public function set_cookies_file($filename) {
+        return $this->setCookiesFile($filename);
+    }
+
+    public function set_soap_action($action) {
+        return $this->setSoapAction($action);
     }
 }
 //@codingStandardsIgnoreEnd

@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Bootstrap_WindowsBootstrapper_DependencyChecker extends CDevSuite_Bootstrap_Bootstrapper {
-
     public function bootstrap() {
         $inTestingEnvironment = strpos($_SERVER['SCRIPT_NAME'], 'phpunit') !== false;
 
@@ -22,5 +21,4 @@ class CDevSuite_Bootstrap_WindowsBootstrapper_DependencyChecker extends CDevSuit
             exit(1);
         }
     }
-
 }

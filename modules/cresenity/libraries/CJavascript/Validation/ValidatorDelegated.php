@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 1:20:13 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 1:20:13 PM
  */
 class CJavascript_Validation_ValidatorDelegated {
-
     use CJavascript_Validation_Trait_AccessProtectedTrait;
 
     /**
@@ -35,7 +35,7 @@ class CJavascript_Validation_ValidatorDelegated {
     /**
      * DelegatedValidator constructor.
      *
-     * @param CValidation_Validator $validator
+     * @param CValidation_Validator                  $validator
      * @param CJavascript_Validation_RuleParserProxy $ruleParser
      */
     public function __construct(CValidation_Validator $validator, CJavascript_Validation_RuleParserProxy $ruleParser) {
@@ -48,7 +48,8 @@ class CJavascript_Validation_ValidatorDelegated {
      * Call validator method.
      *
      * @param string $method
-     * @param array $args
+     * @param array  $args
+     *
      * @return mixed
      */
     private function callValidator($method, $args = []) {
@@ -76,7 +77,7 @@ class CJavascript_Validation_ValidatorDelegated {
     /**
      * Set the data under validation.
      *
-     * @param array
+     * @param array $data
      */
     public function setData($data) {
         $this->validator->setData($data);
@@ -95,6 +96,7 @@ class CJavascript_Validation_ValidatorDelegated {
      * Determine if a given rule implies the attribute is required.
      *
      * @param string $rule
+     *
      * @return bool
      */
     public function isImplicit($rule) {
@@ -107,7 +109,8 @@ class CJavascript_Validation_ValidatorDelegated {
      * @param string $message
      * @param string $attribute
      * @param string $rule
-     * @param array $parameters
+     * @param array  $parameters
+     *
      * @return string
      */
     public function makeReplacements($message, $attribute, $rule, $parameters) {
@@ -121,8 +124,9 @@ class CJavascript_Validation_ValidatorDelegated {
     /**
      * Determine if the given attribute has a rule in the given set.
      *
-     * @param string $attribute
+     * @param string       $attribute
      * @param string|array $rules
+     *
      * @return bool
      */
     public function hasRule($attribute, $rules) {
@@ -134,6 +138,7 @@ class CJavascript_Validation_ValidatorDelegated {
      *
      * @param string $attribute
      * @param string $rule
+     *
      * @return string
      */
     public function getMessage($attribute, $rule) {
@@ -148,6 +153,7 @@ class CJavascript_Validation_ValidatorDelegated {
      * Extract the rule name and parameters from a rule.
      *
      * @param array|string $rules
+     *
      * @return array
      */
     public function parseRule($rules) {
@@ -158,6 +164,7 @@ class CJavascript_Validation_ValidatorDelegated {
      * Explode the rules into an array of rules.
      *
      * @param string|array $rules
+     *
      * @return array
      */
     public function explodeRules($rules) {
@@ -167,9 +174,10 @@ class CJavascript_Validation_ValidatorDelegated {
     /**
      * Add conditions to a given field based on a Closure.
      *
-     * @param string $attribute
+     * @param string       $attribute
      * @param string|array $rules
-     * @param callable $callback
+     * @param callable     $callback
+     *
      * @return void
      */
     public function sometimes($attribute, $rules, callable $callback) {
@@ -181,11 +189,11 @@ class CJavascript_Validation_ValidatorDelegated {
      *
      * @param $method
      * @param $params
+     *
      * @return mixed
      */
     public function __call($method, $params) {
         $arrCaller = [$this->validator, $method];
         return call_user_func_array($arrCaller, $params);
     }
-
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 14, 2018, 3:50:56 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 14, 2018, 3:50:56 PM
  */
 class CElement_FormInput_SelectTag extends CElement_FormInput {
-
     protected $multiple;
 
     public function __construct($id) {
@@ -59,55 +59,59 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
     public function html($indent = 0) {
         if (CManager::instance()->isRegisteredModule('bootstrap-4-material') || CManager::instance()->isRegisteredModule('bootstrap-4')) {
             $html = new CStringBuilder();
-            $html->set_indent($indent);
-            $readonly = "";
+            $html->setIndent($indent);
+            $readonly = '';
             if ($this->readonly) {
                 $readonly = ' readonly="readonly"';
             }
-            $disabled = "";
+            $disabled = '';
             if ($this->disabled) {
                 $disabled = ' disabled="disabled"';
             }
-            $multiple = "";
+            $multiple = '';
             if ($this->multiple) {
                 $multiple = ' multiple="multiple"';
             }
             $name = $this->name;
-            if ($this->multiple)
-                $name = $name . "[]";
+            if ($this->multiple) {
+                $name = $name . '[]';
+            }
             $classes = $this->classes;
-            $classes = implode(" ", $classes);
-            if (strlen($classes) > 0)
-                $classes = " " . $classes;
+            $classes = implode(' ', $classes);
+            if (strlen($classes) > 0) {
+                $classes = ' ' . $classes;
+            }
 
             $custom_css = $this->custom_css;
             $custom_css = crenderer::render_style($custom_css);
             if (strlen($custom_css) > 0) {
                 $custom_css = ' style="' . $custom_css . '"';
             }
-            $addition_attribute = "";
+            $addition_attribute = '';
             foreach ($this->attr as $k => $v) {
-                $addition_attribute .= " " . $k . '="' . $v . '"';
+                $addition_attribute .= ' ' . $k . '="' . $v . '"';
             }
             $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="form-control select' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')->inc_indent()->br();
 
             if ($this->list != null) {
                 foreach ($this->list as $k => $v) {
-                    $selected = "";
+                    $selected = '';
                     if (is_array($this->value)) {
-                        if (in_array($k, $this->value))
+                        if (in_array($k, $this->value)) {
                             $selected = ' selected="selected"';
+                        }
                     } else {
-                        if ($this->value == (string) $k)
+                        if ($this->value == (string) $k) {
                             $selected = ' selected="selected"';
+                        }
                     }
                     $value = $v;
                     $addition_attribute = ' ';
                     if (is_array($v)) {
                         $value = carr::get($v, 'value');
-                        $attributes = carr::get($v, 'attributes', array());
+                        $attributes = carr::get($v, 'attributes', []);
                         foreach ($attributes as $attribute_k => $attribute_v) {
-                            $addition_attribute .= " " . $attribute_k . '="' . $attribute_v . '"';
+                            $addition_attribute .= ' ' . $attribute_k . '="' . $attribute_v . '"';
                         }
                     }
                     if ($this->readonly) {
@@ -134,12 +138,12 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
             $custom_css = ' style="' . $custom_css . '"';
         }
 
-        $classes = implode(" ", $this->classes);
+        $classes = implode(' ', $this->classes);
         if (strlen($classes) > 0) {
-            $classes = " " . $classes;
+            $classes = ' ' . $classes;
         }
         if ($this->bootstrap == '3') {
-            $classes = $classes . " form-control ";
+            $classes = $classes . ' form-control ';
         }
 
         $html->appendln('<input type="hidden"  class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $custom_css . '/>')->br();
@@ -162,43 +166,42 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
         }
         $vals = $this->value;
         if (!is_array($vals)) {
-            $vals = array($vals);
+            $vals = [$vals];
         }
         $vals_str = '';
         foreach ($vals as $val) {
             if (strlen($vals_str) > 0) {
-                $vals_str .= ",";
+                $vals_str .= ',';
             }
             $vals_str .= "'" . $val . "'";
         }
 
         $list = $this->list;
         if (!is_array($list)) {
-            $list = array($list);
+            $list = [$list];
         }
         $list_str = '';
         foreach ($list as $val) {
             if (strlen($list_str) > 0) {
-                $list_str .= ",";
+                $list_str .= ',';
             }
             $list_str .= "'" . $val . "'";
         }
-
 
         $str = "
 			$('#" . $this->id . "').select2({
 				tags: [" . $list_str . "],
 				tokenSeparators: [',', ' ']
 			}).change(function() {
-				
+
 			});
-                        
+
 	";
 
         if (strlen($vals_str) > 0) {
             $str .= "
-                        $('#" . $this->id . "').select2('val',[" . $vals_str . "]);
-                ";
+                        $('#" . $this->id . "').select2('val',[" . $vals_str . ']);
+                ';
         }
 
         $js = new CStringBuilder();
@@ -209,5 +212,4 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
 
         return $js->text();
     }
-
 }

@@ -34,7 +34,8 @@ class CApp_Config {
         if (!isset(self::$configData[$domain])) {
             $config = [];
             foreach ($configFiles as $f) {
-                $appFiles = array_reverse(CF::getFiles('config', $f, $domain));
+                $appFiles = array_reverse(CF::getFiles('config', $f, $domain, true));
+
                 foreach ($appFiles as $file) {
                     $appConfig = include $file;
                     if (!is_array($appConfig)) {

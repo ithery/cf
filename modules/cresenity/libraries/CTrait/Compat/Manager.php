@@ -1,6 +1,10 @@
 <?php
-    //@codingStandardsIgnoreStart
 
+//@codingStandardsIgnoreStart
+
+/**
+ * @see CManager
+ */
 trait CTrait_Compat_Manager {
     /**
      * @param type $type
@@ -31,7 +35,7 @@ trait CTrait_Compat_Manager {
     /**
      * @param string $type Type of control to check
      *
-     * @return boolean
+     * @return bool
      *
      * @deprecated plase use isRegisteredControl
      */
@@ -51,7 +55,7 @@ trait CTrait_Compat_Manager {
     /**
      * @param string $type Type of element to check
      *
-     * @return boolean
+     * @return bool
      *
      * @deprecated plase use isRegisteredElement
      */
@@ -130,7 +134,7 @@ trait CTrait_Compat_Manager {
      *
      * @return $this
      *
-     * @deprecated plase use isMobile
+     * @deprecated plase use setThemeData
      */
     public function set_theme_data($theme_data) {
         return $this->setThemeData($theme_data);
@@ -142,12 +146,12 @@ trait CTrait_Compat_Manager {
      * @param string $module
      * @param array  $data   optional
      *
-     * @return boolean
+     * @return bool
      *
-     * @deprecated 1.1
+     * @deprecated 1.1, use registerModule
      */
     public static function register_module($module, $data = []) {
-        return self::registerModule($module, $data);
+        return static::registerModule($module, $data);
     }
 
     /**
@@ -157,10 +161,10 @@ trait CTrait_Compat_Manager {
      *
      * @return void
      *
-     * @deprecated 1.1
+     * @deprecated 1.1, use unregisterModule
      */
     public static function unregister_module($module) {
-        return CClientModules::instance()->unregisterModule($module);
+        return static::unregisterModule($module);
     }
 }
  //@codingStandardsIgnoreEnd

@@ -39,7 +39,7 @@ class CDatabase_Type_DateType extends CDatabase_Type {
             return $value->format($platform->getDateFormatString());
         }
 
-        throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'DateTime']);
+        throw CDatabase_Schema_Exception_ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'DateTime']);
     }
 
     /**
@@ -52,7 +52,7 @@ class CDatabase_Type_DateType extends CDatabase_Type {
 
         $val = \DateTime::createFromFormat('!' . $platform->getDateFormatString(), $value);
         if (!$val) {
-            throw ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateFormatString());
+            throw CDatabase_Schema_Exception_ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateFormatString());
         }
 
         return $val;

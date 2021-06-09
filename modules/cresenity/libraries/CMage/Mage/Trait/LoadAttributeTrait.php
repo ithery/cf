@@ -1,22 +1,16 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CMage_Mage_Trait_LoadAttributeTrait {
-
     /**
      * Filter the given data, removing any optional values.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return array
      */
     protected function filter($data) {
         $index = -1;
-        
+
         $numericKeys = array_values($data) === $data;
 
         foreach ($data as $key => $value) {
@@ -43,37 +37,41 @@ trait CMage_Mage_Trait_LoadAttributeTrait {
     /**
      * Merge the given data in at the given index.
      *
-     * @param  array  $data
-     * @param  int  $index
-     * @param  array  $merge
-     * @param  bool  $numericKeys
+     * @param array $data
+     * @param int   $index
+     * @param array $merge
+     * @param bool  $numericKeys
+     *
      * @return array
      */
     protected function mergeData($data, $index, $merge, $numericKeys) {
         if ($numericKeys) {
             return $this->removeMissingValues(array_merge(
-                                    array_merge(array_slice($data, 0, $index, true), $merge), $this->filter(array_values(array_slice($data, $index + 1, null, true)))
-                            ), $numericKeys);
+                array_merge(array_slice($data, 0, $index, true), $merge),
+                $this->filter(array_values(array_slice($data, $index + 1, null, true)))
+            ), $numericKeys);
         }
 
-        return $this->removeMissingValues(array_slice($data, 0, $index, true) +
-                        $merge +
-                        $this->filter(array_slice($data, $index + 1, null, true)));
+        return $this->removeMissingValues(array_slice($data, 0, $index, true)
+                        + $merge
+                        + $this->filter(array_slice($data, $index + 1, null, true)));
     }
 
     /**
      * Remove the missing values from the filtered data.
      *
-     * @param  array  $data
-     * @param  bool  $numericKeys
+     * @param array $data
+     * @param bool  $numericKeys
+     *
      * @return array
      */
     protected function removeMissingValues($data, $numericKeys = false) {
         foreach ($data as $key => $value) {
-            if (($value instanceof PotentiallyMissing && $value->isMissing()) ||
-                    ($value instanceof self &&
-                    $value->resource instanceof PotentiallyMissing &&
-                    $value->isMissing())) {
+            if (($value instanceof PotentiallyMissing && $value->isMissing())
+                || ($value instanceof self
+                && $value->resource instanceof PotentiallyMissing
+                && $value->isMissing())
+            ) {
                 unset($data[$key]);
             }
         }
@@ -84,9 +82,10 @@ trait CMage_Mage_Trait_LoadAttributeTrait {
     /**
      * Retrieve a value based on a given condition.
      *
-     * @param  bool  $condition
-     * @param  mixed  $value
-     * @param  mixed  $default
+     * @param bool  $condition
+     * @param mixed $value
+     * @param mixed $default
+     *
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function when($condition, $value, $default = null) {
@@ -100,7 +99,8 @@ trait CMage_Mage_Trait_LoadAttributeTrait {
     /**
      * Merge a value into the array.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return \Illuminate\Http\Resources\MergeValue|mixed
      */
     protected function merge($value) {
@@ -110,8 +110,9 @@ trait CMage_Mage_Trait_LoadAttributeTrait {
     /**
      * Merge a value based on a given condition.
      *
-     * @param  bool  $condition
-     * @param  mixed  $value
+     * @param bool  $condition
+     * @param mixed $value
+     *
      * @return \Illuminate\Http\Resources\MergeValue|mixed
      */
     protected function mergeWhen($condition, $value) {
@@ -121,21 +122,23 @@ trait CMage_Mage_Trait_LoadAttributeTrait {
     /**
      * Merge the given attributes.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return \Illuminate\Http\Resources\MergeValue
      */
     protected function attributes($attributes) {
         return new MergeValue(
-                Arr::only($this->resource->toArray(), $attributes)
+            carr::only($this->resource->toArray(), $attributes)
         );
     }
 
     /**
      * Retrieve a relationship if it has been loaded.
      *
-     * @param  string  $relationship
-     * @param  mixed  $value
-     * @param  mixed  $default
+     * @param string $relationship
+     * @param mixed  $value
+     * @param mixed  $default
+     *
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function whenLoaded($relationship, $value = null, $default = null) {
@@ -155,15 +158,16 @@ trait CMage_Mage_Trait_LoadAttributeTrait {
             return null;
         }
 
-        return value($value);
+        return c::value($value);
     }
 
     /**
      * Execute a callback if the given pivot table has been loaded.
      *
-     * @param  string  $table
-     * @param  mixed  $value
-     * @param  mixed  $default
+     * @param string $table
+     * @param mixed  $value
+     * @param mixed  $default
+     *
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function whenPivotLoaded($table, $value, $default = null) {
@@ -172,24 +176,27 @@ trait CMage_Mage_Trait_LoadAttributeTrait {
         }
 
         return $this->when(
-                        $this->resource->pivot &&
-                        ($this->resource->pivot instanceof $table ||
-                        $this->resource->pivot->getTable() === $table), ...[$value, $default]
+            $this->resource->pivot
+                        && ($this->resource->pivot instanceof $table
+                        || $this->resource->pivot->getTable() === $table),
+            ...[$value, $default]
         );
     }
 
     /**
      * Transform the given value if it is present.
      *
-     * @param  mixed  $value
-     * @param  callable  $callback
-     * @param  mixed  $default
+     * @param mixed    $value
+     * @param callable $callback
+     * @param mixed    $default
+     *
      * @return mixed
      */
     protected function transform($value, callable $callback, $default = null) {
         return transform(
-                $value, $callback, func_num_args() === 3 ? $default : new MissingValue
+            $value,
+            $callback,
+            func_num_args() === 3 ? $default : new MissingValue
         );
     }
-
 }

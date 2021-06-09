@@ -52,7 +52,7 @@ class CDatabase_Type_DateTimeTzType extends CDatabase_Type implements CDatabase_
             return $value->format($platform->getDateTimeTzFormatString());
         }
 
-        throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'DateTime']);
+        throw CDatabase_Schema_Exception_ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'DateTime']);
     }
 
     /**
@@ -65,7 +65,7 @@ class CDatabase_Type_DateTimeTzType extends CDatabase_Type implements CDatabase_
 
         $val = \DateTime::createFromFormat($platform->getDateTimeTzFormatString(), $value);
         if (!$val) {
-            throw ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateTimeTzFormatString());
+            throw CDatabase_Schema_Exception_ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateTimeTzFormatString());
         }
 
         return $val;

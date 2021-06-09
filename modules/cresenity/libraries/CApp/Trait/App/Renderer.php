@@ -254,6 +254,7 @@ HTML;
      * @throws CApp_Exception
      */
     public function render() {
+        /** @var CApp $this */
         if ($this->rendered) {
             throw new CException('CApp already Rendered' . cdbg::getTraceString());
         }

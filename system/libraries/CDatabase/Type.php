@@ -72,14 +72,14 @@ abstract class CDatabase_Type {
      *
      * @var array
      */
-    private static $_typeObjects = [];
+    private static $typeObjects = [];
 
     /**
      * The map of supported doctrine mapping types.
      *
      * @var array
      */
-    private static $_typesMap = [
+    private static $typesMap = [
         self::TARRAY => CDatabase_Type_ArrayType::class,
         self::SIMPLE_ARRAY => CDatabase_Type_SimpleArrayType::class,
         self::JSON_ARRAY => CDatabase_Type_JsonArrayType::class,
@@ -183,14 +183,14 @@ abstract class CDatabase_Type {
      * @throws \Doctrine\DBAL\DBALException
      */
     public static function getType($name) {
-        if (!isset(self::$_typeObjects[$name])) {
-            if (!isset(self::$_typesMap[$name])) {
+        if (!isset(self::$typeObjects[$name])) {
+            if (!isset(self::$typesMap[$name])) {
                 throw CDatabase_Exception::unknownColumnType($name);
             }
-            self::$_typeObjects[$name] = new self::$_typesMap[$name]();
+            self::$typeObjects[$name] = new self::$typesMap[$name]();
         }
 
-        return self::$_typeObjects[$name];
+        return self::$typeObjects[$name];
     }
 
     /**
@@ -204,11 +204,11 @@ abstract class CDatabase_Type {
      * @throws CDatabase_Exception
      */
     public static function addType($name, $className) {
-        if (isset(self::$_typesMap[$name])) {
+        if (isset(self::$typesMap[$name])) {
             throw CDatabase_Exception::typeExists($name);
         }
 
-        self::$_typesMap[$name] = $className;
+        self::$typesMap[$name] = $className;
     }
 
     /**
@@ -219,7 +219,7 @@ abstract class CDatabase_Type {
      * @return bool TRUE if type is supported; FALSE otherwise
      */
     public static function hasType($name) {
-        return isset(self::$_typesMap[$name]);
+        return isset(self::$typesMap[$name]);
     }
 
     /**
@@ -233,15 +233,15 @@ abstract class CDatabase_Type {
      * @throws \Doctrine\DBAL\DBALException
      */
     public static function overrideType($name, $className) {
-        if (!isset(self::$_typesMap[$name])) {
+        if (!isset(self::$typesMap[$name])) {
             throw CDatabase_Exception::typeNotFound($name);
         }
 
-        if (isset(self::$_typeObjects[$name])) {
-            unset(self::$_typeObjects[$name]);
+        if (isset(self::$typeObjects[$name])) {
+            unset(self::$typeObjects[$name]);
         }
 
-        self::$_typesMap[$name] = $className;
+        self::$typesMap[$name] = $className;
     }
 
     /**
@@ -263,7 +263,7 @@ abstract class CDatabase_Type {
      * @return array
      */
     public static function getTypesMap() {
-        return self::$_typesMap;
+        return self::$typesMap;
     }
 
     /**

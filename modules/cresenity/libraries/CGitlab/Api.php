@@ -1,22 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
-
-/**
- * @author Hery Kurniawan
- * @since Jun 19, 2018, 4:31:53 AM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Abstract class for Api classes
  *
- * @author Joseph Bielawski <stloyd@gmail.com>
- * @author Matt Humphrey <matt@m4tt.co>
- * @author Radu Topala <radu.topala@trisoft.ro>
+ * @author Hery Kurniawan
+ * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 19, 2018, 4:31:53 AM
  */
 abstract class CGitlab_Api implements CGitlab_ApiInterface {
-
     /**
      * Default entries per page
      */
@@ -46,63 +40,69 @@ abstract class CGitlab_Api implements CGitlab_ApiInterface {
 
     /**
      * @param string $path
-     * @param array $parameters
-     * @param array $requestHeaders
+     * @param array  $parameters
+     * @param array  $requestHeaders
+     *
      * @return mixed
      */
-    protected function get($path, array $parameters = array(), $requestHeaders = array()) {
+    protected function get($path, array $parameters = [], $requestHeaders = []) {
         $response = $this->client->get($path, $parameters, $requestHeaders);
         return $response;
     }
 
     /**
      * @param string $path
-     * @param array $parameters
-     * @param array $requestHeaders
-     * @param array $files
+     * @param array  $parameters
+     * @param array  $requestHeaders
+     * @param array  $files
+     *
      * @return mixed
      */
-    protected function post($path, array $parameters = array(), $requestHeaders = array(), array $files = array()) {
+    protected function post($path, array $parameters = [], $requestHeaders = [], array $files = []) {
         $response = $this->client->post($path, $parameters, $requestHeaders, $files);
         return $response;
     }
 
     /**
      * @param string $path
-     * @param array $parameters
-     * @param array $requestHeaders
+     * @param array  $parameters
+     * @param array  $requestHeaders
+     *
      * @return mixed
      */
-    protected function patch($path, array $parameters = array(), $requestHeaders = array()) {
+    protected function patch($path, array $parameters = [], $requestHeaders = []) {
         $response = $this->client->patch($path, $parameters, $requestHeaders);
         return $response;
     }
 
     /**
      * @param string $path
-     * @param array $parameters
-     * @param array $requestHeaders
+     * @param array  $parameters
+     * @param array  $requestHeaders
+     *
      * @return mixed
      */
-    protected function put($path, array $parameters = array(), $requestHeaders = array()) {
+    protected function put($path, array $parameters = [], $requestHeaders = []) {
         $response = $this->client->put($path, $parameters, $requestHeaders);
         return $response;
     }
 
     /**
      * @param string $path
-     * @param array $parameters
-     * @param array $requestHeaders
+     * @param array  $parameters
+     * @param array  $requestHeaders
+     *
      * @return mixed
      */
-    protected function delete($path, array $parameters = array(), $requestHeaders = array()) {
+    protected function delete($path, array $parameters = [], $requestHeaders = []) {
         $response = $this->client->delete($path, $parameters, $requestHeaders);
         return $response;
     }
 
     /**
-     * @param int $id
+     * @param int    $id
      * @param string $path
+     *
      * @return string
      */
     protected function getProjectPath($id, $path) {
@@ -111,11 +111,11 @@ abstract class CGitlab_Api implements CGitlab_ApiInterface {
 
     /**
      * @param string $path
+     *
      * @return string
      */
     protected function encodePath($path) {
         $path = rawurlencode($path);
         return str_replace('.', '%2E', $path);
     }
-
 }

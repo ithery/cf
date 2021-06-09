@@ -1,16 +1,15 @@
 <?php
 
 abstract class CLogger_Writer {
-
     /**
-     * @var  string  timestamp format for log entries.
+     * @var string timestamp format for log entries.
      *
      * Defaults to Date::$timestamp_format
      */
     public static $timestamp;
 
     /**
-     * @var  string  timezone for log entries
+     * @var string timezone for log entries
      *
      * Defaults to Date::$timezone, which defaults to date_default_timezone_get()
      */
@@ -18,9 +17,10 @@ abstract class CLogger_Writer {
 
     /**
      * Numeric log level to string lookup table.
+     *
      * @var array
      */
-    protected $_log_levels = array(
+    protected $logLevels = [
         LOG_EMERG => 'EMERGENCY',
         LOG_ALERT => 'ALERT',
         LOG_CRIT => 'CRITICAL',
@@ -29,14 +29,14 @@ abstract class CLogger_Writer {
         LOG_NOTICE => 'NOTICE',
         LOG_INFO => 'INFO',
         LOG_DEBUG => 'DEBUG',
-    );
+    ];
 
     /**
-     * @var  int  Level to use for stack traces
+     * @var int Level to use for stack traces
      */
-    public static $strace_level = LOG_DEBUG;
+    public static $straceLevel = LOG_DEBUG;
 
-    public static function factory($type = 'file', $options) {
+    public static function factory($type = 'file', $options = []) {
         switch ($type) {
             case 'file':
                 return new CLogger_Writer_File($options);
@@ -50,8 +50,9 @@ abstract class CLogger_Writer {
      *
      *     $writer->write($messages);
      *
-     * @param   array   $messages
-     * @return  void
+     * @param array $messages
+     *
+     * @return void
      */
     abstract public function write(array $messages);
 
@@ -60,7 +61,7 @@ abstract class CLogger_Writer {
      *
      *     echo $writer;
      *
-     * @return  string
+     * @return string
      */
     final public function __toString() {
         return spl_object_hash($this);
@@ -69,24 +70,25 @@ abstract class CLogger_Writer {
     /**
      * Formats a log entry.
      *
-     * @param   array   $message
-     * @param   string  $format
-     * @return  string
+     * @param array  $message
+     * @param string $format
+     *
+     * @return string
      */
-    public function format_message(array $message, $format = "time --- domain:level: body in file:line") {
+    public function formatMessage(array $message, $format = 'time --- domain:level: body in file:line') {
         $message['time'] = date('Y-m-d H:i:s', $message['time']);
-        $message['level'] = $this->_log_levels[$message['level']];
+        $message['level'] = $this->logLevels[$message['level']];
 
         $string = strtr($format, array_filter($message, 'is_scalar'));
 
         if (isset($message['exception']) && $message['exception'] != null) {
             // Re-use as much as possible, just resetting the body to the trace
 
-            if (carr::get($message, 'level') >= static::$strace_level) {
+            if (carr::get($message, 'level') >= static::$straceLevel) {
                 $message['body'] .= $message['trace'];
             }
-            if(isset($this->_log_levels[$message['level']])) {
-                $message['level'] = $this->_log_levels[$message['level']];
+            if (isset($this->logLevels[$message['level']])) {
+                $message['level'] = $this->logLevels[$message['level']];
             }
 
             $string .= PHP_EOL . strtr($format, array_filter($message, 'is_scalar'));
@@ -94,5 +96,4 @@ abstract class CLogger_Writer {
 
         return $string;
     }
-
 }

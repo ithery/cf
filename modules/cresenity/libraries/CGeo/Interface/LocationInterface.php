@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 8:10:22 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 8:10:22 PM
  */
 
 /**
  * A location is a single result from a Geocoder.
- *
  */
 interface CGeo_Interface_LocationInterface {
-
     /**
      * Will always return the coordinates value object.
      *

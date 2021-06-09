@@ -6,14 +6,13 @@
  * @author Hery
  */
 class CManager_Lang_Data {
-
-    protected static $langData = array();
+    protected static $langData = [];
 
     protected static function getCharForFolder($message) {
         $char = '_';
         if (strlen($message) > 0) {
             $char = strtolower(substr($message, 0, 1));
-            if (!preg_match("/^[a-zA-Z]$/", $char)) {
+            if (!preg_match('/^[a-zA-Z]$/', $char)) {
                 $char = '_';
             }
         }
@@ -21,8 +20,7 @@ class CManager_Lang_Data {
     }
 
     public static function getLangDir() {
-
-        $dir = DOCROOT . "application/" . CF::appCode() . "/default/lang/";
+        $dir = DOCROOT . 'application/' . CF::appCode() . '/default/lang/';
         if (!is_dir($dir)) {
             mkdir($dir);
         }
@@ -31,7 +29,7 @@ class CManager_Lang_Data {
 
     public static function getLangFile($message, $lang = null) {
         if ($lang == null) {
-            $lang = CApp_Lang::getLang();
+            $lang = CManager_Lang::getLang();
         }
         $dir = static::getLangDir();
         $dir .= $lang . '/';
@@ -81,7 +79,6 @@ class CManager_Lang_Data {
     public static function setLangDataTranslation($lang, $message, $translation) {
         $char = static::getCharForFolder($message);
 
-
         static::load($char, $lang);
         //$message = addslashes($message);
         static::$langData[$lang][$char][$message] = $translation;
@@ -98,7 +95,7 @@ class CManager_Lang_Data {
     }
 
     public static function getLangDataTranslation($lang, $message) {
-        if(!CF::appCode()) {
+        if (!CF::appCode()) {
             return $message;
         }
         $char = static::getCharForFolder($message);
@@ -113,16 +110,15 @@ class CManager_Lang_Data {
     }
 
     public static function load($char, $lang = null) {
-
         $char = static::getCharForFolder($char);
         if (!isset(static::$langData)) {
-            static::$langData = array();
+            static::$langData = [];
         }
         if (!isset(static::$langData[$lang])) {
-            static::$langData[$lang] = array();
+            static::$langData[$lang] = [];
         }
         if (!isset(static::$langData[$lang][$char])) {
-            static::$langData[$lang][$char] = array();
+            static::$langData[$lang][$char] = [];
         }
         $filename = static::getLangFile($char, $lang);
         if (file_exists($filename)) {
@@ -146,5 +142,4 @@ class CManager_Lang_Data {
 
         return true;
     }
-
 }

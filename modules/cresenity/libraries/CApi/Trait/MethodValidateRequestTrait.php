@@ -25,6 +25,19 @@ trait CApi_Trait_MethodValidateRequestTrait {
         return $val;
     }
 
+    public function validateRequestMinLength($key, $length, $message = null) {
+        $val = null;
+        if ($this->errCode == 0) {
+            $val = carr::get($this->request(), $key);
+            $valLength = strlen($val);
+            if ($valLength < $length) {
+                $this->errCode++;
+                $this->errMessage = $message ?: $this->lang('Parameter :key min length is :length', [':key' => $key, ':length' => $length]);
+            }
+        }
+        return $val;
+    }
+
     public function validateRequestInArray($key, $array, $message = null) {
         if ($this->errCode == 0) {
             $val = carr::get($this->request(), $key);

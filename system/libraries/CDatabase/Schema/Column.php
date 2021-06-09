@@ -250,7 +250,7 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @return Type
+     * @return CDatabase_Type
      */
     public function getType() {
         return $this->_type;

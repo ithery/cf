@@ -1,22 +1,18 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of Summernote
  *
  * @author Hery Kurniawan
- * @since Jan 28, 2018, 9:43:02 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jan 28, 2018, 9:43:02 PM
  */
 class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea {
-
     protected $toolbarType = 'default';
+
     protected $haveDragDrop = false;
+
     protected $uploadUrl;
 
     public function __construct($id) {
@@ -95,8 +91,8 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                     ]
                 ";
                 break;
-    	    case 'text-media':
-    		        $json = "
+            case 'text-media':
+                    $json = "
                         [
                             ['fontstyle', ['style']],
                             ['style', ['bold', 'italic', 'underline', 'clear']],
@@ -113,7 +109,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
             case 'text':
                 $json = "
                     [
-                        ['style', ['bold', 'italic', 'underline']],                        
+                        ['style', ['bold', 'italic', 'underline']],
                     ]
                 ";
                 break;
@@ -122,7 +118,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                     [
                         ['style', ['bold', 'italic', 'underline']],
                         ['para', ['paragraph']],
-                        ['link', ['link']],                        
+                        ['link', ['link']],
                     ]
                 ";
                 break;
@@ -173,20 +169,20 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
             ";
         }
 
-        $js = "";
+        $js = '';
         $js .= "
-            
+
         $('#" . $this->id . "').summernote({
             height: '300px',
-            " . $additionalOptions . "
+            " . $additionalOptions . '
             maximumImageFileSize:1024*1024, // 1 MB
             onCreateLink: function(originalLink) {
                 return originalLink; // return originalLink
             },
             callbacks: {
-                " . $additionalCallbackOptions . "
-                onImageUploadError: function(msg){ 
-                    alert('Oops, something went wrong with image url'); 
+                ' . $additionalCallbackOptions . "
+                onImageUploadError: function(msg){
+                    alert('Oops, something went wrong with image url');
                 }
             }
         });
@@ -195,5 +191,4 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
         $js .= parent::js();
         return $js;
     }
-
 }

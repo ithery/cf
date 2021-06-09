@@ -4,10 +4,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Aug 22, 2018, 1:20:44 PM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -28,14 +27,23 @@ class CDebug_Bar_Renderer {
      * @var string
      */
     protected $variableName = 'phpdebugbar';
+
     protected $controls = [];
+
     protected $ignoredCollectors = [];
+
     protected $ajaxHandlerClass = 'PhpDebugBar.AjaxHandler';
+
     protected $ajaxHandlerBindToJquery = true;
+
     protected $ajaxHandlerBindToXHR = false;
+
     protected $ajaxHandlerAutoShow = true;
+
     protected $openHandlerClass = 'PhpDebugBar.OpenHandler';
+
     protected $openHandlerUrl;
+
     protected $cssFiles = [
         'debug/debugbar.css',
         'debug/debugbar/widgets.css',
@@ -44,6 +52,7 @@ class CDebug_Bar_Renderer {
         'debug/debugbar/highlightjs/styles/github.css',
         'debug/debugbar-custom.css',
     ];
+
     protected $jsFiles = [
         'debug/debugbar.js',
         'debug/debugbar/widgets.js',
@@ -52,6 +61,7 @@ class CDebug_Bar_Renderer {
     ];
 
     const REPLACEABLE_TAG = '<!-- CAPP-DEBUGBAR-CODE -->';
+
     const REPLACEABLE_JS_TAG = '/* CAPP-DEBUGBAR-CODE */';
 
     public function __construct(CDebug_Bar $bar) {
@@ -172,8 +182,8 @@ class CDebug_Bar_Renderer {
      *
      * AJAX request should not render the initialization code.
      *
-     * @param boolean $initialize        Whether or not to render the debug bar initialization code
-     * @param boolean $renderStackedData Whether or not to render the stacked data
+     * @param bool $initialize        Whether or not to render the debug bar initialization code
+     * @param bool $renderStackedData Whether or not to render the stacked data
      *
      * @return string
      */
@@ -384,7 +394,7 @@ class CDebug_Bar_Renderer {
     /**
      * Sets whether to call bindToJquery() on the ajax handler
      *
-     * @param boolean $bind
+     * @param bool $bind
      */
     public function setBindAjaxHandlerToJquery($bind = true) {
         $this->ajaxHandlerBindToJquery = $bind;
@@ -394,7 +404,7 @@ class CDebug_Bar_Renderer {
     /**
      * Checks whether bindToJquery() will be called on the ajax handler
      *
-     * @return boolean
+     * @return bool
      */
     public function isAjaxHandlerBoundToJquery() {
         return $this->ajaxHandlerBindToJquery;
@@ -403,7 +413,7 @@ class CDebug_Bar_Renderer {
     /**
      * Sets whether to call bindToXHR() on the ajax handler
      *
-     * @param boolean $bind
+     * @param bool $bind
      */
     public function setBindAjaxHandlerToXHR($bind = true) {
         $this->ajaxHandlerBindToXHR = $bind;
@@ -413,7 +423,7 @@ class CDebug_Bar_Renderer {
     /**
      * Checks whether bindToXHR() will be called on the ajax handler
      *
-     * @return boolean
+     * @return bool
      */
     public function isAjaxHandlerBoundToXHR() {
         return $this->ajaxHandlerBindToXHR;
@@ -423,7 +433,7 @@ class CDebug_Bar_Renderer {
      * Sets whether new ajax debug data will be immediately shown.  Setting to false could be useful
      * if there are a lot of tracking events cluttering things.
      *
-     * @param boolean $autoShow
+     * @param bool $autoShow
      */
     public function setAjaxHandlerAutoShow($autoShow = true) {
         $this->ajaxHandlerAutoShow = $autoShow;
@@ -433,7 +443,7 @@ class CDebug_Bar_Renderer {
     /**
      * Checks whether the ajax handler will immediately show new ajax requests.
      *
-     * @return boolean
+     * @return bool
      */
     public function isAjaxHandlerAutoShow() {
         return $this->ajaxHandlerAutoShow;

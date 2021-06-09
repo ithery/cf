@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Bootstrap_DevSuiteBootstrapper extends CDevSuite_Bootstrap_Bootstrapper {
-
     public function bootstrap() {
         if (!isset($_SERVER['HOME']) && isset($_SERVER['USERPROFILE'])) {
             $_SERVER['HOME'] = $_SERVER['USERPROFILE'];
@@ -14,9 +13,9 @@ class CDevSuite_Bootstrap_DevSuiteBootstrapper extends CDevSuite_Bootstrap_Boots
         if (!isset($_SERVER['USER']) && isset($_SERVER['USERNAME'])) {
             $_SERVER['USER'] = $_SERVER['USERNAME'];
         }
-        
+
         if (!isset($_SERVER['HOME'])) {
-            $_SERVER['HOME']='';
+            $_SERVER['HOME'] = '';
         }
 
         /*
@@ -26,5 +25,4 @@ class CDevSuite_Bootstrap_DevSuiteBootstrapper extends CDevSuite_Bootstrap_Boots
             CDevSuite::configuration()->createConfigurationDirectory();
         }
     }
-
 }

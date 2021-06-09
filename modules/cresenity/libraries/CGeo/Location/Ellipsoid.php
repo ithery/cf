@@ -1,15 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * CGeo_Location_Ellipsoid
+ *
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 7:36:05 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 7:36:05 PM
  */
 class CGeo_Location_Ellipsoid {
-
     /**
      * @var string
      */
@@ -49,8 +50,8 @@ class CGeo_Location_Ellipsoid {
 
     /**
      * @param string $name
-     * @param float $a
-     * @param float $f
+     * @param float  $a
+     * @param float  $f
      */
     public function __construct($name, $a, $f) {
         $this->name = $name;
@@ -116,5 +117,4 @@ class CGeo_Location_Ellipsoid {
     public function getArithmeticMeanRadius() {
         return $this->a * (1 - 1 / $this->f / 3);
     }
-
 }

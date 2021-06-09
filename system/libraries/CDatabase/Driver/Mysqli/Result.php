@@ -1,41 +1,39 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 8:31:26 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 8:31:26 AM
  */
 class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
+    use CTrait_Compat_Database_Driver_Mysqli_Result;
 
-    // Database connection
     /**
-     *
      * @var \mysqli
      */
     protected $link;
+
     // Data fetching types
     protected $fetch_type = 'fetch_object';
+
     protected $return_type = MYSQLI_ASSOC;
 
     /**
      * Sets up the result variables.
      *
-     * @param  object    database link
-     * @param  boolean   return objects or arrays
-     * @param  string    SQL query that was run
+     * @param object $link   database link
+     * @param bool   $object return objects or arrays
+     * @param string $sql    SQL query that was run
      */
-    public function __construct($link, $object = TRUE, $sql) {
-
-
-      
+    public function __construct($link, $object = true, $sql = null) {
         $this->link = $link;
-
 
         if (!$this->link->multi_query($sql)) {
             // SQL error
-            throw new CDatabase_Exception('There was an SQL error: :error', array(':error' => $this->link->error . ' - ' . $sql));
+            throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $this->link->error . ' - ' . $sql]);
         } else {
             $this->result = $this->link->store_result();
 
@@ -43,17 +41,16 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
             if (is_object($this->result)) {
                 $this->current_row = 0;
                 $this->total_rows = $this->result->num_rows;
-                $this->fetch_type = ($object === TRUE) ? 'fetch_object' : 'fetch_array';
+                $this->fetch_type = ($object === true) ? 'fetch_object' : 'fetch_array';
             } elseif ($this->link->error) {
                 // SQL error
-                throw new CDatabase_Exception('There was an SQL error: :error', array(':error' => $this->link->error . ' - ' . $sql));
+                throw new CDatabase_Exception('There was an SQL error: :error', [':error' => $this->link->error . ' - ' . $sql]);
             } else {
                 // Its an DELETE, INSERT, REPLACE, or UPDATE query
                 $this->insert_id = $this->link->insert_id;
                 $this->total_rows = $this->link->affected_rows;
             }
         }
-
 
         // Set result type
         $this->result($object);
@@ -81,7 +78,7 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
         }
     }
 
-    public function result($object = TRUE, $type = MYSQLI_ASSOC) {
+    public function result($object = true, $type = MYSQLI_ASSOC) {
         $this->fetch_type = ((bool) $object) ? 'fetch_object' : 'fetch_array';
 
         // This check has to be outside the previous statement, because we do not
@@ -89,7 +86,7 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
         // NOTE - The class set by $type must be defined before fetching the result,
         // autoloading is disabled to save a lot of stupid overhead.
         if ($this->fetch_type == 'fetch_object') {
-            $this->return_type = (is_string($type) AND CF::auto_load($type)) ? $type : 'stdClass';
+            $this->return_type = (is_string($type) and CF::autoLoad($type)) ? $type : 'stdClass';
         } else {
             $this->return_type = $type;
         }
@@ -97,22 +94,18 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
         return $this;
     }
 
-    public function as_array($object = NULL, $type = MYSQLI_ASSOC) {
-        return $this->result_array($object, $type);
-    }
-
-    public function result_array($object = NULL, $type = MYSQLI_ASSOC) {
-        $rows = array();
+    public function resultArray($object = null, $type = MYSQLI_ASSOC) {
+        $rows = [];
 
         if (is_string($object)) {
             $fetch = $object;
         } elseif (is_bool($object)) {
-            if ($object === TRUE) {
+            if ($object === true) {
                 $fetch = 'fetch_object';
 
                 // NOTE - The class set by $type must be defined before fetching the result,
                 // autoloading is disabled to save a lot of stupid overhead.
-                $type = (is_string($type) AND CF::auto_load($type)) ? $type : 'stdClass';
+                $type = (is_string($type) and CF::autoLoad($type)) ? $type : 'stdClass';
             } else {
                 $fetch = 'fetch_array';
             }
@@ -121,7 +114,7 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
             $fetch = $this->fetch_type;
 
             if ($fetch == 'fetch_object') {
-                $type = (is_string($type) AND CF::auto_load($type)) ? $type : 'stdClass';
+                $type = (is_string($type) and CF::autoLoad($type)) ? $type : 'stdClass';
             }
         }
 
@@ -134,11 +127,11 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
             }
         }
 
-        return isset($rows) ? $rows : array();
+        return isset($rows) ? $rows : [];
     }
 
-    public function list_fields() {
-        $field_names = array();
+    public function listFields() {
+        $field_names = [];
         while ($field = $this->result->fetch_field()) {
             $field_names[] = $field->name;
         }
@@ -147,19 +140,20 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
     }
 
     public function seek($offset) {
-        if ($this->offsetExists($offset) AND $this->result->data_seek($offset)) {
+        if ($this->offsetExists($offset) and $this->result->data_seek($offset)) {
             // Set the current row to the offset
             $this->current_row = $offset;
 
-            return TRUE;
+            return true;
         }
 
-        return FALSE;
+        return false;
     }
 
     public function offsetGet($offset) {
-        if (!$this->seek($offset))
-            return FALSE;
+        if (!$this->seek($offset)) {
+            return false;
+        }
 
         // Return the row
         $fetch = $this->fetch_type;
@@ -170,7 +164,6 @@ class CDatabase_Driver_Mysqli_Result extends CDatabase_Result {
      * {@inheritdoc}
      */
     public function fetchAll($fetchMode = null, $fetchArgument = null, $ctorArgs = null) {
-        return $this->result_array(false);
+        return $this->resultArray(false);
     }
-
 }

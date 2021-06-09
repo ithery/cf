@@ -17,7 +17,7 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
 
         $dbname = carr::path($params, 'connection.database');
         if ($dbname == null) {
-            $dbname = $db->query('SELECT DATABASE()')->fetchColumn();
+            $dbname = $db->getValue('SELECT DATABASE()');
         }
         return $dbname;
     }
@@ -68,7 +68,8 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
             '/^(?:5\.5\.5-)?(mariadb-)?(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)/i',
             $versionString,
             $versionParts
-        )) {
+        )
+        ) {
             throw CDatabase_Exception::invalidPlatformVersionSpecified(
                 $versionString,
                 '^(?:5\.5\.5-)?(mariadb-)?<major_version>.<minor_version>.<patch_version>'
@@ -91,7 +92,8 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
             '/^(?P<major>\d+)(?:\.(?P<minor>\d+)(?:\.(?P<patch>\d+))?)?/',
             $versionString,
             $versionParts
-        )) {
+        )
+        ) {
             throw CDatabase_Exception::invalidPlatformVersionSpecified(
                 $versionString,
                 '<major_version>.<minor_version>.<patch_version>'
