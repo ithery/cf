@@ -6,15 +6,15 @@
  * @author Hery
  */
 class CManager_Theme_Data {
-
     protected $modules;
+
     protected $css;
+
     protected $js;
+
     protected $data;
 
     public function __construct($theme) {
-
-
         $themeFile = CF::getFile('themes', $theme);
         if (!CFile::exists($themeFile)) {
             throw new Exception('Theme ' . $theme . ' not exists');
@@ -41,5 +41,4 @@ class CManager_Theme_Data {
     public function getData() {
         return $this->data;
     }
-
 }

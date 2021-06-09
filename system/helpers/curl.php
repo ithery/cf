@@ -73,10 +73,17 @@ class curl {
 
     //@codingStandardsIgnoreENd
 
+    /**
+     * @return string
+     */
     public static function urlFull() {
         return static::fullUrl();
     }
 
+    /**
+     * @param boolean $qs
+     * @return string
+     */
     public static function fullUrl($qs = true) {
         $requestUri = carr::get($_SERVER, 'REQUEST_URI');
         if ($qs && strlen($requestUri) > 0) {

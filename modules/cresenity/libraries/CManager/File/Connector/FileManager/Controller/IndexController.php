@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 11, 2019, 1:40:19 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 11, 2019, 1:40:19 AM
  */
 use CManager_File_Connector_FileManager_FM as FM;
 
 class CManager_File_Connector_FileManager_Controller_IndexController extends CManager_File_Connector_FileManager_AbstractController {
-
     public function execute() {
         $app = CApp::instance();
         $fm = $this->fm();
@@ -20,5 +20,4 @@ class CManager_File_Connector_FileManager_Controller_IndexController extends CMa
         $app->addTemplate()->setTemplate('CElement/Component/FileManager/Index')->setVar('fm', $fm);
         echo $app->render();
     }
-
 }
