@@ -1,6 +1,6 @@
 <?php
 
-class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
+class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract implements CCache_Contract_DriverHaveMethodAddInterface, CCache_Contract_LockProviderDriverInterface {
     /**
      * The Redis factory implementation.
      *

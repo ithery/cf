@@ -48,7 +48,7 @@ class CCache_Lock_RedisLock extends CCache_LockAbstract {
      * @return bool
      */
     public function release() {
-        return (bool) $this->redis->eval(CCache_LuaScripts::releaseLock(), 1, $this->name, $this->owner);
+        return (bool) $this->redis->doEval(CCache_LuaScripts::releaseLock(), 1, $this->name, $this->owner);
     }
 
     /**

@@ -1,5 +1,7 @@
 <?php
 
+use Mpdf\Tag\P;
+
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
@@ -282,7 +284,7 @@ class CCache_Repository implements ArrayAccess {
             // If the store has an "add" method we will call the method on the store so it
             // has a chance to override this logic. Some drivers better support the way
             // this operation should work with a total "atomic" implementation of it.
-            if (method_exists($this->driver, 'add')) {
+            if ($this->driver instanceof CCache_Contract_DriverHaveMethodAddInterface) {
                 $seconds = $this->getSeconds($ttl);
 
                 return $this->driver->add(
@@ -458,17 +460,19 @@ class CCache_Repository implements ArrayAccess {
      * @throws \BadMethodCallException
      */
     public function tags($names) {
+        if ($this->driver instanceof CCache_DriverTaggableAbstract) {
+            $cache = $this->driver->tags(is_array($names) ? $names : func_get_args());
+
+            if (!is_null($this->events)) {
+                $cache->setEventDispatcher($this->events);
+            }
+
+            return $cache->setDefaultCacheTime($this->default);
+        }
         if (!$this->supportsTags()) {
             throw new BadMethodCallException('This cache store does not support tagging.');
         }
-
-        $cache = $this->driver->tags(is_array($names) ? $names : func_get_args());
-
-        if (!is_null($this->events)) {
-            $cache->setEventDispatcher($this->events);
-        }
-
-        return $cache->setDefaultCacheTime($this->default);
+        return null;
     }
 
     /**
@@ -524,7 +528,7 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Fire an event for this cache instance.
      *
-     * @param string $event
+     * @param string|object $event
      *
      * @return void
      */
@@ -621,5 +625,42 @@ class CCache_Repository implements ArrayAccess {
      */
     public function __clone() {
         $this->driver = clone $this->driver;
+    }
+
+    /**
+     * Get a lock instance.
+     *
+     * @param string      $name
+     * @param int         $seconds
+     * @param string|null $owner
+     *
+     * @return CCache_LockInterface
+     *
+     * @see CCache_Driver_RedisDriver
+     */
+    public function lock($name, $seconds = 0, $owner = null) {
+        if ($this->driver instanceof CCache_Contract_LockProviderDriverInterface) {
+            return $this->driver->lock($name, $seconds, $owner);
+        } else {
+            throw new BadMethodCallException('This cache store does not support lock.');
+        }
+        return false;
+    }
+
+    /**
+     * Restore a lock instance using the owner identifier.
+     *
+     * @param string $name
+     * @param string $owner
+     *
+     * @return \TBCache_LockInterface
+     */
+    public function restoreLock($name, $owner) {
+        if ($this->driver instanceof CCache_Contract_LockProviderDriverInterface) {
+            return $this->driver->restoreLock($name, $owner);
+        } else {
+            throw new BadMethodCallException('This cache store does not support lock.');
+        }
+        return false;
     }
 }
