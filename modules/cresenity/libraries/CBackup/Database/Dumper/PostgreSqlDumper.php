@@ -1,19 +1,16 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Symfony\Component\Process\Process;
 
 class CBackup_Database_Dumper_PostgreSqlDumper extends CBackup_Database_AbstractDumper {
-
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $useInserts = false;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $createTables = true;
 
     public function __construct() {
@@ -114,5 +111,4 @@ class CBackup_Database_Dumper_PostgreSqlDumper extends CBackup_Database_Abstract
         $this->createTables = false;
         return $this;
     }
-
 }

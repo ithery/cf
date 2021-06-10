@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 1:59:16 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 1:59:16 AM
  */
 class CApp_Api_Method_Server_DomainDelete extends CApp_Api_Method_Server {
-
     public function execute() {
         $errCode = 0;
         $errMessage = '';
@@ -17,7 +17,7 @@ class CApp_Api_Method_Server_DomainDelete extends CApp_Api_Method_Server {
         $request = $this->request();
         $domainToDelete = carr::get($request, 'domain');
 
-        $data = array();
+        $data = [];
         if ($errCode == 0) {
             if (strlen($domainToDelete) == 0) {
                 $errCode++;
@@ -39,5 +39,4 @@ class CApp_Api_Method_Server_DomainDelete extends CApp_Api_Method_Server {
 
         return $this;
     }
-
 }
