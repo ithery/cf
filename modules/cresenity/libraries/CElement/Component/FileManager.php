@@ -1,34 +1,37 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 28, 2019, 1:41:33 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 28, 2019, 1:41:33 AM
  */
 use CManager_File_Connector_FileManager_FM as FM;
 
 class CElement_Component_FileManager extends CElement_Component {
-
     protected $disk = null;
+
     protected $rootPath = null;
+
     protected $theme = null;
+
     protected $asPicker = false;
 
-    public function __construct($id = "") {
+    public function __construct($id = '') {
         parent::__construct($id);
 
         $this->tag = 'div';
     }
 
-    public static function factory($id = "") {
+    public static function factory($id = '') {
         return new CElement_Component_FileManager($id);
     }
 
     /**
-     * 
      * @param type $diskName
+     *
      * @return $this
      */
     public function setDisk($diskName) {
@@ -52,7 +55,6 @@ class CElement_Component_FileManager extends CElement_Component {
     }
 
     public function build() {
-
         $config = $this->buildConfig();
 
         $ajaxMethod = CAjax::createMethod()->setType('FileManager')->setData('config', $config);
@@ -92,10 +94,8 @@ class CElement_Component_FileManager extends CElement_Component {
             'crop' => false,
         ];
         if ($this->asPicker != null) {
-
             $config['action']['use'] = true;
         }
         return $config;
     }
-
 }

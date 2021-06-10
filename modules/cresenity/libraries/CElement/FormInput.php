@@ -9,15 +9,25 @@ class CElement_FormInput extends CElement_Element {
     use CTrait_Compat_Element_FormInput;
 
     protected $transforms = [];
+
     protected $name;
+
     protected $type;
+
     protected $submit_onchange;
+
     protected $value;
+
     protected $size;
+
     protected $ajax;
+
     protected $list;
+
     protected $validation;
+
     protected $disabled;
+
     protected $readonly;
 
     public function __construct($id = '') {
