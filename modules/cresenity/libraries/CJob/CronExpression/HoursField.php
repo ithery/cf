@@ -4,8 +4,8 @@
  * Hours field.  Allows: * , / -
  */
 class CJob_CronExpression_HoursField extends CJob_CronExpression_AbstractField {
-
     protected $rangeStart = 0;
+
     protected $rangeEnd = 23;
 
     public function isSatisfiedBy(DateTime $date, $value) {
@@ -30,8 +30,8 @@ class CJob_CronExpression_HoursField extends CJob_CronExpression_AbstractField {
             return $this;
         }
 
-        $parts = strpos($parts, ',') !== false ? explode(',', $parts) : array($parts);
-        $hours = array();
+        $parts = strpos($parts, ',') !== false ? explode(',', $parts) : [$parts];
+        $hours = [];
         foreach ($parts as $part) {
             $hours = array_merge($hours, $this->getRangeForExpression($part, 23));
         }
@@ -40,8 +40,9 @@ class CJob_CronExpression_HoursField extends CJob_CronExpression_AbstractField {
         $position = $invert ? count($hours) - 1 : 0;
         if (count($hours) > 1) {
             for ($i = 0; $i < count($hours) - 1; $i++) {
-                if ((!$invert && $current_hour >= $hours[$i] && $current_hour < $hours[$i + 1]) ||
-                        ($invert && $current_hour > $hours[$i] && $current_hour <= $hours[$i + 1])) {
+                if ((!$invert && $current_hour >= $hours[$i] && $current_hour < $hours[$i + 1])
+                    || ($invert && $current_hour > $hours[$i] && $current_hour <= $hours[$i + 1])
+                ) {
                     $position = $invert ? $i : $i + 1;
                     break;
                 }
@@ -58,5 +59,4 @@ class CJob_CronExpression_HoursField extends CJob_CronExpression_AbstractField {
 
         return $this;
     }
-
 }

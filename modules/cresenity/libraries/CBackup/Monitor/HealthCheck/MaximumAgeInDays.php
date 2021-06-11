@@ -13,12 +13,12 @@ class CBackup_Monitor_HealthCheck_MaximumAgeInDays extends CBackup_Monitor_Abstr
     public function checkHealth(CBackup_BackupDestination $backupDestination) {
         $this->failIf(
             $this->hasNoBackups($backupDestination),
-            clang::__('backup:.unhealthy_backup_found_empty')
+            c::__('backup:.unhealthy_backup_found_empty')
         );
         $newestBackup = $backupDestination->backups()->newest();
         $this->failIf(
             $this->isTooOld($newestBackup),
-            clang::__('backup.unhealthy_backup_found_old', [':date' => $newestBackup->date()->format('Y/m/d h:i:s')])
+            c::__('backup.unhealthy_backup_found_old', [':date' => $newestBackup->date()->format('Y/m/d h:i:s')])
         );
     }
 

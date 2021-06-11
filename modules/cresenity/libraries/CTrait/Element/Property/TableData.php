@@ -1,66 +1,58 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 2, 2019, 10:52:01 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 2, 2019, 10:52:01 PM
  */
 trait CTrait_Element_Property_TableData {
-
     /**
-     *
      * @var array
      */
     protected $tableData;
 
     /**
-     *
-     * @var boolean
+     * @var bool
      */
     protected $tableDataIsAjax;
 
     /**
-     *
      * @var string
      */
     protected $tableDataQuery;
 
     /**
-     *
      * @var array
      */
     protected $tableDataCallbackOptions;
 
     /**
-     *
      * @var string
      */
     protected $tableDataCallbackRequire;
 
     /**
-     *
      * @var string
      */
     protected $tableDataType;
 
     /**
-     * 
      * @param string $q
+     *
      * @return $this
      */
     public function setDataFromQuery($q) {
-
-
         $this->tableDataQuery = $q;
         $this->tableDataType = 'query';
         return $this;
     }
 
     /**
-     * 
      * @param CModel|CModel_Query $model
+     *
      * @return $this
      */
     public function setDataFromModel($model) {
@@ -74,9 +66,9 @@ trait CTrait_Element_Property_TableData {
     }
 
     /**
-     * 
      * @param CElastic_Search $el
-     * @param string $require
+     * @param string          $require
+     *
      * @return $this
      */
     public function setDataFromElastic($el, $require = null) {
@@ -84,20 +76,19 @@ trait CTrait_Element_Property_TableData {
         $this->isElastic = true;
         $this->tableDataType = 'elastic';
         if ($el instanceof CElastic_Search) {
-
             $this->query = $el->ajax_data();
         }
         return $this;
     }
 
     /**
-     * 
      * @param callable $callback
-     * @param array $callbackOptions
-     * @param string $require
+     * @param array    $callbackOptions
+     * @param string   $require
+     *
      * @return $this
      */
-    public function setDataFromCallback($callback, $callbackOptions = array(), $require = null) {
+    public function setDataFromCallback($callback, $callbackOptions = [], $require = null) {
         $this->tableDataQuery = CHelper::closure()->serializeClosure($callback);
         $this->tableDataCallbackOptions = $callbackOptions;
         $this->tableDataCallbackRequire = $require;
@@ -107,8 +98,8 @@ trait CTrait_Element_Property_TableData {
     }
 
     /**
-     * 
      * @param array $array
+     *
      * @return $this
      */
     public function setDataFromArray($array) {
@@ -133,7 +124,7 @@ trait CTrait_Element_Property_TableData {
     }
 
     public function getTableDataArray() {
-        $data = array();
+        $data = [];
         $data['tableData'] = $this->tableData;
         $data['tableDataCallbackOptions'] = $this->tableDataCallbackOptions;
         $data['tableDataCallbackRequire'] = $this->tableDataCallbackRequire;
@@ -157,5 +148,4 @@ trait CTrait_Element_Property_TableData {
                 return $this->tableData;
         }
     }
-
 }

@@ -1,18 +1,21 @@
 <?php
 
 class CAjaxMethod {
-
     use CTrait_Compat_AjaxMethod;
-    
-    public $name = "";
-    public $method = "GET";
-    public $data = array();
-    public $type = "";
-    public $target = "";
-    public $param = array();
+
+    public $name = '';
+
+    public $method = 'GET';
+
+    public $data = [];
+
+    public $type = '';
+
+    public $target = '';
+
+    public $param = [];
 
     public function __construct() {
-        
     }
 
     public static function factory() {
@@ -42,17 +45,14 @@ class CAjaxMethod {
 
         $ajax_method = date('Ymd') . cutils::randmd5();
         $disk = CTemporary::disk();
-        $filename = $ajax_method . ".tmp";
-        
-        $file = CTemporary::getPath("ajax", $filename);
+        $filename = $ajax_method . '.tmp';
+
+        $file = CTemporary::getPath('ajax', $filename);
         $disk->put($file, $json);
         $base_url = curl::base();
         if (CManager::instance()->isMobile()) {
             $base_url = curl::base(false, 'http');
         }
-        return $base_url . "ccore/ajax/" . $ajax_method;
+        return $base_url . 'ccore/ajax/' . $ajax_method;
     }
-
 }
-
-?>

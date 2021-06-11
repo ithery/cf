@@ -1,23 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 1:30:47 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 17, 2018, 1:30:47 AM
  */
 trait CTrait_Element_Behavior_Closeable {
-
     /**
-     *
      * @var bool
      */
     protected $closeable;
 
     /**
-     * 
      * @param bool $bool
+     *
      * @return $this
      */
     public function setCloseable($bool) {
@@ -26,7 +25,6 @@ trait CTrait_Element_Behavior_Closeable {
     }
 
     /**
-     * 
      * @return bool
      */
     public function getCloseable() {
@@ -34,11 +32,9 @@ trait CTrait_Element_Behavior_Closeable {
     }
 
     /**
-     * 
      * @return bool
      */
     public function isCloseable() {
         return $this->closeable == true;
     }
-
 }

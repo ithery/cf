@@ -1,23 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:23:47 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:23:47 PM
  */
 class CJob_EventManager {
-
     /**
-     *
      * @var CEventManager
      */
     protected static $eventManager;
-    protected static $callback = array();
+
+    protected static $callback = [];
 
     /**
-     * 
      * @return CEventManager
      */
     public static function getEventManager() {
@@ -36,12 +35,11 @@ class CJob_EventManager {
     /**
      * Gets the listeners of a specific event or all listeners.
      *
-     * @param string|null $event The name of the event.
+     * @param string|null $event the name of the event
      *
-     * @return object[]|object[][] The event listeners for the specified event, or all event listeners.
+     * @return object[]|object[][] the event listeners for the specified event, or all event listeners
      */
     public static function getCallback($event = null) {
-
         return $event ? (isset(self::$callback[$event]) ? self::$callback[$event] : null) : self::$callback;
     }
 
@@ -60,5 +58,4 @@ class CJob_EventManager {
             $eventManager->addEventListener(CJob_Events::onBackgroundJobPostRun, new CJob_EventManager_Listener());
         }
     }
-
 }

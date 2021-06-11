@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 22, 2018, 4:24:31 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 22, 2018, 4:24:31 PM
  */
 
 /**
@@ -14,47 +15,60 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @author Leaf Corcoran <leafot@gmail.com>
  */
 class CClientScript_Compiler_Css_Scss {
+    public static $VERSION = 'v0.0.12';
 
-    static public $VERSION = 'v0.0.12';
-    static protected $operatorNames = array(
-        '+' => "add",
-        '-' => "sub",
-        '*' => "mul",
-        '/' => "div",
-        '%' => "mod",
-        '==' => "eq",
-        '!=' => "neq",
-        '<' => "lt",
-        '>' => "gt",
-        '<=' => "lte",
-        '>=' => "gte",
-    );
-    static protected $namespaces = array(
-        "special" => "%",
-        "mixin" => "@",
-        "function" => "^",
-    );
-    static protected $unitTable = array(
-        "in" => array(
-            "in" => 1,
-            "pt" => 72,
-            "pc" => 6,
-            "cm" => 2.54,
-            "mm" => 25.4,
-            "px" => 96,
-        )
-    );
-    static public $true = array("keyword", "true");
-    static public $false = array("keyword", "false");
-    static public $null = array("null");
-    static public $defaultValue = array("keyword", "");
-    static public $selfSelector = array("self");
-    protected $importPaths = array("");
-    protected $importCache = array();
-    protected $userFunctions = array();
-    protected $registeredVars = array();
+    protected static $operatorNames = [
+        '+' => 'add',
+        '-' => 'sub',
+        '*' => 'mul',
+        '/' => 'div',
+        '%' => 'mod',
+        '==' => 'eq',
+        '!=' => 'neq',
+        '<' => 'lt',
+        '>' => 'gt',
+        '<=' => 'lte',
+        '>=' => 'gte',
+    ];
+
+    protected static $namespaces = [
+        'special' => '%',
+        'mixin' => '@',
+        'function' => '^',
+    ];
+
+    protected static $unitTable = [
+        'in' => [
+            'in' => 1,
+            'pt' => 72,
+            'pc' => 6,
+            'cm' => 2.54,
+            'mm' => 25.4,
+            'px' => 96,
+        ]
+    ];
+
+    public static $true = ['keyword', 'true'];
+
+    public static $false = ['keyword', 'false'];
+
+    public static $null = ['null'];
+
+    public static $defaultValue = ['keyword', ''];
+
+    public static $selfSelector = ['self'];
+
+    protected $importPaths = [''];
+
+    protected $importCache = [];
+
+    protected $userFunctions = [];
+
+    protected $registeredVars = [];
+
     protected $numberPrecision = 5;
-    protected $formatter = "scss_formatter_nested";
+
+    protected $formatter = 'scss_formatter_nested';
 
     /**
      * Compile scss
@@ -66,15 +80,15 @@ class CClientScript_Compiler_Css_Scss {
      */
     public function compile($code, $name = null) {
         $this->indentLevel = -1;
-        $this->commentsSeen = array();
-        $this->extends = array();
-        $this->extendsMap = array();
-        $this->parsedFiles = array();
+        $this->commentsSeen = [];
+        $this->extends = [];
+        $this->extendsMap = [];
+        $this->parsedFiles = [];
         $this->env = null;
         $this->scope = null;
 
         $locale = setlocale(LC_NUMERIC, 0);
-        setlocale(LC_NUMERIC, "C");
+        setlocale(LC_NUMERIC, 'C');
 
         $this->parser = new CClientScript_Compiler_Css_Scss_Parser($name);
 
@@ -110,13 +124,13 @@ class CClientScript_Compiler_Css_Scss {
         }
 
         $i = count($this->extends);
-        $this->extends[] = array($target, $origin);
+        $this->extends[] = [$target, $origin];
 
         foreach ($target as $part) {
             if (isset($this->extendsMap[$part])) {
                 $this->extendsMap[$part][] = $i;
             } else {
-                $this->extendsMap[$part] = array($i);
+                $this->extendsMap[$part] = [$i];
             }
         }
     }
@@ -124,8 +138,8 @@ class CClientScript_Compiler_Css_Scss {
     protected function makeOutputBlock($type, $selectors = null) {
         $out = new stdClass;
         $out->type = $type;
-        $out->lines = array();
-        $out->children = array();
+        $out->lines = [];
+        $out->children = [];
         $out->parent = $this->scope;
         $out->selectors = $selectors;
         $out->depth = $this->env->depth;
@@ -134,10 +148,11 @@ class CClientScript_Compiler_Css_Scss {
     }
 
     protected function matchExtendsSingle($single, &$outOrigin) {
-        $counts = array();
+        $counts = [];
         foreach ($single as $part) {
-            if (!is_string($part))
-                return false; // hmm
+            if (!is_string($part)) {
+                return false;
+            } // hmm
 
             if (isset($this->extendsMap[$part])) {
                 foreach ($this->extendsMap[$part] as $idx) {
@@ -146,19 +161,21 @@ class CClientScript_Compiler_Css_Scss {
             }
         }
 
-        $outOrigin = array();
+        $outOrigin = [];
         $found = false;
 
         foreach ($counts as $idx => $count) {
             list($target, $origin) = $this->extends[$idx];
 
             // check count
-            if ($count != count($target))
+            if ($count != count($target)) {
                 continue;
+            }
 
             // check if target is subset of single
-            if (array_diff(array_intersect($single, $target), $target))
+            if (array_diff(array_intersect($single, $target), $target)) {
                 continue;
+            }
 
             $rem = array_diff($single, $target);
 
@@ -183,9 +200,9 @@ class CClientScript_Compiler_Css_Scss {
 
     protected function combineSelectorSingle($base, $other) {
         $tag = null;
-        $out = array();
+        $out = [];
 
-        foreach (array($base, $other) as $single) {
+        foreach ([$base, $other] as $single) {
             foreach ($single as $part) {
                 if (preg_match('/^[^\[.#:]/', $part)) {
                     $tag = $part;
@@ -204,8 +221,9 @@ class CClientScript_Compiler_Css_Scss {
 
     protected function matchExtends($selector, &$out, $from = 0, $initial = true) {
         foreach ($selector as $i => $part) {
-            if ($i < $from)
+            if ($i < $from) {
                 continue;
+            }
 
             if ($this->matchExtendsSingle($part, $origin)) {
                 $before = array_slice($selector, 0, $i);
@@ -224,11 +242,14 @@ class CClientScript_Compiler_Css_Scss {
                     }
 
                     $result = array_merge(
-                            $before, $k > 0 ? array_slice($new, $k) : $new, $after);
+                        $before,
+                        $k > 0 ? array_slice($new, $k) : $new,
+                        $after
+                    );
 
-
-                    if ($result == $selector)
+                    if ($result == $selector) {
                         continue;
+                    }
                     $out[] = $result;
 
                     // recursively check for more matches
@@ -237,7 +258,11 @@ class CClientScript_Compiler_Css_Scss {
                     // selector sequence merging
                     if (!empty($before) && count($new) > 1) {
                         $result2 = array_merge(
-                                array_slice($new, 0, -1), $k > 0 ? array_slice($before, $k) : $before, array_slice($new, -1), $after);
+                            array_slice($new, 0, -1),
+                            $k > 0 ? array_slice($before, $k) : $before,
+                            array_slice($new, -1),
+                            $after
+                        );
 
                         $out[] = $result2;
                     }
@@ -248,18 +273,19 @@ class CClientScript_Compiler_Css_Scss {
 
     protected function flattenSelectors($block, $parentKey = null) {
         if ($block->selectors) {
-            $selectors = array();
+            $selectors = [];
             foreach ($block->selectors as $s) {
                 $selectors[] = $s;
-                if (!is_array($s))
+                if (!is_array($s)) {
                     continue;
+                }
                 // check extends
                 if (!empty($this->extendsMap)) {
                     $this->matchExtends($s, $selectors);
                 }
             }
 
-            $block->selectors = array();
+            $block->selectors = [];
             $placeholderSelector = false;
             foreach ($selectors as $selector) {
                 if ($this->hasSelectorPlaceholder($selector)) {
@@ -293,8 +319,7 @@ class CClientScript_Compiler_Css_Scss {
         $mediaQuery = $this->compileMediaQuery($this->multiplyMedia($this->env));
 
         if (!empty($mediaQuery)) {
-
-            $this->scope = $this->makeOutputBlock("media", array($mediaQuery));
+            $this->scope = $this->makeOutputBlock('media', [$mediaQuery]);
 
             $parentScope = $this->mediaParent($this->scope);
 
@@ -311,11 +336,11 @@ class CClientScript_Compiler_Css_Scss {
             }
 
             if ($needsWrap) {
-                $wrapped = (object) array(
-                            "selectors" => array(),
-                            "children" => $media->children
-                );
-                $media->children = array(array("block", $wrapped));
+                $wrapped = (object) [
+                    'selectors' => [],
+                    'children' => $media->children
+                ];
+                $media->children = [['block', $wrapped]];
             }
 
             $this->compileChildren($media->children, $this->scope);
@@ -328,7 +353,7 @@ class CClientScript_Compiler_Css_Scss {
 
     protected function mediaParent($scope) {
         while (!empty($scope->parent)) {
-            if (!empty($scope->type) && $scope->type != "media") {
+            if (!empty($scope->type) && $scope->type != 'media') {
                 break;
             }
             $scope = $scope->parent;
@@ -337,8 +362,8 @@ class CClientScript_Compiler_Css_Scss {
         return $scope;
     }
 
-    // TODO refactor compileNestedBlock and compileMedia into same thing
     protected function compileNestedBlock($block, $selectors) {
+        // TODO refactor compileNestedBlock and compileMedia into same thing
         $this->pushEnv($block);
 
         $this->scope = $this->makeOutputBlock($block->type, $selectors);
@@ -370,7 +395,7 @@ class CClientScript_Compiler_Css_Scss {
     protected function compileBlock($block) {
         $env = $this->pushEnv($block);
 
-        $env->selectors = array_map(array($this, "evalSelector"), $block->selectors);
+        $env->selectors = array_map([$this, 'evalSelector'], $block->selectors);
 
         $out = $this->makeOutputBlock(null, $this->multiplySelectors($env));
         $this->scope->children[] = $out;
@@ -381,11 +406,12 @@ class CClientScript_Compiler_Css_Scss {
 
     // joins together .classes and #ids
     protected function flattenSelectorSingle($single) {
-        $joined = array();
+        $joined = [];
         foreach ($single as $part) {
-            if (empty($joined) ||
-                    !is_string($part) ||
-                    preg_match('/[\[.:#%]/', $part)) {
+            if (empty($joined)
+                || !is_string($part)
+                || preg_match('/[\[.:#%]/', $part)
+            ) {
                 $joined[] = $part;
                 continue;
             }
@@ -402,19 +428,20 @@ class CClientScript_Compiler_Css_Scss {
 
     // replaces all the interpolates
     protected function evalSelector($selector) {
-        return array_map(array($this, "evalSelectorPart"), $selector);
+        return array_map([$this, 'evalSelectorPart'], $selector);
     }
 
     protected function evalSelectorPart($piece) {
         foreach ($piece as &$p) {
-            if (!is_array($p))
+            if (!is_array($p)) {
                 continue;
+            }
 
             switch ($p[0]) {
-                case "interpolate":
+                case 'interpolate':
                     $p = $this->compileValue($p);
                     break;
-                case "string":
+                case 'string':
                     $p = $this->compileValue($p);
                     break;
             }
@@ -426,21 +453,25 @@ class CClientScript_Compiler_Css_Scss {
     // compiles to string
     // self(&) should have been replaced by now
     protected function compileSelector($selector) {
-        if (!is_array($selector))
-            return $selector; // media and the like
+        if (!is_array($selector)) {
+            return $selector;
+        } // media and the like
 
-        return implode(" ", array_map(
-                        array($this, "compileSelectorPart"), $selector));
+        return implode(' ', array_map(
+            [$this, 'compileSelectorPart'],
+            $selector
+        ));
     }
 
     protected function compileSelectorPart($piece) {
         foreach ($piece as &$p) {
-            if (!is_array($p))
+            if (!is_array($p)) {
                 continue;
+            }
 
             switch ($p[0]) {
-                case "self":
-                    $p = "&";
+                case 'self':
+                    $p = '&';
                     break;
                 default:
                     $p = $this->compileValue($p);
@@ -452,8 +483,9 @@ class CClientScript_Compiler_Css_Scss {
     }
 
     protected function hasSelectorPlaceholder($selector) {
-        if (!is_array($selector))
+        if (!is_array($selector)) {
             return false;
+        }
 
         foreach ($selector as $parts) {
             foreach ($parts as $part) {
@@ -469,34 +501,35 @@ class CClientScript_Compiler_Css_Scss {
     protected function compileChildren($stms, $out) {
         foreach ($stms as $stm) {
             $ret = $this->compileChild($stm, $out);
-            if (isset($ret))
+            if (isset($ret)) {
                 return $ret;
+            }
         }
     }
 
     protected function compileMediaQuery($queryList) {
-        $out = "@media";
+        $out = '@media';
         $first = true;
         foreach ($queryList as $query) {
             $type = null;
-            $parts = array();
+            $parts = [];
             foreach ($query as $q) {
                 switch ($q[0]) {
-                    case "mediaType":
+                    case 'mediaType':
                         if ($type) {
-                            $type = $this->mergeMediaTypes($type, array_map(array($this, "compileValue"), array_slice($q, 1)));
+                            $type = $this->mergeMediaTypes($type, array_map([$this, 'compileValue'], array_slice($q, 1)));
                             if (empty($type)) { // merge failed
                                 return null;
                             }
                         } else {
-                            $type = array_map(array($this, "compileValue"), array_slice($q, 1));
+                            $type = array_map([$this, 'compileValue'], array_slice($q, 1));
                         }
                         break;
-                    case "mediaExp":
+                    case 'mediaExp':
                         if (isset($q[2])) {
-                            $parts[] = "(" . $this->compileValue($q[1]) . $this->formatter->assignSeparator . $this->compileValue($q[2]) . ")";
+                            $parts[] = '(' . $this->compileValue($q[1]) . $this->formatter->assignSeparator . $this->compileValue($q[2]) . ')';
                         } else {
-                            $parts[] = "(" . $this->compileValue($q[1]) . ")";
+                            $parts[] = '(' . $this->compileValue($q[1]) . ')';
                         }
                         break;
                 }
@@ -507,11 +540,11 @@ class CClientScript_Compiler_Css_Scss {
             if (!empty($parts)) {
                 if ($first) {
                     $first = false;
-                    $out .= " ";
+                    $out .= ' ';
                 } else {
                     $out .= $this->formatter->tagSeparator;
                 }
-                $out .= implode(" and ", $parts);
+                $out .= implode(' and ', $parts);
             }
         }
         return $out;
@@ -544,26 +577,26 @@ class CClientScript_Compiler_Css_Scss {
             if ($t1 == $t2) {
                 return null;
             }
-            return array(
+            return [
                 $m1 == 'not' ? $m2 : $m1,
                 $m1 == 'not' ? $t2 : $t1
-            );
+            ];
         } elseif ($m1 == 'not' && $m2 == 'not') {
-            # CSS has no way of representing "neither screen nor print"
+            // CSS has no way of representing "neither screen nor print"
             if ($t1 != $t2) {
                 return null;
             }
-            return array('not', $t1);
+            return ['not', $t1];
         } elseif ($t1 != $t2) {
             return null;
         } else { // t1 == t2, neither m1 nor m2 are "not"
-            return array(empty($m1) ? $m2 : $m1, $t1);
+            return [empty($m1) ? $m2 : $m1, $t1];
         }
     }
 
     // returns true if the value was something that could be imported
     protected function compileImport($rawPath, $out) {
-        if ($rawPath[0] == "string") {
+        if ($rawPath[0] == 'string') {
             $path = $this->compileStringContent($rawPath);
             if ($path = $this->findImport($path)) {
                 $this->importFile($path, $out);
@@ -571,13 +604,15 @@ class CClientScript_Compiler_Css_Scss {
             }
             return false;
         }
-        if ($rawPath[0] == "list") {
+        if ($rawPath[0] == 'list') {
             // handle a list of strings
-            if (count($rawPath[2]) == 0)
+            if (count($rawPath[2]) == 0) {
                 return false;
+            }
             foreach ($rawPath[2] as $path) {
-                if ($path[0] != "string")
+                if ($path[0] != 'string') {
                     return false;
+                }
             }
 
             foreach ($rawPath[2] as $path) {
@@ -590,39 +625,41 @@ class CClientScript_Compiler_Css_Scss {
         return false;
     }
 
-    // return a value to halt execution
+    /**
+     * Return a value to halt execution
+     */
     protected function compileChild($child, $out) {
         $this->sourcePos = isset($child[-1]) ? $child[-1] : -1;
         $this->sourceParser = isset($child[-2]) ? $child[-2] : $this->parser;
 
         switch ($child[0]) {
-            case "import":
+            case 'import':
                 list(, $rawPath) = $child;
                 $rawPath = $this->reduce($rawPath);
                 if (!$this->compileImport($rawPath, $out)) {
-                    $out->lines[] = "@import " . $this->compileValue($rawPath) . ";";
+                    $out->lines[] = '@import ' . $this->compileValue($rawPath) . ';';
                 }
                 break;
-            case "directive":
+            case 'directive':
                 list(, $directive) = $child;
-                $s = "@" . $directive->name;
+                $s = '@' . $directive->name;
                 if (!empty($directive->value)) {
-                    $s .= " " . $this->compileValue($directive->value);
+                    $s .= ' ' . $this->compileValue($directive->value);
                 }
-                $this->compileNestedBlock($directive, array($s));
+                $this->compileNestedBlock($directive, [$s]);
                 break;
-            case "media":
+            case 'media':
                 $this->compileMedia($child[1]);
                 break;
-            case "block":
+            case 'block':
                 $this->compileBlock($child[1]);
                 break;
-            case "charset":
-                $out->lines[] = "@charset " . $this->compileValue($child[1]) . ";";
+            case 'charset':
+                $out->lines[] = '@charset ' . $this->compileValue($child[1]) . ';';
                 break;
-            case "assign":
+            case 'assign':
                 list(, $name, $value) = $child;
-                if ($name[0] == "var") {
+                if ($name[0] == 'var') {
                     $isDefault = !empty($child[3]);
 
                     if ($isDefault) {
@@ -638,26 +675,28 @@ class CClientScript_Compiler_Css_Scss {
 
                 // if the value reduces to null from something else then
                 // the property should be discarded
-                if ($value[0] != "null") {
+                if ($value[0] != 'null') {
                     $value = $this->reduce($value);
-                    if ($value[0] == "null") {
+                    if ($value[0] == 'null') {
                         break;
                     }
                 }
 
                 $compiledValue = $this->compileValue($value);
                 $out->lines[] = $this->formatter->property(
-                        $this->compileValue($name), $compiledValue);
+                    $this->compileValue($name),
+                    $compiledValue
+                );
                 break;
-            case "comment":
+            case 'comment':
                 $out->lines[] = $child[1];
                 break;
-            case "mixin":
-            case "function":
+            case 'mixin':
+            case 'function':
                 list(, $block) = $child;
                 $this->set(self::$namespaces[$block->type] . $block->name, $block);
                 break;
-            case "extend":
+            case 'extend':
                 list(, $selectors) = $child;
                 foreach ($selectors as $sel) {
                     // only use the first one
@@ -665,22 +704,22 @@ class CClientScript_Compiler_Css_Scss {
                     $this->pushExtends($sel, $out->selectors);
                 }
                 break;
-            case "if":
+            case 'if':
                 list(, $if) = $child;
                 if ($this->isTruthy($this->reduce($if->cond, true))) {
                     return $this->compileChildren($if->children, $out);
                 } else {
                     foreach ($if->cases as $case) {
-                        if ($case->type == "else" ||
-                                $case->type == "elseif" && $this->isTruthy($this->reduce($case->cond))) {
+                        if ($case->type == 'else'
+                                || $case->type == 'elseif' && $this->isTruthy($this->reduce($case->cond))) {
                             return $this->compileChildren($case->children, $out);
                         }
                     }
                 }
                 break;
-            case "return":
+            case 'return':
                 return $this->reduce($child[1], true);
-            case "each":
+            case 'each':
                 list(, $each) = $child;
                 $list = $this->coerceList($this->reduce($each->list));
                 foreach ($list[2] as $item) {
@@ -691,15 +730,16 @@ class CClientScript_Compiler_Css_Scss {
                     $this->popEnv();
                 }
                 break;
-            case "while":
+            case 'while':
                 list(, $while) = $child;
                 while ($this->isTruthy($this->reduce($while->cond, true))) {
                     $ret = $this->compileChildren($while->children, $out);
-                    if ($ret)
+                    if ($ret) {
                         return $ret;
+                    }
                 }
                 break;
-            case "for":
+            case 'for':
                 list(, $for) = $child;
                 $start = $this->reduce($for->start, true);
                 $start = $start[1];
@@ -708,38 +748,39 @@ class CClientScript_Compiler_Css_Scss {
                 $d = $start < $end ? 1 : -1;
 
                 while (true) {
-                    if ((!$for->until && $start - $d == $end) ||
-                            ($for->until && $start == $end)) {
+                    if ((!$for->until && $start - $d == $end)
+                            || ($for->until && $start == $end)) {
                         break;
                     }
 
-                    $this->set($for->var, array("number", $start, ""));
+                    $this->set($for->var, ['number', $start, '']);
                     $start += $d;
 
                     $ret = $this->compileChildren($for->children, $out);
-                    if ($ret)
+                    if ($ret) {
                         return $ret;
+                    }
                 }
 
                 break;
-            case "nestedprop":
+            case 'nestedprop':
                 list(, $prop) = $child;
-                $prefixed = array();
-                $prefix = $this->compileValue($prop->prefix) . "-";
+                $prefixed = [];
+                $prefix = $this->compileValue($prop->prefix) . '-';
                 foreach ($prop->children as $child) {
-                    if ($child[0] == "assign") {
+                    if ($child[0] == 'assign') {
                         array_unshift($child[1][2], $prefix);
                     }
-                    if ($child[0] == "nestedprop") {
+                    if ($child[0] == 'nestedprop') {
                         array_unshift($child[1]->prefix[2], $prefix);
                     }
                     $prefixed[] = $child;
                 }
                 $this->compileChildren($prefixed, $out);
                 break;
-            case "include": // including a mixin
+            case 'include': // including a mixin
                 list(, $name, $argValues, $content) = $child;
-                $mixin = $this->get(self::$namespaces["mixin"] . $name, false);
+                $mixin = $this->get(self::$namespaces['mixin'] . $name, false);
                 if (!$mixin) {
                     $this->throwError("Undefined mixin $name");
                 }
@@ -754,7 +795,7 @@ class CClientScript_Compiler_Css_Scss {
 
                 if (isset($content)) {
                     $content->scope = $callingScope;
-                    $this->setRaw(self::$namespaces["special"] . "content", $content);
+                    $this->setRaw(self::$namespaces['special'] . 'content', $content);
                 }
 
                 if (isset($mixin->args)) {
@@ -768,13 +809,13 @@ class CClientScript_Compiler_Css_Scss {
                 $this->popEnv();
 
                 break;
-            case "mixin_content":
-                $content = $this->get(self::$namespaces["special"] . "content");
+            case 'mixin_content':
+                $content = $this->get(self::$namespaces['special'] . 'content');
                 if (!isset($content)) {
-                    $this->throwError("Expected @content inside of mixin");
+                    $this->throwError('Expected @content inside of mixin');
                 }
 
-                $strongTypes = array('include', 'block', 'for', 'while');
+                $strongTypes = ['include', 'block', 'for', 'while'];
                 foreach ($content->children as $child) {
                     $this->storeEnv = (in_array($child[0], $strongTypes)) ? null : $content->scope;
 
@@ -783,7 +824,7 @@ class CClientScript_Compiler_Css_Scss {
 
                 unset($this->storeEnv);
                 break;
-            case "debug":
+            case 'debug':
                 list(, $value, $pos) = $child;
                 $line = $this->parser->getLineNo($pos);
                 $value = $this->compileValue($this->reduce($value, true));
@@ -796,14 +837,16 @@ class CClientScript_Compiler_Css_Scss {
 
     protected function expToString($exp) {
         list(, $op, $left, $right, $inParens, $whiteLeft, $whiteRight) = $exp;
-        $content = array($this->reduce($left));
-        if ($whiteLeft)
-            $content[] = " ";
+        $content = [$this->reduce($left)];
+        if ($whiteLeft) {
+            $content[] = ' ';
+        }
         $content[] = $op;
-        if ($whiteRight)
-            $content[] = " ";
+        if ($whiteRight) {
+            $content[] = ' ';
+        }
         $content[] = $this->reduce($right);
-        return array("string", "", $content);
+        return ['string', '', $content];
     }
 
     protected function isTruthy($value) {
@@ -813,12 +856,13 @@ class CClientScript_Compiler_Css_Scss {
     // should $value cause its operand to eval
     protected function shouldEval($value) {
         switch ($value[0]) {
-            case "exp":
-                if ($value[1] == "/") {
+            case 'exp':
+                if ($value[1] == '/') {
                     return $this->shouldEval($value[2], $value[3]);
                 }
-            case "var":
-            case "fncall":
+                // no break
+            case 'var':
+            case 'fncall':
                 return true;
         }
         return false;
@@ -827,7 +871,7 @@ class CClientScript_Compiler_Css_Scss {
     protected function reduce($value, $inExp = false) {
         list($type) = $value;
         switch ($type) {
-            case "exp":
+            case 'exp':
                 list(, $op, $left, $right, $inParens) = $value;
                 $opName = isset(self::$operatorNames[$op]) ? self::$operatorNames[$op] : $op;
 
@@ -837,8 +881,8 @@ class CClientScript_Compiler_Css_Scss {
                 $right = $this->reduce($right, true);
 
                 // only do division in special cases
-                if ($opName == "div" && !$inParens && !$inExp) {
-                    if ($left[0] != "color" && $right[0] != "color") {
+                if ($opName == 'div' && !$inParens && !$inExp) {
+                    if ($left[0] != 'color' && $right[0] != 'color') {
                         return $this->expToString($value);
                     }
                 }
@@ -854,44 +898,46 @@ class CClientScript_Compiler_Css_Scss {
                 // 2. op_[left type]_[right type] (passing the op as first arg
                 // 3. op_[op name]
                 $fn = "op_${opName}_${ltype}_${rtype}";
-                if (is_callable(array($this, $fn)) ||
-                        (($fn = "op_${ltype}_${rtype}") &&
-                        is_callable(array($this, $fn)) &&
-                        $passOp = true) ||
-                        (($fn = "op_${opName}") &&
-                        is_callable(array($this, $fn)) &&
-                        $genOp = true)) {
+                if (is_callable([$this, $fn])
+                    || (($fn = "op_${ltype}_${rtype}")
+                    && is_callable([$this, $fn])
+                    && $passOp = true)
+                    || (($fn = "op_${opName}")
+                    && is_callable([$this, $fn])
+                    && $genOp = true)
+                ) {
                     $unitChange = false;
-                    if (!isset($genOp) &&
-                            $left[0] == "number" && $right[0] == "number") {
-                        if ($opName == "mod" && $right[2] != "") {
+                    if (!isset($genOp)
+                        && $left[0] == 'number' && $right[0] == 'number'
+                    ) {
+                        if ($opName == 'mod' && $right[2] != '') {
                             $this->throwError("Cannot modulo by a number with units: $right[1]$right[2].");
                         }
 
                         $unitChange = true;
-                        $emptyUnit = $left[2] == "" || $right[2] == "";
-                        $targetUnit = "" != $left[2] ? $left[2] : $right[2];
+                        $emptyUnit = $left[2] == '' || $right[2] == '';
+                        $targetUnit = '' != $left[2] ? $left[2] : $right[2];
 
-                        if ($opName != "mul") {
-                            $left[2] = "" != $left[2] ? $left[2] : $targetUnit;
-                            $right[2] = "" != $right[2] ? $right[2] : $targetUnit;
+                        if ($opName != 'mul') {
+                            $left[2] = '' != $left[2] ? $left[2] : $targetUnit;
+                            $right[2] = '' != $right[2] ? $right[2] : $targetUnit;
                         }
 
-                        if ($opName != "mod") {
+                        if ($opName != 'mod') {
                             $left = $this->normalizeNumber($left);
                             $right = $this->normalizeNumber($right);
                         }
 
-                        if ($opName == "div" && !$emptyUnit && $left[2] == $right[2]) {
-                            $targetUnit = "";
+                        if ($opName == 'div' && !$emptyUnit && $left[2] == $right[2]) {
+                            $targetUnit = '';
                         }
 
-                        if ($opName == "mul") {
-                            $left[2] = "" != $left[2] ? $left[2] : $right[2];
-                            $right[2] = "" != $right[2] ? $right[2] : $left[2];
-                        } elseif ($opName == "div" && $left[2] == $right[2]) {
-                            $left[2] = "";
-                            $right[2] = "";
+                        if ($opName == 'mul') {
+                            $left[2] = '' != $left[2] ? $left[2] : $right[2];
+                            $right[2] = '' != $right[2] ? $right[2] : $left[2];
+                        } elseif ($opName == 'div' && $left[2] == $right[2]) {
+                            $left[2] = '';
+                            $right[2] = '';
                         }
                     }
 
@@ -903,7 +949,7 @@ class CClientScript_Compiler_Css_Scss {
                     }
 
                     if (isset($out)) {
-                        if ($unitChange && $out[0] == "number") {
+                        if ($unitChange && $out[0] == 'number') {
                             $out = $this->coerceUnit($out, $targetUnit);
                         }
                         return $out;
@@ -911,22 +957,22 @@ class CClientScript_Compiler_Css_Scss {
                 }
 
                 return $this->expToString($value);
-            case "unary":
+            case 'unary':
                 list(, $op, $exp, $inParens) = $value;
                 $inExp = $inExp || $this->shouldEval($exp);
 
                 $exp = $this->reduce($exp);
-                if ($exp[0] == "number") {
+                if ($exp[0] == 'number') {
                     switch ($op) {
-                        case "+":
+                        case '+':
                             return $exp;
-                        case "-":
+                        case '-':
                             $exp[1] *= -1;
                             return $exp;
                     }
                 }
 
-                if ($op == "not") {
+                if ($op == 'not') {
                     if ($inExp || $inParens) {
                         if ($exp == self::$false) {
                             return self::$true;
@@ -934,34 +980,34 @@ class CClientScript_Compiler_Css_Scss {
                             return self::$false;
                         }
                     } else {
-                        $op = $op . " ";
+                        $op = $op . ' ';
                     }
                 }
 
-                return array("string", "", array($op, $exp));
-            case "var":
+                return ['string', '', [$op, $exp]];
+            case 'var':
                 list(, $name) = $value;
                 return $this->reduce($this->get($name));
-            case "list":
+            case 'list':
                 foreach ($value[2] as &$item) {
                     $item = $this->reduce($item);
                 }
                 return $value;
-            case "string":
+            case 'string':
                 foreach ($value[2] as &$item) {
                     if (is_array($item)) {
                         $item = $this->reduce($item);
                     }
                 }
                 return $value;
-            case "interpolate":
+            case 'interpolate':
                 $value[1] = $this->reduce($value[1]);
                 return $value;
-            case "fncall":
+            case 'fncall':
                 list(, $name, $argValues) = $value;
 
                 // user defined function?
-                $func = $this->get(self::$namespaces["function"] . $name, false);
+                $func = $this->get(self::$namespaces['function'] . $name, false);
                 if ($func) {
                     $this->pushEnv();
 
@@ -971,10 +1017,10 @@ class CClientScript_Compiler_Css_Scss {
                     }
 
                     // throw away lines and children
-                    $tmp = (object) array(
-                                "lines" => array(),
-                                "children" => array()
-                    );
+                    $tmp = (object) [
+                        'lines' => [],
+                        'children' => []
+                    ];
                     $ret = $this->compileChildren($func->children, $tmp);
                     $this->popEnv();
 
@@ -987,13 +1033,13 @@ class CClientScript_Compiler_Css_Scss {
                 }
 
                 // need to flatten the arguments into a list
-                $listArgs = array();
+                $listArgs = [];
                 foreach ((array) $argValues as $arg) {
                     if (empty($arg[0])) {
                         $listArgs[] = $this->reduce($arg[1]);
                     }
                 }
-                return array("function", $name, array("list", ",", $listArgs));
+                return ['function', $name, ['list', ',', $listArgs]];
             default:
                 return $value;
         }
@@ -1004,75 +1050,79 @@ class CClientScript_Compiler_Css_Scss {
         list($type) = $value;
 
         switch ($type) {
-            case "list":
+            case 'list':
                 $value = $this->extractInterpolation($value);
-                if ($value[0] != "list") {
-                    return array("keyword", $this->compileValue($value));
+                if ($value[0] != 'list') {
+                    return ['keyword', $this->compileValue($value)];
                 }
                 foreach ($value[2] as $key => $item) {
                     $value[2][$key] = $this->normalizeValue($item);
                 }
                 return $value;
-            case "number":
+            case 'number':
                 return $this->normalizeNumber($value);
             default:
                 return $value;
         }
     }
 
-    // just does physical lengths for now
+    /**
+     * Just does physical lengths for now
+     */
     protected function normalizeNumber($number) {
         list(, $value, $unit) = $number;
-        if (isset(self::$unitTable["in"][$unit])) {
-            $conv = self::$unitTable["in"][$unit];
-            return array("number", $value / $conv, "in");
+        if (isset(self::$unitTable['in'][$unit])) {
+            $conv = self::$unitTable['in'][$unit];
+            return ['number', $value / $conv, 'in'];
         }
         return $number;
     }
 
-    // $number should be normalized
+    /**
+     * $number should be normalized
+     */
     protected function coerceUnit($number, $unit) {
         list(, $value, $baseUnit) = $number;
         if (isset(self::$unitTable[$baseUnit][$unit])) {
             $value = $value * self::$unitTable[$baseUnit][$unit];
         }
 
-        return array("number", $value, $unit);
+        return ['number', $value, $unit];
     }
 
     protected function op_add_number_number($left, $right) {
-        return array("number", $left[1] + $right[1], $left[2]);
+        return ['number', $left[1] + $right[1], $left[2]];
     }
 
     protected function op_mul_number_number($left, $right) {
-        return array("number", $left[1] * $right[1], $left[2]);
+        return ['number', $left[1] * $right[1], $left[2]];
     }
 
     protected function op_sub_number_number($left, $right) {
-        return array("number", $left[1] - $right[1], $left[2]);
+        return ['number', $left[1] - $right[1], $left[2]];
     }
 
     protected function op_div_number_number($left, $right) {
-        return array("number", $left[1] / $right[1], $left[2]);
+        return ['number', $left[1] / $right[1], $left[2]];
     }
 
     protected function op_mod_number_number($left, $right) {
-        return array("number", $left[1] % $right[1], $left[2]);
+        return ['number', $left[1] % $right[1], $left[2]];
     }
 
     // adding strings
     protected function op_add($left, $right) {
         if ($strLeft = $this->coerceString($left)) {
-            if ($right[0] == "string") {
-                $right[1] = "";
+            if ($right[0] == 'string') {
+                $right[1] = '';
             }
             $strLeft[2][] = $right;
             return $strLeft;
         }
 
         if ($strRight = $this->coerceString($right)) {
-            if ($left[0] == "string") {
-                $left[1] = "";
+            if ($left[0] == 'string') {
+                $left[1] = '';
             }
             array_unshift($strRight[2], $left);
             return $strRight;
@@ -1080,23 +1130,27 @@ class CClientScript_Compiler_Css_Scss {
     }
 
     protected function op_and($left, $right, $shouldEval) {
-        if (!$shouldEval)
+        if (!$shouldEval) {
             return;
-        if ($left != self::$false)
+        }
+        if ($left != self::$false) {
             return $right;
+        }
         return $left;
     }
 
     protected function op_or($left, $right, $shouldEval) {
-        if (!$shouldEval)
+        if (!$shouldEval) {
             return;
-        if ($left != self::$false)
+        }
+        if ($left != self::$false) {
             return $left;
+        }
         return $right;
     }
 
     protected function op_color_color($op, $left, $right) {
-        $out = array('color');
+        $out = ['color'];
         foreach (range(1, 3) as $i) {
             $lval = isset($left[$i]) ? $left[$i] : 0;
             $rval = isset($right[$i]) ? $right[$i] : 0;
@@ -1119,37 +1173,38 @@ class CClientScript_Compiler_Css_Scss {
                     }
                     $out[] = $lval / $rval;
                     break;
-                case "==":
+                case '==':
                     return $this->op_eq($left, $right);
-                case "!=":
+                case '!=':
                     return $this->op_neq($left, $right);
                 default:
                     $this->throwError("color: unknown op $op");
             }
         }
 
-        if (isset($left[4]))
+        if (isset($left[4])) {
             $out[4] = $left[4];
-        elseif (isset($right[4]))
+        } elseif (isset($right[4])) {
             $out[4] = $right[4];
+        }
 
         return $this->fixColor($out);
     }
 
     protected function op_color_number($op, $left, $right) {
         $value = $right[1];
-        return $this->op_color_color($op, $left, array("color", $value, $value, $value));
+        return $this->op_color_color($op, $left, ['color', $value, $value, $value]);
     }
 
     protected function op_number_color($op, $left, $right) {
         $value = $left[1];
-        return $this->op_color_color($op, array("color", $value, $value, $value), $right);
+        return $this->op_color_color($op, ['color', $value, $value, $value], $right);
     }
 
     protected function op_eq($left, $right) {
         if (($lStr = $this->coerceString($left)) && ($rStr = $this->coerceString($right))) {
-            $lStr[1] = "";
-            $rStr[1] = "";
+            $lStr[1] = '';
+            $rStr[1] = '';
             return $this->toBool($this->compileValue($lStr) == $this->compileValue($rStr));
         }
 
@@ -1198,9 +1253,9 @@ class CClientScript_Compiler_Css_Scss {
 
         list($type) = $value;
         switch ($type) {
-            case "keyword":
+            case 'keyword':
                 return $value[1];
-            case "color":
+            case 'color':
                 // [1] - red component (either number for a %)
                 // [2] - green component
                 // [3] - blue component
@@ -1215,7 +1270,7 @@ class CClientScript_Compiler_Css_Scss {
                     return 'rgba(' . $r . ', ' . $g . ', ' . $b . ', ' . $value[4] . ')';
                 }
 
-                $h = sprintf("#%02x%02x%02x", $r, $g, $b);
+                $h = sprintf('#%02x%02x%02x', $r, $g, $b);
 
                 // Converting hex color to short notation (e.g. #003399 to #039)
                 if ($h[1] === $h[2] && $h[3] === $h[4] && $h[5] === $h[6]) {
@@ -1223,64 +1278,66 @@ class CClientScript_Compiler_Css_Scss {
                 }
 
                 return $h;
-            case "number":
+            case 'number':
                 return round($value[1], $this->numberPrecision) . $value[2];
-            case "string":
+            case 'string':
                 return $value[1] . $this->compileStringContent($value) . $value[1];
-            case "function":
-                $args = !empty($value[2]) ? $this->compileValue($value[2]) : "";
+            case 'function':
+                $args = !empty($value[2]) ? $this->compileValue($value[2]) : '';
                 return "$value[1]($args)";
-            case "list":
+            case 'list':
                 $value = $this->extractInterpolation($value);
-                if ($value[0] != "list")
+                if ($value[0] != 'list') {
                     return $this->compileValue($value);
+                }
 
                 list(, $delim, $items) = $value;
 
-                $filtered = array();
+                $filtered = [];
                 foreach ($items as $item) {
-                    if ($item[0] == "null")
+                    if ($item[0] == 'null') {
                         continue;
+                    }
                     $filtered[] = $this->compileValue($item);
                 }
 
                 return implode("$delim ", $filtered);
-            case "interpolated": # node created by extractInterpolation
+            case 'interpolated': // node created by extractInterpolation
                 list(, $interpolate, $left, $right) = $value;
-                list(,, $whiteLeft, $whiteRight) = $interpolate;
+                list(, , $whiteLeft, $whiteRight) = $interpolate;
 
-                $left = count($left[2]) > 0 ?
-                        $this->compileValue($left) . $whiteLeft : "";
+                $left = count($left[2]) > 0
+                        ? $this->compileValue($left) . $whiteLeft : '';
 
-                $right = count($right[2]) > 0 ?
-                        $whiteRight . $this->compileValue($right) : "";
+                $right = count($right[2]) > 0
+                        ? $whiteRight . $this->compileValue($right) : '';
 
                 return $left . $this->compileValue($interpolate) . $right;
 
-            case "interpolate": # raw parse node
+            case 'interpolate': // raw parse node
                 list(, $exp) = $value;
 
                 // strip quotes if it's a string
                 $reduced = $this->reduce($exp);
                 switch ($reduced[0]) {
-                    case "string":
-                        $reduced = array("keyword",
-                            $this->compileStringContent($reduced));
+                    case 'string':
+                        $reduced = ['keyword',
+                            $this->compileStringContent($reduced)];
                         break;
-                    case "null":
-                        $reduced = array("keyword", "");
+                    case 'null':
+                        $reduced = ['keyword', ''];
                 }
 
                 return $this->compileValue($reduced);
-            case "null":
-                return "null";
+            case 'null':
+                return 'null';
             default:
                 $this->throwError("unknown value type: $type");
         }
     }
 
     protected function compileStringContent($string) {
-        $parts = array();
+        $parts = [];
         foreach ($string[2] as $part) {
             if (is_array($part)) {
                 $parts[] = $this->compileValue($part);
@@ -1296,10 +1353,10 @@ class CClientScript_Compiler_Css_Scss {
     protected function extractInterpolation($list) {
         $items = $list[2];
         foreach ($items as $i => $item) {
-            if ($item[0] == "interpolate") {
-                $before = array("list", $list[1], array_slice($items, 0, $i));
-                $after = array("list", $list[1], array_slice($items, $i + 1));
-                return array("interpolated", $item, $before, $after);
+            if ($item[0] == 'interpolate') {
+                $before = ['list', $list[1], array_slice($items, 0, $i)];
+                $after = ['list', $list[1], array_slice($items, $i + 1)];
+                return ['interpolated', $item, $before, $after];
             }
         }
         return $list;
@@ -1307,18 +1364,18 @@ class CClientScript_Compiler_Css_Scss {
 
     // find the final set of selectors
     protected function multiplySelectors($env) {
-        $envs = array();
+        $envs = [];
         while (null !== $env) {
             if (!empty($env->selectors)) {
                 $envs[] = $env;
             }
             $env = $env->parent;
-        };
+        }
 
-        $selectors = array();
-        $parentSelectors = array(array());
+        $selectors = [];
+        $parentSelectors = [[]];
         while ($env = array_pop($envs)) {
-            $selectors = array();
+            $selectors = [];
             foreach ($env->selectors as $selector) {
                 foreach ($parentSelectors as $parent) {
                     $selectors[] = $this->joinSelectors($parent, $selector);
@@ -1333,16 +1390,16 @@ class CClientScript_Compiler_Css_Scss {
     // looks for & to replace, or append parent before child
     protected function joinSelectors($parent, $child) {
         $setSelf = false;
-        $out = array();
+        $out = [];
         foreach ($child as $part) {
-            $newPart = array();
+            $newPart = [];
             foreach ($part as $p) {
                 if ($p == self::$selfSelector) {
                     $setSelf = true;
                     foreach ($parent as $i => $parentPart) {
                         if ($i > 0) {
                             $out[] = $newPart;
-                            $newPart = array();
+                            $newPart = [];
                         }
 
                         foreach ($parentPart as $pp) {
@@ -1361,8 +1418,8 @@ class CClientScript_Compiler_Css_Scss {
     }
 
     protected function multiplyMedia($env, $childQueries = null) {
-        if (!isset($env) ||
-                !empty($env->block->type) && $env->block->type != "media") {
+        if (!isset($env)
+                || !empty($env->block->type) && $env->block->type != 'media') {
             return $childQueries;
         }
 
@@ -1376,11 +1433,11 @@ class CClientScript_Compiler_Css_Scss {
             $childQueries = $parentQueries;
         } else {
             $originalQueries = $childQueries;
-            $childQueries = array();
+            $childQueries = [];
 
             foreach ($parentQueries as $parentQuery) {
                 foreach ($originalQueries as $childQuery) {
-                    $childQueries [] = array_merge($parentQuery, $childQuery);
+                    $childQueries[] = array_merge($parentQuery, $childQuery);
                 }
             }
         }
@@ -1389,26 +1446,26 @@ class CClientScript_Compiler_Css_Scss {
     }
 
     // convert something to list
-    protected function coerceList($item, $delim = ",") {
-        if (isset($item) && $item[0] == "list") {
+    protected function coerceList($item, $delim = ',') {
+        if (isset($item) && $item[0] == 'list') {
             return $item;
         }
 
-        return array("list", $delim, !isset($item) ? array() : array($item));
+        return ['list', $delim, !isset($item) ? [] : [$item]];
     }
 
     protected function applyArguments($argDef, $argValues) {
         $hasVariable = false;
-        $args = array();
+        $args = [];
         foreach ($argDef as $i => $arg) {
             list($name, $default, $isVariable) = $argDef[$i];
-            $args[$name] = array($i, $name, $default, $isVariable);
+            $args[$name] = [$i, $name, $default, $isVariable];
             $hasVariable |= $isVariable;
         }
 
-        $keywordArgs = array();
-        $deferredKeywordArgs = array();
-        $remaining = array();
+        $keywordArgs = [];
+        $deferredKeywordArgs = [];
+        $remaining = [];
         // assign the keyword args
         foreach ((array) $argValues as $arg) {
             if (!empty($arg[0])) {
@@ -1419,7 +1476,7 @@ class CClientScript_Compiler_Css_Scss {
                         $this->throwError("Mixin or function doesn't have an argument named $%s.", $arg[0][1]);
                     }
                 } elseif ($args[$arg[0][1]][0] < count($remaining)) {
-                    $this->throwError("The argument $%s was passed both by position and by name.", $arg[0][1]);
+                    $this->throwError('The argument $%s was passed both by position and by name.', $arg[0][1]);
                 } else {
                     $keywordArgs[$arg[0][1]] = $arg[1];
                 }
@@ -1427,7 +1484,7 @@ class CClientScript_Compiler_Css_Scss {
                 $this->throwError('Positional arguments must come before keyword arguments.');
             } elseif ($arg[2] == true) {
                 $val = $this->reduce($arg[1], true);
-                if ($val[0] == "list") {
+                if ($val[0] == 'list') {
                     foreach ($val[2] as $name => $item) {
                         if (!is_numeric($name)) {
                             $keywordArgs[$name] = $item;
@@ -1446,7 +1503,7 @@ class CClientScript_Compiler_Css_Scss {
         foreach ($args as $arg) {
             list($i, $name, $default, $isVariable) = $arg;
             if ($isVariable) {
-                $val = array("list", ",", array());
+                $val = ['list', ',', []];
                 for ($count = count($remaining); $i < $count; $i++) {
                     $val[2][] = $remaining[$i];
                 }
@@ -1470,7 +1527,7 @@ class CClientScript_Compiler_Css_Scss {
     protected function pushEnv($block = null) {
         $env = new stdClass;
         $env->parent = $this->env;
-        $env->store = array();
+        $env->store = [];
         $env->block = $block;
         $env->depth = isset($this->env->depth) ? $this->env->depth + 1 : 0;
 
@@ -1479,7 +1536,7 @@ class CClientScript_Compiler_Css_Scss {
     }
 
     protected function normalizeName($name) {
-        return str_replace("-", "_", $name);
+        return str_replace('-', '_', $name);
     }
 
     protected function getStoreEnv() {
@@ -1497,8 +1554,9 @@ class CClientScript_Compiler_Css_Scss {
     }
 
     protected function setExisting($name, $value, $env = null) {
-        if (!isset($env))
+        if (!isset($env)) {
             $env = $this->getStoreEnv();
+        }
 
         if (isset($env->store[$name]) || !isset($env->parent)) {
             $env->store[$name] = $value;
@@ -1515,10 +1573,12 @@ class CClientScript_Compiler_Css_Scss {
     public function get($name, $defaultValue = null, $env = null) {
         $name = $this->normalizeName($name);
 
-        if (!isset($env))
+        if (!isset($env)) {
             $env = $this->getStoreEnv();
-        if (!isset($defaultValue))
+        }
+        if (!isset($defaultValue)) {
             $defaultValue = self::$defaultValue;
+        }
 
         if (isset($env->store[$name])) {
             return $env->store[$name];
@@ -1628,26 +1688,28 @@ class CClientScript_Compiler_Css_Scss {
         array_shift($this->importPaths);
     }
 
-    // results the file path for an import url if it exists
+    /**
+     * Results the file path for an import url if it exists
+     */
     public function findImport($url) {
-        $urls = array();
+        $urls = [];
 
         // for "normal" scss imports (ignore vanilla css and external requests)
         if (!preg_match('/\.css|^http:\/\/$/', $url)) {
             // try both normal and the _partial filename
-            $urls = array($url, preg_replace('/[^\/]+$/', '_\0', $url));
+            $urls = [$url, preg_replace('/[^\/]+$/', '_\0', $url)];
         }
 
         foreach ($this->importPaths as $dir) {
             if (is_string($dir)) {
                 // check urls for normal import paths
                 foreach ($urls as $full) {
-                    $full = $dir .
-                            (!empty($dir) && substr($dir, -1) != '/' ? '/' : '') .
-                            $full;
+                    $full = $dir
+                            . (!empty($dir) && substr($dir, -1) != '/' ? '/' : '')
+                            . $full;
 
-                    if ($this->fileExists($file = $full . '.scss') ||
-                            $this->fileExists($file = $full)) {
+                    if ($this->fileExists($file = $full . '.scss')
+                            || $this->fileExists($file = $full)) {
                         return $file;
                     }
                 }
@@ -1670,8 +1732,8 @@ class CClientScript_Compiler_Css_Scss {
     protected function callBuiltin($name, $args, &$returnValue) {
         // try a lib function
         $name = $this->normalizeName($name);
-        $libName = "lib_" . $name;
-        $f = array($this, $libName);
+        $libName = 'lib_' . $name;
+        $f = [$this, $libName];
         if (is_callable($f)) {
             $prototype = isset(self::$$libName) ? self::$$libName : null;
             $sorted = $this->sortArgs($prototype, $args);
@@ -1693,11 +1755,11 @@ class CClientScript_Compiler_Css_Scss {
         if (isset($returnValue)) {
             // coerce a php value into a scss one
             if (is_numeric($returnValue)) {
-                $returnValue = array('number', $returnValue, "");
+                $returnValue = ['number', $returnValue, ''];
             } elseif (is_bool($returnValue)) {
                 $returnValue = $returnValue ? self::$true : self::$false;
             } elseif (!is_array($returnValue)) {
-                $returnValue = array('keyword', $returnValue);
+                $returnValue = ['keyword', $returnValue];
             }
 
             return true;
@@ -1709,8 +1771,8 @@ class CClientScript_Compiler_Css_Scss {
     // sorts any keyword arguments
     // TODO: merge with apply arguments
     protected function sortArgs($prototype, $args) {
-        $keyArgs = array();
-        $posArgs = array();
+        $keyArgs = [];
+        $posArgs = [];
 
         foreach ($args as $arg) {
             list($key, $value) = $arg;
@@ -1722,10 +1784,11 @@ class CClientScript_Compiler_Css_Scss {
             }
         }
 
-        if (!isset($prototype))
+        if (!isset($prototype)) {
             return $posArgs;
+        }
 
-        $finalArgs = array();
+        $finalArgs = [];
         foreach ($prototype as $i => $names) {
             if (isset($posArgs[$i])) {
                 $finalArgs[] = $posArgs[$i];
@@ -1759,12 +1822,12 @@ class CClientScript_Compiler_Css_Scss {
 
     protected function coerceColor($value) {
         switch ($value[0]) {
-            case "color": return $value;
-            case "keyword":
+            case 'color': return $value;
+            case 'keyword':
                 $name = $value[1];
                 if (isset(self::$cssColors[$name])) {
                     $rgba = explode(',', self::$cssColors[$name]);
-                    return isset($rgba[3]) ? array('color', (int) $rgba[0], (int) $rgba[1], (int) $rgba[2], (int) $rgba[3]) : array('color', (int) $rgba[0], (int) $rgba[1], (int) $rgba[2]);
+                    return isset($rgba[3]) ? ['color', (int) $rgba[0], (int) $rgba[1], (int) $rgba[2], (int) $rgba[3]] : ['color', (int) $rgba[0], (int) $rgba[1], (int) $rgba[2]];
                 }
                 return null;
         }
@@ -1774,35 +1837,38 @@ class CClientScript_Compiler_Css_Scss {
 
     protected function coerceString($value) {
         switch ($value[0]) {
-            case "string":
+            case 'string':
                 return $value;
-            case "keyword":
-                return array("string", "", array($value[1]));
+            case 'keyword':
+                return ['string', '', [$value[1]]];
         }
         return null;
     }
 
     public function assertList($value) {
-        if ($value[0] != "list")
-            $this->throwError("expecting list");
+        if ($value[0] != 'list') {
+            $this->throwError('expecting list');
+        }
         return $value;
     }
 
     public function assertColor($value) {
-        if ($color = $this->coerceColor($value))
+        if ($color = $this->coerceColor($value)) {
             return $color;
-        $this->throwError("expecting color");
+        }
+        $this->throwError('expecting color');
     }
 
     public function assertNumber($value) {
-        if ($value[0] != "number")
-            $this->throwError("expecting number");
+        if ($value[0] != 'number') {
+            $this->throwError('expecting number');
+        }
         return $value[1];
     }
 
     protected function coercePercent($value) {
-        if ($value[0] == "number") {
-            if ($value[2] == "%") {
+        if ($value[0] == 'number') {
+            if ($value[2] == '%') {
                 return $value[1] / 100;
             }
             return $value[1];
@@ -1813,10 +1879,12 @@ class CClientScript_Compiler_Css_Scss {
     // make sure a color's components don't go out of bounds
     protected function fixColor($c) {
         foreach (range(1, 3) as $i) {
-            if ($c[$i] < 0)
+            if ($c[$i] < 0) {
                 $c[$i] = 0;
-            if ($c[$i] > 255)
+            }
+            if ($c[$i] > 255) {
                 $c[$i] = 255;
+            }
         }
 
         return $c;
@@ -1833,36 +1901,42 @@ class CClientScript_Compiler_Css_Scss {
         } else {
             $d = $max - $min;
 
-            if ($l < 255)
+            if ($l < 255) {
                 $s = $d / $l;
-            else
+            } else {
                 $s = $d / (510 - $l);
+            }
 
-            if ($red == $max)
+            if ($red == $max) {
                 $h = 60 * ($green - $blue) / $d;
-            elseif ($green == $max)
+            } elseif ($green == $max) {
                 $h = 60 * ($blue - $red) / $d + 120;
-            elseif ($blue == $max)
+            } elseif ($blue == $max) {
                 $h = 60 * ($red - $green) / $d + 240;
+            }
         }
 
-        return array('hsl', fmod($h, 360), $s * 100, $l / 5.1);
+        return ['hsl', fmod($h, 360), $s * 100, $l / 5.1];
     }
 
     public function hueToRGB($m1, $m2, $h) {
-        if ($h < 0)
+        if ($h < 0) {
             $h += 1;
-        elseif ($h > 1)
+        } elseif ($h > 1) {
             $h -= 1;
+        }
 
-        if ($h * 6 < 1)
+        if ($h * 6 < 1) {
             return $m1 + ($m2 - $m1) * $h * 6;
+        }
 
-        if ($h * 2 < 1)
+        if ($h * 2 < 1) {
             return $m2;
+        }
 
-        if ($h * 3 < 2)
+        if ($h * 3 < 2) {
             return $m1 + ($m2 - $m1) * (2 / 3 - $h) * 6;
+        }
 
         return $m1;
     }
@@ -1884,28 +1958,29 @@ class CClientScript_Compiler_Css_Scss {
         $g = $this->hueToRGB($m1, $m2, $h) * 255;
         $b = $this->hueToRGB($m1, $m2, $h - 1 / 3) * 255;
 
-        $out = array('color', $r, $g, $b);
+        $out = ['color', $r, $g, $b];
         return $out;
     }
 
     // Built in functions
 
-    protected static $lib_if = array("condition", "if-true", "if-false");
+    protected static $lib_if = ['condition', 'if-true', 'if-false'];
 
     protected function lib_if($args) {
         list($cond, $t, $f) = $args;
-        if (!$this->isTruthy($cond))
+        if (!$this->isTruthy($cond)) {
             return $f;
+        }
         return $t;
     }
 
-    protected static $lib_index = array("list", "value");
+    protected static $lib_index = ['list', 'value'];
 
     protected function lib_index($args) {
         list($list, $value) = $args;
         $list = $this->assertList($list);
 
-        $values = array();
+        $values = [];
         foreach ($list[2] as $item) {
             $values[] = $this->normalizeValue($item);
         }
@@ -1914,16 +1989,16 @@ class CClientScript_Compiler_Css_Scss {
         return false === $key ? false : $key + 1;
     }
 
-    protected static $lib_rgb = array("red", "green", "blue");
+    protected static $lib_rgb = ['red', 'green', 'blue'];
 
     protected function lib_rgb($args) {
         list($r, $g, $b) = $args;
-        return array("color", $r[1], $g[1], $b[1]);
+        return ['color', $r[1], $g[1], $b[1]];
     }
 
-    protected static $lib_rgba = array(
-        array("red", "color"),
-        "green", "blue", "alpha");
+    protected static $lib_rgba = [
+        ['red', 'color'],
+        'green', 'blue', 'alpha'];
 
     protected function lib_rgba($args) {
         if ($color = $this->coerceColor($args[0])) {
@@ -1934,14 +2009,14 @@ class CClientScript_Compiler_Css_Scss {
         }
 
         list($r, $g, $b, $a) = $args;
-        return array("color", $r[1], $g[1], $b[1], $a[1]);
+        return ['color', $r[1], $g[1], $b[1], $a[1]];
     }
 
     // helper function for adjust_color, change_color, and scale_color
     protected function alter_color($args, $fn) {
         $color = $this->assertColor($args[0]);
 
-        foreach (array(1, 2, 3, 7) as $i) {
+        foreach ([1, 2, 3, 7] as $i) {
             if (isset($args[$i])) {
                 $val = $this->assertNumber($args[$i]);
                 $ii = $i == 7 ? 4 : $i; // alpha
@@ -1951,7 +2026,7 @@ class CClientScript_Compiler_Css_Scss {
 
         if (isset($args[4]) || isset($args[5]) || isset($args[6])) {
             $hsl = $this->toHSL($color[1], $color[2], $color[3]);
-            foreach (array(4, 5, 6) as $i) {
+            foreach ([4, 5, 6] as $i) {
                 if (isset($args[$i])) {
                     $val = $this->assertNumber($args[$i]);
                     $hsl[$i - 3] = $this->$fn($hsl[$i - 3], $val, $i);
@@ -1959,44 +2034,45 @@ class CClientScript_Compiler_Css_Scss {
             }
 
             $rgb = $this->toRGB($hsl[1], $hsl[2], $hsl[3]);
-            if (isset($color[4]))
+            if (isset($color[4])) {
                 $rgb[4] = $color[4];
+            }
             $color = $rgb;
         }
 
         return $color;
     }
 
-    protected static $lib_adjust_color = array(
-        "color", "red", "green", "blue",
-        "hue", "saturation", "lightness", "alpha"
-    );
+    protected static $lib_adjust_color = [
+        'color', 'red', 'green', 'blue',
+        'hue', 'saturation', 'lightness', 'alpha'
+    ];
 
     protected function adjust_color_helper($base, $alter, $i) {
         return $base += $alter;
     }
 
     protected function lib_adjust_color($args) {
-        return $this->alter_color($args, "adjust_color_helper");
+        return $this->alter_color($args, 'adjust_color_helper');
     }
 
-    protected static $lib_change_color = array(
-        "color", "red", "green", "blue",
-        "hue", "saturation", "lightness", "alpha"
-    );
+    protected static $lib_change_color = [
+        'color', 'red', 'green', 'blue',
+        'hue', 'saturation', 'lightness', 'alpha'
+    ];
 
     protected function change_color_helper($base, $alter, $i) {
         return $alter;
     }
 
     protected function lib_change_color($args) {
-        return $this->alter_color($args, "change_color_helper");
+        return $this->alter_color($args, 'change_color_helper');
     }
 
-    protected static $lib_scale_color = array(
-        "color", "red", "green", "blue",
-        "hue", "saturation", "lightness", "alpha"
-    );
+    protected static $lib_scale_color = [
+        'color', 'red', 'green', 'blue',
+        'hue', 'saturation', 'lightness', 'alpha'
+    ];
 
     protected function scale_color_helper($base, $scale, $i) {
         // 1,2,3 - rgb
@@ -2027,10 +2103,10 @@ class CClientScript_Compiler_Css_Scss {
     }
 
     protected function lib_scale_color($args) {
-        return $this->alter_color($args, "scale_color_helper");
+        return $this->alter_color($args, 'scale_color_helper');
     }
 
-    protected static $lib_ie_hex_str = array("color");
+    protected static $lib_ie_hex_str = ['color'];
 
     protected function lib_ie_hex_str($args) {
         $color = $this->coerceColor($args[0]);
@@ -2039,28 +2115,28 @@ class CClientScript_Compiler_Css_Scss {
         return sprintf('#%02X%02X%02X%02X', $color[4], $color[1], $color[2], $color[3]);
     }
 
-    protected static $lib_red = array("color");
+    protected static $lib_red = ['color'];
 
     protected function lib_red($args) {
         $color = $this->coerceColor($args[0]);
         return $color[1];
     }
 
-    protected static $lib_green = array("color");
+    protected static $lib_green = ['color'];
 
     protected function lib_green($args) {
         $color = $this->coerceColor($args[0]);
         return $color[2];
     }
 
-    protected static $lib_blue = array("color");
+    protected static $lib_blue = ['color'];
 
     protected function lib_blue($args) {
         $color = $this->coerceColor($args[0]);
         return $color[3];
     }
 
-    protected static $lib_alpha = array("color");
+    protected static $lib_alpha = ['color'];
 
     protected function lib_alpha($args) {
         if ($color = $this->coerceColor($args[0])) {
@@ -2071,17 +2147,18 @@ class CClientScript_Compiler_Css_Scss {
         return null;
     }
 
-    protected static $lib_opacity = array("color");
+    protected static $lib_opacity = ['color'];
 
     protected function lib_opacity($args) {
         $value = $args[0];
-        if ($value[0] === 'number')
+        if ($value[0] === 'number') {
             return null;
+        }
         return $this->lib_alpha($args);
     }
 
     // mix two colors
-    protected static $lib_mix = array("color-1", "color-2", "weight");
+    protected static $lib_mix = ['color-1', 'color-2', 'weight'];
 
     protected function lib_mix($args) {
         list($first, $second, $weight) = $args;
@@ -2103,11 +2180,11 @@ class CClientScript_Compiler_Css_Scss {
         $w1 = (($w * $a == -1 ? $w : ($w + $a) / (1 + $w * $a)) + 1) / 2.0;
         $w2 = 1.0 - $w1;
 
-        $new = array('color',
+        $new = ['color',
             $w1 * $first[1] + $w2 * $second[1],
             $w1 * $first[2] + $w2 * $second[2],
             $w1 * $first[3] + $w2 * $second[3],
-        );
+        ];
 
         if ($firstAlpha != 1.0 || $secondAlpha != 1.0) {
             $new[] = $firstAlpha * $weight + $secondAlpha * ($weight - 1);
@@ -2116,15 +2193,15 @@ class CClientScript_Compiler_Css_Scss {
         return $this->fixColor($new);
     }
 
-    protected static $lib_hsl = array("hue", "saturation", "lightness");
+    protected static $lib_hsl = ['hue', 'saturation', 'lightness'];
 
     protected function lib_hsl($args) {
         list($h, $s, $l) = $args;
         return $this->toRGB($h[1], $s[1], $l[1]);
     }
 
-    protected static $lib_hsla = array("hue", "saturation",
-        "lightness", "alpha");
+    protected static $lib_hsla = ['hue', 'saturation',
+        'lightness', 'alpha'];
 
     protected function lib_hsla($args) {
         list($h, $s, $l, $a) = $args;
@@ -2133,40 +2210,41 @@ class CClientScript_Compiler_Css_Scss {
         return $color;
     }
 
-    protected static $lib_hue = array("color");
+    protected static $lib_hue = ['color'];
 
     protected function lib_hue($args) {
         $color = $this->assertColor($args[0]);
         $hsl = $this->toHSL($color[1], $color[2], $color[3]);
-        return array("number", $hsl[1], "deg");
+        return ['number', $hsl[1], 'deg'];
     }
 
-    protected static $lib_saturation = array("color");
+    protected static $lib_saturation = ['color'];
 
     protected function lib_saturation($args) {
         $color = $this->assertColor($args[0]);
         $hsl = $this->toHSL($color[1], $color[2], $color[3]);
-        return array("number", $hsl[2], "%");
+        return ['number', $hsl[2], '%'];
     }
 
-    protected static $lib_lightness = array("color");
+    protected static $lib_lightness = ['color'];
 
     protected function lib_lightness($args) {
         $color = $this->assertColor($args[0]);
         $hsl = $this->toHSL($color[1], $color[2], $color[3]);
-        return array("number", $hsl[3], "%");
+        return ['number', $hsl[3], '%'];
     }
 
     protected function adjustHsl($color, $idx, $amount) {
         $hsl = $this->toHSL($color[1], $color[2], $color[3]);
         $hsl[$idx] += $amount;
         $out = $this->toRGB($hsl[1], $hsl[2], $hsl[3]);
-        if (isset($color[4]))
+        if (isset($color[4])) {
             $out[4] = $color[4];
+        }
         return $out;
     }
 
-    protected static $lib_adjust_hue = array("color", "degrees");
+    protected static $lib_adjust_hue = ['color', 'degrees'];
 
     protected function lib_adjust_hue($args) {
         $color = $this->assertColor($args[0]);
@@ -2174,7 +2252,7 @@ class CClientScript_Compiler_Css_Scss {
         return $this->adjustHsl($color, 1, $degrees);
     }
 
-    protected static $lib_lighten = array("color", "amount");
+    protected static $lib_lighten = ['color', 'amount'];
 
     protected function lib_lighten($args) {
         $color = $this->assertColor($args[0]);
@@ -2182,7 +2260,7 @@ class CClientScript_Compiler_Css_Scss {
         return $this->adjustHsl($color, 3, $amount);
     }
 
-    protected static $lib_darken = array("color", "amount");
+    protected static $lib_darken = ['color', 'amount'];
 
     protected function lib_darken($args) {
         $color = $this->assertColor($args[0]);
@@ -2190,18 +2268,19 @@ class CClientScript_Compiler_Css_Scss {
         return $this->adjustHsl($color, 3, -$amount);
     }
 
-    protected static $lib_saturate = array("color", "amount");
+    protected static $lib_saturate = ['color', 'amount'];
 
     protected function lib_saturate($args) {
         $value = $args[0];
-        if ($value[0] === 'number')
+        if ($value[0] === 'number') {
             return null;
+        }
         $color = $this->assertColor($value);
         $amount = 100 * $this->coercePercent($args[1]);
         return $this->adjustHsl($color, 2, $amount);
     }
 
-    protected static $lib_desaturate = array("color", "amount");
+    protected static $lib_desaturate = ['color', 'amount'];
 
     protected function lib_desaturate($args) {
         $color = $this->assertColor($args[0]);
@@ -2209,27 +2288,29 @@ class CClientScript_Compiler_Css_Scss {
         return $this->adjustHsl($color, 2, -$amount);
     }
 
-    protected static $lib_grayscale = array("color");
+    protected static $lib_grayscale = ['color'];
 
     protected function lib_grayscale($args) {
         $value = $args[0];
-        if ($value[0] === 'number')
+        if ($value[0] === 'number') {
             return null;
+        }
         return $this->adjustHsl($this->assertColor($value), 2, -100);
     }
 
-    protected static $lib_complement = array("color");
+    protected static $lib_complement = ['color'];
 
     protected function lib_complement($args) {
         return $this->adjustHsl($this->assertColor($args[0]), 1, 180);
     }
 
-    protected static $lib_invert = array("color");
+    protected static $lib_invert = ['color'];
 
     protected function lib_invert($args) {
         $value = $args[0];
-        if ($value[0] === 'number')
+        if ($value[0] === 'number') {
             return null;
+        }
         $color = $this->assertColor($value);
         $color[1] = 255 - $color[1];
         $color[2] = 255 - $color[2];
@@ -2238,7 +2319,7 @@ class CClientScript_Compiler_Css_Scss {
     }
 
     // increases opacity by amount
-    protected static $lib_opacify = array("color", "amount");
+    protected static $lib_opacify = ['color', 'amount'];
 
     protected function lib_opacify($args) {
         $color = $this->assertColor($args[0]);
@@ -2249,14 +2330,14 @@ class CClientScript_Compiler_Css_Scss {
         return $color;
     }
 
-    protected static $lib_fade_in = array("color", "amount");
+    protected static $lib_fade_in = ['color', 'amount'];
 
     protected function lib_fade_in($args) {
         return $this->lib_opacify($args);
     }
 
     // decreases opacity by amount
-    protected static $lib_transparentize = array("color", "amount");
+    protected static $lib_transparentize = ['color', 'amount'];
 
     protected function lib_transparentize($args) {
         $color = $this->assertColor($args[0]);
@@ -2267,39 +2348,41 @@ class CClientScript_Compiler_Css_Scss {
         return $color;
     }
 
-    protected static $lib_fade_out = array("color", "amount");
+    protected static $lib_fade_out = ['color', 'amount'];
 
     protected function lib_fade_out($args) {
         return $this->lib_transparentize($args);
     }
 
-    protected static $lib_unquote = array("string");
+    protected static $lib_unquote = ['string'];
 
     protected function lib_unquote($args) {
         $str = $args[0];
-        if ($str[0] == "string")
-            $str[1] = "";
+        if ($str[0] == 'string') {
+            $str[1] = '';
+        }
         return $str;
     }
 
-    protected static $lib_quote = array("string");
+    protected static $lib_quote = ['string'];
 
     protected function lib_quote($args) {
         $value = $args[0];
-        if ($value[0] == "string" && !empty($value[1]))
+        if ($value[0] == 'string' && !empty($value[1])) {
             return $value;
-        return array("string", '"', array($value));
+        }
+        return ['string', '"', [$value]];
     }
 
-    protected static $lib_percentage = array("value");
+    protected static $lib_percentage = ['value'];
 
     protected function lib_percentage($args) {
-        return array("number",
+        return ['number',
             $this->coercePercent($args[0]) * 100,
-            "%");
+            '%'];
     }
 
-    protected static $lib_round = array("value");
+    protected static $lib_round = ['value'];
 
     protected function lib_round($args) {
         $num = $args[0];
@@ -2307,7 +2390,7 @@ class CClientScript_Compiler_Css_Scss {
         return $num;
     }
 
-    protected static $lib_floor = array("value");
+    protected static $lib_floor = ['value'];
 
     protected function lib_floor($args) {
         $num = $args[0];
@@ -2315,7 +2398,7 @@ class CClientScript_Compiler_Css_Scss {
         return $num;
     }
 
-    protected static $lib_ceil = array("value");
+    protected static $lib_ceil = ['value'];
 
     protected function lib_ceil($args) {
         $num = $args[0];
@@ -2323,7 +2406,7 @@ class CClientScript_Compiler_Css_Scss {
         return $num;
     }
 
-    protected static $lib_abs = array("value");
+    protected static $lib_abs = ['value'];
 
     protected function lib_abs($args) {
         $num = $args[0];
@@ -2336,7 +2419,7 @@ class CClientScript_Compiler_Css_Scss {
         $min = null;
         foreach ($numbers as $key => $number) {
             if (null === $min || $number[1] <= $min[1]) {
-                $min = array($key, $number[1]);
+                $min = [$key, $number[1]];
             }
         }
 
@@ -2348,7 +2431,7 @@ class CClientScript_Compiler_Css_Scss {
         $max = null;
         foreach ($numbers as $key => $number) {
             if (null === $max || $number[1] >= $max[1]) {
-                $max = array($key, $number[1]);
+                $max = [$key, $number[1]];
             }
         }
 
@@ -2358,10 +2441,10 @@ class CClientScript_Compiler_Css_Scss {
     protected function getNormalizedNumbers($args) {
         $unit = null;
         $originalUnit = null;
-        $numbers = array();
+        $numbers = [];
         foreach ($args as $key => $item) {
             if ('number' != $item[0]) {
-                $this->throwError("%s is not a number", $item[0]);
+                $this->throwError('%s is not a number', $item[0]);
             }
             $number = $this->normalizeNumber($item);
 
@@ -2378,14 +2461,14 @@ class CClientScript_Compiler_Css_Scss {
         return $numbers;
     }
 
-    protected static $lib_length = array("list");
+    protected static $lib_length = ['list'];
 
     protected function lib_length($args) {
         $list = $this->coerceList($args[0]);
         return count($list[2]);
     }
 
-    protected static $lib_nth = array("list", "n");
+    protected static $lib_nth = ['list', 'n'];
 
     protected function lib_nth($args) {
         $list = $this->coerceList($args[0]);
@@ -2394,35 +2477,36 @@ class CClientScript_Compiler_Css_Scss {
     }
 
     protected function listSeparatorForJoin($list1, $sep) {
-        if (!isset($sep))
+        if (!isset($sep)) {
             return $list1[1];
+        }
         switch ($this->compileValue($sep)) {
-            case "comma":
-                return ",";
-            case "space":
-                return "";
+            case 'comma':
+                return ',';
+            case 'space':
+                return '';
             default:
                 return $list1[1];
         }
     }
 
-    protected static $lib_join = array("list1", "list2", "separator");
+    protected static $lib_join = ['list1', 'list2', 'separator'];
 
     protected function lib_join($args) {
         list($list1, $list2, $sep) = $args;
-        $list1 = $this->coerceList($list1, " ");
-        $list2 = $this->coerceList($list2, " ");
+        $list1 = $this->coerceList($list1, ' ');
+        $list2 = $this->coerceList($list2, ' ');
         $sep = $this->listSeparatorForJoin($list1, $sep);
-        return array("list", $sep, array_merge($list1[2], $list2[2]));
+        return ['list', $sep, array_merge($list1[2], $list2[2])];
     }
 
-    protected static $lib_append = array("list", "val", "separator");
+    protected static $lib_append = ['list', 'val', 'separator'];
 
     protected function lib_append($args) {
         list($list1, $value, $sep) = $args;
-        $list1 = $this->coerceList($list1, " ");
+        $list1 = $this->coerceList($list1, ' ');
         $sep = $this->listSeparatorForJoin($list1, $sep);
-        return array("list", $sep, array_merge($list1[2], array($value)));
+        return ['list', $sep, array_merge($list1[2], [$value])];
     }
 
     protected function lib_zip($args) {
@@ -2430,10 +2514,10 @@ class CClientScript_Compiler_Css_Scss {
             $this->assertList($arg);
         }
 
-        $lists = array();
+        $lists = [];
         $firstList = array_shift($args);
         foreach ($firstList[2] as $key => $item) {
-            $list = array("list", "", array($item));
+            $list = ['list', '', [$item]];
             foreach ($args as $arg) {
                 if (isset($arg[2][$key])) {
                     $list[2][] = $arg[2][$key];
@@ -2444,58 +2528,58 @@ class CClientScript_Compiler_Css_Scss {
             $lists[] = $list;
         }
 
-        return array("list", ",", $lists);
+        return ['list', ',', $lists];
     }
 
-    protected static $lib_type_of = array("value");
+    protected static $lib_type_of = ['value'];
 
     protected function lib_type_of($args) {
         $value = $args[0];
         switch ($value[0]) {
-            case "keyword":
+            case 'keyword':
                 if ($value == self::$true || $value == self::$false) {
-                    return "bool";
+                    return 'bool';
                 }
 
                 if ($this->coerceColor($value)) {
-                    return "color";
+                    return 'color';
                 }
 
-                return "string";
+                return 'string';
             default:
                 return $value[0];
         }
     }
 
-    protected static $lib_unit = array("number");
+    protected static $lib_unit = ['number'];
 
     protected function lib_unit($args) {
         $num = $args[0];
-        if ($num[0] == "number") {
-            return array("string", '"', array($num[2]));
+        if ($num[0] == 'number') {
+            return ['string', '"', [$num[2]]];
         }
-        return "";
+        return '';
     }
 
-    protected static $lib_unitless = array("number");
+    protected static $lib_unitless = ['number'];
 
     protected function lib_unitless($args) {
         $value = $args[0];
-        return $value[0] == "number" && empty($value[2]);
+        return $value[0] == 'number' && empty($value[2]);
     }
 
-    protected static $lib_comparable = array("number-1", "number-2");
+    protected static $lib_comparable = ['number-1', 'number-2'];
 
     protected function lib_comparable($args) {
         list($number1, $number2) = $args;
-        if (!isset($number1[0]) || $number1[0] != "number" || !isset($number2[0]) || $number2[0] != "number") {
+        if (!isset($number1[0]) || $number1[0] != 'number' || !isset($number2[0]) || $number2[0] != 'number') {
             $this->throwError('Invalid argument(s) for "comparable"');
         }
 
         $number1 = $this->normalizeNumber($number1);
         $number2 = $this->normalizeNumber($number2);
 
-        return $number1[2] == $number2[2] || $number1[2] == "" || $number2[2] == "";
+        return $number1[2] == $number2[2] || $number1[2] == '' || $number2[2] == '';
     }
 
     /**
@@ -2504,13 +2588,13 @@ class CClientScript_Compiler_Css_Scss {
      * @param array $args
      */
     protected function lib_counter($args) {
-        $list = array_map(array($this, 'compileValue'), $args);
-        return array('string', '', array('counter(' . implode(',', $list) . ')'));
+        $list = array_map([$this, 'compileValue'], $args);
+        return ['string', '', ['counter(' . implode(',', $list) . ')']];
     }
 
     public function throwError($msg = null) {
         if (func_num_args() > 1) {
-            $msg = call_user_func_array("sprintf", func_get_args());
+            $msg = call_user_func_array('sprintf', func_get_args());
         }
 
         if ($this->sourcePos >= 0 && isset($this->sourceParser)) {
@@ -2525,7 +2609,7 @@ class CClientScript_Compiler_Css_Scss {
      *
      * @see http://www.w3.org/TR/css3-color
      */
-    static protected $cssColors = array(
+    protected static $cssColors = [
         'aliceblue' => '240,248,255',
         'antiquewhite' => '250,235,215',
         'aqua' => '0,255,255',
@@ -2674,7 +2758,5 @@ class CClientScript_Compiler_Css_Scss {
         'whitesmoke' => '245,245,245',
         'yellow' => '255,255,0',
         'yellowgreen' => '154,205,50'
-    );
-
-    
+    ];
 }

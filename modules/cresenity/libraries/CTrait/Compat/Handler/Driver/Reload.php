@@ -1,42 +1,44 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 3:22:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 3:22:30 PM
  */
-trait CTrait_Compat_Handler_Driver_Reload {
 
+// @codingStandardsIgnoreStart
+
+trait CTrait_Compat_Handler_Driver_Reload {
     /**
-     * 
-     * @deprecated, please use setMethod
      * @param string $method
+     *
      * @return $this
+     * @deprecated, please use setMethod
      */
     public function set_method($method) {
         return $this->setMethod($method);
     }
 
     /**
-     * 
+     * @param string|array $inputs
+     *
+     * @return $this
      * @deprecated, please use addParamInput
-     * @param type $inputs
-     * @return type
      */
     public function add_param_input($inputs) {
         return $this->addParamInput($inputs);
     }
 
     /**
-     * 
-     * @deprecated, please use addParamInputByName
      * @param type $inputs
-     * @return type
+     *
+     * @return $this
+     * @deprecated, please use addParamInputByName
      */
     public function add_param_input_by_name($inputs) {
         return $this->addParamInputByName($inputs);
     }
-
 }

@@ -1,32 +1,31 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 14, 2018, 4:40:47 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 14, 2018, 4:40:47 AM
  */
 class CApp_Api_Method_Server_GetServerInfo extends CApp_Api_Method_Server {
-
     public function execute() {
         $errCode = 0;
         $errMessage = '';
         $domain = $this->domain;
 
-
-        $data = array();
+        $data = [];
 
         try {
             $serverStorage = CServer::storage();
             $serverSystem = CServer::system();
             $serverMemory = CServer::memory();
-            $dataStorage = array();
+            $dataStorage = [];
             $dataStorage['total'] = $serverStorage->getTotalSpace();
             $dataStorage['free'] = $serverStorage->getFreeSpace();
             $dataStorage['used'] = $dataStorage['total'] - $dataStorage['free'];
 
-            $dataSystem = array();
+            $dataSystem = [];
             $dataSystem['hostname'] = $serverSystem->getHostname();
             $dataSystem['distribution'] = $serverSystem->getDistribution();
             $dataSystem['distributionIcon'] = $serverSystem->getDistributionIcon();
@@ -52,8 +51,8 @@ class CApp_Api_Method_Server_GetServerInfo extends CApp_Api_Method_Server {
                 ];
             }
             $dataSystem['cpus'] = $cpusData;
-            $dataMemory = array();
-            $dataMemory['physical'] = array();
+            $dataMemory = [];
+            $dataMemory['physical'] = [];
             $dataMemory['physical']['free'] = $serverMemory->getMemFree();
             $dataMemory['physical']['total'] = $serverMemory->getMemTotal();
             $dataMemory['physical']['used'] = $serverMemory->getMemUsed();
@@ -65,13 +64,12 @@ class CApp_Api_Method_Server_GetServerInfo extends CApp_Api_Method_Server {
             $dataMemory['physical']['cachePercent'] = $serverMemory->getMemPercentCache();
             $dataMemory['physical']['usedPercent'] = $serverMemory->getMemPercentUsed();
 
-            $dataMemory['swap'] = array();
+            $dataMemory['swap'] = [];
             $dataMemory['swap']['free'] = $serverMemory->getSwapFree();
             $dataMemory['swap']['total'] = $serverMemory->getSwapTotal();
             $dataMemory['swap']['used'] = $serverMemory->getSwapUsed();
             $dataMemory['swap']['usedPercent'] = $serverMemory->getSwapPercentUsed();
             $dataMemory['swap']['devices'] = $serverMemory->getSwapDevices();
-
 
             $data['storage'] = $dataStorage;
             $data['system'] = $dataSystem;
@@ -87,5 +85,4 @@ class CApp_Api_Method_Server_GetServerInfo extends CApp_Api_Method_Server {
 
         return $this;
     }
-
 }

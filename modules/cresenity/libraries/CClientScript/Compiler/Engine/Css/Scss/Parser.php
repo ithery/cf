@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 22, 2018, 4:24:31 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 22, 2018, 4:24:31 PM
  */
 
 /**
@@ -14,10 +15,9 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @author Leaf Corcoran <leafot@gmail.com>
  */
 class CClientScript_Compiler_Css_Scss_Parser {
-
-    static protected $precedence = array(
-        "or" => 0,
-        "and" => 1,
+    protected static $precedence = [
+        'or' => 0,
+        'and' => 1,
         '==' => 2,
         '!=' => 2,
         '<=' => 2,
@@ -30,21 +30,28 @@ class CClientScript_Compiler_Css_Scss_Parser {
         '*' => 4,
         '/' => 4,
         '%' => 4,
-    );
-    static protected $operators = array("+", "-", "*", "/", "%",
-        "==", "!=", "<=", ">=", "<", ">", "and", "or");
-    static protected $operatorStr;
-    static protected $whitePattern;
-    static protected $commentMulti;
-    static protected $commentSingle = "//";
-    static protected $commentMultiLeft = "/*";
-    static protected $commentMultiRight = "*/";
+    ];
+
+    protected static $operators = ['+', '-', '*', '/', '%',
+        '==', '!=', '<=', '>=', '<', '>', 'and', 'or'];
+
+    protected static $operatorStr;
+
+    protected static $whitePattern;
+
+    protected static $commentMulti;
+
+    protected static $commentSingle = '//';
+
+    protected static $commentMultiLeft = '/*';
+
+    protected static $commentMultiRight = '*/';
 
     /**
      * Constructor
      *
-     * @param string  $sourceName
-     * @param boolean $rootParser
+     * @param string $sourceName
+     * @param bool   $rootParser
      */
     public function __construct($sourceName = null, $rootParser = true) {
         $this->sourceName = $sourceName;
@@ -61,8 +68,8 @@ class CClientScript_Compiler_Css_Scss_Parser {
         }
     }
 
-    static protected function makeOperatorStr($operators) {
-        return '(' . implode('|', array_map(array('scss_parser', 'preg_quote'), $operators)) . ')';
+    protected static function makeOperatorStr($operators) {
+        return '(' . implode('|', array_map(['scss_parser', 'preg_quote'], $operators)) . ')';
     }
 
     /**
@@ -90,7 +97,7 @@ class CClientScript_Compiler_Css_Scss_Parser {
         }
 
         if (!empty($this->env->parent)) {
-            $this->throwParseError("unclosed block");
+            $this->throwParseError('unclosed block');
         }
 
         $this->env->isRoot = true;
@@ -135,26 +142,27 @@ class CClientScript_Compiler_Css_Scss_Parser {
      * position into $s. Then if a chain fails, use $this->seek($s) to
      * go back where we started.
      *
-     * @return boolean
+     * @return bool
      */
     protected function parseChunk() {
         $s = $this->seek();
 
         // the directives
-        if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] == "@") {
-            if ($this->literal("@media") && $this->mediaQueryList($mediaQueryList) && $this->literal("{")) {
-                $media = $this->pushSpecialBlock("media");
+        if (isset($this->buffer[$this->count]) && $this->buffer[$this->count] == '@') {
+            if ($this->literal('@media') && $this->mediaQueryList($mediaQueryList) && $this->literal('{')) {
+                $media = $this->pushSpecialBlock('media');
                 $media->queryList = $mediaQueryList[2];
                 return true;
             } else {
                 $this->seek($s);
             }
 
-            if ($this->literal("@mixin") &&
-                    $this->keyword($mixinName) &&
-                    ($this->argumentDef($args) || true) &&
-                    $this->literal("{")) {
-                $mixin = $this->pushSpecialBlock("mixin");
+            if ($this->literal('@mixin')
+                && $this->keyword($mixinName)
+                && ($this->argumentDef($args) || true)
+                && $this->literal('{')
+            ) {
+                $mixin = $this->pushSpecialBlock('mixin');
                 $mixin->name = $mixinName;
                 $mixin->args = $args;
                 return true;
@@ -162,18 +170,19 @@ class CClientScript_Compiler_Css_Scss_Parser {
                 $this->seek($s);
             }
 
-            if ($this->literal("@include") &&
-                    $this->keyword($mixinName) &&
-                    ($this->literal("(") &&
-                    ($this->argValues($argValues) || true) &&
-                    $this->literal(")") || true) &&
-                    ($this->end() ||
-                    $this->literal("{") && $hasBlock = true)) {
-                $child = array("include",
-                    $mixinName, isset($argValues) ? $argValues : null, null);
+            if ($this->literal('@include')
+                && $this->keyword($mixinName)
+                && ($this->literal('(')
+                && ($this->argValues($argValues) || true)
+                && $this->literal(')') || true)
+                && ($this->end()
+                || $this->literal('{') && $hasBlock = true)
+            ) {
+                $child = ['include',
+                    $mixinName, isset($argValues) ? $argValues : null, null];
 
                 if (!empty($hasBlock)) {
-                    $include = $this->pushSpecialBlock("include");
+                    $include = $this->pushSpecialBlock('include');
                     $include->child = $child;
                 } else {
                     $this->append($child, $s);
@@ -184,29 +193,32 @@ class CClientScript_Compiler_Css_Scss_Parser {
                 $this->seek($s);
             }
 
-            if ($this->literal("@import") &&
-                    $this->valueList($importPath) &&
-                    $this->end()) {
-                $this->append(array("import", $importPath), $s);
+            if ($this->literal('@import')
+                && $this->valueList($importPath)
+                && $this->end()
+            ) {
+                $this->append(['import', $importPath], $s);
                 return true;
             } else {
                 $this->seek($s);
             }
 
-            if ($this->literal("@extend") &&
-                    $this->selectors($selector) &&
-                    $this->end()) {
-                $this->append(array("extend", $selector), $s);
+            if ($this->literal('@extend')
+                && $this->selectors($selector)
+                && $this->end()
+            ) {
+                $this->append(['extend', $selector], $s);
                 return true;
             } else {
                 $this->seek($s);
             }
 
-            if ($this->literal("@function") &&
-                    $this->keyword($fnName) &&
-                    $this->argumentDef($args) &&
-                    $this->literal("{")) {
-                $func = $this->pushSpecialBlock("function");
+            if ($this->literal('@function')
+                && $this->keyword($fnName)
+                && $this->argumentDef($args)
+                && $this->literal('{')
+            ) {
+                $func = $this->pushSpecialBlock('function');
                 $func->name = $fnName;
                 $func->args = $args;
                 return true;
@@ -214,19 +226,20 @@ class CClientScript_Compiler_Css_Scss_Parser {
                 $this->seek($s);
             }
 
-            if ($this->literal("@return") && $this->valueList($retVal) && $this->end()) {
-                $this->append(array("return", $retVal), $s);
+            if ($this->literal('@return') && $this->valueList($retVal) && $this->end()) {
+                $this->append(['return', $retVal], $s);
                 return true;
             } else {
                 $this->seek($s);
             }
 
-            if ($this->literal("@each") &&
-                    $this->variable($varName) &&
-                    $this->literal("in") &&
-                    $this->valueList($list) &&
-                    $this->literal("{")) {
-                $each = $this->pushSpecialBlock("each");
+            if ($this->literal('@each')
+                && $this->variable($varName)
+                && $this->literal('in')
+                && $this->valueList($list)
+                && $this->literal('{')
+            ) {
+                $each = $this->pushSpecialBlock('each');
                 $each->var = $varName[1];
                 $each->list = $list;
                 return true;
@@ -234,25 +247,27 @@ class CClientScript_Compiler_Css_Scss_Parser {
                 $this->seek($s);
             }
 
-            if ($this->literal("@while") &&
-                    $this->expression($cond) &&
-                    $this->literal("{")) {
-                $while = $this->pushSpecialBlock("while");
+            if ($this->literal('@while')
+                && $this->expression($cond)
+                && $this->literal('{')
+            ) {
+                $while = $this->pushSpecialBlock('while');
                 $while->cond = $cond;
                 return true;
             } else {
                 $this->seek($s);
             }
 
-            if ($this->literal("@for") &&
-                    $this->variable($varName) &&
-                    $this->literal("from") &&
-                    $this->expression($start) &&
-                    ($this->literal("through") ||
-                    ($forUntil = true && $this->literal("to"))) &&
-                    $this->expression($end) &&
-                    $this->literal("{")) {
-                $for = $this->pushSpecialBlock("for");
+            if ($this->literal('@for')
+                && $this->variable($varName)
+                && $this->literal('from')
+                && $this->expression($start)
+                && ($this->literal('through')
+                || ($forUntil = true && $this->literal('to')))
+                && $this->expression($end)
+                && $this->literal('{')
+            ) {
+                $for = $this->pushSpecialBlock('for');
                 $for->var = $varName[1];
                 $for->start = $start;
                 $for->end = $end;
@@ -262,39 +277,40 @@ class CClientScript_Compiler_Css_Scss_Parser {
                 $this->seek($s);
             }
 
-            if ($this->literal("@if") && $this->valueList($cond) && $this->literal("{")) {
-                $if = $this->pushSpecialBlock("if");
+            if ($this->literal('@if') && $this->valueList($cond) && $this->literal('{')) {
+                $if = $this->pushSpecialBlock('if');
                 $if->cond = $cond;
-                $if->cases = array();
+                $if->cases = [];
                 return true;
             } else {
                 $this->seek($s);
             }
 
-            if (($this->literal("@debug") || $this->literal("@warn")) &&
-                    $this->valueList($value) &&
-                    $this->end()) {
-                $this->append(array("debug", $value, $s), $s);
+            if (($this->literal('@debug') || $this->literal('@warn'))
+                && $this->valueList($value)
+                && $this->end()
+            ) {
+                $this->append(['debug', $value, $s], $s);
                 return true;
             } else {
                 $this->seek($s);
             }
 
-            if ($this->literal("@content") && $this->end()) {
-                $this->append(array("mixin_content"), $s);
+            if ($this->literal('@content') && $this->end()) {
+                $this->append(['mixin_content'], $s);
                 return true;
             } else {
                 $this->seek($s);
             }
 
             $last = $this->last();
-            if (isset($last) && $last[0] == "if") {
+            if (isset($last) && $last[0] == 'if') {
                 list(, $if) = $last;
-                if ($this->literal("@else")) {
-                    if ($this->literal("{")) {
-                        $else = $this->pushSpecialBlock("else");
-                    } elseif ($this->literal("if") && $this->valueList($cond) && $this->literal("{")) {
-                        $else = $this->pushSpecialBlock("elseif");
+                if ($this->literal('@else')) {
+                    if ($this->literal('{')) {
+                        $else = $this->pushSpecialBlock('else');
+                    } elseif ($this->literal('if') && $this->valueList($cond) && $this->literal('{')) {
+                        $else = $this->pushSpecialBlock('elseif');
                         $else->cond = $cond;
                     }
 
@@ -308,22 +324,25 @@ class CClientScript_Compiler_Css_Scss_Parser {
                 $this->seek($s);
             }
 
-            if ($this->literal("@charset") &&
-                    $this->valueList($charset) && $this->end()) {
-                $this->append(array("charset", $charset), $s);
+            if ($this->literal('@charset')
+                && $this->valueList($charset) && $this->end()
+            ) {
+                $this->append(['charset', $charset], $s);
                 return true;
             } else {
                 $this->seek($s);
             }
 
             // doesn't match built in directive, do generic one
-            if ($this->literal("@", false) && $this->keyword($dirName) &&
-                    ($this->openString("{", $dirValue) || true) &&
-                    $this->literal("{")) {
-                $directive = $this->pushSpecialBlock("directive");
+            if ($this->literal('@', false) && $this->keyword($dirName)
+                && ($this->openString('{', $dirValue) || true)
+                && $this->literal('{')
+            ) {
+                $directive = $this->pushSpecialBlock('directive');
                 $directive->name = $dirName;
-                if (isset($dirValue))
+                if (isset($dirValue)) {
                     $directive->value = $dirValue;
+                }
                 return true;
             }
 
@@ -333,38 +352,40 @@ class CClientScript_Compiler_Css_Scss_Parser {
 
         // property shortcut
         // captures most properties before having to parse a selector
-        if ($this->keyword($name, false) &&
-                $this->literal(": ") &&
-                $this->valueList($value) &&
-                $this->end()) {
-            $name = array("string", "", array($name));
-            $this->append(array("assign", $name, $value), $s);
+        if ($this->keyword($name, false)
+            && $this->literal(': ')
+            && $this->valueList($value)
+            && $this->end()
+        ) {
+            $name = ['string', '', [$name]];
+            $this->append(['assign', $name, $value], $s);
             return true;
         } else {
             $this->seek($s);
         }
 
         // variable assigns
-        if ($this->variable($name) &&
-                $this->literal(":") &&
-                $this->valueList($value) && $this->end()) {
+        if ($this->variable($name)
+            && $this->literal(':')
+            && $this->valueList($value) && $this->end()
+        ) {
             // check for !default
-            $defaultVar = $value[0] == "list" && $this->stripDefault($value);
-            $this->append(array("assign", $name, $value, $defaultVar), $s);
+            $defaultVar = $value[0] == 'list' && $this->stripDefault($value);
+            $this->append(['assign', $name, $value, $defaultVar], $s);
             return true;
         } else {
             $this->seek($s);
         }
 
         // misc
-        if ($this->literal("-->")) {
+        if ($this->literal('-->')) {
             return true;
         }
 
         // opening css block
         $oldComments = $this->insertComments;
         $this->insertComments = false;
-        if ($this->selectors($selectors) && $this->literal("{")) {
+        if ($this->selectors($selectors) && $this->literal('{')) {
             $this->pushBlock($selectors);
             $this->insertComments = $oldComments;
             return true;
@@ -374,15 +395,15 @@ class CClientScript_Compiler_Css_Scss_Parser {
         $this->insertComments = $oldComments;
 
         // property assign, or nested assign
-        if ($this->propertyName($name) && $this->literal(":")) {
+        if ($this->propertyName($name) && $this->literal(':')) {
             $foundSomething = false;
             if ($this->valueList($value)) {
-                $this->append(array("assign", $name, $value), $s);
+                $this->append(['assign', $name, $value], $s);
                 $foundSomething = true;
             }
 
-            if ($this->literal("{")) {
-                $propBlock = $this->pushSpecialBlock("nestedprop");
+            if ($this->literal('{')) {
+                $propBlock = $this->pushSpecialBlock('nestedprop');
                 $propBlock->prefix = $name;
                 $foundSomething = true;
             } elseif ($foundSomething) {
@@ -399,23 +420,24 @@ class CClientScript_Compiler_Css_Scss_Parser {
         }
 
         // closing a block
-        if ($this->literal("}")) {
+        if ($this->literal('}')) {
             $block = $this->popBlock();
-            if (isset($block->type) && $block->type == "include") {
+            if (isset($block->type) && $block->type == 'include') {
                 $include = $block->child;
                 unset($block->child);
                 $include[3] = $block;
                 $this->append($include, $s);
             } elseif (empty($block->dontAppend)) {
-                $type = isset($block->type) ? $block->type : "block";
-                $this->append(array($type, $block), $s);
+                $type = isset($block->type) ? $block->type : 'block';
+                $this->append([$type, $block], $s);
             }
             return true;
         }
 
         // extra stuff
-        if ($this->literal(";") ||
-                $this->literal("<!--")) {
+        if ($this->literal(';')
+            || $this->literal('<!--')
+        ) {
             return true;
         }
 
@@ -424,13 +446,13 @@ class CClientScript_Compiler_Css_Scss_Parser {
 
     protected function stripDefault(&$value) {
         $def = end($value[2]);
-        if ($def[0] == "keyword" && $def[1] == "!default") {
+        if ($def[0] == 'keyword' && $def[1] == '!default') {
             array_pop($value[2]);
             $value = $this->flattenList($value);
             return true;
         }
 
-        if ($def[0] == "list") {
+        if ($def[0] == 'list') {
             return $this->stripDefault($value[2][count($value[2]) - 1]);
         }
 
@@ -438,8 +460,9 @@ class CClientScript_Compiler_Css_Scss_Parser {
     }
 
     protected function literal($what, $eatWhitespace = null) {
-        if (!isset($eatWhitespace))
+        if (!isset($eatWhitespace)) {
             $eatWhitespace = $this->eatWhiteDefault;
+        }
 
         // shortcut on single letter
         if (!isset($what[1]) && isset($this->buffer[$this->count])) {
@@ -457,14 +480,19 @@ class CClientScript_Compiler_Css_Scss_Parser {
         return $this->match($this->preg_quote($what), $m, $eatWhitespace);
     }
 
-    // tree builders
-
+    /**
+     * Tree Builders
+     *
+     * @param string $selectors
+     *
+     * @return stdClass
+     */
     protected function pushBlock($selectors) {
         $b = new stdClass;
         $b->parent = $this->env; // not sure if we need this yet
 
         $b->selectors = $selectors;
-        $b->children = array();
+        $b->children = [];
 
         $this->env = $b;
         return $b;
@@ -478,7 +506,7 @@ class CClientScript_Compiler_Css_Scss_Parser {
 
     protected function popBlock() {
         if (empty($this->env->parent)) {
-            $this->throwParseError("unexpected }");
+            $this->throwParseError('unexpected }');
         }
 
         $old = $this->env;
@@ -490,53 +518,63 @@ class CClientScript_Compiler_Css_Scss_Parser {
     protected function append($statement, $pos = null) {
         if ($pos !== null) {
             $statement[-1] = $pos;
-            if (!$this->rootParser)
+            if (!$this->rootParser) {
                 $statement[-2] = $this;
+            }
         }
         $this->env->children[] = $statement;
     }
 
-    // last child that was appended
+    /**
+     * Last child that was appended
+     */
     protected function last() {
         $i = count($this->env->children) - 1;
-        if (isset($this->env->children[$i]))
+        if (isset($this->env->children[$i])) {
             return $this->env->children[$i];
+        }
     }
 
-    // high level parsers (they return parts of ast)
-
+    /**
+     * High level parsers (they return parts of ast)
+     *
+     * @param mixed $out
+     */
     protected function mediaQueryList(&$out) {
-        return $this->genericList($out, "mediaQuery", ",", false);
+        return $this->genericList($out, 'mediaQuery', ',', false);
     }
 
     protected function mediaQuery(&$out) {
         $s = $this->seek();
 
         $expressions = null;
-        $parts = array();
+        $parts = [];
 
-        if (($this->literal("only") && ($only = true) || $this->literal("not") && ($not = true) || true) && $this->mixedKeyword($mediaType)) {
-            $prop = array("mediaType");
-            if (isset($only))
-                $prop[] = array("keyword", "only");
-            if (isset($not))
-                $prop[] = array("keyword", "not");
-            $media = array("list", "", array());
+        if (($this->literal('only') && ($only = true) || $this->literal('not') && ($not = true) || true) && $this->mixedKeyword($mediaType)) {
+            $prop = ['mediaType'];
+            if (isset($only)) {
+                $prop[] = ['keyword', 'only'];
+            }
+            if (isset($not)) {
+                $prop[] = ['keyword', 'not'];
+            }
+            $media = ['list', '', []];
             foreach ((array) $mediaType as $type) {
                 if (is_array($type)) {
                     $media[2][] = $type;
                 } else {
-                    $media[2][] = array("keyword", $type);
+                    $media[2][] = ['keyword', $type];
                 }
             }
             $prop[] = $media;
             $parts[] = $prop;
         }
 
-        if (empty($parts) || $this->literal("and")) {
-            $this->genericList($expressions, "mediaExpression", "and", false);
-            if (is_array($expressions))
+        if (empty($parts) || $this->literal('and')) {
+            $this->genericList($expressions, 'mediaExpression', 'and', false);
+            if (is_array($expressions)) {
                 $parts = array_merge($parts, $expressions[2]);
+            }
         }
 
         $out = $parts;
@@ -546,13 +584,15 @@ class CClientScript_Compiler_Css_Scss_Parser {
     protected function mediaExpression(&$out) {
         $s = $this->seek();
         $value = null;
-        if ($this->literal("(") &&
-                $this->expression($feature) &&
-                ($this->literal(":") && $this->expression($value) || true) &&
-                $this->literal(")")) {
-            $out = array("mediaExp", $feature);
-            if ($value)
+        if ($this->literal('(')
+            && $this->expression($feature)
+            && ($this->literal(':') && $this->expression($value) || true)
+            && $this->literal(')')
+        ) {
+            $out = ['mediaExp', $feature];
+            if ($value) {
                 $out[] = $value;
+            }
             return true;
         }
 
@@ -561,7 +601,7 @@ class CClientScript_Compiler_Css_Scss_Parser {
     }
 
     protected function argValues(&$out) {
-        if ($this->genericList($list, "argValue", ",", false)) {
+        if ($this->genericList($list, 'argValue', ',', false)) {
             $out = $list[2];
             return true;
         }
@@ -572,15 +612,15 @@ class CClientScript_Compiler_Css_Scss_Parser {
         $s = $this->seek();
 
         $keyword = null;
-        if (!$this->variable($keyword) || !$this->literal(":")) {
+        if (!$this->variable($keyword) || !$this->literal(':')) {
             $this->seek($s);
             $keyword = null;
         }
 
-        if ($this->genericList($value, "expression")) {
-            $out = array($keyword, $value, false);
+        if ($this->genericList($value, 'expression')) {
+            $out = [$keyword, $value, false];
             $s = $this->seek();
-            if ($this->literal("...")) {
+            if ($this->literal('...')) {
                 $out[2] = true;
             } else {
                 $this->seek($s);
@@ -596,7 +636,7 @@ class CClientScript_Compiler_Css_Scss_Parser {
      *
      * @param string $out
      *
-     * @return boolean
+     * @return bool
      */
     public function valueList(&$out) {
         return $this->genericList($out, 'spaceList', ',');
@@ -606,14 +646,15 @@ class CClientScript_Compiler_Css_Scss_Parser {
         return $this->genericList($out, 'expression');
     }
 
-    protected function genericList(&$out, $parseItem, $delim = "", $flatten = true) {
+    protected function genericList(&$out, $parseItem, $delim = '', $flatten = true) {
         $s = $this->seek();
-        $items = array();
+        $items = [];
         while ($this->$parseItem($value)) {
             $items[] = $value;
             if ($delim) {
-                if (!$this->literal($delim))
+                if (!$this->literal($delim)) {
                     break;
+                }
             }
         }
 
@@ -625,7 +666,7 @@ class CClientScript_Compiler_Css_Scss_Parser {
         if ($flatten && count($items) == 1) {
             $out = $items[0];
         } else {
-            $out = array("list", $delim, $items);
+            $out = ['list', $delim, $items];
         }
 
         return true;
@@ -634,13 +675,13 @@ class CClientScript_Compiler_Css_Scss_Parser {
     protected function expression(&$out) {
         $s = $this->seek();
 
-        if ($this->literal("(")) {
-            if ($this->literal(")")) {
-                $out = array("list", "", array());
+        if ($this->literal('(')) {
+            if ($this->literal(')')) {
+                $out = ['list', '', []];
                 return true;
             }
 
-            if ($this->valueList($out) && $this->literal(')') && $out[0] == "list") {
+            if ($this->valueList($out) && $this->literal(')') && $out[0] == 'list') {
                 return true;
             }
 
@@ -659,32 +700,34 @@ class CClientScript_Compiler_Css_Scss_Parser {
         $opstr = self::$operatorStr;
 
         $ss = $this->seek();
-        $whiteBefore = isset($this->buffer[$this->count - 1]) &&
-                ctype_space($this->buffer[$this->count - 1]);
+        $whiteBefore = isset($this->buffer[$this->count - 1])
+                && ctype_space($this->buffer[$this->count - 1]);
         while ($this->match($opstr, $m) && self::$precedence[$m[1]] >= $minP) {
-            $whiteAfter = isset($this->buffer[$this->count - 1]) &&
-                    ctype_space($this->buffer[$this->count - 1]);
+            $whiteAfter = isset($this->buffer[$this->count - 1])
+                    && ctype_space($this->buffer[$this->count - 1]);
 
             $op = $m[1];
 
             // don't turn negative numbers into expressions
-            if ($op == "-" && $whiteBefore) {
-                if (!$whiteAfter)
+            if ($op == '-' && $whiteBefore) {
+                if (!$whiteAfter) {
                     break;
+                }
             }
 
-            if (!$this->value($rhs))
+            if (!$this->value($rhs)) {
                 break;
+            }
 
             // peek and see if rhs belongs to next operator
             if ($this->peek($opstr, $next) && self::$precedence[$next[1]] > self::$precedence[$op]) {
                 $rhs = $this->expHelper($rhs, self::$precedence[$next[1]]);
             }
 
-            $lhs = array("exp", $op, $lhs, $rhs, $this->inParens, $whiteBefore, $whiteAfter);
+            $lhs = ['exp', $op, $lhs, $rhs, $this->inParens, $whiteBefore, $whiteAfter];
             $ss = $this->seek();
-            $whiteBefore = isset($this->buffer[$this->count - 1]) &&
-                    ctype_space($this->buffer[$this->count - 1]);
+            $whiteBefore = isset($this->buffer[$this->count - 1])
+                    && ctype_space($this->buffer[$this->count - 1]);
         }
 
         $this->seek($ss);
@@ -694,53 +737,62 @@ class CClientScript_Compiler_Css_Scss_Parser {
     protected function value(&$out) {
         $s = $this->seek();
 
-        if ($this->literal("not", false) && $this->whitespace() && $this->value($inner)) {
-            $out = array("unary", "not", $inner, $this->inParens);
+        if ($this->literal('not', false) && $this->whitespace() && $this->value($inner)) {
+            $out = ['unary', 'not', $inner, $this->inParens];
             return true;
         } else {
             $this->seek($s);
         }
 
-        if ($this->literal("+") && $this->value($inner)) {
-            $out = array("unary", "+", $inner, $this->inParens);
+        if ($this->literal('+') && $this->value($inner)) {
+            $out = ['unary', '+', $inner, $this->inParens];
             return true;
         } else {
             $this->seek($s);
         }
 
         // negation
-        if ($this->literal("-", false) &&
-                ($this->variable($inner) ||
-                $this->unit($inner) ||
-                $this->parenValue($inner))) {
-            $out = array("unary", "-", $inner, $this->inParens);
+        if ($this->literal('-', false)
+            && ($this->variable($inner)
+            || $this->unit($inner)
+            || $this->parenValue($inner))
+        ) {
+            $out = ['unary', '-', $inner, $this->inParens];
             return true;
         } else {
             $this->seek($s);
         }
 
-        if ($this->parenValue($out))
+        if ($this->parenValue($out)) {
             return true;
-        if ($this->interpolation($out))
+        }
+        if ($this->interpolation($out)) {
             return true;
-        if ($this->variable($out))
+        }
+        if ($this->variable($out)) {
             return true;
-        if ($this->color($out))
+        }
+        if ($this->color($out)) {
             return true;
-        if ($this->unit($out))
+        }
+        if ($this->unit($out)) {
             return true;
-        if ($this->string($out))
+        }
+        if ($this->string($out)) {
             return true;
-        if ($this->func($out))
+        }
+        if ($this->func($out)) {
             return true;
-        if ($this->progid($out))
+        }
+        if ($this->progid($out)) {
             return true;
+        }
 
         if ($this->keyword($keyword)) {
-            if ($keyword == "null") {
-                $out = array("null");
+            if ($keyword == 'null') {
+                $out = ['null'];
             } else {
-                $out = array("keyword", $keyword);
+                $out = ['keyword', $keyword];
             }
             return true;
         }
@@ -748,14 +800,19 @@ class CClientScript_Compiler_Css_Scss_Parser {
         return false;
     }
 
-    // value wrappen in parentheses
+    /**
+     * Value wrappen in parentheses
+     *
+     * @param mixed $out
+     */
     protected function parenValue(&$out) {
         $s = $this->seek();
 
         $inParens = $this->inParens;
-        if ($this->literal("(") &&
-                ($this->inParens = true) && $this->expression($exp) &&
-                $this->literal(")")) {
+        if ($this->literal('(')
+            && ($this->inParens = true) && $this->expression($exp)
+            && $this->literal(')')
+        ) {
             $out = $exp;
             $this->inParens = $inParens;
             return true;
@@ -769,14 +826,15 @@ class CClientScript_Compiler_Css_Scss_Parser {
 
     protected function progid(&$out) {
         $s = $this->seek();
-        if ($this->literal("progid:", false) &&
-                $this->openString("(", $fn) &&
-                $this->literal("(")) {
-            $this->openString(")", $args, "(");
-            if ($this->literal(")")) {
-                $out = array("string", "", array(
-                        "progid:", $fn, "(", $args, ")"
-                ));
+        if ($this->literal('progid:', false)
+            && $this->openString('(', $fn)
+            && $this->literal('(')
+        ) {
+            $this->openString(')', $args, '(');
+            if ($this->literal(')')) {
+                $out = ['string', '', [
+                    'progid:', $fn, '(', $args, ')'
+                ]];
                 return true;
             }
         }
@@ -788,30 +846,32 @@ class CClientScript_Compiler_Css_Scss_Parser {
     protected function func(&$func) {
         $s = $this->seek();
 
-        if ($this->keyword($name, false) &&
-                $this->literal("(")) {
-            if ($name == "alpha" && $this->argumentList($args)) {
-                $func = array("function", $name, array("string", "", $args));
+        if ($this->keyword($name, false)
+            && $this->literal('(')
+        ) {
+            if ($name == 'alpha' && $this->argumentList($args)) {
+                $func = ['function', $name, ['string', '', $args]];
                 return true;
             }
 
-            if ($name != "expression" && !preg_match("/^(-[a-z]+-)?calc$/", $name)) {
+            if ($name != 'expression' && !preg_match('/^(-[a-z]+-)?calc$/', $name)) {
                 $ss = $this->seek();
-                if ($this->argValues($args) && $this->literal(")")) {
-                    $func = array("fncall", $name, $args);
+                if ($this->argValues($args) && $this->literal(')')) {
+                    $func = ['fncall', $name, $args];
                     return true;
                 }
                 $this->seek($ss);
             }
 
-            if (($this->openString(")", $str, "(") || true ) &&
-                    $this->literal(")")) {
-                $args = array();
+            if (($this->openString(')', $str, '(') || true)
+                && $this->literal(')')
+            ) {
+                $args = [];
                 if (!empty($str)) {
-                    $args[] = array(null, array("string", "", array($str)));
+                    $args[] = [null, ['string', '', [$str]]];
                 }
 
-                $func = array("fncall", $name, $args);
+                $func = ['fncall', $name, $args];
                 return true;
             }
         }
@@ -822,14 +882,14 @@ class CClientScript_Compiler_Css_Scss_Parser {
 
     protected function argumentList(&$out) {
         $s = $this->seek();
-        $this->literal("(");
+        $this->literal('(');
 
-        $args = array();
+        $args = [];
         while ($this->keyword($var)) {
             $ss = $this->seek();
 
-            if ($this->literal("=") && $this->expression($exp)) {
-                $args[] = array("string", "", array($var . "="));
+            if ($this->literal('=') && $this->expression($exp)) {
+                $args[] = ['string', '', [$var . '=']];
                 $arg = $exp;
             } else {
                 break;
@@ -837,13 +897,14 @@ class CClientScript_Compiler_Css_Scss_Parser {
 
             $args[] = $arg;
 
-            if (!$this->literal(","))
+            if (!$this->literal(',')) {
                 break;
+            }
 
-            $args[] = array("string", "", array(", "));
+            $args[] = ['string', '', [', ']];
         }
 
-        if (!$this->literal(")") || !count($args)) {
+        if (!$this->literal(')') || !count($args)) {
             $this->seek($s);
             return false;
         }
@@ -854,24 +915,24 @@ class CClientScript_Compiler_Css_Scss_Parser {
 
     protected function argumentDef(&$out) {
         $s = $this->seek();
-        $this->literal("(");
+        $this->literal('(');
 
-        $args = array();
+        $args = [];
         while ($this->variable($var)) {
-            $arg = array($var[1], null, false);
+            $arg = [$var[1], null, false];
 
             $ss = $this->seek();
-            if ($this->literal(":") && $this->genericList($defaultVal, "expression")) {
+            if ($this->literal(':') && $this->genericList($defaultVal, 'expression')) {
                 $arg[1] = $defaultVal;
             } else {
                 $this->seek($ss);
             }
 
             $ss = $this->seek();
-            if ($this->literal("...")) {
+            if ($this->literal('...')) {
                 $sss = $this->seek();
-                if (!$this->literal(")")) {
-                    $this->throwParseError("... has to be after the final argument");
+                if (!$this->literal(')')) {
+                    $this->throwParseError('... has to be after the final argument');
                 }
                 $arg[2] = true;
                 $this->seek($sss);
@@ -880,11 +941,12 @@ class CClientScript_Compiler_Css_Scss_Parser {
             }
 
             $args[] = $arg;
-            if (!$this->literal(","))
+            if (!$this->literal(',')) {
                 break;
+            }
         }
 
-        if (!$this->literal(")")) {
+        if (!$this->literal(')')) {
             $this->seek($s);
             return false;
         }
@@ -894,7 +956,7 @@ class CClientScript_Compiler_Css_Scss_Parser {
     }
 
     protected function color(&$out) {
-        $color = array('color');
+        $color = ['color'];
 
         if ($this->match('(#([0-9a-f]{6})|#([0-9a-f]{3}))', $m)) {
             if (isset($m[3])) {
@@ -906,7 +968,7 @@ class CClientScript_Compiler_Css_Scss_Parser {
             }
 
             $num = hexdec($num);
-            foreach (array(3, 2, 1) as $i) {
+            foreach ([3, 2, 1] as $i) {
                 $t = $num % $width;
                 $num /= $width;
 
@@ -922,601 +984,655 @@ class CClientScript_Compiler_Css_Scss_Parser {
 
     protected function unit(&$unit) {
         if ($this->match('([0-9]*(\.)?[0-9]+)([%a-zA-Z]+)?', $m)) {
-            $unit = array("number", $m[1], empty($m[3]) ? "" : $m[3]);
+            $unit = ['number', $m[1], empty($m[3]) ? '' : $m[3]];
             return true;
         }
         return false;
     }
 
     protected function string(&$out) {
-    $s = $this->seek();
-    if ($this->literal('"', false)) {
-        $delim = '"';
-    } elseif ($this->literal("'", false)) {
-        $delim = "'";
-    } else {
-        return false;
-    }
-
-    $content = array();
-    $oldWhite = $this->eatWhiteDefault;
-    $this->eatWhiteDefault = false;
-
-    while ($this->matchString($m, $delim)) {
-        $content[] = $m[1];
-        if ($m[2] == "#{") {
-            $this->count -= strlen($m[2]);
-            if ($this->interpolation($inter, false)) {
-                $content[] = $inter;
-            } else {
-                $this->count += strlen($m[2]);
-                $content[] = "#{"; // ignore it
-            }
-        } elseif ($m[2] == '\\') {
-            $content[] = $m[2];
-            if ($this->literal($delim, false)) {
-                $content[] = $delim;
-            }
+        $s = $this->seek();
+        if ($this->literal('"', false)) {
+            $delim = '"';
+        } elseif ($this->literal("'", false)) {
+            $delim = "'";
         } else {
-            $this->count -= strlen($delim);
-            break; // delim
-        }
-    }
-
-    $this->eatWhiteDefault = $oldWhite;
-
-    if ($this->literal($delim)) {
-        $out = array("string", $delim, $content);
-        return true;
-    }
-
-    $this->seek($s);
-    return false;
-}
-
-protected function mixedKeyword(&$out) {
-    $s = $this->seek();
-
-    $parts = array();
-
-    $oldWhite = $this->eatWhiteDefault;
-    $this->eatWhiteDefault = false;
-
-    while (true) {
-        if ($this->keyword($key)) {
-            $parts[] = $key;
-            continue;
+            return false;
         }
 
-        if ($this->interpolation($inter)) {
-            $parts[] = $inter;
-            continue;
-        }
+        $content = [];
+        $oldWhite = $this->eatWhiteDefault;
+        $this->eatWhiteDefault = false;
 
-        break;
-    }
-
-    $this->eatWhiteDefault = $oldWhite;
-
-    if (count($parts) == 0)
-        return false;
-
-    if ($this->eatWhiteDefault) {
-        $this->whitespace();
-    }
-
-    $out = $parts;
-    return true;
-}
-
-// an unbounded string stopped by $end
-protected function openString($end, &$out, $nestingOpen = null) {
-    $oldWhite = $this->eatWhiteDefault;
-    $this->eatWhiteDefault = false;
-
-    $stop = array("'", '"', "#{", $end);
-    $stop = array_map(array($this, "preg_quote"), $stop);
-    $stop[] = self::$commentMulti;
-
-    $patt = '(.*?)(' . implode("|", $stop) . ')';
-
-    $nestingLevel = 0;
-
-    $content = array();
-    while ($this->match($patt, $m, false)) {
-        if (isset($m[1]) && $m[1] !== '') {
+        while ($this->matchString($m, $delim)) {
             $content[] = $m[1];
-            if ($nestingOpen) {
-                $nestingLevel += substr_count($m[1], $nestingOpen);
-            }
-        }
-
-        $tok = $m[2];
-
-        $this->count -= strlen($tok);
-        if ($tok == $end) {
-            if ($nestingLevel == 0) {
-                break;
+            if ($m[2] == '#{') {
+                $this->count -= strlen($m[2]);
+                if ($this->interpolation($inter, false)) {
+                    $content[] = $inter;
+                } else {
+                    $this->count += strlen($m[2]);
+                    $content[] = '#{'; // ignore it
+                }
+            } elseif ($m[2] == '\\') {
+                $content[] = $m[2];
+                if ($this->literal($delim, false)) {
+                    $content[] = $delim;
+                }
             } else {
-                $nestingLevel--;
+                $this->count -= strlen($delim);
+                break; // delim
             }
         }
 
-        if (($tok == "'" || $tok == '"') && $this->string($str)) {
-            $content[] = $str;
-            continue;
-        }
-
-        if ($tok == "#{" && $this->interpolation($inter)) {
-            $content[] = $inter;
-            continue;
-        }
-
-        $content[] = $tok;
-        $this->count += strlen($tok);
-    }
-
-    $this->eatWhiteDefault = $oldWhite;
-
-    if (count($content) == 0)
-        return false;
-
-    // trim the end
-    if (is_string(end($content))) {
-        $content[count($content) - 1] = rtrim(end($content));
-    }
-
-    $out = array("string", "", $content);
-    return true;
-}
-
-// $lookWhite: save information about whitespace before and after
-protected function interpolation(&$out, $lookWhite = true) {
-    $oldWhite = $this->eatWhiteDefault;
-    $this->eatWhiteDefault = true;
-
-    $s = $this->seek();
-    if ($this->literal("#{") && $this->valueList($value) && $this->literal("}", false)) {
-
-        // TODO: don't error if out of bounds
-
-        if ($lookWhite) {
-            $left = preg_match('/\s/', $this->buffer[$s - 1]) ? " " : "";
-            $right = preg_match('/\s/', $this->buffer[$this->count]) ? " " : "";
-        } else {
-            $left = $right = false;
-        }
-
-        $out = array("interpolate", $value, $left, $right);
         $this->eatWhiteDefault = $oldWhite;
-        if ($this->eatWhiteDefault)
-            $this->whitespace();
-        return true;
-    }
 
-    $this->seek($s);
-    $this->eatWhiteDefault = $oldWhite;
-    return false;
-}
-
-// low level parsers
-// returns an array of parts or a string
-protected function propertyName(&$out) {
-    $s = $this->seek();
-    $parts = array();
-
-    $oldWhite = $this->eatWhiteDefault;
-    $this->eatWhiteDefault = false;
-
-    while (true) {
-        if ($this->interpolation($inter)) {
-            $parts[] = $inter;
-        } elseif ($this->keyword($text)) {
-            $parts[] = $text;
-        } elseif (count($parts) == 0 && $this->match('[:.#]', $m, false)) {
-            // css hacks
-            $parts[] = $m[0];
-        } else {
-            break;
+        if ($this->literal($delim)) {
+            $out = ['string', $delim, $content];
+            return true;
         }
-    }
 
-    $this->eatWhiteDefault = $oldWhite;
-    if (count($parts) == 0)
-        return false;
-
-    // match comment hack
-    if (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
-        if (!empty($m[0])) {
-            $parts[] = $m[0];
-            $this->count += strlen($m[0]);
-        }
-    }
-
-    $this->whitespace(); // get any extra whitespace
-
-    $out = array("string", "", $parts);
-    return true;
-}
-
-// comma separated list of selectors
-protected function selectors(&$out) {
-    $s = $this->seek();
-    $selectors = array();
-    while ($this->selector($sel)) {
-        $selectors[] = $sel;
-        if (!$this->literal(","))
-            break;
-        while ($this->literal(",")); // ignore extra
-    }
-
-    if (count($selectors) == 0) {
         $this->seek($s);
         return false;
     }
 
-    $out = $selectors;
-    return true;
-}
+    protected function mixedKeyword(&$out) {
+        $s = $this->seek();
 
-// whitespace separated list of selectorSingle
-protected function selector(&$out) {
-    $selector = array();
+        $parts = [];
 
-    while (true) {
-        if ($this->match('[>+~]+', $m)) {
-            $selector[] = array($m[0]);
-        } elseif ($this->selectorSingle($part)) {
-            $selector[] = $part;
-            $this->whitespace();
-        } elseif ($this->match('\/[^\/]+\/', $m)) {
-            $selector[] = array($m[0]);
-        } else {
+        $oldWhite = $this->eatWhiteDefault;
+        $this->eatWhiteDefault = false;
+
+        while (true) {
+            if ($this->keyword($key)) {
+                $parts[] = $key;
+                continue;
+            }
+
+            if ($this->interpolation($inter)) {
+                $parts[] = $inter;
+                continue;
+            }
+
             break;
         }
+
+        $this->eatWhiteDefault = $oldWhite;
+
+        if (count($parts) == 0) {
+            return false;
+        }
+
+        if ($this->eatWhiteDefault) {
+            $this->whitespace();
+        }
+
+        $out = $parts;
+        return true;
     }
 
-    if (count($selector) == 0) {
+    /**
+     * An unbounded string stopped by $end
+     *
+     * @param mixed      $end
+     * @param mixed      $out
+     * @param null|mixed $nestingOpen
+     */
+    protected function openString($end, &$out, $nestingOpen = null) {
+        $oldWhite = $this->eatWhiteDefault;
+        $this->eatWhiteDefault = false;
+
+        $stop = ["'", '"', '#{', $end];
+        $stop = array_map([$this, 'preg_quote'], $stop);
+        $stop[] = self::$commentMulti;
+
+        $patt = '(.*?)(' . implode('|', $stop) . ')';
+
+        $nestingLevel = 0;
+
+        $content = [];
+        while ($this->match($patt, $m, false)) {
+            if (isset($m[1]) && $m[1] !== '') {
+                $content[] = $m[1];
+                if ($nestingOpen) {
+                    $nestingLevel += substr_count($m[1], $nestingOpen);
+                }
+            }
+
+            $tok = $m[2];
+
+            $this->count -= strlen($tok);
+            if ($tok == $end) {
+                if ($nestingLevel == 0) {
+                    break;
+                } else {
+                    $nestingLevel--;
+                }
+            }
+
+            if (($tok == "'" || $tok == '"') && $this->string($str)) {
+                $content[] = $str;
+                continue;
+            }
+
+            if ($tok == '#{' && $this->interpolation($inter)) {
+                $content[] = $inter;
+                continue;
+            }
+
+            $content[] = $tok;
+            $this->count += strlen($tok);
+        }
+
+        $this->eatWhiteDefault = $oldWhite;
+
+        if (count($content) == 0) {
+            return false;
+        }
+
+        // trim the end
+        if (is_string(end($content))) {
+            $content[count($content) - 1] = rtrim(end($content));
+        }
+
+        $out = ['string', '', $content];
+        return true;
+    }
+
+    /**
+     * @param mixed $out
+     * @param mixed $lookWhite save information about whitespace before and after
+     */
+    protected function interpolation(&$out, $lookWhite = true) {
+        $oldWhite = $this->eatWhiteDefault;
+        $this->eatWhiteDefault = true;
+
+        $s = $this->seek();
+        if ($this->literal('#{') && $this->valueList($value) && $this->literal('}', false)) {
+            // TODO: don't error if out of bounds
+
+            if ($lookWhite) {
+                $left = preg_match('/\s/', $this->buffer[$s - 1]) ? ' ' : '';
+                $right = preg_match('/\s/', $this->buffer[$this->count]) ? ' ' : '';
+            } else {
+                $left = $right = false;
+            }
+
+            $out = ['interpolate', $value, $left, $right];
+            $this->eatWhiteDefault = $oldWhite;
+            if ($this->eatWhiteDefault) {
+                $this->whitespace();
+            }
+            return true;
+        }
+
+        $this->seek($s);
+        $this->eatWhiteDefault = $oldWhite;
         return false;
     }
 
-    $out = $selector;
-    return true;
-}
+    /**
+     * Low level parsers
+     * Returns an array of parts or a string
+     *
+     * @param mixed $out
+     */
+    protected function propertyName(&$out) {
+        $s = $this->seek();
+        $parts = [];
 
-// the parts that make up
-// div[yes=no]#something.hello.world:nth-child(-2n+1)%placeholder
-protected function selectorSingle(&$out) {
-    $oldWhite = $this->eatWhiteDefault;
-    $this->eatWhiteDefault = false;
+        $oldWhite = $this->eatWhiteDefault;
+        $this->eatWhiteDefault = false;
 
-    $parts = array();
+        while (true) {
+            if ($this->interpolation($inter)) {
+                $parts[] = $inter;
+            } elseif ($this->keyword($text)) {
+                $parts[] = $text;
+            } elseif (count($parts) == 0 && $this->match('[:.#]', $m, false)) {
+                // css hacks
+                $parts[] = $m[0];
+            } else {
+                break;
+            }
+        }
 
-    if ($this->literal("*", false)) {
-        $parts[] = "*";
+        $this->eatWhiteDefault = $oldWhite;
+        if (count($parts) == 0) {
+            return false;
+        }
+
+        // match comment hack
+        if (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
+            if (!empty($m[0])) {
+                $parts[] = $m[0];
+                $this->count += strlen($m[0]);
+            }
+        }
+
+        $this->whitespace(); // get any extra whitespace
+
+        $out = ['string', '', $parts];
+        return true;
     }
 
-    while (true) {
-        // see if we can stop early
-        if ($this->match("\s*[{,]", $m)) {
-            $this->count--;
-            break;
-        }
-
+    /**
+     * Comma separated list of selectors
+     *
+     * @param mixed $out
+     */
+    protected function selectors(&$out) {
         $s = $this->seek();
-        // self
-        if ($this->literal("&", false)) {
-            $parts[] = scssc::$selfSelector;
-            continue;
-        }
-
-        if ($this->literal(".", false)) {
-            $parts[] = ".";
-            continue;
-        }
-
-        if ($this->literal("|", false)) {
-            $parts[] = "|";
-            continue;
-        }
-
-        // for keyframes
-        if ($this->unit($unit)) {
-            $parts[] = $unit;
-            continue;
-        }
-
-        if ($this->keyword($name)) {
-            $parts[] = $name;
-            continue;
-        }
-
-        if ($this->interpolation($inter)) {
-            $parts[] = $inter;
-            continue;
-        }
-
-        if ($this->literal('%', false) && $this->placeholder($placeholder)) {
-            $parts[] = '%';
-            $parts[] = $placeholder;
-            continue;
-        }
-
-        if ($this->literal("#", false)) {
-            $parts[] = "#";
-            continue;
-        }
-
-        // a pseudo selector
-        if ($this->match("::?", $m) && $this->mixedKeyword($nameParts)) {
-            $parts[] = $m[0];
-            foreach ($nameParts as $sub) {
-                $parts[] = $sub;
+        $selectors = [];
+        while ($this->selector($sel)) {
+            $selectors[] = $sel;
+            if (!$this->literal(',')) {
+                break;
             }
+            while ($this->literal(',')); // ignore extra
+        }
 
-            $ss = $this->seek();
-            if ($this->literal("(") &&
-                    ($this->openString(")", $str, "(") || true ) &&
-                    $this->literal(")")) {
-                $parts[] = "(";
-                if (!empty($str))
-                    $parts[] = $str;
-                $parts[] = ")";
-            } else {
-                $this->seek($ss);
-            }
-
-            continue;
-        } else {
+        if (count($selectors) == 0) {
             $this->seek($s);
+            return false;
         }
 
-        // attribute selector
-        // TODO: replace with open string?
-        if ($this->literal("[", false)) {
-            $attrParts = array("[");
-            // keyword, string, operator
-            while (true) {
-                if ($this->literal("]", false)) {
-                    $this->count--;
-                    break; // get out early
-                }
+        $out = $selectors;
+        return true;
+    }
 
-                if ($this->match('\s+', $m)) {
-                    $attrParts[] = " ";
-                    continue;
-                }
-                if ($this->string($str)) {
-                    $attrParts[] = $str;
-                    continue;
-                }
+    /**
+     * Whitespace separated list of selectorSingle
+     *
+     * @param mixed $out
+     */
+    protected function selector(&$out) {
+        $selector = [];
 
-                if ($this->keyword($word)) {
-                    $attrParts[] = $word;
-                    continue;
-                }
+        while (true) {
+            if ($this->match('[>+~]+', $m)) {
+                $selector[] = [$m[0]];
+            } elseif ($this->selectorSingle($part)) {
+                $selector[] = $part;
+                $this->whitespace();
+            } elseif ($this->match('\/[^\/]+\/', $m)) {
+                $selector[] = [$m[0]];
+            } else {
+                break;
+            }
+        }
 
-                if ($this->interpolation($inter, false)) {
-                    $attrParts[] = $inter;
-                    continue;
-                }
+        if (count($selector) == 0) {
+            return false;
+        }
 
-                // operator, handles attr namespace too
-                if ($this->match('[|-~\$\*\^=]+', $m)) {
-                    $attrParts[] = $m[0];
-                    continue;
-                }
+        $out = $selector;
+        return true;
+    }
 
+    /**
+     * The parts that make up
+     * div[yes=no]#something.hello.world:nth-child(-2n+1)%placeholder
+     *
+     * @param mixed $out
+     */
+    protected function selectorSingle(&$out) {
+        $oldWhite = $this->eatWhiteDefault;
+        $this->eatWhiteDefault = false;
+
+        $parts = [];
+
+        if ($this->literal('*', false)) {
+            $parts[] = '*';
+        }
+
+        while (true) {
+            // see if we can stop early
+            if ($this->match("\s*[{,]", $m)) {
+                $this->count--;
                 break;
             }
 
-            if ($this->literal("]", false)) {
-                $attrParts[] = "]";
-                foreach ($attrParts as $part) {
-                    $parts[] = $part;
-                }
+            $s = $this->seek();
+            // self
+            if ($this->literal('&', false)) {
+                $parts[] = scssc::$selfSelector;
                 continue;
             }
-            $this->seek($s);
-            // should just break here?
+
+            if ($this->literal('.', false)) {
+                $parts[] = '.';
+                continue;
+            }
+
+            if ($this->literal('|', false)) {
+                $parts[] = '|';
+                continue;
+            }
+
+            // for keyframes
+            if ($this->unit($unit)) {
+                $parts[] = $unit;
+                continue;
+            }
+
+            if ($this->keyword($name)) {
+                $parts[] = $name;
+                continue;
+            }
+
+            if ($this->interpolation($inter)) {
+                $parts[] = $inter;
+                continue;
+            }
+
+            if ($this->literal('%', false) && $this->placeholder($placeholder)) {
+                $parts[] = '%';
+                $parts[] = $placeholder;
+                continue;
+            }
+
+            if ($this->literal('#', false)) {
+                $parts[] = '#';
+                continue;
+            }
+
+            // a pseudo selector
+            if ($this->match('::?', $m) && $this->mixedKeyword($nameParts)) {
+                $parts[] = $m[0];
+                foreach ($nameParts as $sub) {
+                    $parts[] = $sub;
+                }
+
+                $ss = $this->seek();
+                if ($this->literal('(')
+                    && ($this->openString(')', $str, '(') || true)
+                    && $this->literal(')')
+                ) {
+                    $parts[] = '(';
+                    if (!empty($str)) {
+                        $parts[] = $str;
+                    }
+                    $parts[] = ')';
+                } else {
+                    $this->seek($ss);
+                }
+
+                continue;
+            } else {
+                $this->seek($s);
+            }
+
+            // attribute selector
+            // TODO: replace with open string?
+            if ($this->literal('[', false)) {
+                $attrParts = ['['];
+                // keyword, string, operator
+                while (true) {
+                    if ($this->literal(']', false)) {
+                        $this->count--;
+                        break; // get out early
+                    }
+
+                    if ($this->match('\s+', $m)) {
+                        $attrParts[] = ' ';
+                        continue;
+                    }
+                    if ($this->string($str)) {
+                        $attrParts[] = $str;
+                        continue;
+                    }
+
+                    if ($this->keyword($word)) {
+                        $attrParts[] = $word;
+                        continue;
+                    }
+
+                    if ($this->interpolation($inter, false)) {
+                        $attrParts[] = $inter;
+                        continue;
+                    }
+
+                    // operator, handles attr namespace too
+                    if ($this->match('[|-~\$\*\^=]+', $m)) {
+                        $attrParts[] = $m[0];
+                        continue;
+                    }
+
+                    break;
+                }
+
+                if ($this->literal(']', false)) {
+                    $attrParts[] = ']';
+                    foreach ($attrParts as $part) {
+                        $parts[] = $part;
+                    }
+                    continue;
+                }
+                $this->seek($s);
+                // should just break here?
+            }
+
+            break;
         }
 
-        break;
+        $this->eatWhiteDefault = $oldWhite;
+
+        if (count($parts) == 0) {
+            return false;
+        }
+
+        $out = $parts;
+        return true;
     }
 
-    $this->eatWhiteDefault = $oldWhite;
-
-    if (count($parts) == 0)
+    protected function variable(&$out) {
+        $s = $this->seek();
+        if ($this->literal('$', false) && $this->keyword($name)) {
+            $out = ['var', $name];
+            return true;
+        }
+        $this->seek($s);
         return false;
-
-    $out = $parts;
-    return true;
-}
-
-protected function variable(&$out) {
-    $s = $this->seek();
-    if ($this->literal("$", false) && $this->keyword($name)) {
-        $out = array("var", $name);
-        return true;
     }
-    $this->seek($s);
-    return false;
-}
 
-protected function keyword(&$word, $eatWhitespace = null) {
-    if ($this->match('([\w_\-\*!"\'\\\\][\w\-_"\'\\\\]*)', $m, $eatWhitespace)) {
-        $word = $m[1];
-        return true;
-    }
-    return false;
-}
-
-protected function placeholder(&$placeholder) {
-    if ($this->match('([\w\-_]+)', $m)) {
-        $placeholder = $m[1];
-        return true;
-    }
-    return false;
-}
-
-// consume an end of statement delimiter
-protected function end() {
-    if ($this->literal(';')) {
-        return true;
-    } elseif ($this->count == strlen($this->buffer) || $this->buffer[$this->count] == '}') {
-        // if there is end of file or a closing block next then we don't need a ;
-        return true;
-    }
-    return false;
-}
-
-// advance counter to next occurrence of $what
-// $until - don't include $what in advance
-// $allowNewline, if string, will be used as valid char set
-protected function to($what, &$out, $until = false, $allowNewline = false) {
-    if (is_string($allowNewline)) {
-        $validChars = $allowNewline;
-    } else {
-        $validChars = $allowNewline ? "." : "[^\n]";
-    }
-    if (!$this->match('(' . $validChars . '*?)' . $this->preg_quote($what), $m, !$until))
+    protected function keyword(&$word, $eatWhitespace = null) {
+        if ($this->match('([\w_\-\*!"\'\\\\][\w\-_"\'\\\\]*)', $m, $eatWhitespace)) {
+            $word = $m[1];
+            return true;
+        }
         return false;
-    if ($until)
-        $this->count -= strlen($what); // give back $what
-    $out = $m[1];
-    return true;
-}
-
-public function throwParseError($msg = "parse error", $count = null) {
-    $count = !isset($count) ? $this->count : $count;
-
-    $line = $this->getLineNo($count);
-
-    if (!empty($this->sourceName)) {
-        $loc = "$this->sourceName on line $line";
-    } else {
-        $loc = "line: $line";
     }
 
-    if ($this->peek("(.*?)(\n|$)", $m, $count)) {
-        throw new Exception("$msg: failed at `$m[1]` $loc");
-    } else {
-        throw new Exception("$msg: $loc");
-    }
-}
-
-public function getLineNo($pos) {
-    return 1 + substr_count(substr($this->buffer, 0, $pos), "\n");
-}
-
-/**
- * Match string looking for either ending delim, escape, or string interpolation
- *
- * {@internal This is a workaround for preg_match's 250K string match limit. }}
- *
- * @param array  $m     Matches (passed by reference)
- * @param string $delim Delimeter
- *
- * @return boolean True if match; false otherwise
- */
-protected function matchString(&$m, $delim) {
-    $token = null;
-
-    $end = strpos($this->buffer, "\n", $this->count);
-    if ($end === false || $this->buffer[$end - 1] == '\\' || $this->buffer[$end - 2] == '\\' && $this->buffer[$end - 1] == "\r") {
-        $end = strlen($this->buffer);
+    protected function placeholder(&$placeholder) {
+        if ($this->match('([\w\-_]+)', $m)) {
+            $placeholder = $m[1];
+            return true;
+        }
+        return false;
     }
 
-    // look for either ending delim, escape, or string interpolation
-    foreach (array('#{', '\\', $delim) as $lookahead) {
-        $pos = strpos($this->buffer, $lookahead, $this->count);
-        if ($pos !== false && $pos < $end) {
-            $end = $pos;
-            $token = $lookahead;
+    /**
+     * Consume an end of statement delimiter
+     */
+    protected function end() {
+        if ($this->literal(';')) {
+            return true;
+        } elseif ($this->count == strlen($this->buffer) || $this->buffer[$this->count] == '}') {
+            // if there is end of file or a closing block next then we don't need a ;
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Advance counter to next occurrence of $what
+     *
+     * @param mixed $what
+     * @param mixed $out
+     * @param bool  $until        don't include $what in advance
+     * @param bool  $allowNewline if string, will be used as valid char set
+     *
+     * @return bool
+     */
+    protected function to($what, &$out, $until = false, $allowNewline = false) {
+        if (is_string($allowNewline)) {
+            $validChars = $allowNewline;
+        } else {
+            $validChars = $allowNewline ? '.' : "[^\n]";
+        }
+        if (!$this->match('(' . $validChars . '*?)' . $this->preg_quote($what), $m, !$until)) {
+            return false;
+        }
+        if ($until) {
+            $this->count -= strlen($what);
+        } // give back $what
+        $out = $m[1];
+        return true;
+    }
+
+    public function throwParseError($msg = 'parse error', $count = null) {
+        $count = !isset($count) ? $this->count : $count;
+
+        $line = $this->getLineNo($count);
+
+        if (!empty($this->sourceName)) {
+            $loc = "$this->sourceName on line $line";
+        } else {
+            $loc = "line: $line";
+        }
+
+        if ($this->peek("(.*?)(\n|$)", $m, $count)) {
+            throw new Exception("$msg: failed at `$m[1]` $loc");
+        } else {
+            throw new Exception("$msg: $loc");
         }
     }
 
-    if (!isset($token)) {
-        return false;
+    public function getLineNo($pos) {
+        return 1 + substr_count(substr($this->buffer, 0, $pos), "\n");
     }
 
-    $match = substr($this->buffer, $this->count, $end - $this->count);
-    $m = array(
-        $match . $token,
-        $match,
-        $token
-    );
-    $this->count = $end + strlen($token);
+    /**
+     * Match string looking for either ending delim, escape, or string interpolation
+     *
+     * {@internal This is a workaround for preg_match's 250K string match limit. }}
+     *
+     * @param array  $m     Matches (passed by reference)
+     * @param string $delim Delimeter
+     *
+     * @return bool True if match; false otherwise
+     */
+    protected function matchString(&$m, $delim) {
+        $token = null;
 
-    return true;
-}
+        $end = strpos($this->buffer, "\n", $this->count);
+        if ($end === false || $this->buffer[$end - 1] == '\\' || $this->buffer[$end - 2] == '\\' && $this->buffer[$end - 1] == "\r") {
+            $end = strlen($this->buffer);
+        }
 
-// try to match something on head of buffer
-protected function match($regex, &$out, $eatWhitespace = null) {
-    if (!isset($eatWhitespace))
-        $eatWhitespace = $this->eatWhiteDefault;
-
-    $r = '/' . $regex . '/Ais';
-    if (preg_match($r, $this->buffer, $out, null, $this->count)) {
-        $this->count += strlen($out[0]);
-        if ($eatWhitespace)
-            $this->whitespace();
-        return true;
-    }
-    return false;
-}
-
-// match some whitespace
-protected function whitespace() {
-    $gotWhite = false;
-    while (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
-        if ($this->insertComments) {
-            if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
-                $this->append(array("comment", $m[1]));
-                $this->commentsSeen[$this->count] = true;
+        // look for either ending delim, escape, or string interpolation
+        foreach (['#{', '\\', $delim] as $lookahead) {
+            $pos = strpos($this->buffer, $lookahead, $this->count);
+            if ($pos !== false && $pos < $end) {
+                $end = $pos;
+                $token = $lookahead;
             }
         }
-        $this->count += strlen($m[0]);
-        $gotWhite = true;
+
+        if (!isset($token)) {
+            return false;
+        }
+
+        $match = substr($this->buffer, $this->count, $end - $this->count);
+        $m = [
+            $match . $token,
+            $match,
+            $token
+        ];
+        $this->count = $end + strlen($token);
+
+        return true;
     }
-    return $gotWhite;
-}
 
-protected function peek($regex, &$out, $from = null) {
-    if (!isset($from))
-        $from = $this->count;
+    /**
+     * Try to match something on head of buffer
+     *
+     * @param mixed      $regex
+     * @param mixed      $out
+     * @param null|mixed $eatWhitespace
+     */
+    protected function match($regex, &$out, $eatWhitespace = null) {
+        if (!isset($eatWhitespace)) {
+            $eatWhitespace = $this->eatWhiteDefault;
+        }
 
-    $r = '/' . $regex . '/Ais';
-    $result = preg_match($r, $this->buffer, $out, null, $from);
-
-    return $result;
-}
-
-protected function seek($where = null) {
-    if ($where === null)
-        return $this->count;
-    else
-        $this->count = $where;
-    return true;
-}
-
-static function preg_quote($what) {
-    return preg_quote($what, '/');
-}
-
-protected function show() {
-    if ($this->peek("(.*?)(\n|$)", $m, $this->count)) {
-        return $m[1];
+        $r = '/' . $regex . '/Ais';
+        if (preg_match($r, $this->buffer, $out, null, $this->count)) {
+            $this->count += strlen($out[0]);
+            if ($eatWhitespace) {
+                $this->whitespace();
+            }
+            return true;
+        }
+        return false;
     }
-    return "";
-}
 
-// turn list of length 1 into value type
-protected function flattenList($value) {
-    if ($value[0] == "list" && count($value[2]) == 1) {
-        return $this->flattenList($value[2][0]);
+    /**
+     * Match some whitespace
+     */
+    protected function whitespace() {
+        $gotWhite = false;
+        while (preg_match(self::$whitePattern, $this->buffer, $m, null, $this->count)) {
+            if ($this->insertComments) {
+                if (isset($m[1]) && empty($this->commentsSeen[$this->count])) {
+                    $this->append(['comment', $m[1]]);
+                    $this->commentsSeen[$this->count] = true;
+                }
+            }
+            $this->count += strlen($m[0]);
+            $gotWhite = true;
+        }
+        return $gotWhite;
     }
-    return $value;
-}
 
+    protected function peek($regex, &$out, $from = null) {
+        if (!isset($from)) {
+            $from = $this->count;
+        }
+
+        $r = '/' . $regex . '/Ais';
+        $result = preg_match($r, $this->buffer, $out, null, $from);
+
+        return $result;
+    }
+
+    protected function seek($where = null) {
+        if ($where === null) {
+            return $this->count;
+        } else {
+            $this->count = $where;
+        }
+        return true;
+    }
+
+    public static function preg_quote($what) {
+        return preg_quote($what, '/');
+    }
+
+    protected function show() {
+        if ($this->peek("(.*?)(\n|$)", $m, $this->count)) {
+            return $m[1];
+        }
+        return '';
+    }
+
+    // turn list of length 1 into value type
+    protected function flattenList($value) {
+        if ($value[0] == 'list' && count($value[2]) == 1) {
+            return $this->flattenList($value[2][0]);
+        }
+        return $value;
+    }
 }

@@ -1,7 +1,13 @@
 <?php
 
  //@codingStandardsIgnoreStart
+ /**
+  * @deprecated 1.2 use CElement_Component_Alert
+  * @see CElement_Component_Alert
+  */
  class CMessage extends CElement {
+     use CTrait_Compat_Message;
+
      protected $type;
 
      protected $message;
@@ -13,12 +19,12 @@
          $this->message = '';
      }
 
-     public function set_type($type) {
+     public function setType($type) {
          $this->type = $type;
          return $this;
      }
 
-     public function set_message($msg) {
+     public function setMessage($msg) {
          $this->message = $msg;
          return $this;
      }

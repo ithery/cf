@@ -3,11 +3,11 @@
 //@codingStandardsIgnoreStart
 class crenderer {
     /**
-     * Undocumented function
+     * Render as css styles from array key value
      *
-     * @param [type] $styles
+     * @param array $styles
      *
-     * @return void
+     * @return string
      *
      * @deprecated 1.1
      */

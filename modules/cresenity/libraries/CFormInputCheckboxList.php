@@ -1,14 +1,18 @@
 <?php
 
+/**
+ * @deprecated 1.2
+ */
+//@codingStandardsIgnoreStart
 class CFormInputCheckboxList extends CFormInput {
+    protected $group_list = [];
 
-    protected $group_list = array();
     protected $applyjs;
 
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->applyjs = "";
+        $this->applyjs = '';
     }
 
     public static function factory($id) {
@@ -21,7 +25,6 @@ class CFormInputCheckboxList extends CFormInput {
     }
 
     public function set_lookup($query) {
-        
     }
 
     public function add_group_list($group, $list) {
@@ -32,18 +35,20 @@ class CFormInputCheckboxList extends CFormInput {
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
-        $disabled = "";
-        if ($this->disabled)
+        $disabled = '';
+        if ($this->disabled) {
             $disabled = ' disabled="disabled"';
+        }
 
         $name = $this->name;
-        $name = $name . "[]";
+        $name = $name . '[]';
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
-            $classes = " " . $classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
         if ($this->bootstrap == '3') {
-            $classes = $classes . " form-control ";
+            $classes = $classes . ' form-control ';
         }
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
@@ -57,13 +62,15 @@ class CFormInputCheckboxList extends CFormInput {
                     $html->appendln('<optgroup label="' . $g . '">')->br();
                 }
                 foreach ($list as $k => $v) {
-                    $selected = "";
+                    $selected = '';
                     if (is_array($this->value)) {
-                        if (in_array($k, $this->value))
+                        if (in_array($k, $this->value)) {
                             $selected = ' selected="selected"';
+                        }
                     } else {
-                        if ($this->value == (string) $k)
+                        if ($this->value == (string) $k) {
                             $selected = ' selected="selected"';
+                        }
                     }
                     $html->appendln('<option value="' . $k . '"' . $selected . '>' . $v . '</option>')->br();
                 }
@@ -73,20 +80,20 @@ class CFormInputCheckboxList extends CFormInput {
             }
         }
 
-
         if ($this->list != null) {
             $i = 0;
             foreach ($this->list as $k => $v) {
                 $i++;
-                $checked = "";
+                $checked = '';
                 if (is_array($this->value)) {
-                    if (in_array($k, $this->value))
+                    if (in_array($k, $this->value)) {
                         $checked = ' checked="checked"';
+                    }
                 } else {
-                    if ($this->value == (string) $k)
+                    if ($this->value == (string) $k) {
                         $checked = ' checked="checked"';
+                    }
                 }
-
 
                 $html->appendln('<div class="checkbox"><label><input type="checkbox" name="' . $name . '" id="' . $this->id . '_' . $i . '" class="input-unstyled checkbox' . $classes . '" value="' . $k . '"' . $checked . '> ' . $v . '</label></div>')->br();
                 //$html->appendln('<option value="'.$k.'"'.$checked.'>'.$v.'</option>')->br();
@@ -98,21 +105,19 @@ class CFormInputCheckboxList extends CFormInput {
     }
 
     public function js($indent = 0) {
-
         $js = new CStringBuilder();
         $js->set_indent($indent);
         $js->append(parent::js($indent))->br();
-        if ($this->applyjs == "select2") {
+        if ($this->applyjs == 'select2') {
             $js->append("$('#" . $this->id . "').select2();")->br();
         }
-        if ($this->applyjs == "chosen") {
+        if ($this->applyjs == 'chosen') {
             $js->append("$('#" . $this->id . "').chosen();")->br();
         }
-        if ($this->applyjs == "dualselect") {
+        if ($this->applyjs == 'dualselect') {
             $js->append("$('#" . $this->id . "').multiSelect();")->br();
         }
 
         return $js->text();
     }
-
 }

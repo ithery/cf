@@ -31,7 +31,7 @@ class carr {
      *
      * @param array $array array to check
      *
-     * @return boolean
+     * @return bool
      */
     public static function isAssoc(array $array) {
         // Keys of the array
@@ -47,7 +47,7 @@ class carr {
      *
      * @param array $value array to check
      *
-     * @return boolean
+     * @return bool
      *
      * @deprecated
      */
@@ -72,7 +72,7 @@ class carr {
      *
      * @param mixed $value value to check
      *
-     * @return boolean
+     * @return bool
      */
     public static function isArray($value) {
         if (is_array($value)) {
@@ -89,7 +89,7 @@ class carr {
      *
      * @param mixed $value value to check
      *
-     * @return boolean
+     * @return bool
      *
      * @deprecated
      */
@@ -116,7 +116,7 @@ class carr {
             return $array->offsetExists($key) ? $array->offsetGet($key) : $default;
         }
         if (!static::accessible($array)) {
-            return CF::value($default);
+            return c::value($default);
         }
 
         if (is_null($key)) {
@@ -128,14 +128,14 @@ class carr {
         }
 
         if (strpos($key, '.') === false) {
-            return isset($array[$key]) ? $array[$key] : CF::value($default);
+            return isset($array[$key]) ? $array[$key] : c::value($default);
         }
 
         foreach (explode('.', $key) as $segment) {
             if (static::accessible($array) && static::exists($array, $segment)) {
                 $array = $array[$segment];
             } else {
-                return CF::value($default);
+                return c::value($default);
             }
         }
 
@@ -358,10 +358,10 @@ class carr {
      * Rotates a 2D array clockwise.
      * Example, turns a 2x3 array into a 3x2 array.
      *
-     * @param array   $source_array array to rotate
-     * @param boolean $keep_keys    keep the keys in the final rotated array.
-     *                              the sub arrays of the source array need to have the same key values.
-     *                              if your subkeys might not match, you need to pass FALSE here!
+     * @param array $source_array array to rotate
+     * @param bool  $keep_keys    keep the keys in the final rotated array.
+     *                            the sub arrays of the source array need to have the same key values.
+     *                            if your subkeys might not match, you need to pass FALSE here!
      *
      * @return array
      */
@@ -586,11 +586,11 @@ class carr {
     //@codingStandardsIgnoreEnd
 
     /**
-     * @param mixed   $needle   the value to search for
-     * @param array   $haystack an array of values to search in
-     * @param boolean $sort     sort the array now
+     * @param mixed $needle   the value to search for
+     * @param array $haystack an array of values to search in
+     * @param bool  $sort     sort the array now
      *
-     * @return integer|false the index of the match or FALSE when not found
+     * @return int|false the index of the match or FALSE when not found
      */
     //@codingStandardsIgnoreStart
     public static function binary_search($needle, $haystack, $sort = false) {
@@ -621,8 +621,8 @@ class carr {
     /**
      * Fill an array with a range of numbers.
      *
-     * @param integer $step step
-     * @param integer $max  ending number
+     * @param int $step step
+     * @param int $max  ending number
      *
      * @return array
      */
@@ -700,7 +700,7 @@ class carr {
     public static function first($array, callable $callback = null, $default = null) {
         if (is_null($callback)) {
             if (empty($array)) {
-                return CF::value($default);
+                return c::value($default);
             }
 
             foreach ($array as $item) {
@@ -714,7 +714,7 @@ class carr {
             }
         }
 
-        return CF::value($default);
+        return c::value($default);
     }
 
     /**
@@ -902,7 +902,7 @@ class carr {
         list($value, $key) = static::explodePluckParameters($value, $key);
 
         foreach ($array as $item) {
-            $itemValue = CF::get($item, $value);
+            $itemValue = c::get($item, $value);
 
             // If the key is "null", we will just append the value to the array and keep
             // looping. Otherwise we will key the array using the value of the key we
@@ -910,7 +910,7 @@ class carr {
             if (is_null($key)) {
                 $results[] = $itemValue;
             } else {
-                $itemKey = CF::get($item, $key);
+                $itemKey = c::get($item, $key);
 
                 if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
                     $itemKey = (string) $itemKey;
@@ -1304,11 +1304,11 @@ class carr {
      * `predicate` returns truthy for. The predicate is invoked with three
      * arguments: (value, index|key, collection).
      *
-     * @param iterable $collection The collection to inspect.
-     * @param callable $predicate  The function invoked per iteration.
-     * @param int      $fromIndex  The index to search from.
+     * @param iterable $collection the collection to inspect
+     * @param callable $predicate  the function invoked per iteration
+     * @param int      $fromIndex  the index to search from
      *
-     * @return mixed Returns the matched element, else `null`.
+     * @return mixed returns the matched element, else `null`
      *
      * @example
      * <code>
@@ -1349,11 +1349,11 @@ class carr {
      * This method is like `findIndex` except that it iterates over elements
      * of `collection` from right to left.
      *
-     * @param array $array     The array to inspect.
-     * @param mixed $predicate The function invoked per iteration.
-     * @param int   $fromIndex The index to search from.
+     * @param array $array     the array to inspect
+     * @param mixed $predicate the function invoked per iteration
+     * @param int   $fromIndex the index to search from
      *
-     * @return int the index of the found element, else `-1`.
+     * @return int the index of the found element, else `-1`
      *
      * @example
      * <code>
@@ -1397,10 +1397,10 @@ class carr {
      * `sampleSize`, `slice`, `some`, `sortBy`, `split`, `take`, `takeRight`,
      * `template`, `trim`, `trimEnd`, `trimStart`, and `words`
      *
-     * @param array|object          $collection The collection to iterate over.
-     * @param callable|string|array $iteratee   The function invoked per iteration.
+     * @param array|object          $collection the collection to iterate over
+     * @param callable|string|array $iteratee   the function invoked per iteration
      *
-     * @return array Returns the new mapped array.
+     * @return array returns the new mapped array
      *
      * @example
      * <code>
@@ -1448,10 +1448,10 @@ class carr {
      * Creates a new array concatenating `array` with any additional arrays
      * and/or values.
      *
-     * @param array             $array  The array to concatenate.
-     * @param array<int, mixed> $values The values to concatenate.
+     * @param array             $array  the array to concatenate
+     * @param array<int, mixed> $values the values to concatenate
      *
-     * @return array Returns the new concatenated array.
+     * @return array returns the new concatenated array
      *
      * @example
      * <code>
@@ -1477,10 +1477,10 @@ class carr {
      * Iteration is stopped once `predicate` returns truthy. The predicate is
      * invoked with three arguments: (value, index|key, collection).
      *
-     * @param iterable              $collection The collection to iterate over.
-     * @param callable|string|array $predicate  The function invoked per iteration.
+     * @param iterable              $collection the collection to iterate over
+     * @param callable|string|array $predicate  the function invoked per iteration
      *
-     * @return boolean Returns `true` if any element passes the predicate check, else `false`.
+     * @return bool returns `true` if any element passes the predicate check, else `false`
      *
      * @example
      * <code>
@@ -1524,10 +1524,10 @@ class carr {
      * property are iterated like arrays. To avoid this behavior use `forIn`
      * or `forOwn` for object iteration.
      *
-     * @param array|iterable|object $collection The collection to iterate over.
-     * @param callable              $iteratee   The function invoked per iteration.
+     * @param array|iterable|object $collection the collection to iterate over
+     * @param callable              $iteratee   the function invoked per iteration
      *
-     * @return array|object Returns `collection`.
+     * @return array|object returns `collection`
      *
      * @example
      * <code>

@@ -1,10 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Jun 22, 2018, 4:26:11 PM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 
@@ -14,13 +16,17 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @author Leaf Corcoran <leafot@gmail.com>
  */
 class CClientScript_Compiler_Css_Scss_Formatter {
+    public $indentChar = '  ';
 
-    public $indentChar = "  ";
     public $break = "\n";
-    public $open = " {";
-    public $close = "}";
-    public $tagSeparator = ", ";
-    public $assignSeparator = ": ";
+
+    public $open = ' {';
+
+    public $close = '}';
+
+    public $tagSeparator = ', ';
+
+    public $assignSeparator = ': ';
 
     public function __construct() {
         $this->indentLevel = 0;
@@ -31,19 +37,20 @@ class CClientScript_Compiler_Css_Scss_Formatter {
     }
 
     public function property($name, $value) {
-        return $name . $this->assignSeparator . $value . ";";
+        return $name . $this->assignSeparator . $value . ';';
     }
 
     protected function block($block) {
-        if (empty($block->lines) && empty($block->children))
+        if (empty($block->lines) && empty($block->children)) {
             return;
+        }
 
         $inner = $pre = $this->indentStr();
 
         if (!empty($block->selectors)) {
-            echo $pre .
-            implode($this->tagSeparator, $block->selectors) .
-            $this->open . $this->break;
+            echo $pre
+            . implode($this->tagSeparator, $block->selectors)
+            . $this->open . $this->break;
             $this->indentLevel++;
             $inner = $this->indentStr();
         }
@@ -62,8 +69,9 @@ class CClientScript_Compiler_Css_Scss_Formatter {
 
         if (!empty($block->selectors)) {
             $this->indentLevel--;
-            if (empty($block->children))
+            if (empty($block->children)) {
                 echo $this->break;
+            }
             echo $pre . $this->close . $this->break;
         }
     }
@@ -75,5 +83,4 @@ class CClientScript_Compiler_Css_Scss_Formatter {
 
         return $out;
     }
-
 }

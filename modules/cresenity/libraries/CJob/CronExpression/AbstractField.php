@@ -1,37 +1,34 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Abstract CRON expression field
  */
 abstract class CJob_CronExpression_AbstractField implements CJob_CronExpression_FieldInterface {
-
     /**
      * Full range of values that are allowed for this field type
+     *
      * @var array
      */
     protected $fullRange = [];
 
     /**
      * Literal values we need to convert to integers
+     *
      * @var array
      */
     protected $literals = [];
 
     /**
      * Start value of the full range
-     * @var integer
+     *
+     * @var int
      */
     protected $rangeStart;
 
     /**
      * End value of the full range
-     * @var integer
+     *
+     * @var int
      */
     protected $rangeEnd;
 
@@ -132,15 +129,15 @@ abstract class CJob_CronExpression_AbstractField implements CJob_CronExpression_
      * Returns a range of values for the given cron expression
      *
      * @param string $expression The expression to evaluate
-     * @param int $max           Maximum offset for range
+     * @param int    $max        Maximum offset for range
      *
      * @return array
      */
     public function getRangeForExpression($expression, $max) {
-        $values = array();
+        $values = [];
         if ($this->isRange($expression) || $this->isIncrementsOfRanges($expression)) {
             if (!$this->isIncrementsOfRanges($expression)) {
-                list ($offset, $to) = explode('-', $expression);
+                list($offset, $to) = explode('-', $expression);
                 $stepSize = 1;
             } else {
                 $range = array_map('trim', explode('/', $expression, 2));
@@ -156,7 +153,7 @@ abstract class CJob_CronExpression_AbstractField implements CJob_CronExpression_
             }
             sort($values);
         } else {
-            $values = array($expression);
+            $values = [$expression];
         }
         return $values;
     }
@@ -175,6 +172,7 @@ abstract class CJob_CronExpression_AbstractField implements CJob_CronExpression_
      * Checks to see if a value is valid for the field
      *
      * @param string $value
+     *
      * @return bool
      */
     public function validate($value) {
@@ -218,5 +216,4 @@ abstract class CJob_CronExpression_AbstractField implements CJob_CronExpression_
         }
         return in_array($value, $this->fullRange, true);
     }
-
 }

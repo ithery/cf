@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:36:23 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:36:23 PM
  */
 class CJob_EventManager_Args extends CEventManager_Args {
-
     protected $args;
 
     public function addArg($key, $value) {
@@ -23,5 +23,4 @@ class CJob_EventManager_Args extends CEventManager_Args {
     public function args() {
         return $this->args;
     }
-
 }

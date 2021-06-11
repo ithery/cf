@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 15, 2019, 8:15:44 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 15, 2019, 8:15:44 PM
  */
 trait CTrait_Manager_DriverManager {
-
     /**
      * The registered custom driver creators.
      *
@@ -33,7 +33,8 @@ trait CTrait_Manager_DriverManager {
     /**
      * Get a driver instance.
      *
-     * @param  string  $driver
+     * @param string $driver
+     *
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -43,7 +44,8 @@ trait CTrait_Manager_DriverManager {
 
         if (is_null($driver)) {
             throw new InvalidArgumentException(sprintf(
-                    'Unable to resolve NULL driver for [%s].', static::class
+                'Unable to resolve NULL driver for [%s].',
+                static::class
             ));
         }
 
@@ -60,7 +62,8 @@ trait CTrait_Manager_DriverManager {
     /**
      * Create a new driver instance.
      *
-     * @param  string  $driver
+     * @param string $driver
+     *
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -84,7 +87,8 @@ trait CTrait_Manager_DriverManager {
     /**
      * Call a custom driver creator.
      *
-     * @param  string  $driver
+     * @param string $driver
+     *
      * @return mixed
      */
     protected function callCustomCreator($driver) {
@@ -94,8 +98,9 @@ trait CTrait_Manager_DriverManager {
     /**
      * Register a custom driver creator Closure.
      *
-     * @param  string    $driver
-     * @param  \Closure  $callback
+     * @param string   $driver
+     * @param \Closure $callback
+     *
      * @return $this
      */
     public function extend($driver, Closure $callback) {
@@ -116,12 +121,12 @@ trait CTrait_Manager_DriverManager {
     /**
      * Dynamically call the default driver instance.
      *
-     * @param  string  $method
-     * @param  array   $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters) {
         return $this->driver()->$method(...$parameters);
     }
-
 }
