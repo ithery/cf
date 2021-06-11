@@ -1,6 +1,6 @@
 <?php
 
-class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
+class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract implements CCache_Contract_DriverHaveMethodAddInterface, CCache_Contract_LockProviderDriverInterface {
     /**
      * The Redis factory implementation.
      *
@@ -116,7 +116,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
      */
     public function add($key, $value, $seconds) {
         $lua = "return redis.call('exists',KEYS[1])<1 and redis.call('setex',KEYS[1],ARGV[2],ARGV[1])";
-        return (bool) $this->connection()->eval(
+        return (bool) $this->connection()->doEval(
             $lua,
             1,
             $this->prefix . $key,
@@ -224,7 +224,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract {
     /**
      * Get the Redis connection instance.
      *
-     * @return CRedis_AbstractConnection
+     * @return CRedis_Connection_PhpRedisConnection
      */
     public function connection() {
         return $this->redis->connection($this->connection);

@@ -1,7 +1,7 @@
 <?php
 
-return array(
-    "client_modules" => array(
+return [
+    'client_modules' => [
         'excanvas',
         'canvas-to-blob',
         'load-image',
@@ -21,18 +21,18 @@ return array(
         'easing',
         'select2',
         'modernizr',
-    ),
-    "js" => array(
-        "cresenity-legacy/capp.js",
-        "cresenity-legacy/cresenity.js",
-    ),
-    "css" => array(
-        "cresenity-legacy/cresenity.colors.css",
-        "cresenity-legacy/cresenity.main.css",
-        "cresenity-legacy/cresenity.responsive.css",
-        "cresenity-legacy/cresenity.widget.css",
-        "cresenity-legacy/cresenity.table.css",
-        "cresenity-legacy/cresenity.css",
-        "cresenity-legacy/cresenity-compat.css",
-    ),
-);
+    ],
+    'js' => [
+        'cresenity-legacy/capp.js',
+        'cresenity-legacy/cresenity.js',
+    ],
+    'css' => [
+        'cresenity-legacy/cresenity.colors.css',
+        'cresenity-legacy/cresenity.main.css',
+        'cresenity-legacy/cresenity.responsive.css',
+        'cresenity-legacy/cresenity.widget.css',
+        'cresenity-legacy/cresenity.table.css',
+        'cresenity-legacy/cresenity.css',
+        'cresenity-legacy/cresenity-compat.css',
+    ],
+];

@@ -106,7 +106,7 @@ class CCache_TaggedCache extends CCache_Repository {
     /**
      * Fire an event for this cache instance.
      *
-     * @param string $event
+     * @param string|object $event
      *
      * @return void
      */

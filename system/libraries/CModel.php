@@ -214,6 +214,13 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     const DELETEDBY = 'deletedby';
 
     /**
+     * The name of the "status" column.
+     *
+     * @var string
+     */
+    const STATUS = 'status';
+
+    /**
      * The array of mapping model class
      *
      * @var array

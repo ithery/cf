@@ -1,12 +1,11 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
-
+defined('SYSPATH') or die('No direct access allowed.');
 
 $session = CSession::instance();
-$user = $session->get("user");
-$role_id = "";
-$username = "";
-$user_id = "";
+$user = $session->get('user');
+$role_id = '';
+$username = '';
+$user_id = '';
 if ($user) {
     $role_id = $user->role_id;
     $user_id = $user->user_id;
@@ -35,7 +34,7 @@ $org = $app->org();
                         <span class="brand-logo">
                             <img src="" />
                         </span>
-                        <a href="<?php echo curl::base() . "admin"; ?>"
+                        <a href="<?php echo curl::base() . 'admin'; ?>"
                            class="brand-name sidenav-text font-weight-normal ml-2">
                             @CAppTitle
                         </a>
@@ -67,11 +66,11 @@ $org = $app->org();
                         </button>
 
                         <span class="ml-3">
-                          
+
                         </span>
                         <div class="navbar-nav align-items-lg-center ml-auto">
 
-                            <div class="navbar-collapse collapse" id="layout-navbar-collapse" style="">
+                            <div class="navbar-collapse collapse" id="layout-navbar-collapse" >
 
                                 <a href="javascript:void(0)" class="layout-sidenav-toggle sidenav-link text-large"></a>
                                 <!-- Divider -->
@@ -107,7 +106,7 @@ $org = $app->org();
 
                                     </div>
                                 </div>
-                            </div><!--/.nav-collapse -->	
+                            </div><!--/.nav-collapse -->
                         </div>
 
 
@@ -120,16 +119,18 @@ $org = $app->org();
                                 <div class="col-lg-12">
                                     <?php if ($show_breadcrumb): ?>
                                         <?php
-                                        if ($breadcrumb == "")
+                                        if ($breadcrumb == '') {
                                             $breadcrumb = $title;
-                                        if (!is_array($breadcrumb))
-                                            $breadcrumb = array();
-                                        if (CFRouter::$controller != "home"):
-                                            ?>
+                                        }
+                                        if (!is_array($breadcrumb)) {
+                                            $breadcrumb = [];
+                                        }
+                                        if (CFRouter::$controller != 'home')
+                                            :?>
                                             <div class="bg-lightest container-m--x container-m--y mb-3">
                                                 <ol class="breadcrumb text-big container-p-x py-3 m-0">
                                                     <li class="breadcrumb-item">
-                                                        <a href="<?php echo curl::base() . "admin"; ?>" class="tip-bottom" data-original-title="Go to Home"><i class="ion ion-ios-home"></i></a>
+                                                        <a href="<?php echo curl::base() . 'admin'; ?>" class="tip-bottom" data-original-title="Go to Home"><i class="ion ion-ios-home"></i></a>
                                                     </li>
                                                     <?php foreach ($breadcrumb as $k => $b) : ?>
                                                         <li class="breadcrumb-item">
@@ -188,7 +189,7 @@ $org = $app->org();
                 </div><!-- /page-wrapper -->
             </div>
             <div class="layout-overlay layout-sidenav-toggle"></div>
-        </div><!-- /wrapper -->  
+        </div><!-- /wrapper -->
         @CAppScripts
     </body>
 </html>

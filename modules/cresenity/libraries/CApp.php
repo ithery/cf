@@ -5,6 +5,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @mixin CElement
  *
+ * @see CRenderable
+ * @see CElement
+ *
  * @method CElement_Component_Form addForm($id=null)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
