@@ -57,6 +57,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CModel_Query|static select($columns = ['*'])
  * @method CModel_Query|static groupBy(...$groups)
  * @method CModel_Query|static newQuery()
+ * @method CModel_Query|static withTrashed()
  * @method CModel_Query|static from($table)
  * @method CModel_Query|static leftJoinSub($query, $as, $first, $operator = null, $second = null)
  * @method CModel_Query|static addSelect($column)
