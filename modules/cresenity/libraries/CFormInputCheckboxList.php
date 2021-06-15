@@ -34,7 +34,7 @@ class CFormInputCheckboxList extends CFormInput {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $disabled = '';
         if ($this->disabled) {
             $disabled = ' disabled="disabled"';
@@ -51,7 +51,7 @@ class CFormInputCheckboxList extends CFormInput {
             $classes = $classes . ' form-control ';
         }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
@@ -106,7 +106,7 @@ class CFormInputCheckboxList extends CFormInput {
 
     public function js($indent = 0) {
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         $js->append(parent::js($indent))->br();
         if ($this->applyjs == 'select2') {
             $js->append("$('#" . $this->id . "').select2();")->br();
