@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 23, 2018, 12:05:01 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 23, 2018, 12:05:01 AM
  */
 
 /**
  * Class JsonStrategy.
  */
 class CSerializer_Strategy_JsonStrategy implements CSerializer_StrategyInterface {
-
     /**
      * @param mixed $value
      *
@@ -30,5 +30,4 @@ class CSerializer_Strategy_JsonStrategy implements CSerializer_StrategyInterface
     public function unserialize($value) {
         return \json_decode($value, true);
     }
-
 }
