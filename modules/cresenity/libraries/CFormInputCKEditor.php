@@ -21,8 +21,8 @@ class CFormInputCKEditor extends CFormInputTextarea {
         $this->row = 10;
         $this->toolbar_item = [];
 
-        //		CManager::instance()->register_module('ckeditor');
-        CManager::instance()->register_module('ckeditor-4');
+        // CManager::instance()->register_module('ckeditor');
+        CManager::instance()->registerModule('ckeditor-4');
     }
 
     public static function factory($id) {
@@ -46,7 +46,7 @@ class CFormInputCKEditor extends CFormInputTextarea {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $readonly = '';
         if ($this->readonly) {
             $readonly = ' readonly="readonly"';
@@ -61,7 +61,7 @@ class CFormInputCKEditor extends CFormInputTextarea {
             $classes = ' ' . $classes;
         }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
@@ -76,7 +76,7 @@ class CFormInputCKEditor extends CFormInputTextarea {
 
     public function js($indent = 0) {
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         $js->appendln("
                     CKEDITOR.replace('" . $this->id . "',{
                         extraPlugins: 'markline'

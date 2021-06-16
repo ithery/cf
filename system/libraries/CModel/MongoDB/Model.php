@@ -12,6 +12,9 @@ use MongoDB\BSON\Binary;
 use MongoDB\BSON\ObjectID;
 use MongoDB\BSON\UTCDateTime;
 
+/**
+ * @method static  CModel_MongoDB_Query|static raw($expression = null)
+ */
 abstract class CModel_MongoDB_Model extends CModel {
     use CModel_MongoDB_Trait_HybridRelationsTrait;
     use CModel_MongoDB_Trait_EmbedsRelationsTrait;

@@ -56,10 +56,16 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static CModel_Query|static select($columns = ['*'])
  * @method static CModel_Query|static groupBy(...$groups)
  * @method static CModel_Query|static from($table)
+ * @method static CModel_Query|static newQuery()
+ * @method static CModel_Query|static withTrashed()
  * @method static CModel_Query|static leftJoinSub($query, $as, $first, $operator = null, $second = null)
- * @method static Cmodel_Query|static addSelect($column)
+ * @method static CModel_Query|static addSelect($column)
  * @method static CModel_Query|static selectRaw($expression, array $bindings = [])
  * @method static CModel_Query|static orderBy($column, $direction = 'asc')
+ * @method static CModel_Query|static skip($value)
+ * @method static CModel_Query|static offset($value)
+ * @method static CModel_Query|static take($value)
+ * @method static CModel_Query|static limit($value)
  */
 abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_Jsonable, CQueue_QueueableEntityInterface {
     use CModel_Trait_GuardsAttributes,
