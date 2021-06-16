@@ -63,6 +63,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CModel_Query|static addSelect($column)
  * @method CModel_Query|static selectRaw($expression, array $bindings = [])
  * @method CModel_Query|static orderBy($column, $direction = 'asc')
+ * @method CModel_Query|static skip($value)
+ * @method CModel_Query|static offset($value)
+ * @method CModel_Query|static take($value)
+ * @method CModel_Query|static limit($value)
  */
 class CModel_Query {
     use CDatabase_Trait_Builder,
