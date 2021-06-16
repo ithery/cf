@@ -52,6 +52,10 @@ class Embed {
         return $this->extractorFactory;
     }
 
+    public function setSettings(array $settings) {
+        $this->extractorFactory->setSettings($settings);
+    }
+
     /**
      * @param RequestInterface  $request
      * @param ResponseInterface $response
@@ -60,10 +64,9 @@ class Embed {
      * @return Extractor
      */
     private function extract(RequestInterface $request, ResponseInterface $response, $redirect = true) {
-        $uri = $this->crawler->getResponseUri($response) ?: $request->getUri();
-
+        //$uri = $this->crawler->getResponseUri($response) ?: $request->getUri();
+        $uri = $request->getUri();
         $extractor = $this->extractorFactory->createExtractor($uri, $request, $response, $this->crawler);
-
         if (!$redirect || !$this->mustRedirect($extractor)) {
             return $extractor;
         }
