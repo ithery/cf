@@ -1,11 +1,14 @@
 <?php
 
+/**
+ * @deprecated since 1.2
+ */
+//@codingStandardsIgnoreStart
 class CFormInputLabel extends CFormInput {
-
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->type = "label";
+        $this->type = 'label';
     }
 
     public static function factory($id) {
@@ -15,15 +18,17 @@ class CFormInputLabel extends CFormInput {
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
-        $disabled = "";
+        $disabled = '';
 
-        if ($this->disabled)
+        if ($this->disabled) {
             $disabled = ' disabled="disabled"';
+        }
 
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
-            $classes = " " . $classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
         if (strlen($custom_css) > 0) {
@@ -60,11 +65,8 @@ class CFormInputLabel extends CFormInput {
     public function js($indent = 0) {
         $js = new CStringBuilder();
 
-
         $js->append(parent::js());
-
 
         return $js->text();
     }
-
 }

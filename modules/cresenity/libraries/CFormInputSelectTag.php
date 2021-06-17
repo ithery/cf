@@ -1,7 +1,10 @@
 <?php
 
+/**
+ * @deprecated since 1.2
+ */
+//@codingStandardsIgnoreStart
 class CFormInputSelectTag extends CFormInput {
-
     public function __construct($id) {
         parent::__construct($id);
     }
@@ -49,9 +52,8 @@ class CFormInputSelectTag extends CFormInput {
         $this->placeholder = $placeholder;
         return $this;
     }
-    
-    public function html($indent = 0) {
 
+    public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
         $html->append($this->html_child($indent));
@@ -62,12 +64,12 @@ class CFormInputSelectTag extends CFormInput {
             $custom_css = ' style="' . $custom_css . '"';
         }
 
-        $classes = implode(" ", $this->classes);
+        $classes = implode(' ', $this->classes);
         if (strlen($classes) > 0) {
-            $classes = " " . $classes;
+            $classes = ' ' . $classes;
         }
         if ($this->bootstrap == '3') {
-            $classes = $classes . " form-control ";
+            $classes = $classes . ' form-control ';
         }
 
         $html->appendln('<input type="hidden"  class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $custom_css . '/>')->br();
@@ -76,48 +78,46 @@ class CFormInputSelectTag extends CFormInput {
     }
 
     public function js($indent = 0) {
-
         $vals = $this->value;
-        if(!is_array($vals)) {
-            $vals = array($vals);
+        if (!is_array($vals)) {
+            $vals = [$vals];
         }
         $vals_str = '';
-        foreach($vals as $val) {
-            if(strlen($vals_str)>0) {
-                $vals_str.=",";
+        foreach ($vals as $val) {
+            if (strlen($vals_str) > 0) {
+                $vals_str .= ',';
             }
-            $vals_str.="'".$val."'";
+            $vals_str .= "'" . $val . "'";
         }
-       
+
         $list = $this->list;
-        if(!is_array($list)) {
-            $list = array($list);
+        if (!is_array($list)) {
+            $list = [$list];
         }
         $list_str = '';
-        foreach($list as $val) {
-            if(strlen($list_str)>0) {
-                $list_str.=",";
+        foreach ($list as $val) {
+            if (strlen($list_str) > 0) {
+                $list_str .= ',';
             }
-            $list_str.="'".$val."'";
+            $list_str .= "'" . $val . "'";
         }
-        
 
         $str = "
 			$('#" . $this->id . "').select2({
-				tags: [".$list_str."],
+				tags: [" . $list_str . "],
 				tokenSeparators: [',', ' ']
 			}).change(function() {
-				
+
 			});
-                        
+
 	";
 
-        if(strlen($vals_str)>0) {
-             $str .= "
-                        $('#" . $this->id . "').select2('val',[".$vals_str."]);
-                ";
+        if (strlen($vals_str) > 0) {
+            $str .= "
+                        $('#" . $this->id . "').select2('val',[" . $vals_str . ']);
+                ';
         }
-        
+
         $js = new CStringBuilder();
         $js->append(parent::js($indent))->br();
         $js->set_indent($indent);
@@ -126,5 +126,4 @@ class CFormInputSelectTag extends CFormInput {
 
         return $js->text();
     }
-
 }

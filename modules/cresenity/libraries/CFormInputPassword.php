@@ -1,15 +1,18 @@
 <?php
-
+/**
+ * @deprecated since 1.2
+ */
+//@codingStandardsIgnoreStart
 class CFormInputPassword extends CFormInput {
-
     protected $autocomplete;
+
     protected $placeholder;
 
     public function __construct($id) {
         parent::__construct($id);
-        $this->type = "password";
+        $this->type = 'password';
         $this->autocomplete = true;
-        $this->placeholder = "";
+        $this->placeholder = '';
     }
 
     public static function factory($id) {
@@ -31,11 +34,12 @@ class CFormInputPassword extends CFormInput {
         $html->set_indent($indent);
 
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
-            $classes = " " . $classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
         if ($this->bootstrap >= '3') {
-            $classes = $classes . " form-control ";
+            $classes = $classes . ' form-control ';
         }
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
@@ -46,12 +50,11 @@ class CFormInputPassword extends CFormInput {
         if ($this->autocomplete) {
             $additional_attr = ' autocomplete="on"';
         }
-        $html->appendln('<input type="password" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" '.$custom_css.' class="input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '" ' . $additional_attr . '>')->br();
+        $html->appendln('<input type="password" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" ' . $custom_css . ' class="input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '" ' . $additional_attr . '>')->br();
         return $html->text();
     }
 
     public function js($indent = 0) {
-        return "";
+        return '';
     }
-
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 1:39:19 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 1:39:19 AM
  */
 class CString {
-
     public static function initials($name = null) {
         return new CString_Initials($name);
     }
@@ -16,5 +16,4 @@ class CString {
     public static function language() {
         return new CString_Language();
     }
-
 }
