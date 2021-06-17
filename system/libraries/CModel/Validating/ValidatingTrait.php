@@ -396,7 +396,7 @@ trait CModel_Validating_ValidatingTrait {
     /**
      * Throw a validation exception.
      *
-     * @throws \Watson\Validating\ValidationException
+     * @throws CModel_Validating_ValidationException
      */
     public function throwValidationException() {
         $validator = $this->makeValidator($this->getRules());
