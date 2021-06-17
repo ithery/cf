@@ -93,7 +93,7 @@ class CSession_Middleware_SessionMiddleware {
         // If a session driver has been configured, we will need to start the session here
         // so that the data is ready for an application. Note that the Laravel sessions
         // do not make use of PHP "native" sessions in any way since they are crappy.
-        $request->setSession(
+        $request->setCFSession(
             $this->startSession($request, $session)
         );
 
@@ -229,7 +229,6 @@ class CSession_Middleware_SessionMiddleware {
      * @return void
      */
     protected function saveSession($request) {
-
         CSession::instance()->store()->save();
     }
 

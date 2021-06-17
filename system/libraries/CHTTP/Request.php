@@ -357,8 +357,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Create a new request instance from the given Laravel request.
      *
-     * @param \Illuminate\Http\Request      $from
-     * @param \Illuminate\Http\Request|null $to
+     * @param \CHTTP_Request      $from
+     * @param \CHTTP_Request|null $to
      *
      * @return static
      */
@@ -384,7 +384,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         $request->setJson($from->json());
 
         if ($session = $from->getSession()) {
-            $request->setSession($session);
+            $request->setCFSession($session);
         }
 
         $request->setUserResolver($from->getUserResolver());
@@ -470,7 +470,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get the session associated with the request.
      *
-     * @return \Illuminate\Session\Store|null
+     * @return \CSession_Store|null
      */
     public function getSession() {
         return $this->session;
@@ -483,7 +483,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      *
      * @return void
      */
-    public function setSession($session) {
+    public function setCFSession($session) {
         $this->session = $session;
     }
 
