@@ -152,7 +152,7 @@ class CExporter_QueuedWriter {
      *
      * @return CCollection
      */
-    private function exportView(CExporter_Concern_FromView $export, TemporarCExporter_File_TemporaryFileyFile $temporaryFile, $writerType, $sheetIndex) {
+    private function exportView(CExporter_Concern_FromView $export, CExporter_File_TemporaryFile $temporaryFile, $writerType, $sheetIndex) {
         $jobs = new CCollection();
         $jobs->push(new CExporter_TaskQueue_AppendViewToSheet(
             $export,
