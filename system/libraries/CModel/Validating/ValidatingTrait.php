@@ -242,7 +242,7 @@ trait CModel_Validating_ValidatingTrait {
      *
      * @return void
      */
-    public function setErrors(CValidation_MessageBag $validationErrors) {
+    public function setErrors(CBase_MessageBag $validationErrors) {
         $this->validationErrors = $validationErrors;
     }
 
@@ -343,7 +343,6 @@ trait CModel_Validating_ValidatingTrait {
      */
     public function getValidator() {
         return $this->validator ?: CValidation_Factory::instance();
-        ;
     }
 
     /**
