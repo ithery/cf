@@ -9,7 +9,7 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
     /**
      * The Blade compiler instance.
      *
-     * @var CView_CompilerAbstract
+     * @var CView_CompilerInterface
      */
     protected $compiler;
 
@@ -69,7 +69,7 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
      * @throws \Throwable
      */
     protected function handleViewException($e, $obLevel) {
-        $e = new ErrorException($this->getMessage($e), 0, 1, $e->getFile(), $e->getLine(), $e);
+        //$e = new ErrorException($this->getMessage($e), 0, 1, $e->getFile(), $e->getLine(), $e);
 
         parent::handleViewException($e, $obLevel);
     }
