@@ -14,7 +14,13 @@ use Psr\Http\Message\ResponseInterface;
  */
 final class CurlClient implements ClientInterface {
 
+    /**
+     * @var ResponseFactoryInterface
+     */
     private $responseFactory;
+    /**
+     * @var array
+     */
     private $settings = [];
 
     public function __construct(ResponseFactoryInterface $responseFactory = null) {
