@@ -14,7 +14,7 @@ trait CModel_Validating_ValidatingTrait {
     /**
      * Error messages as provided by the validator.
      *
-     * @var CValidation_MessageBag
+     * @var CBase_MessageBag
      */
     protected $validationErrors;
 
@@ -238,7 +238,7 @@ trait CModel_Validating_ValidatingTrait {
     /**
      * Set the error messages.
      *
-     * @param CValidation_MessageBag $validationErrors
+     * @param CBase_MessageBag $validationErrors
      *
      * @return void
      */

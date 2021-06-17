@@ -7,6 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Jun 30, 2019, 3:34:01 PM
+ * @deprecated since 1.3
  */
 interface CValidation_MessageBagProviderInterface {
     /**
