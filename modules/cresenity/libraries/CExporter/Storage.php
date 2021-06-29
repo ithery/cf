@@ -1,21 +1,12 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_Storage {
-
     /**
-     *
-     * @var CExporter_Storage 
+     * @var CExporter_Storage
      */
     private static $instance;
 
     /**
-     * 
      * @return CExporter_Storage
      */
     public static function instance() {
@@ -30,9 +21,6 @@ class CExporter_Storage {
      */
     private $storage;
 
-    /**
-     * @param Factory $filesystem
-     */
     public function __construct() {
         $this->storage = CStorage::instance();
     }
@@ -45,8 +33,9 @@ class CExporter_Storage {
      */
     public function disk($disk = null, array $diskOptions = []) {
         return new CExporter_Disk(
-                $this->storage->disk($disk), $disk, $diskOptions
+            $this->storage->disk($disk),
+            $disk,
+            $diskOptions
         );
     }
-
 }

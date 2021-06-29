@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_QueuedWriter {
     /**
      * @var CExporter_QueuedWriter
@@ -158,7 +152,7 @@ class CExporter_QueuedWriter {
      *
      * @return CCollection
      */
-    private function exportView(CExporter_Concern_FromView $export, TemporarCExporter_File_TemporaryFileyFile $temporaryFile, $writerType, $sheetIndex) {
+    private function exportView(CExporter_Concern_FromView $export, CExporter_File_TemporaryFile $temporaryFile, $writerType, $sheetIndex) {
         $jobs = new CCollection();
         $jobs->push(new CExporter_TaskQueue_AppendViewToSheet(
             $export,

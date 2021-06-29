@@ -70,6 +70,8 @@
 
         <!-- Ignore that already defined in PSR-->
         <exclude name="PEAR.NamingConventions.ValidFunctionName.ScopeNotCamelCaps"/>
+
+        <exclude name="Generic.ControlStructures.InlineControlStructure.Discouraged"/>
     </rule>
 
     <rule ref="PSR2">

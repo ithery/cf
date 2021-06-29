@@ -2,8 +2,13 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @deprecated since 1.2
+ */
+//@codingStandardsIgnoreStart
 class CSpan extends CElement_Element {
     protected $col;
+
     protected $size;
 
     public function __construct($id = '') {

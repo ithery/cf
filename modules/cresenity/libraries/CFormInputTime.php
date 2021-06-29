@@ -1,20 +1,28 @@
 <?php
 
+/**
+ * @deprecated since 1.2
+ */
+//@codingStandardsIgnoreStart
 class CFormInputTime {
+    public $field_id = '';
 
-    public $field_id = "";
-    public $field_name = "";
-    public $field_value = "";
+    public $field_name = '';
+
+    public $field_value = '';
+
     public $value_pick = true;
+
     public $step = 30;
-    public $addition_attribute = "";
+
+    public $addition_attribute = '';
+
     public $validation = null; //CInputValidation type
 
     public function __construct($id) {
         $this->field_id = $id;
         $this->field_name = $id;
-		CManager::instance()->register_module('timepicker');
-        
+        CManager::instance()->register_module('timepicker');
     }
 
     public static function factory($id) {
@@ -64,28 +72,28 @@ class CFormInputTime {
         $html = new CStringBuilder();
         $html->set_indent($indent);
 
-        $val = explode(" ", $this->field_value);
+        $val = explode(' ', $this->field_value);
         if (count($val) > 1) {
             $val = $val[1];
         } else {
             $val = $val[0];
         }
-        $time_list = array();
+        $time_list = [];
         //in minutes
         $step = $this->step;
         $total_time = 60 * 24;
         $is_value_exists = false;
-        $val_arr = explode(":", $val);
+        $val_arr = explode(':', $val);
         $val_in_minute = false;
         if (count($val_arr) == 3) {
             $val_in_minute = $val_arr[0] * 60 + $val_arr[1] + $val_arr[2] / 60;
         }
-        for ($i = 0; $i < $total_time; $i+=$step) {
+        for ($i = 0; $i < $total_time; $i += $step) {
             $hour = floor($i / 60);
             $minute = ($i % 60);
-            $hour = $hour < 10 ? "0" . $hour : $hour;
-            $minute = $minute < 10 ? "0" . $minute : $minute;
-            $time = $hour . ":" . $minute . ":" . "00";
+            $hour = $hour < 10 ? '0' . $hour : $hour;
+            $minute = $minute < 10 ? '0' . $minute : $minute;
+            $time = $hour . ':' . $minute . ':' . '00';
             $time_list[$time] = $time;
             if ($this->value_pick) {
                 $next_val = $i + $step;
@@ -101,16 +109,14 @@ class CFormInputTime {
         $html->appendln('<select name="' . $field_name . '" id="' . $field_id . '" class="select ' . $this->addition_attribute . '">')->inc_indent()->br();
         if ($time_list != null) {
             foreach ($time_list as $k => $v) {
-                $selected = "";
-                if ($val == $k)
+                $selected = '';
+                if ($val == $k) {
                     $selected = ' selected="selected"';
+                }
                 $html->appendln('<option value="' . $k . '"' . $selected . '>' . $v . '</option>')->br();
             }
         }
         $html->dec_indent()->appendln('</select>')->br();
         return $html->text();
     }
-
 }
-
-?>

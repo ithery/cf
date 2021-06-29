@@ -64,6 +64,16 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
         return pathinfo($path, PATHINFO_DIRNAME) . '/' . rawurlencode(pathinfo($path, PATHINFO_BASENAME));
     }
 
+    protected function getDiskName() {
+        return $this->conversion === null
+            ? $this->resource->disk
+            : $this->resource->conversions_disk;
+    }
+
+    protected function getDisk() {
+        return CStorage::instance()->disk($this->getDiskName());
+    }
+
     public function versionUrl($path = '') {
         if (!CF::config('resource.version_urls')) {
             return $path;

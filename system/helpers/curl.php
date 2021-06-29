@@ -9,7 +9,7 @@ class curl {
     /**
      * Fetches the current URI.
      *
-     * @param boolean $qs include the query string
+     * @param bool $qs include the query string
      *
      * @return string
      */
@@ -23,8 +23,8 @@ class curl {
      * If protocol (and core.site_protocol) and core.site_domain are both empty,
      * then
      *
-     * @param boolean $index    include the index page
-     * @param boolean $protocol non-default protocol
+     * @param bool $index    include the index page
+     * @param bool $protocol non-default protocol
      *
      * @return string
      */
@@ -77,7 +77,7 @@ class curl {
      * @return string
      */
     public static function urlFull() {
-        static::fullUrl();
+        return static::fullUrl();
     }
 
     /**
@@ -127,7 +127,7 @@ class curl {
      * are allowed.
      *
      * @param   string   filename
-     * @param   boolean  include the index page
+     * @param   bool  include the index page
      * @param mixed $file
      * @param mixed $index
      *

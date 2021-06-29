@@ -50,7 +50,7 @@ class CValidation_Validator {
     /**
      * The message bag instance.
      *
-     * @var CValidation_MessageBag
+     * @var CBase_MessageBag
      */
     protected $messages;
 
@@ -265,7 +265,7 @@ class CValidation_Validator {
      * @return bool
      */
     public function passes() {
-        $this->messages = new CValidation_MessageBag();
+        $this->messages = new CBase_MessageBag();
         $this->distinctValues = [];
         $this->failedRules = [];
         // We'll spin through each rule, validating the attributes attached to that
@@ -723,7 +723,7 @@ class CValidation_Validator {
     /**
      * Get the message container for the validator.
      *
-     * @return CValidation_MessageBag
+     * @return CBase_MessageBag
      */
     public function messages() {
         if (!$this->messages) {
@@ -736,7 +736,7 @@ class CValidation_Validator {
     /**
      * An alternative more semantic shortcut to the message container.
      *
-     * @return CValidation_MessageBag
+     * @return CBase_MessageBag
      */
     public function errors() {
         return $this->messages();
@@ -745,7 +745,7 @@ class CValidation_Validator {
     /**
      * Get the messages for the instance.
      *
-     * @return \Illuminate\Support\MessageBag
+     * @return \CBase_MessageBag
      */
     public function getMessageBag() {
         return $this->messages();
@@ -1134,7 +1134,7 @@ class CValidation_Validator {
      * @throws \RuntimeException
      */
     protected function getPresenceVerifierFor($connection) {
-        return CF::tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
+        return c::tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
             $verifier->setConnection($connection);
         });
     }

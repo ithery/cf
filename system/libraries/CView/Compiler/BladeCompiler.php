@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
+class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CView_CompilerInterface {
     use CView_Compiler_BladeCompiler_CompileCommentTrait,
         CView_Compiler_BladeCompiler_CompileComponentTrait,
         CView_Compiler_BladeCompiler_CompileConditionalTrait,

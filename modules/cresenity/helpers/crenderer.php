@@ -1,6 +1,9 @@
 <?php
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated since 1.2
+ */
 class crenderer {
     /**
      * Render as css styles from array key value
@@ -9,7 +12,8 @@ class crenderer {
      *
      * @return string
      *
-     * @deprecated 1.1
+     * @see CRenderable
+     * @deprecated 1.1, use CRenderable::renderStyles
      */
     public static function render_style($styles) {
         $ret = '';

@@ -1,53 +1,79 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @see CElement_Component_Widget
+ * @deprecated since 1.2, use CElement_Component_Widget
+ */
+// @codingStandardsIgnoreStart
 class CWidget extends CElement_Element {
-
     protected $header_action_list;
+
+    /**
+     * Undocumented variable
+     *
+     * @var CFormInput
+     */
     protected $switcher;
+
     public $title;
+
     public $content;
+
     public $span;
+
     public $scroll;
+
     public $icon;
+
     public $wrapped;
+
     public $nopadding;
+
     public $info;
+
     public $info_tip;
+
     public $custom_html;
+
     public $header_action_style;
+
     public $height;
+
     public $attr;
+
     private $collapse;
+
     private $close;
+
     private $js_collapse;
 
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->icon = "th-list";
-        $this->title = "";
-        $this->height = "";
-        $this->content = "";
+        $this->icon = 'th-list';
+        $this->title = '';
+        $this->height = '';
+        $this->content = '';
         $this->span = 12;
         $this->wrapped = true;
         $this->scroll = false;
-        $this->info = "";
-        $this->info_tip = "";
-        $this->custom_html = "";
+        $this->info = '';
+        $this->info_tip = '';
+        $this->custom_html = '';
         $this->nopadding = false;
         $this->header_action_list = CActionList::factory();
         $this->header_action_style = 'widget-action';
-        $this->header_action_list->set_style('widget-action');
-        $this->switcher = '';
-        $this->attr = array();
+        $this->header_action_list->setStyle('widget-action');
+        $this->switcher = null;
+        $this->attr = [];
         $this->collapse = false;
         $this->close = false;
         $this->js_collapse = true;
     }
 
-    public static function factory($id = "") {
+    public static function factory($id = '') {
         return new CWidget($id);
     }
 
@@ -56,7 +82,7 @@ class CWidget extends CElement_Element {
         return $this->header_action_list->child_count() > 0;
     }
 
-    public function add_header_action($id = "") {
+    public function add_header_action($id = '') {
         $row_act = CAction::factory($id);
         if ($this->bootstrap == '3.3') {
             $row_act->add_class('btn-xs');
@@ -65,7 +91,7 @@ class CWidget extends CElement_Element {
         return $row_act;
     }
 
-    public function add_header_action_list($id = "") {
+    public function add_header_action_list($id = '') {
         $row_acts = CActionList::factory($id);
         $row_acts->set_style('btn-dropdown');
         $this->header_action_list->add($row_acts);
@@ -85,13 +111,14 @@ class CWidget extends CElement_Element {
         }
     }
 
-    public function add_switcher($id = "") {
+    public function add_switcher($id = '') {
         return $this->switcher = CFactory::create_control($id, 'switcher');
     }
 
     public function set_title($title, $lang = true) {
-        if ($lang)
+        if ($lang) {
             $title = clang::__($title);
+        }
         $this->title = $title;
         return $this;
     }
@@ -141,21 +168,21 @@ class CWidget extends CElement_Element {
         return $this;
     }
 
-    function get_collapse() {
+    public function get_collapse() {
         return $this->collapse;
     }
 
-    function get_close() {
+    public function get_close() {
         return $this->close;
     }
 
-    function set_collapse($collapse, $js_collapse = false) {
+    public function set_collapse($collapse, $js_collapse = false) {
         $this->collapse = $collapse;
         $this->js_collapse = $js_collapse;
         return $this;
     }
 
-    function set_close($close) {
+    public function set_close($close) {
         $this->close = $close;
         return $this;
     }
@@ -163,7 +190,7 @@ class CWidget extends CElement_Element {
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
-        $disabled = "";
+        $disabled = '';
 
         $main_class = ' widget-box ';
         $main_class_title = ' widget-title ';
@@ -178,8 +205,8 @@ class CWidget extends CElement_Element {
             $class_title = ' box-title ';
         }
 
-        if ($this->header_action_style == "btn-dropdown") {
-            $this->header_action_list->add_class("pull-right");
+        if ($this->header_action_style == 'btn-dropdown') {
+            $this->header_action_list->add_class('pull-right');
         }
         if ($this->wrapped) {
             if ($this->bootstrap > '3') {
@@ -190,22 +217,23 @@ class CWidget extends CElement_Element {
 				<div class="span' . $this->span . '">');
             }
         }
-        $nopadding = "";
+        $nopadding = '';
         if ($this->nopadding) {
-            $nopadding = "nopadding";
+            $nopadding = 'nopadding';
         }
-        $info = "";
+        $info = '';
         if (strlen($this->info) > 0) {
             $info = '<span class="label label-info tip-left " data-original-title="' . $this->info_tip . '">' . $this->info . '</span>';
         }
-        $custom_html = "";
+        $custom_html = '';
         if (strlen($this->custom_html) > 0) {
             $custom_html = $this->custom_html;
         }
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
-            $classes = " " . $classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
         $html->appendln('<div id="' . $this->id . '" class="' . $main_class . $classes . '" style="' . $custom_css . '">');
@@ -263,7 +291,7 @@ class CWidget extends CElement_Element {
             $html->appendln('</div>');
         }
 
-        $scroll_class = "";
+        $scroll_class = '';
         if ($this->scroll) {
             $scroll_class = ' slimscroll';
         }
@@ -343,5 +371,4 @@ class CWidget extends CElement_Element {
         $js->append($this->js_child($js->get_indent()));
         return $js->text();
     }
-
 }
