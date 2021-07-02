@@ -9,6 +9,8 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 class Embed {
+    const VERSION = 2;
+
     private $crawler;
 
     private $extractorFactory;
