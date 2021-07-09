@@ -37,7 +37,7 @@ class CQueue_Worker {
     /**
      * The exception handler instance.
      *
-     * @var \Illuminate\Contracts\Debug\ExceptionHandler
+     * @var \CException_ExceptionHandler
      */
     protected $exceptions;
 
@@ -84,7 +84,7 @@ class CQueue_Worker {
      *
      * @param string                          $connectionName
      * @param string                          $queue
-     * @param \Illuminate\Queue\WorkerOptions $options
+     * @param \CQueue_WorkerOptions $options
      *
      * @return void
      */
