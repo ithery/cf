@@ -1,18 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 2:39:39 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 2:39:39 AM
  */
 interface CQueue_DispatcherInterface {
-
     /**
      * Dispatch a command to its appropriate handler.
      *
-     * @param  mixed  $command
+     * @param mixed $command
+     *
      * @return mixed
      */
     public function dispatch($command);
@@ -20,8 +21,9 @@ interface CQueue_DispatcherInterface {
     /**
      * Dispatch a command to its appropriate handler in the current process.
      *
-     * @param  mixed  $command
-     * @param  mixed  $handler
+     * @param mixed $command
+     * @param mixed $handler
+     *
      * @return mixed
      */
     public function dispatchNow($command, $handler = null);
@@ -29,7 +31,8 @@ interface CQueue_DispatcherInterface {
     /**
      * Determine if the given command has a handler.
      *
-     * @param  mixed  $command
+     * @param mixed $command
+     *
      * @return bool
      */
     public function hasCommandHandler($command);
@@ -37,7 +40,8 @@ interface CQueue_DispatcherInterface {
     /**
      * Retrieve the handler for a command.
      *
-     * @param  mixed  $command
+     * @param mixed $command
+     *
      * @return bool|mixed
      */
     public function getCommandHandler($command);
@@ -45,7 +49,8 @@ interface CQueue_DispatcherInterface {
     /**
      * Set the pipes commands should be piped through before dispatching.
      *
-     * @param  array  $pipes
+     * @param array $pipes
+     *
      * @return $this
      */
     public function pipeThrough(array $pipes);
@@ -53,7 +58,8 @@ interface CQueue_DispatcherInterface {
     /**
      * Map a command to a handler.
      *
-     * @param  array  $map
+     * @param array $map
+     *
      * @return $this
      */
     public function map(array $map);

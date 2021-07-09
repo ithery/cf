@@ -1,0 +1,5 @@
+# Configuration
+
+```php
+$home="abc"
+```

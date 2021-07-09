@@ -1,22 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 9:47:33 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 9:47:33 PM
  */
 trait CTracker_RepositoryManager_QueryTrait {
-
     /**
-     *
      * @var CTracker_Repository_Query
      */
     protected $queryRepository;
 
     /**
-     *
      * @var CTracker_Repository_QueryArgument
      */
     protected $queryArgumentRepository;
@@ -41,15 +39,14 @@ trait CTracker_RepositoryManager_QueryTrait {
                     $value = carr::implodes(',', $value);
                 }
                 $this->queryArgumentRepository->create(
-                        [
-                            'log_query_id' => $id,
-                            'argument' => $argument,
-                            'value' => empty($value) ? '' : $value,
-                        ]
+                    [
+                        'log_query_id' => $id,
+                        'argument' => $argument,
+                        'value' => empty($value) ? '' : $value,
+                    ]
                 );
             }
         }
         return $id;
     }
-
 }

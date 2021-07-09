@@ -1,14 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 1:04:19 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @see Proengsoft\JsValidation
+ * @since Apr 14, 2019, 1:04:19 PM
  */
 class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable {
-
     /**
      * Registered validator instance.
      *
@@ -60,7 +61,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
 
     /**
      * @param \Proengsoft\JsValidation\Javascript\ValidatorHandler $validator
-     * @param array $options
+     * @param array                                                $options
      */
     public function __construct(CJavascript_Validation_ValidatorHandler $validator, $options = []) {
         $this->validator = $validator;
@@ -71,6 +72,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      * Set default parameters.
      *
      * @param $options
+     *
      * @return void
      */
     protected function setDefaults($options) {
@@ -84,14 +86,15 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
     /**
      * Render the specified view with validator data.
      *
-     * @param null|\Illuminate\Contracts\View\View|string $view
      * @param null|string $selector
+     * @param null|mixed  $template
+     *
      * @return string
      */
     public function render($template = null, $selector = null) {
         $this->template($template);
         $this->selector($selector);
-        $template = new CTemplate($this->template, array('validator' => $this->getTemplateData()));
+        $template = new CTemplate($this->template, ['validator' => $this->getTemplateData()]);
         $output = $template->render();
         preg_match_all('#<script>(.*?)</script>#ims', $output, $matches);
         $outputJs = '';
@@ -127,14 +130,15 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      * Gets value from view data.
      *
      * @param $name
+     *
      * @return string
      *
-     * @throws \Proengsoft\JsValidation\Exceptions\PropertyNotFoundException
+     * @throws \CJavascript_Validation_Exception_PropertyNotFoundException
      */
     public function __get($name) {
         $data = $this->getTemplateData();
         if (!array_key_exists($name, $data)) {
-            throw new PropertyNotFoundException($name, get_class());
+            throw new CJavascript_Validation_Exception_PropertyNotFoundException($name, get_class());
         }
         return $data[$name];
     }
@@ -160,6 +164,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      * Set the form selector to validate.
      *
      * @param string $selector
+     *
      * @deprecated
      */
     public function setSelector($selector) {
@@ -170,6 +175,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      * Set the form selector to validate.
      *
      * @param string $selector
+     *
      * @return \Proengsoft\JsValidation\Javascript\JavascriptValidator
      */
     public function selector($selector) {
@@ -181,6 +187,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      * Set the input selector to ignore for validation.
      *
      * @param string $ignore
+     *
      * @return \Proengsoft\JsValidation\Javascript\JavascriptValidator
      */
     public function ignore($ignore) {
@@ -191,7 +198,8 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
     /**
      * Set the view to render Javascript Validations.
      *
-     * @param null|\Illuminate\Contracts\View\View|string $view
+     * @param mixed $template
+     *
      * @return \Proengsoft\JsValidation\Javascript\JavascriptValidator
      */
     public function template($template) {
@@ -203,6 +211,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      * Enables or disables remote validations.
      *
      * @param null|bool $enabled
+     *
      * @return \Proengsoft\JsValidation\Javascript\JavascriptValidator
      */
     public function remote($enabled = true) {
@@ -213,13 +222,13 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
     /**
      * Validate Conditional Validations using Ajax in specified fields.
      *
-     * @param string $attribute
+     * @param string       $attribute
      * @param string|array $rules
+     *
      * @return \Proengsoft\JsValidation\Javascript\JavascriptValidator
      */
     public function sometimes($attribute, $rules) {
         $this->validator->sometimes($attribute, $rules);
         return $this;
     }
-
 }

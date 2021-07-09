@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:08:42 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:08:42 AM
  */
 
 /**
@@ -14,7 +15,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since 2.0
  */
 class CDatabase_Type_ObjectType extends CDatabase_Type {
-
     /**
      * {@inheritdoc}
      */
@@ -40,7 +40,7 @@ class CDatabase_Type_ObjectType extends CDatabase_Type {
         $value = (is_resource($value)) ? stream_get_contents($value) : $value;
         $val = unserialize($value);
         if ($val === false && $value !== 'b:0;') {
-            throw ConversionException::conversionFailed($value, $this->getName());
+            throw CDatabase_Schema_Exception_ConversionException::conversionFailed($value, $this->getName());
         }
 
         return $val;
@@ -59,5 +59,4 @@ class CDatabase_Type_ObjectType extends CDatabase_Type {
     public function requiresSQLCommentHint(CDatabase_Platform $platform) {
         return true;
     }
-
 }

@@ -1,21 +1,27 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Aug 23, 2018, 12:02:58 AM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use SuperClosure\SerializableClosure;
 
 class CSerializer_Serializer {
-
     const CLASS_IDENTIFIER_KEY = '@type';
+
     const CLASS_PARENT_KEY = '@parent';
+
     const SCALAR_TYPE = '@scalar';
+
     const SCALAR_VALUE = '@value';
+
     const NULL_VAR = null;
+
     const MAP_TYPE = '@map';
 
     /**
@@ -80,7 +86,7 @@ class CSerializer_Serializer {
      * This is handly specially in order to add additional data before the
      * serialization process takes place using the transformer public methods, if any.
      *
-     * @return StrategyInterface
+     * @return CSerializer_StrategyInterface
      */
     public function getTransformer() {
         return $this->serializationStrategy;
@@ -93,7 +99,7 @@ class CSerializer_Serializer {
      *
      * @return string JSON encoded
      *
-     * @throws SerializerException
+     * @throws CSerializer_Exception
      */
     public function serialize($value) {
         $this->reset();
@@ -121,21 +127,17 @@ class CSerializer_Serializer {
     protected function serializeData($value) {
         $this->guardForUnsupportedValues($value);
 
-        if ($value instanceof Closure || $value instanceof SerializableClosure) {
-            $closure = $value;
-            if ($closure instanceof SerializableClosure) {
-                $closure = $closure->getClosure();
-            }
-            return CSerializer_Object_ClosureSerializer::serialize($this, $closure);
-        }
         if ($this->isInstanceOf($value, 'SplFixedArray')) {
-            return CSerializer_Object_SplFixedArraySerializer::serialize($this, $value);
+            return SplFixedArraySerializer::serialize($this, $value);
         }
+
         if (\is_object($value)) {
             return $this->serializeObject($value);
         }
+
         $type = (\gettype($value) && $value !== null) ? \gettype($value) : 'string';
         $func = $this->serializationMap[$type];
+
         return $this->$func($value);
     }
 
@@ -148,7 +150,8 @@ class CSerializer_Serializer {
      * @return bool
      */
     private function isInstanceOf($value, $classFQN) {
-        return is_object($value) && (strtolower(get_class($value)) === strtolower($classFQN) || \is_subclass_of($value, $classFQN, true));
+        return is_object($value)
+            && (strtolower(get_class($value)) === strtolower($classFQN) || \is_subclass_of($value, $classFQN, true));
     }
 
     /**
@@ -157,12 +160,16 @@ class CSerializer_Serializer {
      * @throws Serializer_Exception
      */
     protected function guardForUnsupportedValues($value) {
+        if ($value instanceof Closure) {
+            throw new CSerializer_Exception('Closures are not supported in Serializer');
+        }
 
         if ($value instanceof \DatePeriod) {
             throw new CSerializer_Exception(
-            'DatePeriod is not supported in Serializer. Loop through it and serialize the output.'
+                'DatePeriod is not supported in Serializer. Loop through it and serialize the output.'
             );
         }
+
         if (\is_resource($value)) {
             throw new CSerializer_Exception('Resource is not supported in Serializer');
         }
@@ -179,7 +186,9 @@ class CSerializer_Serializer {
         if (\is_array($value) && isset($value[self::SCALAR_TYPE])) {
             return $this->unserializeData($value);
         }
+
         $this->reset();
+
         return $this->unserializeData($this->serializationStrategy->unserialize($value));
     }
 
@@ -194,19 +203,25 @@ class CSerializer_Serializer {
         if ($value === null || !is_array($value)) {
             return $value;
         }
+
         if (isset($value[self::MAP_TYPE]) && !isset($value[self::CLASS_IDENTIFIER_KEY])) {
             $value = $value[self::SCALAR_VALUE];
+
             return $this->unserializeData($value);
         }
+
         if (isset($value[self::SCALAR_TYPE])) {
             return $this->getScalarValue($value);
         }
+
         if (isset($value[self::CLASS_PARENT_KEY]) && 0 === strcmp($value[self::CLASS_PARENT_KEY], 'SplFixedArray')) {
             return SplFixedArraySerializer::unserialize($this, $value[self::CLASS_IDENTIFIER_KEY], $value);
         }
+
         if (isset($value[self::CLASS_IDENTIFIER_KEY])) {
             return $this->unserializeObject($value);
         }
+
         return \array_map([$this, __FUNCTION__], $value);
     }
 
@@ -226,6 +241,7 @@ class CSerializer_Serializer {
             case 'NULL':
                 return self::NULL_VAR;
         }
+
         return $value[self::SCALAR_VALUE];
     }
 
@@ -241,17 +257,21 @@ class CSerializer_Serializer {
     protected function unserializeObject(array $value) {
         $className = $value[self::CLASS_IDENTIFIER_KEY];
         unset($value[self::CLASS_IDENTIFIER_KEY]);
+
         if (isset($value[self::MAP_TYPE])) {
-            unset($value[self::MAP_TYPE]);
-            unset($value[self::SCALAR_VALUE]);
+            unset($value[self::MAP_TYPE], $value[self::SCALAR_VALUE]);
         }
+
         if ($className[0] === '@') {
             return self::$objectMapping[substr($className, 1)];
         }
+
         if (!class_exists($className)) {
-            throw new SerializerException('Unable to find class ' . $className);
+            throw new CSerializer_Exception('Unable to find class ' . $className);
         }
-        return (null === ($obj = $this->unserializeDateTimeFamilyObject($value, $className))) ? $this->unserializeUserDefinedObject($value, $className) : $obj;
+
+        return (null === ($obj = $this->unserializeDateTimeFamilyObject($value, $className)))
+            ? $this->unserializeUserDefinedObject($value, $className) : $obj;
     }
 
     /**
@@ -262,10 +282,12 @@ class CSerializer_Serializer {
      */
     protected function unserializeDateTimeFamilyObject(array $value, $className) {
         $obj = null;
+
         if ($this->isDateTimeFamilyObject($className)) {
             $obj = $this->restoreUsingUnserialize($className, $value);
             self::$objectMapping[self::$objectMappingIndex++] = $obj;
         }
+
         return $obj;
     }
 
@@ -276,9 +298,11 @@ class CSerializer_Serializer {
      */
     protected function isDateTimeFamilyObject($className) {
         $isDateTime = false;
+
         foreach ($this->dateTimeClassType as $class) {
             $isDateTime = $isDateTime || \is_subclass_of($className, $class, true) || $class === $className;
         }
+
         return $isDateTime;
     }
 
@@ -292,10 +316,14 @@ class CSerializer_Serializer {
         foreach ($attributes as &$attribute) {
             $attribute = $this->unserializeData($attribute);
         }
+
         $obj = (object) $attributes;
         $serialized = \preg_replace(
-                '|^O:\d+:"\w+":|', 'O:' . strlen($className) . ':"' . $className . '":', \serialize($obj)
+            '|^O:\d+:"\w+":|',
+            'O:' . strlen($className) . ':"' . $className . '":',
+            \serialize($obj)
         );
+
         return \unserialize($serialized);
     }
 
@@ -308,11 +336,14 @@ class CSerializer_Serializer {
     protected function unserializeUserDefinedObject(array $value, $className) {
         $ref = new ReflectionClass($className);
         $obj = $ref->newInstanceWithoutConstructor();
+
         self::$objectMapping[self::$objectMappingIndex++] = $obj;
         $this->setUnserializedObjectProperties($value, $ref, $obj);
+
         if (\method_exists($obj, '__wakeup')) {
             $obj->__wakeup();
         }
+
         return $obj;
     }
 
@@ -333,6 +364,7 @@ class CSerializer_Serializer {
                 $obj->$property = $this->unserializeData($propertyValue);
             }
         }
+
         return $obj;
     }
 
@@ -346,6 +378,7 @@ class CSerializer_Serializer {
         if ($type === 'double') {
             $type = 'float';
         }
+
         return [
             self::SCALAR_TYPE => $type,
             self::SCALAR_VALUE => $value,
@@ -361,10 +394,12 @@ class CSerializer_Serializer {
         if (\array_key_exists(self::MAP_TYPE, $value)) {
             return $value;
         }
+
         $toArray = [self::MAP_TYPE => 'array', self::SCALAR_VALUE => []];
         foreach ($value as $key => $field) {
             $toArray[self::SCALAR_VALUE][$key] = $this->serializeData($field);
         }
+
         return $this->serializeData($toArray);
     }
 
@@ -379,9 +414,12 @@ class CSerializer_Serializer {
         if (self::$objectStorage->contains($value)) {
             return [self::CLASS_IDENTIFIER_KEY => '@' . self::$objectStorage[$value]];
         }
+
         self::$objectStorage->attach($value, self::$objectMappingIndex++);
+
         $reflection = new ReflectionClass($value);
         $className = $reflection->getName();
+
         return $this->serializeInternalClass($value, $className, $reflection);
     }
 
@@ -396,6 +434,7 @@ class CSerializer_Serializer {
         $paramsToSerialize = $this->getObjectProperties($ref, $value);
         $data = [self::CLASS_IDENTIFIER_KEY => $className];
         $data += \array_map([$this, 'serializeData'], $this->extractObjectData($value, $ref, $paramsToSerialize));
+
         return $data;
     }
 
@@ -412,6 +451,7 @@ class CSerializer_Serializer {
         foreach ($ref->getProperties() as $prop) {
             $props[] = $prop->getName();
         }
+
         return \array_unique(\array_merge($props, \array_keys(\get_object_vars($value))));
     }
 
@@ -426,8 +466,10 @@ class CSerializer_Serializer {
      */
     protected function extractObjectData($value, ReflectionClass $rc, array $properties) {
         $data = [];
+
         $this->extractCurrentObjectProperties($value, $rc, $properties, $data);
         $this->extractAllInhertitedProperties($value, $rc, $data);
+
         return $data;
     }
 
@@ -456,7 +498,7 @@ class CSerializer_Serializer {
      */
     protected function extractAllInhertitedProperties($value, ReflectionClass $rc, array &$data) {
         do {
-            $rp = array();
+            $rp = [];
             /* @var $property \ReflectionProperty */
             foreach ($rc->getProperties() as $property) {
                 $property->setAccessible(true);
@@ -465,5 +507,4 @@ class CSerializer_Serializer {
             $data = \array_merge($rp, $data);
         } while ($rc = $rc->getParentClass());
     }
-
 }

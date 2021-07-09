@@ -1,29 +1,24 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CElement_Component_DataTable_Trait_HtmlTrait {
-
     public function html($indent = 0) {
-
+        /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        
-         if ($this->haveRowAction()) {
-           
-            if ($this->getRowActionStyle() == "btn-dropdown") {
-                $this->rowActionList->addClass("pull-right");
+
+        if ($this->haveRowAction()) {
+            if ($this->getRowActionStyle() == 'btn-dropdown') {
+                if ($this->actionLocation == 'first') {
+                    $this->rowActionList->addClass('dropdown-menu-left');
+                } else {
+                    $this->rowActionList->addClass('dropdown-menu-right');
+                }
             }
-         }
-        
+        }
+
         $wrapped = $this->applyDataTable || $this->haveHeaderAction() || $this->haveFooterAction() || strlen($this->title) > 0;
         if ($wrapped) {
-
             $mainClass = ' widget-box ';
             $mainClassTitle = ' widget-title ';
             $tableViewClass = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' data-table-col-view' : ' data-table-row-view';
@@ -85,9 +80,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         if ($wrapped > 0) {
             $html->decIndent()->appendln('</div>');
             if ($this->haveFooterAction() || strlen($this->footerTitle) > 0) {
-                $mainFooterClass = "widget-footer";
+                $mainFooterClass = 'widget-footer';
                 if ($this->haveFooterAction()) {
-                    $mainFooterClass .= " with-elements";
+                    $mainFooterClass .= ' with-elements';
                 }
                 $html->appendln('<div class="' . $mainFooterClass . '">')->incIndent();
                 if (strlen(strlen($this->footerTitle) > 0)) {
@@ -105,10 +100,6 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             $html->decIndent()->appendln('</div>');
         }
 
-
-
-
-
         return $html->text();
     }
 
@@ -116,8 +107,8 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         $html = new CStringBuilder();
         $html->setIndent($indent);
 
-        $tbodyId = (strlen($this->tbodyId) > 0 ? "id='" . $this->tbodyId . "' " : "");
-        $js = "";
+        $tbodyId = (strlen($this->tbodyId) > 0 ? "id='" . $this->tbodyId . "' " : '');
+        $js = '';
         $html->appendln('<tbody ' . $tbodyId . '>')->incIndent()->br();
         //render body;
         $html->appendln($this->htmlChild($indent));
@@ -130,10 +121,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 }
 
                 $no++;
-                $key = "";
+                $key = '';
 
                 if (array_key_exists($this->keyField, $row)) {
-
                     $key = $row[$this->keyField];
                 }
                 $html->appendln('<tr id="tr-' . $key . '">')->incIndent()->br();
@@ -142,21 +132,21 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     $html->appendln('<td scope="row" class="align-right">' . $no . '</td>')->br();
                 }
                 if ($this->checkbox) {
-                    $checkbox_checked = "";
+                    $checkbox_checked = '';
                     if (in_array($key, $this->checkbox_value)) {
                         $checkbox_checked = ' checked="checked"';
                     }
                     $html->appendln('<td scope="row" class="checkbox-cell align-center"><input type="checkbox" class="checkbox-' . $this->id . '" name="' . $this->id . '-check[]" id="' . $this->id . '-' . $key . '" value="' . $key . '"' . $checkbox_checked . '></td>')->br();
                 }
-                $jsparam = array();
+                $jsparam = [];
                 if ($this->actionLocation == 'first') {
                     $js .= $this->drawActionAndGetJs($html, $row, $key);
                 }
                 foreach ($this->columns as $col) {
                     $col_found = false;
-                    $new_v = "";
-                    $col_v = "";
-                    $ori_v = "";
+                    $new_v = '';
+                    $col_v = '';
+                    $ori_v = '';
                     //do print from query
                     foreach ($row as $k => $v) {
                         if ($v instanceof CRenderable) {
@@ -174,10 +164,8 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     if (strlen($col->format) > 0) {
                         $temp_v = $col->format;
                         foreach ($row as $k2 => $v2) {
-
-                            if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
-                                $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
+                            if (strpos($temp_v, '{' . $k2 . '}') !== false) {
+                                $temp_v = str_replace('{' . $k2 . '}', $v2, $temp_v);
                             }
                             $col_v = $temp_v;
                         }
@@ -210,38 +198,44 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                             $new_v = $new_v['html'];
                         }
                     }
-                    $class = "";
+                    $class = '';
                     switch ($col->getAlign()) {
                         case CConstant::ALIGN_LEFT:
-                            $class .= " align-left";
+                            $class .= ' align-left';
                             break;
                         case CConstant::ALIGN_RIGHT:
-                            $class .= " align-right";
+                            $class .= ' align-right';
                             break;
                         case CConstant::ALIGN_CENTER:
-                            $class .= " align-center";
+                            $class .= ' align-center';
                             break;
                     }
                     if ($col->getNoLineBreak()) {
-                        $class .= " no-line-break";
+                        $class .= ' no-line-break';
                     }
-                    if ($col->getHiddenPhone())
-                        $class .= " hidden-phone";
+                    if ($col->getHiddenPhone()) {
+                        $class .= ' hidden-phone';
+                    }
 
-                    if ($col->getHiddenTablet())
-                        $class .= " hidden-tablet";
+                    if ($col->getHiddenTablet()) {
+                        $class .= ' hidden-tablet';
+                    }
 
-                    if ($col->getHiddenDesktop())
-                        $class .= " hidden-desktop";
+                    if ($col->getHiddenDesktop()) {
+                        $class .= ' hidden-desktop';
+                    }
 
                     $pdfTBodyTdCurrentAttr = $this->getPdfTBodyTdAttr();
                     if ($this->export_pdf) {
                         switch ($col->getAlign()) {
-                            case "left": $pdfTBodyTdCurrentAttr .= ' align="left"';
+                            case 'left':
+                                $pdfTBodyTdCurrentAttr .= ' align="left"';
                                 break;
-                            case "right": $pdfTBodyTdCurrentAttr .= ' align="right"';
+                            case 'right':
+                                $pdfTBodyTdCurrentAttr .= ' align="right"';
                                 break;
-                            case "center": $pdfTBodyTdCurrentAttr .= ' align="center"';
+                            case 'center':
+                                $pdfTBodyTdCurrentAttr .= ' align="center"';
                                 break;
                         }
                     }
@@ -256,8 +250,6 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 if ($this->actionLocation == 'last') {
                     $js .= $this->drawActionAndGetJs($html, $row, $key);
                 }
-
-
 
                 $html->decIndent()->appendln('</tr>')->br();
             }
@@ -276,11 +268,11 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $jsparam[$k] = $v;
             }
 
-            $jsparam["param1"] = $key;
-            
+            $jsparam['param1'] = $key;
+
             $this->rowActionList->regenerateId(true);
-            $this->rowActionList->apply("setJsParam", $jsparam);
-            $this->rowActionList->apply("setHandlerUrlParam", $jsparam);
+            $this->rowActionList->apply('setJsParam', $jsparam);
+            $this->rowActionList->apply('setHandlerUrlParam', $jsparam);
 
             if (($this->filterActionCallbackFunc) != null) {
                 $actions = $this->rowActionList->childs();
@@ -300,7 +292,6 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 }
             }
 
-
             $js = $this->rowActionList->js();
 
             $html->appendln($this->rowActionList->html($html->getIndent()));
@@ -313,9 +304,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         $html = new CStringBuilder();
         $html->setIndent($indent);
 
-        $thClass = "";
+        $thClass = '';
         if ($this->headerNoLineBreak) {
-            $thClass = " no-line-break";
+            $thClass = ' no-line-break';
         }
         $htmlResponsiveOpen = '<div class="table-responsive">';
         $htmlResponsiveClose = '</div>';
@@ -325,33 +316,33 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         }
 
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
+        $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
-            $classes = " " . $classes;
+            $classes = ' ' . $classes;
         }
         if ($this->tableStriped) {
-            $classes .= " table-striped ";
+            $classes .= ' table-striped ';
         }
         if ($this->tableBordered) {
-            $classes .= " table-bordered ";
+            $classes .= ' table-bordered ';
         }
 
         $html->appendln($htmlResponsiveOpen . '<table ' . $this->getPdfTableAttr() . ' class="table responsive ' . $classes . '" id="' . $this->id . '">')
-                ->incIndent()->br();
+            ->incIndent()->br();
         if ($this->show_header) {
             $html->appendln('<thead>')
-                    ->incIndent()->br();
+                ->incIndent()->br();
             if (strlen($this->customColumnHeader) > 0) {
                 $html->appendln($this->customColumnHeader);
             } else {
                 $html->appendln('<tr>')
-                        ->incIndent()->br();
+                    ->incIndent()->br();
 
                 if ($this->numbering) {
                     $html->appendln('<th data-align="align-right" class="' . $thClass . '" width="20" scope="col">No</th>')->br();
                 }
                 if ($this->checkbox) {
-                    $attrWidth = "";
+                    $attrWidth = '';
                     if (strlen($this->checkboxColumnWidth) > 0) {
                         $attrWidth = 'width="' . $this->checkboxColumnWidth . '"';
                     }
@@ -360,7 +351,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 if ($this->getActionLocation() == 'first') {
                     if ($this->haveRowAction()) {
                         $action_width = 31 * $this->rowActionCount() + 5;
-                        if ($this->getRowActionStyle() == "btn-dropdown") {
+                        if ($this->getRowActionStyle() == 'btn-dropdown') {
                             $action_width = 70;
                         }
                         $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $thClass . '">' . clang::__('Actions') . '</th>')->br();
@@ -372,56 +363,62 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 if ($this->getActionLocation() == 'last') {
                     if ($this->haveRowAction()) {
                         $action_width = 31 * $this->rowActionCount() + 5;
-                        if ($this->getRowActionStyle() == "btn-dropdown") {
+                        if ($this->getRowActionStyle() == 'btn-dropdown') {
                             $action_width = 70;
                         }
                         $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $thClass . '">' . clang::__('Actions') . '</th>')->br();
                     }
                 }
-                $html->decIndent()->appendln("</tr>")->br();
+                $html->decIndent()->appendln('</tr>')->br();
             }
-            $html->decIndent()->appendln("</thead>")->br();
+            $html->decIndent()->appendln('</thead>')->br();
         }
 
         $html->append($this->rawTBody($html->getIndent()));
-
 
         //footer
         if ($this->footer) {
             $html->incIndent()->appendln('<tfoot>')->br();
             $total_column = count($this->columns);
             $addition_column = 0;
-            if ($this->haveRowAction())
+            if ($this->haveRowAction()) {
                 $addition_column++;
-            if ($this->numbering)
+            }
+            if ($this->numbering) {
                 $addition_column++;
-            if ($this->checkbox)
+            }
+            if ($this->checkbox) {
                 $addition_column++;
+            }
 
             foreach ($this->footer_field as $f) {
                 $html->incIndent()->appendln('<tr>')->br();
-                $colspan = $f["labelcolspan"];
-                if ($colspan == 0)
+                $colspan = $f['labelcolspan'];
+                if ($colspan == 0) {
                     $colspan = $total_column + $addition_column - 1;
+                }
                 $html->incIndent()->appendln('<td colspan="' . ($colspan) . '">')->br();
-                $html->appendln($f["label"])->br();
+                $html->appendln($f['label'])->br();
                 $html->decIndent()->appendln('</td>')->br();
-                $class = "";
-                switch ($f["align"]) {
-                    case "left": $class .= " align-left";
+                $class = '';
+                switch ($f['align']) {
+                    case 'left':
+                        $class .= ' align-left';
                         break;
-                    case "right": $class .= " align-right";
+                    case 'right':
+                        $class .= ' align-right';
                         break;
-                    case "center": $class .= " align-center";
+                    case 'center':
+                        $class .= ' align-center';
                         break;
                 }
 
-                $fval = $f["value"];
+                $fval = $f['value'];
                 if ($fval instanceof CRenderable) {
                     $html->incIndent()->appendln('<td class="' . $class . '">')->br();
                     $html->appendln($fval->html($indent))->br();
                     $html->decIndent()->appendln('</td>')->br();
-                } else if (is_array($fval)) {
+                } elseif (is_array($fval)) {
                     $skip_column = 0;
 
                     foreach ($this->columns as $col) {
@@ -431,17 +428,20 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                             $is_skipped = true;
                         }
                         if (!$is_skipped) {
-                            $fcolval = "";
+                            $fcolval = '';
                             if (isset($fval[$col->get_fieldname()])) {
                                 $fcolval = $fval[$col->get_fieldname()];
                             }
 
                             switch ($col->get_align()) {
-                                case "left": $class .= " align-left";
+                                case 'left':
+                                    $class .= ' align-left';
                                     break;
-                                case "right": $class .= " align-right";
+                                case 'right':
+                                    $class .= ' align-right';
                                     break;
-                                case "center": $class .= " align-center";
+                                case 'center':
+                                    $class .= ' align-center';
                                     break;
                             }
                             $html->incIndent()->appendln('<td class="' . $class . '">')->br();
@@ -462,5 +462,4 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
 
         return $html->text();
     }
-
 }

@@ -1,24 +1,15 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CParser_HtmlParser implements CParser_HtmlParser_TokenizerCallbackInterface {
-
     use CParser_HtmlParser_ConstantTrait;
     use CParser_HtmlParser_TokenizerCallbackTrait;
 
     /**
-     *
-     * @var CParser_HtmlParser_Tokenizer 
+     * @var CParser_HtmlParser_Tokenizer
      */
     protected $tokenizer = null;
 
     /**
-     *
      * @var CEvent_Dispatcher
      */
     protected $dispatcher = null;
@@ -40,30 +31,30 @@ class CParser_HtmlParser implements CParser_HtmlParser_TokenizerCallbackInterfac
         $this->dispatcher = CEvent::createDispatcher();
         $this->rebuildConstant();
 
-        $this->tagname = "";
-        $this->attributeName = "";
-        $this->attributeValue = "";
+        $this->tagname = '';
+        $this->attributeName = '';
+        $this->attributeValue = '';
         $this->attributes = null;
         $this->stack = [];
         $this->foreignContext = [];
         $this->startIndex = 0;
         $this->endIndex = null;
 
-        
-        $this->lowerCaseTagNames = $this->hasOption("lowerCaseTags") ? !!$this->getOption('lowerCaseTags') : !$this->getOption('xmlMode');
-        $this->lowerCaseAttributeNames = $this->hasOption("lowerCaseAttributeNames") ? !!$this->getOption('lowerCaseAttributeNames') : !$this->getOption('xmlMode');
+        $this->lowerCaseTagNames = $this->hasOption('lowerCaseTags') ? !!$this->getOption('lowerCaseTags') : !$this->getOption('xmlMode');
+        $this->lowerCaseAttributeNames = $this->hasOption('lowerCaseAttributeNames') ? !!$this->getOption('lowerCaseAttributeNames') : !$this->getOption('xmlMode');
 
         $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnParserInit($this));
     }
 
-    //Resets the parser to a blank state, ready to parse a new HTML document
+    /**
+     * Resets the parser to a blank state, ready to parse a new HTML document
+     */
     public function reset() {
-
         $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnReset());
 
         $this->tokenizer->reset();
-        $this->tagname = "";
-        $this->attributeName = "";
+        $this->tagname = '';
+        $this->attributeName = '';
         $this->attributes = null;
         $this->stack = [];
         $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnParserInit($this));
@@ -73,7 +64,11 @@ class CParser_HtmlParser implements CParser_HtmlParser_TokenizerCallbackInterfac
         $this->dispatcher->listen($events, $listener);
     }
 
-    //Parses a complete HTML document and pushes it to the handler
+    /**
+     * Parses a complete HTML document and pushes it to the handler
+     *
+     * @param mixed $data
+     */
     public function parseComplete($data) {
         $this->reset();
         $this->end($data);
@@ -114,7 +109,6 @@ class CParser_HtmlParser implements CParser_HtmlParser_TokenizerCallbackInterfac
             $name = strtolower($name);
         }
 
-
         return $name;
     }
 
@@ -140,7 +134,6 @@ class CParser_HtmlParser implements CParser_HtmlParser_TokenizerCallbackInterfac
 
         if ($lastStackValue === $name) {
             if ($this->dispatcher->hasListeners(CParser_HtmlParser_Event_OnCloseTag::class)) {
-
                 $this->dispatcher->dispatch(new CParser_HtmlParser_Event_OnCloseTag($name));
             }
             array_pop($this->stack);
@@ -154,5 +147,4 @@ class CParser_HtmlParser implements CParser_HtmlParser_TokenizerCallbackInterfac
     public function getEndIndex() {
         return $this->endIndex;
     }
-
 }

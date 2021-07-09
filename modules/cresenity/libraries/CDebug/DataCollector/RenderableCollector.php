@@ -1,21 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 1:40:26 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 1:40:26 PM
  */
 class CDebug_DataCollector_RenderableCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
-
-    protected $renderable = array();
+    protected $renderable = [];
 
     public function __construct() {
         $this->setDataFormatter(new CDebug_DataFormatter_SimpleFormatter());
         $db = CDatabase::instance();
         try {
-            CApp::instance()->listenOnRenderableAdded(function(CApp_Event_OnRenderableAdded $eventArgs) {
+            CApp::instance()->listenOnRenderableAdded(function (CApp_Event_OnRenderableAdded $eventArgs) {
                 $this->addRenderable($eventArgs);
             });
         } catch (\Exception $e) {
@@ -24,15 +24,19 @@ class CDebug_DataCollector_RenderableCollector extends CDebug_DataCollector impl
     }
 
     /**
-     *
      * @param string $className
      */
     public function addRenderable(CApp_Event_OnRenderableAdded $eventArgs) {
         $className = $eventArgs->getRenderableClass();
         $content = $eventArgs->getContent();
-        $message = $className . $content;
-        if (strlen($content) > 0) {
-            $message = '[string] ' . $message;
+        $message = $className;
+        if (is_array($content)) {
+            $message = '[array] ' . var_export($content, true);
+        } elseif (is_string($content)) {
+            $message = $className . $content;
+            if (strlen($content) > 0) {
+                $message = '[string] ' . $message;
+            }
         }
         $this->renderable[] = $message;
     }
@@ -41,14 +45,12 @@ class CDebug_DataCollector_RenderableCollector extends CDebug_DataCollector impl
         $messages = [];
 
         foreach ($this->renderable as $message) {
-
             $messages[] = [
                 'message' => $message,
                 // Use PHP syntax so we can copy-paste to compile config file.
                 'is_string' => true,
             ];
         }
-
 
         return [
             'messages' => $messages,
@@ -63,14 +65,14 @@ class CDebug_DataCollector_RenderableCollector extends CDebug_DataCollector impl
         $name = $this->getName();
         return [
             "$name" => [
-                "icon" => "files-o",
-                "widget" => "PhpDebugBar.Widgets.MessagesWidget",
-                "map" => "$name.messages",
-                "default" => "{}"
+                'icon' => 'files-o',
+                'widget' => 'PhpDebugBar.Widgets.MessagesWidget',
+                'map' => "$name.messages",
+                'default' => '{}'
             ],
             "$name:badge" => [
-                "map" => "$name.count",
-                "default" => "null"
+                'map' => "$name.count",
+                'default' => 'null'
             ]
         ];
     }
@@ -81,5 +83,4 @@ class CDebug_DataCollector_RenderableCollector extends CDebug_DataCollector impl
     public function getName() {
         return 'renderable';
     }
-
 }

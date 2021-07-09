@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CJob_BackgroundJob {
-
     use CJob_SerializerTrait;
 
     /**
@@ -35,7 +28,7 @@ class CJob_BackgroundJob {
      * @param array  $config
      * @param Helper $helper
      */
-    public function __construct($job, array $config, Helper $helper = null) {
+    public function __construct($job, array $config, CJob_Helper $helper = null) {
         $this->job = $job;
         $this->config = $config + [
             'recipients' => null,
@@ -64,7 +57,6 @@ class CJob_BackgroundJob {
     }
 
     public function run() {
-
         $lockFile = $this->getLockFile();
         try {
             $this->checkMaxRuntime($lockFile);
@@ -82,7 +74,6 @@ class CJob_BackgroundJob {
             $lockAcquired = true;
             $retval = null;
             if (isset($this->config['closure'])) {
-
                 $retval = $this->runFunction();
             } else {
                 $retval = $this->runFile();
@@ -130,7 +121,7 @@ class CJob_BackgroundJob {
         if ($maxRuntime === null) {
             return;
         }
-        if ($this->helper->getPlatform() === Helper::WINDOWS) {
+        if ($this->helper->getPlatform() === CJob_Helper::WINDOWS) {
             throw new CJob_Exception('"maxRuntime" is not supported on Windows');
         }
         $runtime = $this->helper->getLockLifetime($lockFile);
@@ -148,7 +139,9 @@ class CJob_BackgroundJob {
             return;
         }
         $this->helper->sendMail(
-                $this->job, $this->config, $message
+            $this->job,
+            $this->config,
+            $message
         );
     }
 
@@ -204,11 +197,10 @@ class CJob_BackgroundJob {
      * @param string $message
      */
     protected function log($message) {
-
         //$now = date($this->config['dateFormat'] ? $this->config['dateFormat'] : 'Y-m-d H:i:s', $_SERVER['REQUEST_TIME']);
         $now = date('Y-m-d H:i:s');
         if ($logfile = $this->getLogfile()) {
-            file_put_contents($logfile, "[" . $now . "] " . $message . "\n", FILE_APPEND);
+            file_put_contents($logfile, '[' . $now . '] ' . $message . "\n", FILE_APPEND);
         }
     }
 
@@ -218,17 +210,15 @@ class CJob_BackgroundJob {
 
         $retval = false;
         try {
-
             $retval = $command();
         } catch (\Throwable $e) {
-            echo "Error! " . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n";
+            echo 'Error! ' . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n";
         }
         $content = ob_get_contents();
         if ($logfile = $this->getLogfile()) {
             file_put_contents($logfile, $content, FILE_APPEND);
         }
         ob_end_clean();
-
 
         if ($retval === false) {
             throw new Exception("Closure did not return false Returned:\n" . print_r($retval, true) . ' content:' . $content);
@@ -257,5 +247,4 @@ class CJob_BackgroundJob {
         }
         return $retval;
     }
-
 }

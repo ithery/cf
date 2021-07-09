@@ -44,7 +44,7 @@ trait CHTTP_Trait_FileHelpersTrait {
         if ($path) {
             $path = rtrim($path, '/') . '/';
         }
-        $hash = $this->hashName ?: $this->hashName = Str::random(40);
+        $hash = $this->hashName ?: $this->hashName = cstr::random(40);
         if ($extension = $this->guessExtension()) {
             $extension = '.' . $extension;
         }

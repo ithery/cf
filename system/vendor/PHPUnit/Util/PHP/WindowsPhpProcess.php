@@ -11,7 +11,7 @@ namespace PHPUnit\Util\PHP;
 
 use const PHP_MAJOR_VERSION;
 use function tmpfile;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit

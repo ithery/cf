@@ -19,8 +19,8 @@
  * @author Michael Dowling <mtdowling@gmail.com>
  */
 class CJob_CronExpression_DayOfMonthField extends CJob_CronExpression_AbstractField {
-
     protected $rangeStart = 1;
+
     protected $rangeEnd = 31;
 
     /**
@@ -40,7 +40,7 @@ class CJob_CronExpression_DayOfMonthField extends CJob_CronExpression_AbstractFi
             return $target;
         }
         $lastDayOfMonth = $target->format('t');
-        foreach (array(-1, 1, -2, 2) as $i) {
+        foreach ([-1, 1, -2, 2] as $i) {
             $adjusted = $targetDay + $i;
             if ($adjusted > 0 && $adjusted <= $lastDayOfMonth) {
                 $target->setDate($currentYear, $currentMonth, $adjusted);
@@ -67,8 +67,10 @@ class CJob_CronExpression_DayOfMonthField extends CJob_CronExpression_AbstractFi
             $targetDay = substr($value, 0, strpos($value, 'W'));
             // Find out if the current day is the nearest day of the week
             return $date->format('j') == self::getNearestWeekday(
-                            $date->format('Y'), $date->format('m'), $targetDay
-                    )->format('j');
+                $date->format('Y'),
+                $date->format('m'),
+                $targetDay
+            )->format('j');
         }
         return $this->isSatisfied($date->format('d'), $value);
     }
@@ -104,5 +106,4 @@ class CJob_CronExpression_DayOfMonthField extends CJob_CronExpression_AbstractFi
         }
         return $basicChecks;
     }
-
 }

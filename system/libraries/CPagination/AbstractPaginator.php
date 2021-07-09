@@ -1,16 +1,11 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * @mixin CCollection
  */
-abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
-{
+abstract class CPagination_AbstractPaginator implements CInterface_Htmlable {
+    use CTrait_ForwardsCalls;
+
     /**
      * All of the items being paginated.
      *
@@ -61,6 +56,20 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
     protected $pageName = 'page';
 
     /**
+     * The number of links to display on each side of current page link.
+     *
+     * @var int
+     */
+    public $onEachSide = 3;
+
+    /**
+     * The paginator options.
+     *
+     * @var array
+     */
+    protected $options;
+
+    /**
      * The current path resolver callback.
      *
      * @var \Closure
@@ -75,6 +84,13 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
     protected static $currentPageResolver;
 
     /**
+     * The query string resolver callback.
+     *
+     * @var \Closure
+     */
+    protected static $queryStringResolver;
+
+    /**
      * The view factory resolver callback.
      *
      * @var \Closure
@@ -86,23 +102,23 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @var string
      */
-    public static $defaultView = 'pagination::default';
+    public static $defaultView = 'pagination.tailwind';
 
     /**
      * The default "simple" pagination view.
      *
      * @var string
      */
-    public static $defaultSimpleView = 'pagination::simple-default';
+    public static $defaultSimpleView = 'pagination.simple-tailwind';
 
     /**
      * Determine if the given value is a valid page number.
      *
-     * @param  int  $page
+     * @param int $page
+     *
      * @return bool
      */
-    protected function isValidPageNumber($page)
-    {
+    protected function isValidPageNumber($page) {
         return $page >= 1 && filter_var($page, FILTER_VALIDATE_INT) !== false;
     }
 
@@ -111,8 +127,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return string|null
      */
-    public function previousPageUrl()
-    {
+    public function previousPageUrl() {
         if ($this->currentPage() > 1) {
             return $this->url($this->currentPage() - 1);
         }
@@ -121,13 +136,13 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
     /**
      * Create a range of pagination URLs.
      *
-     * @param  int  $start
-     * @param  int  $end
+     * @param int $start
+     * @param int $end
+     *
      * @return array
      */
-    public function getUrlRange($start, $end)
-    {
-        return collect(range($start, $end))->mapWithKeys(function ($page) {
+    public function getUrlRange($start, $end) {
+        return c::collect(range($start, $end))->mapWithKeys(function ($page) {
             return [$page => $this->url($page)];
         })->all();
     }
@@ -135,11 +150,11 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
     /**
      * Get the URL for a given page number.
      *
-     * @param  int  $page
+     * @param int $page
+     *
      * @return string
      */
-    public function url($page)
-    {
+    public function url($page) {
         if ($page <= 0) {
             $page = 1;
         }
@@ -153,20 +168,20 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
             $parameters = array_merge($this->query, $parameters);
         }
 
-        return $this->path
-                        .(\cstr::contains($this->path, '?') ? '&' : '?')
-                        .http_build_query($parameters, '', '&')
-                        .$this->buildFragment();
+        return $this->path()
+                . (cstr::contains($this->path(), '?') ? '&' : '?')
+                . carr::query($parameters)
+                . $this->buildFragment();
     }
 
     /**
      * Get / set the URL fragment to be appended to URLs.
      *
-     * @param  string|null  $fragment
+     * @param string|null $fragment
+     *
      * @return $this|string|null
      */
-    public function fragment($fragment = null)
-    {
+    public function fragment($fragment = null) {
         if (is_null($fragment)) {
             return $this->fragment;
         }
@@ -179,12 +194,16 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
     /**
      * Add a set of query string values to the paginator.
      *
-     * @param  array|string  $key
-     * @param  string|null  $value
+     * @param array|string|null $key
+     * @param string|null       $value
+     *
      * @return $this
      */
-    public function appends($key, $value = null)
-    {
+    public function appends($key, $value = null) {
+        if (is_null($key)) {
+            return $this;
+        }
+
         if (is_array($key)) {
             return $this->appendArray($key);
         }
@@ -195,11 +214,11 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
     /**
      * Add an array of query string values.
      *
-     * @param  array  $keys
+     * @param array $keys
+     *
      * @return $this
      */
-    protected function appendArray(array $keys)
-    {
+    protected function appendArray(array $keys) {
         foreach ($keys as $key => $value) {
             $this->addQuery($key, $value);
         }
@@ -208,14 +227,27 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
     }
 
     /**
-     * Add a query string value to the paginator.
+     * Add all current query string values to the paginator.
      *
-     * @param  string  $key
-     * @param  string  $value
      * @return $this
      */
-    protected function addQuery($key, $value)
-    {
+    public function withQueryString() {
+        if (isset(static::$queryStringResolver)) {
+            return $this->appends(call_user_func(static::$queryStringResolver));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a query string value to the paginator.
+     *
+     * @param string $key
+     * @param string $value
+     *
+     * @return $this
+     */
+    protected function addQuery($key, $value) {
         if ($key !== $this->pageName) {
             $this->query[$key] = $value;
         }
@@ -228,9 +260,36 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return string
      */
-    protected function buildFragment()
-    {
-        return $this->fragment ? '#'.$this->fragment : '';
+    protected function buildFragment() {
+        return $this->fragment ? '#' . $this->fragment : '';
+    }
+
+    /**
+     * Load a set of relationships onto the mixed relationship collection.
+     *
+     * @param string $relation
+     * @param array  $relations
+     *
+     * @return $this
+     */
+    public function loadMorph($relation, $relations) {
+        $this->getCollection()->loadMorph($relation, $relations);
+
+        return $this;
+    }
+
+    /**
+     * Load a set of relationship counts onto the mixed relationship collection.
+     *
+     * @param string $relation
+     * @param array  $relations
+     *
+     * @return $this
+     */
+    public function loadMorphCount($relation, $relations) {
+        $this->getCollection()->loadMorphCount($relation, $relations);
+
+        return $this;
     }
 
     /**
@@ -238,8 +297,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return array
      */
-    public function items()
-    {
+    public function items() {
         return $this->items->all();
     }
 
@@ -248,8 +306,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return int
      */
-    public function firstItem()
-    {
+    public function firstItem() {
         return count($this->items) > 0 ? ($this->currentPage - 1) * $this->perPage + 1 : null;
     }
 
@@ -258,9 +315,21 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return int
      */
-    public function lastItem()
-    {
+    public function lastItem() {
         return count($this->items) > 0 ? $this->firstItem() + $this->count() - 1 : null;
+    }
+
+    /**
+     * Transform each item in the slice of items using a callback.
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function through(callable $callback) {
+        $this->items->transform($callback);
+
+        return $this;
     }
 
     /**
@@ -268,8 +337,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return int
      */
-    public function perPage()
-    {
+    public function perPage() {
         return $this->perPage;
     }
 
@@ -278,8 +346,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return bool
      */
-    public function hasPages()
-    {
+    public function hasPages() {
         return $this->currentPage() != 1 || $this->hasMorePages();
     }
 
@@ -288,8 +355,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return bool
      */
-    public function onFirstPage()
-    {
+    public function onFirstPage() {
         return $this->currentPage() <= 1;
     }
 
@@ -298,8 +364,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return int
      */
-    public function currentPage()
-    {
+    public function currentPage() {
         return $this->currentPage;
     }
 
@@ -308,19 +373,18 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return string
      */
-    public function getPageName()
-    {
+    public function getPageName() {
         return $this->pageName;
     }
 
     /**
      * Set the query string variable used to store the page.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return $this
      */
-    public function setPageName($name)
-    {
+    public function setPageName($name) {
         $this->pageName = $name;
 
         return $this;
@@ -329,35 +393,57 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
     /**
      * Set the base path to assign to all URLs.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return $this
      */
-    public function withPath($path)
-    {
+    public function withPath($path) {
         return $this->setPath($path);
     }
 
     /**
      * Set the base path to assign to all URLs.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return $this
      */
-    public function setPath($path)
-    {
+    public function setPath($path) {
         $this->path = $path;
 
         return $this;
     }
 
     /**
+     * Set the number of links to display on each side of current page link.
+     *
+     * @param int $count
+     *
+     * @return $this
+     */
+    public function onEachSide($count) {
+        $this->onEachSide = $count;
+
+        return $this;
+    }
+
+    /**
+     * Get the base path for paginator generated URLs.
+     *
+     * @return string|null
+     */
+    public function path() {
+        return $this->path;
+    }
+
+    /**
      * Resolve the current request path or return the default value.
      *
-     * @param  string  $default
+     * @param string $default
+     *
      * @return string
      */
-    public static function resolveCurrentPath($default = '/')
-    {
+    public static function resolveCurrentPath($default = '/') {
         if (isset(static::$currentPathResolver)) {
             return call_user_func(static::$currentPathResolver);
         }
@@ -368,23 +454,23 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
     /**
      * Set the current request path resolver callback.
      *
-     * @param  \Closure  $resolver
+     * @param \Closure $resolver
+     *
      * @return void
      */
-    public static function currentPathResolver(Closure $resolver)
-    {
+    public static function currentPathResolver(Closure $resolver) {
         static::$currentPathResolver = $resolver;
     }
 
     /**
      * Resolve the current page or return the default value.
      *
-     * @param  string  $pageName
-     * @param  int  $default
+     * @param string $pageName
+     * @param int    $default
+     *
      * @return int
      */
-    public static function resolveCurrentPage($pageName = 'page', $default = 1)
-    {
+    public static function resolveCurrentPage($pageName = 'page', $default = 1) {
         if (isset(static::$currentPageResolver)) {
             return call_user_func(static::$currentPageResolver, $pageName);
         }
@@ -395,55 +481,96 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
     /**
      * Set the current page resolver callback.
      *
-     * @param  \Closure  $resolver
+     * @param \Closure $resolver
+     *
      * @return void
      */
-    public static function currentPageResolver(Closure $resolver)
-    {
+    public static function currentPageResolver(Closure $resolver) {
         static::$currentPageResolver = $resolver;
+    }
+
+    /**
+     * Set with query string resolver callback.
+     *
+     * @param \Closure $resolver
+     *
+     * @return void
+     */
+    public static function queryStringResolver(Closure $resolver) {
+        static::$queryStringResolver = $resolver;
     }
 
     /**
      * Get an instance of the view factory from the resolver.
      *
-     * @return \Illuminate\Contracts\View\Factory
+     * @return CView_Factory
      */
-    public static function viewFactory()
-    {
-        return call_user_func(static::$viewFactoryResolver);
+    public static function viewFactory() {
+        return CView::factory();
+        //return call_user_func(static::$viewFactoryResolver);
     }
 
     /**
      * Set the view factory resolver callback.
      *
-     * @param  \Closure  $resolver
+     * @param \Closure $resolver
+     *
      * @return void
      */
-    public static function viewFactoryResolver(Closure $resolver)
-    {
+    public static function viewFactoryResolver(Closure $resolver) {
         static::$viewFactoryResolver = $resolver;
     }
 
     /**
      * Set the default pagination view.
      *
-     * @param  string  $view
+     * @param string $view
+     *
      * @return void
      */
-    public static function defaultView($view)
-    {
+    public static function defaultView($view) {
         static::$defaultView = $view;
     }
 
     /**
      * Set the default "simple" pagination view.
      *
-     * @param  string  $view
+     * @param string $view
+     *
      * @return void
      */
-    public static function defaultSimpleView($view)
-    {
+    public static function defaultSimpleView($view) {
         static::$defaultSimpleView = $view;
+    }
+
+    /**
+     * Indicate that Tailwind styling should be used for generated links.
+     *
+     * @return void
+     */
+    public static function useTailwind() {
+        static::defaultView('pagination.tailwind');
+        static::defaultSimpleView('pagination.simple-tailwind');
+    }
+
+    /**
+     * Indicate that Bootstrap 4 styling should be used for generated links.
+     *
+     * @return void
+     */
+    public static function useBootstrap() {
+        static::defaultView('pagination.bootstrap-4');
+        static::defaultSimpleView('pagination.simple-bootstrap-4');
+    }
+
+    /**
+     * Indicate that Bootstrap 3 styling should be used for generated links.
+     *
+     * @return void
+     */
+    public static function useBootstrapThree() {
+        static::defaultView('pagination.default');
+        static::defaultSimpleView('pagination.simple-default');
     }
 
     /**
@@ -451,19 +578,26 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return \ArrayIterator
      */
-    public function getIterator()
-    {
-        return new ArrayIterator($this->items->all());
+    public function getIterator() {
+        return $this->items->getIterator();
     }
 
     /**
-     * Determine if the list of items is empty or not.
+     * Determine if the list of items is empty.
      *
      * @return bool
      */
-    public function isEmpty()
-    {
+    public function isEmpty() {
         return $this->items->isEmpty();
+    }
+
+    /**
+     * Determine if the list of items is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty() {
+        return $this->items->isNotEmpty();
     }
 
     /**
@@ -471,76 +605,83 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return int
      */
-    public function count()
-    {
+    public function count() {
         return $this->items->count();
     }
 
     /**
      * Get the paginator's underlying collection.
      *
-     * @return CCollection
+     * @return \Illuminate\Support\Collection
      */
-    public function getCollection()
-    {
+    public function getCollection() {
         return $this->items;
     }
 
     /**
      * Set the paginator's underlying collection.
      *
-     * @param  CCollection  $collection
+     * @param CCollection $collection
+     *
      * @return $this
      */
-    public function setCollection(CCollection $collection)
-    {
+    public function setCollection(CCollection $collection) {
         $this->items = $collection;
 
         return $this;
     }
 
     /**
+     * Get the paginator options.
+     *
+     * @return array
+     */
+    public function getOptions() {
+        return $this->options;
+    }
+
+    /**
      * Determine if the given item exists.
      *
-     * @param  mixed  $key
+     * @param mixed $key
+     *
      * @return bool
      */
-    public function offsetExists($key)
-    {
+    public function offsetExists($key) {
         return $this->items->has($key);
     }
 
     /**
      * Get the item at the given offset.
      *
-     * @param  mixed  $key
+     * @param mixed $key
+     *
      * @return mixed
      */
-    public function offsetGet($key)
-    {
+    public function offsetGet($key) {
         return $this->items->get($key);
     }
 
     /**
      * Set the item at the given offset.
      *
-     * @param  mixed  $key
-     * @param  mixed  $value
+     * @param mixed $key
+     * @param mixed $value
+     *
      * @return void
      */
-    public function offsetSet($key, $value)
-    {
+    public function offsetSet($key, $value) {
         $this->items->put($key, $value);
     }
 
     /**
      * Unset the item at the given key.
      *
-     * @param  mixed  $key
+     * @param mixed $key
+     *
      * @return void
      */
-    public function offsetUnset($key)
-    {
+    public function offsetUnset($key) {
         $this->items->forget($key);
     }
 
@@ -549,28 +690,20 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return string
      */
-    public function toHtml()
-    {
+    public function toHtml() {
         return (string) $this->render();
     }
 
     /**
      * Make dynamic calls into the collection.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
-    public function __call($method, $parameters)
-    {
-        if($method=='get') {
-            try {
-                throw new \Exception('a');
-            } catch(\Exception $ex) {
-                \cdbg::var_dump($ex->getTraceAsString());
-            }
-        }
-        return $this->getCollection()->$method(...$parameters);
+    public function __call($method, $parameters) {
+        return $this->forwardCallTo($this->getCollection(), $method, $parameters);
     }
 
     /**
@@ -578,8 +711,7 @@ abstract class CPagination_AbstractPaginator implements CInterface_Htmlable
      *
      * @return string
      */
-    public function __toString()
-    {
+    public function __toString() {
         return (string) $this->render();
     }
 }

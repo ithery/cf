@@ -1,19 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:45:22 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:45:22 AM
  */
 
 /**
  * MariaDb reserved keywords list.
+ *
  * @link https://mariadb.com/kb/en/the-mariadb-library/reserved-words/
  */
 final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Keywords_Mysql {
-
     /**
      * {@inheritdoc}
      */
@@ -274,5 +275,4 @@ final class CDatabase_Platform_Keywords_MariaDb102 extends CDatabase_Platform_Ke
             'ZEROFILL',
         ];
     }
-
 }

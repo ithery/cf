@@ -1,1 +1,0 @@
-$.getScript('capp.js');

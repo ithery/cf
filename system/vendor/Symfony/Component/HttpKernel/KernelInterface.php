@@ -62,7 +62,7 @@ interface KernelInterface extends HttpKernelInterface
      *
      * @throws \InvalidArgumentException when the bundle is not enabled
      */
-    public function getBundle(string $name);
+    public function getBundle($name);
 
     /**
      * Returns the file path for a given bundle resource.
@@ -81,7 +81,7 @@ interface KernelInterface extends HttpKernelInterface
      * @throws \InvalidArgumentException if the file cannot be found or the name is not valid
      * @throws \RuntimeException         if the name contains invalid/unsafe characters
      */
-    public function locateResource(string $name);
+    public function locateResource($name);
 
     /**
      * Gets the environment.

@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:47:32 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:47:32 AM
  */
 
 /**
  * Abstract interface for a SQL reserved keyword dictionary.
  */
 abstract class CDatabase_Platform_Keywords {
-
     /**
      * @var array|null
      */

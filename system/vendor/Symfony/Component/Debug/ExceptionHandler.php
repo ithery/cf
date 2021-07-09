@@ -52,7 +52,7 @@ class ExceptionHandler
     private $caughtLength;
     private $fileLinkFormat;
 
-    public function __construct(bool $debug = true, string $charset = null, $fileLinkFormat = null)
+    public function __construct(bool $debug = true, $charset = null, $fileLinkFormat = null)
     {
         $this->debug = $debug;
         $this->charset = $charset ?: ini_get('default_charset') ?: 'UTF-8';
@@ -359,7 +359,7 @@ EOF;
 EOF;
     }
 
-    private function decorate(string $content, string $css): string
+    private function decorate(string $content, $css): string
     {
         return <<<EOF
 <!DOCTYPE html>
@@ -383,7 +383,7 @@ EOF;
         return sprintf('<abbr title="%s">%s</abbr>', $class, array_pop($parts));
     }
 
-    private function formatPath(string $path, int $line): string
+    private function formatPath(string $path, $line): string
     {
         $file = $this->escapeHtml(preg_match('#[^/\\\\]*+$#', $path, $file) ? $file[0] : $path);
         $fmt = $this->fileLinkFormat ?: ini_get('xdebug.file_link_format') ?: get_cfg_var('xdebug.file_link_format');

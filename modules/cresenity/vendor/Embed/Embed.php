@@ -10,9 +10,9 @@ use Embed\Http\Url;
 /**
  * https://github.com/oscarotero/Embed/tree/v1.x
  */
+abstract class Embed {
+    const VERSION = 1;
 
-abstract class Embed
-{
     /**
      * @var array
      */
@@ -60,14 +60,13 @@ abstract class Embed
     /**
      * Gets the info from an url.
      *
-     * @param Url|string $url
-     * @param array|null $config
+     * @param Url|string               $url
+     * @param array|null               $config
      * @param DispatcherInterface|null $dispatcher
      *
      * @return Adapter
      */
-    public static function create($url, array $config = null, DispatcherInterface $dispatcher = null)
-    {
+    public static function create($url, array $config = null, DispatcherInterface $dispatcher = null) {
         if (!($url instanceof Url)) {
             $url = Url::create($url);
         }
@@ -109,16 +108,15 @@ abstract class Embed
     /**
      * Process the url.
      *
-     * @param Url $url
-     * @param array   $config
-     * @param DispatcherInterface   $dispatcher
+     * @param Url                 $url
+     * @param array               $config
+     * @param DispatcherInterface $dispatcher
      *
      * @throws Exceptions\InvalidUrlException If the urls is not valid
      *
      * @return Adapter
      */
-    private static function process(Url $url, array $config, DispatcherInterface $dispatcher)
-    {
+    private static function process(Url $url, array $config, DispatcherInterface $dispatcher) {
         $response = $dispatcher->dispatch($url);
 
         //If is a file use File Adapter
@@ -157,17 +155,16 @@ abstract class Embed
      * Returns a class name using the custom_adapters_namespace
      *
      * @param string $name
-     * @param array $config
+     * @param array  $config
      *
-     * @return  string
+     * @return string
      */
-    private static function getClass($name, array $config)
-    {
+    private static function getClass($name, array $config) {
         if (!empty($config['custom_adapters_namespace'])) {
             $namespaces = (array) $config['custom_adapters_namespace'];
 
             foreach ($namespaces as $namespace) {
-                $class = $namespace.$name;
+                $class = $namespace . $name;
 
                 if (class_exists($class)) {
                     return $class;
@@ -175,6 +172,6 @@ abstract class Embed
             }
         }
 
-        return 'Embed\\Adapters\\'.$name;
+        return 'Embed\\Adapters\\' . $name;
     }
 }

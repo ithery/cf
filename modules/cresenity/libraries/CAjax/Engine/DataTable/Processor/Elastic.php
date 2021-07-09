@@ -312,8 +312,8 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
             "datatable" => $output,
             "js" => cbase64::encode($js),
         );
-        $response = json_encode($data);
-        return $response;
+       
+        return $data;
     }
 
 }

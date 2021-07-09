@@ -1,10 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since May 17, 2019, 4:23:10 AM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use PhpParser\Node;
@@ -12,14 +14,13 @@ use PhpParser\NodeVisitorAbstract;
 use PhpParser\NodeTraverser;
 
 class CConfig_Parser_CommentVisitor extends NodeVisitorAbstract {
-
     protected $configKey;
     protected $currentKeyParts;
     protected $comment;
 
     public function __construct($key) {
         $this->configKey = $key;
-        $this->currentKeyParts = array();
+        $this->currentKeyParts = [];
         $this->comment = null;
     }
 
@@ -33,10 +34,10 @@ class CConfig_Parser_CommentVisitor extends NodeVisitorAbstract {
 
                 if ($this->currentKey() == $this->configKey) {
                     $comments = $nodeKey->getAttribute('comments');
-                    if(is_array($comments)) {
+                    if (is_array($comments)) {
                         $comments = implode("\r\n", $comments);
                     }
-                    if(strlen($comments)>0) {
+                    if (strlen($comments) > 0) {
                         $this->comment = $comments;
                     }
                     return NodeTraverser::STOP_TRAVERSAL;
@@ -55,11 +56,10 @@ class CConfig_Parser_CommentVisitor extends NodeVisitorAbstract {
     }
 
     protected function currentKey() {
-        return implode(".", $this->currentKeyParts);
+        return implode('.', $this->currentKeyParts);
     }
 
     public function getComment() {
         return $this->comment;
     }
-
 }

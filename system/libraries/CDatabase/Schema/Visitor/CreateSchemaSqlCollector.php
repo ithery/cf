@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 1:43:59 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 1:43:59 PM
  */
 class CDatabase_Schema_Visitor_CreateSchemaSqlCollector extends CDatabase_Schema_Visitor {
-
     /**
      * @var array
      */
@@ -30,7 +30,6 @@ class CDatabase_Schema_Visitor_CreateSchemaSqlCollector extends CDatabase_Schema
     private $createFkConstraintQueries = [];
 
     /**
-     *
      * @var CDatabase_Platform
      */
     private $platform = null;
@@ -91,8 +90,10 @@ class CDatabase_Schema_Visitor_CreateSchemaSqlCollector extends CDatabase_Schema
      */
     public function getQueries() {
         return array_merge(
-                $this->createNamespaceQueries, $this->createTableQueries, $this->createSequenceQueries, $this->createFkConstraintQueries
+            $this->createNamespaceQueries,
+            $this->createTableQueries,
+            $this->createSequenceQueries,
+            $this->createFkConstraintQueries
         );
     }
-
 }

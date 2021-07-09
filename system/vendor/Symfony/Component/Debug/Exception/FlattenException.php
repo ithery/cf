@@ -43,7 +43,7 @@ class FlattenException
         return static::createFromThrowable($exception, $statusCode, $headers);
     }
 
-    public static function createFromThrowable(\Throwable $exception, int $statusCode = null, array $headers = []): self
+    public static function createFromThrowable(\Throwable $exception, $statusCode = null, array $headers = []): self
     {
         $e = new static();
         $e->setMessage($exception->getMessage());
@@ -289,7 +289,7 @@ class FlattenException
         return $this;
     }
 
-    private function flattenArgs(array $args, int $level = 0, int &$count = 0): array
+    private function flattenArgs(array $args, $level = 0, &$count = 0): array
     {
         $result = [];
         foreach ($args as $key => $value) {

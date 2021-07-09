@@ -1,7 +1,6 @@
 <?php
 
 class CModel_Relation_MorphPivot extends CModel_Relation_Pivot {
-
     /**
      * The type of the polymorphic relation.
      *
@@ -23,12 +22,27 @@ class CModel_Relation_MorphPivot extends CModel_Relation_Pivot {
     /**
      * Set the keys for a save update query.
      *
-     * @param  CModel_Query  $query
+     * @param CModel_Query $query
+     *
      * @return CModel_Query
      */
     protected function setKeysForSaveQuery(CModel_Query $query) {
         $query->where($this->morphType, $this->morphClass);
+
         return parent::setKeysForSaveQuery($query);
+    }
+
+    /**
+     * Set the keys for a select query.
+     *
+     * @param CModel_Query $query
+     *
+     * @return CModel_Query
+     */
+    protected function setKeysForSelectQuery($query) {
+        $query->where($this->morphType, $this->morphClass);
+
+        return parent::setKeysForSelectQuery($query);
     }
 
     /**
@@ -37,15 +51,24 @@ class CModel_Relation_MorphPivot extends CModel_Relation_Pivot {
      * @return int
      */
     public function delete() {
+        if (isset($this->attributes[$this->getKeyName()])) {
+            return (int) parent::delete();
+        }
+        if ($this->fireModelEvent('deleting') === false) {
+            return 0;
+        }
         $query = $this->getDeleteQuery();
         $query->where($this->morphType, $this->morphClass);
-        return $query->delete();
+        return c::tap($query->delete(), function () {
+            $this->fireModelEvent('deleted', false);
+        });
     }
 
     /**
      * Set the morph type for the pivot.
      *
-     * @param  string  $morphType
+     * @param string $morphType
+     *
      * @return $this
      */
     public function setMorphType($morphType) {
@@ -56,7 +79,8 @@ class CModel_Relation_MorphPivot extends CModel_Relation_Pivot {
     /**
      * Set the morph class for the pivot.
      *
-     * @param  string  $morphClass
+     * @param string $morphClass
+     *
      * @return CModel_Relation_MorphPivot
      */
     public function setMorphClass($morphClass) {
@@ -74,14 +98,21 @@ class CModel_Relation_MorphPivot extends CModel_Relation_Pivot {
             return $this->getKey();
         }
         return sprintf(
-                '%s:%s:%s:%s:%s:%s', $this->foreignKey, $this->getAttribute($this->foreignKey), $this->relatedKey, $this->getAttribute($this->relatedKey), $this->morphType, $this->morphClass
+            '%s:%s:%s:%s:%s:%s',
+            $this->foreignKey,
+            $this->getAttribute($this->foreignKey),
+            $this->relatedKey,
+            $this->getAttribute($this->relatedKey),
+            $this->morphType,
+            $this->morphClass
         );
     }
 
     /**
      * Get a new query to restore one or more models by their queueable IDs.
      *
-     * @param  array|int  $ids
+     * @param array|int $ids
+     *
      * @return CModel_Query
      */
     public function newQueryForRestoration($ids) {
@@ -93,18 +124,20 @@ class CModel_Relation_MorphPivot extends CModel_Relation_Pivot {
         }
         $segments = explode(':', $ids);
         return $this->newQueryWithoutScopes()
-                        ->where($segments[0], $segments[1])
-                        ->where($segments[2], $segments[3])
-                        ->where($segments[4], $segments[5]);
+            ->where($segments[0], $segments[1])
+            ->where($segments[2], $segments[3])
+            ->where($segments[4], $segments[5]);
     }
 
     /**
      * Get a new query to restore multiple models by their queueable IDs.
      *
-     * @param  array  $ids
+     * @param array $ids
+     *
      * @return CModel_Query
      */
     protected function newQueryForCollectionRestoration(array $ids) {
+        $ids = array_values($ids);
         if (!cstr::contains($ids[0], ':')) {
             return parent::newQueryForRestoration($ids);
         }
@@ -113,11 +146,10 @@ class CModel_Relation_MorphPivot extends CModel_Relation_Pivot {
             $segments = explode(':', $id);
             $query->orWhere(function ($query) use ($segments) {
                 return $query->where($segments[0], $segments[1])
-                                ->where($segments[2], $segments[3])
-                                ->where($segments[4], $segments[5]);
+                    ->where($segments[2], $segments[3])
+                    ->where($segments[4], $segments[5]);
             });
         }
         return $query;
     }
-
 }

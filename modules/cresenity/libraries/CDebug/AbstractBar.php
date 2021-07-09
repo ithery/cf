@@ -1,32 +1,30 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 3:13:50 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 3:13:50 PM
  */
 class CDebug_AbstractBar implements ArrayAccess {
-
     public static $useOpenHandlerWhenSendingDataHeaders = false;
     protected $data;
 
     /**
-     *
-     * @var CDebug_Interface_DataCollectorInterface[] 
+     * @var CDebug_Interface_DataCollectorInterface[]
      */
-    protected $collectors = array();
+    protected $collectors = [];
 
     /**
      * Config of this bar
-     * 
+     *
      * @var CDebug_Bar_Config
      */
     protected $config;
 
     /**
-     *
      * @var CDebug_Bar_Interface_RequestIdGeneratorInterface
      */
     protected $requestIdGenerator;
@@ -34,7 +32,6 @@ class CDebug_AbstractBar implements ArrayAccess {
     protected $storage;
 
     /**
-     *
      * @var CDebug_Bar_Interface_HttpDriverInterface
      */
     protected $httpDriver;
@@ -42,19 +39,18 @@ class CDebug_AbstractBar implements ArrayAccess {
     protected $stackAlwaysUseSessionStorage = false;
 
     /**
-     *
      * @var CDebug_Bar_Renderer
      */
     protected $renderer;
 
-    public function __construct(array $options = array()) {
+    public function __construct(array $options = []) {
         $this->config = new CDebug_Bar_Config($options);
         $this->renderer = new CDebug_Bar_Renderer($this);
     }
 
     /**
-     * 
      * @param array $options
+     *
      * @return $this
      */
     public function setOptions(array $options) {
@@ -68,6 +64,7 @@ class CDebug_AbstractBar implements ArrayAccess {
      * @param DataCollectorInterface $collector
      *
      * @throws DebugBarException
+     *
      * @return $this
      */
     public function addCollector(CDebug_Interface_DataCollectorInterface $collector) {
@@ -85,7 +82,9 @@ class CDebug_AbstractBar implements ArrayAccess {
      * Returns a data collector
      *
      * @param string $name
+     *
      * @return CDebug_Interface_DataCollectorInterface
+     *
      * @throws CDebug_Bar_Exception
      */
     public function getCollector($name) {
@@ -98,7 +97,7 @@ class CDebug_AbstractBar implements ArrayAccess {
     /**
      * Returns an array of all data collectors
      *
-     * @return array[DataCollectorInterface]
+     * @return CDebug_Interface_DataCollectorInterface[]
      */
     public function getCollectors() {
         return $this->collectors;
@@ -108,6 +107,7 @@ class CDebug_AbstractBar implements ArrayAccess {
      * Checks if a data collector has been added
      *
      * @param string $name
+     *
      * @return boolean
      */
     public function hasCollector($name) {
@@ -118,6 +118,7 @@ class CDebug_AbstractBar implements ArrayAccess {
      * Sets the request id generator
      *
      * @param RequestIdGeneratorInterface $generator
+     *
      * @return $this
      */
     public function setRequestIdGenerator(RequestIdGeneratorInterface $generator) {
@@ -150,29 +151,30 @@ class CDebug_AbstractBar implements ArrayAccess {
     /**
      * Returns an array of HTTP headers containing the data
      *
-     * @param string $headerName
+     * @param string  $headerName
      * @param integer $maxHeaderLength
+     * @param mixed   $maxTotalHeaderLength
+     *
      * @return array
      */
     public function getDataAsHeaders($headerName = 'phpdebugbar', $maxHeaderLength = 4096, $maxTotalHeaderLength = 250000) {
-        $data = rawurlencode(json_encode(array(
+        $data = rawurlencode(json_encode([
             'id' => $this->getCurrentRequestId(),
             'data' => $this->getData()
-        )));
+        ]));
 
         if (strlen($data) > $maxTotalHeaderLength) {
-
-            $data = rawurlencode(json_encode(array(
+            $data = rawurlencode(json_encode([
                 'error' => 'Maximum header size exceeded'
-            )));
+            ]));
         }
-        $chunks = array();
+        $chunks = [];
         while (strlen($data) > $maxHeaderLength) {
             $chunks[] = substr($data, 0, $maxHeaderLength);
             $data = substr($data, $maxHeaderLength);
         }
         $chunks[] = $data;
-        $headers = array();
+        $headers = [];
         for ($i = 0, $c = count($chunks); $i < $c; $i++) {
             $name = $headerName . ($i > 0 ? "-$i" : '');
             $headers[$name] = $chunks[$i];
@@ -183,9 +185,10 @@ class CDebug_AbstractBar implements ArrayAccess {
     /**
      * Sends the data through the HTTP headers
      *
-     * @param bool $useOpenHandler
-     * @param string $headerName
+     * @param bool    $useOpenHandler
+     * @param string  $headerName
      * @param integer $maxHeaderLength
+     *
      * @return $this
      */
     public function sendDataInHeaders($useOpenHandler = null, $headerName = 'phpdebugbar', $maxHeaderLength = 4096) {
@@ -195,7 +198,7 @@ class CDebug_AbstractBar implements ArrayAccess {
         if ($useOpenHandler && $this->storage !== null) {
             $this->getData();
             $headerName .= '-id';
-            $headers = array($headerName => $this->getCurrentRequestId());
+            $headers = [$headerName => $this->getCurrentRequestId()];
         } else {
             $headers = $this->getDataAsHeaders($headerName, $maxHeaderLength);
         }
@@ -229,7 +232,7 @@ class CDebug_AbstractBar implements ArrayAccess {
     public function hasStackedData() {
         try {
             $http = $this->initStackSession();
-        } catch (DebugBarException $e) {
+        } catch (CDebug_Bar_Exception $e) {
             return false;
         }
         return count($http->getSessionValue($this->stackSessionNamespace)) > 0;
@@ -239,6 +242,7 @@ class CDebug_AbstractBar implements ArrayAccess {
      * Returns the data stacked in the session
      *
      * @param boolean $delete Whether to delete the data in the session
+     *
      * @return array
      */
     public function getStackedData($delete = true) {
@@ -247,7 +251,7 @@ class CDebug_AbstractBar implements ArrayAccess {
         if ($delete) {
             $http->deleteSessionValue($this->stackSessionNamespace);
         }
-        $datasets = array();
+        $datasets = [];
         if ($this->isDataPersisted() && !$this->stackAlwaysUseSessionStorage) {
             foreach ($stackedData as $id => $data) {
                 $datasets[$id] = $this->getStorage()->get($id);
@@ -262,6 +266,7 @@ class CDebug_AbstractBar implements ArrayAccess {
      * Sets the key to use in the $_SESSION array
      *
      * @param string $ns
+     *
      * @return $this
      */
     public function setStackDataSessionNamespace($ns) {
@@ -283,6 +288,7 @@ class CDebug_AbstractBar implements ArrayAccess {
      * if a storage is enabled
      *
      * @param boolean $enabled
+     *
      * @return $this
      */
     public function setStackAlwaysUseSessionStorage($enabled = true) {
@@ -302,16 +308,18 @@ class CDebug_AbstractBar implements ArrayAccess {
 
     /**
      * Initializes the session for stacked data
+     *
      * @return HttpDriverInterface
+     *
      * @throws DebugBarException
      */
     protected function initStackSession() {
         $http = $this->getHttpDriver();
         if (!$http->isSessionStarted()) {
-            throw new CDebug_Exception("Session must be started before using stack data in the debug bar");
+            throw new CDebug_Exception('Session must be started before using stack data in the debug bar');
         }
         if (!$http->hasSessionValue($this->stackSessionNamespace)) {
-            $http->setSessionValue($this->stackSessionNamespace, array());
+            $http->setSessionValue($this->stackSessionNamespace, []);
         }
         return $http;
     }
@@ -343,27 +351,28 @@ class CDebug_AbstractBar implements ArrayAccess {
             } else {
                 $ip = '127.0.0.1';
             }
-            $request_variables = array(
+            $request_variables = [
                 'method' => 'CLI',
                 'uri' => isset($_SERVER['SCRIPT_FILENAME']) ? realpath($_SERVER['SCRIPT_FILENAME']) : null,
                 'ip' => $ip
-            );
+            ];
         } else {
-            $request_variables = array(
+            $request_variables = [
                 'method' => isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : null,
                 'uri' => isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : null,
                 'ip' => isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : null
-            );
+            ];
         }
-        $this->data = array(
+        $this->data = [
             '__meta' => array_merge(
-                    array(
-                'id' => $this->getCurrentRequestId(),
-                'datetime' => date('Y-m-d H:i:s'),
-                'utime' => microtime(true)
-                    ), $request_variables
+                [
+                    'id' => $this->getCurrentRequestId(),
+                    'datetime' => date('Y-m-d H:i:s'),
+                    'utime' => microtime(true)
+                ],
+                $request_variables
             )
-        );
+        ];
         foreach ($this->collectors as $name => $collector) {
             $this->data[$name] = $collector->collect();
         }
@@ -393,10 +402,8 @@ class CDebug_AbstractBar implements ArrayAccess {
         return $this->data;
     }
 
-    // --------------------------------------------
-    // ArrayAccess implementation
     public function offsetSet($key, $value) {
-        throw new DebugBarException("DebugBar[] is read-only");
+        throw new CDebug_Bar_Exception('DebugBar[] is read-only');
     }
 
     public function offsetGet($key) {
@@ -408,7 +415,6 @@ class CDebug_AbstractBar implements ArrayAccess {
     }
 
     public function offsetUnset($key) {
-        throw new DebugBarException("DebugBar[] is read-only");
+        throw new CDebug_Bar_Exception('DebugBar[] is read-only');
     }
-
 }

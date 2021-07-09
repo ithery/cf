@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 3:38:20 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 3:38:20 PM
  */
 class CJavascript_Validation_Remote {
-
     use CJavascript_Validation_Trait_AccessProtectedTrait,
         CJavascript_Validation_Trait_RuleListTrait;
 
@@ -49,8 +49,8 @@ class CJavascript_Validation_Remote {
     /**
      * Validate request.
      *
-     * @param $field
      * @param $parameters
+     *
      * @return void
      *
      * @throws CValidation_Exception
@@ -58,7 +58,7 @@ class CJavascript_Validation_Remote {
     public function validate($parameters = []) {
         $field = carr::get($this->data, $this->field);
         $attribute = $this->parseAttributeName($field);
-      
+
         $validationParams = $this->parseParameters($parameters);
         $validationResult = $this->validateJsRemoteRequest($attribute, $validationParams);
         return $validationResult;
@@ -67,26 +67,26 @@ class CJavascript_Validation_Remote {
     /**
      * Throw the failed validation exception.
      *
-     * @param mixed $result
-     * @param CValidation_Validator  $validator
+     * @param mixed                 $result
+     * @param CValidation_Validator $validator
+     *
      * @return void
      *
      * @throws \Illuminate\Validation\ValidationException|\Illuminate\Http\Exceptions\HttpResponseException
      */
     protected function throwValidationException($result, $validator) {
-        if($result===true) {
+        if ($result === true) {
             echo json_encode($result);
         } else {
             echo $validator->errors()->first();
         }
-       
     }
 
-   
     /**
      *  Parse Validation input request data.
      *
      * @param $data
+     *
      * @return array
      */
     protected function parseAttributeName($data) {
@@ -100,6 +100,7 @@ class CJavascript_Validation_Remote {
      *  Parse Validation parameters.
      *
      * @param $parameters
+     *
      * @return array
      */
     protected function parseParameters($parameters) {
@@ -115,6 +116,7 @@ class CJavascript_Validation_Remote {
      *
      * @param $attribute
      * @param array $parameters
+     *
      * @return array|bool
      */
     protected function validateJsRemoteRequest($attribute, $parameters) {
@@ -131,6 +133,7 @@ class CJavascript_Validation_Remote {
      *
      * @param $attribute
      * @param bool $validateAll
+     *
      * @return void
      */
     protected function setRemoteValidation($attribute, $validateAll = false) {
@@ -152,6 +155,7 @@ class CJavascript_Validation_Remote {
      *
      * @param $rules
      * @param BaseValidator $validator
+     *
      * @return mixed
      */
     protected function purgeNonRemoteRules($rules, $validator) {
@@ -164,5 +168,4 @@ class CJavascript_Validation_Remote {
         }
         return $rules;
     }
-
 }

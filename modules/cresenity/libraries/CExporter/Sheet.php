@@ -15,7 +15,6 @@ use PhpOffice\PhpSpreadsheet\Worksheet\BaseDrawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class CExporter_Sheet {
-
     use CExporter_Trait_DelegatedMacroableTrait,
         CExporter_Trait_HasEventBusTrait;
 
@@ -130,7 +129,9 @@ class CExporter_Sheet {
             }
 
             $this->append(
-                    CExporter_Helper_ArrayHelper::ensureMultipleRows($sheetExport->headings()), isset($startCell) ? $startCell : null, $this->hasStrictNullComparison($sheetExport)
+                CExporter_Helper_ArrayHelper::ensureMultipleRows($sheetExport->headings()),
+                isset($startCell) ? $startCell : null,
+                $this->hasStrictNullComparison($sheetExport)
             );
         }
 
@@ -229,7 +230,6 @@ class CExporter_Sheet {
                         CExporter_Validator_RowValidator::instance()->validate($toValidate, $import);
                         $import->onRow($sheetRow);
                     } catch (CExporter_Exception_RowSkippedException $e) {
-                        
                     }
                 } else {
                     $import->onRow($sheetRow);
@@ -290,8 +290,8 @@ class CExporter_Sheet {
      */
     public function toCollection($import, $startRow = null, $nullValue = null, $calculateFormulas = false, $formatData = false) {
         return c::collect(array_map(function (array $row) {
-                            return c::collect($row);
-                        }, $this->toArray($import, $startRow, $nullValue, $calculateFormulas, $formatData)));
+            return c::collect($row);
+        }, $this->toArray($import, $startRow, $nullValue, $calculateFormulas, $formatData)));
     }
 
     /**
@@ -352,7 +352,7 @@ class CExporter_Sheet {
 
     /**
      * @param CExporter_Concern_FromQuery $sheetExport
-     * @param Worksheet $worksheet
+     * @param Worksheet                   $worksheet
      */
     public function fromQuery(CExporter_Concern_FromQuery $sheetExport, Worksheet $worksheet) {
         $sheetExport->query()->chunk($this->getChunkSize($sheetExport), function ($chunk) use ($sheetExport, $worksheet) {
@@ -362,10 +362,9 @@ class CExporter_Sheet {
 
     /**
      * @param CExporter_Concern_FromQuery $sheetExport
-     * @param Worksheet $worksheet
+     * @param Worksheet                   $worksheet
      */
     public function fromSql(CExporter_Concern_FromSql $sheetExport, Worksheet $worksheet) {
-
         CExporter_Helper_SqlHelper::chunkSqlResult($sheetExport->sql(), $this->getChunkSize($sheetExport), function ($chunk) use ($sheetExport, $worksheet) {
             $this->appendRows($chunk, $sheetExport);
         });
@@ -412,7 +411,7 @@ class CExporter_Sheet {
         if ($this->hasRows()) {
             $startCell = CExporter_Helper_CellHelper::getColumnFromCoordinate($startCell) . ($this->worksheet->getHighestRow() + 1);
         }
-        
+
         $this->worksheet->fromArray($rows, null, $startCell, $strictNullComparison);
     }
 
@@ -489,19 +488,20 @@ class CExporter_Sheet {
      * @param object   $sheetExport
      */
     public function appendRows($rows, $sheetExport) {
-        
         $rows = (new CCollection($rows))->flatMap(function ($row) use ($sheetExport) {
-                    if ($sheetExport instanceof CExporter_Concern_WithMapping) {
-                        $row = $sheetExport->map($row);
-                    }
+            if ($sheetExport instanceof CExporter_Concern_WithMapping) {
+                $row = $sheetExport->map($row);
+            }
 
-                    return CExporter_Helper_ArrayHelper::ensureMultipleRows(
-                                    static::mapArraybleRow($row)
-                    );
-                })->toArray();
-                
+            return CExporter_Helper_ArrayHelper::ensureMultipleRows(
+                static::mapArraybleRow($row)
+            );
+        })->toArray();
+
         $this->append(
-                $rows, $sheetExport instanceof CExporter_Concern_WithCustomStartCell ? $sheetExport->startCell() : null, $this->hasStrictNullComparison($sheetExport)
+            $rows,
+            $sheetExport instanceof CExporter_Concern_WithCustomStartCell ? $sheetExport->startCell() : null,
+            $this->hasStrictNullComparison($sheetExport)
         );
     }
 
@@ -592,5 +592,4 @@ class CExporter_Sheet {
 
         return $this->chunkSize;
     }
-
 }

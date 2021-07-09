@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 23, 2019, 3:28:16 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 23, 2019, 3:28:16 AM
  */
 final class CDatabase_TransactionIsolationLevel {
-
     /**
      * Transaction isolation level READ UNCOMMITTED.
      */
@@ -30,7 +30,5 @@ final class CDatabase_TransactionIsolationLevel {
     const SERIALIZABLE = 4;
 
     private function __construct() {
-        
     }
-
 }

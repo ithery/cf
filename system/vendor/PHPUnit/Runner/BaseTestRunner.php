@@ -12,7 +12,7 @@ namespace PHPUnit\Runner;
 use function is_dir;
 use function is_file;
 use function substr;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 use PHPUnit\Framework\TestSuite;
 use ReflectionClass;
 use ReflectionException;

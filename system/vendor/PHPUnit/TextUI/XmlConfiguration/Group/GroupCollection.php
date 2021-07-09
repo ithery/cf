@@ -7,7 +7,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI\XmlConfiguration;
+
+namespace PHPUnit\TextUI\XmlConfiguration\Group;
 
 use IteratorAggregate;
 
@@ -15,8 +16,7 @@ use IteratorAggregate;
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  * @psalm-immutable
  */
-final class GroupCollection implements IteratorAggregate
-{
+final class GroupCollection implements IteratorAggregate {
     /**
      * @var Group[]
      */
@@ -25,29 +25,25 @@ final class GroupCollection implements IteratorAggregate
     /**
      * @param Group[] $groups
      */
-    public static function fromArray(array $groups)
-    {
+    public static function fromArray(array $groups) {
         return new self(...$groups);
     }
 
-    private function __construct(Group ...$groups)
-    {
+    private function __construct(Group ...$groups) {
         $this->groups = $groups;
     }
 
     /**
      * @return Group[]
      */
-    public function asArray()
-    {
+    public function asArray() {
         return $this->groups;
     }
 
     /**
      * @return string[]
      */
-    public function asArrayOfStrings()
-    {
+    public function asArrayOfStrings() {
         $result = [];
 
         foreach ($this->groups as $group) {
@@ -57,13 +53,11 @@ final class GroupCollection implements IteratorAggregate
         return $result;
     }
 
-    public function isEmpty()
-    {
+    public function isEmpty() {
         return empty($this->groups);
     }
 
-    public function getIterator()
-    {
+    public function getIterator() {
         return new GroupCollectionIterator($this);
     }
 }

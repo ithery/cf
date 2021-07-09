@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Column extends CEmail_Builder_Component_BodyComponent {
@@ -30,7 +24,6 @@ class CEmail_Builder_Component_BodyComponent_Column extends CEmail_Builder_Compo
     protected $defaultAttributes = [
         'direction' => 'ltr',
         'vertical-align' => 'top',
-        
     ];
 
     public function getStyles() {
@@ -74,11 +67,10 @@ class CEmail_Builder_Component_BodyComponent_Column extends CEmail_Builder_Compo
         $nonRawSiblings = $this->getProp('nonRawSiblings', 0);
         $width = $this->getAttribute('width');
         $mobileWidth = $this->getAttribute('mobileWidth');
-        
 
         if ($mobileWidth !== 'mobileWidth') {
             return '100%';
-        } else if (strlen($width) == 0) {
+        } elseif (strlen($width) == 0) {
             $width = '100%';
             if ($nonRawSiblings > 0) {
                 $width = (100 / $nonRawSiblings) . '%';
@@ -108,10 +100,8 @@ class CEmail_Builder_Component_BodyComponent_Column extends CEmail_Builder_Compo
         $unit = carr::get($widthParserResult, 'unit');
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
 
-
         if ($unit === '%') {
-
-            return $containerWidth * $parsedWidth / 100 . 'px';
+            return intval($containerWidth) * $parsedWidth / 100 . 'px';
         }
         return $parsedWidth . 'px';
     }
@@ -141,8 +131,6 @@ class CEmail_Builder_Component_BodyComponent_Column extends CEmail_Builder_Compo
     }
 
     public function getColumnClass() {
-
-
         $className = '';
         $parsedWidthResult = $this->getParsedWidth();
         $parsedWidth = carr::get($parsedWidthResult, 'parsedWidth');
@@ -172,18 +160,17 @@ class CEmail_Builder_Component_BodyComponent_Column extends CEmail_Builder_Compo
 
     public function hasGutter() {
         return carr::some([
-                    'padding',
-                    'padding-bottom',
-                    'padding-left',
-                    'padding-right',
-                    'padding-top',
-                        ], function($attr) {
-                    return $this->getAttribute($attr) != null;
-                });
+            'padding',
+            'padding-bottom',
+            'padding-left',
+            'padding-right',
+            'padding-top',
+        ], function ($attr) {
+            return $this->getAttribute($attr) != null;
+        });
     }
 
     public function renderGutter() {
-
         $tableAttr = [];
         $tableAttr['border'] = '0';
         $tableAttr['cellpadding'] = '0';
@@ -213,11 +200,11 @@ class CEmail_Builder_Component_BodyComponent_Column extends CEmail_Builder_Compo
         $tableAttr['style'] = 'table';
         $tableAttr['width'] = '100%';
 
-        $renderer = function($component) {
+        $renderer = function ($component) {
             if ($component->isRawElement()) {
                 return $component->render();
             } else {
-                $style = array();
+                $style = [];
                 $style['background'] = $component->getAttribute('container-background-color');
                 $style['font-size'] = '0px';
                 $style['padding'] = $component->getAttribute('padding');
@@ -241,7 +228,6 @@ class CEmail_Builder_Component_BodyComponent_Column extends CEmail_Builder_Compo
             }
         };
 
-
         return '
       <table' . $this->htmlAttributes($tableAttr) . '>
         ' . $this->renderChildren(['renderer' => $renderer]) . '
@@ -262,5 +248,4 @@ class CEmail_Builder_Component_BodyComponent_Column extends CEmail_Builder_Compo
       </div>
     ';
     }
-
 }

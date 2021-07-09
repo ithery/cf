@@ -20,11 +20,13 @@ class CApp_Navigation_Data {
         if ($domain == null) {
             $domain = CF::domain();
         }
-        $navFile = CF::get_file('config', 'nav', $domain);
-
+        $navFile = CF::getFile('config', 'nav', $domain);
         $data = null;
         if ($navFile != null) {
             $data = include $navFile;
+        }
+        if ($data == null) {
+            $data = CApp::instance()->getNav();
         }
         if (isset(self::$navigationCallback[$domain]) && self::$navigationCallback[$domain] != null && is_callable(self::$navigationCallback[$domain])) {
             $data = CFunction::factory(self::$navigationCallback[$domain])->addArg($data)->execute();

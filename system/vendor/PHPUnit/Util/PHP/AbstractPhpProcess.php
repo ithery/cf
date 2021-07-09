@@ -28,7 +28,7 @@ use function unserialize;
 use __PHP_Incomplete_Class;
 use ErrorException;
 use PHPUnit\Framework\AssertionFailedError;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 use PHPUnit\Framework\SyntheticError;
 use PHPUnit\Framework\Test;
 use PHPUnit\Framework\TestCase;

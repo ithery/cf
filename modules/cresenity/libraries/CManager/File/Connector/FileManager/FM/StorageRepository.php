@@ -1,22 +1,24 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Aug 11, 2019, 3:25:46 AM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use League\Flysystem\Cached\CachedAdapter;
 
 class CManager_File_Connector_FileManager_FM_StorageRepository {
-
     /**
-     *
      * @var CStorage_Adapter
      */
     private $disk;
+
     private $path;
+
     private $helper;
 
     public function __construct($storage_path, $helper) {
@@ -36,16 +38,13 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
             $adapter = $adapter->getAdapter();
         }
 
-
         $pathPrefix = $adapter->getPathPrefix();
-
 
         return $pathPrefix;
     }
 
     public function move($newFmPath) {
         if ($this->isDirectory()) {
-
             return $this->moveRecursive($this->path, $newFmPath->path('storage'));
         }
         return $this->disk->move($this->path, $newFmPath->path('storage'));
@@ -59,7 +58,7 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
         if (strlen($path) == 0) {
             return false;
         }
-        $pathExploded = explode("/", $path);
+        $pathExploded = explode('/', $path);
         $lastDirectory = carr::get($pathExploded, count($pathExploded) - 1);
         $parentPath = substr($path, 0, strlen($path) - strlen($lastDirectory));
         return in_array($path, $this->disk->directories($parentPath));
@@ -75,10 +74,10 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
     /**
      * @param string $from
      * @param string $to
+     *
      * @return bool
      */
     protected function moveDirectory($from, $to) {
-
         if ($this->disk->has($from)) {
             $folderContents = $this->disk->listContents($from, true);
             foreach ($folderContents as $content) {
@@ -89,7 +88,6 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
                 }
             }
             if (!$this->disk->exists($to)) {
-                
                 $this->createDirectory($to);
             }
             $this->disk->deleteDirectory($from);
@@ -97,9 +95,9 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
     }
 
     public function save($file) {
-        $nameint = strripos($this->path, "/");
+        $nameint = strripos($this->path, '/');
         $nameclean = substr($this->path, $nameint + 1);
-        $pathclean = substr_replace($this->path, "", $nameint);
+        $pathclean = substr_replace($this->path, '', $nameint);
         $this->disk->putFileAs($pathclean, $file, $nameclean, 'public');
     }
 
@@ -108,7 +106,6 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
     }
 
     public function makeDirectory() {
-
         $this->disk->makeDirectory($this->path, ...func_get_args());
         $this->disk->setVisibility($this->path, 'public');
     }
@@ -121,5 +118,4 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
     public function extension() {
         return pathinfo($this->path, PATHINFO_EXTENSION);
     }
-
 }

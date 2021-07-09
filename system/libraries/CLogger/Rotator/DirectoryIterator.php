@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CLogger_Rotator_DirectoryIterator extends \DirectoryIterator {
-
     /**
      * Filename format to match files against
      *
@@ -62,10 +55,10 @@ class CLogger_Rotator_DirectoryIterator extends \DirectoryIterator {
      * Return rotated filename
      *
      * @param int $num Rotation number
+     *
      * @return string
      */
     public function getRotatedFilename($num) {
         return $this->getBasename() . '.' . $num;
     }
-
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 3:26:59 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 3:26:59 AM
  */
 class CColor_Format_TypeAbstract implements CColor_Format_TypeInterface {
-
     protected $value;
 
     public function __construct($value) {
@@ -25,7 +25,6 @@ class CColor_Format_TypeAbstract implements CColor_Format_TypeInterface {
         return (string) $this->value;
     }
 
-    
     public function value() {
         return $this->value;
     }

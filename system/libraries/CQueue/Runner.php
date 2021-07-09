@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 4:53:31 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 4:53:31 AM
  */
 class CQueue_Runner {
-
     /**
      * The queue worker instance.
      *
@@ -29,13 +29,14 @@ class CQueue_Runner {
      *
      * @var array
      */
-    protected $options = array();
+    protected $options = [];
 
     /**
      * Create a new queue work command.
      *
-     * @param  CQueue_Worker  $worker
-     * @param  CCache_Repository  $cache
+     * @param CQueue_Worker     $worker
+     * @param CCache_Repository $cache
+     *
      * @return void
      */
     public function __construct(CQueue_Worker $worker, CCache_Repository $cache = null) {
@@ -47,7 +48,7 @@ class CQueue_Runner {
         if ($connection == null) {
             $connection = CQueue::config('default');
         }
-        
+
         if ($this->downForMaintenance() && $this->getOption('once')) {
             return $this->worker->sleep($this->getOption('sleep'));
         }
@@ -60,21 +61,26 @@ class CQueue_Runner {
         // connection being run for the queue operation currently being executed.
         $queue = $this->getQueue($connection);
         $this->runWorker(
-                $connection, $queue
+            $connection,
+            $queue
         );
     }
 
     /**
      * Run the worker instance.
      *
-     * @param  string  $connection
-     * @param  string  $queue
+     * @param string $connection
+     * @param string $queue
+     *
      * @return array
      */
     protected function runWorker($connection, $queue) {
         $this->worker->setCache($this->cache);
         return $this->worker->{$this->getOption('once') ? 'runNextJob' : 'daemon'}(
-                        $connection, $queue, $this->gatherWorkerOptions());
+            $connection,
+            $queue,
+            $this->gatherWorkerOptions()
+        );
     }
 
     protected function runDaemon($connection, $queue) {
@@ -83,7 +89,13 @@ class CQueue_Runner {
 
     protected function gatherWorkerOptions() {
         return new CQueue_WorkerOptions(
-                $this->getOption('delay'), $this->getOption('memory'), $this->getOption('timeout'), $this->getOption('sleep'), $this->getOption('tries'), $this->getOption('force'), $this->getOption('stopWhenEmpty')
+            $this->getOption('delay'),
+            $this->getOption('memory'),
+            $this->getOption('timeout'),
+            $this->getOption('sleep'),
+            $this->getOption('tries'),
+            $this->getOption('force'),
+            $this->getOption('stopWhenEmpty')
         );
         //return new CQueue_WorkerOptions();
     }
@@ -122,7 +134,8 @@ class CQueue_Runner {
     /**
      * Get the queue name for the worker.
      *
-     * @param  string  $connection
+     * @param string $connection
+     *
      * @return string
      */
     protected function getQueue($connection) {
@@ -132,8 +145,9 @@ class CQueue_Runner {
     /**
      * Write the status output for the queue worker.
      *
-     * @param  CQueue_AbstractJob  $job
-     * @param  string $status
+     * @param CQueue_AbstractJob $job
+     * @param string             $status
+     *
      * @return void
      */
     protected function writeOutput(CQueue_AbstractJob $job, $status) {
@@ -150,18 +164,23 @@ class CQueue_Runner {
     /**
      * Format the status output for the queue worker.
      *
-     * @param  CQueue_AbstractJob  $job
-     * @param  string  $status
-     * @param  string  $type
+     * @param CQueue_AbstractJob $job
+     * @param string             $status
+     * @param string             $type
+     *
      * @return void
      */
     protected function writeStatus(CQueue_AbstractJob $job, $status, $type) {
-//        $this->output->writeln(sprintf(
-//                        "<{$type}>[%s][%s] %s</{$type}> %s", Carbon::now()->format('Y-m-d H:i:s'), $job->getJobId(), str_pad("{$status}:", 11), $job->resolveName()
-//        ));
+        //        $this->output->writeln(sprintf(
+        //                        "<{$type}>[%s][%s] %s</{$type}> %s", Carbon::now()->format('Y-m-d H:i:s'), $job->getJobId(), str_pad("{$status}:", 11), $job->resolveName()
+        //        ));
 
         $message = sprintf(
-                "<{$type}>[%s][%s] %s</{$type}> %s", CCarbon::now()->format('Y-m-d H:i:s'), $job->getJobId(), str_pad("{$status}:", 11), $job->resolveName()
+            "<{$type}>[%s][%s] %s</{$type}> %s",
+            CCarbon::now()->format('Y-m-d H:i:s'),
+            $job->getJobId(),
+            str_pad("{$status}:", 11),
+            $job->resolveName()
         );
         if (CDaemon::getRunningService() != null) {
             CDaemon::log($message);
@@ -173,12 +192,16 @@ class CQueue_Runner {
     /**
      * Store a failed job event.
      *
-     * @param  CQueue_Event_JobFailed  $event
+     * @param CQueue_Event_JobFailed $event
+     *
      * @return void
      */
     protected function logFailedJob(CQueue_Event_JobFailed $event) {
         CQueue_FailerFactory::getFailerInstance()->log(
-                $event->connectionName, $event->job->getQueue(), $event->job->getRawBody(), $event->exception
+            $event->connectionName,
+            $event->job->getQueue(),
+            $event->job->getRawBody(),
+            $event->exception
         );
     }
 
@@ -201,5 +224,4 @@ class CQueue_Runner {
         $options = array_merge($defaultOptions, $this->options);
         return carr::get($options, $name);
     }
-
 }

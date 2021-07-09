@@ -1,14 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 1:35:50 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 1:35:50 AM
  */
+//@codingStandardsIgnoreStart
 class CString_Language {
-
     const REGEX_COMMON = '/\p{Common}/u';
     const REGEX_ARABIC = '/\p{Arabic}/u';
     const REGEX_ARMENIAN = '/\p{Armenian}/u';
@@ -246,5 +247,5 @@ class CString_Language {
     public static function isJapanese($string) {
         return self::isHiragana($string) || self::isKatakana($string);
     }
-
 }
+//@codingStandardsIgnoreEnd

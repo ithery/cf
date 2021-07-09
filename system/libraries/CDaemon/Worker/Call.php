@@ -1,27 +1,37 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 16, 2019, 3:57:35 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 16, 2019, 3:57:35 AM
  */
 class CDaemon_Worker_Call {
-
     public $return;
-    public $args;
-    public $method;
-    public $status;
-    public $pid;
-    public $id;
-    public $size = 64;
-    public $retries = 0;
-    public $errors = 0;
-    public $gc = false;
-    public $time = array();
 
-    public function __construct($id, $method = null, Array $args = null) {
+    public $args;
+
+    public $method;
+
+    public $status;
+
+    public $pid;
+
+    public $id;
+
+    public $size = 64;
+
+    public $retries = 0;
+
+    public $errors = 0;
+
+    public $gc = false;
+
+    public $time = [];
+
+    public function __construct($id, $method = null, array $args = null) {
         $this->id = $id;
         $this->method = $method;
         $this->args = $args;
@@ -31,6 +41,7 @@ class CDaemon_Worker_Call {
 
     /**
      * Determine the time this call spent (or has spent thus far) in RUNNING state
+     *
      * @return int|mixed
      */
     public function runtime() {
@@ -46,7 +57,9 @@ class CDaemon_Worker_Call {
 
     /**
      * Merge in data from the supplied $call into this call
+     *
      * @param CDaemon_Worker_Call $call
+     *
      * @return CDaemon_Worker_Call
      */
     public function merge(CDaemon_Worker_Call $call) {
@@ -58,15 +71,17 @@ class CDaemon_Worker_Call {
 
     /**
      * Active calls
+     *
      * @return bool
      */
     public function isActive() {
-        return !in_array($this->status, array(CDaemon_Worker_MediatorAbstract::TIMEOUT, CDaemon_Worker_MediatorAbstract::RETURNED, CDaemon_Worker_MediatorAbstract::CANCELLED));
+        return !in_array($this->status, [CDaemon_Worker_MediatorAbstract::TIMEOUT, CDaemon_Worker_MediatorAbstract::RETURNED, CDaemon_Worker_MediatorAbstract::CANCELLED]);
     }
 
     /**
      * Reduce the memory footprint of this call by unsetting argument & return details that could be memory intensive.
      * All other meta-data of the call will be preserved for analytical purposes. Sets a $gc flag upon completion.
+     *
      * @return bool
      */
     public function gc() {
@@ -81,21 +96,23 @@ class CDaemon_Worker_Call {
     /**
      * Return a message header with pertinent details. Using the SysV via, for example, this is sent on the mq,
      * and the message body is set on shm.
+     *
      * @return array
      */
     public function header() {
-        return array(
+        return [
             'call_id' => $this->id,
             'status' => $this->status,
             'microtime' => $this->time[$this->status],
             'pid' => getmypid(),
-                // I really have no idea why we are sending the pid along in the message header like this, but I assume
-                // there's a good reason so for now I'll just continue to include it.
-        );
+            // I really have no idea why we are sending the pid along in the message header like this, but I assume
+            // there's a good reason so for now I'll just continue to include it.
+        ];
     }
 
     /**
      * Prepare the Call struct to be passed back to the CDaemon_Worker_MediatorAbstract::call() method for another go-around
+     *
      * @return void
      */
     public function retry() {
@@ -133,6 +150,7 @@ class CDaemon_Worker_Call {
 
     /**
      * Get the appropriate queue based on the current status
+     *
      * @return int
      */
     public function queue() {
@@ -155,5 +173,4 @@ class CDaemon_Worker_Call {
     private function updateSize() {
         $this->size = strlen(print_r($this, true));
     }
-
 }

@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Diff implementation.
  */
-final class Differ {
-
+final class CComparator_Differ {
     const OLD = 0;
     const ADDED = 1;
     const REMOVED = 2;
@@ -28,20 +21,21 @@ final class Differ {
      * @throws InvalidArgumentException
      */
     public function __construct($outputBuilder = null) {
-        if ($outputBuilder instanceof DiffOutputBuilderInterface) {
+        if ($outputBuilder instanceof CComparator_Differ_OutputInterface) {
             $this->outputBuilder = $outputBuilder;
         } elseif (null === $outputBuilder) {
-            $this->outputBuilder = new UnifiedDiffOutputBuilder;
+            $this->outputBuilder = new CComparator_Differ_Output_UnifiedDiffOutput();
         } elseif (\is_string($outputBuilder)) {
             // PHPUnit 6.1.4, 6.2.0, 6.2.1, 6.2.2, and 6.2.3 support
             // @see https://github.com/sebastianbergmann/phpunit/issues/2734#issuecomment-314514056
             // @deprecated
-            $this->outputBuilder = new UnifiedDiffOutputBuilder($outputBuilder);
+            $this->outputBuilder = new CComparator_Differ_Output_UnifiedDiffOutput($outputBuilder);
         } else {
             throw new InvalidArgumentException(
-            \sprintf(
-                    'Expected builder to be an instance of DiffOutputBuilderInterface, <null> or a string, got %s.', \is_object($outputBuilder) ? 'instance of "' . \get_class($outputBuilder) . '"' : \gettype($outputBuilder) . ' "' . $outputBuilder . '"'
-            )
+                \sprintf(
+                    'Expected builder to be an instance of DiffOutputBuilderInterface, <null> or a string, got %s.',
+                    \is_object($outputBuilder) ? 'instance of "' . \get_class($outputBuilder) . '"' : \gettype($outputBuilder) . ' "' . $outputBuilder . '"'
+                )
             );
         }
     }
@@ -49,15 +43,17 @@ final class Differ {
     /**
      * Returns the diff between two arrays or strings as string.
      *
-     * @param array|string                            $from
-     * @param array|string                            $to
-     * @param null|LongestCommonSubsequenceCalculator $lcs
+     * @param array|string                                                        $from
+     * @param array|string                                                        $to
+     * @param null|CComparator_Differ_LongestCommonSubsequenceCalculatorInterface $lcs
      *
      * @return string
      */
-    public function diff($from, $to, LongestCommonSubsequenceCalculator $lcs = null) {
+    public function diff($from, $to, CComparator_Differ_LongestCommonSubsequenceCalculatorInterface $lcs = null) {
         $diff = $this->diffToArray(
-                $this->normalizeDiffInput($from), $this->normalizeDiffInput($to), $lcs
+            $this->normalizeDiffInput($from),
+            $this->normalizeDiffInput($to),
+            $lcs
         );
         return $this->outputBuilder->getDiff($diff);
     }
@@ -267,5 +263,4 @@ final class Differ {
         } while (true);
         return [$from, $to, $start, $end];
     }
-
 }

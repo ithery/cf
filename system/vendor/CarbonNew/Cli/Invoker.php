@@ -6,7 +6,7 @@ class Invoker
 {
     const CLI_CLASS_NAME = 'Carbon\\Cli';
 
-    protected function runWithCli(string $className, array $parameters): bool
+    protected function runWithCli($className, array $parameters): bool
     {
         $cli = new $className();
 

@@ -1,24 +1,25 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 12, 2019, 12:19:21 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 12, 2019, 12:19:21 AM
  */
 use CManager_File_Connector_FileManager_FM as FM;
 use Intervention\Image\ImageManager;
 
 class CManager_File_Connector_FileManager_Controller_CropImageController extends CManager_File_Connector_FileManager_AbstractController {
-
-   
     public function execute() {
         $this->crop(true);
     }
 
     /**
      * Crop the image (called via ajax).
+     *
+     * @param mixed $overWrite
      */
     public function crop($overWrite = true) {
         $fm = $this->fm();
@@ -32,21 +33,20 @@ class CManager_File_Connector_FileManager_Controller_CropImageController extends
         }
 
         $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageIsCropping($image_path));
-        $cropInfo = CF::collect(CHTTP::request()->input())->only('dataWidth', 'dataHeight', 'dataX', 'dataY');
-        $width = carr::get($cropInfo,'dataWidth');
-        $height = carr::get($cropInfo,'dataHeight');
-        $x = carr::get($cropInfo,'dataX');
-        $y = carr::get($cropInfo,'dataY');
-        
+        $cropInfo = c::collect(CHTTP::request()->input())->only('dataWidth', 'dataHeight', 'dataX', 'dataY');
+        $width = carr::get($cropInfo, 'dataWidth');
+        $height = carr::get($cropInfo, 'dataHeight');
+        $x = carr::get($cropInfo, 'dataX');
+        $y = carr::get($cropInfo, 'dataY');
+
         $imageManager = new ImageManager();
         $imageManager->make($image_path)
-                ->crop($width,$height,$x,$y)
-                ->save($crop_path);
+            ->crop($width, $height, $x, $y)
+            ->save($crop_path);
         // make new thumbnail
         $fm->path()->makeThumbnail($image_name);
         $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasCropped($image_path));
-        
+
         echo parent::$successResponse;
     }
-
 }

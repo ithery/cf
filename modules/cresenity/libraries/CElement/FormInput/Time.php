@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 24, 2018, 6:09:43 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 24, 2018, 6:09:43 PM
  */
 class CElement_FormInput_Time extends CElement_FormInput {
-
     use CTrait_Compat_Element_FormInput_Time,
         CTrait_Element_Property_Placeholder;
 
@@ -20,63 +20,50 @@ class CElement_FormInput_Time extends CElement_FormInput {
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->type = "timepicker";
+        $this->type = 'timepicker';
         $this->show_second = false;
         $this->template = 'dropdown';
         $this->show_meridian = false;
         $this->minute_step = 1;
 
-        $this->placeholder = "";
+        $this->placeholder = '';
         $this->addClass('form-control');
         CManager::instance()->registerModule('timepicker');
-    }
-
-    public function set_show_meridian($bool) {
-        $this->show_meridian = $bool;
-        return $this;
-    }
-
-    public function set_show_second($bool) {
-        $this->show_second = $bool;
-        return $this;
-    }
-
-    public function set_minute_step($step) {
-        $this->minute_step = $step;
-        return $this;
     }
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
-        $disabled = "";
-        if ($this->disabled)
+        $disabled = '';
+        if ($this->disabled) {
             $disabled = ' disabled="disabled"';
+        }
 
-        $addition_attribute = "";
+        $addition_attribute = '';
         foreach ($this->attr as $k => $v) {
-            $addition_attribute .= " " . $k . '="' . $v . '"';
+            $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
 
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
-            $classes = " " . $classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = static::renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
-        $placeholder = "";
+        $placeholder = '';
         if (strlen($this->placeholder) > 0) {
             $placeholder = ' placeholder="' . $this->placeholder . '"';
         }
         if ($this->bootstrap == '3.3') {
-            $classes = $classes . " form-control timepicker";
+            $classes = $classes . ' form-control timepicker';
             $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
         } else {
             if ($this->bootstrap == '3') {
-                $classes = $classes . " form-control ";
+                $classes = $classes . ' form-control ';
             }
             $html->appendln('<div class="bootstrap-timepicker">');
             $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
@@ -96,9 +83,9 @@ class CElement_FormInput_Time extends CElement_FormInput {
             $js->appendln("	defaultTime: 'false',");
         }
         if (strlen($this->minute_step) > 0) {
-            $js->appendln("	minuteStep: " . $this->minute_step . ",");
+            $js->appendln('	minuteStep: ' . $this->minute_step . ',');
         } else {
-            $js->appendln("	minuteStep: 1,");
+            $js->appendln('	minuteStep: 1,');
         }
         if (strlen($this->template) > 0) {
             $js->appendln("	template: '" . $this->template . "',");
@@ -106,21 +93,20 @@ class CElement_FormInput_Time extends CElement_FormInput {
             $js->appendln("	template: 'dropdown',");
         }
         if ($this->show_second) {
-            $js->appendln("	showSeconds: true,");
+            $js->appendln('	showSeconds: true,');
         } else {
-            $js->appendln("	showSeconds: false,");
+            $js->appendln('	showSeconds: false,');
         }
         if ($this->show_meridian) {
-            $js->appendln("	showMeridian: true,");
+            $js->appendln('	showMeridian: true,');
         } else {
-            $js->appendln("	showMeridian: false,");
+            $js->appendln('	showMeridian: false,');
         }
 
         $js->appendln("	template: 'dropdown',");
-        $js->appendln("	disableFocus: true");
-        $js->appendln("});");
+        $js->appendln('	disableFocus: true');
+        $js->appendln('});');
 
         return $js->text();
     }
-
 }

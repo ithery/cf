@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 11:20:31 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 11:20:31 AM
  */
 class CTranslation_Translator extends CBase_NamespacedItemResolver implements CTranslation_TranslatorInterface {
-
     use CTrait_Macroable;
 
     /**
@@ -42,27 +42,30 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * The message selector.
      *
-     * @var \Illuminate\Translation\MessageSelector
+     * @var CTranslation_MessageSelector
      */
     protected $selector;
 
     /**
      * Create a new translator instance.
      *
-     * @param  CTranslation_LoaderAbstract  $loader
-     * @param  string  $locale
+     * @param CTranslation_LoaderAbstract $loader
+     * @param string                      $locale
+     *
      * @return void
      */
-    public function __construct(CTranslation_LoaderAbstract $loader, $locale='en_US') {
+    public function __construct(CTranslation_LoaderAbstract $loader, $locale = 'en_US') {
         $this->loader = $loader;
         $this->locale = $locale;
+        $this->fallback = CF::config('app.fallback_locale');
     }
 
     /**
      * Determine if a translation exists for a given locale.
      *
-     * @param  string  $key
-     * @param  string|null  $locale
+     * @param string      $key
+     * @param string|null $locale
+     *
      * @return bool
      */
     public function hasForLocale($key, $locale = null) {
@@ -72,9 +75,10 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Determine if a translation exists.
      *
-     * @param  string  $key
-     * @param  string|null  $locale
-     * @param  bool  $fallback
+     * @param string      $key
+     * @param string|null $locale
+     * @param bool        $fallback
+     *
      * @return bool
      */
     public function has($key, $locale = null, $fallback = true) {
@@ -84,9 +88,10 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Get the translation for a given key.
      *
-     * @param  string  $key
-     * @param  array   $replace
-     * @param  string  $locale
+     * @param string $key
+     * @param array  $replace
+     * @param string $locale
+     *
      * @return string|array|null
      */
     public function trans($key, array $replace = [], $locale = null) {
@@ -96,27 +101,34 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Get the translation for the given key.
      *
-     * @param  string  $key
-     * @param  array   $replace
-     * @param  string|null  $locale
-     * @param  bool  $fallback
+     * @param string      $key
+     * @param array       $replace
+     * @param string|null $locale
+     * @param bool        $fallback
+     *
      * @return string|array|null
      */
     public function get($key, array $replace = [], $locale = null, $fallback = true) {
         list($namespace, $group, $item) = $this->parseKey($key);
-       
+
         // Here we will get the locale that should be used for the language line. If one
         // was not passed, we will use the default locales which was given to us when
         // the translator was instantiated. Then, we can load the lines and return.
         $locales = $fallback ? $this->localeArray($locale) : [$locale ?: $this->locale];
+
         foreach ($locales as $locale) {
             if (!is_null($line = $this->getLine(
-                            $namespace, $group, $locale, $item, $replace
-                    ))) {
+                $namespace,
+                $group,
+                $locale,
+                $item,
+                $replace
+            ))
+            ) {
                 break;
             }
         }
-        
+
         // If the line doesn't exist, we will return back the key which was requested as
         // that will be quick to spot in the UI if language keys are wrong or missing
         // from the application's language files. Otherwise we can return the line.
@@ -124,15 +136,16 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
             return $line;
         }
 
-        return $key;
+        return $this->makeReplacements($key, $replace);
     }
 
     /**
      * Get the translation for a given key from the JSON translation files.
      *
-     * @param  string  $key
-     * @param  array  $replace
-     * @param  string  $locale
+     * @param string $key
+     * @param array  $replace
+     * @param string $locale
+     *
      * @return string|array|null
      */
     public function getFromJson($key, array $replace = [], $locale = null) {
@@ -162,10 +175,11 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Get a translation according to an integer value.
      *
-     * @param  string  $key
-     * @param  int|array|\Countable  $number
-     * @param  array   $replace
-     * @param  string  $locale
+     * @param string               $key
+     * @param int|array|\Countable $number
+     * @param array                $replace
+     * @param string               $locale
+     *
      * @return string
      */
     public function transChoice($key, $number, array $replace = [], $locale = null) {
@@ -175,20 +189,23 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Get a translation according to an integer value.
      *
-     * @param  string  $key
-     * @param  int|array|\Countable  $number
-     * @param  array   $replace
-     * @param  string  $locale
+     * @param string               $key
+     * @param int|array|\Countable $number
+     * @param array                $replace
+     * @param string               $locale
+     *
      * @return string
      */
     public function choice($key, $number, array $replace = [], $locale = null) {
         $line = $this->get(
-                $key, $replace, $locale = $this->localeForChoice($locale)
+            $key,
+            $replace,
+            $locale = $this->localeForChoice($locale)
         );
 
-// If the given "number" is actually an array or countable we will simply count the
-// number of elements in an instance. This allows developers to pass an array of
-// items without having to count it on their end first which gives bad syntax.
+        // If the given "number" is actually an array or countable we will simply count the
+        // number of elements in an instance. This allows developers to pass an array of
+        // items without having to count it on their end first which gives bad syntax.
         if (is_array($number) || $number instanceof Countable) {
             $number = count($number);
         }
@@ -196,14 +213,16 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
         $replace['count'] = $number;
 
         return $this->makeReplacements(
-                        $this->getSelector()->choose($line, $number, $locale), $replace
+            $this->getSelector()->choose($line, $number, $locale),
+            $replace
         );
     }
 
     /**
      * Get the proper locale for a choice operation.
      *
-     * @param  string|null  $locale
+     * @param string|null $locale
+     *
      * @return string
      */
     protected function localeForChoice($locale) {
@@ -213,11 +232,12 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Retrieve a language line out the loaded array.
      *
-     * @param  string  $namespace
-     * @param  string  $group
-     * @param  string  $locale
-     * @param  string  $item
-     * @param  array   $replace
+     * @param string $namespace
+     * @param string $group
+     * @param string $locale
+     * @param string $item
+     * @param array  $replace
+     *
      * @return string|array|null
      */
     protected function getLine($namespace, $group, $locale, $item, array $replace) {
@@ -235,8 +255,9 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Make the place-holder replacements on a line.
      *
-     * @param  string  $line
-     * @param  array   $replace
+     * @param string $line
+     * @param array  $replace
+     *
      * @return string
      */
     protected function makeReplacements($line, array $replace) {
@@ -247,8 +268,13 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
         $replace = $this->sortReplacements($replace);
 
         foreach ($replace as $key => $value) {
+            if (cstr::startsWith($key, ':')) {
+                $key = substr($key, 1);
+            }
             $line = str_replace(
-                    [':' . $key, ':' . cstr::upper($key), ':' . cstr::ucfirst($key)], [$value, cstr::upper($value), cstr::ucfirst($value)], $line
+                [':' . $key, ':' . cstr::upper($key), ':' . cstr::ucfirst($key)],
+                [$value, cstr::upper($value), cstr::ucfirst($value)],
+                $line
             );
         }
 
@@ -258,21 +284,23 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Sort the replacements array.
      *
-     * @param  array  $replace
+     * @param array $replace
+     *
      * @return array
      */
     protected function sortReplacements(array $replace) {
         return (new CCollection($replace))->sortBy(function ($value, $key) {
-                    return mb_strlen($key) * -1;
-                })->all();
+            return mb_strlen($key) * -1;
+        })->all();
     }
 
     /**
      * Add translation lines to the given locale.
      *
-     * @param  array  $lines
-     * @param  string  $locale
-     * @param  string  $namespace
+     * @param array  $lines
+     * @param string $locale
+     * @param string $namespace
+     *
      * @return void
      */
     public function addLines(array $lines, $locale, $namespace = '*') {
@@ -286,9 +314,10 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Load the specified language group.
      *
-     * @param  string  $namespace
-     * @param  string  $group
-     * @param  string  $locale
+     * @param string $namespace
+     * @param string $group
+     * @param string $locale
+     *
      * @return void
      */
     public function load($namespace, $group, $locale) {
@@ -307,9 +336,10 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Determine if the given group has been loaded.
      *
-     * @param  string  $namespace
-     * @param  string  $group
-     * @param  string  $locale
+     * @param string $namespace
+     * @param string $group
+     * @param string $locale
+     *
      * @return bool
      */
     protected function isLoaded($namespace, $group, $locale) {
@@ -319,8 +349,9 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Add a new namespace to the loader.
      *
-     * @param  string  $namespace
-     * @param  string  $hint
+     * @param string $namespace
+     * @param string $hint
+     *
      * @return void
      */
     public function addNamespace($namespace, $hint) {
@@ -330,7 +361,8 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Add a new JSON path to the loader.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return void
      */
     public function addJsonPath($path) {
@@ -340,7 +372,8 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Parse a key into namespace, group, and item.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return array
      */
     public function parseKey($key) {
@@ -356,7 +389,8 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Get the array of locales to be checked.
      *
-     * @param  string|null  $locale
+     * @param string|null $locale
+     *
      * @return array
      */
     protected function localeArray($locale) {
@@ -379,7 +413,8 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Set the message selector instance.
      *
-     * @param  CTranslation_MessageSelector  $selector
+     * @param CTranslation_MessageSelector $selector
+     *
      * @return void
      */
     public function setSelector(CTranslation_MessageSelector $selector) {
@@ -416,7 +451,8 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Set the default locale.
      *
-     * @param  string  $locale
+     * @param string $locale
+     *
      * @return void
      */
     public function setLocale($locale) {
@@ -435,11 +471,11 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
     /**
      * Set the fallback locale being used.
      *
-     * @param  string  $fallback
+     * @param string $fallback
+     *
      * @return void
      */
     public function setFallback($fallback) {
         $this->fallback = $fallback;
     }
-
 }

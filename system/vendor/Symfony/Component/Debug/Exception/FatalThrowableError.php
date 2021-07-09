@@ -48,7 +48,7 @@ class FatalThrowableError extends FatalErrorException
         $this->setTrace($e->getTrace());
     }
 
-    public function getOriginalClassName(): string
+    public function getOriginalClassName()
     {
         return $this->originalClassName;
     }

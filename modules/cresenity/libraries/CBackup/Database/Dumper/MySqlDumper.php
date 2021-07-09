@@ -1,43 +1,56 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Symfony\Component\Process\Process;
 
 class CBackup_Database_Dumper_MySqlDumper extends CBackup_Database_AbstractDumper {
-
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $skipComments = true;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $useExtendedInserts = true;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $useSingleTransaction = false;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $skipLockTables = false;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $useQuick = false;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $defaultCharacterSet = '';
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $dbNameWasSetAsExtraOption = false;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $allDatabasesWasSetAsExtraOption = false;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $setGtidPurged = 'AUTO';
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $createTables = true;
 
     public function __construct() {
@@ -135,6 +148,8 @@ class CBackup_Database_Dumper_MySqlDumper extends CBackup_Database_AbstractDumpe
     }
 
     /**
+     * @param mixed $setGtidPurged
+     *
      * @return $this
      */
     public function setGtidPurged($setGtidPurged) {
@@ -147,8 +162,8 @@ class CBackup_Database_Dumper_MySqlDumper extends CBackup_Database_AbstractDumpe
      *
      * @param string $dumpFile
      *
-     * @throws \Spatie\DbDumper\Exceptions\CannotStartDump
-     * @throws \Spatie\DbDumper\Exceptions\DumpFailed
+     * @throws \CBackup_Database_Exception_CannotStartDumpException
+     * @throws \CBackup_Database_Exception_DumpFailedException
      */
     public function dumpToFile($dumpFile) {
         $this->guardAgainstIncompleteCredentials();
@@ -156,7 +171,7 @@ class CBackup_Database_Dumper_MySqlDumper extends CBackup_Database_AbstractDumpe
         fwrite($tempFileHandle, $this->getContentsOfCredentialsFile());
         $temporaryCredentialsFile = stream_get_meta_data($tempFileHandle)['uri'];
         $command = $this->getDumpCommand($dumpFile, $temporaryCredentialsFile);
-        
+
         $process = Process::fromShellCommandline($command, null, null, null, $this->timeout);
         $process->run();
         $this->checkIfDumpWasSuccessFul($process, $dumpFile);
@@ -258,5 +273,4 @@ class CBackup_Database_Dumper_MySqlDumper extends CBackup_Database_AbstractDumpe
             throw CBackup_Database_Exception_CannotStartDumpException::emptyParameter($requiredProperty);
         }
     }
-
 }

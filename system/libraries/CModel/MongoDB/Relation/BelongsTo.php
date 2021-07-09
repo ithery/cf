@@ -1,16 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Oct 21, 2019, 9:22:47 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Oct 21, 2019, 9:22:47 PM
  */
 class CModel_MongoDB_Relation_BelongsTo extends CModel_Relation_BelongsTo {
-
     /**
      * Get the key for comparing against the parent key in "has" query.
+     *
      * @return string
      */
     public function getHasCompareKey() {
@@ -49,6 +50,7 @@ class CModel_MongoDB_Relation_BelongsTo extends CModel_Relation_BelongsTo {
 
     /**
      * Get the owner key with backwards compatible support.
+     *
      * @return string
      */
     public function getOwnerKey() {
@@ -57,12 +59,13 @@ class CModel_MongoDB_Relation_BelongsTo extends CModel_Relation_BelongsTo {
 
     /**
      * Get the name of the "where in" method for eager loading.
+     *
      * @param \Illuminate\Database\Eloquent\Model $model
-     * @param string $key
+     * @param string                              $key
+     *
      * @return string
      */
     protected function whereInMethod(CModel $model, $key) {
         return 'whereIn';
     }
-
 }

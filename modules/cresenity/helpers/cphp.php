@@ -1,9 +1,8 @@
 <?php
 
+//@codingStandardsIgnoreStart
 class cphp {
-
     public static function string_value($val, $level = 0) {
-
         $str = '';
         $eol = PHP_EOL;
         $indent = cutils::indent($level, "\t");
@@ -14,15 +13,14 @@ class cphp {
                 $kSlashes = addcslashes($k, '\'\\');
                 $str .= $indent2 . "'" . $kSlashes . "'=>";
                 $str .= self::string_value($v, $level + 1);
-                $str .= "," . $eol;
+                $str .= ',' . $eol;
             }
 
             $str .= $indent . ')';
-        } else if (is_null($val)) {
+        } elseif (is_null($val)) {
             $str .= 'NULL';
-        } else if (is_bool($val)) {
-
-            $str .= ($val === TRUE ? "TRUE" : "FALSE");
+        } elseif (is_bool($val)) {
+            $str .= ($val === true ? 'TRUE' : 'FALSE');
         } else {
             $str .= "'" . addcslashes($val, '\'\\') . "'";
         }
@@ -40,9 +38,9 @@ class cphp {
 
     public static function load_value($filename) {
         if (!file_exists($filename)) {
-            throw new Exception($filename . " Not found");
+            throw new Exception($filename . ' Not found');
         }
         return include $filename;
     }
-
 }
+//@codingStandardsIgnoreEnd

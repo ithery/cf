@@ -1,19 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Oct 21, 2019, 9:21:53 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Oct 21, 2019, 9:21:53 PM
  */
 trait CModel_MongoDB_Trait_HybridRelationsTrait {
-
     /**
      * Define a one-to-one relationship.
+     *
      * @param string $related
      * @param string $foreignKey
      * @param string $localKey
+     *
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function hasOne($related, $foreignKey = null, $localKey = null) {
@@ -29,12 +31,14 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
 
     /**
      * Define a polymorphic one-to-one relationship.
+     *
      * @param string $related
      * @param string $name
      * @param string $type
      * @param string $id
      * @param string $localKey
-     * @return \Illuminate\Database\Eloquent\Relations\MorphOne
+     *
+     * @return CModel_Relation_MorphOne
      */
     public function morphOne($related, $name, $type = null, $id = null, $localKey = null) {
         // Check if it is a relation with an original model.
@@ -44,15 +48,17 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         $instance = new $related;
         list($type, $id) = $this->getMorphs($name, $type, $id);
         $localKey = $localKey ?: $this->getKeyName();
-        return new CModel_MongoDB_Relation_MorphOne($instance->newQuery(), $this, $type, $id, $localKey);
+        return new CModel_Relation_MorphOne($instance->newQuery(), $this, $type, $id, $localKey);
     }
 
     /**
      * Define a one-to-many relationship.
+     *
      * @param string $related
      * @param string $foreignKey
      * @param string $localKey
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     *
+     * @return CModel_Relation_HasMany
      */
     public function hasMany($related, $foreignKey = null, $localKey = null) {
         // Check if it is a relation with an original model.
@@ -67,11 +73,13 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
 
     /**
      * Define a polymorphic one-to-many relationship.
+     *
      * @param string $related
      * @param string $name
      * @param string $type
      * @param string $id
      * @param string $localKey
+     *
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany
      */
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null) {
@@ -91,10 +99,12 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
 
     /**
      * Define an inverse one-to-one or many relationship.
+     *
      * @param string $related
      * @param string $foreignKey
      * @param string $otherKey
      * @param string $relation
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function belongsTo($related, $foreignKey = null, $otherKey = null, $relation = null) {
@@ -105,10 +115,7 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
             list($current, $caller) = debug_backtrace(false, 2);
             $relation = $caller['function'];
         }
-        
-       
-        
-        
+
         // Check if it is a relation with an original model.
         if (!is_subclass_of($related, CModel_MongoDB_Model::class)) {
             return parent::belongsTo($related, $foreignKey, $otherKey, $relation);
@@ -116,18 +123,17 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         // If no foreign key was supplied, we can use a backtrace to guess the proper
         // foreign key name by using the name of the relationship function, which
         // when combined with an "_id" should conventionally match the columns.
-        
-         $instance = new $related;
-         
+
+        $instance = new $related;
+
         if ($foreignKey === null) {
             $foreignKey = cstr::snake($instance->getTable()) . '_id';
         }
-        
+
         if ($foreignKey === null) {
             $foreignKey = cstr::snake($relation) . '_id';
         }
-        
-        
+
         // Once we have the foreign key names, we'll just create a new Eloquent query
         // for the related models and returns the relationship instance which will
         // actually be responsible for retrieving and hydrating every relations.
@@ -138,10 +144,12 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
 
     /**
      * Define a polymorphic, inverse one-to-one or many relationship.
+     *
      * @param string $name
      * @param string $type
      * @param string $id
      * @param string $ownerKey
+     *
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
     public function morphTo($name = null, $type = null, $id = null, $ownerKey = null) {
@@ -158,7 +166,12 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         // there are multiple types in the morph and we can't use single queries.
         if (($class = $this->$type) === null) {
             return new CModel_MongoDB_Relation_MorphTo(
-                    $this->newQuery(), $this, $id, null, $type, $name
+                $this->newQuery(),
+                $this,
+                $id,
+                null,
+                $type,
+                $name
             );
         }
         // If we are not eager loading the relationship we will essentially treat this
@@ -167,12 +180,18 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         $class = $this->getActualClassNameForMorph($class);
         $instance = new $class;
         return new CModel_MongoDB_Relation_MorphTo(
-                $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
+            $instance->newQuery(),
+            $this,
+            $id,
+            $instance->getKeyName(),
+            $type,
+            $name
         );
     }
 
     /**
      * Define a many-to-many relationship.
+     *
      * @param string $related
      * @param string $collection
      * @param string $foreignKey
@@ -180,10 +199,17 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
      * @param string $parentKey
      * @param string $relatedKey
      * @param string $relation
+     *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function belongsToMany(
-    $related, $collection = null, $foreignKey = null, $otherKey = null, $parentKey = null, $relatedKey = null, $relation = null
+        $related,
+        $collection = null,
+        $foreignKey = null,
+        $otherKey = null,
+        $parentKey = null,
+        $relatedKey = null,
+        $relation = null
     ) {
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
@@ -194,7 +220,13 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         // Check if it is a relation with an original model.
         if (!is_subclass_of($related, CModel_MongoDB_Model::class)) {
             return parent::belongsToMany(
-                            $related, $collection, $foreignKey, $otherKey, $parentKey, $relatedKey, $relation
+                $related,
+                $collection,
+                $foreignKey,
+                $otherKey,
+                $parentKey,
+                $relatedKey,
+                $relation
             );
         }
         // First, we'll need to determine the foreign key and "other key" for the
@@ -214,12 +246,20 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         // appropriate query constraint and entirely manages the hydrations.
         $query = $instance->newQuery();
         return new CModel_MongoDB_Relation_BelongsToMany(
-                $query, $this, $collection, $foreignKey, $otherKey, $parentKey ?: $this->getKeyName(), $relatedKey ?: $instance->getKeyName(), $relation
+            $query,
+            $this,
+            $collection,
+            $foreignKey,
+            $otherKey,
+            $parentKey ?: $this->getKeyName(),
+            $relatedKey ?: $instance->getKeyName(),
+            $relation
         );
     }
 
     /**
      * Get the relationship name of the belongs to many.
+     *
      * @return string
      */
     protected function guessBelongsToManyRelation() {
@@ -238,5 +278,4 @@ trait CModel_MongoDB_Trait_HybridRelationsTrait {
         }
         return new CModel_Query($query);
     }
-
 }

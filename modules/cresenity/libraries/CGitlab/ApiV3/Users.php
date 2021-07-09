@@ -1,46 +1,49 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 19, 2018, 4:58:29 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 19, 2018, 4:58:29 AM
  */
 class CGitlab_ApiV3_Users extends CGitlab_Api {
-
     /**
      * @param null|true $active
-     * @param int $page
-     * @param int $per_page
+     * @param int       $page
+     * @param int       $per_page
+     *
      * @return mixed
      */
     public function all($active = null, $page = 1, $per_page = self::PER_PAGE) {
-        return $this->get('users', array(
-                    'active' => $active,
-                    'page' => $page,
-                    'per_page' => $per_page
-        ));
+        return $this->get('users', [
+            'active' => $active,
+            'page' => $page,
+            'per_page' => $per_page
+        ]);
     }
 
     /**
-     * @param string $query
+     * @param string    $query
      * @param null|true $active
-     * @param int $page
-     * @param int $per_page
+     * @param int       $page
+     * @param int       $per_page
+     *
      * @return mixed
      */
     public function search($query, $active = null, $page = 1, $per_page = self::PER_PAGE) {
-        return $this->get('users', array(
-                    'search' => $query,
-                    'active' => $active,
-                    'page' => $page,
-                    'per_page' => $per_page
-        ));
+        return $this->get('users', [
+            'search' => $query,
+            'active' => $active,
+            'page' => $page,
+            'per_page' => $per_page
+        ]);
     }
 
     /**
      * @param int $id
+     *
      * @return mixed
      */
     public function show($id) {
@@ -50,18 +53,20 @@ class CGitlab_ApiV3_Users extends CGitlab_Api {
     /**
      * @param string $email
      * @param string $password
-     * @param array $params
+     * @param array  $params
+     *
      * @return mixed
      */
-    public function create($email, $password, array $params = array()) {
+    public function create($email, $password, array $params = []) {
         $params['email'] = $email;
         $params['password'] = $password;
         return $this->post('users', $params);
     }
 
     /**
-     * @param int $id
+     * @param int   $id
      * @param array $params
+     *
      * @return mixed
      */
     public function update($id, array $params) {
@@ -70,6 +75,7 @@ class CGitlab_ApiV3_Users extends CGitlab_Api {
 
     /**
      * @param int $id
+     *
      * @return mixed
      */
     public function remove($id) {
@@ -77,7 +83,8 @@ class CGitlab_ApiV3_Users extends CGitlab_Api {
     }
 
     /**
-     * @param  int $id
+     * @param int $id
+     *
      * @return mixed
      */
     public function block($id) {
@@ -85,7 +92,8 @@ class CGitlab_ApiV3_Users extends CGitlab_Api {
     }
 
     /**
-     * @param  int $id
+     * @param int $id
+     *
      * @return mixed
      */
     public function unblock($id) {
@@ -95,19 +103,21 @@ class CGitlab_ApiV3_Users extends CGitlab_Api {
     /**
      * @param string $emailOrUsername
      * @param string $password
+     *
      * @return mixed
      */
     public function session($emailOrUsername, $password) {
-        return $this->post('session', array(
-                    'login' => $emailOrUsername,
-                    'email' => $emailOrUsername,
-                    'password' => $password
-        ));
+        return $this->post('session', [
+            'login' => $emailOrUsername,
+            'email' => $emailOrUsername,
+            'password' => $password
+        ]);
     }
 
     /**
      * @param string $email
      * @param string $password
+     *
      * @return mixed
      */
     public function login($email, $password) {
@@ -130,6 +140,7 @@ class CGitlab_ApiV3_Users extends CGitlab_Api {
 
     /**
      * @param int $id
+     *
      * @return mixed
      */
     public function key($id) {
@@ -139,17 +150,19 @@ class CGitlab_ApiV3_Users extends CGitlab_Api {
     /**
      * @param string $title
      * @param string $key
+     *
      * @return mixed
      */
     public function createKey($title, $key) {
-        return $this->post('user/keys', array(
-                    'title' => $title,
-                    'key' => $key
-        ));
+        return $this->post('user/keys', [
+            'title' => $title,
+            'key' => $key
+        ]);
     }
 
     /**
      * @param int $id
+     *
      * @return mixed
      */
     public function removeKey($id) {
@@ -158,38 +171,41 @@ class CGitlab_ApiV3_Users extends CGitlab_Api {
 
     /**
      * @param int $user_id
+     *
      * @return mixed
      */
     public function userKeys($user_id) {
         return $this->get('users/' . $this->encodePath($user_id) . '/keys');
     }
 
-    /*
+    /**
      * @param int $user_id
      * @param int $key_id
+     *
      * @return mixed
      */
-
     public function userKey($user_id, $key_id) {
         return $this->get('users/' . $this->encodePath($user_id) . '/keys/' . $this->encodePath($key_id));
     }
 
     /**
-     * @param int $user_id
+     * @param int    $user_id
      * @param string $title
      * @param string $key
+     *
      * @return mixed
      */
     public function createKeyForUser($user_id, $title, $key) {
-        return $this->post('users/' . $this->encodePath($user_id) . '/keys', array(
-                    'title' => $title,
-                    'key' => $key
-        ));
+        return $this->post('users/' . $this->encodePath($user_id) . '/keys', [
+            'title' => $title,
+            'key' => $key
+        ]);
     }
 
     /**
      * @param int $user_id
      * @param int $key_id
+     *
      * @return mixed
      */
     public function removeUserKey($user_id, $key_id) {
@@ -205,10 +221,10 @@ class CGitlab_ApiV3_Users extends CGitlab_Api {
 
     /**
      * @param $id
+     *
      * @return mixed
      */
     public function email($id) {
         return $this->get('user/emails/' . $this->encodePath($id));
     }
-
 }

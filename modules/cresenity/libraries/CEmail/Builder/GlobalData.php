@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CEmail_Builder_GlobalData {
-
     protected $data = [];
     protected static $instance;
 
@@ -19,13 +12,11 @@ class CEmail_Builder_GlobalData {
     }
 
     public function reset() {
-        
         $this->data = [];
     }
 
     private function __construct() {
-        
-       $this->reset();
+        $this->reset();
     }
 
     public function get($key, $defaultValue = null) {
@@ -46,9 +37,7 @@ class CEmail_Builder_GlobalData {
 
     public function push($key, $value) {
         if (isset($this->data[$key]) && is_array($this->data[$key])) {
-           
-            $this->data[$key] = array_merge($this->data[$key],$value);
+            $this->data[$key] = array_merge($this->data[$key], $value);
         }
     }
-
 }

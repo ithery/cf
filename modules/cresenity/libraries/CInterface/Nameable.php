@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 7, 2018, 8:12:50 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jul 7, 2018, 8:12:50 PM
  */
 interface CInterface_Nameable {
-
     /**
      * Retrieve the name of this object.
      *

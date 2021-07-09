@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 abstract class CMage_AbstractMage implements ArrayAccess, CMage_MageInterface {
-
     use CMage_Mage_Trait_AuthorizableTrait;
     use CMage_Mage_Trait_ValidationTrait;
     use CMage_Mage_Trait_LoadAttributeTrait;
@@ -16,23 +9,27 @@ abstract class CMage_AbstractMage implements ArrayAccess, CMage_MageInterface {
     use CMage_Mage_Trait_DelegatesToModelTrait;
 
     public $title = null;
+
     public $modelClass;
+
     public $model;
 
     /**
-     *
      * @var CMage_Mage_FieldCollection
      */
     protected $fields;
 
     /**
-     *
      * @var CMage_Mage_FilterCollection
      */
     protected $filters;
+
     public $haveAdd = true;
+
     public $haveEdit = true;
+
     public $haveDelete = true;
+
     public $haveDetail = true;
 
     public function __construct() {
@@ -45,7 +42,6 @@ abstract class CMage_AbstractMage implements ArrayAccess, CMage_MageInterface {
     }
 
     /**
-     * 
      * @return CMage_Mage_FieldCollection
      */
     public function fields() {
@@ -53,7 +49,6 @@ abstract class CMage_AbstractMage implements ArrayAccess, CMage_MageInterface {
     }
 
     /**
-     * 
      * @return CMage_Mage_FieldData
      */
     public function filters() {
@@ -67,7 +62,7 @@ abstract class CMage_AbstractMage implements ArrayAccess, CMage_MageInterface {
      */
     public function newModel() {
         $model = $this->modelClass;
-       
+
         return new $model;
     }
 
@@ -76,40 +71,41 @@ abstract class CMage_AbstractMage implements ArrayAccess, CMage_MageInterface {
         return $this;
     }
 
-    public function getAddFieldsFromRequest($request=array()) {
-         if($request==null){
+    public function getAddFieldsFromRequest($request = []) {
+        if ($request == null) {
             $request = CApp_Base::getRequest();
         }
-        $addFields = $this->fields->reject(function($field) use ($request) {
+        $addFields = $this->fields->reject(function ($field) use ($request) {
             return !$field->showOnAdd || !array_key_exists($field->getName(), $request);
         });
         return $addFields;
     }
-    public function getEditFieldsFromRequest($request=array()) {
-        if($request==null){
+
+    public function getEditFieldsFromRequest($request = []) {
+        if ($request == null) {
             $request = CApp_Base::getRequest();
         }
-        $addFields = $this->fields->reject(function($field) use ($request) {
+        $addFields = $this->fields->reject(function ($field) use ($request) {
             return !$field->showOnEdit || !array_key_exists($field->getName(), $request);
         });
         return $addFields;
     }
+
     public function getIndexFields() {
         $request = CApp_Base::getRequest();
-        $indexFields = $this->fields->reject(function($field) {
-            return !$field->showOnIndex; 
+        $indexFields = $this->fields->reject(function ($field) {
+            return !$field->showOnIndex;
         });
         return $indexFields;
     }
-    
+
     public function buildModelForIndex() {
         $model = $this->newModel();
         $indexFields = $this->getIndexFields();
-        
-        foreach($indexFields as $field) {
+
+        foreach ($indexFields as $field) {
             $model->addSelect($field->getName());
         }
         return $model;
     }
-
 }

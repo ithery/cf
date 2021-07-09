@@ -1,52 +1,55 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ * @license Ittron Global Teknologi <ittron.co.id>
+ *
  * @since Feb 16, 2019, 3:49:34 PM
- * @licene Ittron Global Teknologi <ittron.co.id>
  */
 interface CCache_Driver_FileDriver_EngineInterface {
-
     /**
      * Retrieve an content from the file by key.
      *
-     * @param  string|array  $key
-     * @param  bool          $lock
+     * @param string|array $key
+     * @param bool         $lock
+     *
      * @return mixed
      */
     public function get($key, $lock = false);
 
     /**
-     * get the content in the file by key
+     * Get the content in the file by key
      *
-     * @param  string  $key
-     * @param  mixed   $content
-     * @param  bool    $lock
+     * @param string $key
+     * @param mixed  $content
+     * @param bool   $lock
+     *
      * @return void
      */
     public function put($key, $content, $lock = false);
 
     /**
-     * check file exists by key
+     * Check file exists by key
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return void
      */
     public function exists($key);
 
     /**
-     * delete file exists by key
+     * Delete file exists by key
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return void
      */
     public function delete($key);
 
     /**
-     * delete all files
-     *
+     * Delete all files
      */
     public function deleteDirectory();
 }

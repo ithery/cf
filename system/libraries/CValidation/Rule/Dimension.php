@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 12, 2019, 7:58:07 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 12, 2019, 7:58:07 PM
  */
-class CValidator_Rule_Dimension {
-
+class CValidation_Rule_Dimension {
     /**
      * The constraints for the dimensions rule.
      *
@@ -19,7 +19,8 @@ class CValidator_Rule_Dimension {
     /**
      * Create a new dimensions rule instance.
      *
-     * @param  array  $constraints;
+     * @param array $constraints;
+     *
      * @return void
      */
     public function __construct(array $constraints = []) {
@@ -29,7 +30,8 @@ class CValidator_Rule_Dimension {
     /**
      * Set the "width" constraint.
      *
-     * @param  int  $value
+     * @param int $value
+     *
      * @return $this
      */
     public function width($value) {
@@ -41,7 +43,8 @@ class CValidator_Rule_Dimension {
     /**
      * Set the "height" constraint.
      *
-     * @param  int  $value
+     * @param int $value
+     *
      * @return $this
      */
     public function height($value) {
@@ -53,7 +56,8 @@ class CValidator_Rule_Dimension {
     /**
      * Set the "min width" constraint.
      *
-     * @param  int  $value
+     * @param int $value
+     *
      * @return $this
      */
     public function minWidth($value) {
@@ -65,7 +69,8 @@ class CValidator_Rule_Dimension {
     /**
      * Set the "min height" constraint.
      *
-     * @param  int  $value
+     * @param int $value
+     *
      * @return $this
      */
     public function minHeight($value) {
@@ -77,7 +82,8 @@ class CValidator_Rule_Dimension {
     /**
      * Set the "max width" constraint.
      *
-     * @param  int  $value
+     * @param int $value
+     *
      * @return $this
      */
     public function maxWidth($value) {
@@ -89,7 +95,8 @@ class CValidator_Rule_Dimension {
     /**
      * Set the "max height" constraint.
      *
-     * @param  int  $value
+     * @param int $value
+     *
      * @return $this
      */
     public function maxHeight($value) {
@@ -101,7 +108,8 @@ class CValidator_Rule_Dimension {
     /**
      * Set the "ratio" constraint.
      *
-     * @param  float  $value
+     * @param float $value
+     *
      * @return $this
      */
     public function ratio($value) {
@@ -124,5 +132,4 @@ class CValidator_Rule_Dimension {
 
         return 'dimensions:' . substr($result, 0, -1);
     }
-
 }

@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use GuzzleHttp\Psr7\AppendStream;
 use GuzzleHttp\Psr7\Request;
 use function GuzzleHttp\Psr7\stream_for;
@@ -25,7 +19,6 @@ use Psr\Http\Message\UriInterface;
  * body
  */
 final class CVendor_Firebase_Http_RequestWithSubRequests implements CVendor_Firebase_Http_HasSubRequestsInterface, RequestInterface {
-
     use CVendor_Firebase_Trait_WrappedPsr7RequestTrait;
 
     /** @var string */
@@ -45,7 +38,7 @@ final class CVendor_Firebase_Http_RequestWithSubRequests implements CVendor_Fire
 
     /**
      * @param string|UriInterface $uri
-     * @param string $version Protocol version
+     * @param string              $version Protocol version
      */
     public function __construct($uri, CVendor_Firebase_Http_Requests $subRequests, $version = '1.1') {
         $this->boundary = \sha1(\uniqid('', true));
@@ -107,5 +100,4 @@ final class CVendor_Firebase_Http_RequestWithSubRequests implements CVendor_Fire
 
         return \implode("\r\n", $headers);
     }
-
 }

@@ -1,21 +1,15 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Psr\Http\Message\ServerRequestInterface;
 
 /**
  * Class     AbstractNoCaptcha
  *
  * @package  Arcanedev\NoCaptcha
+ *
  * @author   ARCANEDEV <arcanedev.maroc@gmail.com>
  */
 abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Google_Recaptcha_RecaptchaInterface {
-
     const CAPTCHA_NAME = 'g-recaptcha-response';
 
     /**
@@ -69,9 +63,9 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     /**
      * NoCaptcha constructor.
      *
-     * @param  string       $secret
-     * @param  string       $siteKey
-     * @param  string|null  $lang
+     * @param string      $secret
+     * @param string      $siteKey
+     * @param string|null $lang
      */
     public function __construct($secret, $siteKey, $lang = null) {
         $this->setSecret($secret);
@@ -89,7 +83,7 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     /**
      * Set the secret key.
      *
-     * @param  string  $secret
+     * @param string $secret
      *
      * @return $this
      */
@@ -113,7 +107,7 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     /**
      * Set Site key.
      *
-     * @param  string  $siteKey
+     * @param string $siteKey
      *
      * @return $this
      */
@@ -128,7 +122,7 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     /**
      * Set language code.
      *
-     * @param  string  $lang
+     * @param string $lang
      *
      * @return $this
      */
@@ -141,7 +135,7 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     /**
      * Set HTTP Request Client.
      *
-     * @param  CVendor_Google_Recaptcha_Http_Request  $request
+     * @param CVendor_Google_Recaptcha_Http_Request $request
      *
      * @return $this
      */
@@ -186,8 +180,8 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     /**
      * Verify Response.
      *
-     * @param  string  $response
-     * @param  string  $clientIp
+     * @param string $response
+     * @param string $clientIp
      *
      * @return CVendor_Google_Recaptcha_Http_AbstractResponse|mixed
      */
@@ -203,7 +197,7 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
      * Calls the reCAPTCHA siteverify API to verify whether the user passes CAPTCHA
      * test using a PSR-7 ServerRequest object.
      *
-     * @param  \Psr\Http\Message\ServerRequestInterface  $request
+     * @param \Psr\Http\Message\ServerRequestInterface $request
      *
      * @return CVendor_Google_Recaptcha_Http_AbstractResponse
      */
@@ -212,21 +206,22 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
         $server = $request->getServerParams();
 
         return $this->verify(
-                        isset($body[self::CAPTCHA_NAME]) ? $body[self::CAPTCHA_NAME] : '', isset($server['REMOTE_ADDR']) ? $server['REMOTE_ADDR'] : null
+            isset($body[self::CAPTCHA_NAME]) ? $body[self::CAPTCHA_NAME] : '',
+            isset($server['REMOTE_ADDR']) ? $server['REMOTE_ADDR'] : null
         );
     }
 
     /**
      * Send verify request to API and get response.
      *
-     * @param  array  $query
+     * @param array $query
      *
      * @return CVendor_Google_Recaptcha_Http_AbstractResponse
      */
     protected function sendVerifyRequest(array $query = []) {
         $query = array_filter($query);
         $json = $this->request->send(
-                $this->getVerificationUrl() . '?' . http_build_query($query)
+            $this->getVerificationUrl() . '?' . http_build_query($query)
         );
 
         return $this->parseResponse($json);
@@ -235,7 +230,7 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     /**
      * Parse the response.
      *
-     * @param  string  $json
+     * @param string $json
      *
      * @return CVendor_Google_Recaptcha_Http_AbstractResponse|mixed
      */
@@ -258,8 +253,8 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     /**
      * Check key.
      *
-     * @param  string  $name
-     * @param  string  $value
+     * @param string $name
+     * @param string $value
      */
     private static function checkKey($name, &$value) {
         self::checkIsString($name, $value);
@@ -272,15 +267,15 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     /**
      * Check if the value is a string value.
      *
-     * @param  string  $name
-     * @param  string  $value
+     * @param string $name
+     * @param string $value
      *
      * @throws CVendor_Google_Recaptcha_Exception_ApiException
      */
     private static function checkIsString($name, $value) {
         if (!is_string($value)) {
             throw new CVendor_Google_Recaptcha_Exception_ApiException(
-            "The {$name} must be a string value, " . gettype($value) . ' given.'
+                "The {$name} must be a string value, " . gettype($value) . ' given.'
             );
         }
     }
@@ -288,8 +283,8 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
     /**
      * Check if the value is not empty.
      *
-     * @param string  $name
-     * @param string  $value
+     * @param string $name
+     * @param string $value
      *
      * @throws CVendor_Google_Recaptcha_Exception_ApiException
      */
@@ -299,22 +294,19 @@ abstract class CVendor_Google_Recaptcha_AbstractRecaptcha implements CVendor_Goo
         }
     }
 
-    public function createControl($inputName = 'g-recaptcha-response',$type="simple",$options=[]) {
-        $label = carr::get($options,'label','Send');
-        
+    public function createControl($inputName = 'g-recaptcha-response', $type = 'simple', $options = []) {
+        $label = carr::get($options, 'label', 'Send');
+
         $controlRecaptcha = new CElement_FormInput_GoogleRecaptcha('');
         $controlRecaptcha->setRecaptcha($this);
         $controlRecaptcha->setRecaptchaLabel($label);
         $controlRecaptcha->setRecaptchaType($type);
-        
+
         $controlRecaptcha->setRecaptchaInputName($inputName);
-        
-        
+
         $scriptSrc = $this->getScriptSrc();
         CManager::instance()->registerJs($scriptSrc);
-        
-        
+
         return $controlRecaptcha;
     }
-
 }

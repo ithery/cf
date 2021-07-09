@@ -1,10 +1,11 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 13, 2018, 9:04:32 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 13, 2018, 9:04:32 AM
  */
 if (!isset($icon)) {
     $icon = 'lnr lnr-cart';
@@ -43,4 +44,3 @@ if (!isset($description)) {
         </div>
     </div>
 </div>
-

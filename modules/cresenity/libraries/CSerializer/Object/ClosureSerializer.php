@@ -1,19 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Aug 23, 2018, 12:09:48 AM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use SuperClosure\SerializableClosure;
 
 class CSerializer_Object_ClosureSerializer {
-
     /**
-     * @param CSerializer_Serializer    $serializer
-     * @param Closure $splFixedArray
+     * @param CSerializer_Serializer $serializer
+     * @param Closure                $splFixedArray
      *
      * @return array
      */
@@ -25,7 +26,7 @@ class CSerializer_Object_ClosureSerializer {
 
     /**
      * @param CSerializer_Serializer $serializer
-     * @param string     $param
+     * @param string                 $param
      *
      * @return mixed
      */
@@ -34,5 +35,4 @@ class CSerializer_Object_ClosureSerializer {
         $unserialized = $closureSerializer->unserialize($param);
         return $serialized;
     }
-
 }

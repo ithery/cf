@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CRedis_Event_CommandExecuted {
-
     /**
      * The Redis command that was executed.
      *
@@ -46,10 +39,11 @@ class CRedis_Event_CommandExecuted {
     /**
      * Create a new event instance.
      *
-     * @param  string  $command
-     * @param  array  $parameters
-     * @param  float|null  $time
-     * @param  CRedis_AbstractConnection  $connection
+     * @param string                    $command
+     * @param array                     $parameters
+     * @param float|null                $time
+     * @param CRedis_AbstractConnection $connection
+     *
      * @return void
      */
     public function __construct($command, $parameters, $time, $connection) {
@@ -59,5 +53,4 @@ class CRedis_Event_CommandExecuted {
         $this->connection = $connection;
         $this->connectionName = $connection->getName();
     }
-
 }

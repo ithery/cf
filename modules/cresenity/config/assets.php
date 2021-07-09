@@ -1,25 +1,28 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 4, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Aug 4, 2020
  */
 return [
     'css' => [
         'compile' => false,
-        'disk'=>'local',
-        'minify'=>false,
+        'disk' => 'local',
+        'minify' => false,
         'filters' => [],
-        'versioning'=>false,
+        'versioning' => false,
+        'interval' => 0, // in minutes
     ],
     'js' => [
         'compile' => false,
         'minify' => false,
-        'disk'=>'local',
+        'disk' => 'local',
         'filters' => [],
-        'versioning'=>false,
+        'versioning' => false,
+        'interval' => 0, // in minutes
     ],
 ];

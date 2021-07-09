@@ -1,28 +1,20 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Component_BodyComponent {
-
     protected static $tagName = 'c-group';
-    protected  $allowedAttributes = [
+    protected $allowedAttributes = [
         'background-color' => 'color',
         'direction' => 'enum(ltr,rtl)',
         'vertical-align' => 'enum(top,bottom,middle)',
         'width' => 'unit(px,%)',
     ];
-    protected  $defaultAttributes = [
+    protected $defaultAttributes = [
         'direction' => 'ltr',
     ];
 
     public function getChildContext() {
-
         $parentWidth = $this->context->getContainerWidth();
         $nonRawSiblings = $this->getProp('nonRawSiblings', 0);
         $children = $this->getChildren();
@@ -44,9 +36,7 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
             $containerWidth = ($parentWidth - $paddingSize) . 'px';
         }
 
-
         $context = clone $this->context;
-
 
         $context->set('containerWidth', $containerWidth);
         $context->set('nonRawSiblings', count($children));
@@ -101,9 +91,7 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
         $unit = carr::get($widthParserResult, 'unit');
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
 
-
         if ($unit === '%') {
-
             return $containerWidth * $parsedWidth / 100 . 'px';
         }
         return $parsedWidth . 'px';
@@ -135,18 +123,16 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
     }
 
     public function render() {
-
         $children = $this->getChildren();
         $nonRawSiblings = $this->getProp('nonRawSiblings');
         $groupWidth = $this->getChildContext()->getContainerWidth();
         $containerWidth = $this->context->getContainerWidth();
 
-        $getElementWidth = function($width) use($containerWidth, $nonRawSiblings, $groupWidth) {
+        $getElementWidth = function ($width) use ($containerWidth, $nonRawSiblings, $groupWidth) {
             if (!$width) {
                 if ($nonRawSiblings == 0) {
                     return '0px';
                 }
-
 
                 return ($containerWidth / $nonRawSiblings) . 'px';
             }
@@ -167,16 +153,16 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
             $classesName .= $this->getAttribute('css-class');
         }
 
-        $renderer = function($component) use ($getElementWidth) {
+        $renderer = function ($component) use ($getElementWidth) {
             if ($component->isRawElement()) {
                 return $component->render();
             } else {
-                $style = array();
+                $style = [];
                 $style['align'] = $component->getAttribute('align');
                 $style['font-size'] = '0px';
                 $style['vertical-align'] = $component->getAttribute('vertical-align');
                 $style['width'] = call_user_func_array($getElementWidth, [(method_exists($component, 'getWidthAsPixel')) ? $component->getWidthAsPixel() : $component->getAttribute('width')]);
-                
+
                 $tdAttr = [];
 
                 $tdAttr['style'] = $style;
@@ -197,7 +183,7 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
         <table  role="presentation" border="0" cellpadding="0" cellspacing="0">
           <tr>
         <![endif]-->
-        ' . $this->renderChildren(['attributes' => ['mobileWidth'=>'mobileWidth'], 'renderer' => $renderer]) . '
+        ' . $this->renderChildren(['attributes' => ['mobileWidth' => 'mobileWidth'], 'renderer' => $renderer]) . '
         <!--[if mso | IE]>
           </tr>
           </table>
@@ -205,5 +191,4 @@ class CEmail_Builder_Component_BodyComponent_Group extends CEmail_Builder_Compon
       </div>
     ';
     }
-
 }

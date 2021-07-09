@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:09:44 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:09:44 AM
  */
 
 /**
  * Immutable type of {@see TimeType}.
- *
  */
 class CDatabase_Type_TimeImmutableType extends CDatabase_Type_TimeType {
-
     /**
      * {@inheritdoc}
      */
@@ -33,8 +32,10 @@ class CDatabase_Type_TimeImmutableType extends CDatabase_Type_TimeType {
             return $value->format($platform->getTimeFormatString());
         }
 
-        throw ConversionException::conversionFailedInvalidType(
-                $value, $this->getName(), ['null', \DateTimeImmutable::class]
+        throw CDatabase_Schema_Exception_ConversionException::conversionFailedInvalidType(
+            $value,
+            $this->getName(),
+            ['null', \DateTimeImmutable::class]
         );
     }
 
@@ -49,8 +50,10 @@ class CDatabase_Type_TimeImmutableType extends CDatabase_Type_TimeType {
         $dateTime = \DateTimeImmutable::createFromFormat('!' . $platform->getTimeFormatString(), $value);
 
         if (!$dateTime) {
-            throw ConversionException::conversionFailedFormat(
-                    $value, $this->getName(), $platform->getTimeFormatString()
+            throw CDatabase_Schema_Exception_ConversionException::conversionFailedFormat(
+                $value,
+                $this->getName(),
+                $platform->getTimeFormatString()
             );
         }
 
@@ -63,5 +66,4 @@ class CDatabase_Type_TimeImmutableType extends CDatabase_Type_TimeType {
     public function requiresSQLCommentHint(CDatabase_Platform $platform) {
         return true;
     }
-
 }

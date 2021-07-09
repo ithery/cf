@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 1:43:07 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 1:43:07 AM
  */
 use Intervention\Image\AbstractFont;
 use Intervention\Image\Image;
 use Intervention\Image\ImageManager;
 
 class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
-
     /** @var ImageManager */
     protected $image;
 
@@ -344,7 +344,7 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
         }
         $avatar = $image->canvas($size, $size, !$this->getRounded() ? $bgColor : null);
         if ($this->getRounded()) {
-            $avatar = $avatar->circle($size - 2, $size / 2, $size / 2, function ( $draw ) use ( $bgColor ) {
+            $avatar = $avatar->circle($size - 2, $size / 2, $size / 2, function ($draw) use ($bgColor) {
                 return $draw->background($bgColor);
             });
         }
@@ -352,13 +352,13 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
             $size /= 5;
             $avatar->resize($size, $size);
         }
-        return $avatar->text($name, $size / 2, $size / 2, function ( AbstractFont $font ) use ( $size, $color, $fontFile, $fontSize ) {
-                    $font->file($fontFile);
-                    $font->size($size * $fontSize);
-                    $font->color($color);
-                    $font->align('center');
-                    $font->valign('center');
-                });
+        return $avatar->text($name, $size / 2, $size / 2, function (AbstractFont $font) use ($size, $color, $fontFile, $fontSize) {
+            $font->file($fontFile);
+            $font->size($size * $fontSize);
+            $font->color($color);
+            $font->align('center');
+            $font->valign('center');
+        });
     }
 
     private function findFontFile() {
@@ -414,5 +414,4 @@ class CImage_Avatar_Engine_Initials extends CImage_Avatar_EngineAbstract {
         }
         return $this->getFontFile();
     }
-
 }

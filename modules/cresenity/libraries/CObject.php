@@ -4,15 +4,14 @@
  * @package Cresenity
  */
 class CObject {
-
     use CTrait_Compat_Object,
         CTrait_Macroable;
 
     protected $id;
-    protected $valid_prop = array();
-    protected $prop = array();
-    protected $domain = "";
-    private $friends = array();
+    protected $valid_prop = [];
+    protected $prop = [];
+    protected $domain = '';
+    private $friends = [];
 
     public function addFriend($classname) {
         $this->friends[] = $classname;
@@ -29,7 +28,7 @@ class CObject {
             return $this->$key;
         }
 
-        throw new CException('Cannot access private property :class::$:key', array(':class' => __CLASS__, ':key' => $key));
+        throw new CException('Cannot access private property :class::$:key', [':class' => __CLASS__, ':key' => $key]);
     }
 
     public function __set($key, $value) {
@@ -38,12 +37,12 @@ class CObject {
             return $this->$key = $value;
         }
 
-        throw new CException('Cannot access private property :class::$:key', array(':class' => get_called_class(), ':key' => $key));
+        throw new CException('Cannot access private property :class::$:key', [':class' => get_called_class(), ':key' => $key]);
     }
 
-    protected function __construct($id = "") {
+    protected function __construct($id = '') {
         $observer = CObserver::instance();
-        if ($id == "") {
+        if ($id == '') {
             $id = spl_object_hash($this);
         }
         $this->id = $id;
@@ -60,8 +59,8 @@ class CObject {
     }
 
     /**
-     * 
      * @param string $id
+     *
      * @return $this
      */
     public function setId($id) {
@@ -81,5 +80,4 @@ class CObject {
         $traits = c::classUsesRecursive(get_class($this));
         return isset($traits[$trait]);
     }
-
 }

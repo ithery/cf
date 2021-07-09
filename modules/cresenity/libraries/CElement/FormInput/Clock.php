@@ -1,36 +1,37 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_FormInput_Clock extends CElement_FormInput {
-
     use CTrait_Compat_Element_FormInput_Clock,
         CTrait_Element_Property_Placeholder;
 
     protected $show_second;
+
     protected $show_meridian;
+
     protected $minute_step;
 
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->type = "clockpicker";
+        $this->type = 'clockpicker';
         $this->show_second = false;
         $this->show_meridian = false;
         $this->minute_step = 1;
 
-        $this->placeholder = "";
+        $this->placeholder = '';
         $this->addClass('form-control');
-        $dataModule = array(
-            "css" => array(
-                "plugins/clockpicker/jquery-clockpicker.css",
-                "plugins/clockpicker/bootstrap-clockpicker.css",
-            ),
-            "js" => array(
-                "plugins/clockpicker/jquery-clockpicker.js",
-                "plugins/clockpicker/bootstrap-clockpicker.js",
-            ),
-        );
+        $dataModule = [
+            'css' => [
+                'plugins/clockpicker/jquery-clockpicker.css',
+                'plugins/clockpicker/bootstrap-clockpicker.css',
+            ],
+            'js' => [
+                'plugins/clockpicker/jquery-clockpicker.js',
+                'plugins/clockpicker/bootstrap-clockpicker.js',
+            ],
+        ];
         CManager::registerModule('clockpicker', $dataModule);
     }
 
@@ -46,9 +47,8 @@ class CElement_FormInput_Clock extends CElement_FormInput {
         $js->appendln("$('#" . $this->id . "').clockpicker({");
         $js->appendln("donetext: 'OK'");
 
-        $js->appendln("});");
+        $js->appendln('});');
 
         return $js->text();
     }
-
 }

@@ -9,7 +9,6 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 class CApp_CFCli {
-
     use CTrait_HasOptions;
 
     public function __construct($options = []) {
@@ -25,8 +24,7 @@ class CApp_CFCli {
     }
 
     /**
-     * @param string $job
-     * @param array  $config
+     * @param mixed $cfCommand
      *
      * @return string
      */
@@ -38,16 +36,17 @@ class CApp_CFCli {
     }
 
     /**
-     * 
+     * @param string $cfCommand
+     *
      * @return string
      */
     protected function getCommand($cfCommand) {
-        return $this->getPhpBinary() . " " . $this->getExecutableCommand($cfCommand);
+        return $this->getPhpBinary() . ' ' . $this->getExecutableCommand($cfCommand);
     }
 
     /**
-     * 
      * @param string $cfCommand
+     *
      * @return Process
      */
     public function run($cfCommand) {
@@ -55,5 +54,4 @@ class CApp_CFCli {
         $process->run();
         return $process;
     }
-
 }

@@ -1,19 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 20, 2018, 2:23:56 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 20, 2018, 2:23:56 AM
  */
 class CElement_Component_Icon extends CElement_Component {
-
     use CTrait_Element_Property_Icon;
 
-    public function __construct($id = "", $tag = "div") {
+    public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
-        $this->icon = "";
+        $this->icon = '';
         $this->tag = 'i';
     }
 
@@ -24,5 +24,4 @@ class CElement_Component_Icon extends CElement_Component {
         }
         $this->addClass($icon);
     }
-
 }

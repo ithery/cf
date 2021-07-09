@@ -1,63 +1,76 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 31, 2020 
- * @license Ittron Global Teknologi
  */
 class CApp_ErrorHandler {
+    public static $errorLang = [
+        E_CF => [1, 'Framework Error', 'Please check the CF documentation for information about the following error.'],
+        E_PAGE_NOT_FOUND => [1, 'Page Not Found', 'The requested page was not found. It may have moved, been deleted, or archived.'],
+        E_DATABASE_ERROR => [1, 'Database Error', 'A database error occurred while performing the requested procedure. Please review the database error below for more information.'],
+        E_RECOVERABLE_ERROR => [1, 'Recoverable Error', 'An error was detected which prevented the loading of this page. If this problem persists, please contact the website administrator.'],
+        E_ERROR => [1, 'Fatal Error', ''],
+        E_USER_ERROR => [1, 'Fatal Error', ''],
+        E_PARSE => [1, 'Syntax Error', ''],
+        E_WARNING => [1, 'Warning Message', ''],
+        E_USER_WARNING => [1, 'Warning Message', ''],
+        E_STRICT => [2, 'Strict Mode Error', ''],
+        E_NOTICE => [2, 'Runtime Message', ''],
+    ];
 
-    public static function sendExceptionEmail($email, Exception $exception, $subject = null) {
+    public static function sendExceptionEmail(Exception $exception, $email = null, $subject = null) {
         $html = static::getHtml($exception);
         $app = CApp::instance();
         $org = $app->org();
-        $org_name = 'CAPP';
-        $org_email = $org_name;
+        $orgName = 'CAPP';
+        $orgEmail = $orgName;
         if ($org != null) {
-            $org_email = $org->name;
-            $org_name = $org->name;
+            $orgEmail = $org->name;
+            $orgName = $org->name;
         }
+
+        $ymd = date('Ymd');
         if ($subject == null) {
-            $subject = "Error Cresenity APP - " . $org_name . " on " . crouter::complete_uri();
+            $subject = 'Error Cresenity APP - ' . $orgName . ' on ' . crouter::complete_uri() . ' [' . $ymd . ']';
         }
-        $headers = "From: " . strip_tags($org_email) . "\r\n";
-        $headers .= "Reply-To: " . strip_tags($org_email) . "\r\n";
+        $headers = 'From: ' . strip_tags($orgEmail) . "\r\n";
+        $headers .= 'Reply-To: ' . strip_tags($orgEmail) . "\r\n";
         //$headers .= "CC: susan@example.com\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
 
         $message = $html;
         if ($email == null) {
-            $email = ccfg::get("admin_email");
+            $email = ccfg::get('admin_email');
         }
-        $arr_options = array();
-        if (ccfg::get("mail_error_smtp")) {
-            $smtp_username = ccfg::get('smtp_username_error');
-            $smtp_password = ccfg::get('smtp_password_error');
-            $smtp_host = ccfg::get('smtp_host_error');
-            $smtp_port = ccfg::get('smtp_port_error');
+        $smtpOptions = [];
+        if (ccfg::get('mail_error_smtp')) {
+            $smtpUsername = ccfg::get('smtp_username_error');
+            $smtpPassword = ccfg::get('smtp_password_error');
+            $smtpHost = ccfg::get('smtp_host_error');
+            $smtpPort = ccfg::get('smtp_port_error');
             $secure = ccfg::get('smtp_secure_error');
 
-            if (strlen($smtp_username) > 0) {
-                $arr_options['smtp_username'] = $smtp_username;
+            if (strlen($smtpUsername) > 0) {
+                $smtpOptions['smtp_username'] = $smtpUsername;
             }
-            if (strlen($smtp_password) > 0) {
-                $arr_options['smtp_password'] = $smtp_password;
+            if (strlen($smtpPassword) > 0) {
+                $smtpOptions['smtp_password'] = $smtpPassword;
             }
-            if (strlen($smtp_host) > 0) {
-                $arr_options['smtp_host'] = $smtp_host;
+            if (strlen($smtpHost) > 0) {
+                $smtpOptions['smtp_host'] = $smtpHost;
             }
-            if (strlen($smtp_port) > 0) {
-                $arr_options['smtp_port'] = $smtp_port;
+            if (strlen($smtpPort) > 0) {
+                $smtpOptions['smtp_port'] = $smtpPort;
             }
             if (strlen($secure) > 0) {
-                $arr_options['smtp_secure'] = $secure;
+                $smtpOptions['smtp_secure'] = $secure;
             }
         }
 
-        $ret = cmail::send_smtp($email, $subject . " [FOR ADMINISTRATOR]", $message, array(), array(), array(), $arr_options);
+        $ret = cmail::send_smtp($email, $subject . ' [FOR ADMINISTRATOR]', $message, [], [], [], $smtpOptions);
     }
 
     public static function getHtml(Exception $exception) {
@@ -70,7 +83,7 @@ class CApp_ErrorHandler {
         $org = $app->org();
 
         if (is_numeric($code)) {
-            $codes = CF::lang('errors');
+            $codes = static::$errorLang;
 
             if (!empty($codes[$code])) {
                 list($level, $error, $description) = $codes[$code];
@@ -89,18 +102,16 @@ class CApp_ErrorHandler {
         $file = str_replace('\\', '/', realpath($file));
         $file = preg_replace('|^' . preg_quote(DOCROOT) . '|', '', $file);
 
-
         // Test if display_errors is on
         $trace = false;
         $traceArray = false;
-        if ($line != FALSE) {
+        if ($line != false) {
             // Remove the first entry of debug_backtrace(), it is the exception_handler call
             $traceArray = $exception->getTrace();
 
             // Beautify backtrace
             $trace = CF::backtrace($traceArray);
         }
-
 
         $v = CView::factory('cresenity/mail/exception');
         $v->error = $error;
@@ -112,8 +123,6 @@ class CApp_ErrorHandler {
         $v->exception = $exception;
         $html = $v->render();
 
-
         return $html;
     }
-
 }

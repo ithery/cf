@@ -1,13 +1,14 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 14, 2018, 8:23:43 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 14, 2018, 8:23:43 PM
  */
-if(!isset($ajaxMethod)) {
-    $ajaxMethod='post';
+if (!isset($ajaxMethod)) {
+    $ajaxMethod = 'post';
 }
 ?>
 
@@ -27,7 +28,7 @@ if(!isset($ajaxMethod)) {
                 term.echo(response);
             },
             error: function (xhr, status, error) {
-                term.error('[AJAX] ' + status + ' - Server reponse is: \n' + xhr.responseText);
+                term.error('[TERMINAL] ' + status + ' - Server reponse is: \n' + xhr.responseText);
                 term.resume();
             },
             complete: function () {

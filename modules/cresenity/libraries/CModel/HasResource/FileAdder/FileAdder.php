@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 1, 2019, 11:15:13 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 1, 2019, 11:15:13 PM
  */
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
@@ -14,47 +15,79 @@ use CResources_File as PendingFile;
 use CResources_ImageGenerator_FileType_ImageType as ImageGenerator;
 
 class CModel_HasResource_FileAdder_FileAdder {
-
-    /** @var CModel subject */
+    /**
+     * @var CModel|CModel_HasResourceInterface subject
+     */
     protected $subject;
 
-    /** @var \Spatie\ResourceLibrary\Filesystem\Filesystem */
+    /**
+     * @var \Spatie\ResourceLibrary\Filesystem\Filesystem
+     */
     protected $filesystem;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $preserveOriginal = false;
 
-    /** @var string|\Symfony\Component\HttpFoundation\File\UploadedFile */
+    /**
+     * @var string|\Symfony\Component\HttpFoundation\File\UploadedFile
+     */
     protected $file;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $properties = [];
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $customProperties = [];
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $manipulations = [];
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $pathToFile;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $fileName;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $resourceName;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $diskName = '';
 
-    /** @var null|callable */
+    /**
+     * @var string
+     */
+    protected $conversionsDiskName = '';
+
+    /**
+     * @var null|callable
+     */
     protected $fileNameSanitizer;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $generateResponsiveImages = false;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $customHeaders = [];
 
     /**
@@ -68,29 +101,35 @@ class CModel_HasResource_FileAdder_FileAdder {
     }
 
     /**
-     * @param \Illuminate\Database\Eloquent\Model $subject
+     * @param \CModel $subject
      *
-     * @return FileAdder
+     * @return CModel_HasResource_FileAdder_FileAdder
      */
     public function setSubject(CModel $subject) {
         $this->subject = $subject;
         return $this;
     }
 
-    /*
+    /**
      * Set the file that needs to be imported.
      *
      * @param string|\Symfony\Component\HttpFoundation\File\UploadedFile $file
      *
      * @return $this
      */
-
     public function setFile($file) {
         $this->file = $file;
         if (is_string($file)) {
             $this->pathToFile = $file;
             $this->setFileName(pathinfo($file, PATHINFO_BASENAME));
             $this->resourceName = pathinfo($file, PATHINFO_FILENAME);
+            return $this;
+        }
+        if ($file instanceof CResources_Support_RemoteFile) {
+            $this->pathToFile = $file->getKey();
+            $this->setFileName($file->getFilename());
+            $this->resourceName = $file->getName();
+
             return $this;
         }
         if ($file instanceof CHTTP_UploadedFile) {
@@ -136,6 +175,12 @@ class CModel_HasResource_FileAdder_FileAdder {
         return $this;
     }
 
+    public function storingConversionsOnDisk($diskName) {
+        $this->conversionsDiskName = $diskName;
+
+        return $this;
+    }
+
     public function withManipulations(array $manipulations) {
         $this->manipulations = $manipulations;
         return $this;
@@ -161,12 +206,75 @@ class CModel_HasResource_FileAdder_FileAdder {
         return $this;
     }
 
-    public function toResourceCollectionOnCloudDisk($collectionName = 'default') {
-        return $this->toResourceCollection($collectionName, config('filesystems.cloud'));
+    public function toResourceCollectionOnCloudDisk($collectionName = 'default', $diskName = null) {
+        if ($diskName == null) {
+            $diskName = CF::config('storage.cloud');
+        }
+        return $this->toResourceCollection($collectionName, $diskName);
+    }
+
+    public function toResourceCollectionFromRemote($collectionName = 'default', $diskName = '') {
+        //$storage = CStorage::disk($this->file->getDisk());
+        $storage = CStorage::instance()->disk($diskName);
+        if (!$storage->exists($this->pathToFile)) {
+            throw CResources_Exception_FileCannotBeAdded_FileDoesNotExist::create($this->pathToFile);
+        }
+
+        if ($storage->size($this->pathToFile) > CF::config('resource.max_file_size')) {
+            throw CResources_Exception_FileCannotBeAdded_FileIsTooBig::create($this->pathToFile, $storage->size($this->pathToFile));
+        }
+
+        $resourceClass = CF::config('resource.resource_model');
+        /** @var CApp_Model_Resource $resource */
+        $resource = new $resourceClass();
+
+        $resource->name = $this->resourceName;
+
+        $sanitizedFileName = call_user_func_array($this->fileNameSanitizer, [$this->fileName]);
+        $fileName = $this->fileName;
+        //$fileName = app(config('resources.file_namer'))->originalFileName($sanitizedFileName);
+        $this->fileName = $this->appendExtension($fileName, pathinfo($sanitizedFileName, PATHINFO_EXTENSION));
+
+        $resource->file_name = $this->fileName;
+
+        $resource->disk = $this->determineDiskName($diskName, $collectionName);
+        $this->ensureDiskExists($resource->disk);
+        $resource->conversions_disk = $this->determineConversionsDiskName($resource->disk, $collectionName);
+        $this->ensureDiskExists($resource->conversions_disk);
+
+        $resource->collection_name = $collectionName;
+
+        $resource->mime_type = $storage->mimeType($this->pathToFile);
+        $resource->size = $storage->size($this->pathToFile);
+        $resource->custom_properties = $this->customProperties;
+
+        $resource->generated_conversions = [];
+        $resource->responsive_images = [];
+
+        $resource->manipulations = $this->manipulations;
+
+        if (c::filled($this->customHeaders)) {
+            $resource->setCustomHeaders($this->customHeaders);
+        }
+
+        $resource->fill($this->properties);
+
+        $this->attachResource($resource);
+
+        return $resource;
+    }
+
+    protected function ensureDiskExists($diskName) {
+        if (is_null(CF::config("storage.disks.{$diskName}"))) {
+            throw CResources_Exception_FileCannotBeAdded_DiskDoesNotExist::create($diskName);
+        }
     }
 
     public function toResourceCollection($collectionName = 'default', $diskName = '') {
-       
+        if ($this->file instanceof CResources_Support_RemoteFile) {
+            return $this->toResourceCollectionFromRemote($collectionName, $diskName);
+        }
+
         if (!is_file($this->pathToFile)) {
             throw CResources_Exception_FileCannotBeAdded_FileDoesNotExist::create($this->pathToFile);
         }
@@ -194,7 +302,7 @@ class CModel_HasResource_FileAdder_FileAdder {
         $resource->custom_properties = $this->customProperties;
         $resource->responsive_images = [];
         $resource->manipulations = $this->manipulations;
-        if (CF::filled($this->customHeaders)) {
+        if (c::filled($this->customHeaders)) {
             $resource->setCustomHeaders($this->customHeaders);
         }
         $resource->fill($this->properties);
@@ -213,6 +321,22 @@ class CModel_HasResource_FileAdder_FileAdder {
             }
         }
         return CF::config('resource.disk');
+    }
+
+    protected function determineConversionsDiskName($originalsDiskName, $collectionName) {
+        if ($this->conversionsDiskName !== '') {
+            return $this->conversionsDiskName;
+        }
+
+        if ($collection = $this->getResourceCollection($collectionName)) {
+            $collectionConversionsDiskName = $collection->conversionsDiskName;
+
+            if ($collectionConversionsDiskName !== '') {
+                return $collectionConversionsDiskName;
+            }
+        }
+
+        return $originalsDiskName;
     }
 
     public function defaultSanitizer($fileName) {
@@ -255,17 +379,16 @@ class CModel_HasResource_FileAdder_FileAdder {
         }
         if ($collectionSizeLimit = COptional::create($this->getResourceCollection($resource->collection_name))->collectionSizeLimit) {
             $collectionResource = $this->subject->fresh()->getResource($resource->collection_name);
-            
+
             if ($collectionResource->count() > $collectionSizeLimit) {
                 $model->clearResourceCollectionExcept($resource->collection_name, $collectionResource->reverse()->take($collectionSizeLimit));
             }
         }
-        
     }
 
     protected function getResourceCollection($collectionName) {
         $this->subject->registerResourceCollections();
-        return CF::collect($this->subject->resourceCollections)
+        return c::collect($this->subject->resourceCollections)
                         ->first(function (CResources_ResourceCollection $collection) use ($collectionName) {
                             return $collection->name === $collectionName;
                         });
@@ -281,4 +404,9 @@ class CModel_HasResource_FileAdder_FileAdder {
         }
     }
 
+    protected function appendExtension($file, $extension) {
+        return $extension
+            ? $file . '.' . $extension
+            : $file;
+    }
 }

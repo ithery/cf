@@ -1,55 +1,55 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 1, 2018, 11:57:16 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 1, 2018, 11:57:16 AM
  */
 use CApp_Navigation_Helper as Helper;
 
 class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
-
     public function render($navs = null, $level = 0, &$child = 0) {
-        $is_admin = CApp::instance()->isAdmin();
+        $is_admin = CApp::instance()->isAdministrator();
         if ($navs == null) {
             $navs = $this->navs;
         }
         if ($navs == null) {
             return false;
         }
-        $html = "";
+        $html = '';
         $child_count = 0;
         foreach ($navs as $d) {
-
             $child = 0;
             $pass = 0;
-            $active_class = "";
+            $active_class = '';
             $controller = carr::get($d, 'controller');
             $method = carr::get($d, 'method');
             $label = carr::get($d, 'label');
             $icon = carr::get($d, 'icon');
 
+            $child_html = '';
 
-            $child_html = "";
-
-            if (isset($d["subnav"])) {
-                $child_html .= self::render($d["subnav"], $level + 1, $child);
+            if (isset($d['subnav'])) {
+                $child_html .= $this->render($d['subnav'], $level + 1, $child);
+            }
+            $url = carr::get($d, 'uri');
+            if ($url == null) {
+                $url = Helper::url($d);
             }
 
-            $url = Helper::url($d);
-
-            if (!isset($url) || $url == null)
-                $url = "";
+            if (!isset($url) || $url == null) {
+                $url = '';
+            }
 
             if (strlen($child_html) > 0 || strlen($url) > 0) {
-                if (!Helper::accessAvailable($d, CF::app_id(), CF::domain())) {
+                if (!Helper::accessAvailable($d, CF::appId(), CF::domain())) {
                     continue;
                 }
-                if (isset($d["controller"]) && $d["controller"] != "") {
-                    if (!$is_admin && ccfg::get("have_user_access")) {
-
+                if (isset($d['controller']) && $d['controller'] != '') {
+                    if (!$is_admin && ccfg::get('have_user_access')) {
                         if (!Helper::haveAccess($d)) {
                             continue;
                         }
@@ -63,16 +63,16 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
                 $find_nav = Helper::nav($d);
 
                 if ($find_nav !== false) {
-                    $active_class = " active";
+                    $active_class = ' active';
                 }
 
-                $li_class = "sidenav-item ";
+                $li_class = 'sidenav-item ';
                 if ($child > 0) {
-                    $li_class .= " with-right-arrow";
+                    $li_class .= ' with-right-arrow';
                     if ($level == 0) {
-                        $li_class .= " dropdown";
+                        $li_class .= ' dropdown';
                     } else {
-                        $li_class .= " dropdown-submenu ";
+                        $li_class .= ' dropdown-submenu ';
                     }
                 }
 
@@ -90,12 +90,12 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
                 if (strlen($iconClass) > 0 && strpos($iconClass, 'fa-') === false && strpos($iconClass, 'ion-') === false) {
                     $iconClass = 'icon-' . $iconClass;
                 }
-                $icon_html = "";
+                $icon_html = '';
                 if (strlen($iconClass) > 0) {
                     $icon_html = '<i class="' . $iconClass . '"></i>';
                 }
-                if ($url == "") {
-                    $caret = "";
+                if ($url == '') {
+                    $caret = '';
                     if ($level == 0) {
                         $caret = '<b class="caret">';
                     }
@@ -106,13 +106,14 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
                     }
                     $elem .= "</a>\r\n";
                 } else {
-                    $target = "";
-                    $notif = "";
-                    if (isset($d["target"]) && strlen($d["target"]) > 0) {
-                        $target = ' target="' . $d["target"] . '"';
+                    $url = '/' . trim($url, '/');
+                    $target = '';
+                    $notif = '';
+                    if (isset($d['target']) && strlen($d['target']) > 0) {
+                        $target = ' target="' . $d['target'] . '"';
                     }
-                    if (isset($d["notif_count"])) {
-                        $callable = $d["notif_count"];
+                    if (isset($d['notif_count'])) {
+                        $callable = $d['notif_count'];
 
                         if (is_callable($callable)) {
                             $notif = call_user_func($callable);
@@ -123,7 +124,7 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
                     if ($notif != null && $notif > 0) {
                         $strNotif = ' <span class="label label-info nav-notif nav-notif-count">' . $notif . '</span>';
                     }
-                    $elem = '<a class="' . $active_class . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . "</span>" . $strNotif . "</a>\r\n";
+                    $elem = '<a class="' . $active_class . ' sidenav-link" href="' . $url . '"' . $target . '>' . $icon_html . '<span>' . clang::__($label) . '</span>' . $strNotif . "</a>\r\n";
                 }
                 $html .= $elem;
                 $html .= $child_html;
@@ -132,18 +133,16 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
         }
         if (strlen($html) > 0) {
             if ($level == 0) {
-
                 $html = "  <ul class=\"mainnav \">\r\n" . $html . "  </ul>\r\n";
             } else {
                 $html = "  <ul class=\"dropdown-menu\">\r\n" . $html . "  </ul>\r\n";
             }
         }
         if ($child_count == 0) {
-            $html = "";
+            $html = '';
         }
         $child = $child_count;
 
         return $html;
     }
-
 }

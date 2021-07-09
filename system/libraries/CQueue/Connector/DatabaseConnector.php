@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 4:11:18 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 4:11:18 AM
  */
 class CQueue_Connector_DatabaseConnector extends CQueue_AbstractConnector {
-
     /**
      * Database connections.
      *
@@ -19,7 +19,8 @@ class CQueue_Connector_DatabaseConnector extends CQueue_AbstractConnector {
     /**
      * Create a new connector instance.
      *
-     * @param  CDatabase_ResolverInterface  $db
+     * @param CDatabase_ResolverInterface $db
+     *
      * @return void
      */
     public function __construct(CDatabase_ResolverInterface $connections = null) {
@@ -32,14 +33,17 @@ class CQueue_Connector_DatabaseConnector extends CQueue_AbstractConnector {
     /**
      * Establish a queue connection.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return CQueue_AbstractQueue
      */
     public function connect(array $config) {
         //todo read from config
         return new CQueue_Queue_DatabaseQueue(
-                $this->connections->connection(carr::get($config, 'connection')), carr::get($config, 'table'), carr::get($config, 'queue'), carr::get($config, 'retry_after', 60)
+            $this->connections->connection(carr::get($config, 'connection')),
+            carr::get($config, 'table'),
+            carr::get($config, 'queue'),
+            carr::get($config, 'retry_after', 60)
         );
     }
-
 }

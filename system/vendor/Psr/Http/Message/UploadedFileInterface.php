@@ -3,121 +3,156 @@
 namespace Psr\Http\Message;
 
 /**
- * Value object representing a file uploaded through an HTTP request.
+ * Describes a data stream.
  *
- * Instances of this interface are considered immutable; all methods that
- * might change state MUST be implemented such that they retain the internal
- * state of the current instance and return an instance that contains the
- * changed state.
+ * Typically, an instance will wrap a PHP stream; this interface provides
+ * a wrapper around the most common operations, including serialization of
+ * the entire stream to a string.
  */
-interface UploadedFileInterface
+interface StreamInterface
 {
     /**
-     * Retrieve a stream representing the uploaded file.
+     * Reads all data from the stream into a string, from the beginning to end.
      *
-     * This method MUST return a StreamInterface instance, representing the
-     * uploaded file. The purpose of this method is to allow utilizing native PHP
-     * stream functionality to manipulate the file upload, such as
-     * stream_copy_to_stream() (though the result will need to be decorated in a
-     * native PHP stream wrapper to work with such functions).
+     * This method MUST attempt to seek to the beginning of the stream before
+     * reading data and read the stream until the end is reached.
      *
-     * If the moveTo() method has been called previously, this method MUST raise
-     * an exception.
+     * Warning: This could attempt to load a large amount of data into memory.
      *
-     * @return StreamInterface Stream representation of the uploaded file.
-     * @throws \RuntimeException in cases when no stream is available or can be
-     *     created.
+     * This method MUST NOT raise an exception in order to conform with PHP's
+     * string casting operations.
+     *
+     * @see http://php.net/manual/en/language.oop5.magic.php#object.tostring
+     * @return string
      */
-    public function getStream();
+    public function __toString();
 
     /**
-     * Move the uploaded file to a new location.
+     * Closes the stream and any underlying resources.
      *
-     * Use this method as an alternative to move_uploaded_file(). This method is
-     * guaranteed to work in both SAPI and non-SAPI environments.
-     * Implementations must determine which environment they are in, and use the
-     * appropriate method (move_uploaded_file(), rename(), or a stream
-     * operation) to perform the operation.
-     *
-     * $targetPath may be an absolute path, or a relative path. If it is a
-     * relative path, resolution should be the same as used by PHP's rename()
-     * function.
-     *
-     * The original file or stream MUST be removed on completion.
-     *
-     * If this method is called more than once, any subsequent calls MUST raise
-     * an exception.
-     *
-     * When used in an SAPI environment where $_FILES is populated, when writing
-     * files via moveTo(), is_uploaded_file() and move_uploaded_file() SHOULD be
-     * used to ensure permissions and upload status are verified correctly.
-     *
-     * If you wish to move to a stream, use getStream(), as SAPI operations
-     * cannot guarantee writing to stream destinations.
-     *
-     * @see http://php.net/is_uploaded_file
-     * @see http://php.net/move_uploaded_file
-     * @param string $targetPath Path to which to move the uploaded file.
-     * @throws \InvalidArgumentException if the $targetPath specified is invalid.
-     * @throws \RuntimeException on any error during the move operation, or on
-     *     the second or subsequent call to the method.
+     * @return void
      */
-    public function moveTo($targetPath);
-    
+    public function close();
+
     /**
-     * Retrieve the file size.
+     * Separates any underlying resources from the stream.
      *
-     * Implementations SHOULD return the value stored in the "size" key of
-     * the file in the $_FILES array if available, as PHP calculates this based
-     * on the actual size transmitted.
+     * After the stream has been detached, the stream is in an unusable state.
      *
-     * @return int|null The file size in bytes or null if unknown.
+     * @return resource|null Underlying PHP stream, if any
+     */
+    public function detach();
+
+    /**
+     * Get the size of the stream if known.
+     *
+     * @return int|null Returns the size in bytes if known, or null if unknown.
      */
     public function getSize();
-    
+
     /**
-     * Retrieve the error associated with the uploaded file.
+     * Returns the current position of the file read/write pointer
      *
-     * The return value MUST be one of PHP's UPLOAD_ERR_XXX constants.
-     *
-     * If the file was uploaded successfully, this method MUST return
-     * UPLOAD_ERR_OK.
-     *
-     * Implementations SHOULD return the value stored in the "error" key of
-     * the file in the $_FILES array.
-     *
-     * @see http://php.net/manual/en/features.file-upload.errors.php
-     * @return int One of PHP's UPLOAD_ERR_XXX constants.
+     * @return int Position of the file pointer
+     * @throws \RuntimeException on error.
      */
-    public function getError();
-    
+    public function tell();
+
     /**
-     * Retrieve the filename sent by the client.
+     * Returns true if the stream is at the end of the stream.
      *
-     * Do not trust the value returned by this method. A client could send
-     * a malicious filename with the intention to corrupt or hack your
-     * application.
-     *
-     * Implementations SHOULD return the value stored in the "name" key of
-     * the file in the $_FILES array.
-     *
-     * @return string|null The filename sent by the client or null if none
-     *     was provided.
+     * @return bool
      */
-    public function getClientFilename();
-    
+    public function eof();
+
     /**
-     * Retrieve the media type sent by the client.
+     * Returns whether or not the stream is seekable.
      *
-     * Do not trust the value returned by this method. A client could send
-     * a malicious media type with the intention to corrupt or hack your
-     * application.
-     *
-     * Implementations SHOULD return the value stored in the "type" key of
-     * the file in the $_FILES array.
-     *
-     * @return string|null The media type sent by the client or null if none
-     *     was provided.
+     * @return bool
      */
-    public function getClientMediaType();
+    public function isSeekable();
+
+    /**
+     * Seek to a position in the stream.
+     *
+     * @link http://www.php.net/manual/en/function.fseek.php
+     * @param int $offset Stream offset
+     * @param int $whence Specifies how the cursor position will be calculated
+     *     based on the seek offset. Valid values are identical to the built-in
+     *     PHP $whence values for `fseek()`.  SEEK_SET: Set position equal to
+     *     offset bytes SEEK_CUR: Set position to current location plus offset
+     *     SEEK_END: Set position to end-of-stream plus offset.
+     * @throws \RuntimeException on failure.
+     */
+    public function seek($offset, $whence = SEEK_SET);
+
+    /**
+     * Seek to the beginning of the stream.
+     *
+     * If the stream is not seekable, this method will raise an exception;
+     * otherwise, it will perform a seek(0).
+     *
+     * @see seek()
+     * @link http://www.php.net/manual/en/function.fseek.php
+     * @throws \RuntimeException on failure.
+     */
+    public function rewind();
+
+    /**
+     * Returns whether or not the stream is writable.
+     *
+     * @return bool
+     */
+    public function isWritable();
+
+    /**
+     * Write data to the stream.
+     *
+     * @param string $string The string that is to be written.
+     * @return int Returns the number of bytes written to the stream.
+     * @throws \RuntimeException on failure.
+     */
+    public function write($string);
+
+    /**
+     * Returns whether or not the stream is readable.
+     *
+     * @return bool
+     */
+    public function isReadable();
+
+    /**
+     * Read data from the stream.
+     *
+     * @param int $length Read up to $length bytes from the object and return
+     *     them. Fewer than $length bytes may be returned if underlying stream
+     *     call returns fewer bytes.
+     * @return string Returns the data read from the stream, or an empty string
+     *     if no bytes are available.
+     * @throws \RuntimeException if an error occurs.
+     */
+    public function read($length);
+
+    /**
+     * Returns the remaining contents in a string
+     *
+     * @return string
+     * @throws \RuntimeException if unable to read or an error occurs while
+     *     reading.
+     */
+    public function getContents();
+
+    /**
+     * Get stream metadata as an associative array or retrieve a specific key.
+     *
+     * The keys returned are identical to the keys returned from PHP's
+     * stream_get_meta_data() function.
+     *
+     * @link http://php.net/manual/en/function.stream-get-meta-data.php
+     * @param string $key Specific metadata to retrieve.
+     * @return array|mixed|null Returns an associative array if no key is
+     *     provided. Returns a specific key value if a key is provided and the
+     *     value is found, or null if the key is not found.
+     */
+    public function getMetadata($key = null);
 }

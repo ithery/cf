@@ -15,7 +15,7 @@ interface CException_ExceptionHandlerInterface {
      * @param  \Exception  $e
      * @return void
      */
-    public function report(Exception $e);
+    public function report($e);
 
     /**
      * Determine if the exception should be reported.
@@ -23,7 +23,7 @@ interface CException_ExceptionHandlerInterface {
      * @param  \Exception  $e
      * @return bool
      */
-    public function shouldReport(Exception $e);
+    public function shouldReport($e);
 
     /**
      * Render an exception into an HTTP response.
@@ -32,7 +32,7 @@ interface CException_ExceptionHandlerInterface {
      * @param  \Exception  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function render($request, Exception $e);
+    public function render($request, $e);
 
     /**
      * Render an exception to the console.
@@ -41,5 +41,5 @@ interface CException_ExceptionHandlerInterface {
      * @param  \Exception  $e
      * @return void
      */
-    public function renderForConsole($output, Exception $e);
+    public function renderForConsole($output, $e);
 }

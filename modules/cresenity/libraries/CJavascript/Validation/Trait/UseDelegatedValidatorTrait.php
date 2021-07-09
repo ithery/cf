@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 1:19:07 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 1:19:07 PM
  */
 trait CJavascript_Validation_Trait_UseDelegatedValidatorTrait {
-
     /**
      * Delegated validator.
      *
-     * @var CJavascript_Validation_ValidatorDelegated $validator
+     * @var CJavascript_Validation_ValidatorDelegated
      */
     protected $validator;
 
@@ -20,6 +20,7 @@ trait CJavascript_Validation_Trait_UseDelegatedValidatorTrait {
      * Sets delegated Validator instance.
      *
      * @param \Proengsoft\JsValidation\Support\DelegatedValidator $validator
+     *
      * @return void
      */
     public function setDelegatedValidator(CJavascript_Validation_ValidatorDelegated $validator) {
@@ -34,5 +35,4 @@ trait CJavascript_Validation_Trait_UseDelegatedValidatorTrait {
     public function getDelegatedValidator() {
         return $this->validator;
     }
-
 }

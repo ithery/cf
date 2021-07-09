@@ -1,21 +1,15 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CEmail_Builder_Component_BodyComponent_Body extends CEmail_Builder_Component_BodyComponent {
     protected static $tagName = 'c-body';
-    
-    protected $allowedAttributes = array(
+
+    protected $allowedAttributes = [
         'width' => 'unit(px,%)',
         'background-color' => 'color',
-    );
-    protected $defaultAttributes = array(
+    ];
+    protected $defaultAttributes = [
         'width' => '600px',
-    );
+    ];
 
     public function getStyles() {
         return [
@@ -26,7 +20,6 @@ class CEmail_Builder_Component_BodyComponent_Body extends CEmail_Builder_Compone
     }
 
     public function getChildContext() {
-
         $context = clone $this->context;
         $width = $this->getAttribute('width');
 
@@ -37,7 +30,6 @@ class CEmail_Builder_Component_BodyComponent_Body extends CEmail_Builder_Compone
     public function render() {
         $backgroundColor = $this->getAttribute('background-color');
         if (strlen($backgroundColor) > 0) {
-            
             $this->context->setbackgroundColor($backgroundColor);
         }
 
@@ -47,5 +39,4 @@ class CEmail_Builder_Component_BodyComponent_Body extends CEmail_Builder_Compone
       </div>
     ';
     }
-
 }

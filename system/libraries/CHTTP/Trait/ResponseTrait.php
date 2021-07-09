@@ -1,15 +1,8 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Symfony\Component\HttpFoundation\HeaderBag;
 
 trait CHTTP_Trait_ResponseTrait {
-
     /**
      * The original content of the response.
      *
@@ -56,9 +49,10 @@ trait CHTTP_Trait_ResponseTrait {
     /**
      * Set a header on the Response.
      *
-     * @param  string  $key
-     * @param  array|string  $values
-     * @param  bool  $replace
+     * @param string       $key
+     * @param array|string $values
+     * @param bool         $replace
+     *
      * @return $this
      */
     public function header($key, $values, $replace = true) {
@@ -70,7 +64,8 @@ trait CHTTP_Trait_ResponseTrait {
     /**
      * Add an array of headers to the response.
      *
-     * @param  \Symfony\Component\HttpFoundation\HeaderBag|array  $headers
+     * @param \Symfony\Component\HttpFoundation\HeaderBag|array $headers
+     *
      * @return $this
      */
     public function withHeaders($headers) {
@@ -88,7 +83,8 @@ trait CHTTP_Trait_ResponseTrait {
     /**
      * Add a cookie to the response.
      *
-     * @param  \Symfony\Component\HttpFoundation\Cookie|mixed  $cookie
+     * @param \Symfony\Component\HttpFoundation\Cookie|mixed $cookie
+     *
      * @return $this
      */
     public function cookie($cookie) {
@@ -98,7 +94,8 @@ trait CHTTP_Trait_ResponseTrait {
     /**
      * Add a cookie to the response.
      *
-     * @param  \Symfony\Component\HttpFoundation\Cookie|mixed  $cookie
+     * @param \Symfony\Component\HttpFoundation\Cookie|mixed $cookie
+     *
      * @return $this
      */
     public function withCookie($cookie) {
@@ -123,10 +120,11 @@ trait CHTTP_Trait_ResponseTrait {
     /**
      * Set the exception to attach to the response.
      *
-     * @param  \Throwable  $e
+     * @param \Throwable $e
+     *
      * @return $this
      */
-    public function withException(Throwable $e) {
+    public function withException($e) {
         $this->exception = $e;
 
         return $this;
@@ -142,5 +140,4 @@ trait CHTTP_Trait_ResponseTrait {
     public function throwResponse() {
         throw new CHTTP_Exception_ResponseException($this);
     }
-
 }

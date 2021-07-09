@@ -1,14 +1,10 @@
 <?php
 
 /**
- *
- * @author Raymond Sugiarto
- * @since  Dec 3, 2014
- * @license http://piposystem.com Piposystem
+ * @author Hery Kurniawan
  */
 class CLogger {
-
-    const __EXT = ".log";
+    const __EXT = '.log';
     // Log message levels - Windows users see PHP Bug #18090
     const EMERGENCY = LOG_EMERG;    // 0
     const ALERT = LOG_ALERT;    // 1
@@ -19,29 +15,38 @@ class CLogger {
     const INFO = LOG_INFO;     // 6
     const DEBUG = LOG_DEBUG;    // 7
 
-    /**
-     * @var  CLogger  Singleton instance container
-     */
+    protected static $logLevels = [
+        'emergency' => self::EMERGENCY,
+        'alert' => self::ALERT,
+        'critical' => self::CRITICAL,
+        'error' => self::ERROR,
+        'warning' => self::WARNING,
+        'notice' => self::NOTICE,
+        'info' => self::INFO,
+        'debug' => self::DEBUG,
+    ];
 
-    private static $_instance = NULL;
+    /**
+     * @var CLogger Singleton instance container
+     */
+    private static $instance = null;
 
     /**
-     * @var  array  list of added messages
+     * @var array list of added messages
      */
-    protected $_messages = array();
-    private $_group = '';
+    protected $messages = [];
+
     protected static $writeOnAdd = false;
 
     /**
-     * 
      * @return CLogger
      */
     public static function instance() {
-        if (self::$_instance == NULL) {
-            self::$_instance = new CLogger();
-            register_shutdown_function(array(CLogger::$_instance, 'write'));
+        if (self::$instance == null) {
+            self::$instance = new CLogger();
+            register_shutdown_function([CLogger::$instance, 'write']);
         }
-        return self::$_instance;
+        return self::$instance;
     }
 
     private function __construct() {
@@ -55,23 +60,23 @@ class CLogger {
      *
      *     $log->create_write('file');
      *
-     * @param   type        $type       string
-     * @param   options     $options    array of options for writers
-     * @return  CLogger
+     * @param type    $type    string
+     * @param options $options array of options for writers
+     *
+     * @return CLogger
      */
-    public function createWriter($type = 'file', $options = array()) {
-        $levels = carr::get($options, 'levels', array());
+    public function createWriter($type = 'file', $options = []) {
+        $levels = carr::get($options, 'levels', []);
         $min_level = carr::get($options, 'min_level', 0);
         if (!is_array($levels)) {
             $levels = range($min_level, $levels);
         }
 
         $writer = CLogger_Writer::factory($type, $options);
-        $this->_writers["{$writer}"] = array
-            (
+        $this->_writers["{$writer}"] = [
             'object' => $writer,
             'levels' => $levels,
-        );
+        ];
         return $this;
     }
 
@@ -83,50 +88,62 @@ class CLogger {
      *         ':user' => $username,
      *     ));
      *
-     * @param   string  $level       level of message
-     * @param   string  $message     message body
-     * @param   array   $values      values to replace in the message
-     * @param   array   $additional  additional custom parameters to supply to the log writer
-     * @return  Log
+     * @param string    $level     level of message
+     * @param string    $message   message body
+     * @param array     $values    values to replace in the message
+     * @param array     $context   additional custom parameters to supply to the log writer
+     * @param Exception $exception Exception for log
+     *
+     * @return Log
      */
-    public function add($level, $message, array $values = NULL, array $additional = NULL) {
+    public function add($level, $message, array $values = null, array $context = [], $exception = null) {
+        if (!is_string($level)) {
+            $level = carr::get(self::$logLevels, $level);
+        }
+
+        if (!is_numeric($level)) {
+            $level = static::EMERGENCY;
+        }
+
         if ($values) {
             // Insert the values into the message
             $message = strtr($message, $values);
         }
 
+        if (strlen($message) == 0 && $exception != null) {
+            $message = get_class($exception);
+        }
+
+        $trace = [];
         // Grab a copy of the trace
-        if (isset($additional['exception'])) {
-            $trace = $additional['exception']->getTrace();
+        if ($exception != null) {
+            $trace = $exception->getTrace();
         } else {
             // Older php version don't have 'DEBUG_BACKTRACE_IGNORE_ARGS', so manually remove the args from the backtrace
             if (!defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
                 $trace = array_map(function ($item) {
                     unset($item['args']);
                     return $item;
-                }, array_slice(debug_backtrace(FALSE), 1));
+                }, array_slice(debug_backtrace(false), 1));
             } else {
                 $trace = array_slice(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), 1);
             }
         }
 
-        if ($additional == NULL) {
-            $additional = array();
-        }
-
         // Create a new message
-        $this->_messages[] = array(
+        $this->messages[] = [
             'time' => time(),
             'level' => $level,
             'body' => $message,
             'trace' => $trace,
             'domain' => CF::domain(),
-            'file' => isset($trace[0]['file']) ? $trace[0]['file'] : NULL,
-            'line' => isset($trace[0]['line']) ? $trace[0]['line'] : NULL,
-            'class' => isset($trace[0]['class']) ? $trace[0]['class'] : NULL,
-            'function' => isset($trace[0]['function']) ? $trace[0]['function'] : NULL,
-            'additional' => $additional,
-        );
+            'file' => isset($trace[0]['file']) ? $trace[0]['file'] : null,
+            'line' => isset($trace[0]['line']) ? $trace[0]['line'] : null,
+            'class' => isset($trace[0]['class']) ? $trace[0]['class'] : null,
+            'function' => isset($trace[0]['function']) ? $trace[0]['function'] : null,
+            'context' => $context,
+            'exception' => $exception,
+        ];
 
         if (CLogger::$writeOnAdd) {
             // Write logs as they are added
@@ -141,20 +158,19 @@ class CLogger {
      *
      *     $log->write();
      *
-     * @return  void
+     * @return void
      */
     public function write() {
-
-        if (empty($this->_messages)) {
+        if (empty($this->messages)) {
             // There is nothing to write, move along
             return;
         }
 
         // Import all messages locally
-        $messages = $this->_messages;
+        $messages = $this->messages;
 
         // Reset the messages array
-        $this->_messages = array();
+        $this->messages = [];
 
         foreach ($this->_writers as $writer) {
             if (empty($writer['levels'])) {
@@ -162,7 +178,7 @@ class CLogger {
                 $writer['object']->write($messages);
             } else {
                 // Filtered messages
-                $filtered = array();
+                $filtered = [];
 
                 foreach ($messages as $message) {
                     if (in_array($message['level'], $writer['levels'])) {
@@ -176,5 +192,4 @@ class CLogger {
             }
         }
     }
-
 }

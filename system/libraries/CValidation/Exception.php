@@ -1,13 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct script access.');
+defined('SYSPATH') or die('No direct script access.');
 
 class CValidation_Exception extends Exception {
-
     /**
      * The validator instance.
      *
-     * @var \Illuminate\Contracts\Validation\Validator
+     * @var CValidation_Validator
      */
     public $validator;
 
@@ -42,16 +41,14 @@ class CValidation_Exception extends Exception {
     /**
      * Create a new exception instance.
      *
-     * @param  CValidation_Validator $validator
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
-     * @param  string  $errorBag
+     * @param CValidation_Validator                      $validator
+     * @param \Symfony\Component\HttpFoundation\Response $response
+     * @param string                                     $errorBag
+     *
      * @return void
      */
     public function __construct($validator, $response = null, $errorBag = 'default') {
-        parent::__construct('The given data was invalid. '.$validator->getAllErrorString());
-
-        
-       
+        parent::__construct('The given data was invalid. ' . $validator->getAllErrorString());
 
         $this->response = $response;
         $this->errorBag = $errorBag;
@@ -61,17 +58,18 @@ class CValidation_Exception extends Exception {
     /**
      * Create a new validation exception from a plain array of messages.
      *
-     * @param  array  $messages
+     * @param array $messages
+     *
      * @return static
      */
     public static function withMessages(array $messages) {
-        return new static(CF::tap(CValidation::factory([], []), function ($validator) use ($messages) {
-                    foreach ($messages as $key => $value) {
-                        foreach (carr::wrap($value) as $message) {
-                            $validator->errors()->add($key, $message);
-                        }
-                    }
-                }));
+        return new static(CF::tap(CValidation::factory()->make([], []), function ($validator) use ($messages) {
+            foreach ($messages as $key => $value) {
+                foreach (carr::wrap($value) as $message) {
+                    $validator->errors()->add($key, $message);
+                }
+            }
+        }));
     }
 
     /**
@@ -86,7 +84,8 @@ class CValidation_Exception extends Exception {
     /**
      * Set the HTTP status code to be used for the response.
      *
-     * @param  int  $status
+     * @param int $status
+     *
      * @return $this
      */
     public function status($status) {
@@ -98,7 +97,8 @@ class CValidation_Exception extends Exception {
     /**
      * Set the error bag on the exception.
      *
-     * @param  string  $errorBag
+     * @param string $errorBag
+     *
      * @return $this
      */
     public function errorBag($errorBag) {
@@ -110,7 +110,8 @@ class CValidation_Exception extends Exception {
     /**
      * Set the URL to redirect to on a validation error.
      *
-     * @param  string  $url
+     * @param string $url
+     *
      * @return $this
      */
     public function redirectTo($url) {
@@ -127,5 +128,4 @@ class CValidation_Exception extends Exception {
     public function getResponse() {
         return $this->response;
     }
-
 }

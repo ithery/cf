@@ -1,22 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 1:36:51 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 17, 2018, 1:36:51 AM
  */
 trait CTrait_Element_Property_Visible {
-
     /**
-     *
      * @var bool
      */
     protected $visible = true;
 
     public function setVisible($visible) {
-
         $this->visible = $visible;
         return $this;
     }
@@ -28,5 +26,4 @@ trait CTrait_Element_Property_Visible {
     public function isVisible() {
         return $this->visible == true;
     }
-
 }

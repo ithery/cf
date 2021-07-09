@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 13, 2019, 6:38:26 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 13, 2019, 6:38:26 PM
  */
 class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
-
     protected $dateFormat;
     protected $momentFormat;
     protected $dateStart;
@@ -19,15 +19,13 @@ class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
 
         CManager::instance()->registerModule('bootstrap-daterangepicker');
 
-        $this->type = "text";
+        $this->type = 'text';
         $dateFormat = ccfg::get('date_formatted');
-        if($dateFormat==null) {
-            $dateFormat = "Y-m-d";
+        if ($dateFormat == null) {
+            $dateFormat = 'Y-m-d';
         }
         $this->dateFormat = $dateFormat;
         $this->momentFormat = $this->convertPHPToMomentFormat($dateFormat);
-                
-        
     }
 
     public function convertPHPToMomentFormat($format) {
@@ -131,10 +129,9 @@ class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
                 locale: {
                     format: '" . $this->momentFormat . "'
                 },
-                
+
             });
             ";
         return $js;
     }
-
 }

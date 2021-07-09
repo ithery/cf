@@ -404,7 +404,7 @@ class RequestDataCollector extends DataCollector implements EventSubscriberInter
         return 'request';
     }
 
-    public function collectSessionUsage(): void
+    public function collectSessionUsage()
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 

@@ -12,7 +12,7 @@ namespace PHPUnit\Framework\Constraint;
 use function sprintf;
 use function strpos;
 use Throwable;
-
+use PHPUnit\Framework\Constraint\Constraint;
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */

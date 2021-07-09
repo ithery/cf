@@ -1,28 +1,31 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Carbon\Carbon;
 
 class CBackup_Record {
-
-    /** @var \CStorage_Adapter */
+    /**
+     * @var \CStorage_Adapter
+     */
     protected $disk;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $path;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $exists;
 
-    /** @var Carbon */
+    /**
+     * @var Carbon
+     */
     protected $date;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $size;
 
     public function __construct(CStorage_Adapter $disk, $path) {
@@ -74,5 +77,4 @@ class CBackup_Record {
         $this->disk->delete($this->path);
         CBackup::output()->info("Deleted backup `{$this->path}`.");
     }
-
 }

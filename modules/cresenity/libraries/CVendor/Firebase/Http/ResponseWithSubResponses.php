@@ -1,18 +1,11 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use GuzzleHttp\Psr7\Response;
 use Psr\Http\Message\ResponseInterface;
 use Riverline\MultiPartParser\Converters\PSR7;
 use Riverline\MultiPartParser\StreamedPart;
 
 final class CVendor_Firebase_Http_ResponseWithSubResponses implements CVendor_Firebase_Http_HasSubResponsesInterface, ResponseInterface {
-
     use CVendor_Firebase_Trait_WrappedPsr7ResponseTrait;
 
     /** @var Responses */
@@ -63,7 +56,11 @@ final class CVendor_Firebase_Http_ResponseWithSubResponses implements CVendor_Fi
             }
 
             $subResponse = new Response(
-                    (int) $startLineMatches['status'], $headers, $realPart->getBody(), $startLineMatches['version'], $startLineMatches['reason']
+                (int) $startLineMatches['status'],
+                $headers,
+                $realPart->getBody(),
+                $startLineMatches['version'],
+                $startLineMatches['reason']
             );
 
             foreach ($partHeaders as $name => $value) {
@@ -75,5 +72,4 @@ final class CVendor_Firebase_Http_ResponseWithSubResponses implements CVendor_Fi
 
         return new CVendor_Firebase_Http_Responses(...$subResponses);
     }
-
 }

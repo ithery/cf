@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of PHPUnit.
  *
@@ -7,18 +8,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
+
+namespace PHPUnit\Framework\Constraint\Operator;
+
+use PHPUnit\Framework\Constraint\Constraint;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class LogicalAnd extends BinaryOperator
-{
+final class LogicalAnd extends BinaryOperator {
+
     /**
      * Returns the name of this operator.
      */
-    public function operator()
-    {
+    public function operator() {
         return 'and';
     }
 
@@ -27,8 +30,7 @@ final class LogicalAnd extends BinaryOperator
      *
      * @see https://www.php.net/manual/en/language.operators.precedence.php
      */
-    public function precedence()
-    {
+    public function precedence() {
         return 22;
     }
 
@@ -38,8 +40,7 @@ final class LogicalAnd extends BinaryOperator
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other)
-    {
+    protected function matches($other) {
         foreach ($this->constraints() as $constraint) {
             if (!$constraint->evaluate($other, '', true)) {
                 return false;
@@ -48,4 +49,5 @@ final class LogicalAnd extends BinaryOperator
 
         return [] !== $this->constraints();
     }
+
 }

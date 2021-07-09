@@ -1,21 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @deprecated since 1.2, use CElement_Element_Img
+ */
 class CImgElement extends CElement {
-
     use CTrait_Compat_Element_Img;
 
     protected $src;
 
-    public function __construct($id = "") {
-
+    public function __construct($id = '') {
         parent::__construct($id);
-        $this->tag = "img";
-        $this->src = curl::base() . "ccore/noimage/40/40";
+        $this->tag = 'img';
+        $this->src = curl::base() . 'ccore/noimage/40/40';
     }
 
-    public static function factory($id = "") {
+    public static function factory($id = '') {
         return new CImgElement($id);
     }
 
@@ -25,25 +26,26 @@ class CImgElement extends CElement {
     }
 
     public function toarray() {
-        $data["attr"]["src"] = $this->src;
+        $data['attr']['src'] = $this->src;
         $data = array_merge_recursive($data, parent::toarray());
         return $data;
     }
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
-        $disabled = "";
+        $html->setIndent($indent);
+        $disabled = '';
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
-            $classes = " " . $classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
 
-        $addition_attribute = "";
+        $addition_attribute = '';
         foreach ($this->attr as $k => $v) {
-            $addition_attribute .= " " . $k . '="' . $v . '"';
+            $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
@@ -55,5 +57,4 @@ class CImgElement extends CElement {
     public function js($indent = 0) {
         return parent::js($indent);
     }
-
 }

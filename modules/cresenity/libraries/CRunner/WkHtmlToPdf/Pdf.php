@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use CRunner_WkHtmlToPdf_TmpFile as File;
 use CRunner_WkHtmlToPdf_Command as Command;
 
@@ -18,7 +12,6 @@ use CRunner_WkHtmlToPdf_Command as Command;
  * @license http://www.opensource.org/licenses/MIT
  */
 class CRunner_WkHtmlToPdf_Pdf {
-
     // Type hints for `addPage()` and `addCover()`
     const TYPE_HTML = 'html';
     const TYPE_XML = 'xml';
@@ -38,30 +31,30 @@ class CRunner_WkHtmlToPdf_Pdf {
 
     /**
      * @var string the name of the `wkhtmltopdf` binary. Default is
-     * `wkhtmltopdf`. You can also configure a full path here.
+     *             `wkhtmltopdf`. You can also configure a full path here.
      */
     public $binary = 'wkhtmltopdf';
 
     /**
      * @var array options to pass to the Command constructor. Default is none.
      */
-    public $commandOptions = array();
+    public $commandOptions = [];
 
     /**
      * @var string|null the directory to use for temporary files. If null
-     * (default) the dir is autodetected.
+     *                  (default) the dir is autodetected.
      */
     public $tmpDir;
 
     /**
      * @var bool whether to ignore any errors if some PDF file was still
-     * created. Default is false.
+     *           created. Default is false.
      */
     public $ignoreWarnings = false;
 
     /**
      * @var bool whether the old version 9 of wkhtmltopdf is used (slightly
-     * different syntax). Default is false.
+     *           different syntax). Default is false.
      */
     public $version9 = false;
 
@@ -72,14 +65,14 @@ class CRunner_WkHtmlToPdf_Pdf {
 
     /**
      * @var array global options for `wkhtmltopdf` as `['--opt1', '--opt2' =>
-     * 'val', ...]`
+     *            'val', ...]`
      */
-    protected $_options = array();
+    protected $_options = [];
 
     /**
      * @var array list of wkhtmltopdf objects as arrays
      */
-    protected $_objects = array();
+    protected $_objects = [];
 
     /**
      * @var \mikehaertl\tmp\File the temporary PDF file
@@ -88,10 +81,10 @@ class CRunner_WkHtmlToPdf_Pdf {
 
     /**
      * @var \mikehaertl\tmp\File[] list of tmp file objects. This is here to
-     * keep a reference to `File` and thus avoid too early call of
-     * [[File::__destruct]] if the file is not referenced anymore.
+     *                             keep a reference to `File` and thus avoid too early call of
+     *                             [[File::__destruct]] if the file is not referenced anymore.
      */
-    protected $_tmpFiles = array();
+    protected $_tmpFiles = [];
 
     /**
      * @var Command the command instance that executes wkhtmltopdf
@@ -105,7 +98,7 @@ class CRunner_WkHtmlToPdf_Pdf {
 
     /**
      * @param array|string $options global options for wkhtmltopdf, a page URL,
-     * a HTML string or a filename
+     *                              a HTML string or a filename
      */
     public function __construct($options = null) {
         if (is_array($options)) {
@@ -118,14 +111,15 @@ class CRunner_WkHtmlToPdf_Pdf {
     /**
      * Add a page object to the output
      *
-     * @param string $input either a URL, a HTML string or a filename
-     * @param array $options optional options for this page
-     * @param string|null $type a type hint if the input is a string of known
-     * type. This can either be `TYPE_HTML` or `TYPE_XML`. If `null` (default)
-     * the type is auto detected from the string content.
+     * @param string      $input   either a URL, a HTML string or a filename
+     * @param array       $options optional options for this page
+     * @param string|null $type    a type hint if the input is a string of known
+     *                             type. This can either be `TYPE_HTML` or `TYPE_XML`. If `null` (default)
+     *                             the type is auto detected from the string content.
+     *
      * @return static the Pdf instance for method chaining
      */
-    public function addPage($input, $options = array(), $type = null) {
+    public function addPage($input, $options = [], $type = null) {
         $options['inputArg'] = $this->ensureUrlOrFile($input, $type);
         $this->_objects[] = $this->ensureUrlOrFileOptions($options);
         return $this;
@@ -134,14 +128,15 @@ class CRunner_WkHtmlToPdf_Pdf {
     /**
      * Add a cover page object to the output
      *
-     * @param string $input either a URL, a HTML string or a filename
-     * @param array $options optional options for the cover page
-     * @param string|null $type a type hint if the input is a string of known
-     * type. This can either be `TYPE_HTML` or `TYPE_XML`. If `null` (default)
-     * the type is auto detected from the string content.
+     * @param string      $input   either a URL, a HTML string or a filename
+     * @param array       $options optional options for the cover page
+     * @param string|null $type    a type hint if the input is a string of known
+     *                             type. This can either be `TYPE_HTML` or `TYPE_XML`. If `null` (default)
+     *                             the type is auto detected from the string content.
+     *
      * @return static the Pdf instance for method chaining
      */
-    public function addCover($input, $options = array(), $type = null) {
+    public function addCover($input, $options = [], $type = null) {
         $options['input'] = ($this->version9 ? '--' : '') . 'cover';
         $options['inputArg'] = $this->ensureUrlOrFile($input, $type);
         $this->_objects[] = $this->ensureUrlOrFileOptions($options);
@@ -152,9 +147,10 @@ class CRunner_WkHtmlToPdf_Pdf {
      * Add a TOC object to the output
      *
      * @param array $options optional options for the table of contents
+     *
      * @return static the Pdf instance for method chaining
      */
-    public function addToc($options = array()) {
+    public function addToc($options = []) {
         $options['input'] = ($this->version9 ? '--' : '') . 'toc';
         $this->_objects[] = $this->ensureUrlOrFileOptions($options);
         return $this;
@@ -164,6 +160,7 @@ class CRunner_WkHtmlToPdf_Pdf {
      * Save the PDF to given filename (triggers PDF creation)
      *
      * @param string $filename to save PDF as
+     *
      * @return bool whether PDF was created successfully
      */
     public function saveAs($filename) {
@@ -181,9 +178,10 @@ class CRunner_WkHtmlToPdf_Pdf {
      * Send PDF to client, either inline or as download (triggers PDF creation)
      *
      * @param string|null $filename the filename to send. If empty, the PDF is
-     * streamed inline.
-     * @param bool $inline whether to force inline display of the PDF, even if
-     * filename is present.
+     *                              streamed inline.
+     * @param bool        $inline   whether to force inline display of the PDF, even if
+     *                              filename is present.
+     *
      * @return bool whether PDF was created successfully
      */
     public function send($filename = null, $inline = false) {
@@ -196,8 +194,9 @@ class CRunner_WkHtmlToPdf_Pdf {
 
     /**
      * Get the raw PDF contents (triggers PDF creation).
+     *
      * @return string|bool The PDF content as a string or `false` if the PDF
-     * wasn't created successfully.
+     *                     wasn't created successfully.
      */
     public function toString() {
         if (!$this->_isCreated && !$this->createPdf()) {
@@ -210,9 +209,10 @@ class CRunner_WkHtmlToPdf_Pdf {
      * Set global option(s)
      *
      * @param array $options list of global PDF options to set as name/value pairs
+     *
      * @return static the Pdf instance for method chaining
      */
-    public function setOptions($options = array()) {
+    public function setOptions($options = []) {
         // #264 tmpDir must be set before calling ensureUrlOrFileOptions
         if (isset($options['tmpDir'])) {
             $this->tmpDir = $options['tmpDir'];
@@ -295,11 +295,12 @@ class CRunner_WkHtmlToPdf_Pdf {
      * file name.
      *
      * @param string|File $input the input argument File to check
-     * @param string|null $type a type hint if the input is a string of known
-     * type. This can either be `TYPE_HTML` or `TYPE_XML`. If `null` (default)
-     * the type is auto detected from the string content.
+     * @param string|null $type  a type hint if the input is a string of known
+     *                           type. This can either be `TYPE_HTML` or `TYPE_XML`. If `null` (default)
+     *                           the type is auto detected from the string content.
+     *
      * @return \mikehaertl\tmp\File|string a File object if the input is a HTML
-     * or XML string. The unchanged input otherwhise.
+     *                                     or XML string. The unchanged input otherwhise.
      */
     protected function ensureUrlOrFile($input, $type = null) {
         if ($input instanceof File) {
@@ -315,8 +316,8 @@ class CRunner_WkHtmlToPdf_Pdf {
             // with long strings.
             $isHtml = $type === self::TYPE_HTML || preg_match(self::REGEX_HTML, $input);
             if (!$isHtml) {
-                $maxPathLen = defined('PHP_MAXPATHLEN') ?
-                        constant('PHP_MAXPATHLEN') : self::MAX_PATHLEN;
+                $maxPathLen = defined('PHP_MAXPATHLEN')
+                        ? constant('PHP_MAXPATHLEN') : self::MAX_PATHLEN;
                 if (strlen($input) <= $maxPathLen && is_file($input)) {
                     return $input;
                 }
@@ -330,10 +331,11 @@ class CRunner_WkHtmlToPdf_Pdf {
 
     /**
      * @param array $options list of options as name/value pairs
+     *
      * @return array options with raw HTML/XML/String content converted to tmp
-     * files where neccessary
+     *               files where neccessary
      */
-    protected function ensureUrlOrFileOptions($options = array()) {
+    protected function ensureUrlOrFileOptions($options = []) {
         foreach ($options as $key => $val) {
             // Some options expect a URL or a file name, so check if we need a temp file
             if (is_string($val) && preg_match(self::REGEX_OPTS_TMPFILE, $key)) {
@@ -345,5 +347,4 @@ class CRunner_WkHtmlToPdf_Pdf {
         }
         return $options;
     }
-
 }

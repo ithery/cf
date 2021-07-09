@@ -1,22 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 1:55:18 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 1:55:18 PM
  */
 class CApp_Event_OnRenderableAdded {
-
     /**
-     *
      * @var string
      */
     public $renderableClass;
 
     /**
-     *
      * @var content
      */
     public $content;
@@ -24,7 +22,8 @@ class CApp_Event_OnRenderableAdded {
     /**
      * Create a new event instance.
      *
-     * @param  string|CRenderable  $renderable
+     * @param string|CRenderable $renderable
+     *
      * @return void
      */
     public function __construct($renderable) {
@@ -36,7 +35,6 @@ class CApp_Event_OnRenderableAdded {
     }
 
     /**
-     * 
      * @return CRenderable
      */
     public function getRenderableClass() {
@@ -46,5 +44,4 @@ class CApp_Event_OnRenderableAdded {
     public function getContent() {
         return $this->content;
     }
-
 }

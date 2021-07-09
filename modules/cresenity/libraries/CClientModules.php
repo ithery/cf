@@ -1,12 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 final class CClientModules {
-
     use CTrait_Compat_ClientModules;
 
-    protected static $_instance;
+    protected static $instance;
 
     public function allModules() {
         return CManager::asset()->module()->allModules();
@@ -24,10 +23,6 @@ final class CClientModules {
         return CManager::asset()->module()->getRegisteredModule();
     }
 
-    public function jstree() {
-        return CManager::asset()->module()->jstree($module);
-    }
-
     public function registerModules($modules) {
         return CManager::asset()->module()->registerRunTimeModules($modules);
     }
@@ -41,7 +36,7 @@ final class CClientModules {
     }
 
     public function registerModule($module, $parent = null) {
-        return self::registerRunTimeModule($module);
+        return $this->registerRunTimeModule($module);
     }
 
     public function registerThemeModule($module, $parent = null) {
@@ -53,14 +48,12 @@ final class CClientModules {
     }
 
     /**
-     * 
      * @return CClientModules
      */
     public static function instance() {
-        if (self::$_instance == null) {
-            self::$_instance = new CClientModules();
+        if (self::$instance == null) {
+            self::$instance = new CClientModules();
         }
-        return self::$_instance;
+        return self::$instance;
     }
-
 }

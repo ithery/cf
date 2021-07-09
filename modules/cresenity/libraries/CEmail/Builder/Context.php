@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CEmail_Builder_Context {
-
     protected $data = [];
 
     public function __construct($initialData = []) {
@@ -68,19 +61,16 @@ class CEmail_Builder_Context {
             $params = array_slice($args, 1);
         }
         $globalData = CEmail::builder()->globalData();
-        $attrToPush = ['inlineStyle','componentsHeadStyle','headRaw','style'];
+        $attrToPush = ['inlineStyle', 'componentsHeadStyle', 'headRaw', 'style'];
         if (in_array($attr, $attrToPush)) {
-        
             $globalData->push($attr, $params);
-        } else if ($globalData->exists($attr)) {
-          
+        } elseif ($globalData->exists($attr)) {
             if (count($params) > 1) {
                 $paramKey = carr::get($params, 0);
                 $attrKey = $attr . '.' . $paramKey;
                 if (is_object($globalData->get($attrKey))) {
                     throw new Exception('unimplement');
                 } else {
-                    
                     $globalData->set($attrKey, carr::get($params, 1));
                 }
             } else {
@@ -89,7 +79,5 @@ class CEmail_Builder_Context {
         } else {
             throw new Exception('head element add an unknown head attribute : ' . $attr . '');
         }
-        
     }
-
 }

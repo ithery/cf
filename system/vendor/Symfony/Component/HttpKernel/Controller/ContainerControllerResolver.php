@@ -32,7 +32,7 @@ class ContainerControllerResolver extends ControllerResolver
         parent::__construct($logger);
     }
 
-    protected function createController(string $controller)
+    protected function createController($controller)
     {
         if (1 === substr_count($controller, ':')) {
             $controller = str_replace(':', '::', $controller);
@@ -45,7 +45,7 @@ class ContainerControllerResolver extends ControllerResolver
     /**
      * {@inheritdoc}
      */
-    protected function instantiateController(string $class)
+    protected function instantiateController($class)
     {
         $class = ltrim($class, '\\');
 
@@ -67,7 +67,7 @@ class ContainerControllerResolver extends ControllerResolver
         throw new \InvalidArgumentException(sprintf('Controller "%s" does neither exist as service nor as class.', $class), 0, $e);
     }
 
-    private function throwExceptionIfControllerWasRemoved(string $controller, \Throwable $previous)
+    private function throwExceptionIfControllerWasRemoved($controller, \Throwable $previous)
     {
         if ($this->container instanceof Container && isset($this->container->getRemovedIds()[$controller])) {
             throw new \InvalidArgumentException(sprintf('Controller "%s" cannot be fetched from the container because it is private. Did you forget to tag the service with "controller.service_arguments"?', $controller), 0, $previous);

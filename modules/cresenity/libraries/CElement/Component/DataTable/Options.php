@@ -1,22 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2018, 10:04:13 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2018, 10:04:13 PM
  */
 class CElement_Component_DataTable_Options extends CList {
-
-    private $default_options = array(
-        "bDeferRender" => true,
-        "bFilter" => true,
-        "bInfo" => true,
-        "bPaginate" => true,
-        "bLengthChange" => true,
-        "height" => false,
-    );
+    private $default_options = [
+        'bDeferRender' => true,
+        'bFilter' => true,
+        'bInfo' => true,
+        'bPaginate' => true,
+        'bLengthChange' => true,
+        'height' => false,
+    ];
 
     public function __construct() {
         parent::__construct();
@@ -28,7 +28,4 @@ class CElement_Component_DataTable_Options extends CList {
     public static function factory() {
         return new CElement_Component_DataTable_Options();
     }
-
 }
-
-?>

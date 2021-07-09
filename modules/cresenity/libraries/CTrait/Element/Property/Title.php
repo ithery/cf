@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2018, 11:58:27 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2018, 11:58:27 PM
  */
 trait CTrait_Element_Property_Title {
-
     protected $title;
     protected $rawTitle;
 
@@ -34,12 +34,13 @@ trait CTrait_Element_Property_Title {
     }
 
     /**
-     * call getTitle if parameter title is not passed
-     * call setTitle if parameter title is passed
-     * 
+     * Call getTitle if parameter title is not passed
+     * Call setTitle if parameter title is passed
+     *
      * @param string $title
-     * @param bool $lang
-     * @return mixed 
+     * @param bool   $lang
+     *
+     * @return mixed
      */
     public function title($title = null, $lang = true) {
         if ($title != null) {
@@ -47,5 +48,4 @@ trait CTrait_Element_Property_Title {
         }
         return $this->getTitle();
     }
-
 }

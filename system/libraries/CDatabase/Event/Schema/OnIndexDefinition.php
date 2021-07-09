@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 1:14:07 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 1:14:07 PM
  */
 
 /**
  * Event used when the portable index definition is generated inside CDatabase_Schema_Manager.
- *
  */
 class CDatabase_Event_Schema_OnIndexDefinition extends CDatabase_Event_Schema {
-
     /**
      * @var CDatabase_Schema_Index|null
      */
@@ -37,9 +36,9 @@ class CDatabase_Event_Schema_OnIndexDefinition extends CDatabase_Event_Schema {
     private $_connection;
 
     /**
-     * @param array                     $tableIndex
-     * @param string                    $table
-     * @param CDatabase                 $connection
+     * @param array     $tableIndex
+     * @param string    $table
+     * @param CDatabase $connection
      */
     public function __construct(array $tableIndex, $table, CDatabase $connection) {
         $this->_tableIndex = $tableIndex;
@@ -93,5 +92,4 @@ class CDatabase_Event_Schema_OnIndexDefinition extends CDatabase_Event_Schema {
     public function getDatabasePlatform() {
         return $this->_connection->getDatabasePlatform();
     }
-
 }

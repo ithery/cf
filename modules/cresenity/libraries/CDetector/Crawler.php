@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 4:19:55 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 4:19:55 AM
  */
 class CDetector_Crawler {
-
     /**
      * The user agent.
      *
@@ -21,14 +21,14 @@ class CDetector_Crawler {
      *
      * @var array
      */
-    protected $httpHeaders = array();
+    protected $httpHeaders = [];
 
     /**
      * Store regex matches.
      *
      * @var array
      */
-    protected $matches = array();
+    protected $matches = [];
 
     /**
      * Crawlers object.
@@ -67,6 +67,8 @@ class CDetector_Crawler {
 
     /**
      * Class constructor.
+     *
+     * @param null|mixed $userAgent
      */
     public function __construct(array $headers = null, $userAgent = null) {
         $this->crawlers = new CDetector_Crawler_Provider_CrawlersProvider();
@@ -81,8 +83,8 @@ class CDetector_Crawler {
     /**
      * Compile the regex patterns into one regex string.
      *
-     * @param array
-     * 
+     * @param array $patterns
+     *
      * @return string
      */
     public function compileRegex($patterns) {
@@ -100,7 +102,7 @@ class CDetector_Crawler {
             $httpHeaders = $_SERVER;
         }
         // Clear existing headers.
-        $this->httpHeaders = array();
+        $this->httpHeaders = [];
         // Only save HTTP headers. In PHP land, that means
         // only _SERVER vars that start with HTTP_.
         foreach ($httpHeaders as $key => $value) {
@@ -144,7 +146,9 @@ class CDetector_Crawler {
      */
     public function isCrawler($userAgent = null) {
         $agent = trim(preg_replace(
-                        "/{$this->compiledExclusions}/i", '', $userAgent ?: $this->userAgent
+            "/{$this->compiledExclusions}/i",
+            '',
+            $userAgent ?: $this->userAgent
         ));
         if ($agent == '') {
             return false;
@@ -164,5 +168,4 @@ class CDetector_Crawler {
     public function getMatches() {
         return isset($this->matches[0]) ? $this->matches[0] : null;
     }
-
 }

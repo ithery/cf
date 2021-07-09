@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 4:31:49 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 4:31:49 AM
  */
-abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
-
+abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
     use CTrait_Helper_InteractsWithTime;
 
     /**
@@ -35,9 +35,10 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
     /**
      * Push a new job onto the queue.
      *
-     * @param  string  $queue
-     * @param  string  $job
-     * @param  mixed   $data
+     * @param string $queue
+     * @param string $job
+     * @param mixed  $data
+     *
      * @return mixed
      */
     public function pushOn($queue, $job, $data = '') {
@@ -47,10 +48,11 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
     /**
      * Push a new job onto the queue after a delay.
      *
-     * @param  string  $queue
-     * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  string  $job
-     * @param  mixed   $data
+     * @param string                               $queue
+     * @param \DateTimeInterface|\DateInterval|int $delay
+     * @param string                               $job
+     * @param mixed                                $data
+     *
      * @return mixed
      */
     public function laterOn($queue, $delay, $job, $data = '') {
@@ -60,9 +62,10 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
     /**
      * Push an array of jobs onto the queue.
      *
-     * @param  array   $jobs
-     * @param  mixed   $data
-     * @param  string|null  $queue
+     * @param array       $jobs
+     * @param mixed       $data
+     * @param string|null $queue
+     *
      * @return void
      */
     public function bulk($jobs, $data = '', $queue = null) {
@@ -74,9 +77,10 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
     /**
      * Create a payload string from the given job and data.
      *
-     * @param  string|object  $job
-     * @param  string  $queue
-     * @param  mixed   $data
+     * @param string|object $job
+     * @param string        $queue
+     * @param mixed         $data
+     *
      * @return string
      *
      * @throws \Illuminate\Queue\InvalidPayloadException
@@ -85,7 +89,7 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
         $payload = json_encode($this->createPayloadArray($job, $queue, $data));
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new InvalidPayloadException(
-            'Unable to JSON encode payload. Error code: ' . json_last_error()
+                'Unable to JSON encode payload. Error code: ' . json_last_error()
             );
         }
         return $payload;
@@ -94,9 +98,10 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
     /**
      * Create a payload array from the given job and data.
      *
-     * @param  string|object  $job
-     * @param  string  $queue
-     * @param  mixed  $data
+     * @param string|object $job
+     * @param string        $queue
+     * @param mixed         $data
+     *
      * @return array
      */
     protected function createPayloadArray($job, $queue, $data = '') {
@@ -106,8 +111,9 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
     /**
      * Create a payload for an object-based queue handler.
      *
-     * @param  object  $job
-     * @param  string  $queue
+     * @param object $job
+     * @param string $queue
+     *
      * @return array
      */
     protected function createObjectPayload($job, $queue) {
@@ -134,7 +140,8 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
     /**
      * Get the display name for the given job.
      *
-     * @param  object  $job
+     * @param object $job
+     *
      * @return string
      */
     protected function getDisplayName($job) {
@@ -144,7 +151,8 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
     /**
      * Get the retry delay for an object-based queue handler.
      *
-     * @param  mixed  $job
+     * @param mixed $job
+     *
      * @return mixed
      */
     public function getJobRetryDelay($job) {
@@ -158,7 +166,8 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
     /**
      * Get the expiration timestamp for an object-based queue handler.
      *
-     * @param  mixed  $job
+     * @param mixed $job
+     *
      * @return mixed
      */
     public function getJobExpiration($job) {
@@ -172,26 +181,28 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
     /**
      * Create a typical, string based queue payload array.
      *
-     * @param  string  $job
-     * @param  string  $queue
-     * @param  mixed  $data
+     * @param string $job
+     * @param string $queue
+     * @param mixed  $data
+     *
      * @return array
      */
     protected function createStringPayload($job, $queue, $data) {
         return $this->withCreatePayloadHooks($queue, [
-                    'displayName' => is_string($job) ? explode('@', $job)[0] : null,
-                    'job' => $job,
-                    'maxTries' => null,
-                    'delay' => null,
-                    'timeout' => null,
-                    'data' => $data,
+            'displayName' => is_string($job) ? explode('@', $job)[0] : null,
+            'job' => $job,
+            'maxTries' => null,
+            'delay' => null,
+            'timeout' => null,
+            'data' => $data,
         ]);
     }
 
     /**
      * Register a callback to be executed when creating job payloads.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     *
      * @return void
      */
     public static function createPayloadUsing($callback) {
@@ -205,15 +216,19 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
     /**
      * Create the given payload using any registered payload hooks.
      *
-     * @param  string  $queue
-     * @param  array  $payload
+     * @param string $queue
+     * @param array  $payload
+     *
      * @return array
      */
     protected function withCreatePayloadHooks($queue, array $payload) {
         if (!empty(static::$createPayloadCallbacks)) {
             foreach (static::$createPayloadCallbacks as $callback) {
                 $payload = array_merge($payload, call_user_func(
-                                $callback, $this->getConnectionName(), $queue, $payload
+                    $callback,
+                    $this->getConnectionName(),
+                    $queue,
+                    $payload
                 ));
             }
         }
@@ -232,7 +247,8 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
     /**
      * Set the connection name for the queue.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return $this
      */
     public function setConnectionName($name) {
@@ -243,11 +259,11 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface{
     /**
      * Set the IoC container instance.
      *
-     * @param  CContainer_Container  $container
+     * @param CContainer_Container $container
+     *
      * @return void
      */
     public function setContainer(CContainer_Container $container) {
         $this->container = $container;
     }
-
 }

@@ -34,7 +34,7 @@ final class TerminateEvent extends KernelEvent
         $this->response = $response;
     }
 
-    public function getResponse(): Response
+    public function getResponse()
     {
         return $this->response;
     }

@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 1:07:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 1:07:30 PM
  */
 
 /**
  * Event used when the portable column definition is generated inside CDatabase_Schema_Manager.
  */
 class CDatabase_Event_Schema_OnColumnDefinition extends CDatabase_Event_Schema {
-
     /**
      * @var CDatabase_Schema_Column|null
      */
@@ -41,9 +41,9 @@ class CDatabase_Event_Schema_OnColumnDefinition extends CDatabase_Event_Schema {
     private $_connection;
 
     /**
-     * @param array                     $tableColumn
-     * @param string                    $table
-     * @param string                    $database
+     * @param array     $tableColumn
+     * @param string    $table
+     * @param string    $database
      * @param CDatabase $connection
      */
     public function __construct(array $tableColumn, $table, $database, CDatabase $connection) {
@@ -61,7 +61,7 @@ class CDatabase_Event_Schema_OnColumnDefinition extends CDatabase_Event_Schema {
      *
      * @return CDatabase_Event_Schema_OnColumnDefinition
      */
-    public function setColumn(Column $column = null) {
+    public function setColumn(CDatabase_Schema_Column $column = null) {
         $this->_column = $column;
         return $this;
     }
@@ -107,5 +107,4 @@ class CDatabase_Event_Schema_OnColumnDefinition extends CDatabase_Event_Schema {
     public function getDatabasePlatform() {
         return $this->_connection->getDatabasePlatform();
     }
-
 }

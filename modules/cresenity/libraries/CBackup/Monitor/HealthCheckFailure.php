@@ -1,17 +1,14 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CBackup_HealthCheckFailure {
-
-    /** @var \CBackup_Monitor_AbstractHealthCheck */
+    /**
+     * @var \CBackup_Monitor_AbstractHealthCheck
+     */
     protected $healthCheck;
 
-    /** @var \Exception */
+    /**
+     * @var \Exception
+     */
     protected $exception;
 
     public function __construct(CBackup_Monitor_AbstractHealthCheck $healthCheck, Exception $exception) {
@@ -20,7 +17,6 @@ class CBackup_HealthCheckFailure {
     }
 
     /**
-     * 
      * @return CBackup_Monitor_AbstractHealthCheck
      */
     public function healthCheck() {
@@ -34,5 +30,4 @@ class CBackup_HealthCheckFailure {
     public function wasUnexpected() {
         return !$this->exception instanceof CBackup_Monitor_Exception_InvalidHealthCheckException;
     }
-
 }

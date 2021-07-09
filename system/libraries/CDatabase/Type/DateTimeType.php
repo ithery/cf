@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:09:44 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:09:44 AM
  */
 
 /**
@@ -14,7 +15,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @since 2.0
  */
 class CDatabase_Type_DateTimeType extends CDatabase_Type implements CDatabase_Type_Interface_PhpDateTimeMappingTypeInterface {
-
     /**
      * {@inheritdoc}
      */
@@ -41,7 +41,7 @@ class CDatabase_Type_DateTimeType extends CDatabase_Type implements CDatabase_Ty
             return $value->format($platform->getDateTimeFormatString());
         }
 
-        throw ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'DateTime']);
+        throw CDatabase_Schema_Exception_ConversionException::conversionFailedInvalidType($value, $this->getName(), ['null', 'DateTime']);
     }
 
     /**
@@ -59,10 +59,9 @@ class CDatabase_Type_DateTimeType extends CDatabase_Type implements CDatabase_Ty
         }
 
         if (!$val) {
-            throw ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateTimeFormatString());
+            throw CDatabase_Schema_Exception_ConversionException::conversionFailedFormat($value, $this->getName(), $platform->getDateTimeFormatString());
         }
 
         return $val;
     }
-
 }
