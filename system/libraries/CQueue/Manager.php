@@ -155,8 +155,8 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
         $config = $this->getConfig($name);
 
         return $this->getConnector($config['driver'])
-                        ->connect($config)
-                        ->setConnectionName($name);
+            ->connect($config)
+            ->setConnectionName($name);
     }
 
     /**

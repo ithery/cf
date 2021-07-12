@@ -57,7 +57,7 @@ class CQueue_Queue_NullQueue extends CQueue_AbstractQueue {
      *
      * @param string|null $queue
      *
-     * @return \Illuminate\Contracts\Queue\Job|null
+     * @return \CQueue_JobInterface|null
      */
     public function pop($queue = null) {
         //

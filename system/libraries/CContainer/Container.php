@@ -5,7 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @author Hery Kurniawan
  */
-class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess  {
+class CContainer_Container implements CContainer_ContainerInterface, ArrayAccess {
     /**
      * The current globally available container (if any).
      *
