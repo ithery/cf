@@ -128,7 +128,7 @@ class CQueue_Manager implements CQueue_FactoryInterface, CQueue_MonitorInterface
      *
      * @param string|null $name
      *
-     * @return \Illuminate\Contracts\Queue\Queue
+     * @return \CQueue_QueueInterface
      */
     public function connection($name = null) {
         $name = $name ?: $this->getDefaultDriver();
