@@ -612,8 +612,9 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return bool
      */
     public function offsetExists($offset) {
+        $routeParameters = $this->route() ? $this->route()->parameters() : [];
         return carr::has(
-            $this->all() + $this->route()->parameters(),
+            $this->all() + $routeParameters,
             $offset
         );
     }
