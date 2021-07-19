@@ -25,25 +25,33 @@ class CManager_File_Connector_FileManager_Controller_DeleteController extends CM
             $file_to_delete = $fm->path()->pretty($name_to_delete);
             $file_path = $file_to_delete->path();
             $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageIsDeleting($file_path));
-            if (is_null($name_to_delete)) {
-                array_push($errors, parent::error('folder-name'));
-                continue;
-            }
-            if (!$fm->path()->setName($name_to_delete)->exists()) {
-                array_push($errors, parent::error('folder-not-found', ['folder' => $file_path]));
-                continue;
-            }
-            if ($fm->path()->setName($name_to_delete)->isDirectory()) {
-                if (!$fm->path()->setName($name_to_delete)->directoryIsEmpty()) {
-                    array_push($errors, parent::error('delete-folder'));
+            try {
+                if (is_null($name_to_delete)) {
+                    array_push($errors, parent::error('folder-name'));
                     continue;
                 }
-            } else {
-                if ($file_to_delete->isImage()) {
-                    $fm->path()->setName($name_to_delete)->thumb()->delete();
+                if (!$fm->path()->setName($name_to_delete)->exists()) {
+                    array_push($errors, parent::error('folder-not-found', ['folder' => $file_path]));
+                    continue;
                 }
+
+                if ($fm->path()->setName($name_to_delete)->isDirectory()) {
+                    if (!$fm->path()->setName($name_to_delete)->directoryIsEmpty()) {
+                        array_push($errors, parent::error('delete-folder'));
+                        continue;
+                    }
+                } else {
+                    if ($file_to_delete->isImage()) {
+                        $fm->path()->setName($name_to_delete)->thumb()->delete();
+                    }
+                }
+
+                $fm->path()->setName($name_to_delete)->delete();
+            } catch (\League\Flysystem\FileNotFoundException $ex) {
+                // do nothing on FileNotFoundException
+            } catch (Exception $ex) {
+                throw $ex;
             }
-            $fm->path()->setName($name_to_delete)->delete();
 
             $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasDeleted($file_path));
         }
