@@ -129,8 +129,15 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this;
     }
 
-    public function setAlign($al) {
-        $this->align = $al;
+    /**
+     * Set align of column (left,right,center)
+     *
+     * @param string $align
+     *
+     * @return $this
+     */
+    public function setAlign($align) {
+        $this->align = $align;
         return $this;
     }
 
