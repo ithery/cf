@@ -13,6 +13,8 @@ class CElement_FormInput_Password extends CElement_FormInput {
         CTrait_Element_Property_Placeholder,
         CTrait_Element_Property_AutoComplete;
 
+    private $showPassword = false;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'password';
@@ -30,5 +32,20 @@ class CElement_FormInput_Password extends CElement_FormInput {
         if ($this->readonly) {
             $this->setAttr('readonly', 'readonly');
         }
+    }
+
+    public function after() {
+        $after = parent::after();
+        if ($this->showPassword) {
+            $span = $after->addSpan();
+            $span->addClass('input-group-btn show-password text-muted fa fa-eye');
+        }
+
+        return $after;
+    }
+
+    public function setShowPassword($bool = true) {
+        $this->showPassword = $bool;
+        return $this;
     }
 }
