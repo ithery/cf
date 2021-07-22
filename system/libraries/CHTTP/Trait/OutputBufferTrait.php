@@ -6,7 +6,6 @@
  * @author Hery
  */
 trait CHTTP_Trait_OutputBufferTrait {
-
     /**
      * Turns on output buffering.
      *
@@ -43,5 +42,4 @@ trait CHTTP_Trait_OutputBufferTrait {
     public function flushOutputBuffer() {
         flush();
     }
-
 }
