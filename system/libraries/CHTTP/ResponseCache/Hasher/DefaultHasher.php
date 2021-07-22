@@ -16,8 +16,8 @@ class CHTTP_ResponseCache_Hasher_DefaultHasher implements CHTTP_ResponseCache_Ha
         $cacheNameSuffix = $this->getCacheNameSuffix($request);
 
         return 'responsecache-' . md5(
-            "{$request->getHost()}-{$request->getRequestUri()}-{$request->getMethod()}/$cacheNameSuffix"
-        );
+            "{$request->getHost()}-{$request->getRequestUri()}-{$request->getMethod()}"
+        ) . "/{$cacheNameSuffix}";
     }
 
     protected function getCacheNameSuffix(CHTTP_Request $request) {
