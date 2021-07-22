@@ -38,7 +38,7 @@ class CElement_FormInput_Password extends CElement_FormInput {
         $after = parent::after();
         if ($this->showPassword) {
             $span = $after->addSpan();
-            $span->addClass('input-group-btn show-password text-muted fa fa-eye');
+            $span->addClass('input-group-btn show-password text-muted fa fa-eye-slash');
         }
 
         return $after;
