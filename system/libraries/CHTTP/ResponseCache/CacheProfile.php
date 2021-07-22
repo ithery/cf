@@ -132,9 +132,11 @@ class CHTTP_ResponseCache_CacheProfile {
 
     public function setCacheLifetime($seconds) {
         $this->cacheLifetimeInSeconds = $seconds;
+        return $this;
     }
 
     public function setCacheNameSuffix($suffix) {
-        return $this->cacheNameSuffix = $suffix;
+        $this->cacheNameSuffix = $suffix;
+        return $this;
     }
 }
