@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_Exportable_DataTable extends CExporter_Exportable implements CExporter_Concern_FromCollection, CExporter_Concern_WithHeadings, CExporter_Concern_WithMapping {
-
     protected $table;
 
     public function __construct(CElement_Component_DataTable $table) {
@@ -28,15 +21,13 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
                 if ($trans->getFunction() != 'format_currency') {
                     $value = $trans->execute($value);
                 }
-//                                $col_v = $trans->execute($col_v);
+                // $col_v = $trans->execute($col_v);
             }
             if (strlen($column->format) > 0) {
                 $tempValue = $column->format;
                 foreach ($data as $k2 => $v2) {
-
-                    if (strpos($tempValue, "{" . $k2 . "}") !== false) {
-
-                        $tempValue = str_replace("{" . $k2 . "}", $v2, $tempValue);
+                    if (strpos($tempValue, '{' . $k2 . '}') !== false) {
+                        $tempValue = str_replace('{' . $k2 . '}', $v2, $tempValue);
                     }
                     $value = $tempValue;
                 }
@@ -45,30 +36,28 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
             $exportCallback = $column->determineExportCallback();
             if ($exportCallback != null) {
                 $value = CFunction::factory($exportCallback)
-                        ->addArg($data)
-                        ->addArg($value)
-                        ->setRequire( $column->determineExportCallbackRequire())
-                        ->execute();
+                    ->addArg($data)
+                    ->addArg($value)
+                    ->setRequire($column->determineExportCallbackRequire())
+                    ->execute();
                 if (is_array($value) && isset($value['html']) && isset($value['js'])) {
-
                     $value = $value['html'];
                 }
             }
-            
+
             if (($this->table->cellCallbackFunc) != null) {
                 $value = CFunction::factory($this->table->cellCallbackFunc)
-                        ->addArg($this)
-                        ->addArg($column->getFieldname())
-                        ->addArg($data)
-                        ->addArg($value)
-                        ->setRequire($this->table->requires)
-                        ->execute();
+                    ->addArg($this)
+                    ->addArg($column->getFieldname())
+                    ->addArg($data)
+                    ->addArg($value)
+                    ->setRequire($this->table->requires)
+                    ->execute();
                 if (is_array($value) && isset($value['html']) && isset($value['js'])) {
-
                     $value = $value['html'];
                 }
             }
-            $newRow[$column->getFieldname()]=$value;
+            $newRow[$column->getFieldname()] = $value;
         }
         return $newRow;
     }
@@ -81,5 +70,4 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         }
         return $heading;
     }
-
 }
