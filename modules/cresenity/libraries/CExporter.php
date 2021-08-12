@@ -41,7 +41,7 @@ class CExporter {
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      *
-     * @return bool
+     * @return bool|PendingDispatch
      */
     public static function store($export, $filePath, $options = []) {
         $diskName = carr::get($options, 'diskName');
