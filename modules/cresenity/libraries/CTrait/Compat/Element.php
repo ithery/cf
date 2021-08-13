@@ -31,6 +31,13 @@ trait CTrait_Compat_Element {
         return $this->setTag($tag);
     }
 
+    /**
+     * @param string $c
+     *
+     * @deprecated since version 1.2, please use function addClass
+     *
+     * @return $this
+     */
     public function add_class($c) {
         return $this->addClass($c);
     }
@@ -39,10 +46,26 @@ trait CTrait_Compat_Element {
         return $this->deleteAttr($k);
     }
 
+    /**
+     * @param string $k
+     * @param string $v
+     *
+     * @deprecated since version 1.2, please use function setAttr
+     *
+     * @return $this
+     */
     public function set_attr($k, $v) {
         return $this->setAttr($k, $v);
     }
 
+    /**
+     * @param string $k
+     * @param string $v
+     *
+     * @deprecated since version 1.2, please use function addAttr
+     *
+     * @return $this
+     */
     public function add_attr($k, $v) {
         return $this->addAttr($k, $v);
     }
@@ -60,11 +83,11 @@ trait CTrait_Compat_Element {
     }
 
     protected function html_child($indent = 0) {
-        return $this->htmlChild($indent = 0);
+        return $this->htmlChild($indent);
     }
 
     protected function js_child($indent = 0) {
-        return $this->jsChild($indent = 0);
+        return $this->jsChild($indent);
     }
 }
 //@codingStandardsIgnoreEnd

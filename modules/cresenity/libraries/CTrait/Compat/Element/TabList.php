@@ -1,20 +1,23 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 1:55:05 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 17, 2018, 1:55:05 AM
  */
+//@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_TabList {
-
     /**
-     * 
      * @param string $id
+     *
      * @return CElement_Component_TabList_Tab
+     *
+     * @deprecated since 1.2, use addTab
      */
-    public function add_tab($id = "") {
+    public function add_tab($id = '') {
         return $this->addTab($id);
     }
 
@@ -37,5 +40,4 @@ trait CTrait_Compat_Element_TabList {
     public function set_ajax($bool = true) {
         return $this->setAjax($bool);
     }
-
 }
