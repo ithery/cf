@@ -277,6 +277,7 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
         $this->on(self::ON_IDLE, [$this, 'statsTrim'], (empty($this->loopInterval)) ? null : ($this->loopInterval * 50)); // Throttle to about once every 50 iterations
         $this->setup();
         $this->log('Application Startup Complete. Starting Event Loop.');
+        $this->log('Event Loop Duration. ' . number_format($this->getLoopInterval(), 2)) . ' seconds';
     }
 
     /**
