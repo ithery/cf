@@ -134,4 +134,13 @@ class CVendor_Xendit_Card extends CVendor_Xendit_Base {
 
         return $this->request('POST', $url, $params);
     }
+
+    public function getChargeOption($params) {
+        $url = $this->classUrl() . '/option';
+        $requiredParams = ['amount'];
+
+        $this->validateParams($params, $requiredParams);
+
+        return $this->request('GET', $url, $params);
+    }
 }
