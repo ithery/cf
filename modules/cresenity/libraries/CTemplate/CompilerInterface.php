@@ -1,18 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Jun 20, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Jun 20, 2020
  */
 interface CTemplate_CompilerInterface {
-
     /**
      * Get the path to the compiled version of a view.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function getCompiledPath($path);
@@ -20,7 +21,8 @@ interface CTemplate_CompilerInterface {
     /**
      * Determine if the given view is expired.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public function isExpired($path);
@@ -28,7 +30,8 @@ interface CTemplate_CompilerInterface {
     /**
      * Compile the view at the given path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return void
      */
     public function compile($path);
