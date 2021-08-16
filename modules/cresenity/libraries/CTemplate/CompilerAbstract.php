@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Jun 20, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Jun 20, 2020
  */
 abstract class CTemplate_CompilerAbstract {
-
     /**
      * The CStorage_Adapter instance.
      *
@@ -26,13 +26,14 @@ abstract class CTemplate_CompilerAbstract {
     /**
      * Create a new compiler instance.
      *
-     * @param  CStorage_Adapter  $files
-     * @param  string  $cachePath
+     * @param CStorage_Adapter $files
+     * @param string           $cachePath
+     *
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(Filesystem $files = null, $cachePath = null) {
+    public function __construct(CStorage_Adapter $files = null, $cachePath = null) {
         if ($files == null) {
             $files = CStorage::instance()->disk('local');
         }
@@ -51,7 +52,8 @@ abstract class CTemplate_CompilerAbstract {
     /**
      * Get the path to the compiled version of a view.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return string
      */
     public function getCompiledPath($path) {
@@ -61,7 +63,8 @@ abstract class CTemplate_CompilerAbstract {
     /**
      * Determine if the view at the given path is expired.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return bool
      */
     public function isExpired($path) {
@@ -76,5 +79,4 @@ abstract class CTemplate_CompilerAbstract {
 
         return $this->files->lastModified($path) >= $this->files->lastModified($compiled);
     }
-
 }

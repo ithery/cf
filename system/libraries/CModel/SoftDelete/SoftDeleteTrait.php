@@ -159,6 +159,7 @@ trait CModel_SoftDelete_SoftDeleteTrait {
      * @return string
      */
     public function getStatusColumn() {
+        /** @var CModel $this */
         return defined('static::STATUS') ? static::STATUS : 'status';
     }
 

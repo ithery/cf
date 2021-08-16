@@ -1,19 +1,12 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CTrait_Controller_Application_Server_Beanstalkd {
-
     protected $host;
+
     protected $port;
 
     /**
-     *
-     * @var CServer_Service_Beanstalkd 
+     * @var CServer_Service_Beanstalkd
      */
     protected $beanstalkd;
 
@@ -36,7 +29,6 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
             $tableData[] = $rowData;
         }
 
-        
         $widget = $app->addWidget();
         $widget->setTitle('Tubes')->setNoPadding();
         //$app->addH5()->addClass('mb-3')->add('Tubes');
@@ -44,9 +36,6 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
         $table->setDataFromArray($tableData);
         $table->setApplyDataTable(false);
         $table->setAjax(false);
-
-
-
 
         $table->addColumn('name')->setLabel('Name');
         $table->addColumn('Urgent')->setLabel('Urgent');
@@ -57,7 +46,7 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
         $table->addColumn('Watching')->setLabel('Watching');
         $table->addColumn('Waiting')->setLabel('Waiting');
         $table->addColumn('Delete(cmd)')->setLabel('Delete');
-        $table->addColumn('Pause')->setLabel('Pause')->setCallback(function($row, $value) {
+        $table->addColumn('Pause')->setLabel('Pause')->setCallback(function ($row, $value) {
             return carr::get($row, 'Pause(cmd)') + carr::get($row, 'Pause(sec)') + carr::get($row, 'Pause(left)');
         });
         $table->addColumn('Total')->setLabel('Total');
@@ -68,7 +57,6 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
         $action = $table->addRowAction()->setLabel('Delete Ready')->setIcon('fas fa-trash')->setConfirm();
         $action->setLink($this->controllerUrl() . 'delete/ready/{name}');
 
-        
         $widget = $app->addWidget();
         $widget->setTitle('Stats')->setNoPadding();
         //$app->addH5()->addClass('my-3')->add('Stats');
@@ -112,7 +100,7 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
         }
         if ($method != null) {
             switch ($method) {
-                case 'reload' :
+                case 'reload':
                     return $this->reloadTube($tubeName, $submethod);
                     break;
             }
@@ -141,8 +129,6 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
         $divNext = $app->addDiv('next-up-container');
 
         $this->reloadTubeNext($tubeName, $divNext);
-
-
 
         echo $app->render();
     }
@@ -178,7 +164,7 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
         $divCol = $divRow->addDiv()->addClass('col-md-4');
 
         $widget = $divCol->addWidget()->setTitle('Next Ready');
-        
+
         if ($nextReady) {
             $widget->addField()->setLabel('Job ID')->addControl('beanstalkd-next-ready-id', 'label')->setValue(carr::get($nextReady, 'id'));
             $widget->addField()->setLabel('Data')->addControl('beanstalkd-next-ready-data', 'textarea')->setValue(carr::get($nextReady, 'rawData'))->setAttr('readonly', 'readonly');
@@ -202,7 +188,6 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
             $widget->addField()->setLabel('TTR')->addControl('beanstalkd-next-delayed-ttr', 'label')->setValue(carr::get($nextDelayed, 'stats.ttr'));
         }
         if ($container == null) {
-
             echo $app->render();
         }
     }
@@ -215,7 +200,6 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
         }
         $beanstalkd = $this->getBeanstalkd();
         $tubeStat = $beanstalkd->getRawTubeStats($tubeName);
-
 
         $divRow = $app->addDiv()->addClass('row');
         $divCol = $divRow->addDiv()->addClass('col-md-4');
@@ -236,7 +220,6 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
             'description' => 'Currently in the queue',
         ]);
 
-
         $divCol = $divRow->addDiv()->addClass('col-md-4');
         $template = $divCol->addTemplate()->setTemplate('CApp/Card/Small');
         $template->setData([
@@ -255,7 +238,6 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
             'description' => 'Currently in the queue',
         ]);
 
-
         $divCol = $divRow->addDiv()->addClass('col-md-4');
         $template = $divCol->addTemplate()->setTemplate('CApp/Card/Small');
         $template->setData([
@@ -264,7 +246,6 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
             'amount' => carr::get($tubeStat, 'total-jobs'),
             'description' => 'Since last restart',
         ]);
-
 
         $divCol = $divRow->addDiv()->addClass('col-md-4');
         $template = $divCol->addTemplate()->setTemplate('CApp/Card/Small');
@@ -276,7 +257,6 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
         ]);
 
         if ($container == null) {
-
             echo $app->render();
         }
     }
@@ -287,5 +267,4 @@ trait CTrait_Controller_Application_Server_Beanstalkd {
         }
         return $this->beanstalkd;
     }
-
 }

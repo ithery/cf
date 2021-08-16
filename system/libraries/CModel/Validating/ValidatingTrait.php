@@ -14,7 +14,7 @@ trait CModel_Validating_ValidatingTrait {
     /**
      * Error messages as provided by the validator.
      *
-     * @var CValidation_MessageBag
+     * @var CBase_MessageBag
      */
     protected $validationErrors;
 
@@ -238,11 +238,11 @@ trait CModel_Validating_ValidatingTrait {
     /**
      * Set the error messages.
      *
-     * @param CValidation_MessageBag $validationErrors
+     * @param CBase_MessageBag $validationErrors
      *
      * @return void
      */
-    public function setErrors(CValidation_MessageBag $validationErrors) {
+    public function setErrors(CBase_MessageBag $validationErrors) {
         $this->validationErrors = $validationErrors;
     }
 
@@ -343,7 +343,6 @@ trait CModel_Validating_ValidatingTrait {
      */
     public function getValidator() {
         return $this->validator ?: CValidation_Factory::instance();
-        ;
     }
 
     /**
@@ -397,7 +396,7 @@ trait CModel_Validating_ValidatingTrait {
     /**
      * Throw a validation exception.
      *
-     * @throws \Watson\Validating\ValidationException
+     * @throws CModel_Validating_ValidationException
      */
     public function throwValidationException() {
         $validator = $this->makeValidator($this->getRules());

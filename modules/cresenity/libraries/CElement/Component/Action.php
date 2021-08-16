@@ -14,20 +14,35 @@ class CElement_Component_Action extends CElement_Component {
         CTrait_Element_Property_Icon;
 
     protected $jsfunc;
+
     protected $disabled;
+
     protected $type;
+
     protected $link_target;
+
     protected $link;
+
     protected $orig_label;
+
     protected $submit;
+
     protected $submitTo;
+
     protected $submitToTarget;
+
     protected $jsparam;
+
     protected $confirm;
+
     protected $style;
+
     protected $confirm_message;
+
     protected $button;
+
     protected $btn_style;
+
     protected $value;
 
     public function __construct($id) {
@@ -153,7 +168,7 @@ class CElement_Component_Action extends CElement_Component {
             $classes = ' ' . $classes;
         }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }

@@ -20,7 +20,7 @@ trait CBase_Trait_BaseTrait {
     /**
      * Alias of $_GET
      *
-     * @return type
+     * @return array
      */
     public static function getRequestGet() {
         return $_GET;
@@ -29,7 +29,7 @@ trait CBase_Trait_BaseTrait {
     /**
      * Alias of $_POST
      *
-     * @return type
+     * @return array
      */
     public static function getRequestPost() {
         return $_POST;
@@ -38,7 +38,7 @@ trait CBase_Trait_BaseTrait {
     /**
      * Alias of $_FILES
      *
-     * @return type
+     * @return array
      */
     public static function getRequestFiles() {
         return $_FILES;

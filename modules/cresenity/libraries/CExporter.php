@@ -4,31 +4,44 @@ class CExporter {
     use CExporter_Trait_RegistersCustomConcernsTrait;
 
     const ACTION_STORE = 'store';
+
     const ACTION_DOWNLOAD = 'download';
+
     const XLSX = 'Xlsx';
+
     const CSV = 'Csv';
+
     const TSV = 'Csv';
+
     const ODS = 'Ods';
+
     const XLS = 'Xls';
+
     const SLK = 'Slk';
+
     const XML = 'Xml';
+
     const GNUMERIC = 'Gnumeric';
+
     const HTML = 'Html';
+
     const MPDF = 'Mpdf';
+
     const DOMPDF = 'Dompdf';
+
     const TCPDF = 'Tcpdf';
-    const isQueue = false;
+
+    const IS_QUEUE = false;
 
     /**
-     * @param object      $export
-     * @param string      $filePath
-     * @param string|null $disk
-     * @param mixed       $options
+     * @param object $export
+     * @param string $filePath
+     * @param array  $options
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      *
-     * @return bool
+     * @return bool|PendingDispatch
      */
     public static function store($export, $filePath, $options = []) {
         $diskName = carr::get($options, 'diskName');
@@ -78,7 +91,7 @@ class CExporter {
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      *
-     * @return TemporaryFile
+     * @return CExporter_File_TemporaryFile
      */
     protected static function export($export, $fileName, $writerType = null) {
         $writerType = CExporter_FileTypeDetector::detectStrict($fileName, $writerType);

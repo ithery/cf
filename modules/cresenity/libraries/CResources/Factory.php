@@ -28,8 +28,14 @@ class CResources_Factory {
      * @return CResources_UrlGeneratorAbstract
      */
     public static function createUrlGeneratorForResource(CApp_Model_Interface_ResourceInterface $resource, $conversionName = '') {
-        $urlGeneratorClass = CF::config('resource.url_generator') != null
-                ? CF::config('resource.url_generator') : 'CResources_UrlGenerator_' . ucfirst($resource->getDiskDriverName()) . 'UrlGenerator';
+        $urlGeneratorClass = CF::config('resource.url_generator');
+        if ($urlGeneratorClass == null) {
+            $diskDriverName = $resource->getDiskDriverName();
+            $urlGeneratorClass = CResources_UrlGenerator_DefaultUrlGenerator::class;
+            if (strlen($diskDriverName) > 0) {
+                $urlGeneratorClass = 'CResources_UrlGenerator_' . ucfirst($diskDriverName) . 'UrlGenerator';
+            }
+        }
 
         static::guardAgainstInvalidUrlGenerator($urlGeneratorClass);
         $urlGenerator = new $urlGeneratorClass();

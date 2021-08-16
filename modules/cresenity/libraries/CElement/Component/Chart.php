@@ -1,24 +1,25 @@
 <?php
 
-/**
- * 
- */
 abstract class CElement_Component_Chart extends CElement_Component {
-
     protected $type;
+
     protected $labels;
+
     protected $data;
+
     protected $width;
+
     protected $height;
+
     protected $options;
 
-    public function __construct($id = "") {
+    public function __construct($id = '') {
         parent::__construct($id);
         $this->type = 'line';
         $this->data = [];
     }
 
-    public static function factory($type = 'Chart', $id = "") {
+    public static function factory($type = 'Chart', $id = '') {
         $className = 'CElement_Component_Chart_' . ucfirst(strtolower($type));
         return new $className($id);
     }
@@ -75,5 +76,4 @@ abstract class CElement_Component_Chart extends CElement_Component {
         carr::set($this->options, $key, $value);
         return $this;
     }
-
 }

@@ -1,17 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 1:55:05 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 17, 2018, 1:55:05 AM
+ * @see CElement_Component_DataTable
  */
+//@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_DataTable {
-
     /**
-     * 
+     * @param string $fieldname
+     *
      * @deprecated since version 1.2
+     *
      * @return CElement_Component_DataTable_Column
      */
     public function add_column($fieldname) {
@@ -19,26 +23,30 @@ trait CTrait_Compat_Element_DataTable {
     }
 
     /**
-     * 
      * @deprecated since version 1.2, please use setDataFromQuery
+     *
      * @return CElement_Component_DataTable
+     *
+     * @param mixed $q
      */
     public function set_data_from_query($q) {
         return $this->setDataFromQuery($q);
     }
 
     /**
-     * 
      * @deprecated since version 1.2, please use setAjax
+     *
      * @return CElement_Component_DataTable
+     *
+     * @param mixed $bool
      */
     public function set_ajax($bool) {
         return $this->setAjax($bool);
     }
 
     /**
-     * 
      * @deprecated since version 1.2, please use rowActionCount
+     *
      * @return int
      */
     public function action_count() {
@@ -46,8 +54,8 @@ trait CTrait_Compat_Element_DataTable {
     }
 
     /**
-     * 
      * @deprecated since version 1.2, please use haveRowAction
+     *
      * @return bool
      */
     public function have_action() {
@@ -55,27 +63,33 @@ trait CTrait_Compat_Element_DataTable {
     }
 
     /**
-     * 
      * @deprecated since version 1.2, please use addRowAction
+     *
      * @return CElement_Component_Action
+     *
+     * @param mixed $id
      */
-    public function add_row_action($id = "") {
+    public function add_row_action($id = '') {
         return $this->addRowAction($id);
     }
 
     /**
-     * 
      * @deprecated since version 1.2, please use setRowActionStyle
+     *
      * @return CElement_Component_DataTable
+     *
+     * @param mixed $style
      */
     public function set_action_style($style) {
         return $this->setRowActionStyle($style);
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
+     *
+     * @param mixed $filename
      */
     public function set_export_filename($filename) {
         return $this->setExportFilename($filename);
@@ -93,7 +107,7 @@ trait CTrait_Compat_Element_DataTable {
         return $this->setDatabase($db);
     }
 
-    function set_table_striped($table_striped) {
+    public function set_table_striped($table_striped) {
         return $this->setTableStriped($table_striped);
     }
 
@@ -102,15 +116,15 @@ trait CTrait_Compat_Element_DataTable {
     }
 
     public static function action_download_excel($data) {
-        return $this->actionDownloadExcel($data);
+        return static::actionDownloadExcel($data);
     }
 
-    public function add_footer_action($id = "") {
+    public function add_footer_action($id = '') {
         return $this->addFooterAction($id);
     }
 
     private static function export_excelxml_static($filename, $sheet_name = null, $table) {
-        return $this->exportExcelxmlStatic($filename, $sheet_name = null, $table);
+        return static::exportExcelxmlStatic($filename, $sheet_name = null, $table);
     }
 
     public function have_footer_action() {
@@ -145,6 +159,13 @@ trait CTrait_Compat_Element_DataTable {
         return $this->setShowHeader($bool);
     }
 
+    /**
+     * @param bool $quick_search
+     *
+     * @return $this
+     *
+     * @deprecated since 1.2 use setQuickSearch
+     */
     public function set_quick_search($quick_search) {
         return $this->setQuickSearch($quick_search);
     }
@@ -153,7 +174,7 @@ trait CTrait_Compat_Element_DataTable {
         return $this->setTbodyId($id);
     }
 
-    public function add_footer_field($label, $value, $align = "left", $labelcolspan = 0) {
+    public function add_footer_field($label, $value, $align = 'left', $labelcolspan = 0) {
         return $this->addFooterField($label, $value, $align, $labelcolspan);
     }
 
@@ -193,80 +214,94 @@ trait CTrait_Compat_Element_DataTable {
         return $this->setDisplayLength($length);
     }
 
-    public function cell_callback_func($func, $require = "") {
+    public function cell_callback_func($func, $require = '') {
         return $this->cellCallbackFunc($func, $require);
     }
 
-    public function filter_action_callback_func($func, $require = "") {
+    public function filter_action_callback_func($func, $require = '') {
         return $this->filterActionCallbackFunc($func, $require);
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
+     *
+     * @param mixed $fieldname
      */
     public function set_key($fieldname) {
         return $this->setKey($fieldname);
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
+     *
+     * @param mixed $group_by
      */
     public function set_group_by($group_by) {
         return $this->setGroupBy($group_by);
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
+     *
+     * @param mixed $id
      */
-    public function add_header_action($id = "") {
+    public function add_header_action($id = '') {
         return $this->addHeaderAction($id);
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
+     *
+     * @param mixed $bool
      */
     public function set_checkbox($bool) {
         return $this->setCheckbox($bool);
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
+     *
+     * @param mixed $val
      */
     public function set_checkbox_value($val) {
         return $this->setCheckboxValue($val);
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
+     *
+     * @param mixed $bool
      */
     public function set_header_sortable($bool) {
         return $this->setHeaderSortabel($bool);
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
+     *
+     * @param mixed $bool
      */
     public function set_numbering($bool) {
         return $this->setNumbering($bool);
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
      */
     public function enable_numbering() {
@@ -274,8 +309,8 @@ trait CTrait_Compat_Element_DataTable {
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
      */
     public function disable_numbering() {
@@ -283,8 +318,8 @@ trait CTrait_Compat_Element_DataTable {
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
      */
     public function enable_checkbox() {
@@ -292,8 +327,8 @@ trait CTrait_Compat_Element_DataTable {
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
      */
     public function disable_checkbox() {
@@ -301,27 +336,33 @@ trait CTrait_Compat_Element_DataTable {
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
+     *
+     * @param mixed $q
      */
     public function set_query($q) {
         return $this->setQuery($q);
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
+     *
+     * @param mixed $el
      */
     public function set_data_from_elastic($el) {
         return $this->setDataFromElastic($el);
     }
 
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
+     *
+     * @param mixed $a
      */
     public function set_data_from_array($a) {
         return $this->setDataFromArray($a);
@@ -354,5 +395,4 @@ trait CTrait_Compat_Element_DataTable {
     public function export_excel($filename, $sheet_name) {
         return $this->exportExcel($filename, $sheet_name);
     }
-
 }

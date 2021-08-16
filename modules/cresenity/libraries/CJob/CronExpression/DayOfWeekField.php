@@ -14,10 +14,12 @@
  * "the second Friday" of a given month.
  */
 class CJob_CronExpression_DayOfWeekField extends CJob_CronExpression_AbstractField {
-
     protected $rangeStart = 0;
+
     protected $rangeEnd = 7;
+
     protected $nthRange;
+
     protected $literals = [1 => 'MON', 2 => 'TUE', 3 => 'WED', 4 => 'THU', 5 => 'FRI', 6 => 'SAT', 7 => 'SUN'];
 
     public function __construct() {
@@ -42,8 +44,8 @@ class CJob_CronExpression_DayOfWeekField extends CJob_CronExpression_AbstractFie
             while ($tdate->format('w') != $weekday) {
                 $tdateClone = new DateTime();
                 $tdate = $tdateClone
-                        ->setTimezone($tdate->getTimezone())
-                        ->setDate($currentYear, $currentMonth, --$lastDayOfMonth);
+                    ->setTimezone($tdate->getTimezone())
+                    ->setDate($currentYear, $currentMonth, --$lastDayOfMonth);
             }
             return $date->format('j') == $lastDayOfMonth;
         }
@@ -133,5 +135,4 @@ class CJob_CronExpression_DayOfWeekField extends CJob_CronExpression_AbstractFie
         }
         return $basicChecks;
     }
-
 }

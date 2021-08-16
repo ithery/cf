@@ -29,9 +29,14 @@ class CDebug_DataCollector_RenderableCollector extends CDebug_DataCollector impl
     public function addRenderable(CApp_Event_OnRenderableAdded $eventArgs) {
         $className = $eventArgs->getRenderableClass();
         $content = $eventArgs->getContent();
-        $message = $className . $content;
-        if (strlen($content) > 0) {
-            $message = '[string] ' . $message;
+        $message = $className;
+        if (is_array($content)) {
+            $message = '[array] ' . var_export($content, true);
+        } elseif (is_string($content)) {
+            $message = $className . $content;
+            if (strlen($content) > 0) {
+                $message = '[string] ' . $message;
+            }
         }
         $this->renderable[] = $message;
     }

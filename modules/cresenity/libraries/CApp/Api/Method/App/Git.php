@@ -6,23 +6,23 @@ use Symfony\Component\Process\Process;
 
 /**
  * @author Muhammad Harisuddin Thohir <me@harisuddin.com>
- * @since Mar 10, 2020, 11:13:37 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 10, 2020, 11:13:37 AM
  */
 class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
-
     public function execute() {
         $errCode = 0;
         $errMessage = '';
         $output = '';
         $successOutput = '';
         $errorOutput = '';
-        $data = array();
+        $data = [];
         $command = carr::get($this->request(), 'command');
         $isFramework = carr::get($this->request(), 'isFramework', '0');
         $allowedCommand = ['status', 'fetch', 'pull'];
         $avalableAppList = explode('
-', shell_exec("cd application && ls"));
+', shell_exec('cd application && ls'));
 
         if (!in_array($command, $allowedCommand)) {
             $errCode++;
@@ -43,20 +43,20 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
             try {
                 $pwd = '';
                 $execute = '';
-                
-                if($isFramework == '0'){
+
+                if ($isFramework == '0') {
                     $pwd = shell_exec("cd application/$this->appCode && pwd");
                     $execute = "cd application/$this->appCode && git $command";
-                }else{
-                    $pwd = shell_exec("pwd");
+                } else {
+                    $pwd = shell_exec('pwd');
                     $execute = "git $command";
                 }
-                
+
                 $output .= "working on directory $pwd";
                 $process = new Process($execute);
                 $process->run();
-                
-                $output .=  $process->getOutput();
+
+                $output .= $process->getOutput();
                 $successOutput = $output;
                 $output .= $errorOutput = $process->getErrorOutput();
             } catch (Exception $ex) {
@@ -79,5 +79,4 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
 
         return $this;
     }
-
 }

@@ -65,14 +65,17 @@ trait CApp_Trait_Base {
      * @return int
      */
     public static function orgId() {
-        $org_id = CF::orgId();
-        $app = CApp::instance();
-        if ($app->user() != null) {
-            if (strlen($app->user()->org_id) > 0) {
-                $org_id = $app->user()->org_id;
+        $orgId = CF::orgId();
+        if ($orgId === null) {
+            $app = CApp::instance();
+            if ($app->user() != null) {
+                if (strlen($app->user()->org_id) > 0) {
+                    $orgId = $app->user()->org_id;
+                }
             }
         }
-        return $org_id;
+
+        return $orgId;
     }
 
     /**
@@ -238,8 +241,9 @@ trait CApp_Trait_Base {
     /**
      * Travel to a given date time.
      *
-     * @param mixed $date
+     * @param mixed   $date
      * @param Closure $callback
+     *
      * @return CCarbon
      */
     public static function travelTo($date, Closure $callback = null) {
@@ -268,8 +272,9 @@ trait CApp_Trait_Base {
     /**
      * Travel to each date given.
      *
-     * @param mixed $dates
+     * @param mixed   $dates
      * @param Closure $callback
+     *
      * @return void
      */
     public static function travelEach($dates, Closure $callback) {
@@ -372,7 +377,7 @@ trait CApp_Trait_Base {
     /**
      * Always return false
      *
-     * @return boolean
+     * @return bool
      */
     public static function notAccessible() {
         cmsg::add('error', clang::__('You do not have access to this module, please call administrator'));
@@ -381,7 +386,7 @@ trait CApp_Trait_Base {
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public static function isDevelopment() {
         $domain = CF::domain();
@@ -396,7 +401,7 @@ trait CApp_Trait_Base {
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public static function isStaging() {
         $domain = CF::domain();

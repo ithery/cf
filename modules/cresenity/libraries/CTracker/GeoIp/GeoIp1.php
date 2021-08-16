@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 5:08:44 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 5:08:44 PM
  */
 class CTracker_GeoIp_GeoIp1 extends CTracker_GeoIp_GeoIpAbstract {
-
     public function searchAddr($addr) {
         if (!$this->isEnabled() || !$this->isGeoIpAvailable()) {
             return;
@@ -48,7 +48,6 @@ class CTracker_GeoIp_GeoIp1 extends CTracker_GeoIp_GeoIpAbstract {
      * @return string
      */
     private function getGeoliteFileName() {
-        return __DIR__ . "/GeoLiteCity.dat";
+        return __DIR__ . '/GeoLiteCity.dat';
     }
-
 }

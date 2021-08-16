@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 2:07:19 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 2:07:19 AM
  */
 class CImage_Avatar {
-
     private $engineName;
 
     public function __construct($engineName = 'Initials') {
@@ -16,12 +16,10 @@ class CImage_Avatar {
     }
 
     /**
-     * 
      * @return CImage_Avatar_ApiAbstract
      */
     public function api() {
         $className = 'CImage_Avatar_Api_' . $this->engineName;
         return new $className();
     }
-
 }

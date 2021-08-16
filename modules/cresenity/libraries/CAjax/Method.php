@@ -10,11 +10,17 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CAjax_Method implements CInterface_Jsonable {
     public $name = '';
+
     public $method = 'GET';
+
     public $data = [];
+
     public $type = '';
+
     public $target = '';
+
     public $param = [];
+
     public $args = [];
 
     public function __construct($options = []) {
@@ -94,9 +100,9 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * @param type $jsonOption
+     * @param int $jsonOption
      *
-     * @return type
+     * @return string
      */
     public function makeUrl($jsonOption = 0) {
         //generate ajax_method

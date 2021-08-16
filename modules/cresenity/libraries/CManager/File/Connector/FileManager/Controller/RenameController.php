@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 11, 2019, 9:49:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 11, 2019, 9:49:30 PM
  */
 use CManager_File_Connector_FileManager_FM as FM;
 
 class CManager_File_Connector_FileManager_Controller_RenameController extends CManager_File_Connector_FileManager_AbstractController {
-
     /**
      * Get list of folders as json to populate treeview.
      *
@@ -31,7 +31,6 @@ class CManager_File_Connector_FileManager_Controller_RenameController extends CM
         }
         if ($fm->config('alphanumeric_directory') && preg_match('/[^\w-]/i', $new_name)) {
             return parent::error('folder-alnum');
-            // return parent::error('file-alnum');
         } elseif ($fm->path()->setName($new_name)->exists()) {
             return parent::error('rename');
         }
@@ -49,10 +48,10 @@ class CManager_File_Connector_FileManager_Controller_RenameController extends CM
         }
         if ($old_file->hasThumb()) {
             $fm->path()->setName($old_name)->thumb()
-                    ->move($fm->path()->setName($new_name)->thumb());
+                ->move($fm->path()->setName($new_name)->thumb());
         }
         $fm->path()->setName($old_name)
-                ->move($fm->path()->setName($new_name));
+            ->move($fm->path()->setName($new_name));
         if ($is_directory) {
             $fm->dispatch(new CManager_File_Connector_FileManager_Event_FolderWasRenamed($old_file->path(), $new_file));
         } else {
@@ -60,5 +59,4 @@ class CManager_File_Connector_FileManager_Controller_RenameController extends CM
         }
         echo parent::$successResponse;
     }
-
 }

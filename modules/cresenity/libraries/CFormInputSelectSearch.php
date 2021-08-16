@@ -1,25 +1,31 @@
 <?php
 
+/**
+ * @deprecated since 1.2
+ */
+//@codingStandardsIgnoreStart
 class CFormInputSelectSearch extends CFormInput {
-
     use CTrait_Compat_Element_FormInput_SelectSearch;
-    
+
     protected $query;
+
     protected $multiple;
+
     protected $placeholder;
+
     protected $delay;
 
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->dropdown_classes = array();
-        $this->type = "selectsearch";
-        $this->query = "";
-        $this->format_selection = "";
-        $this->format_result = "";
-        $this->key_field = "";
-        $this->search_field = "";
-        $this->placeholder = "Search for a item";
+        $this->dropdown_classes = [];
+        $this->type = 'selectsearch';
+        $this->query = '';
+        $this->format_selection = '';
+        $this->format_result = '';
+        $this->key_field = '';
+        $this->search_field = '';
+        $this->placeholder = 'Search for a item';
         $this->multiple = false;
         $this->auto_select = false;
         $this->min_input_length = 0;
@@ -97,11 +103,11 @@ class CFormInputSelectSearch extends CFormInput {
         $html = new CStringBuilder();
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
-        $disabled = "";
+        $disabled = '';
         if ($this->disabled) {
             $disabled = ' disabled="disabled"';
         }
-        $multiple = "";
+        $multiple = '';
         if ($this->multiple) {
             $multiple = ' multiple="multiple"';
         }
@@ -110,11 +116,12 @@ class CFormInputSelectSearch extends CFormInput {
         }
 
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
-            $classes = " " . $classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
         if ($this->bootstrap >= '3') {
-            $classes = $classes . " form-control ";
+            $classes = $classes . ' form-control ';
         }
         $html->set_indent($indent);
         $value = $this->value;
@@ -122,7 +129,7 @@ class CFormInputSelectSearch extends CFormInput {
             $db = CDatabase::instance();
             $rjson = 'false';
 
-            $q = "select `" . $this->key_field . "` from (" . $this->query . ") as a limit 1";
+            $q = 'select `' . $this->key_field . '` from (' . $this->query . ') as a limit 1';
             $value = cdbutils::get_value($q);
         }
         if (strlen($this->value) > 0) {
@@ -138,11 +145,11 @@ class CFormInputSelectSearch extends CFormInput {
                 $rjson = 'false';
 
                 if ($this->auto_select) {
-                    $q = "select * from (" . $this->query . ") as a limit 1";
+                    $q = 'select * from (' . $this->query . ') as a limit 1';
                 } else {
-                    $q = "select * from (" . $this->query . ") as a where `" . $this->key_field . "`=" . $db->escape($this->value);
+                    $q = 'select * from (' . $this->query . ') as a where `' . $this->key_field . '`=' . $db->escape($this->value);
                 }
-                $r = $db->query($q)->result_array(false);
+                $r = $db->query($q)->resultArray(false);
                 if (count($r) > 0) {
                     $r = $r[0];
                     $str_selection = $this->format_selection;
@@ -207,80 +214,79 @@ class CFormInputSelectSearch extends CFormInput {
             $str_selection = "'+item." . $this->search_field . "+'";
         }
 
-        $str_result = preg_replace("/[\r\n]+/", "", $str_result);
-        $placeholder = "Search for a item";
+        $str_result = preg_replace("/[\r\n]+/", '', $str_result);
+        $placeholder = 'Search for a item';
         if (strlen($this->placeholder) > 0) {
             $placeholder = $this->placeholder;
         }
-        $str_js_change = "";
+        $str_js_change = '';
         if ($this->submit_onchange) {
             $str_js_change = "$(this).closest('form').submit();";
         }
 
-        $str_js_init = "";
+        $str_js_init = '';
         if ($this->auto_select) {
             $db = CDatabase::instance();
             $rjson = 'false';
 
-            $q = "select * from (" . $this->query . ") as a limit 1";
-            $r = $db->query($q)->result_array(false);
+            $q = 'select * from (' . $this->query . ') as a limit 1';
+            $r = $db->query($q)->resultArray(false);
             if (count($r) > 0) {
                 $r = $r[0];
             }
             $rjson = json_encode($r);
 
-
-            $str_js_init = "
+            $str_js_init = '
 				initSelection : function (element, callback) {
-					
-				var data = " . $rjson . ";
-				
+
+				var data = ' . $rjson . ';
+
 				callback(data);
 			},
-			";
+			';
         }
 
         if ($this->select2 >= '4') {
             // change concept, using select at function html()
         } else {
             if (strlen($this->value) > 0) {
-
                 $db = CDatabase::instance();
                 $rjson = 'false';
 
-                $q = "select * from (" . $this->query . ") as a where `" . $this->key_field . "`=" . $db->escape($this->value);
-                $r = $db->query($q)->result_array(false);
-                if (count($r) > 0)
+                $q = 'select * from (' . $this->query . ') as a where `' . $this->key_field . '`=' . $db->escape($this->value);
+                $r = $db->query($q)->resultArray(false);
+                if (count($r) > 0) {
                     $r = $r[0];
+                }
                 $rjson = json_encode($r);
 
-                $str_js_init = "
+                $str_js_init = '
                                 initSelection : function (element, callback) {
 
-                                var data = " . $rjson . ";
+                                var data = ' . $rjson . ';
 
                                 callback(data);
                         },
-                        ";
+                        ';
             }
         }
 
-
-        $str_multiple = "";
-        if ($this->multiple)
+        $str_multiple = '';
+        if ($this->multiple) {
             $str_multiple = " multiple:'true',";
+        }
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
+        $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
-            $classes = " " . $classes;
+            $classes = ' ' . $classes;
         }
         if ($this->bootstrap == '3.3') {
-            $classes = $classes . " form-control ";
+            $classes = $classes . ' form-control ';
         }
         $dropdown_classes = $this->dropdown_classes;
-        $dropdown_classes = implode(" ", $dropdown_classes);
+        $dropdown_classes = implode(' ', $dropdown_classes);
         if (strlen($dropdown_classes) > 0) {
-            $dropdown_classes = " " . $dropdown_classes;
+            $dropdown_classes = ' ' . $dropdown_classes;
         }
         if ($this->select2 >= '4') {
             $str = "
@@ -291,9 +297,9 @@ class CFormInputSelectSearch extends CFormInput {
                         ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
                                 url: '" . $ajax_url . "',
                                 dataType: 'jsonp',
-                                quietMillis: " . $this->delay . ", 
-                                delay: " . $this->delay . ", 
-                                " . $str_multiple . "
+                                quietMillis: " . $this->delay . ',
+                                delay: ' . $this->delay . ',
+                                ' . $str_multiple . '
                                 data: function (params) {
                                     return {
                                       q: params.term, // search term
@@ -301,7 +307,7 @@ class CFormInputSelectSearch extends CFormInput {
                                       limit: 10
                                     };
                                 },
-                                processResults: function (data, params) { 
+                                processResults: function (data, params) {
                                     // parse the results into the format expected by Select2
                                     // since we are using custom formatting functions we do not need to
                                     // alter the remote JSON data, except to indicate that infinite
@@ -317,7 +323,7 @@ class CFormInputSelectSearch extends CFormInput {
                                 },
                                 cache:true,
                             },
-                        " . $str_js_init . "
+                        ' . $str_js_init . "
                         templateResult: function(item) {
                             if (typeof item.loading !== 'undefined') {
                                 return item.text;
@@ -335,9 +341,9 @@ class CFormInputSelectSearch extends CFormInput {
                         dropdownCssClass: '" . $dropdown_classes . "', // apply css that makes the dropdown taller
                         containerCssClass : 'tpx-select2-container " . $classes . "'
                     }).change(function() {
-				" . $str_js_change . "
+				" . $str_js_change . '
                     });
-                    ";
+                    ';
 //                var_dump($str);
 //                die();
         } else {
@@ -347,10 +353,10 @@ class CFormInputSelectSearch extends CFormInput {
 				minimumInputLength: '" . $this->min_input_length . "',
 				ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
 					url: '" . $ajax_url . "',
-                                        quietMillis: " . $this->delay . ", 
-                                        delay: " . $this->delay . ", 
+                                        quietMillis: " . $this->delay . ',
+                                        delay: ' . $this->delay . ",
 					dataType: 'jsonp',
-					" . $str_multiple . "
+					" . $str_multiple . '
 					data: function (term, page) {
 						return {
 							term: term, // search term
@@ -367,7 +373,7 @@ class CFormInputSelectSearch extends CFormInput {
                     cache:true,
 
 				},
-				" . $str_js_init . "
+				' . $str_js_init . "
 				formatResult: function(item) {
 					return '" . $str_result . "';
 				}, // omitted for brevity, see the source of this page
@@ -377,10 +383,10 @@ class CFormInputSelectSearch extends CFormInput {
 				dropdownCssClass: '" . $dropdown_classes . "', // apply css that makes the dropdown taller
 				containerCssClass : 'tpx-select2-container " . $classes . "'
 			}).change(function() {
-				" . $str_js_change . "
+				" . $str_js_change . '
 			});
-	
-                ";
+
+                ';
         }
 
         $js = new CStringBuilder();
@@ -389,11 +395,6 @@ class CFormInputSelectSearch extends CFormInput {
         //echo $str;
         $js->append($str)->br();
 
-
-
-
-
         return $js->text();
     }
-
 }

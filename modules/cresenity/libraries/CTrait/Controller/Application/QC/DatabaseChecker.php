@@ -1,16 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Oct 7, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Oct 7, 2020
  */
-
-
 trait CTrait_Controller_Application_QC_DatabaseChecker {
-
     protected function getTitle() {
         return 'Database Checker';
     }
@@ -26,18 +24,17 @@ trait CTrait_Controller_Application_QC_DatabaseChecker {
 
         $tableCheckerDiv = $app->addDiv('tableChecker');
 
-        $handlerActionClick = $reloadAction->addListener('click')->addHandler('reload');
+        $handlerActionClick = $reloadAction->onClickListener()->addReloadHandler('reload');
         $handlerActionClick->setTarget('tableChecker');
         $handlerActionClick->setUrl($this->controllerUrl() . 'reloadTabChecker');
 
-
-        $reloadOptions = array();
+        $reloadOptions = [];
         static::reloadTabChecker($tableCheckerDiv, $reloadOptions);
 
         echo $app->render();
     }
 
-    public static function reloadTabChecker($container = null, $options = array()) {
+    public static function reloadTabChecker($container = null, $options = []) {
         $app = $container;
         if ($container == null) {
             $app = CApp::instance();
@@ -49,7 +46,7 @@ trait CTrait_Controller_Application_QC_DatabaseChecker {
         }
         $db = CDatabase::instance();
         $listChecker = $qcManager->databaseCheckers();
-        $dataChecker = array();
+        $dataChecker = [];
         $groupTab = carr::get($_GET, 'group');
         if ($qcManager->haveDatabaseCheckerGroup()) {
             $tabList = $app->addTabList()->setAjax(false);
@@ -77,7 +74,7 @@ trait CTrait_Controller_Application_QC_DatabaseChecker {
         }
     }
 
-    public static function reloadTableChecker($container = null, $options = array()) {
+    public static function reloadTableChecker($container = null, $options = []) {
         $app = $container;
         if ($container == null) {
             $app = CApp::instance();
@@ -90,17 +87,14 @@ trait CTrait_Controller_Application_QC_DatabaseChecker {
         $db = CDatabase::instance();
         $group = carr::get($request, 'group');
         $listChecker = $qcManager->databaseCheckers($group);
-        $dataChecker = array();
+        $dataChecker = [];
         foreach ($listChecker as $kChecker => $vChecker) {
-            
-            
             $template = $app->addTemplate()->setTemplate('CApp/QC/DatabaseChecker/Record');
-            $template->setVar('name',$vChecker);
-            $template->setVar('className',$kChecker);
-            $template->setVar('controllerUrl',static::controllerUrl());
-            
+            $template->setVar('name', $vChecker);
+            $template->setVar('className', $kChecker);
+            $template->setVar('controllerUrl', static::controllerUrl());
         }
-        
+
         if ($container == null) {
             echo $app->render();
         }
@@ -108,20 +102,18 @@ trait CTrait_Controller_Application_QC_DatabaseChecker {
 
     public function check($className) {
         $runner = CQC::createDatabaseCheckerRunner($className);
-        
-        $errCode=0;
-        $errMessage='';
+
+        $errCode = 0;
+        $errMessage = '';
         $data = [];
         try {
             $data = $runner->run();
-            
         } catch (Exception $ex) {
             $errCode++;
             $errMessage = $ex->getMessage();
             cdbg::dd($ex);
         }
-        
+
         echo CApp_Base::jsonResponse($errCode, $errMessage, $data);
     }
-
 }

@@ -1,23 +1,16 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 final class CManager_Daemon {
-
     protected static $instance;
-    protected $daemons = array();
-    protected $daemonsGroup = array();
+
+    protected $daemons = [];
+
+    protected $daemonsGroup = [];
 
     /**
-     * 
      * @return CManager_Daemon
      */
     public static function instance() {
-
         if (self::$instance == null) {
             self::$instance = new self();
         }
@@ -25,7 +18,6 @@ final class CManager_Daemon {
     }
 
     public function registerDaemon($class, $name = null, $group = null) {
-
         if ($name == null) {
             $name = carr::last(explode('_', $class));
         }
@@ -66,13 +58,13 @@ final class CManager_Daemon {
     }
 
     /**
-     * 
      * @param string $className
      * @param string $command
+     *
      * @return \CDaemon
      */
     protected function getDaemon($className, $command = 'status') {
-        $config = array();
+        $config = [];
         $config['serviceClass'] = $className;
         //get last suffix class
         $serviceName = $this->getServiceName($className);
@@ -111,17 +103,17 @@ final class CManager_Daemon {
     }
 
     public function isRunning($className) {
-        $daemon = self::getDaemon($className);
+        $daemon = $this->getDaemon($className);
         return $daemon->isRunning();
     }
 
     public function rotateLog($className) {
-        $daemon = self::getDaemon($className);
+        $daemon = $this->getDaemon($className);
         return $daemon->rotateLog();
     }
 
     public function logDump($className) {
-        $daemon = self::getDaemon($className);
+        $daemon = $this->getDaemon($className);
         return $daemon->logDump();
     }
 
@@ -138,21 +130,21 @@ final class CManager_Daemon {
         if ($filename == null) {
             $filename = $className . '.log';
         }
-        return self::logPath() . $className . '/' . $filename;
+        return $this->logPath() . $className . '/' . $filename;
     }
 
     public function getPidFile($className) {
-        return self::pidPath() . $className . '.pid';
+        return $this->pidPath() . $className . '.pid';
     }
 
     public function getLogFileList($className) {
         $fileHelper = CHelper::file();
-        $logPath = rtrim(self::logPath(), '/') . '/' . $className;
+        $logPath = rtrim($this->logPath(), '/') . '/' . $className;
         if (!is_dir($logPath)) {
             return [];
         }
         $files = $fileHelper->files($logPath);
-        $list = array();
+        $list = [];
         foreach ($files as $file) {
             /* @var $file \Symfony\Component\Finder\SplFileInfo */
             $basename = $file->getBasename();
@@ -162,5 +154,4 @@ final class CManager_Daemon {
 
         return $list;
     }
-
 }

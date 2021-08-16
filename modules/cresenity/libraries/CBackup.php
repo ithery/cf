@@ -1,19 +1,13 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CBackup {
-
     public static function getConfig($key, $defaultValue = null) {
         return CBackup_Config::instance()->getConfig($key, $defaultValue);
     }
 
     /**
-     * 
+     * @param null|array $config
+     *
      * @return CBackup_BackupJob
      */
     public static function createJob($config = null) {
@@ -26,7 +20,6 @@ class CBackup {
     }
 
     /**
-     * 
      * @return CBackup_Output
      */
     public static function output() {
@@ -48,21 +41,21 @@ class CBackup {
     public static function getMonitorFailureData() {
         $backupDestinationStatuses = static::getMonitorCollection();
         $failed = $backupDestinationStatuses
-                ->filter(function (CBackup_Monitor $backupDestinationStatus) {
-                    return $backupDestinationStatus->getHealthCheckFailure() !== null;
-                })
-                ->map(function (CBackup_Monitor $backupDestinationStatus) {
-            return [
-                $backupDestinationStatus->backupDestination()->backupName(),
-                $backupDestinationStatus->backupDestination()->diskName(),
-                $backupDestinationStatus->getHealthCheckFailure()->healthCheck()->name(),
-                $backupDestinationStatus->getHealthCheckFailure()->exception()->getMessage(),
-            ];
-        });
+            ->filter(function (CBackup_Monitor $backupDestinationStatus) {
+                return $backupDestinationStatus->getHealthCheckFailure() !== null;
+            })
+            ->map(function (CBackup_Monitor $backupDestinationStatus) {
+                return [
+                    $backupDestinationStatus->backupDestination()->backupName(),
+                    $backupDestinationStatus->backupDestination()->diskName(),
+                    $backupDestinationStatus->getHealthCheckFailure()->healthCheck()->name(),
+                    $backupDestinationStatus->getHealthCheckFailure()->exception()->getMessage(),
+                ];
+            });
         return $failed;
     }
 
-    protected function convertToRow(CBackup_Monitor $backupDestinationStatus) {
+    protected static function convertToRow(CBackup_Monitor $backupDestinationStatus) {
         $destination = $backupDestinationStatus->backupDestination();
         $row = [
             'name' => $destination->backupName(),
@@ -84,7 +77,7 @@ class CBackup {
         return $row;
     }
 
-    protected function getFormattedBackupDate(CBackup_Record $backup = null) {
+    protected static function getFormattedBackupDate(CBackup_Record $backup = null) {
         return is_null($backup) ? 'No backups present' : CBackup_Helper::formatAgeInDays($backup->date());
     }
 
@@ -98,14 +91,12 @@ class CBackup {
 
         $disableNotifications = true;
 
-
-
         try {
             $strategyClass = static::getConfig('house_keeping.strategy', CBackup_HouseKeeping_Strategy_DefaultStrategy::class);
             $strategy = new $strategyClass();
-            static::output()->info('HouseKeeping run on strategy:'.$strategyClass);
+            static::output()->info('HouseKeeping run on strategy:' . $strategyClass);
             $backupDestinations = CBackup_BackupDestinationFactory::createFromArray(static::getConfig('backup.destination.disks'));
-            
+
             $houseKeeping = new CBackup_HouseKeeping($backupDestinations, $strategy, $disableNotifications);
 
             $deletedFiles = $houseKeeping->run();
@@ -113,15 +104,12 @@ class CBackup {
             static::output()->info('HouseKeeping completed!');
         } catch (Exception $exception) {
             CBackup::output()->error("HouseKeeping failed because {$exception->getMessage()}." . PHP_EOL . $exception->getTraceAsString());
-            
+
             if (!$disableNotifications) {
                 CEvent::dispatch(new CBackup_Event_HouseKeepingHasFailed($exception));
             }
-            
-            
         }
         $output = CBackup::output()->getAndClearOutput();
         return $output;
     }
-
 }

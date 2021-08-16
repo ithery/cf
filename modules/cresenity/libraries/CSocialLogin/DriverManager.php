@@ -90,6 +90,15 @@ class CSocialLogin_DriverManager {
      *
      * @return CSocialLogin_OAuth2_AbstractProvider
      */
+    protected function createInstagramDriver() {
+        return $this->buildProvider(CSocialLogin_OAuth2_Provider_InstagramProvider::class, $this->config);
+    }
+
+    /**
+     * Create an instance of the specified driver.
+     *
+     * @return CSocialLogin_OAuth2_AbstractProvider
+     */
     protected function createSignInWithAppleDriver() {
         return $this->buildProvider(CSocialLogin_OAuth2_Provider_SignInWithAppleProvider::class, $this->config);
     }

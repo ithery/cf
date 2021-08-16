@@ -7,6 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Apr 12, 2019, 8:26:34 PM
+ * @deprecated since 1.3 use CBase_MessageBag
  */
 class CValidation_MessageBag implements CInterface_Arrayable, Countable, CInterface_Jsonable, JsonSerializable, CBase_MessageBagInterface {
     /**

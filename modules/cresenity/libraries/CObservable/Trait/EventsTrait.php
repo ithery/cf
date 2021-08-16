@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 2, 2018, 5:12:31 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 2, 2018, 5:12:31 PM
  */
 trait CObservable_Trait_EventsTrait {
-
-
-    public function onClick(Closure $event=null, $options = array()) {
+    public function onClick(Closure $event = null, $options = []) {
         $compiledJs = '';
         if ($event instanceof Closure) {
             $this->javascript->startDeferred();
@@ -20,7 +19,7 @@ trait CObservable_Trait_EventsTrait {
         $this->javascript->jquery()->onClick($compiledJs);
     }
 
-    public function onChange(Closure $event, $options = array()) {
+    public function onChange(Closure $event, $options = []) {
         $compiledJs = '';
         if ($event instanceof Closure) {
             $this->javascript->startDeferred();
@@ -30,5 +29,4 @@ trait CObservable_Trait_EventsTrait {
 
         $this->javascript->jquery()->onChange($compiledJs);
     }
-
 }

@@ -12,7 +12,9 @@ class CElement_List_ActionList extends CElement_List {
         CTrait_Element_Property_Icon;
 
     public $actions = [];
+
     protected $style;
+
     protected $withCaret;
 
     public function __construct($listId = null) {
@@ -30,6 +32,13 @@ class CElement_List_ActionList extends CElement_List {
         return new CElement_List_ActionList($list_id);
     }
 
+    /**
+     * Set style of action list
+     *
+     * @param string $style
+     *
+     * @return $this
+     */
     public function setStyle($style) {
         if (in_array($style, ['form-action', 'btn-group', 'btn-icon-group', 'btn-list', 'icon-segment', 'btn-dropdown', 'widget-action', 'table-header-action'])) {
             $this->style = $style;

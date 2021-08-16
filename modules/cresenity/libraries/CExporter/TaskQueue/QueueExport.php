@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_TaskQueue_QueueExport extends CQueue_AbstractTask {
 
     /**
@@ -19,20 +13,19 @@ class CExporter_TaskQueue_QueueExport extends CQueue_AbstractTask {
     private $writerType;
 
     /**
-     * @var TemporaryFile
+     * @var CExporter_File_TemporaryFile
      */
     private $temporaryFile;
 
     /**
      * @param object        $export
-     * @param TemporaryFile $temporaryFile
+     * @param CExporter_File_TemporaryFile $temporaryFile
      * @param string        $writerType
      */
     public function __construct($export, CExporter_File_TemporaryFile $temporaryFile, $writerType) {
         $this->export = $export;
         $this->writerType = $writerType;
         $this->temporaryFile = $temporaryFile;
-        
     }
 
     /**
@@ -45,13 +38,11 @@ class CExporter_TaskQueue_QueueExport extends CQueue_AbstractTask {
     }
 
     /**
-     * @param Writer $writer
-     *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
     public function execute() {
-        
-        
+
+
         $writer = CExporter::writer();
         $writer->open($this->export);
 

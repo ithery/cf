@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 22, 2018, 4:26:41 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 22, 2018, 4:26:41 PM
  */
 
 /**
@@ -14,13 +15,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @author Leaf Corcoran <leafot@gmail.com>
  */
 class CClientScript_Compiler_Css_Scss_Formatter_Nested extends CClientScript_Compiler_Css_Scss_Formatter {
+    public $close = ' }';
 
-    public $close = " }";
-
-    // adjust the depths of all children, depth first
+    /**
+     * Adjust the depths of all children, depth first
+     *
+     * @param object $block
+     */
     public function adjustAllChildren($block) {
         // flatten empty nested blocks
-        $children = array();
+        $children = [];
         foreach ($block->children as $i => $child) {
             if (empty($child->lines) && empty($child->children)) {
                 if (isset($block->children[$i + 1])) {
@@ -55,15 +59,15 @@ class CClientScript_Compiler_Css_Scss_Formatter_Nested extends CClientScript_Com
     }
 
     protected function block($block) {
-        if ($block->type == "root") {
+        if ($block->type == 'root') {
             $this->adjustAllChildren($block);
         }
 
         $inner = $pre = $this->indentStr($block->depth - 1);
         if (!empty($block->selectors)) {
-            echo $pre .
-            implode($this->tagSeparator, $block->selectors) .
-            $this->open . $this->break;
+            echo $pre
+            . implode($this->tagSeparator, $block->selectors)
+            . $this->open . $this->break;
             $this->indentLevel++;
             $inner = $this->indentStr($block->depth - 1);
         }
@@ -71,8 +75,9 @@ class CClientScript_Compiler_Css_Scss_Formatter_Nested extends CClientScript_Com
         if (!empty($block->lines)) {
             $glue = $this->break . $inner;
             echo $inner . implode($glue, $block->lines);
-            if (!empty($block->children))
+            if (!empty($block->children)) {
                 echo $this->break;
+            }
         }
 
         foreach ($block->children as $i => $child) {
@@ -95,9 +100,8 @@ class CClientScript_Compiler_Css_Scss_Formatter_Nested extends CClientScript_Com
             echo $this->close;
         }
 
-        if ($block->type == "root") {
+        if ($block->type == 'root') {
             echo $this->break;
         }
     }
-
 }

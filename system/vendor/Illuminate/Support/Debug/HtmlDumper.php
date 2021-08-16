@@ -4,8 +4,7 @@ namespace Illuminate\Support\Debug;
 
 use Symfony\Component\VarDumper\Dumper\HtmlDumper as SymfonyHtmlDumper;
 
-class HtmlDumper extends SymfonyHtmlDumper
-{
+class HtmlDumper extends SymfonyHtmlDumper {
     /**
      * Colour definitions for output.
      *

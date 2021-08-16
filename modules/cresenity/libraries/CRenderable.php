@@ -6,9 +6,13 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
     use CTrait_Compat_Renderable;
 
     protected $renderable;
+
     protected $additional_js;
+
     protected $visibility;
+
     protected $parent;
+
     protected $wrapper;
 
     protected function __construct($id = '') {
@@ -67,7 +71,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
 
         $this->wrapper->renderable[] = $renderable;
 
-        $this->dispatchEvent(CApp_Event::createOnRenderableAddedListener($renderable));
+        $this->dispatchEvent(CApp_Event::createEventOnRenderableAdded($renderable));
 
         return $this;
     }
@@ -129,7 +133,8 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
             }
 
             if (is_object($r) || is_array($r)) {
-                $r = cdbg::d($r, true);
+                $dumper = new CDebug_Dumper();
+                $r = $dumper->getDump($r);
             }
 
             $html->append($r);
@@ -216,7 +221,7 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
      * @return void
      */
     public function listenOnRenderableAdded(Closure $callback) {
-        $this->getEvent()->listen(CApp_Event::ON_RENDERABLE_ADDED, $callback);
+        $this->getEvent()->listen(CApp_Event_OnRenderableAdded::class, $callback);
     }
 
     /**

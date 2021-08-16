@@ -199,13 +199,36 @@ class CHTTP_Kernel {
         return $response;
     }
 
+    public function handleRequest(CHTTP_Request $request) {
+        $responseCache = CHTTP_ResponseCache::instance();
+
+        if ($responseCache->hasCache()) {
+            if ($responseCache->hasBeenCached($request)) {
+                CEvent::dispatch(new CHTTP_ResponseCache_Event_CacheHit($request));
+
+                $response = $responseCache->getCachedResponseFor($request);
+                return $response;
+            }
+        }
+
+        $response = $this->sendRequest($request);
+        if ($responseCache->hasCache() && $responseCache->isEnabled()) {
+            if ($responseCache->shouldCache($request, $response)) {
+                $responseCache->makeReplacementsAndCacheResponse($request, $response);
+                CEvent::dispatch(new CHTTP_ResponseCache_Event_CacheMissed($request));
+            }
+        }
+
+        return $response;
+    }
+
     public function handle(CHTTP_Request $request) {
         CHTTP::setRequest($request);
         CBootstrap::instance()->boot();
         $response = null;
         try {
             $this->setupRouter();
-            $response = $this->sendRequest($request);
+            $response = $this->handleRequest($request);
         } catch (Exception $e) {
             $this->reportException($e);
 

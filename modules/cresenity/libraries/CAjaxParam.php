@@ -1,4 +1,8 @@
 <?php
+/**
+ * @deprecated 1.2
+ */
+// @codingStandardsIgnoreStart
 class CAjaxParam {
     public $name = '';
 

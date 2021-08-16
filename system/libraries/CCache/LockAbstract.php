@@ -105,7 +105,7 @@ abstract class CCache_LockAbstract implements CCache_LockInterface {
      *
      * @return bool
      *
-     * @throws \Illuminate\Contracts\Cache\LockTimeoutException
+     * @throws \CCache_Exception_LockTimeoutException
      */
     public function block($seconds, $callback = null) {
         $starting = $this->currentTime();

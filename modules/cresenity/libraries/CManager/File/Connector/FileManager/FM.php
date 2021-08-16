@@ -9,6 +9,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Aug 11, 2019, 2:08:47 AM
  */
 class CManager_File_Connector_FileManager_FM {
+    const PACKAGE_NAME = 'capp-filemanager';
+
+    const DS = '/';
+
     protected $config = [];
 
     public function __construct($config = []) {
@@ -37,6 +41,12 @@ class CManager_File_Connector_FileManager_FM {
         return new CManager_File_Connector_FileManager_FM_Path($this);
     }
 
+    /**
+     * Get Input
+     *
+     * @param string $key
+     * @return mixed
+     */
     public function input($key) {
         return $this->translateFromUtf8(CHTTP::request()->input($key));
     }

@@ -1,25 +1,14 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTable_Processor {
-
     use CAjax_Engine_DataTable_Trait_ProcessorTrait;
     use CAjax_Engine_DataTable_Trait_ProcessorQueryTrait;
 
     public function process() {
-
         $db = $this->db();
 
         $response = '';
         $request = $this->input;
-
-
-
 
         $action = $this->getData('exporter.action', CExporter::ACTION_DOWNLOAD);
         $queued = $this->getData('exporter.queued', false);
@@ -29,10 +18,6 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
         $filename = $this->getData('exporter.filename', CExporter::randomFilename($writerType));
         $disk = $this->getData('exporter.disk', 'local-temp');
 
-
-
-
-
         $response = '';
         if ($progress) {
             $args = $this->engine->getArgs();
@@ -41,10 +26,10 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
             $exportOptions = [];
             $exportOptions['writerType'] = $writerType;
             $exportOptions['queued'] = $queued;
-            $exportOptions['diskName']=$disk;
+            $exportOptions['diskName'] = $disk;
             $exportOptions['diskOptions'] = [
                 'ContentType' => 'application/octet-stream'
-                ];
+            ];
 
             $storeResult = CExporter::store($exportable, $filename, $exportOptions);
 
@@ -65,7 +50,6 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
             $ajaxMethod->setType('DataTableExporterProgress');
             $ajaxMethod->setData('downloadId', $fileId);
             $progressUrl = $ajaxMethod->makeUrl();
-
 
             $responseData = [
                 'downloadId' => $fileId,
@@ -93,8 +77,6 @@ class CAjax_Engine_DataTable_ExporterProcessor_Query extends CAjax_Engine_DataTa
             }
         }
 
-
         return $response;
     }
-
 }

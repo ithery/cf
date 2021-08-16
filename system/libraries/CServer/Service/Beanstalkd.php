@@ -11,16 +11,14 @@ use Pheanstalk\Pheanstalk;
 use Pheanstalk\Job as PheanstalkJob;
 
 class CServer_Service_Beanstalkd {
-
     protected $client;
+
     protected $contentType;
 
     public function __construct($options = []) {
         $host = carr::get($options, 'host', 'localhost');
         $port = carr::get($options, 'port', Pheanstalk::DEFAULT_PORT);
         $timeout = carr::get($options, 'timeout', Connection::DEFAULT_CONNECT_TIMEOUT);
-
-
 
         $this->client = Pheanstalk::create($host, $port, $timeout);
     }
@@ -32,7 +30,7 @@ class CServer_Service_Beanstalkd {
     }
 
     public function getTubesStats() {
-        $stats = array();
+        $stats = [];
         foreach ($this->getTubes() as $tube) {
             $stats[] = $this->getTubeStats($tube);
         }
@@ -44,8 +42,8 @@ class CServer_Service_Beanstalkd {
     }
 
     public function getTubeStats($tube) {
-        $stats = array();
-        $descr = array(
+        $stats = [];
+        $descr = [
             'name' => 'the tube\'s name',
             'current-jobs-urgent' => 'the number of ready jobs with priority < 1024 in this tube',
             'current-jobs-ready' => 'the number of jobs in the ready queue in this tube',
@@ -57,8 +55,8 @@ class CServer_Service_Beanstalkd {
             'cmd-delete' => 'the cumulative number of delete commands for this tube',
             'pause' => 'the number of seconds the tube has been paused for',
             'cmd-pause-tube' => 'the cumulative number of pause-tube commands for this tube',
-            'pause-time-left' => 'the number of seconds until the tube is un-paused');
-        $nameTube = array(
+            'pause-time-left' => 'the number of seconds until the tube is un-paused'];
+        $nameTube = [
             'name' => 'name',
             'current-jobs-urgent' => 'Urgent',
             'current-jobs-ready' => 'Ready',
@@ -72,21 +70,21 @@ class CServer_Service_Beanstalkd {
             'cmd-delete' => 'Delete(cmd)',
             'cmd-pause-tube' => 'Pause(cmd)',
             'pause' => 'Pause(sec)',
-            'pause-time-left' => 'Pause(left)');
+            'pause-time-left' => 'Pause(left)'];
         foreach ($this->client->statsTube($tube) as $key => $value) {
             if (!array_key_exists($key, $nameTube)) {
                 continue;
             }
-            $stats[] = array(
+            $stats[] = [
                 'key' => $nameTube[$key],
                 'value' => $value,
-                'descr' => isset($descr[$key]) ? $descr[$key] : '');
+                'descr' => isset($descr[$key]) ? $descr[$key] : ''];
         }
         return $stats;
     }
 
     public static function getServerStatsFields() {
-        return array(
+        return [
             'binlog-current-index' => 'the index of the current binlog file being written to. If binlog is not active this value will be 0',
             'binlog-max-size' => 'the maximum size in bytes a binlog file is allowed to get before a new binlog file is opened',
             'binlog-oldest-index' => 'the index of the oldest binlog file needed to store the current jobs',
@@ -133,20 +131,20 @@ class CServer_Service_Beanstalkd {
             'total-jobs' => 'the cumulative count of jobs created',
             'uptime' => 'the number of seconds since this server process started running',
             'version' => 'the version string of the server',
-        );
+        ];
     }
 
     public function getServerStats() {
         $fields = $this->getServerStatsFields();
-        $stats = array();
+        $stats = [];
         $object = $this->client->stats();
         foreach ($fields as $key => $description) {
             if (isset($object[$key])) {
-                $stats[$key] = array(
+                $stats[$key] = [
                     'key' => $key,
                     'description' => $description,
                     'value' => $object[$key],
-                );
+                ];
             }
         }
         return $stats;
@@ -165,10 +163,10 @@ class CServer_Service_Beanstalkd {
     }
 
     public function peekAll($tube) {
-        return array(
+        return [
             'ready' => $this->peekReady($tube),
             'delayed' => $this->peekDelayed($tube),
-            'buried' => $this->peekBuried($tube));
+            'buried' => $this->peekBuried($tube)];
     }
 
     public function kick($tube, $limit) {
@@ -177,17 +175,29 @@ class CServer_Service_Beanstalkd {
 
     public function deleteReady($tube) {
         $job = $this->client->useTube($tube)->peekReady();
-        $this->client->delete($job);
+        if ($job) {
+            $this->client->delete($job);
+            return true;
+        }
+        return false;
     }
 
     public function deleteBuried($tube) {
         $job = $this->client->useTube($tube)->peekBuried();
-        $this->client->delete($job);
+        if ($job) {
+            $this->client->delete($job);
+            return true;
+        }
+        return false;
     }
 
     public function deleteDelayed($tube) {
         $job = $this->client->useTube($tube)->peekDelayed();
-        $this->client->delete($job);
+        if ($job) {
+            $this->client->delete($job);
+            return true;
+        }
+        return false;
     }
 
     public function pauseTube($tube, $delay) {
@@ -207,21 +217,21 @@ class CServer_Service_Beanstalkd {
     /**
      * Pheanstalk class instance
      *
-     * @var Pheanstalk
+     * @param string $tube
+     * @param string $method
      */
     private function peek($tube, $method) {
         $peek = [];
         try {
             $job = $this->client->useTube($tube)->{$method}();
             if ($job) {
-                $peek = array(
+                $peek = [
                     'id' => $job->getId(),
                     'rawData' => $job->getData(),
                     'data' => $job->getData(),
-                    'stats' => $this->client->statsJob($job));
+                    'stats' => $this->client->statsJob($job)];
             }
         } catch (Exception $ex) {
-            
         }
         if ($peek) {
             $peek['data'] = $this->decodeDate($peek['data']);
@@ -237,20 +247,17 @@ class CServer_Service_Beanstalkd {
         try {
             $data = base64_decode($pData);
         } catch (Exception $e) {
-            
         }
         if (!$data) {
             try {
                 $data = unserialize($pData);
             } catch (Exception $e) {
-                
             }
         }
         if ($data) {
             $this->_contentType = 'php';
             $out = $data;
         } else {
-
             $data = @json_decode($pData, true);
 
             if ($data) {
@@ -260,5 +267,4 @@ class CServer_Service_Beanstalkd {
         }
         return $out;
     }
-
 }

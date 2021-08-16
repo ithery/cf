@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @deprecated since 1.2
+ */
+//@codingStandardsIgnoreStart
 class CFormInputHidden extends CFormInput {
     public function __construct($id) {
         parent::__construct($id);

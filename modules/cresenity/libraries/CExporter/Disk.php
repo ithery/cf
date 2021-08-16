@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * @method bool get(string $filename)
  * @method resource readStream(string $filename)
@@ -13,7 +7,6 @@
  * @method bool exists(string $filename)
  */
 class CExporter_Disk {
-
     /**
      * @var IlluminateFilesystem
      */
@@ -30,9 +23,9 @@ class CExporter_Disk {
     protected $diskOptions;
 
     /**
-     * @param CStorage_Adapter  $disk
-     * @param string|null $name
-     * @param array       $diskOptions
+     * @param CStorage_Adapter $disk
+     * @param string|null      $name
+     * @param array            $diskOptions
      */
     public function __construct(CStorage_Adapter $disk, $name = null, array $diskOptions = []) {
         $this->disk = $disk;
@@ -68,7 +61,7 @@ class CExporter_Disk {
      */
     public function copy(CExporter_File_TemporaryFile $source, $destination) {
         $readStream = $source->readStream();
-        
+
         if (realpath($destination)) {
             $tempStream = fopen($destination, 'rb+');
             $success = stream_copy_to_stream($readStream, $tempStream) !== false;
@@ -93,5 +86,4 @@ class CExporter_Disk {
     public function touch($filename) {
         $this->disk->put($filename, '', $this->diskOptions);
     }
-
 }

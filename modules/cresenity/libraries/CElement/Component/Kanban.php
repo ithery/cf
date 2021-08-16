@@ -1,15 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 3, 2019, 1:43:39 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 3, 2019, 1:43:39 AM
  */
 class CElement_Component_Kanban extends CElement_Component {
-
     protected $saveCallback;
+
     protected $saveCallbackRequire;
 
     public function __construct($id) {
@@ -18,7 +19,7 @@ class CElement_Component_Kanban extends CElement_Component {
         CManager::registerModule('dragula');
     }
 
-    public function addList($id = "") {
+    public function addList($id = '') {
         $wrapperList = $this->addDiv()->addClass('col-md');
         $list = CElement_Factory::createComponent('Kanban_List', $id);
         $list->addClass('mb-3');
@@ -34,13 +35,12 @@ class CElement_Component_Kanban extends CElement_Component {
     }
 
     public function build() {
-        
     }
 
     public function js($indent = 0) {
         $saveUrl = '';
         if ($this->saveCallback != null) {
-            $wrapperCallback = function() {
+            $wrapperCallback = function () {
                 $args = func_get_args();
                 $errCode = 0;
                 $errMessage = '';
@@ -54,10 +54,10 @@ class CElement_Component_Kanban extends CElement_Component {
                     //return error with no message for just cancel dracula event
                     $errCode++;
                 }
-                return json_encode(array(
+                return json_encode([
                     'errCode' => $errCode,
                     'errMessage' => $errMessage,
-                ));
+                ]);
             };
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('Callback');
@@ -65,7 +65,7 @@ class CElement_Component_Kanban extends CElement_Component {
             $ajaxMethod->setData('requires', $this->saveCallbackRequire);
             $ajaxMethod->setData('saveCallback', serialize($this->saveCallback));
             $ajaxMethod->setData('method', 'post');
-            $ajaxMethod->setData('parameter', array('itemId', 'fromContainerId', 'toContainerId', 'dataItemFromOrder', 'dataItemToOrder'));
+            $ajaxMethod->setData('parameter', ['itemId', 'fromContainerId', 'toContainerId', 'dataItemFromOrder', 'dataItemToOrder']);
 
             $saveUrl = $ajaxMethod->makeUrl();
         }
@@ -77,7 +77,7 @@ class CElement_Component_Kanban extends CElement_Component {
                     var itemId = $(el).attr('id');
                     var toContainerId = $(target).closest('.widget-box').attr('id');
                     var fromContainerId = $(source).closest('.widget-box').attr('id');
-                    
+
                     var dataItemToOrder = [];
                     $(target).find('.list-group-item').each(function () {
                         dataItemToOrder.push($(this).attr('id'));
@@ -93,7 +93,7 @@ class CElement_Component_Kanban extends CElement_Component {
                     dataPost.fromContainerId=fromContainerId;
                     dataPost.dataItemToOrder=dataItemToOrder;
                     dataPost.dataItemFromOrder=dataItemFromOrder;
-                    
+
                     var container = $(target).closest('.kanban');
                     (function(container){
                         cresenity.blockElement(container);
@@ -107,7 +107,7 @@ class CElement_Component_Kanban extends CElement_Component {
                             },
                             success:function(data) {
                                 console.log(data);
-                                
+
                                 if(data.errCode>0) {
                                     drake.cancel();
                                     if(data.errMessage.length>0) {
@@ -121,8 +121,8 @@ class CElement_Component_Kanban extends CElement_Component {
                             }
                         });
                     })(container);
-                    
-                    
+
+
                 });
                 ";
         }
@@ -141,12 +141,11 @@ class CElement_Component_Kanban extends CElement_Component {
                     }
                 );
                 (function(drake) {
-                " . $saveJs . "
+                " . $saveJs . '
                 })(drake)
             });
-        ";
-        $js.=parent::jsChild($indent);
+        ';
+        $js .= parent::jsChild($indent);
         return $js;
     }
-
 }

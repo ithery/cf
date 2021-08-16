@@ -5,14 +5,32 @@
  */
 class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
     /**
+     * The connection creation callback.
+     *
+     * @var callable
+     */
+    protected $connector;
+
+    /**
+     * The connection configuration array.
+     *
+     * @var array
+     */
+    protected $config;
+
+    /**
      * Create a new PhpRedis connection.
      *
-     * @param \Redis $client
+     * @param \Redis        $client
+     * @param callable|null $connector
+     * @param array         $config
      *
      * @return void
      */
-    public function __construct($client) {
+    public function __construct($client, $connector = null, array $config = []) {
         $this->client = $client;
+        $this->connector = $connector;
+        $this->config = $config;
     }
 
     /**
@@ -38,20 +56,6 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
         return array_map(function ($value) {
             return $value !== false ? $value : null;
         }, $this->command('mget', [$keys]));
-    }
-
-    /**
-     * Determine if the given keys exist.
-     *
-     * @param mixed $keys
-     *
-     * @return int
-     */
-    public function exists(...$keys) {
-        $keys = c::collect($keys)->map(function ($key) {
-            return $this->applyPrefix($key);
-        })->all();
-        return $this->executeRaw(array_merge(['exists'], $keys));
     }
 
     /**
@@ -272,6 +276,100 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
     }
 
     /**
+     * Scans all keys based on options.
+     *
+     * @param mixed $cursor
+     * @param array $options
+     *
+     * @return mixed
+     */
+    public function scan($cursor, $options = []) {
+        $result = $this->client->scan(
+            $cursor,
+            isset($options['match']) && $options['match'] ? $options['match'] : '*',
+            isset($options['count']) && $options['count'] ? $options['count'] : 10
+        );
+
+        if ($result === false) {
+            $result = [];
+        }
+
+        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+    }
+
+    /**
+     * Scans the given set for all values based on options.
+     *
+     * @param string $key
+     * @param mixed  $cursor
+     * @param array  $options
+     *
+     * @return mixed
+     */
+    public function zscan($key, $cursor, $options = []) {
+        $result = $this->client->zscan(
+            $key,
+            $cursor,
+            isset($options['match']) && $options['match'] ? $options['match'] : '*',
+            isset($options['count']) && $options['count'] ? $options['count'] : 10
+        );
+
+        if ($result === false) {
+            $result = [];
+        }
+
+        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+    }
+
+    /**
+     * Scans the given hash for all values based on options.
+     *
+     * @param string $key
+     * @param mixed  $cursor
+     * @param array  $options
+     *
+     * @return mixed
+     */
+    public function hscan($key, $cursor, $options = []) {
+        $result = $this->client->hscan(
+            $key,
+            $cursor,
+            isset($options['match']) && $options['match'] ? $options['match'] : '*',
+            isset($options['count']) && $options['count'] ? $options['count'] : 10
+        );
+
+        if ($result === false) {
+            $result = [];
+        }
+
+        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+    }
+
+    /**
+     * Scans the given set for all values based on options.
+     *
+     * @param string $key
+     * @param mixed  $cursor
+     * @param array  $options
+     *
+     * @return mixed
+     */
+    public function sscan($key, $cursor, $options = []) {
+        $result = $this->client->sscan(
+            $key,
+            $cursor,
+            isset($options['match']) && $options['match'] ? $options['match'] : '*',
+            isset($options['count']) && $options['count'] ? $options['count'] : 10
+        );
+
+        if ($result === false) {
+            $result = [];
+        }
+
+        return $cursor === 0 && empty($result) ? false : [$cursor, $result];
+    }
+
+    /**
      * Execute commands in a pipeline.
      *
      * @param callable|null $callback
@@ -388,6 +486,28 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      */
     public function executeRaw(array $parameters) {
         return $this->command('rawCommand', $parameters);
+    }
+
+    /**
+     * Run a command against the Redis database.
+     *
+     * @param string $method
+     * @param array  $parameters
+     *
+     * @return mixed
+     *
+     * @throws \RedisException
+     */
+    public function command($method, array $parameters = []) {
+        try {
+            return parent::command($method, $parameters);
+        } catch (RedisException $e) {
+            if (cstr::contains($e->getMessage(), 'went away')) {
+                $this->client = $this->connector ? call_user_func($this->connector) : $this->client;
+            }
+
+            throw $e;
+        }
     }
 
     /**
