@@ -119,6 +119,9 @@ class CHTTP_ResponseCache_CacheProfile {
     public function hasCacheableContentType(Response $response) {
         $contentType = $response->headers->get('Content-Type', '');
 
+        if ($contentType == '') {
+            return true;
+        }
         if (cstr::startsWith($contentType, 'text/')) {
             return true;
         }
