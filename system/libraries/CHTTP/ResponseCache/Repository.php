@@ -7,9 +7,9 @@ class CHTTP_ResponseCache_Repository {
 
     protected $cache;
 
-    public function __construct() {
+    public function __construct($cache = null) {
         $this->responseSerializer = new CHTTP_ResponseCache_Serializer_DefaultSerializer();
-        $this->cache = null;
+        $this->cache = $cache;
     }
 
     /**
@@ -94,7 +94,7 @@ class CHTTP_ResponseCache_Repository {
                 $tags = array_merge($this->cache->getTags()->getNames(), $tags);
             }
 
-            return new self($this->responseSerializer, $this->cache->tags($tags));
+            return new self($this->cache->tags($tags));
         }
     }
 

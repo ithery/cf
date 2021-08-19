@@ -93,43 +93,35 @@ class CHTTP_ResponseCache {
      *
      * @param CHTTP_Request $request
      * @param Response      $response
-     * @param int|null      $lifetimeInSeconds
-     * @param array         $tags
      *
      * @return void
      */
     public function makeReplacementsAndCacheResponse(
         CHTTP_Request $request,
-        Response $response,
-        $lifetimeInSeconds = null,
-        array $tags = []
+        Response $response
     ) {
         $cachedResponse = clone $response;
 
         //$this->getReplacers()->each(fn (Replacer $replacer) => $replacer->prepareResponseToCache($cachedResponse));
 
-        $this->cacheResponse($request, $cachedResponse, $lifetimeInSeconds, $tags);
+        $this->cacheResponse($request, $cachedResponse);
     }
 
     /**
      * @param CHTTP_Request $request
      * @param Response      $response
-     * @param int|null      $lifetimeInSeconds
-     * @param array         $tags
      *
      * @return Response
      */
     public function cacheResponse(
         CHTTP_Request $request,
-        Response $response,
-        $lifetimeInSeconds = null,
-        array $tags = []
+        Response $response
     ) {
         if ($this->cacheProfile->isAddCacheTimeHeader()) {
             $response = $this->addCachedHeader($response);
         }
 
-        $this->taggedCache($tags)->put(
+        $this->getCache()->put(
             $this->hasher->getHashFor($request),
             $response,
             $this->cacheProfile->cacheRequestUntil($request)
