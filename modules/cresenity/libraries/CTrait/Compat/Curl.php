@@ -34,6 +34,15 @@ trait CTrait_Compat_Curl {
         return $this->setTimeout($milisecond);
     }
 
+    /**
+     * @deprecated version
+     *
+     * @param [type] $key
+     * @param [type] $value
+     * @param bool   $overwrite
+     *
+     * @return void
+     */
     public function set_opt($key, $value, $overwrite = true) {
         return $this->setOpt($key, $value, $overwrite);
     }
