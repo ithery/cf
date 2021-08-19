@@ -112,6 +112,10 @@ class CHTTP_ResponseCache_Repository {
         return $this;
     }
 
+    public function getCache() {
+        return $this->cache;
+    }
+
     public function hasCache() {
         return $this->cache != null;
     }

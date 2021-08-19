@@ -144,7 +144,7 @@ class CHTTP_ResponseCache {
     /**
      * @return CHTTP_ResponseCache_Repository
      */
-    protected function getCache() {
+    public function getCache() {
         if ($this->cache == null) {
             $this->cache = new CHTTP_ResponseCache_Repository();
         }
