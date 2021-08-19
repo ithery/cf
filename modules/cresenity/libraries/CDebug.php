@@ -30,7 +30,7 @@ class CDebug {
 
     public static function dump($var) {
         if (self::bar()->isEnabled()) {
-            /** @var CDebug_DataCollector_MessageCollector $collector */
+            /** @var CDebug_DataCollector_MessagesCollector $collector */
             $collector = self::bar()->getCollector('messages');
             $collector->debug($var);
         }

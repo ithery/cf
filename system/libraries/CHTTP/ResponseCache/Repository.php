@@ -5,6 +5,9 @@ use Symfony\Component\HttpFoundation\Response;
 class CHTTP_ResponseCache_Repository {
     protected $responseSerializer;
 
+    /**
+     * @var CCache_Repository
+     */
     protected $cache;
 
     public function __construct($cache = null) {
@@ -112,6 +115,9 @@ class CHTTP_ResponseCache_Repository {
         return $this;
     }
 
+    /**
+     * @return CCache_Repository
+     */
     public function getCache() {
         return $this->cache;
     }
