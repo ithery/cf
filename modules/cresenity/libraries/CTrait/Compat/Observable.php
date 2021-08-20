@@ -8,13 +8,22 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Feb 16, 2018, 5:40:40 AM
  */
-
+/**
+ * @see CObservable
+ */
  //@codingStandardsIgnoreStart
 trait CTrait_Compat_Observable {
     public function get_listeners() {
         return $this->getListeners();
     }
 
+    /**
+     * @param string $event
+     *
+     * @return CObservable_Listener
+     *
+     * @deprecated
+     */
     public function add_listener($event) {
         return $this->addListener($event);
     }

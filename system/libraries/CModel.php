@@ -39,6 +39,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static CModel_Query|static whereNotIn($column, $values)
  * @method static CModel_Query|static whereNull($column)
  * @method static CModel_Query|static whereNotNull($column)
+ * @method static CModel_Query|static whereDoesntHave($table, Closure $callback)
  * @method static CModel_Query|static orWhereRaw($sql, array $bindings = [])
  * @method static CModel_Query|static orWhereBetween($column, array $values)
  * @method static CModel_Query|static orWhereNotBetween($column, array $values)
