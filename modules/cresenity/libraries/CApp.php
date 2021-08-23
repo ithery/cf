@@ -498,8 +498,22 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function sendExceptionEmail(Exception $exception, $email = null) {
+        $ignoredExceptions = [
+            CDaemon_Exception_AlreadyRunningException::class,
+            CDaemon_Exception_AlreadyStoppedException::class
+        ];
+
         if (!($exception instanceof CHTTP_Exception_NotFoundHttpException)) {
-            $html = CApp_ErrorHandler::sendExceptionEmail($exception, $email);
+            $ignored = false;
+            foreach ($ignoredExceptions as $ignored) {
+                if (is_subclass_of($exception, $ignored) || get_class($exception) === $ignored) {
+                    $ignored = true;
+                    break;
+                }
+            }
+            if (!$ignored) {
+                $html = CApp_ErrorHandler::sendExceptionEmail($exception, $email);
+            }
         }
     }
 
