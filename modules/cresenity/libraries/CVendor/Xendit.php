@@ -129,6 +129,7 @@ class CVendor_Xendit {
         if (!empty($description)) {
             $data['description'] = $expirationDate;
         }
+
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
@@ -262,6 +263,9 @@ class CVendor_Xendit {
         if (!empty($capture_options['interval_count'])) {
             $data['interval_count'] = $capture_options['interval_count'];
         }
+        if (!empty($capture_options['installment'])) {
+            $data['installment'] = $capture_options['installment'];
+        }
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
@@ -274,6 +278,14 @@ class CVendor_Xendit {
 
         $responseObject = json_decode($response, true);
         return $responseObject;
+    }
+
+    public function getChargeOptionCreditCard($bin, $amount, $options = null) {
+        $endPoint = $this->server_domain . '/credit_card_charges/option';
+        $data['bin'] = $bin;
+        $data['amount'] = $amount;
+        $response = $this->requestToXendit($endPoint, 'get', $data);
+        return $response;
     }
 
     public function issueCreditCardRefund($credit_card_charge_id, $amount, $external_id, $options = null) {
@@ -644,6 +656,7 @@ class CVendor_Xendit {
         }
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
+
 
         curl_close($curl);
         $responseObject = json_decode($response, true);
