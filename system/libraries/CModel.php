@@ -261,7 +261,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     }
 
     /**
-     * Create a new Eloquent model instance.
+     * Create a new model instance.
      *
      * @param array $attributes
      *

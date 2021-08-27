@@ -96,8 +96,15 @@ trait CTrait_Compat_Observable {
         return $this->addFieldset($fieldset_id);
     }
 
-    public function add_table($table_id = '') {
-        return $this->addTable($table_id);
+    /**
+     * @param string $tableId
+     *
+     * @return CElement_Component_DataTable
+     *
+     * @deprecated since 1.2
+     */
+    public function add_table($tableId = '') {
+        return $this->addTable($tableId);
     }
 
     public function add_row($row_id = '') {
