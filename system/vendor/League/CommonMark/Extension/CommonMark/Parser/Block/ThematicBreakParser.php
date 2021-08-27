@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -20,8 +18,7 @@ use League\CommonMark\Parser\Block\BlockContinue;
 use League\CommonMark\Parser\Block\BlockContinueParserInterface;
 use League\CommonMark\Parser\Cursor;
 
-final class ThematicBreakParser extends AbstractBlockContinueParser
-{
+final class ThematicBreakParser extends AbstractBlockContinueParser {
     /**
      * @var ThematicBreak
      *
@@ -29,21 +26,18 @@ final class ThematicBreakParser extends AbstractBlockContinueParser
      */
     private $block;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->block = new ThematicBreak();
     }
 
     /**
      * @return ThematicBreak
      */
-    public function getBlock(): AbstractBlock
-    {
+    public function getBlock() {
         return $this->block;
     }
 
-    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue
-    {
+    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser) {
         // a horizontal rule can never container > 1 line, so fail to match
         return BlockContinue::none();
     }

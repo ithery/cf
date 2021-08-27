@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,25 +16,23 @@ namespace League\CommonMark\Extension\CommonMark\Node\Block;
 
 use League\CommonMark\Node\Block\AbstractBlock;
 
-class Heading extends AbstractBlock
-{
-    /** @var int */
+class Heading extends AbstractBlock {
+    /**
+     * @var int
+     */
     protected $level;
 
-    public function __construct(int $level)
-    {
+    public function __construct($level) {
         parent::__construct();
 
         $this->level = $level;
     }
 
-    public function getLevel(): int
-    {
+    public function getLevel() {
         return $this->level;
     }
 
-    public function setLevel(int $level): void
-    {
+    public function setLevel($level) {
         $this->level = $level;
     }
 }

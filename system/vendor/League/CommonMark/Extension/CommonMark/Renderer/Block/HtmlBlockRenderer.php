@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -25,8 +23,7 @@ use League\CommonMark\Renderer\ChildNodeRendererInterface;
 use League\CommonMark\Renderer\NodeRendererInterface;
 use League\CommonMark\Util\HtmlFilter;
 
-final class HtmlBlockRenderer implements NodeRendererInterface, ConfigurationAwareInterface
-{
+final class HtmlBlockRenderer implements NodeRendererInterface, ConfigurationAwareInterface {
     /**
      * @var ConfigurationInterface
      *
@@ -41,22 +38,20 @@ final class HtmlBlockRenderer implements NodeRendererInterface, ConfigurationAwa
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function render(Node $node, ChildNodeRendererInterface $childRenderer)
-    {
-        if (! ($node instanceof HtmlBlock)) {
+    public function render(Node $node, ChildNodeRendererInterface $childRenderer) {
+        if (!($node instanceof HtmlBlock)) {
             throw new \InvalidArgumentException('Incompatible node type: ' . \get_class($node));
         }
 
         $htmlInput = $this->config->get('html_input', HtmlFilter::ALLOW);
-        if (! \is_string($htmlInput)) {
+        if (!\is_string($htmlInput)) {
             throw InvalidOptionException::forConfigOption('html_input', $htmlInput);
         }
 
         return HtmlFilter::filter($node->getLiteral(), $htmlInput);
     }
 
-    public function setConfiguration(ConfigurationInterface $configuration): void
-    {
+    public function setConfiguration(ConfigurationInterface $configuration) {
         $this->config = $configuration;
     }
 }

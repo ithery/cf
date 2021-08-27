@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -16,30 +14,45 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Extension\CommonMark\Node\Block;
 
-class ListData
-{
-    /** @var int|null */
+class ListData {
+    /**
+     * @var int|null
+     */
     public $start;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     public $padding = 0;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     public $type;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     public $delimiter;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     public $bulletChar;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     public $markerOffset;
 
-    public function equals(ListData $data): bool
-    {
-        return $this->type === $data->type &&
-            $this->delimiter === $data->delimiter &&
-            $this->bulletChar === $data->bulletChar;
+    /**
+     * @param ListData $data
+     *
+     * @return bool
+     */
+    public function equals(ListData $data) {
+        return $this->type === $data->type
+            && $this->delimiter === $data->delimiter
+            && $this->bulletChar === $data->bulletChar;
     }
 }

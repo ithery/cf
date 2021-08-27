@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -21,8 +19,7 @@ use League\CommonMark\Parser\CursorState;
  *
  * @psalm-immutable
  */
-final class BlockContinue
-{
+final class BlockContinue {
     /**
      * @var CursorState|null
      *
@@ -37,19 +34,16 @@ final class BlockContinue
      */
     private $finalize;
 
-    private function __construct(?CursorState $cursorState = null, bool $finalize = false)
-    {
+    private function __construct(CursorState $cursorState = null, $finalize = false) {
         $this->cursorState = $cursorState;
-        $this->finalize    = $finalize;
+        $this->finalize = $finalize;
     }
 
-    public function getCursorState(): ?CursorState
-    {
+    public function getCursorState() {
         return $this->cursorState;
     }
 
-    public function isFinalize(): bool
-    {
+    public function isFinalize() {
         return $this->finalize;
     }
 
@@ -58,24 +52,21 @@ final class BlockContinue
      *
      * @return null
      */
-    public static function none(): ?self
-    {
+    public static function none() {
         return null;
     }
 
     /**
      * Signal that we're continuing at the given position
      */
-    public static function at(Cursor $cursor): self
-    {
+    public static function at(Cursor $cursor) {
         return new self($cursor->saveState(), false);
     }
 
     /**
      * Signal that we want to finalize and close the block
      */
-    public static function finished(): self
-    {
+    public static function finished() {
         return new self(null, true);
     }
 }

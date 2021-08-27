@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -20,8 +18,7 @@ use League\CommonMark\Parser\Cursor;
 use League\CommonMark\Reference\ReferenceMap;
 use League\CommonMark\Reference\ReferenceMapInterface;
 
-class Document extends AbstractBlock
-{
+class Document extends AbstractBlock {
     /**
      * @var ReferenceMapInterface
      *
@@ -29,32 +26,33 @@ class Document extends AbstractBlock
      */
     protected $referenceMap;
 
-    public function __construct(?ReferenceMapInterface $referenceMap = null)
-    {
+    public function __construct(ReferenceMapInterface $referenceMap = null) {
         parent::__construct();
 
         $this->setStartLine(1);
 
-        $this->referenceMap = $referenceMap ?? new ReferenceMap();
+        $this->referenceMap = $referenceMap ?: new ReferenceMap();
     }
 
-    public function getReferenceMap(): ReferenceMapInterface
-    {
+    /**
+     * @return ReferenceMapInterface
+     */
+    public function getReferenceMap() {
         return $this->referenceMap;
     }
 
-    public function canContain(AbstractBlock $block): bool
-    {
+    public function canContain(AbstractBlock $block) {
         return true;
     }
 
-    public function isCode(): bool
-    {
+    /**
+     * @return bool
+     */
+    public function isCode() {
         return false;
     }
 
-    public function matchesNextLine(Cursor $cursor): bool
-    {
+    public function matchesNextLine(Cursor $cursor) {
         return true;
     }
 }

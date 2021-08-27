@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -22,15 +20,12 @@ use League\CommonMark\Parser\Inline\InlineParserInterface;
 use League\CommonMark\Parser\Inline\InlineParserMatch;
 use League\CommonMark\Parser\InlineParserContext;
 
-final class BangParser implements InlineParserInterface
-{
-    public function getMatchDefinition(): InlineParserMatch
-    {
+final class BangParser implements InlineParserInterface {
+    public function getMatchDefinition() {
         return InlineParserMatch::string('![');
     }
 
-    public function parse(InlineParserContext $inlineContext): bool
-    {
+    public function parse(InlineParserContext $inlineContext) {
         $cursor = $inlineContext->getCursor();
         $cursor->advanceBy(2);
 

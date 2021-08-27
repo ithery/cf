@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -20,10 +18,8 @@ use League\CommonMark\Extension\Strikethrough\StrikethroughExtension;
 use League\CommonMark\Extension\Table\TableExtension;
 use League\CommonMark\Extension\TaskList\TaskListExtension;
 
-final class GithubFlavoredMarkdownExtension implements ExtensionInterface
-{
-    public function register(ConfigurableEnvironmentInterface $environment): void
-    {
+final class GithubFlavoredMarkdownExtension implements ExtensionInterface {
+    public function register(ConfigurableEnvironmentInterface $environment) {
         $environment->addExtension(new AutolinkExtension());
         $environment->addExtension(new DisallowedRawHtmlExtension());
         $environment->addExtension(new StrikethroughExtension());

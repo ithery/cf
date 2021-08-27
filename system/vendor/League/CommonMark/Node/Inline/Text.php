@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -16,10 +14,8 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Node\Inline;
 
-class Text extends AbstractStringContainer
-{
-    public function append(string $character): void
-    {
+class Text extends AbstractStringContainer {
+    public function append($character) {
         $this->literal .= $character;
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,10 +16,8 @@ namespace League\CommonMark\Extension\CommonMark\Node\Inline;
 
 use League\CommonMark\Node\Inline\Text;
 
-class Image extends AbstractWebResource
-{
-    public function __construct(string $url, ?string $label = null, ?string $title = null)
-    {
+class Image extends AbstractWebResource {
+    public function __construct($url, $label = null, $title = null) {
         parent::__construct($url);
 
         if ($label !== null && $label !== '') {

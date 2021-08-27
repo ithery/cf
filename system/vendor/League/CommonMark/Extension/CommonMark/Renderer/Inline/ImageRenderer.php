@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -25,8 +23,7 @@ use League\CommonMark\Renderer\NodeRendererInterface;
 use League\CommonMark\Util\HtmlElement;
 use League\CommonMark\Util\RegexHelper;
 
-final class ImageRenderer implements NodeRendererInterface, ConfigurationAwareInterface
-{
+final class ImageRenderer implements NodeRendererInterface, ConfigurationAwareInterface {
     /**
      * @var ConfigurationInterface
      *
@@ -41,24 +38,23 @@ final class ImageRenderer implements NodeRendererInterface, ConfigurationAwareIn
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function render(Node $node, ChildNodeRendererInterface $childRenderer)
-    {
-        if (! ($node instanceof Image)) {
+    public function render(Node $node, ChildNodeRendererInterface $childRenderer) {
+        if (!($node instanceof Image)) {
             throw new \InvalidArgumentException('Incompatible node type: ' . \get_class($node));
         }
 
         $attrs = $node->data->get('attributes');
 
-        $forbidUnsafeLinks = ! $this->config->get('allow_unsafe_links');
+        $forbidUnsafeLinks = !$this->config->get('allow_unsafe_links');
         if ($forbidUnsafeLinks && RegexHelper::isLinkPotentiallyUnsafe($node->getUrl())) {
             $attrs['src'] = '';
         } else {
             $attrs['src'] = $node->getUrl();
         }
 
-        $alt          = $childRenderer->renderNodes($node->children());
-        $alt          = \preg_replace('/\<[^>]*alt="([^"]*)"[^>]*\>/', '$1', $alt);
-        $attrs['alt'] = \preg_replace('/\<[^>]*\>/', '', $alt ?? '');
+        $alt = $childRenderer->renderNodes($node->children());
+        $alt = \preg_replace('/\<[^>]*alt="([^"]*)"[^>]*\>/', '$1', $alt);
+        $attrs['alt'] = \preg_replace('/\<[^>]*\>/', '', $alt ?: '');
 
         if ($node->data->has('title')) {
             $attrs['title'] = $node->data->get('title');
@@ -67,8 +63,7 @@ final class ImageRenderer implements NodeRendererInterface, ConfigurationAwareIn
         return new HtmlElement('img', $attrs, '', true);
     }
 
-    public function setConfiguration(ConfigurationInterface $configuration): void
-    {
+    public function setConfiguration(ConfigurationInterface $configuration) {
         $this->config = $configuration;
     }
 }

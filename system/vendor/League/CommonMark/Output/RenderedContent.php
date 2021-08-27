@@ -9,14 +9,11 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace League\CommonMark\Output;
 
 use League\CommonMark\Node\Block\Document;
 
-class RenderedContent implements RenderedContentInterface
-{
+class RenderedContent implements RenderedContentInterface {
     /**
      * @var Document
      *
@@ -31,27 +28,23 @@ class RenderedContent implements RenderedContentInterface
      */
     private $html;
 
-    public function __construct(Document $document, string $html)
-    {
+    public function __construct(Document $document, $html) {
         $this->document = $document;
-        $this->html     = $html;
+        $this->html = $html;
     }
 
-    public function getDocument(): Document
-    {
+    public function getDocument() {
         return $this->document;
     }
 
-    public function getContent(): string
-    {
+    public function getContent() {
         return $this->html;
     }
 
     /**
      * @psalm-mutation-free
      */
-    public function __toString(): string
-    {
+    public function __toString() {
         return $this->html;
     }
 }

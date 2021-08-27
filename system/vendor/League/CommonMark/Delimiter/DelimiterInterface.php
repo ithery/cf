@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,33 +16,32 @@ namespace League\CommonMark\Delimiter;
 
 use League\CommonMark\Node\Inline\AbstractStringContainer;
 
-interface DelimiterInterface
-{
-    public function canClose(): bool;
+interface DelimiterInterface {
+    public function canClose();
 
-    public function canOpen(): bool;
+    public function canOpen();
 
-    public function isActive(): bool;
+    public function isActive();
 
-    public function setActive(bool $active): void;
+    public function setActive($active);
 
-    public function getChar(): string;
+    public function getChar();
 
-    public function getIndex(): ?int;
+    public function getIndex();
 
-    public function getNext(): ?DelimiterInterface;
+    public function getNext();
 
-    public function setNext(?DelimiterInterface $next): void;
+    public function setNext(DelimiterInterface $next = null);
 
-    public function getLength(): int;
+    public function getLength();
 
-    public function setLength(int $length): void;
+    public function setLength($length);
 
-    public function getOriginalLength(): int;
+    public function getOriginalLength();
 
-    public function getInlineNode(): AbstractStringContainer;
+    public function getInlineNode();
 
-    public function getPrevious(): ?DelimiterInterface;
+    public function getPrevious();
 
-    public function setPrevious(?DelimiterInterface $previous): void;
+    public function setPrevious(DelimiterInterface $previous = null);
 }

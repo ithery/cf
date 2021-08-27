@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -21,32 +19,25 @@ use League\CommonMark\Parser\InlineParserEngineInterface;
  *
  * Slightly more convenient to extend from vs. implementing the interface
  */
-abstract class AbstractBlockContinueParser implements BlockContinueParserInterface
-{
-    public function isContainer(): bool
-    {
+abstract class AbstractBlockContinueParser implements BlockContinueParserInterface {
+    public function isContainer() {
         return false;
     }
 
-    public function canHaveLazyContinuationLines(): bool
-    {
+    public function canHaveLazyContinuationLines() {
         return false;
     }
 
-    public function canContain(AbstractBlock $childBlock): bool
-    {
+    public function canContain(AbstractBlock $childBlock) {
         return false;
     }
 
-    public function addLine(string $line): void
-    {
+    public function addLine($line) {
     }
 
-    public function closeBlock(): void
-    {
+    public function closeBlock() {
     }
 
-    public function parseInlines(InlineParserEngineInterface $inlineParser): void
-    {
+    public function parseInlines(InlineParserEngineInterface $inlineParser) {
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -32,8 +30,7 @@ use League\CommonMark\Reference\ReferenceMapInterface;
 use League\CommonMark\Util\LinkParserHelper;
 use League\CommonMark\Util\RegexHelper;
 
-final class CloseBracketParser implements InlineParserInterface, EnvironmentAwareInterface
-{
+final class CloseBracketParser implements InlineParserInterface, EnvironmentAwareInterface {
     /**
      * @var EnvironmentInterface
      *
@@ -41,20 +38,18 @@ final class CloseBracketParser implements InlineParserInterface, EnvironmentAwar
      */
     private $environment;
 
-    public function getMatchDefinition(): InlineParserMatch
-    {
+    public function getMatchDefinition() {
         return InlineParserMatch::string(']');
     }
 
-    public function parse(InlineParserContext $inlineContext): bool
-    {
+    public function parse(InlineParserContext $inlineContext) {
         // Look through stack of delimiters for a [ or !
         $opener = $inlineContext->getDelimiterStack()->searchByCharacter(['[', '!']);
         if ($opener === null) {
             return false;
         }
 
-        if (! $opener->isActive()) {
+        if (!$opener->isActive()) {
             // no matched opener; remove from emphasis stack
             $inlineContext->getDelimiterStack()->removeDelimiter($opener);
 
@@ -63,13 +58,13 @@ final class CloseBracketParser implements InlineParserInterface, EnvironmentAwar
 
         $cursor = $inlineContext->getCursor();
 
-        $startPos      = $cursor->getPosition();
+        $startPos = $cursor->getPosition();
         $previousState = $cursor->saveState();
 
         $cursor->advanceBy(1);
 
         // Check to see if we have a link/image
-        if (! ($link = $this->tryParseLink($cursor, $inlineContext->getReferenceMap(), $opener, $startPos))) {
+        if (!($link = $this->tryParseLink($cursor, $inlineContext->getReferenceMap(), $opener, $startPos))) {
             // No match
             $inlineContext->getDelimiterStack()->removeDelimiter($opener); // Remove this opener from stack
             $cursor->restoreState($previousState);
@@ -87,7 +82,7 @@ final class CloseBracketParser implements InlineParserInterface, EnvironmentAwar
 
         // Process delimiters such as emphasis inside link/image
         $delimiterStack = $inlineContext->getDelimiterStack();
-        $stackBottom    = $opener->getPrevious();
+        $stackBottom = $opener->getPrevious();
         $delimiterStack->processDelimiters($stackBottom, $this->environment->getDelimiterProcessors());
         $delimiterStack->removeAll($stackBottom);
 
@@ -96,23 +91,23 @@ final class CloseBracketParser implements InlineParserInterface, EnvironmentAwar
 
         // processEmphasis will remove this and later delimiters.
         // Now, for a link, we also remove earlier link openers (no links in links)
-        if (! $isImage) {
+        if (!$isImage) {
             $inlineContext->getDelimiterStack()->removeEarlierMatches('[');
         }
 
         return true;
     }
 
-    public function setEnvironment(EnvironmentInterface $environment): void
-    {
+    public function setEnvironment(EnvironmentInterface $environment) {
         $this->environment = $environment;
     }
 
     /**
      * @return array<string, string>|false
+     *
+     * @param mixed $startPos
      */
-    private function tryParseLink(Cursor $cursor, ReferenceMapInterface $referenceMap, DelimiterInterface $opener, int $startPos)
-    {
+    private function tryParseLink(Cursor $cursor, ReferenceMapInterface $referenceMap, DelimiterInterface $opener, $startPos) {
         // Check to see if we have a link/image
         // Inline link?
         if ($result = $this->tryParseInlineLinkAndTitle($cursor)) {
@@ -129,8 +124,7 @@ final class CloseBracketParser implements InlineParserInterface, EnvironmentAwar
     /**
      * @return array<string, string>|false
      */
-    private function tryParseInlineLinkAndTitle(Cursor $cursor)
-    {
+    private function tryParseInlineLinkAndTitle(Cursor $cursor) {
         if ($cursor->getCharacter() !== '(') {
             return false;
         }
@@ -153,7 +147,7 @@ final class CloseBracketParser implements InlineParserInterface, EnvironmentAwar
         $title = '';
         // make sure there's a space before the title:
         if (\preg_match(RegexHelper::REGEX_WHITESPACE_CHAR, $previousCharacter)) {
-            $title = LinkParserHelper::parseLinkTitle($cursor) ?? '';
+            $title = LinkParserHelper::parseLinkTitle($cursor) ?: '';
         }
 
         $cursor->advanceToNextNonSpaceOrNewline();
@@ -169,20 +163,19 @@ final class CloseBracketParser implements InlineParserInterface, EnvironmentAwar
         return ['url' => $dest, 'title' => $title];
     }
 
-    private function tryParseReference(Cursor $cursor, ReferenceMapInterface $referenceMap, ?int $openerIndex, int $startPos): ?ReferenceInterface
-    {
+    private function tryParseReference(Cursor $cursor, ReferenceMapInterface $referenceMap, $openerIndex, $startPos) {
         if ($openerIndex === null) {
             return null;
         }
 
-        $savePos     = $cursor->saveState();
+        $savePos = $cursor->saveState();
         $beforeLabel = $cursor->getPosition();
-        $n           = LinkParserHelper::parseLinkLabel($cursor);
+        $n = LinkParserHelper::parseLinkLabel($cursor);
         if ($n === 0 || $n === 2) {
-            $start  = $openerIndex;
+            $start = $openerIndex;
             $length = $startPos - $openerIndex;
         } else {
-            $start  = $beforeLabel + 1;
+            $start = $beforeLabel + 1;
             $length = $n - 2;
         }
 
@@ -196,8 +189,7 @@ final class CloseBracketParser implements InlineParserInterface, EnvironmentAwar
         return $referenceMap->get($referenceLabel);
     }
 
-    private function createInline(string $url, string $title, bool $isImage): AbstractWebResource
-    {
+    private function createInline($url, $title, $isImage) {
         if ($isImage) {
             return new Image($url, null, $title);
         }

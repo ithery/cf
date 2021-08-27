@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,8 +16,7 @@ use League\CommonMark\Node\Block\Document;
 /**
  * Event dispatched when the document has been fully parsed
  */
-final class DocumentParsedEvent extends AbstractEvent
-{
+final class DocumentParsedEvent extends AbstractEvent {
     /**
      * @var Document
      *
@@ -27,13 +24,11 @@ final class DocumentParsedEvent extends AbstractEvent
      */
     private $document;
 
-    public function __construct(Document $document)
-    {
+    public function __construct(Document $document) {
         $this->document = $document;
     }
 
-    public function getDocument(): Document
-    {
+    public function getDocument() {
         return $this->document;
     }
 }

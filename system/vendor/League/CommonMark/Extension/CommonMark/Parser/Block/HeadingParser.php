@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -21,8 +19,7 @@ use League\CommonMark\Parser\Block\BlockContinueParserInterface;
 use League\CommonMark\Parser\Cursor;
 use League\CommonMark\Parser\InlineParserEngineInterface;
 
-final class HeadingParser extends AbstractBlockContinueParser
-{
+final class HeadingParser extends AbstractBlockContinueParser {
     /**
      * @var Heading
      *
@@ -30,27 +27,25 @@ final class HeadingParser extends AbstractBlockContinueParser
      */
     private $block;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $content;
 
-    public function __construct(int $level, string $content)
-    {
-        $this->block   = new Heading($level);
+    public function __construct($level, $content) {
+        $this->block = new Heading($level);
         $this->content = $content;
     }
 
-    public function getBlock(): AbstractBlock
-    {
+    public function getBlock() {
         return $this->block;
     }
 
-    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue
-    {
+    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser) {
         return BlockContinue::none();
     }
 
-    public function parseInlines(InlineParserEngineInterface $inlineParser): void
-    {
+    public function parseInlines(InlineParserEngineInterface $inlineParser) {
         $inlineParser->parse($this->content, $this->block);
     }
 }

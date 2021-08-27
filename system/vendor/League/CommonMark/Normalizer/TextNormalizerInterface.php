@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -16,13 +14,12 @@ namespace League\CommonMark\Normalizer;
 /**
  * Creates a normalized version of the given input text
  */
-interface TextNormalizerInterface
-{
+interface TextNormalizerInterface {
     /**
      * @param string $text    The text to normalize
      * @param mixed  $context Additional context about the text being normalized (optional)
      *
      * @psalm-pure
      */
-    public function normalize(string $text, $context = null): string;
+    public function normalize($text, $context = null);
 }

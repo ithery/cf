@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -24,8 +22,7 @@ use League\CommonMark\Renderer\ChildNodeRendererInterface;
 use League\CommonMark\Renderer\NodeRendererInterface;
 use League\CommonMark\Util\HtmlElement;
 
-final class NewlineRenderer implements NodeRendererInterface, ConfigurationAwareInterface
-{
+final class NewlineRenderer implements NodeRendererInterface, ConfigurationAwareInterface {
     /**
      * @var ConfigurationInterface
      *
@@ -33,8 +30,7 @@ final class NewlineRenderer implements NodeRendererInterface, ConfigurationAware
      */
     private $config;
 
-    public function setConfiguration(ConfigurationInterface $configuration): void
-    {
+    public function setConfiguration(ConfigurationInterface $configuration) {
         $this->config = $configuration;
     }
 
@@ -45,9 +41,8 @@ final class NewlineRenderer implements NodeRendererInterface, ConfigurationAware
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function render(Node $node, ChildNodeRendererInterface $childRenderer)
-    {
-        if (! ($node instanceof Newline)) {
+    public function render(Node $node, ChildNodeRendererInterface $childRenderer) {
+        if (!($node instanceof Newline)) {
             throw new \InvalidArgumentException('Incompatible node type: ' . \get_class($node));
         }
 
