@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,8 +16,7 @@ use League\CommonMark\Renderer\ChildNodeRendererInterface;
 use League\CommonMark\Renderer\NodeRendererInterface;
 use League\CommonMark\Util\HtmlElement;
 
-final class TaskListItemMarkerRenderer implements NodeRendererInterface
-{
+final class TaskListItemMarkerRenderer implements NodeRendererInterface {
     /**
      * @param TaskListItemMarker $node
      *
@@ -27,9 +24,8 @@ final class TaskListItemMarkerRenderer implements NodeRendererInterface
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function render(Node $node, ChildNodeRendererInterface $childRenderer)
-    {
-        if (! ($node instanceof TaskListItemMarker)) {
+    public function render(Node $node, ChildNodeRendererInterface $childRenderer) {
+        if (!($node instanceof TaskListItemMarker)) {
             throw new \InvalidArgumentException('Incompatible node type: ' . \get_class($node));
         }
 

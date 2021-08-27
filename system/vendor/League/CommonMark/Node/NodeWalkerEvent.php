@@ -34,7 +34,7 @@ final class NodeWalkerEvent {
         $this->isEntering = $isEntering;
     }
 
-    public function getNode(): Node {
+    public function getNode() {
         return $this->node;
     }
 
