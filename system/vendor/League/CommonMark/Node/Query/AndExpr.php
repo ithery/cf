@@ -35,11 +35,11 @@ final class AndExpr implements ExpressionInterface {
     /**
      * @param callable(Node): bool $expression
      */
-    public function add($expression): void {
+    public function add($expression) {
         $this->conditions[] = $expression;
     }
 
-    public function __invoke(Node $node): bool {
+    public function __invoke(Node $node) {
         foreach ($this->conditions as $condition) {
             if (!$condition($node)) {
                 return false;
