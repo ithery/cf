@@ -1,72 +1,66 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Move
  */
 class CModel_Nested_Move {
-
     /**
      * Node on which the move operation will be performed
      *
      * @var CModel
      */
-    protected $node = NULL;
+    protected $node = null;
 
     /**
      * Destination node
      *
      * @var CModel | int
      */
-    protected $target = NULL;
+    protected $target = null;
 
     /**
      * Move target position, one of: child, left, right, root
      *
      * @var string
      */
-    protected $position = NULL;
+    protected $position = null;
 
     /**
      * Memoized 1st boundary.
      *
      * @var int
      */
-    protected $_bound1 = NULL;
+    protected $bound1 = null;
 
     /**
      * Memoized 2nd boundary.
      *
      * @var int
      */
-    protected $_bound2 = NULL;
+    protected $bound2 = null;
 
     /**
      * Memoized boundaries array.
      *
      * @var array
      */
-    protected $_boundaries = NULL;
+    protected $boundaries = null;
 
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Events\Dispatcher
+     * @var \CEvent_DispatcherInterface
      */
     protected static $dispatcher;
 
     /**
      * Create a new Move class instance.
      *
-     * @param   CModel      $node
-     * @param   CModel|int  $target
-     * @param   string          $position
-     * @return  void
+     * @param CModel     $node
+     * @param CModel|int $target
+     * @param string     $position
+     *
+     * @return void
      */
     public function __construct($node, $target, $position) {
         $this->node = $node;
@@ -79,9 +73,10 @@ class CModel_Nested_Move {
     /**
      * Easy static accessor for performing a move operation.
      *
-     * @param   CModel      $node
-     * @param   CModel|int  $target
-     * @param   string          $position
+     * @param CModel     $node
+     * @param CModel|int $target
+     * @param string     $position
+     *
      * @return CModel
      */
     public static function to($node, $target, $position) {
@@ -98,15 +93,15 @@ class CModel_Nested_Move {
     public function perform() {
         $this->guardAgainstImpossibleMove();
 
-        if ($this->fireMoveEvent('moving') === false)
+        if ($this->fireMoveEvent('moving') === false) {
             return $this->node;
+        }
 
         if ($this->hasChange()) {
             $self = $this;
 
-            $this->node->getConnection()->transaction(function() use ($self) {
+            $this->node->getConnection()->transaction(function () use ($self) {
                 $self->updateStructure();
-
             });
 
             $this->target->reload();
@@ -160,22 +155,23 @@ class CModel_Nested_Move {
       WHEN $wrappedId = $currentId THEN $parentId
       ELSE $wrappedParent END";
 
-        $updateConditions = array(
+        $updateConditions = [
             $leftColumn => $connection->raw($lftSql),
             $rightColumn => $connection->raw($rgtSql),
             $parentColumn => $connection->raw($parentSql)
-        );
+        ];
 
-        if ($this->node->timestamps)
+        if ($this->node->timestamps) {
             $updateConditions[$this->node->getUpdatedAtColumn()] = $this->node->freshTimestamp();
+        }
 
         return $this->node
-                        ->newNestedSetQuery()
-                        ->where(function($query) use ($leftColumn, $rightColumn, $a, $d) {
-                            $query->whereBetween($leftColumn, array($a, $d))
-                            ->orWhereBetween($rightColumn, array($a, $d));
-                        })
-                        ->update($updateConditions);
+            ->newNestedSetQuery()
+            ->where(function ($query) use ($leftColumn, $rightColumn, $a, $d) {
+                $query->whereBetween($leftColumn, [$a, $d])
+                    ->orWhereBetween($rightColumn, [$a, $d]);
+            })
+            ->update($updateConditions);
     }
 
     /**
@@ -183,11 +179,12 @@ class CModel_Nested_Move {
      * supplied parameter is an instance of \Baum\Node. Otherwise it will try
      * to find the node in the database.
      *
-     * @param   \Baum\node|int
-     * @return  \Baum\Node
+     * @param mixed $node
+     *
+     * @return \Baum\Node
      */
     protected function resolveNode($node) {
-        if (c::hasTrait($node,'CModel_Nested_NestedTrait')) {
+        if (c::hasTrait($node, 'CModel_Nested_NestedTrait')) {
             return $node->reload();
         }
 
@@ -200,29 +197,30 @@ class CModel_Nested_Move {
      * @return void
      */
     protected function guardAgainstImpossibleMove() {
-        if (!$this->node->exists)
+        if (!$this->node->exists) {
             throw new CModel_Nested_Exception_MoveNotPossibleException('A new node cannot be moved.');
-
-        if (array_search($this->position, array('child', 'left', 'right', 'root')) === FALSE)
+        }
+        if (array_search($this->position, ['child', 'left', 'right', 'root']) === false) {
             throw new CModel_Nested_Exception_MoveNotPossibleException("Position should be one of ['child', 'left', 'right'] but is {$this->position}.");
-
+        }
         if (!$this->promotingToRoot()) {
-
             if (is_null($this->target)) {
-                if ($this->position === 'left' || $this->position === 'right')
+                if ($this->position === 'left' || $this->position === 'right') {
                     throw new CModel_Nested_Exception_MoveNotPossibleException("Could not resolve target node. This node cannot move any further to the {$this->position}.");
-                else
+                } else {
                     throw new CModel_Nested_Exception_MoveNotPossibleException('Could not resolve target node.');
+                }
             }
 
-            if ($this->node->equals($this->target))
+            if ($this->node->equals($this->target)) {
                 throw new CModel_Nested_Exception_MoveNotPossibleException('A node cannot be moved to itself.');
-
-            if ($this->target->insideSubtree($this->node))
+            }
+            if ($this->target->insideSubtree($this->node)) {
                 throw new CModel_Nested_Exception_MoveNotPossibleException('A node cannot be moved to a descendant of itself (inside moved tree).');
-
-            if (!$this->node->inSameScope($this->target))
+            }
+            if (!$this->node->inSameScope($this->target)) {
                 throw new CModel_Nested_Exception_MoveNotPossibleException('A node cannot be moved to a different scope.');
+            }
         }
     }
 
@@ -232,29 +230,30 @@ class CModel_Nested_Move {
      * @return int
      */
     protected function bound1() {
-        if (!is_null($this->_bound1))
-            return $this->_bound1;
+        if (!is_null($this->bound1)) {
+            return $this->bound1;
+        }
 
         switch ($this->position) {
             case 'child':
-                $this->_bound1 = $this->target->getRight();
+                $this->bound1 = $this->target->getRight();
                 break;
 
             case 'left':
-                $this->_bound1 = $this->target->getLeft();
+                $this->bound1 = $this->target->getLeft();
                 break;
 
             case 'right':
-                $this->_bound1 = $this->target->getRight() + 1;
+                $this->bound1 = $this->target->getRight() + 1;
                 break;
 
             case 'root':
-                $this->_bound1 = $this->node->newNestedSetQuery()->max($this->node->getRightColumnName()) + 1;
+                $this->bound1 = $this->node->newNestedSetQuery()->max($this->node->getRightColumnName()) + 1;
                 break;
         }
 
-        $this->_bound1 = (($this->_bound1 > $this->node->getRight()) ? $this->_bound1 - 1 : $this->_bound1);
-        return $this->_bound1;
+        $this->bound1 = (($this->bound1 > $this->node->getRight()) ? $this->bound1 - 1 : $this->bound1);
+        return $this->bound1;
     }
 
     /**
@@ -264,11 +263,12 @@ class CModel_Nested_Move {
      * @return int
      */
     protected function bound2() {
-        if (!is_null($this->_bound2))
-            return $this->_bound2;
+        if (!is_null($this->bound2)) {
+            return $this->bound2;
+        }
 
-        $this->_bound2 = (($this->bound1() > $this->node->getRight()) ? $this->node->getRight() + 1 : $this->node->getLeft() - 1);
-        return $this->_bound2;
+        $this->bound2 = (($this->bound1() > $this->node->getRight()) ? $this->node->getRight() + 1 : $this->node->getLeft() - 1);
+        return $this->bound2;
     }
 
     /**
@@ -277,20 +277,21 @@ class CModel_Nested_Move {
      * @return array
      */
     protected function boundaries() {
-        if (!is_null($this->_boundaries))
-            return $this->_boundaries;
+        if (!is_null($this->boundaries)) {
+            return $this->boundaries;
+        }
 
         // we have defined the boundaries of two non-overlapping intervals,
         // so sorting puts both the intervals and their boundaries in order
-        $this->_boundaries = array(
+        $this->boundaries = [
             $this->node->getLeft(),
             $this->node->getRight(),
             $this->bound1(),
             $this->bound2()
-        );
-        sort($this->_boundaries);
+        ];
+        sort($this->boundaries);
 
-        return $this->_boundaries;
+        return $this->boundaries;
     }
 
     /**
@@ -301,11 +302,9 @@ class CModel_Nested_Move {
     protected function parentId() {
         switch ($this->position) {
             case 'root':
-                return NULL;
-
+                return null;
             case 'child':
                 return $this->target->getKey();
-
             default:
                 return $this->target->getParentId();
         }
@@ -314,16 +313,16 @@ class CModel_Nested_Move {
     /**
      * Check wether there should be changes in the downward tree structure.
      *
-     * @return boolean
+     * @return bool
      */
     protected function hasChange() {
-        return !( $this->bound1() == $this->node->getRight() || $this->bound1() == $this->node->getLeft() );
+        return !($this->bound1() == $this->node->getRight() || $this->bound1() == $this->node->getLeft());
     }
 
     /**
      * Check if we are promoting the provided instance to a root node.
      *
-     * @return boolean
+     * @return bool
      */
     protected function promotingToRoot() {
         return ($this->position == 'root');
@@ -332,7 +331,7 @@ class CModel_Nested_Move {
     /**
      * Get the event dispatcher instance.
      *
-     * @return \Illuminate\Events\Dispatcher
+     * @return \CEvent_DispatcherInterface
      */
     public static function getEventDispatcher() {
         return static::$dispatcher;
@@ -342,6 +341,7 @@ class CModel_Nested_Move {
      * Set the event dispatcher instance.
      *
      * @param  CEvent_Dispatcher
+     *
      * @return void
      */
     public static function setEventDispatcher(CEvent_Dispatcher $dispatcher) {
@@ -351,13 +351,15 @@ class CModel_Nested_Move {
     /**
      * Fire the given move event for the model.
      *
-     * @param  string $event
-     * @param  bool   $halt
+     * @param string $event
+     * @param bool   $halt
+     *
      * @return mixed
      */
     protected function fireMoveEvent($event, $halt = true) {
-        if (!isset(static::$dispatcher))
+        if (!isset(static::$dispatcher)) {
             return true;
+        }
 
         // Basically the same as \Illuminate\Database\Eloquent\Model->fireModelEvent
         // but we relay the event into the node instance.
@@ -372,15 +374,15 @@ class CModel_Nested_Move {
      * Quotes an identifier for being used in a database query.
      *
      * @param mixed $value
+     *
      * @return string
      */
     protected function quoteIdentifier($value) {
-        if (is_null($value))
+        if (is_null($value)) {
             return 'NULL';
+        }
 
         $connection = $this->node->getConnection();
-
-
 
         return $connection->escape($value);
     }
@@ -388,17 +390,17 @@ class CModel_Nested_Move {
     /**
      * Applies a lock to the rows between the supplied index boundaries.
      *
-     * @param   int   $lft
-     * @param   int   $rgt
-     * @return  void
+     * @param int $lft
+     * @param int $rgt
+     *
+     * @return void
      */
     protected function applyLockBetween($lft, $rgt) {
         $this->node->newQuery()
-                ->where($this->node->getLeftColumnName(), '>=', $lft)
-                ->where($this->node->getRightColumnName(), '<=', $rgt)
-                ->select($this->node->getKeyName())
-                ->lockForUpdate()
-                ->get();
+            ->where($this->node->getLeftColumnName(), '>=', $lft)
+            ->where($this->node->getRightColumnName(), '<=', $rgt)
+            ->select($this->node->getKeyName())
+            ->lockForUpdate()
+            ->get();
     }
-
 }

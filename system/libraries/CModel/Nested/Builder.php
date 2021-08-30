@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CModel_Nested_Builder extends CDatabase_Query_Builder {
-
     /**
      * Replace the "order by" clause of the current query.
      *
@@ -42,5 +35,4 @@ class CModel_Nested_Builder extends CDatabase_Query_Builder {
 
         return parent::aggregate($function, $columns);
     }
-
 }
