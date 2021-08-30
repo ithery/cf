@@ -52,7 +52,19 @@ class CApp_Api_Method_Server_DomainUpdate extends CApp_Api_Method_Server {
             $domainData['org_id'] = $orgId;
             $domainData['org_code'] = $orgCode;
             $domainData['domain'] = $domainToCreate;
-            CFData::set($domainToCreate, $domainData, 'domain');
+
+            $domainData = [
+                'app_id' => $appId,
+                'app_code' => $appCode,
+                'org_id' => $orgId,
+                'org_code' => $orgCode,
+                'domain' => $domain,
+            ];
+
+            if (!CF::createDomain($domainToCreate, $domainData)) {
+                $errCode++;
+                $errMessage = 'Domain ' . $domainToCreate . ' already exists';
+            }
         } catch (Exception $ex) {
             $errCode++;
             $errMessage = $ex->getMessage();
