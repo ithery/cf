@@ -1,28 +1,25 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 1:45:25 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 1:45:25 PM
  */
 class CServer_Memory extends CServer_Base {
-
     /**
-     *
      * @var CServer_Memory
      */
-    protected static $instance = array();
+    protected static $instance = [];
 
     /**
-     *
      * @var CServer_Memory_OS
      */
     protected $os;
 
     /**
-     *
      * @var CServer_Memory_Info
      */
     protected $info;
@@ -37,13 +34,13 @@ class CServer_Memory extends CServer_Base {
     }
 
     /**
-     * 
      * @param array $sshConfig
+     *
      * @return CServer_Memory
      */
     public static function instance(array $sshConfig = null) {
         if (!is_array(self::$instance)) {
-            self::$instance = array();
+            self::$instance = [];
         }
         $host = 'localhost';
 
@@ -160,5 +157,4 @@ class CServer_Memory extends CServer_Base {
         }
         return $this->info->getSwapUsed();
     }
-
 }

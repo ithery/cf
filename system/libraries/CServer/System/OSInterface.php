@@ -1,70 +1,80 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 2:07:02 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 2:07:02 PM
  */
 interface CServer_System_OSInterface {
-
     /**
-     * build the hostname information
+     * Build the hostname information
+     *
      * @return void
      */
     public function buildHostname();
 
     /**
-     * build the distro information
+     * Build the distro information
+     *
      * @return void
      */
     public function buildDistro();
 
     /**
-     * build the ip information
+     * Build the ip information
+     *
      * @return void
      */
     public function buildIp();
 
     /**
-     * build the kernel information
+     * Build the kernel information
+     *
      * @return void
      */
     public function buildKernel();
 
     /**
-     * build the machine information
+     * Build the machine information
+     *
      * @return void
      */
     public function buildMachine();
 
     /**
-     * build the uptime information
+     * Build the uptime information
+     *
      * @return void
      */
     public function buildUptime();
 
     /**
-     * build the users information
+     * Build the users information
+     *
      * @return void
      */
     public function buildUsers();
 
     /**
-     * build the processes information
+     * Build the processes information
+     *
      * @return void
      */
     public function buildProcesses();
 
     /**
-     * build the loadavg information
+     * Build the loadavg information
+     *
      * @return void
      */
     public function buildLoadAvg();
 
     /**
-     * build the cpu information
+     * Build the cpu information
+     *
      * @return void
      */
     public function buildCpuInfo();

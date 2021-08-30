@@ -1,66 +1,72 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 6:19:18 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 6:19:18 PM
  */
 class CServer_Memory_Info {
-
     /**
-     * free memory in bytes
-     * @var Integer
+     * Free memory in bytes
+     *
+     * @var int
      */
     private $memFree = 0;
 
     /**
-     * total memory in bytes
-     * @var Integer
+     * Total memory in bytes
+     *
+     * @var int
      */
     private $memTotal = 0;
 
     /**
-     * used memory in bytes
-     * @var Integer
+     * Used memory in bytes
+     *
+     * @var int
      */
     private $memUsed = 0;
 
     /**
-     * used memory by applications in bytes
-     * @var Integer
+     * Used memory by applications in bytes
+     *
+     * @var int
      */
     private $memApplication = null;
 
     /**
-     * used memory for buffers in bytes
-     * @var Integer
+     * Used memory for buffers in bytes
+     *
+     * @var int
      */
     private $memBuffer = null;
 
     /**
-     * used memory for cache in bytes
-     * @var Integer
+     * Used memory for cache in bytes
+     *
+     * @var int
      */
     private $memCache = null;
 
     /**
-     * array with swap devices
+     * Array with swap devices
      *
      * @see DiskDevice
      *
      * @var array
      */
-    private $swapDevices = array();
+    private $swapDevices = [];
 
     /**
-     * return percent of used memory
+     * Return percent of used memory
      *
      * @see CServer_Memory_Info::memUsed
      * @see CServer_Memory_Info::memTotal
      *
-     * @return Integer
+     * @return int
      */
     public function getMemPercentUsed() {
         if ($this->memTotal > 0) {
@@ -71,12 +77,12 @@ class CServer_Memory_Info {
     }
 
     /**
-     * return percent of used memory for applications
+     * Return percent of used memory for applications
      *
      * @see CServer_Memory_Info::memApplication
      * @see CServer_Memory_Info::memTotal
      *
-     * @return Integer
+     * @return int
      */
     public function getMemPercentApplication() {
         if ($this->memApplication !== null) {
@@ -91,12 +97,12 @@ class CServer_Memory_Info {
     }
 
     /**
-     * return percent of used memory for cache
+     * Return percent of used memory for cache
      *
      * @see CServer_Memory_Info::memCache
      * @see CServer_Memory_Info::memTotal
      *
-     * @return Integer
+     * @return int
      */
     public function getMemPercentCache() {
         if ($this->memCache !== null) {
@@ -115,12 +121,12 @@ class CServer_Memory_Info {
     }
 
     /**
-     * return percent of used memory for buffer
+     * Return percent of used memory for buffer
      *
      * @see CServer_Memory_Info::memBuffer
      * @see CServer_Memory_Info::memTotal
      *
-     * @return Integer
+     * @return int
      */
     public function getMemPercentBuffer() {
         if ($this->memBuffer !== null) {
@@ -146,9 +152,11 @@ class CServer_Memory_Info {
 
     /**
      * Returns total free swap space
+     *
      * @see CServer_Memory_Info::swapDevices
      * @see DiskDevice::getFree()
-     * @return Integer
+     *
+     * @return int
      */
     public function getSwapFree() {
         if (count($this->swapDevices) > 0) {
@@ -165,9 +173,11 @@ class CServer_Memory_Info {
 
     /**
      * Returns total swap space
+     *
      * @see CServer_Memory_Info::swapDevices
      * @see DiskDevice::getTotal()
-     * @return Integer
+     *
+     * @return int
      */
     public function getSwapTotal() {
         if (count($this->swapDevices) > 0) {
@@ -184,9 +194,11 @@ class CServer_Memory_Info {
 
     /**
      * Returns total used swap space
+     *
      * @see CServer_Memory_Info::swapDevices
      * @see DiskDevice::getUsed()
-     * @return Integer
+     *
+     * @return int
      */
     public function getSwapUsed() {
         if (count($this->swapDevices) > 0) {
@@ -202,10 +214,12 @@ class CServer_Memory_Info {
     }
 
     /**
-     * return percent of total swap space used
+     * Return percent of total swap space used
+     *
      * @see CServer_Memory_Info::getSwapUsed()
      * @see CServer_Memory_Info::getSwapTotal()
-     * @return Integer
+     *
+     * @return int
      */
     public function getSwapPercentUsed() {
         if ($this->getSwapTotal() !== null) {
@@ -221,8 +235,10 @@ class CServer_Memory_Info {
 
     /**
      * Returns $memApplication.
+     *
      * @see CServer_Memory_Info::$memApplication
-     * @return Integer
+     *
+     * @return int
      */
     public function getMemApplication() {
         return $this->memApplication;
@@ -230,9 +246,12 @@ class CServer_Memory_Info {
 
     /**
      * Sets $memApplication.
-     * @param Integer $memApplication application memory
+     *
+     * @param int $memApplication application memory
+     *
      * @see CServer_Memory_Info::$memApplication
-     * @return Void
+     *
+     * @return void
      */
     public function setMemApplication($memApplication) {
         $this->memApplication = $memApplication;
@@ -240,8 +259,10 @@ class CServer_Memory_Info {
 
     /**
      * Returns $memBuffer.
+     *
      * @see CServer_Memory_Info::$memBuffer
-     * @return Integer
+     *
+     * @return int
      */
     public function getMemBuffer() {
         return $this->memBuffer;
@@ -249,9 +270,12 @@ class CServer_Memory_Info {
 
     /**
      * Sets $memBuffer.
-     * @param Integer $memBuffer buffer memory
+     *
+     * @param int $memBuffer buffer memory
+     *
      * @see CServer_Memory_Info::$memBuffer
-     * @return Void
+     *
+     * @return void
      */
     public function setMemBuffer($memBuffer) {
         $this->memBuffer = $memBuffer;
@@ -259,8 +283,10 @@ class CServer_Memory_Info {
 
     /**
      * Returns $memCache.
+     *
      * @see CServer_Memory_Info::$memCache
-     * @return Integer
+     *
+     * @return int
      */
     public function getMemCache() {
         return $this->memCache;
@@ -268,9 +294,12 @@ class CServer_Memory_Info {
 
     /**
      * Sets $memCache.
-     * @param Integer $memCache cache memory
+     *
+     * @param int $memCache cache memory
+     *
      * @see CServer_Memory_Info::$memCache
-     * @return Void
+     *
+     * @return void
      */
     public function setMemCache($memCache) {
         $this->memCache = $memCache;
@@ -278,8 +307,10 @@ class CServer_Memory_Info {
 
     /**
      * Returns $memFree.
+     *
      * @see CServer_Memory_Info::$memFree
-     * @return Integer
+     *
+     * @return int
      */
     public function getMemFree() {
         return $this->memFree;
@@ -287,9 +318,12 @@ class CServer_Memory_Info {
 
     /**
      * Sets $memFree.
-     * @param Integer $memFree free memory
+     *
+     * @param int $memFree free memory
+     *
      * @see CServer_Memory_Info::$memFree
-     * @return Void
+     *
+     * @return void
      */
     public function setMemFree($memFree) {
         $this->memFree = $memFree;
@@ -297,8 +331,10 @@ class CServer_Memory_Info {
 
     /**
      * Returns $memTotal.
+     *
      * @see CServer_Memory_Info::$memTotal
-     * @return Integer
+     *
+     * @return int
      */
     public function getMemTotal() {
         return $this->memTotal;
@@ -306,9 +342,12 @@ class CServer_Memory_Info {
 
     /**
      * Sets $memTotal.
-     * @param Integer $memTotal total memory
+     *
+     * @param int $memTotal total memory
+     *
      * @see CServer_Memory_Info::$memTotal
-     * @return Void
+     *
+     * @return void
      */
     public function setMemTotal($memTotal) {
         $this->memTotal = $memTotal;
@@ -316,8 +355,10 @@ class CServer_Memory_Info {
 
     /**
      * Returns $memUsed.
+     *
      * @see CServer_Memory_Info::$memUsed
-     * @return Integer
+     *
+     * @return int
      */
     public function getMemUsed() {
         return $this->memUsed;
@@ -325,9 +366,12 @@ class CServer_Memory_Info {
 
     /**
      * Sets $memUsed.
-     * @param Integer $memUsed used memory
+     *
+     * @param int $memUsed used memory
+     *
      * @see CServer_Memory_Info::$memUsed
-     * @return Void
+     *
+     * @return void
      */
     public function setMemUsed($memUsed) {
         $this->memUsed = $memUsed;
@@ -335,7 +379,9 @@ class CServer_Memory_Info {
 
     /**
      * Returns $swapDevices.
+     *
      * @see CServer_Memory_Info::$swapDevices
+     *
      * @return array
      */
     public function getSwapDevices() {
@@ -344,13 +390,15 @@ class CServer_Memory_Info {
 
     /**
      * Sets $swapDevices.
+     *
      * @param CServer_Device_Disk $swapDevices swap devices
+     *
      * @see CServer_Memory_Info::$swapDevices
      * @see CServer_Device_Disk
-     * @return Void
+     *
+     * @return void
      */
     public function setSwapDevices($swapDevices) {
         array_push($this->swapDevices, $swapDevices);
     }
-
 }
