@@ -11,7 +11,11 @@ class CVendor {
      *
      * @return \CVendor_DigitalOcean
      */
-    public static function digitalOcean($accessToken) {
+    public static function digitalOcean($accessToken = null) {
+        if ($accessToken == null) {
+            $accessToken = CF::config('vendor.digitalOcean.accessToken');
+        }
+
         return new CVendor_DigitalOcean($accessToken);
     }
 
