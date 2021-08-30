@@ -14,6 +14,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Component_DataTable addTable($id=null)
  * @method CElement_Component_Widget addWidget($id=null)
  * @method CElement_List_TabList addTabList($id=null)
+ * @method CElement_List_ActionList addActionList($id=null)
  * @method CElement_Component_FileManager addFileManager($id=null)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {

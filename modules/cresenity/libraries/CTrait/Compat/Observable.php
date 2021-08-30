@@ -166,6 +166,13 @@ trait CTrait_Compat_Observable {
         return $this->addForm($id);
     }
 
+    /**
+     * @deprecated Please use addNestable
+     *
+     * @param string $id
+     *
+     * @return CElement_Component_Nestable
+     */
     public function add_nestable($id = '') {
         return $this->addNestable($id);
     }
