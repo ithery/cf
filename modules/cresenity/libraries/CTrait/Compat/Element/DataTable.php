@@ -206,6 +206,13 @@ trait CTrait_Compat_Element_DataTable {
         return $this->setAjaxMethod($value);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     *
+     * @deprecated 1.2
+     */
     public function set_apply_data_table($bool) {
         return $this->setApplyDataTable($bool);
     }
