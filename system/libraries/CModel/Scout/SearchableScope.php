@@ -1,6 +1,6 @@
 <?php
 
-class CModel_Scout_ScoutableScope implements CModel_Interface_Scope {
+class CModel_Scout_SearchableScope implements CModel_Interface_Scope {
     /**
      * Apply the scope to a given Eloquent query builder.
      *

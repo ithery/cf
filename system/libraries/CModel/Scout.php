@@ -13,7 +13,7 @@ class CModel_Scout {
      *
      * @var string
      */
-    public static $removeFromSearchJob = RemoveFromSearch::class;
+    public static $removeFromSearchJob = CModel_Scout_TaskQueue_RemoveFromSearch::class;
 
     /**
      * Specify the job class that should make models searchable.

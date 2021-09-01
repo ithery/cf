@@ -1,6 +1,6 @@
 <?php
 
-trait CModel_Trait_Scoutable {
+trait CModel_Scout_SearchableTrait {
     /**
      * Additional metadata attributes managed by Scout.
      *
@@ -13,8 +13,8 @@ trait CModel_Trait_Scoutable {
      *
      * @return void
      */
-    public static function bootScoutable() {
-        static::addGlobalScope(new CModel_Scout_ScoutableScope);
+    public static function bootSearchableTrait() {
+        static::addGlobalScope(new CModel_Scout_SearchableScope);
 
         static::observe(new CModel_Scout_ModelObserver);
 
@@ -41,7 +41,7 @@ trait CModel_Trait_Scoutable {
     /**
      * Dispatch the job to make the given models searchable.
      *
-     * @param \Illuminate\Database\Eloquent\Collection $models
+     * @param \CModel_Collection $models
      *
      * @return void
      */
@@ -62,7 +62,7 @@ trait CModel_Trait_Scoutable {
     /**
      * Dispatch the job to make the given models unsearchable.
      *
-     * @param \Illuminate\Database\Eloquent\Collection $models
+     * @param \CModel_Collection $models
      *
      * @return void
      */
@@ -358,14 +358,5 @@ trait CModel_Trait_Scoutable {
      */
     public function getScoutKeyName() {
         return $this->getQualifiedKeyName();
-    }
-
-    /**
-     * Determine if the current class should use soft deletes with searching.
-     *
-     * @return bool
-     */
-    protected static function usesSoftDelete() {
-        return in_array(CModel_SoftDelete_SoftDeleteTrait::class, c::classUsesRecursive(get_called_class()));
     }
 }
