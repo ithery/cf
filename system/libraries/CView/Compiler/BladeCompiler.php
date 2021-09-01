@@ -748,4 +748,11 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
     public function withoutComponentTags() {
         $this->compilesComponentTags = false;
     }
+
+    public function clearCompiled() {
+        $path = CF::config('view.compiled');
+        $files = glob($path . '/*');
+
+        CFile::delete($files);
+    }
 }
