@@ -63,15 +63,19 @@ class CApp_Api_Method_App_Service extends CApp_Api_Method_App {
                 $status = carr::get($matches, '1.0', $status);
                 $statuses = explode(' ', $status);
                 $status = carr::get($statuses, '0', $status);
-                $status = str_replace('(', '', $status);
-                $status = str_replace(')', '', $status);
-                $status = str_replace('exited', 'stopped', $status);
-                $status = str_replace('inactive', 'stopped', $status);
-                $status = str_replace('deactivating', 'stopped', $status);
-                $status = str_replace('active', 'running', $status);
                 $time = carr::get($matches, '2.0');
                 $since = carr::get($matches, '3.0');
+            } else {
+                preg_match('/Active: (.+?) /', $output, $matches, PREG_OFFSET_CAPTURE);
+                $status = carr::get($matches, '1.0', $status);
             }
+
+            $status = str_replace('(', '', $status);
+            $status = str_replace(')', '', $status);
+            $status = str_replace('exited', 'stopped', $status);
+            $status = str_replace('inactive', 'stopped', $status);
+            $status = str_replace('deactivating', 'stopped', $status);
+            $status = str_replace('active', 'running', $status);
         }
 
         if ($errCode == 0) {
