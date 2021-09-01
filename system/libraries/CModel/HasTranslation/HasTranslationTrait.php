@@ -1,14 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 3:44:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 3:44:30 PM
  */
 trait CModel_HasTranslation_HasTranslationTrait {
-
+    /**
+     * @param string $key
+     *
+     * @return mixed
+     */
     public function getAttributeValue($key) {
         if (!$this->isTranslatableAttribute($key)) {
             return parent::getAttributeValue($key);
@@ -52,7 +57,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
         if ($key !== null) {
             $this->guardAgainstNonTranslatableAttribute($key);
             $attributes = $this->getAttributes();
-            return array_filter(json_decode(isset($attributes[$key]) ? $attributes[$key] : '' ?: '{}', true) ?: [], function ($value) {
+            return array_filter(json_decode((isset($attributes[$key]) ? $attributes[$key] : '') ?: '{}', true) ?: [], function ($value) {
                 return $value !== null && $value !== '';
             });
         }
@@ -93,7 +98,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
     }
 
     public function forgetAllTranslations($locale) {
-        c::collect($this->getTranslatableAttributes())->each(function ( $attribute) use ($locale) {
+        c::collect($this->getTranslatableAttributes())->each(function ($attribute) use ($locale) {
             $this->forgetTranslation($attribute, $locale);
         });
         return $this;
@@ -114,7 +119,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
 
     protected function guardAgainstNonTranslatableAttribute($key) {
         if (!$this->isTranslatableAttribute($key)) {
-            throw AttributeIsNotTranslatable::make($key, $this);
+            throw CModel_HasTranslation_Exception_AttributeIsNotTranslatable::make($key, $this);
         }
     }
 
@@ -125,7 +130,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
         if (!$useFallbackLocale) {
             return $locale;
         }
-        if (!is_null($fallbackLocale = config('app.fallback_locale'))) {
+        if (!is_null($fallbackLocale = CF::config('app.fallback_locale'))) {
             return $fallbackLocale;
         }
         return $locale;
@@ -141,7 +146,7 @@ trait CModel_HasTranslation_HasTranslationTrait {
 
     public function getTranslationsAttribute() {
         return c::collect($this->getTranslatableAttributes())
-                        ->mapWithKeys(function ( $key) {
+                        ->mapWithKeys(function ($key) {
                             return [$key => $this->getTranslations($key)];
                         })
                         ->toArray();
@@ -149,22 +154,10 @@ trait CModel_HasTranslation_HasTranslationTrait {
 
     public function getCasts() {
         return array_merge(
-                parent::getCasts(), array_fill_keys($this->getTranslatableAttributes(), 'array')
+            parent::getCasts(),
+            array_fill_keys($this->getTranslatableAttributes(), 'array')
         );
     }
-
-    /**
-     * @param string $key
-     *
-     * @return mixed
-     */
-//    
-//    public function getAttributeValue($key) {
-//        if (!$this->isTranslatableAttribute($key)) {
-//            return parent::getAttributeValue($key);
-//        }
-//        return $this->getTranslation($key, config('app.locale')) ?: array_first($this->getTranslations($key));
-//    }
 
     /**
      * Convert the model's attributes to an array.
@@ -173,33 +166,33 @@ trait CModel_HasTranslation_HasTranslationTrait {
      */
     public function attributesToArray() {
         $values = array_map(function ($attribute) {
-            return $this->getTranslation($attribute, config('app.locale')) ?: null;
+            return $this->getTranslation($attribute, CF::config('app.locale')) ?: null;
         }, $keys = $this->getTranslatableAttributes());
         return array_replace(parent::attributesToArray(), array_combine($keys, $values));
     }
 
-//    /**
-//     * Get translations.
-//     *
-//     * @param $key
-//     *
-//     * @return array
-//     */
-//    public function getTranslations($key) {
-//        $this->guardAgainstNonTranslatableAttribute($key);
-//        $attributes = $this->getAttributes();
-//        $value = json_decode(isset($attributes[$key]) ? $attributes[$key] : '' ?: '{}', true);
-//        // Inject default translation if none supplied
-//        if (!is_array($value)) {
-//            $oldValue = $value;
-//            if ($this->hasSetMutator($key)) {
-//                $method = 'set' . studly_case($key) . 'Attribute';
-//                $value = $this->{$method}($value);
-//            }
-//            $value = [$locale = app()->getLocale() => $value];
-//            $this->attributes[$key] = $this->asJson($value);
-//            event(new TranslationHasBeenSet($this, $key, $locale, $oldValue, $value));
-//        }
-//        return $value;
-//    }
+    // /**
+    //  * Get translations.
+    //  *
+    //  * @param $key
+    //  *
+    //  * @return array
+    //  */
+    // public function getTranslations($key) {
+    //     $this->guardAgainstNonTranslatableAttribute($key);
+    //     $attributes = $this->getAttributes();
+    //     $value = json_decode(isset($attributes[$key]) ? $attributes[$key] : '' ?: '{}', true);
+    //     // Inject default translation if none supplied
+    //     if (!is_array($value)) {
+    //         $oldValue = $value;
+    //         if ($this->hasSetMutator($key)) {
+    //             $method = 'set' . studly_case($key) . 'Attribute';
+    //             $value = $this->{$method}($value);
+    //         }
+    //         $value = [$locale = app()->getLocale() => $value];
+    //         $this->attributes[$key] = $this->asJson($value);
+    //         event(new TranslationHasBeenSet($this, $key, $locale, $oldValue, $value));
+    //     }
+    //     return $value;
+    // }
 }
