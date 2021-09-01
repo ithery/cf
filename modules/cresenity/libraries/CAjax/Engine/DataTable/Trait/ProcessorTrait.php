@@ -38,12 +38,12 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                         $action->removeClass('d-none');
 
                         $visibility = CFunction::factory($table->filterActionCallbackFunc)
-                                ->addArg($table)
-                                ->addArg('action')
-                                ->addArg($row)
-                                ->addArg($action)
-                                ->setRequire($table->requires)
-                                ->execute();
+                            ->addArg($table)
+                            ->addArg('action')
+                            ->addArg($row)
+                            ->addArg($action)
+                            ->setRequire($table->requires)
+                            ->execute();
 
                         if ($visibility == false) {
                             $action->addClass('d-none');
@@ -75,7 +75,22 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
             foreach ($table->columns as $col) {
                 $col_found = false;
                 $new_v = '';
-                $col_v = carr::get($row, $col->getFieldname());
+                if ($row instanceof CModel) {
+                    $fieldName = $col->getFieldname();
+                    if (strpos($fieldName, '.') !== false) {
+                        $fields = explode('.', $fieldName);
+                        $col_v = $row;
+
+                        foreach ($fields as $field) {
+                            $col_v = (new COptional($col_v))->{$field};
+                        }
+                    } else {
+                        $col_v = $row->{$col->getFieldname()};
+                    }
+                } else {
+                    $col_v = carr::get($row, $col->getFieldname());
+                }
+
                 $ori_v = $col_v;
                 //do transform
                 foreach ($col->transforms as $trans) {

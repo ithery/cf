@@ -10,10 +10,16 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $columns[] = $col;
             }
 
+            $isModelQuery = $this->query instanceof CModel_Query;
+            if ($isModelQuery) {
+                $this->query = CModel_QuerySerializer::serialize($this->query);
+            }
+
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('DataTable');
             $ajaxMethod->setData('columns', $columns);
             $ajaxMethod->setData('query', $this->query);
+            $ajaxMethod->setData('isModelQuery', $isModelQuery);
             $ajaxMethod->setData('table', serialize($this));
 
             $ajaxMethod->setData('dbConfig', $this->dbConfig);
