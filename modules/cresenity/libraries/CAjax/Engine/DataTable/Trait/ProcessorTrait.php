@@ -14,7 +14,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
             if ($rowActionList != null && $rowActionList->childCount() > 0) {
                 $html = new CStringBuilder();
 
-                $html->appendln('<td class="low-padding align-center cell-action td-action ">')->inc_indent()->br();
+                $html->appendln('<td class="low-padding align-center cell-action td-action ">')->incIndent()->br();
                 foreach ($row as $k => $v) {
                     $jsparam[$k] = $v;
                 }
