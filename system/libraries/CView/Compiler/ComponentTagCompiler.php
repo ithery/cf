@@ -39,8 +39,9 @@ class CView_Compiler_ComponentTagCompiler {
     /**
      * Create new component tag compiler.
      *
-     * @param array $aliases
-     * @param  \Illuminate\View\Compilers\BladeCompiler|null
+     * @param array                              $aliases
+     * @param array                              $namespaces
+     * @param \CView_Compiler_BladeCompiler|null $blade
      *
      * @return void
      */

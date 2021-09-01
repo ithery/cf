@@ -305,13 +305,13 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops the index from the given table.
      *
-     * @param \Doctrine\DBAL\Schema\Index|string $index the name of the index
-     * @param \Doctrine\DBAL\Schema\Table|string $table the name of the table
+     * @param \CDatabase_Schema_Index|string $index the name of the index
+     * @param \CDatabase_Schema_Table|string $table the name of the table
      *
      * @return void
      */
     public function dropIndex($index, $table) {
-        if ($index instanceof Index) {
+        if ($index instanceof CDatabase_Schema_Index) {
             $index = $index->getQuotedName($this->platform);
         }
 
@@ -321,12 +321,12 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops the constraint from the given table.
      *
-     * @param \Doctrine\DBAL\Schema\Constraint   $constraint
-     * @param \Doctrine\DBAL\Schema\Table|string $table      the name of the table
+     * @param \CDatabase_Schema_Constraint   $constraint
+     * @param \CDatabase_Schema_Table|string $table      the name of the table
      *
      * @return void
      */
-    public function dropConstraint(Constraint $constraint, $table) {
+    public function dropConstraint(CDatabase_Schema_Constraint $constraint, $table) {
         $this->_execSql($this->platform->getDropConstraintSQL($constraint, $table));
     }
 
@@ -380,19 +380,19 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Creates a new table.
      *
-     * @param \Doctrine\DBAL\Schema\Table $table
+     * @param \CDatabase_Schema_Table $table
      *
      * @return void
      */
-    public function createTable(Table $table) {
-        $createFlags = AbstractPlatform::CREATE_INDEXES | AbstractPlatform::CREATE_FOREIGNKEYS;
+    public function createTable(CDatabase_Schema_Table $table) {
+        $createFlags = CDatabase_Platform::CREATE_INDEXES | CDatabase_Platform::CREATE_FOREIGNKEYS;
         $this->_execSql($this->platform->getCreateTableSQL($table, $createFlags));
     }
 
     /**
      * Creates a new sequence.
      *
-     * @param \Doctrine\DBAL\Schema\Sequence $sequence
+     * @param \CDatabase_Schema_Sequence $sequence
      *
      * @return void
      *
@@ -405,47 +405,47 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Creates a constraint on a table.
      *
-     * @param \Doctrine\DBAL\Schema\Constraint   $constraint
-     * @param \Doctrine\DBAL\Schema\Table|string $table
+     * @param \CDatabase_Schema_Constraint   $constraint
+     * @param \CDatabase_Schema_Table|string $table
      *
      * @return void
      */
-    public function createConstraint(Constraint $constraint, $table) {
+    public function createConstraint(CDatabase_Schema_Constraint $constraint, $table) {
         $this->_execSql($this->platform->getCreateConstraintSQL($constraint, $table));
     }
 
     /**
      * Creates a new index on a table.
      *
-     * @param \Doctrine\DBAL\Schema\Index        $index
-     * @param \Doctrine\DBAL\Schema\Table|string $table the name of the table on which the index is to be created
+     * @param \CDatabase_Schema_Index        $index
+     * @param \CDatabase_Schema_Table|string $table the name of the table on which the index is to be created
      *
      * @return void
      */
-    public function createIndex(Index $index, $table) {
+    public function createIndex(CDatabase_Schema_Index $index, $table) {
         $this->_execSql($this->platform->getCreateIndexSQL($index, $table));
     }
 
     /**
      * Creates a new foreign key.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey the ForeignKey instance
-     * @param \Doctrine\DBAL\Schema\Table|string         $table      the name of the table on which the foreign key is to be created
+     * @param \CDatabase_Schema_ForeignKeyConstraint $foreignKey the ForeignKey instance
+     * @param \CDatabase_Schema_Table|string         $table      the name of the table on which the foreign key is to be created
      *
      * @return void
      */
-    public function createForeignKey(ForeignKeyConstraint $foreignKey, $table) {
+    public function createForeignKey(CDatabase_Schema_ForeignKeyConstraint $foreignKey, $table) {
         $this->_execSql($this->platform->getCreateForeignKeySQL($foreignKey, $table));
     }
 
     /**
      * Creates a new view.
      *
-     * @param \Doctrine\DBAL\Schema\View $view
+     * @param \CDatabase_Schema_View $view
      *
      * @return void
      */
-    public function createView(View $view) {
+    public function createView(CDatabase_Schema_View $view) {
         $this->_execSql($this->platform->getCreateViewSQL($view->getQuotedName($this->platform), $view->getSql()));
     }
 
@@ -454,15 +454,15 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and creates a constraint.
      *
-     * @see dropConstraint()
-     * @see createConstraint()
-     *
-     * @param \Doctrine\DBAL\Schema\Constraint   $constraint
-     * @param \Doctrine\DBAL\Schema\Table|string $table
+     * @param \CDatabase_Schema_Constraint   $constraint
+     * @param \CDatabase_Schema_Table|string $table
      *
      * @return void
+     *
+     * @see dropConstraint()
+     * @see createConstraint()
      */
-    public function dropAndCreateConstraint(Constraint $constraint, $table) {
+    public function dropAndCreateConstraint(CDatabase_Schema_Constraint $constraint, $table) {
         $this->tryMethod('dropConstraint', $constraint, $table);
         $this->createConstraint($constraint, $table);
     }
@@ -470,12 +470,12 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and creates a new index on a table.
      *
-     * @param \Doctrine\DBAL\Schema\Index        $index
-     * @param \Doctrine\DBAL\Schema\Table|string $table the name of the table on which the index is to be created
+     * @param \CDatabase_Schema_Index        $index
+     * @param \CDatabase_Schema_Table|string $table the name of the table on which the index is to be created
      *
      * @return void
      */
-    public function dropAndCreateIndex(Index $index, $table) {
+    public function dropAndCreateIndex(CDatabase_Schema_Index $index, $table) {
         $this->tryMethod('dropIndex', $index->getQuotedName($this->platform), $table);
         $this->createIndex($index, $table);
     }
@@ -483,12 +483,12 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and creates a new foreign key.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey an associative array that defines properties of the foreign key to be created
-     * @param \Doctrine\DBAL\Schema\Table|string         $table      the name of the table on which the foreign key is to be created
+     * @param \CDatabase_Schema_ForeignKeyConstraint $foreignKey an associative array that defines properties of the foreign key to be created
+     * @param \CDatabase_Schema_Table|string         $table      the name of the table on which the foreign key is to be created
      *
      * @return void
      */
-    public function dropAndCreateForeignKey(ForeignKeyConstraint $foreignKey, $table) {
+    public function dropAndCreateForeignKey(CDatabase_Schema_ForeignKeyConstraint $foreignKey, $table) {
         $this->tryMethod('dropForeignKey', $foreignKey, $table);
         $this->createForeignKey($foreignKey, $table);
     }
@@ -496,13 +496,13 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and create a new sequence.
      *
-     * @param \Doctrine\DBAL\Schema\Sequence $sequence
+     * @param \CDatabase_Schema_Sequence $sequence
      *
      * @return void
      *
      * @throws \Doctrine\DBAL\ConnectionException if something fails at database level
      */
-    public function dropAndCreateSequence(Sequence $sequence) {
+    public function dropAndCreateSequence(CDatabase_Schema_Sequence $sequence) {
         $this->tryMethod('dropSequence', $sequence->getQuotedName($this->platform));
         $this->createSequence($sequence);
     }
@@ -510,11 +510,11 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and creates a new table.
      *
-     * @param \Doctrine\DBAL\Schema\Table $table
+     * @param \CDatabase_Schema_Table $table
      *
      * @return void
      */
-    public function dropAndCreateTable(Table $table) {
+    public function dropAndCreateTable(CDatabase_Schema_Table $table) {
         $this->tryMethod('dropTable', $table->getQuotedName($this->platform));
         $this->createTable($table);
     }
@@ -534,11 +534,11 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and creates a new view.
      *
-     * @param \Doctrine\DBAL\Schema\View $view
+     * @param \CDatabase_Schema_View $view
      *
      * @return void
      */
-    public function dropAndCreateView(View $view) {
+    public function dropAndCreateView(CDatabase_Schema_View $view) {
         $this->tryMethod('dropView', $view->getQuotedName($this->platform));
         $this->createView($view);
     }
@@ -548,11 +548,11 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Alters an existing tables schema.
      *
-     * @param \Doctrine\DBAL\Schema\TableDiff $tableDiff
+     * @param \CDatabase_Schema_Table_Diff $tableDiff
      *
      * @return void
      */
-    public function alterTable(TableDiff $tableDiff) {
+    public function alterTable(CDatabase_Schema_Table_Diff $tableDiff) {
         $queries = $this->platform->getAlterTableSQL($tableDiff);
         if (is_array($queries) && count($queries)) {
             foreach ($queries as $ddlQuery) {
@@ -570,7 +570,7 @@ abstract class CDatabase_Schema_Manager {
      * @return void
      */
     public function renameTable($name, $newName) {
-        $tableDiff = new TableDiff($name);
+        $tableDiff = new CDatabase_Schema_Table_Diff($name);
         $tableDiff->newName = $newName;
         $this->alterTable($tableDiff);
     }
