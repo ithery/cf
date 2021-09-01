@@ -58,6 +58,10 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
                 $output .= $process->getOutput();
                 $successOutput = $output;
                 $output .= $errorOutput = $process->getErrorOutput();
+
+                if ($command === "pull") {
+                    CView::blade()->clearCompiled();
+                }
             } catch (Exception $ex) {
                 $errCode++;
                 $errMessage = $ex->getMessage();
