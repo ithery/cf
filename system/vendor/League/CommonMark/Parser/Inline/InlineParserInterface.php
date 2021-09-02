@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -15,9 +13,8 @@ namespace League\CommonMark\Parser\Inline;
 
 use League\CommonMark\Parser\InlineParserContext;
 
-interface InlineParserInterface
-{
-    public function getMatchDefinition(): InlineParserMatch;
+interface InlineParserInterface {
+    public function getMatchDefinition();
 
-    public function parse(InlineParserContext $inlineContext): bool;
+    public function parse(InlineParserContext $inlineContext);
 }

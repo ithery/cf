@@ -112,14 +112,19 @@ trait CModel_HasResource_HasResourceTrait {
     public function addResourceFromUrl() {
         $args = func_get_args();
         $url = carr::get($args, 0);
-        $allowedMimeTypes = array_slice($args, 1);
+        $allowedMimeTypes = array_slice($args, 2);
+
         if (!$stream = @fopen($url, 'r')) {
             throw CResources_Exception_FileCannotBeAdded_UnreachableUrl::create($url);
         }
         $temporaryFile = tempnam(sys_get_temp_dir(), 'resource-library');
         file_put_contents($temporaryFile, $stream);
         $this->guardAgainstInvalidMimeType($temporaryFile, $allowedMimeTypes);
-        $filename = basename(parse_url($url, PHP_URL_PATH));
+        $filename = carr::get($args, 1);
+
+        if ($filename == null) {
+            $filename = basename(parse_url($url, PHP_URL_PATH));
+        }
         $filename = str_replace('%20', ' ', $filename);
         if ($filename === '') {
             $filename = 'file';

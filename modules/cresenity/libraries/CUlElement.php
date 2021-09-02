@@ -2,6 +2,9 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @deprecated since 1.2
+ */
 class CUlElement extends CElement {
     public function __construct($id = '') {
         parent::__construct($id);

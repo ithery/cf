@@ -1,20 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 3:17:12 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 3:17:12 PM
  */
 class CServer_Config {
-
     protected static $instance;
+
     protected $config;
+
     protected $configBefore;
 
     public function init() {
-        if (!function_exists("proc_open")) { //proc_open function test by executing 'pwd' command
+        if (!function_exists('proc_open')) { //proc_open function test by executing 'pwd' command
             $this->set('mode_popen', true);
         }
         if ($this->get('os') === null) { //if not overloaded in config server.php
@@ -26,18 +28,18 @@ class CServer_Config {
                     $contents = false;
                     if (file_exists('/system/build.prop')) { //Android
                         $this->set('os', 'Android');
-                        if (@exec('uname -o 2>/dev/null', $unameo) && (sizeof($unameo) > 0) && (($unameo0 = trim($unameo[0])) != "")) {
+                        if (@exec('uname -o 2>/dev/null', $unameo) && (sizeof($unameo) > 0) && (($unameo0 = trim($unameo[0])) != '')) {
                             $this->set('unameo', $unameo0);
                         }
                         if ($this->get('mode_popen') === null) {//if not overloaded in config server.php
-                            if (!function_exists("proc_open")) { //proc_open function test by executing 'pwd' command
+                            if (!function_exists('proc_open')) { //proc_open function test by executing 'pwd' command
                                 $this->set('mode_popen', true); //use popen() function - no stderr error handling (but with problems with timeout)
                             } else {
                                 $out = '';
                                 $err = '';
-                                $pipes = array();
-                                $descriptorspec = array(0 => array("pipe", "r"), 1 => array("pipe", "w"), 2 => array("pipe", "w"));
-                                $process = proc_open("pwd 2>/dev/null ", $descriptorspec, $pipes);
+                                $pipes = [];
+                                $descriptorspec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
+                                $process = proc_open('pwd 2>/dev/null ', $descriptorspec, $pipes);
                                 if (!is_resource($process)) {
                                     $this->set('mode_popen', true);
                                 } else {
@@ -45,7 +47,7 @@ class CServer_Config {
                                     $e = null;
 
                                     while (!(feof($pipes[1]) && feof($pipes[2]))) {
-                                        $read = array($pipes[1], $pipes[2]);
+                                        $read = [$pipes[1], $pipes[2]];
 
                                         $n = stream_select($read, $w, $e, 5);
 
@@ -62,7 +64,7 @@ class CServer_Config {
                                         }
                                     }
 
-                                    if (is_null($out) || (trim($out) == "") || (substr(trim($out), 0, 1) != "/")) {
+                                    if (is_null($out) || (trim($out) == '') || (substr(trim($out), 0, 1) != '/')) {
                                         $this->set('mode_popen', true);
                                     }
                                     fclose($pipes[0]);
@@ -76,10 +78,12 @@ class CServer_Config {
                         }
                     }
                 }
-                if (!($this->get('system_codepage') !== null && $this->get('system_lang') !== null) //also if both not overloaded in config server.php
-                        && $contents && (preg_match('/^(LANG="?[^"\n]*"?)/m', $contents, $matches) || preg_match('/^RC_(LANG="?[^"\n]*"?)/m', $contents, $matches) || preg_match('/^\s*export (LANG="?[^"\n]*"?)/m', $contents, $matches))) {
+                if (!($this->get('system_codepage') !== null
+                    && $this->get('system_lang') !== null) //also if both not overloaded in config server.php
+                    && $contents && (preg_match('/^(LANG="?[^"\n]*"?)/m', $contents, $matches) || preg_match('/^RC_(LANG="?[^"\n]*"?)/m', $contents, $matches) || preg_match('/^\s*export (LANG="?[^"\n]*"?)/m', $contents, $matches))
+                ) {
                     if ($this->get('system_codepage') === null) {
-                        if (file_exists($vtfname = '/sys/module/vt/parameters/default_utf8') && (trim(@file_get_contents($vtfname)) === "1")) {
+                        if (file_exists($vtfname = '/sys/module/vt/parameters/default_utf8') && (trim(@file_get_contents($vtfname)) === '1')) {
                             $this->set('system_codepage', 'UTF-8');
                         } elseif (@exec($matches[1] . ' locale -k LC_CTYPE 2>/dev/null', $lines)) { //if not overloaded in config server.php
                             foreach ($lines as $line) {
@@ -93,12 +97,12 @@ class CServer_Config {
                     if ($this->get('system_lang') === null && @exec($matches[1] . ' locale 2>/dev/null', $lines2)) { //also if not overloaded in config server.php
                         foreach ($lines2 as $line) {
                             if (preg_match('/^LC_MESSAGES="?([^\."@]*)/', $line, $matches2)) {
-                                $lang = "";
+                                $lang = '';
                                 $langdata = CServer_Const::$languages;
                                 if (isset($langdata['Linux']['_' . $matches2[1]])) {
                                     $lang = $langdata['Linux']['_' . $matches2[1]];
                                 }
-                                if ($lang == "") {
+                                if ($lang == '') {
                                     $lang = 'Unknown';
                                 }
                                 $this->set('system_lang', $lang . ' (' . $matches2[1] . ')');
@@ -113,7 +117,6 @@ class CServer_Config {
         if ($this->get('os') === null) {
             $this->set('os', PHP_OS);
         }
-
 
         if ($this->get('system_codepage') === null) { //if not overloaded in config server.php
             if (($this->get('os') == 'Android') || ($this->get('os') == 'Darwin')) {
@@ -133,8 +136,7 @@ class CServer_Config {
     }
 
     public function __construct() {
-
-        $defaultConfig = array(
+        $defaultConfig = [
             'use_vhost' => false,
             'debug' => false,
             'load_percent_enabled' => true,
@@ -143,9 +145,9 @@ class CServer_Config {
             'system_lang' => null,
             'unameo' => null,
             'mode_popen' => null,
-        );
+        ];
 
-        $this->config = array_merge($defaultConfig, CF::config('server', array()));
+        $this->config = array_merge($defaultConfig, CF::config('server', []));
         $this->init();
 
         $this->configBefore = $this->config;
@@ -179,5 +181,4 @@ class CServer_Config {
     public function loadPercentEnabled() {
         return $this->get('load_percent_enabled') === true;
     }
-
 }

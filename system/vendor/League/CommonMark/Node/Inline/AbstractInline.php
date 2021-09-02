@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,6 +16,5 @@ namespace League\CommonMark\Node\Inline;
 
 use League\CommonMark\Node\Node;
 
-abstract class AbstractInline extends Node
-{
+abstract class AbstractInline extends Node {
 }

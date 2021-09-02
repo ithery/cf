@@ -4,35 +4,29 @@ use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\RequestOptions;
 
-class CVendor_Xendit_HttpClient_GuzzleClient implements CVendor_Xendit_Exception_ApiException {
-    private static $instance;
-
+class CVendor_Xendit_HttpClient_GuzzleClient implements CVendor_Xendit_HttpClient_HttpClientInterface {
     protected $http;
+
+    protected $baseUri;
+
+    protected $secretApiKey;
 
     /**
      * XenditClient constructor
+     *
+     * @param mixed $secretApiKey
+     * @param mixed $baseUri
      */
-    public function __construct() {
-        $baseUri = strval(CVendor_Xendit_Config::$apiBase);
+    public function __construct($secretApiKey, $baseUri) {
+        $this->baseUri = strval($baseUri);
+        $this->secretApiKey = strval($secretApiKey);
         $this->http = new Guzzle(
             [
-                'base_uri' => $baseUri,
+                'base_uri' => $this->baseUri,
                 'verify' => false,
                 'timeout' => 60
             ]
         );
-    }
-
-    /**
-     * Create Client instance
-     *
-     * @return GuzzleClient
-     */
-    public static function instance() {
-        if (!self::$instance) {
-            self::$instance = new static();
-        }
-        return self::$instance;
     }
 
     /**
@@ -47,7 +41,7 @@ class CVendor_Xendit_HttpClient_GuzzleClient implements CVendor_Xendit_Exception
      *
      * @throws CVendor_Xendit_Exception_ApiException
      */
-    public function sendRequest($method, string $url, array $defaultHeaders, $params) {
+    public function sendRequest($method, $url, array $defaultHeaders, $params) {
         $method = strtoupper($method);
 
         $opts = [];
@@ -75,10 +69,10 @@ class CVendor_Xendit_HttpClient_GuzzleClient implements CVendor_Xendit_Exception
      *
      * @throws CVendor_Xendit_Exception_ApiException
      */
-    private function executeRequest(array $opts, string $url) {
+    private function executeRequest(array $opts, $url) {
         $headers = $opts['headers'];
         $params = $opts['params'];
-        $apiKey = CVendor_Xendit_Config::$apiKey;
+        $apiKey = $this->secretApiKey;
         $url = strval($url);
         try {
             if (count($params) > 0) {

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,10 +16,8 @@ use League\CommonMark\Parser\Block\BlockStartParserInterface;
 use League\CommonMark\Parser\Cursor;
 use League\CommonMark\Parser\MarkdownParserStateInterface;
 
-final class BlockQuoteStartParser implements BlockStartParserInterface
-{
-    public function tryStart(Cursor $cursor, MarkdownParserStateInterface $parserState): ?BlockStart
-    {
+final class BlockQuoteStartParser implements BlockStartParserInterface {
+    public function tryStart(Cursor $cursor, MarkdownParserStateInterface $parserState) {
         if ($cursor->isIndented()) {
             return BlockStart::none();
         }

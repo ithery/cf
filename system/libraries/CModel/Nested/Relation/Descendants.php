@@ -1,28 +1,29 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 24, 2018, 2:22:24 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 24, 2018, 2:22:24 PM
  */
 class CModel_Nested_Relation_Descendants extends CModel_Nested_Relation {
-
     /**
      * Set the base constraints on the relation query.
      *
      * @return void
      */
     public function addConstraints() {
-        if (!static::$constraints)
+        if (!static::$constraints) {
             return;
+        }
         $this->query->whereDescendantOf($this->parent);
     }
 
     /**
      * @param QueryBuilder $query
-     * @param Model $model
+     * @param Model        $model
      */
     protected function addEagerConstraint($query, $model) {
         $query->orWhereDescendantOf($model);
@@ -49,5 +50,4 @@ class CModel_Nested_Relation_Descendants extends CModel_Nested_Relation {
     protected function relationExistenceCondition($hash, $table, $lft, $rgt) {
         return "{$hash}.{$lft} between {$table}.{$lft} + 1 and {$table}.{$rgt}";
     }
-
 }

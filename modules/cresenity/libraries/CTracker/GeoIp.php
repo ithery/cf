@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 2:39:25 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 2:39:25 PM
  */
 
 use GeoIp2\Database\Reader as GeoIpReader;
 use GeoIp2\Exception\AddressNotFoundException;
 
 class CTracker_GeoIp {
-
     private $geoIp;
 
     /**
@@ -28,7 +28,7 @@ class CTracker_GeoIp {
     }
 
     private function databaseExists() {
-        return file_exists($this->databasePath);
+        return $this->databasePath ? file_exists($this->databasePath) : false;
     }
 
     private function getGeoIp() {
@@ -39,21 +39,20 @@ class CTracker_GeoIp {
     }
 
     public function searchAddr($addr) {
-
         if ($geoip = $this->getGeoIp()) {
             return $geoip->searchAddr($addr);
         }
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function isEnabled() {
         return $this->getGeoIp()->isEnabled();
     }
 
     /**
-     * @param boolean $enabled
+     * @param bool $enabled
      */
     public function setEnabled($enabled) {
         return $this->getGeoIp()->setEnabled($enabled);
@@ -69,5 +68,4 @@ class CTracker_GeoIp {
         }
         return new CTracker_GeoIp_GeoIp1();
     }
-
 }

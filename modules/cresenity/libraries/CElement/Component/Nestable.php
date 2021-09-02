@@ -1,44 +1,54 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Oct 12, 2018, 1:48:18 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Oct 12, 2018, 1:48:18 PM
  */
 class CElement_Component_Nestable extends CElement_Component {
-
     use CTrait_Compat_Element_Nestable,
         CTrait_Element_ActionList_Row;
 
     protected $data;
+
     protected $id_key;
+
     protected $value_key;
+
     protected $applyjs;
+
     protected $input;
+
     protected $action_style;
+
     protected $displayCallbackFunc;
+
     protected $filterActionCallbackFunc;
+
     protected $requires;
+
     protected $checkbox;
+
     protected $disable_dnd;
+
     protected $js_cell;
 
     public function __construct($id) {
         parent::__construct($id);
-
-        CClientModules::instance()->register_module('jquery.nestable');
-        $this->data = array();
+        CManager::registerModule('jquery.nestable');
+        $this->data = [];
         $this->applyjs = true;
         $this->input = '';
         $this->rowActionList = CElement_Factory::createList('ActionList');
         $this->action_style = 'btn-icon-group';
         $this->rowActionList->setStyle('btn-icon-group');
         $this->displayCallbackFunc = false;
-        $this->filterActionCallbackFunc = "";
+        $this->filterActionCallbackFunc = '';
         $this->checkbox = false;
-        $this->requires = array();
+        $this->requires = [];
         $this->js_cell = '';
     }
 
@@ -46,7 +56,7 @@ class CElement_Component_Nestable extends CElement_Component {
         return new CElement_Component_Nestable($id);
     }
 
-    public function displayCallbackFunc($func, $require = "") {
+    public function displayCallbackFunc($func, $require = '') {
         $this->displayCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
@@ -54,7 +64,7 @@ class CElement_Component_Nestable extends CElement_Component {
         return $this;
     }
 
-    public function filterActionCallbackFunc($func, $require = "") {
+    public function filterActionCallbackFunc($func, $require = '') {
         $this->filterActionCallbackFunc = $func;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
@@ -71,19 +81,17 @@ class CElement_Component_Nestable extends CElement_Component {
         /**
          * NOT DONE
          */
-
         $orgId = CApp_Base::orgId();
 
         $root = $root->descendants();
         if (strlen($orgId) > 0) {
-            $root = $root->where(function($query) use ($orgId) {
-                        $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
-                    })->where('status', '>', 0);
+            $root = $root->where(function ($query) use ($orgId) {
+                $query->where('org_id', '=', $orgId)->orWhereNull('org_id');
+            })->where('status', '>', 0);
         }
 
         $tree = $root->get()->toTree();
-        $childArray = array();
-
+        $childArray = [];
 
         $traverse = function ($nodes) use (&$traverse, &$childArray) {
             foreach ($nodes as $node) {
@@ -97,12 +105,11 @@ class CElement_Component_Nestable extends CElement_Component {
 
         $traverse($tree);
 
-
         $this->data = $childArray;
         return $this;
     }
 
-    public function setDataFromArray($array = array()) {
+    public function setDataFromArray($array = []) {
         $this->data = $array;
         return $this;
     }
@@ -141,13 +148,11 @@ class CElement_Component_Nestable extends CElement_Component {
         $html = new CStringBuilder();
         $html->setIndent($indent);
 
-        $html->appendln('<div id="' . $this->id . '" class="dd nestable">')->inc_indent();
+        $html->appendln('<div id="' . $this->id . '" class="dd nestable">')->incIndent();
         if (count($this->data) > 0) {
-
             $depth_before = -1;
             $in = 0;
             foreach ($this->data as $d) {
-
                 $depth = $d['depth'];
                 if ($depth_before >= $depth) {
                     $html->decIndent()->appendln('</li>');
@@ -163,11 +168,11 @@ class CElement_Component_Nestable extends CElement_Component {
                     $in++;
                     $html->appendln('<ol class="dd-list">')->incIndent();
                 }
-                $html->appendln('<li class="dd-item" data-id="' . $d[$this->id_key] . '">')->inc_indent();
+                $html->appendln('<li class="dd-item" data-id="' . $d[$this->id_key] . '">')->incIndent();
 
                 $html->appendln('<div class="dd-handle">')->incIndent();
                 if ($this->checkbox) {
-                    $html->appendln('<input id="cb_' . $d[$this->id_key] . '" name="cb[' . $d[$this->id_key] . ']" data-parent-id="' . $d["parent_id"] . '" type="checkbox" value="' . $d[$this->id_key] . '"/>')->inc_indent();
+                    $html->appendln('<input id="cb_' . $d[$this->id_key] . '" name="cb[' . $d[$this->id_key] . ']" data-parent-id="' . $d['parent_id'] . '" type="checkbox" value="' . $d[$this->id_key] . '"/>')->incIndent();
                 }
                 $val = carr::get($d, $this->value_key);
                 $newV = $val;
@@ -182,18 +187,17 @@ class CElement_Component_Nestable extends CElement_Component {
                 $html->appendln($newV);
                 $html->decIndent()->appendln('</div>');
                 if ($this->haveRowAction()) {
-
                     foreach ($d as $k => $v) {
                         $jsparam[$k] = $v;
                     }
-                    $jsparam["param1"] = carr::get($d,$this->id_key);
-                    $this->rowActionList->addClass("pull-right");
-                    if ($this->action_style == "btn-dropdown") {
-                        $this->rowActionList->addClass("pull-right");
+                    $jsparam['param1'] = carr::get($d, $this->id_key);
+                    $this->rowActionList->addClass('pull-right');
+                    if ($this->action_style == 'btn-dropdown') {
+                        $this->rowActionList->addClass('pull-right');
                     }
                     $this->rowActionList->regenerateId(true);
-                    $this->rowActionList->apply("jsparam", $jsparam);
-                    $this->rowActionList->apply("set_handler_url_param", $jsparam);
+                    $this->rowActionList->apply('jsparam', $jsparam);
+                    $this->rowActionList->apply('set_handler_url_param', $jsparam);
 
                     if (($this->filterActionCallbackFunc) != null) {
                         $actions = $this->rowActionList->childs();
@@ -211,9 +215,8 @@ class CElement_Component_Nestable extends CElement_Component {
                     }
 
                     $this->js_cell .= $this->rowActionList->js();
-                    $html->appendln($this->rowActionList->html($html->get_indent()));
+                    $html->appendln($this->rowActionList->html($html->getIndent()));
                 }
-
 
                 $depth_before = $depth;
             }
@@ -224,14 +227,11 @@ class CElement_Component_Nestable extends CElement_Component {
         }
         $html->decIndent()->appendln('</div>');
         return $html->text();
-      
     }
 
     public function js($indent = 0) {
-
-
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         if ($this->applyjs) {
             if ($this->disable_dnd) {
                 $js->appendln("
@@ -269,11 +269,9 @@ class CElement_Component_Nestable extends CElement_Component {
             }
         }
 
-
         $js->append($this->js_cell)->br();
 
         $js->append($this->jsChild($indent))->br();
         return $js->text();
     }
-
 }

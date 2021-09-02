@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -24,8 +22,7 @@ use League\CommonMark\Renderer\ChildNodeRendererInterface;
 use League\CommonMark\Renderer\NodeRendererInterface;
 use League\CommonMark\Util\HtmlElement;
 
-final class ListItemRenderer implements NodeRendererInterface
-{
+final class ListItemRenderer implements NodeRendererInterface {
     /**
      * @param ListItem $node
      *
@@ -33,14 +30,13 @@ final class ListItemRenderer implements NodeRendererInterface
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function render(Node $node, ChildNodeRendererInterface $childRenderer)
-    {
-        if (! ($node instanceof ListItem)) {
+    public function render(Node $node, ChildNodeRendererInterface $childRenderer) {
+        if (!($node instanceof ListItem)) {
             throw new \InvalidArgumentException('Incompatible node type: ' . \get_class($node));
         }
 
         $contents = $childRenderer->renderNodes($node->children());
-        if (\substr($contents, 0, 1) === '<' && ! $this->startsTaskListItem($node)) {
+        if (\substr($contents, 0, 1) === '<' && !$this->startsTaskListItem($node)) {
             $contents = "\n" . $contents;
         }
 
@@ -53,8 +49,7 @@ final class ListItemRenderer implements NodeRendererInterface
         return new HtmlElement('li', $attrs, $contents);
     }
 
-    private function startsTaskListItem(ListItem $block): bool
-    {
+    private function startsTaskListItem(ListItem $block) {
         $firstChild = $block->firstChild();
 
         return $firstChild instanceof Paragraph && $firstChild->firstChild() instanceof TaskListItemMarker;

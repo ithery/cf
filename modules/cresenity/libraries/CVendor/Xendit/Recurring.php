@@ -1,7 +1,6 @@
 <?php
 
-class CVendor_Xendit_Recurring {
-    use CVendor_Xendit_ApiOperation_Request;
+class CVendor_Xendit_Recurring extends CVendor_Xendit_Base {
     use CVendor_Xendit_ApiOperation_Create;
     use CVendor_Xendit_ApiOperation_Retrieve;
     use CVendor_Xendit_ApiOperation_Update;
@@ -11,7 +10,7 @@ class CVendor_Xendit_Recurring {
      *
      * @return string
      */
-    public static function classUrl() {
+    protected function classUrl() {
         return '/recurring_payments';
     }
 
@@ -20,7 +19,7 @@ class CVendor_Xendit_Recurring {
      *
      * @return array
      */
-    public static function createReqParams() {
+    protected function createReqParams() {
         return [
             'external_id',
             'payer_email',
@@ -36,7 +35,7 @@ class CVendor_Xendit_Recurring {
      *
      * @return array
      */
-    public static function updateReqParams() {
+    protected function updateReqParams() {
         return [];
     }
 
@@ -66,10 +65,10 @@ class CVendor_Xendit_Recurring {
      *
      * @throws CVendor_Xendit_Exception_ApiException
      */
-    public static function stop($id) {
+    public function stop($id) {
         $url = '/recurring_payments/' . $id . '/stop!';
 
-        return static::request('POST', $url);
+        return $this->request('POST', $url);
     }
 
     /**
@@ -96,12 +95,12 @@ class CVendor_Xendit_Recurring {
      *                'start_date'=> string
      *                ]
      *
-     * @throws Exceptions\ApiException
+     * @throws CVendor_Xendit_Exception_ApiException
      */
-    public static function pause($id) {
+    public function pause($id) {
         $url = '/recurring_payments/' . $id . '/pause!';
 
-        return static::request('POST', $url);
+        return $this->request('POST', $url);
     }
 
     /**
@@ -128,11 +127,11 @@ class CVendor_Xendit_Recurring {
      *                'start_date'=> string
      *                ]
      *
-     * @throws Exceptions\ApiException
+     * @throws CVendor_Xendit_Exception_ApiException
      */
-    public static function resume($id) {
+    public function resume($id) {
         $url = '/recurring_payments/' . $id . '/resume!';
 
-        return static::request('POST', $url);
+        return $this->request('POST', $url);
     }
 }

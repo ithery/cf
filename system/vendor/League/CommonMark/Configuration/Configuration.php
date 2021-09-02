@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -16,51 +14,48 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Configuration;
 
-final class Configuration implements ConfigurationInterface
-{
+final class Configuration implements ConfigurationInterface {
     /**
      * @internal
      */
-    private const MISSING = '833f2700-af8d-49d4-9171-4b5f12d3bfbc';
+    const MISSING = '833f2700-af8d-49d4-9171-4b5f12d3bfbc';
 
-    /** @var array<string, mixed> */
+    /**
+     * @var array<string, mixed>
+     */
     private $config;
 
     /**
      * @param array<string, mixed> $config
      */
-    public function __construct(array $config = [])
-    {
+    public function __construct(array $config = []) {
         $this->config = $config;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function merge(array $config = []): void
-    {
+    public function merge(array $config = []) {
         $this->config = \array_replace_recursive($this->config, $config);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function replace(array $config = []): void
-    {
+    public function replace(array $config = []) {
         $this->config = $config;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get(string $key, $default = null)
-    {
+    public function get($key, $default = null) {
         // accept a/b/c as ['a']['b']['c']
         if (\strpos($key, '/')) {
             return $this->getConfigByPath($key, $default);
         }
 
-        if (! isset($this->config[$key])) {
+        if (!isset($this->config[$key])) {
             return $default;
         }
 
@@ -70,8 +65,7 @@ final class Configuration implements ConfigurationInterface
     /**
      * {@inheritdoc}
      */
-    public function set(string $key, $value): void
-    {
+    public function set($key, $value) {
         // accept a/b/c as ['a']['b']['c']
         if (\strpos($key, '/')) {
             $this->setByPath($key, $value);
@@ -80,22 +74,21 @@ final class Configuration implements ConfigurationInterface
         $this->config[$key] = $value;
     }
 
-    public function exists(string $key): bool
-    {
+    public function exists($key) {
         return $this->getConfigByPath($key, self::MISSING) !== self::MISSING;
     }
 
     /**
      * @param mixed|null $default
+     * @param mixed      $keyPath
      *
      * @return mixed|null
      */
-    private function getConfigByPath(string $keyPath, $default = null)
-    {
+    private function getConfigByPath($keyPath, $default = null) {
         $keyArr = \explode('/', $keyPath);
-        $data   = $this->config;
+        $data = $this->config;
         foreach ($keyArr as $k) {
-            if (! \is_array($data) || ! isset($data[$k])) {
+            if (!\is_array($data) || !isset($data[$k])) {
                 return $default;
             }
 
@@ -107,17 +100,17 @@ final class Configuration implements ConfigurationInterface
 
     /**
      * @param mixed|null $value
+     * @param mixed      $keyPath
      */
-    private function setByPath(string $keyPath, $value = null): void
-    {
-        $keyArr  = \explode('/', $keyPath);
+    private function setByPath($keyPath, $value = null) {
+        $keyArr = \explode('/', $keyPath);
         $pointer = &$this->config;
         while (($k = \array_shift($keyArr)) !== null) {
-            if (! \is_array($pointer)) {
+            if (!\is_array($pointer)) {
                 $pointer = [];
             }
 
-            if (! isset($pointer[$k])) {
+            if (!isset($pointer[$k])) {
                 $pointer[$k] = null;
             }
 

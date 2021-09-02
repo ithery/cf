@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -22,8 +20,7 @@ use League\CommonMark\Parser\Cursor;
 use League\CommonMark\Util\ArrayCollection;
 use League\CommonMark\Util\RegexHelper;
 
-final class FencedCodeParser extends AbstractBlockContinueParser
-{
+final class FencedCodeParser extends AbstractBlockContinueParser {
     /**
      * @var FencedCode
      *
@@ -31,27 +28,26 @@ final class FencedCodeParser extends AbstractBlockContinueParser
      */
     private $block;
 
-    /** @var ArrayCollection<string> */
+    /**
+     * @var ArrayCollection<string>
+     */
     protected $strings;
 
-    public function __construct(int $fenceLength, string $fenceChar, int $fenceOffset)
-    {
-        $this->block   = new FencedCode($fenceLength, $fenceChar, $fenceOffset);
+    public function __construct($fenceLength, $fenceChar, $fenceOffset) {
+        $this->block = new FencedCode($fenceLength, $fenceChar, $fenceOffset);
         $this->strings = new ArrayCollection();
     }
 
     /**
      * @return FencedCode
      */
-    public function getBlock(): AbstractBlock
-    {
+    public function getBlock() {
         return $this->block;
     }
 
-    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue
-    {
+    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser) {
         // Check for closing code fence
-        if (! $cursor->isIndented() && $cursor->getNextNonSpaceCharacter() === $this->block->getChar()) {
+        if (!$cursor->isIndented() && $cursor->getNextNonSpaceCharacter() === $this->block->getChar()) {
             $match = RegexHelper::matchFirst('/^(?:`{3,}|~{3,})(?= *$)/', $cursor->getLine(), $cursor->getNextNonSpacePosition());
             if ($match !== null && \strlen($match[0]) >= $this->block->getLength()) {
                 // closing fence - we're at end of line, so we can finalize now
@@ -65,13 +61,11 @@ final class FencedCodeParser extends AbstractBlockContinueParser
         return BlockContinue::at($cursor);
     }
 
-    public function addLine(string $line): void
-    {
+    public function addLine($line) {
         $this->strings[] = $line;
     }
 
-    public function closeBlock(): void
-    {
+    public function closeBlock() {
         // first line becomes info string
         $firstLine = $this->strings->first();
         if ($firstLine === false) {

@@ -468,8 +468,13 @@ var CFileManager = function (options) {
             var h = window.data.Properties.Height;
             window.opener.SetUrl(p, w, h);
         };
+        let url;
+        if(Array.isArray(items)) {
+            url = items[0].url;
+        } else {
+            url = items.url;
+        }
 
-        var url = items[0].url;
 
         if (typeof window.cfm !== 'undefined') {
             if (window.cfm.haveCallback('use')) {

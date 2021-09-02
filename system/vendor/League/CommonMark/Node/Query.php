@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -16,23 +14,21 @@ namespace League\CommonMark\Node;
 use League\CommonMark\Node\Query\AndExpr;
 use League\CommonMark\Node\Query\OrExpr;
 
-final class Query
-{
-    /** @var callable(Node): bool $condition */
+final class Query {
+    /**
+     * @var callable
+     */
     private $condition;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->condition = new AndExpr();
     }
 
-    public function where(callable ...$conditions): self
-    {
+    public function where(...$conditions) {
         return $this->andWhere(...$conditions);
     }
 
-    public function andWhere(callable ...$conditions): self
-    {
+    public function andWhere(...$conditions) {
         if ($this->condition instanceof AndExpr) {
             foreach ($conditions as $condition) {
                 $this->condition->add($condition);
@@ -44,8 +40,7 @@ final class Query
         return $this;
     }
 
-    public function orWhere(callable ...$conditions): self
-    {
+    public function orWhere(callable ...$conditions): self {
         if ($this->condition instanceof OrExpr) {
             foreach ($conditions as $condition) {
                 $this->condition->add($condition);
@@ -57,11 +52,10 @@ final class Query
         return $this;
     }
 
-    public function findOne(Node $node): ?Node
-    {
+    public function findOne(Node $node): ?Node {
         $walker = $node->walker();
         while ($event = $walker->next()) {
-            if (! $event->isEntering()) {
+            if (!$event->isEntering()) {
                 continue;
             }
 
@@ -76,15 +70,14 @@ final class Query
     /**
      * @return iterable<Node>
      */
-    public function findAll(Node $node, ?int $limit = PHP_INT_MAX): iterable
-    {
+    public function findAll(Node $node, ?int $limit = PHP_INT_MAX): iterable {
         /** @var Node[] $results */
-        $results     = [];
+        $results = [];
         $resultCount = 0;
 
         $walker = $node->walker();
         while ($event = $walker->next()) {
-            if (! $event->isEntering()) {
+            if (!$event->isEntering()) {
                 continue;
             }
 
@@ -104,8 +97,7 @@ final class Query
     /**
      * @return callable(Node): bool
      */
-    public static function type(string $class): callable
-    {
+    public static function type(string $class): callable {
         return static function (Node $node) use ($class): bool {
             return $node instanceof $class;
         };
@@ -118,8 +110,7 @@ final class Query
      *
      * @return callable(Node): bool
      */
-    public static function hasChild(?callable $condition = null): callable
-    {
+    public static function hasChild(?callable $condition = null): callable {
         return static function (Node $node) use ($condition): bool {
             foreach ($node->children() as $child) {
                 if ($condition === null || $condition($child)) {
@@ -138,8 +129,7 @@ final class Query
      *
      * @return callable(Node): bool
      */
-    public static function hasParent(?callable $condition = null): callable
-    {
+    public static function hasParent(?callable $condition = null): callable {
         return static function (Node $node) use ($condition): bool {
             $parent = $node->parent();
             if ($parent === null) {

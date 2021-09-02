@@ -7,14 +7,18 @@ class CRedis_Connector_PhpRedisConnector extends CRedis_AbstractConnector {
      * @param array $config
      * @param array $options
      *
-     * @return \Illuminate\Redis\Connections\PhpRedisConnection
+     * @return \CRedis_Connection_PhpRedisConnection
      */
     public function connect(array $config, array $options) {
-        return new CRedis_Connection_PhpRedisConnection($this->createClient(array_merge(
-            $config,
-            $options,
-            carr::pull($config, 'options', [])
-        )));
+        $connector = function () use ($config, $options) {
+            return $this->createClient(array_merge(
+                $config,
+                $options,
+                carr::pull($config, 'options', [])
+            ));
+        };
+
+        return new CRedis_Connection_PhpRedisConnection($connector(), $connector, $config);
     }
 
     /**
@@ -24,7 +28,7 @@ class CRedis_Connector_PhpRedisConnector extends CRedis_AbstractConnector {
      * @param array $clusterOptions
      * @param array $options
      *
-     * @return \Illuminate\Redis\Connections\PhpRedisClusterConnection
+     * @return \CRedis_Connection_PhpRedisClusterConnection
      */
     public function connectToCluster(array $config, array $clusterOptions, array $options) {
         $options = array_merge($options, $clusterOptions, carr::pull($config, 'options', []));
@@ -57,7 +61,7 @@ class CRedis_Connector_PhpRedisConnector extends CRedis_AbstractConnector {
      * @throws \LogicException
      */
     protected function createClient(array $config) {
-        return CF::tap(new Redis, function ($client) use ($config) {
+        return c::tap(new Redis, function ($client) use ($config) {
             $this->establishConnection($client, $config);
             if (!empty($config['password'])) {
                 $client->auth($config['password']);
@@ -116,7 +120,7 @@ class CRedis_Connector_PhpRedisConnector extends CRedis_AbstractConnector {
         if (version_compare(phpversion('redis'), '4.3.0', '>=')) {
             $parameters[] = isset($options['password']) ? $options['password'] : null;
         }
-        return CF::tap(new RedisCluster(...$parameters), function ($client) use ($options) {
+        return c::tap(new RedisCluster(...$parameters), function ($client) use ($options) {
             if (!empty($options['prefix'])) {
                 $client->setOption(RedisCluster::OPT_PREFIX, $options['prefix']);
             }

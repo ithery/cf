@@ -9,8 +9,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace League\CommonMark\Normalizer;
 
 /***
@@ -20,12 +18,11 @@ namespace League\CommonMark\Normalizer;
  *
  * @psalm-immutable
  */
-final class TextNormalizer implements TextNormalizerInterface
-{
+final class TextNormalizer implements TextNormalizerInterface {
     /**
      * Source: https://github.com/symfony/polyfill-mbstring/blob/master/Mbstring.php
      */
-    private const CASE_FOLD = [
+    const CASE_FOLD = [
         ['µ', 'ſ', "\xCD\x85", 'ς', "\xCF\x90", "\xCF\x91", "\xCF\x95", "\xCF\x96", "\xCF\xB0", "\xCF\xB1", "\xCF\xB5", "\xE1\xBA\x9B", "\xE1\xBE\xBE", "\xC3\x9F", "\xE1\xBA\x9E"],
         ['μ', 's', 'ι',        'σ', 'β',        'θ',        'φ',        'π',        'κ',        'ρ',        'ε',        "\xE1\xB9\xA1", 'ι',            'ss',       'ss'],
     ];
@@ -35,14 +32,13 @@ final class TextNormalizer implements TextNormalizerInterface
      *
      * @psalm-pure
      */
-    public function normalize(string $text, $context = null): string
-    {
+    public function normalize($text, $context = null) {
         // Collapse internal whitespace to single space and remove
         // leading/trailing whitespace
         $text = \preg_replace('/\s+/', ' ', \trim($text));
         \assert(\is_string($text));
 
-        if (! \defined('MB_CASE_FOLD')) {
+        if (!\defined('MB_CASE_FOLD')) {
             // We're not on a version of PHP (7.3+) which has this feature
             $text = \str_replace(self::CASE_FOLD[0], self::CASE_FOLD[1], $text);
 

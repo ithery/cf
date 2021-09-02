@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,8 +17,7 @@ use League\CommonMark\Parser\Block\ParagraphParser;
 /**
  * @internal You should rely on the interface instead
  */
-final class MarkdownParserState implements MarkdownParserStateInterface
-{
+final class MarkdownParserState implements MarkdownParserStateInterface {
     /**
      * @var BlockContinueParserInterface
      *
@@ -35,30 +32,26 @@ final class MarkdownParserState implements MarkdownParserStateInterface
      */
     private $lastMatchedBlockParser;
 
-    public function __construct(BlockContinueParserInterface $activeBlockParser, BlockContinueParserInterface $lastMatchedBlockParser)
-    {
-        $this->activeBlockParser      = $activeBlockParser;
+    public function __construct(BlockContinueParserInterface $activeBlockParser, BlockContinueParserInterface $lastMatchedBlockParser) {
+        $this->activeBlockParser = $activeBlockParser;
         $this->lastMatchedBlockParser = $lastMatchedBlockParser;
     }
 
-    public function getActiveBlockParser(): BlockContinueParserInterface
-    {
+    public function getActiveBlockParser() {
         return $this->activeBlockParser;
     }
 
-    public function getLastMatchedBlockParser(): BlockContinueParserInterface
-    {
+    public function getLastMatchedBlockParser() {
         return $this->lastMatchedBlockParser;
     }
 
-    public function getParagraphContent(): ?string
-    {
-        if (! $this->lastMatchedBlockParser instanceof ParagraphParser) {
+    public function getParagraphContent() {
+        if (!$this->lastMatchedBlockParser instanceof ParagraphParser) {
             return null;
         }
 
         $paragraphParser = $this->lastMatchedBlockParser;
-        $content         = $paragraphParser->getContentString();
+        $content = $paragraphParser->getContentString();
 
         return $content === '' ? null : $content;
     }

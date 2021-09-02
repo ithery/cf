@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -23,43 +21,41 @@ use League\CommonMark\Node\Node;
  *
  * @method parent() ?AbstractBlock
  */
-abstract class AbstractBlock extends Node
-{
-    /** @var int|null */
+abstract class AbstractBlock extends Node {
+    /**
+     * @var int|null
+     */
     protected $startLine;
 
-    /** @var int|null */
+    /**
+     * @var int|null
+     */
     protected $endLine;
 
-    protected function setParent(?Node $node = null): void
-    {
-        if ($node && ! $node instanceof self) {
+    protected function setParent(Node $node = null) {
+        if ($node && !$node instanceof self) {
             throw new \InvalidArgumentException('Parent of block must also be block (cannot be inline)');
         }
 
         parent::setParent($node);
     }
 
-    public function setStartLine(?int $startLine): void
-    {
+    public function setStartLine($startLine) {
         $this->startLine = $startLine;
         if ($this->endLine === null) {
             $this->endLine = $startLine;
         }
     }
 
-    public function getStartLine(): ?int
-    {
+    public function getStartLine() {
         return $this->startLine;
     }
 
-    public function setEndLine(?int $endLine): void
-    {
+    public function setEndLine($endLine) {
         $this->endLine = $endLine;
     }
 
-    public function getEndLine(): ?int
-    {
+    public function getEndLine() {
         return $this->endLine;
     }
 }

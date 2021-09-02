@@ -11,7 +11,7 @@ trait CProfiler_Trait_PopulateDatabaseTrait {
      *
      * @return void
      */
-    public function createDatabaseTable() {
+    public static function createDatabaseTable() {
         $table = new CProfiler_TableRenderer();
 
         $table->addColumn();

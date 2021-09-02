@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2018, 5:42:31 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2018, 5:42:31 AM
  */
 class CModel_Nested_NestedSet {
-
     /**
      * The name of default lft column.
      */
@@ -42,9 +42,9 @@ class CModel_Nested_NestedSet {
     /**
      * Add default nested set columns to the table. Also create an index.
      *
-     * @param \Illuminate\Database\Schema\Blueprint $table
+     * @param \CDatabase_Schema_Blueprint $table
      */
-    public static function columns(Blueprint $table) {
+    public static function columns(CDatabase_Schema_Blueprint $table) {
         $table->unsignedInteger(self::LFT)->default(0);
         $table->unsignedInteger(self::RGT)->default(0);
         $table->unsignedInteger(self::DEPTH)->default(0);
@@ -55,9 +55,9 @@ class CModel_Nested_NestedSet {
     /**
      * Drop NestedSet columns.
      *
-     * @param \Illuminate\Database\Schema\Blueprint $table
+     * @param \CDatabase_Schema_Blueprint $table
      */
-    public static function dropColumns(Blueprint $table) {
+    public static function dropColumns(CDatabase_Schema_Blueprint $table) {
         $columns = static::getDefaultColumns();
         $table->dropIndex($columns);
         $table->dropColumn($columns);
@@ -82,5 +82,4 @@ class CModel_Nested_NestedSet {
     public static function isNode($node) {
         return is_object($node) && in_array(CModel_Nested_Trait::class, (array) $node);
     }
-
 }

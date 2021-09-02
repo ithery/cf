@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @deprecated since 1.2
+ */
+//@codingStandardsIgnoreStart
 class CTableRow extends CElement {
     protected $columns = [];
 

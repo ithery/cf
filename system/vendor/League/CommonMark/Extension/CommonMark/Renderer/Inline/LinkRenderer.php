@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -25,8 +23,7 @@ use League\CommonMark\Renderer\NodeRendererInterface;
 use League\CommonMark\Util\HtmlElement;
 use League\CommonMark\Util\RegexHelper;
 
-final class LinkRenderer implements NodeRendererInterface, ConfigurationAwareInterface
-{
+final class LinkRenderer implements NodeRendererInterface, ConfigurationAwareInterface {
     /**
      * @var ConfigurationInterface
      *
@@ -41,16 +38,15 @@ final class LinkRenderer implements NodeRendererInterface, ConfigurationAwareInt
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function render(Node $node, ChildNodeRendererInterface $childRenderer)
-    {
-        if (! ($node instanceof Link)) {
+    public function render(Node $node, ChildNodeRendererInterface $childRenderer) {
+        if (!($node instanceof Link)) {
             throw new \InvalidArgumentException('Incompatible node type: ' . \get_class($node));
         }
 
         $attrs = $node->data->get('attributes');
 
-        $forbidUnsafeLinks = ! $this->config->get('allow_unsafe_links');
-        if (! ($forbidUnsafeLinks && RegexHelper::isLinkPotentiallyUnsafe($node->getUrl()))) {
+        $forbidUnsafeLinks = !$this->config->get('allow_unsafe_links');
+        if (!($forbidUnsafeLinks && RegexHelper::isLinkPotentiallyUnsafe($node->getUrl()))) {
             $attrs['href'] = $node->getUrl();
         }
 
@@ -58,15 +54,14 @@ final class LinkRenderer implements NodeRendererInterface, ConfigurationAwareInt
             $attrs['title'] = $node->data->get('title');
         }
 
-        if (isset($attrs['target']) && $attrs['target'] === '_blank' && ! isset($attrs['rel'])) {
+        if (isset($attrs['target']) && $attrs['target'] === '_blank' && !isset($attrs['rel'])) {
             $attrs['rel'] = 'noopener noreferrer';
         }
 
         return new HtmlElement('a', $attrs, $childRenderer->renderNodes($node->children()));
     }
 
-    public function setConfiguration(ConfigurationInterface $configuration): void
-    {
+    public function setConfiguration(ConfigurationInterface $configuration) {
         $this->config = $configuration;
     }
 }

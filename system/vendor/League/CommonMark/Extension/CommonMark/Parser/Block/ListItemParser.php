@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -23,8 +21,7 @@ use League\CommonMark\Parser\Block\BlockContinue;
 use League\CommonMark\Parser\Block\BlockContinueParserInterface;
 use League\CommonMark\Parser\Cursor;
 
-final class ListItemParser extends AbstractBlockContinueParser
-{
+final class ListItemParser extends AbstractBlockContinueParser {
     /**
      * @var ListItem
      *
@@ -32,29 +29,27 @@ final class ListItemParser extends AbstractBlockContinueParser
      */
     private $block;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     private $hadBlankLine = false;
 
-    public function __construct(ListData $listData)
-    {
+    public function __construct(ListData $listData) {
         $this->block = new ListItem($listData);
     }
 
     /**
      * @return ListItem
      */
-    public function getBlock(): AbstractBlock
-    {
+    public function getBlock() {
         return $this->block;
     }
 
-    public function isContainer(): bool
-    {
+    public function isContainer(): bool {
         return true;
     }
 
-    public function canContain(AbstractBlock $childBlock): bool
-    {
+    public function canContain(AbstractBlock $childBlock) {
         if ($this->hadBlankLine) {
             // We saw a blank line in this list item, that means the list block is loose.
             //
@@ -69,8 +64,7 @@ final class ListItemParser extends AbstractBlockContinueParser
         return true;
     }
 
-    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue
-    {
+    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser) {
         if ($cursor->isBlank()) {
             if ($this->block->firstChild() === null) {
                 // Blank line after empty list item

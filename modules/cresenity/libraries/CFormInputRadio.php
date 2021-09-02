@@ -1,22 +1,28 @@
 <?php
 
+/**
+ * @deprecated since 1.2
+ */
+//@codingStandardsIgnoreStart
 class CFormInputRadio extends CFormInput {
-
     use CTrait_Compat_Element_FormInput_Radio,
         CTrait_Element_Property_Label;
 
     protected $checked;
+
     // protected $label;
     protected $applyjs;
+
     protected $label_wrap;
+
     protected $inline;
 
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->type = "radio";
-        $this->label = "";
-        $this->applyjs = "uniform";
+        $this->type = 'radio';
+        $this->label = '';
+        $this->applyjs = 'uniform';
         $this->checked = false;
         $this->inline = false;
         $this->label_wrap = false;
@@ -35,17 +41,16 @@ class CFormInputRadio extends CFormInput {
         return $this;
     }
 
-   
     public function set_label_wrap($bool) {
         $this->label_wrap = $bool;
         return $this;
     }
 
-    function get_inline() {
+    public function get_inline() {
         return $this->inline;
     }
 
-    function set_inline($inline) {
+    public function set_inline($inline) {
         $this->inline = $inline;
         return $this;
     }
@@ -53,17 +58,20 @@ class CFormInputRadio extends CFormInput {
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
-        $disabled = "";
-        $checked = "";
-        if ($this->checked)
+        $disabled = '';
+        $checked = '';
+        if ($this->checked) {
             $checked = ' checked="checked"';
-        if ($this->disabled)
+        }
+        if ($this->disabled) {
             $disabled = ' disabled="disabled"';
+        }
 
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
-            $classes = " " . $classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
 
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
@@ -76,11 +84,10 @@ class CFormInputRadio extends CFormInput {
                 $label_class = 'control-label';
             }
         }
-        $addition_attribute = "";
+        $addition_attribute = '';
         foreach ($this->attr as $k => $v) {
-            $addition_attribute .= " " . $k . '="' . $v . '"';
+            $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
-
 
         if ($this->bootstrap >= '3') {
             if ($this->inline == false) {
@@ -107,7 +114,7 @@ class CFormInputRadio extends CFormInput {
             }
         } else {
             $html->append('<label class="checkbox' . $classes . '" >');
-            if ($this->applyjs == "switch") {
+            if ($this->applyjs == 'switch') {
                 $html->append('<div class="switch">');
             }
 
@@ -115,7 +122,7 @@ class CFormInputRadio extends CFormInput {
             if (strlen($this->label) > 0) {
                 $html->appendln('&nbsp;' . $this->label);
             }
-            if ($this->applyjs == "switch") {
+            if ($this->applyjs == 'switch') {
                 $html->append('</div>');
             }
         }
@@ -128,11 +135,11 @@ class CFormInputRadio extends CFormInput {
         $js = new CStringBuilder();
         $js->set_indent($indent);
         $js->append(parent::js($indent))->br();
-        if ($this->applyjs == "uniform") {
+        if ($this->applyjs == 'uniform') {
             //$js->append("$('#".$this->id."').uniform();")->br();
-        } else if ($this->applyjs == "switch") {
+        } elseif ($this->applyjs == 'switch') {
             //$js->append("$('#".$this->id."').parent().bootstrapSwitch();")->br();
-        } else if ($this->applyjs == 'icheck') {
+        } elseif ($this->applyjs == 'icheck') {
             $js->append("
                     $('#" . $this->id . "').iCheck({
                         radioClass: 'iradio iradio_minimal-blue'
@@ -142,5 +149,4 @@ class CFormInputRadio extends CFormInput {
 
         return $js->text();
     }
-
 }

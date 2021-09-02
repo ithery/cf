@@ -1,15 +1,19 @@
 <?php
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated since 1.2
+ */
 class crenderer {
     /**
-     * Undocumented function
+     * Render as css styles from array key value
      *
-     * @param [type] $styles
+     * @param array $styles
      *
-     * @return void
+     * @return string
      *
-     * @deprecated 1.1
+     * @see CRenderable
+     * @deprecated 1.1, use CRenderable::renderStyles
      */
     public static function render_style($styles) {
         $ret = '';

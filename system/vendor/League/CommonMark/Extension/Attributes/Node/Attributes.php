@@ -16,23 +16,27 @@ namespace League\CommonMark\Extension\Attributes\Node;
 
 use League\CommonMark\Node\Block\AbstractBlock;
 
-final class Attributes extends AbstractBlock
-{
-    public const TARGET_PARENT   = 0;
-    public const TARGET_PREVIOUS = 1;
-    public const TARGET_NEXT     = 2;
+final class Attributes extends AbstractBlock {
+    const TARGET_PARENT = 0;
 
-    /** @var array<string, mixed> */
+    const TARGET_PREVIOUS = 1;
+
+    const TARGET_NEXT = 2;
+
+    /**
+     * @var array<string, mixed>
+     */
     private $attributes;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     private $target = self::TARGET_NEXT;
 
     /**
      * @param array<string, mixed> $attributes
      */
-    public function __construct(array $attributes)
-    {
+    public function __construct(array $attributes) {
         parent::__construct();
 
         $this->attributes = $attributes;
@@ -41,26 +45,30 @@ final class Attributes extends AbstractBlock
     /**
      * @return array<string, mixed>
      */
-    public function getAttributes(): array
-    {
+    public function getAttributes() {
         return $this->attributes;
     }
 
     /**
      * @param array<string, mixed> $attributes
      */
-    public function setAttributes(array $attributes): void
-    {
+    public function setAttributes(array $attributes) {
         $this->attributes = $attributes;
     }
 
-    public function getTarget(): int
-    {
+    /**
+     * @return int
+     */
+    public function getTarget() {
         return $this->target;
     }
 
-    public function setTarget(int $target): void
-    {
+    /**
+     * @param int $target
+     *
+     * @return void
+     */
+    public function setTarget($target) {
         $this->target = $target;
     }
 }

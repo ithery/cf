@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,8 +17,7 @@ use League\CommonMark\Parser\CursorState;
 /**
  * Result object for starting parsing of a block; see static methods for constructors
  */
-final class BlockStart
-{
+final class BlockStart {
     /**
      * @var BlockContinueParserInterface[]
      *
@@ -42,26 +39,22 @@ final class BlockStart
      */
     private $replaceActiveBlockParser = false;
 
-    private function __construct(BlockContinueParserInterface ...$blockParsers)
-    {
+    private function __construct(BlockContinueParserInterface ...$blockParsers) {
         $this->blockParsers = $blockParsers;
     }
 
     /**
      * @return BlockContinueParserInterface[]
      */
-    public function getBlockParsers(): iterable
-    {
+    public function getBlockParsers() {
         return $this->blockParsers;
     }
 
-    public function getCursorState(): ?CursorState
-    {
+    public function getCursorState() {
         return $this->cursorState;
     }
 
-    public function isReplaceActiveBlockParser(): bool
-    {
+    public function isReplaceActiveBlockParser() {
         return $this->replaceActiveBlockParser;
     }
 
@@ -70,8 +63,7 @@ final class BlockStart
      *
      * @return $this
      */
-    public function at(Cursor $cursor): self
-    {
+    public function at(Cursor $cursor) {
         $this->cursorState = $cursor->saveState();
 
         return $this;
@@ -82,8 +74,7 @@ final class BlockStart
      *
      * @return $this
      */
-    public function replaceActiveBlockParser(): self
-    {
+    public function replaceActiveBlockParser() {
         $this->replaceActiveBlockParser = true;
 
         return $this;
@@ -94,16 +85,14 @@ final class BlockStart
      *
      * @return null
      */
-    public static function none(): ?self
-    {
+    public static function none() {
         return null;
     }
 
     /**
      * Signal that we'd like to register the given parser(s) so they can parse the current block
      */
-    public static function of(BlockContinueParserInterface ...$blockParsers): self
-    {
+    public static function of(BlockContinueParserInterface ...$blockParsers) {
         return new self(...$blockParsers);
     }
 }

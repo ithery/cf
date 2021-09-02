@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -24,8 +22,7 @@ namespace League\CommonMark\Util;
  * @phpstan-implements \IteratorAggregate<int, T>
  * @phpstan-implements \ArrayAccess<int, T>
  */
-final class ArrayCollection implements \IteratorAggregate, \Countable, \ArrayAccess
-{
+final class ArrayCollection implements \IteratorAggregate, \Countable, \ArrayAccess {
     /**
      * @var array<int, mixed>
      * @phpstan-var array<int, T>
@@ -39,8 +36,7 @@ final class ArrayCollection implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @phpstan-param array<int, T> $elements
      */
-    public function __construct(array $elements = [])
-    {
+    public function __construct(array $elements = []) {
         $this->elements = $elements;
     }
 
@@ -49,8 +45,7 @@ final class ArrayCollection implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @phpstan-return T|false
      */
-    public function first()
-    {
+    public function first() {
         return \reset($this->elements);
     }
 
@@ -59,8 +54,7 @@ final class ArrayCollection implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @phpstan-return T|false
      */
-    public function last()
-    {
+    public function last() {
         return \end($this->elements);
     }
 
@@ -71,18 +65,16 @@ final class ArrayCollection implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @phpstan-return \ArrayIterator<int, T>
      */
-    public function getIterator(): \ArrayIterator
-    {
+    public function getIterator() {
         return new \ArrayIterator($this->elements);
     }
 
     /**
      * Count elements of an object
      *
-     * @return int The count as an integer.
+     * @return int the count as an integer
      */
-    public function count(): int
-    {
+    public function count() {
         return \count($this->elements);
     }
 
@@ -93,8 +85,7 @@ final class ArrayCollection implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @phpstan-param int $offset
      */
-    public function offsetExists($offset): bool
-    {
+    public function offsetExists($offset) {
         return \array_key_exists($offset, $this->elements);
     }
 
@@ -107,9 +98,8 @@ final class ArrayCollection implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @phpstan-return T|null
      */
-    public function offsetGet($offset)
-    {
-        return $this->elements[$offset] ?? null;
+    public function offsetGet($offset) {
+        return isset($this->elements[$offset]) ? $this->elements[$offset] : null;
     }
 
     /**
@@ -120,8 +110,7 @@ final class ArrayCollection implements \IteratorAggregate, \Countable, \ArrayAcc
      * @phpstan-param int|null $offset
      * @phpstan-param T        $value
      */
-    public function offsetSet($offset, $value): void
-    {
+    public function offsetSet($offset, $value) {
         if ($offset === null) {
             $this->elements[] = $value;
         } else {
@@ -136,9 +125,8 @@ final class ArrayCollection implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @phpstan-param int $offset
      */
-    public function offsetUnset($offset): void
-    {
-        if (! \array_key_exists($offset, $this->elements)) {
+    public function offsetUnset($offset) {
+        if (!\array_key_exists($offset, $this->elements)) {
             return;
         }
 
@@ -151,9 +139,11 @@ final class ArrayCollection implements \IteratorAggregate, \Countable, \ArrayAcc
      * @return array<int, mixed>
      *
      * @phpstan-return array<int, T>
+     *
+     * @param mixed      $offset
+     * @param null|mixed $length
      */
-    public function slice(int $offset, ?int $length = null): array
-    {
+    public function slice($offset, $length = null) {
         return \array_slice($this->elements, $offset, $length, true);
     }
 
@@ -162,8 +152,7 @@ final class ArrayCollection implements \IteratorAggregate, \Countable, \ArrayAcc
      *
      * @phpstan-return array<int, T>
      */
-    public function toArray(): array
-    {
+    public function toArray() {
         return $this->elements;
     }
 }

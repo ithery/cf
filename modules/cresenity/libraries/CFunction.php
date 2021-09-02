@@ -1,32 +1,33 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
+ * @package Cresenity
+ *
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 12:58:00 AM
  * @license Ittron Global Teknologi <ittron.co.id>
- * @version 1.1
- * @package cresenity
+ *
+ * @version Release:1.1
+ *
+ * @since Feb 17, 2018, 12:58:00 AM
  */
 class CFunction {
-
     /**
-     *
      * @var string|callable
      */
-    public $func = "";
+    public $func = '';
 
     /**
-     *
      * @var array
      */
-    public $args = array();
-    public $requires = array();
-    public $type = "defined"; //defined,class,
+    public $args = [];
+
+    public $requires = [];
+
+    public $type = 'defined'; //defined,class,
 
     private function __construct($func) {
-
         $this->func = CHelper::closure()->deserializeClosure($func);
     }
 
@@ -60,19 +61,19 @@ class CFunction {
 
     public function setRequire($p) {
         if ($p == null) {
-            $p = array();
+            $p = [];
         }
         if (is_string($p)) {
-            $p = array($p);
+            $p = [$p];
         }
 
         $this->requires = $p;
         return $this;
     }
 
-    public function execute($args = array()) {
+    public function execute($args = []) {
         if (!is_array($args)) {
-            $args = array($args);
+            $args = [$args];
         }
         foreach ($this->requires as $r) {
             if (strlen($r) > 0 && file_exists($r)) {
@@ -84,7 +85,6 @@ class CFunction {
         $error = 0;
         if ($error == 0) {
             if (is_array($this->func)) {
-
                 if (is_callable($this->func)) {
                     return call_user_func_array($this->func, $args);
                 } else {
@@ -110,30 +110,27 @@ class CFunction {
         }
         if ($error == 0) {
             //not the function name, let check it if it is function from ctransform class
-            if (is_callable(array('ctransform', $this->func))) {
-                return call_user_func_array(array('ctransform', $this->func), $args);
+            if (is_callable(['ctransform', $this->func])) {
+                return call_user_func_array(['ctransform', $this->func], $args);
             }
         }
         if ($error == 0) {
             //not the function name, let check it if it is function from CHelper_Transform class
             $transform = CHelper::transform();
-            if (is_callable(array($transform, $this->func))) {
-                return call_user_func_array(array($transform, $this->func), $args);
+            if (is_callable([$transform, $this->func])) {
+                return call_user_func_array([$transform, $this->func], $args);
             }
         }
         if ($error == 0) {
             //it is not method from ctransform class, try the other class if it is found ::
-            if (strpos($this->func, "::") !== false) {
-                return call_user_func_array(explode("::", $this->func), $args);
+            if (strpos($this->func, '::') !== false) {
+                return call_user_func_array(explode('::', $this->func), $args);
             }
         }
         //last return this name of function
         if ($error == 0) {
             return $this->func;
         }
-        return "ERROR ON CFUNCTION";
+        return 'ERROR ON CFUNCTION';
     }
-
 }
-
-?>

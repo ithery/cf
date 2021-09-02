@@ -4,7 +4,6 @@
  * CRON field interface
  */
 interface CJob_CronExpression_FieldInterface {
-
     /**
      * Check if the respective value of a DateTime field satisfies a CRON exp
      *

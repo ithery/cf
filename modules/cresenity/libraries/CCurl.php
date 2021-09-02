@@ -335,49 +335,49 @@ class CCurl {
     }
 
     public function setCookiesFile($filename) {
-        $this->set_opt(CURLOPT_COOKIEJAR, $filename);
-        $this->set_opt(CURLOPT_COOKIEFILE, $filename);
+        $this->setOpt(CURLOPT_COOKIEJAR, $filename);
+        $this->setOpt(CURLOPT_COOKIEFILE, $filename);
         return $this;
     }
 
     public function setTimeout($milisecond) {
-        $this->set_opt(CURLOPT_TIMEOUT, $milisecond);
+        $this->setOpt(CURLOPT_TIMEOUT, $milisecond);
         return $this;
     }
 
     public function setRawPost($string) {
         $this->post_data = $string;
-        $this->set_opt(CURLOPT_POST, true);
-        $this->set_opt(CURLOPT_POSTFIELDS, $string);
+        $this->setOpt(CURLOPT_POST, true);
+        $this->setOpt(CURLOPT_POSTFIELDS, $string);
         return $this;
     }
 
     public function setPost(array $data) {
         $this->post_data = $data;
         $post_data = curl::asPostString($data);
-        $this->set_opt(CURLOPT_POST, true);
-        $this->set_opt(CURLOPT_POSTFIELDS, $post_data);
+        $this->setOpt(CURLOPT_POST, true);
+        $this->setOpt(CURLOPT_POSTFIELDS, $post_data);
         return $this;
     }
 
     public function setSSL() {
-        $this->set_opt(CURLOPT_SSL_VERIFYPEER, false);
-        $this->set_opt(CURLOPT_SSL_VERIFYHOST, false);
+        $this->setOpt(CURLOPT_SSL_VERIFYPEER, false);
+        $this->setOpt(CURLOPT_SSL_VERIFYHOST, false);
         return $this;
     }
 
     public function setReferrer($referrer) {
-        $this->set_opt(CURLOPT_REFERER, $referrer);
+        $this->setOpt(CURLOPT_REFERER, $referrer);
         return $this;
     }
 
     public function setUserAgent($useragent) {
-        $this->set_opt(CURLOPT_USERAGENT, $useragent);
+        $this->setOpt(CURLOPT_USERAGENT, $useragent);
         return $this;
     }
 
     public function setHttpHeader($http_header) {
-        $this->set_opt(CURLOPT_HTTPHEADER, $http_header);
+        $this->setOpt(CURLOPT_HTTPHEADER, $http_header);
         return $this;
     }
 

@@ -39,6 +39,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static CModel_Query|static whereNotIn($column, $values)
  * @method static CModel_Query|static whereNull($column)
  * @method static CModel_Query|static whereNotNull($column)
+ * @method static CModel_Query|static whereDoesntHave($table, Closure $callback)
  * @method static CModel_Query|static orWhereRaw($sql, array $bindings = [])
  * @method static CModel_Query|static orWhereBetween($column, array $values)
  * @method static CModel_Query|static orWhereNotBetween($column, array $values)
@@ -56,10 +57,16 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method static CModel_Query|static select($columns = ['*'])
  * @method static CModel_Query|static groupBy(...$groups)
  * @method static CModel_Query|static from($table)
+ * @method static CModel_Query|static newQuery()
+ * @method static CModel_Query|static withTrashed()
  * @method static CModel_Query|static leftJoinSub($query, $as, $first, $operator = null, $second = null)
- * @method static Cmodel_Query|static addSelect($column)
+ * @method static CModel_Query|static addSelect($column)
  * @method static CModel_Query|static selectRaw($expression, array $bindings = [])
  * @method static CModel_Query|static orderBy($column, $direction = 'asc')
+ * @method static CModel_Query|static skip($value)
+ * @method static CModel_Query|static offset($value)
+ * @method static CModel_Query|static take($value)
+ * @method static CModel_Query|static limit($value)
  */
 abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_Jsonable, CQueue_QueueableEntityInterface {
     use CModel_Trait_GuardsAttributes,
@@ -214,6 +221,13 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     const DELETEDBY = 'deletedby';
 
     /**
+     * The name of the "status" column.
+     *
+     * @var string
+     */
+    const STATUS = 'status';
+
+    /**
      * The array of mapping model class
      *
      * @var array
@@ -247,7 +261,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     }
 
     /**
-     * Create a new Eloquent model instance.
+     * Create a new model instance.
      *
      * @param array $attributes
      *

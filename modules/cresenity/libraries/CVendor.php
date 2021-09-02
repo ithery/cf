@@ -11,7 +11,11 @@ class CVendor {
      *
      * @return \CVendor_DigitalOcean
      */
-    public static function digitalOcean($accessToken) {
+    public static function digitalOcean($accessToken = null) {
+        if ($accessToken == null) {
+            $accessToken = CF::config('vendor.digitalOcean.accessToken');
+        }
+
         return new CVendor_DigitalOcean($accessToken);
     }
 
@@ -152,6 +156,9 @@ class CVendor {
     public static function sendGrid($apiKey = null, $options = []) {
         if (strlen($apiKey) == 0) {
             $apiKey = ccfg::get('smtp_password');
+        }
+        if (strlen($apiKey) == 0) {
+            $apiKey = CF::config('vendor.sendgrid.apiKey');
         }
 
         return new CVendor_SendGrid($apiKey, $options);

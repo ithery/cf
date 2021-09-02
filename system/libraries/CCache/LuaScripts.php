@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CCache_LuaScripts {
-
     /**
      * Get the Lua script to atomically release a lock.
      *
@@ -24,5 +23,4 @@ else
 end
 LUA;
     }
-
 }

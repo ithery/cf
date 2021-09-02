@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -21,15 +19,13 @@ use League\CommonMark\Environment\Environment;
 /**
  * Converts CommonMark-compatible Markdown to HTML.
  */
-final class CommonMarkConverter extends MarkdownConverter
-{
+final class CommonMarkConverter extends MarkdownConverter {
     /**
      * Create a new commonmark converter instance.
      *
      * @param array<string, mixed> $config
      */
-    public function __construct(array $config = [])
-    {
+    public function __construct(array $config = []) {
         $environment = Environment::createCommonMarkEnvironment();
         $environment->mergeConfig($config);
 

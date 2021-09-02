@@ -18,62 +18,121 @@ class CElement_Component_DataTable extends CElement_Component {
         '100' => '100',
         '-1' => 'ALL',
     ];
+
     public $current_row = 1;
+
     public $dbName;
+
     public $dbConfig;
+
     public $columns;
+
     public $footerTitle;
+
     public $footer;
+
     public $footer_field;
+
     public $requires = [];
+
     public $data;
+
     public $keyField;
+
     public $checkbox;
+
     public $checkboxColumnWidth;
+
     public $checkbox_value;
+
     public $numbering;
+
     public $query;
+
     public $customColumnHeader;
+
     public $header_sortable;
+
     public $cellCallbackFunc;
+
     public $filterActionCallbackFunc;
+
     public $display_length;
+
     public $paging_list;
+
     public $responsive;
+
     public $options;
+
     public $applyDataTable;
+
     public $group_by;
+
     public $title;
+
     public $ajax;
+
     public $ajax_method;
+
     public $icon;
+
     public $editable_form;
+
     public $can_edit;
+
     public $can_add;
+
     public $can_delete;
+
     public $can_view;
+
     public $headerNoLineBreak;
+
     public $pdf_font_size;
+
     public $pdf_orientation;
+
     public $show_header;
+
     public $isElastic = false;
+
     public $isCallback = false;
+
     public $callbackRequire = null;
+
     public $callbackOptions = null;
+
     public $searchPlaceholder = '';
+
     public $infoText = '';
+
+    protected $isModelQuery = false;
+
     protected $actionLocation = 'last';
+
     protected $haveRowSelection = false;
+
     protected $tableStriped;
+
     protected $tableBordered;
+
     protected $quick_search = false;
+
     protected $tbodyId;
+
     protected $js_cell;
+
     protected $dom = null;
+
     protected $widget_title;
+
     protected $fixedColumn;
+
     protected $scrollX;
+
     protected $scrollY;
+
     protected $dbResolver;
 
     public function __construct($id = '') {
@@ -580,6 +639,21 @@ class CElement_Component_DataTable extends CElement_Component {
             $this->data = $r->result(false);
         }
         $this->query = $q;
+        return $this;
+    }
+
+    /**
+     * @param string $q
+     *
+     * @return $this
+     */
+    public function setDataFromModelQuery(CModel_Query $q) {
+        if ($this->ajax == false) {
+            $r = $q->get();
+            $this->data = $r;
+        }
+        $this->query = $q;
+
         return $this;
     }
 

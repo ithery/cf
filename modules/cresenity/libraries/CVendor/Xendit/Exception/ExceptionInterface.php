@@ -1,5 +1,5 @@
 <?php
-interface CVendor_Xendit_Exception_ExceptionInterface extends \Throwable {
+interface CVendor_Xendit_Exception_ExceptionInterface {
     /**
      * Get error code for the exception instance
      *

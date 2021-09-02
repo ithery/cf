@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use SuperClosure\SerializableClosure;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 class CJob {
-
     use CJob_SerializerTrait;
 
     /**
@@ -40,6 +33,7 @@ class CJob {
 
     /**
      * @param array $config
+     * @param mixed $script
      */
     public function __construct($script, array $config = []) {
         $this->setConfig($this->getDefaultConfig());
@@ -125,11 +119,8 @@ class CJob {
         if (!(isset($config['command']) xor isset($config['closure']))) {
             throw new Exception("Either 'command' or 'closure' is required for '$job' job");
         }
-        if (isset($config['command']) &&
-                (
-                $config['command'] instanceof Closure ||
-                $config['command'] instanceof SerializableClosure
-                )
+        if (isset($config['command'])
+            && ($config['command'] instanceof Closure || $config['command'] instanceof SerializableClosure)
         ) {
             $config['closure'] = $config['command'];
             unset($config['command']);
@@ -182,6 +173,7 @@ class CJob {
     }
 
     // @codeCoverageIgnoreStart
+
     /**
      * @param string $job
      * @param array  $config
@@ -191,10 +183,11 @@ class CJob {
         // http://us3.php.net/manual/en/function.exec.php#43834
         $binary = $this->getPhpBinary();
         $command = $this->getExecutableCommand($job, $config);
-        pclose(popen("start \"blah\" /B \"$binary\" $command", "r"));
+        pclose(popen("start \"blah\" /B \"$binary\" $command", 'r'));
     }
 
     // @codeCoverageIgnoreEnd
+
     /**
      * @param string $job
      * @param array  $config
@@ -223,7 +216,6 @@ class CJob {
     }
 
     public static function cliRunner($parameter = null) {
-
         $argv = carr::get($_SERVER, 'argv');
         if ($parameter == null) {
             $parameter = $argv[3];
@@ -252,5 +244,4 @@ class CJob {
     public static function onBackgroundJobPostRun($callback) {
         CJob_EventManager::addEventCallback(CJob_Events::onBackgroundJobPostRun, $callback);
     }
-
 }

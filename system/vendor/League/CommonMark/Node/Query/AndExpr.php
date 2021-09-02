@@ -18,8 +18,7 @@ use League\CommonMark\Node\Node;
 /**
  * @internal
  */
-final class AndExpr implements ExpressionInterface
-{
+final class AndExpr implements ExpressionInterface {
     /**
      * @var callable[]
      * @psalm-var list<callable(Node): bool>
@@ -29,23 +28,20 @@ final class AndExpr implements ExpressionInterface
     /**
      * @psalm-param callable(Node): bool $expressions
      */
-    public function __construct(callable ...$expressions)
-    {
+    public function __construct(...$expressions) {
         $this->conditions = $expressions;
     }
 
     /**
      * @param callable(Node): bool $expression
      */
-    public function add(callable $expression): void
-    {
+    public function add($expression) {
         $this->conditions[] = $expression;
     }
 
-    public function __invoke(Node $node): bool
-    {
+    public function __invoke(Node $node) {
         foreach ($this->conditions as $condition) {
-            if (! $condition($node)) {
+            if (!$condition($node)) {
                 return false;
             }
         }

@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
+class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CView_CompilerInterface {
     use CView_Compiler_BladeCompiler_CompileCommentTrait,
         CView_Compiler_BladeCompiler_CompileComponentTrait,
         CView_Compiler_BladeCompiler_CompileConditionalTrait,
@@ -747,5 +747,12 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract {
      */
     public function withoutComponentTags() {
         $this->compilesComponentTags = false;
+    }
+
+    public function clearCompiled() {
+        $path = CF::config('view.compiled');
+        $files = glob($path . '/*');
+
+        CFile::delete($files);
     }
 }

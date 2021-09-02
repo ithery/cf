@@ -1,33 +1,22 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CApp_Api_Method_Server_Temp_ListFile extends CApp_Api_Method_Server_Temp_Abstract {
-
     public function execute() {
-
-
         $errCode = 0;
         $errMessage = '';
         $domain = $this->method->domain();
         $request = $this->method->request();
         $directory = carr::get($request, 'directory');
         $allFiles = cfs::list_files(DOCROOT . 'temp/' . ltrim($directory, '/'));
-        $files = array();
+        $files = [];
         foreach ($allFiles as $filename) {
-
-
-            $file = array(
+            $file = [
                 'filename' => $filename,
                 'created' => date('Y-m-d H:i:s', filemtime($filename)),
-            );
+            ];
             $files[] = $file;
         }
-        $data = array();
+        $data = [];
         $data['list'] = $files;
         $data['count'] = count($files);
 
@@ -37,5 +26,4 @@ class CApp_Api_Method_Server_Temp_ListFile extends CApp_Api_Method_Server_Temp_A
 
         return $data;
     }
-
 }

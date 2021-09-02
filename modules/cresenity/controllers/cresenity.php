@@ -285,8 +285,6 @@ class Controller_Cresenity extends CController {
             throw new Exception('PHP fileinfo extension must be installed/enabled to use avatar endpoint.');
         }
 
-        ob_start('ob_gzhandler');
-
         $engineName = 'Initials';
         switch ($method) {
             case 'initials':
@@ -294,7 +292,9 @@ class Controller_Cresenity extends CController {
                 break;
         }
 
+        ob_start('ob_gzhandler');
         $avatarApi = CImage::avatar()->api($engineName);
+
         /*
         if (!isset($_GET['noheader'])) {
             header('Content-type: image/png');
@@ -304,6 +304,7 @@ class Controller_Cresenity extends CController {
         }
         $avatarApi->render();
         */
+
         $headers = [
             'Content-Type' => 'image/png',
             'Pragma' => 'public',

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 20, 2019, 3:09:11 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 20, 2019, 3:09:11 PM
  */
 class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Handler {
-
     use CTrait_Compat_Handler_Driver_Dialog,
         CObservable_Listener_Handler_Trait_AjaxHandlerTrait,
         CObservable_Listener_Handler_Trait_TargetHandlerTrait,
@@ -16,24 +16,32 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         CTrait_Element_Property_Title;
 
     protected $content;
+
     protected $param;
+
     protected $actions;
+
     protected $param_inputs;
+
     protected $param_request;
+
     protected $isSidebar;
+
     protected $isFull;
+
     protected $modalClass;
+
     protected $backdrop;
 
     public function __construct($listener) {
         parent::__construct($listener);
-        $this->name = "Dialog";
-        $this->method = "get";
-        $this->target = "";
+        $this->name = 'Dialog';
+        $this->method = 'get';
+        $this->target = '';
         $this->content = CHandlerElement::factory();
-        $this->actions = CActionList::factory();
-        $this->param_inputs = array();
-        $this->param_request = array();
+        $this->actions = CElement_List_ActionList::factory();
+        $this->param_inputs = [];
+        $this->param_request = [];
         $this->title = 'Detail';
         $this->js_class = null;
         $this->js_class_manual = null;
@@ -43,9 +51,10 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         $this->isSidebar = $bool;
         return $this;
     }
+
     public function setFull($bool = true) {
         $this->isFull = $bool;
-        
+
         return $this;
     }
 
@@ -61,7 +70,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
 
     public function addParamInput($inputs) {
         if (!is_array($inputs)) {
-            $inputs = array($inputs);
+            $inputs = [$inputs];
         }
         foreach ($inputs as $inp) {
             $this->param_inputs[] = $inp;
@@ -69,9 +78,9 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         return $this;
     }
 
-    public function add_param_request($param_request) {
+    public function addParamRequest($param_request) {
         if (!is_array($param_request)) {
-            $param_request = array($param_request);
+            $param_request = [$param_request];
         }
         foreach ($param_request as $req_k => $req_v) {
             $this->param_request[$req_k] = $req_v;
@@ -79,7 +88,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
         return $this;
     }
 
-    public function set_method($method) {
+    public function setMethod($method) {
         $this->method = $method;
         return $this;
     }
@@ -91,7 +100,7 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
     public function js() {
         $js = '';
         if (strlen($this->target) == 0) {
-            $this->target = "modal_opt_" . $this->event . "_" . $this->owner . "_dialog";
+            $this->target = 'modal_opt_' . $this->event . '_' . $this->owner . '_dialog';
         }
 
         $dataAddition = '';
@@ -112,11 +121,11 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
 
         $generatedUrl = $this->generatedUrl();
 
-        $reloadOptions = "{";
+        $reloadOptions = '{';
         $reloadOptions .= "url:'" . $generatedUrl . "',";
         $reloadOptions .= "method:'" . $this->method . "',";
-        $reloadOptions .= "dataAddition:" . $dataAddition . ",";
-        $reloadOptions .= "}";
+        $reloadOptions .= 'dataAddition:' . $dataAddition . ',';
+        $reloadOptions .= '}';
 
         $backdropValue = "'static'";
 
@@ -124,19 +133,19 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
             $backdropValue = $this->backdrop ? 'true' : 'false';
         }
 
-        $jsOptions = "{";
+        $jsOptions = '{';
         $jsOptions .= "selector:'#" . $this->target . "',";
         $jsOptions .= "title:'" . $this->title . "',";
         $jsOptions .= "modalClass:'" . $this->modalClass . "',";
-        $jsOptions .= "backdrop:" . $backdropValue . ",";
-        $jsOptions .= "reload:" . $reloadOptions . ",";
+        $jsOptions .= 'backdrop:' . $backdropValue . ',';
+        $jsOptions .= 'reload:' . $reloadOptions . ',';
         if ($this->haveCloseListener()) {
-            $jsOptions .= "onClose:" . $this->getCloseListener()->js() . ",";
+            $jsOptions .= 'onClose:' . $this->getCloseListener()->js() . ',';
         }
-        $jsOptions .= "isSidebar:" . ($this->isSidebar ? 'true' : 'false') . ",";
-        $jsOptions .= "isFull:" . ($this->isFull ? 'true' : 'false') . ",";
+        $jsOptions .= 'isSidebar:' . ($this->isSidebar ? 'true' : 'false') . ',';
+        $jsOptions .= 'isFull:' . ($this->isFull ? 'true' : 'false') . ',';
 
-        $jsOptions .= "}";
+        $jsOptions .= '}';
 
         $js_class = ccfg::get('js_class');
         if (strlen($js_class) > 0) {
@@ -152,24 +161,22 @@ class CObservable_Listener_Handler_DialogHandler extends CObservable_Listener_Ha
                 $content = $this->content;
             }
             $content = addslashes($content);
-            $content = str_replace("\r\n", "", $content);
+            $content = str_replace("\r\n", '', $content);
             if (strlen(trim($content)) == 0) {
                 $content = $this->generatedUrl();
             }
-            $js .= "
-                $." . $this->js_class . ".show_dialog('" . $this->target . "','" . $this->title . "','" . $content . "');
+            $js .= '
+                $.' . $this->js_class . ".show_dialog('" . $this->target . "','" . $this->title . "','" . $content . "');
             ";
         } else {
-
-            $js .= "
+            $js .= '
             if(cresenity) {
-                cresenity.modal(" . $jsOptions . ");
+                cresenity.modal(' . $jsOptions . ");
             } else {
-                 $.cresenity.show_dialog('" . $this->target . "','" . $generatedUrl . "','" . $this->method . "'," . $jsOptions . "," . $dataAddition . ");
+                 $.cresenity.show_dialog('" . $this->target . "','" . $generatedUrl . "','" . $this->method . "'," . $jsOptions . ',' . $dataAddition . ');
             }
-         ";
+         ';
         }
         return $js;
     }
-
 }

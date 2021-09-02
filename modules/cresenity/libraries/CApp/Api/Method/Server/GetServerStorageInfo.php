@@ -1,30 +1,28 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 14, 2018, 4:40:47 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 14, 2018, 4:40:47 AM
  */
 class CApp_Api_Method_Server_GetServerStorageInfo extends CApp_Api_Method_Server {
-
     public function execute() {
         $errCode = 0;
         $errMessage = '';
         $domain = $this->domain;
 
-
-        $data = array();
+        $data = [];
 
         try {
             $serverStorage = CServer::storage();
 
-            $dataStorage = array();
+            $dataStorage = [];
             $dataStorage['total'] = $serverStorage->getTotalSpace();
             $dataStorage['free'] = $serverStorage->getFreeSpace();
             $dataStorage['used'] = $dataStorage['total'] - $dataStorage['free'];
-
 
             $diskDevices = CServer::storage()->getDiskDevices();
             $dataDevices = [];
@@ -38,7 +36,6 @@ class CApp_Api_Method_Server_GetServerStorageInfo extends CApp_Api_Method_Server
                 $totalDisk = $device->getTotal();
                 $usedPercent = $usedDisk * 100 / $totalDisk;
                 $usedPercent = min(ceil($usedPercent * 100) / 100, 100);
-
 
                 $dataDevice['free'] = $freeDisk;
                 $dataDevice['used'] = $usedDisk;
@@ -65,5 +62,4 @@ class CApp_Api_Method_Server_GetServerStorageInfo extends CApp_Api_Method_Server
 
         return $this;
     }
-
 }

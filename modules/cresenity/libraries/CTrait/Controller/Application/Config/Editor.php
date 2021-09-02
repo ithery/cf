@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 17, 2019, 1:43:03 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 17, 2019, 1:43:03 AM
  */
 trait CTrait_Controller_Application_Config_Editor {
-
     protected function getTitle() {
         return '';
     }
@@ -42,7 +42,6 @@ trait CTrait_Controller_Application_Config_Editor {
     }
 
     public function index() {
-
         $app = CApp::instance();
 
         $app->title($this->computeTitle());
@@ -58,8 +57,8 @@ trait CTrait_Controller_Application_Config_Editor {
         $table->setApplyDataTable(false);
         //$table->setRowActionStyle('btn-dropdown');
         if ($this->canEdit()) {
-            $table->addRowAction()->setLabel("Edit")->setIcon('fas fa-edit')->addClass('btn-primary')
-                    ->setLink($this->baseUri() . '/edit/{key}');
+            $table->addRowAction()->setLabel('Edit')->setIcon('fas fa-edit')->addClass('btn-primary')
+                ->setLink($this->baseUri() . '/edit/{key}');
         }
 
         echo $app->render();
@@ -78,16 +77,14 @@ trait CTrait_Controller_Application_Config_Editor {
         $config = CConfig::instance($this->getConfigGroup());
         $appConfigFile = CF::appPath() . 'default/config/' . $this->getConfigGroup() . EXT;
         //find record for this key
-        $configRecord = array();
+        $configRecord = [];
 
         foreach ($config->getConfigData() as $d) {
-
             if (carr::get($d, 'key') == $key) {
                 $configRecord = $d;
                 break;
             }
         }
-
 
         $value = carr::get($configRecord, 'value');
         $file = carr::get($configRecord, 'file');
@@ -103,7 +100,7 @@ trait CTrait_Controller_Application_Config_Editor {
             if (gettype($newValueCasted) !== $type) {
                 settype($newValueCasted, $type);
             }
-            $currentConfig = array();
+            $currentConfig = [];
             if (file_exists($appConfigFile)) {
                 $currentConfig = include $appConfigFile;
             }
@@ -130,7 +127,7 @@ trait CTrait_Controller_Application_Config_Editor {
             $keyControlType = 'label';
         }
         $valueControlType = 'text';
-        $controlList = array();
+        $controlList = [];
 
         if (is_array($value)) {
             $valueControlType = 'select-tag';
@@ -138,7 +135,7 @@ trait CTrait_Controller_Application_Config_Editor {
         if (is_bool($value)) {
             $valueControlType = 'select';
             $controlList = CConstant::yesNoList();
-            $value = $value ? "1" : "0";
+            $value = $value ? '1' : '0';
         }
         $form->addField()->setLabel('Config Location')->addControl('file', 'label')->setValue($file);
         $form->addField()->setLabel('Type')->addControl('type', 'label')->setValue($type);
@@ -147,11 +144,10 @@ trait CTrait_Controller_Application_Config_Editor {
         if ($valueControlType == 'select') {
             $valueControl->setList($controlList);
         }
-        if(strlen($comment)>0) {
+        if (strlen($comment) > 0) {
             $form->addDiv()->setHaveIndent(false)->addClass('console')->add(trim($comment));
         }
         $form->addActionList()->addAction()->setLabel('Submit')->setSubmit()->setConfirm();
         echo $app->render();
     }
-
 }

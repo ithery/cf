@@ -1,12 +1,11 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
-
+defined('SYSPATH') or die('No direct access allowed.');
 
 $session = CSession::instance();
-$user = $session->get("user");
-$role_id = "";
-$username = "";
-$user_id = "";
+$user = $session->get('user');
+$role_id = '';
+$username = '';
+$user_id = '';
 if ($user) {
     $role_id = $user->role_id;
     $user_id = $user->user_id;
@@ -16,7 +15,7 @@ $app = CApp::instance();
 $org = $app->org();
 ?>
 <!DOCTYPE html>
-<html class="no-js" lang="<?php echo clang::getlang(); ?>" >
+<html class="no-js capp-legacy" lang="<?php echo clang::getlang(); ?>" >
     <head>
         <meta charset="utf-8">
         <title><?php echo $title; ?></title>
@@ -43,11 +42,11 @@ $org = $app->org();
 
                     <a class="brand" href="<?php echo curl::base(); ?>">
                         <?php
-                        $web_title = ccfg::get("title");
+                        $web_title = ccfg::get('title');
                         //if($org!=null) $web_title = strtoupper($org->name);
                         echo $web_title;
-                        ?>			
-                    </a>		
+                        ?>
+                    </a>
                     <span id="servertime">
                     </span>
                     <div class="nav-collapse">
@@ -69,10 +68,10 @@ $org = $app->org();
                             <li >
                                 <?php
                                 $show_nav = CApp_Var::getVar('NAV_MENU_SHOW', $user_id);
-                                if ($show_nav == null)
+                                if ($show_nav == null) {
                                     $show_nav = true;
-                                if ($show_nav):
-                                    ?>
+                                }
+                                if ($show_nav) :?>
                                     <a href="javascript:void(0)" id="toggle-subnavbar">
                                         <i class="icon-th"></i>
                                         <span>Hide</span>
@@ -86,7 +85,7 @@ $org = $app->org();
                                 <?php endif; ?>
 
                             </li>
-                            <?php if (ccfg::get("multilang")): ?>
+                            <?php if (ccfg::get('multilang')): ?>
                                 <li class="dropdown">
 
                                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
@@ -99,9 +98,10 @@ $org = $app->org();
                                         <?php
                                         $list = clang::get_lang_list();
                                         foreach ($list as $k => $v) {
-                                            $active = "";
-                                            if ($k == clang::getlang())
-                                                $active = "active";
+                                            $active = '';
+                                            if ($k == clang::getlang()) {
+                                                $active = 'active';
+                                            }
                                             $img = '<img style="padding-right:10px;display:inline-block;margin-top:-3px;" src="' . curl::base() . 'media/img/flags/' . $k . '.gif" />';
                                             echo '<li class="' . $active . '"><a href="' . curl::base() . 'cresenity/change_lang/' . $k . '" hreflang="' . $k . '">' . $img . ' ' . $v . '</a></li>';
                                         }
@@ -111,27 +111,11 @@ $org = $app->org();
 
                                 </li>
                             <?php endif; ?>
-                            <?php if (ccfg::get("change_theme")): ?>
-                                <li class="dropdown">
-                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                        <?php echo clang::__('Theme'); ?> <b class="caret"></b>
-                                    </a>
-                                    <ul class="dropdown-menu">
-                                        <?php
-                                        $theme_list = ctheme::get_theme_list();
-                                        foreach ($theme_list as $k => $v) {
-                                            if ($k != ctheme::get_current_theme()) {
-                                                echo '<li><a href="' . curl::base() . 'cresenity/change_theme/' . $k . '">' . $v . '</a></li>';
-                                            }
-                                        }
-                                        ?>
-                                    </ul>
-                                </li>
-                            <?php endif; ?>
+
                             <li class="dropdown">
 
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                    <i class="icon-user"></i> 
+                                    <i class="icon-user"></i>
                                     <?php echo $username; ?>
                                     <b class="caret"></b>
                                 </a>
@@ -156,7 +140,7 @@ $org = $app->org();
                                 <input type="text" class="search-query" placeholder="Search">
                         </form>
                         -->
-                    </div><!--/.nav-collapse -->	
+                    </div><!--/.nav-collapse -->
 
                 </div> <!-- /container -->
 
@@ -164,7 +148,7 @@ $org = $app->org();
 
         </div> <!-- /navbar -->
 
-        <div class="subnavbar" id="subnavbar" <?php if (!$show_nav) echo 'style="display:none"'; ?>>
+        <div class="subnavbar" id="subnavbar" <?php echo(!$show_nav ? 'style="display:none"' : ''); ?>>
 
             <div class="subnavbar-inner">
 
@@ -204,12 +188,13 @@ $org = $app->org();
                     <?php endif; ?>
                     <?php if ($show_breadcrumb): ?>
                         <?php
-                        if ($breadcrumb == "")
+                        if ($breadcrumb == '') {
                             $breadcrumb = $title;
-                        if (!is_array($breadcrumb))
-                            $breadcrumb = array();
-                        if (CFRouter::$controller != "home"):
-                            ?>
+                        }
+                        if (!is_array($breadcrumb)) {
+                            $breadcrumb = [];
+                        }
+                        if (CFRouter::$controller != 'home') :?>
                             <div id="breadcrumb">
                                 <a href="<?php echo curl::base(); ?>" class="tip-left" data-original-title="Go to Home"><i class="icon-home"></i> Home</a>
                                 <?php foreach ($breadcrumb as $k => $b) : ?>
@@ -231,7 +216,7 @@ $org = $app->org();
 
                     <?php echo $content; ?>
 
-                    <?php defined('SYSPATH') OR die('No direct access allowed.'); ?>
+                    <?php defined('SYSPATH') or die('No direct access allowed.'); ?>
 
 
                 </div>
@@ -272,12 +257,10 @@ echo $ready_client_script;
     </body>
 </html>
 <?php
-if (ccfg::get("log_request")) {
+if (ccfg::get('log_request')) {
     $user = CApp::instance()->user();
     if ($user != null) {
-
         clog::request($user->user_id);
     }
 }
 ?>
-				
