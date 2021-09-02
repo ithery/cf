@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 8:54:25 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 8:54:25 AM
  */
 
 /**
@@ -14,12 +15,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * uses the InnoDB storage engine.
  */
 class CDatabase_Platform_Mysql extends CDatabase_Platform {
-
     const LENGTH_LIMIT_TINYTEXT = 255;
+
     const LENGTH_LIMIT_TEXT = 65535;
+
     const LENGTH_LIMIT_MEDIUMTEXT = 16777215;
+
     const LENGTH_LIMIT_TINYBLOB = 255;
+
     const LENGTH_LIMIT_BLOB = 65535;
+
     const LENGTH_LIMIT_MEDIUMBLOB = 16777215;
 
     /**
@@ -121,11 +126,11 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
         if ($currentDatabase) {
             $currentDatabase = $this->quoteStringLiteral($currentDatabase);
             $table = $this->quoteStringLiteral($table);
-            return 'SELECT NON_UNIQUE AS Non_Unique, INDEX_NAME AS Key_name, COLUMN_NAME AS Column_Name,' .
-                    ' SUB_PART AS Sub_Part, INDEX_TYPE AS Index_Type' .
-                    ' FROM information_schema.STATISTICS WHERE TABLE_NAME = ' . $table .
-                    ' AND TABLE_SCHEMA = ' . $currentDatabase .
-                    ' ORDER BY SEQ_IN_INDEX ASC';
+            return 'SELECT NON_UNIQUE AS Non_Unique, INDEX_NAME AS Key_name, COLUMN_NAME AS Column_Name,'
+                    . ' SUB_PART AS Sub_Part, INDEX_TYPE AS Index_Type'
+                    . ' FROM information_schema.STATISTICS WHERE TABLE_NAME = ' . $table
+                    . ' AND TABLE_SCHEMA = ' . $currentDatabase
+                    . ' ORDER BY SEQ_IN_INDEX ASC';
         }
         return 'SHOW INDEX FROM ' . $table;
     }
@@ -136,7 +141,7 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
     public function getListViewsSQL($database) {
         $database = $this->quoteStringLiteral($database);
 
-        return "SELECT * FROM information_schema.VIEWS WHERE TABLE_SCHEMA = " . $database;
+        return 'SELECT * FROM information_schema.VIEWS WHERE TABLE_SCHEMA = ' . $database;
     }
 
     /**
@@ -149,17 +154,17 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
             $database = $this->quoteStringLiteral($database);
         }
 
-        $sql = "SELECT DISTINCT k.`CONSTRAINT_NAME`, k.`COLUMN_NAME`, k.`REFERENCED_TABLE_NAME`, " .
-                "k.`REFERENCED_COLUMN_NAME` /*!50116 , c.update_rule, c.delete_rule */ " .
-                "FROM information_schema.key_column_usage k /*!50116 " .
-                "INNER JOIN information_schema.referential_constraints c ON " .
-                "  c.constraint_name = k.constraint_name AND " .
-                "  c.table_name = $table */ WHERE k.table_name = $table";
+        $sql = 'SELECT DISTINCT k.`CONSTRAINT_NAME`, k.`COLUMN_NAME`, k.`REFERENCED_TABLE_NAME`, '
+                . 'k.`REFERENCED_COLUMN_NAME` /*!50116 , c.update_rule, c.delete_rule */ '
+                . 'FROM information_schema.key_column_usage k /*!50116 '
+                . 'INNER JOIN information_schema.referential_constraints c ON '
+                . '  c.constraint_name = k.constraint_name AND '
+                . "  c.table_name = $table */ WHERE k.table_name = $table";
 
         $databaseNameSql = isset($database) && $database != null ? $database : 'DATABASE()';
 
         $sql .= " AND k.table_schema = $databaseNameSql /*!50116 AND c.constraint_schema = $databaseNameSql */";
-        $sql .= " AND k.`REFERENCED_COLUMN_NAME` is not NULL";
+        $sql .= ' AND k.`REFERENCED_COLUMN_NAME` is not NULL';
 
         return $sql;
     }
@@ -261,12 +266,12 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
      * Obtain DBMS specific SQL code portion needed to set the COLLATION
      * of a field declaration to be used in statements like CREATE TABLE.
      *
-     * @deprecated Deprecated since version 2.5, Use {@link self::getColumnCollationDeclarationSQL()} instead.
-     *
      * @param string $collation name of the collation
      *
-     * @return string  DBMS specific SQL code portion needed to set the COLLATION
-     *                 of a field declaration.
+     * @return string DBMS specific SQL code portion needed to set the COLLATION
+     *                of a field declaration
+     *
+     * @deprecated Deprecated since version 2.5, Use {@link self::getColumnCollationDeclarationSQL()} instead.
      */
     public function getCollationFieldDeclaration($collation) {
         return $this->getColumnCollationDeclarationSQL($collation);
@@ -324,21 +329,23 @@ class CDatabase_Platform_Mysql extends CDatabase_Platform {
             $database = 'DATABASE()';
         }
 
-        return 'SELECT COLUMN_NAME AS Field, COLUMN_TYPE AS Type, IS_NULLABLE AS `Null`, ' .
-                'COLUMN_KEY AS `Key`, COLUMN_DEFAULT AS `Default`, EXTRA AS Extra, COLUMN_COMMENT AS Comment, ' .
-                'CHARACTER_SET_NAME AS CharacterSet, COLLATION_NAME AS Collation ' .
-                'FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ' . $database . ' AND TABLE_NAME = ' . $table .
-                ' ORDER BY ORDINAL_POSITION ASC';
+        return 'SELECT COLUMN_NAME AS Field, COLUMN_TYPE AS Type, IS_NULLABLE AS `Null`, '
+                . 'COLUMN_KEY AS `Key`, COLUMN_DEFAULT AS `Default`, EXTRA AS Extra, COLUMN_COMMENT AS Comment, '
+                . 'CHARACTER_SET_NAME AS CharacterSet, COLLATION_NAME AS Collation '
+                . 'FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = ' . $database . ' AND TABLE_NAME = ' . $table
+                . ' ORDER BY ORDINAL_POSITION ASC';
     }
 
     public function getListTableMetadataSQL($table, $database = null) {
         return sprintf(
-                <<<'SQL'
+            <<<'SQL'
 SELECT ENGINE, AUTO_INCREMENT, TABLE_COLLATION, TABLE_COMMENT, CREATE_OPTIONS
 FROM information_schema.TABLES
 WHERE TABLE_TYPE = 'BASE TABLE' AND TABLE_SCHEMA = %s AND TABLE_NAME = %s
 SQL
-                , $database ? $this->quoteStringLiteral($database) : 'DATABASE()', $this->quoteStringLiteral($table)
+                ,
+            $database ? $this->quoteStringLiteral($database) : 'DATABASE()',
+            $this->quoteStringLiteral($table)
         );
     }
 
@@ -359,7 +366,7 @@ SQL
     /**
      * {@inheritDoc}
      */
-    protected function _getCreateTableSQL($tableName, array $columns, array $options = []) {
+    protected function protectedGetCreateTableSQL($tableName, array $columns, array $options = []) {
         $queryFields = $this->getColumnDeclarationListSQL($columns);
 
         if (isset($options['uniqueConstraints']) && !empty($options['uniqueConstraints'])) {
@@ -464,7 +471,7 @@ SQL
         if (isset($options['comment'])) {
             $comment = trim($options['comment'], " '");
 
-            $tableOptions[] = sprintf("COMMENT = %s ", $this->quoteStringLiteral($comment));
+            $tableOptions[] = sprintf('COMMENT = %s ', $this->quoteStringLiteral($comment));
         }
 
         // Row format
@@ -568,10 +575,12 @@ SQL
 
         if (!$this->onSchemaAlterTable($diff, $tableSql)) {
             if (count($queryParts) > 0) {
-                $sql[] = 'ALTER TABLE ' . $diff->getName($this)->getQuotedName($this) . ' ' . implode(", ", $queryParts);
+                $sql[] = 'ALTER TABLE ' . $diff->getName($this)->getQuotedName($this) . ' ' . implode(', ', $queryParts);
             }
             $sql = array_merge(
-                    $this->getPreAlterTableIndexForeignKeySQL($diff), $sql, $this->getPostAlterTableIndexForeignKeySQL($diff)
+                $this->getPreAlterTableIndexForeignKeySQL($diff),
+                $sql,
+                $this->getPostAlterTableIndexForeignKeySQL($diff)
             );
         }
 
@@ -594,7 +603,6 @@ SQL
 
             foreach ($diff->addedIndexes as $addKey => $addIndex) {
                 if ($remIndex->getColumns() == $addIndex->getColumns()) {
-
                     $indexClause = 'INDEX ' . $addIndex->getName();
 
                     if ($addIndex->isPrimary()) {
@@ -630,15 +638,18 @@ SQL
         }
 
         $sql = array_merge(
-                $sql, $this->getPreAlterTableAlterIndexForeignKeySQL($diff), parent::getPreAlterTableIndexForeignKeySQL($diff), $this->getPreAlterTableRenameIndexForeignKeySQL($diff)
+            $sql,
+            $this->getPreAlterTableAlterIndexForeignKeySQL($diff),
+            parent::getPreAlterTableIndexForeignKeySQL($diff),
+            $this->getPreAlterTableRenameIndexForeignKeySQL($diff)
         );
 
         return $sql;
     }
 
     /**
-     * @param CDatabase_Schema_Table_Diff   $diff
-     * @param CDatabase_Schema_Index        $index
+     * @param CDatabase_Schema_Table_Diff $diff
+     * @param CDatabase_Schema_Index      $index
      *
      * @return string[]
      */
@@ -662,11 +673,10 @@ SQL
                 continue;
             }
 
-
             $column->setAutoincrement(false);
 
-            $sql[] = 'ALTER TABLE ' . $tableName . ' MODIFY ' .
-                    $this->getColumnDeclarationSQL($column->getQuotedName($this), $column->toArray());
+            $sql[] = 'ALTER TABLE ' . $tableName . ' MODIFY '
+                    . $this->getColumnDeclarationSQL($column->getQuotedName($this), $column->toArray());
 
             // original autoincrement information might be needed later on by other parts of the table alteration
             $column->setAutoincrement(true);
@@ -676,7 +686,7 @@ SQL
     }
 
     /**
-     * @param CDatabase_Schema_Table_Diff $diff The table diff to gather the SQL for.
+     * @param CDatabase_Schema_Table_Diff $diff the table diff to gather the SQL for
      *
      * @return array
      */
@@ -702,8 +712,8 @@ SQL
                 // before we can drop and recreate the primary key.
                 $column->setAutoincrement(false);
 
-                $sql[] = 'ALTER TABLE ' . $table . ' MODIFY ' .
-                        $this->getColumnDeclarationSQL($column->getQuotedName($this), $column->toArray());
+                $sql[] = 'ALTER TABLE ' . $table . ' MODIFY '
+                        . $this->getColumnDeclarationSQL($column->getQuotedName($this), $column->toArray());
 
                 // Restore the autoincrement attribute as it might be needed later on
                 // by other parts of the table alteration.
@@ -715,7 +725,7 @@ SQL
     }
 
     /**
-     * @param CDatabase_Schema_Table_Diff $diff The table diff to gather the SQL for.
+     * @param CDatabase_Schema_Table_Diff $diff the table diff to gather the SQL for
      *
      * @return array
      */
@@ -740,7 +750,7 @@ SQL
      * "Remaining" here refers to the diff between the foreign keys currently defined in the associated
      * table and the foreign keys to be removed.
      *
-     * @param CDatabase_Schema_Table_Diff $diff The table diff to evaluate.
+     * @param CDatabase_Schema_Table_Diff $diff the table diff to evaluate
      *
      * @return CDatabase_Schema_ForeignKeyConstraint[]
      */
@@ -752,7 +762,8 @@ SQL
         $foreignKeys = [];
         /** @var CDatabase_Schema_ForeignKeyConstraint[] $remainingForeignKeys */
         $remainingForeignKeys = array_diff_key(
-                $diff->fromTable->getForeignKeys(), $diff->removedForeignKeys
+            $diff->fromTable->getForeignKeys(),
+            $diff->removedForeignKeys
         );
 
         foreach ($remainingForeignKeys as $foreignKey) {
@@ -773,12 +784,13 @@ SQL
      */
     protected function getPostAlterTableIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
         return array_merge(
-                parent::getPostAlterTableIndexForeignKeySQL($diff), $this->getPostAlterTableRenameIndexForeignKeySQL($diff)
+            parent::getPostAlterTableIndexForeignKeySQL($diff),
+            $this->getPostAlterTableRenameIndexForeignKeySQL($diff)
         );
     }
 
     /**
-     * @param CDatabase_Schema_Table_Diff $diff The table diff to gather the SQL for.
+     * @param CDatabase_Schema_Table_Diff $diff the table diff to gather the SQL for
      *
      * @return array
      */
@@ -822,21 +834,21 @@ SQL
      * {@inheritDoc}
      */
     public function getIntegerTypeDeclarationSQL(array $field) {
-        return 'INT' . $this->_getCommonIntegerTypeDeclarationSQL($field);
+        return 'INT' . $this->getCommonIntegerTypeDeclarationSQL($field);
     }
 
     /**
      * {@inheritDoc}
      */
     public function getBigIntTypeDeclarationSQL(array $field) {
-        return 'BIGINT' . $this->_getCommonIntegerTypeDeclarationSQL($field);
+        return 'BIGINT' . $this->getCommonIntegerTypeDeclarationSQL($field);
     }
 
     /**
      * {@inheritDoc}
      */
     public function getSmallIntTypeDeclarationSQL(array $field) {
-        return 'SMALLINT' . $this->_getCommonIntegerTypeDeclarationSQL($field);
+        return 'SMALLINT' . $this->getCommonIntegerTypeDeclarationSQL($field);
     }
 
     /**
@@ -867,7 +879,7 @@ SQL
     /**
      * {@inheritDoc}
      */
-    protected function _getCommonIntegerTypeDeclarationSQL(array $columnDef) {
+    protected function getCommonIntegerTypeDeclarationSQL(array $columnDef) {
         $autoinc = '';
         if (!empty($columnDef['autoincrement'])) {
             $autoinc = ' AUTO_INCREMENT';
@@ -875,12 +887,11 @@ SQL
 
         return $this->getUnsignedDeclaration($columnDef) . $autoinc;
     }
-    
+
     /**
      * {@inheritDoc}
      */
-    public function getColumnCharsetDeclarationSQL($charset)
-    {
+    public function getColumnCharsetDeclarationSQL($charset) {
         return 'CHARACTER SET ' . $charset;
     }
 
@@ -937,7 +948,7 @@ SQL
      * {@inheritDoc}
      */
     public function getSetTransactionIsolationSQL($level) {
-        return 'SET SESSION TRANSACTION ISOLATION LEVEL ' . $this->_getTransactionIsolationLevelSQL($level);
+        return 'SET SESSION TRANSACTION ISOLATION LEVEL ' . $this->getTransactionIsolationLevelSQL($level);
     }
 
     /**
@@ -1076,5 +1087,4 @@ SQL
     public function getDefaultTransactionIsolationLevel() {
         return CDatabase_TransactionIsolationLevel::REPEATABLE_READ;
     }
-
 }

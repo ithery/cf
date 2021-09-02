@@ -55,7 +55,9 @@ class CDatabase {
      */
     protected $configuration;
 
-    // Configuration
+    /**
+     * @var array
+     */
     protected $config = [
         'benchmark' => true,
         'persistent' => false,
@@ -75,31 +77,6 @@ class CDatabase {
     protected $driver_name;
 
     protected $link;
-
-    // Un-compiled parts of the SQL query
-    protected $select = [];
-
-    protected $set = [];
-
-    protected $from = [];
-
-    protected $join = [];
-
-    protected $where = [];
-
-    protected $orderby = [];
-
-    protected $order = [];
-
-    protected $groupby = [];
-
-    protected $having = [];
-
-    protected $distinct = false;
-
-    protected $limit = false;
-
-    protected $offset = false;
 
     protected $last_query = '';
 

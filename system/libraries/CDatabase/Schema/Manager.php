@@ -78,7 +78,7 @@ abstract class CDatabase_Schema_Manager {
 
         $databases = $this->db->fetchAll($sql);
 
-        return $this->_getPortableDatabasesList($databases);
+        return $this->getPortableDatabasesList($databases);
     }
 
     /**
@@ -109,7 +109,7 @@ abstract class CDatabase_Schema_Manager {
 
         $sequences = $this->db->fetchAll($sql);
 
-        return $this->filterAssetNames($this->_getPortableSequencesList($sequences));
+        return $this->filterAssetNames($this->getPortableSequencesList($sequences));
     }
 
     /**
@@ -136,7 +136,7 @@ abstract class CDatabase_Schema_Manager {
 
         $tableColumns = $this->db->fetchAll($sql);
 
-        return $this->_getPortableTableColumnList($table, $database, $tableColumns);
+        return $this->getPortableTableColumnList($table, $database, $tableColumns);
     }
 
     /**
@@ -153,7 +153,7 @@ abstract class CDatabase_Schema_Manager {
 
         $tableIndexes = $this->db->fetchAll($sql);
 
-        return $this->_getPortableTableIndexesList($tableIndexes, $table);
+        return $this->getPortableTableIndexesList($tableIndexes, $table);
     }
 
     /**
@@ -178,7 +178,7 @@ abstract class CDatabase_Schema_Manager {
         $sql = $this->platform->getListTablesSQL();
 
         $tables = $this->db->fetchAll($sql);
-        $tableNames = $this->_getPortableTablesList($tables);
+        $tableNames = $this->getPortableTablesList($tables);
 
         return $this->filterAssetNames($tableNames);
     }
@@ -255,7 +255,7 @@ abstract class CDatabase_Schema_Manager {
         $sql = $this->platform->getListViewsSQL($database);
         $views = $this->db->fetchAll($sql);
 
-        return $this->_getPortableViewsList($views);
+        return $this->getPortableViewsList($views);
     }
 
     /**
@@ -273,7 +273,7 @@ abstract class CDatabase_Schema_Manager {
         $sql = $this->platform->getListTableForeignKeysSQL($table, $database);
         $tableForeignKeys = $this->db->fetchAll($sql);
 
-        return $this->_getPortableTableForeignKeysList($tableForeignKeys);
+        return $this->getPortableTableForeignKeysList($tableForeignKeys);
     }
 
     /* drop*() Methods */
@@ -288,7 +288,7 @@ abstract class CDatabase_Schema_Manager {
      * @return void
      */
     public function dropDatabase($database) {
-        $this->_execSql($this->platform->getDropDatabaseSQL($database));
+        $this->execSql($this->platform->getDropDatabaseSQL($database));
     }
 
     /**
@@ -299,7 +299,7 @@ abstract class CDatabase_Schema_Manager {
      * @return void
      */
     public function dropTable($tableName) {
-        $this->_execSql($this->platform->getDropTableSQL($tableName));
+        $this->execSql($this->platform->getDropTableSQL($tableName));
     }
 
     /**
@@ -315,7 +315,7 @@ abstract class CDatabase_Schema_Manager {
             $index = $index->getQuotedName($this->platform);
         }
 
-        $this->_execSql($this->platform->getDropIndexSQL($index, $table));
+        $this->execSql($this->platform->getDropIndexSQL($index, $table));
     }
 
     /**
@@ -327,7 +327,7 @@ abstract class CDatabase_Schema_Manager {
      * @return void
      */
     public function dropConstraint(CDatabase_Schema_Constraint $constraint, $table) {
-        $this->_execSql($this->platform->getDropConstraintSQL($constraint, $table));
+        $this->execSql($this->platform->getDropConstraintSQL($constraint, $table));
     }
 
     /**
@@ -339,7 +339,7 @@ abstract class CDatabase_Schema_Manager {
      * @return void
      */
     public function dropForeignKey($foreignKey, $table) {
-        $this->_execSql($this->platform->getDropForeignKeySQL($foreignKey, $table));
+        $this->execSql($this->platform->getDropForeignKeySQL($foreignKey, $table));
     }
 
     /**
@@ -350,7 +350,7 @@ abstract class CDatabase_Schema_Manager {
      * @return void
      */
     public function dropSequence($name) {
-        $this->_execSql($this->platform->getDropSequenceSQL($name));
+        $this->execSql($this->platform->getDropSequenceSQL($name));
     }
 
     /**
@@ -361,7 +361,7 @@ abstract class CDatabase_Schema_Manager {
      * @return void
      */
     public function dropView($name) {
-        $this->_execSql($this->platform->getDropViewSQL($name));
+        $this->execSql($this->platform->getDropViewSQL($name));
     }
 
     /* create*() Methods */
@@ -374,7 +374,7 @@ abstract class CDatabase_Schema_Manager {
      * @return void
      */
     public function createDatabase($database) {
-        $this->_execSql($this->platform->getCreateDatabaseSQL($database));
+        $this->execSql($this->platform->getCreateDatabaseSQL($database));
     }
 
     /**
@@ -386,7 +386,7 @@ abstract class CDatabase_Schema_Manager {
      */
     public function createTable(CDatabase_Schema_Table $table) {
         $createFlags = CDatabase_Platform::CREATE_INDEXES | CDatabase_Platform::CREATE_FOREIGNKEYS;
-        $this->_execSql($this->platform->getCreateTableSQL($table, $createFlags));
+        $this->execSql($this->platform->getCreateTableSQL($table, $createFlags));
     }
 
     /**
@@ -399,7 +399,7 @@ abstract class CDatabase_Schema_Manager {
      * @throws \Doctrine\DBAL\ConnectionException if something fails at database level
      */
     public function createSequence($sequence) {
-        $this->_execSql($this->platform->getCreateSequenceSQL($sequence));
+        $this->execSql($this->platform->getCreateSequenceSQL($sequence));
     }
 
     /**
@@ -411,7 +411,7 @@ abstract class CDatabase_Schema_Manager {
      * @return void
      */
     public function createConstraint(CDatabase_Schema_Constraint $constraint, $table) {
-        $this->_execSql($this->platform->getCreateConstraintSQL($constraint, $table));
+        $this->execSql($this->platform->getCreateConstraintSQL($constraint, $table));
     }
 
     /**
@@ -423,7 +423,7 @@ abstract class CDatabase_Schema_Manager {
      * @return void
      */
     public function createIndex(CDatabase_Schema_Index $index, $table) {
-        $this->_execSql($this->platform->getCreateIndexSQL($index, $table));
+        $this->execSql($this->platform->getCreateIndexSQL($index, $table));
     }
 
     /**
@@ -435,7 +435,7 @@ abstract class CDatabase_Schema_Manager {
      * @return void
      */
     public function createForeignKey(CDatabase_Schema_ForeignKeyConstraint $foreignKey, $table) {
-        $this->_execSql($this->platform->getCreateForeignKeySQL($foreignKey, $table));
+        $this->execSql($this->platform->getCreateForeignKeySQL($foreignKey, $table));
     }
 
     /**
@@ -446,7 +446,7 @@ abstract class CDatabase_Schema_Manager {
      * @return void
      */
     public function createView(CDatabase_Schema_View $view) {
-        $this->_execSql($this->platform->getCreateViewSQL($view->getQuotedName($this->platform), $view->getSql()));
+        $this->execSql($this->platform->getCreateViewSQL($view->getQuotedName($this->platform), $view->getSql()));
     }
 
     /* dropAndCreate*() Methods */
@@ -556,7 +556,7 @@ abstract class CDatabase_Schema_Manager {
         $queries = $this->platform->getAlterTableSQL($tableDiff);
         if (is_array($queries) && count($queries)) {
             foreach ($queries as $ddlQuery) {
-                $this->_execSql($ddlQuery);
+                $this->execSql($ddlQuery);
             }
         }
     }
@@ -587,10 +587,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableDatabasesList($databases) {
+    protected function getPortableDatabasesList($databases) {
         $list = [];
         foreach ($databases as $value) {
-            if ($value = $this->_getPortableDatabaseDefinition($value)) {
+            if ($value = $this->getPortableDatabaseDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -620,7 +620,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return mixed
      */
-    protected function _getPortableDatabaseDefinition($database) {
+    protected function getPortableDatabaseDefinition($database) {
         return $database;
     }
 
@@ -640,10 +640,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableFunctionsList($functions) {
+    protected function getPortableFunctionsList($functions) {
         $list = [];
         foreach ($functions as $value) {
-            if ($value = $this->_getPortableFunctionDefinition($value)) {
+            if ($value = $this->getPortableFunctionDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -656,7 +656,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return mixed
      */
-    protected function _getPortableFunctionDefinition($function) {
+    protected function getPortableFunctionDefinition($function) {
         return $function;
     }
 
@@ -665,10 +665,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableTriggersList($triggers) {
+    protected function getPortableTriggersList($triggers) {
         $list = [];
         foreach ($triggers as $value) {
-            if ($value = $this->_getPortableTriggerDefinition($value)) {
+            if ($value = $this->getPortableTriggerDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -681,7 +681,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return mixed
      */
-    protected function _getPortableTriggerDefinition($trigger) {
+    protected function getPortableTriggerDefinition($trigger) {
         return $trigger;
     }
 
@@ -690,10 +690,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableSequencesList($sequences) {
+    protected function getPortableSequencesList($sequences) {
         $list = [];
         foreach ($sequences as $value) {
-            if ($value = $this->_getPortableSequenceDefinition($value)) {
+            if ($value = $this->getPortableSequenceDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -704,12 +704,12 @@ abstract class CDatabase_Schema_Manager {
     /**
      * @param array $sequence
      *
-     * @return \Doctrine\DBAL\Schema\Sequence
+     * @return \CDatabase_Schema_Sequence
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \CDatabase_Exception
      */
-    protected function _getPortableSequenceDefinition($sequence) {
-        throw DBALException::notSupported('Sequences');
+    protected function getPortableSequenceDefinition($sequence) {
+        throw CDatabase_Exception::notSupported('Sequences');
     }
 
     /**
@@ -723,23 +723,23 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableTableColumnList($table, $database, $tableColumns) {
-        $eventManager = $this->platform->getEventManager();
+    protected function getPortableTableColumnList($table, $database, $tableColumns) {
+        $eventDispatcher = $this->platform->getEventDispatcher();
 
         $list = [];
         foreach ($tableColumns as $tableColumn) {
             $column = null;
             $defaultPrevented = false;
 
-            if (null !== $eventManager && $eventManager->hasListeners(CDatabase_Event::onSchemaColumnDefinition)) {
-                $eventArgs = new SchemaColumnDefinitionEventArgs($tableColumn, $table, $database, $this->db);
-                $eventManager->dispatchEvent(CDatabase_Event::onSchemaColumnDefinition, $eventArgs);
+            if (null !== $eventDispatcher) {
+                $eventArgs = new CDatabase_Event_Schema_OnColumnDefinition($tableColumn, $table, $database, $this->db);
+                $eventDispatcher->dispatch($eventArgs);
                 $defaultPrevented = $eventArgs->isDefaultPrevented();
                 $column = $eventArgs->getColumn();
             }
 
             if (!$defaultPrevented) {
-                $column = $this->_getPortableTableColumnDefinition($tableColumn);
+                $column = $this->getPortableTableColumnDefinition($tableColumn);
             }
             if ($column) {
                 $name = strtolower($column->getQuotedName($this->platform));
@@ -755,9 +755,9 @@ abstract class CDatabase_Schema_Manager {
      *
      * @param array $tableColumn
      *
-     * @return \Doctrine\DBAL\Schema\Column
+     * @return \CDatabase_Schema_Column
      */
-    abstract protected function _getPortableTableColumnDefinition($tableColumn);
+    abstract protected function getPortableTableColumnDefinition($tableColumn);
 
     /**
      * Aggregates and groups the index results according to the required data result.
@@ -767,7 +767,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableTableIndexesList($tableIndexRows, $tableName = null) {
+    protected function getPortableTableIndexesList($tableIndexRows, $tableName = null) {
         $result = [];
         foreach ($tableIndexRows as $tableIndex) {
             $indexName = $keyName = $tableIndex['key_name'];
@@ -790,16 +790,16 @@ abstract class CDatabase_Schema_Manager {
             }
         }
 
-        $eventManager = $this->platform->getEventManager();
+        $eventDispatcher = $this->platform->getEventDispatcher();
 
         $indexes = [];
         foreach ($result as $indexKey => $data) {
             $index = null;
             $defaultPrevented = false;
 
-            if (null !== $eventManager && $eventManager->hasListeners(CDatabase_Event::onSchemaIndexDefinition)) {
-                $eventArgs = new SchemaIndexDefinitionEventArgs($data, $tableName, $this->db);
-                $eventManager->dispatchEvent(CDatabase_Event::onSchemaIndexDefinition, $eventArgs);
+            if (null !== $eventDispatcher) {
+                $eventArgs = new CDatabase_Event_Schema_OnIndexDefinition($data, $tableName, $this->db);
+                $eventDispatcher->dispatch($eventArgs);
 
                 $defaultPrevented = $eventArgs->isDefaultPrevented();
                 $index = $eventArgs->getIndex();
@@ -822,10 +822,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableTablesList($tables) {
+    protected function getPortableTablesList($tables) {
         $list = [];
         foreach ($tables as $value) {
-            if ($value = $this->_getPortableTableDefinition($value)) {
+            if ($value = $this->getPortableTableDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -838,7 +838,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableTableDefinition($table) {
+    protected function getPortableTableDefinition($table) {
         return $table;
     }
 
@@ -847,10 +847,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableUsersList($users) {
+    protected function getPortableUsersList($users) {
         $list = [];
         foreach ($users as $value) {
-            if ($value = $this->_getPortableUserDefinition($value)) {
+            if ($value = $this->getPortableUserDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -863,7 +863,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return mixed
      */
-    protected function _getPortableUserDefinition($user) {
+    protected function getPortableUserDefinition($user) {
         return $user;
     }
 
@@ -872,10 +872,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableViewsList($views) {
+    protected function getPortableViewsList($views) {
         $list = [];
         foreach ($views as $value) {
-            if ($view = $this->_getPortableViewDefinition($value)) {
+            if ($view = $this->getPortableViewDefinition($value)) {
                 $viewName = strtolower($view->getQuotedName($this->platform));
                 $list[$viewName] = $view;
             }
@@ -889,7 +889,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return mixed
      */
-    protected function _getPortableViewDefinition($view) {
+    protected function getPortableViewDefinition($view) {
         return false;
     }
 
@@ -898,10 +898,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableTableForeignKeysList($tableForeignKeys) {
+    protected function getPortableTableForeignKeysList($tableForeignKeys) {
         $list = [];
         foreach ($tableForeignKeys as $value) {
-            if ($value = $this->_getPortableTableForeignKeyDefinition($value)) {
+            if ($value = $this->getPortableTableForeignKeyDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -914,7 +914,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return mixed
      */
-    protected function _getPortableTableForeignKeyDefinition($tableForeignKey) {
+    protected function getPortableTableForeignKeyDefinition($tableForeignKey) {
         return $tableForeignKey;
     }
 
@@ -923,9 +923,9 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return void
      */
-    protected function _execSql($sql) {
+    protected function execSql($sql) {
         foreach ((array) $sql as $query) {
-            $this->db->executeUpdate($query);
+            $this->db->query($query);
         }
     }
 
@@ -955,7 +955,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Creates the configuration for this schema.
      *
-     * @return \Doctrine\DBAL\Schema\SchemaConfig
+     * @return \CDatabase_Schema_Config
      */
     public function createSchemaConfig() {
         $schemaConfig = new CDatabase_Schema_Config();
@@ -1020,5 +1020,13 @@ abstract class CDatabase_Schema_Manager {
      */
     public function removeDoctrineTypeFromComment($comment, $type) {
         return str_replace('(DC2Type:' . $type . ')', '', $comment);
+    }
+
+    public function getDatabaseRowCount() {
+        throw CDatabase_Exception::notSupported('getDatabaseRowCount');
+    }
+
+    public function getDatabaseSize() {
+        throw CDatabase_Exception::notSupported('getDatabaseSize');
     }
 }
