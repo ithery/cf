@@ -8,13 +8,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
 class crequest {
-    // Possible HTTP methods
-    protected static $http_methods = ['get', 'head', 'options', 'post',
-        'put', 'delete'];
-
-    // Content types from client's HTTP Accept request header (array)
-    protected static $accept_types;
-
     /**
      * Returns the HTTP referrer, or the default if the referrer is not set.
      *
@@ -41,97 +34,67 @@ class crequest {
         return carr::get($_GET, 'capp_current_container_id');
     }
 
+    public static function userAgent() {
+        return CHTTP::request()->userAgent();
+    }
+
+    /**
+     * @deprecated 1.2
+     *
+     * @return string
+     */
     public static function user_agent() {
-        return CF::user_agent();
+        return static::userAgent();
     }
 
     public static function browser() {
-        return '';
-        $browser = CBrowser::instance()->browser();
-        return $browser->Browser;
+        return CHTTP::request()->browser()->getBrowser();
     }
 
+    /**
+     * @deprecated 1.2
+     *
+     * @return string
+     */
     public static function browser_version() {
-        return '';
-        $browser = CBrowser::instance()->browser();
-        return $browser->Version;
+        return static::browserVersion();
     }
 
-    public static function browser_major_version() {
-        return '';
-        $browser = CBrowser::instance()->browser();
-        return $browser->MajorVer;
-    }
-
-    public static function browser_minor_version() {
-        return '';
-        $browser = CBrowser::instance()->browser();
-        return $browser->MinorVer;
+    public static function browserVersion() {
+        return CHTTP::request()->browser()->getVersion();
     }
 
     public static function platform() {
-        return '';
-        $browser = CBrowser::instance()->browser();
-        return $browser->Platform;
+        return CHTTP::request()->browser()->getPlatform();
     }
 
+    /**
+     * @deprecated 1.2
+     *
+     * @return string
+     */
     public static function platform_version() {
         return '';
-        $browser = CBrowser::instance()->browser();
-        return $browser->Platform_Version;
     }
-
-    /*
-      public static function browser_name($browser = "") {
-      if(strlen($browser)==0) {
-      $browser = crequest::browser();
-      }
-      $browser_name = "Unknown";
-      switch($browser) {
-      case "firefox": $browser_name="Firefox"; break;
-      case "ie": $browser_name="Internet Explorer"; break;
-      case "ipad": $browser_name="IPad"; break;
-      case "android": $browser_name="Android"; break;
-      case "chrome": $browser_name="Chrome"; break;
-      case "safari": $browser_name="Safari"; break;
-      case "air": $browser_name="Air"; break;
-      case "fluid": $browser_name="Fluid"; break;
-
-      }
-
-
-
-      return $browser_name;
-      }
-     */
 
     /**
      * Fetch the Remote Address.
      *
      * @return string
      */
+    public static function remoteAddress() {
+        return CHTTP::request()->ip();
+    }
+
+    /**
+     * Fetch the Remote Address.
+     *
+     * @return string
+     *
+     * @deprecated 1.2
+     */
     public static function remote_address() {
-        // Server keys that could contain the client IP address
-        $keys = ['HTTP_X_FORWARDED_FOR', 'HTTP_CLIENT_IP', 'REMOTE_ADDR'];
-        $ip_address = '';
-        foreach ($keys as $key) {
-            if (isset($_SERVER[$key])) {
-                $ip_address = $_SERVER[$key];
-                // An IP address has been found
-                break;
-            }
-        }
-
-        if ($comma = strrpos($ip_address, ',') !== false) {
-            $ip_address = substr($ip_address, $comma + 1);
-        }
-
-        if (!cvalid::ip($ip_address)) {
-            // Use an empty IP
-            $ip_address = '0.0.0.0';
-        }
-
-        return $ip_address;
+        return static::remoteAddress();
     }
 
     /**
@@ -169,178 +132,30 @@ class crequest {
      * @static
      */
     public static function is_https() {
-        if (isset($_SERVER['HTTPS']) && !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
-            return true;
-        } else {
-            return false;
-        }
+        return static::isHttps();
+    }
+
+    /**
+     * Checks to see if the page is being server over SSL or not
+     *
+     * @return bool
+     *
+     * @since   1.0.000
+     * @static
+     */
+    public static function isHttps() {
+        return static::protocol() === 'https';
     }
 
     /**
      * Returns current request method.
-     *
-     * @throws CF_Exception in case of an unknown request method
      *
      * @return string
      */
     public static function method() {
         $method = strtolower($_SERVER['REQUEST_METHOD']);
 
-        if (!in_array($method, request::$http_methods)) {
-            throw new CF_Exception('request.unknown_method', $method);
-        }
-
         return $method;
-    }
-
-    /**
-     * Returns boolean of whether client accepts content type.
-     *
-     * @param   string   content type
-     * @param   bool  set to TRUE to disable wildcard checking
-     * @param null|mixed $type
-     * @param mixed      $explicit_check
-     *
-     * @return bool
-     */
-    public static function accepts($type = null, $explicit_check = false) {
-        crequest::parse_accept_header();
-
-        if ($type === null) {
-            return crequest::$accept_types;
-        }
-
-        return (crequest::accepts_at_quality($type, $explicit_check) > 0);
-    }
-
-    /**
-     * Compare the q values for given array of content types and return the one with the highest value.
-     * If items are found to have the same q value, the first one encountered in the given array wins.
-     * If all items in the given array have a q value of 0, FALSE is returned.
-     *
-     * @param   array    content types
-     * @param   bool  set to TRUE to disable wildcard checking
-     * @param mixed $types
-     * @param mixed $explicit_check
-     *
-     * @return mixed string mime type with highest q value, FALSE if none of the given types are accepted
-     */
-    public static function preferred_accept($types, $explicit_check = false) {
-        // Initialize
-        $mime_types = [];
-        $max_q = 0;
-        $preferred = false;
-
-        // Load q values for all given content types
-        foreach (array_unique($types) as $type) {
-            $mime_types[$type] = crequest::accepts_at_quality($type, $explicit_check);
-        }
-
-        // Look for the highest q value
-        foreach ($mime_types as $type => $q) {
-            if ($q > $max_q) {
-                $max_q = $q;
-                $preferred = $type;
-            }
-        }
-
-        return $preferred;
-    }
-
-    /**
-     * Returns quality factor at which the client accepts content type.
-     *
-     * @param   string   content type (e.g. "image/jpg", "jpg")
-     * @param   bool  set to TRUE to disable wildcard checking
-     * @param null|mixed $type
-     * @param mixed      $explicit_check
-     *
-     * @return int|float
-     */
-    public static function accepts_at_quality($type = null, $explicit_check = false) {
-        crequest::parse_accept_header();
-
-        // Normalize type
-        $type = strtolower((string) $type);
-
-        // General content type (e.g. "jpg")
-        if (strpos($type, '/') === false) {
-            // Don't accept anything by default
-            $q = 0;
-
-            // Look up relevant mime types
-            foreach ((array) CF::config('mimes.' . $type) as $type) {
-                $q2 = crequest::accepts_at_quality($type, $explicit_check);
-                $q = ($q2 > $q) ? $q2 : $q;
-            }
-
-            return $q;
-        }
-
-        // Content type with subtype given (e.g. "image/jpg")
-        $type = explode('/', $type, 2);
-
-        // Exact match
-        if (isset(crequest::$accept_types[$type[0]][$type[1]])) {
-            return crequest::$accept_types[$type[0]][$type[1]];
-        }
-
-        // Wildcard match (if not checking explicitly)
-        if ($explicit_check === false and isset(request::$accept_types[$type[0]]['*'])) {
-            return crequest::$accept_types[$type[0]]['*'];
-        }
-
-        // Catch-all wildcard match (if not checking explicitly)
-        if ($explicit_check === false and isset(request::$accept_types['*']['*'])) {
-            return crequest::$accept_types['*']['*'];
-        }
-
-        // Content type not accepted
-        return 0;
-    }
-
-    /**
-     * Parses client's HTTP Accept request header, and builds array structure representing it.
-     *
-     * @return void
-     */
-    protected static function parse_accept_header() {
-        // Run this function just once
-        if (crequest::$accept_types !== null) {
-            return;
-        }
-
-        // Initialize accept_types array
-        crequest::$accept_types = [];
-
-        // No HTTP Accept header found
-        if (empty($_SERVER['HTTP_ACCEPT'])) {
-            // Accept everything
-            crequest::$accept_types['*']['*'] = 1;
-            return;
-        }
-
-        // Remove linebreaks and parse the HTTP Accept header
-        foreach (explode(',', str_replace(["\r", "\n"], '', $_SERVER['HTTP_ACCEPT'])) as $accept_entry) {
-            // Explode each entry in content type and possible quality factor
-            $accept_entry = explode(';', trim($accept_entry), 2);
-
-            // Explode each content type (e.g. "text/html")
-            $type = explode('/', $accept_entry[0], 2);
-
-            // Skip invalid content types
-            if (!isset($type[1])) {
-                continue;
-            }
-
-            // Assume a default quality factor of 1 if no custom q value found
-            $q = (isset($accept_entry[1]) and preg_match('~\bq\s*+=\s*+([.0-9]+)~', $accept_entry[1], $match)) ? (float) $match[1] : 1;
-
-            // Populate accept_types array
-            if (!isset(crequest::$accept_types[$type[0]][$type[1]]) or $q > request::$accept_types[$type[0]][$type[1]]) {
-                crequest::$accept_types[$type[0]][$type[1]] = $q;
-            }
-        }
     }
 }
 

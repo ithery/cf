@@ -1,8 +1,6 @@
 <?php
 //@codingStandardsIgnoreStart
 class clog {
-    //@codingStandardsIgnoreEnd
-
     /**
      * Log login
      *
@@ -14,12 +12,13 @@ class clog {
         $app = CApp::instance();
         $app_id = $app->appId();
         $db = CDatabase::instance();
-        $ip_address = crequest::remote_address();
+        $ip_address = CHTTP::request()->ip();
         $session_id = CSession::instance()->id();
-        $browser = crequest::browser();
-        $browser_version = crequest::browser_version();
-        $platform = crequest::platform();
-        $platform_version = crequest::platform_version();
+        $browser = CHTTP::request()->browser()->getBrowser();
+        $browser_version = CHTTP::request()->browser()->getVersion();
+        $platform = CHTTP::request()->browser()->getPlatform();
+        $platform_version = '';
+
         $user = cuser::get($user_id);
         $org_id = CF::orgId();
         $data = [
@@ -38,32 +37,25 @@ class clog {
         $db->insert('log_login', $data);
     }
 
-    public static function login_fail($username, $password, $error_message) {
+    public static function loginFail($username, $password, $errorMessage) {
         $app = CApp::instance();
-        $app_id = $app->appId();
-        $db = CDatabase::instance();
-        $ip_address = crequest::remote_address();
-        $session_id = CSession::instance()->id();
-        $browser = crequest::browser();
-        $browser_version = crequest::browser_version();
-        $platform = crequest::platform();
-        $platform_version = crequest::platform_version();
+
         $data = [
             'login_fail_date' => date('Y-m-d H:i:s'),
             'org_id' => null,
-            'user_agent' => CF::userAgent(),
+            'user_agent' => CHTTP::request()->userAgent(),
             'username' => $username,
             'password' => $password,
-            'error_message' => $error_message,
-            'browser' => $browser,
-            'browser_version' => $browser_version,
-            'platform' => $platform,
-            'platform_version' => $platform_version,
-            'remote_addr' => $ip_address,
-            'session_id' => $session_id,
-            'app_id' => $app_id,
+            'error_message' => $errorMessage,
+            'browser' => CHTTP::request()->browser()->getBrowser(),
+            'browser_version' => CHTTP::request()->browser()->getVersion(),
+            'platform' => CHTTP::request()->browser()->getPlatform(),
+            'platform_version' => '',
+            'remote_addr' => CHTTP::request()->ip(),
+            'session_id' => CSession::instance()->id(),
+            'app_id' => $app->appId(),
         ];
-        $db->insert('log_login_fail', $data);
+        return CDatabase::instance()->insert('log_login_fail', $data);
     }
 
     public static function log_print($user_id, $print_mode, $printer_type, $printer_name, $data_type, $print_ref_id, $print_ref_code) {
@@ -83,7 +75,7 @@ class clog {
             'print_date' => date('Y-m-d H:i:s'),
             'org_id' => $org_id,
             'session_id' => CSession::instance()->id(),
-            'user_agent' => CF::userAgent(),
+            'user_agent' => CHTTP::request()->userAgent(),
             'browser' => $browser,
             'browser_version' => $browser_version,
             'platform' => $platform,
@@ -188,19 +180,6 @@ class clog {
         $db->insert('log_activity', $data);
     }
 
-    public static function sync_error($org_id, $store_id, $session_id, $message) {
-        $db = CDatabase::instance();
-
-        $data = [
-            'log_date' => date('Y-m-d H:i:s'),
-            'org_id' => $org_id,
-            'store_id' => $store_id,
-            'session_id' => $session_id,
-            'message' => $message,
-        ];
-        $db->insert('log_sync_error', $data);
-    }
-
     public static function backup($user_id, $filename, $directory = '') {
         $db = CDatabase::instance();
         $app = CApp::instance();
@@ -270,15 +249,7 @@ class clog {
             $filename = carr::get($options, 'filename');
             $level = carr::get($options, 'level');
             $path = carr::get($options, 'path');
-            /*
-              if (strlen($filename) > 0)
-              $clogger_instance->set_suffix_filename($filename);
-              if (strlen($level) > 0)
-              $clogger_instance->set_level($level);
-              if (strlen($path) > 0)
-              $clogger_instance->set_additional_path($path);
-             *
-             */
+
             $param['path'] = $path;
         }
         return $clogger_instance->add($level, $message);
@@ -330,5 +301,9 @@ class clog {
 
     public static function debug($message) {
         return CLogger::instance()->add(CLogger::DEBUG, $message);
+    }
+
+    public static function login_fail($username, $password, $error_message) {
+        return static::loginFail($username, $password, $error_message);
     }
 }
