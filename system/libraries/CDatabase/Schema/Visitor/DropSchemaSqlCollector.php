@@ -41,7 +41,7 @@ class CDatabase_Schema_Visitor_DropSchemaSqlCollector extends CDatabase_Schema_V
      */
     public function acceptForeignKey(CDatabase_Schema_Table $localTable, CDatabase_Schema_ForeignKeyConstraint $fkConstraint) {
         if (strlen($fkConstraint->getName()) === 0) {
-            throw SchemaException::namedForeignKeyRequired($localTable, $fkConstraint);
+            throw CDatabase_Exception_SchemaException::namedForeignKeyRequired($localTable, $fkConstraint);
         }
 
         $this->constraints->attach($fkConstraint, $localTable);
