@@ -67,7 +67,9 @@ class CDatabase {
         'escape' => true,
     ];
 
-    // Database driver object
+    /**
+     * @var CDatabase_Driver|CDatabase_Driver_Mysqli
+     */
     protected $driver;
 
     protected $driver_name;
@@ -480,7 +482,7 @@ class CDatabase {
                     $val = (strpos($val, '.') !== false) ? $this->config['table_prefix'] . $val : $val;
                 }
 
-                $val = $this->driver->escape_column($val);
+                $val = $this->driver->escapeColumn($val);
             }
 
             $this->select[] = $val;
@@ -526,76 +528,6 @@ class CDatabase {
 
             $this->from[] = $val;
         }
-
-        return $this;
-    }
-
-    /**
-     * Generates the JOIN portion of the query.
-     *
-     * @param string       $table table name
-     * @param string|array $key   where key or array of key => value pairs
-     * @param string       $value where value
-     * @param string       $type  type of join
-     *
-     * @return CDatabase this Database object
-     */
-    public function join($table, $key, $value = null, $type = '') {
-        $join = [];
-
-        if (!empty($type)) {
-            $type = strtoupper(trim($type));
-
-            if (!in_array($type, ['LEFT', 'RIGHT', 'OUTER', 'INNER', 'LEFT OUTER', 'RIGHT OUTER'], true)) {
-                $type = '';
-            } else {
-                $type .= ' ';
-            }
-        }
-
-        $cond = [];
-        $keys = is_array($key) ? $key : [$key => $value];
-        foreach ($keys as $key => $value) {
-            $key = (strpos($key, '.') !== false) ? $this->config['table_prefix'] . $key : $key;
-
-            if (is_string($value)) {
-                // Only escape if it's a string
-                $value = $this->driver->escape_column($this->config['table_prefix'] . $value);
-            }
-
-            $cond[] = $this->driver->where($key, $value, 'AND ', count($cond), false);
-        }
-
-        if (!is_array($this->join)) {
-            $this->join = [];
-        }
-
-        if (!is_array($table)) {
-            $table = [$table];
-        }
-
-        foreach ($table as $t) {
-            if (is_string($t)) {
-                // TODO: Temporary solution, this should be moved to database driver (AS is checked for twice)
-                if (stripos($t, ' AS ') !== false) {
-                    $t = str_ireplace(' AS ', ' AS ', $t);
-
-                    list($table, $alias) = explode(' AS ', $t);
-
-                    // Attach prefix to both sides of the AS
-                    $t = $this->config['table_prefix'] . $table . ' AS ' . $this->config['table_prefix'] . $alias;
-                } else {
-                    $t = $this->config['table_prefix'] . $t;
-                }
-            }
-
-            $join['tables'][] = $this->driver->escape_column($t);
-        }
-
-        $join['conditions'] = '(' . trim(implode(' ', $cond)) . ')';
-        $join['type'] = $type;
-
-        $this->join[] = $join;
 
         return $this;
     }
@@ -834,48 +766,6 @@ class CDatabase {
         $this->reset_write();
 
         return $this->query($sql);
-    }
-
-    /**
-     * Adds an "IN" condition to the where clause
-     *
-     * @param string $field  Name of the column being examined
-     * @param mixed  $values An array or string to match against
-     * @param bool   $not    Generate a NOT IN clause instead
-     *
-     * @return CDatabase this Database object
-     */
-    public function in($field, $values, $not = false) {
-        if (is_array($values)) {
-            $escaped_values = [];
-            foreach ($values as $v) {
-                if (is_numeric($v)) {
-                    $escaped_values[] = $v;
-                } else {
-                    $escaped_values[] = "'" . $this->driver->escape_str($v) . "'";
-                }
-            }
-            $values = implode(',', $escaped_values);
-        }
-
-        $where = $this->driver->escape_column(((strpos($field, '.') !== false) ? $this->config['table_prefix'] : '') . $field) . ' ' . ($not === true ? 'NOT ' : '') . 'IN (' . $values . ')';
-        $this->where[] = $this->driver->where($where, '', 'AND ', count($this->where), -1);
-
-        return $this;
-    }
-
-    /**
-     * Adds a "NOT IN" condition to the where clause
-     *
-     * @param string $field  Name of the column being examined
-     * @param mixed  $values An array or string to match against
-     *
-     * @return CDatabase this Database object
-     *
-     * @deprecated 1.1
-     */
-    public function notin($field, $values) {
-        return $this->in($field, $values, true);
     }
 
     /**
