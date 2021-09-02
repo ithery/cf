@@ -353,14 +353,14 @@ abstract class CDatabase_Platform {
             $this->initializeAllDoctrineTypeMappings();
         }
 
-        if (!Types\Type::hasType($doctrineType)) {
+        if (!CDatabase_Type::hasType($doctrineType)) {
             throw CDatabase_Exception::typeNotFound($doctrineType);
         }
 
         $dbType = strtolower($dbType);
         $this->doctrineTypeMapping[$dbType] = $doctrineType;
 
-        $doctrineType = Type::getType($doctrineType);
+        $doctrineType = CDatabase_Type::getType($doctrineType);
 
         if ($doctrineType->requiresSQLCommentHint($this)) {
             $this->markDoctrineTypeCommented($doctrineType);
@@ -711,19 +711,19 @@ abstract class CDatabase_Platform {
      *
      * @return string
      */
-    public function getTrimExpression($str, $mode = TrimMode::UNSPECIFIED, $char = false) {
+    public function getTrimExpression($str, $mode = CDatabase_Platform_TrimMode::UNSPECIFIED, $char = false) {
         $expression = '';
 
         switch ($mode) {
-            case TrimMode::LEADING:
+            case CDatabase_Platform_TrimMode::LEADING:
                 $expression = 'LEADING ';
                 break;
 
-            case TrimMode::TRAILING:
+            case CDatabase_Platform_TrimMode::TRAILING:
                 $expression = 'TRAILING ';
                 break;
 
-            case TrimMode::BOTH:
+            case CDatabase_Platform_TrimMode::BOTH:
                 $expression = 'BOTH ';
                 break;
         }
@@ -2050,39 +2050,6 @@ abstract class CDatabase_Platform {
         return implode(', ', $queryFields);
     }
 
-    /**
-     * Obtains DBMS specific SQL code portion needed to declare a generic type
-     * field to be used in statements like CREATE TABLE.
-     *
-     * @param string $name  the name the field to be declared
-     * @param array  $field An associative array with the name of the properties
-     *                      of the field being declared as array indexes. Currently, the types
-     *                      of supported field properties are as follows:
-     *
-     *      length
-     *          Integer value that determines the maximum length of the text
-     *          field. If this argument is missing the field should be
-     *          declared to have the longest length allowed by the DBMS.
-     *
-     *      default
-     *          Text value to be used as default for this field.
-     *
-     *      notnull
-     *          Boolean flag that indicates whether this field is constrained
-     *          to not be set to null.
-     *      charset
-     *          Text value with the default CHARACTER SET for this field.
-     *      collation
-     *          Text value with the default COLLATION for this field.
-     *      unique
-     *          unique constraint
-     *      check
-     *          column check constraint
-     *      columnDefinition
-     *          a string that defines the complete column
-     *
-     * @return string DBMS specific SQL code portion that should be used to declare the column
-     */
     public function getColumnDeclarationSQL($name, array $field) {
         if (isset($field['columnDefinition'])) {
             $columnDef = $this->getCustomTypeDeclarationSQL($field);
@@ -2210,7 +2177,7 @@ abstract class CDatabase_Platform {
      *
      * @throws \InvalidArgumentException
      */
-    public function getUniqueConstraintDeclarationSQL($name, Index $index) {
+    public function getUniqueConstraintDeclarationSQL($name, CDatabase_Schema_Index $index) {
         $columns = $index->getQuotedColumns($this);
         $name = new CDatabase_Schema_Identifier($name);
 
@@ -3248,7 +3215,7 @@ abstract class CDatabase_Platform {
      * @return string
      */
     public function getTruncateTableSQL($tableName, $cascade = false) {
-        $tableIdentifier = new Identifier($tableName);
+        $tableIdentifier = new CDatabase_Schema_Identifier($tableName);
 
         return 'TRUNCATE ' . $tableIdentifier->getQuotedName($this);
     }

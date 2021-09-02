@@ -381,7 +381,7 @@ trait CTrait_Compat_Database {
      *
      * @deprecated 1.1
      */
-    protected function reset_select() {
+    protected function resetSelect() {
         $this->select = [];
         $this->from = [];
         $this->join = [];

@@ -68,7 +68,7 @@ class CDatabase {
     ];
 
     /**
-     * @var CDatabase_Driver|CDatabase_Driver_Mysqli
+     * @var CDatabase_Driver_Mysqli
      */
     protected $driver;
 
@@ -360,7 +360,7 @@ class CDatabase {
         if (!is_resource($this->link) and !is_object($this->link)) {
             $this->link = $this->driver->connect();
             if (!is_resource($this->link) and !is_object($this->link)) {
-                throw new CDatabase_Exception('There was an error connecting to the database: :error', [':error' => $this->driver->show_error()]);
+                throw new CDatabase_Exception('There was an error connecting to the database: :error', [':error' => $this->driver->showError()]);
             }
             // Clear password after successful connect
             $this->config['connection']['pass'] = null;
@@ -711,31 +711,6 @@ class CDatabase {
     }
 
     /**
-     * Compiles the select statement based on the other functions called and returns the query string.
-     *
-     * @param string $table  table name
-     * @param string $limit  limit clause
-     * @param string $offset offset clause
-     *
-     * @return string sql string
-     */
-    public function compile($table = '', $limit = null, $offset = null) {
-        if ($table != '') {
-            $this->from($table);
-        }
-
-        if (!is_null($limit)) {
-            $this->limit($limit, $offset);
-        }
-
-        $sql = $this->driver->compile_select(get_object_vars($this));
-
-        $this->reset_select();
-
-        return $sql;
-    }
-
-    /**
      * Compiles an insert string and runs the query.
      *
      * @param string $table table name
@@ -743,58 +718,8 @@ class CDatabase {
      *
      * @return CDatabase_Result Query result
      */
-    public function insert($table = '', $set = null) {
-        if (!is_null($set)) {
-            $this->set($set);
-        }
-
-        if ($this->set == null) {
-            throw new CDatabase_Exception('You must set a SET clause for your query');
-        }
-        if ($table == '') {
-            if (!isset($this->from[0])) {
-                throw new CDatabase_Exception('You must set a database table for your query');
-            }
-            $table = $this->from[0];
-        }
-
-        // If caching is enabled, clear the cache before inserting
-        ($this->config['cache'] === true) and $this->clear_cache();
-
-        $sql = $this->driver->insert($this->config['table_prefix'] . $table, array_keys($this->set), array_values($this->set));
-
-        $this->reset_write();
-
-        return $this->query($sql);
-    }
-
-    /**
-     * Compiles a merge string and runs the query.
-     *
-     * @param string $table table name
-     * @param array  $set   array of key/value pairs to merge
-     *
-     * @return CDatabase_Result Query result
-     */
-    public function merge($table = '', $set = null) {
-        if (!is_null($set)) {
-            $this->set($set);
-        }
-
-        if ($this->set == null) {
-            throw new CDatabase_Exception('You must set a SET clause for your query');
-        }
-        if ($table == '') {
-            if (!isset($this->from[0])) {
-                throw new CDatabase_Exception('You must set a database table for your query');
-            }
-            $table = $this->from[0];
-        }
-
-        $sql = $this->driver->merge($this->config['table_prefix'] . $table, array_keys($this->set), array_values($this->set));
-
-        $this->reset_write();
-        return $this->query($sql);
+    public function insert($table, $set) {
+        return $this->table($table)->insert($set);
     }
 
     /**
@@ -807,28 +732,7 @@ class CDatabase {
      * @return CDatabase_Result Query result
      */
     public function update($table = '', $set = null, $where = null) {
-        if (is_array($set)) {
-            $this->set($set);
-        }
-
-        if (!is_null($where)) {
-            $this->where($where);
-        }
-
-        if ($this->set == false) {
-            throw new CDatabase_Exception('You must set a SET clause for your query');
-        }
-        if ($table == '') {
-            if (!isset($this->from[0])) {
-                throw new CDatabase_Exception('You must set a database table for your query');
-            }
-            $table = $this->from[0];
-        }
-
-        $sql = $this->driver->update($this->config['table_prefix'] . $table, $this->set, $this->where);
-
-        $this->reset_write();
-        return $this->query($sql);
+        return $this->table($table)->where($where)->update($set);
     }
 
     /**
@@ -840,26 +744,10 @@ class CDatabase {
      * @return CDatabase_Result Query result
      */
     public function delete($table = '', $where = null) {
-        if ($table == '') {
-            if (!isset($this->from[0])) {
-                throw new CDatabase_Exception('You must set a database table for your query');
-            }
-            $table = $this->from[0];
-        } else {
-            $table = $this->config['table_prefix'] . $table;
-        }
-
-        if (!is_null($where)) {
-            $this->where($where);
-        }
-
         if (count($this->where) < 1) {
             throw new CDatabase_Exception('You must set a WHERE clause for your query');
         }
-        $sql = $this->driver->delete($table, $this->where);
-
-        $this->reset_write();
-        return $this->query($sql);
+        return $this->table($table)->where($where)->delete();
     }
 
     /**
@@ -890,7 +778,7 @@ class CDatabase {
     public function listTables() {
         $this->link or $this->connect();
 
-        return $this->driver->list_tables();
+        return $this->driver->listTables();
     }
 
     /**
@@ -903,9 +791,9 @@ class CDatabase {
      */
     public function tableExists($table_name, $prefix = true) {
         if ($prefix) {
-            return in_array($this->config['table_prefix'] . $table_name, $this->list_tables());
+            return in_array($this->config['table_prefix'] . $table_name, $this->listTables());
         }
-        return in_array($table_name, $this->list_tables());
+        return in_array($table_name, $this->listTables());
     }
 
     /**
@@ -949,7 +837,7 @@ class CDatabase {
     public function fieldData($table = '') {
         $this->link or $this->connect();
 
-        return $this->driver->field_data($this->config['table_prefix'] . $table);
+        return $this->driver->fieldData($this->config['table_prefix'] . $table);
     }
 
     /**
@@ -961,7 +849,7 @@ class CDatabase {
      */
     public function listFields($table = '') {
         $this->link or $this->connect();
-        return $this->driver->list_fields($this->config['table_prefix'] . $table);
+        return $this->driver->listFields($this->config['table_prefix'] . $table);
     }
 
     /**
@@ -983,7 +871,7 @@ class CDatabase {
      * @return string
      */
     public function escapeStr($str) {
-        return $this->driver->escape_str($str);
+        return $this->driver->escapeStr($str);
     }
 
     /**
@@ -994,7 +882,7 @@ class CDatabase {
      * @return string
      */
     public function escapeTable($table) {
-        return $this->driver->escape_table($table);
+        return $this->driver->escapeTable($table);
     }
 
     /**
@@ -1005,7 +893,7 @@ class CDatabase {
      * @return string
      */
     public function escapeColumn($table) {
-        return $this->driver->escape_column($table);
+        return $this->driver->escapeColumn($table);
     }
 
     /**
@@ -1027,8 +915,8 @@ class CDatabase {
 
             // Get the total rows from the last query executed
             $result = $this->query(
-                'SELECT COUNT(*) AS ' . $this->escape_column('total_rows') . ' '
-                    . 'FROM (' . trim($sql) . ') AS ' . $this->escape_table('counted_results')
+                'SELECT COUNT(*) AS ' . $this->escapeColumn('total_rows') . ' '
+                    . 'FROM (' . trim($sql) . ') AS ' . $this->escapeTable('counted_results')
             );
 
             // Return the total number of rows from the query
@@ -1050,25 +938,12 @@ class CDatabase {
     }
 
     public function escapeLike($str) {
-        //$str = str_replace(array($e, '_', '%'), array($e.$e, $e.'_', $e.'%'), $s);
-        $str = $this->escape_str($str);
+        $str = $this->escapeStr($str);
         return $str;
     }
 
     public function driverName() {
         return $this->driverName;
-    }
-
-    /**
-     * Prepares and executes an SQL query and returns the result as an associative array.
-     *
-     * @param string $sql    the SQL query
-     * @param array  $params the query parameters
-     *
-     * @return array
-     */
-    public function fetchAll($sql, array $params = []) {
-        return $this->query($sql, $params)->fetchAll();
     }
 
     /**
@@ -1473,6 +1348,18 @@ class CDatabase {
 
     public function ping() {
         return $this->driver->ping();
+    }
+
+    /**
+     * Prepares and executes an SQL query and returns the result as an associative array.
+     *
+     * @param string $sql    the SQL query
+     * @param array  $params the query parameters
+     *
+     * @return array
+     */
+    public function fetchAll($sql, array $params = []) {
+        return $this->query($sql, $params)->fetchAll();
     }
 }
 
