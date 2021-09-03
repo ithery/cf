@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -22,21 +20,18 @@ use League\CommonMark\Parser\Inline\InlineParserInterface;
 use League\CommonMark\Parser\Inline\InlineParserMatch;
 use League\CommonMark\Parser\InlineParserContext;
 
-final class BacktickParser implements InlineParserInterface
-{
-    public function getMatchDefinition(): InlineParserMatch
-    {
+final class BacktickParser implements InlineParserInterface {
+    public function getMatchDefinition() {
         return InlineParserMatch::regex('`+');
     }
 
-    public function parse(InlineParserContext $inlineContext): bool
-    {
-        $ticks  = $inlineContext->getFullMatch();
+    public function parse(InlineParserContext $inlineContext) {
+        $ticks = $inlineContext->getFullMatch();
         $cursor = $inlineContext->getCursor();
         $cursor->advanceBy($inlineContext->getFullMatchLength());
 
         $currentPosition = $cursor->getPosition();
-        $previousState   = $cursor->saveState();
+        $previousState = $cursor->saveState();
 
         while ($matchingTicks = $cursor->match('/`+/m')) {
             if ($matchingTicks !== $ticks) {
@@ -45,13 +40,13 @@ final class BacktickParser implements InlineParserInterface
 
             $code = $cursor->getSubstring($currentPosition, $cursor->getPosition() - $currentPosition - \strlen($ticks));
 
-            $c = \preg_replace('/\n/m', ' ', $code) ?? '';
+            $c = \preg_replace('/\n/m', ' ', $code) ?: '';
 
             if (
-                $c !== '' &&
-                $c[0] === ' ' &&
-                \substr($c, -1, 1) === ' ' &&
-                \preg_match('/[^ ]/', $c)
+                $c !== ''
+                && $c[0] === ' '
+                && \substr($c, -1, 1) === ' '
+                && \preg_match('/[^ ]/', $c)
             ) {
                 $c = \substr($c, 1, -1);
             }

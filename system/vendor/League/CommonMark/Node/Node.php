@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,8 +16,7 @@ namespace League\CommonMark\Node;
 
 use Dflydev\DotAccessData\Data;
 
-abstract class Node
-{
+abstract class Node {
     /**
      * @var Data
      *
@@ -69,39 +66,36 @@ abstract class Node
      */
     protected $lastChild;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->data = new Data([
             'attributes' => [],
         ]);
     }
 
-    public function previous(): ?Node
-    {
+    public function previous() {
         return $this->previous;
     }
 
-    public function next(): ?Node
-    {
+    /**
+     * @return Node|null
+     */
+    public function next() {
         return $this->next;
     }
 
-    public function parent(): ?Node
-    {
+    public function parent() {
         return $this->parent;
     }
 
-    protected function setParent(?Node $node = null): void
-    {
+    protected function setParent(Node $node = null) {
         $this->parent = $node;
-        $this->depth  = $node === null ? 0 : $node->depth + 1;
+        $this->depth = $node === null ? 0 : $node->depth + 1;
     }
 
     /**
      * Inserts the $sibling node after $this
      */
-    public function insertAfter(Node $sibling): void
-    {
+    public function insertAfter(Node $sibling) {
         $sibling->detach();
         $sibling->next = $this->next;
 
@@ -110,10 +104,10 @@ abstract class Node
         }
 
         $sibling->previous = $this;
-        $this->next        = $sibling;
+        $this->next = $sibling;
         $sibling->setParent($this->parent);
 
-        if (! $sibling->next && $sibling->parent) {
+        if (!$sibling->next && $sibling->parent) {
             $sibling->parent->lastChild = $sibling;
         }
     }
@@ -121,8 +115,7 @@ abstract class Node
     /**
      * Inserts the $sibling node before $this
      */
-    public function insertBefore(Node $sibling): void
-    {
+    public function insertBefore(Node $sibling) {
         $sibling->detach();
         $sibling->previous = $this->previous;
 
@@ -130,24 +123,22 @@ abstract class Node
             $sibling->previous->next = $sibling;
         }
 
-        $sibling->next  = $this;
+        $sibling->next = $this;
         $this->previous = $sibling;
         $sibling->setParent($this->parent);
 
-        if (! $sibling->previous && $sibling->parent) {
+        if (!$sibling->previous && $sibling->parent) {
             $sibling->parent->firstChild = $sibling;
         }
     }
 
-    public function replaceWith(Node $replacement): void
-    {
+    public function replaceWith(Node $replacement) {
         $replacement->detach();
         $this->insertAfter($replacement);
         $this->detach();
     }
 
-    public function detach(): void
-    {
+    public function detach() {
         if ($this->previous) {
             $this->previous->next = $this->next;
         } elseif ($this->parent) {
@@ -160,32 +151,28 @@ abstract class Node
             $this->parent->lastChild = $this->previous;
         }
 
-        $this->parent   = null;
-        $this->next     = null;
+        $this->parent = null;
+        $this->next = null;
         $this->previous = null;
-        $this->depth    = 0;
+        $this->depth = 0;
     }
 
-    public function hasChildren(): bool
-    {
+    public function hasChildren() {
         return $this->firstChild !== null;
     }
 
-    public function firstChild(): ?Node
-    {
+    public function firstChild() {
         return $this->firstChild;
     }
 
-    public function lastChild(): ?Node
-    {
+    public function lastChild() {
         return $this->lastChild;
     }
 
     /**
      * @return Node[]
      */
-    public function children(): iterable
-    {
+    public function children() {
         $children = [];
         for ($current = $this->firstChild; $current !== null; $current = $current->next) {
             $children[] = $current;
@@ -194,8 +181,7 @@ abstract class Node
         return $children;
     }
 
-    public function appendChild(Node $child): void
-    {
+    public function appendChild(Node $child) {
         if ($this->lastChild) {
             $this->lastChild->insertAfter($child);
         } else {
@@ -208,8 +194,7 @@ abstract class Node
     /**
      * Adds $child as the very first child of $this
      */
-    public function prependChild(Node $child): void
-    {
+    public function prependChild(Node $child) {
         if ($this->firstChild) {
             $this->firstChild->insertBefore($child);
         } else {
@@ -222,8 +207,7 @@ abstract class Node
     /**
      * Detaches all child nodes of given node
      */
-    public function detachChildren(): void
-    {
+    public function detachChildren() {
         foreach ($this->children() as $children) {
             $children->setParent(null);
         }
@@ -236,21 +220,18 @@ abstract class Node
      *
      * @param iterable<Node> $children
      */
-    public function replaceChildren(iterable $children): void
-    {
+    public function replaceChildren($children) {
         $this->detachChildren();
         foreach ($children as $item) {
             $this->appendChild($item);
         }
     }
 
-    public function getDepth(): int
-    {
+    public function getDepth() {
         return $this->depth;
     }
 
-    public function walker(): NodeWalker
-    {
+    public function walker() {
         return new NodeWalker($this);
     }
 
@@ -259,12 +240,11 @@ abstract class Node
      *
      * WARNING: This is a recursive function and should not be called on deeply-nested node trees!
      */
-    public function __clone()
-    {
+    public function __clone() {
         // Cloned nodes are detached from their parents, siblings, and children
-        $this->parent   = null;
+        $this->parent = null;
         $this->previous = null;
-        $this->next     = null;
+        $this->next = null;
         // But save a copy of the children since we'll need that in a moment
         $children = $this->children();
         $this->detachChildren();

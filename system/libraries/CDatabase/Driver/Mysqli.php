@@ -274,14 +274,6 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         return new CDatabase_Schema_Manager_Mysql($db);
     }
 
-    /**
-     * {@inheritdoc}
-     *
-     * The server version detection includes a special case for MariaDB
-     * to support '5.5.5-' prefixed versions introduced in Maria 10+
-     *
-     * @link https://jira.mariadb.org/browse/MDEV-4088
-     */
     public function getServerVersion() {
         if (!$this->link) {
             $this->connect();
@@ -298,9 +290,6 @@ class CDatabase_Driver_Mysqli extends CDatabase_Driver_AbstractMysql {
         return $majorVersion . '.' . $minorVersion . '.' . $patchVersion;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function requiresQueryForServerVersion() {
         return false;
     }

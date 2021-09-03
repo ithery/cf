@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -21,10 +19,8 @@ use League\CommonMark\Node\Node;
 /**
  * @internal
  */
-final class AdjacentTextMerger
-{
-    public static function mergeChildNodes(Node $node): void
-    {
+final class AdjacentTextMerger {
+    public static function mergeChildNodes(Node $node) {
         // No children or just one child node, no need for merging
         if ($node->firstChild() === $node->lastChild() || $node->firstChild() === null || $node->lastChild() === null) {
             return;
@@ -34,8 +30,7 @@ final class AdjacentTextMerger
         self::mergeTextNodesInclusive($node->firstChild(), $node->lastChild());
     }
 
-    public static function mergeTextNodesBetweenExclusive(Node $fromNode, Node $toNode): void
-    {
+    public static function mergeTextNodesBetweenExclusive(Node $fromNode, Node $toNode) {
         // No nodes between them
         if ($fromNode === $toNode || $fromNode->next() === $toNode || $fromNode->next() === null || $toNode->previous() === null) {
             return;
@@ -45,10 +40,9 @@ final class AdjacentTextMerger
         self::mergeTextNodesInclusive($fromNode->next(), $toNode->previous());
     }
 
-    private static function mergeTextNodesInclusive(Node $fromNode, Node $toNode): void
-    {
+    private static function mergeTextNodesInclusive(Node $fromNode, Node $toNode) {
         $first = null;
-        $last  = null;
+        $last = null;
 
         $node = $fromNode;
         while ($node !== null) {
@@ -61,7 +55,7 @@ final class AdjacentTextMerger
             } else {
                 self::mergeIfNeeded($first, $last);
                 $first = null;
-                $last  = null;
+                $last = null;
             }
 
             if ($node === $toNode) {
@@ -74,8 +68,13 @@ final class AdjacentTextMerger
         self::mergeIfNeeded($first, $last);
     }
 
-    private static function mergeIfNeeded(?Text $first, ?Text $last): void
-    {
+    /**
+     * @param Text|null $first
+     * @param Text|null $last
+     *
+     * @return void
+     */
+    private static function mergeIfNeeded(Text $first = null, Text $last = null) {
         if ($first === null || $last === null || $first === $last) {
             // No merging needed
             return;
@@ -86,9 +85,10 @@ final class AdjacentTextMerger
         $node = $first->next();
         $stop = $last->next();
         while ($node !== $stop && $node instanceof Text) {
-            $s     .= $node->getLiteral();
+            /** @var Text $node */
+            $s .= $node->getLiteral();
             $unlink = $node;
-            $node   = $node->next();
+            $node = $node->next();
             $unlink->detach();
         }
 

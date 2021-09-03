@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -24,8 +22,7 @@ use League\CommonMark\Renderer\ChildNodeRendererInterface;
 use League\CommonMark\Renderer\NodeRendererInterface;
 use League\CommonMark\Util\HtmlElement;
 
-final class ParagraphRenderer implements NodeRendererInterface
-{
+final class ParagraphRenderer implements NodeRendererInterface {
     /**
      * @param Paragraph $node
      *
@@ -33,9 +30,8 @@ final class ParagraphRenderer implements NodeRendererInterface
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function render(Node $node, ChildNodeRendererInterface $childRenderer)
-    {
-        if (! ($node instanceof Paragraph)) {
+    public function render(Node $node, ChildNodeRendererInterface $childRenderer) {
+        if (!($node instanceof Paragraph)) {
             throw new \InvalidArgumentException('Incompatible node type: ' . \get_class($node));
         }
 
@@ -48,15 +44,14 @@ final class ParagraphRenderer implements NodeRendererInterface
         return new HtmlElement('p', $attrs, $childRenderer->renderNodes($node->children()));
     }
 
-    private function inTightList(Paragraph $node): bool
-    {
+    private function inTightList(Paragraph $node) {
         $parent = $node->parent();
-        if (! $parent instanceof ListItem) {
+        if (!$parent instanceof ListItem) {
             return false;
         }
 
         $gramps = $parent->parent();
-        if (! $gramps instanceof ListBlock) {
+        if (!$gramps instanceof ListBlock) {
             return false;
         }
 

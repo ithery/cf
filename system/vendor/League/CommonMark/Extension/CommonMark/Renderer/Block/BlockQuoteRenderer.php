@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -22,8 +20,7 @@ use League\CommonMark\Renderer\ChildNodeRendererInterface;
 use League\CommonMark\Renderer\NodeRendererInterface;
 use League\CommonMark\Util\HtmlElement;
 
-final class BlockQuoteRenderer implements NodeRendererInterface
-{
+final class BlockQuoteRenderer implements NodeRendererInterface {
     /**
      * @param BlockQuote $node
      *
@@ -31,15 +28,14 @@ final class BlockQuoteRenderer implements NodeRendererInterface
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function render(Node $node, ChildNodeRendererInterface $childRenderer)
-    {
-        if (! ($node instanceof BlockQuote)) {
+    public function render(Node $node, ChildNodeRendererInterface $childRenderer) {
+        if (!($node instanceof BlockQuote)) {
             throw new \InvalidArgumentException('Incompatible node type: ' . \get_class($node));
         }
 
         $attrs = $node->data->get('attributes');
 
-        $filling        = $childRenderer->renderNodes($node->children());
+        $filling = $childRenderer->renderNodes($node->children());
         $innerSeparator = $childRenderer->getInnerSeparator();
         if ($filling === '') {
             return new HtmlElement('blockquote', $attrs, $innerSeparator);

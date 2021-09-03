@@ -378,8 +378,8 @@ class CVendor_SendGrid_Client {
     /**
      * Prepare response object
      *
-     * @param resource $channel the curl resource
-     * @param string   $content
+     * @param CurlHandle $channel the curl resource
+     * @param string     $content
      *
      * @return CVendor_SendGrid_Response object
      */

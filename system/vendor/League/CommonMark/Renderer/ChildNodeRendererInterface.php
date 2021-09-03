@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,14 +16,13 @@ use League\CommonMark\Node\Node;
 /**
  * Renders multiple nodes by delegating to the individual node renderers and adding spacing where needed
  */
-interface ChildNodeRendererInterface
-{
+interface ChildNodeRendererInterface {
     /**
      * @param Node[] $nodes
      */
-    public function renderNodes(iterable $nodes): string;
+    public function renderNodes($nodes);
 
-    public function getBlockSeparator(): string;
+    public function getBlockSeparator();
 
-    public function getInnerSeparator(): string;
+    public function getInnerSeparator();
 }

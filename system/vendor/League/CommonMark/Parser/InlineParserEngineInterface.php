@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,10 +16,11 @@ use League\CommonMark\Node\Block\AbstractBlock;
 /**
  * Parser for inline content (text, links, emphasized text, etc).
  */
-interface InlineParserEngineInterface
-{
+interface InlineParserEngineInterface {
     /**
      * Parse the given contents as inlines and insert them into the given block
+     *
+     * @param mixed $contents
      */
-    public function parse(string $contents, AbstractBlock $block): void;
+    public function parse($contents, AbstractBlock $block);
 }

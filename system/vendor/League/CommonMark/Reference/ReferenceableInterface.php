@@ -9,11 +9,11 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace League\CommonMark\Reference;
 
-interface ReferenceableInterface
-{
-    public function getReference(): ReferenceInterface;
+interface ReferenceableInterface {
+    /**
+     * @return ReferenceInterface
+     */
+    public function getReference();
 }

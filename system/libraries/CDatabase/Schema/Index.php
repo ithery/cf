@@ -13,19 +13,19 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
      * Asset identifier instances of the column names the index is associated with.
      * array($columnName => Identifier)
      *
-     * @var Identifier[]
+     * @var CDatabase_Schema_Identifier[]
      */
-    protected $_columns = [];
+    protected $columns = [];
 
     /**
      * @var bool
      */
-    protected $_isUnique = false;
+    protected $isUnique = false;
 
     /**
      * @var bool
      */
-    protected $_isPrimary = false;
+    protected $isPrimary = false;
 
     /**
      * Platform specific flags for indexes.
@@ -33,7 +33,7 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
      *
      * @var array
      */
-    protected $_flags = [];
+    protected $flags = [];
 
     /**
      * Platform specific options
@@ -55,13 +55,13 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
     public function __construct($indexName, array $columns, $isUnique = false, $isPrimary = false, array $flags = [], array $options = []) {
         $isUnique = $isUnique || $isPrimary;
 
-        $this->_setName($indexName);
-        $this->_isUnique = $isUnique;
-        $this->_isPrimary = $isPrimary;
+        $this->setName($indexName);
+        $this->isUnique = $isUnique;
+        $this->isPrimary = $isPrimary;
         $this->options = $options;
 
         foreach ($columns as $column) {
-            $this->_addColumn($column);
+            $this->addColumn($column);
         }
         foreach ($flags as $flag) {
             $this->addFlag($flag);
@@ -75,9 +75,9 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
      *
      * @throws \InvalidArgumentException
      */
-    protected function _addColumn($column) {
+    protected function addColumn($column) {
         if (is_string($column)) {
-            $this->_columns[$column] = new CDatabase_Schema_Identifier($column);
+            $this->columns[$column] = new CDatabase_Schema_Identifier($column);
         } else {
             throw new \InvalidArgumentException('Expecting a string as Index Column');
         }
@@ -87,7 +87,7 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
      * {@inheritdoc}
      */
     public function getColumns() {
-        return array_keys($this->_columns);
+        return array_keys($this->columns);
     }
 
     /**
@@ -96,7 +96,7 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
     public function getQuotedColumns(CDatabase_Platform $platform) {
         $columns = [];
 
-        foreach ($this->_columns as $column) {
+        foreach ($this->columns as $column) {
             $columns[] = $column->getQuotedName($platform);
         }
 
@@ -116,21 +116,21 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
      * @return bool
      */
     public function isSimpleIndex() {
-        return !$this->_isPrimary && !$this->_isUnique;
+        return !$this->isPrimary && !$this->isUnique;
     }
 
     /**
      * @return bool
      */
     public function isUnique() {
-        return $this->_isUnique;
+        return $this->isUnique;
     }
 
     /**
      * @return bool
      */
     public function isPrimary() {
-        return $this->_isPrimary;
+        return $this->isPrimary;
     }
 
     /**
@@ -210,11 +210,11 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
     /**
      * Detects if the other index is a non-unique, non primary index that can be overwritten by this one.
      *
-     * @param Index $other
+     * @param CDatabase_Schema_Index $other
      *
      * @return bool
      */
-    public function overrules(Index $other) {
+    public function overrules(CDatabase_Schema_Index $other) {
         if ($other->isPrimary()) {
             return false;
         } elseif ($this->isSimpleIndex() && $other->isUnique()) {
@@ -230,20 +230,20 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
      * @return string[]
      */
     public function getFlags() {
-        return array_keys($this->_flags);
+        return array_keys($this->flags);
     }
 
     /**
      * Adds Flag for an index that translates to platform specific handling.
      *
-     * @example $index->addFlag('CLUSTERED')
-     *
      * @param string $flag
      *
-     * @return Index
+     * @return CDatabase_Schema_Index
+     *
+     * @example $index->addFlag('CLUSTERED')
      */
     public function addFlag($flag) {
-        $this->_flags[strtolower($flag)] = true;
+        $this->flags[strtolower($flag)] = true;
 
         return $this;
     }
@@ -256,7 +256,7 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
      * @return bool
      */
     public function hasFlag($flag) {
-        return isset($this->_flags[strtolower($flag)]);
+        return isset($this->flags[strtolower($flag)]);
     }
 
     /**
@@ -267,7 +267,7 @@ class CDatabase_Schema_Index extends CDatabase_AbstractAsset implements CDatabas
      * @return void
      */
     public function removeFlag($flag) {
-        unset($this->_flags[strtolower($flag)]);
+        unset($this->flags[strtolower($flag)]);
     }
 
     /**

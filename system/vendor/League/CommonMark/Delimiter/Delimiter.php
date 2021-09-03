@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,8 +16,7 @@ namespace League\CommonMark\Delimiter;
 
 use League\CommonMark\Node\Inline\AbstractStringContainer;
 
-final class Delimiter implements DelimiterInterface
-{
+final class Delimiter implements DelimiterInterface {
     /**
      * @var string
      *
@@ -90,85 +87,70 @@ final class Delimiter implements DelimiterInterface
      */
     private $index;
 
-    public function __construct(string $char, int $numDelims, AbstractStringContainer $node, bool $canOpen, bool $canClose, ?int $index = null)
-    {
-        $this->char           = $char;
-        $this->length         = $numDelims;
+    public function __construct($char, $numDelims, AbstractStringContainer $node, $canOpen, $canClose, $index = null) {
+        $this->char = $char;
+        $this->length = $numDelims;
         $this->originalLength = $numDelims;
-        $this->inlineNode     = $node;
-        $this->canOpen        = $canOpen;
-        $this->canClose       = $canClose;
-        $this->active         = true;
-        $this->index          = $index;
+        $this->inlineNode = $node;
+        $this->canOpen = $canOpen;
+        $this->canClose = $canClose;
+        $this->active = true;
+        $this->index = $index;
     }
 
-    public function canClose(): bool
-    {
+    public function canClose() {
         return $this->canClose;
     }
 
-    public function canOpen(): bool
-    {
+    public function canOpen() {
         return $this->canOpen;
     }
 
-    public function isActive(): bool
-    {
+    public function isActive() {
         return $this->active;
     }
 
-    public function setActive(bool $active): void
-    {
+    public function setActive($active) {
         $this->active = $active;
     }
 
-    public function getChar(): string
-    {
+    public function getChar() {
         return $this->char;
     }
 
-    public function getIndex(): ?int
-    {
+    public function getIndex() {
         return $this->index;
     }
 
-    public function getNext(): ?DelimiterInterface
-    {
+    public function getNext() {
         return $this->next;
     }
 
-    public function setNext(?DelimiterInterface $next): void
-    {
+    public function setNext(DelimiterInterface $next = null) {
         $this->next = $next;
     }
 
-    public function getLength(): int
-    {
+    public function getLength() {
         return $this->length;
     }
 
-    public function setLength(int $length): void
-    {
+    public function setLength($length) {
         $this->length = $length;
     }
 
-    public function getOriginalLength(): int
-    {
+    public function getOriginalLength() {
         return $this->originalLength;
     }
 
-    public function getInlineNode(): AbstractStringContainer
-    {
+    public function getInlineNode() {
         return $this->inlineNode;
     }
 
-    public function getPrevious(): ?DelimiterInterface
-    {
+    public function getPrevious() {
         return $this->previous;
     }
 
-    public function setPrevious(?DelimiterInterface $previous): void
-    {
+    public function setPrevious(DelimiterInterface $previous = null) {
         $this->previous = $previous;
     }
 }

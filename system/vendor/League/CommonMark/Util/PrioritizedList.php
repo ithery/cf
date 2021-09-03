@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -22,8 +20,7 @@ namespace League\CommonMark\Util;
  * @phpstan-template T
  * @phpstan-implements \IteratorAggregate<T>
  */
-final class PrioritizedList implements \IteratorAggregate
-{
+final class PrioritizedList implements \IteratorAggregate {
     /**
      * @var array<int, array<mixed>>
      * @phpstan-var array<int, array<T>>
@@ -38,13 +35,13 @@ final class PrioritizedList implements \IteratorAggregate
 
     /**
      * @param mixed $item
+     * @param mixed $priority
      *
      * @phpstan-param T $item
      */
-    public function add($item, int $priority): void
-    {
+    public function add($item, $priority) {
         $this->list[$priority][] = $item;
-        $this->optimized         = null;
+        $this->optimized = null;
     }
 
     /**
@@ -52,8 +49,7 @@ final class PrioritizedList implements \IteratorAggregate
      *
      * @phpstan-return \Traversable<int, T>
      */
-    public function getIterator(): \Traversable
-    {
+    public function getIterator() {
         if ($this->optimized === null) {
             \krsort($this->list);
 

@@ -37,7 +37,7 @@ class CQueue_Worker {
     /**
      * The exception handler instance.
      *
-     * @var \Illuminate\Contracts\Debug\ExceptionHandler
+     * @var \CException_ExceptionHandler
      */
     protected $exceptions;
 
@@ -84,7 +84,7 @@ class CQueue_Worker {
      *
      * @param string                          $connectionName
      * @param string                          $queue
-     * @param \Illuminate\Queue\WorkerOptions $options
+     * @param \CQueue_WorkerOptions $options
      *
      * @return void
      */
@@ -186,7 +186,8 @@ class CQueue_Worker {
      * @return bool
      */
     protected function daemonShouldRun(CQueue_WorkerOptions $options, $connectionName, $queue) {
-        $isDownForMaintenance = $this->isDownForMaintenance();
+        //$isDownForMaintenance = $this->isDownForMaintenance();
+        $isDownForMaintenance = false;
         return !(($isDownForMaintenance && !$options->force)
                 || $this->paused
                 || $this->events->until(new CQueue_Event_Looping($connectionName, $queue)) === false);
@@ -404,8 +405,9 @@ class CQueue_Worker {
             // so it is not lost entirely. This'll let the job be retried at a later time by
             // another listener (or this same one). We will re-throw this exception after.
             if (!$job->isDeleted() && !$job->isReleased() && !$job->hasFailed()) {
+                $methodDelaySeconds =  'delaySeconds';
                 $job->release(
-                    method_exists($job, 'delaySeconds') && !is_null($job->delaySeconds()) ? $job->delaySeconds() : $options->delay
+                    method_exists($job, $methodDelaySeconds) && !is_null($job->$methodDelaySeconds()) ? $job->$methodDelaySeconds() : $options->delay
                 );
             }
         }

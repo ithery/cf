@@ -21,6 +21,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         CHTTP_Trait_InteractsWithContentTypes,
         CHTTP_Trait_InteractsWithFlashData;
 
+    protected $browser;
+
     /**
      * The decoded JSON content for the request.
      *
@@ -612,8 +614,9 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return bool
      */
     public function offsetExists($offset) {
+        $routeParameters = $this->route() ? $this->route()->parameters() : [];
         return carr::has(
-            $this->all() + $this->route()->parameters(),
+            $this->all() + $routeParameters,
             $offset
         );
     }
@@ -674,5 +677,17 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         return carr::get($this->all(), $key, function () use ($key) {
             return $this->route($key);
         });
+    }
+
+    /**
+     * Get Browser
+     *
+     * @return CBrowser
+     */
+    public function browser() {
+        if ($this->browser == null) {
+            $this->browser = new CBrowser($this->userAgent());
+        }
+        return $this->browser;
     }
 }

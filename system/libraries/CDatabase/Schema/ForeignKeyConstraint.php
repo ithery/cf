@@ -16,7 +16,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      *
      * @var CDatabase_Schema_Table
      */
-    protected $_localTable;
+    protected $localTable;
 
     /**
      * Asset identifier instances of the referencing table column names the foreign key constraint is associated with.
@@ -24,14 +24,14 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      *
      * @var CDatabase_Schema_Identifier[]
      */
-    protected $_localColumnNames;
+    protected $localColumnNames;
 
     /**
      * Table or asset identifier instance of the referenced table name the foreign key constraint is associated with.
      *
      * @var CDatabase_Schema_Table|Identifier
      */
-    protected $_foreignTableName;
+    protected $foreignTableName;
 
     /**
      * Asset identifier instances of the referenced table column names the foreign key constraint is associated with.
@@ -39,12 +39,12 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      *
      * @var CDatabase_Schema_Identifier[]
      */
-    protected $_foreignColumnNames;
+    protected $foreignColumnNames;
 
     /**
      * @var array options associated with the foreign key constraint
      */
-    protected $_options;
+    protected $options;
 
     /**
      * Initializes the foreign key constraint.
@@ -56,20 +56,20 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @param array                         $options            options associated with the foreign key constraint
      */
     public function __construct(array $localColumnNames, $foreignTableName, array $foreignColumnNames, $name = null, array $options = []) {
-        $this->_setName($name);
+        $this->setName($name);
         $identifierConstructorCallback = function ($column) {
             return new CDatabase_Schema_Identifier($column);
         };
-        $this->_localColumnNames = $localColumnNames ? array_combine($localColumnNames, array_map($identifierConstructorCallback, $localColumnNames)) : [];
+        $this->localColumnNames = $localColumnNames ? array_combine($localColumnNames, array_map($identifierConstructorCallback, $localColumnNames)) : [];
 
         if ($foreignTableName instanceof CDatabase_Schema_Table) {
-            $this->_foreignTableName = $foreignTableName;
+            $this->foreignTableName = $foreignTableName;
         } else {
-            $this->_foreignTableName = new CDatabase_Schema_Identifier($foreignTableName);
+            $this->foreignTableName = new CDatabase_Schema_Identifier($foreignTableName);
         }
 
-        $this->_foreignColumnNames = $foreignColumnNames ? array_combine($foreignColumnNames, array_map($identifierConstructorCallback, $foreignColumnNames)) : [];
-        $this->_options = $options;
+        $this->foreignColumnNames = $foreignColumnNames ? array_combine($foreignColumnNames, array_map($identifierConstructorCallback, $foreignColumnNames)) : [];
+        $this->options = $options;
     }
 
     /**
@@ -79,7 +79,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @return string
      */
     public function getLocalTableName() {
-        return $this->_localTable->getName();
+        return $this->localTable->getName();
     }
 
     /**
@@ -91,14 +91,14 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @return void
      */
     public function setLocalTable(CDatabase_Schema_Table $table) {
-        $this->_localTable = $table;
+        $this->localTable = $table;
     }
 
     /**
      * @return CDatabase_Schema_Table
      */
     public function getLocalTable() {
-        return $this->_localTable;
+        return $this->localTable;
     }
 
     /**
@@ -108,7 +108,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @return array
      */
     public function getLocalColumns() {
-        return array_keys($this->_localColumnNames);
+        return array_keys($this->localColumnNames);
     }
 
     /**
@@ -126,7 +126,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
     public function getQuotedLocalColumns(CDatabase_Platform $platform) {
         $columns = [];
 
-        foreach ($this->_localColumnNames as $column) {
+        foreach ($this->localColumnNames as $column) {
             $columns[] = $column->getQuotedName($platform);
         }
 
@@ -185,7 +185,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @return string
      */
     public function getForeignTableName() {
-        return $this->_foreignTableName->getName();
+        return $this->foreignTableName->getName();
     }
 
     /**
@@ -194,7 +194,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @return string
      */
     public function getUnqualifiedForeignTableName() {
-        $parts = explode('.', $this->_foreignTableName->getName());
+        $parts = explode('.', $this->foreignTableName->getName());
 
         return strtolower(end($parts));
     }
@@ -212,7 +212,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @return string
      */
     public function getQuotedForeignTableName(CDatabase_Platform $platform) {
-        return $this->_foreignTableName->getQuotedName($platform);
+        return $this->foreignTableName->getQuotedName($platform);
     }
 
     /**
@@ -222,7 +222,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @return array
      */
     public function getForeignColumns() {
-        return array_keys($this->_foreignColumnNames);
+        return array_keys($this->foreignColumnNames);
     }
 
     /**
@@ -240,7 +240,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
     public function getQuotedForeignColumns(CDatabase_Platform $platform) {
         $columns = [];
 
-        foreach ($this->_foreignColumnNames as $column) {
+        foreach ($this->foreignColumnNames as $column) {
             $columns[] = $column->getQuotedName($platform);
         }
 
@@ -256,7 +256,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @return bool
      */
     public function hasOption($name) {
-        return isset($this->_options[$name]);
+        return isset($this->options[$name]);
     }
 
     /**
@@ -267,7 +267,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @return mixed
      */
     public function getOption($name) {
-        return $this->_options[$name];
+        return $this->options[$name];
     }
 
     /**
@@ -276,7 +276,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @return array
      */
     public function getOptions() {
-        return $this->_options;
+        return $this->options;
     }
 
     /**
@@ -308,8 +308,8 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      * @return string|null
      */
     private function onEvent($event) {
-        if (isset($this->_options[$event])) {
-            $onEvent = strtoupper($this->_options[$event]);
+        if (isset($this->options[$event])) {
+            $onEvent = strtoupper($this->options[$event]);
 
             if (!in_array($onEvent, ['NO ACTION', 'RESTRICT'])) {
                 return $onEvent;
@@ -331,7 +331,7 @@ class CDatabase_Schema_ForeignKeyConstraint extends CDatabase_AbstractAsset impl
      */
     public function intersectsIndexColumns(CDatabase_Schema_Index $index) {
         foreach ($index->getColumns() as $indexColumn) {
-            foreach ($this->_localColumnNames as $localColumn) {
+            foreach ($this->localColumnNames as $localColumn) {
                 if (strtolower($indexColumn) === strtolower($localColumn->getName())) {
                     return true;
                 }

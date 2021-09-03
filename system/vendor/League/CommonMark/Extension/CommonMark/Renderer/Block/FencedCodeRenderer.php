@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -23,8 +21,7 @@ use League\CommonMark\Renderer\NodeRendererInterface;
 use League\CommonMark\Util\HtmlElement;
 use League\CommonMark\Util\Xml;
 
-final class FencedCodeRenderer implements NodeRendererInterface
-{
+final class FencedCodeRenderer implements NodeRendererInterface {
     /**
      * @param FencedCode $node
      *
@@ -32,9 +29,8 @@ final class FencedCodeRenderer implements NodeRendererInterface
      *
      * @psalm-suppress MoreSpecificImplementedParamType
      */
-    public function render(Node $node, ChildNodeRendererInterface $childRenderer)
-    {
-        if (! ($node instanceof FencedCode)) {
+    public function render(Node $node, ChildNodeRendererInterface $childRenderer) {
+        if (!($node instanceof FencedCode)) {
             throw new \InvalidArgumentException('Incompatible node type: ' . \get_class($node));
         }
 

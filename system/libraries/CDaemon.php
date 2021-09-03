@@ -136,12 +136,12 @@ class CDaemon {
         $isRunning = $this->isRunning();
         if ($command == 'start') {
             if ($isRunning) {
-                throw new Exception('daemon is running');
+                throw new CDaemon_Exception_AlreadyRunningException('daemon is running');
             }
         }
         if ($command == 'stop') {
             if (!$isRunning) {
-                throw new Exception('daemon is stopped');
+                throw new CDaemon_Exception_AlreadyStoppedException('daemon is stopped');
             }
         }
 

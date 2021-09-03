@@ -1,24 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 2:18:08 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 2:18:08 AM
  */
 final class CQueue {
-
     protected static $dispatcher;
 
     /**
-     * 
      * @return CQueue_Dispatcher
      */
     public static function dispatcher() {
         if (self::$dispatcher == null) {
             self::$dispatcher = new CQueue_Dispatcher(CContainer::getInstance(), function ($connection = null) {
-
                 return CQueue::queuer()->connection($connection);
             });
         }
@@ -26,25 +24,25 @@ final class CQueue {
     }
 
     /**
-     * 
      * @return CQueue_Manager
      */
     public static function queuer() {
-        return CF::tap(new CQueue_Manager(), function ($manager) {
-                    CQueue::registerConnectors($manager);
-                });
+        return c::tap(new CQueue_Manager(), function ($manager) {
+            CQueue::registerConnectors($manager);
+        });
     }
 
     /**
      * Register the connectors on the queue manager.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param CQueue_Manager $manager
+     *
      * @return void
      */
     public static function registerConnectors($manager) {
-//        foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
-//            self::{"register{$connector}Connector"}($manager);
-//        }
+        // foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
+        //     self::{"register{$connector}Connector"}($manager);
+        // }
         foreach (['Null', 'Database', 'Sqs', 'Beanstalkd'] as $connector) {
             self::{"register{$connector}Connector"}($manager);
         }
@@ -53,7 +51,8 @@ final class CQueue {
     /**
      * Register the Null queue connector.
      *
-     * @param  CQueue_Manager  $manager
+     * @param CQueue_Manager $manager
+     *
      * @return void
      */
     protected static function registerNullConnector($manager) {
@@ -65,7 +64,8 @@ final class CQueue {
     /**
      * Register the Sync queue connector.
      *
-     * @param  CQueue_Manager  $manager
+     * @param CQueue_Manager $manager
+     *
      * @return void
      */
     protected static function registerSyncConnector($manager) {
@@ -77,7 +77,8 @@ final class CQueue {
     /**
      * Register the Sync queue connector.
      *
-     * @param  CQueue_Manager  $manager
+     * @param CQueue_Manager $manager
+     *
      * @return void
      */
     protected static function registerBeanstalkdConnector($manager) {
@@ -89,11 +90,11 @@ final class CQueue {
     /**
      * Register the database queue connector.
      *
-     * @param  CQueue_Manager  $manager
+     * @param CQueue_Manager $manager
+     *
      * @return void
      */
     protected static function registerDatabaseConnector($manager) {
-
         $manager->addConnector('database', function () {
             return new CQueue_Connector_DatabaseConnector();
         });
@@ -102,7 +103,8 @@ final class CQueue {
     /**
      * Register the Amazon SQS queue connector.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param \CQueue_Manager $manager
+     *
      * @return void
      */
     protected static function registerSqsConnector($manager) {
@@ -119,8 +121,6 @@ final class CQueue {
     }
 
     public static function run($connection = null) {
-
-
         $runner = new CQueue_Runner(CQueue::worker(), null);
         $runner->run($connection);
     }
@@ -132,5 +132,4 @@ final class CQueue {
     public static function primaryKey($database, $table) {
         return $database->driverName() == 'MongoDB' ? '_id' : $table . '_id';
     }
-
 }

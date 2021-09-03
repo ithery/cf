@@ -16,27 +16,27 @@ class CDatabase_Event_Schema_OnAlterTableRenameColumn extends CDatabase_Event_Sc
     /**
      * @var string
      */
-    private $_oldColumnName;
+    private $oldColumnName;
 
     /**
      * @var CDatabase_Schema_Column
      */
-    private $_column;
+    private $column;
 
     /**
      * @var CDatabase_Schema_Table_Diff
      */
-    private $_tableDiff;
+    private $tableDiff;
 
     /**
      * @var CDatabase_Platform
      */
-    private $_platform;
+    private $platform;
 
     /**
      * @var array
      */
-    private $_sql = [];
+    private $sql = [];
 
     /**
      * @param string                      $oldColumnName
@@ -45,38 +45,38 @@ class CDatabase_Event_Schema_OnAlterTableRenameColumn extends CDatabase_Event_Sc
      * @param CDatabase_Platform          $platform
      */
     public function __construct($oldColumnName, CDatabase_Schema_Column $column, CDatabase_Schema_Table_Diff $tableDiff, CDatabase_Platform $platform) {
-        $this->_oldColumnName = $oldColumnName;
-        $this->_column = $column;
-        $this->_tableDiff = $tableDiff;
-        $this->_platform = $platform;
+        $this->oldColumnName = $oldColumnName;
+        $this->column = $column;
+        $this->tableDiff = $tableDiff;
+        $this->platform = $platform;
     }
 
     /**
      * @return string
      */
     public function getOldColumnName() {
-        return $this->_oldColumnName;
+        return $this->oldColumnName;
     }
 
     /**
      * @return CDatabase_Schema_Column
      */
     public function getColumn() {
-        return $this->_column;
+        return $this->column;
     }
 
     /**
      * @return CDatabase_Schema_Table_Diff
      */
     public function getTableDiff() {
-        return $this->_tableDiff;
+        return $this->tableDiff;
     }
 
     /**
      * @return CDatabase_Platform
      */
     public function getPlatform() {
-        return $this->_platform;
+        return $this->platform;
     }
 
     /**
@@ -86,9 +86,9 @@ class CDatabase_Event_Schema_OnAlterTableRenameColumn extends CDatabase_Event_Sc
      */
     public function addSql($sql) {
         if (is_array($sql)) {
-            $this->_sql = array_merge($this->_sql, $sql);
+            $this->sql = array_merge($this->sql, $sql);
         } else {
-            $this->_sql[] = $sql;
+            $this->sql[] = $sql;
         }
         return $this;
     }
@@ -97,6 +97,6 @@ class CDatabase_Event_Schema_OnAlterTableRenameColumn extends CDatabase_Event_Sc
      * @return array
      */
     public function getSql() {
-        return $this->_sql;
+        return $this->sql;
     }
 }

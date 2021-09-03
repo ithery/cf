@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -16,7 +14,6 @@ namespace League\CommonMark\Configuration;
 /**
  * Implement this class to inject the configuration where needed
  */
-interface ConfigurationAwareInterface
-{
-    public function setConfiguration(ConfigurationInterface $configuration): void;
+interface ConfigurationAwareInterface {
+    public function setConfiguration(ConfigurationInterface $configuration);
 }

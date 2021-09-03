@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is a part of dflydev/dot-access-data.
  *
@@ -16,11 +14,12 @@ namespace Dflydev\DotAccessData;
 use Dflydev\DotAccessData\Exception\DataException;
 use Dflydev\DotAccessData\Exception\InvalidPathException;
 
-interface DataInterface
-{
-    public const PRESERVE = 0;
-    public const REPLACE = 1;
-    public const MERGE = 2;
+interface DataInterface {
+    const PRESERVE = 0;
+
+    const REPLACE = 1;
+
+    const MERGE = 2;
 
     /**
      * Append a value to a key (assumes key refers to an array value)
@@ -33,7 +32,7 @@ interface DataInterface
      *
      * @throws InvalidPathException if the given key is empty
      */
-    public function append(string $key, $value = null): void;
+    public function append($key, $value = null);
 
     /**
      * Set a value for a key
@@ -44,9 +43,9 @@ interface DataInterface
      * @param mixed  $value
      *
      * @throws InvalidPathException if the given key is empty
-     * @throws DataException if the given key does not target an array
+     * @throws DataException        if the given key does not target an array
      */
-    public function set(string $key, $value = null): void;
+    public function set($key, $value = null);
 
     /**
      * Remove a key
@@ -57,7 +56,7 @@ interface DataInterface
      *
      * @throws InvalidPathException if the given key is empty
      */
-    public function remove(string $key): void;
+    public function remove($key);
 
     /**
      * Get the raw value for a key
@@ -66,7 +65,7 @@ interface DataInterface
      * If no default is provided then an exception will be thrown instead.
      *
      * @param string $key
-     * @param mixed $default
+     * @param mixed  $default
      *
      * @return mixed
      *
@@ -75,7 +74,7 @@ interface DataInterface
      *
      * @psalm-mutation-free
      */
-    public function get(string $key, $default = null);
+    public function get($key, $default = null);
 
     /**
      * Check if the key exists
@@ -88,7 +87,7 @@ interface DataInterface
      *
      * @psalm-mutation-free
      */
-    public function has(string $key): bool;
+    public function has($key);
 
     /**
      * Get a data instance for a key
@@ -98,11 +97,11 @@ interface DataInterface
      * @return DataInterface
      *
      * @throws InvalidPathException if the given key is empty
-     * @throws DataException if the given key does not reference an array
+     * @throws DataException        if the given key does not reference an array
      *
      * @psalm-mutation-free
      */
-    public function getData(string $key): DataInterface;
+    public function getData($key);
 
     /**
      * Import data into existing data
@@ -110,7 +109,7 @@ interface DataInterface
      * @param array<string, mixed>                     $data
      * @param self::PRESERVE|self::REPLACE|self::MERGE $mode
      */
-    public function import(array $data, int $mode = self::REPLACE): void;
+    public function import(array $data, $mode = self::REPLACE);
 
     /**
      * Import data from an external data into existing data
@@ -118,7 +117,7 @@ interface DataInterface
      * @param DataInterface                            $data
      * @param self::PRESERVE|self::REPLACE|self::MERGE $mode
      */
-    public function importData(DataInterface $data, int $mode = self::REPLACE): void;
+    public function importData(DataInterface $data, $mode = self::REPLACE);
 
     /**
      * Export data as raw data
@@ -127,5 +126,5 @@ interface DataInterface
      *
      * @psalm-mutation-free
      */
-    public function export(): array;
+    public function export();
 }

@@ -32,21 +32,21 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableViewDefinition($view) {
-        return new CView_View($view['TABLE_NAME'], $view['VIEW_DEFINITION']);
+    protected function getPortableViewDefinition($view) {
+        return new CDatabase_Schema_View($view['TABLE_NAME'], $view['VIEW_DEFINITION']);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableTableDefinition($table) {
+    protected function getPortableTableDefinition($table) {
         return array_shift($table);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableUserDefinition($user) {
+    protected function getPortableUserDefinition($user) {
         return [
             'user' => $user['User'],
             'password' => $user['Password'],
@@ -56,7 +56,7 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableTableIndexesList($tableIndexes, $tableName = null) {
+    protected function getPortableTableIndexesList($tableIndexes, $tableName = null) {
         foreach ($tableIndexes as $k => $v) {
             $v = array_change_key_case($v, CASE_LOWER);
             if ($v['key_name'] === 'PRIMARY') {
@@ -72,27 +72,27 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
             $tableIndexes[$k] = $v;
         }
 
-        return parent::_getPortableTableIndexesList($tableIndexes, $tableName);
+        return parent::getPortableTableIndexesList($tableIndexes, $tableName);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableSequenceDefinition($sequence) {
+    protected function getPortableSequenceDefinition($sequence) {
         return end($sequence);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableDatabaseDefinition($database) {
+    protected function getPortableDatabaseDefinition($database) {
         return $database['Database'];
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableTableColumnDefinition($tableColumn) {
+    protected function getPortableTableColumnDefinition($tableColumn) {
         $tableColumn = array_change_key_case($tableColumn, CASE_LOWER);
 
         $dbType = strtolower($tableColumn['type']);
@@ -203,10 +203,10 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
      *   null in some circumstances (see https://jira.mariadb.org/browse/MDEV-14053)
      * - \' is always stored as '' in information_schema (normalized)
      *
+     * @param null|string $columnDefault default value as stored in information_schema for MariaDB >= 10.2.7
+     *
      * @link https://mariadb.com/kb/en/library/information-schema-columns-table/
      * @link https://jira.mariadb.org/browse/MDEV-13132
-     *
-     * @param null|string $columnDefault default value as stored in information_schema for MariaDB >= 10.2.7
      */
     private function getMariaDb1027ColumnDefault(CDatabase_Platform_MariaDb1027 $platform, $columnDefault = null) {
         if ($columnDefault === 'NULL' || $columnDefault === null) {
@@ -235,7 +235,7 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableTableForeignKeysList($tableForeignKeys) {
+    protected function getPortableTableForeignKeysList($tableForeignKeys) {
         $list = [];
         foreach ($tableForeignKeys as $value) {
             $value = array_change_key_case($value, CASE_LOWER);

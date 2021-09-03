@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -26,45 +24,56 @@ use League\CommonMark\Parser\InlineParserEngineInterface;
  * A block continue parser can only handle a single block instance. The current block being parsed is stored within this parser and
  * can be returned once parsing has completed. If you need to parse multiple block continuations, instantiate a new parser for each one.
  */
-interface BlockContinueParserInterface
-{
+interface BlockContinueParserInterface {
     /**
      * Return the current block being parsed by this parser
+     *
+     * @return AbstractBlock
      */
-    public function getBlock(): AbstractBlock;
+    public function getBlock();
 
     /**
      * Return whether we are parsing a container block
+     *
+     * @return bool
      */
-    public function isContainer(): bool;
+    public function isContainer();
 
     /**
      * Return whether we are interested in possibly lazily parsing any subsequent lines
+     *
+     * @return bool
      */
-    public function canHaveLazyContinuationLines(): bool;
+    public function canHaveLazyContinuationLines();
 
     /**
      * Determine whether the current block being parsed can contain the given child block
+     *
+     * @return bool
      */
-    public function canContain(AbstractBlock $childBlock): bool;
+    public function canContain(AbstractBlock $childBlock);
 
     /**
      * Attempt to parse the given line
+     *
+     * @return BlockContinue|null
      */
-    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue;
+    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser);
 
     /**
      * Add the given line of text to the current block
+     *
+     * @param mixed $line
      */
-    public function addLine(string $line): void;
+    public function addLine($line);
 
     /**
      * Close and finalize the current block
      */
-    public function closeBlock(): void;
+    public function closeBlock();
 
     /**
      * Parse any inlines inside of the current block
      */
-    public function parseInlines(InlineParserEngineInterface $inlineParser): void;
+    public function parseInlines(InlineParserEngineInterface $inlineParser);
 }

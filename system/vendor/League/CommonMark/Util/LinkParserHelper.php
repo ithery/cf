@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -21,15 +19,13 @@ use League\CommonMark\Parser\Cursor;
 /**
  * @psalm-immutable
  */
-final class LinkParserHelper
-{
+final class LinkParserHelper {
     /**
      * Attempt to parse link destination
      *
      * @return string|null The string, or null if no match
      */
-    public static function parseLinkDestination(Cursor $cursor): ?string
-    {
+    public static function parseLinkDestination(Cursor $cursor) {
         if ($res = $cursor->match(RegexHelper::REGEX_LINK_DESTINATION_BRACES)) {
             // Chop off surrounding <..>:
             return UrlEncoder::unescapeAndEncode(
@@ -51,8 +47,7 @@ final class LinkParserHelper
         );
     }
 
-    public static function parseLinkLabel(Cursor $cursor): int
-    {
+    public static function parseLinkLabel(Cursor $cursor) {
         $match = $cursor->match('/^\[(?:[^\\\\\[\]]|\\\\.){0,1000}\]/');
         if ($match === null) {
             return 0;
@@ -67,8 +62,7 @@ final class LinkParserHelper
         return $length;
     }
 
-    public static function parsePartialLinkLabel(Cursor $cursor): ?string
-    {
+    public static function parsePartialLinkLabel(Cursor $cursor) {
         return $cursor->match('/^(?:[^\\\\\[\]]|\\\\.){0,1000}/');
     }
 
@@ -77,8 +71,7 @@ final class LinkParserHelper
      *
      * @return string|null The string, or null if no match
      */
-    public static function parseLinkTitle(Cursor $cursor): ?string
-    {
+    public static function parseLinkTitle(Cursor $cursor) {
         if ($title = $cursor->match('/' . RegexHelper::PARTIAL_LINK_TITLE . '/')) {
             // Chop off quotes from title and unescape
             return RegexHelper::unescape(\substr($title, 1, -1));
@@ -87,10 +80,9 @@ final class LinkParserHelper
         return null;
     }
 
-    public static function parsePartialLinkTitle(Cursor $cursor, string $endDelimiter): ?string
-    {
+    public static function parsePartialLinkTitle(Cursor $cursor, $endDelimiter) {
         $endDelimiter = \preg_quote($endDelimiter, '/');
-        $regex        = \sprintf('/(%s|[^%s\x00])*(?:%s)?/', RegexHelper::PARTIAL_ESCAPED_CHAR, $endDelimiter, $endDelimiter);
+        $regex = \sprintf('/(%s|[^%s\x00])*(?:%s)?/', RegexHelper::PARTIAL_ESCAPED_CHAR, $endDelimiter, $endDelimiter);
         if (($partialTitle = $cursor->match($regex)) === null) {
             return null;
         }
@@ -98,10 +90,9 @@ final class LinkParserHelper
         return RegexHelper::unescape($partialTitle);
     }
 
-    private static function manuallyParseLinkDestination(Cursor $cursor): ?string
-    {
+    private static function manuallyParseLinkDestination(Cursor $cursor) {
         $oldPosition = $cursor->getPosition();
-        $oldState    = $cursor->saveState();
+        $oldState = $cursor->saveState();
 
         $openParens = 0;
         while (($c = $cursor->getCharacter()) !== null) {
@@ -128,7 +119,7 @@ final class LinkParserHelper
             return null;
         }
 
-        if ($cursor->getPosition() === $oldPosition && (! isset($c) || $c !== ')')) {
+        if ($cursor->getPosition() === $oldPosition && (!isset($c) || $c !== ')')) {
             return null;
         }
 

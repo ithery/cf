@@ -1,39 +1,40 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 20, 2018, 1:13:03 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 20, 2018, 1:13:03 AM
  */
 
 /**
  * A registry for custom helpers.
- *
  */
 class CTemplate_Helpers {
-
     /**
      * The map of registered helpers.
-     * @var array
      *
+     * @var array
      */
-    protected $map = array();
+    protected $map = [];
 
     /**
      * Constructor.
-     * @param array $map A map of helpers.
      *
+     * @param array $map a map of helpers
      */
-    public function __construct(array $map = array()) {
+    public function __construct(array $map = []) {
         $this->map = $map;
     }
 
     /**
      * Magic call to invoke helpers as methods on this registry.
-     * @param string $name The registered helper name.
-     * @param array $args Arguments to pass to the helper invocation.
+     *
+     * @param string $name the registered helper name
+     * @param array  $args arguments to pass to the helper invocation
+     *
      * @return mixed
      */
     public function __call($name, $args) {
@@ -41,21 +42,22 @@ class CTemplate_Helpers {
     }
 
     /**
-     *
      * Registers a helper.
-     * @param string $name Register the helper under this name.
-     * @param callable $callable The callable helper.
-     * @return null
      *
+     * @param string   $name     register the helper under this name
+     * @param callable $callable the callable helper
+     *
+     * @return null
      */
     public function set($name, $callable) {
         $this->map[$name] = $callable;
     }
 
     /**
-     *
      * Is a named helper registered?
-     * @param string $name The helper name.
+     *
+     * @param string $name the helper name
+     *
      * @return bool
      */
     public function has($name) {
@@ -63,11 +65,11 @@ class CTemplate_Helpers {
     }
 
     /**
-     *
      * Gets a helper from the registry.
-     * @param string $name The helper name.
-     * @return callable
      *
+     * @param string $name the helper name
+     *
+     * @return callable
      */
     public function get($name) {
         if (!$this->has($name)) {
@@ -75,5 +77,4 @@ class CTemplate_Helpers {
         }
         return $this->map[$name];
     }
-
 }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -20,8 +18,7 @@ use League\CommonMark\Delimiter\DelimiterStack;
 use League\CommonMark\Node\Block\AbstractBlock;
 use League\CommonMark\Reference\ReferenceMapInterface;
 
-final class InlineParserContext
-{
+final class InlineParserContext {
     /**
      * @var AbstractBlock
      *
@@ -58,47 +55,40 @@ final class InlineParserContext
      */
     private $matches;
 
-    public function __construct(Cursor $contents, AbstractBlock $container, ReferenceMapInterface $referenceMap)
-    {
-        $this->referenceMap   = $referenceMap;
-        $this->container      = $container;
-        $this->cursor         = $contents;
+    public function __construct(Cursor $contents, AbstractBlock $container, ReferenceMapInterface $referenceMap) {
+        $this->referenceMap = $referenceMap;
+        $this->container = $container;
+        $this->cursor = $contents;
         $this->delimiterStack = new DelimiterStack();
     }
 
-    public function getContainer(): AbstractBlock
-    {
+    public function getContainer() {
         return $this->container;
     }
 
-    public function getReferenceMap(): ReferenceMapInterface
-    {
+    public function getReferenceMap() {
         return $this->referenceMap;
     }
 
-    public function getCursor(): Cursor
-    {
+    public function getCursor() {
         return $this->cursor;
     }
 
-    public function getDelimiterStack(): DelimiterStack
-    {
+    public function getDelimiterStack() {
         return $this->delimiterStack;
     }
 
     /**
      * @return string The full text that matched the InlineParserMatch definition
      */
-    public function getFullMatch(): string
-    {
+    public function getFullMatch() {
         return $this->matches[0];
     }
 
     /**
      * @return int The length of the full match (in characters, not bytes)
      */
-    public function getFullMatchLength(): int
-    {
+    public function getFullMatchLength() {
         return \mb_strlen($this->matches[0]);
     }
 
@@ -107,16 +97,14 @@ final class InlineParserContext
      *
      * @psalm-return non-empty-array<string>
      */
-    public function getMatches(): array
-    {
+    public function getMatches() {
         return $this->matches;
     }
 
     /**
      * @return string[]
      */
-    public function getSubMatches(): array
-    {
+    public function getSubMatches() {
         return \array_slice($this->matches, 1);
     }
 
@@ -125,8 +113,7 @@ final class InlineParserContext
      *
      * @psalm-param non-empty-array<string> $matches
      */
-    public function withMatches(array $matches): InlineParserContext
-    {
+    public function withMatches(array $matches) {
         $ctx = clone $this;
 
         $ctx->matches = $matches;

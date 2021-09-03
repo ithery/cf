@@ -4,7 +4,9 @@
  * @mixin CModel_Query
  */
 abstract class CModel_Relation {
-    use CTrait_ForwardsCalls;
+    use CTrait_ForwardsCalls, CTrait_Macroable {
+        __call as macroCall;
+    }
 
     /**
      * The model query builder instance.
@@ -374,9 +376,11 @@ abstract class CModel_Relation {
      * @return mixed
      */
     public function __call($method, $parameters) {
-        $result = $this->forwardCallTo($this->query, $method, $parameters);
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
 
-        //$result = $this->query->{$method}(...$parameters);
+        $result = $this->forwardCallTo($this->query, $method, $parameters);
 
         if ($result === $this->query) {
             return $this;

@@ -58,7 +58,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Get the underlying Redis client.
      *
-     * @return mixed
+     * @return \Redis
      */
     public function client() {
         return $this->client;
@@ -156,7 +156,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Get the event dispatcher used by the connection.
      *
-     * @return \Illuminate\Contracts\Events\Dispatcher
+     * @return \CEvent_DispatcherInterface
      */
     public function getEventDispatcher() {
         return $this->events;
@@ -165,7 +165,7 @@ abstract class CRedis_AbstractConnection implements CRedis_ConnectionInterface {
     /**
      * Set the event dispatcher instance on the connection.
      *
-     * @param CEvent_Dispatcher $events
+     * @param CEvent_DispatcherInterface $events
      *
      * @return void
      */

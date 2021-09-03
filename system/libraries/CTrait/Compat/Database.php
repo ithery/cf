@@ -7,6 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Mar 22, 2019, 2:10:37 PM
+ * @see CDatabase
  */
 
 // @codingStandardsIgnoreStart
@@ -310,28 +311,6 @@ trait CTrait_Compat_Database {
     }
 
     /**
-     * Selects the limit section of a query.
-     *
-     * @param   int  number of rows to limit result to
-     * @param   int  offset in result to start returning rows from
-     * @param mixed      $limit
-     * @param null|mixed $offset
-     *
-     * @return CDatabase this Database object
-     *
-     * @deprecated use model or query builder
-     */
-    public function limit($limit, $offset = null) {
-        $this->limit = (int) $limit;
-
-        if ($offset !== null or !is_int($this->offset)) {
-            $this->offset($offset);
-        }
-
-        return $this;
-    }
-
-    /**
      * Sets the offset portion of a query.
      *
      * @param   int  offset value
@@ -369,7 +348,7 @@ trait CTrait_Compat_Database {
             $this->where($where);
         }
 
-        $query = $this->select('COUNT(*) AS ' . $this->escape_column('records_found'))->get()->result(true);
+        $query = $this->select('COUNT(*) AS ' . $this->escapeColumn('records_found'))->get()->result(true);
 
         return (int) $query->current()->records_found;
     }
@@ -381,7 +360,7 @@ trait CTrait_Compat_Database {
      *
      * @deprecated 1.1
      */
-    protected function reset_select() {
+    protected function resetSelect() {
         $this->select = [];
         $this->from = [];
         $this->join = [];

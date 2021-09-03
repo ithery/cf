@@ -15,7 +15,7 @@ interface CVendor_Xendit_HttpClient_HttpClientInterface {
      */
     public function sendRequest(
         $method,
-        string $url,
+        $url,
         array $defaultHeaders,
         $params
     );

@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Pheanstalk\Job as PheanstalkJob;
 use Pheanstalk\Pheanstalk;
 
 class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
-
     /**
      * The Pheanstalk instance.
      *
@@ -42,10 +35,11 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
     /**
      * Create a new Beanstalkd queue instance.
      *
-     * @param  \Pheanstalk\Pheanstalk  $pheanstalk
-     * @param  string  $default
-     * @param  int  $timeToRun
-     * @param  int  $blockFor
+     * @param \Pheanstalk\Pheanstalk $pheanstalk
+     * @param string                 $default
+     * @param int                    $timeToRun
+     * @param int                    $blockFor
+     *
      * @return void
      */
     public function __construct(Pheanstalk $pheanstalk, $default, $timeToRun, $blockFor = 0) {
@@ -58,7 +52,8 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
     /**
      * Get the size of the queue.
      *
-     * @param  string|null  $queue
+     * @param string|null $queue
+     *
      * @return int
      */
     public function size($queue = null) {
@@ -69,22 +64,23 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
     /**
      * Push a new job onto the queue.
      *
-     * @param  string  $job
-     * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param string      $job
+     * @param mixed       $data
+     * @param string|null $queue
+     *
      * @return mixed
      */
     public function push($job, $data = '', $queue = null) {
-
         return $this->pushRaw($this->createPayload($job, $this->getQueue($queue), $data), $queue);
     }
 
     /**
      * Push a raw payload onto the queue.
      *
-     * @param  string  $payload
-     * @param  string|null  $queue
-     * @param  array  $options
+     * @param string      $payload
+     * @param string|null $queue
+     * @param array       $options
+     *
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = []) {
@@ -93,33 +89,40 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
             $e = new \Exception;
             CDaemon::log($e->getTraceAsString());
         }
- 
 
         return $this->pheanstalk->useTube($this->getQueue($queue))->put(
-                        $payload, Pheanstalk::DEFAULT_PRIORITY, Pheanstalk::DEFAULT_DELAY, $this->timeToRun
+            $payload,
+            Pheanstalk::DEFAULT_PRIORITY,
+            Pheanstalk::DEFAULT_DELAY,
+            $this->timeToRun
         );
     }
 
     /**
      * Push a new job onto the queue after a delay.
      *
-     * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  string  $job
-     * @param  mixed  $data
-     * @param  string|null  $queue
+     * @param \DateTimeInterface|\DateInterval|int $delay
+     * @param string                               $job
+     * @param mixed                                $data
+     * @param string|null                          $queue
+     *
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null) {
         $pheanstalk = $this->pheanstalk->useTube($this->getQueue($queue));
         return $pheanstalk->put(
-                        $this->createPayload($job, $this->getQueue($queue), $data), Pheanstalk::DEFAULT_PRIORITY, $this->secondsUntil($delay), $this->timeToRun
+            $this->createPayload($job, $this->getQueue($queue), $data),
+            Pheanstalk::DEFAULT_PRIORITY,
+            $this->secondsUntil($delay),
+            $this->timeToRun
         );
     }
 
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string|null  $queue
+     * @param string|null $queue
+     *
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null) {
@@ -129,7 +132,11 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
 
         if ($job instanceof PheanstalkJob) {
             return new CQueue_Job_BeanstalkdJob(
-                    $this->container, $this->pheanstalk, $job, $this->connectionName, $queue
+                $this->container,
+                $this->pheanstalk,
+                $job,
+                $this->connectionName,
+                $queue
             );
         }
     }
@@ -137,8 +144,9 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
     /**
      * Delete a message from the Beanstalk queue.
      *
-     * @param  string  $queue
-     * @param  string|int  $id
+     * @param string     $queue
+     * @param string|int $id
+     *
      * @return void
      */
     public function deleteMessage($queue, $id) {
@@ -149,7 +157,8 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
     /**
      * Get the queue or return the default.
      *
-     * @param  string|null  $queue
+     * @param string|null $queue
+     *
      * @return string
      */
     public function getQueue($queue) {
@@ -164,5 +173,4 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
     public function getPheanstalk() {
         return $this->pheanstalk;
     }
-
 }

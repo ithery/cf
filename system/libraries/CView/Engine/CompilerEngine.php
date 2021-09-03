@@ -88,7 +88,7 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
     /**
      * Get the compiler implementation.
      *
-     * @return \Illuminate\View\Compilers\CompilerInterface
+     * @return \CView_CompilerInterface
      */
     public function getCompiler() {
         return $this->compiler;

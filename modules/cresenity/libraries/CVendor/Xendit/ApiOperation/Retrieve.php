@@ -8,8 +8,8 @@ trait CVendor_Xendit_ApiOperation_Retrieve {
      *
      * @return array
      */
-    public static function retrieve($id) {
-        $url = static::classUrl() . '/' . $id;
-        return static::_request('GET', $url, []);
+    public function retrieve($id) {
+        $url = $this->classUrl() . '/' . $id;
+        return $this->request('GET', $url, []);
     }
 }

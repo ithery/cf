@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -20,8 +18,7 @@ use League\CommonMark\Parser\InlineParserEngineInterface;
 use League\CommonMark\Reference\ReferenceInterface;
 use League\CommonMark\Reference\ReferenceParser;
 
-final class ParagraphParser extends AbstractBlockContinueParser
-{
+final class ParagraphParser extends AbstractBlockContinueParser {
     /**
      * @var Paragraph
      *
@@ -36,27 +33,23 @@ final class ParagraphParser extends AbstractBlockContinueParser
      */
     private $referenceParser;
 
-    public function __construct()
-    {
-        $this->block           = new Paragraph();
+    public function __construct() {
+        $this->block = new Paragraph();
         $this->referenceParser = new ReferenceParser();
     }
 
-    public function canHaveLazyContinuationLines(): bool
-    {
+    public function canHaveLazyContinuationLines() {
         return true;
     }
 
     /**
      * @return Paragraph
      */
-    public function getBlock(): AbstractBlock
-    {
+    public function getBlock() {
         return $this->block;
     }
 
-    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue
-    {
+    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser) {
         if ($cursor->isBlank()) {
             return BlockContinue::none();
         }
@@ -64,36 +57,31 @@ final class ParagraphParser extends AbstractBlockContinueParser
         return BlockContinue::at($cursor);
     }
 
-    public function addLine(string $line): void
-    {
+    public function addLine($line) {
         $this->referenceParser->parse($line);
     }
 
-    public function closeBlock(): void
-    {
+    public function closeBlock() {
         if ($this->referenceParser->hasReferences() && $this->referenceParser->getParagraphContent() === '') {
             $this->block->detach();
         }
     }
 
-    public function parseInlines(InlineParserEngineInterface $inlineParser): void
-    {
+    public function parseInlines(InlineParserEngineInterface $inlineParser) {
         $content = $this->getContentString();
         if ($content !== '') {
             $inlineParser->parse($content, $this->block);
         }
     }
 
-    public function getContentString(): string
-    {
+    public function getContentString() {
         return $this->referenceParser->getParagraphContent();
     }
 
     /**
      * @return ReferenceInterface[]
      */
-    public function getReferences(): iterable
-    {
+    public function getReferences() {
         return $this->referenceParser->getReferences();
     }
 }

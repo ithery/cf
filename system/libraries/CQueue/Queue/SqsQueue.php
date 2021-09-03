@@ -114,7 +114,7 @@ class CQueue_Queue_SqsQueue extends CQueue_AbstractQueue {
      *
      * @param string|null $queue
      *
-     * @return \Illuminate\Contracts\Queue\Job|null
+     * @return \CQueue_JobInterface|null
      */
     public function pop($queue = null) {
         $response = $this->sqs->receiveMessage([

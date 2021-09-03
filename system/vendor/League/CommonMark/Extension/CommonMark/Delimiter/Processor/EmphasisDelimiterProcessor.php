@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -27,8 +25,7 @@ use League\CommonMark\Extension\CommonMark\Node\Inline\Emphasis;
 use League\CommonMark\Extension\CommonMark\Node\Inline\Strong;
 use League\CommonMark\Node\Inline\AbstractStringContainer;
 
-final class EmphasisDelimiterProcessor implements DelimiterProcessorInterface, ConfigurationAwareInterface
-{
+final class EmphasisDelimiterProcessor implements DelimiterProcessorInterface, ConfigurationAwareInterface {
     /**
      * @var string
      *
@@ -46,28 +43,23 @@ final class EmphasisDelimiterProcessor implements DelimiterProcessorInterface, C
     /**
      * @param string $char The emphasis character to use (typically '*' or '_')
      */
-    public function __construct(string $char)
-    {
+    public function __construct($char) {
         $this->char = $char;
     }
 
-    public function getOpeningCharacter(): string
-    {
+    public function getOpeningCharacter() {
         return $this->char;
     }
 
-    public function getClosingCharacter(): string
-    {
+    public function getClosingCharacter() {
         return $this->char;
     }
 
-    public function getMinLength(): int
-    {
+    public function getMinLength() {
         return 1;
     }
 
-    public function getDelimiterUse(DelimiterInterface $opener, DelimiterInterface $closer): int
-    {
+    public function getDelimiterUse(DelimiterInterface $opener, DelimiterInterface $closer) {
         // "Multiple of 3" rule for internal delimiter runs
         if (($opener->canClose() || $closer->canOpen()) && $closer->getOriginalLength() % 3 !== 0 && ($opener->getOriginalLength() + $closer->getOriginalLength()) % 3 === 0) {
             return 0;
@@ -89,8 +81,7 @@ final class EmphasisDelimiterProcessor implements DelimiterProcessorInterface, C
         return 0;
     }
 
-    public function process(AbstractStringContainer $opener, AbstractStringContainer $closer, int $delimiterUse): void
-    {
+    public function process(AbstractStringContainer $opener, AbstractStringContainer $closer, $delimiterUse) {
         if ($delimiterUse === 1) {
             $emphasis = new Emphasis();
         } elseif ($delimiterUse === 2) {
@@ -109,8 +100,7 @@ final class EmphasisDelimiterProcessor implements DelimiterProcessorInterface, C
         $opener->insertAfter($emphasis);
     }
 
-    public function setConfiguration(ConfigurationInterface $configuration): void
-    {
+    public function setConfiguration(ConfigurationInterface $configuration) {
         $this->config = $configuration;
     }
 }

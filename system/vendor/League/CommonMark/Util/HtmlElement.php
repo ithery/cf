@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -16,18 +14,25 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Util;
 
-class HtmlElement
-{
-    /** @var string */
+class HtmlElement {
+    /**
+     * @var string
+     */
     protected $tagName;
 
-    /** @var array<string, string|bool> */
+    /**
+     * @var array
+     */
     protected $attributes = [];
 
-    /** @var HtmlElement|HtmlElement[]|string */
+    /**
+     * @var HtmlElement|HtmlElement[]|string
+     */
     protected $contents;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $selfClosing = false;
 
     /**
@@ -36,37 +41,35 @@ class HtmlElement
      * @param HtmlElement|HtmlElement[]|string|null $contents    Inner contents, pre-escaped if needed
      * @param bool                                  $selfClosing Whether the tag is self-closing
      */
-    public function __construct(string $tagName, array $attributes = [], $contents = '', bool $selfClosing = false)
-    {
-        $this->tagName     = $tagName;
+    public function __construct($tagName, array $attributes = [], $contents = '', $selfClosing = false) {
+        $this->tagName = $tagName;
         $this->selfClosing = $selfClosing;
 
         foreach ($attributes as $name => $value) {
             $this->setAttribute($name, $value);
         }
 
-        $this->setContents($contents ?? '');
+        $this->setContents($contents ?: '');
     }
 
-    public function getTagName(): string
-    {
+    public function getTagName() {
         return $this->tagName;
     }
 
     /**
-     * @return array<string, string|bool>
+     * @return array
      */
-    public function getAllAttributes(): array
-    {
+    public function getAllAttributes() {
         return $this->attributes;
     }
 
     /**
      * @return string|bool|null
+     *
+     * @param mixed $key
      */
-    public function getAttribute(string $key)
-    {
-        if (! isset($this->attributes[$key])) {
+    public function getAttribute($key) {
+        if (!isset($this->attributes[$key])) {
             return null;
         }
 
@@ -75,9 +78,9 @@ class HtmlElement
 
     /**
      * @param string|string[]|bool $value
+     * @param mixed                $key
      */
-    public function setAttribute(string $key, $value): self
-    {
+    public function setAttribute($key, $value) {
         if (\is_array($value)) {
             $this->attributes[$key] = \implode(' ', \array_unique($value));
         } else {
@@ -89,10 +92,11 @@ class HtmlElement
 
     /**
      * @return HtmlElement|HtmlElement[]|string
+     *
+     * @param mixed $asString
      */
-    public function getContents(bool $asString = true)
-    {
-        if (! $asString) {
+    public function getContents($asString = true) {
+        if (!$asString) {
             return $this->contents;
         }
 
@@ -106,15 +110,13 @@ class HtmlElement
      *
      * @return $this
      */
-    public function setContents($contents): self
-    {
-        $this->contents = $contents ?? '';
+    public function setContents($contents) {
+        $this->contents = $contents ? $contents : '';
 
         return $this;
     }
 
-    public function __toString(): string
-    {
+    public function __toString() {
         $result = '<' . $this->tagName;
 
         foreach ($this->attributes as $key => $value) {
@@ -140,8 +142,7 @@ class HtmlElement
         return $result;
     }
 
-    private function getContentsAsString(): string
-    {
+    private function getContentsAsString() {
         if (\is_string($this->contents)) {
             return $this->contents;
         }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -13,7 +11,6 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Environment;
 
-interface EnvironmentAwareInterface
-{
-    public function setEnvironment(EnvironmentInterface $environment): void;
+interface EnvironmentAwareInterface {
+    public function setEnvironment(EnvironmentInterface $environment);
 }

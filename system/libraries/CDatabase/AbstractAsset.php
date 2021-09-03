@@ -19,19 +19,19 @@ abstract class CDatabase_AbstractAsset {
     /**
      * @var string
      */
-    protected $_name;
+    protected $name;
 
     /**
      * Namespace of the asset. If none isset the default namespace is assumed.
      *
      * @var string|null
      */
-    protected $_namespace = null;
+    protected $namespace = null;
 
     /**
      * @var bool
      */
-    protected $_quoted = false;
+    protected $quoted = false;
 
     /**
      * Sets the name of this asset.
@@ -40,19 +40,19 @@ abstract class CDatabase_AbstractAsset {
      *
      * @return void
      */
-    protected function _setName($name) {
+    protected function setName($name) {
         if ($this->isIdentifierQuoted($name)) {
-            $this->_quoted = true;
+            $this->quoted = true;
             $name = $this->trimQuotes($name);
         }
 
         if (strpos($name, '.') !== false) {
             $parts = explode('.', $name);
-            $this->_namespace = $parts[0];
+            $this->namespace = $parts[0];
             $name = $parts[1];
         }
 
-        $this->_name = $name;
+        $this->name = $name;
     }
 
     /**
@@ -63,7 +63,7 @@ abstract class CDatabase_AbstractAsset {
      * @return bool
      */
     public function isInDefaultNamespace($defaultNamespaceName) {
-        return $this->_namespace == $defaultNamespaceName || $this->_namespace === null;
+        return $this->namespace == $defaultNamespaceName || $this->namespace === null;
     }
 
     /**
@@ -74,7 +74,7 @@ abstract class CDatabase_AbstractAsset {
      * @return string|null
      */
     public function getNamespaceName() {
-        return $this->_namespace;
+        return $this->namespace;
     }
 
     /**
@@ -87,8 +87,8 @@ abstract class CDatabase_AbstractAsset {
      */
     public function getShortestName($defaultNamespaceName) {
         $shortestName = $this->getName();
-        if ($this->_namespace == $defaultNamespaceName) {
-            $shortestName = $this->_name;
+        if ($this->namespace == $defaultNamespaceName) {
+            $shortestName = $this->name;
         }
 
         return strtolower($shortestName);
@@ -109,7 +109,7 @@ abstract class CDatabase_AbstractAsset {
      */
     public function getFullQualifiedName($defaultNamespaceName) {
         $name = $this->getName();
-        if (!$this->_namespace) {
+        if (!$this->namespace) {
             $name = $defaultNamespaceName . '.' . $name;
         }
 
@@ -122,7 +122,7 @@ abstract class CDatabase_AbstractAsset {
      * @return bool
      */
     public function isQuoted() {
-        return $this->_quoted;
+        return $this->quoted;
     }
 
     /**
@@ -153,11 +153,11 @@ abstract class CDatabase_AbstractAsset {
      * @return string
      */
     public function getName() {
-        if ($this->_namespace) {
-            return $this->_namespace . '.' . $this->_name;
+        if ($this->namespace) {
+            return $this->namespace . '.' . $this->name;
         }
 
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -172,7 +172,7 @@ abstract class CDatabase_AbstractAsset {
         $keywords = $platform->getReservedKeywordsList();
         $parts = explode('.', $this->getName());
         foreach ($parts as $k => $v) {
-            $parts[$k] = ($this->_quoted || $keywords->isKeyword($v)) ? $platform->quoteIdentifier($v) : $v;
+            $parts[$k] = ($this->quoted || $keywords->isKeyword($v)) ? $platform->quoteIdentifier($v) : $v;
         }
 
         return implode('.', $parts);
@@ -191,7 +191,7 @@ abstract class CDatabase_AbstractAsset {
      *
      * @return string
      */
-    protected function _generateIdentifierName($columnNames, $prefix = '', $maxSize = 30) {
+    protected function generateIdentifierName($columnNames, $prefix = '', $maxSize = 30) {
         $hash = implode('', array_map(function ($column) {
             return dechex(crc32($column));
         }, $columnNames));

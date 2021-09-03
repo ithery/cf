@@ -195,7 +195,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
      *
      * @param string|null $queue
      *
-     * @return \Illuminate\Contracts\Queue\Job|null
+     * @return \CQueue_JobInterface|null
      *
      * @throws \Exception|\Throwable
      */
@@ -213,7 +213,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
      *
      * @param string|null $queue
      *
-     * @return \Illuminate\Queue\Jobs\DatabaseJobRecord|null
+     * @return \CQueue_Job_DatabaseJobRecord|null
      */
     protected function getNextAvailableJob($queue) {
         $job = $this->database->table($this->table)
@@ -232,7 +232,7 @@ class CQueue_Queue_DatabaseQueue extends CQueue_AbstractQueue {
     /**
      * Modify the query to check for available jobs.
      *
-     * @param \Illuminate\Database\Query\Builder $query
+     * @param \CDatabase_Query_Builder $query
      *
      * @return void
      */

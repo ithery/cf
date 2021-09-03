@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,25 +16,23 @@ namespace League\CommonMark\Extension\CommonMark\Node\Inline;
 
 use League\CommonMark\Node\Inline\AbstractInline;
 
-abstract class AbstractWebResource extends AbstractInline
-{
-    /** @var string */
+abstract class AbstractWebResource extends AbstractInline {
+    /**
+     * @var string
+     */
     protected $url;
 
-    public function __construct(string $url)
-    {
+    public function __construct($url) {
         parent::__construct();
 
         $this->url = $url;
     }
 
-    public function getUrl(): string
-    {
+    public function getUrl() {
         return $this->url;
     }
 
-    public function setUrl(string $url): void
-    {
+    public function setUrl($url) {
         $this->url = $url;
     }
 }

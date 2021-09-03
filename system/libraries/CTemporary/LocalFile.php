@@ -56,7 +56,7 @@ class CTemporary_LocalFile {
      *                                 streamed inline.
      * @param string      $contentType the Content-Type header
      * @param bool        $inline      whether to force inline display of the file, even if
-     *                                 filename is present.
+     *                                 filename is present
      */
     public function send($filename = null, $contentType = '', $inline = false) {
         header('Pragma: public');

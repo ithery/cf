@@ -23,10 +23,10 @@ class CDatabase_Schema_Identifier extends CDatabase_AbstractAsset {
      * @param bool   $quote      whether to force quoting the given identifier
      */
     public function __construct($identifier, $quote = false) {
-        $this->_setName($identifier);
+        $this->setName($identifier);
 
         if ($quote && !$this->_quoted) {
-            $this->_setName('"' . $this->getName() . '"');
+            $this->setName('"' . $this->getName() . '"');
         }
     }
 }
