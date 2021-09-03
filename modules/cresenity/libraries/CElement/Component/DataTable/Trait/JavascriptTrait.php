@@ -125,6 +125,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             //            renderer: $.fn.dataTable.Responsive.renderer.tableAll()
             //        }
             //    },");
+            if (strlen($this->initialSearch) > 0) {
+                $js->appendln("'oSearch': {'sSearch': '" . $this->initialSearch . "'},")->br();
+            }
             if ($this->ajax) {
                 $js->append('')
                     ->appendln("'bRetrieve': true,")->br()

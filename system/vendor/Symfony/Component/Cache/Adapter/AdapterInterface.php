@@ -19,8 +19,7 @@ use Symfony\Component\Cache\CacheItem;
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-interface AdapterInterface extends CacheItemPoolInterface
-{
+interface AdapterInterface extends CacheItemPoolInterface {
     /**
      * {@inheritdoc}
      *
@@ -40,5 +39,5 @@ interface AdapterInterface extends CacheItemPoolInterface
      *
      * @return bool
      */
-    public function clear(string $prefix = '');
+    public function clear($prefix = '');
 }
