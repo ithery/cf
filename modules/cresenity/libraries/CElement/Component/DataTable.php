@@ -616,7 +616,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public function requery() {
         if (!$this->isElastic && !$this->isCallback) {
             if ($this->ajax == false) {
-                if (strlen($this->query) > 0) {
+                if (is_string($this->query) && strlen($this->query) > 0) {
                     $r = $this->db()->query($this->query);
                     $this->data = $r->result(false);
                 }

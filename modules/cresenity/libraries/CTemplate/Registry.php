@@ -222,12 +222,13 @@ class CTemplate_Registry {
             extract($__VARS__, EXTR_SKIP);
             $path = $__FILE__;
             if (cstr::endsWith($__FILE__, '.blade.php')) {
-                $compiler = CView_Compiler_BladeCompiler::instance();
+                $compiler = CTemplate::blade();
                 if ($compiler->isExpired($path)) {
                     $compiler->compile($path);
                 }
                 $path = $compiler->getCompiledPath($path);
             }
+            $__env = CView_Factory::instance();
             require $path;
         };
     }

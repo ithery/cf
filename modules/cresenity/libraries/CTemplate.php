@@ -52,6 +52,8 @@ class CTemplate {
      */
     private $helpers;
 
+    protected static $bladeCompiler;
+
     public function __construct($name, $data = []) {
         $this->registry = new CTemplate_Registry();
 
@@ -78,7 +80,9 @@ class CTemplate {
         if ($this->blockRoutingCallback != null && is_callable($this->blockRoutingCallback)) {
             $name = call_user_func_array($this->blockRoutingCallback, [$name]);
         }
-        $filename = CF::findFile(static::TEMPLATE_FOLDER, $name, true);
+
+        $filename = CTemplate_Finder::instance()->find($name);
+        //$filename = CF::findFile(static::TEMPLATE_FOLDER, $name, true);
         $this->registry->set($name, $filename);
         if ($data === null || !is_array($data)) {
             $data = [];
@@ -238,5 +242,14 @@ class CTemplate {
         $body = ob_get_clean();
         $name = array_pop($this->capture);
         $this->setSection($name, $body);
+    }
+
+    public static function blade() {
+        if (static::$bladeCompiler == null) {
+            static::$bladeCompiler = new CTemplate_Compiler_BladeCompiler();
+            static::$bladeCompiler->directive('block', [CTemplate_Blade_Directive::class, 'block']);
+        }
+
+        return static::$bladeCompiler;
     }
 }
