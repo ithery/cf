@@ -23,7 +23,7 @@ class CApp_Api_Method_App_Service extends CApp_Api_Method_App {
         $service = carr::get($this->request(), 'service');
         $command = carr::get($this->request(), 'command');
 
-        $allowedCommand = ['status'];
+        $allowedCommand = ['status', 'start', 'stop', 'restart'];
 
         if (!in_array($command, $allowedCommand)) {
             $errCode++;
