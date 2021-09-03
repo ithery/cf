@@ -92,7 +92,7 @@ class Lexer {
         $tokens[] = new Token(Token::EOF_TYPE, null, $cursor + 1);
 
         if (!empty($brackets)) {
-            [$expect, $cur] = array_pop($brackets);
+            list($expect, $cur) = array_pop($brackets);
             throw new SyntaxError(sprintf('Unclosed "%s".', $expect), $cur, $expression);
         }
 
