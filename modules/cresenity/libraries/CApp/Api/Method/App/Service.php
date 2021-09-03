@@ -42,7 +42,7 @@ class CApp_Api_Method_App_Service extends CApp_Api_Method_App {
 
         if ($errCode == 0) {
             try {
-                $execute = "systemctl $command $service | grep \"Active:\"";
+                $execute = "sudo systemctl $command $service | grep \"Active:\"";
                 $output = '';
                 $errorOutput  = '';
 
