@@ -55,16 +55,11 @@ class chtml {
     /**
      * Create HTML link anchors.
      *
-     * @param   string  URL or URI string
-     * @param   string  link text
-     * @param   array   HTML anchor attributes
-     * @param   string  non-default protocol, eg: https
-     * @param   bool option to escape the title that is output
-     * @param mixed      $uri
-     * @param null|mixed $title
-     * @param null|mixed $attributes
-     * @param null|mixed $protocol
-     * @param mixed      $escape_title
+     * @param string $uri          URL or URI string
+     * @param string $title        link text
+     * @param array  $attributes   HTML anchor attributes
+     * @param string $protocol     non-default protocol, eg: https
+     * @param bool   $escape_title option to escape the title that is output
      *
      * @return string
      */

@@ -1230,6 +1230,12 @@ class c {
         }
         return $a > $b ? 1 : -1;
     }
+
+    public static function dispatch($job) {
+        return $job instanceof Closure
+            ? new CQueue_PendingClosureDispatch(CQueue_CallQueuedClosure::create($job))
+            : new CQueue_PendingDispatch($job);
+    }
 }
 
 // End c

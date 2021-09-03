@@ -34,5 +34,6 @@ return [
         'cresenity-legacy/cresenity.table.css',
         'cresenity-legacy/cresenity.css',
         'cresenity-legacy/cresenity-compat.css',
+        'cresenity-legacy/cresenity-legacy.css',
     ],
 ];

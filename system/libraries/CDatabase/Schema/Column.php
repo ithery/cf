@@ -16,77 +16,77 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     /**
      * @var CDatabase_Type
      */
-    protected $_type;
+    protected $type;
 
     /**
      * @var int|null
      */
-    protected $_length = null;
+    protected $length = null;
 
     /**
      * @var int
      */
-    protected $_precision = 10;
+    protected $precision = 10;
 
     /**
      * @var int
      */
-    protected $_scale = 0;
+    protected $scale = 0;
 
     /**
      * @var bool
      */
-    protected $_unsigned = false;
+    protected $unsigned = false;
 
     /**
      * @var bool
      */
-    protected $_fixed = false;
+    protected $fixed = false;
 
     /**
      * @var bool
      */
-    protected $_notnull = true;
+    protected $notnull = true;
 
     /**
      * @var string|null
      */
-    protected $_default = null;
+    protected $default = null;
 
     /**
      * @var bool
      */
-    protected $_autoincrement = false;
+    protected $autoincrement = false;
 
     /**
      * @var array
      */
-    protected $_platformOptions = [];
+    protected $platformOptions = [];
 
     /**
      * @var string|null
      */
-    protected $_columnDefinition = null;
+    protected $columnDefinition = null;
 
     /**
      * @var string|null
      */
-    protected $_comment = null;
+    protected $comment = null;
 
     /**
      * @var array
      */
-    protected $_customSchemaOptions = [];
+    protected $customSchemaOptions = [];
 
     /**
      * Creates a new Column.
      *
-     * @param string $columnName
-     * @param Type   $type
-     * @param array  $options
+     * @param string         $columnName
+     * @param CDatabase_Type $type
+     * @param array          $options
      */
     public function __construct($columnName, CDatabase_Type $type, array $options = []) {
-        $this->_setName($columnName);
+        $this->setName($columnName);
         $this->setType($type);
         $this->setOptions($options);
     }
@@ -116,12 +116,12 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @param Type $type
+     * @param CDatabase_Type $type
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setType(CDatabase_Type $type) {
-        $this->_type = $type;
+        $this->type = $type;
 
         return $this;
     }
@@ -129,13 +129,13 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     /**
      * @param int|null $length
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setLength($length) {
         if ($length !== null) {
-            $this->_length = (int) $length;
+            $this->length = (int) $length;
         } else {
-            $this->_length = null;
+            $this->length = null;
         }
 
         return $this;
@@ -144,14 +144,14 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     /**
      * @param int $precision
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setPrecision($precision) {
         if (!is_numeric($precision)) {
             $precision = 10; // defaults to 10 when no valid precision is given.
         }
 
-        $this->_precision = (int) $precision;
+        $this->precision = (int) $precision;
 
         return $this;
     }
@@ -159,14 +159,14 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     /**
      * @param int $scale
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setScale($scale) {
         if (!is_numeric($scale)) {
             $scale = 0;
         }
 
-        $this->_scale = (int) $scale;
+        $this->scale = (int) $scale;
 
         return $this;
     }
@@ -174,10 +174,10 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     /**
      * @param bool $unsigned
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setUnsigned($unsigned) {
-        $this->_unsigned = (bool) $unsigned;
+        $this->unsigned = (bool) $unsigned;
 
         return $this;
     }
@@ -185,10 +185,10 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     /**
      * @param bool $fixed
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setFixed($fixed) {
-        $this->_fixed = (bool) $fixed;
+        $this->fixed = (bool) $fixed;
 
         return $this;
     }
@@ -196,10 +196,10 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     /**
      * @param bool $notnull
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setNotnull($notnull) {
-        $this->_notnull = (bool) $notnull;
+        $this->notnull = (bool) $notnull;
 
         return $this;
     }
@@ -207,10 +207,10 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     /**
      * @param mixed $default
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setDefault($default) {
-        $this->_default = $default;
+        $this->default = $default;
 
         return $this;
     }
@@ -218,10 +218,10 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     /**
      * @param array $platformOptions
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setPlatformOptions(array $platformOptions) {
-        $this->_platformOptions = $platformOptions;
+        $this->platformOptions = $platformOptions;
 
         return $this;
     }
@@ -230,10 +230,10 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
      * @param string $name
      * @param mixed  $value
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setPlatformOption($name, $value) {
-        $this->_platformOptions[$name] = $value;
+        $this->platformOptions[$name] = $value;
 
         return $this;
     }
@@ -241,10 +241,10 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     /**
      * @param string $value
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setColumnDefinition($value) {
-        $this->_columnDefinition = $value;
+        $this->columnDefinition = $value;
 
         return $this;
     }
@@ -253,63 +253,63 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
      * @return CDatabase_Type
      */
     public function getType() {
-        return $this->_type;
+        return $this->type;
     }
 
     /**
      * @return int|null
      */
     public function getLength() {
-        return $this->_length;
+        return $this->length;
     }
 
     /**
      * @return int
      */
     public function getPrecision() {
-        return $this->_precision;
+        return $this->precision;
     }
 
     /**
      * @return int
      */
     public function getScale() {
-        return $this->_scale;
+        return $this->scale;
     }
 
     /**
      * @return bool
      */
     public function getUnsigned() {
-        return $this->_unsigned;
+        return $this->unsigned;
     }
 
     /**
      * @return bool
      */
     public function getFixed() {
-        return $this->_fixed;
+        return $this->fixed;
     }
 
     /**
      * @return bool
      */
     public function getNotnull() {
-        return $this->_notnull;
+        return $this->notnull;
     }
 
     /**
      * @return string|null
      */
     public function getDefault() {
-        return $this->_default;
+        return $this->default;
     }
 
     /**
      * @return array
      */
     public function getPlatformOptions() {
-        return $this->_platformOptions;
+        return $this->platformOptions;
     }
 
     /**
@@ -318,7 +318,7 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
      * @return bool
      */
     public function hasPlatformOption($name) {
-        return isset($this->_platformOptions[$name]);
+        return isset($this->platformOptions[$name]);
     }
 
     /**
@@ -327,30 +327,30 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
      * @return mixed
      */
     public function getPlatformOption($name) {
-        return $this->_platformOptions[$name];
+        return $this->platformOptions[$name];
     }
 
     /**
      * @return string|null
      */
     public function getColumnDefinition() {
-        return $this->_columnDefinition;
+        return $this->columnDefinition;
     }
 
     /**
      * @return bool
      */
     public function getAutoincrement() {
-        return $this->_autoincrement;
+        return $this->autoincrement;
     }
 
     /**
      * @param bool $flag
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setAutoincrement($flag) {
-        $this->_autoincrement = $flag;
+        $this->autoincrement = $flag;
 
         return $this;
     }
@@ -358,10 +358,10 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
     /**
      * @param string $comment
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setComment($comment) {
-        $this->_comment = $comment;
+        $this->comment = $comment;
 
         return $this;
     }
@@ -370,17 +370,17 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
      * @return string|null
      */
     public function getComment() {
-        return $this->_comment;
+        return $this->comment;
     }
 
     /**
      * @param string $name
      * @param mixed  $value
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setCustomSchemaOption($name, $value) {
-        $this->_customSchemaOptions[$name] = $value;
+        $this->customSchemaOptions[$name] = $value;
 
         return $this;
     }
@@ -391,7 +391,7 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
      * @return bool
      */
     public function hasCustomSchemaOption($name) {
-        return isset($this->_customSchemaOptions[$name]);
+        return isset($this->customSchemaOptions[$name]);
     }
 
     /**
@@ -400,16 +400,16 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
      * @return mixed
      */
     public function getCustomSchemaOption($name) {
-        return $this->_customSchemaOptions[$name];
+        return $this->customSchemaOptions[$name];
     }
 
     /**
      * @param array $customSchemaOptions
      *
-     * @return Column
+     * @return CDatabase_Schema_Column
      */
     public function setCustomSchemaOptions(array $customSchemaOptions) {
-        $this->_customSchemaOptions = $customSchemaOptions;
+        $this->customSchemaOptions = $customSchemaOptions;
 
         return $this;
     }
@@ -418,7 +418,7 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
      * @return array
      */
     public function getCustomSchemaOptions() {
-        return $this->_customSchemaOptions;
+        return $this->customSchemaOptions;
     }
 
     /**
@@ -426,18 +426,18 @@ class CDatabase_Schema_Column extends CDatabase_AbstractAsset {
      */
     public function toArray() {
         return array_merge([
-            'name' => $this->_name,
-            'type' => $this->_type,
-            'default' => $this->_default,
-            'notnull' => $this->_notnull,
-            'length' => $this->_length,
-            'precision' => $this->_precision,
-            'scale' => $this->_scale,
-            'fixed' => $this->_fixed,
-            'unsigned' => $this->_unsigned,
-            'autoincrement' => $this->_autoincrement,
-            'columnDefinition' => $this->_columnDefinition,
-            'comment' => $this->_comment,
-        ], $this->_platformOptions, $this->_customSchemaOptions);
+            'name' => $this->name,
+            'type' => $this->type,
+            'default' => $this->default,
+            'notnull' => $this->notnull,
+            'length' => $this->length,
+            'precision' => $this->precision,
+            'scale' => $this->scale,
+            'fixed' => $this->fixed,
+            'unsigned' => $this->unsigned,
+            'autoincrement' => $this->autoincrement,
+            'columnDefinition' => $this->columnDefinition,
+            'comment' => $this->comment,
+        ], $this->platformOptions, $this->customSchemaOptions);
     }
 }

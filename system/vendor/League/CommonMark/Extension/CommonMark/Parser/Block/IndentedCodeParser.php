@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -21,8 +19,7 @@ use League\CommonMark\Parser\Block\BlockContinueParserInterface;
 use League\CommonMark\Parser\Cursor;
 use League\CommonMark\Util\ArrayCollection;
 
-final class IndentedCodeParser extends AbstractBlockContinueParser
-{
+final class IndentedCodeParser extends AbstractBlockContinueParser {
     /**
      * @var IndentedCode
      *
@@ -30,25 +27,24 @@ final class IndentedCodeParser extends AbstractBlockContinueParser
      */
     private $block;
 
-    /** @var ArrayCollection<string> */
+    /**
+     * @var ArrayCollection<string>
+     */
     protected $strings;
 
-    public function __construct()
-    {
-        $this->block   = new IndentedCode();
+    public function __construct() {
+        $this->block = new IndentedCode();
         $this->strings = new ArrayCollection();
     }
 
     /**
      * @return IndentedCode
      */
-    public function getBlock(): AbstractBlock
-    {
+    public function getBlock() {
         return $this->block;
     }
 
-    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue
-    {
+    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser) {
         if ($cursor->isIndented()) {
             $cursor->advanceBy(Cursor::INDENT_LEVEL, true);
 
@@ -64,16 +60,14 @@ final class IndentedCodeParser extends AbstractBlockContinueParser
         return BlockContinue::none();
     }
 
-    public function addLine(string $line): void
-    {
+    public function addLine($line) {
         $this->strings[] = $line;
     }
 
-    public function closeBlock(): void
-    {
+    public function closeBlock() {
         $reversed = \array_reverse($this->strings->toArray(), true);
         foreach ($reversed as $index => $line) {
-            if ($line !== '' && $line !== "\n" && ! \preg_match('/^(\n *)$/', $line)) {
+            if ($line !== '' && $line !== "\n" && !\preg_match('/^(\n *)$/', $line)) {
                 break;
             }
 
@@ -81,7 +75,7 @@ final class IndentedCodeParser extends AbstractBlockContinueParser
         }
 
         $fixed = \array_reverse($reversed);
-        $tmp   = \implode("\n", $fixed);
+        $tmp = \implode("\n", $fixed);
         if (\substr($tmp, -1) !== "\n") {
             $tmp .= "\n";
         }

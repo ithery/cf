@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -27,8 +25,7 @@ use Psr\EventDispatcher\StoppableEventInterface;
  * You can call the method stopPropagation() to abort the execution of
  * further listeners in your event listener.
  */
-abstract class AbstractEvent implements StoppableEventInterface
-{
+abstract class AbstractEvent implements StoppableEventInterface {
     /**
      * @var bool
      *
@@ -39,8 +36,7 @@ abstract class AbstractEvent implements StoppableEventInterface
     /**
      * Returns whether further event listeners should be triggered.
      */
-    final public function isPropagationStopped(): bool
-    {
+    final public function isPropagationStopped() {
         return $this->propagationStopped;
     }
 
@@ -51,8 +47,7 @@ abstract class AbstractEvent implements StoppableEventInterface
      * further event listener will be triggered once any trigger calls
      * stopPropagation().
      */
-    final public function stopPropagation(): void
-    {
+    final public function stopPropagation() {
         $this->propagationStopped = true;
     }
 }

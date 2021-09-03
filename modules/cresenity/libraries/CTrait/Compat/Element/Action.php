@@ -19,10 +19,12 @@ trait CTrait_Compat_Element_Action {
     }
 
     /**
+     * @param string $label
+     * @param bool   $lang
+     *
      * @deprecated since version 1.2
      *
-     * @param mixed $label
-     * @param mixed $lang
+     * @return $this
      */
     public function set_label($label, $lang = true) {
         return $this->setLabel($label, $lang);

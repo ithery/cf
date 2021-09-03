@@ -10,12 +10,19 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CApp_Trait_Template {
     protected $templateName;
+
     protected $templateData;
+
     protected $htmlOutput = '';
+
     protected $jsOutput = '';
+
     protected $onBeforeParse = null;
+
     protected $sections = [];
+
     private $sectionJs = '';
+
     protected $skeleton = '';
 
     /**

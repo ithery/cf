@@ -39,7 +39,7 @@ trait CTrait_Compat_Element_Widget {
      *
      * @param [type] $bool
      *
-     * @return void
+     * @return $this
      *
      * @deprecated 1.1
      */
@@ -111,8 +111,8 @@ trait CTrait_Compat_Element_Widget {
     /**
      * Undocumented function
      *
-     * @param [type]  $collapse
-     * @param boolean $js_collapse
+     * @param [type] $collapse
+     * @param bool   $js_collapse
      *
      * @return void
      *

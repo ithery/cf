@@ -140,21 +140,17 @@ class CDatabase_Schema_Blueprint {
     protected function addFluentIndexes() {
         foreach ($this->columns as $column) {
             foreach (['primary', 'unique', 'index', 'spatialIndex'] as $index) {
-                // If the index has been specified on the given column, but is simply equal
-                // to "true" (boolean), no name has been specified for this index so the
-                // index method can be called without a name and it will generate one.
                 if ($column->{$index} === true) {
+                    // If the index has been specified on the given column, but is simply equal
+                    // to "true" (boolean), no name has been specified for this index so the
+                    // index method can be called without a name and it will generate one.
                     $this->{$index}($column->name);
-
                     continue 2;
-                }
-
-                // If the index has been specified on the given column, and it has a string
-                // value, we'll go ahead and call the index method and pass the name for
-                // the index since the developer specified the explicit name for this.
-                elseif (isset($column->{$index})) {
+                } elseif (isset($column->{$index})) {
+                    // If the index has been specified on the given column, and it has a string
+                    // value, we'll go ahead and call the index method and pass the name for
+                    // the index since the developer specified the explicit name for this.
                     $this->{$index}($column->name, $column->{$index});
-
                     continue 2;
                 }
             }
@@ -1081,9 +1077,7 @@ class CDatabase_Schema_Blueprint {
         // If no name was specified for this index, we will create one using a basic
         // convention of the table name, followed by the columns, followed by an
         // index type, such as primary or index, which makes the index unique.
-        $index = $index
-
-?: $this->createIndexName($type, $columns);
+        $index = $index ?: $this->createIndexName($type, $columns);
 
         return $this->addCommand(
             $type,
@@ -1122,8 +1116,7 @@ class CDatabase_Schema_Blueprint {
      * @return string
      */
     protected function createIndexName($type, array $columns) {
-        $index = strtolower($this->table
-    . '_' . implode('_', $columns) . '_' . $type);
+        $index = strtolower($this->table . '_' . implode('_', $columns) . '_' . $type);
 
         return  str_replace(['-', '.'], '_', $index);
     }

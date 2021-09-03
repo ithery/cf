@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,26 +17,32 @@ use League\CommonMark\Parser\MarkdownParser;
 use League\CommonMark\Parser\MarkdownParserInterface;
 use League\CommonMark\Renderer\HtmlRenderer;
 
-class MarkdownConverter implements MarkdownConverterInterface
-{
-    /** @var EnvironmentInterface */
+class MarkdownConverter implements MarkdownConverterInterface {
+    /**
+     * @var EnvironmentInterface
+     */
     private $environment;
 
-    /** @var MarkdownParserInterface */
+    /**
+     * @var MarkdownParserInterface
+     */
     private $markdownParser;
 
-    /** @var HtmlRenderer */
+    /**
+     * @var HtmlRenderer
+     */
     private $htmlRenderer;
 
-    public function __construct(EnvironmentInterface $environment)
-    {
-        $this->environment    = $environment;
+    public function __construct(EnvironmentInterface $environment) {
+        $this->environment = $environment;
         $this->markdownParser = new MarkdownParser($environment);
-        $this->htmlRenderer   = new HtmlRenderer($environment);
+        $this->htmlRenderer = new HtmlRenderer($environment);
     }
 
-    public function getEnvironment(): EnvironmentInterface
-    {
+    /**
+     * @return EnvironmentInterface
+     */
+    public function getEnvironment() {
         return $this->environment;
     }
 
@@ -51,8 +55,7 @@ class MarkdownConverter implements MarkdownConverterInterface
      *
      * @throws \RuntimeException
      */
-    public function convertToHtml(string $markdown): RenderedContentInterface
-    {
+    public function convertToHtml($markdown) {
         $documentAST = $this->markdownParser->parse($markdown);
 
         return $this->htmlRenderer->renderDocument($documentAST);
@@ -61,12 +64,15 @@ class MarkdownConverter implements MarkdownConverterInterface
     /**
      * Converts CommonMark to HTML.
      *
+     * @param string $markdown
+     *
      * @see Converter::convertToHtml
+     *
+     * @return RenderedContentInterface
      *
      * @throws \RuntimeException
      */
-    public function __invoke(string $markdown): RenderedContentInterface
-    {
+    public function __invoke($markdown) {
         return $this->convertToHtml($markdown);
     }
 }

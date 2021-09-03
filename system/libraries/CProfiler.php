@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 4:00:17 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 4:00:17 PM
  */
 class CProfiler {
-
     protected static $enabled = false;
 
     use CProfiler_Trait_PopulateBenchmarkTrait,
@@ -29,14 +29,15 @@ class CProfiler {
     /**
      * Render the profiler. Output is added to the bottom of the page by default.
      *
-     * @param   boolean  return the output if TRUE
-     * @return  void|string
+     * @param   bool  return the output if TRUE
+     *
+     * @return void|string
      */
     public static function render() {
         if (!static::$enabled) {
             return '';
         }
-        $start = microtime(TRUE);
+        $start = microtime(true);
 
         $styleRenderer = new CProfiler_StyleRenderer();
 
@@ -47,20 +48,18 @@ class CProfiler {
         $profilerTables[] = static::createBenchmarkTable();
         $profilerTables[] = static::createDatabaseTable();
 
-
         $html = '';
-        $html.='<style type="text/css">' . $styles . '</style>';
-        $html.='<a href="javascript:;" id="cf-profiler-button">Profiler</a>';
-        $html.='<div id="cf-profiler">';
+        $html .= '<style type="text/css">' . $styles . '</style>';
+        $html .= '<a href="javascript:;" id="cf-profiler-button">Profiler</a>';
+        $html .= '<div id="cf-profiler">';
         foreach ($profilerTables as $table) {
-            $html.=$table->render();
+            $html .= $table->render();
         }
-        $executionTime = microtime(TRUE) - $start;
-        $html.='<p class="cp-meta">Profiler executed in ' . number_format($executionTime, 3) . 's</p>';
-        $html.='</div>';
+        $executionTime = microtime(true) - $start;
+        $html .= '<p class="cp-meta">Profiler executed in ' . number_format($executionTime, 3) . 's</p>';
+        $html .= '</div>';
 
-        
-        $js = "";
+        $js = '';
         $js = "
             <script>
             document.getElementById('cf-profiler-button').addEventListener('click', e => {
@@ -71,26 +70,26 @@ class CProfiler {
 
         ";
 
-        
-        
-        return $html.$js;
+        return $html . $js;
     }
 
     /**
      * Session data.
      *
-     * @return  void
+     * @return void
      */
     public function session() {
-        if (empty($_SESSION))
+        if (empty($_SESSION)) {
             return;
+        }
 
-        if (!$table = $this->table('session'))
+        if (!$table = $this->table('session')) {
             return;
+        }
 
         $table->add_column('kp-name');
         $table->add_column();
-        $table->add_row(array('Session', 'Value'), 'kp-title', 'background-color: #CCE8FB');
+        $table->add_row(['Session', 'Value'], 'kp-title', 'background-color: #CCE8FB');
 
         text::alternate();
         foreach ($_SESSION as $name => $value) {
@@ -98,7 +97,7 @@ class CProfiler {
                 $value = get_class($value) . ' [object]';
             }
 
-            $data = array($name, $value);
+            $data = [$name, $value];
             $class = text::alternate('', 'kp-altrow');
             $table->add_row($data, $class);
         }
@@ -107,22 +106,24 @@ class CProfiler {
     /**
      * POST data.
      *
-     * @return  void
+     * @return void
      */
     public function post() {
-        if (empty($_POST))
+        if (empty($_POST)) {
             return;
+        }
 
-        if (!$table = $this->table('post'))
+        if (!$table = $this->table('post')) {
             return;
+        }
 
         $table->add_column('kp-name');
         $table->add_column();
-        $table->add_row(array('POST', 'Value'), 'kp-title', 'background-color: #E0E0FF');
+        $table->add_row(['POST', 'Value'], 'kp-title', 'background-color: #E0E0FF');
 
         text::alternate();
         foreach ($_POST as $name => $value) {
-            $data = array($name, $value);
+            $data = [$name, $value];
             $class = text::alternate('', 'kp-altrow');
             $table->add_row($data, $class);
         }
@@ -131,25 +132,26 @@ class CProfiler {
     /**
      * Cookie data.
      *
-     * @return  void
+     * @return void
      */
     public function cookies() {
-        if (empty($_COOKIE))
+        if (empty($_COOKIE)) {
             return;
+        }
 
-        if (!$table = $this->table('cookies'))
+        if (!$table = $this->table('cookies')) {
             return;
+        }
 
         $table->add_column('kp-name');
         $table->add_column();
-        $table->add_row(array('Cookies', 'Value'), 'kp-title', 'background-color: #FFF4D7');
+        $table->add_row(['Cookies', 'Value'], 'kp-title', 'background-color: #FFF4D7');
 
         text::alternate();
         foreach ($_COOKIE as $name => $value) {
-            $data = array($name, $value);
+            $data = [$name, $value];
             $class = text::alternate('', 'kp-altrow');
             $table->add_row($data, $class);
         }
     }
-
 }

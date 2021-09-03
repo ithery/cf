@@ -38,7 +38,6 @@ trait CModel_Trait_Timestamps {
      */
     protected function updateTimestamps() {
         $time = $this->freshTimestamp();
-
         if (!is_null(static::UPDATED) && !$this->isDirty(static::UPDATED)) {
             $this->setUpdatedAt($time);
         }

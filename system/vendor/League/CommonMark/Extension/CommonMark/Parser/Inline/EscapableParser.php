@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -23,16 +21,13 @@ use League\CommonMark\Parser\Inline\InlineParserMatch;
 use League\CommonMark\Parser\InlineParserContext;
 use League\CommonMark\Util\RegexHelper;
 
-final class EscapableParser implements InlineParserInterface
-{
-    public function getMatchDefinition(): InlineParserMatch
-    {
+final class EscapableParser implements InlineParserInterface {
+    public function getMatchDefinition() {
         return InlineParserMatch::string('\\');
     }
 
-    public function parse(InlineParserContext $inlineContext): bool
-    {
-        $cursor   = $inlineContext->getCursor();
+    public function parse(InlineParserContext $inlineContext) {
+        $cursor = $inlineContext->getCursor();
         $nextChar = $cursor->peek();
 
         if ($nextChar === "\n") {

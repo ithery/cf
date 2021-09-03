@@ -8,13 +8,22 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Feb 16, 2018, 5:40:40 AM
  */
-
+/**
+ * @see CObservable
+ */
  //@codingStandardsIgnoreStart
 trait CTrait_Compat_Observable {
     public function get_listeners() {
         return $this->getListeners();
     }
 
+    /**
+     * @param string $event
+     *
+     * @return CObservable_Listener
+     *
+     * @deprecated
+     */
     public function add_listener($event) {
         return $this->addListener($event);
     }
@@ -87,8 +96,15 @@ trait CTrait_Compat_Observable {
         return $this->addFieldset($fieldset_id);
     }
 
-    public function add_table($table_id = '') {
-        return $this->addTable($table_id);
+    /**
+     * @param string $tableId
+     *
+     * @return CElement_Component_DataTable
+     *
+     * @deprecated since 1.2
+     */
+    public function add_table($tableId = '') {
+        return $this->addTable($tableId);
     }
 
     public function add_row($row_id = '') {
@@ -150,6 +166,13 @@ trait CTrait_Compat_Observable {
         return $this->addForm($id);
     }
 
+    /**
+     * @deprecated Please use addNestable
+     *
+     * @param string $id
+     *
+     * @return CElement_Component_Nestable
+     */
     public function add_nestable($id = '') {
         return $this->addNestable($id);
     }

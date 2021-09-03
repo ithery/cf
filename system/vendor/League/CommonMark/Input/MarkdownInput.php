@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -15,8 +13,7 @@ namespace League\CommonMark\Input;
 
 use League\CommonMark\Exception\UnexpectedEncodingException;
 
-class MarkdownInput implements MarkdownInputInterface
-{
+class MarkdownInput implements MarkdownInputInterface {
     /**
      * @var array<int, string>|null
      *
@@ -45,26 +42,23 @@ class MarkdownInput implements MarkdownInputInterface
      */
     private $lineOffset;
 
-    public function __construct(string $content, int $lineOffset = 0)
-    {
-        if (! \mb_check_encoding($content, 'UTF-8')) {
+    public function __construct($content, $lineOffset = 0) {
+        if (!\mb_check_encoding($content, 'UTF-8')) {
             throw new UnexpectedEncodingException('Unexpected encoding - UTF-8 or ASCII was expected');
         }
 
-        $this->content    = $content;
+        $this->content = $content;
         $this->lineOffset = $lineOffset;
     }
 
-    public function getContent(): string
-    {
+    public function getContent() {
         return $this->content;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLines(): iterable
-    {
+    public function getLines() {
         $this->splitLinesIfNeeded();
 
         \assert($this->lines !== null);
@@ -75,8 +69,7 @@ class MarkdownInput implements MarkdownInputInterface
         }
     }
 
-    public function getLineCount(): int
-    {
+    public function getLineCount() {
         $this->splitLinesIfNeeded();
 
         \assert($this->lineCount !== null);
@@ -84,8 +77,7 @@ class MarkdownInput implements MarkdownInputInterface
         return $this->lineCount;
     }
 
-    private function splitLinesIfNeeded(): void
-    {
+    private function splitLinesIfNeeded() {
         if ($this->lines !== null) {
             return;
         }

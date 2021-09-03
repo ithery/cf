@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,10 +17,11 @@ use League\CommonMark\Output\RenderedContentInterface;
 /**
  * Renders a parsed Document AST to HTML
  */
-interface HtmlRendererInterface
-{
+interface HtmlRendererInterface {
     /**
      * Render the given Document node (and all of its children)
+     *
+     * @return RenderedContentInterface
      */
-    public function renderDocument(Document $node): RenderedContentInterface;
+    public function renderDocument(Document $node);
 }

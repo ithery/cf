@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -18,12 +16,14 @@ namespace League\CommonMark\Extension\CommonMark\Node\Block;
 
 use League\CommonMark\Node\Block\AbstractBlock;
 
-class ListBlock extends AbstractBlock
-{
-    public const TYPE_BULLET  = 'bullet';
+class ListBlock extends AbstractBlock {
+    public const TYPE_BULLET = 'bullet';
+
     public const TYPE_ORDERED = 'ordered';
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $tight = false;
 
     /**
@@ -33,25 +33,21 @@ class ListBlock extends AbstractBlock
      */
     protected $listData;
 
-    public function __construct(ListData $listData)
-    {
+    public function __construct(ListData $listData) {
         parent::__construct();
 
         $this->listData = $listData;
     }
 
-    public function getListData(): ListData
-    {
+    public function getListData(): ListData {
         return $this->listData;
     }
 
-    public function isTight(): bool
-    {
+    public function isTight() {
         return $this->tight;
     }
 
-    public function setTight(bool $tight): void
-    {
+    public function setTight($tight) {
         $this->tight = $tight;
     }
 }

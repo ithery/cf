@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,8 +17,7 @@ use League\CommonMark\Node\Node;
 use League\CommonMark\Renderer\ChildNodeRendererInterface;
 use League\CommonMark\Renderer\NodeRendererInterface;
 
-final class DisallowedRawHtmlRenderer implements NodeRendererInterface, ConfigurationAwareInterface
-{
+final class DisallowedRawHtmlRenderer implements NodeRendererInterface, ConfigurationAwareInterface {
     private const DEFAULT_DISALLOWED_TAGS = [
         'title',
         'textarea',
@@ -47,16 +44,14 @@ final class DisallowedRawHtmlRenderer implements NodeRendererInterface, Configur
      */
     private $config;
 
-    public function __construct(NodeRendererInterface $innerRenderer)
-    {
+    public function __construct(NodeRendererInterface $innerRenderer) {
         $this->innerRenderer = $innerRenderer;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function render(Node $node, ChildNodeRendererInterface $childRenderer)
-    {
+    public function render(Node $node, ChildNodeRendererInterface $childRenderer) {
         $rendered = (string) $this->innerRenderer->render($node, $childRenderer);
 
         if ($rendered === '') {
@@ -74,8 +69,7 @@ final class DisallowedRawHtmlRenderer implements NodeRendererInterface, Configur
         return \preg_replace($regex, '&lt;$1', $rendered);
     }
 
-    public function setConfiguration(ConfigurationInterface $configuration): void
-    {
+    public function setConfiguration(ConfigurationInterface $configuration): void {
         $this->config = $configuration;
 
         if ($this->innerRenderer instanceof ConfigurationAwareInterface) {

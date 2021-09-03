@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,10 +17,8 @@ use League\CommonMark\Parser\Cursor;
 use League\CommonMark\Parser\MarkdownParserStateInterface;
 use League\CommonMark\Util\RegexHelper;
 
-final class ThematicBreakStartParser implements BlockStartParserInterface
-{
-    public function tryStart(Cursor $cursor, MarkdownParserStateInterface $parserState): ?BlockStart
-    {
+final class ThematicBreakStartParser implements BlockStartParserInterface {
+    public function tryStart(Cursor $cursor, MarkdownParserStateInterface $parserState) {
         if ($cursor->isIndented()) {
             return BlockStart::none();
         }

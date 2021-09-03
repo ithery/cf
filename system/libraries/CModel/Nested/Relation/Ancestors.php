@@ -1,22 +1,23 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 24, 2018, 2:21:48 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 24, 2018, 2:21:48 PM
  */
 class CModel_Nested_Relation_Ancestors extends CModel_Nested_Relation {
-
     /**
      * Set the base constraints on the relation query.
      *
      * @return void
      */
     public function addConstraints() {
-        if (!static::$constraints)
+        if (!static::$constraints) {
             return;
+        }
         $this->query->whereAncestorOf($this->parent)->defaultOrder();
     }
 
@@ -32,7 +33,7 @@ class CModel_Nested_Relation_Ancestors extends CModel_Nested_Relation {
 
     /**
      * @param QueryBuilder $query
-     * @param Model $model
+     * @param Model        $model
      *
      * @return void
      */
@@ -52,5 +53,4 @@ class CModel_Nested_Relation_Ancestors extends CModel_Nested_Relation {
         $key = $this->getBaseQuery()->getGrammar()->wrap($this->parent->getKeyName());
         return "{$table}.{$rgt} between {$hash}.{$lft} and {$hash}.{$rgt} and $table.$key <> $hash.$key";
     }
-
 }

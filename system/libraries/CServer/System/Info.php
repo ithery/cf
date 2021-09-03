@@ -1,91 +1,106 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 2:18:46 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 2:18:46 PM
  */
 class CServer_System_Info {
-
     /**
-     * name of the host where CServer_System runs
-     * @var String
+     * Name of the host where CServer_System runs
+     *
+     * @var string
      */
     private $hostname;
 
     /**
-     * ip of the host where CServer_System runs
-     * @var String
+     * Ip of the host where CServer_System runs
+     *
+     * @var string
      */
     private $ip;
 
     /**
-     * detailed Information about the kernel
-     * @var String
+     * Detailed Information about the kernel
+     *
+     * @var string
      */
     private $kernel;
 
     /**
-     * name of the distribution
-     * @var String
+     * Name of the distribution
+     *
+     * @var string
      */
     private $distribution;
 
     /**
-     * icon of the distribution (must be available in CServer_System)
-     * @var String
+     * Icon of the distribution (must be available in CServer_System)
+     *
+     * @var string
      */
     private $distributionIcon;
 
     /**
-     * detailed Information about the machine name
-     * @var String
+     * Detailed Information about the machine name
+     *
+     * @var string
      */
     private $machine;
 
     /**
-     * time in sec how long the system is running
-     * @var Integer
+     * Time in sec how long the system is running
+     *
+     * @var int
      */
     private $uptime;
 
     /**
-     * count of users that are currently logged in
-     * @var Integer
+     * Count of users that are currently logged in
+     *
+     * @var int
      */
     private $users;
 
     /**
-     * load of the system
-     * @var String
+     * Load of the system
+     *
+     * @var string
      */
     private $load;
 
     /**
-     * load of the system in percent (all cpus, if more than one)
-     * @var Integer
+     * Load of the system in percent (all cpus, if more than one)
+     *
+     * @var int
      */
     private $loadPercent;
 
     /**
-     * array of types of processes
+     * Array of types of processes
+     *
      * @var array
      */
     private $processes;
 
     /**
-     * array with cpu devices
+     * Array with cpu devices
+     *
      * @see CServer_System_Device_Cpu
+     *
      * @var array
      */
     private $cpus;
 
     /**
      * Returns $hostname.
+     *
      * @see CServer_System_Info::$hostname
-     * @return String
+     *
+     * @return string
      */
     public function getHostname() {
         return $this->hostname;
@@ -93,8 +108,11 @@ class CServer_System_Info {
 
     /**
      * Sets $hostname.
-     * @param String $hostname hostname
+     *
+     * @param string $hostname hostname
+     *
      * @see CServer_System_Info::$hostname
+     *
      * @return $this;
      */
     public function setHostname($hostname) {
@@ -104,8 +122,10 @@ class CServer_System_Info {
 
     /**
      * Returns $ip.
+     *
      * @see CServer_System_Info::$ip
-     * @return String
+     *
+     * @return string
      */
     public function getIp() {
         return $this->ip;
@@ -113,8 +133,11 @@ class CServer_System_Info {
 
     /**
      * Sets $ip.
-     * @param String $ip IP
+     *
+     * @param string $ip IP
+     *
      * @see CServer_System_Info::$ip
+     *
      * @return $this
      */
     public function setIp($ip) {
@@ -124,8 +147,10 @@ class CServer_System_Info {
 
     /**
      * Returns $kernel.
+     *
      * @see CServer_System_Info::$kernel
-     * @return String
+     *
+     * @return string
      */
     public function getKernel() {
         return $this->kernel;
@@ -133,8 +158,11 @@ class CServer_System_Info {
 
     /**
      * Sets $kernel.
-     * @param String $kernel kernelname
+     *
+     * @param string $kernel kernelname
+     *
      * @see CServer_System_Info::$kernel
+     *
      * @return $this
      */
     public function setKernel($kernel) {
@@ -144,8 +172,10 @@ class CServer_System_Info {
 
     /**
      * Returns $distribution.
+     *
      * @see CServer_System_Info::$distribution
-     * @return String
+     *
+     * @return string
      */
     public function getDistribution() {
         return $this->distribution;
@@ -153,9 +183,12 @@ class CServer_System_Info {
 
     /**
      * Sets $distribution.
-     * @param String $distribution distributionname
+     *
+     * @param string $distribution distributionname
+     *
      * @see CServer_System_Info::$distribution
-     * @return Void
+     *
+     * @return void
      */
     public function setDistribution($distribution) {
         $this->distribution = $distribution;
@@ -163,8 +196,10 @@ class CServer_System_Info {
 
     /**
      * Returns $distributionIcon.
+     *
      * @see CServer_System_Info::$distributionIcon
-     * @return String
+     *
+     * @return string
      */
     public function getDistributionIcon() {
         return $this->distributionIcon;
@@ -172,9 +207,12 @@ class CServer_System_Info {
 
     /**
      * Sets $distributionIcon.
-     * @param String $distributionIcon distribution icon
+     *
+     * @param string $distributionIcon distribution icon
+     *
      * @see CServer_System_Info::$distributionIcon
-     * @return Void
+     *
+     * @return void
      */
     public function setDistributionIcon($distributionIcon) {
         $this->distributionIcon = $distributionIcon;
@@ -182,8 +220,10 @@ class CServer_System_Info {
 
     /**
      * Returns $load.
+     *
      * @see CServer_System_Info::$load
-     * @return String
+     *
+     * @return string
      */
     public function getLoad() {
         return $this->load;
@@ -191,9 +231,12 @@ class CServer_System_Info {
 
     /**
      * Sets $load.
-     * @param String $load current system load
+     *
+     * @param string $load current system load
+     *
      * @see CServer_System_Info::$load
-     * @return Void
+     *
+     * @return void
      */
     public function setLoad($load) {
         $this->load = $load;
@@ -201,8 +244,10 @@ class CServer_System_Info {
 
     /**
      * Returns $loadPercent.
+     *
      * @see CServer_System_Info::$loadPercent
-     * @return Integer
+     *
+     * @return int
      */
     public function getLoadPercent() {
         return $this->loadPercent;
@@ -210,9 +255,12 @@ class CServer_System_Info {
 
     /**
      * Sets $loadPercent.
-     * @param Integer $loadPercent load percent
+     *
+     * @param int $loadPercent load percent
+     *
      * @see CServer_System_Info::$loadPercent
-     * @return Void
+     *
+     * @return void
      */
     public function setLoadPercent($loadPercent) {
         $this->loadPercent = $loadPercent;
@@ -220,8 +268,10 @@ class CServer_System_Info {
 
     /**
      * Returns $machine.
+     *
      * @see CServer_System_Info::$machine
-     * @return String
+     *
+     * @return string
      */
     public function getMachine() {
         return $this->machine;
@@ -229,9 +279,12 @@ class CServer_System_Info {
 
     /**
      * Sets $machine.
+     *
      * @param string $machine machine
+     *
      * @see CServer_System_Info::$machine
-     * @return Void
+     *
+     * @return void
      */
     public function setMachine($machine) {
         $this->machine = $machine;
@@ -239,8 +292,10 @@ class CServer_System_Info {
 
     /**
      * Returns $uptime.
+     *
      * @see CServer_System_Info::$uptime
-     * @return Integer
+     *
+     * @return int
      */
     public function getUptime() {
         return $this->uptime;
@@ -248,9 +303,12 @@ class CServer_System_Info {
 
     /**
      * Sets $uptime.
-     * @param integer $uptime uptime
+     *
+     * @param int $uptime uptime
+     *
      * @see CServer_System_Info::$uptime
-     * @return Void
+     *
+     * @return void
      */
     public function setUptime($uptime) {
         $this->uptime = $uptime;
@@ -261,7 +319,7 @@ class CServer_System_Info {
      *
      * @see CServer_System_Info::$users
      *
-     * @return Integer
+     * @return int
      */
     public function getUsers() {
         return $this->users;
@@ -269,9 +327,12 @@ class CServer_System_Info {
 
     /**
      * Sets $users.
-     * @param Integer $users user count
+     *
+     * @param int $users user count
+     *
      * @see CServer_System_Info::$users
-     * @return Void
+     *
+     * @return void
      */
     public function setUsers($users) {
         $this->users = $users;
@@ -279,7 +340,9 @@ class CServer_System_Info {
 
     /**
      * Returns $_processes.
+     *
      * @see CServer_System_Info::$_processes
+     *
      * @return array
      */
     public function getProcesses() {
@@ -288,9 +351,12 @@ class CServer_System_Info {
 
     /**
      * Sets $proceses.
+     *
      * @param $processes array of types of processes
+     *
      * @see CServer_System_Info::$processes
-     * @return Void
+     *
+     * @return void
      */
     public function setProcesses($processes) {
         $this->processes = $processes;
@@ -298,7 +364,9 @@ class CServer_System_Info {
 
     /**
      * Returns $cpus.
+     *
      * @see CServer_System_Info::$_cpus
+     *
      * @return array
      */
     public function getCpus() {
@@ -307,31 +375,32 @@ class CServer_System_Info {
 
     /**
      * Sets $_cpus.
+     *
      * @param CpuDevice $cpus cpu device
      *
      * @see System::$_cpus
      * @see CpuDevice
      *
-     * @return Void
+     * @return void
      */
     public function addCpus($cpus) {
         if (!is_array($this->cpus)) {
-            $this->cpus = array();
+            $this->cpus = [];
         }
         array_push($this->cpus, $cpus);
     }
 
     /**
      * Sets $_cpus.
+     *
      * @param CpuDevice $cpus cpu device
      *
      * @see System::$_cpus
      * @see CpuDevice
      *
-     * @return Void
+     * @return void
      */
     public function setCpus($cpus) {
         $this->cpus = $cpus;
     }
-
 }

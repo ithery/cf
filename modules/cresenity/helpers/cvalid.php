@@ -1,16 +1,7 @@
 <?php
 defined('SYSPATH') or die('No direct access allowed.');
-/**
- * Validation helper class.
- *
- * $Id: valid.php 4367 2009-05-27 21:23:57Z samsoir $
- *
- * @package    Core
- *
- * @author     Kohana Team
- * @copyright  (c) 2007-2008 Kohana Team
- * @license    http://kohanaphp.com/license.html
- */
+
+//@codingStandardsIgnoreStart
 class cvalid {
     /**
      * Validate email, commonly used characters only
@@ -18,7 +9,7 @@ class cvalid {
      * @param   string   email address
      * @param mixed $email
      *
-     * @return boolean
+     * @return bool
      */
     public static function email($email) {
         return (bool) filter_var($email, FILTER_VALIDATE_EMAIL);
@@ -33,7 +24,7 @@ class cvalid {
      * @param   string   email address
      * @param mixed $email
      *
-     * @return boolean
+     * @return bool
      */
     public static function email_domain($email) {
         // If we can't prove the domain is invalid, consider it valid
@@ -57,7 +48,7 @@ class cvalid {
      * @param   string   email address
      * @param mixed $email
      *
-     * @return boolean
+     * @return bool
      */
     public static function email_rfc($email) {
         $qtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]';
@@ -82,7 +73,7 @@ class cvalid {
      * @param   string   URL
      * @param mixed $url
      *
-     * @return boolean
+     * @return bool
      */
     public static function url($url) {
         return (bool) filter_var($url, FILTER_VALIDATE_URL, FILTER_FLAG_HOST_REQUIRED);
@@ -92,13 +83,13 @@ class cvalid {
      * Validate IP
      *
      * @param   string   IP address
-     * @param   boolean  allow IPv6 addresses
-     * @param   boolean  allow private IP networks
+     * @param   bool  allow IPv6 addresses
+     * @param   bool  allow private IP networks
      * @param mixed $ip
      * @param mixed $ipv6
      * @param mixed $allow_private
      *
-     * @return boolean
+     * @return bool
      */
     public static function ip($ip, $ipv6 = false, $allow_private = true) {
         // By default do not allow private and reserved range IPs
@@ -119,12 +110,12 @@ class cvalid {
      *
      * @see http://en.wikipedia.org/wiki/Luhn_algorithm
      *
-     * @param   integer       credit card number
+     * @param   int       credit card number
      * @param   string|array  card type, or an array of card types
      * @param mixed      $number
      * @param null|mixed $type
      *
-     * @return boolean
+     * @return bool
      */
     public static function credit_card($number, $type = null) {
         // Remove all non-digit characters from the number
@@ -200,7 +191,7 @@ class cvalid {
      * @param mixed      $number
      * @param null|mixed $lengths
      *
-     * @return boolean
+     * @return bool
      */
     public static function phone($number, $lengths = null) {
         if (!is_array($lengths)) {
@@ -220,7 +211,7 @@ class cvalid {
      * @param   string   date to check
      * @param mixed $str
      *
-     * @return boolean
+     * @return bool
      */
     public static function date($str) {
         return (strtotime($str) !== false);
@@ -230,11 +221,11 @@ class cvalid {
      * Checks whether a string consists of alphabetical characters only.
      *
      * @param   string   input string
-     * @param   boolean  trigger UTF-8 compatibility
+     * @param   bool  trigger UTF-8 compatibility
      * @param mixed $str
      * @param mixed $utf8
      *
-     * @return boolean
+     * @return bool
      */
     public static function alpha($str, $utf8 = false) {
         return ($utf8 === true)
@@ -246,11 +237,11 @@ class cvalid {
      * Checks whether a string consists of alphabetical characters and numbers only.
      *
      * @param   string   input string
-     * @param   boolean  trigger UTF-8 compatibility
+     * @param   bool  trigger UTF-8 compatibility
      * @param mixed $str
      * @param mixed $utf8
      *
-     * @return boolean
+     * @return bool
      */
     public static function alpha_numeric($str, $utf8 = false) {
         return ($utf8 === true)
@@ -262,11 +253,11 @@ class cvalid {
      * Checks whether a string consists of alphabetical characters, numbers, underscores and dashes only.
      *
      * @param   string   input string
-     * @param   boolean  trigger UTF-8 compatibility
+     * @param   bool  trigger UTF-8 compatibility
      * @param mixed $str
      * @param mixed $utf8
      *
-     * @return boolean
+     * @return bool
      */
     public static function alpha_dash($str, $utf8 = false) {
         return ($utf8 === true)
@@ -278,11 +269,11 @@ class cvalid {
      * Checks whether a string consists of digits only (no dots or dashes).
      *
      * @param   string   input string
-     * @param   boolean  trigger UTF-8 compatibility
+     * @param   bool  trigger UTF-8 compatibility
      * @param mixed $str
      * @param mixed $utf8
      *
-     * @return boolean
+     * @return bool
      */
     public static function digit($str, $utf8 = false) {
         return ($utf8 === true)
@@ -299,7 +290,7 @@ class cvalid {
      * @param   string   input string
      * @param mixed $str
      *
-     * @return boolean
+     * @return bool
      */
     public static function numeric($str) {
         // Use localeconv to set the decimal_point value: Usually a comma or period.
@@ -314,7 +305,7 @@ class cvalid {
      * @param   string   text to check
      * @param mixed $str
      *
-     * @return boolean
+     * @return bool
      */
     public static function standard_text($str) {
         // pL matches letters
@@ -337,7 +328,7 @@ class cvalid {
      * @param mixed      $str
      * @param null|mixed $format
      *
-     * @return boolean
+     * @return bool
      */
     public static function decimal($str, $format = null) {
         // Create the pattern

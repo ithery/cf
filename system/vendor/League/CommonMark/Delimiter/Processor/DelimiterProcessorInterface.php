@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -25,14 +23,13 @@ use League\CommonMark\Node\Inline\AbstractStringContainer;
 /**
  * Interface for a delimiter processor
  */
-interface DelimiterProcessorInterface
-{
+interface DelimiterProcessorInterface {
     /**
      * Returns the character that marks the beginning of a delimited node.
      *
      * This must not clash with any other processors being added to the environment.
      */
-    public function getOpeningCharacter(): string;
+    public function getOpeningCharacter();
 
     /**
      * Returns the character that marks the ending of a delimited node.
@@ -41,14 +38,14 @@ interface DelimiterProcessorInterface
      *
      * Note that for a symmetric delimiter such as "*", this is the same as the opening.
      */
-    public function getClosingCharacter(): string;
+    public function getClosingCharacter();
 
     /**
      * Minimum number of delimiter characters that are needed to active this.
      *
      * Must be at least 1.
      */
-    public function getMinLength(): int;
+    public function getMinLength();
 
     /**
      * Determine how many (if any) of the delimiter characters should be used.
@@ -61,7 +58,7 @@ interface DelimiterProcessorInterface
      * @param DelimiterInterface $opener The opening delimiter run
      * @param DelimiterInterface $closer The closing delimiter run
      */
-    public function getDelimiterUse(DelimiterInterface $opener, DelimiterInterface $closer): int;
+    public function getDelimiterUse(DelimiterInterface $opener, DelimiterInterface $closer);
 
     /**
      * Process the matched delimiters, e.g. by wrapping the nodes between opener
@@ -74,5 +71,5 @@ interface DelimiterProcessorInterface
      * @param AbstractStringContainer $closer       The node that contained the closing delimiter
      * @param int                     $delimiterUse The number of delimiters that were used
      */
-    public function process(AbstractStringContainer $opener, AbstractStringContainer $closer, int $delimiterUse): void;
+    public function process(AbstractStringContainer $opener, AbstractStringContainer $closer, $delimiterUse);
 }

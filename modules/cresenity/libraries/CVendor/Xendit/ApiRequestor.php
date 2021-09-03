@@ -1,12 +1,13 @@
 <?php
 class CVendor_Xendit_ApiRequestor {
-    private static $instance;
+    protected $httpClient;
 
-    public static function instance() {
-        if (self::$instance == null) {
-            self::$instance = new static();
+    public function __construct($secretApiKey, $baseUri, $libVersion = null) {
+        $this->httpClient = new CVendor_Xendit_HttpClient_GuzzleClient($secretApiKey, $baseUri);
+        if ($libVersion == null) {
+            $libVersion = CVendor_Xendit::VERSION;
         }
-        return self::$instance;
+        $this->libVersion = $libVersion;
     }
 
     /**
@@ -38,11 +39,10 @@ class CVendor_Xendit_ApiRequestor {
     private function setDefaultHeaders($headers) {
         $defaultHeaders = [];
         $lib = 'php';
-        $libVersion = CVendor_Xendit_Config::getLibVersion();
 
         $defaultHeaders['Content-Type'] = 'application/json';
         $defaultHeaders['xendit-lib'] = $lib;
-        $defaultHeaders['xendit-lib-ver'] = $libVersion;
+        $defaultHeaders['xendit-lib-ver'] = $this->libVersion;
 
         return array_merge($defaultHeaders, $headers);
     }
@@ -82,6 +82,6 @@ class CVendor_Xendit_ApiRequestor {
      * @return CVendor_Xendit_HttpClient_GuzzleClient
      */
     private function httpClient() {
-        return CVendor_Xendit_HttpClient_GuzzleClient::instance();
+        return $this->httpClient;
     }
 }

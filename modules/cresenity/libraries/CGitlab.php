@@ -1,26 +1,30 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 19, 2018, 3:46:29 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 19, 2018, 3:46:29 AM
  */
 class CGitlab {
-
     protected $gitUrl;
+
     protected $client;
+
+    /**
+     * @var CGitlab[]
+     */
     protected static $instances;
 
     /**
-     * 
      * @param string $gitUrl
      * @param string $token
+     *
      * @return CGitlab
      */
     public static function instance($gitUrl = '', $token = null) {
-
         if (!isset(self::$instances[$gitUrl])) {
             self::$instances[$gitUrl] = new static($gitUrl);
         }
@@ -31,7 +35,6 @@ class CGitlab {
     }
 
     /**
-     * 
      * @param string $gitUrl
      */
     protected function __construct($gitUrl) {
@@ -40,7 +43,6 @@ class CGitlab {
     }
 
     /**
-     * 
      * @return CGitlab_Client
      */
     public function client() {
@@ -48,7 +50,6 @@ class CGitlab {
     }
 
     /**
-     * 
      * @return CGitlab_Api_Projects
      */
     public function projects() {
@@ -56,7 +57,6 @@ class CGitlab {
     }
 
     /**
-     * 
      * @return CGitlab_Api_Users
      */
     public function users() {
@@ -64,7 +64,6 @@ class CGitlab {
     }
 
     /**
-     * 
      * @return CGitlab_Api_Repositories
      */
     public function repositories() {
@@ -72,7 +71,6 @@ class CGitlab {
     }
 
     /**
-     * 
      * @return CGitlab_Api_Issues
      */
     public function issues() {
@@ -80,7 +78,6 @@ class CGitlab {
     }
 
     /**
-     * 
      * @return CGitlab_Api_Groups
      */
     public function groups() {
@@ -88,11 +85,9 @@ class CGitlab {
     }
 
     /**
-     * 
      * @return CGitlab_Api_Groups
      */
     public function snippets() {
         return $this->client->api('snippets');
     }
-
 }

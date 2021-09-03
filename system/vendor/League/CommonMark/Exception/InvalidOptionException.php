@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -13,15 +11,13 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Exception;
 
-final class InvalidOptionException extends \UnexpectedValueException
-{
+final class InvalidOptionException extends \UnexpectedValueException {
     /**
      * @param string  $option      Name/path of the option
      * @param mixed   $valueGiven  The invalid option that was provided
      * @param ?string $description Additional text describing the issue (optional)
      */
-    public static function forConfigOption(string $option, $valueGiven, ?string $description = null): self
-    {
+    public static function forConfigOption($option, $valueGiven, $description = null) {
         $message = \sprintf('Invalid config option for "%s": %s', $option, self::getDebugValue($valueGiven));
         if ($description !== null) {
             $message .= \sprintf(' (%s)', $description);
@@ -34,16 +30,14 @@ final class InvalidOptionException extends \UnexpectedValueException
      * @param string $option     Description of the option
      * @param mixed  $valueGiven The invalid option that was provided
      */
-    public static function forParameter(string $option, $valueGiven): self
-    {
+    public static function forParameter($option, $valueGiven) {
         return new self(\sprintf('Invalid %s: %s', $option, self::getDebugValue($valueGiven)));
     }
 
     /**
      * @param mixed $value
      */
-    private static function getDebugValue($value): string
-    {
+    private static function getDebugValue($value) {
         if (\is_object($value)) {
             return \get_class($value);
         }

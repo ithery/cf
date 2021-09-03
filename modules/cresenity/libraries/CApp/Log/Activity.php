@@ -37,12 +37,12 @@ class CApp_Log_Activity {
         $appId = Base::appId();
         $orgId = Base::orgId();
         $userId = Base::userId();
-        $browser = new CBrowser();
+        $browser = CHTTP::request()->browser();
         $model->fill([
             'org_id' => $orgId,
             'app_id' => $appId,
             'session_id' => CSession::instance()->id(),
-            'remote_addr' => crequest::remote_address(),
+            'remote_addr' => CHTTP::request()->ip(),
             'user_agent' => $browser->getUserAgent(),
             'browser' => $browser->getBrowser(),
             'browser_version' => $browser->getVersion(),

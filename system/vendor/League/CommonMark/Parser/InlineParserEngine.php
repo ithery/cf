@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -26,8 +24,7 @@ use League\CommonMark\Reference\ReferenceMapInterface;
 /**
  * @internal
  */
-final class InlineParserEngine implements InlineParserEngineInterface
-{
+final class InlineParserEngine implements InlineParserEngineInterface {
     /**
      * @var EnvironmentInterface
      *
@@ -49,9 +46,8 @@ final class InlineParserEngine implements InlineParserEngineInterface
      */
     private $parsers;
 
-    public function __construct(EnvironmentInterface $environment, ReferenceMapInterface $referenceMap)
-    {
-        $this->environment  = $environment;
+    public function __construct(EnvironmentInterface $environment, ReferenceMapInterface $referenceMap) {
+        $this->environment = $environment;
         $this->referenceMap = $referenceMap;
 
         foreach ($environment->getInlineParsers() as $parser) {
@@ -62,10 +58,9 @@ final class InlineParserEngine implements InlineParserEngineInterface
         }
     }
 
-    public function parse(string $contents, AbstractBlock $block): void
-    {
+    public function parse($contents, AbstractBlock $block) {
         $contents = \trim($contents);
-        $cursor   = new Cursor($contents);
+        $cursor = new Cursor($contents);
 
         $inlineParserContext = new InlineParserContext($cursor, $block, $this->referenceMap);
 
@@ -85,7 +80,9 @@ final class InlineParserEngine implements InlineParserEngineInterface
 
             // We're now at a potential start - see which of the current parsers can handle it
             $parsed = false;
-            foreach ($parsers as [$parser, $matches]) {
+            //foreach ($parsers as [$parser, $matches]) {
+            foreach ($parsers as $parserData) {
+                list($parser, $matches) = $parserData;
                 \assert($parser instanceof InlineParserInterface);
                 if ($parser->parse($inlineParserContext->withMatches($matches))) {
                     // A parser has successfully handled the text at the given position; don't consider any others at this position
@@ -104,7 +101,7 @@ final class InlineParserEngine implements InlineParserEngineInterface
         }
 
         // Add any remaining text that wasn't parsed
-        if (! $cursor->isAtEnd()) {
+        if (!$cursor->isAtEnd()) {
             $this->addPlainText($cursor->getRemainder(), $block);
         }
 
@@ -117,10 +114,9 @@ final class InlineParserEngine implements InlineParserEngineInterface
         AdjacentTextMerger::mergeChildNodes($block);
     }
 
-    private function addPlainText(string $text, AbstractBlock $container): void
-    {
+    private function addPlainText($text, AbstractBlock $container) {
         $lastInline = $container->lastChild();
-        if ($lastInline instanceof Text && ! $lastInline->data->has('delim')) {
+        if ($lastInline instanceof Text && !$lastInline->data->has('delim')) {
             $lastInline->append($text);
         } else {
             $container->appendChild(new Text($text));
@@ -138,21 +134,23 @@ final class InlineParserEngine implements InlineParserEngineInterface
      * @psalm-return array<int, list<array{0: InlineParserInterface, 1: non-empty-array<string>}>>
      *
      * @phpstan-return array<int, array<int, array{0: InlineParserInterface, 1: non-empty-array<string>}>>
+     *
+     * @param mixed $contents
      */
-    private function matchParsers(string $contents): array
-    {
-        $contents    = \trim($contents);
+    private function matchParsers($contents) {
+        $contents = \trim($contents);
         $isMultibyte = \mb_strlen($contents) !== \strlen($contents);
 
         $ret = [];
 
-        foreach ($this->parsers as [$parser, $regex, $isRegexMultibyte]) {
+        foreach ($this->parsers as $parserData) {
+            list($parser, $regex, $isRegexMultibyte) = $parserData;
             if ($isMultibyte || $isRegexMultibyte) {
                 $regex .= 'u';
             }
 
             // See if the parser's InlineParserMatch regex matched against any part of the string
-            if (! \preg_match_all($regex, $contents, $matches, \PREG_OFFSET_CAPTURE | \PREG_SET_ORDER)) {
+            if (!\preg_match_all($regex, $contents, $matches, \PREG_OFFSET_CAPTURE | \PREG_SET_ORDER)) {
                 continue;
             }
 
@@ -166,7 +164,7 @@ final class InlineParserEngine implements InlineParserEngineInterface
                 }
 
                 // Remove the offsets, keeping only the matched text
-                $m = \array_map(static function (array $s): string {
+                $m = \array_map(static function (array $s) {
                     return (string) $s[0];
                 }, $match);
 

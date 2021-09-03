@@ -101,39 +101,40 @@ abstract class CDatabase_Platform {
     protected $doctrineTypeComments = null;
 
     /**
-     * @var CDatabase_Event
+     * @var CEvent_Dispatcher
      */
-    protected $_eventManager;
+    protected $eventDispatcher;
 
     /**
      * Holds the KeywordList instance for the current platform.
      *
      * @var CDatabase_Platform_Keywords
      */
-    protected $_keywords;
+    protected $keywords;
 
     /**
      * Constructor.
      */
     public function __construct() {
+        $this->eventDispatcher = CEvent::dispatcher();
     }
 
     /**
      * Sets the EventManager used by the Platform.
      *
-     * @param CDatabase_Dispatcher $eventManager
+     * @param CDatabase_Dispatcher $eventDispatcher
      */
-    public function setEventManager(CEvent_Dispatcher $eventManager) {
-        $this->_eventManager = $eventManager;
+    public function setEventManager(CEvent_Dispatcher $eventDispatcher) {
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
      * Gets the EventManager used by the Platform.
      *
-     * @return CEventManager
+     * @return CEvent_Dispatcher
      */
-    public function getEventManager() {
-        return $this->_eventManager;
+    public function getEventDispatcher() {
+        return $this->eventDispatcher;
     }
 
     /**
@@ -179,7 +180,7 @@ abstract class CDatabase_Platform {
      *
      * @return string
      */
-    abstract protected function _getCommonIntegerTypeDeclarationSQL(array $columnDef);
+    abstract protected function getCommonIntegerTypeDeclarationSQL(array $columnDef);
 
     /**
      * Lazy load Doctrine Type Mappings.
@@ -353,14 +354,14 @@ abstract class CDatabase_Platform {
             $this->initializeAllDoctrineTypeMappings();
         }
 
-        if (!Types\Type::hasType($doctrineType)) {
+        if (!CDatabase_Type::hasType($doctrineType)) {
             throw CDatabase_Exception::typeNotFound($doctrineType);
         }
 
         $dbType = strtolower($dbType);
         $this->doctrineTypeMapping[$dbType] = $doctrineType;
 
-        $doctrineType = Type::getType($doctrineType);
+        $doctrineType = CDatabase_Type::getType($doctrineType);
 
         if ($doctrineType->requiresSQLCommentHint($this)) {
             $this->markDoctrineTypeCommented($doctrineType);
@@ -711,19 +712,19 @@ abstract class CDatabase_Platform {
      *
      * @return string
      */
-    public function getTrimExpression($str, $mode = TrimMode::UNSPECIFIED, $char = false) {
+    public function getTrimExpression($str, $mode = CDatabase_Platform_TrimMode::UNSPECIFIED, $char = false) {
         $expression = '';
 
         switch ($mode) {
-            case TrimMode::LEADING:
+            case CDatabase_Platform_TrimMode::LEADING:
                 $expression = 'LEADING ';
                 break;
 
-            case TrimMode::TRAILING:
+            case CDatabase_Platform_TrimMode::TRAILING:
                 $expression = 'TRAILING ';
                 break;
 
-            case TrimMode::BOTH:
+            case CDatabase_Platform_TrimMode::BOTH:
                 $expression = 'BOTH ';
                 break;
         }
@@ -1298,9 +1299,9 @@ abstract class CDatabase_Platform {
             throw new \InvalidArgumentException('getDropTableSQL() expects $table parameter to be string or CDatabase_Schema_Table.');
         }
 
-        if (null !== $this->_eventManager && $this->_eventManager->hasListeners(CDatabase_Event::onSchemaDropTable)) {
-            $eventArgs = new SchemaDropTableEventArgs($tableArg, $this);
-            $this->_eventManager->dispatchEvent(CDatabase_Event::onSchemaDropTable, $eventArgs);
+        if (null !== $this->eventDispatcher) {
+            $eventArgs = new CDatabase_Event_Schema_OnDropTable($tableArg, $this);
+            $this->eventDispatcher->dispatch($eventArgs);
 
             if ($eventArgs->isDefaultPrevented()) {
                 return $eventArgs->getSql();
@@ -1432,9 +1433,9 @@ abstract class CDatabase_Platform {
         foreach ($table->getColumns() as $column) {
             /* @var CDatabase_Schema_Column $column */
 
-            if (null !== $this->_eventManager && $this->_eventManager->hasListeners(CDatabase_Event::onSchemaCreateTableColumn)) {
-                $eventArgs = new SchemaCreateTableColumnEventArgs($column, $table, $this);
-                $this->_eventManager->dispatchEvent(Events::onSchemaCreateTableColumn, $eventArgs);
+            if (null !== $this->eventDispatcher) {
+                $eventArgs = new CDatabase_Event_Schema_OnCreateTableColumn($column, $table, $this);
+                $this->eventDispatcher->dispatch($eventArgs);
 
                 $columnSql = array_merge($columnSql, $eventArgs->getSql());
 
@@ -1466,16 +1467,16 @@ abstract class CDatabase_Platform {
             }
         }
 
-        if (null !== $this->_eventManager && $this->_eventManager->hasListeners(CDatabase_Event::onSchemaCreateTable)) {
-            $eventArgs = new SchemaCreateTableEventArgs($table, $columns, $options, $this);
-            $this->_eventManager->dispatchEvent(Events::onSchemaCreateTable, $eventArgs);
+        if (null !== $this->eventDispatcher) {
+            $eventArgs = new CDatabase_Event_Schema_OnCreateTable($table, $columns, $options, $this);
+            $this->eventDispatcher->dispatch($eventArgs);
 
             if ($eventArgs->isDefaultPrevented()) {
                 return array_merge($eventArgs->getSql(), $columnSql);
             }
         }
 
-        $sql = $this->_getCreateTableSQL($tableName, $columns, $options);
+        $sql = $this->protectedGetCreateTableSQL($tableName, $columns, $options);
         if ($this->supportsCommentOnStatement()) {
             foreach ($table->getColumns() as $column) {
                 $comment = $this->getColumnComment($column);
@@ -1531,7 +1532,7 @@ abstract class CDatabase_Platform {
      *
      * @return array
      */
-    protected function _getCreateTableSQL($tableName, array $columns, array $options = []) {
+    protected function protectedGetCreateTableSQL($tableName, array $columns, array $options = []) {
         $columnListSql = $this->getColumnDeclarationListSQL($columns);
 
         if (isset($options['uniqueConstraints']) && !empty($options['uniqueConstraints'])) {
@@ -1802,16 +1803,12 @@ abstract class CDatabase_Platform {
      * @return bool
      */
     protected function onSchemaAlterTableAddColumn(CDatabase_Schema_Column $column, CDatabase_Schema_Table_Diff $diff, &$columnSql) {
-        if (null === $this->_eventManager) {
+        if (null === $this->eventDispatcher) {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(CDatabase_Event::onSchemaAlterTableAddColumn)) {
-            return false;
-        }
-
-        $eventArgs = new SchemaAlterTableAddColumnEventArgs($column, $diff, $this);
-        $this->_eventManager->dispatchEvent(Events::onSchemaAlterTableAddColumn, $eventArgs);
+        $eventArgs = new CDatabase_Event_Schema_OnAlterTableAddColumn($column, $diff, $this);
+        $this->eventDispatcher->dispatch($eventArgs);
 
         $columnSql = array_merge($columnSql, $eventArgs->getSql());
 
@@ -1826,16 +1823,12 @@ abstract class CDatabase_Platform {
      * @return bool
      */
     protected function onSchemaAlterTableRemoveColumn(CDatabase_Schema_Column $column, CDatabase_Schema_Table_Diff $diff, &$columnSql) {
-        if (null === $this->_eventManager) {
+        if (null === $this->eventDispatcher) {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(CDatabase_Event::onSchemaAlterTableRemoveColumn)) {
-            return false;
-        }
-
-        $eventArgs = new SchemaAlterTableRemoveColumnEventArgs($column, $diff, $this);
-        $this->_eventManager->dispatchEvent(CDatabase_Event::onSchemaAlterTableRemoveColumn, $eventArgs);
+        $eventArgs = new CDatabase_Event_Schema_OnAlterTableRemoveColumn($column, $diff, $this);
+        $this->eventDispatcher->dispatch($eventArgs);
 
         $columnSql = array_merge($columnSql, $eventArgs->getSql());
 
@@ -1850,16 +1843,12 @@ abstract class CDatabase_Platform {
      * @return bool
      */
     protected function onSchemaAlterTableChangeColumn(CDatabase_Schema_Column_Diff $columnDiff, CDatabase_Schema_Table_Diff $diff, &$columnSql) {
-        if (null === $this->_eventManager) {
+        if (null === $this->eventDispatcher) {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(CDatabase_Event::onSchemaAlterTableChangeColumn)) {
-            return false;
-        }
-
-        $eventArgs = new SchemaAlterTableChangeColumnEventArgs($columnDiff, $diff, $this);
-        $this->_eventManager->dispatchEvent(CDatabase_Event::onSchemaAlterTableChangeColumn, $eventArgs);
+        $eventArgs = new CDatabase_Event_Schema_OnAlterTableChangeColumn($columnDiff, $diff, $this);
+        $this->eventDispatcher->dispatch($eventArgs);
 
         $columnSql = array_merge($columnSql, $eventArgs->getSql());
 
@@ -1875,16 +1864,12 @@ abstract class CDatabase_Platform {
      * @return bool
      */
     protected function onSchemaAlterTableRenameColumn($oldColumnName, CDatabase_Schema_Column $column, CDatabase_Schema_Table_Diff $diff, &$columnSql) {
-        if (null === $this->_eventManager) {
+        if (null === $this->eventDispatcher) {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(CDatabase_Event::onSchemaAlterTableRenameColumn)) {
-            return false;
-        }
-
-        $eventArgs = new SchemaAlterTableRenameColumnEventArgs($oldColumnName, $column, $diff, $this);
-        $this->_eventManager->dispatchEvent(CDatabase_Event::onSchemaAlterTableRenameColumn, $eventArgs);
+        $eventArgs = new CDatabase_Event_Schema_OnAlterTableRenameColumn($oldColumnName, $column, $diff, $this);
+        $this->eventDispatcher->dispatch($eventArgs);
 
         $columnSql = array_merge($columnSql, $eventArgs->getSql());
 
@@ -1898,16 +1883,12 @@ abstract class CDatabase_Platform {
      * @return bool
      */
     protected function onSchemaAlterTable(CDatabase_Schema_Table_Diff $diff, &$sql) {
-        if (null === $this->_eventManager) {
+        if (null === $this->eventDispatcher) {
             return false;
         }
 
-        if (!$this->_eventManager->hasListeners(CDatabase_Event::onSchemaAlterTable)) {
-            return false;
-        }
-
-        $eventArgs = new SchemaAlterTableEventArgs($diff, $this);
-        $this->_eventManager->dispatchEvent(CDatabase_Event::onSchemaAlterTable, $eventArgs);
+        $eventArgs = new CDatabase_Event_Schema_OnAlterTable($diff, $this);
+        $this->eventDispatcher->dispatch($eventArgs);
 
         $sql = array_merge($sql, $eventArgs->getSql());
 
@@ -2004,7 +1985,7 @@ abstract class CDatabase_Platform {
      *
      * @return array
      */
-    protected function _getAlterTableIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
+    protected function getAlterTableIndexForeignKeySQL(CDatabase_Schema_Table_Diff $diff) {
         return array_merge($this->getPreAlterTableIndexForeignKeySQL($diff), $this->getPostAlterTableIndexForeignKeySQL($diff));
     }
 
@@ -2050,39 +2031,6 @@ abstract class CDatabase_Platform {
         return implode(', ', $queryFields);
     }
 
-    /**
-     * Obtains DBMS specific SQL code portion needed to declare a generic type
-     * field to be used in statements like CREATE TABLE.
-     *
-     * @param string $name  the name the field to be declared
-     * @param array  $field An associative array with the name of the properties
-     *                      of the field being declared as array indexes. Currently, the types
-     *                      of supported field properties are as follows:
-     *
-     *      length
-     *          Integer value that determines the maximum length of the text
-     *          field. If this argument is missing the field should be
-     *          declared to have the longest length allowed by the DBMS.
-     *
-     *      default
-     *          Text value to be used as default for this field.
-     *
-     *      notnull
-     *          Boolean flag that indicates whether this field is constrained
-     *          to not be set to null.
-     *      charset
-     *          Text value with the default CHARACTER SET for this field.
-     *      collation
-     *          Text value with the default COLLATION for this field.
-     *      unique
-     *          unique constraint
-     *      check
-     *          column check constraint
-     *      columnDefinition
-     *          a string that defines the complete column
-     *
-     * @return string DBMS specific SQL code portion that should be used to declare the column
-     */
     public function getColumnDeclarationSQL($name, array $field) {
         if (isset($field['columnDefinition'])) {
             $columnDef = $this->getCustomTypeDeclarationSQL($field);
@@ -2210,7 +2158,7 @@ abstract class CDatabase_Platform {
      *
      * @throws \InvalidArgumentException
      */
-    public function getUniqueConstraintDeclarationSQL($name, Index $index) {
+    public function getUniqueConstraintDeclarationSQL($name, CDatabase_Schema_Index $index) {
         $columns = $index->getQuotedColumns($this);
         $name = new CDatabase_Schema_Identifier($name);
 
@@ -2560,7 +2508,7 @@ abstract class CDatabase_Platform {
      *
      * @throws \InvalidArgumentException
      */
-    protected function _getTransactionIsolationLevelSQL($level) {
+    protected function getTransactionIsolationLevelSQL($level) {
         switch ($level) {
             case CDatabase_TransactionIsolationLevel::READ_UNCOMMITTED:
                 return 'READ UNCOMMITTED';
@@ -3248,7 +3196,7 @@ abstract class CDatabase_Platform {
      * @return string
      */
     public function getTruncateTableSQL($tableName, $cascade = false) {
-        $tableIdentifier = new Identifier($tableName);
+        $tableIdentifier = new CDatabase_Schema_Identifier($tableName);
 
         return 'TRUNCATE ' . $tableIdentifier->getQuotedName($this);
     }
@@ -3306,8 +3254,8 @@ abstract class CDatabase_Platform {
      */
     final public function getReservedKeywordsList() {
         // Check for an existing instantiation of the keywords class.
-        if ($this->_keywords) {
-            return $this->_keywords;
+        if ($this->keywords) {
+            return $this->keywords;
         }
 
         $class = $this->getReservedKeywordsClass();
@@ -3317,7 +3265,7 @@ abstract class CDatabase_Platform {
         }
 
         // Store the instance so it doesn't need to be generated on every request.
-        $this->_keywords = $keywords;
+        $this->keywords = $keywords;
 
         return $keywords;
     }

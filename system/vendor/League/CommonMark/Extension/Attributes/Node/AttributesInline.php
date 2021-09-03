@@ -10,49 +10,47 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace League\CommonMark\Extension\Attributes\Node;
 
 use League\CommonMark\Node\Inline\AbstractInline;
 
-final class AttributesInline extends AbstractInline
-{
-    /** @var array<string, mixed> */
+final class AttributesInline extends AbstractInline {
+    /**
+     * @var array<string, mixed>
+     */
     public $attributes;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     public $block;
 
     /**
      * @param array<string, mixed> $attributes
+     * @param mixed                $block
      */
-    public function __construct(array $attributes, bool $block)
-    {
+    public function __construct(array $attributes, $block) {
         parent::__construct();
 
         $this->attributes = $attributes;
-        $this->block      = $block;
+        $this->block = $block;
     }
 
     /**
      * @return array<string, mixed>
      */
-    public function getAttributes(): array
-    {
+    public function getAttributes() {
         return $this->attributes;
     }
 
     /**
      * @param array<string, mixed> $attributes
      */
-    public function setAttributes(array $attributes): void
-    {
+    public function setAttributes(array $attributes) {
         $this->attributes = $attributes;
     }
 
-    public function isBlock(): bool
-    {
+    public function isBlock() {
         return $this->block;
     }
 }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -22,8 +20,7 @@ use League\CommonMark\Parser\Block\BlockContinue;
 use League\CommonMark\Parser\Block\BlockContinueParserInterface;
 use League\CommonMark\Parser\Cursor;
 
-final class ListBlockParser extends AbstractBlockContinueParser
-{
+final class ListBlockParser extends AbstractBlockContinueParser {
     /**
      * @var ListBlock
      *
@@ -31,33 +28,33 @@ final class ListBlockParser extends AbstractBlockContinueParser
      */
     private $block;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     private $hadBlankLine = false;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     private $linesAfterBlank = 0;
 
-    public function __construct(ListData $listData)
-    {
+    public function __construct(ListData $listData) {
         $this->block = new ListBlock($listData);
     }
 
     /**
      * @return ListBlock
      */
-    public function getBlock(): AbstractBlock
-    {
+    public function getBlock() {
         return $this->block;
     }
 
-    public function isContainer(): bool
-    {
+    public function isContainer() {
         return true;
     }
 
-    public function canContain(AbstractBlock $childBlock): bool
-    {
-        if (! $childBlock instanceof ListItem) {
+    public function canContain(AbstractBlock $childBlock) {
+        if (!$childBlock instanceof ListItem) {
             return false;
         }
 
@@ -72,10 +69,9 @@ final class ListBlockParser extends AbstractBlockContinueParser
         return true;
     }
 
-    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue
-    {
+    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser) {
         if ($cursor->isBlank()) {
-            $this->hadBlankLine    = true;
+            $this->hadBlankLine = true;
             $this->linesAfterBlank = 0;
         } elseif ($this->hadBlankLine) {
             $this->linesAfterBlank++;
