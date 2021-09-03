@@ -23,17 +23,17 @@ class Token {
 
     public $cursor;
 
-    public const EOF_TYPE = 'end of expression';
+    const EOF_TYPE = 'end of expression';
 
-    public const NAME_TYPE = 'name';
+    const NAME_TYPE = 'name';
 
-    public const NUMBER_TYPE = 'number';
+    const NUMBER_TYPE = 'number';
 
-    public const STRING_TYPE = 'string';
+    const STRING_TYPE = 'string';
 
-    public const OPERATOR_TYPE = 'operator';
+    const OPERATOR_TYPE = 'operator';
 
-    public const PUNCTUATION_TYPE = 'punctuation';
+    const PUNCTUATION_TYPE = 'punctuation';
 
     /**
      * @param string                $type   The type of the token (self::*_TYPE)
