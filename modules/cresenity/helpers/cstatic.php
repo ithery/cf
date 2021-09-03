@@ -1,9 +1,9 @@
 <?php
 
+//@codingStandardsIgnoreStart
 class cstatic {
-
     public static function http_status_header() {
-        $status_header = array(
+        $status_header = [
             100 => 'Continue',
             101 => 'Switching Protocols',
             102 => 'Processing',
@@ -55,18 +55,16 @@ class cstatic {
             506 => 'Variant Also Negotiates',
             507 => 'Insufficient Storage',
             510 => 'Not Extended'
-        );
+        ];
         return $status_header;
     }
-	public static function month_list($clang) {
-		return self::month($clang);
-	}
 
-	
-	
+    public static function month_list($clang) {
+        return self::month($clang);
+    }
+
     public static function month($clang = true) {
-
-        $ret = array(
+        $ret = [
             1 => 'January',
             2 => 'February',
             3 => 'March',
@@ -79,7 +77,7 @@ class cstatic {
             10 => 'October',
             11 => 'November',
             12 => 'December'
-        );
+        ];
         if ($clang) {
             foreach ($ret as $k => $v) {
                 $ret[$k] = clang::__($v);
@@ -89,7 +87,7 @@ class cstatic {
     }
 
     public static function country() {
-        return array(
+        return [
             'AF' => 'Afghanistan',
             'AL' => 'Albania',
             'DZ' => 'Algeria',
@@ -335,7 +333,6 @@ class cstatic {
             'YU' => 'Yugoslavia',
             'ZM' => 'Zambia',
             'ZW' => 'Zimbabwe'
-        );
+        ];
     }
-
 }

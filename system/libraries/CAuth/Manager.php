@@ -56,7 +56,7 @@ class CAuth_Manager {
      *
      * @param string|null $name
      *
-     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
+     * @return \CAuth_GuardInterface|\CAuth_StatefulGuardInterface
      */
     public function guard($name = null) {
         $name = $name ?: $this->getDefaultDriver();
@@ -117,7 +117,7 @@ class CAuth_Manager {
      * @param string $name
      * @param array  $config
      *
-     * @return \Illuminate\Auth\SessionGuard
+     * @return \CAuth_Guard_SessionGuard
      */
     public function createSessionDriver($name, $config) {
         $provider = $this->createUserProvider(carr::get($config, 'provider', null));

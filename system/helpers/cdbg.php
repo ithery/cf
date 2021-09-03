@@ -38,6 +38,8 @@ class cdbg {
      * @param string $var
      * @param bool   $return
      *
+     * @deprecated 1.2
+     *
      * @return void
      */
     //@codingStandardsIgnoreStart
