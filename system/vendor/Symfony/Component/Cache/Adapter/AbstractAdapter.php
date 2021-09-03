@@ -24,22 +24,21 @@ use Symfony\Contracts\Cache\CacheInterface;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-abstract class AbstractAdapter implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface
-{
+abstract class AbstractAdapter implements AdapterInterface, CacheInterface, LoggerAwareInterface, ResettableInterface {
     /**
      * @internal
      */
-    protected const NS_SEPARATOR = ':';
+    const NS_SEPARATOR = ':';
 
     use AbstractAdapterTrait;
     use ContractsTrait;
 
     private static $apcuSupported;
+
     private static $phpFilesSupported;
 
-    protected function __construct(string $namespace = '', int $defaultLifetime = 0)
-    {
-        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace).static::NS_SEPARATOR;
+    protected function __construct($namespace = '', $defaultLifetime = 0) {
+        $this->namespace = '' === $namespace ? '' : CacheItem::validateKey($namespace) . static::NS_SEPARATOR;
         if (null !== $this->maxIdLength && \strlen($namespace) > $this->maxIdLength - 24) {
             throw new InvalidArgumentException(sprintf('Namespace must be %d chars max, %d given ("%s")', $this->maxIdLength - 24, \strlen($namespace), $namespace));
         }
@@ -84,7 +83,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
                         unset($metadata[CacheItem::METADATA_TAGS]);
                     }
                     // For compactness, expiry and creation duration are packed in the key of an array, using magic numbers as separators
-                    $byLifetime[$ttl][$getId($key)] = $metadata ? ["\x9D".pack('VN', (int) (0.1 + $metadata[self::METADATA_EXPIRY] - self::METADATA_EXPIRY_OFFSET), $metadata[self::METADATA_CTIME])."\x5F" => $item->value] : $item->value;
+                    $byLifetime[$ttl][$getId($key)] = $metadata ? ["\x9D" . pack('VN', (int) (0.1 + $metadata[self::METADATA_EXPIRY] - self::METADATA_EXPIRY_OFFSET), $metadata[self::METADATA_CTIME]) . "\x5F" => $item->value] : $item->value;
                 }
 
                 return $byLifetime;
@@ -101,8 +100,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
      *
      * @return AdapterInterface
      */
-    public static function createSystemCache(string $namespace, int $defaultLifetime, string $version, string $directory, LoggerInterface $logger = null)
-    {
+    public static function createSystemCache(string $namespace, int $defaultLifetime, string $version, string $directory, LoggerInterface $logger = null) {
         $opcache = new PhpFilesAdapter($namespace, $defaultLifetime, $directory, true);
         if (null !== $logger) {
             $opcache->setLogger($logger);
@@ -122,8 +120,7 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
         return new ChainAdapter([$apcu, $opcache]);
     }
 
-    public static function createConnection(string $dsn, array $options = [])
-    {
+    public static function createConnection(string $dsn, array $options = []) {
         if (0 === strpos($dsn, 'redis:') || 0 === strpos($dsn, 'rediss:')) {
             return RedisAdapter::createConnection($dsn, $options);
         }
@@ -139,11 +136,10 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
      *
      * @return bool
      */
-    public function commit()
-    {
+    public function commit() {
         $ok = true;
-        $byLifetime = $this->mergeByLifetime;
-        $byLifetime = $byLifetime($this->deferred, $this->namespace, $expiredIds);
+
+        $byLifetime = (self::$mergeByLifetime)($this->deferred, $this->namespace, $expiredIds, \Closure::fromCallable([$this, 'getId']), $this->defaultLifetime);
         $retry = $this->deferred = [];
 
         if ($expiredIds) {
@@ -161,9 +157,9 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
                 foreach (\is_array($e) ? $e : array_keys($values) as $id) {
                     $ok = false;
                     $v = $values[$id];
-                    $type = \is_object($v) ? \get_class($v) : \gettype($v);
-                    $message = sprintf('Failed to save key "{key}" of type %s%s', $type, $e instanceof \Exception ? ': '.$e->getMessage() : '.');
-                    CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null]);
+                    $type = get_debug_type($v);
+                    $message = sprintf('Failed to save key "{key}" of type %s%s', $type, $e instanceof \Exception ? ': ' . $e->getMessage() : '.');
+                    CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null, 'cache-adapter' => get_debug_type($this)]);
                 }
             } else {
                 foreach ($values as $id => $v) {
@@ -184,9 +180,9 @@ abstract class AbstractAdapter implements AdapterInterface, CacheInterface, Logg
                     continue;
                 }
                 $ok = false;
-                $type = \is_object($v) ? \get_class($v) : \gettype($v);
-                $message = sprintf('Failed to save key "{key}" of type %s%s', $type, $e instanceof \Exception ? ': '.$e->getMessage() : '.');
-                CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null]);
+                $type = get_debug_type($v);
+                $message = sprintf('Failed to save key "{key}" of type %s%s', $type, $e instanceof \Exception ? ': ' . $e->getMessage() : '.');
+                CacheItem::log($this->logger, $message, ['key' => substr($id, \strlen($this->namespace)), 'exception' => $e instanceof \Exception ? $e : null, 'cache-adapter' => get_debug_type($this)]);
             }
         }
 
