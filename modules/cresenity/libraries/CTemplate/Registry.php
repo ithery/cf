@@ -220,7 +220,15 @@ class CTemplate_Registry {
     protected function enclose($__FILE__) {
         return function (array $__VARS__ = []) use ($__FILE__) {
             extract($__VARS__, EXTR_SKIP);
-            require $__FILE__;
+            $path = $__FILE__;
+            if (cstr::endsWith($__FILE__, '.blade.php')) {
+                $compiler = CView_Compiler_BladeCompiler::instance();
+                if ($compiler->isExpired($path)) {
+                    $compiler->compile($path);
+                }
+                $path = $compiler->getCompiledPath($path);
+            }
+            require $path;
         };
     }
 }
