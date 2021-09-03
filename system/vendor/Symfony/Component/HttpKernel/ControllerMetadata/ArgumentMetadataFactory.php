@@ -21,7 +21,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createArgumentMetadata($controller): array
+    public function createArgumentMetadata($controller)
     {
         $arguments = [];
 
@@ -43,7 +43,7 @@ final class ArgumentMetadataFactory implements ArgumentMetadataFactoryInterface
     /**
      * Returns an associated type to the given parameter if available.
      */
-    private function getType(\ReflectionParameter $parameter, \ReflectionFunctionAbstract $function): ?string
+    private function getType(\ReflectionParameter $parameter, \ReflectionFunctionAbstract $function)
     {
         if (!$type = $parameter->getType()) {
             return null;

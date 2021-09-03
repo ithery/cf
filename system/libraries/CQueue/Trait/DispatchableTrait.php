@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 2:46:55 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 2:46:55 AM
  */
 trait CQueue_Trait_DispatchableTrait {
-
     /**
      * Dispatch the job with the given arguments.
      *
@@ -30,11 +30,11 @@ trait CQueue_Trait_DispatchableTrait {
     /**
      * Set the jobs that should run if this job is successful.
      *
-     * @param  array  $chain
+     * @param array $chain
+     *
      * @return \Illuminate\Foundation\Bus\PendingChain
      */
     public static function withChain($chain) {
         return new CQueue_PendingChain(static::class, $chain);
     }
-
 }

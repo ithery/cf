@@ -1,46 +1,70 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 10:57:55 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 10:57:55 AM
  */
 
 /**
  * The base class for mapping types.
  *
  * A Type object is obtained by calling the static {@link getType()} method.
- *
  */
 abstract class CDatabase_Type {
-
     const TARRAY = 'array';
+
     const SIMPLE_ARRAY = 'simple_array';
+
     const JSON_ARRAY = 'json_array';
+
     const JSON = 'json';
+
     const BIGINT = 'bigint';
+
     const BOOLEAN = 'boolean';
+
     const DATETIME = 'datetime';
+
     const DATETIME_IMMUTABLE = 'datetime_immutable';
+
     const DATETIMETZ = 'datetimetz';
+
     const DATETIMETZ_IMMUTABLE = 'datetimetz_immutable';
+
     const DATE = 'date';
+
     const DATE_IMMUTABLE = 'date_immutable';
+
     const TIME = 'time';
+
     const TIME_IMMUTABLE = 'time_immutable';
+
     const DECIMAL = 'decimal';
+
     const INTEGER = 'integer';
+
     const OBJECT = 'object';
+
     const SMALLINT = 'smallint';
+
     const STRING = 'string';
+
     const TEXT = 'text';
+
     const BINARY = 'binary';
+
     const BLOB = 'blob';
+
     const FLOAT = 'float';
+
     const GUID = 'guid';
+
     const DATEINTERVAL = 'dateinterval';
+
     const ENUM = 'enum';
 
     /**
@@ -48,14 +72,14 @@ abstract class CDatabase_Type {
      *
      * @var array
      */
-    private static $_typeObjects = [];
+    private static $typeObjects = [];
 
     /**
      * The map of supported doctrine mapping types.
      *
      * @var array
      */
-    private static $_typesMap = [
+    private static $typesMap = [
         self::TARRAY => CDatabase_Type_ArrayType::class,
         self::SIMPLE_ARRAY => CDatabase_Type_SimpleArrayType::class,
         self::JSON_ARRAY => CDatabase_Type_JsonArrayType::class,
@@ -88,17 +112,16 @@ abstract class CDatabase_Type {
      * Prevents instantiation and forces use of the factory method.
      */
     final private function __construct() {
-        
     }
 
     /**
      * Converts a value from its PHP representation to its database representation
      * of this type.
      *
-     * @param mixed                                     $value    The value to convert.
-     * @param CDatabase_Platform $platform The currently used database platform.
+     * @param mixed              $value    the value to convert
+     * @param CDatabase_Platform $platform the currently used database platform
      *
-     * @return mixed The database representation of the value.
+     * @return mixed the database representation of the value
      */
     public function convertToDatabaseValue($value, CDatabase_Platform $platform) {
         return $value;
@@ -108,10 +131,10 @@ abstract class CDatabase_Type {
      * Converts a value from its database representation to its PHP representation
      * of this type.
      *
-     * @param mixed                                     $value    The value to convert.
-     * @param CDatabase_Platform $platform The currently used database platform.
+     * @param mixed              $value    the value to convert
+     * @param CDatabase_Platform $platform the currently used database platform
      *
-     * @return mixed The PHP representation of the value.
+     * @return mixed the PHP representation of the value
      */
     public function convertToPHPValue($value, CDatabase_Platform $platform) {
         return $value;
@@ -133,8 +156,8 @@ abstract class CDatabase_Type {
     /**
      * Gets the SQL declaration snippet for a field of this type.
      *
-     * @param array                     $fieldDeclaration The field declaration.
-     * @param \CDatabase_Platform       $platform         The currently used database platform.
+     * @param array               $fieldDeclaration the field declaration
+     * @param \CDatabase_Platform $platform         the currently used database platform
      *
      * @return string
      */
@@ -153,50 +176,50 @@ abstract class CDatabase_Type {
      * Factory method to create type instances.
      * Type instances are implemented as flyweights.
      *
-     * @param string $name The name of the type (as returned by getName()).
+     * @param string $name the name of the type (as returned by getName())
      *
-     * @return \Doctrine\DBAL\Types\Type
+     * @return CDatabase_Type
      *
      * @throws \Doctrine\DBAL\DBALException
      */
     public static function getType($name) {
-        if (!isset(self::$_typeObjects[$name])) {
-            if (!isset(self::$_typesMap[$name])) {
+        if (!isset(self::$typeObjects[$name])) {
+            if (!isset(self::$typesMap[$name])) {
                 throw CDatabase_Exception::unknownColumnType($name);
             }
-            self::$_typeObjects[$name] = new self::$_typesMap[$name]();
+            self::$typeObjects[$name] = new self::$typesMap[$name]();
         }
 
-        return self::$_typeObjects[$name];
+        return self::$typeObjects[$name];
     }
 
     /**
      * Adds a custom type to the type map.
      *
      * @param string $name      The name of the type. This should correspond to what getName() returns.
-     * @param string $className The class name of the custom type.
+     * @param string $className the class name of the custom type
      *
      * @return void
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws CDatabase_Exception
      */
     public static function addType($name, $className) {
-        if (isset(self::$_typesMap[$name])) {
-            throw DBALException::typeExists($name);
+        if (isset(self::$typesMap[$name])) {
+            throw CDatabase_Exception::typeExists($name);
         }
 
-        self::$_typesMap[$name] = $className;
+        self::$typesMap[$name] = $className;
     }
 
     /**
      * Checks if exists support for a type.
      *
-     * @param string $name The name of the type.
+     * @param string $name the name of the type
      *
-     * @return bool TRUE if type is supported; FALSE otherwise.
+     * @return bool TRUE if type is supported; FALSE otherwise
      */
     public static function hasType($name) {
-        return isset(self::$_typesMap[$name]);
+        return isset(self::$typesMap[$name]);
     }
 
     /**
@@ -210,15 +233,15 @@ abstract class CDatabase_Type {
      * @throws \Doctrine\DBAL\DBALException
      */
     public static function overrideType($name, $className) {
-        if (!isset(self::$_typesMap[$name])) {
-            throw DBALException::typeNotFound($name);
+        if (!isset(self::$typesMap[$name])) {
+            throw CDatabase_Exception::typeNotFound($name);
         }
 
-        if (isset(self::$_typeObjects[$name])) {
-            unset(self::$_typeObjects[$name]);
+        if (isset(self::$typeObjects[$name])) {
+            unset(self::$typeObjects[$name]);
         }
 
-        self::$_typesMap[$name] = $className;
+        self::$typesMap[$name] = $className;
     }
 
     /**
@@ -230,7 +253,7 @@ abstract class CDatabase_Type {
      * @return int
      */
     public function getBindingType() {
-        return ParameterType::STRING;
+        return CDatabase_ParameterType::STRING;
     }
 
     /**
@@ -240,7 +263,7 @@ abstract class CDatabase_Type {
      * @return array
      */
     public static function getTypesMap() {
-        return self::$_typesMap;
+        return self::$typesMap;
     }
 
     /**
@@ -269,7 +292,7 @@ abstract class CDatabase_Type {
     /**
      * Modifies the SQL expression (identifier, parameter) to convert to a database value.
      *
-     * @param string                                    $sqlExpr
+     * @param string             $sqlExpr
      * @param CDatabase_Platform $platform
      *
      * @return string
@@ -281,7 +304,7 @@ abstract class CDatabase_Type {
     /**
      * Modifies the SQL expression (identifier, parameter) to convert to a PHP value.
      *
-     * @param string                                    $sqlExpr
+     * @param string             $sqlExpr
      * @param CDatabase_Platform $platform
      *
      * @return string
@@ -314,5 +337,4 @@ abstract class CDatabase_Type {
     public function requiresSQLCommentHint(CDatabase_Platform $platform) {
         return false;
     }
-
 }

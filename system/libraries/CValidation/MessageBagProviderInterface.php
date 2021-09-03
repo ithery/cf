@@ -1,14 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 3:34:01 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 3:34:01 PM
+ * @deprecated since 1.3 use CBase_MessageProviderInterface
  */
 interface CValidation_MessageBagProviderInterface {
-
     /**
      * Get the messages for the instance.
      *

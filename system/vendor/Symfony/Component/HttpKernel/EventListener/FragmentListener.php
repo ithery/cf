@@ -39,7 +39,7 @@ class FragmentListener implements EventSubscriberInterface
     /**
      * @param string $fragmentPath The path that triggers this listener
      */
-    public function __construct(UriSigner $signer, string $fragmentPath = '/_fragment')
+    public function __construct(UriSigner $signer, $fragmentPath = '/_fragment')
     {
         $this->signer = $signer;
         $this->fragmentPath = $fragmentPath;
@@ -90,7 +90,7 @@ class FragmentListener implements EventSubscriberInterface
         throw new AccessDeniedHttpException();
     }
 
-    public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents()
     {
         return [
             KernelEvents::REQUEST => [['onKernelRequest', 48]],

@@ -896,7 +896,7 @@ trait Comparison
      *
      * @return bool
      */
-    public function is(string $tester)
+    public function is($tester)
     {
         $tester = trim($tester);
 

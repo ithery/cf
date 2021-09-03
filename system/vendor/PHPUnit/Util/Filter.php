@@ -15,7 +15,7 @@ use function in_array;
 use function is_file;
 use function realpath;
 use function sprintf;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 use PHPUnit\Framework\SyntheticError;
 use Throwable;
 

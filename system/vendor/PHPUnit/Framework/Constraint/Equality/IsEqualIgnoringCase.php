@@ -7,16 +7,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
+namespace PHPUnit\Framework\Constraint\Equality;
 
 use function is_string;
 use function sprintf;
 use function strpos;
 use function trim;
-use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\Exception\ExpectationFailedException;
 use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Comparator\Factory as ComparatorFactory;
-
+use PHPUnit\Framework\Constraint\Constraint;
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */

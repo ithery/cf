@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 12:55:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 12:55:34 PM
  */
 
 /**
  * Event used when SQL queries for creating tables are generated inside CDatabase_Platform.
- *
  */
 class CDatabase_Event_Schema_OnAlterTable extends CDatabase_Event_Schema {
-
     /**
      * @var CDatabase_Schema_Table_Diff
      */
@@ -30,8 +29,8 @@ class CDatabase_Event_Schema_OnAlterTable extends CDatabase_Event_Schema {
     private $_sql = [];
 
     /**
-     * @param CDatabase_Schema_Table_Diff           $tableDiff
-     * @param CDatabase_Platform $platform
+     * @param CDatabase_Schema_Table_Diff $tableDiff
+     * @param CDatabase_Platform          $platform
      */
     public function __construct(CDatabase_Schema_Table_Diff $tableDiff, CDatabase_Platform $platform) {
         $this->_tableDiff = $tableDiff;
@@ -72,5 +71,4 @@ class CDatabase_Event_Schema_OnAlterTable extends CDatabase_Event_Schema {
     public function getSql() {
         return $this->_sql;
     }
-
 }

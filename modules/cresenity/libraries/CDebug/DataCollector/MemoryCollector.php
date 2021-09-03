@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 5:04:48 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 5:04:48 PM
  */
 
 /**
  * Collects info about memory usage
  */
 class CDebug_DataCollector_MemoryCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
-
     protected $realUsage = false;
     protected $peakUsage = 0;
 
@@ -57,10 +57,10 @@ class CDebug_DataCollector_MemoryCollector extends CDebug_DataCollector implemen
      */
     public function collect() {
         $this->updatePeakUsage();
-        return array(
+        return [
             'peak_usage' => $this->peakUsage,
             'peak_usage_str' => $this->getDataFormatter()->formatBytes($this->peakUsage)
-        );
+        ];
     }
 
     /**
@@ -74,14 +74,13 @@ class CDebug_DataCollector_MemoryCollector extends CDebug_DataCollector implemen
      * @return array
      */
     public function getWidgets() {
-        return array(
-            "memory" => array(
-                "icon" => "cogs",
-                "tooltip" => "Memory Usage",
-                "map" => "memory.peak_usage_str",
-                "default" => "'0B'"
-            )
-        );
+        return [
+            'memory' => [
+                'icon' => 'cogs',
+                'tooltip' => 'Memory Usage',
+                'map' => 'memory.peak_usage_str',
+                'default' => "'0B'"
+            ]
+        ];
     }
-
 }

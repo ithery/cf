@@ -1,10 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Aug 11, 2019, 3:20:19 AM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Intervention\Image\Facades\Image;
@@ -12,10 +14,12 @@ use Intervention\Image\Facades\Image;
 use Intervention\Image\ImageManager;
 
 class CManager_File_Connector_FileManager_FM_Path {
-
     private $working_dir;
+
     private $item_name;
+
     private $is_thumb = false;
+
     private $helper;
 
     public function __construct(CManager_File_Connector_FileManager_FM $fm = null) {
@@ -29,7 +33,6 @@ class CManager_File_Connector_FileManager_FM_Path {
     }
 
     public function __call($function_name, $arguments) {
-
         return $this->storage->$function_name(...$arguments);
     }
 
@@ -84,9 +87,7 @@ class CManager_File_Connector_FileManager_FM_Path {
     }
 
     public function folders() {
-
         $all_folders = array_map(function ($directory_path) {
-
             return $this->pretty($directory_path);
         }, $this->storage->directories());
 
@@ -122,7 +123,6 @@ class CManager_File_Connector_FileManager_FM_Path {
     /**
      * Create folder if not exist.
      *
-     * @param  string  $path  Real path of a directory.
      * @return bool
      */
     public function createFolder() {
@@ -137,7 +137,7 @@ class CManager_File_Connector_FileManager_FM_Path {
 
         $parent_dir = substr($working_dir, 0, strrpos($working_dir, '/'));
         if (strlen($parent_dir) == 0) {
-            $parent_dir = "/";
+            $parent_dir = '/';
         }
 
         $parent_directories = array_map(function ($directory_path) {
@@ -154,7 +154,6 @@ class CManager_File_Connector_FileManager_FM_Path {
     /**
      * Check a folder and its subfolders is empty or not.
      *
-     * @param  string  $directory_path  Real path of a directory.
      * @return bool
      */
     public function directoryIsEmpty() {
@@ -177,7 +176,8 @@ class CManager_File_Connector_FileManager_FM_Path {
     /**
      * Sort files and directories.
      *
-     * @param  mixed  $arr_items  Array of files or folders or both.
+     * @param mixed $arr_items array of files or folders or both
+     *
      * @return array of object
      */
     public function sortByColumn($arr_items) {
@@ -197,7 +197,13 @@ class CManager_File_Connector_FileManager_FM_Path {
         return $this->helper->error($error_type, $variables);
     }
 
-    // Upload section
+    /**
+     * Upload File
+     *
+     * @param mixed $file
+     *
+     * @return string
+     */
     public function upload($file) {
         $this->uploadValidator($file);
         $newFileName = $this->getNewName($file);
@@ -207,9 +213,8 @@ class CManager_File_Connector_FileManager_FM_Path {
         try {
             $newFileName = $this->saveFile($file, $newFileName);
         } catch (\Exception $e) {
-//            
-//            \Log::info($e);
-            //return $this->error('invalid');
+            // \Log::info($e);
+            // return $this->error('invalid');
             return $this->error($e->getMessage());
         }
         // TODO should be "FileWasUploaded"
@@ -249,7 +254,7 @@ class CManager_File_Connector_FileManager_FM_Path {
 
     private function getNewName($file) {
         $newFileName = $this->helper
-                ->translateFromUtf8(trim(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)));
+            ->translateFromUtf8(trim(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)));
         if ($this->helper->config('rename_file') === true) {
             $newFileName = uniqid();
         } elseif ($this->helper->config('alphanumeric_filename') === true) {
@@ -280,8 +285,7 @@ class CManager_File_Connector_FileManager_FM_Path {
 
         $imageManager = new ImageManager();
         $image = $imageManager->make($original_image->get())
-                ->fit($this->helper->config('thumb_img_width', 200), $this->helper->config('thumb_img_height', 200));
+            ->fit($this->helper->config('thumb_img_width', 200), $this->helper->config('thumb_img_height', 200));
         $this->storage->put($image->stream()->detach());
     }
-
 }

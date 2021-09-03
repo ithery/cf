@@ -1,31 +1,24 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of Textarea
  *
  * @author Hery Kurniawan
- * @since Jan 28, 2018, 9:50:24 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jan 28, 2018, 9:50:24 PM
  */
 class CElement_FormInput_Textarea extends CElement_FormInput {
-
     use CTrait_Compat_Element_FormInput_Textarea;
     use CTrait_Element_Property_Placeholder;
 
     protected $col;
     protected $row;
 
-    //put your code here
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->tag = "textarea";
+        $this->tag = 'textarea';
         $this->isOneTag = false;
 
         $this->col = 60;
@@ -48,8 +41,8 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
         if ($this->col) {
             $this->setAttr('col', $this->col);
         }
-        if(strlen($this->placeholder)>0) {
-            $this->setAttr('placeholder',$this->placeholder);
+        if (strlen($this->placeholder) > 0) {
+            $this->setAttr('placeholder', $this->placeholder);
         }
     }
 
@@ -77,7 +70,4 @@ class CElement_FormInput_Textarea extends CElement_FormInput {
         $this->row = $row;
         return $this;
     }
-
-    
-   
 }

@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Nov 5, 2019, 5:35:15 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Nov 5, 2019, 5:35:15 PM
  */
 use Aws\DynamoDb\DynamoDbClient;
 
 class CQueue_FailerFactory {
-
     private static $failerInstance;
 
     public static function getFailerInstance() {
@@ -27,21 +27,23 @@ class CQueue_FailerFactory {
     /**
      * Create a new database failed job provider.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return \Illuminate\Queue\Failed\DatabaseFailedJobProvider
      */
     protected static function databaseFailedJobProvider($config) {
-
         $db = CDatabase::instance(carr::get($config, 'database'));
         return new CQueue_FailedJob_DatabaseFailedJob(
-                $db, carr::get($config, 'table')
+            $db,
+            carr::get($config, 'table')
         );
     }
 
     /**
      * Create a new DynamoDb failed job provider.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return \Illuminate\Queue\Failed\DynamoDbFailedJobProvider
      */
     protected static function dynamoFailedJobProvider($config) {
@@ -54,8 +56,9 @@ class CQueue_FailerFactory {
             $dynamoConfig['credentials'] = carr::only($config, ['key', 'secret', 'token']);
         }
         return new CQueue_FailedJob_DynamoDbFailedJob(
-                new DynamoDbClient($dynamoConfig), CF::appCode(), $config['table']
+            new DynamoDbClient($dynamoConfig),
+            CF::appCode(),
+            $config['table']
         );
     }
-
 }

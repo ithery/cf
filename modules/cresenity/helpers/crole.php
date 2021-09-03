@@ -1,16 +1,23 @@
 <?php
 
+//@codingStandardsIgnoreStart
 class crole {
-
-    protected static $roles = array();
+    //@codingStandardsIgnoreEnd
+    /**
+     * Roles cache
+     *
+     * @var array
+     */
+    protected static $roles = [];
 
     public static function get($id) {
         if ($id === null) {
             return null;
         }
         $db = CDatabase::instance();
+
         if (!isset(self::$roles[$id])) {
-            $query = "select * from roles where status>0 and role_id=" . $db->escape($id);
+            $query = 'select * from roles where status>0 and role_id=' . $db->escape($id);
             $result = $db->query($query);
             self::$roles[$id] = null;
             if ($result->count() > 0) {
@@ -20,5 +27,4 @@ class crole {
 
         return self::$roles[$id];
     }
-
 }

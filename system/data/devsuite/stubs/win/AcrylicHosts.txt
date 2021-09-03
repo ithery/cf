@@ -1,0 +1,4 @@
+127.0.0.1 *.DEVSUITE_TLD
+::1 *.DEVSUITE_TLD
+
+@DEVSUITE_HOME_PATH/AcrylicHosts.txt

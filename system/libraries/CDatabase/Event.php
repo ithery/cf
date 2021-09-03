@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 12:19:51 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 12:19:51 PM
  */
 class CDatabase_Event {
-
     /**
      * The name of the connection.
      *
@@ -28,7 +28,8 @@ class CDatabase_Event {
     /**
      * Create a new event instance.
      *
-     * @param  CDatabase  $db
+     * @param CDatabase $db
+     *
      * @return void
      */
     public function __construct($db) {
@@ -37,21 +38,31 @@ class CDatabase_Event {
     }
 
     const onQueryExecuted = 'CDatabase_Event_OnQueryExecuted';
+
     const onPostConnect = 'CDatabase_Event_OnPostConnect';
+
     /* schema */
     const onSchemaCreateTable = 'CDatabase_Event_Schema_OnCreateTable';
+
     const onSchemaCreateTableColumn = 'CDatabase_Event_Schema_OnCreateTableColumn';
+
     const onSchemaDropTable = 'CDatabase_Event_Schema_OnDropTable';
+
     const onSchemaAlterTable = 'CDatabase_Event_Schema_OnAlterTable';
+
     const onSchemaAlterTableAddColumn = 'CDatabase_Event_Schema_OnAlterTableAddColumn';
+
     const onSchemaAlterTableRemoveColumn = 'CDatabase_Event_Schema_OnAlterTableRemoveColumn';
+
     const onSchemaAlterTableChangeColumn = 'CDatabase_Event_Schema_OnAlterTableChangeColumn';
+
     const onSchemaAlterTableRenameColumn = 'CDatabase_Event_Schema_OnAlterTableRenameColumn';
+
     const onSchemaColumnDefinition = 'CDatabase_Event_Schema_OnColumnDefinition';
+
     const onSchemaIndexDefinition = 'CDatabase_Event_Schema_OnIndexDefinition';
 
     public static function createOnQueryExecutedEvent($sql, $bindings, $time, $rowsCount, $db) {
         return new CDatabase_Event_OnQueryExecuted($sql, $bindings, $time, $rowsCount, $db);
     }
-
 }

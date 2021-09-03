@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CModel_Resource_ResourceObserver {
-
     public function creating(CModel $resource) {
         if ($resource->shouldSortWhenCreating()) {
             $resource->setHighestOrderNumber();
@@ -16,7 +9,7 @@ class CModel_Resource_ResourceObserver {
 
     public function updating(CModel $resource) {
         if ($resource->file_name !== $resource->getOriginal('file_name')) {
-            /** @var CResources_Filesystem */
+            /** @var CResources_Filesystem $filesystem */
             $filesystem = CResources_Factory::createFileSystem();
 
             $filesystem->syncFileNames($resource);
@@ -30,9 +23,7 @@ class CModel_Resource_ResourceObserver {
 
         $original = $media->getOriginal('manipulations');
 
-
         $original = json_decode($original, true);
-
 
         if ($media->manipulations !== $original) {
             $eventDispatcher = CModel::getEventDispatcher();
@@ -58,5 +49,4 @@ class CModel_Resource_ResourceObserver {
 
         $filesystem->removeAllFiles($media);
     }
-
 }

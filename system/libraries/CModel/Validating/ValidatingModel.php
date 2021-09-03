@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 3:38:37 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 3:38:37 PM
  */
-abstract class ValidatingModel extends CModel_Query implements CValidation_MessageBagProviderInterface, CModel_Validating_ValidatingInterface {
-
+abstract class ValidatingModel extends CModel_Query implements CBase_MessageProviderInterface, CModel_Validating_ValidatingInterface {
     /**
      * Make model validate attributes.
      *
@@ -31,5 +31,4 @@ abstract class ValidatingModel extends CModel_Query implements CValidation_Messa
     public function getMessageBag() {
         return $this->getErrors();
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of PHPUnit.
  *
@@ -7,13 +8,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
+
+namespace PHPUnit\Framework\Constraint\Cardinality;
+
+use PHPUnit\Framework\Constraint\Constraint;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class GreaterThan extends Constraint
-{
+final class GreaterThan extends Constraint {
+
     /**
      * @var float|int
      */
@@ -22,8 +26,7 @@ final class GreaterThan extends Constraint
     /**
      * @param float|int $value
      */
-    public function __construct($value)
-    {
+    public function __construct($value) {
         $this->value = $value;
     }
 
@@ -32,8 +35,7 @@ final class GreaterThan extends Constraint
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function toString()
-    {
+    public function toString() {
         return 'is greater than ' . $this->exporter()->export($this->value);
     }
 
@@ -43,8 +45,8 @@ final class GreaterThan extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other)
-    {
+    protected function matches($other) {
         return $this->value < $other;
     }
+
 }

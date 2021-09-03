@@ -1,13 +1,8 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 use CVendor_Firebase_Messaging_RegistrationToken as RegistrationToken;
-final class CVendor_Firebase_Messaging_RegistrationTokens implements Countable, IteratorAggregate {
 
+final class CVendor_Firebase_Messaging_RegistrationTokens implements Countable, IteratorAggregate {
     /** @var RegistrationToken[] */
     private $tokens;
 
@@ -51,7 +46,6 @@ final class CVendor_Firebase_Messaging_RegistrationTokens implements Countable, 
      */
     public function getIterator() {
         return new ArrayIterator($this->tokens);
-        
     }
 
     public function isEmpty() {
@@ -75,5 +69,4 @@ final class CVendor_Firebase_Messaging_RegistrationTokens implements Countable, 
     public function count() {
         return \count($this->tokens);
     }
-
 }

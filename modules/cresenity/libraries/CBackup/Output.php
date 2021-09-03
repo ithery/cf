@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CBackup_Output {
-
     private static $instance;
     protected $messages;
     protected $errors;
@@ -45,5 +38,4 @@ class CBackup_Output {
         $this->clear();
         return $messages;
     }
-
 }

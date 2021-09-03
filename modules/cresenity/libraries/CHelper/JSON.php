@@ -1,30 +1,28 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 17, 2018, 12:20:01 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jul 17, 2018, 12:20:01 AM
  */
 
 /**
  * JSON tools.
  */
 class CHelper_JSON {
-
     /**
      * Wrapper for JSON encoding that throws when an error occurs.
      *
      * Shamelessly copied from Guzzle.
      *
-     * @internal
+     * @param mixed $value   The value being encoded
+     * @param int   $options JSON encode option bitmask
+     * @param int   $depth   Set the maximum depth. Must be greater than zero
      *
      * @see \GuzzleHttp\json_encode()
-     *
-     * @param mixed $value   The value being encoded
-     * @param int $options JSON encode option bitmask
-     * @param int $depth   Set the maximum depth. Must be greater than zero
      *
      * @throws InvalidArgumentException if the JSON cannot be encoded
      */
@@ -35,7 +33,6 @@ class CHelper_JSON {
         if ($depth == null) {
             $depth = 512;
         }
-
 
         $json = \json_encode($value, $options, $depth);
         if ($error = self::getJsonLastErrorMsg()) {
@@ -50,16 +47,14 @@ class CHelper_JSON {
      *
      * Shamelessly copied from Guzzle.
      *
-     * @internal
-     *
-     * @see \GuzzleHttp\json_encode()
-     *
-     * @param string $json JSON data to parse
-     * @param bool $assoc  When true, returned objects will be converted into associative arrays
-     * @param int $depth User specified recursion depth
-     * @param int $options Bitmask of JSON decode options
+     * @param string $json    JSON data to parse
+     * @param bool   $assoc   When true, returned objects will be converted into associative arrays
+     * @param int    $depth   User specified recursion depth
+     * @param int    $options Bitmask of JSON decode options
      *
      * @throws \InvalidArgumentException if the JSON cannot be decoded
+     *
+     * @see \GuzzleHttp\json_encode()
      *
      * @return mixed
      */
@@ -84,8 +79,6 @@ class CHelper_JSON {
     /**
      * Returns true if the given value is a valid JSON string.
      *
-     * @internal
-     *
      * @param mixed $value
      */
     public static function isValid($value) {
@@ -99,8 +92,6 @@ class CHelper_JSON {
     }
 
     /**
-     * @internal
-     *
      * @param mixed $value
      */
     public static function prettyPrint($value) {
@@ -110,10 +101,10 @@ class CHelper_JSON {
     /**
      * Parse JSON string to an array.
      *
+     * @param string $args,... JSON string to parse
+     *
      * @link http://php.net/manual/en/function.json-decode.php
      * @link http://php.net/manual/en/function.json-last-error.php
-     *
-     * @param string $args,... JSON string to parse
      *
      * @throws CHelper_Exception_JSONParseException
      *
@@ -136,10 +127,10 @@ class CHelper_JSON {
     /**
      * Convert input to JSON string with standard options.
      *
+     * @param mixed $args,... Target to stringify
+     *
      * @link http://php.net/manual/en/function.json-encode.php
      * @link http://php.net/manual/en/function.json-last-error.php
-     *
-     * @param mixed $args,... Target to stringify
      *
      * @throws CHelper_Exception_JSONParseException
      *
@@ -163,5 +154,4 @@ class CHelper_JSON {
     private static function getJsonLastErrorMsg() {
         return JSON_ERROR_NONE !== json_last_error() ? json_last_error_msg() : false;
     }
-
 }

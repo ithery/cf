@@ -1,12 +1,13 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2018, 1:58:36 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2018, 1:58:36 AM
  */
-$fontList = array(
+$fontList = [
     'fa-500px' => 'f26e',
     'fa-adjust' => 'f042',
     'fa-adn' => 'f170',
@@ -701,7 +702,7 @@ $fontList = array(
     'fa-youtube' => 'f167',
     'fa-youtube-play' => 'f16a',
     'fa-youtube-square' => 'f166',
-);
+];
 ?>
 
 

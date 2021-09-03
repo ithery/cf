@@ -1,40 +1,44 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Nov 6, 2019, 5:11:31 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Nov 6, 2019, 5:11:31 PM
  */
-abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
-
+abstract class CModel_MongoDB_Relation_EmbedsOneOrMany extends CModel_Relation {
     /**
      * The local key of the parent model.
+     *
      * @var string
      */
     protected $localKey;
 
     /**
      * The foreign key of the parent model.
+     *
      * @var string
      */
     protected $foreignKey;
 
     /**
      * The "name" of the relationship.
+     *
      * @var string
      */
     protected $relation;
 
     /**
      * Create a new embeds many relationship instance.
-     * @param CModel_Query $query
+     *
+     * @param CModel_Query         $query
      * @param CModel_MongoDB_Model $parent
      * @param CModel_MongoDB_Model $related
-     * @param string $localKey
-     * @param string $foreignKey
-     * @param string $relation
+     * @param string               $localKey
+     * @param string               $foreignKey
+     * @param string               $relation
      */
     public function __construct(CModel_Query $query, CModel_MongoDB_Model $parent, CModel_MongoDB_Model $related, $localKey, $foreignKey, $relation) {
         $this->query = $query;
@@ -80,7 +84,9 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Shorthand to get the results of the relationship.
+     *
      * @param array $columns
+     *
      * @return CModel_Collection
      */
     public function get($columns = ['*']) {
@@ -89,6 +95,7 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Get the number of embedded models.
+     *
      * @return int
      */
     public function count() {
@@ -97,17 +104,21 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Attach a model instance to the parent model.
-     * @param Model $model
-     * @return Model|bool
+     *
+     * @param CModel_MongoDB_Model $model
+     *
+     * @return CModel_MongoDB_Model|bool
      */
-    public function save(Model $model) {
+    public function save(CModel_MongoDB_Model $model) {
         $model->setParentRelation($this);
         return $model->save() ? $model : false;
     }
 
     /**
      * Attach a collection of models to the parent instance.
+     *
      * @param CModel_Collection|array $models
+     *
      * @return CModel_Collection|array
      */
     public function saveMany($models) {
@@ -119,7 +130,9 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Create a new instance of the related model.
+     *
      * @param array $attributes
+     *
      * @return Model
      */
     public function create(array $attributes = []) {
@@ -134,7 +147,9 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Create an array of new instances of the related model.
+     *
      * @param array $records
+     *
      * @return array
      */
     public function createMany(array $records) {
@@ -147,7 +162,9 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Transform single ID, single Model or array of Models into an array of IDs.
+     *
      * @param mixed $ids
+     *
      * @return array
      */
     protected function getIdsArrayFrom($ids) {
@@ -158,7 +175,7 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
             $ids = [$ids];
         }
         foreach ($ids as &$id) {
-            if ($id instanceof Model) {
+            if ($id instanceof CModel_MongoDB_Model) {
                 $id = $id->getKey();
             }
         }
@@ -191,11 +208,13 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Get the foreign key value for the relation.
+     *
      * @param mixed $id
+     *
      * @return mixed
      */
     protected function getForeignKeyValue($id) {
-        if ($id instanceof Model) {
+        if ($id instanceof CModel_MongoDB_Model) {
             $id = $id->getKey();
         }
         // Convert the id to MongoId if necessary.
@@ -204,7 +223,9 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Convert an array of records to a CModel_Collection.
+     *
      * @param array $records
+     *
      * @return CModel_Collection
      */
     protected function toCollection(array $records = []) {
@@ -220,7 +241,9 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Create a related model instanced.
+     *
      * @param array $attributes
+     *
      * @return Model
      */
     protected function toModel($attributes = []) {
@@ -229,7 +252,8 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
         }
         $connection = $this->related->getConnection();
         $model = $this->related->newFromBuilder(
-                (array) $attributes, $connection ? $connection->getName() : null
+            (array) $attributes,
+            $connection ? $connection->getName() : null
         );
         $model->setParentRelation($this);
         $model->setRelation($this->foreignKey, $this->parent);
@@ -240,6 +264,7 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Get the relation instance of the parent.
+     *
      * @return Relation
      */
     protected function getParentRelation() {
@@ -266,6 +291,7 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Check if this relation is nested in another relation.
+     *
      * @return bool
      */
     protected function isNested() {
@@ -274,7 +300,9 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Get the fully qualified local key name.
+     *
      * @param string $glue
+     *
      * @return string
      */
     protected function getPathHierarchy($glue = '.') {
@@ -296,6 +324,7 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Get the primary key value of the parent.
+     *
      * @return string
      */
     protected function getParentKey() {
@@ -304,8 +333,10 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Return update values
+     *
      * @param $array
      * @param string $prepend
+     *
      * @return array
      */
     public static function getUpdateValues($array, $prepend = '') {
@@ -318,6 +349,7 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Get the foreign key for the relationship.
+     *
      * @return string
      */
     public function getQualifiedForeignKeyName() {
@@ -326,12 +358,13 @@ abstract class CModel_Relation_EmbedsOneOrMany extends CModel_Relation {
 
     /**
      * Get the name of the "where in" method for eager loading.
+     *
      * @param CModel $model
      * @param string $key
+     *
      * @return string
      */
     protected function whereInMethod(CModel $model, $key) {
         return 'whereIn';
     }
-
 }

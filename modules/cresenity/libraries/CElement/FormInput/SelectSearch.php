@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 12:00:39 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 12:00:39 AM
  */
 class CElement_FormInput_SelectSearch extends CElement_FormInput {
-
     use CTrait_Compat_Element_FormInput_SelectSearch;
 
     protected $query;
@@ -28,19 +28,19 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->dropdownClasses = array();
-        $this->type = "selectsearch";
-        $this->query = "";
-        $this->formatSelection = "";
-        $this->formatResult = "";
-        $this->keyField = "";
-        $this->searchField = "";
-        $this->placeholder = "Search for a item";
+        $this->dropdownClasses = [];
+        $this->type = 'selectsearch';
+        $this->query = '';
+        $this->formatSelection = '';
+        $this->formatResult = '';
+        $this->keyField = '';
+        $this->searchField = '';
+        $this->placeholder = 'Search for a item';
         $this->multiple = false;
         $this->autoSelect = false;
         $this->minInputLength = 0;
         $this->delay = 100;
-        $this->requires = array();
+        $this->requires = [];
         $this->valueCallback = null;
     }
 
@@ -48,7 +48,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return new CElement_FormInput_SelectSearch($id);
     }
 
-    public function setValueCallback(callable $callback, $require = "") {
+    public function setValueCallback(callable $callback, $require = '') {
         $this->valueCallback = $callback;
         if (strlen($require) > 0) {
             $this->requires[] = $require;
@@ -122,12 +122,13 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
-        $disabled = "";
+
+        $custom_css = $this->renderStyle($custom_css);
+        $disabled = '';
         if ($this->disabled) {
             $disabled = ' disabled="disabled"';
         }
-        $multiple = "";
+        $multiple = '';
         if ($this->multiple) {
             $multiple = ' multiple="multiple"';
         }
@@ -136,12 +137,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         }
 
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
+        $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
-            $classes = " " . $classes;
+            $classes = ' ' . $classes;
         }
 
-        $classes = $classes . " form-control ";
+        $classes = $classes . ' form-control ';
 
         $html->setIndent($indent);
         $value = null;
@@ -149,15 +150,15 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $db = CDatabase::instance();
             $rjson = 'false';
 
-            $q = "select `" . $this->keyField . "` from (" . $this->query . ") as a limit 1";
+            $q = 'select `' . $this->keyField . '` from (' . $this->query . ') as a limit 1';
             $value = cdbutils::get_value($q);
         }
         if (strlen($this->value) > 0) {
             $value = $this->value;
         }
-        $additionAttribute = "";
+        $additionAttribute = '';
         foreach ($this->attr as $k => $v) {
-            $additionAttribute .= " " . $k . '="' . $v . '"';
+            $additionAttribute .= ' ' . $k . '="' . $v . '"';
         }
         $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $disabled . $custom_css . $multiple . $additionAttribute . '">');
 
@@ -167,9 +168,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $rjson = 'false';
 
             if ($this->autoSelect) {
-                $q = "select * from (" . $this->query . ") as a limit 1";
+                $q = 'select * from (' . $this->query . ') as a limit 1';
             } else {
-                $q = "select * from (" . $this->query . ") as a where `" . $this->keyField . "`=" . $db->escape($this->value);
+                $q = 'select * from (' . $this->query . ') as a where `' . $this->keyField . '`=' . $db->escape($this->value);
             }
             $r = $db->query($q)->result_array(false);
             if (count($r) > 0) {
@@ -203,7 +204,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     public function createAjaxUrl() {
-
         $ajaxMethod = CAjax::createMethod();
         $ajaxMethod->setType('SearchSelect');
         $ajaxMethod->setData('query', $this->query);
@@ -241,39 +241,38 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $strSelection = $this->formatSelection;
         $strResult = $this->formatResult;
 
-
         $strSelection = $this->generateSelect2Template($strSelection);
         $strResult = $this->generateSelect2Template($strResult);
 
         if (strlen($strResult) == 0) {
-            $searchFieldText = CF::value($this->searchField);
+            $searchFieldText = c::value($this->searchField);
             if (strlen($searchFieldText) > 0) {
                 $strResult = "'+item." . $searchFieldText . "+'";
             }
         }
         if (strlen($strSelection) == 0) {
-            $searchFieldText = CF::value($this->searchField);
+            $searchFieldText = c::value($this->searchField);
             if (strlen($searchFieldText) > 0) {
                 $strSelection = "'+item." . $searchFieldText . "+'";
             }
         }
 
-        $strResult = preg_replace("/[\r\n]+/", "", $strResult);
-        $placeholder = "Search for a item";
+        $strResult = preg_replace("/[\r\n]+/", '', $strResult);
+        $placeholder = 'Search for a item';
         if (strlen($this->placeholder) > 0) {
             $placeholder = $this->placeholder;
         }
-        $strJsChange = "";
+        $strJsChange = '';
         if ($this->submit_onchange) {
             $strJsChange = "$(this).closest('form').submit();";
         }
 
-        $strJsInit = "";
+        $strJsInit = '';
         if ($this->autoSelect) {
             $db = CDatabase::instance();
             $rjson = 'false';
 
-            $q = "select * from (" . $this->query . ") as a limit 1";
+            $q = 'select * from (' . $this->query . ') as a limit 1';
             $r = $db->query($q)->result_array(false);
             if (count($r) > 0) {
                 $r = $r[0];
@@ -285,34 +284,30 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             }
             $rjson = json_encode($r);
 
-
-            $strJsInit = "
+            $strJsInit = '
                 initSelection : function (element, callback) {
-                    var data = " . $rjson . ";
+                    var data = ' . $rjson . ';
                     callback(data);
                 },
-            ";
+            ';
         }
 
-
-
-
-        $strMultiple = "";
+        $strMultiple = '';
         if ($this->multiple) {
             $strMultiple = " multiple:'true',";
         }
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
+        $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
-            $classes = " " . $classes;
+            $classes = ' ' . $classes;
         }
 
         //$classes = $classes . " form-control ";
 
         $dropdownClasses = $this->dropdownClasses;
-        $dropdownClasses = implode(" ", $dropdownClasses);
+        $dropdownClasses = implode(' ', $dropdownClasses);
         if (strlen($dropdownClasses) > 0) {
-            $dropdownClasses = " " . $dropdownClasses;
+            $dropdownClasses = ' ' . $dropdownClasses;
         }
 
         $str = "
@@ -324,9 +319,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
                         url: '" . $ajaxUrl . "',
                         dataType: 'jsonp',
-                        quietMillis: " . $this->delay . ", 
-                        delay: " . $this->delay . ", 
-                        " . $strMultiple . "
+                        quietMillis: " . $this->delay . ',
+                        delay: ' . $this->delay . ',
+                        ' . $strMultiple . '
                         data: function (params) {
                             return {
                                 q: params.term, // search term
@@ -334,7 +329,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                                 limit: 10
                             };
                         },
-                        processResults: function (data, params) { 
+                        processResults: function (data, params) {
                             // parse the results into the format expected by Select2
                             // since we are using custom formatting functions we do not need to
                             // alter the remote JSON data, except to indicate that infinite
@@ -350,7 +345,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                         },
                         cache:true,
                     },
-                " . $strJsInit . "
+                ' . $strJsInit . "
                 templateResult: function(item) {
                     if (typeof item.loading !== 'undefined') {
                         return item.text;
@@ -395,11 +390,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         //echo $str;
         $js->append($str)->br();
 
-
-
-
-
         return $js->text();
     }
-
 }

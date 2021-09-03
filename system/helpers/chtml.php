@@ -1,44 +1,37 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * HTML helper class.
- *
- * $Id: html.php 4376 2009-06-01 11:40:39Z samsoir $
- *
- * @package    Core
- * @author     Kohana Team
- * @copyright  (c) 2007-2008 Kohana Team
- * @license    http://kohanaphp.com/license.html
- */
+// @codingStandardsIgnoreStart
 class chtml {
-
     // Enable or disable automatic setting of target="_blank"
-    public static $windowed_urls = FALSE;
+    public static $windowed_urls = false;
 
     /**
      * Convert special characters to HTML entities
      *
      * @param   string   string to convert
-     * @param   boolean  encode existing entities
-     * @return  string
+     * @param   bool  encode existing entities
+     * @param mixed $str
+     * @param mixed $double_encode
+     *
+     * @return string
      */
-    public static function specialchars($str, $double_encode = TRUE) {
+    public static function specialchars($str, $double_encode = true) {
         // Force the string to be a string
         $str = (string) $str;
 
         // Do encode existing HTML entities (default)
-        if ($double_encode === TRUE) {
+        if ($double_encode === true) {
             $str = htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
         } else {
             // Do not encode existing HTML entities
             // From PHP 5.2.3 this functionality is built-in, otherwise use a regex
             if (version_compare(PHP_VERSION, '5.2.3', '>=')) {
-                $str = htmlspecialchars($str, ENT_QUOTES, 'UTF-8', FALSE);
+                $str = htmlspecialchars($str, ENT_QUOTES, 'UTF-8', false);
             } else {
                 $str = preg_replace('/&(?!(?:#\d++|[a-z]++);)/ui', '&amp;', $str);
-                $str = str_replace(array('<', '>', '\'', '"'), array('&lt;', '&gt;', '&#39;', '&quot;'), $str);
+                $str = str_replace(['<', '>', '\'', '"'], ['&lt;', '&gt;', '&#39;', '&quot;'], $str);
             }
         }
 
@@ -47,12 +40,15 @@ class chtml {
 
     /**
      * Perform a chtml::specialchars() with additional URL specific encoding.
-     *  
+     *
      * @param   string   string to convert
-     * @param   boolean  encode existing entities
-     * @return  string
+     * @param   bool  encode existing entities
+     * @param mixed $str
+     * @param mixed $double_encode
+     *
+     * @return string
      */
-    public static function specialurlencode($str, $double_encode = TRUE) {
+    public static function specialurlencode($str, $double_encode = true) {
         return str_replace(' ', '%20', chtml::specialchars($str, $double_encode));
     }
 
@@ -63,19 +59,25 @@ class chtml {
      * @param   string  link text
      * @param   array   HTML anchor attributes
      * @param   string  non-default protocol, eg: https
-     * @param   boolean option to escape the title that is output
-     * @return  string
+     * @param   bool option to escape the title that is output
+     * @param mixed      $uri
+     * @param null|mixed $title
+     * @param null|mixed $attributes
+     * @param null|mixed $protocol
+     * @param mixed      $escape_title
+     *
+     * @return string
      */
-    public static function anchor($uri, $title = NULL, $attributes = NULL, $protocol = NULL, $escape_title = FALSE) {
+    public static function anchor($uri, $title = null, $attributes = null, $protocol = null, $escape_title = false) {
         if ($uri === '') {
-            $site_url = curl::base(FALSE);
+            $site_url = curl::base(false);
         } elseif (strpos($uri, '#') === 0) {
             // This is an id target link, not a URL
             $site_url = $uri;
-        } elseif (strpos($uri, '://') === FALSE) {
+        } elseif (strpos($uri, '://') === false) {
             $site_url = curl::site($uri, $protocol);
         } else {
-            if (chtml::$windowed_urls === TRUE AND empty($attributes['target'])) {
+            if (chtml::$windowed_urls === true and empty($attributes['target'])) {
                 $attributes['target'] = '_blank';
             }
 
@@ -84,11 +86,11 @@ class chtml {
 
         return
                 // Parsed URL
-                '<a href="' . chtml::specialurlencode($site_url, FALSE) . '"'
+                '<a href="' . chtml::specialurlencode($site_url, false) . '"'
                 // Attributes empty? Use an empty string
                 . (is_array($attributes) ? chtml::attributes($attributes) : '') . '>'
                 // Title empty? Use the parsed URL
-                . ($escape_title ? chtml::specialchars((($title === NULL) ? $site_url : $title), FALSE) : (($title === NULL) ? $site_url : $title)) . '</a>';
+                . ($escape_title ? chtml::specialchars((($title === null) ? $site_url : $title), false) : (($title === null) ? $site_url : $title)) . '</a>';
     }
 
     /**
@@ -98,16 +100,21 @@ class chtml {
      * @param   string  link text
      * @param   array   HTML anchor attributes
      * @param   string  non-default protocol, eg: ftp
-     * @return  string
+     * @param mixed      $file
+     * @param null|mixed $title
+     * @param null|mixed $attributes
+     * @param null|mixed $protocol
+     *
+     * @return string
      */
-    public static function file_anchor($file, $title = NULL, $attributes = NULL, $protocol = NULL) {
+    public static function file_anchor($file, $title = null, $attributes = null, $protocol = null) {
         return
                 // Base URL + URI = full URL
-                '<a href="' . chtml::specialurlencode(curl::base(FALSE, $protocol) . $file, FALSE) . '"'
+                '<a href="' . chtml::specialurlencode(curl::base(false, $protocol) . $file, false) . '"'
                 // Attributes empty? Use an empty string
                 . (is_array($attributes) ? chtml::attributes($attributes) : '') . '>'
                 // Title empty? Use the filename part of the URI
-                . (($title === NULL) ? end(explode('/', $file)) : $title) . '</a>';
+                . (($title === null) ? end(explode('/', $file)) : $title) . '</a>';
     }
 
     /**
@@ -117,9 +124,14 @@ class chtml {
      * @param   string  URI or URL to link to
      * @param   string  link text
      * @param   array   HTML anchor attributes
-     * @return  string
+     * @param mixed      $protocol
+     * @param mixed      $uri
+     * @param null|mixed $title
+     * @param mixed      $attributes
+     *
+     * @return string
      */
-    public static function panchor($protocol, $uri, $title = NULL, $attributes = FALSE) {
+    public static function panchor($protocol, $uri, $title = null, $attributes = false) {
         return chtml::anchor($uri, $title, $attributes, $protocol);
     }
 
@@ -127,10 +139,11 @@ class chtml {
      * Create an array of anchors from an array of link/title pairs.
      *
      * @param   array  link/title pairs
-     * @return  array
+     *
+     * @return array
      */
     public static function anchor_array(array $array) {
-        $anchors = array();
+        $anchors = [];
         foreach ($array as $link => $title) {
             // Create list of anchors
             $anchors[] = chtml::anchor($link, $title);
@@ -142,7 +155,9 @@ class chtml {
      * Generates an obfuscated version of an email address.
      *
      * @param   string  email address
-     * @return  string
+     * @param mixed $email
+     *
+     * @return string
      */
     public static function email($email) {
         $safe = '';
@@ -168,16 +183,21 @@ class chtml {
      * @param   string  email address to send to
      * @param   string  link text
      * @param   array   HTML anchor attributes
-     * @return  string
+     * @param mixed      $email
+     * @param null|mixed $title
+     * @param null|mixed $attributes
+     *
+     * @return string
      */
-    public static function mailto($email, $title = NULL, $attributes = NULL) {
-        if (empty($email))
+    public static function mailto($email, $title = null, $attributes = null) {
+        if (empty($email)) {
             return $title;
+        }
 
         // Remove the subject or other parameters that do not need to be encoded
-        if (strpos($email, '?') !== FALSE) {
+        if (strpos($email, '?') !== false) {
             // Extract the parameters from the email address
-            list ($email, $params) = explode('?', $email, 2);
+            list($email, $params) = explode('?', $email, 2);
 
             // Make the params into a query string, replacing spaces
             $params = '?' . str_replace(' ', '%20', $params);
@@ -203,19 +223,19 @@ class chtml {
      * Generate a "breadcrumb" list of anchors representing the URI.
      *
      * @param   array   segments to use as breadcrumbs, defaults to using Router::$segments
-     * @return  string
+     *
+     * @return string
      */
-    public static function breadcrumb($segments = NULL) {
-        empty($segments) and $segments = Router::$segments;
+    public static function breadcrumb($segments = null) {
+        empty($segments) and $segments = CFRouter::$segments;
 
-        $array = array();
+        $array = [];
         while ($segment = array_pop($segments)) {
-            $array[] = chtml::anchor
-                            (
-                            // Complete URI for the URL
-                            implode('/', $segments) . '/' . $segment,
-                            // Title for the current segment
-                            ucwords(inflector::humanize($segment))
+            $array[] = chtml::anchor(
+                // Complete URI for the URL
+                implode('/', $segments) . '/' . $segment,
+                // Title for the current segment
+                ucwords(inflector::humanize($segment))
             );
         }
 
@@ -228,11 +248,14 @@ class chtml {
      *
      * @param   string|array   tag name, or an array of tags
      * @param   string         tag "content" value
-     * @return  string
+     * @param mixed      $tag
+     * @param null|mixed $value
+     *
+     * @return string
      */
-    public static function meta($tag, $value = NULL) {
+    public static function meta($tag, $value = null) {
         if (is_array($tag)) {
-            $tags = array();
+            $tags = [];
             foreach ($tag as $t => $v) {
                 // Build each tag and add it to the array
                 $tags[] = chtml::meta($t, $v);
@@ -243,7 +266,7 @@ class chtml {
         }
 
         // Set the meta attribute value
-        $attr = in_array(strtolower($tag), Kohana::config('http.meta_equiv')) ? 'http-equiv' : 'name';
+        $attr = in_array(strtolower($tag), CF::config('http.meta_equiv')) ? 'http-equiv' : 'name';
 
         return '<meta ' . $attr . '="' . $tag . '" content="' . $value . '" />';
     }
@@ -253,10 +276,14 @@ class chtml {
      *
      * @param   string|array  filename, or array of filenames to match to array of medias
      * @param   string|array  media type of stylesheet, or array to match filenames
-     * @param   boolean       include the index_page in the link
-     * @return  string
+     * @param   bool       include the index_page in the link
+     * @param mixed $style
+     * @param mixed $media
+     * @param mixed $index
+     *
+     * @return string
      */
-    public static function stylesheet($style, $media = FALSE, $index = FALSE) {
+    public static function stylesheet($style, $media = false, $index = false) {
         return chtml::link($style, 'stylesheet', 'text/css', '.css', $media, $index);
     }
 
@@ -268,10 +295,17 @@ class chtml {
      * @param   string|array  mimetype
      * @param   string        specifies suffix of the file
      * @param   string|array  specifies on what device the document will be displayed
-     * @param   boolean       include the index_page in the link
-     * @return  string
+     * @param   bool       include the index_page in the link
+     * @param mixed $href
+     * @param mixed $rel
+     * @param mixed $type
+     * @param mixed $suffix
+     * @param mixed $media
+     * @param mixed $index
+     *
+     * @return string
      */
-    public static function link($href, $rel, $type, $suffix = FALSE, $media = FALSE, $index = FALSE) {
+    public static function link($href, $rel, $type, $suffix = false, $media = false, $index = false) {
         $compiled = '';
 
         if (is_array($href)) {
@@ -283,24 +317,23 @@ class chtml {
                 $compiled .= chtml::link($_href, $_rel, $_type, $suffix, $_media, $index);
             }
         } else {
-            if (strpos($href, '://') === FALSE) {
+            if (strpos($href, '://') === false) {
                 // Make the URL absolute
                 $href = curl::base($index) . $href;
             }
 
             $length = strlen($suffix);
 
-            if ($length > 0 AND substr_compare($href, $suffix, -$length, $length, FALSE) !== 0) {
+            if ($length > 0 and substr_compare($href, $suffix, -$length, $length, false) !== 0) {
                 // Add the defined suffix
                 $href .= $suffix;
             }
 
-            $attr = array
-                (
+            $attr = [
                 'rel' => $rel,
                 'type' => $type,
                 'href' => $href,
-            );
+            ];
 
             if (!empty($media)) {
                 // Add the media type to the attributes
@@ -317,10 +350,13 @@ class chtml {
      * Creates a script link.
      *
      * @param   string|array  filename
-     * @param   boolean       include the index_page in the link
-     * @return  string
+     * @param   bool       include the index_page in the link
+     * @param mixed $script
+     * @param mixed $index
+     *
+     * @return string
      */
-    public static function script($script, $index = FALSE) {
+    public static function script($script, $index = false) {
         $compiled = '';
 
         if (is_array($script)) {
@@ -328,12 +364,12 @@ class chtml {
                 $compiled .= chtml::script($name, $index);
             }
         } else {
-            if (strpos($script, '://') === FALSE) {
+            if (strpos($script, '://') === false) {
                 // Add the suffix only when it's not already present
                 $script = curl::base((bool) $index) . $script;
             }
 
-            if (substr_compare($script, '.js', -3, 3, FALSE) !== 0) {
+            if (substr_compare($script, '.js', -3, 3, false) !== 0) {
                 // Add the javascript suffix
                 $script .= '.js';
             }
@@ -349,12 +385,16 @@ class chtml {
      *
      * @param   string        image source, or an array of attributes
      * @param   string|array  image alt attribute, or an array of attributes
-     * @param   boolean       include the index_page in the link
-     * @return  string
+     * @param   bool       include the index_page in the link
+     * @param null|mixed $src
+     * @param null|mixed $alt
+     * @param mixed      $index
+     *
+     * @return string
      */
-    public static function image($src = NULL, $alt = NULL, $index = FALSE) {
+    public static function image($src = null, $alt = null, $index = false) {
         // Create attribute list
-        $attributes = is_array($src) ? $src : array('src' => $src);
+        $attributes = is_array($src) ? $src : ['src' => $src];
 
         if (is_array($alt)) {
             $attributes += $alt;
@@ -363,7 +403,7 @@ class chtml {
             $attributes['alt'] = $alt;
         }
 
-        if (strpos($attributes['src'], '://') === FALSE) {
+        if (strpos($attributes['src'], '://') === false) {
             // Make the src attribute into an absolute URL
             $attributes['src'] = curl::base($index) . $attributes['src'];
         }
@@ -375,14 +415,18 @@ class chtml {
      * Compiles an array of HTML attributes into an attribute string.
      *
      * @param   string|array  array of attributes
-     * @return  string
+     * @param mixed $attrs
+     *
+     * @return string
      */
     public static function attributes($attrs) {
-        if (empty($attrs))
+        if (empty($attrs)) {
             return '';
+        }
 
-        if (is_string($attrs))
+        if (is_string($attrs)) {
             return ' ' . $attrs;
+        }
 
         $compiled = '';
         foreach ($attrs as $key => $val) {
@@ -391,7 +435,7 @@ class chtml {
 
         return $compiled;
     }
-
 }
 
 // End html
+// @codingStandardsIgnoreEnd

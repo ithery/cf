@@ -81,7 +81,7 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
         return new Response($tag);
     }
 
-    private function generateSignedFragmentUri(ControllerReference $uri, Request $request): string
+    private function generateSignedFragmentUri(ControllerReference $uri, Request $request)
     {
         if (null === $this->signer) {
             throw new \LogicException('You must use a URI when using the ESI rendering strategy or set a URL signer.');
@@ -93,7 +93,7 @@ abstract class AbstractSurrogateFragmentRenderer extends RoutableFragmentRendere
         return substr($fragmentUri, \strlen($request->getSchemeAndHttpHost()));
     }
 
-    private function containsNonScalars(array $values): bool
+    private function containsNonScalars(array $values)
     {
         foreach ($values as $value) {
             if (\is_array($value)) {

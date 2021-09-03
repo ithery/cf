@@ -1,15 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 11, 2019, 9:54:22 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 11, 2019, 9:54:22 PM
  */
 class CManager_File_Connector_FileManager_Event_FileIsMoving {
-
     private $old_path;
+
     private $new_path;
 
     public function __construct($old_path, $new_path) {
@@ -27,5 +28,4 @@ class CManager_File_Connector_FileManager_Event_FileIsMoving {
     public function newPath() {
         return $this->new_path;
     }
-
 }

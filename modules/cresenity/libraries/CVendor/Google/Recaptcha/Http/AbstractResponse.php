@@ -1,12 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
 abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterface_Arrayable, CInterface_Jsonable, JsonSerializable {
     /* -----------------------------------------------------------------
       |  Constants
@@ -44,6 +37,7 @@ abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterf
 
     /**
      * The hostname of the site where the reCAPTCHA was solved.
+     *
      * @var string
      */
     protected $hostname;
@@ -70,13 +64,13 @@ abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterf
     /**
      * Response constructor.
      *
-     * @param  bool         $success
-     * @param  array        $errorCodes
-     * @param  string|null  $hostname
-     * @param  string|null  $challengeTs
-     * @param  string|null  $apkPackageName
-     * @param  float|null   $score
-     * @param  string|null  $action
+     * @param bool        $success
+     * @param array       $errorCodes
+     * @param string|null $hostname
+     * @param string|null $challengeTs
+     * @param string|null $apkPackageName
+     * @param float|null  $score
+     * @param string|null $action
      */
     public function __construct($success, array $errorCodes = [], $hostname = null, $challengeTs = null, $apkPackageName = null, $score = null, $action = null) {
         $this->success = $success;
@@ -135,15 +129,16 @@ abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterf
     /**
      * Build the response from the expected JSON returned by the service.
      *
-     * @param  string  $json
+     * @param string $json
      *
      * @return Google_Recaptcha_Http_AbstractResponse
      */
     public static function fromJson($json) {
         $responseData = json_decode($json, true);
 
-        if (!$responseData)
+        if (!$responseData) {
             return new static(false, [Google_Recaptcha_Http_ResponseV3::E_INVALID_JSON]);
+        }
 
         return static::fromArray($responseData);
     }
@@ -151,7 +146,7 @@ abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterf
     /**
      * Build the response from an array.
      *
-     * @param  array  $array
+     * @param array $array
      *
      * @return Google_Recaptcha_Http_AbstractResponse|mixed
      */
@@ -167,7 +162,7 @@ abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterf
     /**
      * Convert the object to its JSON representation.
      *
-     * @param  int  $options
+     * @param int $options
      *
      * @return string
      */
@@ -201,12 +196,11 @@ abstract class CVendor_Google_Recaptcha_Http_AbstractResponse implements CInterf
     /**
      * Check the hostname.
      *
-     * @param  string  $hostname
+     * @param string $hostname
      *
      * @return bool
      */
     public function isHostname($hostname) {
         return $this->getHostname() === $hostname;
     }
-
 }

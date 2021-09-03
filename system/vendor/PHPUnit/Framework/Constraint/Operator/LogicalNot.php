@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of PHPUnit.
  *
@@ -7,21 +8,22 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
+
+namespace PHPUnit\Framework\Constraint\Operator;
 
 use function array_map;
 use function count;
 use function preg_match;
 use function preg_quote;
 use function preg_replace;
+use PHPUnit\Framework\Constraint\Constraint;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class LogicalNot extends UnaryOperator
-{
-    public static function negate($string)
-    {
+final class LogicalNot extends UnaryOperator {
+
+    public static function negate($string) {
         $positives = [
             'contains ',
             'exists',
@@ -58,19 +60,13 @@ final class LogicalNot extends UnaryOperator
             $nonInput = $matches[2];
 
             $negatedString = preg_replace(
-                '/' . preg_quote($nonInput, '/') . '/',
-                preg_replace(
-                    $positives,
-                    $negatives,
-                    $nonInput
-                ),
-                $string
+                    '/' . preg_quote($nonInput, '/') . '/', preg_replace(
+                            $positives, $negatives, $nonInput
+                    ), $string
             );
         } else {
             $negatedString = preg_replace(
-                $positives,
-                $negatives,
-                $string
+                    $positives, $negatives, $string
             );
         }
 
@@ -80,8 +76,7 @@ final class LogicalNot extends UnaryOperator
     /**
      * Returns the name of this operator.
      */
-    public function operator()
-    {
+    public function operator() {
         return 'not';
     }
 
@@ -90,8 +85,7 @@ final class LogicalNot extends UnaryOperator
      *
      * @see https://www.php.net/manual/en/language.operators.precedence.php
      */
-    public function precedence()
-    {
+    public function precedence() {
         return 5;
     }
 
@@ -101,8 +95,7 @@ final class LogicalNot extends UnaryOperator
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other)
-    {
+    protected function matches($other) {
         return !$this->constraint()->evaluate($other, '', true);
     }
 
@@ -110,8 +103,7 @@ final class LogicalNot extends UnaryOperator
      * Applies additional transformation to strings returned by toString() or
      * failureDescription().
      */
-    protected function transformString($string)
-    {
+    protected function transformString($string) {
         return self::negate($string);
     }
 
@@ -122,8 +114,7 @@ final class LogicalNot extends UnaryOperator
      *
      * See Constraint::reduce() for more.
      */
-    protected function reduce()
-    {
+    protected function reduce() {
         $constraint = $this->constraint();
 
         if ($constraint instanceof self) {
@@ -132,4 +123,5 @@ final class LogicalNot extends UnaryOperator
 
         return parent::reduce();
     }
+
 }

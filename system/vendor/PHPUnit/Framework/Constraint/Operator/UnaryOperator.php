@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of PHPUnit.
  *
@@ -7,15 +8,17 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
+
+namespace PHPUnit\Framework\Constraint\Operator;
 
 use function count;
+use PHPUnit\Framework\Constraint\Constraint;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-abstract class UnaryOperator extends Operator
-{
+abstract class UnaryOperator extends Operator {
+
     /**
      * @var Constraint
      */
@@ -24,24 +27,21 @@ abstract class UnaryOperator extends Operator
     /**
      * @param Constraint|mixed $constraint
      */
-    public function __construct($constraint)
-    {
+    public function __construct($constraint) {
         $this->constraint = $this->checkConstraint($constraint);
     }
 
     /**
      * Returns the number of operands (constraints).
      */
-    public function arity()
-    {
+    public function arity() {
         return 1;
     }
 
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString()
-    {
+    public function toString() {
         $reduced = $this->reduce();
 
         if ($reduced !== $this) {
@@ -66,8 +66,7 @@ abstract class UnaryOperator extends Operator
     /**
      * Counts the number of constraint elements.
      */
-    public function count()
-    {
+    public function count() {
         return count($this->constraint);
     }
 
@@ -81,8 +80,7 @@ abstract class UnaryOperator extends Operator
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function failureDescription($other)
-    {
+    protected function failureDescription($other) {
         $reduced = $this->reduce();
 
         if ($reduced !== $this) {
@@ -115,26 +113,24 @@ abstract class UnaryOperator extends Operator
      *
      * @param string $string the string to be transformed
      */
-    protected function transformString($string)
-    {
+    protected function transformString($string) {
         return $string;
     }
 
     /**
      * Provides access to $this->constraint for subclasses.
      */
-    final protected function constraint()
-    {
+    final protected function constraint() {
         return $this->constraint;
     }
 
     /**
      * Returns true if the $constraint needs to be wrapped with parentheses.
      */
-    protected function constraintNeedsParentheses(Constraint $constraint)
-    {
+    protected function constraintNeedsParentheses(Constraint $constraint) {
         $constraint = $constraint->reduce();
 
         return $constraint instanceof self || parent::constraintNeedsParentheses($constraint);
     }
+
 }

@@ -1,17 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 11:16:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 11:16:30 PM
  */
 use Psr\Log\NullLogger;
 use MongoDB\BSON\ObjectID;
 
 class CTracker_Tracker {
-
     use CTracker_Trait_TrackableTrait;
 
     private $booted = false;
@@ -22,25 +22,21 @@ class CTracker_Tracker {
     protected $route;
 
     /**
-     *
-     * @var CTracker_RepositoryManager 
+     * @var CTracker_RepositoryManager
      */
     protected $repositoryManager;
 
     /**
-     *
      * @var array
      */
     protected $sessionData;
 
     /**
-     *
      * @var CTracker_Config
      */
     protected $config;
 
     public function __construct() {
-
         $this->repositoryManager = CTracker_RepositoryManager::instance();
         $this->config = CTracker_Config::instance();
         $this->route = CTracker::populator()->get('route');
@@ -52,7 +48,6 @@ class CTracker_Tracker {
      * @return array
      */
     protected function getLogData() {
-
         $logData = [
             'log_session_id' => $this->getSessionId(true),
             'method' => CTracker::populator()->get('request.method'),
@@ -76,7 +71,8 @@ class CTracker_Tracker {
 
     public function getSessionId($updateLastActivity = false) {
         return $this->repositoryManager->getSessionId(
-                        $this->makeSessionData(), $updateLastActivity
+            $this->makeSessionData(),
+            $updateLastActivity
         );
     }
 
@@ -84,13 +80,10 @@ class CTracker_Tracker {
      * @return array
      */
     protected function makeSessionData() {
-
-
-
         //$logDeviceId = new ObjectID($this->getDeviceId());
-        $clientIp=CTracker::populator()->get('request.clientIp');
-        if (strpos($clientIp, ",") !== false) {
-            $clientIp = trim(carr::get(explode(",", $clientIp), 0));
+        $clientIp = CTracker::populator()->get('request.clientIp');
+        if (strpos($clientIp, ',') !== false) {
+            $clientIp = trim(carr::get(explode(',', $clientIp), 0));
         }
         $sessionData = [
             'user_id' => $this->getUserId(),
@@ -117,7 +110,6 @@ class CTracker_Tracker {
             $sessionData = array_merge($sessionData, $customSessionData);
         }
 
-
         $this->sessionData = $sessionData;
 
         return $this->sessionData;
@@ -129,8 +121,8 @@ class CTracker_Tracker {
 
     public function getDeviceId() {
         return $this->config->isLogDevice() ? $this->repositoryManager->findOrCreateDevice(
-                        $this->repositoryManager->getCurrentDeviceProperties()
-                ) : null;
+            $this->repositoryManager->getCurrentDeviceProperties()
+        ) : null;
     }
 
     protected function getGeoIpId() {
@@ -143,8 +135,8 @@ class CTracker_Tracker {
 
     protected function getRefererId() {
         return $this->config->isLogReferer() ? $this->repositoryManager->getRefererId(
-                        CTracker::populator()->get('request.referer')
-                ) : null;
+            CTracker::populator()->get('request.referer')
+        ) : null;
     }
 
     public function getCookieId() {
@@ -156,17 +148,17 @@ class CTracker_Tracker {
     }
 
     public function getPathId() {
-        return $this->config->isLogPath() ? $this->repositoryManager->findOrCreatePath(['path' => CTracker::populator()->get('request.path'),]) : null;
+        return $this->config->isLogPath() ? $this->repositoryManager->findOrCreatePath(['path' => CTracker::populator()->get('request.path'), ]) : null;
     }
 
     public function getQueryId() {
         if ($this->config->isLogQuery()) {
             if (count($arguments = CTracker::populator()->get('request.query'))) {
                 return $this->repositoryManager->getQueryId(
-                                [
-                                    'query' => carr::implode('=', '|', $arguments),
-                                    'arguments' => $arguments,
-                                ]
+                    [
+                        'query' => carr::implode('=', '|', $arguments),
+                        'arguments' => $arguments,
+                    ]
                 );
             }
         }
@@ -177,11 +169,10 @@ class CTracker_Tracker {
     }
 
     public function logSqlQuery($query, $bindings, $time, $name) {
-        if (
-                $this->isTrackable() &&
-                $this->config->isLogEnabled() &&
-                $this->config->isLogSqlQuery() &&
-                $this->isSqlQueriesLoggableConnection($name)
+        if ($this->isTrackable()
+            && $this->config->isLogEnabled()
+            && $this->config->isLogSqlQuery()
+            && $this->isSqlQueriesLoggableConnection($name)
         ) {
             $this->repositoryManager->logSqlQuery($query, $bindings, $time, $name);
         }
@@ -198,7 +189,6 @@ class CTracker_Tracker {
 
         $this->booted = true;
         if ($this->isTrackable()) {
-
             if (CTracker::config()->get('isQueued')) {
                 $queueData = [
                     'data' => CTracker::populator()->getData(),
@@ -221,9 +211,7 @@ class CTracker_Tracker {
         $log = $this->getLogData();
 
         if ($this->config->isLogEnabled()) {
-
             $this->repositoryManager->createLog($log);
         }
     }
-
 }

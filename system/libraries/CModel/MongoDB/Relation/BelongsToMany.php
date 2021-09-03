@@ -1,16 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Nov 6, 2019, 4:57:33 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Nov 6, 2019, 4:57:33 PM
  */
 class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMany {
-
     /**
      * Get the key for comparing against the parent key in "has" query.
+     *
      * @return string
      */
     public function getHasCompareKey() {
@@ -33,7 +34,9 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
 
     /**
      * Set the select clause for the relation query.
+     *
      * @param array $columns
+     *
      * @return array
      */
     protected function getSelectColumns(array $columns = ['*']) {
@@ -58,6 +61,7 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
 
     /**
      * Set the where clause for the relation query.
+     *
      * @return $this
      */
     protected function setWhere() {
@@ -120,14 +124,15 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
         if ($detaching && count($detach) > 0) {
             $this->detach($detach);
             $changes['detached'] = (array) array_map(function ($v) {
-                        return is_numeric($v) ? (int) $v : (string) $v;
-                    }, $detach);
+                return is_numeric($v) ? (int) $v : (string) $v;
+            }, $detach);
         }
         // Now we are finally ready to attach the new records. Note that we'll disable
         // touching until after the entire operation is complete so we don't fire a
         // ton of touch operations until we are totally done syncing the records.
         $changes = array_merge(
-                $changes, $this->attachNew($records, $current, false)
+            $changes,
+            $this->attachNew($records, $current, false)
         );
         if (count($changes['attached']) || count($changes['updated'])) {
             $this->touchIfTouching();
@@ -219,6 +224,7 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
 
     /**
      * Create a new query builder for the related model.
+     *
      * @return CModel_Query
      */
     public function newRelatedQuery() {
@@ -227,6 +233,7 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
 
     /**
      * Get the fully qualified foreign key for the relation.
+     *
      * @return string
      */
     public function getForeignKey() {
@@ -250,8 +257,11 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
     /**
      * Format the sync list so that it is keyed by ID. (Legacy Support)
      * The original function has been renamed to formatRecordsList since Laravel 5.3
+     *
      * @param array $records
+     *
      * @return array
+     *
      * @deprecated
      */
     protected function formatSyncList(array $records) {
@@ -267,6 +277,7 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
 
     /**
      * Get the related key with backwards compatible support.
+     *
      * @return string
      */
     public function getRelatedKey() {
@@ -275,12 +286,13 @@ class CModel_MongoDB_Relation_BelongsToMany extends CModel_Relation_BelongsToMan
 
     /**
      * Get the name of the "where in" method for eager loading.
+     *
      * @param CModel $model
      * @param string $key
+     *
      * @return string
      */
     protected function whereInMethod(CModel $model, $key) {
         return 'whereIn';
     }
-
 }

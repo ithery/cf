@@ -1,21 +1,13 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Psr\Http\Message\RequestInterface;
 use CVendor_Firebase_Messaging_MessageTarget as MessageTarget;
 
 final class CVendor_Firebase_Messaging_MulticastSendReport implements Countable {
-
     /** @var CVendor_Firebase_Messaging_SendReport[] */
     private $items = [];
 
     private function __construct() {
-        
     }
 
     /**
@@ -107,23 +99,21 @@ final class CVendor_Firebase_Messaging_MulticastSendReport implements Countable 
     }
 
     /**
-     * 
      * @return CVendor_Firebase_Messaging_MulticastSendReport
      */
     public function successes() {
         return self::withItems(\array_filter($this->items, static function (CVendor_Firebase_Messaging_SendReport $item) {
-                            return $item->isSuccess();
-                        }));
+            return $item->isSuccess();
+        }));
     }
 
     /**
-     * 
      * @return CVendor_Firebase_Messaging_MulticastSendReport
      */
     public function failures() {
         return self::withItems(\array_filter($this->items, static function (CVendor_Firebase_Messaging_SendReport $item) {
-                            return $item->isFailure();
-                        }));
+            return $item->isFailure();
+        }));
     }
 
     public function hasFailures() {
@@ -133,5 +123,4 @@ final class CVendor_Firebase_Messaging_MulticastSendReport implements Countable 
     public function count() {
         return \count($this->items);
     }
-
 }

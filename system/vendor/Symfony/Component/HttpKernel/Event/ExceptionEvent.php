@@ -36,14 +36,14 @@ final class ExceptionEvent extends RequestEvent
      */
     private $allowCustomResponseCode = false;
 
-    public function __construct(HttpKernelInterface $kernel, Request $request, int $requestType, \Throwable $e)
+    public function __construct(HttpKernelInterface $kernel, Request $request, $requestType, \Throwable $e)
     {
         parent::__construct($kernel, $request, $requestType);
 
         $this->setThrowable($e);
     }
 
-    public function getThrowable(): \Throwable
+    public function getThrowable()
     {
         return $this->throwable;
     }
@@ -53,7 +53,7 @@ final class ExceptionEvent extends RequestEvent
      *
      * This exception will be thrown if no response is set in the event.
      */
-    public function setThrowable(\Throwable $exception): void
+    public function setThrowable(\Throwable $exception)
     {
         $this->throwable = $exception;
     }
@@ -61,7 +61,7 @@ final class ExceptionEvent extends RequestEvent
     /**
      * Mark the event as allowing a custom response code.
      */
-    public function allowCustomResponseCode(): void
+    public function allowCustomResponseCode()
     {
         $this->allowCustomResponseCode = true;
     }
@@ -69,7 +69,7 @@ final class ExceptionEvent extends RequestEvent
     /**
      * Returns true if the event allows a custom response code.
      */
-    public function isAllowingCustomResponseCode(): bool
+    public function isAllowingCustomResponseCode()
     {
         return $this->allowCustomResponseCode;
     }

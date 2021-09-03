@@ -1,15 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 2, 2019, 12:39:25 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 2, 2019, 12:39:25 AM
  */
 
 class CResources_Helpers_File {
-
     public static function renameInDirectory($fileNameWithDirectory, $newFileNameWithoutDirectory) {
         $targetFile = pathinfo($fileNameWithDirectory, PATHINFO_DIRNAME) . '/' . $newFileNameWithoutDirectory;
         rename($fileNameWithDirectory, $targetFile);
@@ -31,5 +31,4 @@ class CResources_Helpers_File {
         $finfo = new Finfo(FILEINFO_MIME_TYPE);
         return $finfo->file($path);
     }
-
 }

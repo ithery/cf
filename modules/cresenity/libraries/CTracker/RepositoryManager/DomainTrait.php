@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 3:28:33 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 3:28:33 PM
  */
 trait CTracker_RepositoryManager_DomainTrait {
-
     /**
-     *
      * @var CTracker_Repository_Domain
      */
     protected $domainRepository;
@@ -21,9 +20,8 @@ trait CTracker_RepositoryManager_DomainTrait {
 
     public function getDomainId($domain) {
         return $this->domainRepository->findOrCreate(
-                        ['name' => $domain], ['name']
+            ['name' => $domain],
+            ['name']
         );
     }
-
-   
 }

@@ -1,34 +1,39 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @author Hery Kurniawan
- * @since Feb 17, 2018, 9:18:22 PM
- * @license Ittron Global Teknologi <ittron.co.id>
+ * @deprecated since 1.2
  */
+//@codingStandardsIgnoreStart
 class CFormInputSelect extends CFormInput {
-
     use CTrait_Compat_Element_FormInput_Select;
-    
-    protected $group_list = array();
+
+    protected $group_list = [];
+
     protected $multiple;
+
     protected $applyjs;
+
     protected $dropdown_classes;
+
     protected $hide_search;
+
     protected $readonly;
+
     protected $maximumSelectionLength;
+
     protected $placeholder;
 
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->dropdown_classes = array();
-        $this->tag = "select";
+        $this->dropdown_classes = [];
+        $this->tag = 'select';
         $this->multiple = false;
-        $this->type = "select";
-        $this->placeholder = "";
-        $this->applyjs = "false";
+        $this->type = 'select';
+        $this->placeholder = '';
+        $this->applyjs = 'false';
         $this->hide_search = false;
         $this->readonly = false;
         $this->maximumSelectionLength = false;
@@ -49,7 +54,6 @@ class CFormInputSelect extends CFormInput {
     }
 
     public function set_lookup($query) {
-        
     }
 
     public function setMaximumSelectionLength($length) {
@@ -79,75 +83,80 @@ class CFormInputSelect extends CFormInput {
         $this->readonly = $bool;
         return $this;
     }
+
     public function setPlaceholder($placeholder) {
         $this->placeholder = $placeholder;
         return $this;
     }
+
     public function toarray() {
-        $data = array();
+        $data = [];
         $data = array_merge_recursive($data, parent::toarray());
         if ($this->multiple) {
-            $data["attr"]["multiple"] = "multiple";
+            $data['attr']['multiple'] = 'multiple';
         }
-        $data["children"] = array();
+        $data['children'] = [];
 
         if ($this->list != null) {
             foreach ($this->list as $k => $v) {
-                $selected = "";
+                $selected = '';
                 if (is_array($this->value)) {
-                    if (in_array($k, $this->value))
+                    if (in_array($k, $this->value)) {
                         $selected = ' selected="selected"';
+                    }
                 } else {
-                    if ($this->value == (string) $k)
+                    if ($this->value == (string) $k) {
                         $selected = ' selected="selected"';
+                    }
                 }
-                $child = array();
-                $child["tag"] = "option";
-                $child["attr"]["value"] = $k;
+                $child = [];
+                $child['tag'] = 'option';
+                $child['attr']['value'] = $k;
                 if (strlen($selected) > 0) {
-                    $child["attr"]["selected"] = 'selected';
+                    $child['attr']['selected'] = 'selected';
                 }
-                $child["text"] = $v;
-                $data["children"][] = $child;
+                $child['text'] = $v;
+                $data['children'][] = $child;
             }
         }
         return $data;
     }
 
     public function html($indent = 0) {
-
         $html = new CStringBuilder();
         $html->set_indent($indent);
-        $readonly = "";
+        $readonly = '';
         if ($this->readonly) {
             $readonly = ' readonly="readonly"';
         }
-        $disabled = "";
+        $disabled = '';
         if ($this->disabled) {
             $disabled = ' disabled="disabled"';
         }
-        $multiple = "";
+        $multiple = '';
         if ($this->multiple) {
             $multiple = ' multiple="multiple"';
         }
         $name = $this->name;
-        if ($this->multiple)
-            $name = $name . "[]";
+        if ($this->multiple) {
+            $name = $name . '[]';
+        }
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
-            $classes = " " . $classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
         if ($this->bootstrap >= '3') {
-            $classes = $classes . " form-control ";
+            $classes = $classes . ' form-control ';
         }
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
-        $addition_attribute = "";
+        $addition_attribute = '';
         foreach ($this->attr as $k => $v) {
-            $addition_attribute .= " " . $k . '="' . $v . '"';
+            $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
         $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="select' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')->inc_indent()->br();
         if (count($this->group_list) > 0) {
@@ -156,13 +165,15 @@ class CFormInputSelect extends CFormInput {
                     $html->appendln('<optgroup label="' . $g . '">')->br();
                 }
                 foreach ($list as $k => $v) {
-                    $selected = "";
+                    $selected = '';
                     if (is_array($this->value)) {
-                        if (in_array($k, $this->value))
+                        if (in_array($k, $this->value)) {
                             $selected = ' selected="selected"';
+                        }
                     } else {
-                        if ($this->value == (string) $k)
+                        if ($this->value == (string) $k) {
                             $selected = ' selected="selected"';
+                        }
                     }
                     $html->appendln('<option value="' . $k . '"' . $selected . '>' . $v . '</option>')->br();
                 }
@@ -173,21 +184,23 @@ class CFormInputSelect extends CFormInput {
         }
         if ($this->list != null) {
             foreach ($this->list as $k => $v) {
-                $selected = "";
+                $selected = '';
                 if (is_array($this->value)) {
-                    if (in_array($k, $this->value))
+                    if (in_array($k, $this->value)) {
                         $selected = ' selected="selected"';
+                    }
                 } else {
-                    if ($this->value == (string) $k)
+                    if ($this->value == (string) $k) {
                         $selected = ' selected="selected"';
+                    }
                 }
                 $value = $v;
                 $addition_attribute = ' ';
                 if (is_array($v)) {
                     $value = carr::get($v, 'value');
-                    $attributes = carr::get($v, 'attributes', array());
+                    $attributes = carr::get($v, 'attributes', []);
                     foreach ($attributes as $attribute_k => $attribute_v) {
-                        $addition_attribute .= " " . $attribute_k . '="' . $attribute_v . '"';
+                        $addition_attribute .= ' ' . $attribute_k . '="' . $attribute_v . '"';
                     }
                 }
                 if ($this->readonly) {
@@ -206,50 +219,49 @@ class CFormInputSelect extends CFormInput {
     }
 
     public function js($indent = 0) {
-
         $js = new CStringBuilder();
         $js->set_indent($indent);
         $js->append(parent::js($indent))->br();
-        $placeholder = "";
+        $placeholder = '';
         if (strlen($this->placeholder) > 0) {
             $placeholder = $this->placeholder;
         }
-        if ($this->applyjs == "select2") {
+        if ($this->applyjs == 'select2') {
             if ($this->select2 == '4') {
                 CManager::instance()->register_module('select2-4.0');
             } else {
                 CManager::instance()->register_module('select2');
             }
             $classes = $this->classes;
-            $classes = implode(" ", $classes);
+            $classes = implode(' ', $classes);
             if (strlen($classes) > 0) {
-                $classes = " " . $classes;
+                $classes = ' ' . $classes;
             }
             if ($this->bootstrap == '3.3') {
-                $classes = $classes . " form-control ";
+                $classes = $classes . ' form-control ';
             }
             $dropdown_classes = $this->dropdown_classes;
-            $dropdown_classes = implode(" ", $dropdown_classes);
+            $dropdown_classes = implode(' ', $dropdown_classes);
             if (strlen($dropdown_classes) > 0) {
-                $dropdown_classes = " " . $dropdown_classes;
+                $dropdown_classes = ' ' . $dropdown_classes;
             }
             $js->append("$('#" . $this->id . "').select2({
                         dropdownCssClass: '" . $dropdown_classes . "', // apply css that makes the dropdown taller
             ");
             if ($this->hide_search) {
-                $js->append("minimumResultsForSearch: Infinity,");
+                $js->append('minimumResultsForSearch: Infinity,');
             }
             if ($this->maximumSelectionLength !== false) {
-                $js->append("maximumSelectionLength: " . $this->maximumSelectionLength . ",");
+                $js->append('maximumSelectionLength: ' . $this->maximumSelectionLength . ',');
             }
             $js->append("containerCssClass : 'tpx-select2-container " . $classes . "',");
             $js->append("placeholder : '" . $placeholder . "'");
-            $js->append("});")->br();
+            $js->append('});')->br();
         }
-        if ($this->applyjs == "chosen") {
+        if ($this->applyjs == 'chosen') {
             $js->append("$('#" . $this->id . "').chosen();")->br();
         }
-        if ($this->applyjs == "dualselect") {
+        if ($this->applyjs == 'dualselect') {
             $js->append("$('#" . $this->id . "').multiSelect();")->br();
         }
 
@@ -264,5 +276,4 @@ class CFormInputSelect extends CFormInput {
         $this->hide_search = $hide_search;
         return $this;
     }
-
 }

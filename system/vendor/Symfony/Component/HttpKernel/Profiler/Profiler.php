@@ -79,7 +79,7 @@ class Profiler implements ResetInterface
      *
      * @return Profile|null A Profile instance
      */
-    public function loadProfile(string $token)
+    public function loadProfile($token)
     {
         return $this->storage->read($token);
     }
@@ -124,7 +124,7 @@ class Profiler implements ResetInterface
      *
      * @see https://php.net/datetime.formats for the supported date/time formats
      */
-    public function find(?string $ip, ?string $url, ?string $limit, ?string $method, ?string $start, ?string $end, string $statusCode = null)
+    public function find($ip, $url, $limit, $method, $start, $end, $statusCode = null)
     {
         return $this->storage->find($ip, $url, $limit, $method, $this->getTimestamp($start), $this->getTimestamp($end), $statusCode);
     }
@@ -213,7 +213,7 @@ class Profiler implements ResetInterface
      *
      * @return bool
      */
-    public function has(string $name)
+    public function has($name)
     {
         return isset($this->collectors[$name]);
     }
@@ -227,7 +227,7 @@ class Profiler implements ResetInterface
      *
      * @throws \InvalidArgumentException if the collector does not exist
      */
-    public function get(string $name)
+    public function get($name)
     {
         if (!isset($this->collectors[$name])) {
             throw new \InvalidArgumentException(sprintf('Collector "%s" does not exist.', $name));
@@ -236,7 +236,7 @@ class Profiler implements ResetInterface
         return $this->collectors[$name];
     }
 
-    private function getTimestamp(?string $value): ?int
+    private function getTimestamp($value)
     {
         if (null === $value || '' === $value) {
             return null;

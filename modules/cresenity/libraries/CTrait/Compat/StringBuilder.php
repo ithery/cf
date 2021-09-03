@@ -1,18 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 2:16:00 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 17, 2018, 2:16:00 AM
  */
-trait CTrait_Compat_StringBuilder {
 
+//@codingStandardsIgnoreStart
+trait CTrait_Compat_StringBuilder {
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @param type $ind
+     *
      * @return type
      */
     public function set_indent($ind) {
@@ -28,6 +31,8 @@ trait CTrait_Compat_StringBuilder {
 
     /**
      * @deprecated since version 1.2
+     *
+     * @param mixed $n
      */
     public function inc_indent($n = 1) {
         return $this->incIndent($n);
@@ -35,9 +40,11 @@ trait CTrait_Compat_StringBuilder {
 
     /**
      * @deprecated since version 1.2
+     *
+     * @param mixed $n
      */
     public function dec_indent($n = 1) {
         return $this->decIndent($n);
     }
-
 }
+//@codingStandardsIgnoreEnd

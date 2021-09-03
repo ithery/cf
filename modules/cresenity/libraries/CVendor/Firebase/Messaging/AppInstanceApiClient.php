@@ -1,24 +1,17 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Promise;
 use Psr\Http\Message\ResponseInterface;
-
 
 /**
  * @internal
  */
 class CVendor_Firebase_Messaging_AppInstanceApiClient {
-
     /** @var ClientInterface */
     private $client;
 
-    /** @var MessagingApiExceptionConverter */
+    /** @var CVendor_Firebase_Messaging_ApiExceptionConverter */
     private $errorHandler;
 
     /**
@@ -30,23 +23,25 @@ class CVendor_Firebase_Messaging_AppInstanceApiClient {
     }
 
     /**
-     * @param Topic|string $topic
-     * @param RegistrationToken[]|string[] $tokens
+     * @param CVendor_Firebase_Messaging_Topic|string                 $topic
+     * @param CVendor_Firebase_Messaging_RegistrationToken[]|string[] $tokens
      *
      * @throws FirebaseException
      * @throws MessagingException
+     *
+     * @see https://developers.google.com/instance-id/reference/server#manage_relationship_maps_for_multiple_app_instances     *
      */
     public function subscribeToTopic($topic, array $tokens) {
         return $this->requestApi('POST', '/iid/v1:batchAdd', [
-                    'json' => [
-                        'to' => '/topics/' . $topic,
-                        'registration_tokens' => $tokens,
-                    ],
+            'json' => [
+                'to' => '/topics/' . $topic,
+                'registration_tokens' => $tokens,
+            ],
         ]);
     }
 
     /**
-     * @param Topic|string $topic
+     * @param Topic|string                 $topic
      * @param RegistrationToken[]|string[] $tokens
      *
      * @throws FirebaseException
@@ -54,14 +49,16 @@ class CVendor_Firebase_Messaging_AppInstanceApiClient {
      */
     public function unsubscribeFromTopic($topic, array $tokens) {
         return $this->requestApi('POST', '/iid/v1:batchRemove', [
-                    'json' => [
-                        'to' => '/topics/' . $topic,
-                        'registration_tokens' => $tokens,
-                    ],
+            'json' => [
+                'to' => '/topics/' . $topic,
+                'registration_tokens' => $tokens,
+            ],
         ]);
     }
 
     /**
+     * @param mixed $registrationToken
+     *
      * @throws FirebaseException
      * @throws MessagingException
      */
@@ -70,6 +67,9 @@ class CVendor_Firebase_Messaging_AppInstanceApiClient {
     }
 
     /**
+     * @param mixed $method
+     * @param mixed $endpoint
+     *
      * @throws FirebaseException
      * @throws MessagingException
      */
@@ -80,5 +80,4 @@ class CVendor_Firebase_Messaging_AppInstanceApiClient {
             throw $this->errorHandler->convertException($e);
         }
     }
-
 }

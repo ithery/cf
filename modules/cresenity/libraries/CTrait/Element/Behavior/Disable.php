@@ -1,23 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 1:30:41 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 17, 2018, 1:30:41 AM
  */
 trait CTrait_Element_Behavior_Disable {
-
     /**
-     *
      * @var bool
      */
     protected $disable;
 
     /**
-     * 
      * @param bool $bool
+     *
      * @return $this
      */
     public function setDisable($bool) {
@@ -26,7 +25,6 @@ trait CTrait_Element_Behavior_Disable {
     }
 
     /**
-     * 
      * @return bool
      */
     public function getDisable() {
@@ -34,11 +32,9 @@ trait CTrait_Element_Behavior_Disable {
     }
 
     /**
-     * 
      * @return bool
      */
     public function isDisable() {
         return $this->disable == true;
     }
-
 }

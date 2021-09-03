@@ -32,7 +32,7 @@ class ControllerArgumentValueResolverPass implements CompilerPassInterface
     private $argumentValueResolverTag;
     private $traceableResolverStopwatch;
 
-    public function __construct(string $argumentResolverService = 'argument_resolver', string $argumentValueResolverTag = 'controller.argument_value_resolver', string $traceableResolverStopwatch = 'debug.stopwatch')
+    public function __construct($argumentResolverService = 'argument_resolver', $argumentValueResolverTag = 'controller.argument_value_resolver', $traceableResolverStopwatch = 'debug.stopwatch')
     {
         $this->argumentResolverService = $argumentResolverService;
         $this->argumentValueResolverTag = $argumentValueResolverTag;

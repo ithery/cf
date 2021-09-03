@@ -5,7 +5,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 /**
  * CSession driver interface
  */
-interface CSession_Driver {
+interface CSession_Driver extends SessionHandlerInterface {
 
     /**
      * Opens a session.

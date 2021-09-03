@@ -136,7 +136,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
     /**
      * Returns if the current Symfony version is a Long-Term Support one.
      */
-    public function isSymfonyLts(): bool
+    public function isSymfonyLts()
     {
         return $this->data['symfony_lts'];
     }
@@ -285,7 +285,7 @@ class ConfigDataCollector extends DataCollector implements LateDataCollectorInte
      *
      * @return string One of: dev, stable, eom, eol
      */
-    private function determineSymfonyState(): string
+    private function determineSymfonyState()
     {
         $now = new \DateTime();
         $eom = \DateTime::createFromFormat('d/m/Y', '01/'.Kernel::END_OF_MAINTENANCE)->modify('last day of this month');

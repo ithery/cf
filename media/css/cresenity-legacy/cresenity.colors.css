@@ -1,0 +1,13 @@
+
+.btn.btn-orange {
+  background: #f8a31f;
+  color: #fff !important;
+}
+.btn.btn-orange:hover {
+  background: #dd8907;
+}
+
+ul > li.orange, .label-orange {
+  background: #f8a31f;
+}
+

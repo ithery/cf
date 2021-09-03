@@ -29,7 +29,7 @@ abstract class RoutableFragmentRenderer implements FragmentRendererInterface
      *
      * @see FragmentListener
      */
-    public function setFragmentPath(string $path)
+    public function setFragmentPath($path)
     {
         $this->fragmentPath = $path;
     }

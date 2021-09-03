@@ -117,7 +117,7 @@ abstract class Bundle implements BundleInterface
     /**
      * Returns the bundle name (the class short name).
      */
-    final public function getName(): string
+    final public function getName()
     {
         if (null === $this->name) {
             $this->parseClassName();

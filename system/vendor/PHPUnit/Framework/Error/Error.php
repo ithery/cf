@@ -9,7 +9,7 @@
  */
 namespace PHPUnit\Framework\Error;
 
-use PHPUnit\Framework\Exception;
+use PHPUnit\Framework\Exception\Exception;
 
 /**
  * @internal

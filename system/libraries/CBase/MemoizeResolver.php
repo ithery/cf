@@ -1,18 +1,15 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CBase_MemoizeResolver {
-
     public $cache;
     private $resolver;
     private $func;
 
-    public function __construct(callable $func, callable $resolver = null) {
+    /**
+     * @param Closure $func
+     * @param Closure $resolver
+     */
+    public function __construct($func, $resolver = null) {
         $this->resolver = $resolver;
         $this->func = $func;
     }
@@ -20,8 +17,6 @@ class CBase_MemoizeResolver {
     public function __invoke() {
         $args = \func_get_args();
         if ($this->resolver) {
-
-            
             $closure = Closure::bind($this->resolver, $this);
             //$closure = Closure::fromCallable($this->resolver)->bindTo($this);
             $key = $closure(...$args);
@@ -37,5 +32,4 @@ class CBase_MemoizeResolver {
         $this->cache = $this->cache->set($key, $result);
         return $result;
     }
-
 }

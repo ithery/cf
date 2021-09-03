@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CEmail_Builder_Type_TypeFactory {
-
     public static $typeCache = [];
     public static $typeData = [
         'boolean' => [
@@ -26,7 +19,7 @@ class CEmail_Builder_Type_TypeFactory {
             'matcher' => CEmail_Builder_Type_Adapter_StringAdapter::MATCHER,
             'class' => CEmail_Builder_Type_Adapter_StringAdapter::class,
         ],
-        
+
         'color' => [
             'matcher' => CEmail_Builder_Type_Adapter_ColorAdapter::MATCHER,
             'class' => CEmail_Builder_Type_Adapter_ColorAdapter::class,
@@ -41,9 +34,9 @@ class CEmail_Builder_Type_TypeFactory {
         if (isset(static::$typeCache[$typeConfig])) {
             return static::$typeCache[$typeConfig];
         }
-        $record = carr::find(static::$typeData, function($type) use($typeConfig) {
-                    return preg_match(carr::get($type, 'matcher'), $typeConfig);
-                });
+        $record = carr::find(static::$typeData, function ($type) use ($typeConfig) {
+            return preg_match(carr::get($type, 'matcher'), $typeConfig);
+        });
 
         if ($record == null) {
             throw new Exception('No type found for ' . $typeConfig);
@@ -53,5 +46,4 @@ class CEmail_Builder_Type_TypeFactory {
         static::$typeCache[$typeConfig] = $class;
         return static::$typeCache[$typeConfig];
     }
-
 }

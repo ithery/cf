@@ -31,7 +31,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
     private $currentRequest;
     private $requestStack;
 
-    public function __construct($logger = null, string $containerPathPrefix = null, RequestStack $requestStack = null)
+    public function __construct($logger = null, $containerPathPrefix = null, RequestStack $requestStack = null)
     {
         if (null !== $logger && $logger instanceof DebugLoggerInterface) {
             $this->logger = $logger;
@@ -120,7 +120,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return 'logger';
     }
 
-    private function getContainerDeprecationLogs(): array
+    private function getContainerDeprecationLogs()
     {
         if (null === $this->containerPathPrefix || !is_file($file = $this->containerPathPrefix.'Deprecations.log')) {
             return [];
@@ -146,7 +146,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return $logs;
     }
 
-    private function getContainerCompilerLogs(string $compilerLogsFilepath = null): array
+    private function getContainerCompilerLogs($compilerLogsFilepath = null)
     {
         if (!is_file($compilerLogsFilepath)) {
             return [];
@@ -214,7 +214,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return array_values($sanitizedLogs);
     }
 
-    private function isSilencedOrDeprecationErrorLog(array $log): bool
+    private function isSilencedOrDeprecationErrorLog(array $log)
     {
         if (!isset($log['context']['exception'])) {
             return false;
@@ -233,7 +233,7 @@ class LoggerDataCollector extends DataCollector implements LateDataCollectorInte
         return false;
     }
 
-    private function computeErrorsCount(array $containerDeprecationLogs): array
+    private function computeErrorsCount(array $containerDeprecationLogs)
     {
         $silencedLogs = [];
         $count = [

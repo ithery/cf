@@ -49,7 +49,7 @@ class DebugHandlersListener implements EventSubscriberInterface
      * @param string|FileLinkFormatter|null $fileLinkFormat   The format for links to source files
      * @param bool                          $scope            Enables/disables scoping mode
      */
-    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = E_ALL, ?int $throwAt = E_ALL, bool $scream = true, $fileLinkFormat = null, bool $scope = true, LoggerInterface $deprecationLogger = null)
+    public function __construct(callable $exceptionHandler = null, LoggerInterface $logger = null, $levels = E_ALL, $throwAt = E_ALL, bool $scream = true, $fileLinkFormat = null, bool $scope = true, LoggerInterface $deprecationLogger = null)
     {
         $this->exceptionHandler = $exceptionHandler;
         $this->logger = $logger;
@@ -136,7 +136,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
     }
 
-    private function setDefaultLoggers(ErrorHandler $handler): void
+    private function setDefaultLoggers(ErrorHandler $handler)
     {
         if (\is_array($this->levels)) {
             $levelsDeprecatedOnly = [];
@@ -164,7 +164,7 @@ class DebugHandlersListener implements EventSubscriberInterface
         }
     }
 
-    public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents()
     {
         $events = [KernelEvents::REQUEST => ['configure', 2048]];
 

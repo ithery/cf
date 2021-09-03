@@ -5,58 +5,66 @@
  *
  * @author Hery
  */
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 class CView_Legacy {
+    use CTrait_Compat_View;
 
     protected static $viewFolder = 'views';
+
     // The view file name and type
-    protected $filename = FALSE;
-    protected $filetype = FALSE;
+    protected $filename = false;
+
+    protected $filetype = false;
+
     // CView variable storage
-    protected $local_data = array();
-    protected static $global_data = array();
+    protected $local_data = [];
+
+    protected static $global_data = [];
 
     /**
      * Creates a new CView using the given parameters.
      *
-     * @param   string  view name
-     * @param   array   pre-load data
-     * @param   string  type of file: html, css, js, etc.
-     * @return  object
+     * @param string $name view name
+     * @param array  $data pre-load data
+     * @param string $type type of file: html, css, js, etc
+     *
+     * @return CView_Legacy
      */
-    public static function factory($name = NULL, $data = NULL, $type = NULL) {
+    public static function factory($name = null, $data = null, $type = null) {
         return new CView_Legacy($name, $data, $type);
     }
 
     /**
      * Check a CView is exists.
      *
-     * @param   string  view name
-     * @return  boolean
+     * @param string $name view name
+     *
+     * @return bool
      */
     public static function exists($name) {
-        $filename = CF::find_file(self::$viewFolder, $name, false);
+        $filename = CF::findFile(self::$viewFolder, $name, false);
         return strlen($filename) > 0;
     }
 
     /**
      * Attempts to load a view and pre-load view data.
      *
-     * @throws  CF_Exception  if the requested view cannot be found
-     * @param   string  view name
-     * @param   array   pre-load data
-     * @param   string  type of file: html, css, js, etc.
-     * @return  void
+     * @param string $name view name
+     * @param array  $data pre-load data
+     * @param string $type type of file: html, css, js, etc
+     *
+     * @throws CException if the requested view cannot be found
+     *
+     * @return void
      */
-    public function __construct($name = NULL, $data = NULL, $type = NULL) {
-        if (is_string($name) AND $name !== '') {
+    public function __construct($name = null, $data = null, $type = null) {
+        if (is_string($name) and $name !== '') {
             // Set the filename
-            $this->set_filename($name, $type);
+            $this->setFilename($name, $type);
         }
 
-
-        if (is_array($data) AND!empty($data)) {
+        if (is_array($data) and !empty($data)) {
             // Preload data using array_merge, to allow user extensions
             $this->local_data = array_merge($this->local_data, $data);
         }
@@ -65,37 +73,37 @@ class CView_Legacy {
     /**
      * Magic method access to test for view property
      *
-     * @param   string   CView property to test for
-     * @return  boolean
+     * @param string $key CView property to test for
+     *
+     * @return bool
      */
-    public function __isset($key = NULL) {
-        return $this->is_set($key);
+    public function __isset($key = null) {
+        return $this->isSet($key);
     }
 
     /**
      * Sets the view filename.
      *
-     * @chainable
-     * @param   string  view filename
-     * @param   string  view file type
-     * @return  object
+     * @param string      $name view filename
+     * @param string|null $type view file type
+     *
+     * @return object
      */
-    public function set_filename($name, $type = NULL) {
-
-        if ($type == NULL) {
+    public function setFilename($name, $type = null) {
+        if ($type == null) {
             // Load the filename and set the content type
-            $this->filename = CF::find_file(self::$viewFolder, $name, TRUE);
+            $this->filename = CF::findFile(self::$viewFolder, $name, true);
             $this->filetype = EXT;
         } else {
             // Check if the filetype is allowed by the configuration
-            if (!in_array($type, CF::config('view.allowed_filetypes')))
-                throw new CF_Exception('core.invalid_filetype', $type);
-
+            if (!in_array($type, CF::config('view.allowed_filetypes'))) {
+                throw new CException(CF::lang('core.invalid_filetype', [':type' => $type]));
+            }
             // Load the filename and set the content type
-            $this->filename = CF::find_file(self::$viewFolder, $name, TRUE, $type);
+            $this->filename = CF::findFile(self::$viewFolder, $name, true, $type);
             $this->filetype = CF::config('mimes.' . $type);
 
-            if ($this->filetype == NULL) {
+            if ($this->filetype == null) {
                 // Use the specified type
                 $this->filetype = $type;
             }
@@ -107,11 +115,12 @@ class CView_Legacy {
     /**
      * Sets a view variable.
      *
-     * @param   string|array  name of variable or an array of variables
-     * @param   mixed         value when using a named variable
-     * @return  object
+     * @param string|array $name  name of variable or an array of variables
+     * @param mixed        $value value when using a named variable
+     *
+     * @return object
      */
-    public function set($name, $value = NULL) {
+    public function set($name, $value = null) {
         if (is_array($name)) {
             foreach ($name as $key => $value) {
                 $this->__set($key, $value);
@@ -127,28 +136,27 @@ class CView_Legacy {
      * Checks for a property existence in the view locally or globally. Unlike the built in __isset(),
      * this method can take an array of properties to test simultaneously.
      *
-     * @param string $key property name to test for
-     * @param array $key array of property names to test for
-     * @return boolean property test result
-     * @return array associative array of keys and boolean test result
+     * @param string|array $key property name to test for
+     *
+     * @return bool|array property test result
      */
-    public function is_set($key = FALSE) {
+    public function isSet($key = false) {
         // Setup result;
-        $result = FALSE;
+        $result = false;
 
         // If key is an array
         if (is_array($key)) {
             // Set the result to an array
-            $result = array();
+            $result = [];
 
             // Foreach key
             foreach ($key as $property) {
                 // Set the result to an associative array
-                $result[$property] = (array_key_exists($property, $this->local_data) OR array_key_exists($property, self::$global_data)) ? TRUE : FALSE;
+                $result[$property] = (array_key_exists($property, $this->local_data) or array_key_exists($property, self::$global_data)) ? true : false;
             }
         } else {
             // Otherwise just check one property
-            $result = (array_key_exists($key, $this->local_data) OR array_key_exists($key, self::$global_data)) ? TRUE : FALSE;
+            $result = (array_key_exists($key, $this->local_data) or array_key_exists($key, self::$global_data)) ? true : false;
         }
 
         // Return the result
@@ -158,39 +166,24 @@ class CView_Legacy {
     /**
      * Sets a bound variable by reference.
      *
-     * @param   string   name of variable
-     * @param   mixed    variable to assign by reference
-     * @return  object
+     * @param string $name name of variable
+     * @param mixed  $var  variable to assign by reference
+     *
+     * @return object
      */
-    public function bind($name, & $var) {
-        $this->local_data[$name] = & $var;
+    public function bind($name, &$var) {
+        $this->local_data[$name] = &$var;
 
         return $this;
     }
 
     /**
-     * Sets a view global variable.
-     *
-     * @param   string|array  name of variable or an array of variables
-     * @param   mixed         value when using a named variable
-     * @return  void
-     */
-    public static function set_global($name, $value = NULL) {
-        if (is_array($name)) {
-            foreach ($name as $key => $value) {
-                self::$global_data[$key] = $value;
-            }
-        } else {
-            self::$global_data[$name] = $value;
-        }
-    }
-
-    /**
      * Magically sets a view variable.
      *
-     * @param   string   variable key
-     * @param   string   variable value
-     * @return  void
+     * @param string $key   variable key
+     * @param string $value variable value
+     *
+     * @return void
      */
     public function __set($key, $value) {
         $this->local_data[$key] = $value;
@@ -199,25 +192,28 @@ class CView_Legacy {
     /**
      * Magically gets a view variable.
      *
-     * @param  string  variable key
-     * @return mixed   variable value if the key is found
-     * @return void    if the key is not found
+     * @param string $key variable key
+     *
+     * @return mixed|null variable value if the key is found, null if the key is not found
      */
     public function &__get($key) {
-        if (isset($this->local_data[$key]))
+        if (isset($this->local_data[$key])) {
             return $this->local_data[$key];
+        }
 
-        if (isset(self::$global_data[$key]))
+        if (isset(self::$global_data[$key])) {
             return self::$global_data[$key];
+        }
 
-        if (isset($this->$key))
+        if (isset($this->$key)) {
             return $this->$key;
+        }
     }
 
     /**
      * Magically converts view object to string.
      *
-     * @return  string
+     * @return string
      */
     public function __toString() {
         try {
@@ -231,13 +227,15 @@ class CView_Legacy {
     /**
      * Load a view.
      *
-     * @param   view_filename   filename of view
-     * @param   input_data  data to pass to view
-     * @return  string    
+     * @param string $view_filename filename of view
+     * @param array  $input_data    data to pass to view
+     *
+     * @return string
      */
-    public static function load_view($view_filename, $input_data) {
-        if ($view_filename == '')
+    public static function loadView($view_filename, $input_data) {
+        if ($view_filename == '') {
             return;
+        }
 
         // Buffering on
         ob_start();
@@ -262,29 +260,28 @@ class CView_Legacy {
     /**
      * Renders a view.
      *
-     * @param   boolean   set to TRUE to echo the output instead of returning it
-     * @param   callback  special renderer to pass the output through
-     * @return  string    if print is FALSE
-     * @return  void      if print is TRUE
+     * @param mixed $print
+     * @param mixed $renderer
+     *
+     * @return string if print is FALSE
      */
-    public function render($print = FALSE, $renderer = FALSE) {
+    public function render($print = false, $renderer = false) {
         if (empty($this->filename)) {
-            throw new CF_Exception('core.view_set_filename');
+            throw new Exception(CF::lang('core.view_set_filename'));
         }
         if (is_string($this->filetype)) {
             // Merge global and local data, local overrides global with the same name
             $data = array_merge(self::$global_data, $this->local_data);
 
-//            var_dump(CF::$instance);
             // Load the view in the controller for access to $this
-            $output = self::load_view($this->filename, $data);
+            $output = self::loadView($this->filename, $data);
 
-            if ($renderer !== FALSE AND is_callable($renderer, TRUE)) {
+            if ($renderer !== false and is_callable($renderer, true)) {
                 // Pass the output through the user defined renderer
                 $output = call_user_func($renderer, $output);
             }
 
-            if ($print === TRUE) {
+            if ($print === true) {
                 // Display the output
                 echo $output;
                 return;
@@ -293,7 +290,7 @@ class CView_Legacy {
             // Set the content type and size
             header('Content-Type: ' . $this->filetype[0]);
 
-            if ($print === TRUE) {
+            if ($print === true) {
                 if ($file = fopen($this->filename, 'rb')) {
                     // Display the output
                     fpassthru($file);
@@ -308,7 +305,6 @@ class CView_Legacy {
 
         return $output;
     }
-
 }
 
 // End CView_Legacy

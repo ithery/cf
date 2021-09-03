@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 final class CVendor_Firebase_Messaging_MessageTarget {
-
     const CONDITION = 'condition';
     const TOKEN = 'token';
     const TOPIC = 'topic';
@@ -26,15 +19,17 @@ final class CVendor_Firebase_Messaging_MessageTarget {
     private $value;
 
     private function __construct() {
-        
     }
 
     /**
      * Create a new message target with the given type and value.
      *
+     * @param mixed $type
+     * @param mixed $value
+     *
      * @throws InvalidArgumentException
      *
-     * @return MessageTarget
+     * @return CVendor_Firebase_Messaging_MessageTarget
      */
     public static function with($type, $value) {
         $targetType = \mb_strtolower($type);
@@ -66,5 +61,4 @@ final class CVendor_Firebase_Messaging_MessageTarget {
     public function value() {
         return $this->value;
     }
-
 }

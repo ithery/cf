@@ -1,23 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2018, 1:30:41 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 17, 2018, 1:30:41 AM
  */
 trait CTrait_Element_Behavior_Sortable {
-
     /**
-     *
      * @var bool
      */
     protected $sortable;
 
     /**
-     * 
      * @param bool $bool
+     *
      * @return $this
      */
     public function setSortable($bool) {
@@ -26,7 +25,6 @@ trait CTrait_Element_Behavior_Sortable {
     }
 
     /**
-     * 
      * @return bool
      */
     public function getSortable() {
@@ -34,11 +32,9 @@ trait CTrait_Element_Behavior_Sortable {
     }
 
     /**
-     * 
      * @return bool
      */
     public function isSortable() {
         return $this->sortable == true;
     }
-
 }

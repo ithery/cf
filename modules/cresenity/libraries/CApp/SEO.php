@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CApp_SEO {
-
     protected $instance = null;
 
     private function __construct() {
@@ -15,7 +8,6 @@ class CApp_SEO {
     }
 
     /**
-     * 
      * @return CApp_SEO
      */
     public static function instance() {
@@ -26,7 +18,6 @@ class CApp_SEO {
     }
 
     /**
-     * 
      * @return CApp_SEO_MetaTags
      */
     public function metatags() {
@@ -34,7 +25,6 @@ class CApp_SEO {
     }
 
     /**
-     * 
      * @return CApp_SEO_OpenGraph
      */
     public function opengraph() {
@@ -42,7 +32,6 @@ class CApp_SEO {
     }
 
     /**
-     * 
      * @return CApp_SEO_Twitter
      */
     public function twitter() {
@@ -50,7 +39,6 @@ class CApp_SEO {
     }
 
     /**
-     * 
      * @return CApp_SEO_JsonLd
      */
     public function jsonLd() {
@@ -132,5 +120,4 @@ class CApp_SEO {
 
         return ($minify) ? str_replace(PHP_EOL, '', $html) : $html;
     }
-
 }

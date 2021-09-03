@@ -33,7 +33,7 @@ class SessionListener extends AbstractSessionListener
         parent::__construct($container, $debug);
     }
 
-    protected function getSession(): ?SessionInterface
+    protected function getSession()
     {
         if (!$this->container->has('session')) {
             return null;

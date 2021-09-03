@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 12:14:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 12:14:30 PM
  */
 
 /**
  * Schema Diff.
- *
  */
 class CDatabase_Schema_Diff {
-
     /**
      * @var CDatabase_Schema
      */
@@ -80,7 +79,7 @@ class CDatabase_Schema_Diff {
      * @param CDatabase_Schema_Table[]     $newTables
      * @param CDatabase_Schema_TableDiff[] $changedTables
      * @param CDatabase_Schema_Table[]     $removedTables
-     * @param CDatabase_Schema|null $fromSchema
+     * @param CDatabase_Schema|null        $fromSchema
      */
     public function __construct($newTables = [], $changedTables = [], $removedTables = [], CDatabase_Schema $fromSchema = null) {
         $this->newTables = $newTables;
@@ -117,7 +116,7 @@ class CDatabase_Schema_Diff {
 
     /**
      * @param CDatabase_Platform $platform
-     * @param bool                                      $saveMode
+     * @param bool               $saveMode
      *
      * @return array
      */
@@ -155,7 +154,8 @@ class CDatabase_Schema_Diff {
         $foreignKeySql = [];
         foreach ($this->newTables as $table) {
             $sql = array_merge(
-                    $sql, $platform->getCreateTableSQL($table, CDatabase_Platform::CREATE_INDEXES)
+                $sql,
+                $platform->getCreateTableSQL($table, CDatabase_Platform::CREATE_INDEXES)
             );
 
             if (!$platform->supportsForeignKeyConstraints()) {
@@ -179,5 +179,4 @@ class CDatabase_Schema_Diff {
 
         return $sql;
     }
-
 }

@@ -1,20 +1,26 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 3, 2018, 1:26:28 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 3, 2018, 1:26:28 AM
  */
 class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_CompilableInterface {
-
     protected $method = 'GET';
+
     protected $url = null;
+
     protected $complete = null;
+
     protected $dataType = 'json';
+
     protected $data = null;
+
     protected $success = null;
+
     protected $error = null;
 
     public function __construct($options) {
@@ -32,7 +38,7 @@ class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_
         }
     }
 
-    public function compileAjaxEvent($statement, $args = array()) {
+    public function compileAjaxEvent($statement, $args = []) {
         if (is_array($statement)) {
             $function = new CJavascript_Statement_Function('', $args);
             foreach ($statement as $stat) {
@@ -40,12 +46,12 @@ class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_
             }
             $statement = $function;
         }
-        if ($statement instanceOf CJavascript_Statement && (!$statement instanceOf CJavascript_Statement_Function)) {
+        if ($statement instanceof CJavascript_Statement && (!$statement instanceof CJavascript_Statement_Function)) {
             $function = new CJavascript_Statement_Function('', $args);
             $function->addStatement($statement);
             $statement = $function;
         }
-        if ($statement instanceOf CJavascript_Statement_Function) {
+        if ($statement instanceof CJavascript_Statement_Function) {
             $statement = $statement->getStatement();
         }
 
@@ -58,17 +64,17 @@ class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_
         $str .= 'dataType:' . CJavascript_Helper_Javascript::prepValue($this->dataType) . ',';
 
         if ($this->complete != null) {
-            $args = array('data');
+            $args = ['data'];
             $this->complete = $this->compileAjaxEvent($this->complete, $args);
             $str .= 'complete:' . $this->complete . ',';
         }
         if ($this->success != null) {
-            $args = array('data');
+            $args = ['data'];
             $this->success = $this->compileAjaxEvent($this->success, $args);
             $str .= 'success:' . $this->success . ',';
         }
         if ($this->error != null) {
-            $args = array('jqXhr', 'textStatus', 'errorThrown');
+            $args = ['jqXhr', 'textStatus', 'errorThrown'];
             $this->error = $this->compileAjaxEvent($this->error, $args);
             $str .= 'error:' . $this->error . ',';
         }
@@ -77,5 +83,4 @@ class CJavascript_Statement_JQuery_Ajax implements CJavascript_Statement_JQuery_
         $str .= '})';
         return $str;
     }
-
 }

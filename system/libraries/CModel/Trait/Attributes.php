@@ -1,14 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Dec 25, 2017, 10:08:50 PM
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 trait CModel_Trait_Attributes {
-
     /**
      * The model's attributes.
      *
@@ -82,18 +79,20 @@ trait CModel_Trait_Attributes {
         // to a DateTime / Carbon instance. This is so we will get some consistent
         // formatting while accessing attributes vs. arraying / JSONing a model.
         $attributes = $this->addDateAttributesToArray(
-                $attributes = $this->getArrayableAttributes()
+            $attributes = $this->getArrayableAttributes()
         );
 
         $attributes = $this->addMutatedAttributesToArray(
-                $attributes, $mutatedAttributes = $this->getMutatedAttributes()
+            $attributes,
+            $mutatedAttributes = $this->getMutatedAttributes()
         );
 
         // Next we will handle any casts that have been setup for this model and cast
         // the values to their appropriate type. If the attribute has a mutator we
         // will not perform the cast on those attributes to avoid any confusion.
         $attributes = $this->addCastAttributesToArray(
-                $attributes, $mutatedAttributes
+            $attributes,
+            $mutatedAttributes
         );
 
         // Here we will grab all of the appended, calculated attributes to this model
@@ -109,7 +108,8 @@ trait CModel_Trait_Attributes {
     /**
      * Add the date attributes to the attributes array.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return array
      */
     protected function addDateAttributesToArray(array $attributes) {
@@ -119,7 +119,7 @@ trait CModel_Trait_Attributes {
             }
 
             $attributes[$key] = $this->serializeDate(
-                    $this->asDateTime($attributes[$key])
+                $this->asDateTime($attributes[$key])
             );
         }
 
@@ -129,8 +129,9 @@ trait CModel_Trait_Attributes {
     /**
      * Add the mutated attributes to the attributes array.
      *
-     * @param  array  $attributes
-     * @param  array  $mutatedAttributes
+     * @param array $attributes
+     * @param array $mutatedAttributes
+     *
      * @return array
      */
     protected function addMutatedAttributesToArray(array $attributes, array $mutatedAttributes) {
@@ -146,7 +147,8 @@ trait CModel_Trait_Attributes {
             // mutated attribute's actual values. After we finish mutating each of the
             // attributes we will return this final array of the mutated attributes.
             $attributes[$key] = $this->mutateAttributeForArray(
-                    $key, $attributes[$key]
+                $key,
+                $attributes[$key]
             );
         }
 
@@ -156,8 +158,9 @@ trait CModel_Trait_Attributes {
     /**
      * Add the casted attributes to the attributes array.
      *
-     * @param  array  $attributes
-     * @param  array  $mutatedAttributes
+     * @param array $attributes
+     * @param array $mutatedAttributes
+     *
      * @return array
      */
     protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes) {
@@ -170,14 +173,16 @@ trait CModel_Trait_Attributes {
             // then we will serialize the date for the array. This will convert the dates
             // to strings based on the date format specified for these Eloquent models.
             $attributes[$key] = $this->castAttribute(
-                    $key, $attributes[$key]
+                $key,
+                $attributes[$key]
             );
 
             // If the attribute cast was a date or a datetime, we will serialize the date as
             // a string. This allows the developers to customize how dates are serialized
             // into an array without affecting how they are persisted into the storage.
-            if ($attributes[$key] &&
-                    ($value === 'date' || $value === 'datetime')) {
+            if ($attributes[$key]
+                && ($value === 'date' || $value === 'datetime')
+            ) {
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
         }
@@ -205,7 +210,7 @@ trait CModel_Trait_Attributes {
         }
 
         return $this->getArrayableItems(
-                        array_combine($this->appends, $this->appends)
+            array_combine($this->appends, $this->appends)
         );
     }
 
@@ -221,14 +226,12 @@ trait CModel_Trait_Attributes {
             // If the values implements the Arrayable interface we can just call this
             // toArray method on the instances which will convert both models and
             // collections to their proper array form and we'll set the values.
-            if ($value instanceof Arrayable) {
+            if ($value instanceof CInterface_Arrayable) {
                 $relation = $value->toArray();
-            }
-
-            // If the value is null, we'll still go ahead and set it in this list of
-            // attributes since null is used to represent empty relationships if
-            // if it a has one or belongs to type relationships on the models.
-            elseif (is_null($value)) {
+            } elseif (is_null($value)) {
+                // If the value is null, we'll still go ahead and set it in this list of
+                // attributes since null is used to represent empty relationships if
+                // if it a has one or belongs to type relationships on the models.
                 $relation = $value;
             }
 
@@ -264,7 +267,8 @@ trait CModel_Trait_Attributes {
     /**
      * Get an attribute array of all arrayable values.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return array
      */
     protected function getArrayableItems(array $values) {
@@ -282,7 +286,8 @@ trait CModel_Trait_Attributes {
     /**
      * Get an attribute from the model.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function getAttribute($key) {
@@ -304,14 +309,14 @@ trait CModel_Trait_Attributes {
             return;
         }
 
-
         return $this->getRelationValue($key);
     }
 
     /**
      * Get a plain attribute (not a relationship).
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function getAttributeValue($key) {
@@ -334,8 +339,9 @@ trait CModel_Trait_Attributes {
         // If the attribute is listed as a date, we will convert it to a DateTime
         // instance on retrieval, which makes it quite convenient to work with
         // date fields without having to create a mutator for each property.
-        if (in_array($key, $this->getDates()) &&
-                !is_null($value)) {
+        if (in_array($key, $this->getDates())
+            && !is_null($value)
+        ) {
             return $this->asDateTime($value);
         }
 
@@ -345,7 +351,8 @@ trait CModel_Trait_Attributes {
     /**
      * Get an attribute from the $attributes array.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     protected function getAttributeFromArray($key) {
@@ -357,7 +364,8 @@ trait CModel_Trait_Attributes {
     /**
      * Get a relationship.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function getRelationValue($key) {
@@ -368,7 +376,6 @@ trait CModel_Trait_Attributes {
         if ($this->relationLoaded($key)) {
             return $this->relations[$key];
         }
-
 
         // If the "attribute" exists as a method on the model, we will just assume
         // it is a relationship and will load and return results from the query
@@ -381,7 +388,8 @@ trait CModel_Trait_Attributes {
     /**
      * Get a relationship value from a method.
      *
-     * @param  string  $method
+     * @param string $method
+     *
      * @return mixed
      *
      * @throws \LogicException
@@ -394,14 +402,15 @@ trait CModel_Trait_Attributes {
         }
 
         return c::tap($relation->getResults(), function ($results) use ($method) {
-                    $this->setRelation($method, $results);
-                });
+            $this->setRelation($method, $results);
+        });
     }
 
     /**
      * Determine if a get mutator exists for an attribute.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function hasGetMutator($key) {
@@ -411,8 +420,9 @@ trait CModel_Trait_Attributes {
     /**
      * Get the value of an attribute using its mutator.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return mixed
      */
     protected function mutateAttribute($key, $value) {
@@ -422,21 +432,36 @@ trait CModel_Trait_Attributes {
     /**
      * Get the value of an attribute using its mutator for array conversion.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return mixed
      */
     protected function mutateAttributeForArray($key, $value) {
         $value = $this->mutateAttribute($key, $value);
 
-        return $value instanceof Arrayable ? $value->toArray() : $value;
+        return $value instanceof CInterface_Arrayable ? $value->toArray() : $value;
+    }
+
+    /**
+     * Merge new casts with existing casts on the model.
+     *
+     * @param array $casts
+     *
+     * @return $this
+     */
+    public function mergeCasts($casts) {
+        $this->casts = array_merge($this->casts, $casts);
+
+        return $this;
     }
 
     /**
      * Cast an attribute to a native PHP type.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return mixed
      */
     protected function castAttribute($key, $value) {
@@ -463,7 +488,7 @@ trait CModel_Trait_Attributes {
             case 'json':
                 return $this->fromJson($value);
             case 'collection':
-                return new BaseCollection($this->fromJson($value));
+                return new CCollection($this->fromJson($value));
             case 'date':
                 return $this->asDate($value);
             case 'datetime':
@@ -478,7 +503,8 @@ trait CModel_Trait_Attributes {
     /**
      * Get the type of cast for a model attribute.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return string
      */
     protected function getCastType($key) {
@@ -488,8 +514,9 @@ trait CModel_Trait_Attributes {
     /**
      * Set a given attribute on the model.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return $this
      */
     public function setAttribute($key, $value) {
@@ -500,12 +527,10 @@ trait CModel_Trait_Attributes {
             $method = 'set' . cstr::studly($key) . 'Attribute';
 
             return $this->{$method}($value);
-        }
-
-        // If an attribute is listed as a "date", we'll convert it from a DateTime
-        // instance into a form proper for storage on the database tables using
-        // the connection grammar's date format. We will auto set the values.
-        elseif ($value && $this->isDateAttribute($key)) {
+        } elseif ($value && $this->isDateAttribute($key)) {
+            // If an attribute is listed as a "date", we'll convert it from a DateTime
+            // instance into a form proper for storage on the database tables using
+            // the connection grammar's date format. We will auto set the values.
             $value = $this->fromDateTime($value);
         }
 
@@ -528,7 +553,8 @@ trait CModel_Trait_Attributes {
     /**
      * Determine if a set mutator exists for an attribute.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function hasSetMutator($key) {
@@ -538,26 +564,30 @@ trait CModel_Trait_Attributes {
     /**
      * Determine if the given attribute is a date or date castable.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     protected function isDateAttribute($key) {
-        return in_array($key, $this->getDates()) ||
-                $this->isDateCastable($key);
+        return in_array($key, $this->getDates())
+                || $this->isDateCastable($key);
     }
 
     /**
      * Set a given JSON attribute on the model.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return $this
      */
     public function fillJsonAttribute($key, $value) {
         list($key, $path) = explode('->', $key, 2);
 
         $this->attributes[$key] = $this->asJson($this->getArrayAttributeWithValue(
-                        $path, $key, $value
+            $path,
+            $key,
+            $value
         ));
 
         return $this;
@@ -566,9 +596,10 @@ trait CModel_Trait_Attributes {
     /**
      * Get an array attribute with the given key and value set.
      *
-     * @param  string  $path
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $path
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return $this
      */
     protected function getArrayAttributeWithValue($path, $key, $value) {
@@ -580,27 +611,31 @@ trait CModel_Trait_Attributes {
     /**
      * Get an array attribute or return an empty array if it is not set.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return array
      */
     protected function getArrayAttributeByKey($key) {
-        return isset($this->attributes[$key]) ?
-                $this->fromJson($this->attributes[$key]) : [];
+        return isset($this->attributes[$key])
+                ? $this->fromJson($this->attributes[$key]) : [];
     }
 
     /**
      * Cast the given attribute to JSON.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return string
      */
     protected function castAttributeAsJson($key, $value) {
         $value = $this->asJson($value);
 
         if ($value === false) {
-            throw JsonEncodingException::forAttribute(
-                    $this, $key, json_last_error_msg()
+            throw CModel_Exception_JsonEncodingException::forAttribute(
+                $this,
+                $key,
+                json_last_error_msg()
             );
         }
 
@@ -610,7 +645,8 @@ trait CModel_Trait_Attributes {
     /**
      * Encode the given value as JSON.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return string
      */
     protected function asJson($value) {
@@ -620,8 +656,9 @@ trait CModel_Trait_Attributes {
     /**
      * Decode the given JSON back into an array or object.
      *
-     * @param  string  $value
-     * @param  bool  $asObject
+     * @param string $value
+     * @param bool   $asObject
+     *
      * @return mixed
      */
     public function fromJson($value, $asObject = false) {
@@ -631,7 +668,8 @@ trait CModel_Trait_Attributes {
     /**
      * Return a timestamp as DateTime object with time set to 00:00:00.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return CCarbon
      */
     protected function asDate($value) {
@@ -641,7 +679,8 @@ trait CModel_Trait_Attributes {
     /**
      * Return a timestamp as DateTime object.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return CCarbon
      */
     protected function asDateTime($value) {
@@ -657,7 +696,8 @@ trait CModel_Trait_Attributes {
         // when checking the field. We will just return the DateTime right away.
         if ($value instanceof DateTimeInterface) {
             return new CCarbon(
-                    $value->format('Y-m-d H:i:s.u'), $value->getTimezone()
+                $value->format('Y-m-d H:i:s.u'),
+                $value->getTimezone()
             );
         }
 
@@ -687,14 +727,16 @@ trait CModel_Trait_Attributes {
         // the database connection and use that format to create the Carbon object
         // that is returned back out to the developers after we convert it here.
         return CCarbon::createFromFormat(
-                        $this->getDateFormat(), $value
+            $this->getDateFormat(),
+            $value
         );
     }
 
     /**
      * Determine if the given value is a standard date format.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return bool
      */
     protected function isElasticDateFormat($value) {
@@ -704,7 +746,8 @@ trait CModel_Trait_Attributes {
     /**
      * Determine if the given value is a standard date format.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return bool
      */
     protected function isStandardDateFormat($value) {
@@ -714,19 +757,21 @@ trait CModel_Trait_Attributes {
     /**
      * Convert a DateTime to a storable string.
      *
-     * @param  \DateTime|int  $value
+     * @param \DateTime|int $value
+     *
      * @return string
      */
     public function fromDateTime($value) {
         return is_null($value) ? $value : $this->asDateTime($value)->format(
-                        $this->getDateFormat()
+            $this->getDateFormat()
         );
     }
 
     /**
      * Return a timestamp as unix timestamp.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return int
      */
     protected function asTimestamp($value) {
@@ -736,7 +781,8 @@ trait CModel_Trait_Attributes {
     /**
      * Prepare a date for array / JSON serialization.
      *
-     * @param  \DateTimeInterface  $date
+     * @param \DateTimeInterface $date
+     *
      * @return string
      */
     protected function serializeDate(DateTimeInterface $date) {
@@ -749,6 +795,7 @@ trait CModel_Trait_Attributes {
      * @return array
      */
     public function getDates() {
+        /** @var CModel $this */
         $defaults = [static::CREATED, static::UPDATED];
 
         return $this->usesTimestamps() ? array_unique(array_merge($this->dates, $defaults)) : $this->dates;
@@ -766,7 +813,8 @@ trait CModel_Trait_Attributes {
     /**
      * Set the date format used by the model.
      *
-     * @param  string  $format
+     * @param string $format
+     *
      * @return $this
      */
     public function setDateFormat($format) {
@@ -778,8 +826,9 @@ trait CModel_Trait_Attributes {
     /**
      * Determine whether an attribute should be cast to a native type.
      *
-     * @param  string  $key
-     * @param  array|string|null  $types
+     * @param string            $key
+     * @param array|string|null $types
+     *
      * @return bool
      */
     public function hasCast($key, $types = null) {
@@ -806,7 +855,8 @@ trait CModel_Trait_Attributes {
     /**
      * Determine whether a value is Date / DateTime castable for inbound manipulation.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     protected function isDateCastable($key) {
@@ -816,7 +866,8 @@ trait CModel_Trait_Attributes {
     /**
      * Determine whether a value is JSON castable for inbound manipulation.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     protected function isJsonCastable($key) {
@@ -835,8 +886,9 @@ trait CModel_Trait_Attributes {
     /**
      * Set the array of model attributes. No checking is done.
      *
-     * @param  array  $attributes
-     * @param  bool  $sync
+     * @param array $attributes
+     * @param bool  $sync
+     *
      * @return $this
      */
     public function setRawAttributes(array $attributes, $sync = false) {
@@ -852,8 +904,9 @@ trait CModel_Trait_Attributes {
     /**
      * Get the model's original attribute values.
      *
-     * @param  string|null  $key
-     * @param  mixed  $default
+     * @param string|null $key
+     * @param mixed       $default
+     *
      * @return mixed|array
      */
     public function getOriginal($key = null, $default = null) {
@@ -863,7 +916,8 @@ trait CModel_Trait_Attributes {
     /**
      * Get a subset of the model's attributes.
      *
-     * @param  array|mixed  $attributes
+     * @param array|mixed $attributes
+     *
      * @return array
      */
     public function only($attributes) {
@@ -890,7 +944,8 @@ trait CModel_Trait_Attributes {
     /**
      * Sync a single original attribute with its current value.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return $this
      */
     public function syncOriginalAttribute($attribute) {
@@ -900,7 +955,8 @@ trait CModel_Trait_Attributes {
     /**
      * Sync multiple original attribute with their current values.
      *
-     * @param  array|string  $attributes
+     * @param array|string $attributes
+     *
      * @return $this
      */
     public function syncOriginalAttributes($attributes) {
@@ -929,19 +985,22 @@ trait CModel_Trait_Attributes {
     /**
      * Determine if the model or given attribute(s) have been modified.
      *
-     * @param  array|string|null  $attributes
+     * @param array|string|null $attributes
+     *
      * @return bool
      */
     public function isDirty($attributes = null) {
         return $this->hasChanges(
-                        $this->getDirty(), is_array($attributes) ? $attributes : func_get_args()
+            $this->getDirty(),
+            is_array($attributes) ? $attributes : func_get_args()
         );
     }
 
     /**
      * Determine if the model or given attribute(s) have remained the same.
      *
-     * @param  array|string|null  $attributes
+     * @param array|string|null $attributes
+     *
      * @return bool
      */
     public function isClean($attributes = null) {
@@ -951,20 +1010,23 @@ trait CModel_Trait_Attributes {
     /**
      * Determine if the model or given attribute(s) have been modified.
      *
-     * @param  array|string|null  $attributes
+     * @param array|string|null $attributes
+     *
      * @return bool
      */
     public function wasChanged($attributes = null) {
         return $this->hasChanges(
-                        $this->getChanges(), is_array($attributes) ? $attributes : func_get_args()
+            $this->getChanges(),
+            is_array($attributes) ? $attributes : func_get_args()
         );
     }
 
     /**
      * Determine if the given attributes were changed.
      *
-     * @param  array  $changes
-     * @param  array|string|null  $attributes
+     * @param array             $changes
+     * @param array|string|null $attributes
+     *
      * @return bool
      */
     protected function hasChanges($changes, $attributes = null) {
@@ -1016,8 +1078,9 @@ trait CModel_Trait_Attributes {
     /**
      * Determine if the new and old values for a given key are equivalent.
      *
-     * @param  string $key
-     * @param  mixed  $current
+     * @param string $key
+     * @param mixed  $current
+     *
      * @return bool
      */
     protected function originalIsEquivalent($key, $current) {
@@ -1043,12 +1106,13 @@ trait CModel_Trait_Attributes {
     /**
      * Append attributes to query when building a query.
      *
-     * @param  array|string  $attributes
+     * @param array|string $attributes
+     *
      * @return $this
      */
     public function append($attributes) {
         $this->appends = array_unique(
-                array_merge($this->appends, is_string($attributes) ? func_get_args() : $attributes)
+            array_merge($this->appends, is_string($attributes) ? func_get_args() : $attributes)
         );
 
         return $this;
@@ -1057,7 +1121,8 @@ trait CModel_Trait_Attributes {
     /**
      * Set the accessors to append to model arrays.
      *
-     * @param  array  $appends
+     * @param array $appends
+     *
      * @return $this
      */
     public function setAppends(array $appends) {
@@ -1084,19 +1149,21 @@ trait CModel_Trait_Attributes {
     /**
      * Extract and cache all the mutated attributes of a class.
      *
-     * @param  string  $class
+     * @param string $class
+     *
      * @return void
      */
     public static function cacheMutatedAttributes($class) {
         static::$mutatorCache[$class] = c::collect(static::getMutatorMethods($class))->map(function ($match) {
-                    return lcfirst(static::$snakeAttributes ? cstr::snake($match) : $match);
-                })->all();
+            return lcfirst(static::$snakeAttributes ? cstr::snake($match) : $match);
+        })->all();
     }
 
     /**
      * Get all of the attribute mutator methods.
      *
-     * @param  mixed  $class
+     * @param mixed $class
+     *
      * @return array
      */
     protected static function getMutatorMethods($class) {
@@ -1104,5 +1171,4 @@ trait CModel_Trait_Attributes {
 
         return $matches[1];
     }
-
 }

@@ -1,20 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 26, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Aug 26, 2020
  */
 use FFMpeg\Format\FormatInterface;
-
 
 /**
  * @mixin \CRunner_FFMpeg_Driver_PHPFFMpeg
  */
 class CRunner_FFMpeg_Exporter_MediaExporter {
-
     use CTrait_ForwardsCalls,
         CRunner_FFMpeg_Trait_HandlesAdvancedMediaTrait,
         CRunner_FFMpeg_Trait_HandlesConcatenationTrait,
@@ -82,8 +81,8 @@ class CRunner_FFMpeg_Exporter_MediaExporter {
         $this->maps->each->apply($this->driver->get());
 
         return $this->driver->getFinalCommand(
-                        $this->format,
-                        $path ? $this->getDisk()->makeMedia($path)->getLocalPath() : null
+            $this->format,
+            $path ? $this->getDisk()->makeMedia($path)->getLocalPath() : null
         );
     }
 
@@ -110,9 +109,9 @@ class CRunner_FFMpeg_Exporter_MediaExporter {
             $this->driver->saveFromSameCodecs($outputMedia->getLocalPath());
         } elseif ($this->driver->isFrame()) {
             $data = $this->driver->save(
-                    optional($outputMedia)->getLocalPath(),
-                    $this->getAccuracy(),
-                    $this->returnFrameContents
+                c::optional($outputMedia)->getLocalPath(),
+                $this->getAccuracy(),
+                $this->returnFrameContents
             );
 
             if ($this->returnFrameContents) {
@@ -154,20 +153,22 @@ class CRunner_FFMpeg_Exporter_MediaExporter {
 
     protected function getMediaOpener() {
         return new CRunner_FFMpeg(
-                $this->driver->getMediaCollection()->last()->getDisk(),
-                $this->driver,
-                $this->driver->getMediaCollection()
+            $this->driver->getMediaCollection()->last()->getDisk(),
+            $this->driver,
+            $this->driver->getMediaCollection()
         );
     }
 
     /**
      * Forwards the call to the driver object and returns the result
      * if it's something different than the driver object itself.
+     *
+     * @param mixed $method
+     * @param mixed $arguments
      */
     public function __call($method, $arguments) {
         $result = $this->forwardCallTo($driver = $this->driver, $method, $arguments);
 
         return ($result === $driver) ? $this : $result;
     }
-
 }

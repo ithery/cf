@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_TaskQueue_AppendDataToSheet extends CQueue_AbstractTask {
-
     use CExporter_Trait_ProxyFailures;
 
     /**
@@ -16,7 +9,7 @@ class CExporter_TaskQueue_AppendDataToSheet extends CQueue_AbstractTask {
     public $data = [];
 
     /**
-     * @var string
+     * @var CExporter_File_TemporaryFile
      */
     public $temporaryFile;
 
@@ -36,11 +29,11 @@ class CExporter_TaskQueue_AppendDataToSheet extends CQueue_AbstractTask {
     public $sheetExport;
 
     /**
-     * @param object        $sheetExport
+     * @param object                       $sheetExport
      * @param CExporter_File_TemporaryFile $temporaryFile
-     * @param string        $writerType
-     * @param int           $sheetIndex
-     * @param array         $data
+     * @param string                       $writerType
+     * @param int                          $sheetIndex
+     * @param array                        $data
      */
     public function __construct($sheetExport, CExporter_File_TemporaryFile $temporaryFile, $writerType, $sheetIndex, array $data) {
         $this->sheetExport = $sheetExport;
@@ -60,20 +53,22 @@ class CExporter_TaskQueue_AppendDataToSheet extends CQueue_AbstractTask {
     }
 
     /**
-     * @param CExporter_Writer $writer
-     *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function execute( ) {
+    public function execute() {
         $writer = CExporter::writer();
         $writer = $writer->reopen($this->temporaryFile, $this->writerType);
 
         $sheet = $writer->getSheetByIndex($this->sheetIndex);
-
+        CDaemon::log('append row');
+        //CDaemon::log(json_encode($this->data));
         $sheet->appendRows($this->data, $this->sheetExport);
+        CDaemon::log('end append row');
 
+        CDaemon::log('write excel');
         $writer->write($this->sheetExport, $this->temporaryFile, $this->writerType);
+        CDaemon::log('end write excel');
+        CDaemon::log('Memory Usage:' . memory_get_usage());
     }
-
 }

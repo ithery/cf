@@ -29,19 +29,19 @@ final class ControllerEvent extends KernelEvent
 {
     private $controller;
 
-    public function __construct(HttpKernelInterface $kernel, callable $controller, Request $request, ?int $requestType)
+    public function __construct(HttpKernelInterface $kernel, callable $controller, Request $request, $requestType)
     {
         parent::__construct($kernel, $request, $requestType);
 
         $this->setController($controller);
     }
 
-    public function getController(): callable
+    public function getController()
     {
         return $this->controller;
     }
 
-    public function setController(callable $controller): void
+    public function setController(callable $controller)
     {
         $this->controller = $controller;
     }

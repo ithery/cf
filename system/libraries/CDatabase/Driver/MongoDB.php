@@ -1,14 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use MongoDB\Client;
 
 class CDatabase_Driver_MongoDB extends CDatabase_Driver {
+    use CTrait_Compat_Database_Driver_MongoDB;
 
     /**
      * Database connection link
@@ -16,12 +11,11 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     protected $link;
 
     /**
-     * @var CDatabase 
+     * @var CDatabase
      */
     protected $db;
 
     /**
-     *
      * @var \MongoDB\Database
      */
     protected $mongoDB;
@@ -35,6 +29,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      * Sets the config for the class.
      *
      * @param  array  database configuration
+     * @param mixed $config
      */
     public function __construct(CDatabase $db, $config) {
         $this->db = $db;
@@ -52,12 +47,13 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      * Closes the database connection.
      */
     public function __destruct() {
-        
     }
 
     /**
      * Determine if the given configuration array has a dsn string.
+     *
      * @param array $config
+     *
      * @return bool
      */
     protected function hasDsnString(array $config = null) {
@@ -71,7 +67,9 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
 
     /**
      * Get the DSN string form configuration.
+     *
      * @param array $config
+     *
      * @return string
      */
     protected function getDsnString(array $config = null) {
@@ -85,7 +83,9 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
 
     /**
      * Get the DSN string for a host / port configuration.
+     *
      * @param array $config
+     *
      * @return string
      */
     protected function getHostDsn(array $config = null) {
@@ -122,7 +122,9 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
 
     /**
      * Create a DSN string from a configuration.
+     *
      * @param array $config
+     *
      * @return string
      */
     protected function getDsn(array $config = null) {
@@ -133,7 +135,6 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     }
 
     /**
-     * 
      * @return \MongoDB\Client
      */
     public function getMongoClient() {
@@ -141,15 +142,13 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     }
 
     /**
-     * 
      * @return \MongoDB\Driver\Manager
      */
     public function getMongoManager() {
         return $this->getMongoClient()->getManager();
     }
-    
+
     /**
-     * 
      * @return \MongoDB\Driver\Server
      */
     public function getMongoServer() {
@@ -157,7 +156,6 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     }
 
     /**
-     * 
      * @return \MongoDB\Database
      */
     public function getMongoDatabase() {
@@ -181,9 +179,11 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
 
     /**
      * Create a new MongoDB connection.
+     *
      * @param string $dsn
-     * @param array $config
-     * @param array $options
+     * @param array  $config
+     * @param array  $options
+     *
      * @return \MongoDB\Client
      */
     protected function createConnection($dsn, array $config, array $options) {
@@ -204,47 +204,38 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         return new Client($dsn, $options, $driverOptions);
     }
 
-    public function compile_select($database) {
-        
+    public function escapeColumn($column) {
+        return $column;
     }
 
-    public function escape_column($column) {
-        
-    }
-
-    public function escape_str($str) {
+    public function escapeStr($str) {
         return $str;
     }
 
-    public function escape_table($table) {
+    public function escapeTable($table) {
         return $table;
     }
 
-    public function field_data($table) {
-        
+    public function fieldData($table) {
+        return null;
     }
 
     public function limit($limit, $offset = 0) {
-        
+        return null;
     }
 
-    public function list_fields($table) {
-        
+    public function listFields($table) {
     }
 
-    public function list_tables() {
-        
+    public function listTables() {
+        return [];
     }
 
     public function query($sql) {
-
-      
-        return new CDatabase_Driver_MongoDB_Result($this->link,$this->mongoDB, carr::get($this->dbConfig,'object',true), $sql);
-
+        return new CDatabase_Driver_MongoDB_Result($this->link, $this->mongoDB, carr::get($this->dbConfig, 'object', true), $sql);
     }
 
-    public function show_error() {
-        
+    public function showError() {
     }
 
     public function getElapsedTime($start) {
@@ -253,7 +244,9 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
 
     /**
      * Get a MongoDB collection.
+     *
      * @param string $name
+     *
      * @return Collection
      */
     public function getCollection($name) {
@@ -276,8 +269,10 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
 
     /**
      * Dynamically pass methods to the connection.
+     *
      * @param string $method
-     * @param array $parameters
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters) {
@@ -286,6 +281,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
 
     /**
      * {@inheritdoc}
+     *
      * @return CDatabase_Schema_Manager_MongoDB
      */
     public function getSchemaManager(CDatabase $db) {
@@ -294,13 +290,13 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
 
     /**
      * {@inheritdoc}
+     *
      * @return CDatabase_Platform_MongooDB
      */
     public function getDatabasePlatform() {
         return new CDatabase_Platform_MongoDB();
     }
 
-    
     /**
      * Get the name of the connected database.
      *

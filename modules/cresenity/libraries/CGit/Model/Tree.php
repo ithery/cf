@@ -1,20 +1,23 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 3, 2019, 1:27:47 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 3, 2019, 1:27:47 PM
  */
 class CGit_Model_Tree extends CGit_Model_GitObject implements \RecursiveIterator {
-
     protected $mode;
+
     protected $name;
+
     protected $data;
+
     protected $position = 0;
 
-    public function __construct($hash, CGit_Repository  $repository) {
+    public function __construct($hash, CGit_Repository $repository) {
         $this->setHash($hash);
         $this->setRepository($repository);
     }
@@ -22,8 +25,8 @@ class CGit_Model_Tree extends CGit_Model_GitObject implements \RecursiveIterator
     public function parse() {
         $data = $this->getRepository()->getClient()->run($this->getRepository(), 'ls-tree -lz ' . $this->getHash());
         $lines = explode("\0", $data);
-        $files = array();
-        $root = array();
+        $files = [];
+        $root = [];
         foreach ($lines as $key => $line) {
             if (empty($line)) {
                 unset($lines[$key]);
@@ -62,7 +65,7 @@ class CGit_Model_Tree extends CGit_Model_GitObject implements \RecursiveIterator
     }
 
     public function output() {
-        $files = $folders = array();
+        $files = $folders = [];
         foreach ($this as $node) {
             if ($node instanceof CGit_Model_Blob) {
                 $file['type'] = 'blob';
@@ -146,5 +149,4 @@ class CGit_Model_Tree extends CGit_Model_GitObject implements \RecursiveIterator
     public function isTree() {
         return true;
     }
-
 }

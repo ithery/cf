@@ -1,13 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Dec 26, 2017, 1:42:35 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Dec 26, 2017, 1:42:35 AM
  */
 trait CModel_Trait_Event {
+    /**
+     * The event dispatcher instance.
+     *
+     * @var CEvent_DispatcherInterface
+     */
+    protected static $dispatcher;
 
     /**
      * The event map for the model.
@@ -30,7 +37,8 @@ trait CModel_Trait_Event {
     /**
      * Register an observer with the Model.
      *
-     * @param  object|string  $class
+     * @param object|string $class
+     *
      * @return void
      */
     public static function observe($class) {
@@ -55,18 +63,20 @@ trait CModel_Trait_Event {
      */
     public function getObservableEvents() {
         return array_merge(
-                [
-            'retrieved', 'creating', 'created', 'updating',
-            'updated', 'deleting', 'deleted', 'saving',
-            'saved', 'restoring', 'restored',
-                ], $this->observables
+            [
+                'retrieved', 'creating', 'created', 'updating',
+                'updated', 'deleting', 'deleted', 'saving',
+                'saved', 'restoring', 'restored',
+            ],
+            $this->observables
         );
     }
 
     /**
      * Set the observable event names.
      *
-     * @param  array  $observables
+     * @param array $observables
+     *
      * @return $this
      */
     public function setObservableEvents(array $observables) {
@@ -78,51 +88,55 @@ trait CModel_Trait_Event {
     /**
      * Add an observable event name.
      *
-     * @param  array|mixed  $observables
+     * @param array|mixed $observables
+     *
      * @return void
      */
     public function addObservableEvents($observables) {
         $this->observables = array_unique(array_merge(
-                        $this->observables, is_array($observables) ? $observables : func_get_args()
+            $this->observables,
+            is_array($observables) ? $observables : func_get_args()
         ));
     }
 
     /**
      * Remove an observable event name.
      *
-     * @param  array|mixed  $observables
+     * @param array|mixed $observables
+     *
      * @return void
      */
     public function removeObservableEvents($observables) {
         $this->observables = array_diff(
-                $this->observables, is_array($observables) ? $observables : func_get_args()
+            $this->observables,
+            is_array($observables) ? $observables : func_get_args()
         );
     }
 
     /**
      * Register a model event with the dispatcher.
      *
-     * @param  string  $event
-     * @param  \Closure|string  $callback
+     * @param string          $event
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     protected static function registerModelEvent($event, $callback) {
         if (isset(static::$dispatcher)) {
             $name = static::class;
-            static::$dispatcher->listen("eloquent.{$event}: {$name}", $callback);
+            static::$dispatcher->listen("model.{$event}: {$name}", $callback);
         }
     }
 
     /**
      * Fire the given event for the model.
      *
-     * @param  string  $event
-     * @param  bool  $halt
+     * @param string $event
+     * @param bool   $halt
+     *
      * @return mixed
      */
     protected function fireModelEvent($event, $halt = true) {
-
-
         if (!isset(static::$dispatcher)) {
             return true;
         }
@@ -133,7 +147,7 @@ trait CModel_Trait_Event {
         $method = $halt ? 'until' : 'dispatch';
 
         $result = $this->filterModelEventResults(
-                $this->fireCustomModelEvent($event, $method)
+            $this->fireCustomModelEvent($event, $method)
         );
 
         if ($result === false) {
@@ -141,15 +155,17 @@ trait CModel_Trait_Event {
         }
 
         return !empty($result) ? $result : static::$dispatcher->{$method}(
-                        "eloquent.{$event}: " . static::class, $this
+            "model.{$event}: " . static::class,
+            $this
         );
     }
 
     /**
      * Fire a custom model event for the given event.
      *
-     * @param  string  $event
-     * @param  string  $method
+     * @param string $event
+     * @param string $method
+     *
      * @return mixed|null
      */
     protected function fireCustomModelEvent($event, $method) {
@@ -167,7 +183,8 @@ trait CModel_Trait_Event {
     /**
      * Filter the model event results.
      *
-     * @param  mixed  $result
+     * @param mixed $result
+     *
      * @return mixed
      */
     protected function filterModelEventResults($result) {
@@ -183,7 +200,8 @@ trait CModel_Trait_Event {
     /**
      * Register a retrieved model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function retrieved($callback) {
@@ -193,7 +211,8 @@ trait CModel_Trait_Event {
     /**
      * Register a saving model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function saving($callback) {
@@ -203,7 +222,8 @@ trait CModel_Trait_Event {
     /**
      * Register a saved model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function saved($callback) {
@@ -213,7 +233,8 @@ trait CModel_Trait_Event {
     /**
      * Register an updating model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function updating($callback) {
@@ -223,7 +244,8 @@ trait CModel_Trait_Event {
     /**
      * Register an updated model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function updated($callback) {
@@ -233,7 +255,8 @@ trait CModel_Trait_Event {
     /**
      * Register a creating model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function creating($callback) {
@@ -243,7 +266,8 @@ trait CModel_Trait_Event {
     /**
      * Register a created model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function created($callback) {
@@ -253,7 +277,8 @@ trait CModel_Trait_Event {
     /**
      * Register a deleting model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function deleting($callback) {
@@ -263,7 +288,8 @@ trait CModel_Trait_Event {
     /**
      * Register a deleted model event with the dispatcher.
      *
-     * @param  \Closure|string  $callback
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public static function deleted($callback) {
@@ -283,7 +309,7 @@ trait CModel_Trait_Event {
         $instance = new static;
 
         foreach ($instance->getObservableEvents() as $event) {
-            static::$dispatcher->forget("eloquent.{$event}: " . static::class);
+            static::$dispatcher->forget("model.{$event}: " . static::class);
         }
 
         foreach (array_values($instance->dispatchesEvents) as $event) {
@@ -303,7 +329,8 @@ trait CModel_Trait_Event {
     /**
      * Set the event dispatcher instance.
      *
-     * @param  CEvent_Dispatcher  $dispatcher
+     * @param CEvent_Dispatcher $dispatcher
+     *
      * @return void
      */
     public static function setEventDispatcher(CEvent_DispatcherInterface $dispatcher) {
@@ -322,11 +349,11 @@ trait CModel_Trait_Event {
     /**
      * Execute a callback without firing any model events for any model type.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     *
      * @return mixed
      */
-    public static function withoutEvents(callable $callback)
-    {
+    public static function withoutEvents(callable $callback) {
         $dispatcher = static::getEventDispatcher();
 
         if ($dispatcher) {
@@ -341,5 +368,4 @@ trait CModel_Trait_Event {
             }
         }
     }
-
 }

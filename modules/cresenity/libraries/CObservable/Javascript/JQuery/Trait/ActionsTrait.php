@@ -1,27 +1,26 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 2, 2018, 6:38:10 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 2, 2018, 6:38:10 PM
  */
 trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
-
     /**
      * @return string
      */
-    abstract function getSelector();
+    abstract public function getSelector();
 
-    abstract function resetJQueryStatement();
+    abstract public function resetJQueryStatement();
 
-    abstract function jQueryStatement();
+    abstract public function jQueryStatement();
 
-    abstract function filterArgs();
+    abstract public function filterArgs();
 
     /**
-     * 
      * @param string $class
      */
     public function addClass($class = '') {
@@ -50,7 +49,6 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
     }
 
     public function append($element) {
-
         $this->jQueryStatement()->append($element);
         $this->resetJQueryStatement();
         return $this;
@@ -59,11 +57,10 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
     public function val() {
         $args = func_get_args();
         $object = $this->jQueryStatement();
-        $object = call_user_func_array(array($object, 'val'), $args);
+        $object = call_user_func_array([$object, 'val'], $args);
         $statement = $object;
         $this->resetJQueryStatement();
         if (count($args) == 0) {
-
             return $statement;
         }
         return $this;
@@ -73,12 +70,11 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
         $args = func_get_args();
         $object = $this->jQueryStatement();
         $args = $this->filterArgs($args);
-        $object = call_user_func_array(array($object, 'html'), $args);
+        $object = call_user_func_array([$object, 'html'], $args);
 
         $statement = $object;
         $this->resetJQueryStatement();
         if (count($args) == 0) {
-
             return $statement;
         }
         return $this;
@@ -87,7 +83,7 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
     public function find() {
         $args = func_get_args();
         $object = $this->jQueryStatement();
-        $object = call_user_func_array(array($object, 'find'), $args);
+        $object = call_user_func_array([$object, 'find'], $args);
         if (count($args) > 0) {
             return $this;
         }
@@ -130,11 +126,10 @@ trait CObservable_Javascript_JQuery_Trait_ActionsTrait {
         $this->resetJQueryStatement();
         return $this;
     }
-    
+
     public function toggle() {
         $this->jQueryStatement()->toggle();
         $this->resetJQueryStatement();
         return $this;
     }
-
 }

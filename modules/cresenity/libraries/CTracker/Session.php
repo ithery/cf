@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 1:51:48 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 1:51:48 AM
  */
 class CTracker_Session {
-
     public function get($key) {
         $session = $this->getNamespaceData();
         return carr::get($session, $key);
@@ -22,19 +22,20 @@ class CTracker_Session {
     public function set($key, $value) {
         $session = $this->getNamespaceData();
         if (!is_array($session)) {
-            $session = array();
+            $session = [];
         }
 
         $session[$key] = $value;
-        
-        
+
         $this->setNamespaceData($session);
-    }  
+    }
+
     /**
      * Alias of function set
-     * 
+     *
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
+     *
      * @return mixed
      */
     public function put($key, $value) {
@@ -42,16 +43,14 @@ class CTracker_Session {
     }
 
     protected function getNamespaceData() {
-        return CSession::instance()->get(static::sessionNamespace(), array());
+        return CSession::instance()->get(static::sessionNamespace(), []);
     }
 
     protected function setNamespaceData($value) {
-         
         return CSession::instance()->set(static::sessionNamespace(), $value);
     }
 
     public static function sessionNamespace() {
         return CTracker::config()->get('sessionNamespace', 'CTracker');
     }
-
 }

@@ -1,8 +1,7 @@
 <?php
 
-return array(
-    "client_modules" => array(
-        'json2',
+return [
+    'client_modules' => [
         'excanvas',
         'canvas-to-blob',
         'load-image',
@@ -10,7 +9,6 @@ return array(
         'bootstrap',
         'font-awesome',
         'jquery-ui-1.12.1.custom',
-        'jquery.dialog2',
         'slimscroll',
         'fileupload',
         'wysihtml5',
@@ -22,24 +20,21 @@ return array(
         'effects',
         'validation',
         'easing',
-        'chosen',
-        'uniform',
         'select2',
         'modernizr',
-    ),
-    "js" => array(
-        "capp.js",
-        "cresenity.js",
-    ),
-    "css" => array(
-        "cresenity.colors.css",
-        "cresenity.main.css",
-        "cresenity.responsive.css",
-        "cresenity.pos.css",
-        "cresenity.retail.css",
-        "cresenity.widget.css",
-        "cresenity.table.css",
-        "cresenity.css",
-        "cresenity-compat.css",
-    ),
-);
+    ],
+    'js' => [
+        'capp.js',
+        'cresenity.js',
+    ],
+    'css' => [
+        'cresenity.colors.css',
+        'cresenity.main.css',
+        'cresenity.responsive.css',
+        'cresenity.retail.css',
+        'cresenity.widget.css',
+        'cresenity.table.css',
+        'cresenity.css',
+        'cresenity-compat.css',
+    ],
+];

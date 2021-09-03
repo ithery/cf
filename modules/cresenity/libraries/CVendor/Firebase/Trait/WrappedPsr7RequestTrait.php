@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
@@ -14,7 +8,6 @@ use Psr\Http\Message\UriInterface;
  * @codeCoverageIgnore
  */
 trait CVendor_Firebase_Trait_WrappedPsr7RequestTrait {
-
     /** @var RequestInterface */
     protected $wrappedRequest;
 
@@ -111,7 +104,6 @@ trait CVendor_Firebase_Trait_WrappedPsr7RequestTrait {
     }
 
     public function subRequests() {
-        return $this->wrappedRequest instanceof CVendor_Firebase_Http_HasSubRequestsInterface ? $this->wrappedRequest->subRequests() : new Requests();
+        return $this->wrappedRequest instanceof CVendor_Firebase_Http_HasSubRequestsInterface ? $this->wrappedRequest->subRequests() : new CVendor_Firebase_Http_Requests();
     }
-
 }

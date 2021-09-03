@@ -7,18 +7,19 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
+
+namespace PHPUnit\Framework\Constraint\Type;
+
+use PHPUnit\Framework\Constraint\Constraint;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class IsNull extends Constraint
-{
+final class IsNull extends Constraint {
     /**
      * Returns a string representation of the constraint.
      */
-    public function toString()
-    {
+    public function toString() {
         return 'is null';
     }
 
@@ -28,8 +29,7 @@ final class IsNull extends Constraint
      *
      * @param mixed $other value or object to evaluate
      */
-    protected function matches($other)
-    {
+    protected function matches($other) {
         return $other === null;
     }
 }

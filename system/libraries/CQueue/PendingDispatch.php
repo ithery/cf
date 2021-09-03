@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 2:37:03 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 2:37:03 AM
  */
 class CQueue_PendingDispatch {
-
     /**
      * The job.
      *
@@ -19,7 +19,8 @@ class CQueue_PendingDispatch {
     /**
      * Create a new pending job dispatch.
      *
-     * @param  mixed  $job
+     * @param mixed $job
+     *
      * @return void
      */
     public function __construct($job) {
@@ -29,7 +30,8 @@ class CQueue_PendingDispatch {
     /**
      * Set the desired connection for the job.
      *
-     * @param  string|null  $connection
+     * @param string|null $connection
+     *
      * @return $this
      */
     public function onConnection($connection) {
@@ -40,7 +42,8 @@ class CQueue_PendingDispatch {
     /**
      * Set the desired queue for the job.
      *
-     * @param  string|null  $queue
+     * @param string|null $queue
+     *
      * @return $this
      */
     public function onQueue($queue) {
@@ -51,7 +54,8 @@ class CQueue_PendingDispatch {
     /**
      * Set the desired connection for the chain.
      *
-     * @param  string|null  $connection
+     * @param string|null $connection
+     *
      * @return $this
      */
     public function allOnConnection($connection) {
@@ -62,7 +66,8 @@ class CQueue_PendingDispatch {
     /**
      * Set the desired queue for the chain.
      *
-     * @param  string|null  $queue
+     * @param string|null $queue
+     *
      * @return $this
      */
     public function allOnQueue($queue) {
@@ -73,7 +78,8 @@ class CQueue_PendingDispatch {
     /**
      * Set the desired delay for the job.
      *
-     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
+     * @param \DateTimeInterface|\DateInterval|int|null $delay
+     *
      * @return $this
      */
     public function delay($delay) {
@@ -84,7 +90,8 @@ class CQueue_PendingDispatch {
     /**
      * Set the jobs that should run if this job is successful.
      *
-     * @param  array  $chain
+     * @param array $chain
+     *
      * @return $this
      */
     public function chain($chain) {
@@ -99,7 +106,5 @@ class CQueue_PendingDispatch {
      */
     public function __destruct() {
         CQueue::dispatcher()->dispatch($this->job);
-        
     }
-
 }

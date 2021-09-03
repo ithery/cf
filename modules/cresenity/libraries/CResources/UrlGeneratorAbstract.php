@@ -1,20 +1,19 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGeneratorInterface {
-
-    /** @var CApp_Model_Interface_ResourceInterface */
+    /**
+     * @var CApp_Model_Interface_ResourceInterface
+     */
     protected $resource;
 
-    /** @var CResources_Conversion */
+    /**
+     * @var CResources_Conversion
+     */
     protected $conversion;
 
-    /** @var CResources_PathGeneratorInterface */
+    /**
+     * @var CResources_PathGeneratorInterface
+     */
     protected $pathGenerator;
 
     /**
@@ -47,10 +46,9 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
         return $this;
     }
 
-    /*
+    /**
      * Get the path to the requested file relative to the root of the resource directory.
      */
-
     public function getPathRelativeToRoot() {
         if (is_null($this->conversion)) {
             return $this->pathGenerator->getPath($this->resource) . ($this->resource->file_name);
@@ -66,11 +64,20 @@ abstract class CResources_UrlGeneratorAbstract implements CResources_UrlGenerato
         return pathinfo($path, PATHINFO_DIRNAME) . '/' . rawurlencode(pathinfo($path, PATHINFO_BASENAME));
     }
 
+    protected function getDiskName() {
+        return $this->conversion === null
+            ? $this->resource->disk
+            : $this->resource->conversions_disk;
+    }
+
+    protected function getDisk() {
+        return CStorage::instance()->disk($this->getDiskName());
+    }
+
     public function versionUrl($path = '') {
         if (!CF::config('resource.version_urls')) {
             return $path;
         }
         return "{$path}?v={$this->resource->updated->timestamp}";
     }
-
 }

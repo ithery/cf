@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 12:47:40 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 12:47:40 PM
  */
 
 /**
  * Event used when SQL queries for adding table columns are generated inside CDatabase_Platform.
- *
  */
 class CDatabase_Event_Schema_OnAlterTableAddColumnEventArgs extends CDatabase_Event_Schema {
-
     /**
      * @var CDatabase_Schema_Column
      */
@@ -35,11 +34,11 @@ class CDatabase_Event_Schema_OnAlterTableAddColumnEventArgs extends CDatabase_Ev
     private $_sql = [];
 
     /**
-     * @param CDatabase_Schema_Column       $column
-     * @param CDatabase_Schema_Table_Diff   $tableDiff
-     * @param CDatabase_Schema_Platform     $platform
+     * @param CDatabase_Schema_Column     $column
+     * @param CDatabase_Schema_Table_Diff $tableDiff
+     * @param CDatabase_Schema_Platform   $platform
      */
-    public function __construct(CDatabase_Schema_Column $column, CDatabase_Schema_Table_Diff $tableDiff, CDatabase_Schema_Platform $platform) {
+    public function __construct(CDatabase_Schema_Column $column, CDatabase_Schema_Table_Diff $tableDiff, CDatabase_Platform $platform) {
         $this->_column = $column;
         $this->_tableDiff = $tableDiff;
         $this->_platform = $platform;
@@ -86,5 +85,4 @@ class CDatabase_Event_Schema_OnAlterTableAddColumnEventArgs extends CDatabase_Ev
     public function getSql() {
         return $this->_sql;
     }
-
 }

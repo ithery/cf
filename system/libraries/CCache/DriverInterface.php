@@ -1,37 +1,61 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 1:07:23 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 1:07:23 PM
  */
 interface CCache_DriverInterface {
-
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return mixed
      */
     public function get($key);
 
     /**
-     * Store an item in the cache for a given number of minutes.
+     * Retrieve multiple items from the cache by key.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  float|int  $minutes
-     * @return void
+     * Items not found in the cache will have a null value.
+     *
+     * @param array $keys
+     *
+     * @return array
      */
-    public function put($key, $value, $minutes);
+    public function many(array $keys);
+
+    /**
+     * Store an item in the cache for a given number of seconds.
+     *
+     * @param string $key
+     * @param mixed  $value
+     * @param int    $seconds
+     *
+     * @return bool
+     */
+    public function put($key, $value, $seconds);
+
+    /**
+     * Store multiple items in the cache for a given number of seconds.
+     *
+     * @param array $values
+     * @param int   $seconds
+     *
+     * @return bool
+     */
+    public function putMany(array $values, $seconds);
 
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int|bool
      */
     public function increment($key, $value = 1);
@@ -39,8 +63,9 @@ interface CCache_DriverInterface {
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int|bool
      */
     public function decrement($key, $value = 1);
@@ -48,8 +73,9 @@ interface CCache_DriverInterface {
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return bool
      */
     public function forever($key, $value);
@@ -57,7 +83,8 @@ interface CCache_DriverInterface {
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function forget($key);

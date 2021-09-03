@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 17, 2019, 4:39:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 17, 2019, 4:39:55 PM
  */
 
 /**
  * WebSocket protocol.
  */
 class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract {
-
     /**
      * Websocket blob type.
      *
@@ -30,11 +30,12 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
     /**
      * Check the integrity of the package.
      *
-     * @param string              $buffer
-     * @param ConnectionInterface $connection
+     * @param string                             $buffer
+     * @param CDaemon_Worker_ConnectionInterface $connection
+     *
      * @return int
      */
-    public static function input($buffer, ConnectionInterface $connection) {
+    public static function input($buffer, CDaemon_Worker_ConnectionInterface $connection) {
         // Receive length.
         $recv_len = strlen($buffer);
         // We need more data.
@@ -97,8 +98,8 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
                 // Pong package.
                 case 0xa:
                     break;
-                // Wrong opcode. 
-                default :
+                // Wrong opcode.
+                default:
                     Worker::safeEcho("error opcode $opcode and close websocket connection. Buffer:" . bin2hex($buffer) . "\n");
                     $connection->close();
                     return 0;
@@ -155,7 +156,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
                         }
                     }
                     return 0;
-                } else if ($opcode === 0xa) {
+                } elseif ($opcode === 0xa) {
                     if ($recv_len >= $current_frame_length) {
                         $pong_data = static::decode(substr($buffer, 0, $current_frame_length), $connection);
                         $connection->consumeRecvBuffer($current_frame_length);
@@ -208,13 +209,14 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
     /**
      * Websocket encode.
      *
-     * @param string              $buffer
-     * @param ConnectionInterface $connection
+     * @param string                             $buffer
+     * @param CDaemon_Worker_ConnectionInterface $connection
+     *
      * @return string
      */
-    public static function encode($buffer, ConnectionInterface $connection) {
+    public static function encode($buffer, CDaemon_Worker_ConnectionInterface $connection) {
         if (!is_scalar($buffer)) {
-            throw new \Exception("You can't send(" . gettype($buffer) . ") to client, you need to convert it to a string. ");
+            throw new \Exception("You can't send(" . gettype($buffer) . ') to client, you need to convert it to a string. ');
         }
         $len = strlen($buffer);
         if (empty($connection->websocketType)) {
@@ -225,9 +227,9 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
             $encode_buffer = $first_byte . chr($len) . $buffer;
         } else {
             if ($len <= 65535) {
-                $encode_buffer = $first_byte . chr(126) . pack("n", $len) . $buffer;
+                $encode_buffer = $first_byte . chr(126) . pack('n', $len) . $buffer;
             } else {
-                $encode_buffer = $first_byte . chr(127) . pack("xxxxN", $len) . $buffer;
+                $encode_buffer = $first_byte . chr(127) . pack('xxxxN', $len) . $buffer;
             }
         }
         // Handshake not completed so temporary buffer websocket data waiting for send.
@@ -274,11 +276,12 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
     /**
      * Websocket decode.
      *
-     * @param string              $buffer
-     * @param ConnectionInterface $connection
+     * @param string                             $buffer
+     * @param CDaemon_Worker_ConnectionInterface $connection
+     *
      * @return string
      */
-    public static function decode($buffer, ConnectionInterface $connection) {
+    public static function decode($buffer, CDaemon_Worker_ConnectionInterface $connection) {
         $masks = $data = $decoded = '';
         $len = ord($buffer[1]) & 127;
         if ($len === 126) {
@@ -311,8 +314,9 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
     /**
      * Websocket handshake.
      *
-     * @param string                              $buffer
+     * @param string                                  $buffer
      * @param CDaemon_Worker_Connection_TcpConnection $connection
+     *
      * @return int
      */
     protected static function dealHandshake($buffer, $connection) {
@@ -334,13 +338,13 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
                 return 0;
             }
             // Calculation websocket key.
-            $new_key = base64_encode(sha1($Sec_WebSocket_Key . "258EAFA5-E914-47DA-95CA-C5AB0DC85B11", true));
+            $new_key = base64_encode(sha1($Sec_WebSocket_Key . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11', true));
             // Handshake response data.
             $handshake_message = "HTTP/1.1 101 Switching Protocols\r\n";
             $handshake_message .= "Upgrade: websocket\r\n";
             $handshake_message .= "Sec-WebSocket-Version: 13\r\n";
             $handshake_message .= "Connection: Upgrade\r\n";
-            $handshake_message .= "Sec-WebSocket-Accept: " . $new_key . "\r\n";
+            $handshake_message .= 'Sec-WebSocket-Accept: ' . $new_key . "\r\n";
             // Websocket data buffer.
             $connection->websocketDataBuffer = '';
             // Current websocket frame length.
@@ -369,7 +373,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
                 if (!empty($_SESSION) && class_exists('\GatewayWorker\Lib\Context')) {
                     $connection->session = \GatewayWorker\Lib\Context::sessionEncode($_SESSION);
                 }
-                $_GET = $_SERVER = $_SESSION = $_COOKIE = array();
+                $_GET = $_SERVER = $_SESSION = $_COOKIE = [];
                 if (isset($connection->headers)) {
                     if (is_array($connection->headers)) {
                         foreach ($connection->headers as $header) {
@@ -384,7 +388,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
                 }
             }
             if (!$has_server_header) {
-                $handshake_message .= "Server: workerman/" . Worker::VERSION . "\r\n";
+                $handshake_message .= 'Server: workerman/' . Worker::VERSION . "\r\n";
             }
             $handshake_message .= "\r\n";
             // Send handshake response.
@@ -417,6 +421,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
      * Parse http header.
      *
      * @param string $buffer
+     *
      * @return void
      */
     protected static function parseHttpHeader($buffer) {
@@ -424,7 +429,7 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
         list($http_header, ) = explode("\r\n\r\n", $buffer, 2);
         $header_data = explode("\r\n", $http_header);
         if ($_SERVER) {
-            $_SERVER = array();
+            $_SERVER = [];
         }
         list($_SERVER['REQUEST_METHOD'], $_SERVER['REQUEST_URI'], $_SERVER['SERVER_PROTOCOL']) = explode(' ', $header_data[0]);
         unset($header_data[0]);
@@ -461,5 +466,4 @@ class CDaemon_Worker_Protocol_Websocket extends CDaemon_Worker_ProtocolAbstract 
             $_SERVER['QUERY_STRING'] = '';
         }
     }
-
 }

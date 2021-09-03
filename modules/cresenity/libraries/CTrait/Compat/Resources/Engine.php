@@ -1,19 +1,34 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 10, 2018, 2:18:13 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 10, 2018, 2:18:13 AM
  */
-trait CTrait_Compat_Resources_Engine {
 
+ //@codingStandardsIgnoreStart
+trait CTrait_Compat_Resources_Engine {
+    /**
+     * @param null|mixed $filename
+     * @param mixed      $size
+     * @param mixed      $encode
+     *
+     * @deprecated 1.2
+     */
     public function get_url($filename = null, $size = '', $encode = true) {
         return $this->getUrl($filename, $size, $encode);
     }
 
+    /**
+     * @param mixed      $filename
+     * @param null|mixed $size
+     *
+     * @deprecated 1.2
+     */
     public function get_path($filename, $size = null) {
-        return $this->getPath($filename,$size);
+        return $this->getPath($filename, $size);
     }
 }

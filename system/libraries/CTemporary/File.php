@@ -1,34 +1,30 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2019, 10:15:15 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2019, 10:15:15 PM
  */
 class CTemporary_File {
-
     /**
-     *
-     * @var CTemp_Directory 
+     * @var CTemp_Directory
      */
     protected $directory;
 
     /**
-     *
-     * @var CTemp_PathAbstract 
+     * @var CTemp_PathAbstract
      */
     protected $pathEngine;
 
     /**
-     *
      * @var CFile
      */
     protected $file;
 
     /**
-     *
      * @var string
      */
     protected $filename;
@@ -54,7 +50,7 @@ class CTemporary_File {
     public function exists() {
         return $this->file->exists($this->getPath());
     }
-    
+
     public function delete() {
         return $this->file->delete($this->getPath());
     }
@@ -66,5 +62,4 @@ class CTemporary_File {
     public function getUrl() {
         return $this->directory->getUrl() . '/' . $this->filename;
     }
-
 }

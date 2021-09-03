@@ -1,22 +1,13 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CEmail_Builder_Parser {
-
     /**
-     *
      * @var CEmail_Builder_Node
      */
     protected $node;
 
     /**
-     *
-     * @var array 
+     * @var array
      */
     protected $globalData = [];
     protected $errors = [];
@@ -36,7 +27,6 @@ class CEmail_Builder_Parser {
         $defaultFonts['Roboto'] = 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700';
         $defaultFonts['Ubuntu'] = 'https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700';
 
-
         $this->node = $cml;
         $beautify = carr::get($options, 'beautify', false);
         $fonts = carr::get($options, 'fonts', $defaultFonts);
@@ -46,20 +36,15 @@ class CEmail_Builder_Parser {
         $validationLevel = carr::get($options, 'validationLevel', 'soft');
         $filePath = carr::get($options, 'filePath', '.');
 
-
-
         if (is_string($this->node)) {
             $parserOptions = [];
             $parserOptions['keepComments'] = $keepComments;
             $parserOptions['components'] = CEmail::builder()->components();
             $parserOptions['filePath'] = $filePath;
 
-
             $cmlParser = new CEmail_Builder_Parser_CmlParser($this->node, $parserOptions);
             $this->node = $cmlParser->parse();
         }
-
-
 
         $globalData->set('backgroundColor', '');
         $globalData->set('breakpoint', '480px');
@@ -82,13 +67,10 @@ class CEmail_Builder_Parser {
     }
 
     public function parse() {
-
-
         //$this->globalDatas['headRaw'] = $this->processing($cHead, $headHelpers);
         CEmail::Builder()->globalData()->set('headRaw', $this->getHead());
         $content = $this->getContent();
         $options = $this->globalData;
-
 
         $renderer = new CEmail_Builder_Renderer($content, $options);
         return trim($renderer->render());
@@ -140,20 +122,18 @@ class CEmail_Builder_Parser {
     }
 
     public function processing($node, $context, $callbackParseCML = null) {
-
         $name = $node->tagName;
         if (cstr::startsWith($name, 'c-')) {
             $name = substr($name, '2');
         }
 
         if ($callbackParseCML == null) {
-            $callbackParseCML = array('c', 'identity');
+            $callbackParseCML = ['c', 'identity'];
         }
 
         $options = $callbackParseCML();
         $options['context'] = $context;
 
-        $component = CEmail::builder()->initComponent($name, $options);
+        //$component = CEmail::builder()->initComponent($name, $options);
     }
-
 }

@@ -7,16 +7,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\TextUI\XmlConfiguration\CodeCoverage\Report;
 
-use PHPUnit\TextUI\XmlConfiguration\Directory;
+use PHPUnit\TextUI\XmlConfiguration\Filesystem\Directory;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  * @psalm-immutable
  */
-final class Html
-{
+final class Html {
     /**
      * @var Directory
      */
@@ -32,25 +32,21 @@ final class Html
      */
     private $highLowerBound;
 
-    public function __construct(Directory $target, $lowUpperBound, $highLowerBound)
-    {
-        $this->target         = $target;
-        $this->lowUpperBound  = $lowUpperBound;
+    public function __construct(Directory $target, $lowUpperBound, $highLowerBound) {
+        $this->target = $target;
+        $this->lowUpperBound = $lowUpperBound;
         $this->highLowerBound = $highLowerBound;
     }
 
-    public function target()
-    {
+    public function target() {
         return $this->target;
     }
 
-    public function lowUpperBound()
-    {
+    public function lowUpperBound() {
         return $this->lowUpperBound;
     }
 
-    public function highLowerBound()
-    {
+    public function highLowerBound() {
         return $this->highLowerBound;
     }
 }

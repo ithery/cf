@@ -1,18 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CEmail_Builder_Component {
-
     protected $name;
     protected $props = [];
 
     /**
-     *
      * @var CEmail_Builder_Context
      */
     protected $context = null;
@@ -27,7 +19,7 @@ class CEmail_Builder_Component {
     protected static $tagName = '';
 
     public function __construct($options) {
-        $defaultOptions = array();
+        $defaultOptions = [];
         $defaultOptions['attributes'] = [];
         $defaultOptions['children'] = [];
         $defaultOptions['content'] = '';
@@ -42,7 +34,7 @@ class CEmail_Builder_Component {
         $this->name = carr::get($options, 'name');
 
         $globalAttributes = CEmail::builder()->globalData()->get('defaultAttributes');
-        
+
         //$attributes = array_merge($this->defaultAttributes, carr::get($options, 'globalAttributes', []), carr::get($options, 'attributes', []));
         $attributes = array_merge($this->defaultAttributes, $globalAttributes, carr::get($options, 'attributes', []));
         $this->attributes = CEmail_Builder_Helper::formatAttributes($attributes, $this->allowedAttributes);
@@ -52,6 +44,7 @@ class CEmail_Builder_Component {
     public static function getTagName() {
         return static::$tagName;
     }
+
     public static function isEndingTag() {
         return static::$endingTag;
     }
@@ -66,10 +59,10 @@ class CEmail_Builder_Component {
 
     public function add($element) {
         $rawElement = $element;
-        if ($rawElement instanceof CEmail_Element) {
+        if ($rawElement instanceof CEmail_Builder_Component) {
             $this->childs[] = $rawElement;
         } else {
-            $rawElement = new CEmail_Element_Raw();
+            $rawElement = new CEmail_Builder_Component_BodyComponent_Raw([]);
             $rawElement->setContent($element);
             $this->childs[] = $rawElement;
         }
@@ -84,26 +77,30 @@ class CEmail_Builder_Component {
         return trim($this->content);
     }
 
+    public function setContent($content) {
+        return $this->content = trim($content);
+    }
+
     public function addBody() {
-        $element = new CEmail_Element_Body();
+        $element = new CEmail_Builder_Component_BodyComponent_Body([]);
         $this->add($element);
         return $element;
     }
 
     public function addSection() {
-        $element = new CEmail_Element_Section();
+        $element = new CEmail_Builder_Component_BodyComponent_Section([]);
         $this->add($element);
         return $element;
     }
 
     public function addColumn() {
-        $element = new CEmail_Element_Column();
+        $element = new CEmail_Builder_Component_BodyComponent_Column([]);
         $this->add($element);
         return $element;
     }
 
     public function addImage() {
-        $element = new CEmail_Element_Image();
+        $element = new CEmail_Builder_Component_BodyComponent_Image([]);
         $this->add($element);
         return $element;
     }
@@ -136,6 +133,4 @@ class CEmail_Builder_Component {
     public function getChildren() {
         return $this->children;
     }
-
-   
 }

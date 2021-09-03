@@ -1,16 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 3, 2019, 1:40:52 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 3, 2019, 1:40:52 PM
  */
 class CGit_Model_Symlink extends CGit_ModelAbstract {
-
     protected $mode;
+
     protected $name;
+
     protected $path;
 
     public function getMode() {
@@ -39,5 +41,4 @@ class CGit_Model_Symlink extends CGit_ModelAbstract {
         $this->path = $path;
         return $this;
     }
-
 }

@@ -1,20 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 1:59:16 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 1:59:16 AM
  */
 class CApp_Api_Method_Server_DomainUpdate extends CApp_Api_Method_Server {
-
     public function execute() {
         $errCode = 0;
         $errMessage = '';
         $domain = $this->domain;
 
-        $data = array();
+        $data = [];
         $request = $this->request();
         $domainToUpdate = carr::get($request, 'domain');
         $appId = carr::get($request, 'app_id');
@@ -46,7 +46,7 @@ class CApp_Api_Method_Server_DomainUpdate extends CApp_Api_Method_Server {
             }
         }
         try {
-            $domainData = array();
+            $domainData = [];
             $domainData['app_id'] = $appId;
             $domainData['app_code'] = $appCode;
             $domainData['org_id'] = $orgId;
@@ -64,5 +64,4 @@ class CApp_Api_Method_Server_DomainUpdate extends CApp_Api_Method_Server {
 
         return $this;
     }
-
 }

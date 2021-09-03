@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 15, 2019, 9:09:35 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 15, 2019, 9:09:35 PM
  */
 interface CSocialLogin_UserInterface {
-
     /**
      * Get the unique identifier for the user.
      *

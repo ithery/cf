@@ -1,15 +1,8 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Psr\Http\Message\RequestInterface;
 
 final class CVendor_Firebase_Http_Requests implements IteratorAggregate {
-
     /** @var RequestInterface[] */
     private $requests;
 
@@ -34,5 +27,4 @@ final class CVendor_Firebase_Http_Requests implements IteratorAggregate {
     public function getIterator() {
         return new ArrayIterator($this->requests);
     }
-
 }

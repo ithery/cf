@@ -1,22 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 30, 2019, 2:26:15 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 30, 2019, 2:26:15 AM
  */
 class CImage_Chart_Constant {
-
     /**
-     * pBubble
+     * Bubble
      */
     const BUBBLE_SHAPE_ROUND = 700001;
     const BUBBLE_SHAPE_SQUARE = 700002;
 
     /**
-     * pData
+     * Data
      */
     /* Axis configuration */
     const AXIS_FORMAT_DEFAULT = 680001;
@@ -49,14 +49,15 @@ class CImage_Chart_Constant {
     /* Replacement to the PHP null keyword */
     const VOID = 0.123456789;
 
-    /* Euro symbol for GD fonts */
-
-    public static function EURO_SYMBOL() {
-        return utf8_encode("&#8364;");
+    /**
+     * Euro symbol for GD fonts
+     */
+    public static function euroSymbol() {
+        return utf8_encode('&#8364;');
     }
 
     /**
-     * pDraw
+     * Draw
      */
     const DIRECTION_VERTICAL = 690001;
     const DIRECTION_HORIZONTAL = 690002;
@@ -126,7 +127,7 @@ class CImage_Chart_Constant {
     const OUT_OF_SIGHT = -10000000000000;
 
     /**
-     * pImage
+     * Image
      */
     /* Image map handling */
     const IMAGE_MAP_STORAGE_FILE = 680001;
@@ -135,14 +136,17 @@ class CImage_Chart_Constant {
     const CHART_LAST_LAYOUT_REGULAR = 680011;
     const CHART_LAST_LAYOUT_STACKED = 680012;
 
-    /* ImageMap string delimiter */
-
-    public static function IMAGE_MAP_DELIMITER() {
+    /**
+     * ImageMap string delimiter
+     *
+     * @return string
+     */
+    public static function imageMapDelimiter() {
         return chr(1);
     }
 
     /**
-     * pIndicator
+     * Indicator
      */
     const INDICATOR_CAPTION_DEFAULT = 700001;
     const INDICATOR_CAPTION_EXTENDED = 700002;
@@ -152,7 +156,7 @@ class CImage_Chart_Constant {
     const INDICATOR_VALUE_LABEL = 700022;
 
     /**
-     * pPie
+     * Pie
      */
     /* Class return codes */
     const PIE_NO_ABSCISSA = 140001;
@@ -167,7 +171,7 @@ class CImage_Chart_Constant {
     const PIE_VALUE_OUTSIDE = 140031;
 
     /**
-     * pRadar
+     * Radar
      */
     const SEGMENT_HEIGHT_AUTO = 690001;
     const RADAR_LAYOUT_STAR = 690011;
@@ -176,19 +180,19 @@ class CImage_Chart_Constant {
     const RADAR_LABELS_HORIZONTAL = 690022;
 
     /**
-     * pScatter
+     * Scatter
      */
     const SCATTER_MISSING_X_SERIE = 190001;
     const SCATTER_MISSING_Y_SERIE = 190002;
 
     /**
-     * pSplit
+     * Split
      */
     const TEXT_POS_TOP = 690001;
     const TEXT_POS_RIGHT = 690002;
 
     /**
-     * pSpring
+     * Spring
      */
     const NODE_TYPE_FREE = 690001;
     const NODE_TYPE_CENTRAL = 690002;
@@ -203,12 +207,12 @@ class CImage_Chart_Constant {
     const LABEL_LIGHT = 690032;
 
     /**
-     * pStock
+     * Stock
      */
     const STOCK_MISSING_SERIE = 180001;
 
     /**
-     * pSurface
+     * Surface
      */
     const UNKNOWN = 0.123456789;
     const IGNORED = -1;
@@ -216,5 +220,4 @@ class CImage_Chart_Constant {
     const LABEL_POSITION_RIGHT = 880002;
     const LABEL_POSITION_TOP = 880003;
     const LABEL_POSITION_BOTTOM = 880004;
-
 }

@@ -1,16 +1,13 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Dec 26, 2017, 4:01:45 AM
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Carbon\Carbon as BaseCarbon;
 
 class CCarbon extends BaseCarbon implements JsonSerializable {
-
     /**
      * The custom Carbon JSON serializer.
      *
@@ -38,11 +35,11 @@ class CCarbon extends BaseCarbon implements JsonSerializable {
     /**
      * JSON serialize all Carbon instances using the given callback.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     *
      * @return void
      */
     public static function serializeUsing($callback) {
         static::$serializer = $callback;
     }
-
 }

@@ -1,0 +1,488 @@
+
+/*------------------------------------------------------------------
+
+[Login/Signup Stylesheet]
+
+	Project:		Base Admin
+	Version:		1.0
+	Last change:	05/21/2012
+	Assigned to:	Rod Howard (rh)
+
+-------------------------------------------------------------------*/
+
+
+
+
+/** Base Body Styles **/
+body{ background: url(../img/bg.jpg); color:#838383; font: 13px/1.7em 'Open Sans';}
+
+
+.account-container {
+	width: 380px; 
+	display: block;
+	margin: 60px auto 0 auto;
+	
+	background: #f9f9f9;
+	
+	border: 1px solid #d5d5d5;
+	
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+
+	box-shadow:  0px 0px 2px #dadada, inset 0px -3px 0px #e6e6e6;
+}
+
+.content {
+	padding: 16px 28px 23px;
+} 
+
+.login-fields {
+	
+}
+
+.login-fields .field {
+	margin-bottom: 1.25em;
+}
+
+.login-fields label {
+	display: none;
+}
+
+.login-fields input {
+	font-family: 'Open Sans';
+	font-size: 13px;
+	color: #8e8d8d;
+	padding: 11px 15px 10px 50px;
+	background-color: #fdfdfd;
+	width: 255px;
+	display: block;
+	margin: 0;
+	box-shadow: inset 2px 2px 4px #f1f1f1;
+}
+
+.username-field { background: url(../img/login/user.png) no-repeat; }
+
+.password-field { background: url(../img/login/password.png) no-repeat; }
+
+
+
+
+.login-actions {
+	float: left;
+	
+	width: 100%;
+	
+	margin-top: -1em;
+	margin-bottom: 1.25em;
+}
+
+.login-social {
+	float: left;
+	
+	padding: 10px 0 15px;
+	
+	border: 1px dotted #CCC;
+	border-right: none;
+	border-left: none;	
+}
+
+span.login-checkbox {
+	float: left;
+	margin-top: 31px;
+}
+
+span.login-checkbox > input[type='checkbox'] {
+    opacity: 0;
+    float: left;
+    width: 15px;
+}
+
+span.login-checkbox > input[type='checkbox'] + label {    
+    clear: none;
+    
+	height: 15px; 
+	display: block;
+    padding: 0 0 0 22px;
+    margin: 0;
+    
+    font-size: 12px;
+    line-height: 1.2em;
+    
+    background: url(../img/login/check.png) no-repeat 0 0;
+    
+    cursor: pointer;
+}
+
+span.login-checkbox > input[type='checkbox']:checked + label {	
+	background-position: 0 -15px;
+}
+
+/** Text Under Box**/
+.login-extra {
+	display: block; 
+	width: 300px; 
+	margin: 1.5em auto;
+	 
+	text-align: center;
+	line-height: 19px; 
+	
+	text-shadow: 1px 1px 0px #fff; 	
+}
+
+
+.account-container h1 {
+	margin-bottom: .4em;
+	
+	color: #f90;
+}
+
+/** Buttons **/
+.twitter, .fb {
+	position: relative;
+	
+	height: 32px; 
+	width: 157px; 
+	display: block;
+	
+	background: url(../img/login/twitter_btn.png) no-repeat; 
+	
+}
+
+.fb {
+	width: 162px; 
+	
+	background: url(../img/login/fb_btn.png) no-repeat; 	
+}
+
+.twitter:active, .fb:active {
+	top: 1px;
+}
+
+.twitter:hover, .fb:hover {
+	background-position: 0 -32px;
+}
+
+.twitter a, .fb a {
+	padding: 5px 0 0 35px; 
+	text-shadow: -1px -1px 0px rgba(0,0,0,.3); 
+	color:#fff; 
+	font-weight: bold; 
+	font-size: 11px; 
+	height: 32px; 
+	display: block;	
+}
+
+.fb a {
+	padding: 5px 0 0 31px; 
+	
+}
+
+.twitter, .fb {
+	display: inline-block;
+}
+
+.twitter a:hover, .fb a:hover {
+	color: #FFF;
+	text-decoration: none;
+}
+
+.button {-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; display: inline-block; float: right; margin-top: 18px;}
+
+
+
+
+
+
+.register .login-social {
+	margin-bottom: 1em;
+}
+
+.register .login-actions {
+	margin-bottom: 0;
+}
+
+.register .login-fields input {
+	width: 299px;
+	padding-left: 6px;
+}
+
+.register h1 {
+	color: #444;
+}
+
+.register span.login-checkbox {
+	position: relative;
+	top: -6px;
+	
+	width: 200px;
+}
+
+.register span.login-checkbox > input[type="checkbox"] + label {
+	position: relative;
+	line-height: 1.3em;
+}
+
+.red-gradient, .red-gradient:visited,
+.red-gradient > .select-value, .red-gradient > .select-arrow {
+	color: white;
+	background: #d52607 url(../img/old-browsers/colors/bg_red-gradient.png) repeat-x;
+	-webkit-background-size: 100% 100%;
+	-moz-background-size: 100% 100%;
+	-o-background-size: 100% 100%;
+	background-size: 100% 100%;
+	background: -webkit-gradient(linear, left top, left bottom, from(#e24913), to(#d52607));
+	background: -webkit-linear-gradient(top, #e24913, #d52607);
+	background: -moz-linear-gradient(top, #e24913, #d52607);
+	background: -ms-linear-gradient(top, #e24913, #d52607);
+	background: -o-linear-gradient(top, #e24913, #d52607);
+	background: linear-gradient(top, #e24913, #d52607);
+	border-color: #931a03;
+	}
+	a.red-gradient:hover, button.red-gradient:hover,
+	:hover > .button-icon.red-gradient,
+	.red-gradient > a.select-value:hover, .red-gradient > .select-arrow:hover {
+		color: white;
+		background: #d12206 url(../img/old-browsers/colors/bg_a_red-gradient_hover.png) repeat-x;
+		-webkit-background-size: 100% 100%;
+		-moz-background-size: 100% 100%;
+		-o-background-size: 100% 100%;
+		background-size: 100% 100%;
+		background: -webkit-gradient(linear, left top, left bottom, from(#eb671d), to(#d12206));
+		background: -webkit-linear-gradient(top, #eb671d, #d12206);
+		background: -moz-linear-gradient(top, #eb671d, #d12206);
+		background: -ms-linear-gradient(top, #eb671d, #d12206);
+		background: -o-linear-gradient(top, #eb671d, #d12206);
+		background: linear-gradient(top, #eb671d, #d12206);
+		border-color: #931a03;
+	}
+	.red-gradient.glossy,
+	.glossy > .button-icon.red-gradient, .button-icon.glossy.red-gradient,
+	.red-gradient.glossy > .select-value, .red-gradient.glossy > .select-arrow {
+		background: #d42622 url(../img/old-browsers/colors/bg_red-gradient_glossy.png) repeat-x;
+		-webkit-background-size: 100% 100%;
+		-moz-background-size: 100% 100%;
+		-o-background-size: 100% 100%;
+		background-size: 100% 100%;
+		background: -webkit-gradient(linear, left top, left bottom, from(#fd8383), to(#d42622), color-stop(0.5, #c30909), color-stop(0.5, #a70606));
+		background: -webkit-linear-gradient(top, #fd8383, #c30909 50%, #a70606 50%, #d42622);
+		background: -moz-linear-gradient(top, #fd8383, #c30909 50%, #a70606 50%, #d42622);
+		background: -ms-linear-gradient(top, #fd8383, #c30909 50%, #a70606 50%, #d42622);
+		background: -o-linear-gradient(top, #fd8383, #c30909 50%, #a70606 50%, #d42622);
+		background: linear-gradient(top, #fd8383, #c30909 50%, #a70606 50%, #d42622);
+		}
+		a.red-gradient.glossy:hover, button.red-gradient.glossy:hover,
+		.glossy:hover > .button-icon.red-gradient, :hover > .button-icon.glossy.red-gradient,
+		.red-gradient.glossy > a.select-value:hover, .red-gradient.glossy > .select-arrow:hover {
+			background: #e94237 url(../img/old-browsers/colors/bg_a_red-gradient_glossy_hover.png) repeat-x;
+			-webkit-background-size: 100% 100%;
+			-moz-background-size: 100% 100%;
+			-o-background-size: 100% 100%;
+			background-size: 100% 100%;
+			background: -webkit-gradient(linear, left top, left bottom, from(#fe9b96), to(#e94237), color-stop(0.5, #df1411), color-stop(0.5, #ce0d0c));
+			background: -webkit-linear-gradient(top, #fe9b96, #df1411 50%, #ce0d0c 50%, #e94237);
+			background: -moz-linear-gradient(top, #fe9b96, #df1411 50%, #ce0d0c 50%, #e94237);
+			background: -ms-linear-gradient(top, #fe9b96, #df1411 50%, #ce0d0c 50%, #e94237);
+			background: -o-linear-gradient(top, #fe9b96, #df1411 50%, #ce0d0c 50%, #e94237);
+			background: linear-gradient(top, #fe9b96, #df1411 50%, #ce0d0c 50%, #e94237);
+		}
+	a.red-gradient:active, button.red-gradient:active, .button.red-gradient:active, .red-gradient.active,
+	:active > .button-icon.red-gradient, .active > .button-icon.red-gradient {
+		background: #e4360a url(../img/old-browsers/colors/bg_a_red-gradient_active.png) repeat-x !important;
+		-webkit-background-size: 100% 100%;
+		-moz-background-size: 100% 100%;
+		-o-background-size: 100% 100%;
+		background-size: 100% 100%;
+		background: -webkit-gradient(linear, left top, left bottom, from(#ce1d06), to(#e4360a)) !important;
+		background: -webkit-linear-gradient(top, #ce1d06, #e4360a) !important;
+		background: -moz-linear-gradient(top, #ce1d06, #e4360a) !important;
+		background: -ms-linear-gradient(top, #ce1d06, #e4360a) !important;
+		background: -o-linear-gradient(top, #ce1d06, #e4360a) !important;
+		background: linear-gradient(top, #ce1d06, #e4360a) !important;
+	}
+
+
+/* Red */
+.count, .close,
+.extra-notifications,
+.more-notifications {
+	color: white;
+	background: #d52607 url(../img/old-browsers/colors/bg_count.png) repeat-x;
+	-webkit-background-size: 100% 100%;
+	-moz-background-size: 100% 100%;
+	-o-background-size: 100% 100%;
+	background-size: 100% 100%;
+	background: -webkit-gradient(linear, left top, left bottom, from(#e24913), to(#d52607));
+	background: -webkit-linear-gradient(top, #e24913, #d52607);
+	background: -moz-linear-gradient(top, #e24913, #d52607);
+	background: -ms-linear-gradient(top, #e24913, #d52607);
+	background: -o-linear-gradient(top, #e24913, #d52607);
+	background: linear-gradient(top, #e24913, #d52607);
+	border-color: #931a03;
+	}
+	a.count:hover, a.close:hover {
+		color: white;
+		background: #d12206 url(../img/old-browsers/colors/bg_a_count_hover.png) repeat-x;
+		-webkit-background-size: 100% 100%;
+		-moz-background-size: 100% 100%;
+		-o-background-size: 100% 100%;
+		background-size: 100% 100%;
+		background: -webkit-gradient(linear, left top, left bottom, from(#eb671d), to(#d12206));
+		background: -webkit-linear-gradient(top, #eb671d, #d12206);
+		background: -moz-linear-gradient(top, #eb671d, #d12206);
+		background: -ms-linear-gradient(top, #eb671d, #d12206);
+		background: -o-linear-gradient(top, #eb671d, #d12206);
+		background: linear-gradient(top, #eb671d, #d12206);
+		border-color: #931a03;
+	}
+	.count.glossy, .close.glossy {
+		background: #d42622 url(../img/old-browsers/colors/bg_count_glossy.png) repeat-x;
+		-webkit-background-size: 100% 100%;
+		-moz-background-size: 100% 100%;
+		-o-background-size: 100% 100%;
+		background-size: 100% 100%;
+		background: -webkit-gradient(linear, left top, left bottom, from(#fd8383), to(#d42622), color-stop(0.5, #c30909), color-stop(0.5, #a70606));
+		background: -webkit-linear-gradient(top, #fd8383, #c30909 50%, #a70606 50%, #d42622);
+		background: -moz-linear-gradient(top, #fd8383, #c30909 50%, #a70606 50%, #d42622);
+		background: -ms-linear-gradient(top, #fd8383, #c30909 50%, #a70606 50%, #d42622);
+		background: -o-linear-gradient(top, #fd8383, #c30909 50%, #a70606 50%, #d42622);
+		background: linear-gradient(top, #fd8383, #c30909 50%, #a70606 50%, #d42622);
+		}
+		a.count.glossy:hover, a.close.glossy:hover {
+			background: #e94237 url(../img/old-browsers/colors/bg_a_count_glossy_hover.png) repeat-x;
+			-webkit-background-size: 100% 100%;
+			-moz-background-size: 100% 100%;
+			-o-background-size: 100% 100%;
+			background-size: 100% 100%;
+			background: -webkit-gradient(linear, left top, left bottom, from(#fe9b96), to(#e94237), color-stop(0.5, #df1411), color-stop(0.5, #ce0d0c));
+			background: -webkit-linear-gradient(top, #fe9b96, #df1411 50%, #ce0d0c 50%, #e94237);
+			background: -moz-linear-gradient(top, #fe9b96, #df1411 50%, #ce0d0c 50%, #e94237);
+			background: -ms-linear-gradient(top, #fe9b96, #df1411 50%, #ce0d0c 50%, #e94237);
+			background: -o-linear-gradient(top, #fe9b96, #df1411 50%, #ce0d0c 50%, #e94237);
+			background: linear-gradient(top, #fe9b96, #df1411 50%, #ce0d0c 50%, #e94237);
+		}
+	a.count:active, a.count.active, a.count.glossy:active,
+	a.close:active, a.close.active, a.close.glossy:active {
+		background: #e4360a url(../img/old-browsers/colors/bg_a_count_active.png) repeat-x;
+		-webkit-background-size: 100% 100%;
+		-moz-background-size: 100% 100%;
+		-o-background-size: 100% 100%;
+		background-size: 100% 100%;
+		background: -webkit-gradient(linear, left top, left bottom, from(#ce1d06), to(#e4360a));
+		background: -webkit-linear-gradient(top, #ce1d06, #e4360a);
+		background: -moz-linear-gradient(top, #ce1d06, #e4360a);
+		background: -ms-linear-gradient(top, #ce1d06, #e4360a);
+		background: -o-linear-gradient(top, #ce1d06, #e4360a);
+		background: linear-gradient(top, #ce1d06, #e4360a);
+	}
+
+.blue-bg,
+.blue-gradient > .drop-down {
+	background: #0059a0;
+	color: white;
+	border-color: #004795;
+	}
+	a.blue-bg:hover {
+		background: #2b75b0;
+		color: white;
+	}
+.blue-gradient, .blue-gradient:visited,
+.blue-gradient > .select-value, .blue-gradient > .select-arrow {
+	color: white;
+	background: #00438d url(../img/old-browsers/colors/bg_blue-gradient.png) repeat-x;
+	-webkit-background-size: 100% 100%;
+	-moz-background-size: 100% 100%;
+	-o-background-size: 100% 100%;
+	background-size: 100% 100%;
+	background: -webkit-gradient(linear, left top, left bottom, from(#006aac), to(#00438d));
+	background: -webkit-linear-gradient(top, #006aac, #00438d);
+	background: -moz-linear-gradient(top, #006aac, #00438d);
+	background: -ms-linear-gradient(top, #006aac, #00438d);
+	background: -o-linear-gradient(top, #006aac, #00438d);
+	background: linear-gradient(top, #006aac, #00438d);
+	border-color: #004795;
+	}
+	a.blue-gradient:hover, button.blue-gradient:hover,
+	.blue-gradient > a.select-value:hover, .blue-gradient > .select-arrow:hover {
+		color: white;
+		background: #003d86 url(../img/old-browsers/colors/bg_a_blue-gradient_hover.png) repeat-x;
+		-webkit-background-size: 100% 100%;
+		-moz-background-size: 100% 100%;
+		-o-background-size: 100% 100%;
+		background-size: 100% 100%;
+		background: -webkit-gradient(linear, left top, left bottom, from(#0089c3), to(#003d86));
+		background: -webkit-linear-gradient(top, #0089c3, #003d86);
+		background: -moz-linear-gradient(top, #0089c3, #003d86);
+		background: -ms-linear-gradient(top, #0089c3, #003d86);
+		background: -o-linear-gradient(top, #0089c3, #003d86);
+		background: linear-gradient(top, #0089c3, #003d86);
+		border-color: #004795;
+	}
+	.blue-gradient.glossy,
+	.blue-gradient.glossy > .select-value, .blue-gradient.glossy > .select-arrow {
+		background: #0a5db8 url(../img/old-browsers/colors/bg_blue-gradient_glossy.png) repeat-x;
+		-webkit-background-size: 100% 100%;
+		-moz-background-size: 100% 100%;
+		-o-background-size: 100% 100%;
+		background-size: 100% 100%;
+		background: -webkit-gradient(linear, left top, left bottom, from(#65b2dd), to(#0a5db8), color-stop(0.5, #045ab2), color-stop(0.5, #004995));
+		background: -webkit-linear-gradient(top, #65b2dd, #045ab2 50%, #004995 50%, #0a5db8);
+		background: -moz-linear-gradient(top, #65b2dd, #045ab2 50%, #004995 50%, #0a5db8);
+		background: -ms-linear-gradient(top, #65b2dd, #045ab2 50%, #004995 50%, #0a5db8);
+		background: -o-linear-gradient(top, #65b2dd, #045ab2 50%, #004995 50%, #0a5db8);
+		background: linear-gradient(top, #65b2dd, #045ab2 50%, #004995 50%, #0a5db8);
+		}
+		a.blue-gradient.glossy:hover, button.blue-gradient.glossy:hover,
+		.blue-gradient.glossy > a.select-value:hover, .blue-gradient.glossy > .select-arrow:hover {
+			background: #056fc9 url(../img/old-browsers/colors/bg_a_blue-gradient_glossy_hover.png) repeat-x;
+			-webkit-background-size: 100% 100%;
+			-moz-background-size: 100% 100%;
+			-o-background-size: 100% 100%;
+			background-size: 100% 100%;
+			background: -webkit-gradient(linear, left top, left bottom, from(#46bde5), to(#056fc9), color-stop(0.5, #026cc4), color-stop(0.5, #005cac));
+			background: -webkit-linear-gradient(top, #46bde5, #026cc4 50%, #005cac 50%, #056fc9);
+			background: -moz-linear-gradient(top, #46bde5, #026cc4 50%, #005cac 50%, #056fc9);
+			background: -ms-linear-gradient(top, #46bde5, #026cc4 50%, #005cac 50%, #056fc9);
+			background: -o-linear-gradient(top, #46bde5, #026cc4 50%, #005cac 50%, #056fc9);
+			background: linear-gradient(top, #46bde5, #026cc4 50%, #005cac 50%, #056fc9);
+		}
+	a.blue-gradient:active, button.blue-gradient:active, .button.blue-gradient:active, .blue-gradient.active {
+		background: #005fb4 url(../img/old-browsers/colors/bg_a_blue-gradient_active.png) repeat-x !important;
+		-webkit-background-size: 100% 100%;
+		-moz-background-size: 100% 100%;
+		-o-background-size: 100% 100%;
+		background-size: 100% 100%;
+		background: -webkit-gradient(linear, left top, left bottom, from(#003475), to(#005fb4)) !important;
+		background: -webkit-linear-gradient(top, #003475, #005fb4) !important;
+		background: -moz-linear-gradient(top, #003475, #005fb4) !important;
+		background: -ms-linear-gradient(top, #003475, #005fb4) !important;
+		background: -o-linear-gradient(top, #003475, #005fb4) !important;
+		background: linear-gradient(top, #003475, #005fb4) !important;
+	}
+
+@media (max-width: 480px) {
+	
+	.account-container {
+		width: 280px;	
+		margin-top: 35px;
+	}
+	
+	.login-fields input {
+		width: 160px;
+	}
+	
+	.login-social {
+		width: 100%;
+	}
+	
+	.twitter {
+		display: block;
+		margin-bottom: 1em;
+	}
+	
+	.register .login-fields input {
+		width: 204px;
+		padding-left: 6px;
+	}
+	
+}

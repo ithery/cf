@@ -5,19 +5,23 @@ defined('SYSPATH') or die('No direct access allowed.');
  * PHP Excel library. Helper class to make spreadsheet creation easier.
  *
  * @package    Spreadsheet
+ *
  * @author     Flynsarmy
  * @website    http://www.flynsarmy.com/
+ *
  * @license    TEH FREEZ
+ *
+ * @deprecated 2.0
  */
-require_once dirname(__FILE__) . "/Lib/fpdf/fpdf.php";
+require_once dirname(__FILE__) . '/Lib/fpdf/fpdf.php';
 
+//@codingStandardsIgnoreStart
 class CPDF extends FPDF {
-
     private $header_enabled = true;
     private $footer_enabled = true;
-    private $param = array();
-    private $header_callback_func = "";
-    private $footer_callback_func = "";
+    private $param = [];
+    private $header_callback_func = '';
+    private $footer_callback_func = '';
 
     public function GetParam() {
         return $this->param;
@@ -48,7 +52,7 @@ class CPDF extends FPDF {
         return $this;
     }
 
-    function Header() {
+    public function Header() {
         if ($this->header_enabled) {
             if (($this->header_callback_func) != null) {
                 $v = CDynFunction::factory($this->header_callback_func)
@@ -70,20 +74,22 @@ class CPDF extends FPDF {
         }
     }
 
-    public static function factory($o = "P", $u = "mm", $s = "A4") {
+    public static function factory($o = 'P', $u = 'mm', $s = 'A4') {
         return new CPDF($o, $u, $s);
     }
 
-    function MultiCellLine($w, $h, $txt, $border = 0, $align = 'J', $fill = false) {
+    public function MultiCellLine($w, $h, $txt, $border = 0, $align = 'J', $fill = false) {
         // Output text with automatic or explicit line breaks
         $cw = &$this->CurrentFont['cw'];
-        if ($w == 0)
+        if ($w == 0) {
             $w = $this->w - $this->rMargin - $this->x;
+        }
         $wmax = ($w - 2 * $this->cMargin) * 1000 / $this->FontSize;
         $s = str_replace("\r", '', $txt);
         $nb = strlen($s);
-        if ($nb > 0 && $s[$nb - 1] == "\n")
+        if ($nb > 0 && $s[$nb - 1] == "\n") {
             $nb--;
+        }
         $b = 0;
         if ($border) {
             if ($border == 1) {
@@ -92,10 +98,12 @@ class CPDF extends FPDF {
                 $b2 = 'LR';
             } else {
                 $b2 = '';
-                if (strpos($border, 'L') !== false)
+                if (strpos($border, 'L') !== false) {
                     $b2 .= 'L';
-                if (strpos($border, 'R') !== false)
+                }
+                if (strpos($border, 'R') !== false) {
                     $b2 .= 'R';
+                }
                 $b = (strpos($border, 'T') !== false) ? $b2 . 'T' : $b2;
             }
         }
@@ -118,8 +126,9 @@ class CPDF extends FPDF {
                 $l = 0;
                 $ns = 0;
                 $nl++;
-                if ($border && $nl == 2)
+                if ($border && $nl == 2) {
                     $b = $b2;
+                }
                 continue;
             }
             if ($c == ' ') {
@@ -131,8 +140,9 @@ class CPDF extends FPDF {
             if ($l > $wmax) {
                 // Automatic line break
                 if ($sep == -1) {
-                    if ($i == $j)
+                    if ($i == $j) {
                         $i++;
+                    }
                     if ($this->ws > 0) {
                         $this->ws = 0;
                     }
@@ -146,18 +156,20 @@ class CPDF extends FPDF {
                 $l = 0;
                 $ns = 0;
                 $nl++;
-                if ($border && $nl == 2)
+                if ($border && $nl == 2) {
                     $b = $b2;
-            }
-            else
+                }
+            } else {
                 $i++;
+            }
         }
         // Last chunk
 
-        if ($border && strpos($border, 'B') !== false)
+        if ($border && strpos($border, 'B') !== false) {
             $b .= 'B';
+        }
         $line++;
         return $line;
     }
-
 }
+//@codingStandardsIgnoreEnd

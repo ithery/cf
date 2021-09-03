@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 final class CBase_RecursionContext {
-
     /**
      * @var array[]
      */
@@ -22,7 +15,7 @@ final class CBase_RecursionContext {
      * Initialises the context
      */
     public function __construct() {
-        $this->arrays = array();
+        $this->arrays = [];
         $this->objects = new \SplObjectStorage;
     }
 
@@ -42,7 +35,7 @@ final class CBase_RecursionContext {
             return $this->addObject($value);
         }
         throw new InvalidArgumentException(
-        'Only arrays and objects are supported'
+            'Only arrays and objects are supported'
         );
     }
 
@@ -62,7 +55,7 @@ final class CBase_RecursionContext {
             return $this->containsObject($value);
         }
         throw new InvalidArgumentException(
-        'Only arrays and objects are supported'
+            'Only arrays and objects are supported'
         );
     }
 
@@ -139,5 +132,4 @@ final class CBase_RecursionContext {
             }
         }
     }
-
 }

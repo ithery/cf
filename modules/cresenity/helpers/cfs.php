@@ -1,17 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
+//@codingStandardsIgnoreStart
 class cfs {
-
-    public static function list_files_in_dir($dir, &$results = array(), $ignore_dir = array()) {
+    public static function list_files_in_dir($dir, &$results = [], $ignore_dir = []) {
         $files = scandir($dir);
 
         foreach ($files as $key => $value) {
             $path = realpath($dir . DIRECTORY_SEPARATOR . $value);
             if (!is_dir($path)) {
                 $results[] = $path;
-            } else if ($value != "." && $value != ".." && !in_array($value, $ignore_dir)) {
+            } elseif ($value != '.' && $value != '..' && !in_array($value, $ignore_dir)) {
                 self::list_files_in_dir($path, $results, $ignore_dir);
                 $results[] = $path;
             }
@@ -21,15 +21,17 @@ class cfs {
     }
 
     public static function list_files($dir) {
-        $result = array();
+        $result = [];
         $dir = rtrim($dir, DS) . DS;
         if (is_dir($dir)) {
             if ($handle = opendir($dir)) {
                 while (($file = readdir($handle)) !== false) {
-                    if ($file == "." || $file == ".." || $file == "Thumbs.db")
+                    if ($file == '.' || $file == '..' || $file == 'Thumbs.db') {
                         continue;
-                    if (is_dir($dir . $file))
+                    }
+                    if (is_dir($dir . $file)) {
                         continue;
+                    }
                     $result[] = $dir . $file;
                 }
                 closedir($handle);
@@ -39,15 +41,17 @@ class cfs {
     }
 
     public static function list_dir($dir) {
-        $result = array();
+        $result = [];
         $dir = trim($dir, DS) . DS;
         if (is_dir($dir)) {
             if ($handle = opendir($dir)) {
                 while (($file = readdir($handle)) !== false) {
-                    if ($file == "." || $file == ".." || $file == "Thumbs.db")
+                    if ($file == '.' || $file == '..' || $file == 'Thumbs.db') {
                         continue;
-                    if (!is_dir($dir . $file))
+                    }
+                    if (!is_dir($dir . $file)) {
                         continue;
+                    }
                     $result[] = $dir . $file;
                 }
                 closedir($handle);
@@ -57,7 +61,6 @@ class cfs {
     }
 
     public static function delete_dir($dir, $virtual = false) {
-
         $ds = DIRECTORY_SEPARATOR;
         $dir = $virtual ? realpath($dir) : $dir;
         $dir = substr($dir, -1) == $ds ? substr($dir, 0, -1) : $dir;
@@ -104,14 +107,15 @@ class cfs {
     }
 
     public static function is_file($value) {
-        $value = strval(str_replace("\0", "", $value));
+        $value = strval(str_replace("\0", '', $value));
 
         return is_file($value);
     }
 
     public static function file_exists($value) {
-        if (!cfs::is_file($value))
+        if (!cfs::is_file($value)) {
             return false;
+        }
         return file_exists($value);
     }
 
@@ -123,8 +127,9 @@ class cfs {
         if ($time == null) {
             return time() - cfs::mtime($file);
         }
-        if (is_string($time))
+        if (is_string($time)) {
             $time = strtotime($time);
+        }
         return $time - cfs::mtime($file);
     }
 
@@ -135,10 +140,11 @@ class cfs {
      * If the script is killed before the write is complete, only the temporary
      * trash file will be corrupted.
      *
-     * @param string $filename     Filename to write the data to.
-     * @param string $data         Data to write to file.
-     * @param string $atomicSuffix Lets you optionally provide a different
-     *                             suffix for the temporary file.
+     * @param string $filename      Filename to write the data to.
+     * @param string $data          Data to write to file.
+     * @param string $atomicSuffix  Lets you optionally provide a different
+     *                              suffix for the temporary file.
+     * @param mixed  $atomic_suffix
      *
      * @return mixed Number of bytes written on success, otherwise FALSE.
      */
@@ -157,5 +163,4 @@ class cfs {
 
         return false; // Failed.
     }
-
 }

@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CVendor_Firebase_Messaging_SendReport {
-
     /** @var CVendor_Firebase_Messaging_MessageTarget */
     private $target;
 
@@ -18,7 +11,6 @@ class CVendor_Firebase_Messaging_SendReport {
     private $error;
 
     private function __construct() {
-        
     }
 
     public static function success(CVendor_Firebase_Messaging_MessageTarget $target, $response) {
@@ -38,7 +30,6 @@ class CVendor_Firebase_Messaging_SendReport {
     }
 
     /**
-     * 
      * @return CVendor_Firebase_Messaging_MessageTarget
      */
     public function target() {
@@ -66,5 +57,4 @@ class CVendor_Firebase_Messaging_SendReport {
     public function error() {
         return $this->error;
     }
-
 }

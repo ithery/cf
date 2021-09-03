@@ -1,39 +1,29 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
-
-
 use Psr\Http\Message\ResponseInterface;
-
 
 /**
  * @internal
  */
-class CVendor_Firebase_Messaging_ApiExceptionConverter
-{
+class CVendor_Firebase_Messaging_ApiExceptionConverter {
     /** @var ErrorResponseParser */
     private $responseParser;
 
     /**
      * @internal
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->responseParser = new CVendor_Firebase_Http_ErrorResponseParser();
     }
 
     /**
+     * @param mixed $exception
+     *
      * @return MessagingException
      */
-    public function convertException( $exception)
-    {
+    public function convertException($exception) {
         if ($exception instanceof RequestException) {
             return $this->convertGuzzleRequestException($exception);
         }
@@ -41,8 +31,7 @@ class CVendor_Firebase_Messaging_ApiExceptionConverter
         return new CVendor_Firebase_Messaging_Exception_MessagingErrorException($exception->getMessage(), $exception->getCode(), $exception);
     }
 
-    public function convertResponse(ResponseInterface $response,  $previous = null)
-    {
+    public function convertResponse(ResponseInterface $response, $previous = null) {
         $code = $response->getStatusCode();
 
         if ($code < 400) {
@@ -79,8 +68,7 @@ class CVendor_Firebase_Messaging_ApiExceptionConverter
             ->withResponse($response);
     }
 
-    private function convertGuzzleRequestException(RequestException $e)
-    {
+    private function convertGuzzleRequestException(RequestException $e) {
         if ($e instanceof ConnectException) {
             return new CVendor_Firebase_Messaging_Exception_ApiConnectionFailedException($e->getMessage(), $e->getCode(), $e);
         }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Dec 25, 2017, 10:08:50 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Dec 25, 2017, 10:08:50 PM
  */
 trait CModel_Trait_Timestamps {
-
     /**
      * Indicates if the model should be timestamped.
      *
@@ -51,7 +51,8 @@ trait CModel_Trait_Timestamps {
     /**
      * Set the value of the "created at" attribute.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return $this
      */
     public function setCreatedAt($value) {
@@ -63,7 +64,8 @@ trait CModel_Trait_Timestamps {
     /**
      * Set the value of the "updated at" attribute.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return $this
      */
     public function setUpdatedAt($value) {
@@ -116,5 +118,4 @@ trait CModel_Trait_Timestamps {
     public function getUpdatedAtColumn() {
         return static::UPDATED;
     }
-
 }

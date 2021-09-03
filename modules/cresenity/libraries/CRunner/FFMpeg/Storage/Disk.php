@@ -1,10 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 26, 2020 
+ *
+ * @since Aug 26, 2020
+ *
  * @license Ittron Global Teknologi
  */
 use League\Flysystem\Adapter\Local;
@@ -16,7 +18,6 @@ use Spatie\TemporaryDirectory\TemporaryDirectory;
  * @mixin CStorage_Adapter
  */
 class CRunner_FFMpeg_Storage_Disk {
-
     use CTrait_ForwardsCalls;
 
     /**
@@ -40,6 +41,8 @@ class CRunner_FFMpeg_Storage_Disk {
 
     /**
      * Little helper method to instantiate this class.
+     *
+     * @param mixed $disk
      */
     public static function make($disk) {
         if ($disk instanceof self) {
@@ -65,7 +68,7 @@ class CRunner_FFMpeg_Storage_Disk {
             return $this->temporaryDirectory;
         }
 
-        return $this->temporaryDirectory = TemporaryDirectories::create();
+        return $this->temporaryDirectory = CRunner_FFMpeg_Storage_TemporaryDirectories::create();
     }
 
     public function makeMedia($path) {
@@ -81,7 +84,7 @@ class CRunner_FFMpeg_Storage_Disk {
             return $this->disk;
         }
 
-        return get_class($this->getFlysystemAdapter()) . "_" . md5(json_encode(serialize($this->getFlysystemAdapter())));
+        return get_class($this->getFlysystemAdapter()) . '_' . md5(json_encode(serialize($this->getFlysystemAdapter())));
     }
 
     public function getFilesystemAdapter() {
@@ -109,11 +112,37 @@ class CRunner_FFMpeg_Storage_Disk {
     }
 
     /**
+     * Replaces backward slashes into forward slashes.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public static function normalizePath($path) {
+        return str_replace('\\', '/', $path);
+    }
+
+    /**
+     * Get the full path for the file at the given "short" path.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public function path($path) {
+        $path = $this->getFilesystemAdapter()->path($path);
+
+        return $this->isLocalDisk() ? static::normalizePath($path) : $path;
+    }
+
+    /**
      * Forwards all calls to Laravel's FilesystemAdapter which will pass
      * dynamic methods call onto Flysystem.
+     *
+     * @param mixed $method
+     * @param mixed $parameters
      */
     public function __call($method, $parameters) {
         return $this->forwardCallTo($this->getFilesystemAdapter(), $method, $parameters);
     }
-
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 3:26:19 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 3:26:19 AM
  */
 interface CQueue_JobInterface {
-
     /**
      * Get the job identifier.
      *
@@ -35,7 +35,8 @@ interface CQueue_JobInterface {
      *
      * Accepts a delay specified in seconds.
      *
-     * @param  int   $delay
+     * @param int $delay
+     *
      * @return void
      */
     public function release($delay = 0);
@@ -92,7 +93,8 @@ interface CQueue_JobInterface {
     /**
      * Delete the job, call the "failed" method, and raise the failed job event.
      *
-     * @param  \Throwable|null $e
+     * @param \Throwable|null $e
+     *
      * @return void
      */
     public function fail($e = null);

@@ -1,0 +1,12 @@
+<?php
+
+defined('SYSPATH') or die('No direct script access.');
+
+class {ControllerClass} extends {prefix}Controller {
+    /**
+     * Default route controller
+     */
+    public function index() {
+        //TODO:do something awesome on controller index
+    }
+}

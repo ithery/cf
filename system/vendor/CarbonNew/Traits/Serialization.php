@@ -26,7 +26,7 @@ use InvalidArgumentException;
  *
  * Depends on the following methods:
  *
- * @method string|static locale(string $locale = null)
+ * @method string|static locale($locale = null)
  * @method string        toJSON()
  */
 trait Serialization
@@ -104,9 +104,9 @@ trait Serialization
     public function __sleep()
     {
         $properties = ['date', 'timezone_type', 'timezone'];
-        if ($this->localTranslator ?? null) {
+        if (isset($this->localTranslator) ? $this->localTranslator : null) {
             $properties[] = 'dumpLocale';
-            $this->dumpLocale = $this->locale ?? null;
+            $this->dumpLocale = isset($this->locale) ? $this->locale : null;
         }
 
         return $properties;
@@ -133,7 +133,7 @@ trait Serialization
      */
     public function jsonSerialize()
     {
-        $serializer = $this->localSerializer ?? static::$serializer;
+        $serializer = isset($this->localSerializer) ? $this->localSerializer : static::$serializer;
         if ($serializer) {
             return is_string($serializer)
                 ? $this->rawFormat($serializer)

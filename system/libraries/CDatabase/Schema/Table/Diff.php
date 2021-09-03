@@ -1,25 +1,25 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 12:18:31 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 12:18:31 PM
  */
 
 /**
  * Table Diff.
  */
 class CDatabase_Schema_Table_Diff {
-
     /**
      * @var string
      */
     public $name = null;
 
     /**
-     * @var string|boolean
+     * @var string|bool
      */
     public $newName = false;
 
@@ -129,13 +129,13 @@ class CDatabase_Schema_Table_Diff {
     }
 
     /**
-     * @param CDatabase_Platform $platform The platform to use for retrieving this table diff's name.
+     * @param CDatabase_Platform $platform the platform to use for retrieving this table diff's name
      *
      * @return CDatabase_Schema_Identifier
      */
     public function getName(CDatabase_Platform $platform) {
         return new CDatabase_Schema_Identifier(
-                $this->fromTable instanceof CDatabase_Schema_Table ? $this->fromTable->getQuotedName($platform) : $this->name
+            $this->fromTable instanceof CDatabase_Schema_Table ? $this->fromTable->getQuotedName($platform) : $this->name
         );
     }
 
@@ -145,5 +145,4 @@ class CDatabase_Schema_Table_Diff {
     public function getNewName() {
         return $this->newName ? new CDatabase_Schema_Identifier($this->newName) : $this->newName;
     }
-
 }

@@ -1,17 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Aug 12, 2019, 12:58:41 AM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use CManager_File_Connector_FileManager_FM as FM;
 use Intervention\Image\ImageManager;
 
 class CManager_File_Connector_FileManager_Controller_ResizeImageController extends CManager_File_Connector_FileManager_AbstractController {
-
     public function execute() {
         $fm = $this->fm();
         $imageName = $fm->input('img');
@@ -25,5 +26,4 @@ class CManager_File_Connector_FileManager_Controller_ResizeImageController exten
         $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasResized($image_path));
         echo parent::$successResponse;
     }
-
 }

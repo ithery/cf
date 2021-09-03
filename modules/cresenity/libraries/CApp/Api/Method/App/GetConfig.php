@@ -2,17 +2,13 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * 
- */
 class CApp_Api_Method_App_GetConfig extends CApp_Api_Method_App {
-
     public function execute() {
         $errCode = 0;
         $errMessage = '';
         $domain = carr::get($this->request(), 'domain');
 
-        $data = array();
+        $data = [];
 
         try {
             $config = CF::getFile('config', 'app', $domain);
@@ -28,5 +24,4 @@ class CApp_Api_Method_App_GetConfig extends CApp_Api_Method_App {
 
         return $this;
     }
-
 }

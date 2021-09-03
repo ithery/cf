@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 1:28:25 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 1:28:25 PM
  */
 class CJavascript_Validation_RuleParser {
-
     use CJavascript_Validation_Trait_JavascriptRulesTrait;
     use CJavascript_Validation_Trait_RuleListTrait;
     use CJavascript_Validation_Trait_UseDelegatedValidatorTrait;
@@ -26,7 +26,7 @@ class CJavascript_Validation_RuleParser {
     /**
      * Token used to secure romte validations.
      *
-     * @var null|string $remoteToken
+     * @var null|string
      */
     protected $remoteToken;
 
@@ -41,7 +41,7 @@ class CJavascript_Validation_RuleParser {
      * Create a new JsValidation instance.
      *
      * @param \Proengsoft\JsValidation\Support\DelegatedValidator $validator
-     * @param null|string $remoteToken
+     * @param null|string                                         $remoteToken
      */
     public function __construct(CJavascript_Validation_ValidatorDelegated $validator, $remoteToken = null) {
         $this->validator = $validator;
@@ -55,6 +55,7 @@ class CJavascript_Validation_RuleParser {
      * @param string $rule
      * @param $parameters
      * @param $rawRule
+     *
      * @return array
      */
     public function getRule($attribute, $rule, $parameters, $rawRule) {
@@ -84,12 +85,13 @@ class CJavascript_Validation_RuleParser {
      *
      * @param mixed $attribute
      * @param array $rules
+     *
      * @return void
      */
     public function addConditionalRules($attribute, $rules = []) {
         foreach ((array) $attribute as $key) {
             $current = isset($this->conditional[$key]) ? $this->conditional[$key] : [];
-            $merge = head($this->validator->explodeRules((array) $rules));
+            $merge = c::head($this->validator->explodeRules((array) $rules));
             $this->conditional[$key] = array_merge($current, $merge);
         }
     }
@@ -97,13 +99,14 @@ class CJavascript_Validation_RuleParser {
     /**
      * Determine if rule is passed with sometimes.
      *
-     * @param mixed $attribute
+     * @param mixed  $attribute
      * @param string $rule
+     *
      * @return bool
      */
     protected function isConditionalRule($attribute, $rule) {
-        return isset($this->conditional[$attribute]) &&
-                in_array($rule, $this->conditional[$attribute]);
+        return isset($this->conditional[$attribute])
+                && in_array($rule, $this->conditional[$attribute]);
     }
 
     /**
@@ -112,6 +115,7 @@ class CJavascript_Validation_RuleParser {
      * @param string $attribute
      * @param string $rule
      * @param $parameters
+     *
      * @return array
      */
     protected function clientRule($attribute, $rule, $parameters) {
@@ -127,7 +131,8 @@ class CJavascript_Validation_RuleParser {
      * Returns Javascript parameters for remote validated rules.
      *
      * @param string $attribute
-     * @param bool $forceRemote
+     * @param bool   $forceRemote
+     *
      * @return array
      */
     protected function remoteRule($attribute, $forceRemote) {
@@ -144,6 +149,7 @@ class CJavascript_Validation_RuleParser {
      * Handles multidimensional attribute names.
      *
      * @param mixed $attribute
+     *
      * @return string
      */
     protected function getAttributeName($attribute) {
@@ -158,6 +164,7 @@ class CJavascript_Validation_RuleParser {
      * Parse named parameters to $key => $value items.
      *
      * @param array $parameters
+     *
      * @return array
      */
     public function parseNamedParameters($parameters) {
@@ -167,5 +174,4 @@ class CJavascript_Validation_RuleParser {
             return $result;
         });
     }
-
 }

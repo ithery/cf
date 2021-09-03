@@ -9,41 +9,64 @@
 use Symfony\Component\Process\Process;
 
 abstract class CBackup_Database_AbstractDumper {
-
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $dbName;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $userName;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $password;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $host = 'localhost';
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $port = 5432;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $socket = '';
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $timeout = 0;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $dumpBinaryPath = '';
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $includeTables = [];
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $excludeTables = [];
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $extraOptions = [];
 
-    /** @var object */
+    /**
+     * @var object
+     */
     protected $compressor = null;
 
     public static function create() {
@@ -218,16 +241,20 @@ abstract class CBackup_Database_AbstractDumper {
     }
 
     protected function echoToFile($command, $dumpFile) {
-        $dumpFile = '"' . addcslashes($dumpFile, '\\"') . '"';
+        if (!CServer::isWindows()) {
+            $dumpFile = '"' . addcslashes($dumpFile, '\\"') . '"';
+        } else {
+            $dumpFile = '"' . addcslashes($dumpFile, '"') . '"';
+        }
         if ($this->compressor) {
             $compressCommand = $this->compressor->useCommand();
             return "(((({$command}; echo \$? >&3) | {$compressCommand} > {$dumpFile}) 3>&1) | (read x; exit \$x))";
         }
+
         return $command . ' > ' . $dumpFile;
     }
 
     protected function determineQuote() {
         return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN' ? '"' : "'";
     }
-
 }
