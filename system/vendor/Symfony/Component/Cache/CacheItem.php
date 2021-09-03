@@ -45,7 +45,7 @@ final class CacheItem implements ItemInterface {
     /**
      * {@inheritdoc}
      */
-    public function getKey(): string {
+    public function getKey() {
         return $this->key;
     }
 
@@ -59,7 +59,7 @@ final class CacheItem implements ItemInterface {
     /**
      * {@inheritdoc}
      */
-    public function isHit(): bool {
+    public function isHit() {
         return $this->isHit;
     }
 
@@ -68,7 +68,7 @@ final class CacheItem implements ItemInterface {
      *
      * @return $this
      */
-    public function set($value): self {
+    public function set($value) {
         $this->value = $value;
 
         return $this;
@@ -79,7 +79,7 @@ final class CacheItem implements ItemInterface {
      *
      * @return $this
      */
-    public function expiresAt($expiration): self {
+    public function expiresAt($expiration) {
         if (null === $expiration) {
             $this->expiry = $this->defaultLifetime > 0 ? microtime(true) + $this->defaultLifetime : null;
         } elseif ($expiration instanceof \DateTimeInterface) {
@@ -96,7 +96,7 @@ final class CacheItem implements ItemInterface {
      *
      * @return $this
      */
-    public function expiresAfter($time): self {
+    public function expiresAfter($time) {
         if (null === $time) {
             $this->expiry = $this->defaultLifetime > 0 ? microtime(true) + $this->defaultLifetime : null;
         } elseif ($time instanceof \DateInterval) {
@@ -113,7 +113,7 @@ final class CacheItem implements ItemInterface {
     /**
      * {@inheritdoc}
      */
-    public function tag($tags): ItemInterface {
+    public function tag($tags) {
         if (!$this->isTaggable) {
             throw new LogicException(sprintf('Cache item "%s" comes from a non tag-aware pool: you cannot tag it.', $this->key));
         }
@@ -142,7 +142,7 @@ final class CacheItem implements ItemInterface {
     /**
      * {@inheritdoc}
      */
-    public function getMetadata(): array {
+    public function getMetadata() {
         return $this->metadata;
     }
 
@@ -153,7 +153,7 @@ final class CacheItem implements ItemInterface {
      *
      * @throws InvalidArgumentException When $key is not valid
      */
-    public static function validateKey($key): string {
+    public static function validateKey($key) {
         if (!\is_string($key)) {
             throw new InvalidArgumentException(sprintf('Cache key must be string, "%s" given', \is_object($key) ? \get_class($key) : \gettype($key)));
         }
@@ -171,8 +171,10 @@ final class CacheItem implements ItemInterface {
      * Internal logging helper.
      *
      * @internal
+     *
+     * @param mixed $message
      */
-    public static function log(?LoggerInterface $logger, string $message, array $context = []) {
+    public static function log(LoggerInterface $logger, $message, array $context = []) {
         if ($logger) {
             $logger->warning($message, $context);
         } else {
