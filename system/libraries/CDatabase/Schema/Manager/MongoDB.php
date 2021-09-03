@@ -47,20 +47,24 @@ class CDatabase_Schema_Manager_MongoDB extends CDatabase_Schema_Manager {
         });
     }
 
-    protected function _getPortableTableColumnDefinition($tableColumn) {
+    protected function getPortableTableColumnDefinition($tableColumn) {
     }
 
     /**
      * @return \MongoDB\Client
      */
     public function getMongoClient() {
-        return $this->db->driver()->getMongoClient();
+        $driver = $this->db->driver();
+        /** @var CDatabase_Driver_MongoDB $driver */
+        return $driver->getMongoClient();
     }
 
     /**
      * @return \MongoDB\Database
      */
     public function getMongoDatabase() {
-        return $this->db->driver()->getMongoDatabase();
+        $driver = $this->db->driver();
+        /** @var CDatabase_Driver_MongoDB $driver */
+        return $driver->getMongoDatabase();
     }
 }

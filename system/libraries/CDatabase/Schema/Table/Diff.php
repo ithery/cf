@@ -54,7 +54,7 @@ class CDatabase_Schema_Table_Diff {
     /**
      * All added indexes.
      *
-     * @var CDatabase_SchemaIndex[]
+     * @var CDatabase_Schema_Index[]
      */
     public $addedIndexes = [];
 

@@ -181,4 +181,8 @@ abstract class CDatabase_Result implements CDatabase_ResultInterface, ArrayAcces
     public function valid() {
         return $this->offsetExists($this->current_row);
     }
+
+    public function fetchAll($fetchMode = null, $fetchArgument = null, $ctorArgs = null) {
+        return $this->resultArray(false);
+    }
 }
