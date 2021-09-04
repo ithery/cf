@@ -1,78 +1,90 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 5:40:10 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 5:40:10 PM
  */
 class CServer_Device_Cpu extends CServer_Device {
-
     /**
-     * model of the cpu
-     * @var String
+     * Model of the cpu
+     *
+     * @var string
      */
-    private $model = "";
+    private $model = '';
 
     /**
-     * speed of the cpu in hertz
-     * @var Integer
+     * Speed of the cpu in hertz
+     *
+     * @var int
      */
     private $cpuSpeed = 0;
 
     /**
-     * max speed of the cpu in hertz
-     * @var Integer
+     * Max speed of the cpu in hertz
+     *
+     * @var int
      */
     private $cpuSpeedMax = 0;
 
     /**
-     * min speed of the cpu in hertz
-     * @var Integer
+     * Min speed of the cpu in hertz
+     *
+     * @var int
      */
     private $cpuSpeedMin = 0;
 
     /**
-     * cache size in bytes, if available
-     * @var Integer
+     * Cache size in bytes, if available
+     *
+     * @var int
      */
     private $cache = null;
 
     /**
-     * virtualization, if available
-     * @var String
+     * Virtualization, if available
+     *
+     * @var string
      */
     private $virt = null;
 
     /**
-     * busspeed in hertz, if available
-     * @var Integer
+     * Busspeed in hertz, if available
+     *
+     * @var int
      */
     private $busSpeed = null;
 
     /**
-     * temperature of the cpu, if available
-     * @var Integer
+     * Temperature of the cpu, if available
+     *
+     * @var int
      */
     private $temp = null;
 
     /**
-     * bogomips of the cpu, if available
-     * @var Integer
+     * Bogomips of the cpu, if available
+     *
+     * @var int
      */
     private $bogomips = null;
 
     /**
-     * current load in percent of the cpu, if available
-     * @var Integer
+     * Current load in percent of the cpu, if available
+     *
+     * @var int
      */
     private $load = null;
 
     /**
      * Returns $bogomips.
+     *
      * @see CServer_System_Device_Cpu::$bogomips
-     * @return Integer
+     *
+     * @return int
      */
     public function getBogomips() {
         return $this->bogomips;
@@ -80,9 +92,12 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Sets $bogomips.
-     * @param Integer $bogomips bogompis
+     *
+     * @param int $bogomips bogompis
+     *
      * @see CServer_System_Device_Cpu::$bogomips
-     * @return Void
+     *
+     * @return void
      */
     public function setBogomips($bogomips) {
         $this->bogomips = $bogomips;
@@ -90,8 +105,10 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Returns $busSpeed.
+     *
      * @see CServer_System_Device_Cpu::$busSpeed
-     * @return Integer
+     *
+     * @return int
      */
     public function getBusSpeed() {
         return $this->busSpeed;
@@ -99,9 +116,12 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Sets $busSpeed.
-     * @param Integer $busSpeed busspeed
+     *
+     * @param int $busSpeed busspeed
+     *
      * @see CServer_System_Device_Cpu::$busSpeed
-     * @return Void
+     *
+     * @return void
      */
     public function setBusSpeed($busSpeed) {
         $this->busSpeed = $busSpeed;
@@ -109,8 +129,10 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Returns $cache.
+     *
      * @see CServer_System_Device_Cpu::$cache
-     * @return Integer
+     *
+     * @return int
      */
     public function getCache() {
         return $this->cache;
@@ -118,9 +140,12 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Sets $cache.
-     * @param Integer $cache cache size
+     *
+     * @param int $cache cache size
+     *
      * @see CServer_System_Device_Cpu::$cache
-     * @return Void
+     *
+     * @return void
      */
     public function setCache($cache) {
         $this->cache = $cache;
@@ -128,8 +153,10 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Returns $virt.
+     *
      * @see CServer_System_Device_Cpu::$virt
-     * @return String
+     *
+     * @return string
      */
     public function getVirt() {
         return $this->virt;
@@ -137,9 +164,12 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Sets $virt.
+     *
      * @param string $virt
+     *
      * @see CServer_System_Device_Cpu::$virt
-     * @return Void
+     *
+     * @return void
      */
     public function setVirt($virt) {
         $this->virt = $virt;
@@ -147,8 +177,10 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Returns $cpuSpeed.
+     *
      * @see CServer_System_Device_Cpu::$cpuSpeed
-     * @return Integer
+     *
+     * @return int
      */
     public function getCpuSpeed() {
         return $this->cpuSpeed;
@@ -156,8 +188,10 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Returns $cpuSpeedMax.
+     *
      * @see CServer_System_Device_Cpu::$cpuSpeedMAx
-     * @return Integer
+     *
+     * @return int
      */
     public function getCpuSpeedMax() {
         return $this->cpuSpeedMax;
@@ -165,8 +199,10 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Returns $cpuSpeedMin.
+     *
      * @see CServer_System_Device_Cpu::$cpuSpeedMin
-     * @return Integer
+     *
+     * @return int
      */
     public function getCpuSpeedMin() {
         return $this->cpuSpeedMin;
@@ -174,9 +210,12 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Sets $cpuSpeed.
-     * @param Integer $cpuSpeed cpuspeed
+     *
+     * @param int $cpuSpeed cpuspeed
+     *
      * @see CServer_System_Device_Cpu::$cpuSpeed
-     * @return Void
+     *
+     * @return void
      */
     public function setCpuSpeed($cpuSpeed) {
         $this->cpuSpeed = $cpuSpeed;
@@ -184,9 +223,12 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Sets $cpuSpeedMax.
-     * @param Integer $cpuSpeedMax cpuspeedmax
+     *
+     * @param int $cpuSpeedMax cpuspeedmax
+     *
      * @see CServer_System_Device_Cpu::$cpuSpeedMax
-     * @return Void
+     *
+     * @return void
      */
     public function setCpuSpeedMax($cpuSpeedMax) {
         $this->cpuSpeedMax = $cpuSpeedMax;
@@ -194,9 +236,12 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Sets $cpuSpeedMin.
-     * @param Integer $cpuSpeedMin cpuspeedmin
+     *
+     * @param int $cpuSpeedMin cpuspeedmin
+     *
      * @see CServer_System_Device_Cpu::$cpuSpeedMin
-     * @return Void
+     *
+     * @return void
      */
     public function setCpuSpeedMin($cpuSpeedMin) {
         $this->cpuSpeedMin = $cpuSpeedMin;
@@ -204,8 +249,10 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Returns $model.
+     *
      * @see CServer_System_Device_Cpu::$model
-     * @return String
+     *
+     * @return string
      */
     public function getModel() {
         return $this->model;
@@ -213,9 +260,12 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Sets $model.
-     * @param String $model cpumodel
+     *
+     * @param string $model cpumodel
+     *
      * @see CServer_System_Device_Cpu::$model
-     * @return Void
+     *
+     * @return void
      */
     public function setModel($model) {
         $this->model = $model;
@@ -223,8 +273,10 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Returns $temp.
+     *
      * @see CServer_System_Device_Cpu::$temp
-     * @return Integer
+     *
+     * @return int
      */
     public function getTemp() {
         return $this->temp;
@@ -232,9 +284,12 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Sets $temp.
-     * @param Integer $temp temperature
+     *
+     * @param int $temp temperature
+     *
      * @see CServer_System_Device_Cpu::$temp
-     * @return Void
+     *
+     * @return void
      */
     public function setTemp($temp) {
         $this->temp = $temp;
@@ -242,8 +297,10 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Returns $load.
+     *
      * @see CServer_System_Device_Cpu::$load
-     * @return Integer
+     *
+     * @return int
      */
     public function getLoad() {
         return $this->load;
@@ -251,13 +308,14 @@ class CServer_Device_Cpu extends CServer_Device {
 
     /**
      * Sets $load.
-     * @param Integer $load load percent
+     *
+     * @param int $load load percent
+     *
      * @see CServer_System_Device_Cpu::$load
      *
-     * @return Void
+     * @return void
      */
     public function setLoad($load) {
         $this->load = $load;
     }
-
 }
