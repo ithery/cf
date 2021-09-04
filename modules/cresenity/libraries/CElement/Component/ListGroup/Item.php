@@ -1,39 +1,39 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 2, 2019, 11:14:24 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 2, 2019, 11:14:24 PM
  */
 class CElement_Component_ListGroup_Item extends CElement_Element {
-
     /**
      *  Callback for this item, when not defined will use default renderer
-     * 
+     *
      * @var callable
      */
     protected $callback;
 
     /**
      * Data for this item
-     * 
+     *
      * @var array
      */
     protected $data;
-    
+
     /**
      * Index for this item
-     * 
+     *
      * @var int
      */
     protected $index;
 
     /**
-     *  path of file to need to be require manually
-     * 
-     * @var string 
+     *  Path of file to need to be require manually
+     *
+     * @var string
      */
     protected $callbackRequire;
 
@@ -41,7 +41,7 @@ class CElement_Component_ListGroup_Item extends CElement_Element {
         parent::__construct($id);
     }
 
-    public function setCallback($callback, $require = "") {
+    public function setCallback($callback, $require = '') {
         $this->callback = CHelper::closure()->serializeClosure($callback);
         if (strlen($require) > 0) {
             $this->callbackRequire = $require;
@@ -53,7 +53,7 @@ class CElement_Component_ListGroup_Item extends CElement_Element {
         $this->index = $index;
         return $this;
     }
-    
+
     public function setData($data) {
         $this->data = $data;
         return $this;
@@ -81,5 +81,4 @@ class CElement_Component_ListGroup_Item extends CElement_Element {
             $this->addDiv()->add($content);
         }
     }
-
 }

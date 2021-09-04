@@ -29,4 +29,26 @@ class CHelper_Closure {
         }
         return $callback;
     }
+
+    public static function serialize($callback) {
+        try {
+            $serializer = new SuperClosure\Serializer;
+            $callback = $serializer->serialize($callback);
+        } catch (Exception $ex) {
+            //do nothing
+        }
+        return $callback;
+    }
+
+    public static function unserialize($callback) {
+        if (is_string($callback)) {
+            try {
+                $serializer = new SuperClosure\Serializer;
+                $callback = $serializer->unserialize($callback);
+            } catch (Exception $ex) {
+                //do nothing
+            }
+        }
+        return $callback;
+    }
 }

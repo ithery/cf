@@ -13,6 +13,8 @@ trait CTrait_Element_Handler_ReloadHandler {
      */
     protected $reloadHandler;
 
+    protected $reloadHandlers = [];
+
     /**
      * @return CObservable_Listener_Handler_ReloadHandler
      */
@@ -23,6 +25,7 @@ trait CTrait_Element_Handler_ReloadHandler {
             $this->reloadHandler = new CObservable_Listener_Handler_ReloadHandler($listener);
             $this->reloadHandler->setSelector('#' . $this->id());
             $listener->addHandler($this->reloadHandler);
+            $this->reloadHandlers[] = $this->reloadHandler;
         }
         return $this->reloadHandler;
     }
@@ -34,5 +37,9 @@ trait CTrait_Element_Handler_ReloadHandler {
                 $this->setAttr('data-' . cstr::snake($key, '-'), c::html($value, ENT_QUOTES));
             }
         }
+    }
+
+    public function haveReloadHandler() {
+        return $this->reloadHandler !== null;
     }
 }
