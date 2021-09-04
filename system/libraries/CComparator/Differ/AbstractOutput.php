@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 abstract class CComparator_Differ_AbstractOutput implements CComparator_Differ_OutputBuilder {
-
     /**
      * Takes input of the diff array and returns the common parts.
      * Iterates through diff line by line.
@@ -44,5 +37,4 @@ abstract class CComparator_Differ_AbstractOutput implements CComparator_Differ_O
         }
         return $commonChunks;
     }
-
 }
