@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 17, 2019, 4:52:31 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 17, 2019, 4:52:31 PM
  */
 class CDaemon_Event_Listener {
-
     /**
      * Read event.
      *
@@ -22,5 +22,4 @@ class CDaemon_Event_Listener {
      * @var int
      */
     const ON_WRITE = 'CDaemon.Listener.OnRead';
-
 }
