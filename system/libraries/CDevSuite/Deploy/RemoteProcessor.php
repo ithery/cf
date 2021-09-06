@@ -8,12 +8,12 @@
 use Symfony\Component\Process\Process;
 
 abstract class CDevSuite_Deploy_RemoteProcessor {
-
     /**
      * Run the given task over SSH.
      *
-     * @param  CDevSuite_Deploy_Task  $task
-     * @param  \Closure|null  $callback
+     * @param CDevSuite_Deploy_Task $task
+     * @param \Closure|null         $callback
+     *
      * @return int
      */
     abstract public function run(CDevSuite_Deploy_Task $task, Closure $callback = null);
@@ -21,8 +21,9 @@ abstract class CDevSuite_Deploy_RemoteProcessor {
     /**
      * Run the given script on the given host.
      *
-     * @param  string  $host
-     * @param  CDevSuite_Deploy_Task  $task
+     * @param string                $host
+     * @param CDevSuite_Deploy_Task $task
+     *
      * @return array
      */
     protected function getProcess($host, CDevSuite_Deploy_Task $task) {
@@ -31,20 +32,15 @@ abstract class CDevSuite_Deploy_RemoteProcessor {
         $env = $this->getEnvironment($host);
         CDevSuite::info('Prepare script:' . PHP_EOL . $task->script . PHP_EOL . 'to:' . $target);
 
-        $process = new CDevSuite_Deploy_Process(CDevSuite::ssh()->getRemoteSsh($target),$task);
+        $process = new CDevSuite_Deploy_Process(CDevSuite::ssh()->getRemoteSsh($target), $task);
         return [$target, $process->setTimeout(null)];
-        
-        
-        
-        if (in_array($target, ['local', 'localhost', '127.0.0.1'])) {
-            
-            $process = Process::fromShellCommandline($task->script, null, $env);
-        }
 
-        // Here we'll run the SSH task on the server inline. We do not need to write the
-        // script out to a file or anything. We will start the SSH process then pass
-        // these lines of output back to the parent callback for display purposes.
-        else {
+        if (in_array($target, ['local', 'localhost', '127.0.0.1'])) {
+            $process = Process::fromShellCommandline($task->script, null, $env);
+        } else {
+            // Here we'll run the SSH task on the server inline. We do not need to write the
+            // script out to a file or anything. We will start the SSH process then pass
+            // these lines of output back to the parent callback for display purposes.
             $delimiter = 'EOF-DEVSUITE-DEPLOY';
 
             foreach ($env as $k => $v) {
@@ -57,13 +53,13 @@ abstract class CDevSuite_Deploy_RemoteProcessor {
                 $process = Process::fromShellCommandline("putty.exe -ssh $target -T");
 
                 $process->setInput(
-                        implode(PHP_EOL, $env)
+                    implode(PHP_EOL, $env)
                         . 'set -e ' . PHP_EOL
                         . str_replace("\r", '', $task->script)
                 );
             } else {
                 $process = Process::fromShellCommandline(
-                                "ssh $target 'bash -se' << \\$delimiter" . PHP_EOL
+                    "ssh $target 'bash -se' << \\$delimiter" . PHP_EOL
                                 . implode(PHP_EOL, $env) . PHP_EOL
                                 . 'set -e' . PHP_EOL
                                 . $task->script . PHP_EOL
@@ -78,7 +74,8 @@ abstract class CDevSuite_Deploy_RemoteProcessor {
     /**
      * Get the appropriate environment variables.
      *
-     * @param  string  $host
+     * @param string $host
+     *
      * @return array
      */
     protected function getEnvironment($host) {
@@ -90,7 +87,8 @@ abstract class CDevSuite_Deploy_RemoteProcessor {
     /**
      * Gather the cumulative exit code for the processes.
      *
-     * @param  array  $processes
+     * @param array $processes
+     *
      * @return int
      */
     protected function gatherExitCodes(array $processes) {
@@ -102,5 +100,4 @@ abstract class CDevSuite_Deploy_RemoteProcessor {
 
         return $code;
     }
-
 }

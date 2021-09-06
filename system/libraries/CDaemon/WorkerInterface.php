@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 15, 2019, 12:09:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 15, 2019, 12:09:34 PM
  */
 interface CDaemon_WorkerInterface {
-
     /**
      * Interfaces cannot specify properties, but note that a reference to the Mediator object will be set as $this->mediator in your Worker
      * Note: While this would in theory enable you to do crazy things like grab an instance of the mediator object from within a worker and use that
@@ -20,22 +20,26 @@ interface CDaemon_WorkerInterface {
      * @example Access plugins: $ini=$this->mediator->daemon('ini'); $password = $ini['database']['password'];
      */
     // public $mediator;
+
     /**
      * Called on Construct or Init
+     *
      * @return void
      */
     public function setup();
 
     /**
      * Called on Destruct
+     *
      * @return void
      */
     public function teardown();
 
     /**
      * This is called during object construction to validate any dependencies
-     * @return Array    Return array of error messages (Think stuff like "GD Library Extension Required" or
-     *                  "Cannot open /tmp for Writing") or an empty array
+     *
+     * @return array Return array of error messages (Think stuff like "GD Library Extension Required" or
+     *               "Cannot open /tmp for Writing") or an empty array
      */
-    public function checkEnvironment(Array $errors = array());
+    public function checkEnvironment(array $errors = []);
 }

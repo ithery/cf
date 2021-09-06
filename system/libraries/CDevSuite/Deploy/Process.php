@@ -6,21 +6,17 @@
  * @author Hery
  */
 class CDevSuite_Deploy_Process {
-
     /**
-     *
      * @var CRemote_SSH
      */
     protected $ssh;
 
     /**
-     *
      * @var CDevSuite_Deploy_Task
      */
     protected $task;
 
     /**
-     *
      * @var string[]
      */
     protected $error;
@@ -57,5 +53,4 @@ class CDevSuite_Deploy_Process {
     public function getExitCode() {
         return count($this->error) == 0 ? CConsole::SUCCESS_EXIT : CConsole::FAILURE_EXIT;
     }
-
 }

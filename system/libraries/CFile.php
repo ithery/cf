@@ -20,7 +20,7 @@ class CFile {
     public static function exists($file) {
         if (filter_var($file, FILTER_VALIDATE_URL)) {
             $stream = stream_context_create(['http' => ['method' => 'HEAD']]);
-            if ($content = @fopen($file, 'r', null, $stream)) {
+            if ($content = @fopen($file, 'r', false, $stream)) {
                 $headers = stream_get_meta_data($content);
                 fclose($content);
                 $status = substr($headers['wrapper_data'][0], 9, 3);
@@ -38,12 +38,12 @@ class CFile {
      * If the script is killed before the write is complete, only the temporary
      * trash file will be corrupted.
      *
-     * @param string $path         Filename to write the data to.
-     * @param string $contents     Data to write to file.
-     * @param string $atomicSuffix Lets you optionally provide a different
-     *                             suffix for the temporary file.
+     * @param string $path         filename to write the data to
+     * @param string $contents     data to write to file
+     * @param string $atomicSuffix lets you optionally provide a different
+     *                             suffix for the temporary file
      *
-     * @return mixed Number of bytes written on success, otherwise FALSE.
+     * @return mixed number of bytes written on success, otherwise FALSE
      */
     public static function putAtomic($path, $contents, $atomicSuffix = 'atomictmp') {
         // Perform an exclusive (locked) overwrite to a temporary file.

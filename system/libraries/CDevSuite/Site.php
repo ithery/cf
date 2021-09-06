@@ -358,9 +358,9 @@ abstract class CDevSuite_Site {
      */
     public function secured() {
         return c::collect($this->files->scandir($this->certificatesPath()))
-                        ->map(function ($file) {
-                            return str_replace(['.key', '.csr', '.crt', '.conf'], '', $file);
-                        })->unique()->values()->all();
+            ->map(function ($file) {
+                return str_replace(['.key', '.csr', '.crt', '.conf'], '', $file);
+            })->unique()->values()->all();
     }
 
     /**

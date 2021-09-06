@@ -243,7 +243,7 @@ class CConsole_Application extends SymfonyApplication implements CConsole_Applic
      * @return \Symfony\Component\Console\Input\InputDefinition
      */
     protected function getDefaultInputDefinition() {
-        return CF::tap(parent::getDefaultInputDefinition(), function ($definition) {
+        return c::tap(parent::getDefaultInputDefinition(), function ($definition) {
             $definition->addOption($this->getEnvironmentOption());
         });
     }

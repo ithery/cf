@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 17, 2019, 3:35:10 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 17, 2019, 3:35:10 AM
  */
 use PhpParser\Error;
 use PhpParser\NodeDumper;
@@ -16,7 +17,6 @@ use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
 
 class CConfig_Parser {
-
     public function getComment($file, $key) {
         $code = file_get_contents($file);
         $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
@@ -34,5 +34,4 @@ class CConfig_Parser {
         }
         return $comment;
     }
-
 }

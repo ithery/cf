@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Deploy_Compiler {
-
     /**
      * All of the available compiler functions.
      *
@@ -60,8 +59,9 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile the given Envoy template contents.
      *
-     * @param  string  $value
-     * @param  bool  $serversOnly
+     * @param string $value
+     * @param bool   $serversOnly
+     *
      * @return string
      */
     public function compile($value, $serversOnly = false) {
@@ -79,7 +79,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy sets into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileSets($value) {
@@ -89,7 +90,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy imports into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileImports($value) {
@@ -101,7 +103,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy comments into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileComments($value) {
@@ -113,7 +116,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy echos into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileEchos($value) {
@@ -123,7 +127,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile the "regular" echo statements.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileRegularEchos($value) {
@@ -143,7 +148,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile the default values for the echo statement.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public function compileEchoDefaults($value) {
@@ -153,7 +159,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy structure openings into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileOpenings($value) {
@@ -165,7 +172,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy structure closings into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileClosings($value) {
@@ -177,7 +185,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy else statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileElse($value) {
@@ -189,7 +198,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy unless statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileUnless($value) {
@@ -201,7 +211,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy end unless statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileEndUnless($value) {
@@ -213,7 +224,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile setup section begin statement into PHP start tag.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public function compileSetupStart($value) {
@@ -225,7 +237,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile setup section stop statement into PHP end tag.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public function compileSetupStop($value) {
@@ -237,7 +250,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile an @include into a PHP include statement.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public function compileInclude($value) {
@@ -249,7 +263,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy server statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileServers($value) {
@@ -261,7 +276,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy macro start statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileMacroStart($value) {
@@ -277,7 +293,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy macro stop statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileMacroStop($value) {
@@ -293,7 +310,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy task start statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileTaskStart($value) {
@@ -305,7 +323,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy task stop statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileTaskStop($value) {
@@ -317,7 +336,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy after statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileAfter($value) {
@@ -329,7 +349,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy after stop statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileAfterStop($value) {
@@ -339,7 +360,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy finished statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileFinished($value) {
@@ -351,7 +373,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy finished stop statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileFinishedStop($value) {
@@ -361,7 +384,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy error statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileError($value) {
@@ -373,7 +397,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy error stop statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileErrorStop($value) {
@@ -383,7 +408,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy Slack statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileSlack($value) {
@@ -395,7 +421,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy Discord statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileDiscord($value) {
@@ -407,7 +434,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Compile Envoy Telegram statements into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileTelegram($value) {
@@ -419,7 +447,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Initialize the variables included in the Envoy template.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     private function initializeVariables($value) {
@@ -435,7 +464,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Get the regular expression for a generic Envoy function.
      *
-     * @param  string  $function
+     * @param string $function
+     *
      * @return string
      */
     public function createMatcher($function) {
@@ -445,7 +475,8 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Get the regular expression for a generic Envoy function.
      *
-     * @param  string  $function
+     * @param string $function
+     *
      * @return string
      */
     public function createOpenMatcher($function) {
@@ -455,11 +486,11 @@ class CDevSuite_Deploy_Compiler {
     /**
      * Create a plain Envoy matcher.
      *
-     * @param  string  $function
+     * @param string $function
+     *
      * @return string
      */
     public function createPlainMatcher($function) {
         return '/(?<!\w)(\s*)@' . $function . '(\s*)/';
     }
-
 }

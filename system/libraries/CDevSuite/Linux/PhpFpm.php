@@ -7,9 +7,13 @@
  */
 class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
     public $pm;
+
     public $sm;
+
     public $cli;
+
     public $files;
+
     public $version;
 
     /**
@@ -190,7 +194,7 @@ class CDevSuite_Linux_PhpFpm extends CDevSuite_PhpFpm {
     /**
      * Get installed PHP version.
      *
-     * @param string $real force getting version from /usr/bin/php.
+     * @param string $real force getting version from /usr/bin/php
      *
      * @return string
      */

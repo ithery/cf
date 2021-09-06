@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Deploy_Task {
-
     /**
      * All of the hosts to run the task on.
      *
@@ -45,11 +44,12 @@ class CDevSuite_Deploy_Task {
     /**
      * Create a new Task instance.
      *
-     * @param  array  $hosts
-     * @param  string  $user
-     * @param  string  $script
-     * @param  bool  $parallel
-     * @param  string|null  $confirm
+     * @param array       $hosts
+     * @param string      $user
+     * @param string      $script
+     * @param bool        $parallel
+     * @param string|null $confirm
+     *
      * @return void
      */
     public function __construct(array $hosts, $user, $script, $parallel = false, $confirm = null) {
@@ -59,5 +59,4 @@ class CDevSuite_Deploy_Task {
         $this->parallel = $parallel;
         $this->confirm = $confirm;
     }
-
 }
