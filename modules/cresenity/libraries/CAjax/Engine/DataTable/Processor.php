@@ -1,46 +1,40 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 8, 2018, 3:01:36 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jul 8, 2018, 3:01:36 AM
  */
 abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTable_ProcessorInterface {
-
     /**
-     *
      * @var CAjax_Engine
      */
     protected $engine;
 
     /**
-     *
      * @var array
      */
     protected $input;
 
     /**
-     * 
      * @param array data
      */
     protected $data;
 
     /**
-     *
      * @var string
      */
     protected $method;
 
     /**
-     *
      * @var CAjax_Engine_DataTable_Parameter
      */
     protected $parameter;
 
     /**
-     *
      * @var CElement_Component_DataTable
      */
     protected $table;
@@ -54,7 +48,6 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
     }
 
     /**
-     * 
      * @return array
      */
     public function columns() {
@@ -62,7 +55,6 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
     }
 
     /**
-     * 
      * @return string
      */
     public function domain() {
@@ -70,7 +62,6 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
     }
 
     /**
-     * 
      * @return string
      */
     public function actionLocation() {
@@ -80,10 +71,10 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
     public function table() {
         if ($this->table == null) {
             $data = $this->engine->getData();
-           
+
             $this->table = unserialize(carr::get($data, 'table'));
         }
-         
+
         return $this->table;
     }
 
@@ -110,5 +101,4 @@ abstract class CAjax_Engine_DataTable_Processor implements CAjax_Engine_DataTabl
     public function getData($key, $default = null) {
         return carr::get($this->data, $key, $default);
     }
-
 }

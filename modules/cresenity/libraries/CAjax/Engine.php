@@ -42,10 +42,18 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
         $this->input = $input;
     }
 
+    /**
+     * Get Input
+     *
+     * @return array
+     */
     public function getInput() {
         return $this->input;
     }
 
+    /**
+     * @return string
+     */
     public function getMethod() {
         return $this->ajaxMethod->getMethod();
     }
