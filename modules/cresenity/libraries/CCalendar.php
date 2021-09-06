@@ -10,10 +10,8 @@ class CCalendar extends CElement {
 
     protected $js;
 
-//        protected $month;
     protected $dialog_url = '';
 
-//        protected $day_content = array();
     protected $month_names = [];
 
     protected $prev_month;
@@ -56,10 +54,6 @@ class CCalendar extends CElement {
 
     public function __construct($id) {
         parent::__construct($id);
-//            $this->dialog_url='';
-//            $this->input_month_id = $id."_selected_month";
-//            $this->input_year_id = $id."_selected_year";
-//            $this->input_selected_day_id = $id."_selected_day";
 
         $this->month_names = [
             clang::__('January'),
