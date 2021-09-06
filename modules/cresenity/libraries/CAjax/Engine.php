@@ -58,14 +58,29 @@ abstract class CAjax_Engine implements CAjax_EngineInterface {
         return $this->ajaxMethod->getMethod();
     }
 
+    /**
+     * Get Data
+     *
+     * @return array
+     */
     public function getData() {
         return $this->ajaxMethod->getData();
     }
 
+    /**
+     * Get Type
+     *
+     * @return string
+     */
     public function getType() {
         return $this->ajaxMethod->getType();
     }
 
+    /**
+     * Get args
+     *
+     * @return array
+     */
     public function getArgs() {
         return $this->ajaxMethod->getArgs();
     }
