@@ -5,18 +5,22 @@
  */
 final class CComparator_Differ {
     const OLD = 0;
+
     const ADDED = 1;
+
     const REMOVED = 2;
+
     const DIFF_LINE_END_WARNING = 3;
+
     const NO_LINE_END_EOF_WARNING = 4;
 
     /**
-     * @var DiffOutputBuilderInterface
+     * @var CComparator_Differ_OutputInterface
      */
     private $outputBuilder;
 
     /**
-     * @param DiffOutputBuilderInterface $outputBuilder
+     * @param mixed $outputBuilder
      *
      * @throws InvalidArgumentException
      */
@@ -69,57 +73,72 @@ final class CComparator_Differ {
      * - 1: ADDED: $token was added to $from
      * - 0: OLD: $token is not changed in $to
      *
-     * @param array|string                       $from
-     * @param array|string                       $to
-     * @param LongestCommonSubsequenceCalculator $lcs
+     * @param array|string                                                   $from
+     * @param array|string                                                   $to
+     * @param CComparator_Differ_LongestCommonSubsequenceCalculatorInterface $lcs
      *
      * @return array
      */
-    public function diffToArray($from, $to, CComparator_Differ_AbstractCalculator $lcs = null) {
-        if (\is_string($from)) {
+    public function diffToArray($from, $to, CComparator_Differ_LongestCommonSubsequenceCalculatorInterface $lcs = null) {
+        if (is_string($from)) {
             $from = $this->splitStringByLines($from);
-        } elseif (!\is_array($from)) {
+        } elseif (!is_array($from)) {
             throw new InvalidArgumentException('"from" must be an array or string.');
         }
-        if (\is_string($to)) {
+
+        if (is_string($to)) {
             $to = $this->splitStringByLines($to);
-        } elseif (!\is_array($to)) {
+        } elseif (!is_array($to)) {
             throw new InvalidArgumentException('"to" must be an array or string.');
         }
-        list($from, $to, $start, $end) = self::getArrayDiffParted($from, $to);
+
+        [$from, $to, $start, $end] = self::getArrayDiffParted($from, $to);
+
         if ($lcs === null) {
             $lcs = $this->selectLcsImplementation($from, $to);
         }
-        $common = $lcs->calculate(\array_values($from), \array_values($to));
+
+        $common = $lcs->calculate(array_values($from), array_values($to));
         $diff = [];
+
         foreach ($start as $token) {
             $diff[] = [$token, self::OLD];
         }
-        \reset($from);
-        \reset($to);
+
+        reset($from);
+        reset($to);
+
         foreach ($common as $token) {
-            while (($fromToken = \reset($from)) !== $token) {
-                $diff[] = [\array_shift($from), self::REMOVED];
+            while (($fromToken = reset($from)) !== $token) {
+                $diff[] = [array_shift($from), self::REMOVED];
             }
-            while (($toToken = \reset($to)) !== $token) {
-                $diff[] = [\array_shift($to), self::ADDED];
+
+            while (($toToken = reset($to)) !== $token) {
+                $diff[] = [array_shift($to), self::ADDED];
             }
+
             $diff[] = [$token, self::OLD];
-            \array_shift($from);
-            \array_shift($to);
+
+            array_shift($from);
+            array_shift($to);
         }
-        while (($token = \array_shift($from)) !== null) {
+
+        while (($token = array_shift($from)) !== null) {
             $diff[] = [$token, self::REMOVED];
         }
-        while (($token = \array_shift($to)) !== null) {
+
+        while (($token = array_shift($to)) !== null) {
             $diff[] = [$token, self::ADDED];
         }
+
         foreach ($end as $token) {
             $diff[] = [$token, self::OLD];
         }
+
         if ($this->detectUnmatchedLineEndings($diff)) {
-            \array_unshift($diff, ["#Warning: Strings contain different line endings!\n", self::DIFF_LINE_END_WARNING]);
+            array_unshift($diff, ["#Warning: Strings contain different line endings!\n", self::DIFF_LINE_END_WARNING]);
         }
+
         return $diff;
     }
 
@@ -131,9 +150,10 @@ final class CComparator_Differ {
      * @return array|string
      */
     private function normalizeDiffInput($input) {
-        if (!\is_array($input) && !\is_string($input)) {
+        if (!is_array($input) && !is_string($input)) {
             return (string) $input;
         }
+
         return $input;
     }
 
@@ -145,7 +165,7 @@ final class CComparator_Differ {
      * @return array
      */
     private function splitStringByLines(string $input) {
-        return \preg_split('/(.*\R)/', $input, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        return preg_split('/(.*\R)/', $input, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
     }
 
     /**
