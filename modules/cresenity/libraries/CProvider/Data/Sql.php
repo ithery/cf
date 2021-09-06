@@ -10,6 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CProvider_Data_Sql extends CProvider_DataAbstract {
     protected $sql;
+
     protected $db;
 
     public function setSql($sql) {

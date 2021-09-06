@@ -81,7 +81,7 @@ abstract class CObservable_Listener_Handler_Driver implements CObservable_Listen
 
     public function setUrlParam($urlParam) {
         if (!is_array($urlParam)) {
-            trigger_error('Invalid URL Param ' . cdbg::var_dump($urlParam, true) . '');
+            trigger_error('Invalid URL Param ' . cdbg::varDump($urlParam, true) . '');
         }
         $this->urlParam = $urlParam;
         return $this;
