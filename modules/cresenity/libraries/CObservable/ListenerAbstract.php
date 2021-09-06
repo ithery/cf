@@ -62,8 +62,6 @@ abstract class CObservable_ListenerAbstract {
      * @param string $handlerName
      *
      * @return CObservable_Listener_Handler
-     *
-     * @deprecated 1.2
      */
     public function addHandler($handlerName) {
         $handler = $handlerName;
