@@ -2,18 +2,22 @@
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since May 30, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since May 30, 2020
  */
 class CXMPP_Ejabberd_Response {
-
     protected $errCode;
+
     protected $errMessage;
+
     protected $data;
+
     protected $rawResponse;
+
     protected $command;
 
-    public function __construct($command,$body) {
+    public function __construct($command, $body) {
         $this->errCode = 0;
         $this->errMessage = '';
         $this->data = [];
@@ -25,36 +29,30 @@ class CXMPP_Ejabberd_Response {
         }
 
         $jsonDecoded = false;
-        
+
         if (is_string($body)) {
             $this->rawResponse = $body;
             $jsonDecoded = json_decode($body, true);
             if (!is_array($jsonDecoded)) {
-                
-                if($body=='"internal_error"') {
+                if ($body == '"internal_error"') {
                     $body = ['status' => 'error', 'ejabberd' => $body];
                     $body = ['status' => 'success', 'ejabberd' => $body, 'command' => $this->command->getCommandName()];
                 } else {
                     $body = ['status' => 'success', 'ejabberd' => $body];
                 }
-                
             } else {
                 $body = $jsonDecoded;
             }
         }
-         
 
         if (is_array($body)) {
-            
-            $status = carr::get($body, 'status',null);
-            if ($status!=null && $status != 'success') {
+            $status = carr::get($body, 'status', null);
+            if ($status != null && $status != 'success') {
                 $this->errCode = carr::get($body, 'code', 9998);
                 $this->errMessage = carr::get($body, 'message', 'ejabberd error on guzzle exception');
             }
             $this->data = $body;
         }
-
-         
 
         if (!is_array($body)) {
             cdbg::dd($body);
@@ -72,19 +70,18 @@ class CXMPP_Ejabberd_Response {
     }
 
     public function data() {
-
         $data = $this->data;
-        
+
         if (strlen($this->rawResponse) > 0) {
             $data = array_merge($data, ['rawResponse' => $this->rawResponse]);
         }
-        
+
         return $data;
     }
 
     public function toJson() {
         $array = $this->toArray();
-        if (is_empty(carr::get($array, 'data', []))) {
+        if (empty(carr::get($array, 'data', []))) {
             $array['data'] = new stdclass();
         }
         return json_encode($array);
@@ -101,5 +98,4 @@ class CXMPP_Ejabberd_Response {
     public function __toString() {
         return $this->toJson();
     }
-
 }
