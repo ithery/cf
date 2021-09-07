@@ -32,6 +32,9 @@ class CManager_Asset_Helper {
     }
 
     public static function urlJsFile($file, $withHttp = false) {
+        if ($file instanceof CManager_Asset_File_JsFile) {
+            return $file->getUrl();
+        }
         $path = $file;
         $path = carr::first(explode('?', $file));
         $docroot = str_replace(DS, '/', DOCROOT);

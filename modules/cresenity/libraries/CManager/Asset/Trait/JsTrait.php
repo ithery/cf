@@ -35,7 +35,11 @@ trait CManager_Asset_Trait_JsTrait {
 
         $urls = [];
         foreach ($files as $f) {
-            $urls[] = CManager_Asset_Helper::urlJsFile($f);
+            if ($f instanceof CManager_Asset_FileAbstract) {
+                $urls[] = $f->getUrl();
+            } else {
+                $urls[] = CManager_Asset_Helper::urlJsFile($f);
+            }
         }
         return $urls;
     }
@@ -49,27 +53,16 @@ trait CManager_Asset_Trait_JsTrait {
     }
 
     public function registerJsFile($file, $pos = 'end') {
-        $dir_file = $file;
-        $js_version = '';
-        if (!cstr::startsWith($file, 'http')) {
-            if (strpos($file, '?') !== false) {
-                $dir_file = substr($file, 0, strpos($file, '?'));
-                $js_version = substr($file, strpos($file, '?'), strlen($file) - 1);
-            }
+        $fileOptions = $file;
+        if (!is_array($fileOptions)) {
+            $fileOptions = [
+                'script' => $file,
+            ];
         }
-        $js_file = $this->fullpathJsFile($dir_file);
-        if (strpos($dir_file, 'http') !== false) {
-            $js_file = $dir_file;
-        } else {
-            $js_file = $this->fullpathJsFile($dir_file);
-            if (!file_exists($js_file)) {
-                throw new Exception('JS File not exists, ' . $file);
-            }
-            if (strlen($js_version) > 0) {
-                $js_file .= $js_version;
-            }
-        }
-        $this->scripts[$pos]['js_file'][] = $js_file;
+        $fileOptions['type'] = 'js';
+        $fileOptions['pos'] = $pos;
+
+        $this->scripts[$pos]['js_file'][] = new CManager_Asset_File_JsFile($fileOptions);
 
         return $this;
     }
