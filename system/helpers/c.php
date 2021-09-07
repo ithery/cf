@@ -973,7 +973,7 @@ class c {
      *
      * @throws \Exception
      */
-    public static function retry($times, callable $callback, $sleep = 0, $when = null) {
+    public static function retry($times, $callback, $sleep = 0, $when = null) {
         $attempts = 0;
 
         beginning:
@@ -1235,6 +1235,53 @@ class c {
         return $job instanceof Closure
             ? new CQueue_PendingClosureDispatch(CQueue_CallQueuedClosure::create($job))
             : new CQueue_PendingDispatch($job);
+    }
+
+    /**
+     * Determine whether the current environment is Windows based.
+     *
+     * @return bool
+     */
+    public static function windowsOs() {
+        return PHP_OS_FAMILY === 'Windows';
+    }
+
+    /**
+     * Transform the given value if it is present.
+     *
+     * @param mixed    $value
+     * @param callable $callback
+     * @param mixed    $default
+     *
+     * @return mixed|null
+     */
+    public static function transform($value, $callback, $default = null) {
+        if (c::filled($value)) {
+            return $callback($value);
+        }
+
+        if (is_callable($default)) {
+            return $default($value);
+        }
+
+        return $default;
+    }
+
+    /**
+     * Replace a given pattern with each value in the array in sequentially.
+     *
+     * @param string $pattern
+     * @param array  $replacements
+     * @param string $subject
+     *
+     * @return string
+     */
+    public static function pregReplaceArray($pattern, array $replacements, $subject) {
+        return preg_replace_callback($pattern, function () use (&$replacements) {
+            foreach ($replacements as $key => $value) {
+                return array_shift($replacements);
+            }
+        }, $subject);
     }
 }
 
