@@ -89,9 +89,13 @@
                             </nav>
                         </div>
                         <div class="col-md-3 text-left">
-                            <a href="https://github.com/cresenity" class="btn btn-sm btn-primary btn-rounded">
-                                Cresenity Git
+                            <a href="{{ c::url('') }}" class="btn btn-sm btn-primary btn-rounded">
+                                <i class="fas fa-home"></i> Home
                             </a>
+                            <a href="https://github.com/cresenity" class="btn btn-sm btn-primary btn-rounded">
+                                <i class="fab fa-git"></i> Organization
+                            </a>
+
                         </div>
                     </div>
                     <div class="row p-lg-4">
