@@ -188,12 +188,6 @@ HTML;
 
             $viewData['css_hash'] = '';
             $viewData['js_hash'] = '';
-            if (ccfg::get('merge_css')) {
-                $viewData['css_hash'] = $cs->create_css_hash();
-            }
-            if (ccfg::get('merge_js')) {
-                $viewData['js_hash'] = $cs->create_js_hash();
-            }
 
             $viewData['theme'] = $theme;
             $viewData['theme_path'] = $theme_path;
