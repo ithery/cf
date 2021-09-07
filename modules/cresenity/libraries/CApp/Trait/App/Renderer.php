@@ -31,6 +31,7 @@ trait CApp_Trait_App_Renderer {
             $nav = $this->nav;
         }
 
+        /** @var CApp $this */
         $nav = $this->resolveNav($nav);
 
         $renderer = $this->resolveNavRenderer();
