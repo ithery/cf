@@ -39,7 +39,17 @@ return [
                 'name' => 'basic.controller',
                 'label' => c::__('Controller'),
                 'uri' => 'docs/basic/controller',
-            ]
+            ],
+            [
+                'name' => 'basic.request',
+                'label' => c::__('Request'),
+                'uri' => 'docs/basic/request',
+            ],
+            [
+                'name' => 'basic.view',
+                'label' => c::__('View'),
+                'uri' => 'docs/basic/view',
+            ],
         ]
     ],
     [
