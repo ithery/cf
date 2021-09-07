@@ -112,7 +112,7 @@
                             @if(count($rightSubnavs)>0)
                             <ul class="aside-nav nav flex-column" data-toggle="affix" >
                                 @foreach($rightSubnavs as $subnav)
-                                <li class="nav-item"> <a data-scroll="" class="nav-link text-dark" href="#section-{{ cstr::snake($subnav, '-') }}">{{ $subnav }}</a> </li>
+                                <li class="nav-item"> <a data-scroll="" class="nav-link text-dark" href="#section-{{ cstr::slug($subnav, '-') }}">{{ $subnav }}</a> </li>
                                 @endforeach
                             </ul>
                             @endif

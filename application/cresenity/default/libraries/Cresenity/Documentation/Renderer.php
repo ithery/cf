@@ -15,7 +15,7 @@ class Renderer {
 
     private function run() {
         $this->h3List = $this->getTextBetweenTags($this->html, 'h3', function ($matches) {
-            return '<h3 id="section-' . \cstr::snake(trim($matches[1]), '-') . '">' . trim($matches[1]) . '</h3>';
+            return '<h3 id="section-' . \cstr::slug(trim($matches[1]), '-') . '">' . trim($matches[1]) . '</h3>';
         });
     }
 
