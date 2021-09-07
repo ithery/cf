@@ -84,6 +84,11 @@ return [
         'label' => c::__('Command'),
         'subnav' => [
             [
+                'name' => 'command.introduction',
+                'label' => c::__('Introduction'),
+                'uri' => 'docs/command/introduction',
+            ],
+            [
                 'name' => 'command.basic',
                 'label' => c::__('Basic'),
                 'uri' => 'docs/command/basic',
