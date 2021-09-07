@@ -68,6 +68,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     protected $renderer;
 
+    protected $data = [];
+
     private static $renderingElement;
 
     /**
@@ -567,5 +569,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             static::$haveScrollToTop = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
         }
         return static::$haveScrollToTop;
+    }
+
+    public function setData($key, $value) {
+        $this->data[$key] = $value;
+        return $this;
     }
 }

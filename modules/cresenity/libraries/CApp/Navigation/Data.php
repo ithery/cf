@@ -1,19 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 1, 2018, 12:57:45 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 1, 2018, 12:57:45 PM
  */
 class CApp_Navigation_Data {
-
-    protected static $navigationCallback = array();
+    protected static $navigationCallback = [];
 
     /**
-     * 
      * @param string $domain
+     *
      * @return array
      */
     public static function get($domain = null) {
@@ -35,9 +35,8 @@ class CApp_Navigation_Data {
     }
 
     /**
-     * 
      * @param callable $navigationCallback
-     * @param string $domain optional
+     * @param string   $domain             optional
      */
     public static function setNavigationCallback(callable $navigationCallback, $domain = null) {
         if ($domain == null) {
@@ -48,7 +47,6 @@ class CApp_Navigation_Data {
     }
 
     /**
-     * 
      * @param string $domain optional
      */
     public static function removeNavigationCallback($domain = null) {
@@ -60,7 +58,6 @@ class CApp_Navigation_Data {
     }
 
     /**
-     * 
      * @param string $domain optional
      */
     public static function getNavigationCallback($domain = null) {
@@ -70,5 +67,4 @@ class CApp_Navigation_Data {
 
         return self::$navigationCallback[$domain];
     }
-
 }

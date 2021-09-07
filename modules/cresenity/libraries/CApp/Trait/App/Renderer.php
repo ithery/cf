@@ -215,6 +215,8 @@ HTML;
             $viewData['header_body'] = '';
             $viewData['headerBody'] = '';
 
+            $viewData = array_merge($this->data, $viewData);
+
             $this->viewData = $viewData;
         }
         return $this->viewData;
