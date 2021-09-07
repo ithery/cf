@@ -20,5 +20,5 @@
 
         @CApp('content')
         @CApp('scripts')
-    </body> 
-</html> 
+    </body>
+</html>

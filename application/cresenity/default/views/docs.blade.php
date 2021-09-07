@@ -7,8 +7,8 @@
         <title>Cresenity Framework - Documentation</title>
 
         <!-- Fonts -->
-        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
-
+        <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
+        <link rel="shortcut icon" href="{{ c::media('img/favico.png') }}" />
         @CApp('styles')
         <style>
             body {
