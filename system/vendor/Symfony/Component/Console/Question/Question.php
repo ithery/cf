@@ -19,7 +19,8 @@ use Symfony\Component\Console\Exception\LogicException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Question {
+class Question
+{
     private $question;
     private $attempts;
     private $hidden = false;
@@ -32,10 +33,11 @@ class Question {
     private $multiline = false;
 
     /**
-     * @param string $question The question to ask to the user
-     * @param mixed  $default  The default answer to return if the user enters nothing
+     * @param string                     $question The question to ask to the user
+     * @param string|bool|int|float|null $default  The default answer to return if the user enters nothing
      */
-    public function __construct($question, $default = null) {
+    public function __construct(string $question, $default = null)
+    {
         $this->question = $question;
         $this->default = $default;
     }
@@ -45,23 +47,26 @@ class Question {
      *
      * @return string
      */
-    public function getQuestion() {
+    public function getQuestion()
+    {
         return $this->question;
     }
 
     /**
      * Returns the default answer.
      *
-     * @return mixed
+     * @return string|bool|int|float|null
      */
-    public function getDefault() {
+    public function getDefault()
+    {
         return $this->default;
     }
 
     /**
      * Returns whether the user response accepts newline characters.
      */
-    public function isMultiline() {
+    public function isMultiline(): bool
+    {
         return $this->multiline;
     }
 
@@ -70,7 +75,8 @@ class Question {
      *
      * @return $this
      */
-    public function setMultiline(bool $multiline) {
+    public function setMultiline(bool $multiline): self
+    {
         $this->multiline = $multiline;
 
         return $this;
@@ -81,20 +87,20 @@ class Question {
      *
      * @return bool
      */
-    public function isHidden() {
+    public function isHidden()
+    {
         return $this->hidden;
     }
 
     /**
      * Sets whether the user response must be hidden or not.
      *
-     * @param bool $hidden
-     *
      * @return $this
      *
      * @throws LogicException In case the autocompleter is also used
      */
-    public function setHidden($hidden) {
+    public function setHidden(bool $hidden)
+    {
         if ($this->autocompleterCallback) {
             throw new LogicException('A hidden question cannot use the autocompleter.');
         }
@@ -109,18 +115,18 @@ class Question {
      *
      * @return bool
      */
-    public function isHiddenFallback() {
+    public function isHiddenFallback()
+    {
         return $this->hiddenFallback;
     }
 
     /**
      * Sets whether to fallback on non-hidden question if the response can not be hidden.
      *
-     * @param bool $fallback
-     *
      * @return $this
      */
-    public function setHiddenFallback($fallback) {
+    public function setHiddenFallback(bool $fallback)
+    {
         $this->hiddenFallback = (bool) $fallback;
 
         return $this;
@@ -131,7 +137,8 @@ class Question {
      *
      * @return iterable|null
      */
-    public function getAutocompleterValues() {
+    public function getAutocompleterValues()
+    {
         $callback = $this->getAutocompleterCallback();
 
         return $callback ? $callback('') : null;
@@ -143,10 +150,9 @@ class Question {
      * @return $this
      *
      * @throws LogicException
-     *
-     * @param mixed $values
      */
-    public function setAutocompleterValues($values) {
+    public function setAutocompleterValues(?iterable $values)
+    {
         if (\is_array($values)) {
             $values = $this->isAssoc($values) ? array_merge(array_keys($values), array_values($values)) : array_values($values);
 
@@ -168,7 +174,8 @@ class Question {
     /**
      * Gets the callback function used for the autocompleter.
      */
-    public function getAutocompleterCallback(): ?callable {
+    public function getAutocompleterCallback(): ?callable
+    {
         return $this->autocompleterCallback;
     }
 
@@ -179,7 +186,8 @@ class Question {
      *
      * @return $this
      */
-    public function setAutocompleterCallback(callable $callback = null) {
+    public function setAutocompleterCallback(callable $callback = null): self
+    {
         if ($this->hidden && null !== $callback) {
             throw new LogicException('A hidden question cannot use the autocompleter.');
         }
@@ -193,10 +201,9 @@ class Question {
      * Sets a validator for the question.
      *
      * @return $this
-     *
-     * @param null|mixed $validator
      */
-    public function setValidator($validator = null) {
+    public function setValidator(callable $validator = null)
+    {
         $this->validator = $validator;
 
         return $this;
@@ -207,7 +214,8 @@ class Question {
      *
      * @return callable|null
      */
-    public function getValidator() {
+    public function getValidator()
+    {
         return $this->validator;
     }
 
@@ -219,10 +227,9 @@ class Question {
      * @return $this
      *
      * @throws InvalidArgumentException in case the number of attempts is invalid
-     *
-     * @param mixed $attempts
      */
-    public function setMaxAttempts($attempts) {
+    public function setMaxAttempts(?int $attempts)
+    {
         if (null !== $attempts) {
             $attempts = (int) $attempts;
             if ($attempts < 1) {
@@ -242,7 +249,8 @@ class Question {
      *
      * @return int|null
      */
-    public function getMaxAttempts() {
+    public function getMaxAttempts()
+    {
         return $this->attempts;
     }
 
@@ -252,10 +260,9 @@ class Question {
      * The normalizer can be a callable (a string), a closure or a class implementing __invoke.
      *
      * @return $this
-     *
-     * @param mixed $normalizer
      */
-    public function setNormalizer($normalizer) {
+    public function setNormalizer(callable $normalizer)
+    {
         $this->normalizer = $normalizer;
 
         return $this;
@@ -268,22 +275,26 @@ class Question {
      *
      * @return callable|null
      */
-    public function getNormalizer() {
+    public function getNormalizer()
+    {
         return $this->normalizer;
     }
 
-    protected function isAssoc(array $array) {
+    protected function isAssoc(array $array)
+    {
         return (bool) \count(array_filter(array_keys($array), 'is_string'));
     }
 
-    public function isTrimmable(): bool {
+    public function isTrimmable(): bool
+    {
         return $this->trimmable;
     }
 
     /**
      * @return $this
      */
-    public function setTrimmable(bool $trimmable) {
+    public function setTrimmable(bool $trimmable): self
+    {
         $this->trimmable = $trimmable;
 
         return $this;

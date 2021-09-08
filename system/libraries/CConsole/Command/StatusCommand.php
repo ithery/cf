@@ -42,5 +42,13 @@ class CConsole_Command_StatusCommand extends CConsole_Command {
         $this->info('======================');
 
         $this->table(['Description', 'Value'], $rows);
+
+        $results = new CConsole_Result();
+        $connectionName = $db->getName();
+        $results->add(
+            'Connection name',
+            $connectionName
+        );
+        $results->printToConsole($this, ['Description', 'Value']);
     }
 }
