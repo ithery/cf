@@ -2,13 +2,13 @@
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since May 30, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since May 30, 2020
  */
-
 class CXMPP_Ejabberd_Command_Register extends CXMPP_Ejabberd_CommandAbstract {
-
     private $user;
+
     private $password;
 
     /**
@@ -17,7 +17,6 @@ class CXMPP_Ejabberd_Command_Register extends CXMPP_Ejabberd_CommandAbstract {
     private $host;
 
     public function __construct($user, $password, $host = -1) {
-
         $this->user = $user;
         $this->password = $password;
         $this->host = $host;
@@ -34,5 +33,4 @@ class CXMPP_Ejabberd_Command_Register extends CXMPP_Ejabberd_CommandAbstract {
             'password' => $this->password
         ];
     }
-
 }

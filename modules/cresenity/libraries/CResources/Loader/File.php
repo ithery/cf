@@ -2,11 +2,17 @@
 
 class CResources_Loader_File extends CResources_LoaderAbstract {
     protected $appCode = '';
+
     protected $orgCode = '';
+
     protected $resourceName = '';
+
     protected $resourceType = 'file';
+
     protected $type = '';
+
     protected $s3Options = null;
+
     protected $s3Object = null;
 
     public function __construct($resourceName, $options = []) {
@@ -109,6 +115,7 @@ class CResources_Loader_File extends CResources_LoaderAbstract {
     public function saveToS3() {
         $resultSave = false;
         if ($this->s3Object != null) {
+            $bucket = carr::get($this->s3Options, 'bucket');
             $this->s3Object->setBucket($bucket);
 
             $basePath = $this->getBasePath();

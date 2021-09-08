@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Command_DbCreateCommand extends CDevSuite_CommandAbstract {
-
     public function getSignatureArguments() {
         return '{name}';
     }
@@ -14,10 +13,10 @@ class CDevSuite_Command_DbCreateCommand extends CDevSuite_CommandAbstract {
     public function run(CConsole_Command $cfCommand) {
         $name = $cfCommand->argument('name');
         if (CDevSuite::db()->exists($name)) {
-            CDevSuite::error('Database configuration: ' . $key . ' already exists');
+            CDevSuite::error('Database configuration: ' . $name . ' already exists');
             exit(CConsole::FAILURE_EXIT);
         }
-        
+
         $data = [];
 
         $type = $cfCommand->choice('Type:', ['mysql', 'mongodb'], 0, 1);
@@ -52,5 +51,4 @@ class CDevSuite_Command_DbCreateCommand extends CDevSuite_CommandAbstract {
             CDevSuite::success('A [' . $name . '] ssh configuration has been created');
         }
     }
-
 }

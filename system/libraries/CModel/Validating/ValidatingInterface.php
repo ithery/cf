@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 3:38:52 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 3:38:52 PM
  */
 interface CModel_Validating_ValidatingInterface {
-
     /**
      * Returns whether or not the model will attempt to validate
      * itself when saving.
@@ -20,7 +20,8 @@ interface CModel_Validating_ValidatingInterface {
     /**
      * Set whether the model should attempt validation on saving.
      *
-     * @param  bool $value
+     * @param bool $value
+     *
      * @return void
      */
     public function setValidating($value);
@@ -37,8 +38,10 @@ interface CModel_Validating_ValidatingInterface {
      * Set whether the model should raise an exception or
      * return a boolean on a failed validation.
      *
-     * @param  bool $value
+     * @param bool $value
+     *
      * @return void
+     *
      * @throws InvalidArgumentException
      */
     public function setThrowValidationExceptions($value);
@@ -55,8 +58,10 @@ interface CModel_Validating_ValidatingInterface {
      * Set the model to add unique identifier to rules when performing
      * validation.
      *
-     * @param  bool $value
+     * @param bool $value
+     *
      * @return void
+     *
      * @throws InvalidArgumentException
      */
     public function setInjectUniqueIdentifier($value);
@@ -85,7 +90,8 @@ interface CModel_Validating_ValidatingInterface {
     /**
      * Set the global validation rules.
      *
-     * @param  array $rules
+     * @param array $rules
+     *
      * @return void
      */
     public function setRules(array $rules = null);
@@ -100,10 +106,11 @@ interface CModel_Validating_ValidatingInterface {
     /**
      * Set the error messages.
      *
-     * @param  \Illuminate\Support\MessageBag $validationErrors
+     * @param \CBase_MessageBag $validationErrors
+     *
      * @return void
      */
-    public function setErrors(MessageBag $validationErrors);
+    public function setErrors(CBase_MessageBag $validationErrors);
 
     /**
      * Returns whether the model is valid or not.
@@ -116,6 +123,7 @@ interface CModel_Validating_ValidatingInterface {
      * Returns if the model is valid, otherwise throws an exception.
      *
      * @return bool
+     *
      * @throws \Watson\Validating\ValidationException
      */
     public function isValidOrFail();
@@ -139,6 +147,7 @@ interface CModel_Validating_ValidatingInterface {
      * instead of returning a boolean (which is the default behaviour).
      *
      * @return void
+     *
      * @throws \Watson\Validating\ValidatingException
      */
     public function saveOrFail();
@@ -154,16 +163,16 @@ interface CModel_Validating_ValidatingInterface {
     /**
      * Get the Validator instance
      *
-     * @return \Illuminate\Validation\Factory
+     * @return CValidation_Factory
      */
     public function getValidator();
 
     /**
      * Set the Validator instance
      *
-     * @param \Illuminate\Validation\Factory $validator
+     * @param CValidation_Factory $validator
      */
-    public function setValidator(Factory $validator);
+    public function setValidator(CValidation_Factory $validator);
 
     /**
      * Throw a validation exception.

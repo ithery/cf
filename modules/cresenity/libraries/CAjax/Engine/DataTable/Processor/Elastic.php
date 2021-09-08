@@ -290,7 +290,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
 
         $data = [
             'datatable' => $output,
-            'js' => cbase64::encode($js),
+            'js' => base64_encode($js),
         ];
 
         return $data;

@@ -1,12 +1,5 @@
 # Helper carr
 
-### Available Methods
-[carr::accessible](#carr::accessible)
-
-[carr::get](#title)
-
-
-
 ### carr::accessible
 
 `carr::accessible` method dapat menentukan apakah value adalah array accessible:

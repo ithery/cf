@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 use Symfony\Component\VarDumper\VarDumper;
 
 class CBase_String {
-
     use CTrait_Macroable;
 
     /**
@@ -23,7 +23,8 @@ class CBase_String {
     /**
      * Create a new instance of the class.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return void
      */
     public function __construct($value = '') {
@@ -33,7 +34,8 @@ class CBase_String {
     /**
      * Return the remainder of a string after the first occurrence of a given value.
      *
-     * @param  string  $search
+     * @param string $search
+     *
      * @return static
      */
     public function after($search) {
@@ -43,7 +45,8 @@ class CBase_String {
     /**
      * Return the remainder of a string after the last occurrence of a given value.
      *
-     * @param  string  $search
+     * @param string $search
+     *
      * @return static
      */
     public function afterLast($search) {
@@ -53,7 +56,8 @@ class CBase_String {
     /**
      * Append the given values to the string.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return static
      */
     public function append(...$values) {
@@ -63,7 +67,8 @@ class CBase_String {
     /**
      * Transliterate a UTF-8 value to ASCII.
      *
-     * @param  string  $language
+     * @param string $language
+     *
      * @return static
      */
     public function ascii($language = 'en') {
@@ -73,7 +78,8 @@ class CBase_String {
     /**
      * Get the trailing name component of the path.
      *
-     * @param  string  $suffix
+     * @param string $suffix
+     *
      * @return static
      */
     public function basename($suffix = '') {
@@ -86,13 +92,14 @@ class CBase_String {
      * @return static
      */
     public function classBasename() {
-        return new static(class_basename($this->value));
+        return new static(c::classBasename($this->value));
     }
 
     /**
      * Get the portion of a string before the first occurrence of a given value.
      *
-     * @param  string  $search
+     * @param string $search
+     *
      * @return static
      */
     public function before($search) {
@@ -102,7 +109,8 @@ class CBase_String {
     /**
      * Get the portion of a string before the last occurrence of a given value.
      *
-     * @param  string  $search
+     * @param string $search
+     *
      * @return static
      */
     public function beforeLast($search) {
@@ -112,8 +120,9 @@ class CBase_String {
     /**
      * Get the portion of a string between two given values.
      *
-     * @param  string  $from
-     * @param  string  $to
+     * @param string $from
+     * @param string $to
+     *
      * @return static
      */
     public function between($from, $to) {
@@ -132,7 +141,8 @@ class CBase_String {
     /**
      * Determine if a given string contains a given substring.
      *
-     * @param  string|array  $needles
+     * @param string|array $needles
+     *
      * @return bool
      */
     public function contains($needles) {
@@ -142,7 +152,8 @@ class CBase_String {
     /**
      * Determine if a given string contains all array values.
      *
-     * @param  array  $needles
+     * @param array $needles
+     *
      * @return bool
      */
     public function containsAll(array $needles) {
@@ -152,7 +163,8 @@ class CBase_String {
     /**
      * Get the parent directory's path.
      *
-     * @param  int  $levels
+     * @param int $levels
+     *
      * @return static
      */
     public function dirname($levels = 1) {
@@ -162,7 +174,8 @@ class CBase_String {
     /**
      * Determine if a given string ends with a given substring.
      *
-     * @param  string|array  $needles
+     * @param string|array $needles
+     *
      * @return bool
      */
     public function endsWith($needles) {
@@ -172,7 +185,8 @@ class CBase_String {
     /**
      * Determine if the string is an exact match with the given value.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return bool
      */
     public function exactly($value) {
@@ -182,8 +196,9 @@ class CBase_String {
     /**
      * Explode the string into an array.
      *
-     * @param  string  $delimiter
-     * @param  int  $limit
+     * @param string $delimiter
+     * @param int    $limit
+     *
      * @return CCollection
      */
     public function explode($delimiter, $limit = PHP_INT_MAX) {
@@ -193,9 +208,10 @@ class CBase_String {
     /**
      * Split a string using a regular expression or by length.
      *
-     * @param  string|int  $pattern
-     * @param  int  $limit
-     * @param  int  $flags
+     * @param string|int $pattern
+     * @param int        $limit
+     * @param int        $flags
+     *
      * @return CCollection
      */
     public function split($pattern, $limit = -1, $flags = 0) {
@@ -211,7 +227,8 @@ class CBase_String {
     /**
      * Cap a string with a single instance of a given value.
      *
-     * @param  string  $cap
+     * @param string $cap
+     *
      * @return static
      */
     public function finish($cap) {
@@ -221,7 +238,8 @@ class CBase_String {
     /**
      * Determine if a given string matches a given pattern.
      *
-     * @param  string|array  $pattern
+     * @param string|array $pattern
+     *
      * @return bool
      */
     public function is($pattern) {
@@ -267,7 +285,8 @@ class CBase_String {
     /**
      * Return the length of the given string.
      *
-     * @param  string  $encoding
+     * @param string $encoding
+     *
      * @return int
      */
     public function length($encoding = null) {
@@ -277,8 +296,9 @@ class CBase_String {
     /**
      * Limit the number of characters in a string.
      *
-     * @param  int  $limit
-     * @param  string  $end
+     * @param int    $limit
+     * @param string $end
+     *
      * @return static
      */
     public function limit($limit = 100, $end = '...') {
@@ -297,7 +317,8 @@ class CBase_String {
     /**
      * Get the string matching the given pattern.
      *
-     * @param  string  $pattern
+     * @param string $pattern
+     *
      * @return static|null
      */
     public function match($pattern) {
@@ -313,7 +334,8 @@ class CBase_String {
     /**
      * Get the string matching the given pattern.
      *
-     * @param  string  $pattern
+     * @param string $pattern
+     *
      * @return CCollection
      */
     public function matchAll($pattern) {
@@ -329,8 +351,9 @@ class CBase_String {
     /**
      * Pad both sides of the string with another.
      *
-     * @param  int  $length
-     * @param  string  $pad
+     * @param int    $length
+     * @param string $pad
+     *
      * @return static
      */
     public function padBoth($length, $pad = ' ') {
@@ -340,8 +363,9 @@ class CBase_String {
     /**
      * Pad the left side of the string with another.
      *
-     * @param  int  $length
-     * @param  string  $pad
+     * @param int    $length
+     * @param string $pad
+     *
      * @return static
      */
     public function padLeft($length, $pad = ' ') {
@@ -351,8 +375,9 @@ class CBase_String {
     /**
      * Pad the right side of the string with another.
      *
-     * @param  int  $length
-     * @param  string  $pad
+     * @param int    $length
+     * @param string $pad
+     *
      * @return static
      */
     public function padRight($length, $pad = ' ') {
@@ -362,7 +387,8 @@ class CBase_String {
     /**
      * Parse a Class@method style callback into class and method.
      *
-     * @param  string|null  $default
+     * @param string|null $default
+     *
      * @return array
      */
     public function parseCallback($default = null) {
@@ -372,7 +398,8 @@ class CBase_String {
     /**
      * Get the plural form of an English word.
      *
-     * @param  int  $count
+     * @param int $count
+     *
      * @return static
      */
     public function plural($count = 2) {
@@ -382,7 +409,8 @@ class CBase_String {
     /**
      * Pluralize the last word of an English, studly caps case string.
      *
-     * @param  int  $count
+     * @param int $count
+     *
      * @return static
      */
     public function pluralStudly($count = 2) {
@@ -392,7 +420,8 @@ class CBase_String {
     /**
      * Prepend the given values to the string.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return static
      */
     public function prepend(...$values) {
@@ -402,8 +431,9 @@ class CBase_String {
     /**
      * Replace the given value in the given string.
      *
-     * @param  string|string[]  $search
-     * @param  string|string[]  $replace
+     * @param string|string[] $search
+     * @param string|string[] $replace
+     *
      * @return static
      */
     public function replace($search, $replace) {
@@ -413,8 +443,9 @@ class CBase_String {
     /**
      * Replace a given value in the string sequentially with an array.
      *
-     * @param  string  $search
-     * @param  array  $replace
+     * @param string $search
+     * @param array  $replace
+     *
      * @return static
      */
     public function replaceArray($search, array $replace) {
@@ -424,8 +455,9 @@ class CBase_String {
     /**
      * Replace the first occurrence of a given value in the string.
      *
-     * @param  string  $search
-     * @param  string  $replace
+     * @param string $search
+     * @param string $replace
+     *
      * @return static
      */
     public function replaceFirst($search, $replace) {
@@ -435,8 +467,9 @@ class CBase_String {
     /**
      * Replace the last occurrence of a given value in the string.
      *
-     * @param  string  $search
-     * @param  string  $replace
+     * @param string $search
+     * @param string $replace
+     *
      * @return static
      */
     public function replaceLast($search, $replace) {
@@ -446,9 +479,10 @@ class CBase_String {
     /**
      * Replace the patterns matching the given regular expression.
      *
-     * @param  string  $pattern
-     * @param  \Closure|string  $replace
-     * @param  int  $limit
+     * @param string          $pattern
+     * @param \Closure|string $replace
+     * @param int             $limit
+     *
      * @return static
      */
     public function replaceMatches($pattern, $replace, $limit = -1) {
@@ -462,7 +496,8 @@ class CBase_String {
     /**
      * Begin a string with a single instance of a given value.
      *
-     * @param  string  $prefix
+     * @param string $prefix
+     *
      * @return static
      */
     public function start($prefix) {
@@ -499,8 +534,9 @@ class CBase_String {
     /**
      * Generate a URL friendly "slug" from a given string.
      *
-     * @param  string  $separator
-     * @param  string|null  $language
+     * @param string      $separator
+     * @param string|null $language
+     *
      * @return static
      */
     public function slug($separator = '-', $language = 'en') {
@@ -510,7 +546,8 @@ class CBase_String {
     /**
      * Convert a string to snake case.
      *
-     * @param  string  $delimiter
+     * @param string $delimiter
+     *
      * @return static
      */
     public function snake($delimiter = '_') {
@@ -520,7 +557,8 @@ class CBase_String {
     /**
      * Determine if a given string starts with a given substring.
      *
-     * @param  string|array  $needles
+     * @param string|array $needles
+     *
      * @return bool
      */
     public function startsWith($needles) {
@@ -539,8 +577,9 @@ class CBase_String {
     /**
      * Returns the portion of string specified by the start and length parameters.
      *
-     * @param  int  $start
-     * @param  int|null  $length
+     * @param int      $start
+     * @param int|null $length
+     *
      * @return static
      */
     public function substr($start, $length = null) {
@@ -550,9 +589,10 @@ class CBase_String {
     /**
      * Returns the number of substring occurrences.
      *
-     * @param  string  $needle
-     * @param  int|null  $offset
-     * @param  int|null  $length
+     * @param string   $needle
+     * @param int|null $offset
+     * @param int|null $length
+     *
      * @return int
      */
     public function substrCount($needle, $offset = null, $length = null) {
@@ -562,7 +602,8 @@ class CBase_String {
     /**
      * Trim the string of the given characters.
      *
-     * @param  string  $characters
+     * @param string $characters
+     *
      * @return static
      */
     public function trim($characters = null) {
@@ -572,7 +613,8 @@ class CBase_String {
     /**
      * Left trim the string of the given characters.
      *
-     * @param  string  $characters
+     * @param string $characters
+     *
      * @return static
      */
     public function ltrim($characters = null) {
@@ -582,7 +624,8 @@ class CBase_String {
     /**
      * Right trim the string of the given characters.
      *
-     * @param  string  $characters
+     * @param string $characters
+     *
      * @return static
      */
     public function rtrim($characters = null) {
@@ -601,9 +644,10 @@ class CBase_String {
     /**
      * Apply the callback's string changes if the given "value" is true.
      *
-     * @param  mixed  $value
-     * @param  callable  $callback
-     * @param  callable|null  $default
+     * @param mixed         $value
+     * @param callable      $callback
+     * @param callable|null $default
+     *
      * @return mixed|$this
      */
     public function when($value, $callback, $default = null) {
@@ -619,7 +663,8 @@ class CBase_String {
     /**
      * Execute the given callback if the string is empty.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     *
      * @return static
      */
     public function whenEmpty($callback) {
@@ -635,8 +680,9 @@ class CBase_String {
     /**
      * Limit the number of words in a string.
      *
-     * @param  int  $words
-     * @param  string  $end
+     * @param int    $words
+     * @param string $end
+     *
      * @return static
      */
     public function words($words = 100, $end = '...') {
@@ -668,7 +714,8 @@ class CBase_String {
     /**
      * Proxy dynamic properties onto methods.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function __get($key) {
@@ -683,5 +730,4 @@ class CBase_String {
     public function __toString() {
         return (string) $this->value;
     }
-
 }

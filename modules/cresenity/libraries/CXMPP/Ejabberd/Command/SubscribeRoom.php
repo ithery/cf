@@ -2,13 +2,15 @@
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since May 31, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since May 31, 2020
  */
 class CXMPP_Ejabberd_Command_SubscribeRoom extends CXMPP_Ejabberd_CommandAbstract {
-
     private $user;
+
     private $nick;
+
     private $room;
 
     /**
@@ -62,5 +64,4 @@ class CXMPP_Ejabberd_Command_SubscribeRoom extends CXMPP_Ejabberd_CommandAbstrac
             'nodes' => implode(',', $this->nodes)
         ];
     }
-
 }

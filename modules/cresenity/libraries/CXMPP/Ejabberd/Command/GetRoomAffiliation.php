@@ -1,16 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Jul 6, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Jul 6, 2020
  */
 class CXMPP_Ejabberd_Command_GetRoomAffiliation extends CXMPP_Ejabberd_CommandAbstract {
-
     private $name;
+
     private $service;
+
     private $user;
 
     public function __construct($user, $name, $service) {
@@ -30,5 +32,4 @@ class CXMPP_Ejabberd_Command_GetRoomAffiliation extends CXMPP_Ejabberd_CommandAb
             'jid' => $this->user
         ];
     }
-
 }

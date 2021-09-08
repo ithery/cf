@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Deploy_SSHConfigFile {
-
     /**
      * The SSH configuration groups.
      *
@@ -17,7 +16,8 @@ class CDevSuite_Deploy_SSHConfigFile {
     /**
      * Create a new SSH configuration file.
      *
-     * @param  array  $groups
+     * @param array $groups
+     *
      * @return void
      */
     public function __construct(array $groups) {
@@ -27,7 +27,8 @@ class CDevSuite_Deploy_SSHConfigFile {
     /**
      * Parse the given configuration file.
      *
-     * @param  string  $file
+     * @param string $file
+     *
      * @return CDevSuite_Deploy_SSHConfigFile
      */
     public static function parse($file) {
@@ -37,7 +38,8 @@ class CDevSuite_Deploy_SSHConfigFile {
     /**
      * Parse the given configuration string.
      *
-     * @param  string  $string
+     * @param string $string
+     *
      * @return CDevSuite_Deploy_SSHConfigFile
      */
     public static function parseString($string) {
@@ -61,12 +63,10 @@ class CDevSuite_Deploy_SSHConfigFile {
                 $key = strtolower($match[1]);
 
                 $value = self::unquote($match[2]);
-            }
-
-            // Keys and values may also get separated via a space, so we will parse them
-            // out here and hang onto their values. We will also lower case this keys
-            // and unquotes the values so they are properly formatted for next use.
-            else {
+            } else {
+                // Keys and values may also get separated via a space, so we will parse them
+                // out here and hang onto their values. We will also lower case this keys
+                // and unquotes the values so they are properly formatted for next use.
                 $segments = preg_split('/\s+/', $line, 2);
 
                 $key = strtolower($segments[0]);
@@ -96,15 +96,17 @@ class CDevSuite_Deploy_SSHConfigFile {
     /**
      * Get the configured SSH host by name or IP.
      *
-     * @param  string  $host
+     * @param string $host
+     *
      * @return string|null
      */
     public function findConfiguredHost($host) {
         list($user, $host) = $this->parseHost($host);
 
         foreach ($this->groups as $group) {
-            if ((isset($group['host']) && $group['host'] == $host) ||
-                    (isset($group['hostname']) && $group['hostname'] == $host)) {
+            if ((isset($group['host']) && $group['host'] == $host)
+                || (isset($group['hostname']) && $group['hostname'] == $host)
+            ) {
                 if (!empty($user)) {
                     // User is not specified in the SSH configuration...
                     if (!isset($group['user'])) {
@@ -125,7 +127,8 @@ class CDevSuite_Deploy_SSHConfigFile {
     /**
      * Parse the host into user and host segments.
      *
-     * @param  string  $host
+     * @param string $host
+     *
      * @return array
      */
     protected function parseHost($host) {
@@ -135,7 +138,8 @@ class CDevSuite_Deploy_SSHConfigFile {
     /**
      * Unquote an optionally double quoted string.
      *
-     * @param  string  $string
+     * @param string $string
+     *
      * @return string
      */
     private static function unquote($string) {
@@ -145,5 +149,4 @@ class CDevSuite_Deploy_SSHConfigFile {
 
         return $string;
     }
-
 }

@@ -14,7 +14,7 @@ class CResources_Engine_Image_GifCreator {
     private $version;
 
     /**
-     * @var boolean Check the image is build or not (old: this->IMG)
+     * @var bool Check the image is build or not (old: this->IMG)
      */
     private $imgBuilt;
 
@@ -24,17 +24,17 @@ class CResources_Engine_Image_GifCreator {
     private $frameSources;
 
     /**
-     * @var integer Gif loop (old: this->LOP)
+     * @var int Gif loop (old: this->LOP)
      */
     private $loop;
 
     /**
-     * @var integer Gif dis (old: this->DIS)
+     * @var int Gif dis (old: this->DIS)
      */
     private $dis;
 
     /**
-     * @var integer Gif color (old: this->COL)
+     * @var int Gif color (old: this->COL)
      */
     private $colour;
 
@@ -65,14 +65,14 @@ class CResources_Engine_Image_GifCreator {
     /**
      * Create the GIF string (old: GIFEncoder)
      *
-     * @param array   $frames    An array of frame: can be file paths, resource image variables, binary sources or image URLs
-     * @param array   $durations An array containing the duration of each frame
-     * @param integer $loop      Number of GIF loops before stopping animation (Set 0 to get an infinite loop)
+     * @param array $frames    An array of frame: can be file paths, resource image variables, binary sources or image URLs
+     * @param array $durations An array containing the duration of each frame
+     * @param int   $loop      Number of GIF loops before stopping animation (Set 0 to get an infinite loop)
      *
      * @return string The GIF string source
      */
     public function create($frames = [], $durations = [], $loop = 0) {
-        if (!is_array($frames) && !is_array($GIF_tim)) {
+        if (!is_array($frames) && !is_array($durations)) {
             throw new \Exception($this->version . ': ' . $this->errors['ERR00']);
         }
 
@@ -99,7 +99,7 @@ class CResources_Engine_Image_GifCreator {
                 $this->frameSources[] = ob_get_contents();
                 ob_end_clean();
             } else { // Fail
-                throw new \Exception($this->version . ': ' . $this->errors['ERR02'] . ' (' . $mode . ')');
+                throw new \Exception($this->version . ': ' . $this->errors['ERR02']);
             }
 
             if ($i == 0) {
@@ -110,8 +110,8 @@ class CResources_Engine_Image_GifCreator {
                 throw new \Exception($this->version . ': ' . $i . ' ' . $this->errors['ERR01']);
             }
 
-            for ($j = (13 + 3 * (2 << (ord($this->frameSources[$i]{10}) & 0x07))), $k = true; $k; $j++) {
-                switch ($this->frameSources[$i]{$j}) {
+            for ($j = (13 + 3 * (2 << (ord($this->frameSources[$i][10]) & 0x07))), $k = true; $k; $j++) {
+                switch ($this->frameSources[$i][$j]) {
                     case '!':
                         if ((substr($this->frameSources[$i], ($j + 3), 8)) == 'NETSCAPE') {
                             throw new \Exception($this->version . ': ' . $this->errors['ERR03'] . ' (' . ($i + 1) . ' source).');
@@ -155,8 +155,8 @@ class CResources_Engine_Image_GifCreator {
     public function gifAddHeader() {
         $cmap = 0;
 
-        if (ord($this->frameSources[0]{10}) & 0x80) {
-            $cmap = 3 * (2 << (ord($this->frameSources[0]{10}) & 0x07));
+        if (ord($this->frameSources[0][10]) & 0x80) {
+            $cmap = 3 * (2 << (ord($this->frameSources[0][10]) & 0x07));
 
             $this->gif .= substr($this->frameSources[0], 6, 7);
             $this->gif .= substr($this->frameSources[0], 13, $cmap);
@@ -167,28 +167,28 @@ class CResources_Engine_Image_GifCreator {
     /**
      * Add the frame sources to the GIF string (old: GIFAddFrames)
      *
-     * @param integer $i
-     * @param integer $d
+     * @param int $i
+     * @param int $d
      */
     public function addGifFrames($i, $d) {
-        $Locals_str = 13 + 3 * (2 << (ord($this->frameSources[$i]{10}) & 0x07));
+        $Locals_str = 13 + 3 * (2 << (ord($this->frameSources[$i][10]) & 0x07));
 
         $Locals_end = strlen($this->frameSources[$i]) - $Locals_str - 1;
         $Locals_tmp = substr($this->frameSources[$i], $Locals_str, $Locals_end);
 
-        $Global_len = 2 << (ord($this->frameSources[0]{10}) & 0x07);
-        $Locals_len = 2 << (ord($this->frameSources[$i]{10}) & 0x07);
+        $Global_len = 2 << (ord($this->frameSources[0][10]) & 0x07);
+        $Locals_len = 2 << (ord($this->frameSources[$i][10]) & 0x07);
 
-        $Global_rgb = substr($this->frameSources[0], 13, 3 * (2 << (ord($this->frameSources[0]{10}) & 0x07)));
-        $Locals_rgb = substr($this->frameSources[$i], 13, 3 * (2 << (ord($this->frameSources[$i]{10}) & 0x07)));
+        $Global_rgb = substr($this->frameSources[0], 13, 3 * (2 << (ord($this->frameSources[0][10]) & 0x07)));
+        $Locals_rgb = substr($this->frameSources[$i], 13, 3 * (2 << (ord($this->frameSources[$i][10]) & 0x07)));
 
         $Locals_ext = "!\xF9\x04" . chr(($this->dis << 2) + 0) . chr(($d >> 0) & 0xFF) . chr(($d >> 8) & 0xFF) . "\x0\x0";
 
-        if ($this->colour > -1 && ord($this->frameSources[$i]{10}) & 0x80) {
-            for ($j = 0; $j < (2 << (ord($this->frameSources[$i]{10}) & 0x07)); $j++) {
-                if (ord($Locals_rgb{3 * $j + 0}) == (($this->colour >> 16) & 0xFF)
-                    && ord($Locals_rgb{3 * $j + 1}) == (($this->colour >> 8) & 0xFF)
-                    && ord($Locals_rgb{3 * $j + 2}) == (($this->colour >> 0) & 0xFF)
+        if ($this->colour > -1 && ord($this->frameSources[$i][10]) & 0x80) {
+            for ($j = 0; $j < (2 << (ord($this->frameSources[$i][10]) & 0x07)); $j++) {
+                if (ord($Locals_rgb[3 * $j + 0]) == (($this->colour >> 16) & 0xFF)
+                    && ord($Locals_rgb[3 * $j + 1]) == (($this->colour >> 8) & 0xFF)
+                    && ord($Locals_rgb[3 * $j + 2]) == (($this->colour >> 0) & 0xFF)
                 ) {
                     $Locals_ext = "!\xF9\x04" . chr(($this->dis << 2) + 1) . chr(($d >> 0) & 0xFF) . chr(($d >> 8) & 0xFF) . chr($j) . "\x0";
                     break;
@@ -196,7 +196,7 @@ class CResources_Engine_Image_GifCreator {
             }
         }
 
-        switch ($Locals_tmp{0}) {
+        switch ($Locals_tmp[0]) {
             case '!':
                 $Locals_img = substr($Locals_tmp, 8, 10);
                 $Locals_tmp = substr($Locals_tmp, 18, strlen($Locals_tmp) - 18);
@@ -209,24 +209,24 @@ class CResources_Engine_Image_GifCreator {
                 break;
         }
 
-        if (ord($this->frameSources[$i]{10}) & 0x80 && $this->imgBuilt) {
+        if (ord($this->frameSources[$i][10]) & 0x80 && $this->imgBuilt) {
             if ($Global_len == $Locals_len) {
                 if ($this->gifBlockCompare($Global_rgb, $Locals_rgb, $Global_len)) {
                     $this->gif .= $Locals_ext . $Locals_img . $Locals_tmp;
                 } else {
-                    $byte = ord($Locals_img{9});
+                    $byte = ord($Locals_img[9]);
                     $byte |= 0x80;
                     $byte &= 0xF8;
-                    $byte |= (ord($this->frameSources[0]{10}) & 0x07);
-                    $Locals_img{9} = chr($byte);
+                    $byte |= (ord($this->frameSources[0][10]) & 0x07);
+                    $Locals_img[9] = chr($byte);
                     $this->gif .= $Locals_ext . $Locals_img . $Locals_rgb . $Locals_tmp;
                 }
             } else {
-                $byte = ord($Locals_img{9});
+                $byte = ord($Locals_img[9]);
                 $byte |= 0x80;
                 $byte &= 0xF8;
-                $byte |= (ord($this->frameSources[$i]{10}) & 0x07);
-                $Locals_img{9} = chr($byte);
+                $byte |= (ord($this->frameSources[$i][10]) & 0x07);
+                $Locals_img[9] = chr($byte);
                 $this->gif .= $Locals_ext . $Locals_img . $Locals_rgb . $Locals_tmp;
             }
         } else {
@@ -246,17 +246,17 @@ class CResources_Engine_Image_GifCreator {
     /**
      * Compare two block and return the version (old: GIFBlockCompare)
      *
-     * @param string  $globalBlock
-     * @param string  $localBlock
-     * @param integer $length
+     * @param string $globalBlock
+     * @param string $localBlock
+     * @param int    $length
      *
-     * @return integer
+     * @return int
      */
     public function gifBlockCompare($globalBlock, $localBlock, $length) {
         for ($i = 0; $i < $length; $i++) {
-            if ($globalBlock{3 * $i + 0} != $localBlock{3 * $i + 0}
-                || $globalBlock{3 * $i + 1} != $localBlock{3 * $i + 1}
-                || $globalBlock{3 * $i + 2} != $localBlock{3 * $i + 2}
+            if ($globalBlock[3 * $i + 0] != $localBlock[3 * $i + 0]
+                || $globalBlock[3 * $i + 1] != $localBlock[3 * $i + 1]
+                || $globalBlock[3 * $i + 2] != $localBlock[3 * $i + 2]
             ) {
                 return 0;
             }

@@ -10,12 +10,19 @@ use DigitalOceanV2\DigitalOceanV2;
  */
 class CResources_Loader_Image extends CResources_LoaderAbstract {
     protected $appCode = '';
+
     protected $orgCode = '';
+
     protected $resourceName = '';
+
     protected $resourceType = 'image';
+
     protected $sizeName = 'original';
+
     protected $type = '';
+
     protected $s3Options = null;
+
     protected $s3Object = null;
 
     public function __construct($resourceName, $options = []) {
@@ -169,6 +176,7 @@ class CResources_Loader_Image extends CResources_LoaderAbstract {
     public function saveToS3() {
         $resultSave = false;
         if ($this->s3Object != null) {
+            $bucket = carr::get($this->s3Options, 'bucket');
             $this->s3Object->setBucket($bucket);
 
             $fullPath = $this->getSizePath($this->sizeName);

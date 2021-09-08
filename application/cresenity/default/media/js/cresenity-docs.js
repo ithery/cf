@@ -1,54 +1,51 @@
 jQuery(function ($) {
-
     // Dropdown menu
-    $(".sidebar-dropdown > a").click(function () {
+    $('.sidebar-dropdown > a').click(function () {
         //$(".sidebar-submenu").slideUp(200);
-        if ($(this).parent().hasClass("active")) {
-            $(".sidebar-dropdown").removeClass("active");
-            $(this).parent().removeClass("active");
+        if ($(this).parent().hasClass('active')) {
+            $('.sidebar-dropdown').removeClass('active');
+            $(this).parent().removeClass('active');
         } else {
-            $(".sidebar-dropdown").removeClass("active");
+            $('.sidebar-dropdown').removeClass('active');
             //$(this).next(".sidebar-submenu").slideDown(200);
-            $(this).parent().addClass("active");
+            $(this).parent().addClass('active');
         }
-
     });
 
     //toggle sidebar
-    $("#toggle-sidebar").click(function () {
-        $(".page-wrapper").toggleClass("toggled");
+    $('#toggle-sidebar').click(function () {
+        $('.page-wrapper').toggleClass('toggled');
     });
     //Pin sidebar
-    $("#pin-sidebar").click(function () {
-        if ($(".page-wrapper").hasClass("pinned")) {
+    $('#pin-sidebar').click(function () {
+        if ($('.page-wrapper').hasClass('pinned')) {
             // unpin sidebar when hovered
-            $(".page-wrapper").removeClass("pinned");
-            $("#sidebar").unbind( "hover");
+            $('.page-wrapper').removeClass('pinned');
+            $('#sidebar').unbind('hover');
         } else {
-            $(".page-wrapper").addClass("pinned");
-            $("#sidebar").hover(
+            $('.page-wrapper').addClass('pinned');
+            $('#sidebar').hover(
                 function () {
-                    console.log("mouseenter");
-                    $(".page-wrapper").addClass("sidebar-hovered");
+                    //console.log('mouseenter');
+                    $('.page-wrapper').addClass('sidebar-hovered');
                 },
                 function () {
-                    console.log("mouseout");
-                    $(".page-wrapper").removeClass("sidebar-hovered");
+                    //console.log('mouseout');
+                    $('.page-wrapper').removeClass('sidebar-hovered');
                 }
-            )
-
+            );
         }
     });
 
 
     //toggle sidebar overlay
-    $("#overlay").click(function () {
-        $(".page-wrapper").toggleClass("toggled");
+    $('#overlay').click(function () {
+        $('.page-wrapper').toggleClass('toggled');
     });
 
 
     //custom scroll bar is only used on desktop
-    
+
     if (!/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
         /*
         $(".sidebar-content").mCustomScrollbar({
@@ -58,8 +55,32 @@ jQuery(function ($) {
         });
          * s
          */
-        $(".sidebar-content").addClass("desktop");
-
+        $('.sidebar-content').addClass('desktop');
     }
-});
 
+
+    var toggleAffix = function (affixElement, scrollElement, wrapper) {
+        // var height = affixElement.outerHeight();
+        var top = wrapper.offset().top;
+
+        if (scrollElement.scrollTop() >= top) {
+            affixElement.addClass('affix');
+        } else {
+            affixElement.removeClass('affix');
+        }
+    };
+
+
+    $('[data-toggle="affix"]').each(function () {
+        var ele = $(this),
+            wrapper = $('<div></div>');
+
+        ele.before(wrapper);
+        $(window).on('scroll resize', function () {
+            toggleAffix(ele, $(this), wrapper);
+        });
+
+        // init
+        toggleAffix(ele, $(window), wrapper);
+    });
+});

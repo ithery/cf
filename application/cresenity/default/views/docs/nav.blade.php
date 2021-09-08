@@ -1,6 +1,4 @@
-<div>
-    {{ $category }}
-</div>
+
 <ul>
     @foreach($navs as $nav)
     <li class="sidebar-dropdown {{ carr::get($nav,'name')==$category ? ' active':'' }}">

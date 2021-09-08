@@ -3,22 +3,28 @@
 abstract class CResources_Engine implements CResources_EngineInterface {
     use CTrait_Compat_Resources_Engine;
 
-    protected $_resource_type;
-    protected $_type;
-    protected $_org_code;
-    protected $_app_code;
-    protected $_sizes;
-    protected $_filename;
-    protected $_root_directory;
+    protected $resourceType;
 
-    public function __construct($resource_type, $type, $options = []) {
-        $this->_resource_type = strtolower($resource_type);
-        $this->_type = $type;
+    protected $type;
 
-        $this->_org_code = carr::get($options, 'org_code');
-        $this->_app_code = carr::get($options, 'app_code');
-        $this->_sizes = [];
-        $this->_root_directory = 'resources';
+    protected $orgCode;
+
+    protected $appCode;
+
+    protected $sizes;
+
+    protected $filename;
+
+    protected $rootDirectory;
+
+    public function __construct($resourceType, $type, $options = []) {
+        $this->resource_type = strtolower($resourceType);
+        $this->type = $type;
+
+        $this->orgCode = carr::get($options, 'org_code');
+        $this->appCode = carr::get($options, 'app_code');
+        $this->sizes = [];
+        $this->rootDirectory = 'resources';
     }
 
     public function getPath($filename, $size = null) {
@@ -46,7 +52,7 @@ abstract class CResources_Engine implements CResources_EngineInterface {
             $temp .= $size . DS;
         }
         $temp .= $filename;
-        $dir = $this->_root_directory . DS;
+        $dir = $this->rootDirectory . DS;
         $temp_path = str_replace(DS, '/', $dir) . '' . $temp;
 
         return $temp_path;
@@ -66,21 +72,21 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         }
         $date_now = date('Y-m-d H:i:s');
 
-        $dir = $this->_root_directory . DS;
+        $dir = $this->rootDirectory . DS;
 
-        $org_code = $this->_org_code;
+        $org_code = $this->orgCode;
         if ($org_code == null) {
             $org_code = 'default';
         }
         $dir .= $org_code . DS;
 
-        $dir .= $this->_resource_type . DS;
+        $dir .= $this->resource_type . DS;
 
-        $dir .= $this->_type . DS;
+        $dir .= $this->type . DS;
 
         $dir .= date('YmdHis', strtotime($date_now)) . DS;
 
-        $temp_file_name = $org_code . '_' . $this->_resource_type . '_' . $this->_type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
+        $temp_file_name = $org_code . '_' . $this->resource_type . '_' . $this->type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
         $path = $dir . $temp_file_name;
 
         if (cstr::startsWith($path, DOCROOT)) {
@@ -92,28 +98,28 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         if ($written === false) {
             throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));
         }
-        $this->_filename = $temp_file_name;
+        $this->filename = $temp_file_name;
         return $temp_file_name;
     }
 
     public function save($file_name, $file_request) {
         $date_now = date('Y-m-d H:i:s');
 
-        $dir = $this->_root_directory . DS;
+        $dir = $this->rootDirectory . DS;
 
-        $org_code = $this->_org_code;
+        $org_code = $this->orgCode;
         if ($org_code == null) {
             $org_code = 'default';
         }
         $dir .= $org_code . DS;
 
-        $dir .= $this->_resource_type . DS;
+        $dir .= $this->resource_type . DS;
 
-        $dir .= $this->_type . DS;
+        $dir .= $this->type . DS;
 
         $dir .= date('YmdHis', strtotime($date_now)) . DS;
 
-        $temp_file_name = $org_code . '_' . $this->_resource_type . '_' . $this->_type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
+        $temp_file_name = $org_code . '_' . $this->resource_type . '_' . $this->type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
         $path = $dir . $temp_file_name;
 
         if (cstr::startsWith($path, DOCROOT)) {
@@ -125,16 +131,16 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         if ($written === false) {
             throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));
         }
-        $this->_filename = $temp_file_name;
+        $this->filename = $temp_file_name;
         return $temp_file_name;
     }
 
     public function saveFromTemporary($filename, $folder, $fileId) {
         $dateNow = date('Y-m-d H:i:s');
 
-        $dir = $this->_root_directory . DS;
+        $dir = $this->rootDirectory . DS;
         //$dir = '';
-        $orgCode = $this->_org_code;
+        $orgCode = $this->orgCode;
         if ($orgCode == null) {
             $orgCode = 'default';
         }
@@ -142,15 +148,15 @@ abstract class CResources_Engine implements CResources_EngineInterface {
 
         $tempDisk = CStorage::instance()->temp();
         $tempPath = CTemporary::getPath($folder, $fileId);
-        $dir .= $this->_resource_type . DS;
+        $dir .= $this->resource_type . DS;
 
-        $dir .= $this->_type . DS;
+        $dir .= $this->type . DS;
 
         $dir .= date('YmdHis', strtotime($dateNow)) . DS;
 
         //cfs::mkdir($dir);
 
-        $tempFileName = $orgCode . '_' . $this->_resource_type . '_' . $this->_type . '_' . date('YmdHis', strtotime($dateNow)) . '_' . $filename;
+        $tempFileName = $orgCode . '_' . $this->resource_type . '_' . $this->type . '_' . date('YmdHis', strtotime($dateNow)) . '_' . $filename;
         $path = $dir . $tempFileName;
 
         if (cstr::startsWith($path, DOCROOT)) {
@@ -163,60 +169,60 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         if ($written === false) {
             throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));
         }
-        $this->_filename = $tempFileName;
+        $this->filename = $tempFileName;
         return $tempFileName;
     }
 
     public function saveFromTemp($file_name, $tempPath) {
         $date_now = date('Y-m-d H:i:s');
 
-        $dir = $this->_root_directory . DS;
+        $dir = $this->rootDirectory . DS;
 
-        $org_code = $this->_org_code;
+        $org_code = $this->orgCode;
         if ($org_code == null) {
             $org_code = 'default';
         }
         $dir .= $org_code . DS;
 
-        $dir .= $this->_resource_type . DS;
+        $dir .= $this->resource_type . DS;
 
-        $dir .= $this->_type . DS;
+        $dir .= $this->type . DS;
 
         $dir .= date('YmdHis', strtotime($date_now)) . DS;
 
         cfs::mkdir($dir);
 
-        $temp_file_name = $org_code . '_' . $this->_resource_type . '_' . $this->_type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
+        $temp_file_name = $org_code . '_' . $this->resource_type . '_' . $this->type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
         $path = $dir . $temp_file_name;
         $written = copy($tempPath, $path);
 
         if ($written === false) {
             throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));
         }
-        $this->_filename = $temp_file_name;
+        $this->filename = $temp_file_name;
         return $temp_file_name;
     }
 
     public function saveFile($file_name, $file_request) {
         $date_now = date('Y-m-d H:i:s');
 
-        $dir = $this->_root_directory . DS;
+        $dir = $this->rootDirectory . DS;
 
-        $org_code = $this->_org_code;
+        $org_code = $this->orgCode;
         if ($org_code == null) {
             $org_code = 'default';
         }
         $dir .= $org_code . DS;
 
-        $dir .= $this->_resource_type . DS;
+        $dir .= $this->resource_type . DS;
 
-        $dir .= $this->_type . DS;
+        $dir .= $this->type . DS;
 
         $dir .= date('YmdHis', strtotime($date_now)) . DS;
 
         cfs::mkdir($dir);
 
-        $temp_file_name = $org_code . '_' . $this->_resource_type . '_' . $this->_type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
+        $temp_file_name = $org_code . '_' . $this->resource_type . '_' . $this->type . '_' . date('YmdHis', strtotime($date_now)) . '_' . $file_name;
         $path = $dir . $temp_file_name;
 
         $written = rename($file_request, $path);
@@ -224,24 +230,17 @@ abstract class CResources_Engine implements CResources_EngineInterface {
         if ($written === false) {
             throw new CResources_Exception(sprintf('The %s resource file is not writable.', $path));
         }
-        $this->_filename = $temp_file_name;
+        $this->filename = $temp_file_name;
         return $temp_file_name;
     }
 
     public function getUrl($filename = null, $size = '', $encode = true) {
-//        if(CResources::isS3()) {
-//            $path = $this->getPath($filename,$size);
-//            $disk = CResources::disk();
-//            return $disk->url($path);
-//
-//        }
-
         if ($filename == null) {
-            $filename = $this->_filename;
+            $filename = $this->filename;
         }
-        if ($this->_resource_type == 'image') {
+        if ($this->resource_type == 'image') {
             $options = [
-                'app_code' => $this->_app_code,
+                'app_code' => $this->appCode,
             ];
             $imageLoader = CResources::image($filename, $options);
             if (strlen($size) > 0) {
@@ -249,11 +248,11 @@ abstract class CResources_Engine implements CResources_EngineInterface {
             }
             return $imageLoader->getUrl();
         }
-        if ($this->_resource_type == 'file' || $this->_resource_type == 'pdf') {
+        if ($this->resource_type == 'file' || $this->resource_type == 'pdf') {
             $options = [
-                'app_code' => $this->_app_code,
+                'app_code' => $this->appCode,
             ];
-            $fileLoader = CResources::files($filename, $options);
+            $fileLoader = CResources::file($filename, $options);
             return $fileLoader->getUrl();
         }
 
@@ -267,16 +266,15 @@ abstract class CResources_Engine implements CResources_EngineInterface {
             $path = curl::base(false, $http_or_https) . 'assets/image/' . $size_add . $filename;
         }
 
-//            $file_name_encode = $this->encode($file_name,self::_digit);
         return $path;
     }
 
-    public function get_root_directory() {
-        return $this->_root_directory;
+    public function getRootDirectory() {
+        return $this->rootDirectory;
     }
 
-    public function set_root_directory($_root_directory) {
-        $this->_root_directory = $_root_directory;
+    public function setRootDirectory($_root_directory) {
+        $this->rootDirectory = $_root_directory;
         return $this;
     }
 }

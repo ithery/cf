@@ -1,23 +1,25 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 15, 2019, 6:47:31 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 15, 2019, 6:47:31 PM
  */
 final class CModel_Activity {
-
     use CEvent_Trait_Dispatchable;
 
     private $isStarted;
+
     private $message;
+
     private static $instance;
+
     private $data;
 
     /**
-     * 
      * @return CModel_Activity
      */
     public static function instance() {
@@ -28,7 +30,7 @@ final class CModel_Activity {
     }
 
     private function __construct() {
-        $this->data = array();
+        $this->data = [];
     }
 
     public function setMessage($message) {
@@ -36,17 +38,16 @@ final class CModel_Activity {
     }
 
     public function setListener($callback) {
-
         $this->listen('OnActivity', $callback);
     }
 
     public function start() {
         $this->isStarted = true;
-        $this->data = array();
+        $this->data = [];
     }
 
     public function stop() {
-        $this->dispatch('OnActivity', array($this->message, $this->data));
+        $this->dispatch('OnActivity', [$this->message, $this->data]);
         $this->isStarted = false;
     }
 
@@ -63,5 +64,4 @@ final class CModel_Activity {
     public function isStarted() {
         return $this->isStarted;
     }
-
 }

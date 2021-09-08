@@ -8,7 +8,7 @@ class CConsole_Kernel implements CConsole_KernelInterface {
     /**
      * The event dispatcher implementation.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var CEvents_DispatcherInterface
      */
     protected $events;
 

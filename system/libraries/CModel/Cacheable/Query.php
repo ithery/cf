@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 4:03:03 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 4:03:03 PM
  */
 
 /**
  * @mixin CModel_Query
  */
 class CModel_Cacheable_Query extends CModel_Query {
-
     /**
      * Execute the query as a "select" statement.
      *
@@ -57,14 +57,15 @@ class CModel_Cacheable_Query extends CModel_Query {
             // If the model has a mutator for the requested column, we will spin through
             // the results and mutate the values so that the mutated version of these
             // columns are returned as you would expect from these Eloquent models.
-            if (!$this->model->hasGetMutator($column) &&
-                    !$this->model->hasCast($column) &&
-                    !in_array($column, $this->model->getDates())) {
+            if (!$this->model->hasGetMutator($column)
+                && !$this->model->hasCast($column)
+                && !in_array($column, $this->model->getDates())
+            ) {
                 return $results;
             }
             return $results->map(function ($value) use ($column) {
-                        return $this->model->newFromBuilder([$column => $value])->{$column};
-                    });
+                return $this->model->newFromBuilder([$column => $value])->{$column};
+            });
         };
         // Check if cache is enabled
         if ($this->model->getCacheLifetime()) {
@@ -76,5 +77,4 @@ class CModel_Cacheable_Query extends CModel_Query {
         $this->model->resetCacheConfig();
         return $results;
     }
-
 }

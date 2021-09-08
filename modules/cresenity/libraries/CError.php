@@ -3,6 +3,8 @@
  * Error class
  *
  * PHP version 5
+ *
+ * @deprecated 1.2
  */
 class CError {
     /**

@@ -1,17 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 26, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Aug 26, 2020
  */
 
 use Evenement\EventEmitterInterface;
 
-trait CRunner_FFMpeg_Trait_HasProgressListenerTrait
-{
+trait CRunner_FFMpeg_Trait_HasProgressListenerTrait {
     /**
      * @var \Closure
      */
@@ -27,15 +27,13 @@ trait CRunner_FFMpeg_Trait_HasProgressListenerTrait
      */
     protected $lastRemaining = 0;
 
-    public function onProgress(Closure $callback)
-    {
+    public function onProgress(Closure $callback) {
         $this->onProgressCallback = $callback;
 
         return $this;
     }
 
-    private function applyProgressListenerToFormat(EventEmitterInterface $format)
-    {
+    private function applyProgressListenerToFormat(EventEmitterInterface $format) {
         $format->on('progress', function ($media, $format, $percentage, $remaining = null, $rate = null) {
             if ($percentage !== $this->lastPercentage && $percentage < 100) {
                 $this->lastPercentage = $percentage;
