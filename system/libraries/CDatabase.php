@@ -1338,6 +1338,10 @@ class CDatabase {
     public function fetchAll($sql, array $params = []) {
         return $this->query($sql, $params)->fetchAll();
     }
+
+    public function getTablePrefix() {
+        return carr::get($this->config, 'table_prefix');
+    }
 }
 
 // End Database Class
