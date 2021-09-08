@@ -41,7 +41,7 @@ interface InputInterface
      *
      * @return bool true if the value is contained in the raw parameters
      */
-    public function hasParameterOption($values, bool $onlyParams = false);
+    public function hasParameterOption($values, $onlyParams = false);
 
     /**
      * Returns the value of a raw option (not parsed).
@@ -51,18 +51,16 @@ interface InputInterface
      * Does not necessarily return the correct result for short options
      * when multiple flags are combined in the same option.
      *
-     * @param string|array                     $values     The value(s) to look for in the raw parameters (can be an array)
-     * @param string|bool|int|float|array|null $default    The default value to return if no result is found
-     * @param bool                             $onlyParams Only check real parameters, skip those following an end of options (--) signal
+     * @param string|array $values     The value(s) to look for in the raw parameters (can be an array)
+     * @param mixed        $default    The default value to return if no result is found
+     * @param bool         $onlyParams Only check real parameters, skip those following an end of options (--) signal
      *
      * @return mixed The option value
      */
-    public function getParameterOption($values, $default = false, bool $onlyParams = false);
+    public function getParameterOption($values, $default = false, $onlyParams = false);
 
     /**
      * Binds the current Input instance with the given arguments and options.
-     *
-     * @throws RuntimeException
      */
     public function bind(InputDefinition $definition);
 
@@ -76,66 +74,76 @@ interface InputInterface
     /**
      * Returns all the given arguments merged with the default values.
      *
-     * @return array<string|bool|int|float|array|null>
+     * @return array
      */
     public function getArguments();
 
     /**
      * Returns the argument value for a given argument name.
      *
-     * @return mixed
+     * @param string $name The argument name
+     *
+     * @return mixed The argument value
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    public function getArgument(string $name);
+    public function getArgument($name);
 
     /**
      * Sets an argument value by name.
      *
-     * @param mixed $value The argument value
+     * @param string $name  The argument name
+     * @param string $value The argument value
      *
      * @throws InvalidArgumentException When argument given doesn't exist
      */
-    public function setArgument(string $name, $value);
+    public function setArgument($name, $value);
 
     /**
      * Returns true if an InputArgument object exists by name or position.
      *
+     * @param string|int $name The InputArgument name or position
+     *
      * @return bool true if the InputArgument object exists, false otherwise
      */
-    public function hasArgument(string $name);
+    public function hasArgument($name);
 
     /**
      * Returns all the given options merged with the default values.
      *
-     * @return array<string|bool|int|float|array|null>
+     * @return array
      */
     public function getOptions();
 
     /**
      * Returns the option value for a given option name.
      *
-     * @return mixed
+     * @param string $name The option name
+     *
+     * @return mixed The option value
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function getOption(string $name);
+    public function getOption($name);
 
     /**
      * Sets an option value by name.
      *
-     * @param mixed $value The option value
+     * @param string      $name  The option name
+     * @param string|bool $value The option value
      *
      * @throws InvalidArgumentException When option given doesn't exist
      */
-    public function setOption(string $name, $value);
+    public function setOption($name, $value);
 
     /**
      * Returns true if an InputOption object exists by name.
      *
+     * @param string $name The InputOption name
+     *
      * @return bool true if the InputOption object exists, false otherwise
      */
-    public function hasOption(string $name);
+    public function hasOption($name);
 
     /**
      * Is this input means interactive?
@@ -146,6 +154,8 @@ interface InputInterface
 
     /**
      * Sets the input interactivity.
+     *
+     * @param bool $interactive If the input should be interactive
      */
-    public function setInteractive(bool $interactive);
+    public function setInteractive($interactive);
 }
