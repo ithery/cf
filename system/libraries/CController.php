@@ -13,6 +13,16 @@ abstract class CController {
     protected $baseUri;
 
     /**
+     * @var CController_Input
+     */
+    protected $input;
+
+    /**
+     * @var URI
+     */
+    protected $uri;
+
+    /**
      * Loads URI, and Input into this controller.
      *
      * @return void
