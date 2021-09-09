@@ -237,7 +237,7 @@ class curl {
         // Run the redirect event
         CFEvent::run('system.redirect', $uri);
 
-        if (strpos($uri, '://') === false) {
+        if (is_string($uri) && strpos($uri, '://') === false) {
             // HTTP headers expect absolute URLs
             $uri = curl::site($uri, static::protocol());
         }
