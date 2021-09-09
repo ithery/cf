@@ -130,7 +130,10 @@ abstract class CElement extends CObservable {
         return $this;
     }
 
-    public function setAttr($k, $v) {
+    public function setAttr($k, $v = null) {
+        if (is_array($k)) {
+            return $this->setAttrFromArray($k);
+        }
         $this->attr[$k] = $v;
         return $this;
     }

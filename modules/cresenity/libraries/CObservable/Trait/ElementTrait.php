@@ -101,6 +101,19 @@ trait CObservable_Trait_ElementTrait {
     }
 
     /**
+     * Add Button Element &lt;button&gt
+     *
+     * @param string $id optional
+     *
+     * @return CElement_Element_Button Button Element
+     */
+    public function addButton($id = '') {
+        $element = CElement_Factory::createElement('button', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
+
+    /**
      * Add Heading 5 Element &lt;h5&gt
      *
      * @param string $id optional

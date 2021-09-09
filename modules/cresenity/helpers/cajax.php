@@ -3,6 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
+
 class cajax {
     public static function callback($obj, $input) {
         $callable = $obj->data->callable;
@@ -32,7 +33,7 @@ class cajax {
             $process_id = $input['ajax_process_id'];
         }
         if (isset($input['ajax_process_id'])) {
-            $last_process_id = cprogress::last_process_id();
+            //$last_process_id = cprogress::last_process_id();
         }
         if (isset($input['cancel'])) {
             $filename = $process_id . '_cancel' . '.tmp';
@@ -461,7 +462,8 @@ class cajax {
                     $transforms = json_decode($transforms, true);
 
                     foreach ($transforms as $transforms_k => $transforms_v) {
-                        $value = ctransform::$transforms_v['func']($value, true);
+                        $method = $transforms_v['func'];
+                        $value = ctransform::$method($value, true);
                     }
                 }
 
@@ -731,10 +733,11 @@ class cajax {
     }
 
     public static function dataelastic($obj, $input) {
+        $db = CDatabase::instance();
         $ajax_data = $obj->data->query;
         $param = $obj->param;
         $js = '';
-
+        $q = $obj->data->query;
         foreach ($param as $p) {
             $val = $input[$p->name];
             $q = str_replace('{' . $p->name . '}', $db->escape($val), $q);

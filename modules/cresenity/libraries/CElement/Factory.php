@@ -5,7 +5,7 @@ class CElement_Factory {
      * @param string $tag
      * @param string $id  optional
      *
-     * @return \CElement_Element|boolean
+     * @return \CElement_Element|bool
      *
      * @throws CApp_Exception
      */
@@ -38,6 +38,7 @@ class CElement_Factory {
             case 'label':
             case 'canvas':
             case 'img':
+            case 'button':
                 $class_name = 'CElement_Element_' . ucfirst($tag);
                 return new $class_name($id);
                 break;
@@ -51,7 +52,7 @@ class CElement_Factory {
     /**
      * @param string $id optional
      *
-     * @return \CElement_Template|boolean
+     * @return \CElement_Template|bool
      */
     public static function createTemplate($id = '') {
         return new CElement_Template($id);

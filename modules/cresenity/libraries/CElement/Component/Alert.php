@@ -9,13 +9,25 @@ class CElement_Component_Alert extends CElement_Component {
 
     protected $type;
 
+    protected $isDismissable;
+
+    /**
+     * @var CElement_Element_Button
+     */
+    protected $dismissableButton;
+
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
+        $this->dismissableButton = $this->addButton()->addClass('close')->setAttr([
+            'data-dismiss' => 'alert',
+            'aria-hidden' => 'true',
+        ])->add('×');
         $this->header = $this->addH4();
-        $this->content = $this->add_div()->addClass(' clearfix');
+        $this->content = $this->addDiv()->addClass(' clearfix');
         $this->addClass('alert');
         $this->wrapper = $this->content;
         $this->tag = 'div';
+        $this->isDismissable = false;
     }
 
     public function setType($type) {
@@ -23,9 +35,17 @@ class CElement_Component_Alert extends CElement_Component {
         return $this;
     }
 
+    public function setDismissable($bool = true) {
+        $this->isDismissable = $bool;
+        return $this;
+    }
+
     public function build() {
         if (strlen($this->title) == 0) {
             $this->header->setVisibility(false);
+        }
+        if (!$this->isDismissable) {
+            $this->dismissableButton->setVisibility(false);
         }
         $this->header->add($this->getTranslationTitle());
         switch ($this->type) {

@@ -44,7 +44,8 @@ class cmsg {
         }
         cmsg::clear($type);
         if (strlen($message) > 0) {
-            $message = CMessage::factory()->set_type($type)->set_message($message)->html();
+            $alert = new CElement_Component_Alert();
+            $message = $alert->setType($type)->add($message)->setDismissable()->html();
         }
         return $message;
     }
