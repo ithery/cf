@@ -197,6 +197,8 @@ class curl {
      * @param mixed $method
      *
      * @return void
+     *
+     * @deprecated 1.2 please use c::redirect
      */
     public static function redirect($uri = '', $method = '302') {
         if (CFEvent::has_run('system.send_headers')) {
