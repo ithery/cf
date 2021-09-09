@@ -2,6 +2,7 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+//@codingStandardsIgnoreStart
 final class CFEvent {
     // CFEvent callbacks
     private static $events = [];
