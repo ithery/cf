@@ -230,7 +230,7 @@ class CController_Input {
 
         $purifier = new HTMLPurifier($config);
         $data = $purifier->purify($data);
-
+        $data = htmlspecialchars_decode($data);
         return $data;
     }
 
