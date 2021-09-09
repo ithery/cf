@@ -27,7 +27,7 @@ abstract class CController {
         $this->uri = URI::instance();
 
         // Input should always be available
-        $this->input = Input::instance();
+        $this->input = CController_Input::instance();
 
         $this->baseUri = CFRouter::controllerUri();
     }

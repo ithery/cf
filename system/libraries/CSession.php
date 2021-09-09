@@ -7,14 +7,14 @@ class CSession {
 
     // Session singleton
     protected static $instance;
+
     // Protected key names (cannot be set by the user)
     protected static $protect = ['session_id', 'user_agent', 'last_activity', 'ip_address', 'total_hits', '_kf_flash_'];
+
     // Configuration and driver
     protected static $config;
-    protected static $driver;
 
-    // Input library
-    protected $input;
+    protected static $driver;
 
     /**
      * Singleton instance of Session.
@@ -34,8 +34,6 @@ class CSession {
      * On first session instance creation, sets up the driver and creates session.
      */
     public function __construct() {
-        $this->input = Input::instance();
-
         // This part only needs to be run once
         if (CSession::$instance === null) {
             // Load config
@@ -156,7 +154,7 @@ class CSession {
             $_SESSION['_kf_flash_'] = [];
 
             $_SESSION['user_agent'] = c::userAgent();
-            $_SESSION['ip_address'] = $this->input->ip_address();
+            $_SESSION['ip_address'] = CHTTP::request()->ip();
         }
 
         // Set up flash variables
@@ -172,14 +170,14 @@ class CSession {
                 switch ($valid) {
                     // Check user agent for consistency
                     case 'user_agent':
-                        if ($_SESSION[$valid] !== c::userAgent()) {
+                        if ($_SESSION[$valid] !== CHTTP::request()->userAgent()) {
                             return $this->create();
                         }
                         break;
 
                     // Check ip address for consistency
                     case 'ip_address':
-                        if ($_SESSION[$valid] !== $this->input->$valid()) {
+                        if ($_SESSION[$valid] !== CHTTP::request()->ip()) {
                             return $this->create();
                         }
                         break;
@@ -311,7 +309,7 @@ class CSession {
      * @param string $key     variable key
      * @param mixed  $default default value returned if variable does not exist
      *
-     * @return mixed Variable data if key specified, otherwise array containing all session data.
+     * @return mixed variable data if key specified, otherwise array containing all session data
      */
     public function get($key = false, $default = null) {
         if (empty($key)) {

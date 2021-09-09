@@ -37,7 +37,7 @@ class CApp_Message {
     }
 
     public static function flash($type) {
-        $msgs = cmsg::get($type);
+        $msgs = static::get($type);
         $message = '';
         if (is_array($msgs)) {
             foreach ($msgs as $msg) {
@@ -48,14 +48,15 @@ class CApp_Message {
                 $message = $msgs;
             }
         }
-        cmsg::clear($type);
+        static::clear($type);
         if (strlen($message) > 0) {
-            $message = CMessage::factory()->set_type($type)->set_message($message)->html();
+            $alert = new CElement_Component_Alert();
+            $message = $alert->setType($type)->add($message)->setDismissable()->html();
         }
         return $message;
     }
 
     public static function flashAll() {
-        return cmsg::flash('error') . cmsg::flash('warning') . cmsg::flash('info') . cmsg::flash('success');
+        return static::flash('error') . static::flash('warning') . static::flash('info') . static::flash('success');
     }
 }
