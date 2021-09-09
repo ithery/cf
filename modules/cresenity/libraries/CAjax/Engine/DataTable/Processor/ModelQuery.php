@@ -50,7 +50,7 @@ class CAjax_Engine_DataTable_Processor_ModelQuery extends CAjax_Engine_DataTable
 
         $data = [
             'datatable' => $output,
-            'js' => cbase64::encode($js),
+            'js' => base64_encode($js),
         ];
 
         return $data;

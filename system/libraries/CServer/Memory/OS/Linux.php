@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 6:18:54 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 6:18:54 PM
  */
 class CServer_Memory_OS_Linux extends CServer_Memory_OS {
-
     /**
      * Physical memory information and Swap Space information
      *
@@ -17,8 +17,6 @@ class CServer_Memory_OS_Linux extends CServer_Memory_OS {
     public function buildMemory() {
         $cmd = $this->createCommand();
         if ($cmd->rfts('/proc/meminfo', $mbuf)) {
-
-
             $bufe = preg_split("/\n/", $mbuf, -1, PREG_SPLIT_NO_EMPTY);
             foreach ($bufe as $buf) {
                 if (preg_match('/^MemTotal:\s+(\d+)\s*kB/i', $buf, $ar_buf)) {
@@ -48,7 +46,7 @@ class CServer_Memory_OS_Linux extends CServer_Memory_OS {
                 $ar_buf = preg_split('/\s+/', $swap, 5);
                 $dev = CServer::createDeviceDisk();
                 $dev->setMountPoint($ar_buf[0]);
-                $dev->setName("SWAP");
+                $dev->setName('SWAP');
                 $dev->setTotal($ar_buf[2] * 1024);
                 $dev->setUsed($ar_buf[3] * 1024);
                 $dev->setFree($dev->getTotal() - $dev->getUsed());
@@ -56,5 +54,4 @@ class CServer_Memory_OS_Linux extends CServer_Memory_OS {
             }
         }
     }
-
 }

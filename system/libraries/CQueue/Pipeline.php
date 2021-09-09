@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 2:51:59 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 2:51:59 AM
  */
 class CQueue_Pipeline implements CQueue_PipelineInterface {
-
     /**
      * The container implementation.
      *
@@ -40,7 +40,8 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
     /**
      * Create a new class instance.
      *
-     * @param  CContainer_ContainerInterface|null  $container
+     * @param CContainer_ContainerInterface|null $container
+     *
      * @return void
      */
     public function __construct(CContainer_ContainerInterface $container = null) {
@@ -50,7 +51,8 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
     /**
      * Set the object being sent through the pipeline.
      *
-     * @param  mixed  $passable
+     * @param mixed $passable
+     *
      * @return $this
      */
     public function send($passable) {
@@ -61,7 +63,8 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
     /**
      * Set the array of pipes.
      *
-     * @param  array|mixed  $pipes
+     * @param array|mixed $pipes
+     *
      * @return $this
      */
     public function through($pipes) {
@@ -72,7 +75,8 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
     /**
      * Set the method to call on the pipes.
      *
-     * @param  string  $method
+     * @param string $method
+     *
      * @return $this
      */
     public function via($method) {
@@ -83,12 +87,15 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
     /**
      * Run the pipeline with a final destination callback.
      *
-     * @param  \Closure  $destination
+     * @param \Closure $destination
+     *
      * @return mixed
      */
     public function then(Closure $destination) {
         $pipeline = array_reduce(
-                array_reverse($this->pipes), $this->carry(), $this->prepareDestination($destination)
+            array_reverse($this->pipes),
+            $this->carry(),
+            $this->prepareDestination($destination)
         );
         return $pipeline($this->passable);
     }
@@ -100,14 +107,15 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
      */
     public function thenReturn() {
         return $this->then(function ($passable) {
-                    return $passable;
-                });
+            return $passable;
+        });
     }
 
     /**
      * Get the final piece of the Closure onion.
      *
-     * @param  \Closure  $destination
+     * @param \Closure $destination
+     *
      * @return \Closure
      */
     protected function prepareDestination(Closure $destination) {
@@ -163,7 +171,8 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
     /**
      * Parse full pipe string to get name and parameters.
      *
-     * @param  string $pipe
+     * @param string $pipe
+     *
      * @return array
      */
     protected function parsePipeString($pipe) {
@@ -191,7 +200,8 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
     /**
      * Handles the value returned from each pipe before passing it to the next.
      *
-     * @param  mixed $carry
+     * @param mixed $carry
+     *
      * @return mixed
      */
     protected function handleCarry($carry) {
@@ -201,8 +211,9 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
     /**
      * Handle the given exception.
      *
-     * @param  mixed  $passable
-     * @param  \Exception  $e
+     * @param mixed      $passable
+     * @param \Exception $e
+     *
      * @return mixed
      *
      * @throws \Exception
@@ -210,5 +221,4 @@ class CQueue_Pipeline implements CQueue_PipelineInterface {
     protected function handleException($passable, Exception $e) {
         throw $e;
     }
-
 }

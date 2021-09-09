@@ -1,25 +1,19 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CDevSuite_Linux_Site extends CDevSuite_Site {
-
     /**
      * Get all certificates from config folder.
      *
      * @param string $path
-     * @return \Illuminate\Support\Collection
+     *
+     * @return \CCollection
      */
     public function getCertificates($path) {
         return c::collect($this->files->scanDir($path))->filter(function ($value, $key) {
-                    return cstr::endsWith($value, '.crt');
-                })->map(function ($cert) {
-                    return substr($cert, 0, -9);
-                })->flip();
+            return cstr::endsWith($value, '.crt');
+        })->map(function ($cert) {
+            return substr($cert, 0, -9);
+        })->flip();
     }
 
     /**
@@ -49,6 +43,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      *
      * @param string $oldDomain
      * @param string $domain
+     *
      * @return void
      */
     public function resecureForNewDomain($oldDomain, $domain) {
@@ -71,6 +66,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      * Secure the given host with TLS.
      *
      * @param string $url
+     *
      * @return void
      */
     public function secure($url) {
@@ -110,7 +106,12 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
             $this->files->unlink($caPemPath);
         }
         $this->cli->runAsUser(sprintf(
-                        'openssl req -new -newkey rsa:2048 -days 730 -nodes -x509 -subj "/O=%s/commonName=%s/organizationalUnitName=Developers/emailAddress=%s/" -keyout "%s" -out "%s"', $oName, $cName, 'rootcertificate@cf.devsuite', $caKeyPath, $caPemPath
+            'openssl req -new -newkey rsa:2048 -days 730 -nodes -x509 -subj "/O=%s/commonName=%s/organizationalUnitName=Developers/emailAddress=%s/" -keyout "%s" -out "%s"',
+            $oName,
+            $cName,
+            'rootcertificate@cf.devsuite',
+            $caKeyPath,
+            $caPemPath
         ));
     }
 
@@ -118,6 +119,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      * Create and trust a certificate for the given URL.
      *
      * @param string $url
+     *
      * @return void
      */
     public function createCertificate($url) {
@@ -137,9 +139,15 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
         if ($this->files->exists($caSrlPath)) {
             $caSrlParam = ' -CAserial ' . $caSrlPath;
         }
-        
+
         $commandOpenSSL = sprintf(
-                        'openssl x509 -req -sha256 -days 365 -CA "%s" -CAkey "%s"%s -in "%s" -out "%s" -extensions v3_req -extfile "%s"', $caPemPath, $caKeyPath, $caSrlParam, $csrPath, $crtPath, $confPath
+            'openssl x509 -req -sha256 -days 365 -CA "%s" -CAkey "%s"%s -in "%s" -out "%s" -extensions v3_req -extfile "%s"',
+            $caPemPath,
+            $caKeyPath,
+            $caSrlParam,
+            $csrPath,
+            $crtPath,
+            $confPath
         );
         $this->cli->runAsUser($commandOpenSSL);
 
@@ -150,6 +158,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      * Create the private key for the TLS certificate.
      *
      * @param string $keyPath
+     *
      * @return void
      */
     public function createPrivateKey($keyPath) {
@@ -160,21 +169,30 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      * Create the signing request for the TLS certificate.
      *
      * @param string $keyPath
+     * @param mixed  $url
+     * @param mixed  $csrPath
+     * @param mixed  $confPath
+     *
      * @return void
      */
     public function createSigningRequest($url, $keyPath, $csrPath, $confPath) {
         $this->cli->runAsUser(sprintf(
-                        'openssl req -new -key %s -out %s -subj "/C=US/ST=MN/O=DevSuite/localityName=DevSuite/commonName=%s/organizationalUnitName=DevSuite/emailAddress=devsuite/" -config %s -passin pass:', $keyPath, $csrPath, $url, $confPath
+            'openssl req -new -key %s -out %s -subj "/C=US/ST=MN/O=DevSuite/localityName=DevSuite/commonName=%s/organizationalUnitName=DevSuite/emailAddress=devsuite/" -config %s -passin pass:',
+            $keyPath,
+            $csrPath,
+            $url,
+            $confPath
         ));
     }
 
-    /*     * tap
+    /**
      * Build the SSL config for the given URL.
      *
      * @param string $url
+     * @param mixed  $path
+     *
      * @return string
      */
-
     public function buildCertificateConf($path, $url) {
         $config = str_replace('DEVSUITE_DOMAIN', $url, $this->files->get(CDevSuite::stubsPath() . 'openssl.conf'));
         $this->files->putAsUser($path, $config);
@@ -184,23 +202,29 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      * Trust the given certificate file in the Mac Keychain.
      *
      * @param string $crtPath
+     * @param mixed  $url
+     *
      * @return void
      */
     public function trustCertificate($crtPath, $url) {
         $commandTrust1 = sprintf(
-                        'certutil -d sql:$HOME/.pki/nssdb -A -t TC -n "%s" -i "%s"', $url, $crtPath
-        ); 
-        
+            'certutil -d sql:$HOME/.pki/nssdb -A -t TC -n "%s" -i "%s"',
+            $url,
+            $crtPath
+        );
+
         $commandTrust2 = sprintf(
-                        'certutil -d $HOME/.mozilla/firefox/*.default -A -t TC -n "%s" -i "%s"', $url, $crtPath
-        ); 
-        
-        CDevSuite::info('Executing Command:'.$commandTrust1);
-        
+            'certutil -d $HOME/.mozilla/firefox/*.default -A -t TC -n "%s" -i "%s"',
+            $url,
+            $crtPath
+        );
+
+        CDevSuite::info('Executing Command:' . $commandTrust1);
+
         $this->cli->run($commandTrust1);
 
-        CDevSuite::info('Executing Command:'.$commandTrust2);
-        
+        CDevSuite::info('Executing Command:' . $commandTrust2);
+
         $this->cli->run($commandTrust2);
     }
 
@@ -209,7 +233,8 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      */
     public function createSecureNginxServer($url) {
         $this->files->putAsUser(
-                CDevSuite::homePath() . '/Nginx/' . $url, $this->buildSecureNginxServer($url)
+            CDevSuite::homePath() . '/Nginx/' . $url,
+            $this->buildSecureNginxServer($url)
         );
     }
 
@@ -217,35 +242,36 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      * Build the TLS secured Nginx server for the given URL.
      *
      * @param string $url
+     *
      * @return string
      */
     public function buildSecureNginxServer($url) {
         $path = $this->certificatesPath();
 
         $content = str_replace(
-                [
-                    'DEVSUITE_HOME_PATH',
-                    'DEVSUITE_SERVER_PATH',
-                    'DEVSUITE_STATIC_PREFIX',
-                    'DEVSUITE_SITE',
-                    'DEVSUITE_CERT',
-                    'DEVSUITE_KEY',
-                    'DEVSUITE_HTTP_PORT',
-                    'DEVSUITE_HTTPS_PORT',
-                    'DEVSUITE_REDIRECT_PORT',
-                ]
-                , [
-            rtrim(CDevSuite::homePath(), '/'),
-            CDevSuite::serverPath(),
-            CDevSuite::staticPrefix(),
-            $url,
-            $path . '/' . $url . '.crt',
-            $path . '/' . $url . '.key',
-            $this->config->get('port', 80),
-            $this->config->get('https_port', 443),
-            $this->httpsSuffix(),
-                ]
-                , $this->files->get(CDevSuite::stubsPath() . 'secure.devsuite.conf')
+            [
+                'DEVSUITE_HOME_PATH',
+                'DEVSUITE_SERVER_PATH',
+                'DEVSUITE_STATIC_PREFIX',
+                'DEVSUITE_SITE',
+                'DEVSUITE_CERT',
+                'DEVSUITE_KEY',
+                'DEVSUITE_HTTP_PORT',
+                'DEVSUITE_HTTPS_PORT',
+                'DEVSUITE_REDIRECT_PORT',
+            ],
+            [
+                rtrim(CDevSuite::homePath(), '/'),
+                CDevSuite::serverPath(),
+                CDevSuite::staticPrefix(),
+                $url,
+                $path . '/' . $url . '.crt',
+                $path . '/' . $url . '.key',
+                $this->config->get('port', 80),
+                $this->config->get('https_port', 443),
+                $this->httpsSuffix(),
+            ],
+            $this->files->get(CDevSuite::stubsPath() . 'secure.devsuite.conf')
         );
 
         return $content;
@@ -255,6 +281,7 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      * Unsecure the given URL so that it will use HTTP again.
      *
      * @param string $url
+     *
      * @return void
      */
     public function unsecure($url) {
@@ -277,9 +304,8 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      * @return void
      */
     public function regenerateSecuredSitesConfig() {
-        $this->secured()->each(function ($url) {
+        c::collect($this->secured())->each(function ($url) {
             $this->createSecureNginxServer($url);
         });
     }
-
 }

@@ -26,7 +26,7 @@ abstract class ValidatingModel extends CModel_Query implements CBase_MessageProv
     /**
      * Get the messages for the instance.
      *
-     * @return \Illuminate\Support\MessageBag
+     * @return CBase_MessageBag
      */
     public function getMessageBag() {
         return $this->getErrors();

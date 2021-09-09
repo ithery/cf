@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 26, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Aug 26, 2020
  */
 use FFMpeg\Format\FormatInterface;
 use FFMpeg\Format\Video\DefaultVideo;
 use FFMpeg\Media\AdvancedMedia;
 
 class CRunner_FFMpeg_AdvancedOutputMapping {
-
     /**
      * @var array
      */
@@ -29,12 +29,12 @@ class CRunner_FFMpeg_AdvancedOutputMapping {
     private $output;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $forceDisableAudio = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $forceDisableVideo = false;
 
@@ -75,5 +75,4 @@ class CRunner_FFMpeg_AdvancedOutputMapping {
     public function hasOut($out) {
         return in_array($out, $this->outs);
     }
-
 }

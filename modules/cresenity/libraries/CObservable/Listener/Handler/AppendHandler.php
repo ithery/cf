@@ -92,16 +92,16 @@ class CObservable_Listener_Handler_AppendHandler extends CObservable_Listener_Ha
         }
         $data_addition = '{' . $data_addition . '}';
         $js .= '
-                    var is_duplicate = 0;
-                    var check_duplicate = ' . (strlen($this->check_duplicate_selector) > 0 ? '1' : '0') . ";
-                    if(check_duplicate==1){
-                        if (jQuery('#" . $this->target . "').find('" . $this->check_duplicate_selector . "').length > 0) {
-                            is_duplicate = 1;
-                        }
-                    }
-                    if (is_duplicate==0) {
-			$.cresenity.append('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $data_addition . ');
-                    }
+            var is_duplicate = 0;
+            var check_duplicate = ' . (strlen($this->check_duplicate_selector) > 0 ? '1' : '0') . ";
+            if(check_duplicate==1){
+                if (jQuery('#" . $this->target . "').find('" . $this->check_duplicate_selector . "').length > 0) {
+                    is_duplicate = 1;
+                }
+            }
+            if (is_duplicate==0) {
+			    $.cresenity.append('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $data_addition . ');
+            }
 		';
 
         return $js;

@@ -6,11 +6,11 @@
  * @author Hery
  */
 trait CDevSuite_Deploy_Trait_ConfigurationParserTrait {
-
     /**
      * Get the configured server from the SSH config.
      *
-     * @param  string  $host
+     * @param string $host
+     *
      * @return string|null
      */
     protected function getConfiguredServer($host) {
@@ -22,7 +22,8 @@ trait CDevSuite_Deploy_Trait_ConfigurationParserTrait {
     /**
      * Get the SSH configuration file instance.
      *
-     * @param  string  $user
+     * @param string $user
+     *
      * @return \Laravel\Envoy\SSHConfigFile|null
      */
     protected function getSshConfig($user) {
@@ -34,7 +35,8 @@ trait CDevSuite_Deploy_Trait_ConfigurationParserTrait {
     /**
      * Get the home directory for the user based on OS.
      *
-     * @param  string  $user
+     * @param string $user
+     *
      * @return string|null
      */
     protected function getHomeDirectory($user) {
@@ -65,11 +67,11 @@ trait CDevSuite_Deploy_Trait_ConfigurationParserTrait {
     /**
      * Determine if the given value is a valid IP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return bool
      */
     protected function isValidIp($value) {
         return filter_var($value, FILTER_VALIDATE_IP) !== false;
     }
-
 }

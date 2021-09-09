@@ -1,18 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jan 7, 2018, 12:27:35 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jan 7, 2018, 12:27:35 PM
  */
 class CSendGrid_Attachment implements \JsonSerializable {
-
     private $content;
+
     private $type;
+
     private $filename;
+
     private $disposition;
+
     private $content_id;
 
     public function setContent($content) {
@@ -57,16 +61,16 @@ class CSendGrid_Attachment implements \JsonSerializable {
 
     public function jsonSerialize() {
         return array_filter(
-                        [
-                    'content' => $this->getContent(),
-                    'type' => $this->getType(),
-                    'filename' => $this->getFilename(),
-                    'disposition' => $this->getDisposition(),
-                    'content_id' => $this->getContentID()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'content' => $this->getContent(),
+                'type' => $this->getType(),
+                'filename' => $this->getFilename(),
+                'disposition' => $this->getDisposition(),
+                'content_id' => $this->getContentID()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

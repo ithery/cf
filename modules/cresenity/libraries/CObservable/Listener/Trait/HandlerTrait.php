@@ -109,6 +109,15 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
+     * @return \CObservable_Listener_Handler_SubmitHandler
+     */
+    public function addSubmitHandler() {
+        $handler = new CObservable_Listener_Handler_SubmitHandler($this);
+        $this->handlers[] = $handler;
+        return $handler;
+    }
+
+    /**
      * @return \CObservable_Listener_Handler_CustomHandler
      */
     public function addCustomHandler() {

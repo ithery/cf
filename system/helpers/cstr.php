@@ -229,6 +229,24 @@ class cstr {
     }
 
     /**
+     * Determine if a given string contains all array values.
+     *
+     * @param string   $haystack
+     * @param string[] $needles
+     *
+     * @return bool
+     */
+    public static function containsAll($haystack, array $needles) {
+        foreach ($needles as $needle) {
+            if (!static::contains($haystack, $needle)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * Convert a string to snake case.
      *
      * @param string $value
@@ -523,6 +541,24 @@ class cstr {
      */
     public static function substr($string, $start, $length = null) {
         return mb_substr($string, $start, $length, 'UTF-8');
+    }
+
+    /**
+     * Returns the number of substring occurrences.
+     *
+     * @param string   $haystack
+     * @param string   $needle
+     * @param int      $offset
+     * @param int|null $length
+     *
+     * @return int
+     */
+    public static function substrCount($haystack, $needle, $offset = 0, $length = null) {
+        if (!is_null($length)) {
+            return substr_count($haystack, $needle, $offset, $length);
+        } else {
+            return substr_count($haystack, $needle, $offset);
+        }
     }
 
     /**
@@ -1008,5 +1044,44 @@ class cstr {
      */
     public static function createUuidsNormally() {
         static::$uuidFactory = null;
+    }
+
+    /**
+     * Pad both sides of a string with another.
+     *
+     * @param string $value
+     * @param int    $length
+     * @param string $pad
+     *
+     * @return string
+     */
+    public static function padBoth($value, $length, $pad = ' ') {
+        return str_pad($value, $length, $pad, STR_PAD_BOTH);
+    }
+
+    /**
+     * Pad the left side of a string with another.
+     *
+     * @param string $value
+     * @param int    $length
+     * @param string $pad
+     *
+     * @return string
+     */
+    public static function padLeft($value, $length, $pad = ' ') {
+        return str_pad($value, $length, $pad, STR_PAD_LEFT);
+    }
+
+    /**
+     * Pad the right side of a string with another.
+     *
+     * @param string $value
+     * @param int    $length
+     * @param string $pad
+     *
+     * @return string
+     */
+    public static function padRight($value, $length, $pad = ' ') {
+        return str_pad($value, $length, $pad, STR_PAD_RIGHT);
     }
 }

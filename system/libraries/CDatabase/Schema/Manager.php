@@ -23,6 +23,8 @@ abstract class CDatabase_Schema_Manager {
      */
     protected $platform;
 
+    protected $isSuperUser;
+
     /**
      * Constructor. Accepts the Connection instance to manage the schema for.
      *
@@ -1028,5 +1030,9 @@ abstract class CDatabase_Schema_Manager {
 
     public function getDatabaseSize() {
         throw CDatabase_Exception::notSupported('getDatabaseSize');
+    }
+
+    public function isSuperUser() {
+        throw CDatabase_Exception::notSupported('isSuperUser');
     }
 }

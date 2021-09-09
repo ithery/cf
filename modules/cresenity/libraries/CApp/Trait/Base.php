@@ -336,7 +336,7 @@ trait CApp_Trait_Base {
     }
 
     public static function remoteAddress() {
-        return crequest::remote_address();
+        return CHTTP::request()->ip();
     }
 
     public static function noImageUrl($width = 100, $height = 100, $backgroundColor = 'EFEFEF', $color = 'AAAAAA', $text = 'NO IMAGE') {
@@ -429,6 +429,14 @@ trait CApp_Trait_Base {
 
     public static function jsonResponse($errCode, $errMessage, $data = []) {
         return json_encode([
+            'errCode' => $errCode,
+            'errMessage' => $errMessage,
+            'data' => $data,
+        ]);
+    }
+
+    public static function toJsonResponse($errCode, $errMessage, $data = []) {
+        return c::response()->json([
             'errCode' => $errCode,
             'errMessage' => $errMessage,
             'data' => $data,

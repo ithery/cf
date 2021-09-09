@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Nov 4, 2019, 5:14:15 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Nov 4, 2019, 5:14:15 PM
  */
 class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
-
     /**
      * The current connection
      *
@@ -26,9 +26,9 @@ class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
     /**
      * Create a new database failed job provider.
      *
-     * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
-     * @param  string  $database
-     * @param  string  $table
+     * @param CDatabase $database
+     * @param string    $table
+     *
      * @return void
      */
     public function __construct(CDatabase $db, $table) {
@@ -39,17 +39,22 @@ class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
     /**
      * Log a failed job into storage.
      *
-     * @param  string  $connection
-     * @param  string  $queue
-     * @param  string  $payload
-     * @param  \Exception  $exception
+     * @param string     $connection
+     * @param string     $queue
+     * @param string     $payload
+     * @param \Exception $exception
+     *
      * @return int|null
      */
     public function log($connection, $queue, $payload, $exception) {
         $failed_at = CApp_Base::now();
         $exception = (string) $exception;
         return $this->getTable()->insertGetId(compact(
-                                'connection', 'queue', 'payload', 'exception', 'failed_at'
+            'connection',
+            'queue',
+            'payload',
+            'exception',
+            'failed_at'
         ));
     }
 
@@ -65,7 +70,8 @@ class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
     /**
      * Get a single failed job.
      *
-     * @param  mixed  $id
+     * @param mixed $id
+     *
      * @return object|null
      */
     public function find($id) {
@@ -75,7 +81,8 @@ class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
     /**
      * Delete a single failed job from storage.
      *
-     * @param  mixed  $id
+     * @param mixed $id
+     *
      * @return bool
      */
     public function forget($id) {
@@ -99,5 +106,4 @@ class CQueue_FailedJob_DatabaseFailedJob extends CQueue_AbstractFailedJob {
     protected function getTable() {
         return $this->db->table($this->table);
     }
-
 }

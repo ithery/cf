@@ -13,22 +13,33 @@ class CParser_HtmlParser implements CParser_HtmlParser_TokenizerCallbackInterfac
      * @var CEvent_Dispatcher
      */
     protected $dispatcher = null;
+
     protected $options = [];
+
     protected $tagName = '';
+
     protected $attributeName = '';
+
     protected $attributeValue = '';
+
     protected $attributes = null;
+
     protected $stack = [];
+
     protected $foreignContext = [];
+
     protected $lowerCaseTagNames = false;
+
     protected $lowerCaseAttributeNames = false;
+
     protected $endIndex = null;
+
     protected $startIndex = 0;
 
     public function __construct($options) {
         $this->options = $options;
         $this->tokenizer = new CParser_HtmlParser_Tokenizer($this->options, $this);
-        $this->dispatcher = CEvent::createDispatcher();
+        $this->dispatcher = CEvent::dispatcher();
         $this->rebuildConstant();
 
         $this->tagname = '';

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 28, 2019, 9:31:19 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 28, 2019, 9:31:19 PM
  */
 class CModel_Search {
-
     protected $aspects = [];
 
     /**
@@ -16,8 +16,7 @@ class CModel_Search {
      *
      * @return CModel_Search
      */
-    public function registerAspect(CModel_Search_SearchAspect$searchAspect) {
-
+    public function registerAspect(CModel_Search_SearchAspect $searchAspect) {
         $this->aspects[$searchAspect->getType()] = $searchAspect;
         return $this;
     }
@@ -50,5 +49,4 @@ class CModel_Search {
                 });
         return $searchResults;
     }
-
 }

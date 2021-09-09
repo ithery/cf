@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 12, 2019, 4:15:09 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 12, 2019, 4:15:09 PM
  */
 class CDaemon_Helper {
-
     /**
      * @var int
      */
@@ -74,7 +74,9 @@ EOF;
         $swiftVersion = (int) explode('.', \Swift::VERSION)[0];
         if ($config['mailer'] === 'smtp') {
             $transport = new \Swift_SmtpTransport(
-                    $config['smtpHost'], $config['smtpPort'], $config['smtpSecurity']
+                $config['smtpHost'],
+                $config['smtpPort'],
+                $config['smtpSecurity']
             );
             $transport->setUsername($config['smtpUsername']);
             $transport->setPassword($config['smtpPassword']);
@@ -220,5 +222,4 @@ EOF;
         }
         return 'NUL';
     }
-
 }

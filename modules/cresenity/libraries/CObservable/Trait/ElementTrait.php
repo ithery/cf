@@ -256,4 +256,17 @@ trait CObservable_Trait_ElementTrait {
         $this->wrapper->add($element);
         return $element;
     }
+
+    /**
+     * Add Canvas Element &lt;canvas&gt
+     *
+     * @param string $id
+     *
+     * @return CElement_Element_Pre Canvas Element
+     */
+    public function addPre($id = '') {
+        $element = CElement_Factory::createElement('pre', $id);
+        $this->wrapper->add($element);
+        return $element;
+    }
 }

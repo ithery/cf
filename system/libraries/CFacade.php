@@ -1,15 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
  * @since Aug 18, 2018, 10:21:59 AM
  */
-
 abstract class CFacade {
-
     /**
      * The application instance being facaded.
      *
@@ -56,7 +55,7 @@ abstract class CFacade {
      * @return \Mockery\Expectation
      */
     protected static function createFreshMockInstance() {
-        return tap(static::createMock(), function ($mock) {
+        return c::tap(static::createMock(), function ($mock) {
             static::swap($mock);
 
             $mock->shouldAllowMockingProtectedMethods();
@@ -82,8 +81,8 @@ abstract class CFacade {
     protected static function isMock() {
         $name = static::getFacadeAccessor();
 
-        return isset(static::$resolvedInstance[$name]) &&
-                static::$resolvedInstance[$name] instanceof MockInterface;
+        return isset(static::$resolvedInstance[$name])
+                && static::$resolvedInstance[$name] instanceof MockInterface;
     }
 
     /**
@@ -100,7 +99,8 @@ abstract class CFacade {
     /**
      * Hotswap the underlying instance behind the facade.
      *
-     * @param  mixed  $instance
+     * @param mixed $instance
+     *
      * @return void
      */
     public static function swap($instance) {
@@ -134,7 +134,8 @@ abstract class CFacade {
     /**
      * Resolve the facade root instance from the container.
      *
-     * @param  string|object  $name
+     * @param string|object $name
+     *
      * @return mixed
      */
     protected static function resolveFacadeInstance($name) {
@@ -152,7 +153,8 @@ abstract class CFacade {
     /**
      * Clear a resolved facade instance.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return void
      */
     public static function clearResolvedInstance($name) {
@@ -180,7 +182,8 @@ abstract class CFacade {
     /**
      * Set the application instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     *
      * @return void
      */
     public static function setFacadeApplication($app) {
@@ -190,8 +193,9 @@ abstract class CFacade {
     /**
      * Handle dynamic, static calls to the object.
      *
-     * @param  string  $method
-     * @param  array   $args
+     * @param string $method
+     * @param array  $args
+     *
      * @return mixed
      *
      * @throws \RuntimeException
@@ -205,5 +209,4 @@ abstract class CFacade {
 
         return $instance->$method(...$args);
     }
-
 }

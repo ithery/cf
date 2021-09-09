@@ -1,8 +1,11 @@
 <?php
 
 class CApp_Administrator_Fixer_Database {
-    public static function sqlCollation($table) {
-        $db = CDatabase::instance();
+    public static function sqlCollation($table, $db = null) {
+        if ($db == null) {
+            $db = CDatabase::instance();
+        }
+
         $schemaManager = $db->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $columnsData = $schemaManager->listTableColumns($table);
@@ -42,8 +45,10 @@ class CApp_Administrator_Fixer_Database {
         return $sql;
     }
 
-    public static function sqlColumn($table) {
-        $db = CDatabase::instance();
+    public static function sqlColumn($table, $db = null) {
+        if ($db == null) {
+            $db = CDatabase::instance();
+        }
         $schemaManager = $db->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $columnsData = $schemaManager->listTableColumns($table);
@@ -235,8 +240,11 @@ class CApp_Administrator_Fixer_Database {
         return $sql;
     }
 
-    public static function sqlDataType($table) {
-        $db = CDatabase::instance();
+    public static function sqlDataType($table, $db = null) {
+        if ($db == null) {
+            $db = CDatabase::instance();
+        }
+
         $schemaManager = $db->getSchemaManager();
         $schema = $schemaManager->createSchema();
         $columnsData = $schemaManager->listTableColumns($table);
@@ -298,8 +306,11 @@ class CApp_Administrator_Fixer_Database {
         return $sql;
     }
 
-    public static function sqlRelationship($table) {
-        $db = CDatabase::instance();
+    public static function sqlRelationship($table, $db = null) {
+        if ($db == null) {
+            $db = CDatabase::instance();
+        }
+
         $schemaManager = $db->getSchemaManager();
         $tables = $schemaManager->listTableNames();
         $schema = $schemaManager->createSchema();

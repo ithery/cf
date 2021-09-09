@@ -13,6 +13,7 @@ use CRunner_WkHtmlToPdf_Command as Command;
 class CRunner_WkHtmlToPdf_Image {
     // Regular expression to detect HTML strings
     const REGEX_HTML = '/<html/i';
+
     // prefix for tmp files
     const TMP_PREFIX = 'tmp_wkhtmlto_pdf_';
 
@@ -136,7 +137,7 @@ class CRunner_WkHtmlToPdf_Image {
      *                              streamed inline. Note, that the file extension must match what you
      *                              configured as $type (png, jpg, ...).
      * @param bool        $inline   whether to force inline display of the image, even
-     *                              if filename is present.
+     *                              if filename is present
      *
      * @return bool whether image was created successfully
      */
@@ -151,8 +152,8 @@ class CRunner_WkHtmlToPdf_Image {
     /**
      * Get the raw Image contents (triggers Image creation).
      *
-     * @return string|bool The Image content as a string or `false` if the
-     *                     Image wasn't created successfully.
+     * @return string|bool the Image content as a string or `false` if the
+     *                     Image wasn't created successfully
      */
     public function toString() {
         if (!$this->_isCreated && !$this->createImage()) {

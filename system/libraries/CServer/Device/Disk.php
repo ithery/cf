@@ -1,67 +1,77 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 6:26:12 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 6:26:12 PM
  */
 class CServer_Device_Disk {
-
     /**
-     * name of the disk device
-     * @var String
+     * Name of the disk device
+     *
+     * @var string
      */
-    private $name = "";
+    private $name = '';
 
     /**
-     * type of the filesystem on the disk device
-     * @var String
+     * Type of the filesystem on the disk device
+     *
+     * @var string
      */
-    private $fsType = "";
+    private $fsType = '';
 
     /**
-     * diskspace that is free in bytes
-     * @var Integer
+     * Diskspace that is free in bytes
+     *
+     * @var int
      */
     private $free = 0;
 
     /**
-     * diskspace that is used in bytes
-     * @var Integer
+     * Diskspace that is used in bytes
+     *
+     * @var int
      */
     private $used = 0;
 
     /**
-     * total diskspace
-     * @var Integer
+     * Total diskspace
+     *
+     * @var int
      */
     private $total = 0;
 
     /**
-     * mount point of the disk device if available
-     * @var String
+     * Mount point of the disk device if available
+     *
+     * @var string
      */
     private $mountPoint = null;
 
     /**
-     * additional options of the device, like mount options
-     * @var String
+     * Additional options of the device, like mount options
+     *
+     * @var string
      */
     private $options = null;
 
     /**
-     * inodes usage in percent if available
+     * Inodes usage in percent if available
+     *
      * @var int
      */
     private $percentInodesUsed = null;
 
     /**
      * Returns PercentUsed calculated when function is called from internal values
+     *
      * @see CServer_Device_Disk::$total
      * @see CServer_Device_Disk::$used
-     * @return Integer
+     *
+     * @return int
      */
     public function getPercentUsed() {
         if ($this->total > 0) {
@@ -73,8 +83,10 @@ class CServer_Device_Disk {
 
     /**
      * Returns $PercentInodesUsed.
+     *
      * @see CServer_Device_Disk::$PercentInodesUsed
-     * @return Integer
+     *
+     * @return int
      */
     public function getPercentInodesUsed() {
         return $this->percentInodesUsed;
@@ -82,9 +94,12 @@ class CServer_Device_Disk {
 
     /**
      * Sets $PercentInodesUsed.
-     * @param Integer $percentInodesUsed inodes percent
+     *
+     * @param int $percentInodesUsed inodes percent
+     *
      * @see CServer_Device_Disk::$PercentInodesUsed
-     * @return Void
+     *
+     * @return void
      */
     public function setPercentInodesUsed($percentInodesUsed) {
         $this->percentInodesUsed = $percentInodesUsed;
@@ -92,8 +107,10 @@ class CServer_Device_Disk {
 
     /**
      * Returns $free.
+     *
      * @see CServer_Device_Disk::$free
-     * @return Integer
+     *
+     * @return int
      */
     public function getFree() {
         return $this->free;
@@ -101,9 +118,12 @@ class CServer_Device_Disk {
 
     /**
      * Sets $free.
-     * @param Integer $free free bytes
+     *
+     * @param int $free free bytes
+     *
      * @see CServer_Device_Disk::$free
-     * @return Void
+     *
+     * @return void
      */
     public function setFree($free) {
         $this->free = $free;
@@ -111,8 +131,10 @@ class CServer_Device_Disk {
 
     /**
      * Returns $fsType.
+     *
      * @see CServer_Device_Disk::$fsType
-     * @return String
+     *
+     * @return string
      */
     public function getFsType() {
         return $this->fsType;
@@ -120,9 +142,12 @@ class CServer_Device_Disk {
 
     /**
      * Sets $fsType.
-     * @param String $fsType filesystemtype
+     *
+     * @param string $fsType filesystemtype
+     *
      * @see CServer_Device_Disk::$fsType
-     * @return Void
+     *
+     * @return void
      */
     public function setFsType($fsType) {
         $this->fsType = $fsType;
@@ -130,8 +155,10 @@ class CServer_Device_Disk {
 
     /**
      * Returns $mountPoint.
+     *
      * @see CServer_Device_Disk::$mountPoint
-     * @return String
+     *
+     * @return string
      */
     public function getMountPoint() {
         return $this->mountPoint;
@@ -139,9 +166,12 @@ class CServer_Device_Disk {
 
     /**
      * Sets $mountPoint.
-     * @param String $mountPoint mountpoint
+     *
+     * @param string $mountPoint mountpoint
+     *
      * @see CServer_Device_Disk::$mountPoint
-     * @return Void
+     *
+     * @return void
      */
     public function setMountPoint($mountPoint) {
         $this->mountPoint = $mountPoint;
@@ -149,8 +179,10 @@ class CServer_Device_Disk {
 
     /**
      * Returns $name.
+     *
      * @see CServer_Device_Disk::$name
-     * @return String
+     *
+     * @return string
      */
     public function getName() {
         return $this->name;
@@ -158,9 +190,12 @@ class CServer_Device_Disk {
 
     /**
      * Sets $name.
-     * @param String $name device name
+     *
+     * @param string $name device name
+     *
      * @see CServer_Device_Disk::$name
-     * @return Void
+     *
+     * @return void
      */
     public function setName($name) {
         $this->name = $name;
@@ -168,8 +203,10 @@ class CServer_Device_Disk {
 
     /**
      * Returns $options.
+     *
      * @see CServer_Device_Disk::$options
-     * @return String
+     *
+     * @return string
      */
     public function getOptions() {
         return $this->options;
@@ -177,9 +214,12 @@ class CServer_Device_Disk {
 
     /**
      * Sets $options.
-     * @param String $options additional options
+     *
+     * @param string $options additional options
+     *
      * @see CServer_Device_Disk::$options
-     * @return Void
+     *
+     * @return void
      */
     public function setOptions($options) {
         $this->options = $options;
@@ -187,8 +227,10 @@ class CServer_Device_Disk {
 
     /**
      * Returns $total.
+     *
      * @see CServer_Device_Disk::$total
-     * @return Integer
+     *
+     * @return int
      */
     public function getTotal() {
         return $this->total;
@@ -196,9 +238,12 @@ class CServer_Device_Disk {
 
     /**
      * Sets $total.
-     * @param Integer $total total bytes
+     *
+     * @param int $total total bytes
+     *
      * @see CServer_Device_Disk::$total
-     * @return Void
+     *
+     * @return void
      */
     public function setTotal($total) {
         $this->total = $total;
@@ -206,8 +251,10 @@ class CServer_Device_Disk {
 
     /**
      * Returns $used.
+     *
      * @see CServer_Device_Disk::$used
-     * @return Integer
+     *
+     * @return int
      */
     public function getUsed() {
         return $this->used;
@@ -215,12 +262,14 @@ class CServer_Device_Disk {
 
     /**
      * Sets $used.
-     * @param Integer $used used bytes
+     *
+     * @param int $used used bytes
+     *
      * @see CServer_Device_Disk::$used
-     * @return Void
+     *
+     * @return void
      */
     public function setUsed($used) {
         $this->used = $used;
     }
-
 }

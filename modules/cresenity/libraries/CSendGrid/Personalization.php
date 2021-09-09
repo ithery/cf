@@ -1,32 +1,33 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of Personalization
  *
  * @author Hery Kurniawan
- * @since Jan 7, 2018, 12:33:18 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jan 7, 2018, 12:33:18 PM
  */
 class CSendGrid_Personalization implements \JsonSerializable {
-
     private $tos;
+
     private $ccs;
+
     private $bccs;
+
     private $subject;
+
     private $headers;
+
     private $substitutions;
+
     private $custom_args;
+
     private $send_at;
 
     public function addTo($email) {
         if (!is_array($email)) {
-            $email = array($email);
+            $email = [$email];
         }
         foreach ($email as $em) {
             $this->tos[] = $em;
@@ -39,7 +40,7 @@ class CSendGrid_Personalization implements \JsonSerializable {
 
     public function addCc($email) {
         if (!is_array($email)) {
-            $email = array($email);
+            $email = [$email];
         }
         foreach ($email as $em) {
             $this->ccs[] = $em;
@@ -52,7 +53,7 @@ class CSendGrid_Personalization implements \JsonSerializable {
 
     public function addBcc($email) {
         if (!is_array($email)) {
-            $email = array($email);
+            $email = [$email];
         }
         foreach ($email as $em) {
             $this->bccs[] = $em;
@@ -105,19 +106,19 @@ class CSendGrid_Personalization implements \JsonSerializable {
 
     public function jsonSerialize() {
         return array_filter(
-                        [
-                    'to' => $this->getTos(),
-                    'cc' => $this->getCcs(),
-                    'bcc' => $this->getBccs(),
-                    'subject' => $this->subject,
-                    'headers' => $this->getHeaders(),
-                    'substitutions' => $this->getSubstitutions(),
-                    'custom_args' => $this->getCustomArgs(),
-                    'send_at' => $this->getSendAt()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'to' => $this->getTos(),
+                'cc' => $this->getCcs(),
+                'bcc' => $this->getBccs(),
+                'subject' => $this->subject,
+                'headers' => $this->getHeaders(),
+                'substitutions' => $this->getSubstitutions(),
+                'custom_args' => $this->getCustomArgs(),
+                'send_at' => $this->getSendAt()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

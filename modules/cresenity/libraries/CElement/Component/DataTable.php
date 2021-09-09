@@ -135,6 +135,8 @@ class CElement_Component_DataTable extends CElement_Component {
 
     protected $dbResolver;
 
+    protected $initialSearch;
+
     public function __construct($id = '') {
         parent::__construct($id);
         $this->defaultPagingList['-1'] = clang::__('ALL');
@@ -616,7 +618,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public function requery() {
         if (!$this->isElastic && !$this->isCallback) {
             if ($this->ajax == false) {
-                if (strlen($this->query) > 0) {
+                if (is_string($this->query) && strlen($this->query) > 0) {
                     $r = $this->db()->query($this->query);
                     $this->data = $r->result(false);
                 }
@@ -820,5 +822,10 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function queueDownloadExcel($filePath, $disk = null, $writerType = null, $diskOptions = []) {
         return CExporter::queue($this->toExportable(), $filePath, $disk, $writerType, $diskOptions);
+    }
+
+    public function setInitialSearch($initialSearch) {
+        $this->initialSearch = $initialSearch;
+        return $this;
     }
 }

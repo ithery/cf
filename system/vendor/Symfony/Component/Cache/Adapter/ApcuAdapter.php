@@ -17,13 +17,14 @@ use Symfony\Component\Cache\Exception\CacheException;
 /**
  * @author Nicolas Grekas <p@tchwork.com>
  */
-class ApcuAdapter extends AbstractAdapter
-{
+class ApcuAdapter extends AbstractAdapter {
     /**
      * @throws CacheException if APCu is not enabled
+     *
+     * @param mixed      $namespace
+     * @param null|mixed $version
      */
-    public function __construct(string $namespace = '', int $defaultLifetime = 0, string $version = null)
-    {
+    public function __construct($namespace = '', int $defaultLifetime = 0, $version = null) {
         if (!static::isSupported()) {
             throw new CacheException('APCu is not enabled');
         }
@@ -35,24 +36,22 @@ class ApcuAdapter extends AbstractAdapter
         if (null !== $version) {
             CacheItem::validateKey($version);
 
-            if (!apcu_exists($version.'@'.$namespace)) {
+            if (!apcu_exists($version . '@' . $namespace)) {
                 $this->doClear($namespace);
-                apcu_add($version.'@'.$namespace, null);
+                apcu_add($version . '@' . $namespace, null);
             }
         }
     }
 
-    public static function isSupported()
-    {
+    public static function isSupported() {
         return \function_exists('apcu_fetch') && filter_var(ini_get('apc.enabled'), FILTER_VALIDATE_BOOLEAN);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function doFetch(array $ids)
-    {
-        $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__.'::handleUnserializeCallback');
+    protected function doFetch(array $ids) {
+        $unserializeCallbackHandler = ini_set('unserialize_callback_func', __CLASS__ . '::handleUnserializeCallback');
         try {
             $values = [];
             foreach (apcu_fetch($ids, $ok) ?: [] as $k => $v) {
@@ -72,16 +71,14 @@ class ApcuAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doHave(string $id)
-    {
+    protected function doHave($id) {
         return apcu_exists($id);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function doClear(string $namespace)
-    {
+    protected function doClear($namespace) {
         return isset($namespace[0]) && class_exists('APCuIterator', false) && ('cli' !== \PHP_SAPI || filter_var(ini_get('apc.enable_cli'), FILTER_VALIDATE_BOOLEAN))
             ? apcu_delete(new \APCuIterator(sprintf('/^%s/', preg_quote($namespace, '/')), APC_ITER_KEY))
             : apcu_clear_cache();
@@ -90,8 +87,7 @@ class ApcuAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doDelete(array $ids)
-    {
+    protected function doDelete(array $ids) {
         foreach ($ids as $id) {
             apcu_delete($id);
         }
@@ -102,8 +98,7 @@ class ApcuAdapter extends AbstractAdapter
     /**
      * {@inheritdoc}
      */
-    protected function doSave(array $values, int $lifetime)
-    {
+    protected function doSave(array $values, $lifetime) {
         try {
             if (false === $failures = apcu_store($values, null, $lifetime)) {
                 $failures = $values;

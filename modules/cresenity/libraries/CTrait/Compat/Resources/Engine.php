@@ -31,4 +31,12 @@ trait CTrait_Compat_Resources_Engine {
     public function get_path($filename, $size = null) {
         return $this->getPath($filename, $size);
     }
+
+    public function get_root_directory() {
+        return $this->getRootDirectory();
+    }
+
+    public function set_root_directory($rootDirectory) {
+        return $this->setRootDirectory($rootDirectory);
+    }
 }

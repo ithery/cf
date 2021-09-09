@@ -12,13 +12,13 @@ class CDatabase_Event_Schema {
     /**
      * @var bool
      */
-    private $_preventDefault = false;
+    private $preventDefault = false;
 
     /**
      * @return CDatabase_Event_Schema
      */
     public function preventDefault() {
-        $this->_preventDefault = true;
+        $this->preventDefault = true;
         return $this;
     }
 
@@ -26,6 +26,6 @@ class CDatabase_Event_Schema {
      * @return bool
      */
     public function isDefaultPrevented() {
-        return $this->_preventDefault;
+        return $this->preventDefault;
     }
 }

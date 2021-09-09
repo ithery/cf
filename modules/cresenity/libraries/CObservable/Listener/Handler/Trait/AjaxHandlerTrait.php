@@ -11,15 +11,17 @@ defined('SYSPATH') or die('No direct access allowed.');
 trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
     protected $method;
 
+    protected $callback;
+
     /**
      * Url for ajax handler type
      *
-     * @var string $url
+     * @var string
      */
     protected $url;
 
     /**
-     * @var array $urlParam
+     * @var array
      */
     protected $urlParam = [];
 
@@ -28,9 +30,14 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         return $this;
     }
 
+    public function setCallback($callback) {
+        $this->callback = $callback;
+        return $this;
+    }
+
     public function setUrlParam($urlParam) {
         if (!is_array($urlParam)) {
-            trigger_error('Invalid URL Param ' . cdbg::var_dump($urlParam, true) . '');
+            throw new Exception('Invalid url param, url param must type array');
         }
         $this->urlParam = $urlParam;
         return $this;
@@ -45,9 +52,16 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         $link = $this->url;
 
         if (strlen($link) == 0) {
-            $ajaxUrl = CAjax::createMethod()->setType('handler_' . $this->name)
+            $callback = $this->callback;
+            if ($callback !== null) {
+                $callback = CHelper::closure()->serialize($callback);
+            }
+
+            $ajaxUrl = CAjax::createMethod()->setType('AjaxHandler')
                 ->setData('json', $this->content->json())
+                ->setData('callback', $callback)
                 ->makeUrl();
+
             $link = $ajaxUrl;
         }
 
@@ -143,5 +157,9 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
     public function setMethod($method) {
         $this->method = $method;
         return $this;
+    }
+
+    public function getUrl() {
+        return $this->url;
     }
 }

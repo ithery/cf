@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CDevSuite_Command_InstallCommand extends CDevSuite_CommandAbstract {
-
     public function getSignatureArguments() {
         switch (CServer::getOS()) {
             case CServer::OS_LINUX:
@@ -18,9 +11,6 @@ class CDevSuite_Command_InstallCommand extends CDevSuite_CommandAbstract {
     }
 
     public function run(CConsole_Command $cfCommand) {
-
-
-
         CDevSuite::devCloud()->install();
 
         switch (CServer::getOS()) {
@@ -73,5 +63,4 @@ class CDevSuite_Command_InstallCommand extends CDevSuite_CommandAbstract {
         }
         CDevSuite::output(PHP_EOL . '<info>Dev Suite installed successfully!</info>');
     }
-
 }
