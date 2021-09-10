@@ -3,6 +3,9 @@
 class CElement_Component_Alert extends CElement_Component {
     use CTrait_Element_Property_Title;
 
+    /**
+     * @var CElement_Element_H4
+     */
     protected $header;
 
     protected $content;
