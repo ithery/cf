@@ -10,9 +10,13 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CManager_Asset_Module {
     protected static $instance;
+
     protected $runTimeModules = [];
+
     protected $themeModules = [];
+
     protected $unregisteredThemeModules = [];
+
     private $allModules = null;
 
     public function __construct() {
@@ -29,12 +33,13 @@ class CManager_Asset_Module {
 
     public function allModules() {
         if ($this->allModules == null) {
-            $this->allModules = include DOCROOT . 'config' . DS . 'client_modules' . DS . 'client_modules.php';
-            $app_files = CF::getFiles('config', 'client_modules');
-            //$this->all_modules = include DOCROOT."config".DS."client_modules".DS."client_modules.php";
-            $app_files = array_reverse($app_files);
+            $this->allModules = [];
+            $clientModulesFiles = CF::getFiles('config', 'client_modules');
 
-            foreach ($app_files as $file) {
+            //$this->all_modules = include DOCROOT."config".DS."client_modules".DS."client_modules.php";
+            $clientModulesFiles = array_reverse($clientModulesFiles);
+
+            foreach ($clientModulesFiles as $file) {
                 $appModules = include $file;
                 if (!is_array($appModules)) {
                     throw new CManager_Exception('Invalid client modules config format on :file', [':file', $file]);
