@@ -51,7 +51,11 @@ class CApp_Message {
         static::clear($type);
         if (strlen($message) > 0) {
             $alert = new CElement_Component_Alert();
-            $message = $alert->setType($type)->add($message)->setDismissable()->html();
+            $header = ucfirst($type) . '!';
+
+            $message = $alert->setType($type)
+                ->setTitle($header)
+                ->setDismissable()->add($message)->html();
         }
         return $message;
     }
