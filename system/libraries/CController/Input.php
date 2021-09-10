@@ -275,4 +275,14 @@ class CController_Input {
 
         return $str;
     }
+
+    /**
+     * @return string
+     *
+     * @deprecated 1.2
+     */
+    // @codingStandardsIgnoreStart
+    public function ip_address() {
+        return CHTTP::request()->ip();
+    }
 }
