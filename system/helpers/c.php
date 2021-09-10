@@ -1078,6 +1078,15 @@ class c {
         return CApp::instance();
     }
 
+    /**
+     * Get the CDatabase instance.
+     *
+     * @return \CDatabase
+     */
+    public static function db() {
+        return CDatabase::instance();
+    }
+
     public static function userAgent() {
         return (!empty($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '');
     }
