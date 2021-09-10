@@ -219,6 +219,7 @@ input[disabled=disabled],select[disabled=disabled],textarea[disabled=disabled],i
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
+    user-select:none;
 }
 
 .switcher-label {
@@ -771,11 +772,7 @@ div.dataTables_wrapper .ui-widget-header {
     box-shadow: none;
 }
 
-.select2-search {
-    /*
-    margin-top: 5px;
-    */
-}
+
 
 .select2-search input {
 
@@ -1329,7 +1326,6 @@ body.mini-navbar #page-wrapper {
     word-break: break-all;
 }
 
-.modal.modal-download-progress {}
 .modal.modal-download-progress .modal-dialog {
     width: auto;
     max-width: 35rem;

@@ -1,5 +1,25 @@
 
 
-.bootbox.modal.fade.in {
-    top:300px;
+.modal {
+    margin:0;
+}
+
+.modal .modal-header .modal-title {
+    display: inline-block;
+}
+
+.modal .modal-header .close  {
+    margin-left:auto;
+    border:0;
+}
+
+.modal button.close  {
+    border:0;
+}
+.modal .modal-content {
+    overflow: hidden;
+}
+
+.dataTables_wrapper {
+    overflow-x: visible;
 }
