@@ -1294,6 +1294,27 @@ class c {
             }
         }, $subject);
     }
+
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
+    public static function trailingslashit($string) {
+        return c::untrailingslashit($string) . '/';
+    }
+
+    /**
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    public static function untrailingslashit($string) {
+        return rtrim($string, '/');
+    }
+
+
 }
 
 // End c
