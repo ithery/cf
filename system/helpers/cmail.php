@@ -85,6 +85,10 @@ class cmail {
     //@codingStandardsIgnoreStart
     public static function send_smtp($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
         //@codingStandardsIgnoreEnd
+        // $options['cc']=$cc;
+        // $options['bcc']=$bcc;
+        // $options['attachments']=$attachments;
+        // CEmail::sender($options)->send($to,$subject,$message,$options);
         $mail = CSMTP::factory();
         $smtp_username = carr::get($options, 'smtp_username');
         $smtp_password = carr::get($options, 'smtp_password');

@@ -87,6 +87,9 @@ return [
     ],
     'model' => [
         'org' => CApp_Model_Org::class,
+        'user' => CApp_Model_Users::class,
+        'role' => CApp_Model_Roles::class,
+        'role_nav' => CApp_Model_RoleNav::class,
     ],
 
     'lang' => 'id', //deprecated

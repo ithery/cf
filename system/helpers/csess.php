@@ -6,7 +6,7 @@
  */
 class csess {
     public static function get($key) {
-        $session = CSession::instance();
+        $session = c::session();
         return $session->get($key);
     }
 
