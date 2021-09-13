@@ -34,6 +34,6 @@ class CApp_Auth_Action_EnsureLoginIsNotThrottled {
 
         c::event(new CAuth_Event_Lockout($request));
 
-        return c::app(CApp_Auth_Response_LockoutResponse::class);
+        return c::container(CApp_Auth_Response_LockoutResponse::class);
     }
 }

@@ -19,7 +19,7 @@ trait CApp_Auth_Controller_AuthTrait {
             if ($callback != null) {
                 return $callback($request);
             } else {
-                return c::app(CApp_Auth_Response_LoginResponse::class);
+                return c::container(CApp_Auth_Response_LoginResponse::class);
             }
         });
     }
@@ -33,18 +33,18 @@ trait CApp_Auth_Controller_AuthTrait {
      */
     protected function loginPipeline(CHTTP_Request $request) {
         if (CApp_Auth::$authenticateThroughCallback) {
-            return (new CBase_Pipeline(c::app()))->send($request)->through(array_filter(
+            return (new CBase_Pipeline(c::container()))->send($request)->through(array_filter(
                 call_user_func(CApp_Auth::$authenticateThroughCallback, $request)
             ));
         }
 
         if (is_array(CF::config('app.auth.pipelines.login'))) {
-            return (new CBase_Pipeline(c::app()))->send($request)->through(array_filter(
+            return (new CBase_Pipeline(c::container()))->send($request)->through(array_filter(
                 CF::config('app.auth.pipelines.login')
             ));
         }
 
-        return (new CBase_Pipeline(c::app()))->send($request)->through(array_filter([
+        return (new CBase_Pipeline(c::container()))->send($request)->through(array_filter([
             CF::config('app.auth.limiters.login') ? null : CApp_Auth_Action_EnsureLoginIsNotThrottled::class,
 
             CApp_Auth_Features::enabled(CApp_Auth_Features::twoFactorAuthentication()) ? new CApp_Auth_Action_RedirectIfTwoFactorAuthenticatable(CApp_Auth::guard(), CApp_Auth::loginRateLimiter()) : null,
@@ -71,7 +71,7 @@ trait CApp_Auth_Controller_AuthTrait {
         if ($callback != null) {
             return $callback($request);
         } else {
-            return c::app(CApp_Auth_Response_LogoutResponse::class);
+            return c::container(CApp_Auth_Response_LogoutResponse::class);
         }
     }
 }

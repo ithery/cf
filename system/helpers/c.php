@@ -885,13 +885,6 @@ class c {
     }
 
     /**
-     * @return CContainer_Container
-     */
-    public static function container() {
-        return CContainer::getInstance();
-    }
-
-    /**
      * Get hash manager instance
      *
      * @param null|string $hasher
@@ -1066,14 +1059,32 @@ class c {
      * @param string|null $abstract
      * @param array       $parameters
      *
-     * @return mixed|\Illuminate\Contracts\Foundation\Application
+     * @return mixed|\CContainer_Container
      */
-    public static function app($abstract = null, array $parameters = []) {
+    public static function container($abstract = null, array $parameters = []) {
         if (is_null($abstract)) {
-            return static::container();
+            return CContainer::getInstance();
         }
 
-        return c::container()->make($abstract, $parameters);
+        return CContainer::getInstance()->make($abstract, $parameters);
+    }
+
+    /**
+     * Get the CApp instance.
+     *
+     * @return \CApp
+     */
+    public static function app() {
+        return CApp::instance();
+    }
+
+    /**
+     * Get the CDatabase instance.
+     *
+     * @return \CDatabase
+     */
+    public static function db() {
+        return CDatabase::instance();
     }
 
     public static function userAgent() {
@@ -1192,6 +1203,19 @@ class c {
     }
 
     /**
+     * Fill in data where it's missing.
+     *
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $value
+     *
+     * @return mixed
+     */
+    public static function fill(&$target, $key, $value) {
+        return static::set($target, $key, $value, false);
+    }
+
+    /**
      * Get the first element of an array. Useful for method chaining.
      *
      * @param array $array
@@ -1282,6 +1306,24 @@ class c {
                 return array_shift($replacements);
             }
         }, $subject);
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
+    public static function trailingslashit($string) {
+        return c::untrailingslashit($string) . '/';
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
+    public static function untrailingslashit($string) {
+        return rtrim($string, '/');
     }
 }
 

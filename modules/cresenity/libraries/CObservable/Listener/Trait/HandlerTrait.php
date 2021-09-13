@@ -109,6 +109,15 @@ trait CObservable_Listener_Trait_HandlerTrait {
     }
 
     /**
+     * @return \CObservable_Listener_Handler_RedirectHandler
+     */
+    public function addRedirectHandler() {
+        $handler = new CObservable_Listener_Handler_RedirectHandler($this);
+        $this->handlers[] = $handler;
+        return $handler;
+    }
+
+    /**
      * @return \CObservable_Listener_Handler_SubmitHandler
      */
     public function addSubmitHandler() {
