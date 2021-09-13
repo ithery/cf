@@ -12,6 +12,8 @@ class CProfiler {
     protected static $enabled = false;
 
     use CProfiler_Trait_PopulateBenchmarkTrait,
+        CProfiler_Trait_PopulateCookiesTrait,
+        CProfiler_Trait_PopulateSessionTrait,
         CProfiler_Trait_PopulateDatabaseTrait;
 
     public static function enable() {
@@ -47,6 +49,8 @@ class CProfiler {
         $profilerTables = [];
         $profilerTables[] = static::createBenchmarkTable();
         $profilerTables[] = static::createDatabaseTable();
+        $profilerTables[] = static::createCookiesTable();
+        $profilerTables[] = static::createSessionTable();
 
         $html = '';
         $html .= '<style type="text/css">' . $styles . '</style>';
@@ -123,32 +127,6 @@ class CProfiler {
 
         text::alternate();
         foreach ($_POST as $name => $value) {
-            $data = [$name, $value];
-            $class = text::alternate('', 'kp-altrow');
-            $table->add_row($data, $class);
-        }
-    }
-
-    /**
-     * Cookie data.
-     *
-     * @return void
-     */
-    public function cookies() {
-        if (empty($_COOKIE)) {
-            return;
-        }
-
-        if (!$table = $this->table('cookies')) {
-            return;
-        }
-
-        $table->add_column('kp-name');
-        $table->add_column();
-        $table->add_row(['Cookies', 'Value'], 'kp-title', 'background-color: #FFF4D7');
-
-        text::alternate();
-        foreach ($_COOKIE as $name => $value) {
             $data = [$name, $value];
             $class = text::alternate('', 'kp-altrow');
             $table->add_row($data, $class);

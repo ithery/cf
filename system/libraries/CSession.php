@@ -497,6 +497,10 @@ class CSession {
     public function remove($key) {
         return $this->pull($key);
     }
+
+    public function all() {
+        return $_SESSION;
+    }
 }
 
 // End Session Class

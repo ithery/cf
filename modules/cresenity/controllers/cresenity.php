@@ -42,9 +42,6 @@ class Controller_Cresenity extends CController {
         $filename = $method . '.tmp';
         $file = CTemporary::getPath('ajax', $filename);
 
-        if (isset($_GET['profiler'])) {
-            new CProfiler();
-        }
         $disk = CTemporary::disk();
         if (!$disk->exists($file)) {
             throw new CException('failed to get temporary file :filename', [':filename' => $file]);
