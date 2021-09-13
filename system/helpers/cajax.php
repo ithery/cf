@@ -4,6 +4,10 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
 
+/**
+ * @deprecated since 1.2
+*/
+
 class cajax {
     public static function callback($obj, $input) {
         $callable = $obj->data->callable;

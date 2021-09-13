@@ -3,6 +3,9 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated since 1.2
+*/
 class cfs {
     public static function list_files_in_dir($dir, &$results = [], $ignore_dir = []) {
         $files = scandir($dir);

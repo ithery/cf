@@ -4,6 +4,8 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Class carr
+ *
+ * @deprecated since 1.2
  */
 // @codingStandardsIgnoreStart
 class carr {

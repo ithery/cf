@@ -2,7 +2,7 @@
 
 //@codingStandardsIgnoreStart
 /**
- * @deprecated
+ * @deprecated since 1.2
  */
 class csess {
     public static function get($key) {

@@ -1,6 +1,9 @@
 <?php
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated since 1.2
+*/
 class cmailapi {
     public static function sendgridv3($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
         $smtp_password = carr::get($options, 'smtp_password');

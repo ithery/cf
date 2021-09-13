@@ -1,6 +1,9 @@
 <?php
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated since 1.2
+*/
 class corg {
     public static function get($id) {
         $default_data = [

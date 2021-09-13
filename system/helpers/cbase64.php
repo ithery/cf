@@ -4,8 +4,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Base64 helper class.
+ *
+ * @deprecated since 1.2
  */
-
 //@codingStandardsIgnoreStart
 class cbase64 {
     public static function encode($data) {

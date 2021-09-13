@@ -1,6 +1,9 @@
 <?php
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated since 1.2
+*/
 class cdbutils {
     public static function table_exists($table, $db = null) {
         if ($db == null) {

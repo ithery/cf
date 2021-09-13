@@ -2,6 +2,9 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated since 1.2
+*/
 class cparam {
     public static function get_params($cmd) {
         $params = [];

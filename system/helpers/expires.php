@@ -11,13 +11,16 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @author     Kohana Team
  * @copyright  (c) 2007-2008 Kohana Team
  * @license    http://kohanaphp.com/license.html
+ * @deprecated since 1.2
+ */
+
  */
 class expires {
 
     /**
      * Sets the amount of time before a page expires
      *
-     * @param  integer Seconds before the page expires 
+     * @param  integer Seconds before the page expires
      * @return boolean
      */
     public static function set($seconds = 60) {
