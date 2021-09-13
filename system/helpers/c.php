@@ -12,9 +12,6 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\VarDumper\VarDumper;
 
 //@codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class c {
     //@codingStandardsIgnoreEnd
 

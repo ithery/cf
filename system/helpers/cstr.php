@@ -6,9 +6,6 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactory;
 
 // @codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class cstr {
     // @codingStandardsIgnoreEnd
 
