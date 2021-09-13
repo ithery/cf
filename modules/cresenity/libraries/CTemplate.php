@@ -248,6 +248,7 @@ class CTemplate {
         if (static::$bladeCompiler == null) {
             static::$bladeCompiler = new CTemplate_Compiler_BladeCompiler();
             static::$bladeCompiler->directive('block', [CTemplate_Blade_Directive::class, 'block']);
+            static::$bladeCompiler->directive('template', [CTemplate_Blade_Directive::class, 'template']);
         }
 
         return static::$bladeCompiler;
