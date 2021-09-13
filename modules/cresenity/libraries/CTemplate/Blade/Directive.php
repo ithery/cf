@@ -8,4 +8,8 @@ class CTemplate_Blade_Directive {
     public static function template($expression) {
         return '{!! $this->template(' . $expression . ') !!}';
     }
+
+    public static function section($expression) {
+        return '{!! $this->section(' . $expression . ') !!}';
+    }
 }
