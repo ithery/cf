@@ -23,6 +23,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     use CTrait_Compat_App,
         CTrait_Macroable,
         CTrait_RequestInfoTrait,
+        CApp_Concern_OrgTrait,
         CApp_Concern_NavigationTrait,
         CApp_Concern_ManageStackTrait,
         CApp_Concern_BreadcrumbTrait,
@@ -50,8 +51,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     private $activation = false;
 
     private $resend = false;
-
-    private $org = null;
 
     public static $instance = null;
 
@@ -205,8 +204,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     public function __construct($domain = null) {
         $this->element = new CApp_Element();
-
-        //$this->org = corg::get(CF::orgCode());
 
         //we load another configuration for this app
         //org configuration
@@ -402,24 +399,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             return $this->custom_data;
         }
         return carr::get($this->custom_data, $key, $default);
-    }
-
-    public function org() {
-        if ($this->org == null) {
-            $role = $this->role();
-            if ($role != null) {
-                // $this->org = corg::get($role->org_id);
-            }
-        }
-        return $this->org;
-    }
-
-    public function orgId() {
-        $org = $this->org();
-        if ($org == null) {
-            return null;
-        }
-        return $org->org_id;
     }
 
     public function getRoleChildList($roleId = null, $orgId = null, $type = null) {

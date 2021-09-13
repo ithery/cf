@@ -85,6 +85,9 @@ return [
             //CApp_Auth_Features::twoFactorAuthentication(),
         ],
     ],
+    'model' => [
+        'org' => CApp_Model_Org::class,
+    ],
 
     'lang' => 'id', //deprecated
     'app_id' => 1,
