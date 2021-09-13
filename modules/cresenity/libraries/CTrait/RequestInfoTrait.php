@@ -16,7 +16,7 @@ trait CTrait_RequestInfoTrait {
     }
 
     /**
-     * @param type $userAgent
+     * @param string $userAgent
      *
      * @return \UAParser\Result\Client
      */
