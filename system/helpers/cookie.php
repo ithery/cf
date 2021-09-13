@@ -2,9 +2,6 @@
 
 defined('SYSPATH') OR die('No direct access allowed.');
 
-/**
- * @deprecated since 1.2
-*/
 class cookie {
 
     /**

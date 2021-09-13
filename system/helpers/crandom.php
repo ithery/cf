@@ -1,8 +1,5 @@
 <?php
 // @codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class crandom {
     public static function readable_random_string($length = 6) {
         $conso = ['b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n',

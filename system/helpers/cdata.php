@@ -1,9 +1,6 @@
 <?php
 
 //@codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class cdata {
     public static function path() {
         $dir = DOCROOT . 'data' . DIRECTORY_SEPARATOR . '';

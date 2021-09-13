@@ -1,9 +1,6 @@
 <?php
 
 //@codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class cstatic {
     public static function http_status_header() {
         $status_header = [

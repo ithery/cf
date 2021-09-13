@@ -3,9 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class ctransform {
     public static function thousand_separator($rp, $decimal = null, $always_decimal = false) {
         $minus_str = '';

@@ -1,9 +1,6 @@
 <?php
 
 //@codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class cformatting {
     public static function trailingslashit($string) {
         return cformatting::untrailingslashit($string) . '/';

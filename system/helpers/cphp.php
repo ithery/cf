@@ -1,9 +1,6 @@
 <?php
 
 //@codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class cphp {
     public static function string_value($val, $level = 0) {
         $str = '';

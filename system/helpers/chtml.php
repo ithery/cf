@@ -3,9 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 // @codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class chtml {
     // Enable or disable automatic setting of target="_blank"
     public static $windowed_urls = false;

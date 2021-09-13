@@ -2,9 +2,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class cprinter {
     public static function client_protocol() {
         $app = CApp::instance();

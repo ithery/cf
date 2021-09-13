@@ -2,9 +2,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class cvalid {
     /**
      * Validate email, commonly used characters only

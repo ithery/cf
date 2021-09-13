@@ -3,9 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class cimage {
     public static function create_scaled_image($file_path, $options) {
         $file_name = basename(stripslashes($file_path));

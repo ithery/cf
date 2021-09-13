@@ -1,9 +1,6 @@
 <?php
 
 //@codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class cobj {
     public static function get($object, $key, $default = null) {
         return isset($object->$key) ? $object->$key : $default;

@@ -1,9 +1,6 @@
 <?php
 
 //@codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class cminify {
     /**
      * Minimizes and compresses the provided string. Removes comments, tabs, spaces, and newlines.

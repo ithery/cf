@@ -4,8 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Debugger helper class.
- *
- * @deprecated since 1.2
  */
 //@codingStandardsIgnoreStart
 class cdbg {

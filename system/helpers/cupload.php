@@ -3,9 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
-/**
- * @deprecated since 1.2
-*/
 class cupload {
     /**
      * Save an uploaded file to a new location.
