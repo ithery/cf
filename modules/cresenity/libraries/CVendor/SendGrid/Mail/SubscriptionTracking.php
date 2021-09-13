@@ -202,8 +202,8 @@ class CVendor_SendGrid_Mail_SubscriptionTracking implements \JsonSerializable {
                 'substitution_tag' => $this->getSubstitutionTag()
             ],
             function ($value) {
-                            return $value !== null;
-                        }
+                return $value !== null;
+            }
         ) ?: null;
     }
 }
