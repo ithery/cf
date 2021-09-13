@@ -55,6 +55,13 @@ return [
      */
     'environment' => CBase::ENVIRONMENT_DEVELOPMENT,
 
+    /**
+     * When your application is in debug mode, detailed error messages with
+     * stack traces will be shown on every error that occurs within your
+     * application. If disabled, a simple generic error page is shown.
+     */
+    'debug' => !IN_PRODUCTION,
+
     'auth' => [
         'guard' => 'web',
         'middleware' => ['web'],
@@ -78,13 +85,7 @@ return [
             //CApp_Auth_Features::twoFactorAuthentication(),
         ],
     ],
-    /*
-     * When your application is in debug mode, detailed error messages with
-     * stack traces will be shown on every error that occurs within your
-     * application. If disabled, a simple generic error page is shown.
-     *
-     */
-    'debug' => !IN_PRODUCTION,
+
     'lang' => 'id', //deprecated
     'app_id' => 1,
     'install' => false,
