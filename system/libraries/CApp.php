@@ -206,7 +206,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     public function __construct($domain = null) {
         $this->element = new CApp_Element();
 
-        $this->org = corg::get(CF::orgCode());
+        //$this->org = corg::get(CF::orgCode());
 
         //we load another configuration for this app
         //org configuration
@@ -408,7 +408,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if ($this->org == null) {
             $role = $this->role();
             if ($role != null) {
-                $this->org = corg::get($role->org_id);
+                // $this->org = corg::get($role->org_id);
             }
         }
         return $this->org;
