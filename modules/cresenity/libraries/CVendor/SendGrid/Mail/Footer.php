@@ -1,34 +1,34 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * This class is used to construct a Footer object for the /mail/send API call
  *
  * @package SendGrid\Mail
  */
-class CVendor_SendGrid_Mail_Footer implements \JsonSerializable
-{
-    /** @var $enable bool Indicates if this setting is enabled */
+class CVendor_SendGrid_Mail_Footer implements \JsonSerializable {
+    /**
+     * @var bool Indicates if this setting is enabled
+     */
     private $enable;
-    /** @var $text string The plain text content of your footer */
+
+    /**
+     * @var string The plain text content of your footer
+     */
     private $text;
-    /** @var $html string The HTML content of your footer */
+
+    /**
+     * @var string The HTML content of your footer
+     */
     private $html;
 
     /**
      * Optional constructor
      *
-     * @param bool|null $enable Indicates if this setting is enabled
-     * @param string|null $text The plain text content of your footer
-     * @param string|null $html The HTML content of your footer
+     * @param bool|null   $enable Indicates if this setting is enabled
+     * @param string|null $text   The plain text content of your footer
+     * @param string|null $html   The HTML content of your footer
      */
-    public function __construct($enable = null, $text = null, $html = null)
-    {
+    public function __construct($enable = null, $text = null, $html = null) {
         if (isset($enable)) {
             $this->setEnable($enable);
         }
@@ -44,11 +44,10 @@ class CVendor_SendGrid_Mail_Footer implements \JsonSerializable
      * Update the enable setting on a Footer object
      *
      * @param bool $enable Indicates if this setting is enabled
-     * 
+     *
      * @throws CVendor_SendGrid_Mail_TypeException
-     */ 
-    public function setEnable($enable)
-    {
+     */
+    public function setEnable($enable) {
         if (!is_bool($enable)) {
             throw new CVendor_SendGrid_Mail_TypeException('$enable must be of type bool');
         }
@@ -60,8 +59,7 @@ class CVendor_SendGrid_Mail_Footer implements \JsonSerializable
      *
      * @return bool
      */
-    public function getEnable()
-    {
+    public function getEnable() {
         return $this->enable;
     }
 
@@ -69,11 +67,10 @@ class CVendor_SendGrid_Mail_Footer implements \JsonSerializable
      * Add text to a Footer object
      *
      * @param string $text The plain text content of your footer
-     * 
+     *
      * @throws CVendor_SendGrid_Mail_TypeException
-     */ 
-    public function setText($text)
-    {
+     */
+    public function setText($text) {
         if (!is_string($text)) {
             throw new CVendor_SendGrid_Mail_TypeException('$text must be of type string.');
         }
@@ -85,8 +82,7 @@ class CVendor_SendGrid_Mail_Footer implements \JsonSerializable
      *
      * @return string
      */
-    public function getText()
-    {
+    public function getText() {
         return $this->text;
     }
 
@@ -94,11 +90,10 @@ class CVendor_SendGrid_Mail_Footer implements \JsonSerializable
      * Add html to a Footer object
      *
      * @param string $html The HTML content of your footer
-     * 
+     *
      * @throws CVendor_SendGrid_Mail_TypeException
-     */ 
-    public function setHtml($html)
-    {
+     */
+    public function setHtml($html) {
         if (!is_string($html)) {
             throw new CVendor_SendGrid_Mail_TypeException('$html must be of type string.');
         }
@@ -110,8 +105,7 @@ class CVendor_SendGrid_Mail_Footer implements \JsonSerializable
      *
      * @return string
      */
-    public function getHtml()
-    {
+    public function getHtml() {
         return $this->html;
     }
 
@@ -120,8 +114,7 @@ class CVendor_SendGrid_Mail_Footer implements \JsonSerializable
      *
      * @return null|array
      */
-    public function jsonSerialize()
-    {
+    public function jsonSerialize() {
         return array_filter(
             [
                 'enable' => $this->getEnable(),
