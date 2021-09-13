@@ -26,8 +26,6 @@ class CTreeDB {
         if ($db == null) {
             $db = CDatabase::instance(null, null, $domain);
         }
-        $data = cdata::get($domain, 'domain');
-        //$this->org_id = CF::org_id();
         $this->org_id = '';
 
         $pk_column = $table_name . '_id';
