@@ -1,7 +1,35 @@
 <?php
 
 class CEmail_Config {
+    /**
+     * @var string
+     */
     protected $driver;
+
+    /**
+     * @var string
+     */
+    protected $username;
+
+    /**
+     * @var string
+     */
+    protected $password;
+
+    /**
+     * @var string
+     */
+    protected $host;
+
+    /**
+     * @var string
+     */
+    protected $port;
+
+    /**
+     * @var string
+     */
+    protected $secure;
 
     protected static $smtpHostToDriverMap = [
         'smtp.sendgrid.net' => 'sendgrid',
@@ -13,11 +41,12 @@ class CEmail_Config {
 
     public function __construct($options = []) {
         $options = $this->reformatOptions($options);
-        $this->driverName = carr::get($options, 'driver');
+        $this->driver = carr::get($options, 'driver');
         $this->username = carr::get($options, 'username');
         $this->password = carr::get($options, 'password');
         $this->host = carr::get($options, 'host');
         $this->port = carr::get($options, 'port');
+        $this->secure = carr::get($options, 'secure');
 
         $smtp_username = carr::get($options, 'smtp_username');
         $smtp_password = carr::get($options, 'smtp_password');
@@ -40,7 +69,7 @@ class CEmail_Config {
         if (!$secure) {
             $secure = ccfg::get('smtp_secure');
         }
-        $this->driverName = carr::get(static::$smtpHostToDriverMap, $smtpHost, 'smtp');
+        $this->driver = carr::get(static::$smtpHostToDriverMap, $smtpHost, 'smtp');
     }
 
     public function reformatOptions($config) {
@@ -57,8 +86,33 @@ class CEmail_Config {
             if ($driver == 'smtp') {
                 $newConfig['host'] = carr::get($config, 'smtp_host', carr::get($config, 'host'));
                 $newConfig['port'] = carr::get($config, 'smtp_port', carr::get($config, 'port'));
+                $newConfig['secure'] = carr::get($config, 'smtp_secure', carr::get($config, 'secure'));
             }
         }
         return $newConfig;
+    }
+
+    public function getDriver() {
+        return $this->driver;
+    }
+
+    public function getUsername() {
+        return $this->username;
+    }
+
+    public function getPassword() {
+        return $this->password;
+    }
+
+    public function getHost() {
+        return $this->host;
+    }
+
+    public function getPort() {
+        return $this->port;
+    }
+
+    public function getSecure() {
+        return $this->secure;
     }
 }
