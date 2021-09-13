@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Nov 29, 2020
  */
-trait CApp_Trait_App_View {
+trait CApp_Concern_ViewTrait {
     private $viewName = 'capp/page';
 
     private $viewLoginName = 'capp/login';

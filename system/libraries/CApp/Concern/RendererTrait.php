@@ -9,7 +9,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @see CApp
  * @since Jul 27, 2019, 10:23:46 PM
  */
-trait CApp_Trait_App_Renderer {
+trait CApp_Concern_RendererTrait {
     protected $rendered = false;
 
     protected $viewData = null;

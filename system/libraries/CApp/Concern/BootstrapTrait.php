@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Nov 29, 2020
  */
-trait CApp_Trait_App_Bootstrap {
+trait CApp_Concern_BootstrapTrait {
     protected static $registerComponentBooted = false;
 
     protected static $registerControlBooted = false;

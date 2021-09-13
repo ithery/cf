@@ -7,7 +7,7 @@
  *
  * @see CApp
  */
-trait CApp_Trait_App_Variables {
+trait CApp_Concern_VariablesTrait {
     /**
      * @var array
      */

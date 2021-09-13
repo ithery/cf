@@ -5,7 +5,7 @@
  *
  * @author Hery
  */
-trait CApp_Concern_Navigation {
+trait CApp_Concern_NavigationTrait {
     protected $nav = 'nav';
 
     protected $navRenderer = CApp_Navigation_Engine_SideNav::class;

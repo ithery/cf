@@ -8,9 +8,11 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jul 27, 2019, 10:53:10 PM
  */
-trait CApp_Trait_App_Auth {
+trait CApp_Concern_AuthTrait {
     private $role = null;
+
     private $user = null;
+
     private $loginRequired = true;
 
     public function isUserLogin() {

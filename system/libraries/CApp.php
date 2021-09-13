@@ -23,15 +23,15 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     use CTrait_Compat_App,
         CTrait_Macroable,
         CTrait_RequestInfoTrait,
-        CApp_Concern_Navigation,
+        CApp_Concern_NavigationTrait,
         CApp_Concern_ManageStackTrait,
-        CApp_Trait_App_Breadcrumb,
-        CApp_Trait_App_Variables,
-        CApp_Trait_App_View,
-        CApp_Trait_App_Renderer,
-        CApp_Trait_App_Auth,
-        CApp_Trait_App_Bootstrap,
-        CApp_Trait_App_Title;
+        CApp_Concern_BreadcrumbTrait,
+        CApp_Concern_VariablesTrait,
+        CApp_Concern_ViewTrait,
+        CApp_Concern_RendererTrait,
+        CApp_Concern_AuthTrait,
+        CApp_Concern_BootstrapTrait,
+        CApp_Concern_TitleTrait;
 
     private $content = '';
 

@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jul 27, 2019, 10:54:01 PM
  */
-trait CApp_Trait_App_Title {
+trait CApp_Concern_TitleTrait {
     use CTrait_Element_Property_Title;
 
     private $showTitle = true;
