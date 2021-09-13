@@ -55,8 +55,10 @@ class CSession {
                 // Regenerate session id and update session cookie
                 $this->regenerate();
             } else {
+                // Expiration timestamp
+                $expire = (CSession::$config['expiration'] == 0) ? 0 : time() + (int) CSession::$config['expiration'];
                 // Always update session cookie to keep the session alive
-                setcookie(CSession::$config['name'], $_SESSION['session_id'], CSession::$config['expiration']);
+                setcookie(CSession::$config['name'], $_SESSION['session_id'], $expire);
             }
 
             // Close the session just before sending the headers, so that
