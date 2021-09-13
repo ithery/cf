@@ -220,13 +220,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             include $appBootFile;
         }
 
-        $org = $this->org();
-
         if (ccfg::get('set_timezone')) {
             $timezone = ccfg::get('default_timezone');
-            if ($org != null) {
-                //$timezone = $org->timezone;
-            }
 
             date_default_timezone_set($timezone);
         }

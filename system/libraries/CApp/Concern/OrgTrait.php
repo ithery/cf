@@ -13,7 +13,7 @@ trait CApp_Concern_OrgTrait {
     /**
      * Get the model of org
      *
-     * @return CModel
+     * @return CModel|CApp_Model_Org
      */
     public function org() {
         if ($this->org != null) {
