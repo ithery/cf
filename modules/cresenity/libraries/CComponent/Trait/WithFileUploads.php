@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 30, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 30, 2020
  */
 trait CComponent_Trait_WithFileUploads {
-
     public function startUpload($name, $fileInfo, $isMultiple) {
         if (CComponent_FileUploadConfiguration::isUsingS3()) {
             c::throwIf($isMultiple, CComponent_Exception_S3DoesntSupportMultipleFileUploads::class);
@@ -25,11 +25,11 @@ trait CComponent_Trait_WithFileUploads {
 
     public function finishUpload($name, $tmpPath, $isMultiple) {
         $this->cleanupOldUploads();
-        
+
         if ($isMultiple) {
             $file = c::collect($tmpPath)->map(function ($i) {
-                        return CComponent_TemporaryUploadedFile::createFromComponent($i);
-                    })->toArray();
+                return CComponent_TemporaryUploadedFile::createFromComponent($i);
+            })->toArray();
             $this->emit('upload:finished', $name, c::collect($file)->map->getFilename()->toArray())->self();
         } else {
             $file = CComponent_TemporaryUploadedFile::createFromComponent($tmpPath[0]);
@@ -50,8 +50,9 @@ trait CComponent_Trait_WithFileUploads {
 
         if (is_null($errorsInJson)) {
             $genericValidationMessage = c::trans('validation.uploaded', ['attribute' => $name]);
-            if ($genericValidationMessage === 'validation.uploaded')
+            if ($genericValidationMessage === 'validation.uploaded') {
                 $genericValidationMessage = "The {$name} failed to upload.";
+            }
             throw CValidation_Exception::withMessages([$name => $genericValidationMessage]);
         }
 
@@ -69,26 +70,28 @@ trait CComponent_Trait_WithFileUploads {
             $this->emit('upload:removed', $name, $tmpFilename)->self();
 
             $this->syncInput($name, array_values(array_filter($uploads, function ($upload) use ($tmpFilename) {
-                                if ($upload->getFilename() === $tmpFilename) {
-                                    $upload->delete();
-                                    return false;
-                                }
+                if ($upload->getFilename() === $tmpFilename) {
+                    $upload->delete();
+                    return false;
+                }
 
-                                return true;
-                            })));
+                return true;
+            })));
         } elseif ($uploads instanceof CComponent_TemporaryUploadedFile) {
             $uploads->delete();
 
             $this->emit('upload:removed', $name, $tmpFilename)->self();
 
-            if ($uploads->getFilename() === $tmpFilename)
+            if ($uploads->getFilename() === $tmpFilename) {
                 $this->syncInput($name, null);
+            }
         }
     }
 
     protected function cleanupOldUploads() {
-        if (CComponent_FileUploadConfiguration::isUsingS3())
+        if (CComponent_FileUploadConfiguration::isUsingS3()) {
             return;
+        }
 
         $storage = CComponent_FileUploadConfiguration::storage();
 
@@ -99,5 +102,4 @@ trait CComponent_Trait_WithFileUploads {
             }
         }
     }
-
 }

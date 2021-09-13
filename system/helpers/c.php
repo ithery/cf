@@ -1203,6 +1203,19 @@ class c {
     }
 
     /**
+     * Fill in data where it's missing.
+     *
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $value
+     *
+     * @return mixed
+     */
+    public static function fill(&$target, $key, $value) {
+        return static::set($target, $key, $value, false);
+    }
+
+    /**
      * Get the first element of an array. Useful for method chaining.
      *
      * @param array $array
@@ -1305,7 +1318,6 @@ class c {
     }
 
     /**
-     *
      * @param string $string
      *
      * @return string
@@ -1313,8 +1325,6 @@ class c {
     public static function untrailingslashit($string) {
         return rtrim($string, '/');
     }
-
-
 }
 
 // End c

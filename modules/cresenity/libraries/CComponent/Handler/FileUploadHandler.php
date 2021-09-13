@@ -6,11 +6,10 @@
  * @author Hery
  */
 class CComponent_Handler_FileUploadHandler extends CComponent_HandlerAbstract {
-
     public function getMiddleware() {
         return [[
-        'middleware' => CComponent_FileUploadConfiguration::middleware(),
-        'options' => [],
+            'middleware' => CComponent_FileUploadConfiguration::middleware(),
+            'options' => [],
         ]];
     }
 
@@ -26,27 +25,25 @@ class CComponent_Handler_FileUploadHandler extends CComponent_HandlerAbstract {
     }
 
     public function validateAndStore($files, $disk) {
-       
         c::validator()->make(['files' => $files], [
             'files.*' => CComponent_FileUploadConfiguration::rules()
         ])->validate();
 
         $fileHashPaths = c::collect($files)->map(function ($file) use ($disk) {
             $filename = CComponent_TemporaryUploadedFile::generateHashNameWithOriginalNameEmbedded($file);
-            
+
             return $file->storeAs('/' . CComponent_FileUploadConfiguration::path(), $filename, [
-                        'disk' => $disk
+                'disk' => $disk
             ]);
         });
 
         // Strip out the temporary upload directory from the paths.
         return $fileHashPaths->map(function ($path) {
-                    return str_replace(CComponent_FileUploadConfiguration::path('/'), '', $path);
-                });
+            return str_replace(CComponent_FileUploadConfiguration::path('/'), '', $path);
+        });
     }
 
     public function __invoke() {
         return $this->handle();
     }
-
 }

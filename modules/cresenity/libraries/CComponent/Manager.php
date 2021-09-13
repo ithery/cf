@@ -10,10 +10,15 @@ class CComponent_Manager {
      * @var CComponent_Manager
      */
     protected static $instance;
+
     protected $listeners = [];
+
     protected $componentAliases = [];
+
     protected $queryParamsForTesting = [];
+
     public static $isLivewireRequestTestingOverride;
+
     protected static $redirector = null;
 
     /**
@@ -125,7 +130,7 @@ class CComponent_Manager {
     }
 
     public function styles($options = []) {
-        $debug = config('app.debug');
+        $debug = CF::config('app.debug');
 
         $styles = $this->cssAssets();
 
@@ -178,7 +183,7 @@ HTML;
 
         $devTools = null;
 
-        if (config('app.debug')) {
+        if (CF::config('app.debug')) {
             $devTools = 'window.livewire.devTools(true);';
         }
 
