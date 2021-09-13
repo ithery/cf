@@ -56,7 +56,7 @@ class CSession {
                 $this->regenerate();
             } else {
                 // Always update session cookie to keep the session alive
-                cookie::set(CSession::$config['name'], $_SESSION['session_id'], CSession::$config['expiration']);
+                setcookie(CSession::$config['name'], $_SESSION['session_id'], CSession::$config['expiration']);
             }
 
             // Close the session just before sending the headers, so that
@@ -250,7 +250,7 @@ class CSession {
             $_SESSION = [];
 
             // Delete the session cookie
-            cookie::delete($name);
+            setcookie($name, '', -86400);
         }
     }
 
