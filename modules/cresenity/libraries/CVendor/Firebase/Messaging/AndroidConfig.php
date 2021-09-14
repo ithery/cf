@@ -71,7 +71,7 @@ final class CVendor_Firebase_Messaging_AndroidConfig implements JsonSerializable
      */
     public function withSound($sound) {
         $config = clone $this;
-        $config->config['notification'] = $config->config['notification'] ?? [];
+        $config->config['notification'] = isset($config->config['notification']) ? $config->config['notification'] : [];
         $config->config['notification']['sound'] = $sound;
 
         return $config;

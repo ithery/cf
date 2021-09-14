@@ -52,7 +52,7 @@ final class CVendor_Firebase_Messaging_WebPushConfig implements JsonSerializable
 
     public function withUrgency($urgency) {
         $config = clone $this;
-        $config->rawConfig['headers'] = $config->rawConfig['headers'] ?? [];
+        $config->rawConfig['headers'] = isset($config->rawConfig['headers']) ? $config->rawConfig['headers'] : [];
         $config->rawConfig['headers']['Urgency'] = $urgency;
 
         return $config;

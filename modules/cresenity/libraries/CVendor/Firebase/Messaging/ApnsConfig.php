@@ -75,7 +75,7 @@ final class CVendor_Firebase_Messaging_ApnsConfig implements JsonSerializable {
 
     public function withPriority($priority) {
         $config = clone $this;
-        $config->config['headers'] = $config->config['headers'] ?? [];
+        $config->config['headers'] = isset($config->config['headers']) ? $config->config['headers'] : [];
         $config->config['headers']['apns-priority'] = $priority;
 
         return $config;
