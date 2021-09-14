@@ -89,7 +89,7 @@ class cmail {
         // $options['bcc'] = $bcc;
         // $options['attachments'] = $attachments;
         // CEmail::sender($options)->send($to, $subject, $message, $options);
-        $mail = CSMTP::factory();
+
         $smtp_username = carr::get($options, 'smtp_username');
         $smtp_password = carr::get($options, 'smtp_password');
         $smtp_host = carr::get($options, 'smtp_host');
@@ -131,7 +131,7 @@ class cmail {
                 }
                 break;
         }
-
+        $mail = CSMTP::factory();
         $mail->set_username($smtp_username);
         $mail->set_password($smtp_password);
         $mail->set_host($smtp_host);
