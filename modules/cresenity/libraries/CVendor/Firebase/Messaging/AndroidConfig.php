@@ -39,7 +39,7 @@ final class CVendor_Firebase_Messaging_AndroidConfig implements JsonSerializable
         $this->config = $config;
     }
 
-    public static function new() {
+    public static function getNew() {
         return new self([]);
     }
 

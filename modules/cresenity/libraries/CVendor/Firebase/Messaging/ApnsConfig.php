@@ -17,7 +17,7 @@ final class CVendor_Firebase_Messaging_ApnsConfig implements JsonSerializable {
     private function __construct() {
     }
 
-    public static function new() {
+    public static function getNew() {
         return self::fromArray([]);
     }
 
