@@ -4,6 +4,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 //@codingStandardsIgnoreStart
 class cmsg {
     public static function add($type, $message) {
+        if (headers_sent()) {
+            return null;
+        }
         $session = CSession::instance();
         $msgs = $session->get('cmsg_' . $type);
         if (!is_array($msgs)) {
@@ -31,6 +34,9 @@ class cmsg {
     }
 
     public static function flash($type) {
+        if (headers_sent()) {
+            return null;
+        }
         $msgs = cmsg::get($type);
         $message = '';
         if (is_array($msgs)) {
