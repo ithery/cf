@@ -3,13 +3,19 @@
  * @see https://developers.google.com/instance-id/reference/server#results
  */
 final class CVendor_Firebase_Messaging_AppInstance implements JsonSerializable {
-    /** @var CVendor_Firebase_Messaging_RegistrationToken */
+    /**
+     * @var CVendor_Firebase_Messaging_RegistrationToken
+     */
     private $registrationToken;
 
-    /** @var array<string, mixed> */
+    /**
+     * @var array<string, mixed>
+     */
     private $rawData = [];
 
-    /** @var CVendor_Firebase_Messaging_TopicSubscriptions */
+    /**
+     * @var CVendor_Firebase_Messaging_TopicSubscriptions
+     */
     private $topicSubscriptions;
 
     private function __construct() {

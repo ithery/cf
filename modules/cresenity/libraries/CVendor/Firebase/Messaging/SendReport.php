@@ -1,13 +1,19 @@
 <?php
 
 class CVendor_Firebase_Messaging_SendReport {
-    /** @var CVendor_Firebase_Messaging_MessageTarget */
+    /**
+     * @var CVendor_Firebase_Messaging_MessageTarget
+     */
     private $target;
 
-    /** @var array|null */
+    /**
+     * @var array|null
+     */
     private $result;
 
-    /** @var Throwable|null */
+    /**
+     * @var Throwable|null
+     */
     private $error;
 
     private function __construct() {

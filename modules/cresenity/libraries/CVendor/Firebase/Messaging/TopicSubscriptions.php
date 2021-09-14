@@ -4,7 +4,9 @@
  * @implements IteratorAggregate<TopicSubscription>
  */
 final class CVendor_Firebase_Messaging_TopicSubscriptions implements Countable, IteratorAggregate {
-    /** @var CVendor_Firebase_Messaging_TopicSubscription[] */
+    /**
+     * @var CVendor_Firebase_Messaging_TopicSubscription[]
+     */
     private $subscriptions;
 
     public function __construct(CVendor_Firebase_Messaging_TopicSubscription ...$subscriptions) {
