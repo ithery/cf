@@ -44,8 +44,8 @@ final class CVendor_Firebase_Messaging_ApnsConfig implements JsonSerializable {
     public function withSound($sound) {
         $config = clone $this;
 
-        $config->config['payload'] = $config->config['payload'] ?? [];
-        $config->config['payload']['aps'] = $config->config['payload']['aps'] ?? [];
+        $config->config['payload'] = isset($config->config['payload']) ? $config->config['payload'] : [];
+        $config->config['payload']['aps'] = isset($config->config['payload']['aps']) ? $config->config['payload']['aps'] : [];
         $config->config['payload']['aps']['sound'] = $sound;
 
         return $config;
@@ -58,8 +58,8 @@ final class CVendor_Firebase_Messaging_ApnsConfig implements JsonSerializable {
      */
     public function withBadge($number) {
         $config = clone $this;
-        $config->config['payload'] = $config->config['payload'] ?? [];
-        $config->config['payload']['aps'] = $config->config['payload']['aps'] ?? [];
+        $config->config['payload'] = isset($config->config['payload']) ? $config->config['payload'] : [];
+        $config->config['payload']['aps'] = isset($config->config['payload']['aps']) ? $config->config['payload']['aps'] : [];
         $config->config['payload']['aps']['badge'] = $number;
 
         return $config;
