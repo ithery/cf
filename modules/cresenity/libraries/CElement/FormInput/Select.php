@@ -13,10 +13,15 @@ class CElement_FormInput_Select extends CElement_FormInput {
         CTrait_Element_Property_ApplyJs;
 
     protected $group_list = [];
+
     protected $multiple;
+
     protected $dropdown_classes;
+
     protected $hide_search;
+
     protected $maximumSelectionLength;
+
     protected $placeholder;
 
     public function __construct($id) {

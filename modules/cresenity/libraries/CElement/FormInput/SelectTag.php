@@ -9,21 +9,13 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Sep 14, 2018, 3:50:56 PM
  */
 class CElement_FormInput_SelectTag extends CElement_FormInput {
+    use CTrait_Compat_Element_FormInput_SelectTag;
+
     protected $multiple;
 
     public function __construct($id) {
         parent::__construct($id);
         $this->multiple = true;
-    }
-
-    public function set_multiple($bool) {
-        $this->multiple = $bool;
-        return $this;
-    }
-
-    public function set_min_input_length($min_input_length) {
-        $this->min_input_length = $min_input_length;
-        return $this;
     }
 
     public function set_key_field($key_field) {
@@ -83,7 +75,7 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
             }
 
             $custom_css = $this->custom_css;
-            $custom_css = crenderer::render_style($custom_css);
+            $custom_css = $this->renderStyle($custom_css);
             if (strlen($custom_css) > 0) {
                 $custom_css = ' style="' . $custom_css . '"';
             }
@@ -123,16 +115,16 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
                     }
                 }
             }
-            $html->dec_indent()->appendln('</select>')->br();
+            $html->decIndent()->appendln('</select>')->br();
 
             //$html->appendln('<input type="text" name="'.$this->name.'" id="'.$this->id.'" class="input-unstyled'.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.'>')->br();
             return $html->text();
         }
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $html->append($this->html_child($indent));
 
-        $custom_css = crenderer::render_style($this->custom_css);
+        $custom_css = $this->renderStyle($this->custom_css);
         $multiple = ' multiple="multiple"';
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
@@ -196,17 +188,17 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
 
 			});
 
-	";
+	    ";
 
         if (strlen($vals_str) > 0) {
             $str .= "
-                        $('#" . $this->id . "').select2('val',[" . $vals_str . ']);
-                ';
+                $('#" . $this->id . "').select2('val',[" . $vals_str . ']);
+            ';
         }
 
         $js = new CStringBuilder();
         $js->append(parent::js($indent))->br();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         //echo $str;
         $js->append($str)->br();
 

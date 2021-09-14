@@ -877,6 +877,9 @@ class c {
      * @return CHTTP_Redirector|CHttp_RedirectResponse
      */
     public static function redirect($to = null, $status = 302, $headers = [], $secure = null) {
+        if ($to instanceof CController) {
+            $to = $to->controllerUrl();
+        }
         if (is_null($to)) {
             return CHTTP::redirector();
         }
