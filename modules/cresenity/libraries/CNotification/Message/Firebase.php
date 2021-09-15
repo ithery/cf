@@ -23,11 +23,8 @@ class CNotification_Message_Firebase extends CNotification_MessageAbstract {
         }
 
         if (is_array($apnsConfig)) {
-            $message = $message->withApnsConfig($androidConfig);
+            $message = $message->withApnsConfig($apnsConfig);
         }
-
-        CDaemon::log('Array Message' . json_encode($message->jsonSerialize()));
-        CDaemon::log('Tokens' . json_encode($tokens));
 
         $multicastReport = $messaging->sendMulticast($message, $tokens);
         foreach ($multicastReport->successes()->getItems() as $report) {
