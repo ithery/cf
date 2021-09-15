@@ -2,109 +2,118 @@
 
 //@codingStandardsIgnoreStart
 class cmailapi {
+    /**
+     * @deprecated since 1.2 use CEmail
+     */
     public static function sendgridv3($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
-        $smtp_password = carr::get($options, 'smtp_password');
-        $smtp_host = carr::get($options, 'smtp_host');
-        if (!$smtp_password) {
-            $smtp_password = ccfg::get('smtp_password');
-        }
-        if (!$smtp_host) {
-            $smtp_host = ccfg::get('smtp_host');
-        }
-        if ($smtp_host != 'smtp.sendgrid.net') {
-            throw new Exception('Fail to send mail API, SMTP Host is not valid');
-        }
-        $sendgrid_apikey = $smtp_password;
+        $options['driver'] = 'sendgrid';
+        $options['cc'] = $cc;
+        $options['bcc'] = $bcc;
+        $options['attachments'] = $attachments;
+        CEmail::sender($options)->send($to, $subject, $message, $options);
 
-        $smtp_from = carr::get($options, 'smtp_from');
-        if ($smtp_from == null) {
-            $smtp_from = ccfg::get('smtp_from');
-        }
-        $smtp_from_name = carr::get($options, 'smtp_from_name');
-        if ($smtp_from_name == null) {
-            $smtp_from_name = ccfg::get('smtp_from_name');
-        }
+//         $smtp_password = carr::get($options, 'smtp_password');
+//         $smtp_host = carr::get($options, 'smtp_host');
+//         if (!$smtp_password) {
+//             $smtp_password = ccfg::get('smtp_password');
+//         }
+//         if (!$smtp_host) {
+//             $smtp_host = ccfg::get('smtp_host');
+//         }
+//         if ($smtp_host != 'smtp.sendgrid.net') {
+//             throw new Exception('Fail to send mail API, SMTP Host is not valid');
+//         }
+//         $sendgrid_apikey = $smtp_password;
 
-//        if (is_array($to)) {
-//            $to = carr::get($to, 0);
-//        }
-        $mail = new CVendor_SendGrid_Mail_Mail();
-        $mail->setFrom($smtp_from, $smtp_from_name);
+//         $smtp_from = carr::get($options, 'smtp_from');
+//         if ($smtp_from == null) {
+//             $smtp_from = ccfg::get('smtp_from');
+//         }
+//         $smtp_from_name = carr::get($options, 'smtp_from_name');
+//         if ($smtp_from_name == null) {
+//             $smtp_from_name = ccfg::get('smtp_from_name');
+//         }
 
-        $toSendGrid = [];
-        if (!is_array($to)) {
-            $to = [$to];
-        }
-        foreach ($to as $toItem) {
-            $toName = '';
-            $toEmail = $toItem;
-            if (is_array($toItem)) {
-                $toName = carr::get($toItem, 'toName');
-                $toEmail = carr::get($toItem, 'toEmail');
-            }
-            $mail->addTo($toEmail, $toName);
-        }
-        $mail->setSubject($subject);
-        $mail->addContent('text/html', $message);
+// //        if (is_array($to)) {
+// //            $to = carr::get($to, 0);
+// //        }
+//         $mail = new CVendor_SendGrid_Mail_Mail();
+//         $mail->setFrom($smtp_from, $smtp_from_name);
 
-        if (!is_array($attachments)) {
-            $attachments = [];
-        }
+//         $toSendGrid = [];
+//         if (!is_array($to)) {
+//             $to = [$to];
+//         }
+//         foreach ($to as $toItem) {
+//             $toName = '';
+//             $toEmail = $toItem;
+//             if (is_array($toItem)) {
+//                 $toName = carr::get($toItem, 'toName');
+//                 $toEmail = carr::get($toItem, 'toEmail');
+//             }
+//             $mail->addTo($toEmail, $toName);
+//         }
+//         $mail->setSubject($subject);
+//         $mail->addContent('text/html', $message);
 
-        $subjectPreview = carr::get($options, 'subject_preview');
-        foreach ($attachments as $att) {
-            $disk = '';
-            if (is_array($att)) {
-                $path = carr::get($att, 'path');
-                $filename = basename($path);
-                $attachmentFilename = carr::get($att, 'filename');
-                $type = carr::get($att, 'type');
-                $disk = carr::get($att, 'disk');
-            } else {
-                $path = $att;
-                $filename = basename($att);
-                $attachmentFilename = $filename;
-                $type = '';
-            }
+//         if (!is_array($attachments)) {
+//             $attachments = [];
+//         }
 
-            if (strlen($type) == 0) {
-                $ext = pathinfo($filename, PATHINFO_EXTENSION);
+//         $subjectPreview = carr::get($options, 'subject_preview');
+//         foreach ($attachments as $att) {
+//             $disk = '';
+//             if (is_array($att)) {
+//                 $path = carr::get($att, 'path');
+//                 $filename = basename($path);
+//                 $attachmentFilename = carr::get($att, 'filename');
+//                 $type = carr::get($att, 'type');
+//                 $disk = carr::get($att, 'disk');
+//             } else {
+//                 $path = $att;
+//                 $filename = basename($att);
+//                 $attachmentFilename = $filename;
+//                 $type = '';
+//             }
 
-                $type = 'application/text';
-                if ($ext == 'pdf') {
-                    $type = 'application/pdf';
-                }
-                if ($ext == 'jpg' || $ext == 'jpeg') {
-                    $type = 'image/jpeg';
-                }
-                if ($ext == 'png') {
-                    $type = 'image/png';
-                }
-            }
-            $content = '';
-            if (strlen($disk) > 0) {
-                $diskObject = CStorage::instance()->disk($disk);
-                $content = $diskObject->get($path);
-            } else {
-                $content = file_get_contents($path);
-            }
-            $attachment = new CVendor_SendGrid_Mail_Attachment();
-            $attachment->setContent(base64_encode($content));
-            $attachment->setType($type);
-            $attachment->setDisposition('attachment');
-            $attachment->setFilename($attachmentFilename);
-            $mail->addAttachment($attachment);
-        }
+//             if (strlen($type) == 0) {
+//                 $ext = pathinfo($filename, PATHINFO_EXTENSION);
 
-        $sg = new CVendor_SendGrid($sendgrid_apikey);
+//                 $type = 'application/text';
+//                 if ($ext == 'pdf') {
+//                     $type = 'application/pdf';
+//                 }
+//                 if ($ext == 'jpg' || $ext == 'jpeg') {
+//                     $type = 'image/jpeg';
+//                 }
+//                 if ($ext == 'png') {
+//                     $type = 'image/png';
+//                 }
+//             }
+//             $content = '';
+//             if (strlen($disk) > 0) {
+//                 $diskObject = CStorage::instance()->disk($disk);
+//                 $content = $diskObject->get($path);
+//             } else {
+//                 $content = file_get_contents($path);
+//             }
+//             $attachment = new CVendor_SendGrid_Mail_Attachment();
+//             $attachment->setContent(base64_encode($content));
+//             $attachment->setType($type);
+//             $attachment->setDisposition('attachment');
+//             $attachment->setFilename($attachmentFilename);
+//             $mail->addAttachment($attachment);
+//         }
 
-        //cdbg::var_dump(json_encode($mail, JSON_PRETTY_PRINT));
+//         $sg = new CVendor_SendGrid($sendgrid_apikey);
 
-        $response = $sg->send($mail);
-        if ($response->statusCode() > 400) {
-            throw new Exception('Fail to send mail, API Response:(' . $response->statusCode() . ')' . $response->body());
-        }
-        return $response;
+//         //cdbg::var_dump(json_encode($mail, JSON_PRETTY_PRINT));
+
+//         $response = $sg->send($mail);
+//         if ($response->statusCode() > 400) {
+//             throw new Exception('Fail to send mail, API Response:(' . $response->statusCode() . ')' . $response->body());
+//         }
+//         return $response;
     }
 
     public static function sendgridv3bak($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
@@ -208,79 +217,87 @@ class cmailapi {
         return $response;
     }
 
+    /**
+     * @deprecated since 1.2 use CEmail
+     */
     public static function sendgrid($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
-        //$sendgrid_apikey = "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";
+        $options['driver'] = 'sendgrid';
+        $options['cc'] = $cc;
+        $options['bcc'] = $bcc;
+        $options['attachments'] = $attachments;
+        CEmail::sender($options)->send($to, $subject, $message, $options);
+        // //$sendgrid_apikey = "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";
 
-        $smtp_password = carr::get($options, 'smtp_password');
-        $smtp_host = carr::get($options, 'smtp_host');
-        if (!$smtp_password) {
-            $smtp_password = ccfg::get('smtp_password');
-        }
-        if (!$smtp_host) {
-            $smtp_host = ccfg::get('smtp_host');
-        }
-        if ($smtp_host != 'smtp.sendgrid.net') {
-            throw new Exception('Fail to send mail API, SMTP Host is not valid');
-        }
-        $sendgrid_apikey = $smtp_password;
-        $smtp_from = carr::get($options, 'smtp_from');
-        if ($smtp_from == null) {
-            $smtp_from = ccfg::get('smtp_from');
-        }
-        $smtp_from_name = carr::get($options, 'smtp_from_name');
-        if ($smtp_from_name == null) {
-            $smtp_from_name = ccfg::get('smtp_from_name');
-        }
+        // $smtp_password = carr::get($options, 'smtp_password');
+        // $smtp_host = carr::get($options, 'smtp_host');
+        // if (!$smtp_password) {
+        //     $smtp_password = ccfg::get('smtp_password');
+        // }
+        // if (!$smtp_host) {
+        //     $smtp_host = ccfg::get('smtp_host');
+        // }
+        // if ($smtp_host != 'smtp.sendgrid.net') {
+        //     throw new Exception('Fail to send mail API, SMTP Host is not valid');
+        // }
+        // $sendgrid_apikey = $smtp_password;
+        // $smtp_from = carr::get($options, 'smtp_from');
+        // if ($smtp_from == null) {
+        //     $smtp_from = ccfg::get('smtp_from');
+        // }
+        // $smtp_from_name = carr::get($options, 'smtp_from_name');
+        // if ($smtp_from_name == null) {
+        //     $smtp_from_name = ccfg::get('smtp_from_name');
+        // }
 
-        $url = 'https://api.sendgrid.com/';
-        $pass = $sendgrid_apikey;
-        /*
-          $template_id = '<your_template_id>';
-          $js = array(
-          'sub' => array(':name' => array('Elmer')),
-          'filters' => array('templates' => array('settings' => array('enable' => 1, 'template_id' => $template_id)))
-          );
-         */
+        // $url = 'https://api.sendgrid.com/';
+        // $pass = $sendgrid_apikey;
+        // /*
+        //   $template_id = '<your_template_id>';
+        //   $js = array(
+        //   'sub' => array(':name' => array('Elmer')),
+        //   'filters' => array('templates' => array('settings' => array('enable' => 1, 'template_id' => $template_id)))
+        //   );
+        //  */
 
-        $files = [];
+        // $files = [];
 
-        $params = [
-            'to' => $to,
-            'cc' => $cc,
-            'bcc' => $bcc,
-            'from' => $smtp_from,
-            'fromname' => $smtp_from_name,
-            'subject' => $subject . '',
-            'html' => $message,
-        ];
+        // $params = [
+        //     'to' => $to,
+        //     'cc' => $cc,
+        //     'bcc' => $bcc,
+        //     'from' => $smtp_from,
+        //     'fromname' => $smtp_from_name,
+        //     'subject' => $subject . '',
+        //     'html' => $message,
+        // ];
 
-        $request = $url . 'api/mail.send.json';
+        // $request = $url . 'api/mail.send.json';
 
-        // Generate curl request
-        $session = curl_init($request);
-        // Tell PHP not to use SSLv3 (instead opting for TLS)
-        curl_setopt($session, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
-        curl_setopt($session, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $sendgrid_apikey]);
-        // Tell curl to use HTTP POST
-        curl_setopt($session, CURLOPT_POST, true);
-        // Tell curl that this is the body of the POST
-        curl_setopt($session, CURLOPT_POSTFIELDS, curl::asPostString($params));
-        // Tell curl not to return headers, but do return the response
-        curl_setopt($session, CURLOPT_HEADER, false);
-        curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
+        // // Generate curl request
+        // $session = curl_init($request);
+        // // Tell PHP not to use SSLv3 (instead opting for TLS)
+        // curl_setopt($session, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+        // curl_setopt($session, CURLOPT_HTTPHEADER, ['Authorization: Bearer ' . $sendgrid_apikey]);
+        // // Tell curl to use HTTP POST
+        // curl_setopt($session, CURLOPT_POST, true);
+        // // Tell curl that this is the body of the POST
+        // curl_setopt($session, CURLOPT_POSTFIELDS, curl::asPostString($params));
+        // // Tell curl not to return headers, but do return the response
+        // curl_setopt($session, CURLOPT_HEADER, false);
+        // curl_setopt($session, CURLOPT_RETURNTRANSFER, true);
 
-        if (count($files) > 0) {
-            //curl_setopt($session, CURLOPT_SAFE_UPLOAD, false);
-        }
-        // obtain response
-        $response = curl_exec($session);
-        curl_close($session);
+        // if (count($files) > 0) {
+        //     //curl_setopt($session, CURLOPT_SAFE_UPLOAD, false);
+        // }
+        // // obtain response
+        // $response = curl_exec($session);
+        // curl_close($session);
 
-        $response_array = json_decode($response, true);
-        if (carr::get($response_array, 'message') != 'success') {
-            throw new Exception('Fail to send mail, API Response:' . $response);
-        }
-        return $response_array;
+        // $response_array = json_decode($response, true);
+        // if (carr::get($response_array, 'message') != 'success') {
+        //     throw new Exception('Fail to send mail, API Response:' . $response);
+        // }
+        // return $response_array;
     }
 
     public static function mailgun($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
