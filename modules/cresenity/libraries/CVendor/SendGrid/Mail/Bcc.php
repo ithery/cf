@@ -5,6 +5,5 @@
  *
  * @package SendGrid\Mail
  */
-class CVendor_SendGrid_Mail_Bcc extends CVendor_SendGrid_Mail_EmailAddress implements \JsonSerializable
-{
+class CVendor_SendGrid_Mail_Bcc extends CVendor_SendGrid_Mail_EmailAddress implements \JsonSerializable {
 }
