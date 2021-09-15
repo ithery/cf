@@ -86,11 +86,11 @@ class CVendor_SendGrid_Mail_SubscriptionTracking implements \JsonSerializable {
      *
      * @param bool $enable Indicates if this setting is enabled
      *
-     * @throws CVendor_SendGrid_Mail_TypeException
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setEnable($enable) {
         if (!is_bool($enable)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$enable must be of type bool.');
+            throw new CVendor_SendGrid_Exception_TypeException('$enable must be of type bool.');
         }
         $this->enable = $enable;
     }
@@ -112,11 +112,11 @@ class CVendor_SendGrid_Mail_SubscriptionTracking implements \JsonSerializable {
      *                     control where the link is by using the
      *                     tag <% %>
      *
-     * @throws CVendor_SendGrid_Mail_TypeException
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setText($text) {
         if (!is_string($text)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$text must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$text must be of type string.');
         }
         $this->text = $text;
     }
@@ -138,11 +138,11 @@ class CVendor_SendGrid_Mail_SubscriptionTracking implements \JsonSerializable {
      *                     control where the link is by using the
      *                     tag <% %>
      *
-     * @throws CVendor_SendGrid_Mail_TypeException
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setHtml($html) {
         if (!is_string($html)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$html must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$html must be of type string.');
         }
         $this->html = $html;
     }
@@ -167,11 +167,11 @@ class CVendor_SendGrid_Mail_SubscriptionTracking implements \JsonSerializable {
      *                                 will be placed at the substitution tag’s
      *                                 location, with no additional formatting %>
      *
-     * @throws CVendor_SendGrid_Mail_TypeException
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setSubstitutionTag($substitution_tag) {
         if (!is_string($substitution_tag)) {
-            throw new CVendor_SendGrid_Mail_TypeException(
+            throw new CVendor_SendGrid_Exception_TypeException(
                 '$substitution_tag must be of type string.'
             );
         }

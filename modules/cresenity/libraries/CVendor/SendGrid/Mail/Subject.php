@@ -27,11 +27,11 @@ class CVendor_SendGrid_Mail_Subject implements \JsonSerializable {
      *
      * @param string $subject The email subject
      *
-     * @throws CVendor_SendGrid_Mail_TypeException
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setSubject($subject) {
         if (!is_string($subject)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$subject must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$subject must be of type string.');
         }
 
         $this->subject = $subject;

@@ -12,8 +12,9 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_BatchId implements \JsonSerializable {
-
-    /** @var $batch_id string This ID represents a batch of emails to be sent at the same time */
+    /**
+     * @var string This ID represents a batch of emails to be sent at the same time
+     */
     private $batch_id;
 
     /**
@@ -33,12 +34,12 @@ class CVendor_SendGrid_Mail_BatchId implements \JsonSerializable {
      *
      * @param string $batch_id This ID represents a batch of emails to be sent
      *                         at the same time
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setBatchId($batch_id) {
         if (!is_string($batch_id)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$batch_id must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$batch_id must be of type string.');
         }
         $this->batch_id = $batch_id;
     }
@@ -60,5 +61,4 @@ class CVendor_SendGrid_Mail_BatchId implements \JsonSerializable {
     public function jsonSerialize() {
         return $this->getBatchId();
     }
-
 }

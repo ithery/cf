@@ -78,9 +78,10 @@ class cmail {
      * @param array        $bcc
      * @param array        $options     Options available smtp_username,smtp_password,dll
      *
-     * @return type
+     * @return void|CVendor_SendGrid_Response
      *
      * @deprecated since 1.2 use CEmail
+     *
      * @throws Exception
      */
     //@codingStandardsIgnoreStart

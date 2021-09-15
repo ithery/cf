@@ -16,6 +16,16 @@ class CEmail_Sender {
         $this->driver = CEmail_Factory::createDriver($config);
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param array|string $to
+     * @param string       $subject
+     * @param string       $message
+     * @param array        $options
+     *
+     * @return void|CVendor_SendGrid_Response
+     */
     public function send($to, $subject, $message, $options = []) {
         //build the default options
         $to = carr::wrap($to);
