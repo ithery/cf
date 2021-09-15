@@ -32,6 +32,7 @@ trait CApp_Concern_ViewTrait {
         if ($this->isUsingBlade()) {
             $this->useRequireJs = false;
         }
+        return $this;
     }
 
     public function getView() {
