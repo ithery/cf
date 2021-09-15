@@ -23,7 +23,7 @@ class CNotification_Message_Firebase extends CNotification_MessageAbstract {
         }
 
         if (is_array($apnsConfig)) {
-            $message = $message->withApnsConfig($androidConfig);
+            $message = $message->withApnsConfig($apnsConfig);
         }
 
         $multicastReport = $messaging->sendMulticast($message, $tokens);
