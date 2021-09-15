@@ -1082,6 +1082,15 @@ class c {
     }
 
     /**
+     * Get the CApp instance.
+     *
+     * @return \CManager
+     */
+    public static function manager() {
+        return CManager::instance();
+    }
+
+    /**
      * Get the CDatabase instance.
      *
      * @return \CDatabase
