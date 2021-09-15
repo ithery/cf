@@ -6,6 +6,9 @@ class CNotification_Message_Firebase extends CNotification_MessageAbstract {
         $tokens = carr::wrap($this->getOption('recipient'));
 
         $data = $this->getOption('data');
+        $androidConfig = $this->getOption('android');
+        $apnsConfig = $this->getOption('apns');
+
         $messaging = $firebase->createMessaging();
 
         $message = $messaging->createCloudMessage()
@@ -13,6 +16,14 @@ class CNotification_Message_Firebase extends CNotification_MessageAbstract {
 
         if (is_array($data)) {
             $message = $message->withData($data);
+        }
+
+        if (is_array($androidConfig)) {
+            $message = $message->withAndroidConfig($androidConfig);
+        }
+
+        if (is_array($apnsConfig)) {
+            $message = $message->withApnsConfig($androidConfig);
         }
 
         $multicastReport = $messaging->sendMulticast($message, $tokens);

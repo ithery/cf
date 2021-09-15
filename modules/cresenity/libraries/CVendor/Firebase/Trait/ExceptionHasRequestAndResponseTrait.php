@@ -5,10 +5,14 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 trait CVendor_Firebase_Trait_ExceptionHasRequestAndResponseTrait {
-    /** @var RequestInterface|null */
+    /**
+     * @var RequestInterface|null
+     */
     protected $request;
 
-    /** @var ResponseInterface|null */
+    /**
+     * @var ResponseInterface|null
+     */
     protected $response;
 
     /**
