@@ -16,10 +16,15 @@ class CElement_Component_Widget_Header extends CElement_Element {
      * @var CElement_List_ActionList
      */
     protected $actions;
+
     protected $switcher;
+
     protected $switcherWrapper;
+
     protected $titleWrapper;
+
     protected $switcherBehaviour = 'hide';
+
     protected $switcherBlockMessage = '';
 
     public function __construct($id = '', $tag = 'div') {
@@ -58,7 +63,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
     public function addSwitcher($id = null) {
         if ($this->switcher == null) {
             $this->switcherWrapper = $this->addDiv()->addClass('widget-switcher-wrapper pull-right');
-            $this->switcher = CFactory::createControl($id, 'switcher');
+            $this->switcher = CElement_Factory::createControl($id, 'switcher');
             $this->switcherWrapper->add($this->switcher);
         }
         return $this->switcher;
@@ -117,7 +122,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
                 ');
             }
         }
-        $js->append($this->jsChild($js->get_indent()));
+        $js->append($this->jsChild($js->getIndent()));
         return $js->text();
     }
 }
