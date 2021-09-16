@@ -155,7 +155,7 @@ trait CApp_Concern_BootstrapTrait {
                 'switcher' => CElement_FormInput_Checkbox_Switcher::class,
                 'summernote' => CElement_FormInput_Textarea_Summernote::class,
                 'radio' => CElement_FormInput_Radio::class,
-                'label' => CFormInputLabel::class,
+                'label' => CElement_FormInput_Label::class,
                 'quill' => CElement_FormInput_Textarea_Quill::class,
                 'file' => CFormInputFile::class,
                 'ckeditor' => CFormInputCKEditor::class,

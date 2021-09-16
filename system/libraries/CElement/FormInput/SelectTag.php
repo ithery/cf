@@ -18,36 +18,6 @@ class CElement_FormInput_SelectTag extends CElement_FormInput {
         $this->multiple = true;
     }
 
-    public function set_key_field($key_field) {
-        $this->key_field = $key_field;
-        return $this;
-    }
-
-    public function set_search_field($search_field) {
-        $this->search_field = $search_field;
-        return $this;
-    }
-
-    public function set_query($query) {
-        $this->query = $query;
-        return $this;
-    }
-
-    public function set_format_result($fmt) {
-        $this->format_result = $fmt;
-        return $this;
-    }
-
-    public function set_format_selection($fmt) {
-        $this->format_selection = $fmt;
-        return $this;
-    }
-
-    public function set_placeholder($placeholder) {
-        $this->placeholder = $placeholder;
-        return $this;
-    }
-
     public function html($indent = 0) {
         if (CManager::instance()->isRegisteredModule('bootstrap-4-material') || CManager::instance()->isRegisteredModule('bootstrap-4')) {
             $html = new CStringBuilder();

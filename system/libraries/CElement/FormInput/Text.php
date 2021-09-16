@@ -13,8 +13,11 @@ class CElement_FormInput_Text extends CElement_FormInput {
         CTrait_Element_Property_Placeholder;
 
     protected $bootstrap;
+
     protected $input_style;
+
     protected $button_position;
+
     protected $action;
 
     public function __construct($id) {
@@ -99,7 +102,7 @@ class CElement_FormInput_Text extends CElement_FormInput {
 
     public function js($indent = 0) {
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
 
         if ($this->action != null) {
             $js->appendln($this->action->js());

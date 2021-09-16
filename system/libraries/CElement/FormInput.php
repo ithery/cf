@@ -16,6 +16,9 @@ class CElement_FormInput extends CElement_Element {
 
     protected $submit_onchange;
 
+    /**
+     * @var string|array
+     */
     protected $value;
 
     protected $size;
