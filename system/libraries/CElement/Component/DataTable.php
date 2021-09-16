@@ -282,7 +282,6 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setDomain($domain) {
-        parent::setDomain($domain);
         $this->setDatabase(CDatabase::instance(null, null, $domain));
         return $this;
     }
@@ -723,9 +722,9 @@ class CElement_Component_DataTable extends CElement_Component {
         }
 
         if (strlen($this->dbName) > 0) {
-            return CDatabase::instance($this->dbName, null, $this->domain);
+            return CDatabase::instance($this->dbName);
         }
-        return CDatabase::instance($this->dbName, $this->dbConfig, $this->domain);
+        return CDatabase::instance($this->dbName, $this->dbConfig);
     }
 
     /**

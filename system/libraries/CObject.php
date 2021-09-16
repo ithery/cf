@@ -21,10 +21,6 @@ class CObject {
         $this->friends[] = $classname;
     }
 
-    public function setDomain($domain) {
-        $this->domain = $domain;
-    }
-
     public function __get($key) {
         $trace = debug_backtrace();
 
@@ -74,10 +70,6 @@ class CObject {
 
     public function className() {
         return get_class($this);
-    }
-
-    public function domain() {
-        return $this->domain;
     }
 
     public function isUseTrait($trait) {
