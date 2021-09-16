@@ -154,7 +154,7 @@ trait CApp_Concern_BootstrapTrait {
                 'checkbox-list' => CFormInputCheckboxList::class,
                 'switcher' => CElement_FormInput_Checkbox_Switcher::class,
                 'summernote' => CElement_FormInput_Textarea_Summernote::class,
-                'radio' => CFormInputRadio::class,
+                'radio' => CElement_FormInput_Radio::class,
                 'label' => CFormInputLabel::class,
                 'quill' => CElement_FormInput_Textarea_Quill::class,
                 'file' => CFormInputFile::class,
