@@ -27,9 +27,9 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
         $this->path = $storage_path;
     }
 
-    public function __call($function_name, $arguments) {
+    public function __call($functionName, $arguments) {
         // TODO: check function exists
-        return $this->disk->$function_name($this->path, ...$arguments);
+        return $this->disk->$functionName($this->path, ...$arguments);
     }
 
     public function rootPath() {

@@ -63,7 +63,7 @@ class CValidation_Exception extends Exception {
      * @return static
      */
     public static function withMessages(array $messages) {
-        return new static(CF::tap(CValidation::factory()->make([], []), function ($validator) use ($messages) {
+        return new static(c::tap(CValidation::factory()->make([], []), function ($validator) use ($messages) {
             foreach ($messages as $key => $value) {
                 foreach (carr::wrap($value) as $message) {
                     $validator->errors()->add($key, $message);

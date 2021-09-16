@@ -2,7 +2,9 @@
 
 class CRunner_FFMpeg_ProcessOutput {
     private $all;
+
     private $errors;
+
     private $out;
 
     public function __construct(array $all, array $errors, array $out) {

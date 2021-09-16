@@ -6,11 +6,9 @@
  * @author Hery
  */
 class CController_RedirectController extends CController {
-
     /**
      * Invoke the controller method.
      *
-     * @param  CHttp_Request  $request
      * @return CHttp_RedirectResponse
      */
     public function __invoke() {
@@ -25,12 +23,12 @@ class CController_RedirectController extends CController {
         $parameters->forget('status')->forget('destination');
 
         $route = (new CRouting_Route('GET', $destination, [
-                    'as' => 'cf_route_redirect_destination',
-                        ]))->bind($request);
+            'as' => 'cf_route_redirect_destination',
+        ]))->bind($request);
 
         $parameters = $parameters->only(
-                        $route->getCompiled()->getPathVariables()
-                )->toArray();
+            $route->getCompiled()->getPathVariables()
+        )->toArray();
 
         $url = $url->toRoute($route, $parameters, false);
 
@@ -40,5 +38,4 @@ class CController_RedirectController extends CController {
 
         return new CHTTP_RedirectResponse($url, $status);
     }
-
 }

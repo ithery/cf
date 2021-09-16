@@ -17,7 +17,7 @@ class CUlElement extends CElement {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $disabled = '';
         $classes = $this->classes;
         $classes = implode(' ', $classes);
@@ -35,7 +35,7 @@ class CUlElement extends CElement {
         }
         $html->appendln('<ul id="' . $this->id . '" class="' . $classes . '"' . $custom_css . $addition_attribute . '>');
 
-        $html->appendln(parent::html($html->get_indent()))->br();
+        $html->appendln(parent::html($html->getIndent()))->br();
         $html->appendln('</ul>');
 
         return $html->text();

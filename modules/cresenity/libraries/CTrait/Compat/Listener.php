@@ -9,6 +9,9 @@ defined('SYSPATH') or die('No direct access allowed.');
   * @since Feb 16, 2018, 6:51:44 AM
   */
  //@codingStandardsIgnoreStart
+ /**
+  * @see CObservable_Listener
+  */
  trait CTrait_Compat_Listener {
      public function set_confirm($bool) {
          return $this->setConfirm($bool);
@@ -30,7 +33,14 @@ defined('SYSPATH') or die('No direct access allowed.');
          return $this->setHandlerUrlParam($param);
      }
 
-     public function add_handler($handler_name) {
-         return $this->addHandler($handler_name);
+     /**
+      * @param string $handlerName
+      *
+      * @return CObservable_Listener_Handler
+      *
+      * @deprecated
+      */
+     public function add_handler($handlerName) {
+         return $this->addHandler($handlerName);
      }
  }

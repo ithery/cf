@@ -21,8 +21,7 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
         $command = carr::get($this->request(), 'command');
         $isFramework = carr::get($this->request(), 'isFramework', '0');
         $allowedCommand = ['status', 'fetch', 'pull'];
-        $avalableAppList = explode('
-', shell_exec('cd application && ls'));
+        $avalableAppList = explode(PHP_EOL, shell_exec('cd application && ls'));
 
         if (!in_array($command, $allowedCommand)) {
             $errCode++;
@@ -36,7 +35,7 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
 
         if (!in_array($this->appCode, $avalableAppList)) {
             $errCode++;
-            $errMessage = "appCode '$this->appCode' not found";
+            $errMessage = 'appCode ' . $this->appCode . ' not found';
         }
 
         if ($errCode == 0) {
@@ -45,11 +44,11 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
                 $execute = '';
 
                 if ($isFramework == '0') {
-                    $pwd = shell_exec("cd application/$this->appCode && pwd");
-                    $execute = "cd application/$this->appCode && git $command";
+                    $pwd = shell_exec("cd application/{$this->appCode} && pwd");
+                    $execute = "cd application/{$this->appCode} && git {$command}";
                 } else {
                     $pwd = shell_exec('pwd');
-                    $execute = "git $command";
+                    $execute = "git {$command}";
                 }
 
                 $output .= "working on directory $pwd";
@@ -59,6 +58,10 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
                 $output .= $process->getOutput();
                 $successOutput = $output;
                 $output .= $errorOutput = $process->getErrorOutput();
+
+                if ($command === "pull") {
+                    CView::blade()->clearCompiled();
+                }
             } catch (Exception $ex) {
                 $errCode++;
                 $errMessage = $ex->getMessage();

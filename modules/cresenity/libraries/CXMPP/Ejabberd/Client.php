@@ -2,33 +2,42 @@
 
 /**
  * Description of Client
- * 
+ *
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since May 30, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since May 30, 2020
  */
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
 class CXMPP_Ejabberd_Client {
-
     private $api = '';
+
     private $user = '';
+
     private $verify;
+
     private $password = '';
+
     private $domain = '';
+
     private $conference_domain = '';
+
     private $debug = '';
+
     private $client = '';
+
     private $lastResponse = null;
 
     /**
      * Ejabberd constructor.
+     *
      * @param $config
+     *
      * @throws Exception
      */
     public function __construct($config) {
-
         $this->api = carr::get($config, 'api');
         $this->user = carr::get($config, 'user');
         $this->user = carr::get($config, 'verify', false);
@@ -49,7 +58,9 @@ class CXMPP_Ejabberd_Client {
 
     /**
      * @param CXMPP_Ejabberd_CommandAbstract
+     *
      * @return null|\Psr\Http\Message\StreamInterface
+     *
      * @throws EjabberdException
      */
     public function execute(CXMPP_Ejabberd_CommandAbstract $command) {
@@ -69,32 +80,25 @@ class CXMPP_Ejabberd_Client {
                 ];
             }
 
-
             $result = $this->client->request('POST', $commandName, $request)->getBody()->getContents();
-          
-           
-        
         } catch (GuzzleException $e) {
             if ($e->getResponse() == null) {
                 throw $e;
-            }
-            else {
+            } else {
                 $result = $e->getResponse()->getBody()->getContents();
             }
         } catch (\Exception $e) {
-
             $result = $e;
         }
 
-        $response= (new CXMPP_Ejabberd_Response($command,$result));
+        $response = (new CXMPP_Ejabberd_Response($command, $result));
         $this->lastResponse = $response;
-        if($response->hasError()) {
+        if ($response->hasError()) {
             throw $response->throwException();
         }
         return $response->data();
     }
 
-    
     public function getLastResponse() {
         return $this->lastResponse;
     }

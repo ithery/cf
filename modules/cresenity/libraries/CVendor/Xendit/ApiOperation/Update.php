@@ -20,11 +20,11 @@ trait CVendor_Xendit_ApiOperation_Update {
      *
      * @return array
      */
-    public static function update($id, $params = []) {
-        self::validateParams($params, static::updateReqParams());
+    public function update($id, $params = []) {
+        $this->validateParams($params, $this->updateReqParams());
 
-        $url = static::classUrl() . '/' . $id;
+        $url = $this->classUrl() . '/' . $id;
 
-        return static::_request('PATCH', $url, $params);
+        return $this->request('PATCH', $url, $params);
     }
 }

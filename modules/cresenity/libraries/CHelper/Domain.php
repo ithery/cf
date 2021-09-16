@@ -10,9 +10,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CHelper_Domain {
     public static function getTopLevelDomain($domain) {
+        if (static::isTopLevelDomain($domain)) {
+            return $domain;
+        }
         $domainParts = explode('.', $domain);
 
-        while (count($domainParts) > 1) {
+        while (count($domainParts) > 2) {
             $previousDomainParts = $domainParts;
 
             array_shift($previousDomainParts);

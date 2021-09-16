@@ -1,32 +1,35 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 7, 2018, 8:32:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 7, 2018, 8:32:55 PM
  */
 class CObservable_Listener_Handler_Driver_Submit extends CObservable_Listener_Handler_Driver {
-
     use CTrait_Compat_Handler_Driver_Submit;
 
     protected $target;
+
     protected $method;
+
     protected $content;
+
     protected $param;
+
     protected $formId;
 
     public function __construct($owner, $event, $name) {
         parent::__construct($owner, $event, $name);
-        $this->method = "get";
-        $this->target = "";
+        $this->method = 'get';
+        $this->target = '';
         $this->content = CHandlerElement::factory();
-        $this->formId = "";
+        $this->formId = '';
     }
 
     public function setTarget($target) {
-
         $this->target = $target;
 
         return $this;
@@ -60,5 +63,4 @@ class CObservable_Listener_Handler_Driver_Submit extends CObservable_Listener_Ha
 
         return $js;
     }
-
 }

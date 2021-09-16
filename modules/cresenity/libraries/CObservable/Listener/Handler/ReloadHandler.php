@@ -42,7 +42,7 @@ class CObservable_Listener_Handler_ReloadHandler extends CObservable_Listener_Ha
             'selector' => $this->getSelector(),
             'url' => $this->generatedUrl(),
             'method' => $this->method,
-            'blockType' => $this->blockType,
+            'blockType' => $this->blockerType,
         ];
     }
 

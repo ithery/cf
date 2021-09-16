@@ -4,20 +4,35 @@ abstract class CElement extends CObservable {
     use CTrait_Compat_Element;
 
     protected $classes;
+
     protected $tag;
+
     protected $body;
+
     protected $attr;
+
     protected $custom_css;
+
     protected $text;
+
     protected $checkbox;
+
     protected $radio;
+
     protected $bootstrap;
+
     protected $select2;
+
     protected $theme;
+
     protected $theme_style = [];
+
     protected $theme_data = [];
+
     protected $before;
+
     protected $after;
+
     protected $is_empty = false;
 
     public function validTag() {

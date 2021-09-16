@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -13,14 +11,13 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Input;
 
-interface MarkdownInputInterface
-{
-    public function getContent(): string;
+interface MarkdownInputInterface {
+    public function getContent();
 
     /**
      * @return iterable<int, string>
      */
-    public function getLines(): iterable;
+    public function getLines();
 
-    public function getLineCount(): int;
+    public function getLineCount();
 }

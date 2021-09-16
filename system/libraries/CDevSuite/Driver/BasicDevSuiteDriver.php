@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Driver_BasicDevSuiteDriver extends CDevSuite_DevSuiteDriver {
-
     /**
      * Determine if the driver serves the request.
      *
@@ -30,12 +29,11 @@ class CDevSuite_Driver_BasicDevSuiteDriver extends CDevSuite_DevSuiteDriver {
      * @return string|false
      */
     public function isStaticFile($sitePath, $siteName, $uri) {
-        
-        if (file_exists($staticFilePath = $sitePath .  $uri . 'index.html')) {
+        if (file_exists($staticFilePath = $sitePath . $uri . 'index.html')) {
             return $staticFilePath;
-        } elseif (file_exists($staticFilePath = $sitePath .  $uri . 'index.php')) {
+        } elseif (file_exists($staticFilePath = $sitePath . $uri . 'index.php')) {
             return $staticFilePath;
-        } elseif (file_exists($staticFilePath = $sitePath .  $uri)) {
+        } elseif (file_exists($staticFilePath = $sitePath . $uri)) {
             return $staticFilePath;
         } elseif ($this->isActualFile($staticFilePath = $sitePath . $uri)) {
             return $staticFilePath;
@@ -58,7 +56,6 @@ class CDevSuite_Driver_BasicDevSuiteDriver extends CDevSuite_DevSuiteDriver {
         $_SERVER['SERVER_ADDR'] = '127.0.0.1';
         $_SERVER['SERVER_NAME'] = $_SERVER['HTTP_HOST'];
 
-                
         $dynamicCandidates = [
             $this->asActualFile($sitePath, $uri),
             $this->asPhpIndexFileInDirectory($sitePath, $uri),
@@ -81,7 +78,6 @@ class CDevSuite_Driver_BasicDevSuiteDriver extends CDevSuite_DevSuiteDriver {
             $this->asPublicHtmlIndexFile($sitePath) => $sitePath . '/public',
         ];
 
-        
         foreach ($fixedCandidatesAndDocroots as $candidate => $docroot) {
             if ($this->isActualFile($candidate)) {
                 $_SERVER['SCRIPT_FILENAME'] = $candidate;
@@ -161,5 +157,4 @@ class CDevSuite_Driver_BasicDevSuiteDriver extends CDevSuite_DevSuiteDriver {
     protected function asPublicHtmlIndexFile($sitePath) {
         return $sitePath . '/public/index.html';
     }
-
 }

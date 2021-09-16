@@ -1,13 +1,19 @@
 <?php
 
 final class CVendor_Firebase_Messaging_TopicSubscription implements JsonSerializable {
-    /** @var CVendor_Firebase_Messaging_Topic */
+    /**
+     * @var CVendor_Firebase_Messaging_Topic
+     */
     private $topic;
 
-    /** @var CVendor_Firebase_Messaging_RegistrationToken */
+    /**
+     * @var CVendor_Firebase_Messaging_RegistrationToken
+     */
     private $registrationToken;
 
-    /** @var DateTimeImmutable */
+    /**
+     * @var DateTimeImmutable
+     */
     private $subscribedAt;
 
     public function __construct(CVendor_Firebase_Messaging_Topic $topic, CVendor_Firebase_Messaging_RegistrationToken $registrationToken, DateTimeImmutable $subscribedAt) {

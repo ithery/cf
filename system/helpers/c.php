@@ -885,13 +885,6 @@ class c {
     }
 
     /**
-     * @return CContainer_Container
-     */
-    public static function container() {
-        return CContainer::getInstance();
-    }
-
-    /**
      * Get hash manager instance
      *
      * @param null|string $hasher
@@ -973,7 +966,7 @@ class c {
      *
      * @throws \Exception
      */
-    public static function retry($times, callable $callback, $sleep = 0, $when = null) {
+    public static function retry($times, $callback, $sleep = 0, $when = null) {
         $attempts = 0;
 
         beginning:
@@ -1066,14 +1059,32 @@ class c {
      * @param string|null $abstract
      * @param array       $parameters
      *
-     * @return mixed|\Illuminate\Contracts\Foundation\Application
+     * @return mixed|\CContainer_Container
      */
-    public static function app($abstract = null, array $parameters = []) {
+    public static function container($abstract = null, array $parameters = []) {
         if (is_null($abstract)) {
-            return static::container();
+            return CContainer::getInstance();
         }
 
-        return c::container()->make($abstract, $parameters);
+        return CContainer::getInstance()->make($abstract, $parameters);
+    }
+
+    /**
+     * Get the CApp instance.
+     *
+     * @return \CApp
+     */
+    public static function app() {
+        return CApp::instance();
+    }
+
+    /**
+     * Get the CDatabase instance.
+     *
+     * @return \CDatabase
+     */
+    public static function db() {
+        return CDatabase::instance();
     }
 
     public static function userAgent() {
@@ -1192,6 +1203,19 @@ class c {
     }
 
     /**
+     * Fill in data where it's missing.
+     *
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $value
+     *
+     * @return mixed
+     */
+    public static function fill(&$target, $key, $value) {
+        return static::set($target, $key, $value, false);
+    }
+
+    /**
      * Get the first element of an array. Useful for method chaining.
      *
      * @param array $array
@@ -1229,6 +1253,77 @@ class c {
             return 0;
         }
         return $a > $b ? 1 : -1;
+    }
+
+    public static function dispatch($job) {
+        return $job instanceof Closure
+            ? new CQueue_PendingClosureDispatch(CQueue_CallQueuedClosure::create($job))
+            : new CQueue_PendingDispatch($job);
+    }
+
+    /**
+     * Determine whether the current environment is Windows based.
+     *
+     * @return bool
+     */
+    public static function windowsOs() {
+        return PHP_OS_FAMILY === 'Windows';
+    }
+
+    /**
+     * Transform the given value if it is present.
+     *
+     * @param mixed    $value
+     * @param callable $callback
+     * @param mixed    $default
+     *
+     * @return mixed|null
+     */
+    public static function transform($value, $callback, $default = null) {
+        if (c::filled($value)) {
+            return $callback($value);
+        }
+
+        if (is_callable($default)) {
+            return $default($value);
+        }
+
+        return $default;
+    }
+
+    /**
+     * Replace a given pattern with each value in the array in sequentially.
+     *
+     * @param string $pattern
+     * @param array  $replacements
+     * @param string $subject
+     *
+     * @return string
+     */
+    public static function pregReplaceArray($pattern, array $replacements, $subject) {
+        return preg_replace_callback($pattern, function () use (&$replacements) {
+            foreach ($replacements as $key => $value) {
+                return array_shift($replacements);
+            }
+        }, $subject);
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
+    public static function trailingslashit($string) {
+        return c::untrailingslashit($string) . '/';
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
+    public static function untrailingslashit($string) {
+        return rtrim($string, '/');
     }
 }
 

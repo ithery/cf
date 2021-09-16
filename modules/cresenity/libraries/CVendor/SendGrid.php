@@ -3,19 +3,27 @@
 class CVendor_SendGrid {
     const VERSION = '7.4.1';
 
-    // @var string
+    /**
+     * @var string
+     */
     protected $namespace = 'SendGrid';
-    // @var CVendor_SendGrid_Client
+
+    /**
+     * @var CVendor_SendGrid_Client
+     */
     public $client;
-    // @var string
+
+    /**
+     * @var string
+     */
     public $version = self::VERSION;
 
     /**
      * Setup the HTTP Client
      *
-     * @param string $apiKey  Your Twilio SendGrid API Key.
-     * @param array  $options An array of options, currently only "host", "curl" and
-     *                        "impersonateSubuser" are implemented.
+     * @param string $apiKey  your Twilio SendGrid API Key
+     * @param array  $options an array of options, currently only "host", "curl" and
+     *                        "impersonateSubuser" are implemented
      */
     public function __construct($apiKey, $options = []) {
         $headers = [

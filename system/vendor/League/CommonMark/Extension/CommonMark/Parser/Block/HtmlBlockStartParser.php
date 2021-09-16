@@ -1,7 +1,4 @@
 <?php
-
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -20,10 +17,8 @@ use League\CommonMark\Parser\Cursor;
 use League\CommonMark\Parser\MarkdownParserStateInterface;
 use League\CommonMark\Util\RegexHelper;
 
-final class HtmlBlockStartParser implements BlockStartParserInterface
-{
-    public function tryStart(Cursor $cursor, MarkdownParserStateInterface $parserState): ?BlockStart
-    {
+final class HtmlBlockStartParser implements BlockStartParserInterface {
+    public function tryStart(Cursor $cursor, MarkdownParserStateInterface $parserState) {
         if ($cursor->isIndented() || $cursor->getNextNonSpaceCharacter() !== '<') {
             return BlockStart::none();
         }
@@ -38,7 +33,7 @@ final class HtmlBlockStartParser implements BlockStartParserInterface
                 $line
             );
 
-            if ($match !== null && ($blockType < 7 || ! ($parserState->getLastMatchedBlockParser()->getBlock() instanceof Paragraph))) {
+            if ($match !== null && ($blockType < 7 || !($parserState->getLastMatchedBlockParser()->getBlock() instanceof Paragraph))) {
                 return BlockStart::of(new HtmlBlockParser($blockType))->at($cursor);
             }
         }

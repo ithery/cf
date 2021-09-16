@@ -9,6 +9,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Jan 6, 2018, 6:33:59 PM
  */
 class CTemplate {
+    const TEMPLATE_FOLDER = 'templates';
+
     /**
      * The stack of section names currently being captured.
      *
@@ -36,8 +38,11 @@ class CTemplate {
      * @var array
      */
     protected $data = [];
+
     protected $name;
+
     protected $registry;
+
     protected $blockRoutingCallback = null;
 
     /**
@@ -47,10 +52,13 @@ class CTemplate {
      */
     private $helpers;
 
+    protected static $bladeCompiler;
+
     public function __construct($name, $data = []) {
         $this->registry = new CTemplate_Registry();
 
-        $filename = CF::findFile($this->templateFolder, $name, true);
+        $filename = CTemplate_Finder::instance()->find($name);
+
         $this->name = $name;
         $this->registry->set($name, $filename);
         if ($data === null || !is_array($data)) {
@@ -72,7 +80,9 @@ class CTemplate {
         if ($this->blockRoutingCallback != null && is_callable($this->blockRoutingCallback)) {
             $name = call_user_func_array($this->blockRoutingCallback, [$name]);
         }
-        $filename = CF::findFile($this->templateFolder, $name, true);
+
+        $filename = CTemplate_Finder::instance()->find($name);
+        //$filename = CF::findFile(static::TEMPLATE_FOLDER, $name, true);
         $this->registry->set($name, $filename);
         if ($data === null || !is_array($data)) {
             $data = [];
@@ -114,8 +124,8 @@ class CTemplate {
     /**
      * Magic call to expose helper object methods as template methods.
      *
-     * @param string $name The helper object method name.
-     * @param array  $args The arguments to pass to the helper.
+     * @param string $name the helper object method name
+     * @param array  $args the arguments to pass to the helper
      *
      * @return mixed
      */
@@ -179,7 +189,7 @@ class CTemplate {
     /**
      * Is a particular named section available?
      *
-     * @param string $name The section name.
+     * @param string $name the section name
      *
      * @return bool
      */
@@ -191,8 +201,8 @@ class CTemplate {
      * Sets the body of a named section directly, as opposed to buffering and
      * capturing output.
      *
-     * @param string $name The section name.
-     * @param string $body The section body.
+     * @param string $name the section name
+     * @param string $body the section body
      *
      * @return null
      */
@@ -203,7 +213,7 @@ class CTemplate {
     /**
      * Gets the body of a named section.
      *
-     * @param string $name The section name.
+     * @param string $name the section name
      *
      * @return string
      */
@@ -214,7 +224,7 @@ class CTemplate {
     /**
      * Begins output buffering for a named section.
      *
-     * @param string $name The section name.
+     * @param string $name the section name
      *
      * @return null
      */
@@ -232,5 +242,14 @@ class CTemplate {
         $body = ob_get_clean();
         $name = array_pop($this->capture);
         $this->setSection($name, $body);
+    }
+
+    public static function blade() {
+        if (static::$bladeCompiler == null) {
+            static::$bladeCompiler = new CTemplate_Compiler_BladeCompiler();
+            static::$bladeCompiler->directive('block', [CTemplate_Blade_Directive::class, 'block']);
+        }
+
+        return static::$bladeCompiler;
     }
 }

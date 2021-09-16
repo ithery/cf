@@ -2,17 +2,21 @@
 
 /**
  * Description of SendDirectInvitation
- * 
+ *
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since May 31, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since May 31, 2020
  */
 class CXMPP_Ejabberd_Command_SendDirectInvitation extends CXMPP_Ejabberd_CommandAbstract {
-
     private $name;
+
     private $service;
+
     private $password;
+
     private $reason;
+
     private $users;
 
     /**
@@ -33,17 +37,14 @@ class CXMPP_Ejabberd_Command_SendDirectInvitation extends CXMPP_Ejabberd_Command
     }
 
     public function getCommandData() {
-
         $data = [
             'name' => $this->name,
             'service' => $this->service,
-            'users' => implode(':',carr::wrap($this->users)),
+            'users' => implode(':', carr::wrap($this->users)),
             'reason' => $this->reason,
             'password' => $this->password
         ];
-        
 
         return $data;
     }
-
 }

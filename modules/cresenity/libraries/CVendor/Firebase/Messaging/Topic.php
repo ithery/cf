@@ -1,7 +1,9 @@
 <?php
 
 final class CVendor_Firebase_Messaging_Topic implements \JsonSerializable {
-    /** @var string */
+    /**
+     * @var string
+     */
     private $value;
 
     private function __construct(string $value) {

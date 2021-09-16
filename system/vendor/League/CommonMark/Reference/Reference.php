@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,8 +17,7 @@ namespace League\CommonMark\Reference;
 /**
  * @psalm-immutable
  */
-final class Reference implements ReferenceInterface
-{
+final class Reference implements ReferenceInterface {
     /**
      * @var string
      *
@@ -42,25 +39,21 @@ final class Reference implements ReferenceInterface
      */
     private $title;
 
-    public function __construct(string $label, string $destination, string $title)
-    {
-        $this->label       = $label;
+    public function __construct($label, $destination, $title) {
+        $this->label = $label;
         $this->destination = $destination;
-        $this->title       = $title;
+        $this->title = $title;
     }
 
-    public function getLabel(): string
-    {
+    public function getLabel() {
         return $this->label;
     }
 
-    public function getDestination(): string
-    {
+    public function getDestination() {
         return $this->destination;
     }
 
-    public function getTitle(): string
-    {
+    public function getTitle() {
         return $this->title;
     }
 }

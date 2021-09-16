@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 26, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Aug 26, 2020
  */
 trait CRunner_FFMpeg_Trait_HandlesTimelapseTrait {
-
     /**
      * @var float
      */
@@ -22,9 +22,8 @@ trait CRunner_FFMpeg_Trait_HandlesTimelapseTrait {
 
     protected function addTimelapseParametersToFormat() {
         $this->format->setInitialParameters(array_merge(
-                        $this->format->getInitialParameters() ?: [],
-                        ['-framerate', $this->timelapseFramerate, '-f', 'image2']
+            $this->format->getInitialParameters() ?: [],
+            ['-framerate', $this->timelapseFramerate, '-f', 'image2']
         ));
     }
-
 }

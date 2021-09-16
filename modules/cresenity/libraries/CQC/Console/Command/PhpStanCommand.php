@@ -10,7 +10,6 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 class CQC_Console_Command_PhpStanCommand extends CConsole_Command {
-
     /**
      * The name and signature of the console command.
      *
@@ -19,7 +18,6 @@ class CQC_Console_Command_PhpStanCommand extends CConsole_Command {
     protected $signature = 'qc:phpstan';
 
     public function handle() {
-
         $domain = CConsole::domain();
         $domainData = CFData::domain($domain);
         $appCode = carr::get($domainData, 'app_code');
@@ -28,21 +26,17 @@ class CQC_Console_Command_PhpStanCommand extends CConsole_Command {
             $this->installPhpStan();
         }
 
-        $command = [$this->phpBinary(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanPhar($appDir), 'analyze','--level','1', $appDir];
-
-
+        $command = [$this->phpBinary(), '-d', 'memory_limit=1G', '-d', 'max_execution_time=0', $this->getPhpStanPhar($appDir), 'analyze', '--level', '1', $appDir];
 
         $process = Process::fromShellCommandline($command, $appDir);
-        $process->setTimeout(60* 60);
+        $process->setTimeout(60 * 60);
         $process->start(function ($type, $buffer) {
             $this->output->write($buffer);
         });
 
-
         $process->wait();
         // executes after the command finishes
         if (!$process->isSuccessful()) {
-
             $errMessage = $process->getErrorOutput();
             if (strlen($errMessage) == 0) {
                 $errMessage = 'Something went wrong on running phpstan, please manually check the command';
@@ -66,13 +60,11 @@ class CQC_Console_Command_PhpStanCommand extends CConsole_Command {
 
     protected function installPhpStan() {
         $this->call('composer', [
-            'args' => ['require', 'phpstan/phpstan']
-            , '--opts' => ['dev']
+            'args' => ['require', 'phpstan/phpstan'], '--opts' => ['dev']
         ]);
     }
 
     protected function phpBinary() {
         return (new PhpExecutableFinder())->find(false);
     }
-
 }

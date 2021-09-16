@@ -19,7 +19,7 @@ class CDatabase_Schema_Column_Diff {
     public $oldColumnName;
 
     /**
-     * @var Column
+     * @var CDatabase_Schema_Column
      */
     public $column;
 

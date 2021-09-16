@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -16,14 +14,15 @@ namespace League\CommonMark\Util;
 /**
  * @psalm-immutable
  */
-final class HtmlFilter
-{
+final class HtmlFilter {
     // Return the entire string as-is
-    public const ALLOW = 'allow';
+    const ALLOW = 'allow';
+
     // Escape the entire string so any HTML/JS won't be interpreted as such
-    public const ESCAPE = 'escape';
+    const ESCAPE = 'escape';
+
     // Return an empty string
-    public const STRIP = 'strip';
+    const STRIP = 'strip';
 
     /**
      * Runs the given HTML through the given filter
@@ -37,8 +36,7 @@ final class HtmlFilter
      *
      * @psalm-pure
      */
-    public static function filter(string $html, string $filter): string
-    {
+    public static function filter($html, $filter) {
         switch ($filter) {
             case self::STRIP:
                 return '';

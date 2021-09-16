@@ -37,7 +37,7 @@ class CRunner_FFMpeg_Driver_PHPFFMpeg {
     private $mediaCollection;
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $forceAdvanced = false;
 

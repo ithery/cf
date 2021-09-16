@@ -54,9 +54,12 @@ class CApp_Api {
         /**
          * @var CApp_Api_Method Description
          */
-        $className = 'CApp_Api_Method_' . $method;
-        if ($submethod != null) {
-            $className = 'CApp_Api_Method_' . $method . '_' . $submethod;
+        $className = $method;
+        if (!cstr::startsWith($method, 'CApp_Api_Method_')) {
+            $className = 'CApp_Api_Method_' . $method;
+            if ($submethod != null) {
+                $className = 'CApp_Api_Method_' . $method . '_' . $submethod;
+            }
         }
 
         $logger = null;

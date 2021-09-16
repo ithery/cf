@@ -540,7 +540,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
         });
 
         $this->directive('else' . $name, function ($expression) use ($name) {
-            return $expression !== '' ? "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>" : "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
+            return $expression !== '' ? "<?php elseif (\CView_Blade::check('{$name}', {$expression})): ?>" : "<?php elseif (\CView_Blade::check('{$name}')): ?>";
         });
 
         $this->directive('end' . $name, function () {
@@ -747,5 +747,12 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
      */
     public function withoutComponentTags() {
         $this->compilesComponentTags = false;
+    }
+
+    public function clearCompiled() {
+        $path = CF::config('view.compiled');
+        $files = glob($path . '/*');
+
+        CFile::delete($files);
     }
 }

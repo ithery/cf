@@ -10,8 +10,6 @@
  * file that was distributed with this source code.
  */
 
-declare(strict_types=1);
-
 namespace League\CommonMark\Extension\Attributes\Event;
 
 use League\CommonMark\Event\DocumentParsedEvent;
@@ -24,21 +22,21 @@ use League\CommonMark\Extension\CommonMark\Node\Block\ListItem;
 use League\CommonMark\Node\Inline\AbstractInline;
 use League\CommonMark\Node\Node;
 
-final class AttributesListener
-{
-    private const DIRECTION_PREFIX = 'prefix';
-    private const DIRECTION_SUFFIX = 'suffix';
+final class AttributesListener {
+    const DIRECTION_PREFIX = 'prefix';
 
-    public function processDocument(DocumentParsedEvent $event): void
-    {
+    const DIRECTION_SUFFIX = 'suffix';
+
+    public function processDocument(DocumentParsedEvent $event): void {
         $walker = $event->getDocument()->walker();
         while ($event = $walker->next()) {
             $node = $event->getNode();
-            if (! $node instanceof AttributesInline && ($event->isEntering() || ! $node instanceof Attributes)) {
+            if (!$node instanceof AttributesInline && ($event->isEntering() || !$node instanceof Attributes)) {
                 continue;
             }
 
-            [$target, $direction] = self::findTargetAndDirection($node);
+            /** @var Attributes|AttributesInline $node */
+            list($target, $direction) = self::findTargetAndDirection($node);
 
             if ($target instanceof Node) {
                 $parent = $target->parent();
@@ -64,18 +62,17 @@ final class AttributesListener
      *
      * @return array<Node|string|null>
      */
-    private static function findTargetAndDirection($node): array
-    {
-        $target    = null;
+    private static function findTargetAndDirection($node) {
+        $target = null;
         $direction = null;
-        $previous  = $next = $node;
+        $previous = $next = $node;
         while (true) {
             $previous = self::getPrevious($previous);
-            $next     = self::getNext($next);
+            $next = self::getNext($next);
 
             if ($previous === null && $next === null) {
-                if (! $node->parent() instanceof FencedCode) {
-                    $target    = $node->parent();
+                if (!$node->parent() instanceof FencedCode) {
+                    $target = $node->parent();
                     $direction = self::DIRECTION_SUFFIX;
                 }
 
@@ -86,15 +83,15 @@ final class AttributesListener
                 continue;
             }
 
-            if ($previous !== null && ! self::isAttributesNode($previous)) {
-                $target    = $previous;
+            if ($previous !== null && !self::isAttributesNode($previous)) {
+                $target = $previous;
                 $direction = self::DIRECTION_SUFFIX;
 
                 break;
             }
 
-            if ($next !== null && ! self::isAttributesNode($next)) {
-                $target    = $next;
+            if ($next !== null && !self::isAttributesNode($next)) {
+                $target = $next;
                 $direction = self::DIRECTION_PREFIX;
 
                 break;
@@ -107,8 +104,7 @@ final class AttributesListener
     /**
      * Get any previous block (sibling or parent) this might apply to
      */
-    private static function getPrevious(?Node $node = null): ?Node
-    {
+    private static function getPrevious(Node $node = null) {
         if ($node instanceof Attributes) {
             if ($node->getTarget() === Attributes::TARGET_NEXT) {
                 return null;
@@ -125,8 +121,7 @@ final class AttributesListener
     /**
      * Get any previous block (sibling or parent) this might apply to
      */
-    private static function getNext(?Node $node = null): ?Node
-    {
+    private static function getNext(Node $node = null) {
         if ($node instanceof Attributes && $node->getTarget() !== Attributes::TARGET_NEXT) {
             return null;
         }
@@ -134,8 +129,7 @@ final class AttributesListener
         return $node instanceof Node ? $node->next() : null;
     }
 
-    private static function isAttributesNode(Node $node): bool
-    {
+    private static function isAttributesNode(Node $node) {
         return $node instanceof Attributes || $node instanceof AttributesInline;
     }
 }

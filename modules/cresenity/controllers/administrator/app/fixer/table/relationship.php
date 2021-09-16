@@ -1,18 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 13, 2019, 12:54:01 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 13, 2019, 12:54:01 AM
  */
 use CApp_Administrator_Fixer_Database as DatabaseFixer;
 
 class Controller_Administrator_App_Fixer_Table_Relationship extends CApp_Administrator_Controller_User {
-
     public function index($table) {
-
         $app = CApp::instance();
 
         $haveChanged = false;
@@ -21,9 +20,9 @@ class Controller_Administrator_App_Fixer_Table_Relationship extends CApp_Adminis
 
         if (strlen($sql) > 0) {
             $template = $app->addTemplate()
-                    ->setTemplate('CApp/Administrator/Fixer/Database/Relationship/Result')
-                    ->setVar('table', $table)
-                    ->setVar('sql', $sql);
+                ->setTemplate('CApp/Administrator/Fixer/Database/Relationship/Result')
+                ->setVar('table', $table)
+                ->setVar('sql', $sql);
 
             $resultBody = $template->section('resultBody');
             $prismCode = $resultBody->addPrismCode();
@@ -33,7 +32,6 @@ class Controller_Administrator_App_Fixer_Table_Relationship extends CApp_Adminis
             $prismCode->add($sql);
             $haveChanged = true;
         }
-
 
         if (!$haveChanged) {
             $app->addAlert()->setType('success')->add('No Problem Found');
@@ -55,5 +53,4 @@ class Controller_Administrator_App_Fixer_Table_Relationship extends CApp_Adminis
         }
         echo CApp_Base::jsonResponse($errCode, $errMessage);
     }
-
 }

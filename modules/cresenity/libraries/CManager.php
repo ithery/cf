@@ -236,11 +236,21 @@ final class CManager {
      * @throws CException
      */
     public function createControl($id, $type) {
-        if (!isset($this->controls[$type])) {
+        $class = null;
+
+        if (isset($this->controls[$type])) {
+            $class = $this->controls[$type];
+        }
+
+        if ($class == null) {
+            if (class_exists($type)) {
+                $class = $type;
+            }
+        }
+        if ($class == null) {
+            //check for class exists
             throw new CException('Type of control :type not registered', [':type' => $type]);
         }
-        $class = $this->controls[$type];
-
         if (cstr::startsWith($class, 'CElement_FormInput')) {
             return CElement_Factory::createFormInput($class, $id);
         }

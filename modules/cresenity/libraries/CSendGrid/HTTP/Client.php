@@ -7,7 +7,9 @@
  * @author    Elmer Thomas <dx@sendgrid.com>
  * @copyright 2016 SendGrid
  * @license   https://opensource.org/licenses/MIT The MIT License
+ *
  * @version   GIT: <git_id>
+ *
  * @link      http://packagist.org/packages/sendgrid/php-http-client
  */
 
@@ -19,33 +21,47 @@
  * @method Response patch($body = null, $query = null, $headers = null)
  * @method Response put($body = null, $query = null, $headers = null)
  * @method Response delete($body = null, $query = null, $headers = null)
- *
  * @method Client version($value)
  */
 class CSendGrid_HTTP_Client {
-
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $host;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $headers;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $version;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $path;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $curlOptions;
 
-    /** @var bool $isConcurrentRequest */
+    /**
+     * @var bool
+     */
     protected $isConcurrentRequest;
 
-    /** @var array $savedRequests */
+    /**
+     * @var array
+     */
     protected $savedRequests;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $retryOnLimit;
 
     /**
@@ -58,10 +74,10 @@ class CSendGrid_HTTP_Client {
     /**
      * Initialize the client
      *
-     * @param string  $host                    the base url (e.g. https://api.sendgrid.com)
-     * @param array   $headers                 global request headers
-     * @param string  $version                 api version (configurable)
-     * @param array   $path                    holds the segments of the url path
+     * @param string $host    the base url (e.g. https://api.sendgrid.com)
+     * @param array  $headers global request headers
+     * @param string $version api version (configurable)
+     * @param array  $path    holds the segments of the url path
      */
     public function __construct($host, $headers = [], $version = '/v3', $path = []) {
         $this->host = $host;
@@ -130,7 +146,7 @@ class CSendGrid_HTTP_Client {
     }
 
     /**
-     * set concurrent request flag
+     * Set concurrent request flag
      *
      * @param bool $isConcurrent
      *
@@ -169,19 +185,21 @@ class CSendGrid_HTTP_Client {
      * this function does not mutate any private variables
      *
      * @param string $method
-     * @param array $body
-     * @param array $headers
+     * @param array  $body
+     * @param array  $headers
+     *
      * @return array
      */
     private function createCurlOptions($method, $body = null, $headers = null) {
         $options = array_merge(
-                [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_HEADER => 1,
-            CURLOPT_CUSTOMREQUEST => strtoupper($method),
-            CURLOPT_SSL_VERIFYPEER => false,
-            CURLOPT_FAILONERROR => false
-                ], $this->curlOptions
+            [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_HEADER => 1,
+                CURLOPT_CUSTOMREQUEST => strtoupper($method),
+                CURLOPT_SSL_VERIFYPEER => false,
+                CURLOPT_FAILONERROR => false
+            ],
+            $this->curlOptions
         );
 
         if (isset($headers)) {
@@ -195,7 +213,7 @@ class CSendGrid_HTTP_Client {
             $options[CURLOPT_POSTFIELDS] = $encodedBody;
             $headers = array_merge($headers, ['Content-Type: application/json']);
         }
-        
+
         $options[CURLOPT_HTTPHEADER] = $headers;
 
         return $options;
@@ -203,8 +221,8 @@ class CSendGrid_HTTP_Client {
 
     /**
      * @param array $requestData
-     *      e.g. ['method' => 'POST', 'url' => 'www.example.com', 'body' => 'test body', 'headers' => []]
-     * @param bool $retryOnLimit
+     *                            e.g. ['method' => 'POST', 'url' => 'www.example.com', 'body' => 'test body', 'headers' => []]
+     * @param bool  $retryOnLimit
      *
      * @return array
      */
@@ -245,7 +263,6 @@ class CSendGrid_HTTP_Client {
      */
     public function makeRequest($method, $url, $body = null, $headers = null, $retryOnLimit = false) {
         $curl = curl_init($url);
-        
 
         $curlOpts = $this->createCurlOptions($method, $body, $headers);
         curl_setopt_array($curl, $curlOpts);
@@ -278,13 +295,14 @@ class CSendGrid_HTTP_Client {
      * Send all saved requests at once
      *
      * @param array $requests
+     *
      * @return Response[]
      */
     public function makeAllRequests($requests = []) {
         if (empty($requests)) {
             $requests = $this->savedRequests;
         }
-        list ($channels, $multiHandle) = $this->createCurlMultiHandle($requests);
+        list($channels, $multiHandle) = $this->createCurlMultiHandle($requests);
 
         // running all requests
         $isRunning = null;
@@ -306,7 +324,7 @@ class CSendGrid_HTTP_Client {
             $responseHeaders = explode("\n", $responseHeaders);
             $responseHeaders = array_map('trim', $responseHeaders);
 
-            $response = new Response($statusCode, $responseBody, $responseHeaders);
+            $response = new CSendGrid_HTTP_Response($statusCode, $responseBody, $responseHeaders);
             if (($statusCode === 429) && $requests[$id]['retryOnLimit']) {
                 $headers = $response->headers(true);
                 $sleepDurations = max($sleepDurations, $headers['X-Ratelimit-Reset'] - time());
@@ -343,7 +361,9 @@ class CSendGrid_HTTP_Client {
      *
      * @return CSendGrid_HTTP_Client object
      */
+    //@codingStandardsIgnoreStart
     public function _($name = null) {
+        //@codingStandardsIgnoreEnd
         if (isset($name)) {
             $this->path[] = $name;
         }
@@ -387,7 +407,8 @@ class CSendGrid_HTTP_Client {
             if ($this->isConcurrentRequest) {
                 // save request to be sent later
                 $this->savedRequests[] = $this->createSavedRequest(
-                        ['method' => $name, 'url' => $url, 'body' => $body, 'headers' => $headers], $retryOnLimit
+                    ['method' => $name, 'url' => $url, 'body' => $body, 'headers' => $headers],
+                    $retryOnLimit
                 );
                 return null;
             }
@@ -397,5 +418,4 @@ class CSendGrid_HTTP_Client {
 
         return $this->_($name);
     }
-
 }

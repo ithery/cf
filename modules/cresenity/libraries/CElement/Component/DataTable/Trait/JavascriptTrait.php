@@ -10,10 +10,16 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $columns[] = $col;
             }
 
+            $isModelQuery = $this->query instanceof CModel_Query;
+            if ($isModelQuery) {
+                $this->query = CModel_QuerySerializer::serialize($this->query);
+            }
+
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('DataTable');
             $ajaxMethod->setData('columns', $columns);
             $ajaxMethod->setData('query', $this->query);
+            $ajaxMethod->setData('isModelQuery', $isModelQuery);
             $ajaxMethod->setData('table', serialize($this));
 
             $ajaxMethod->setData('dbConfig', $this->dbConfig);
@@ -119,6 +125,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             //            renderer: $.fn.dataTable.Responsive.renderer.tableAll()
             //        }
             //    },");
+            if (strlen($this->initialSearch) > 0) {
+                $js->appendln("'oSearch': {'sSearch': '" . $this->initialSearch . "'},")->br();
+            }
             if ($this->ajax) {
                 $js->append('')
                     ->appendln("'bRetrieve': true,")->br()
@@ -344,13 +353,34 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                                 }
 
                                 if(column.searchable) {
-                                    input = jQuery('<input>');
-                                    input.attr('type', 'text');
-                                    input.attr('name', 'dt_table_qs-' + jQuery(this).attr('field_name'));
-                                    input.attr('class', 'data_table-quick_search');
 
-                                    input.attr('transforms', transforms);
-                                    input.attr('placeholder', 'Search ' + title );
+                                    var searchType = column.searchType || 'text';
+
+                                    if(searchType=='text') {
+                                        input = jQuery('<input>');
+                                        input.attr('type', 'text');
+                                        input.attr('name', 'dt_table_qs-' + jQuery(this).attr('field_name'));
+                                        input.attr('class', 'data_table-quick_search');
+
+                                        input.attr('transforms', transforms);
+                                        input.attr('placeholder', 'Search ' + title );
+                                    }
+                                    if(searchType=='select') {
+                                        input = jQuery('<select>');
+                                        input.attr('name', 'dt_table_qs-' + jQuery(this).attr('field_name'));
+                                        input.attr('class', 'data_table-quick_search');
+
+                                        input.attr('transforms', transforms);
+                                        input.attr('placeholder', 'Search ' + title );
+
+                                        var options = column.searchOptions||[];
+                                        for(optionKey in options) {
+                                            var optionElement = jQuery('<option>');
+                                            optionElement.attr('value',optionKey);
+                                            optionElement.append(options[optionKey]);
+                                            input.append(optionElement);
+                                        }
+                                    }
                                 }
                             }
 
@@ -365,7 +395,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln('if (dttable_quick_search == "1") { buildFilters_' . $this->id . '(); }');
 
             $js->appendln("
-                jQuery('.data_table-quick_search').on('keyup', function(){
+                jQuery('.data_table-quick_search').on('keyup change', function(){
                     table.fnClearTable( 0 );
                     table.fnDraw();
                 });

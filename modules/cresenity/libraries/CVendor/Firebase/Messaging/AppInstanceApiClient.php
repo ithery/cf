@@ -8,10 +8,14 @@ use Psr\Http\Message\ResponseInterface;
  * @internal
  */
 class CVendor_Firebase_Messaging_AppInstanceApiClient {
-    /** @var ClientInterface */
+    /**
+     * @var ClientInterface
+     */
     private $client;
 
-    /** @var CVendor_Firebase_Messaging_ApiExceptionConverter */
+    /**
+     * @var CVendor_Firebase_Messaging_ApiExceptionConverter
+     */
     private $errorHandler;
 
     /**

@@ -277,7 +277,7 @@ class CModel_Nested_Query extends CModel_Query {
      * @return $this
      */
     protected function whereIsBeforeOrAfter($id, $operator, $boolean) {
-        if (NestedSet::isNode($id)) {
+        if (CModel_Nested_NestedSet::isNode($id)) {
             $value = '?';
             $this->query->addBinding($id->getLft());
         } else {

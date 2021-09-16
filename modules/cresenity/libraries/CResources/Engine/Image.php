@@ -8,7 +8,7 @@ class CResources_Engine_Image extends CResources_Engine {
     }
 
     public function addSize($size_name, $options) {
-        $this->_sizes[$size_name] = $options;
+        $this->sizes[$size_name] = $options;
         return $this;
     }
 
@@ -125,9 +125,9 @@ class CResources_Engine_Image extends CResources_Engine {
 
     public function save($file_name, $file_request) {
         $filename = parent::save($file_name, $file_request);
-        $fullfilename = parent::get_path($filename);
+        $fullfilename = parent::getPath($filename);
         $path = dirname($fullfilename) . DS;
-        foreach ($this->_sizes as $k => $size) {
+        foreach ($this->sizes as $k => $size) {
             $width = carr::get($size, 'width', '100');
             $height = carr::get($size, 'height', '100');
             $crop = carr::get($size, 'crop', true);

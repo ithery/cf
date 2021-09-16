@@ -2,23 +2,25 @@
 
 /**
  * Description of Ejabberd
- * 
+ *
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since May 30, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since May 30, 2020
  */
 class CXMPP_Ejabberd {
-
     /**
-     *
-     * @var CXMPP_Ejabberd_Client 
+     * @var CXMPP_Ejabberd_Client
      */
     protected $client;
+
     protected $config;
 
     /**
      * Ejabberd constructor.
+     *
      * @param $config
+     *
      * @throws Exception
      */
     public function __construct($config) {
@@ -27,10 +29,10 @@ class CXMPP_Ejabberd {
     }
 
     /**
-     * 
      * @param string $user
      * @param string $password
      * @param string $host
+     *
      * @return CXMPP_Ejabberd_Response
      */
     public function register($user, $password, $host = null) {
@@ -42,7 +44,6 @@ class CXMPP_Ejabberd {
     }
 
     public function registeredUser($host = null) {
-
         if ($host == null) {
             $host = carr::get($this->config, 'domain');
         }
@@ -51,7 +52,6 @@ class CXMPP_Ejabberd {
     }
 
     public function connectedUsers($fullInfo = false) {
-
         $command = new CXMPP_Ejabberd_Command_ConnectedUsers($fullInfo);
         return $this->client->execute($command);
     }
@@ -84,20 +84,17 @@ class CXMPP_Ejabberd {
         return $this->client->execute($command);
     }
 
-    public function autoJoinRoom($user, $host, $room, $service, $nick = "") {
-
+    public function autoJoinRoom($user, $host, $room, $service, $nick = '') {
         $command = new CXMPP_Ejabberd_Command_AutoJoinRoom($user, $host, $room, $service, $nick);
         return $this->client->execute($command);
     }
 
-    public function removeAutoJoinRoom($user, $host, $room, $service, $nick = "") {
-
+    public function removeAutoJoinRoom($user, $host, $room, $service, $nick = '') {
         $command = new CXMPP_Ejabberd_Command_RemoveAutoJoinRoom($user, $host, $room, $service, $nick);
         return $this->client->execute($command);
     }
 
     public function destroyRoom($room, $service) {
-
         $command = new CXMPP_Ejabberd_Command_DestroyRoom($room, $service);
         return $this->client->execute($command);
     }
@@ -120,5 +117,4 @@ class CXMPP_Ejabberd {
     public function getLastResponse() {
         return $this->client->getLastResponse();
     }
-
 }

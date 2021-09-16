@@ -41,6 +41,12 @@ class CManager_File_Connector_FileManager_FM {
         return new CManager_File_Connector_FileManager_FM_Path($this);
     }
 
+    /**
+     * Get Input
+     *
+     * @param string $key
+     * @return mixed
+     */
     public function input($key) {
         return $this->translateFromUtf8(CHTTP::request()->input($key));
     }

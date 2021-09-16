@@ -11,9 +11,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Component_Form addForm($id=null)
  * @method CElement_Element_Div addDiv($id=null)
  * @method CElement_Template addTemplate($id=null)
- * @method CElement_Component_Table addTable($id=null)
+ * @method CElement_Component_DataTable addTable($id=null)
  * @method CElement_Component_Widget addWidget($id=null)
  * @method CElement_List_TabList addTabList($id=null)
+ * @method CElement_List_ActionList addActionList($id=null)
+ * @method CElement_Component_FileManager addFileManager($id=null)
+ * @method CElement_Element_Pre addPre($id=null)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
     use CTrait_Compat_App,
@@ -64,6 +67,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     private static $haveScrollToTop = null;
 
     protected $renderer;
+
+    protected $data = [];
 
     private static $renderingElement;
 
@@ -497,8 +502,22 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function sendExceptionEmail(Exception $exception, $email = null) {
+        $ignoredExceptions = [
+            CDaemon_Exception_AlreadyRunningException::class,
+            CDaemon_Exception_AlreadyStoppedException::class
+        ];
+
         if (!($exception instanceof CHTTP_Exception_NotFoundHttpException)) {
-            $html = CApp_ErrorHandler::sendExceptionEmail($exception, $email);
+            $ignored = false;
+            foreach ($ignoredExceptions as $ignored) {
+                if (is_subclass_of($exception, $ignored) || get_class($exception) === $ignored) {
+                    $ignored = true;
+                    break;
+                }
+            }
+            if (!$ignored) {
+                $html = CApp_ErrorHandler::sendExceptionEmail($exception, $email);
+            }
         }
     }
 
@@ -550,5 +569,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             static::$haveScrollToTop = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
         }
         return static::$haveScrollToTop;
+    }
+
+    public function setData($key, $value) {
+        $this->data[$key] = $value;
+        return $this;
     }
 }

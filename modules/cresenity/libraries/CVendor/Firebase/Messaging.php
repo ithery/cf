@@ -1,13 +1,19 @@
 <?php
 
 class CVendor_Firebase_Messaging {
-    /** @var string */
+    /**
+     * @var string
+     */
     private $projectId;
 
-    /** @var ApiClient */
+    /**
+     * @var ApiClient
+     */
     private $messagingApi;
 
-    /** @var AppInstanceApiClient */
+    /**
+     * @var AppInstanceApiClient
+     */
     private $appInstanceApi;
 
     /**

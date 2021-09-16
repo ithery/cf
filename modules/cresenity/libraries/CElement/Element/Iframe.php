@@ -1,20 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_Element_Iframe extends CElement_Element {
-
     use CTrait_Element_Property_Width,
         CTrait_Element_Property_Height;
 
-    protected $src = "";
+    protected $src = '';
 
-    public function __construct($id = "") {
+    public function __construct($id = '') {
         parent::__construct($id);
-        $this->tag = "iframe";
+        $this->tag = 'iframe';
     }
 
+    // @codingStandardsIgnoreStart
     public function set_src($src) {
+        // @codingStandardsIgnoreEnd
         $this->src = $src;
         return $this;
     }
@@ -33,5 +34,4 @@ class CElement_Element_Iframe extends CElement_Element {
             $this->setAttr('height', $this->height);
         }
     }
-
 }

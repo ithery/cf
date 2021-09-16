@@ -11,7 +11,7 @@ class CTreeDB {
 
     protected $table_name = '';
 
-    protected $org_id = null;
+    protected $org_id = '';
 
     protected $filters = [];
 
@@ -28,7 +28,7 @@ class CTreeDB {
         }
         $data = cdata::get($domain, 'domain');
         //$this->org_id = CF::org_id();
-        $this->org_id = null;
+        $this->org_id = '';
 
         $pk_column = $table_name . '_id';
         if (strlen($prefix) > 0) {

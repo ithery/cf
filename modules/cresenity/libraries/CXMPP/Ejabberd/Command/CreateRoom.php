@@ -2,13 +2,15 @@
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since May 31, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since May 31, 2020
  */
 class CXMPP_Ejabberd_Command_CreateRoom extends CXMPP_Ejabberd_CommandAbstract {
-
     private $name;
+
     private $service;
+
     private $host;
 
     /**
@@ -56,5 +58,4 @@ class CXMPP_Ejabberd_Command_CreateRoom extends CXMPP_Ejabberd_CommandAbstract {
         }
         return $data;
     }
-
 }

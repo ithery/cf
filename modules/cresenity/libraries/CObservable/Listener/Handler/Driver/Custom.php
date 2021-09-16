@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 class CObservable_Listener_Handler_Driver_Custom extends CObservable_Listener_Handler_Driver {
-
     use CTrait_Compat_Handler_Driver_Custom;
 
     protected $target;
+
     protected $js;
 
     public function setJs($js) {
-
         $this->js = $js;
 
         return $this;
@@ -20,8 +19,6 @@ class CObservable_Listener_Handler_Driver_Custom extends CObservable_Listener_Ha
         $js = '';
         $js .= $this->js;
 
-
         return $js;
     }
-
 }

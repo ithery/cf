@@ -11,10 +11,12 @@ defined('SYSPATH') or die('No direct access allowed.');
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_Tab {
     /**
-     * @param mixed $label
-     * @param mixed $lang
+     * @param string $label
+     * @param bool   $lang
      *
      * @return CElement_Component_Tab
+     *
+     * @deprecated since 1.2, use setLabel
      */
     public function set_label($label, $lang = true) {
         return $this->setLabel($label, $lang);
@@ -27,7 +29,7 @@ trait CTrait_Compat_Element_Tab {
      *
      * @return CElement_Component_Tab
      *
-     * @deprecated 1.1
+     * @deprecated since 1.1, use setAjaxUrl
      */
     public function set_ajax_url($url) {
         return $this->setAjaxUrl($url);
@@ -40,7 +42,7 @@ trait CTrait_Compat_Element_Tab {
      *
      * @return CElement_Component_Tab
      *
-     * @deprecated 1.1
+     * @deprecated since 1.1, use setTarget
      */
     public function set_target($target) {
         return $this->setTarget($target);
@@ -66,7 +68,7 @@ trait CTrait_Compat_Element_Tab {
      *
      * @return CElement_Component_Tab
      *
-     * @deprecated 1.1
+     * @deprecated 1.1 use setNoPadding
      */
     public function set_nopadding($bool) {
         return $this->setNoPadding($bool);

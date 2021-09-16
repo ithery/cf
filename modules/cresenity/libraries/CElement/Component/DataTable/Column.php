@@ -41,6 +41,10 @@ class CElement_Component_DataTable_Column extends CObject {
 
     protected $exportCallbackRequire;
 
+    public $searchType = 'text';
+
+    public $searchOptions = [];
+
     public function __construct($fieldname) {
         parent::__construct();
 
@@ -112,6 +116,16 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this;
     }
 
+    public function setSearchType($type) {
+        $this->searchType = $type;
+        return $this;
+    }
+
+    public function setSearchOptions($option) {
+        $this->searchOptions = $option;
+        return $this;
+    }
+
     public function setEditable($bool) {
         $this->editable = $bool;
         return $this;
@@ -129,8 +143,15 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this;
     }
 
-    public function setAlign($al) {
-        $this->align = $al;
+    /**
+     * Set align of column (left,right,center)
+     *
+     * @param string $align
+     *
+     * @return $this
+     */
+    public function setAlign($align) {
+        $this->align = $align;
         return $this;
     }
 

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,87 +17,84 @@ namespace League\CommonMark\Extension\CommonMark\Node\Block;
 use League\CommonMark\Node\Block\AbstractBlock;
 use League\CommonMark\Node\StringContainerInterface;
 
-class FencedCode extends AbstractBlock implements StringContainerInterface
-{
-    /** @var string|null */
+class FencedCode extends AbstractBlock implements StringContainerInterface {
+    /**
+     * @var string|null
+     */
     protected $info;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $literal = '';
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $length;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $char;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $offset;
 
-    public function __construct(int $length, string $char, int $offset)
-    {
+    public function __construct($length, $char, $offset) {
         parent::__construct();
 
         $this->length = $length;
-        $this->char   = $char;
+        $this->char = $char;
         $this->offset = $offset;
     }
 
-    public function getInfo(): ?string
-    {
+    public function getInfo() {
         return $this->info;
     }
 
     /**
      * @return string[]
      */
-    public function getInfoWords(): array
-    {
-        return \preg_split('/\s+/', $this->info ?? '') ?: [];
+    public function getInfoWords() {
+        return \preg_split('/\s+/', $this->info ?: '') ?: [];
     }
 
-    public function setInfo(string $info): void
-    {
+    public function setInfo($info) {
         $this->info = $info;
     }
 
-    public function getLiteral(): string
-    {
+    public function getLiteral() {
         return $this->literal;
     }
 
-    public function setLiteral(string $literal): void
-    {
+    public function setLiteral($literal) {
         $this->literal = $literal;
     }
 
-    public function getChar(): string
-    {
+    public function getChar() {
         return $this->char;
     }
 
-    public function setChar(string $char): void
-    {
+    public function setChar($char) {
         $this->char = $char;
     }
 
-    public function getLength(): int
-    {
+    public function getLength() {
         return $this->length;
     }
 
-    public function setLength(int $length): void
-    {
+    public function setLength($length) {
         $this->length = $length;
     }
 
-    public function getOffset(): int
-    {
+    public function getOffset() {
         return $this->offset;
     }
 
-    public function setOffset(int $offset): void
-    {
+    public function setOffset($offset) {
         $this->offset = $offset;
     }
 }

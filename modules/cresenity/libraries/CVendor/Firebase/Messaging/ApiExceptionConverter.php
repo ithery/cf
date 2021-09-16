@@ -8,7 +8,9 @@ use Psr\Http\Message\ResponseInterface;
  * @internal
  */
 class CVendor_Firebase_Messaging_ApiExceptionConverter {
-    /** @var ErrorResponseParser */
+    /**
+     * @var ErrorResponseParser
+     */
     private $responseParser;
 
     /**

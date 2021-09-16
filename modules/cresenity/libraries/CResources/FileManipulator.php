@@ -80,7 +80,7 @@ class CResources_FileManipulator {
                         . '.' . $conversion->getResultExtension(pathinfo($copiedOriginalFile, PATHINFO_EXTENSION));
                 $renamedFile = ResourceLibraryFileHelper::renameInDirectory($manipulationResult, $newFileName);
                 if ($conversion->shouldGenerateResponsiveImages()) {
-                    c::app(ResponsiveImageGenerator::class)->generateResponsiveImagesForConversion(
+                    c::container(ResponsiveImageGenerator::class)->generateResponsiveImagesForConversion(
                         $resource,
                         $conversion,
                         $renamedFile

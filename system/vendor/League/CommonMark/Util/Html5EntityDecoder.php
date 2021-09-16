@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,13 +17,13 @@ namespace League\CommonMark\Util;
 /**
  * @psalm-immutable
  */
-final class Html5EntityDecoder
-{
+final class Html5EntityDecoder {
     /**
      * @psalm-pure
+     *
+     * @param mixed $entity
      */
-    public static function decode(string $entity): string
-    {
+    public static function decode($entity) {
         if (\substr($entity, -1) !== ';') {
             return $entity;
         }
@@ -46,8 +44,7 @@ final class Html5EntityDecoder
      *
      * @psalm-pure
      */
-    private static function fromDecimal($number): string
-    {
+    private static function fromDecimal($number) {
         // Only convert code points within planes 0-2, excluding NULL
         // phpcs:ignore Generic.PHP.ForbiddenFunctions.Found
         if (empty($number) || $number > 0x2FFFF) {
@@ -67,9 +64,10 @@ final class Html5EntityDecoder
 
     /**
      * @psalm-pure
+     *
+     * @param mixed $hexChars
      */
-    private static function fromHex(string $hexChars): string
-    {
+    private static function fromHex($hexChars) {
         return self::fromDecimal(\hexdec($hexChars));
     }
 }

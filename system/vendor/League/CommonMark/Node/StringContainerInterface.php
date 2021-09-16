@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,9 +17,8 @@ namespace League\CommonMark\Node;
 /**
  * Interface for a node which directly contains line(s) of text
  */
-interface StringContainerInterface
-{
-    public function setLiteral(string $literal): void;
+interface StringContainerInterface {
+    public function setLiteral($literal);
 
-    public function getLiteral(): string;
+    public function getLiteral();
 }

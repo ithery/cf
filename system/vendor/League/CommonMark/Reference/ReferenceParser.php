@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,20 +17,24 @@ namespace League\CommonMark\Reference;
 use League\CommonMark\Parser\Cursor;
 use League\CommonMark\Util\LinkParserHelper;
 
-final class ReferenceParser
-{
+final class ReferenceParser {
     // Looking for the start of a definition, i.e. `[`
-    private const START_DEFINITION = 0;
+    const START_DEFINITION = 0;
+
     // Looking for and parsing the label, i.e. `[foo]` within `[foo]`
-    private const LABEL = 1;
+    const LABEL = 1;
+
     // Parsing the destination, i.e. `/url` in `[foo]: /url`
-    private const DESTINATION = 2;
+    const DESTINATION = 2;
+
     // Looking for the start of a title, i.e. the first `"` in `[foo]: /url "title"`
-    private const START_TITLE = 3;
+    const START_TITLE = 3;
+
     // Parsing the content of the title, i.e. `title` in `[foo]: /url "title"`
-    private const TITLE = 4;
+    const TITLE = 4;
+
     // End state, no matter what kind of lines we add, they won't be references
-    private const PARAGRAPH = 5;
+    const PARAGRAPH = 5;
 
     /**
      * @var string
@@ -90,28 +92,24 @@ final class ReferenceParser
      */
     private $referenceValid = false;
 
-    public function getParagraphContent(): string
-    {
+    public function getParagraphContent() {
         return $this->paragraph;
     }
 
     /**
      * @return ReferenceInterface[]
      */
-    public function getReferences(): iterable
-    {
+    public function getReferences() {
         $this->finishReference();
 
         return $this->references;
     }
 
-    public function hasReferences(): bool
-    {
+    public function hasReferences() {
         return $this->references !== [];
     }
 
-    public function parse(string $line): void
-    {
+    public function parse($line) {
         if ($this->paragraph !== '') {
             $this->paragraph .= "\n";
         }
@@ -119,7 +117,7 @@ final class ReferenceParser
         $this->paragraph .= $line;
 
         $cursor = new Cursor($line);
-        while (! $cursor->isAtEnd()) {
+        while (!$cursor->isAtEnd()) {
             $result = false;
             switch ($this->state) {
                 case self::PARAGRAPH:
@@ -146,7 +144,7 @@ final class ReferenceParser
                     break;
             }
 
-            if (! $result) {
+            if (!$result) {
                 $this->state = self::PARAGRAPH;
 
                 return;
@@ -154,8 +152,7 @@ final class ReferenceParser
         }
     }
 
-    private function parseStartDefinition(Cursor $cursor): bool
-    {
+    private function parseStartDefinition(Cursor $cursor) {
         $cursor->advanceToNextNonSpaceOrTab();
         if ($cursor->isAtEnd() || $cursor->getCharacter() !== '[') {
             return false;
@@ -172,8 +169,7 @@ final class ReferenceParser
         return true;
     }
 
-    private function parseLabel(Cursor $cursor): bool
-    {
+    private function parseLabel(Cursor $cursor) {
         $cursor->advanceToNextNonSpaceOrTab();
 
         $partialLabel = LinkParserHelper::parsePartialLinkLabel($cursor);
@@ -221,8 +217,7 @@ final class ReferenceParser
         return true;
     }
 
-    private function parseDestination(Cursor $cursor): bool
-    {
+    private function parseDestination(Cursor $cursor) {
         $cursor->advanceToNextNonSpaceOrTab();
 
         $destination = LinkParserHelper::parseLinkDestination($cursor);
@@ -237,7 +232,7 @@ final class ReferenceParser
             // Destination was at end of line, so this is a valid reference for sure (and maybe a title).
             // If not at end of line, wait for title to be valid first.
             $this->referenceValid = true;
-            $this->paragraph      = '';
+            $this->paragraph = '';
         } elseif ($advanced === 0) {
             // spec: The title must be separated from the link destination by whitespace
             return false;
@@ -248,8 +243,7 @@ final class ReferenceParser
         return true;
     }
 
-    private function parseStartTitle(Cursor $cursor): bool
-    {
+    private function parseStartTitle(Cursor $cursor) {
         $cursor->advanceToNextNonSpaceOrTab();
         if ($cursor->isAtEnd()) {
             $this->state = self::START_DEFINITION;
@@ -286,8 +280,7 @@ final class ReferenceParser
         return true;
     }
 
-    private function parseTitle(Cursor $cursor): bool
-    {
+    private function parseTitle(Cursor $cursor) {
         \assert($this->titleDelimiter !== null);
         $title = LinkParserHelper::parsePartialLinkTitle($cursor, $this->titleDelimiter);
 
@@ -306,7 +299,7 @@ final class ReferenceParser
 
         $this->title .= $title;
 
-        if (! $endDelimiterFound && $cursor->isAtEnd()) {
+        if (!$endDelimiterFound && $cursor->isAtEnd()) {
             // Title still going, continue on next line
             $this->title .= "\n";
 
@@ -315,7 +308,7 @@ final class ReferenceParser
 
         // We either hit the end delimiter or some extra whitespace
         $cursor->advanceToNextNonSpaceOrTab();
-        if (! $cursor->isAtEnd()) {
+        if (!$cursor->isAtEnd()) {
             // spec: No further non-whitespace characters may occur on the line.
             return false;
         }
@@ -330,19 +323,18 @@ final class ReferenceParser
         return true;
     }
 
-    private function finishReference(): void
-    {
-        if (! $this->referenceValid) {
+    private function finishReference() {
+        if (!$this->referenceValid) {
             return;
         }
 
         /** @psalm-suppress PossiblyNullArgument -- these can't possibly be null if we're in this state */
         $this->references[] = new Reference($this->label, $this->destination, $this->title);
 
-        $this->label          = null;
+        $this->label = null;
         $this->referenceValid = false;
-        $this->destination    = null;
-        $this->title          = '';
+        $this->destination = null;
+        $this->title = '';
         $this->titleDelimiter = null;
     }
 }

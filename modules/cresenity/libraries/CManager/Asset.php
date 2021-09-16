@@ -13,20 +13,30 @@ class CManager_Asset {
      * POS CONST
      */
     const POS_HEAD = 'head';
+
     const POS_BEGIN = 'begin';
+
     const POS_END = 'end';
+
     const POS_READY = 'ready';
+
     const POS_LOAD = 'load';
 
     /**
      * TYPE CONST
      */
     const TYPE_JS_FILE = 'js_file';
+
     const TYPE_JS = 'js';
+
     const TYPE_CSS_FILE = 'css_file';
+
     const TYPE_CSS = 'css';
+
     const TYPE_META = 'meta';
+
     const TYPE_LINK = 'link';
+
     const TYPE_PLAIN = 'plain';
 
     /**
@@ -165,9 +175,9 @@ class CManager_Asset {
 
         $jsFiles = array_merge($moduleThemejsFiles, $themejsFiles, $moduleRunTimejsFiles, $runTimejsFiles);
 
-        $js_open = '';
-        $js_close = '';
-        $js_before = '';
+        $jsOpen = '';
+        $jsClose = '';
+        $jsBefore = '';
         $i = 0;
         $manager = CManager::instance();
         if ($manager->getUseRequireJs()) {
@@ -180,14 +190,14 @@ class CManager_Asset {
                     }
                 }
 
-                $js_open .= str_repeat("\t", $i) . $require . "(['" . $urlJsFile . "'],function(){" . PHP_EOL;
+                $jsOpen .= str_repeat("\t", $i) . $require . "(['" . $urlJsFile . "'],function(){" . PHP_EOL;
 
-                $js_close .= '})';
+                $jsClose .= '})';
                 $i++;
             }
         }
-        $js_before = $this->varJs();
-        return $js_before . $this->wrapJs($js_open . $js . $js_close);
+        $jsBefore = $this->varJs();
+        return $jsBefore . $this->wrapJs($jsOpen . $js . $jsClose);
     }
 
     public function render($pos, $type = null) {
@@ -241,27 +251,35 @@ class CManager_Asset {
                 foreach ($scriptValueArray as $scriptValue) {
                     switch ($scriptType) {
                         case self::TYPE_JS_FILE:
-                            $urlJsFile = CManager_Asset_Helper::urlJsFile($scriptValue);
-                            if ($manager->isMobile()) {
-                                $mobilePath = $manager->getMobilePath();
-                                if (strlen($mobilePath) > 0) {
-                                    $urlJsFile = $mobilePath . $scriptValue;
+                            if ($scriptValue instanceof CManager_Asset_File_JsFile) {
+                                $script .= $scriptValue->render() . PHP_EOL;
+                            } else {
+                                $urlJsFile = CManager_Asset_Helper::urlJsFile($scriptValue);
+                                if ($manager->isMobile()) {
+                                    $mobilePath = $manager->getMobilePath();
+                                    if (strlen($mobilePath) > 0) {
+                                        $urlJsFile = $mobilePath . $scriptValue;
+                                    }
                                 }
-                            }
 
-                            $script .= '<script src="' . $urlJsFile . '"></script>' . PHP_EOL;
+                                $script .= '<script src="' . $urlJsFile . '"></script>' . PHP_EOL;
+                            }
 
                             break;
                         case self::TYPE_CSS_FILE:
-                            $urlCssFile = CManager_Asset_Helper::urlCssFile($scriptValue);
-                            if ($manager->isMobile()) {
-                                $mobilePath = $manager->getMobilePath();
-                                if (strlen($mobilePath) > 0) {
-                                    $urlCssFile = $mobilePath . $scriptValue;
+                            if ($scriptValue instanceof CManager_Asset_File_CssFile) {
+                                $script .= $scriptValue->render() . PHP_EOL;
+                            } else {
+                                $urlCssFile = CManager_Asset_Helper::urlCssFile($scriptValue);
+                                if ($manager->isMobile()) {
+                                    $mobilePath = $manager->getMobilePath();
+                                    if (strlen($mobilePath) > 0) {
+                                        $urlCssFile = $mobilePath . $scriptValue;
+                                    }
                                 }
-                            }
 
-                            $script .= '<link href="' . $urlCssFile . '" rel="stylesheet" />' . PHP_EOL;
+                                $script .= '<link href="' . $urlCssFile . '" rel="stylesheet" />' . PHP_EOL;
+                            }
                             break;
                         case self::TYPE_JS:
                             $script .= '<script>' . $scriptValue . '</script>' . PHP_EOL;

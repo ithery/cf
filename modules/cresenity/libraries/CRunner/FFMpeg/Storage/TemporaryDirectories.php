@@ -17,8 +17,6 @@ class CRunner_FFMpeg_Storage_TemporaryDirectories {
 
     /**
      * Sets the root and removes the trailing slash.
-     *
-     * @param string $root
      */
     public function __construct() {
         $root = DOCROOT . 'temp' . DS . 'runner' . DS . 'ffmpeg';

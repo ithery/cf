@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,32 +17,33 @@ use League\CommonMark\Parser\Inline\InlineParserInterface;
 use League\CommonMark\Renderer\NodeRendererInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
 
-interface EnvironmentInterface extends EventDispatcherInterface
-{
+interface EnvironmentInterface extends EventDispatcherInterface {
     /**
      * @param string $key     Configuration option key
      * @param mixed  $default Default value to return if config option is not set
      *
      * @return mixed
      */
-    public function getConfig(string $key, $default = null);
+    public function getConfig($key, $default = null);
 
     /**
      * @return iterable<BlockStartParserInterface>
      */
-    public function getBlockStartParsers(): iterable;
+    public function getBlockStartParsers();
 
     /**
      * @return iterable<InlineParserInterface>
      */
-    public function getInlineParsers(): iterable;
+    public function getInlineParsers();
 
-    public function getDelimiterProcessors(): DelimiterProcessorCollection;
+    public function getDelimiterProcessors();
 
     /**
      * @psalm-param class-string $nodeClass
      *
      * @return iterable<NodeRendererInterface>
+     *
+     * @param string $nodeClass
      */
-    public function getRenderersForClass(string $nodeClass): iterable;
+    public function getRenderersForClass($nodeClass);
 }

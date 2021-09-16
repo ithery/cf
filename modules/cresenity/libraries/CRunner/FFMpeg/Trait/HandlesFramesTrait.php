@@ -1,21 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 26, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Aug 26, 2020
  */
 trait CRunner_FFMpeg_Trait_HandlesFramesTrait {
-
     /**
-     * @var boolean
+     * @var bool
      */
     protected $mustBeAccurate = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $returnFrameContents = false;
 
@@ -40,5 +40,4 @@ trait CRunner_FFMpeg_Trait_HandlesFramesTrait {
 
         return $this->save();
     }
-
 }

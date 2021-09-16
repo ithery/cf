@@ -4,7 +4,9 @@ use Psr\Http\Message\RequestInterface;
 use CVendor_Firebase_Messaging_MessageTarget as MessageTarget;
 
 final class CVendor_Firebase_Messaging_MulticastSendReport implements Countable {
-    /** @var CVendor_Firebase_Messaging_SendReport[] */
+    /**
+     * @var CVendor_Firebase_Messaging_SendReport[]
+     */
     private $items = [];
 
     private function __construct() {

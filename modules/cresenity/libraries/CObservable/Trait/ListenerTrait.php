@@ -54,6 +54,16 @@ trait CObservable_Trait_ListenerTrait {
     }
 
     /**
+     * @return CObservable_Listener_ReadyListener
+     */
+    public function onReadyListener() {
+        if (!isset($this->listeners['ready'])) {
+            $this->listeners['ready'] = new CObservable_Listener_ReadyListener($this->id);
+        }
+        return $this->listeners['ready'];
+    }
+
+    /**
      * @return CObservable_Listener_ClickListener
      */
     public function onClickListener() {
@@ -78,7 +88,7 @@ trait CObservable_Trait_ListenerTrait {
      */
     public function onMouseUpListener() {
         if (!isset($this->listeners['mouseUp'])) {
-            $this->listeners['mouseUp'] = new CObservable_Listener_ChangeListener($this->id);
+            $this->listeners['mouseUp'] = new CObservable_Listener_MouseUpListener($this->id);
         }
         return $this->listeners['mouseUp'];
     }

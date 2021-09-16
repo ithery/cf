@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -21,11 +19,10 @@ namespace League\CommonMark\Reference;
  *
  * @phpstan-extends \IteratorAggregate<ReferenceInterface>
  */
-interface ReferenceMapInterface extends \IteratorAggregate, \Countable
-{
-    public function add(ReferenceInterface $reference): void;
+interface ReferenceMapInterface extends \IteratorAggregate, \Countable {
+    public function add(ReferenceInterface $reference);
 
-    public function contains(string $label): bool;
+    public function contains($label);
 
-    public function get(string $label): ?ReferenceInterface;
+    public function get($label);
 }

@@ -1,21 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 24, 2018, 2:20:56 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 24, 2018, 2:20:56 PM
  */
 abstract class CModel_Nested_Relation extends CModel_Relation {
-
     /**
      * @var CModel_Nested_Query
      */
     protected $query;
 
     /**
-     * @var CModel_Nested_Trait|Model
+     * @var CModel_Nested_Trait|CModel
      */
     protected $parent;
 
@@ -30,7 +30,7 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
      * AncestorsRelation constructor.
      *
      * @param CModel_Nested_Query $builder
-     * @param CModel $model
+     * @param CModel              $model
      */
     public function __construct(CModel_Nested_Query $builder, CModel $model) {
         if (!CModel_Nested_NestedSet::isNode($model)) {
@@ -49,7 +49,7 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
 
     /**
      * @param CModel_Nested_Query $query
-     * @param Model $model
+     * @param Model               $model
      *
      * @return void
      */
@@ -68,11 +68,14 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
     /**
      * @param CModel_Query $query
      * @param CModel_Query $parent
-     * @param array $columns
+     * @param array        $columns
      *
      * @return mixed
      */
-    public function getRelationExistenceQuery(CModel_Query $query, CModel_Query $parent, $columns = ['*']
+    public function getRelationExistenceQuery(
+        CModel_Query $query,
+        CModel_Query $parent,
+        $columns = ['*']
     ) {
         $query = $this->getParent()->replicate()->newScopedQuery()->select($columns);
         $table = $query->getModel()->getTable();
@@ -80,15 +83,19 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
         $query->getModel()->setTable($hash);
         $grammar = $query->getQuery()->getGrammar();
         $condition = $this->relationExistenceCondition(
-                $grammar->wrapTable($hash), $grammar->wrapTable($table), $grammar->wrap($this->parent->getLftName()), $grammar->wrap($this->parent->getRgtName()));
+            $grammar->wrapTable($hash),
+            $grammar->wrapTable($table),
+            $grammar->wrap($this->parent->getLftName()),
+            $grammar->wrap($this->parent->getRgtName())
+        );
         return $query->whereRaw($condition);
     }
 
     /**
      * Initialize the relation on a set of models.
      *
-     * @param  array $models
-     * @param  string $relation
+     * @param array  $models
+     * @param string $relation
      *
      * @return array
      */
@@ -99,12 +106,14 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
     /**
      * @param CModel_Query $query
      * @param CModel_Query $parent
-     * @param array $columns
+     * @param array        $columns
      *
      * @return mixed
      */
     public function getRelationQuery(
-    CModel_Query $query, CModel_Query $parent, $columns = ['*']
+        CModel_Query $query,
+        CModel_Query $parent,
+        $columns = ['*']
     ) {
         return $this->getRelationExistenceQuery($query, $parent, $columns);
     }
@@ -112,10 +121,12 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
     /**
      * Get a relationship join table hash.
      *
+     * @param bool $incrementJoinCount
+     *
      * @return string
      */
-    public function getRelationCountHash() {
-        return 'nested_set_' . self::$selfJoinCount++;
+    public function getRelationCountHash($incrementJoinCount = true) {
+        return 'cmodel_nested_set_reserved_' . ($incrementJoinCount ? static::$selfJoinCount++ : static::$selfJoinCount);
     }
 
     /**
@@ -130,14 +141,15 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
     /**
      * Set the constraints for an eager load of the relation.
      *
-     * @param  array $models
+     * @param array $models
      *
      * @return void
      */
     public function addEagerConstraints(array $models) {
-        $this->query->whereNested(function (Builder $inner) use ($models) {
+        $this->query->whereNested(function (CDatabase_Query_Builder $inner) use ($models) {
             // We will use this query in order to apply constraints to the
             // base query builder
+            /** @var CModel_Nested_Relation $this */
             $outer = $this->parent->newQuery()->setQuery($inner);
             foreach ($models as $model) {
                 $this->addEagerConstraint($outer, $model);
@@ -148,9 +160,9 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
     /**
      * Match the eagerly loaded results to their parents.
      *
-     * @param  array $models
-     * @param  CModel_Collection $results
-     * @param  string $relation
+     * @param array             $models
+     * @param CModel_Collection $results
+     * @param string            $relation
      *
      * @return array
      */
@@ -163,12 +175,12 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
     }
 
     /**
-     * @param Model $model
+     * @param CModel            $model
      * @param CModel_Collection $results
      *
      * @return CCollection
      */
-    protected function matchForModel(Model $model, CModel_Collection $results) {
+    protected function matchForModel(CModel $model, CModel_Collection $results) {
         $result = $this->related->newCollection();
         foreach ($results as $related) {
             if ($this->matches($model, $related)) {
@@ -177,5 +189,4 @@ abstract class CModel_Nested_Relation extends CModel_Relation {
         }
         return $result;
     }
-
 }

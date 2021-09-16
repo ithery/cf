@@ -16,7 +16,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
         $tableServiceDiv = $app->addDiv('tableService');
 
-        $handlerActionClick = $reloadAction->addListener('click')->addHandler('reload');
+        $handlerActionClick = $reloadAction->addListener('click')->addReloadHandler();
         $handlerActionClick->setTarget('tableService');
         $handlerActionClick->setUrl($this->controllerUrl() . 'reloadTabService');
 

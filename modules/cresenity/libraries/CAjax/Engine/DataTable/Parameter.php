@@ -1,15 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 29, 2019, 10:45:30 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 29, 2019, 10:45:30 AM
  */
 class CAjax_Engine_DataTable_Parameter {
-
     protected $requestGet;
+
     protected $processor;
 
     public function __construct(CAjax_Engine_DataTable_Processor $processor) {
@@ -37,7 +38,7 @@ class CAjax_Engine_DataTable_Parameter {
         $table = $this->processor->table();
         $columns = $this->processor->columns();
         $iSortingCols = intval(carr::get($this->requestGet, 'iSortingCols', 0));
-        $sortingData = array();
+        $sortingData = [];
         if (isset($this->requestGet['iSortCol_0'])) {
             for ($i = 0; $i < $iSortingCols; $i++) {
                 $i2 = 0;
@@ -49,14 +50,13 @@ class CAjax_Engine_DataTable_Parameter {
                     $iSortColIndex = $iSortColIndex + $i2;
                     $iSortDir = carr::get($this->requestGet, 'sSortDir_' . ($iSortColIndex), 'asc');
                     $fieldName = carr::get(carr::get($columns, $iSortColIndex), 'fieldname');
-                    $sortableEnabled = carr::get($this->requestGet, 'bSortable_' . $iSortColIndex) == "true";
+                    $sortableEnabled = carr::get($this->requestGet, 'bSortable_' . $iSortColIndex) == 'true';
                     if ($sortableEnabled) {
-                        $sortingData[] = array($fieldName, $iSortDir);
+                        $sortingData[] = [$fieldName, $iSortDir];
                     }
                 }
             }
         }
         return $sortingData;
     }
-
 }

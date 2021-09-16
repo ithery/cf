@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 7, 2019, 2:18:19 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 7, 2019, 2:18:19 PM
  */
 class CServer_Memory_OS_Darwin extends CServer_Memory_OS_Linux {
-
     use CServer_Trait_OS_Darwin;
 
     /**
@@ -74,5 +74,4 @@ class CServer_Memory_OS_Darwin extends CServer_Memory_OS_Linux {
             $this->info->setSwapDevices($dev);
         }
     }
-
 }

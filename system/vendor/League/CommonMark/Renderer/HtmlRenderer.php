@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -25,8 +23,7 @@ use League\CommonMark\Output\RenderedContent;
 use League\CommonMark\Output\RenderedContentInterface;
 use League\CommonMark\Util\HtmlElement;
 
-final class HtmlRenderer implements HtmlRendererInterface, ChildNodeRendererInterface
-{
+final class HtmlRenderer implements HtmlRendererInterface, ChildNodeRendererInterface {
     /**
      * @var EnvironmentInterface
      *
@@ -34,13 +31,16 @@ final class HtmlRenderer implements HtmlRendererInterface, ChildNodeRendererInte
      */
     private $environment;
 
-    public function __construct(EnvironmentInterface $environment)
-    {
+    public function __construct(EnvironmentInterface $environment) {
         $this->environment = $environment;
     }
 
-    public function renderDocument(Document $node): RenderedContentInterface
-    {
+    /**
+     * @param Document $node
+     *
+     * @return RenderedContentInterface
+     */
+    public function renderDocument(Document $node) {
         $output = new RenderedContent($node, (string) $this->renderNode($node));
 
         $event = new DocumentRenderedEvent($output);
@@ -52,8 +52,7 @@ final class HtmlRenderer implements HtmlRendererInterface, ChildNodeRendererInte
     /**
      * {@inheritdoc}
      */
-    public function renderNodes(iterable $nodes): string
-    {
+    public function renderNodes($nodes) {
         $output = '';
 
         // Track whether the previous item was a block, as we'll need to insert newlines after them
@@ -62,7 +61,7 @@ final class HtmlRenderer implements HtmlRendererInterface, ChildNodeRendererInte
         foreach ($nodes as $node) {
             if ($lastItemWasBlock) {
                 $lastItemWasBlock = false;
-                $output          .= $this->getBlockSeparator();
+                $output .= $this->getBlockSeparator();
             }
 
             $output .= $this->renderNode($node);
@@ -80,8 +79,7 @@ final class HtmlRenderer implements HtmlRendererInterface, ChildNodeRendererInte
      *
      * @throws \RuntimeException
      */
-    private function renderNode(Node $node)
-    {
+    private function renderNode(Node $node) {
         $renderers = $this->environment->getRenderersForClass(\get_class($node));
 
         foreach ($renderers as $renderer) {
@@ -94,13 +92,11 @@ final class HtmlRenderer implements HtmlRendererInterface, ChildNodeRendererInte
         throw new \RuntimeException('Unable to find corresponding renderer for node type ' . \get_class($node));
     }
 
-    public function getBlockSeparator(): string
-    {
+    public function getBlockSeparator() {
         return $this->environment->getConfig('renderer/block_separator', "\n");
     }
 
-    public function getInnerSeparator(): string
-    {
+    public function getInnerSeparator() {
         return $this->environment->getConfig('renderer/inner_separator', "\n");
     }
 }
