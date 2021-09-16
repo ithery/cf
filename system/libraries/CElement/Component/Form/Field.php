@@ -12,17 +12,29 @@ class CElement_Component_Form_Field extends CElement_Component {
     use CTrait_Compat_Element_Form_Field;
 
     protected $group_classes = [];
+
     protected $group_id = '';
+
     protected $group_custom_css = [];
+
     protected $label = [];
+
     protected $show_label = [];
+
     protected $label_size = [];
+
     protected $fullwidth = [];
+
     protected $info_text = [];
+
     protected $label_class = [];
+
     protected $control_class = [];
+
     protected $style_form_group;
+
     protected $inline_without_default;
+
     protected $labelRequired = false;
 
     public function __construct($id = '') {
@@ -84,7 +96,7 @@ class CElement_Component_Form_Field extends CElement_Component {
             $group_classes = ' ' . $group_classes;
         }
         $group_custom_css = $this->group_custom_css;
-        $group_custom_css = crenderer::render_style($group_custom_css);
+        $group_custom_css = $this->renderStyle($group_custom_css);
         if (strlen($group_custom_css) > 0) {
             $group_custom_css = ' style="' . $group_custom_css . '"';
         }
@@ -100,7 +112,7 @@ class CElement_Component_Form_Field extends CElement_Component {
 
         if ($this->bootstrap == '3.3') {
             // read default style from each theme
-            if (strlen($this->style_form_group) == 0) {
+            if ($this->style_form_group == null || strlen($this->style_form_group) == 0) {
                 $this->style_form_group = carr::get($this->theme_style, 'form_field_style');
             }
             $html->appendln('<div class="form-group ' . $group_classes . '" ' . $group_custom_css . $group_attr . '>')->incIndent();

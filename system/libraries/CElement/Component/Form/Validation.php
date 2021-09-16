@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 12:43:37 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 12:43:37 PM
  */
 class CElement_Component_Form_Validation {
-
     /**
      * Configuration options.
      *
@@ -17,7 +17,7 @@ class CElement_Component_Form_Validation {
     protected $options;
 
     /**
-     * rules.
+     * Rules.
      *
      * @var array
      */
@@ -27,6 +27,7 @@ class CElement_Component_Form_Validation {
      * Create a new Validator factory instance.
      *
      * @param array $options
+     * @param mixed $rules
      */
     public function __construct($rules, array $options = []) {
         $this->setOptions($options);
@@ -35,6 +36,7 @@ class CElement_Component_Form_Validation {
 
     /**
      * @param $options
+     *
      * @return void
      */
     protected function setOptions($options) {
@@ -47,10 +49,10 @@ class CElement_Component_Form_Validation {
     /**
      * Get the validator instance for the request.
      *
-     * @param array $rules
      * @param array $messages
      * @param array $customAttributes
-     * @return \Illuminate\Validation\Validator
+     *
+     * @return \CValidation_Validator
      */
     protected function getValidatorInstance(array $messages = [], array $customAttributes = []) {
         $data = $this->getValidationData($this->rules, $customAttributes);
@@ -63,6 +65,7 @@ class CElement_Component_Form_Validation {
      * Gets fake data when validator has wildcard rules.
      *
      * @param array $rules
+     *
      * @return array
      */
     protected function getValidationData(array $rules, array $customAttributes = []) {
@@ -80,8 +83,8 @@ class CElement_Component_Form_Validation {
     /**
      * Creates JsValidator instance based on Validator.
      *
-     * @param CValidation_Validator $validator
      * @param null|string $selector
+     *
      * @return \Proengsoft\JsValidation\Javascript\JavascriptValidator
      */
     public function validator($selector = null) {
@@ -93,7 +96,8 @@ class CElement_Component_Form_Validation {
      * Creates JsValidator instance based on Validator.
      *
      * @param CValidation_Validator $validator
-     * @param null|string $selector
+     * @param null|string           $selector
+     *
      * @return CJavascript_Validation_ValidatorJavascript
      */
     protected function jsValidator(CValidation_Validator $validator, $selector = null) {
@@ -116,5 +120,4 @@ class CElement_Component_Form_Validation {
         $token = CSession::instance()->id();
         return $token;
     }
-
 }

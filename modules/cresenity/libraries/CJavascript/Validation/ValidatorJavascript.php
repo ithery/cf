@@ -6,7 +6,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
- * @see Proengsoft\JsValidation
+ * @see Proengsoft\JsValidation https://github.com/proengsoft/laravel-jsvalidation
  * @since Apr 14, 2019, 1:04:19 PM
  */
 class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable {
@@ -60,8 +60,8 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
     protected $ignore;
 
     /**
-     * @param \Proengsoft\JsValidation\Javascript\ValidatorHandler $validator
-     * @param array                                                $options
+     * @param \CJavascript_Validation_ValidatorHandler $validator
+     * @param array                                    $options
      */
     public function __construct(CJavascript_Validation_ValidatorHandler $validator, $options = []) {
         $this->validator = $validator;
@@ -176,7 +176,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      *
      * @param string $selector
      *
-     * @return \Proengsoft\JsValidation\Javascript\JavascriptValidator
+     * @return \CJavascript_Validation_ValidatorJavascript
      */
     public function selector($selector) {
         $this->selector = is_null($selector) ? $this->selector : $selector;
@@ -188,7 +188,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      *
      * @param string $ignore
      *
-     * @return \Proengsoft\JsValidation\Javascript\JavascriptValidator
+     * @return \CJavascript_Validation_ValidatorJavascript
      */
     public function ignore($ignore) {
         $this->ignore = $ignore;
@@ -200,7 +200,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      *
      * @param mixed $template
      *
-     * @return \Proengsoft\JsValidation\Javascript\JavascriptValidator
+     * @return \CJavascript_Validation_ValidatorJavascript
      */
     public function template($template) {
         $this->view = is_null($template) ? $this->template : $template;
@@ -212,7 +212,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      *
      * @param null|bool $enabled
      *
-     * @return \Proengsoft\JsValidation\Javascript\JavascriptValidator
+     * @return \CJavascript_Validation_ValidatorJavascript
      */
     public function remote($enabled = true) {
         $this->remote = $enabled;
@@ -225,7 +225,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      * @param string       $attribute
      * @param string|array $rules
      *
-     * @return \Proengsoft\JsValidation\Javascript\JavascriptValidator
+     * @return \CJavascript_Validation_ValidatorJavascript
      */
     public function sometimes($attribute, $rules) {
         $this->validator->sometimes($attribute, $rules);
