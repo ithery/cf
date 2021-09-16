@@ -31,6 +31,16 @@ class CEmail_Config {
      */
     protected $secure;
 
+    /**
+     * @var string
+     */
+    protected $from;
+
+    /**
+     * @var string
+     */
+    protected $fromName;
+
     protected static $smtpHostToDriverMap = [
         'smtp.sendgrid.net' => 'sendgrid',
         'smtp.mailgun.org' => 'mailgun',
@@ -41,55 +51,65 @@ class CEmail_Config {
 
     public function __construct($options = []) {
         $options = $this->reformatOptions($options);
+
         $this->driver = carr::get($options, 'driver');
         $this->username = carr::get($options, 'username');
         $this->password = carr::get($options, 'password');
         $this->host = carr::get($options, 'host');
         $this->port = carr::get($options, 'port');
         $this->secure = carr::get($options, 'secure');
-
-        $smtp_username = carr::get($options, 'smtp_username');
-        $smtp_password = carr::get($options, 'smtp_password');
-        $smtpHost = carr::get($options, 'smtp_host');
-        $smtp_port = carr::get($options, 'smtp_port');
-        $secure = carr::get($options, 'smtp_secure');
-
-        if (!$smtp_username) {
-            $smtp_username = ccfg::get('smtp_username');
-        }
-        if (!$smtp_password) {
-            $smtp_password = ccfg::get('smtp_password');
-        }
-        if (!$smtpHost) {
-            $smtp_host = ccfg::get('smtp_host');
-        }
-        if (!$smtp_port) {
-            $smtp_port = ccfg::get('smtp_port');
-        }
-        if (!$secure) {
-            $secure = ccfg::get('smtp_secure');
-        }
-        $this->driver = carr::get(static::$smtpHostToDriverMap, $smtpHost, 'smtp');
     }
 
     public function reformatOptions($config) {
-        $smtpHostLegacy = carr::get($config, 'smtp_host');
-        $isLegacyOptions = c::filled($smtpHostLegacy);
+        $config = $this->mergeWithDefaultConfig($config);
+
+        $isLegacyOptions = !carr::get($config, 'driver');
         $newConfig = $config;
         if ($isLegacyOptions) {
-            $smtpHost = carr::get($config, 'smtp_host');
+            $smtpHost = carr::get($config, 'host', carr::get($config, 'smtp_host'));
+            if ($smtpHost == null) {
+                throw new Exception('SMTP Host is null');
+            }
             $driver = carr::get(static::$smtpHostToDriverMap, $smtpHost, 'smtp');
+
             $newConfig = [];
             $newConfig['driver'] = $driver;
-            $newConfig['username'] = carr::get($config, 'smtp_username', carr::get($config, 'username'));
-            $newConfig['password'] = carr::get($config, 'smtp_password', carr::get($config, 'password'));
+            $newConfig['username'] = carr::get($config, 'username', carr::get($config, 'smtp_username'));
+            $newConfig['password'] = carr::get($config, 'password', carr::get($config, 'smtp_password'));
+            $newConfig['from'] = carr::get($config, 'from', carr::get($config, 'smtp_from'));
+            $newConfig['from_name'] = carr::get($config, 'from_name', carr::get($config, 'smtp_from_name'));
             if ($driver == 'smtp') {
-                $newConfig['host'] = carr::get($config, 'smtp_host', carr::get($config, 'host'));
-                $newConfig['port'] = carr::get($config, 'smtp_port', carr::get($config, 'port'));
-                $newConfig['secure'] = carr::get($config, 'smtp_secure', carr::get($config, 'secure'));
+                $newConfig['host'] = carr::get($config, 'host', carr::get($config, 'smtp_host'));
+                $newConfig['port'] = carr::get($config, 'port', carr::get($config, 'smtp_port'));
+                $newConfig['secure'] = carr::get($config, 'secure', carr::get($config, 'smtp_secure'));
             }
         }
         return $newConfig;
+    }
+
+    public function mergeWithDefaultConfig($config) {
+        if (!isset($config['from']) || c::blank($config['from'])) {
+            $config['from'] = carr::get($config, 'smtp_from', CF::config('app.email.from', CF::config('app.smtp_from')));
+        }
+
+        if (!isset($config['from_name']) || c::blank($config['from_name'])) {
+            $config['from_name'] = carr::get($config, 'smtp_from_name', CF::config('app.email.from_name', CF::config('app.smtp_from_name')));
+        }
+        if (!isset($config['host']) || c::blank($config['from'])) {
+            $config['host'] = carr::get($config, 'smtp_host', CF::config('app.email.host', CF::config('app.smtp_host')));
+        }
+        if (!isset($config['username']) || c::blank($config['username'])) {
+            $config['username'] = carr::get($config, 'smtp_username', CF::config('app.email.username', CF::config('app.smtp_username')));
+        }
+        if (!isset($config['password']) || c::blank($config['password'])) {
+            $config['password'] = carr::get($config, 'smtp_password', CF::config('app.email.password', CF::config('app.smtp_password')));
+        }
+
+        if (!isset($config['secure']) || c::blank($config['secure'])) {
+            $config['secure'] = carr::get($config, 'smtp_secure', CF::config('app.email.secure', CF::config('app.smtp_secure')));
+        }
+
+        return $config;
     }
 
     public function getDriver() {
@@ -114,5 +134,13 @@ class CEmail_Config {
 
     public function getSecure() {
         return $this->secure;
+    }
+
+    public function getFrom() {
+        return $this->from;
+    }
+
+    public function getFromName() {
+        return $this->fromName;
     }
 }
