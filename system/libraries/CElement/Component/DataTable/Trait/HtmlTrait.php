@@ -23,11 +23,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             $mainClassTitle = ' widget-title ';
             $tableViewClass = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' data-table-col-view' : ' data-table-row-view';
             $mainClassContent = ' widget-content ' . $tableViewClass . ' col-view-count-' . $this->dataTableViewColCount;
-            if ($this->bootstrap == '3.3') {
-                $mainClass = ' box box-info';
-                $mainClassTitle = ' box-header with-border ';
-                $mainClassContent = ' box-body data-table-row-view';
-            }
+
             if ($this->widget_title == false) {
                 $mainClassTitle = ' ';
             }
@@ -36,9 +32,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             }
             $html->appendln('<div id="' . $this->id() . '-widget-box" class="' . $mainClass . ' widget-table">')->incIndent();
             $showTitle = true;
-            if ($this->bootstrap == '3.3' && strlen($this->title) == 0) {
-                $showTitle = false;
-            }
+
             if ($showTitle) {
                 $html->appendln('<div class="' . $mainClassTitle . '">')->incIndent();
                 if (strlen($this->icon > 0)) {
