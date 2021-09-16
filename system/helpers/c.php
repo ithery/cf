@@ -1338,9 +1338,9 @@ class c {
         return rtrim($string, '/');
     }
 
-    public static function theme($key=null, $default=null) {
-        if ($key!==null) {
-            return static::manager()->theme()->getData($key,$default);
+    public static function theme($key = null, $default = null) {
+        if ($key !== null) {
+            return static::manager()->theme()->getData($key, $default);
         }
         return static::manager()->theme();
     }
