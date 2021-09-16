@@ -8,9 +8,13 @@ class CObject {
         CTrait_Macroable;
 
     protected $id;
+
     protected $valid_prop = [];
+
     protected $prop = [];
+
     protected $domain = '';
+
     private $friends = [];
 
     public function addFriend($classname) {
