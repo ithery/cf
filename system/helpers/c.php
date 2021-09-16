@@ -1344,6 +1344,10 @@ class c {
         }
         return static::manager()->theme();
     }
+
+    public static function locale() {
+        return str_replace('_', '-', CF::getLocale());
+    }
 }
 
 // End c
