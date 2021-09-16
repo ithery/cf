@@ -32,7 +32,7 @@ class CFormInputSelectSearch extends CElement_FormInput {
         $this->auto_select = false;
         $this->min_input_length = 0;
         $this->delay = 100;
-        $this->select2Version = c::theme('select2.version');
+        $this->select2Version = c::theme('select2.version', 2);
     }
 
     public static function factory($id) {
