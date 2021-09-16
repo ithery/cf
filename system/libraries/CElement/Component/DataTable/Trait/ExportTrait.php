@@ -10,12 +10,19 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CElement_Component_DataTable_Trait_ExportTrait {
     public $export_xml;
+
     public $export_excel;
+
     public $export_excelxml;
+
     public $export_excelcsv;
+
     public $export_pdf;
+
     public $report_header = [];
+
     public $export_filename = '';
+
     public $export_sheetname = '';
 
     private static function exportExcelxmlStatic($filename, $sheet_name = null, $table = null) {
@@ -141,7 +148,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         }
         if (!is_resource($data)) {
             if (is_object($data)) {
-                $data = $data->result_array(false);
+                $data = $data->resultArray(false);
             }
         }
         foreach ($data as $row) {

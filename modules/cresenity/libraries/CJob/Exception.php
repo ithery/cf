@@ -1,4 +1,4 @@
 <?php
 
-class CJob_Exception extends CException {
+class CJob_Exception extends Exception {
 }

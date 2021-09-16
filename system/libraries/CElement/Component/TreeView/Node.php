@@ -1,29 +1,26 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 28, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 28, 2020
  */
 class CElement_Component_TreeView_Node implements CInterface_Arrayable {
-
     /**
-     *
      * @var string
      */
     protected $text;
 
     /**
-     *
      * @var string
      */
     protected $icon;
 
     /**
-     *
-     * @var CElement_Component_TreeView_Node[] 
+     * @var CElement_Component_TreeView_Node[]
      */
     protected $childs;
 
@@ -45,7 +42,7 @@ class CElement_Component_TreeView_Node implements CInterface_Arrayable {
         if (!($child instanceof CElement_Component_TreeView_Node)) {
             if (is_array($child)) {
                 $child = static::createFromArray($child);
-            } else if (is_string($child)) {
+            } elseif (is_string($child)) {
                 $child = new static($child);
             } else {
                 throw new Exception('child is on bad format');
@@ -73,13 +70,12 @@ class CElement_Component_TreeView_Node implements CInterface_Arrayable {
     }
 
     public function toArray() {
-        return c::collect($this->childs)->map(function($node) {
-                    return [
-                        'text' => $node->getText(),
-                        'icon' => $node->getIcon(),
-                        'children' => $node->toArray(),
-                    ];
-                })->all();
+        return c::collect($this->childs)->map(function ($node) {
+            return [
+                'text' => $node->getText(),
+                'icon' => $node->getIcon(),
+                'children' => $node->toArray(),
+            ];
+        })->all();
     }
-
 }

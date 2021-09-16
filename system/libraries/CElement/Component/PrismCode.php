@@ -1,22 +1,27 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 7, 2018, 7:50:27 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 7, 2018, 7:50:27 PM
  */
 class CElement_Component_PrismCode extends CElement_Component {
-
     protected $prismLanguage = 'php';
+
     protected $prismTheme = 'okaidia';
+
     protected $codeElement;
+
     protected $haveCopyToClipboard;
+
     protected $haveSelectCode;
+
     protected $isWrap;
 
-    public function __construct($id = "", $tag = "div") {
+    public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
         $this->tag = 'pre';
         $this->codeElement = $this->addCode();
@@ -43,8 +48,8 @@ class CElement_Component_PrismCode extends CElement_Component {
         $cs->registerCssFile('plugins/prism/themes/prism-' . $this->prismTheme . '.css');
         $cs->registerCssFile('plugins/prism/plugins/prism-toolbar.css');
         $this->codeElement->addClass('language-' . $this->prismLanguage);
-        if($this->isWrap) {
-            $this->codeElement->customCss('white-space','pre-wrap');
+        if ($this->isWrap) {
+            $this->codeElement->customCss('white-space', 'pre-wrap');
         }
     }
 
@@ -132,5 +137,4 @@ class CElement_Component_PrismCode extends CElement_Component {
         $js .= 'Prism.highlightAll();';
         return $js;
     }
-
 }
