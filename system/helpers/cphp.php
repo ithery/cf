@@ -1,46 +1,44 @@
 <?php
 
 //@codingStandardsIgnoreStart
+/**
+ * @deprecated since 1.2, see CFile
+ * @see CFile
+ */
 class cphp {
+    /**
+     * @param mixed $val
+     * @param int   $level
+     *
+     * @return string
+     *
+     * @deprecated since 1.2, see CFile::phpValue
+     */
     public static function string_value($val, $level = 0) {
-        $str = '';
-        $eol = PHP_EOL;
-        $indent = cutils::indent($level, "\t");
-        if (is_array($val)) {
-            $str .= 'array(' . $eol;
-            $indent2 = cutils::indent($level + 1, "\t");
-            foreach ($val as $k => $v) {
-                $kSlashes = addcslashes($k, '\'\\');
-                $str .= $indent2 . "'" . $kSlashes . "'=>";
-                $str .= self::string_value($v, $level + 1);
-                $str .= ',' . $eol;
-            }
-
-            $str .= $indent . ')';
-        } elseif (is_null($val)) {
-            $str .= 'NULL';
-        } elseif (is_bool($val)) {
-            $str .= ($val === true ? 'TRUE' : 'FALSE');
-        } else {
-            $str .= "'" . addcslashes($val, '\'\\') . "'";
-        }
-        return $str;
+        return CFile::phpValue($val, $level);
     }
 
+    /**
+     * @param mixed  $value
+     * @param string $filename
+     *
+     * @return int|bool
+     *
+     * @deprecated since 1.2, see CFile::putPhpValue
+     */
     public static function save_value($value, $filename = null) {
-        $val = '<?php ' . PHP_EOL . 'return ' . cphp::string_value($value) . ';';
-        if ($filename != null) {
-            cfs::atomic_write($filename, $val);
-            //file_put_contents($filename, $val);
-        }
-        return $val;
+        return CFile::putPhpValue($filename, $value);
     }
 
+    /**
+     * @param string $filename
+     *
+     * @return mixed
+     *
+     * @deprecated since 1.2, see CFile::getRequire
+     */
     public static function load_value($filename) {
-        if (!file_exists($filename)) {
-            throw new Exception($filename . ' Not found');
-        }
-        return include $filename;
+        return CFile::getRequire($filename);
     }
 }
 //@codingStandardsIgnoreEnd
