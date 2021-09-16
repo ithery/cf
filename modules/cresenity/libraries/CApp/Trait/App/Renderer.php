@@ -31,6 +31,7 @@ trait CApp_Trait_App_Renderer {
             $nav = $this->nav;
         }
 
+        /** @var CApp $this */
         $nav = $this->resolveNav($nav);
 
         $renderer = $this->resolveNavRenderer();
@@ -213,6 +214,8 @@ HTML;
             //deprecated view data
             $viewData['header_body'] = '';
             $viewData['headerBody'] = '';
+
+            $viewData = array_merge($this->data, $viewData);
 
             $this->viewData = $viewData;
         }

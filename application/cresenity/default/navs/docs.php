@@ -39,7 +39,17 @@ return [
                 'name' => 'basic.controller',
                 'label' => c::__('Controller'),
                 'uri' => 'docs/basic/controller',
-            ]
+            ],
+            [
+                'name' => 'basic.request',
+                'label' => c::__('Request'),
+                'uri' => 'docs/basic/request',
+            ],
+            [
+                'name' => 'basic.view',
+                'label' => c::__('View'),
+                'uri' => 'docs/basic/view',
+            ],
         ]
     ],
     [
@@ -73,6 +83,11 @@ return [
         'name' => 'command',
         'label' => c::__('Command'),
         'subnav' => [
+            [
+                'name' => 'command.introduction',
+                'label' => c::__('Introduction'),
+                'uri' => 'docs/command/introduction',
+            ],
             [
                 'name' => 'command.basic',
                 'label' => c::__('Basic'),

@@ -81,7 +81,8 @@ class curl {
     }
 
     /**
-     * @param boolean $qs
+     * @param bool $qs
+     *
      * @return string
      */
     public static function fullUrl($qs = true) {

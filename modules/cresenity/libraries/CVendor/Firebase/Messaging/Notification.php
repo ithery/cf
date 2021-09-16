@@ -1,13 +1,19 @@
 <?php
 
 class CVendor_Firebase_Messaging_Notification implements \JsonSerializable {
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     private $title;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     private $body;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     private $imageUrl;
 
     private function __construct($title = null, $body = null, $imageUrl = null) {

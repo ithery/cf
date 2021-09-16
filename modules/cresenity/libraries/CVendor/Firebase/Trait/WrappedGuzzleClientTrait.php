@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\RequestInterface;
@@ -16,8 +10,9 @@ use Psr\Http\Message\ResponseInterface;
  * @codeCoverageIgnore
  */
 trait CVendor_Firebase_Trait_WrappedGuzzleClientTrait {
-
-    /** @var ClientInterface */
+    /**
+     * @var ClientInterface
+     */
     protected $client;
 
     public function send(RequestInterface $request, array $options = []) {
@@ -39,5 +34,4 @@ trait CVendor_Firebase_Trait_WrappedGuzzleClientTrait {
     public function getConfig($option = null) {
         return $this->client->getConfig($option);
     }
-
 }

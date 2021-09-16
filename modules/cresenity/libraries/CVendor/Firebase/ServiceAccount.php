@@ -2,12 +2,18 @@
 
 class CVendor_Firebase_ServiceAccount {
     private $projectId;
+
     private $sanitizedProjectId;
+
     private $clientId;
+
     private $clientEmail;
+
     private $privateKey;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     private $filePath;
 
     /**

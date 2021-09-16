@@ -4,7 +4,9 @@
  * @codeCoverageIgnore
  */
 trait CVendor_Firebase_Trait_ExceptionHasErrorsTrait {
-    /** @var string[] */
+    /**
+     * @var string[]
+     */
     protected $errors = [];
 
     /**

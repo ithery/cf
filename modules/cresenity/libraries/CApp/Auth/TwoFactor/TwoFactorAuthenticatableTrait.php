@@ -56,7 +56,7 @@ trait CApp_Auth_TwoFactor_TwoFactorAuthenticatableTrait {
      * @return string
      */
     public function twoFactorQrCodeUrl() {
-        return c::app(CApp_Auth_TwoFactor_TwoFactorAuthenticationProviderInterface::class)->qrCodeUrl(
+        return c::container(CApp_Auth_TwoFactor_TwoFactorAuthenticationProviderInterface::class)->qrCodeUrl(
             CF::config('app.name'),
             $this->email,
             c::decrypt($this->two_factor_secret)
