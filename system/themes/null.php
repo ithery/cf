@@ -21,7 +21,10 @@ return [
             'class' => null,
         ],
         'select2' => [
-            'version' => null,
+            'version' => null, //select2 version
+        ],
+        'radio' => [
+            'js' => null, // js module for radio
         ]
     ],
     'custom_js' => '',

@@ -4,7 +4,7 @@
  * @deprecated since 1.2
  */
 //@codingStandardsIgnoreStart
-class CFormInputLabel extends CFormInput {
+class CFormInputLabel extends CElement_FormInput {
     public function __construct($id) {
         parent::__construct($id);
 
@@ -12,12 +12,12 @@ class CFormInputLabel extends CFormInput {
     }
 
     public static function factory($id) {
-        return new CFormInputLabel($id);
+        return new static($id);
     }
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $disabled = '';
 
         if ($this->disabled) {
@@ -30,7 +30,7 @@ class CFormInputLabel extends CFormInput {
             $classes = ' ' . $classes;
         }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
