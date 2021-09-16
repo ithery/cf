@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 use CRouting_UrlRoutableInterface as ImplicitlyBindable;
 
 class CComponent_ImplicitlyBoundMethod extends CContainer_BoundMethod {
-
     protected static function getMethodDependencies($container, $callback, array $parameters = []) {
         $dependencies = [];
         $paramIndex = 0;
@@ -33,12 +33,12 @@ class CComponent_ImplicitlyBoundMethod extends CContainer_BoundMethod {
         if ($parameter->isVariadic()) {
             // this last param will pick up the rest - reindex any remaining parameters
             $parameters = array_merge(
-                    array_filter($parameters, function ($key) {
-                        return !is_int($key);
-                    }, ARRAY_FILTER_USE_KEY),
-                    array_values(array_filter($parameters, function ($key) {
-                                return is_int($key);
-                            }, ARRAY_FILTER_USE_KEY))
+                array_filter($parameters, function ($key) {
+                    return !is_int($key);
+                }, ARRAY_FILTER_USE_KEY),
+                array_values(array_filter($parameters, function ($key) {
+                    return is_int($key);
+                }, ARRAY_FILTER_USE_KEY))
             );
 
             return;
@@ -106,7 +106,6 @@ class CComponent_ImplicitlyBoundMethod extends CContainer_BoundMethod {
             return ($type && !$type->isBuiltin()) ? $type->getName() : null;
         }
 
-
         return !static::getParameterIsBuiltIn($parameter) ? static::getParameterTypeName($parameter) : null;
     }
 
@@ -139,5 +138,4 @@ class CComponent_ImplicitlyBoundMethod extends CContainer_BoundMethod {
         $builtInType = ['boolean', 'integer', 'double', 'string', 'array', 'object', 'NULL', 'resource', 'resource (closed)', 'unknown type'];
         return in_array(static::getParameterTypeNameForPhp56($parameter), $builtInType);
     }
-
 }

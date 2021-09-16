@@ -12,17 +12,20 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_Content implements \JsonSerializable {
-
-    /** @var $type string The mime type of the content you are including in your email. For example, “text/plain” or “text/html” */
+    /**
+     * @var string The mime type of the content you are including in your email. For example, “text/plain” or “text/html”
+     */
     private $type;
 
-    /** @var $value string The actual content of the specified mime type that you are including in your email */
+    /**
+     * @var string The actual content of the specified mime type that you are including in your email
+     */
     private $value;
 
     /**
      * Optional constructor
      *
-     * @param string|null $type The mime type of the content you are including
+     * @param string|null $type  The mime type of the content you are including
      *                           in your email. For example, “text/plain” or
      *                           “text/html”
      * @param string|null $value The actual content of the specified mime type
@@ -43,12 +46,12 @@ class CVendor_SendGrid_Mail_Content implements \JsonSerializable {
      * @param string $type The mime type of the content you are including
      *                     in your email. For example, “text/plain” or
      *                     “text/html”
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setType($type) {
         if (!is_string($type)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$type must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$type must be of type string.');
         }
         $this->type = $type;
     }
@@ -67,12 +70,12 @@ class CVendor_SendGrid_Mail_Content implements \JsonSerializable {
      *
      * @param string $value The actual content of the specified mime type
      *                      that you are including in your email
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setValue($value) {
         if (!is_string($value)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$value must be of type string');
+            throw new CVendor_SendGrid_Exception_TypeException('$value must be of type string');
         }
         $this->value = mb_convert_encoding($value, 'UTF-8', 'UTF-8');
     }
@@ -93,13 +96,13 @@ class CVendor_SendGrid_Mail_Content implements \JsonSerializable {
      */
     public function jsonSerialize() {
         return array_filter(
-                        [
-                    'type' => $this->getType(),
-                    'value' => $this->getValue()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'type' => $this->getType(),
+                'value' => $this->getValue()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

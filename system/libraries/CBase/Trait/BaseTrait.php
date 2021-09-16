@@ -81,7 +81,7 @@ trait CBase_Trait_BaseTrait {
      */
     public static function orgCode($orgId = null) {
         $org = self::org($orgId);
-        return cobj::get($org, 'code');
+        return c::get($org, 'code');
     }
 
     //@codingStandardsIgnoreEnd
@@ -93,7 +93,7 @@ trait CBase_Trait_BaseTrait {
      */
     public static function orgName($orgId = null) {
         $org = self::org($orgId);
-        return cobj::get($org, 'name');
+        return c::get($org, 'name');
     }
 
     /**
@@ -163,13 +163,15 @@ trait CBase_Trait_BaseTrait {
      * @return int
      */
     public static function userId() {
-        return cobj::get(self::user(), 'user_id');
+        return c::get(self::user(), 'user_id');
     }
 
     /**
      * User ID dari session CApp
      *
      * @return int
+     *
+     * @deprecated since 1.2 use userId
      */
     //@codingStandardsIgnoreStart
     public static function user_id() {
@@ -302,7 +304,7 @@ trait CBase_Trait_BaseTrait {
     /**
      * Always return false
      *
-     * @return boolean
+     * @return bool
      */
     public static function notAccessible() {
         cmsg::add('error', clang::__('You do not have access to this module, please call administrator'));
@@ -311,14 +313,14 @@ trait CBase_Trait_BaseTrait {
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public static function isDevelopment() {
         return static::environment() != CBase::ENVIRONMENT_PRODUCTION;
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
     public static function isStaging() {
         return static::environment() == CBase::ENVIRONMENT_STAGING;

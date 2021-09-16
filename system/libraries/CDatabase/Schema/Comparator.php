@@ -166,7 +166,7 @@ class CDatabase_Schema_Comparator {
      *
      * @return bool
      */
-    public function diffSequence(Sequence $sequence1, Sequence $sequence2) {
+    public function diffSequence(CDatabase_Schema_Sequence $sequence1, CDatabase_Schema_Sequence $sequence2) {
         if ($sequence1->getAllocationSize() != $sequence2->getAllocationSize()) {
             return true;
         }
@@ -318,7 +318,8 @@ class CDatabase_Schema_Comparator {
 
             $tableDifferences->renamedColumns[$removedColumnName] = $addedColumn;
             unset(
-                    $tableDifferences->addedColumns[$addedColumnName], $tableDifferences->removedColumns[$removedColumnName]
+                $tableDifferences->addedColumns[$addedColumnName],
+                $tableDifferences->removedColumns[$removedColumnName]
             );
         }
     }
@@ -361,7 +362,8 @@ class CDatabase_Schema_Comparator {
             }
             $tableDifferences->renamedIndexes[$removedIndexName] = $addedIndex;
             unset(
-                    $tableDifferences->addedIndexes[$addedIndexName], $tableDifferences->removedIndexes[$removedIndexName]
+                $tableDifferences->addedIndexes[$addedIndexName],
+                $tableDifferences->removedIndexes[$removedIndexName]
             );
         }
     }
@@ -434,7 +436,7 @@ class CDatabase_Schema_Comparator {
         }
 
         if (($properties1['type'] instanceof CDatabase_Type_StringType && !$properties1['type'] instanceof CDatabase_Type_GuidType)
-                || $properties1['type'] instanceof CDatabase_Type_BinaryType
+            || $properties1['type'] instanceof CDatabase_Type_BinaryType
         ) {
             // check if value of length is set at all, default value assumed otherwise.
             $length1 = $properties1['length'] ?: 255;
@@ -457,8 +459,8 @@ class CDatabase_Schema_Comparator {
 
         // A null value and an empty string are actually equal for a comment so they should not trigger a change.
         if ($properties1['comment'] !== $properties2['comment']
-                && !($properties1['comment'] === null && $properties2['comment'] === '')
-                && !($properties2['comment'] === null && $properties1['comment'] === '')
+            && !($properties1['comment'] === null && $properties2['comment'] === '')
+            && !($properties2['comment'] === null && $properties1['comment'] === '')
         ) {
             $changedProperties[] = 'comment';
         }

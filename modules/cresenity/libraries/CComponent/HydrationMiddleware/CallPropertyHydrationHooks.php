@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 class CComponent_HydrationMiddleware_CallPropertyHydrationHooks implements CComponent_HydrationMiddlewareInterface {
-
     public static function hydrate($instance, $request) {
         $publicProperties = $instance->getPublicPropertiesDefinedBySubClass();
 
@@ -38,5 +38,4 @@ class CComponent_HydrationMiddleware_CallPropertyHydrationHooks implements CComp
             CComponent_Manager::instance()->dispatch('property.dehydrate', $property, $value, $instance, $response);
         }
     }
-
 }

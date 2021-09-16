@@ -19,17 +19,20 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_CustomArg implements \JsonSerializable {
-
-    /** @var $key string Custom arg key */
+    /**
+     * @var string Custom arg key
+     */
     private $key;
 
-    /** @var $value string Custom arg value */
+    /**
+     * @var string Custom arg value
+     */
     private $value;
 
     /**
      * Optional constructor
      *
-     * @param string|null $key Custom arg key
+     * @param string|null $key   Custom arg key
      * @param string|null $value Custom arg value
      */
     public function __construct($key = null, $value = null) {
@@ -45,12 +48,12 @@ class CVendor_SendGrid_Mail_CustomArg implements \JsonSerializable {
      * Add a custom arg key on a CustomArg object
      *
      * @param string $key Custom arg key
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setKey($key) {
         if (!is_string($key)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$key must be of type string');
+            throw new CVendor_SendGrid_Exception_TypeException('$key must be of type string');
         }
         $this->key = (string) $key;
     }
@@ -68,12 +71,12 @@ class CVendor_SendGrid_Mail_CustomArg implements \JsonSerializable {
      * Add a custom arg value on a CustomArg object
      *
      * @param string $value Custom arg value
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setValue($value) {
         if (!is_string($value)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$value must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$value must be of type string.');
         }
         $this->value = (string) $value;
     }
@@ -94,13 +97,13 @@ class CVendor_SendGrid_Mail_CustomArg implements \JsonSerializable {
      */
     public function jsonSerialize() {
         return array_filter(
-                        [
-                    'key' => $this->getKey(),
-                    'value' => $this->getValue()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'key' => $this->getKey(),
+                'value' => $this->getValue()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

@@ -78,7 +78,7 @@ class CComponent_RenameMe_SupportBrowserHistory {
              */
         } catch (NotFoundHttpException $e) {
             // If not, use the current route.
-            return app('router')->current();
+            return c::container('router')->current();
         }
     }
 

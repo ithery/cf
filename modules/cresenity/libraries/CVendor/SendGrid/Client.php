@@ -512,7 +512,9 @@ class CVendor_SendGrid_Client {
      *
      * @return CVendor_SendGrid_Client object
      */
+    //@codingStandardsIgnoreStart
     public function _($name = null) {
+        //@codingStandardsIgnoreEnd
         if (isset($name)) {
             $this->path[] = $name;
         }

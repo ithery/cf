@@ -4,7 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class Controller_Cresenity extends CController {
     public function index() {
-        curl::redirect('');
+        return c::redirect();
     }
 
     public function cron() {
@@ -42,9 +42,6 @@ class Controller_Cresenity extends CController {
         $filename = $method . '.tmp';
         $file = CTemporary::getPath('ajax', $filename);
 
-        if (isset($_GET['profiler'])) {
-            new CProfiler();
-        }
         $disk = CTemporary::disk();
         if (!$disk->exists($file)) {
             throw new CException('failed to get temporary file :filename', [':filename' => $file]);
@@ -78,12 +75,12 @@ class Controller_Cresenity extends CController {
      */
     public function change_lang($lang) {
         clang::setlang($lang);
-        curl::redirect(crequest::referrer());
+        return c::redirect(crequest::referrer());
     }
 
     public function change_theme($theme) {
         CManager::theme()->setTheme($theme);
-        curl::redirect(crequest::referrer());
+        return c::redirect(crequest::referrer());
     }
 
     //@codingStandardsIgnoreEnd
@@ -158,7 +155,7 @@ class Controller_Cresenity extends CController {
                                 ];
                                 $db->update('users', $data, ['user_id' => $row[0]->user_id]);
                                 cmsg::clear('error');
-                                clog::login($row[0]->user_id, $session->id(), $this->input->ip_address());
+                                clog::login($row[0]->user_id, $session->id(), CHTTP::request()->ip());
                                 //$acceptable_url = app_login::refresh_menu();
                                 $success_login = true;
                             }
@@ -185,7 +182,7 @@ class Controller_Cresenity extends CController {
             echo json_encode($json);
             return true;
         } else {
-            curl::redirect('');
+            return c::redirect('');
         }
     }
 
@@ -195,7 +192,7 @@ class Controller_Cresenity extends CController {
         $session->delete('current_position');
         $session->delete('completed_position');
         //$session->destroy();
-        curl::redirect('');
+        return c::redirect('');
     }
 
     public function captcha() {

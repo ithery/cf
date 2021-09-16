@@ -1,30 +1,32 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 use Symfony\Component\Finder\SplFileInfo;
 
 class CComponent_Finder {
-
     protected $path;
+
     protected $files;
+
     protected $manifest;
+
     protected $manifestPath;
+
     protected $registry;
 
     /**
-     *
      * @var CComponent_Finder
      */
     protected static $instance;
 
     /**
-     * 
      * @return CComponent_Finder
      */
     public static function instance() {
@@ -35,12 +37,10 @@ class CComponent_Finder {
     }
 
     public function __construct() {
-
         $this->path = DOCROOT . 'application/cresenity/default/libraries/Cresenity/Component/';
         $this->manifestPath = DOCROOT . 'temp' . DS . 'component' . DS . 'manifest' . EXT;
         $this->registry = [];
         if (!CFile::isDirectory(dirname($this->manifestPath))) {
-
             CFile::makeDirectory(dirname($this->manifestPath), $mode = 0755, $recursive = true);
         }
     }
@@ -59,7 +59,6 @@ class CComponent_Finder {
         }
 
         if (!file_exists($this->manifestPath)) {
-
             $this->build();
         }
 
@@ -69,9 +68,9 @@ class CComponent_Finder {
 
     public function build() {
         $this->manifest = $this->getClassNames()
-                        ->mapWithKeys(function ($class) {
-                            return [$class::getName() => $class];
-                        })->toArray();
+            ->mapWithKeys(function ($class) {
+                return [$class::getName() => $class];
+            })->toArray();
 
         $this->write($this->manifest);
 
@@ -87,20 +86,16 @@ class CComponent_Finder {
     }
 
     public function getClassNames() {
-
-
         return c::collect(CFile::allFiles($this->path))
                         ->map(function (SplFileInfo $file) {
-
                             return
                                     c::str($file->getPathname())
                                     ->after(CF::appDir() . '/')
                                     ->replace(['/', '.php'], ['\\', ''])->__toString();
                         })
                         ->filter(function ($class) {
-                            return is_subclass_of($class, CComponent::class) &&
-                                    !(new ReflectionClass($class))->isAbstract();
+                            return is_subclass_of($class, CComponent::class)
+                                    && !(new ReflectionClass($class))->isAbstract();
                         });
     }
-
 }

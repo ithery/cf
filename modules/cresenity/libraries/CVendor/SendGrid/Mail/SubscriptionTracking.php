@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * This class is used to construct a SubscriptionTracking object for
  * the /mail/send API call
@@ -18,43 +12,44 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_SubscriptionTracking implements \JsonSerializable {
-
-    /** @var $enable bool Indicates if this setting is enabled */
+    /**
+     * @var bool Indicates if this setting is enabled
+     */
     private $enable;
 
     /**
-     * @var $text string Text to be appended to the email, with the
-     * subscription tracking link. You may control where the
-     * link is by using the tag <% %>
+     * @var string Text to be appended to the email, with the
+     *             subscription tracking link. You may control where the
+     *             link is by using the tag <% %>
      */
     private $text;
 
     /**
-     * @var $htmlstring string to be appended to the email, with the
-     * subscription tracking link. You may control where the
-     * link is by using the tag <% %>
+     * @var string to be appended to the email, with the
+     *             subscription tracking link. You may control where the
+     *             link is by using the tag <% %>
      */
     private $html;
 
     /**
-     * @var $substitution_tag string A tag that will be replaced with the
-     * unsubscribe URL. for example: [unsubscribe_url]. If
-     * this parameter is used, it will override both the text
-     * and html parameters. The URL of the link will be placed
-     * at the substitution tag’s location, with no additional
-     * formatting
+     * @var string A tag that will be replaced with the
+     *             unsubscribe URL. for example: [unsubscribe_url]. If
+     *             this parameter is used, it will override both the text
+     *             and html parameters. The URL of the link will be placed
+     *             at the substitution tag’s location, with no additional
+     *             formatting
      */
     private $substitution_tag;
 
     /**
      * Optional constructor
      *
-     * @param bool|null $enable Indicates if this setting is enabled
-     * @param string|null $text Text to be appended to the email, with
+     * @param bool|null   $enable           Indicates if this setting is enabled
+     * @param string|null $text             Text to be appended to the email, with
      *                                      the subscription tracking link. You may
      *                                      control where the link is by using the
      *                                      tag <% %>
-     * @param string|null $html HTML to be appended to the email, with
+     * @param string|null $html             HTML to be appended to the email, with
      *                                      the subscription tracking link. You may
      *                                      control where the link is by using the
      *                                      tag <% %>
@@ -67,7 +62,10 @@ class CVendor_SendGrid_Mail_SubscriptionTracking implements \JsonSerializable {
      *                                      location, with no additional formatting
      */
     public function __construct(
-    $enable = null, $text = null, $html = null, $substitution_tag = null
+        $enable = null,
+        $text = null,
+        $html = null,
+        $substitution_tag = null
     ) {
         if (isset($enable)) {
             $this->setEnable($enable);
@@ -87,12 +85,12 @@ class CVendor_SendGrid_Mail_SubscriptionTracking implements \JsonSerializable {
      * Update the enable setting on a SubscriptionTracking object
      *
      * @param bool $enable Indicates if this setting is enabled
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setEnable($enable) {
         if (!is_bool($enable)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$enable must be of type bool.');
+            throw new CVendor_SendGrid_Exception_TypeException('$enable must be of type bool.');
         }
         $this->enable = $enable;
     }
@@ -113,12 +111,12 @@ class CVendor_SendGrid_Mail_SubscriptionTracking implements \JsonSerializable {
      *                     the subscription tracking link. You may
      *                     control where the link is by using the
      *                     tag <% %>
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setText($text) {
         if (!is_string($text)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$text must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$text must be of type string.');
         }
         $this->text = $text;
     }
@@ -139,12 +137,12 @@ class CVendor_SendGrid_Mail_SubscriptionTracking implements \JsonSerializable {
      *                     the subscription tracking link. You may
      *                     control where the link is by using the
      *                     tag <% %>
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setHtml($html) {
         if (!is_string($html)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$html must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$html must be of type string.');
         }
         $this->html = $html;
     }
@@ -168,13 +166,13 @@ class CVendor_SendGrid_Mail_SubscriptionTracking implements \JsonSerializable {
      *                                 and html parameters. The URL of the link
      *                                 will be placed at the substitution tag’s
      *                                 location, with no additional formatting %>
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setSubstitutionTag($substitution_tag) {
         if (!is_string($substitution_tag)) {
-            throw new CVendor_SendGrid_Mail_TypeException(
-            '$substitution_tag must be of type string.'
+            throw new CVendor_SendGrid_Exception_TypeException(
+                '$substitution_tag must be of type string.'
             );
         }
         $this->substitution_tag = $substitution_tag;
@@ -197,15 +195,15 @@ class CVendor_SendGrid_Mail_SubscriptionTracking implements \JsonSerializable {
      */
     public function jsonSerialize() {
         return array_filter(
-                        [
-                    'enable' => $this->getEnable(),
-                    'text' => $this->getText(),
-                    'html' => $this->getHtml(),
-                    'substitution_tag' => $this->getSubstitutionTag()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'enable' => $this->getEnable(),
+                'text' => $this->getText(),
+                'html' => $this->getHtml(),
+                'substitution_tag' => $this->getSubstitutionTag()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

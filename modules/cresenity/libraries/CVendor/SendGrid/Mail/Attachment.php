@@ -12,35 +12,48 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
-
-    /** @var $content string Base64 encoded content */
+    /**
+     * @var string Base64 encoded content
+     */
     private $content;
 
-    /** @var $type string Mime type of the attachment */
+    /**
+     * @var string Mime type of the attachment
+     */
     private $type;
 
-    /** @var $filename string File name of the attachment */
+    /**
+     * @var string File name of the attachment
+     */
     private $filename;
 
-    /** @var $disposition string How the attachment should be displayed: inline or attachment, default is attachment */
+    /**
+     * @var string How the attachment should be displayed: inline or attachment, default is attachment
+     */
     private $disposition;
 
-    /** @var $content_id string Used when disposition is inline to diplay the file within the body of the email */
+    /**
+     * @var string Used when disposition is inline to diplay the file within the body of the email
+     */
     private $content_id;
 
     /**
      * Optional constructor
      *
-     * @param string $content Base64 encoded content
-     * @param string $type Mime type of the attachment
-     * @param string $filename File name of the attachment
+     * @param string $content     Base64 encoded content
+     * @param string $type        Mime type of the attachment
+     * @param string $filename    File name of the attachment
      * @param string $disposition How the attachment should be displayed: inline
      *                            or attachment, default is attachment
-     * @param string $content_id Used when disposition is inline to diplay the
+     * @param string $content_id  Used when disposition is inline to diplay the
      *                            file within the body of the email
      */
     public function __construct(
-    $content = null, $type = null, $filename = null, $disposition = null, $content_id = null
+        $content = null,
+        $type = null,
+        $filename = null,
+        $disposition = null,
+        $content_id = null
     ) {
         if (isset($content)) {
             $this->setContent($content);
@@ -64,11 +77,11 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
      *
      * @param string $content Base64 encoded content
      *
-     * @throws CVendor_SendGrid_Mail_TypeException
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setContent($content) {
         if (!is_string($content)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$content must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$content must be of type string.');
         }
         if (!$this->isBase64($content)) {
             $this->content = base64_encode($content);
@@ -90,12 +103,12 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
      * Add the mime type to a Attachment object
      *
      * @param string $type Mime type of the attachment
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setType($type) {
         if (!is_string($type)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$type must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$type must be of type string.');
         }
         $this->type = $type;
     }
@@ -113,12 +126,12 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
      * Add the file name to a Attachment object
      *
      * @param string $filename File name of the attachment
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setFilename($filename) {
         if (!is_string($filename)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$filename must be of type string');
+            throw new CVendor_SendGrid_Exception_TypeException('$filename must be of type string');
         }
         $this->filename = $filename;
     }
@@ -137,12 +150,12 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
      *
      * @param string $disposition How the attachment should be displayed:
      *                            inline or attachment, default is attachment
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setDisposition($disposition) {
         if (!is_string($disposition)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$disposition must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$disposition must be of type string.');
         }
         $this->disposition = $disposition;
     }
@@ -164,7 +177,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
      */
     public function setContentID($content_id) {
         if (!is_string($content_id)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$content_id must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$content_id must be of type string.');
         }
         $this->content_id = $content_id;
     }
@@ -182,6 +195,7 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
      *  Verifies whether or not the provided string is a valid base64 string
      *
      * @param $string string The string that has to be checked
+     *
      * @return bool
      */
     private function isBase64($string) {
@@ -200,16 +214,16 @@ class CVendor_SendGrid_Mail_Attachment implements \JsonSerializable {
      */
     public function jsonSerialize() {
         return array_filter(
-                        [
-                    'content' => $this->getContent(),
-                    'type' => $this->getType(),
-                    'filename' => $this->getFilename(),
-                    'disposition' => $this->getDisposition(),
-                    'content_id' => $this->getContentID()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'content' => $this->getContent(),
+                'type' => $this->getType(),
+                'filename' => $this->getFilename(),
+                'disposition' => $this->getDisposition(),
+                'content_id' => $this->getContentID()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

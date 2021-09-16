@@ -28,10 +28,22 @@ trait CTrait_Compat_Observable {
         return $this->addListener($event);
     }
 
+    /**
+     * @param mixed $event
+     * @param mixed $listener
+     *
+     * @deprecated
+     */
     public function attach_listener($event, $listener) {
+        /** @var CObservable $this */
         return $this->attachListeners($event, $listener);
     }
 
+    /**
+     * @param mixed $event
+     *
+     * @deprecated
+     */
     public function detach_listener($event) {
         return $this->detachListener($event);
     }
@@ -88,6 +100,11 @@ trait CTrait_Compat_Observable {
         return $this->addIframe($id);
     }
 
+    /**
+     * @param mixed $field_id
+     *
+     * @deprecated
+     */
     public function add_field($field_id = '') {
         return $this->addField($field_id);
     }

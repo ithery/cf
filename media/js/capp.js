@@ -194,6 +194,7 @@ let CF = function () {
 };
 
 
+// eslint-disable-next-line no-unused-vars
 let CUploader = function (options) {
     this.settings = $.extend({
         // These are the defaults.
@@ -427,6 +428,7 @@ let CUploader = function (options) {
     };
 };
 
+// eslint-disable-next-line no-unused-vars
 let CBlocker = function () {
 
 };
@@ -2540,9 +2542,11 @@ if (!window.cresenity) {
             window.cresenity.unblockElement(selector);
         }
     };
+    // eslint-disable-next-line no-extend-native
     String.prototype.format_currency = function () {
         return $.cresenity.format_currency(this);
     };
+    // eslint-disable-next-line no-extend-native
     String.prototype.unformat_currency = function () {
         return $.cresenity.unformat_currency(this);
     };

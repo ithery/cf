@@ -6,19 +6,16 @@
  * @author Hery
  */
 class CComponent_GenerateSignedUploadUrl {
+    public static function forLocal() {
+        // return c::url()->temporarySignedRoute(
+        //     'component.upload-file',
+        //     c::now()->addMinutes(5)
+        // );
 
-    public function forLocal() {
-        /*
-        return c::url()->temporarySignedRoute(
-                        'component.upload-file', c::now()->addMinutes(5)
-        );
-         * 
-         */
-        
-        return curl::base().'cresenity/component/upload';
+        return curl::base() . 'cresenity/component/upload';
     }
 
-    public function forS3($file, $visibility = 'private') {
+    public static function forS3($file, $visibility = 'private') {
         $adapter = CComponent_FileUploadConfiguration::storage()->getDriver()->getAdapter();
 
         $fileType = $file->getMimeType();
@@ -35,24 +32,23 @@ class CComponent_GenerateSignedUploadUrl {
         ]));
 
         $signedRequest = $adapter->getClient()->createPresignedRequest(
-                $command,
-                '+5 minutes'
+            $command,
+            '+5 minutes'
         );
 
         return [
             'path' => $fileHashName,
             'url' => (string) $signedRequest->getUri(),
-            'headers' => $this->headers($signedRequest, $fileType),
+            'headers' => static::headers($signedRequest, $fileType),
         ];
     }
 
-    protected function headers($signedRequest, $fileType) {
+    protected static function headers($signedRequest, $fileType) {
         return array_merge(
-                $signedRequest->getHeaders(),
-                [
-                    'Content-Type' => $fileType ?: 'application/octet-stream'
-                ]
+            $signedRequest->getHeaders(),
+            [
+                'Content-Type' => $fileType ?: 'application/octet-stream'
+            ]
         );
     }
-
 }

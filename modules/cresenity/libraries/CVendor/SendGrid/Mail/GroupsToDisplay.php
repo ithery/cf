@@ -13,8 +13,9 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_GroupsToDisplay implements \JsonSerializable {
-
-    /** @var $groups_to_display int[] An array containing the unsubscribe groups that you would like to be displayed on the unsubscribe preferences page. Maximum of 25 */
+    /**
+     * @var int[] An array containing the unsubscribe groups that you would like to be displayed on the unsubscribe preferences page. Maximum of 25
+     */
     private $groups_to_display;
 
     /**
@@ -40,13 +41,14 @@ class CVendor_SendGrid_Mail_GroupsToDisplay implements \JsonSerializable {
      *                                     that you would like to be
      *                                     displayed on the unsubscribe
      *                                     preferences page
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
+     *
      * @return null
      */
     public function setGroupsToDisplay($groups_to_display) {
         if (!is_array($groups_to_display)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$groups_to_display must be an array.');
+            throw new CVendor_SendGrid_Exception_TypeException('$groups_to_display must be an array.');
         }
         if (is_array($groups_to_display)) {
             $this->groups_to_display = $groups_to_display;
@@ -72,5 +74,4 @@ class CVendor_SendGrid_Mail_GroupsToDisplay implements \JsonSerializable {
     public function jsonSerialize() {
         return $this->getGroupsToDisplay();
     }
-
 }

@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 class CComponent_HydrationMiddleware_HashDataPropertiesForDirtyDetection implements CComponent_HydrationMiddlewareInterface {
-
     protected static $propertyHashesByComponentId = [];
 
     public static function hydrate($instance, $request) {
-        $data = CF::get($request, 'memo.data', []);
+        $data = c::get($request, 'memo.data', []);
 
         c::collect($data)->each(function ($value, $key) use ($instance) {
             if (is_array($value)) {
@@ -26,17 +26,17 @@ class CComponent_HydrationMiddleware_HashDataPropertiesForDirtyDetection impleme
     }
 
     public static function dehydrate($instance, $response) {
-        $data = CF::get($response, 'memo.data', []);
+        $data = c::get($response, 'memo.data', []);
 
         $dirtyProps = c::collect(isset(static::$propertyHashesByComponentId[$instance->id]) ? static::$propertyHashesByComponentId[$instance->id] : [])
                 ->filter(function ($hash, $key) use ($data) {
                     // Only return the propertyHashes/props that have changed.
-                    return static::hash(CF::get($data, $key)) !== $hash;
+                    return static::hash(c::get($data, $key)) !== $hash;
                 })
                 ->keys()
                 ->toArray();
 
-        CF::set($response, 'effects.dirty', $dirtyProps);
+        c::set($response, 'effects.dirty', $dirtyProps);
     }
 
     public static function rehashProperty($name, $value, $component) {
@@ -54,5 +54,4 @@ class CComponent_HydrationMiddleware_HashDataPropertiesForDirtyDetection impleme
         // Using crc32 because it's fast, and this doesn't have to be secure.
         return crc32($value);
     }
-
 }

@@ -4,7 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class Controller_Ccore extends CController {
     public function index() {
-        curl::redirect('');
+        return c::redirect('');
     }
 
     public function js($hash = null) {
