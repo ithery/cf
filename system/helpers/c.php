@@ -1337,6 +1337,13 @@ class c {
     public static function untrailingslashit($string) {
         return rtrim($string, '/');
     }
+
+    public static function theme($key=null, $default=null) {
+        if ($key!==null) {
+            return static::manager()->theme()->getData($key,$default);
+        }
+        return static::manager()->theme();
+    }
 }
 
 // End c
