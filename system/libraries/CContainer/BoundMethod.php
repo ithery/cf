@@ -1,21 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 2:59:26 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 2:59:26 AM
  */
 class CContainer_BoundMethod {
-
     /**
      * Call the given Closure / class@method and inject its dependencies.
      *
-     * @param  CContainer_Container  $container
-     * @param  callable|string  $callback
-     * @param  array  $parameters
-     * @param  string|null  $defaultMethod
+     * @param CContainer_Container $container
+     * @param callable|string      $callback
+     * @param array                $parameters
+     * @param string|null          $defaultMethod
+     *
      * @return mixed
      *
      * @throws \ReflectionException
@@ -26,19 +27,21 @@ class CContainer_BoundMethod {
             return static::callClass($container, $callback, $parameters, $defaultMethod);
         }
         return static::callBoundMethod($container, $callback, function () use ($container, $callback, $parameters) {
-                    return call_user_func_array(
-                            $callback, static::getMethodDependencies($container, $callback, $parameters)
-                    );
-                });
+            return call_user_func_array(
+                $callback,
+                static::getMethodDependencies($container, $callback, $parameters)
+            );
+        });
     }
 
     /**
      * Call a string reference to a class using Class@method syntax.
      *
-     * @param  CContainer_Container  $container
-     * @param  string  $target
-     * @param  array  $parameters
-     * @param  string|null  $defaultMethod
+     * @param CContainer_Container $container
+     * @param string               $target
+     * @param array                $parameters
+     * @param string|null          $defaultMethod
+     *
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -53,16 +56,19 @@ class CContainer_BoundMethod {
             throw new InvalidArgumentException('Method not provided.');
         }
         return static::call(
-                        $container, [$container->make($segments[0]), $method], $parameters
+            $container,
+            [$container->make($segments[0]), $method],
+            $parameters
         );
     }
 
     /**
      * Call a method that has been bound to the container.
      *
-     * @param  CContainer_Container  $container
-     * @param  callable  $callback
-     * @param  mixed  $default
+     * @param CContainer_Container $container
+     * @param callable             $callback
+     * @param mixed                $default
+     *
      * @return mixed
      */
     protected static function callBoundMethod($container, $callback, $default) {
@@ -82,7 +88,8 @@ class CContainer_BoundMethod {
     /**
      * Normalize the given callback into a Class@method string.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     *
      * @return string
      */
     protected static function normalizeMethod($callback) {
@@ -93,9 +100,10 @@ class CContainer_BoundMethod {
     /**
      * Get all dependencies for a given method.
      *
-     * @param  CContainer_Container  $container
-     * @param  callable|string  $callback
-     * @param  array  $parameters
+     * @param CContainer_Container $container
+     * @param callable|string      $callback
+     * @param array                $parameters
+     *
      * @return array
      *
      * @throws \ReflectionException
@@ -111,7 +119,8 @@ class CContainer_BoundMethod {
     /**
      * Get the proper reflection instance for the given callback.
      *
-     * @param  callable|string $callback
+     * @param callable|string $callback
+     *
      * @return \ReflectionFunctionAbstract
      *
      * @throws \ReflectionException
@@ -126,10 +135,11 @@ class CContainer_BoundMethod {
     /**
      * Get the dependency for the given call parameter.
      *
-     * @param  CContainer_Container  $container
-     * @param  \ReflectionParameter  $parameter
-     * @param  array  $parameters
-     * @param  array  $dependencies
+     * @param CContainer_Container $container
+     * @param \ReflectionParameter $parameter
+     * @param array                $parameters
+     * @param array                $dependencies
+     *
      * @return void
      */
     protected static function addDependencyForCallParameter($container, $parameter, array &$parameters, &$dependencies) {
@@ -149,11 +159,11 @@ class CContainer_BoundMethod {
     /**
      * Determine if the given string is in Class@method syntax.
      *
-     * @param  mixed  $callback
+     * @param mixed $callback
+     *
      * @return bool
      */
     protected static function isCallableWithAtSign($callback) {
         return is_string($callback) && strpos($callback, '@') !== false;
     }
-
 }

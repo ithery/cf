@@ -1,7 +1,9 @@
 <?php
 
 final class CVendor_Firebase_Messaging_Messages implements Countable, IteratorAggregate {
-    /** @var CVendor_Firebase_Messaging_MessageInterface[] */
+    /**
+     * @var CVendor_Firebase_Messaging_MessageInterface[]
+     */
     private $messages;
 
     public function __construct(CVendor_Firebase_Messaging_MessageInterface ...$messages) {

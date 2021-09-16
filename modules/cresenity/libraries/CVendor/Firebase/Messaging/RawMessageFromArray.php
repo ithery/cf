@@ -1,7 +1,9 @@
 <?php
 
 final class CVendor_Firebase_Messaging_RawMessageFromArray implements CVendor_Firebase_Messaging_MessageInterface {
-    /** @var array */
+    /**
+     * @var array
+     */
     private $data;
 
     public function __construct(array $data) {

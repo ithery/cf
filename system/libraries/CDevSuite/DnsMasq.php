@@ -8,6 +8,9 @@
 abstract class CDevSuite_DnsMasq {
     public $cli;
 
+    /**
+     * @var CDevSuite_Filesystem_Linux
+     */
     public $files;
 
     public $configuration;

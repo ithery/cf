@@ -7,7 +7,7 @@ class CResources_Engine_File extends CResources_Engine {
 
     public function save($file_name, $file_request) {
         $filename = parent::save($file_name, $file_request);
-        $fullfilename = parent::get_path($filename);
+        $fullfilename = parent::getPath($filename);
         $path = dirname($fullfilename) . DS;
 
         return $filename;

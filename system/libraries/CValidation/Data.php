@@ -36,7 +36,7 @@ class CValidation_Data {
             return $data;
         }
 
-        return CF::set($data, $attribute, null, true);
+        return c::set($data, $attribute, null, true);
     }
 
     /**

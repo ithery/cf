@@ -6,15 +6,12 @@
  * @author Hery
  */
 class CQC_Process_UnitTestProcess extends CQC_ProcessAbstract {
-
     /**
-     *
      * @var CQC_UnitTestAbstract
      */
     protected $unitTest;
 
     /**
-     * 
      * @return CQC_UnitTestAbstract
      */
     protected function getUnitTest() {
@@ -26,22 +23,20 @@ class CQC_Process_UnitTestProcess extends CQC_ProcessAbstract {
     }
 
     /**
-     * 
      * @return array
      */
     public function getTestMethods() {
         $phpMethods = get_class_methods($this->getUnitTest());
 
-        $methods = c::collect($phpMethods)->filter(function($method) {
-                    return cstr::startsWith($method, 'test');
-                })->all();
+        $methods = c::collect($phpMethods)->filter(function ($method) {
+            return cstr::startsWith($method, 'test');
+        })->all();
         return $methods;
     }
 
-    public function run($options=[]) {
-        $methods = carr::wrap(carr::get($options,'method',$this->getTestMethods()));
-        
-       
+    public function run($options = []) {
+        $methods = carr::wrap(carr::get($options, 'method', $this->getTestMethods()));
+
         $result = [];
         foreach ($methods as $method) {
             $result[$method] = $this->runMethod($method);
@@ -63,11 +58,10 @@ class CQC_Process_UnitTestProcess extends CQC_ProcessAbstract {
             $isError = true;
             $exception = $ex;
         }
-        if($exception) {
+        if ($exception) {
             throw $exception;
         }
         $result = $unitTest->result();
         return $result;
     }
-
 }

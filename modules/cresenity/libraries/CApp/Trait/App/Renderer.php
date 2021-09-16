@@ -31,6 +31,7 @@ trait CApp_Trait_App_Renderer {
             $nav = $this->nav;
         }
 
+        /** @var CApp $this */
         $nav = $this->resolveNav($nav);
 
         $renderer = $this->resolveNavRenderer();
@@ -160,8 +161,8 @@ HTML;
             $viewData['pageTitle'] = $this->title;
             $asset = CManager::asset();
 
-            $css_urls = $asset->getAllCssFileUrl();
-            $js_urls = $asset->getAllJsFileUrl();
+            // $css_urls = $asset->getAllCssFileUrl();
+            // $js_urls = $asset->getAllJsFileUrl();
             $additional_js = '';
 
             $js = '';
@@ -188,12 +189,6 @@ HTML;
 
             $viewData['css_hash'] = '';
             $viewData['js_hash'] = '';
-            if (ccfg::get('merge_css')) {
-                $viewData['css_hash'] = $cs->create_css_hash();
-            }
-            if (ccfg::get('merge_js')) {
-                $viewData['js_hash'] = $cs->create_js_hash();
-            }
 
             $viewData['theme'] = $theme;
             $viewData['theme_path'] = $theme_path;
@@ -219,6 +214,8 @@ HTML;
             //deprecated view data
             $viewData['header_body'] = '';
             $viewData['headerBody'] = '';
+
+            $viewData = array_merge($this->data, $viewData);
 
             $this->viewData = $viewData;
         }

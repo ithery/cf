@@ -32,7 +32,7 @@ class CAjax_Engine_DataTable_Processor_Query extends CAjax_Engine_DataTable_Proc
 
         $data = [
             'datatable' => $output,
-            'js' => cbase64::encode($js),
+            'js' => base64_encode($js),
         ];
 
         return $data;

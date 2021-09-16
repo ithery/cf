@@ -1,7 +1,7 @@
 <?php
 
 trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
-    public function populateAAData($data, $table, $request, &$js) {
+    public function populateAAData($data, CElement_Component_DataTable $table, $request, &$js) {
         $aaData = [];
         $rowActionList = $table->getRowActionList();
         $no = carr::get($request, 'iDisplayStart', 0);

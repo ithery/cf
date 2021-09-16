@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 17, 2019, 8:53:57 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 17, 2019, 8:53:57 PM
  */
 abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
-
     /**
      * Default backlog. Backlog is the maximum length of the queue of pending connections.
      *
@@ -21,12 +21,12 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
      *
      * @var array
      */
-    protected static $builtinTransports = array(
+    protected static $builtinTransports = [
         'tcp' => 'tcp',
         'udp' => 'udp',
         'unix' => 'unix',
         'ssl' => 'tcp'
-    );
+    ];
 
     /**
      * Unix group of processes, needs appropriate privileges (usually root).
@@ -50,14 +50,14 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
     protected $socketName = '';
 
     /**
-     * reuse port.
+     * Reuse port.
      *
      * @var bool
      */
     public $reusePort = false;
 
     /**
-     * reloadable.
+     * Reloadable.
      *
      * @var bool
      */
@@ -80,21 +80,21 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
     /**
      * Emitted when a socket connection is successfully established.
      *
-     * @var callback
+     * @var callable
      */
     public $onConnect = null;
 
     /**
      * Emitted when data is received.
      *
-     * @var callback
+     * @var callable
      */
     public $onMessage = null;
 
     /**
      * Emitted when the other end of the socket sends a FIN packet.
      *
-     * @var callback
+     * @var callable
      */
     public $onClose = null;
 
@@ -131,7 +131,7 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
      *
      * @var array
      */
-    public $connections = array();
+    public $connections = [];
 
     /**
      * Application layer protocol.
@@ -154,8 +154,7 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
      */
     protected $mainSocket = null;
 
-    public function setSocket($socketName = '', $contextOption = array()) {
-
+    public function setSocket($socketName = '', $contextOption = []) {
         // Context for socket.
         if (strlen($socketName) > 0) {
             $this->socketName = $socketName;
@@ -169,13 +168,11 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
     /**
      * Accept a connection.
      *
-     * @param resource $socket
      * @return void
      */
     public function acceptConnection() {
         // Accept a connection on server socket.
-        set_error_handler(function() {
-            
+        set_error_handler(function () {
         });
         $newSocket = stream_socket_accept($this->mainSocket, 0, $remoteAddress);
         restore_error_handler();
@@ -220,9 +217,9 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
         if ($this->event && true === $this->pauseAccept && $this->mainSocket) {
             $this->log('Listen acceptConnection');
             if ($this->transport !== 'udp') {
-                $this->event->listen(CDaemon_Worker_Constant::EV_LISTENER_READ, array($this, 'acceptConnection'));
+                $this->event->listen(CDaemon_Worker_Constant::EV_LISTENER_READ, [$this, 'acceptConnection']);
             } else {
-                $this->event->listen(CDaemon_Worker_Constant::EV_LISTENER_READ, array($this, 'acceptUdpConnection'));
+                $this->event->listen(CDaemon_Worker_Constant::EV_LISTENER_READ, [$this, 'acceptUdpConnection']);
             }
             $this->_pauseAccept = false;
         }
@@ -268,9 +265,9 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
                 $scheme = ucfirst($scheme);
                 $this->protocol = substr($scheme, 0, 1) === '\\' ? $scheme : '\\Protocols\\' . $scheme;
                 if (!class_exists($this->protocol)) {
-                    $this->protocol = "CDaemon_Worker_Protocol_" . $scheme;
+                    $this->protocol = 'CDaemon_Worker_Protocol_' . $scheme;
                     if (!class_exists($this->protocol)) {
-                        throw new Exception("class " . $this->protocol . " not exist");
+                        throw new Exception('class ' . $this->protocol . ' not exist');
                     }
                 }
                 if (!isset(static::$builtinTransports[$this->transport])) {
@@ -279,7 +276,7 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
             } else {
                 $this->transport = $scheme;
             }
-            $localSocket = static::$builtinTransports[$this->transport] . ":" . $address;
+            $localSocket = static::$builtinTransports[$this->transport] . ':' . $address;
             // Flag.
             $flags = $this->transport === 'udp' ? STREAM_SERVER_BIND : STREAM_SERVER_BIND | STREAM_SERVER_LISTEN;
             $errno = 0;
@@ -292,7 +289,6 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
 
             $this->mainSocket = stream_socket_server($localSocket, $errno, $errmsg, $flags, $this->context);
             if (!$this->mainSocket) {
-
                 throw new Exception($errmsg);
             }
             $this->log('Start listening ' . $localSocket);
@@ -310,8 +306,7 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
             }
             // Try to open keepalive for tcp and disable Nagle algorithm.
             if (function_exists('socket_import_stream') && static::$builtinTransports[$this->transport] === 'tcp') {
-                set_error_handler(function() {
-                    
+                set_error_handler(function () {
                 });
                 $socket = socket_import_stream($this->mainSocket);
                 socket_set_option($socket, SOL_SOCKET, SO_KEEPALIVE, 1);
@@ -343,7 +338,7 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
         // Get uid.
         $user_info = posix_getpwnam($this->user);
         if (!$user_info) {
-            static::log("Warning: User {$this->user} not exsits");
+            $this->log("Warning: User {$this->user} not exsits");
             return;
         }
         $uid = $user_info['uid'];
@@ -361,7 +356,7 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
         // Set uid and gid.
         if ($uid != posix_getuid() || $gid != posix_getgid()) {
             if (!posix_setgid($gid) || !posix_initgroups($user_info['name'], $gid) || !posix_setuid($uid)) {
-                $this->log("Warning: change gid or uid fail.");
+                $this->log('Warning: change gid or uid fail.');
             }
         }
     }
@@ -374,13 +369,11 @@ abstract class CDaemon_ListenerAbstract extends CDaemon_ServiceAbstract {
     public function unlisten() {
         $this->pauseAccept();
         if ($this->mainSocket) {
-            set_error_handler(function() {
-                
+            set_error_handler(function () {
             });
             fclose($this->mainSocket);
             restore_error_handler();
             $this->mainSocket = null;
         }
     }
-
 }

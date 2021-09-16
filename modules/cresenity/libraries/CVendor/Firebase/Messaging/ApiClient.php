@@ -11,10 +11,14 @@ use Psr\Http\Message\ResponseInterface;
 class CVendor_Firebase_Messaging_ApiClient implements ClientInterface {
     use CVendor_Firebase_Trait_WrappedGuzzleClientTrait;
 
-    /** @var MessagingApiExceptionConverter */
+    /**
+     * @var MessagingApiExceptionConverter
+     */
     private $errorHandler;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $projectId;
 
     /**

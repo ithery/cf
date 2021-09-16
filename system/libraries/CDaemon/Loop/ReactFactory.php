@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 16, 2019, 1:54:24 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 16, 2019, 1:54:24 AM
  */
 use React\EventLoop\ExtEvLoop;
 use React\EventLoop\ExtUvLoop;
@@ -16,7 +17,6 @@ use React\EventLoop\StreamSelectLoop;
 use React\EventLoop\Factory;
 
 class CDaemon_Loop_ReactFactory {
-
     public static function createExtUvLoop() {
         return new ExtUvLoop();
     }
@@ -44,5 +44,4 @@ class CDaemon_Loop_ReactFactory {
     public static function auto() {
         return Factory::create();
     }
-
 }

@@ -20,9 +20,7 @@ class CResources_UrlGenerator_DefaultUrlGenerator extends CResources_UrlGenerato
     public function getPath() {
         $adapter = $this->getDisk()->getAdapter();
 
-        $cachedAdapter = '\League\Flysystem\Cached\CachedAdapter';
-
-        if ($adapter instanceof $cachedAdapter) {
+        if ($adapter instanceof \League\Flysystem\Cached\CachedAdapter) {
             $adapter = $adapter->getAdapter();
         }
 

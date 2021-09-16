@@ -4,19 +4,23 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Sep 1, 2018, 4:07:06 PM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CObservable_Listener_Handler_Driver_Prepend extends CObservable_Listener_Handler_Driver {
     use CTrait_Compat_Handler_Driver_Prepend;
 
     protected $target;
+
     protected $method;
+
     protected $content;
+
     protected $param;
+
     protected $param_inputs;
+
     protected $check_duplicate_selector;
 
     public function __construct($owner, $event, $name) {
@@ -46,7 +50,7 @@ class CObservable_Listener_Handler_Driver_Prepend extends CObservable_Listener_H
         return $this->content;
     }
 
-    public function set_check_duplicate_selector($selector) {
+    public function setCheckDuplicateSelector($selector) {
         $this->check_duplicate_selector = $selector;
         return $this;
     }

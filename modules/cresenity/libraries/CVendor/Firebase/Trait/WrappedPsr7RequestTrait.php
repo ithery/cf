@@ -8,7 +8,9 @@ use Psr\Http\Message\UriInterface;
  * @codeCoverageIgnore
  */
 trait CVendor_Firebase_Trait_WrappedPsr7RequestTrait {
-    /** @var RequestInterface */
+    /**
+     * @var RequestInterface
+     */
     protected $wrappedRequest;
 
     public function getProtocolVersion() {

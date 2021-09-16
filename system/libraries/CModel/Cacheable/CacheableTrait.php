@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 3:57:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 3:57:34 PM
  */
 trait CModel_Cacheable_CacheableTrait {
-
     /**
      * Register an updated model event with the dispatcher.
      *
@@ -210,7 +210,7 @@ trait CModel_Cacheable_CacheableTrait {
      * Generate unique cache key.
      *
      * @param CDatabase_Query_Builder|CModel_Query $builder
-     * @param array                                                                    $columns
+     * @param array                                $columns
      *
      * @return string
      */
@@ -250,8 +250,8 @@ trait CModel_Cacheable_CacheableTrait {
      * Cache given callback.
      *
      * @param CDatabase_Query_Builder|CModel_Query $builder
-     * @param array                                                                    $columns
-     * @param \Closure                                                                 $closure
+     * @param array                                $columns
+     * @param \Closure                             $closure
      *
      * @return mixed
      */
@@ -280,12 +280,11 @@ trait CModel_Cacheable_CacheableTrait {
     /**
      * Create a new Eloquent query builder for the model.
      *
-     * @param CDatabae_Query_Builder $query
+     * @param CDatabase_Query_Builder $query
      *
      * @return CModel_Query|static
      */
     public function newModelBuilder($query) {
         return new CModel_Cacheable_Query($query);
     }
-
 }

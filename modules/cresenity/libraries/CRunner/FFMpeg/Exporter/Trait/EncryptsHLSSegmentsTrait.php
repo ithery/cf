@@ -37,21 +37,21 @@ trait EncryptsHLSSegments {
     /**
      * Wether to rotate the key on every segment.
      *
-     * @var boolean
+     * @var bool
      */
     private $rotateEncryptiongKey = false;
 
     /**
      * Number of opened segments.
      *
-     * @var integer
+     * @var int
      */
     private $segmentsOpened = 0;
 
     /**
      * Number of segments that can use the same key.
      *
-     * @var integer
+     * @var int
      */
     private $segmentsPerKey = 1;
 
@@ -100,7 +100,7 @@ trait EncryptsHLSSegments {
         $this->encryptionIV = bin2hex(static::generateEncryptionKey());
 
         $this->encryptionKeyFilename = $filename;
-        $this->encryptionSecretsRoot = c::app(CRunner_FFMpeg_Storage_TemporaryDirectories::class)->create();
+        $this->encryptionSecretsRoot = c::container(CRunner_FFMpeg_Storage_TemporaryDirectories::class)->create();
 
         return $this;
     }

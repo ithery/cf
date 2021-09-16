@@ -2,8 +2,11 @@
 
 final class CVendor_Firebase_Messaging_MessageTarget {
     const CONDITION = 'condition';
+
     const TOKEN = 'token';
+
     const TOPIC = 'topic';
+
     const TYPES = [
         self::CONDITION, self::TOKEN, self::TOPIC,
     ];

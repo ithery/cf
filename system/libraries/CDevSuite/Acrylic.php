@@ -7,6 +7,7 @@
  */
 class CDevSuite_Acrylic {
     protected $cli;
+
     protected $files;
 
     /**

@@ -6,12 +6,11 @@
  * @author Hery
  */
 trait CQC_Manager_UnitTestTrait {
+    protected $unitTest = [];
 
-    protected $unitTest = array();
-    protected $unitTestGroup = array();
+    protected $unitTestGroup = [];
 
     public function registerUnitTest($class, $name = null, $group = null) {
-
         if ($name == null) {
             $name = carr::last(explode('_', $class));
         }
@@ -50,5 +49,4 @@ trait CQC_Manager_UnitTestTrait {
     public function haveUnitTestGroup() {
         return count($this->getUnitTestGroupsKey()) > 0;
     }
-
 }

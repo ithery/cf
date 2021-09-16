@@ -1,89 +1,103 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 16, 2019, 4:14:29 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 16, 2019, 4:14:29 AM
  */
 class CDaemon_DebugShell {
-
     const ABORT = 0;
+
     const CONT = 1;
+
     const CAPTURE = 2;
+
     const INDENT_DEPTH = 6;
 
     /**
      * The object that is being proxied by this shell
+     *
      * @var stdClass
      */
     public $object;
 
     /**
      * A simple way to toggle debugging on & off
+     *
      * @var bool
      */
     public $debug = true;
 
     /**
      * Used to determine which process has access to issue prompts to the debug console.
-     * @var Resource
+     *
+     * @var resource
      */
     private $mutex;
 
     /**
      * Shared Memory resource to store settings for this debug shell that can be shared across all processes
      * using it.
-     * @var Resource
+     *
+     * @var resource
      */
     public $shm;
+
     public $ftok;
 
     /**
      * Does this process currently own the semaphore?
+     *
      * @var bool
      */
     public $mutexAcquired = null;
 
     /**
-     *
      * @var CDaemon_ServiceAbstract
      */
     public $service;
 
     /**
      * List of methods to exclude from debugging -- will be passed directly to the proxied $object
+     *
      * @var array
      */
-    public $blacklist = array();
+    public $blacklist = [];
 
     /**
      * Associative array of method names and their corresponding prompt -- If ommitted the method name will be used
      * to form a generic prompt.
+     *
      * @example ['setup', 'Setup the object & connect to the database']
+     *
      * @var array
      */
-    public $prompts = array();
+    public $prompts = [];
 
     /**
      * Array of callables
+     *
      * @var closure[]
      */
-    private $parsers = array();
+    private $parsers = [];
 
     /**
      * Array of commands and their descriptions
+     *
      * @var array
      */
-    private $commands = array();
+    private $commands = [];
 
     /**
      * Associative array of method names and a callable that will be called if that method is interrupted.
      * For example, it could be used to print a special message if a given method is interrupted, or clean up unused resources.
+     *
      * @var Closure[]
      */
-    public $interruptCallables = array();
+    public $interruptCallables = [];
 
     /**
      * It can be helpful to group multiple lines of the same logical event using indentation. But the rules to distinguish
@@ -91,20 +105,22 @@ class CDaemon_DebugShell {
      * should return an integer: the number of tab characters to indent the prompt .
      * This callable will be passed $method, $args and should return the number of spaces to indent.
      * Note: The return value will be mod'd using the INDENT_DEPTH constant to ensure we don't just indent perpetually.
-     * @var Callable
+     *
+     * @var callable
      */
     public $indentCallback;
 
     /**
      * The prompt prefix should have any relevant state data. Think about standard bash prompts. You get the cwd, etc, in the prompt.
      * This callable will be passed $method, $args and should return the prompt prefix.
-     * @var Callable
+     *
+     * @var callable
      */
     public $promptPrefixCallback;
 
     public function __construct($object) {
         if (!is_object($object)) {
-            throw new Exception("DebugShell Failed: You must supply an object to be proxied.");
+            throw new Exception('DebugShell Failed: You must supply an object to be proxied.');
         }
         $this->object = $object;
     }
@@ -123,16 +139,18 @@ class CDaemon_DebugShell {
      *
      * @param $method
      * @param $args
+     *
      * @return bool|mixed|null|void
      */
     public function __call($method, $args) {
         $o = $this->object;
-        $cb = function() use($o, $method, $args) {
-            return call_user_func_array(array($o, $method), $args);
+        $cb = function () use ($o, $method, $args) {
+            return call_user_func_array([$o, $method], $args);
         };
         $interrupt = null;
-        if (isset($this->interruptCallables[$method]))
+        if (isset($this->interruptCallables[$method])) {
             $interrupt = $this->interruptCallables[$method];
+        }
         if (!$this->isBreakpointActive($method)) {
             return $cb();
         }
@@ -144,8 +162,9 @@ class CDaemon_DebugShell {
                 echo "\nReturn Value:";
                 print_r($return);
                 echo "\n";
-                if ($this->prompt(self::CAPTURE, null))
+                if ($this->prompt(self::CAPTURE, null)) {
                     return $return;
+                }
                 break;
         }
         if (is_callable($interrupt)) {
@@ -170,6 +189,7 @@ class CDaemon_DebugShell {
 
     /**
      * Setup the debug shell: Attach any shared resources and register any prompts or parsers.
+     *
      * @return void
      */
     public function setupShell() {
@@ -182,42 +202,42 @@ class CDaemon_DebugShell {
         $daemon = $this->service;
         $this->prompts[self::CAPTURE] = 'Pass-thru captured return value?';
         // Add any default parsers
-        $parsers = array();
-        $parsers[] = array(
+        $parsers = [];
+        $parsers[] = [
             'regex' => '/^eval (.*)/i',
             'command' => 'eval [php]',
             'description' => 'Eval the supplied code. Passed to eval() as-is. Any return values will be printed. In this context, $shell, $object and $daemon objects are available',
-            'closure' => function($matches, $printer) use($shell, $object, $daemon) {
+            'closure' => function ($matches, $printer) use ($shell, $object, $daemon) {
                 $return = @eval($matches[1]);
                 if ($return === false) {
-                    $printer("eval returned false -- possibly a parse error. Check semi-colons, parens, braces, etc.");
+                    $printer('eval returned false -- possibly a parse error. Check semi-colons, parens, braces, etc.');
                 } elseif ($return !== null) {
-                    $printer("eval() returned:" . PHP_EOL . print_r($return, true));
+                    $printer('eval() returned:' . PHP_EOL . print_r($return, true));
                 } else {
                     echo PHP_EOL;
                 }
                 return false;
             }
-        );
-        $parsers[] = array(
+        ];
+        $parsers[] = [
             'regex' => '/^signal (\d+)/i',
             'command' => 'skipfor [n]',
             'description' => 'Run the daemon (and skip ALL breakpoints) for N seconds, then return to normal break point operation.',
-            'closure' => function($matches, $printer) {
+            'closure' => function ($matches, $printer) {
                 posix_kill(CDaemon::getRunningService()->getParentPid(), $matches[1]);
-                $printer("Signal Sent");
+                $printer('Signal Sent');
             }
-        );
-        $parsers[] = array(
+        ];
+        $parsers[] = [
             'regex' => '/^skipfor (\d+)/i',
             'command' => 'signal [n]',
             'description' => 'Send the n signal to the parent daemon.',
-            'closure' => function($matches, $printer) use($shell) {
+            'closure' => function ($matches, $printer) use ($shell) {
                 $time = time() + $matches[1];
-                $shell->debugState("skip__until", $time);
+                $shell->debugState('skip__until', $time);
                 $printer("Skipping Breakpoints for $matches[1] seconds. Will resume at " . date('H:i:s', $time));
             }
-        );
+        ];
         $this->loadParsers($parsers);
     }
 
@@ -225,8 +245,9 @@ class CDaemon_DebugShell {
      * Return a thread-aware monotonically incrementing integer. Optionally supply a $key to cache the integer assignment
      * and return that to subsequent requests with the same key.
      *
-     * @param string $key  If we've already assigned an integer to this key, return that. Otherwise, assign, cache and return it.
-     * @return integer
+     * @param string $key If we've already assigned an integer to this key, return that. Otherwise, assign, cache and return it.
+     *
+     * @return int
      */
     public function incrementIndent($key = null) {
         $i = 1 + $this->debugState('indent_incrementor', null, 0);
@@ -234,7 +255,7 @@ class CDaemon_DebugShell {
             $this->debugState('indent_incrementor', $i);
             return $i;
         }
-        $map = $this->debugState('indent_map', null, array());
+        $map = $this->debugState('indent_map', null, []);
         if (!isset($map[$key])) {
             $map[$key] = $i;
             $this->debugState('indent_map', $map);
@@ -246,9 +267,11 @@ class CDaemon_DebugShell {
     /**
      * Add a parser to the queue. Will be evaluated FIFO.
      * The parser functions will be passed the method, args
-     * @param $command
-     * @param $callable
+     *
+     * @param string $command
      * @param string $description
+     * @param mixed  $regex
+     * @param mixed  $closure
      */
     public function addParser($regex, $command, $description, $closure) {
         $this->parsers[] = compact('regex', 'command', 'description', 'closure');
@@ -257,14 +280,16 @@ class CDaemon_DebugShell {
     /**
      * Append the given array of parsers to the end of the parser queue
      * Array should contain associative array with keys: regex, command, description, closure
+     *
      * @param array $parsers
+     *
      * @throws Exception
      */
     public function loadParsers(array $parsers) {
         $test = array_keys(current($parsers));
-        $keys = array('regex', 'command', 'description', 'closure');
+        $keys = ['regex', 'command', 'description', 'closure'];
         if ($test != $keys) {
-            throw new Exception("Cannot Load Parser Queue: Invalid array format. Expected Keys: " . implode(', ', $test) . " Given Keys: " . implode(', ', $keys));
+            throw new Exception('Cannot Load Parser Queue: Invalid array format. Expected Keys: ' . implode(', ', $test) . ' Given Keys: ' . implode(', ', $keys));
         }
         $this->parsers = array_merge($this->parsers, $parsers);
     }
@@ -273,6 +298,7 @@ class CDaemon_DebugShell {
      * Acquire the mutex. If it's acquired elsewhere, method will block until the mutex is acquired.
      * Note: this method is not thread-aware. The point of caching the pid the mutex was assigned to
      * is to avoid problems where a mutex is acquired, the process forks, and the child thinks IT owns the mutex.
+     *
      * @return bool
      */
     private function mutexAcquire() {
@@ -281,9 +307,9 @@ class CDaemon_DebugShell {
             return true;
         }
         if (sem_acquire($this->mutex)) {
-            $this->service->log("Mutex Granted");
+            $this->service->log('Mutex Granted');
         } else {
-            $this->service->log("Mutex Grant Failed");
+            $this->service->log('Mutex Grant Failed');
         }
         //throw new Exception("Cannot acquire mutex: Unknown Error.");
         $this->mutexAcquired = $pid;
@@ -292,6 +318,7 @@ class CDaemon_DebugShell {
 
     /**
      * Release the mutex
+     *
      * @return void
      */
     private function mutexRelease() {
@@ -302,20 +329,23 @@ class CDaemon_DebugShell {
 
     /**
      * Get and Set state variables to share settings for this console across processes
+     *
      * @param $key
-     * @param null $value
+     * @param null       $value
+     * @param null|mixed $default
+     *
      * @return bool|null
      */
     public function debugState($key, $value = null, $default = null) {
         static $state = false;
-        $defaults = array(
+        $defaults = [
             'parent' => $this->service()->getParentPid(),
             'enabled' => true,
             'indent' => true,
             'last' => '',
             'banner' => true,
             'warned' => false,
-        );
+        ];
         if (shm_has_var($this->shm, 1)) {
             $state = shm_get_var($this->shm, 1);
         } else {
@@ -329,7 +359,7 @@ class CDaemon_DebugShell {
         if ($value === null) {
             if (isset($state[$key])) {
                 $this->service->log("State get $key = " . $state[$key]);
-            }else {
+            } else {
                 $this->service->log("State get $key = [$default]");
             }
         } else {
@@ -355,6 +385,7 @@ class CDaemon_DebugShell {
      * 4. At runtime, you can temporarily disable ALL prompts for a duration using the "skipfor" command.
      *
      * @param $method
+     *
      * @return bool
      */
     private function isBreakpointActive($method) {
@@ -379,6 +410,7 @@ class CDaemon_DebugShell {
      *
      * @param $method
      * @param $args
+     *
      * @return string
      */
     private function getTextPrompt($method, $args) {
@@ -401,7 +433,7 @@ class CDaemon_DebugShell {
         }
         $prefixer = $this->promptPrefixCallback;
         if (is_callable($prefixer)) {
-            $prompt = "[" . $prefixer($method, $args) . "] " . $prompt;
+            $prompt = '[' . $prefixer($method, $args) . '] ' . $prompt;
         }
         return "$prompt > ";
     }
@@ -437,7 +469,9 @@ class CDaemon_DebugShell {
      *
      * @param $method
      * @param $args
+     *
      * @return bool|int|mixed|null
+     *
      * @throws Exception
      */
     public function prompt($method, $args) {
@@ -452,7 +486,7 @@ class CDaemon_DebugShell {
             return true;
         }
         // Pass a simple print-line closure to parsers to use instead of just "echo" or "print"
-        $printer = function($message, $maxlen = null) {
+        $printer = function ($message, $maxlen = null) {
             if (empty($message)) {
                 return;
             }
@@ -483,24 +517,27 @@ class CDaemon_DebugShell {
                 $matches = false;
                 $message = '';
                 // Use the familiar bash !! to re-run the last command
-                if (substr($input, -2) == '!!')
+                if (substr($input, -2) == '!!') {
                     $input = $this->debugState('last');
-                elseif (!empty($input))
+                } elseif (!empty($input)) {
                     $this->debugState('last', $input);
+                }
                 // Validate the input as an expression
-                $matches = array();
-                foreach ($this->parsers as $parser)
+                $matches = [];
+                foreach ($this->parsers as $parser) {
                     if (preg_match($parser['regex'], $input, $matches) == 1) {
                         $break = $parser['closure']($matches, $printer);
                         break;
                     }
-                if ($matches)
+                }
+                if ($matches) {
                     continue;
+                }
                 // If one of the parsers didn't catch the message
                 // fall through to the built-in commands
                 switch (strtolower($input)) {
                     case 'help':
-                        $out = array();
+                        $out = [];
                         $out[] = 'For the PHP Simple Daemon debugging guide, see: ';
                         $out[] = 'https://github.com/shaneharter/PHP-Daemon/wiki/Debugging-Workers';
                         $out[] = '';
@@ -515,12 +552,14 @@ class CDaemon_DebugShell {
                         $out[] = 'skip              Skip this breakpoint from now on.';
                         $out[] = 'shutdown          End Debugging and Gracefully shutdown the daemon after the current loop_interval.';
                         $out[] = 'trace             Print A Stack Trace';
-                        ;
-                        if (is_callable($this->indentCallback))
+
+                        if (is_callable($this->indentCallback)) {
                             $out[] = 'indent [y|n]      When turned-on, indentation will be used to group messages from the same call in a column so you can easily match them together.';
+                        }
                         $out[] = '';
-                        foreach ($this->parsers as $parser)
+                        foreach ($this->parsers as $parser) {
                             $out[] = sprintf('%s%s', str_pad($parser['command'], 18, ' ', STR_PAD_RIGHT), $parser['description']);
+                        }
                         $out[] = '';
                         $out[] = '!!                Repeat previous command';
                         $printer(implode(PHP_EOL, $out));
@@ -538,7 +577,7 @@ class CDaemon_DebugShell {
                         break;
                     case 'shutdown':
                         //$this->service->shutdown();
-                        $printer("Shutdown In Progress... Use `end` command to cease debugging until shutdown is complete.");
+                        $printer('Shutdown In Progress... Use `end` command to cease debugging until shutdown is complete.');
                         $break = true;
                         break;
                     case 'trace':
@@ -580,8 +619,9 @@ class CDaemon_DebugShell {
                         $break = true;
                         break;
                     default:
-                        if ($input)
-                            $printer("Unknown Command! See `help` for list of commands.");
+                        if ($input) {
+                            $printer('Unknown Command! See `help` for list of commands.');
+                        }
                 }
             }
         } catch (Exception $e) {
@@ -593,7 +633,6 @@ class CDaemon_DebugShell {
     }
 
     /**
-     * 
      * @return CDaemon_ServiceAbstract
      */
     public function service() {

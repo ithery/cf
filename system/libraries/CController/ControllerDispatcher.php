@@ -5,8 +5,8 @@
  *
  * @author Hery
  */
-class CController_ControllerDispatcher /*implements ControllerDispatcherContract*/
-{
+class CController_ControllerDispatcher {
+    /*implements ControllerDispatcherContract*/
     use CRouting_Concern_RouteDependencyResolverTrait;
 
     /**

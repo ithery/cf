@@ -19,8 +19,7 @@ use Psr\Cache\InvalidArgumentException;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-interface CacheInterface
-{
+interface CacheInterface {
     /**
      * Fetches a value from the pool or computes it if not found.
      *
@@ -42,7 +41,7 @@ interface CacheInterface
      *
      * @throws InvalidArgumentException When $key is not valid or when $beta is negative
      */
-    public function get(string $key, callable $callback, float $beta = null, array &$metadata = null);
+    public function get($key, $callback, $beta = null, array &$metadata = null);
 
     /**
      * Removes an item from the pool.
@@ -53,5 +52,5 @@ interface CacheInterface
      *
      * @return bool True if the item was successfully removed, false if there was any error
      */
-    public function delete(string $key): bool;
+    public function delete($key);
 }

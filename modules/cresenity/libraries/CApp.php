@@ -16,6 +16,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_List_TabList addTabList($id=null)
  * @method CElement_List_ActionList addActionList($id=null)
  * @method CElement_Component_FileManager addFileManager($id=null)
+ * @method CElement_Element_Pre addPre($id=null)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
     use CTrait_Compat_App,
@@ -66,6 +67,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     private static $haveScrollToTop = null;
 
     protected $renderer;
+
+    protected $data = [];
 
     private static $renderingElement;
 
@@ -566,5 +569,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             static::$haveScrollToTop = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
         }
         return static::$haveScrollToTop;
+    }
+
+    public function setData($key, $value) {
+        $this->data[$key] = $value;
+        return $this;
     }
 }

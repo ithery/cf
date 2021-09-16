@@ -1,20 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 3:26:15 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 3:26:15 PM
  */
 trait CModel_Validating_Injector_UniqueInjectorTrait {
-
     /**
      * Prepare a unique rule, adding the table name, column and model identifier
      * if required.
      *
-     * @param  array  $parameters
-     * @param  string $field
+     * @param array  $parameters
+     * @param string $field
+     *
      * @return string
      */
     protected function prepareUniqueRule($parameters, $field) {
@@ -51,5 +52,4 @@ trait CModel_Validating_Injector_UniqueInjectorTrait {
         }
         return 'unique:' . implode(',', $parameters);
     }
-
 }

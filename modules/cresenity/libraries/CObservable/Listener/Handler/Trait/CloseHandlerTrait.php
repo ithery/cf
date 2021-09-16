@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 20, 2019, 6:36:18 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 20, 2019, 6:36:18 PM
  */
 trait CObservable_Listener_Handler_Trait_CloseHandlerTrait {
-
     public function onCloseListener() {
         if (!isset($this->handlerListeners['close'])) {
             $this->handlerListeners['close'] = new CObservable_Listener_Pseudo_CloseListener($this);
@@ -23,5 +23,4 @@ trait CObservable_Listener_Handler_Trait_CloseHandlerTrait {
     public function getCloseListener() {
         return $this->getListener('close');
     }
-
 }

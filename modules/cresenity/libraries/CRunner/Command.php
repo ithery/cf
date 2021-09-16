@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Symfony\Component\Process\Process;
 
 /**
@@ -17,28 +11,27 @@ use Symfony\Component\Process\Process;
  * @license http://www.opensource.org/licenses/MIT
  */
 class CRunner_Command {
-
     /**
      * @var bool whether to escape any argument passed through `addArg()`.
-     * Default is `true`.
+     *           Default is `true`.
      */
     public $escapeArgs = true;
 
     /**
      * @var bool whether to escape the command passed to `setCommand()` or the
-     * constructor.  This is only useful if `$escapeArgs` is `false`. Default
-     * is `false`.
+     *           constructor.  This is only useful if `$escapeArgs` is `false`. Default
+     *           is `false`.
      */
     public $escapeCommand = false;
 
     /**
      * @var bool whether to use `exec()` instead of `proc_open()`. This can be
-     * used on Windows system to workaround some quirks there. Note, that any
-     * errors from your command will be output directly to the PHP output
-     * stream. `getStdErr()` will also not work anymore and thus you also won't
-     * get the error output from `getError()` in this case. You also can't pass
-     * any environment variables to the command if this is enabled. Default is
-     * `false`.
+     *           used on Windows system to workaround some quirks there. Note, that any
+     *           errors from your command will be output directly to the PHP output
+     *           stream. `getStdErr()` will also not work anymore and thus you also won't
+     *           get the error output from `getError()` in this case. You also can't pass
+     *           any environment variables to the command if this is enabled. Default is
+     *           `false`.
      */
     public $useExec = false;
 
@@ -49,48 +42,48 @@ class CRunner_Command {
 
     /**
      * @var bool whether to capture stderr (2>&1) when `useExec` is true. This
-     * will try to redirect the stderr to stdout and provide the complete
-     * output of both in `getStdErr()` and `getError()`.  Default is `true`.
+     *           will try to redirect the stderr to stdout and provide the complete
+     *           output of both in `getStdErr()` and `getError()`.  Default is `true`.
      */
     public $captureStdErr = true;
 
     /**
      * @var string|null the initial working dir for `proc_open()`. Default is
-     * `null` for current PHP working dir.
+     *                  `null` for current PHP working dir.
      */
     public $procCwd;
 
     /**
      * @var array|null an array with environment variables to pass to
-     * `proc_open()`. Default is `null` for none.
+     *                 `proc_open()`. Default is `null` for none.
      */
     public $procEnv;
 
     /**
      * @var array|null an array of other_options for `proc_open()`. Default is
-     * `null` for none.
+     *                 `null` for none.
      */
     public $procOptions;
 
     /**
      * @var bool|null whether to set the stdin/stdout/stderr streams to
-     * non-blocking mode when `proc_open()` is used. This allows to have huge
-     * inputs/outputs without making the process hang. The default is `null`
-     * which will enable the feature on Non-Windows systems. Set it to `true`
-     * or `false` to manually enable/disable it. It does not work on Windows.
+     *                non-blocking mode when `proc_open()` is used. This allows to have huge
+     *                inputs/outputs without making the process hang. The default is `null`
+     *                which will enable the feature on Non-Windows systems. Set it to `true`
+     *                or `false` to manually enable/disable it. It does not work on Windows.
      */
     public $nonBlockingMode;
 
     /**
      * @var int the time in seconds after which a command should be terminated.
-     * This only works in non-blocking mode. Default is `null` which means the
-     * process is never terminated.
+     *          This only works in non-blocking mode. Default is `null` which means the
+     *          process is never terminated.
      */
     public $timeout;
 
     /**
      * @var null|string the locale to temporarily set before calling
-     * `escapeshellargs()`. Default is `null` for none.
+     *                  `escapeshellargs()`. Default is `null` for none.
      */
     public $locale;
 
@@ -107,7 +100,7 @@ class CRunner_Command {
     /**
      * @var array the list of command arguments
      */
-    protected $_args = array();
+    protected $_args = [];
 
     /**
      * @var string the full command string to execute
@@ -141,6 +134,7 @@ class CRunner_Command {
 
     /**
      * @param string|array $options either a command string or an options array
+     *
      * @see setOptions
      */
     public function __construct($options = null) {
@@ -153,10 +147,12 @@ class CRunner_Command {
 
     /**
      * @param array $options array of name => value options that should be
-     * applied to the object You can also pass options that use a setter, e.g.
-     * you can pass a `fileName` option which will be passed to
-     * `setFileName()`.
+     *                       applied to the object You can also pass options that use a setter, e.g.
+     *                       you can pass a `fileName` option which will be passed to
+     *                       `setFileName()`.
+     *
      * @throws \Exception
+     *
      * @return static for method chaining
      */
     public function setOptions($options) {
@@ -166,7 +162,7 @@ class CRunner_Command {
             } else {
                 $method = 'set' . ucfirst($key);
                 if (method_exists($this, $method)) {
-                    call_user_func(array($this, $method), $value);
+                    call_user_func([$this, $method], $value);
                 } else {
                     throw new \Exception("Unknown configuration option '$key'");
                 }
@@ -177,9 +173,10 @@ class CRunner_Command {
 
     /**
      * @param string $command the command or full command string to execute,
-     * like 'gzip' or 'gzip -d'.  You can still call addArg() to add more
-     * arguments to the command. If $escapeCommand was set to true, the command
-     * gets escaped with escapeshellcmd().
+     *                        like 'gzip' or 'gzip -d'.  You can still call addArg() to add more
+     *                        arguments to the command. If $escapeCommand was set to true, the command
+     *                        gets escaped with escapeshellcmd().
+     *
      * @return static for method chaining
      */
     public function setCommand($command) {
@@ -191,7 +188,7 @@ class CRunner_Command {
             // a full path in command
             if (isset($command[1]) && $command[1] === ':') {
                 $position = 1;
-                // Could be a quoted absolute path because of spaces.
+            // Could be a quoted absolute path because of spaces.
                 // i.e. "C:\Program Files (x86)\file.exe"
             } elseif (isset($command[2]) && $command[2] === ':') {
                 $position = 2;
@@ -202,7 +199,9 @@ class CRunner_Command {
             // Absolute path. If it's a relative path, let it slide.
             if ($position) {
                 $command = sprintf(
-                        $command[$position - 1] . ': && cd %s && %s', escapeshellarg(dirname($command)), escapeshellarg(basename($command))
+                    $command[$position - 1] . ': && cd %s && %s',
+                    escapeshellarg(dirname($command)),
+                    escapeshellarg(basename($command))
                 );
             }
         }
@@ -212,10 +211,11 @@ class CRunner_Command {
 
     /**
      * @param string|resource $stdIn If set, the string will be piped to the
-     * command via standard input. This enables the same functionality as
-     * piping on the command line. It can also be a resource like a file
-     * handle or a stream in which case its content will be piped into the
-     * command like an input redirection.
+     *                               command via standard input. This enables the same functionality as
+     *                               piping on the command line. It can also be a resource like a file
+     *                               handle or a stream in which case its content will be piped into the
+     *                               command like an input redirection.
+     *
      * @return static for method chaining
      */
     public function setStdIn($stdIn) {
@@ -225,7 +225,7 @@ class CRunner_Command {
 
     /**
      * @return string|null the command that was set through setCommand() or
-     * passed to the constructor. `null` if none.
+     *                     passed to the constructor. `null` if none.
      */
     public function getCommand() {
         return $this->_command;
@@ -233,8 +233,8 @@ class CRunner_Command {
 
     /**
      * @return string|bool the full command string to execute. If no command
-     * was set with setCommand() or passed to the constructor it will return
-     * `false`.
+     *                     was set with setCommand() or passed to the constructor it will return
+     *                     `false`.
      */
     public function getExecCommand() {
         if ($this->_execCommand === null) {
@@ -251,34 +251,36 @@ class CRunner_Command {
 
     /**
      * @param string $args the command arguments as string. Note that these
-     * will not get escaped!
+     *                     will not get escaped!
+     *
      * @return static for method chaining
      */
     public function setArgs($args) {
-        $this->_args = array($args);
+        $this->_args = [$args];
         return $this;
     }
 
     /**
      * @return string the command args that where set with setArgs() or added
-     * with addArg() separated by spaces
+     *                with addArg() separated by spaces
      */
     public function getArgs() {
         return implode(' ', $this->_args);
     }
 
     /**
-     * @param string $key the argument key to add e.g. `--feature` or
-     * `--name=`. If the key does not end with and `=`, the $value will be
-     * separated by a space, if any. Keys are not escaped unless $value is null
-     * and $escape is `true`.
-     * @param string|array|null $value the optional argument value which will
-     * get escaped if $escapeArgs is true.  An array can be passed to add more
-     * than one value for a key, e.g. `addArg('--exclude',
-     * array('val1','val2'))` which will create the option `'--exclude' 'val1'
-     * 'val2'`.
-     * @param bool|null $escape if set, this overrides the $escapeArgs setting
-     * and enforces escaping/no escaping
+     * @param string            $key    the argument key to add e.g. `--feature` or
+     *                                  `--name=`. If the key does not end with and `=`, the $value will be
+     *                                  separated by a space, if any. Keys are not escaped unless $value is null
+     *                                  and $escape is `true`.
+     * @param string|array|null $value  the optional argument value which will
+     *                                  get escaped if $escapeArgs is true.  An array can be passed to add more
+     *                                  than one value for a key, e.g. `addArg('--exclude',
+     *                                  array('val1','val2'))` which will create the option `'--exclude' 'val1'
+     *                                  'val2'`.
+     * @param bool|null         $escape if set, this overrides the $escapeArgs setting
+     *                                  and enforces escaping/no escaping
+     *
      * @return static for method chaining
      */
     public function addArg($key, $value = null, $escape = null) {
@@ -302,14 +304,14 @@ class CRunner_Command {
             $argKey = $doEscape ? escapeshellarg($argKey) : $argKey;
 
             if (is_array($value)) {
-                $params = array();
+                $params = [];
                 foreach ($value as $v) {
                     $params[] = $doEscape ? escapeshellarg($v) : $v;
                 }
                 $this->_args[] = $argKey . $separator . implode(' ', $params);
             } else {
-                $this->_args[] = $argKey . $separator .
-                        ($doEscape ? escapeshellarg($value) : $value);
+                $this->_args[] = $argKey . $separator
+                        . ($doEscape ? escapeshellarg($value) : $value);
             }
         }
         if ($useLocale) {
@@ -321,6 +323,7 @@ class CRunner_Command {
 
     /**
      * @param bool $trim whether to `trim()` the return value. The default is `true`.
+     *
      * @return string the command output (stdout). Empty if none.
      */
     public function getOutput($trim = true) {
@@ -329,8 +332,9 @@ class CRunner_Command {
 
     /**
      * @param bool $trim whether to `trim()` the return value. The default is `true`.
+     *
      * @return string the error message, either stderr or an internal message.
-     * Empty string if none.
+     *                Empty string if none.
      */
     public function getError($trim = true) {
         return $trim ? trim($this->_error) : $this->_error;
@@ -338,6 +342,7 @@ class CRunner_Command {
 
     /**
      * @param bool $trim whether to `trim()` the return value. The default is `true`.
+     *
      * @return string the stderr output. Empty if none.
      */
     public function getStdErr($trim = true) {
@@ -362,7 +367,7 @@ class CRunner_Command {
      * Execute the command
      *
      * @return bool whether execution was successful. If `false`, error details
-     * can be obtained from getError(), getStdErr() and getExitCode().
+     *              can be obtained from getError(), getStdErr() and getExitCode().
      */
     public function execute() {
         $command = $this->getExecCommand();
@@ -376,7 +381,6 @@ class CRunner_Command {
             $process->run();
 
             $this->_stdOut = $process->getOutput();
-
 
             $this->_exitCode = $process->getExitCode();
             if ($this->_exitCode !== 0) {
@@ -396,31 +400,29 @@ class CRunner_Command {
                 return false;
             }
         } else {
-            $isInputStream = $this->_stdIn !== null &&
-                    is_resource($this->_stdIn) &&
-                    in_array(get_resource_type($this->_stdIn), array('file', 'stream'));
+            $isInputStream = $this->_stdIn !== null
+                    && is_resource($this->_stdIn)
+                    && in_array(get_resource_type($this->_stdIn), ['file', 'stream']);
             $isInputString = is_string($this->_stdIn);
             $hasInput = $isInputStream || $isInputString;
             $hasTimeout = $this->timeout !== null && $this->timeout > 0;
 
-            $descriptors = array(
-                1 => array('pipe', 'w'),
-                2 => array('pipe', $this->getIsWindows() ? 'a' : 'w'),
-            );
+            $descriptors = [
+                1 => ['pipe', 'w'],
+                2 => ['pipe', $this->getIsWindows() ? 'a' : 'w'],
+            ];
             if ($hasInput) {
-                $descriptors[0] = array('pipe', 'r');
+                $descriptors[0] = ['pipe', 'r'];
             }
 
-
             // Issue #20 Set non-blocking mode to fix hanging processes
-            $nonBlocking = $this->nonBlockingMode === null ?
-                    !$this->getIsWindows() : $this->nonBlockingMode;
+            $nonBlocking = $this->nonBlockingMode === null
+                    ? !$this->getIsWindows() : $this->nonBlockingMode;
 
             $startTime = $hasTimeout ? time() : 0;
             $process = proc_open($command, $descriptors, $pipes, $this->procCwd, $this->procEnv, $this->procOptions);
 
             if (is_resource($process)) {
-
                 if ($nonBlocking) {
                     stream_set_blocking($pipes[1], false);
                     stream_set_blocking($pipes[2], false);
@@ -530,9 +532,9 @@ class CRunner_Command {
                 }
 
                 if ($this->_exitCode !== 0) {
-                    $this->_error = $this->_stdErr ?
-                            $this->_stdErr :
-                            "Failed without error message: $command (Exit code: {$this->_exitCode})";
+                    $this->_error = $this->_stdErr
+                            ? $this->_stdErr
+                            : "Failed without error message: $command (Exit code: {$this->_exitCode})";
                     return false;
                 }
             } else {
@@ -559,5 +561,4 @@ class CRunner_Command {
     public function __toString() {
         return (string) $this->getExecCommand();
     }
-
 }

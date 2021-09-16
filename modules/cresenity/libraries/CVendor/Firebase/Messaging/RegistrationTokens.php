@@ -3,7 +3,9 @@
 use CVendor_Firebase_Messaging_RegistrationToken as RegistrationToken;
 
 final class CVendor_Firebase_Messaging_RegistrationTokens implements Countable, IteratorAggregate {
-    /** @var RegistrationToken[] */
+    /**
+     * @var RegistrationToken[]
+     */
     private $tokens;
 
     public function __construct(RegistrationToken ...$tokens) {

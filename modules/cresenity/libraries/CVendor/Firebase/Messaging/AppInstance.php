@@ -3,13 +3,19 @@
  * @see https://developers.google.com/instance-id/reference/server#results
  */
 final class CVendor_Firebase_Messaging_AppInstance implements JsonSerializable {
-    /** @var CVendor_Firebase_Messaging_RegistrationToken */
+    /**
+     * @var CVendor_Firebase_Messaging_RegistrationToken
+     */
     private $registrationToken;
 
-    /** @var array<string, mixed> */
+    /**
+     * @var array<string, mixed>
+     */
     private $rawData = [];
 
-    /** @var CVendor_Firebase_Messaging_TopicSubscriptions */
+    /**
+     * @var CVendor_Firebase_Messaging_TopicSubscriptions
+     */
     private $topicSubscriptions;
 
     private function __construct() {
@@ -29,9 +35,9 @@ final class CVendor_Firebase_Messaging_AppInstance implements JsonSerializable {
 
         $subscriptions = [];
 
-        foreach ($rawData['rel']['topics'] ?? [] as $topicName => $subscriptionInfo) {
+        foreach ((isset($rawData['rel']['topics']) ? $rawData['rel']['topics'] : []) as $topicName => $subscriptionInfo) {
             $topic = CVendor_Firebase_Messaging_Topic::fromValue((string) $topicName);
-            $addedAt = CVendor_Firebase_Util_DT::toUTCDateTimeImmutable($subscriptionInfo['addDate'] ?? null);
+            $addedAt = CVendor_Firebase_Util_DT::toUTCDateTimeImmutable(isset($subscriptionInfo['addDate']) ? $subscriptionInfo['addDate'] : null);
             $subscriptions[] = new CVendor_Firebase_Messaging_TopicSubscription($topic, $registrationToken, $addedAt);
         }
 

@@ -1,21 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Nov 12, 2017, 3:34:27 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Nov 12, 2017, 3:34:27 AM
  */
-
 class CElement_Element_H1 extends CElement_Element {
-
-    public function __construct($id = "") {
-
+    public function __construct($id = '') {
         parent::__construct($id);
-        $this->tag = "h1";
+        $this->tag = 'h1';
     }
-
-   
-
 }

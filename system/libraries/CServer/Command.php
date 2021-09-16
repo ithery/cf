@@ -36,12 +36,12 @@ class CServer_Command extends CServer_Base {
     /**
      * Get the content of stdout/stderr with the option to set a timeout for reading
      *
-     * @param array   $pipes   array of file pointers for stdin, stdout, stderr (proc_open())
-     * @param string  &$out    target string for the output message (reference)
-     * @param string  &$err    target string for the error message (reference)
-     * @param integer $timeout timeout value in seconds
+     * @param array  $pipes   array of file pointers for stdin, stdout, stderr (proc_open())
+     * @param string &$out    target string for the output message (reference)
+     * @param string &$err    target string for the error message (reference)
+     * @param int    $timeout timeout value in seconds
      *
-     * @return boolean timeout expired or not
+     * @return bool timeout expired or not
      */
     private function timeoutfgets($pipes, &$out, &$err, $timeout) {
         $w = null;
@@ -179,11 +179,11 @@ class CServer_Command extends CServer_Base {
     }
 
     /**
-     * file exists
+     * File exists
      *
      * @param string $strFileName name of the file which should be check
      *
-     * @return boolean command successfull or not
+     * @return bool command successfull or not
      */
     public static function fileExists($strFileName) {
         if (defined('PSI_LOG') && is_string(PSI_LOG) && (strlen(PSI_LOG) > 0) && ((substr(PSI_LOG, 0, 1) == '-') || (substr(PSI_LOG, 0, 1) == '+'))) {
@@ -241,13 +241,13 @@ class CServer_Command extends CServer_Base {
     /**
      * read a file and return the content as a string
      *
-     * @param string  $strFileName name of the file which should be read
-     * @param string  &$strRet     content of the file (reference)
-     * @param integer $intLines    control how many lines should be read
-     * @param integer $intBytes    control how many bytes of each line should be read
-     * @param boolean $booErrorRep en- or disables the reporting of errors which should be logged
+     * @param string $strFileName name of the file which should be read
+     * @param string &$strRet     content of the file (reference)
+     * @param int    $intLines    control how many lines should be read
+     * @param int    $intBytes    control how many bytes of each line should be read
+     * @param bool   $booErrorRep en- or disables the reporting of errors which should be logged
      *
-     * @return boolean command successfull or not
+     * @return bool command successfull or not
      */
     public function rfts($strFileName, &$strRet, $intLines = 0, $intBytes = 4096, $booErrorRep = true) {
         if ($this->sshConfig != null) {
@@ -315,13 +315,13 @@ class CServer_Command extends CServer_Base {
      * ie $program = CommonFunctions::executeProgram('netstat', '-anp | grep LIST');
      * NOT $program = CommonFunctions::executeProgram('netstat', '-anp|grep LIST');
      *
-     * @param string  $strProgramname name of the program
-     * @param string  $strArgs        arguments to the program
-     * @param string  &$strBuffer     output of the command
-     * @param boolean $booErrorRep    en- or disables the reporting of errors which should be logged
-     * @param integer $timeout        timeout value in seconds (default value is 30)
+     * @param string $strProgramname name of the program
+     * @param string $strArgs        arguments to the program
+     * @param string &$strBuffer     output of the command
+     * @param bool   $booErrorRep    en- or disables the reporting of errors which should be logged
+     * @param int    $timeout        timeout value in seconds (default value is 30)
      *
-     * @return boolean command successfull or not
+     * @return bool command successfull or not
      */
     public function executeProgram($strProgramname, $strArgs, &$strBuffer, $booErrorRep = true, $timeout = 30) {
         if ((CServer::getOS() !== 'WINNT') && preg_match('/^([^=]+=[^ \t]+)[ \t]+(.*)$/', $strProgramname, $strmatch)) {

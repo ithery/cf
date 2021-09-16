@@ -2,6 +2,7 @@
 
 class CResources_Support_RemoteFile {
     protected $key;
+
     protected $disk;
 
     public function __construct($key, $disk) {

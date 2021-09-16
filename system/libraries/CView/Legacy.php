@@ -78,7 +78,7 @@ class CView_Legacy {
      * @return bool
      */
     public function __isset($key = null) {
-        return $this->isSet($key);
+        return $this->varIsset($key);
     }
 
     /**
@@ -140,7 +140,7 @@ class CView_Legacy {
      *
      * @return bool|array property test result
      */
-    public function isSet($key = false) {
+    public function varIsset($key = false) {
         // Setup result;
         $result = false;
 

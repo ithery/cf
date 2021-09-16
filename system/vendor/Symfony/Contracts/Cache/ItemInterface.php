@@ -20,8 +20,7 @@ use Psr\Cache\InvalidArgumentException;
  *
  * @author Nicolas Grekas <p@tchwork.com>
  */
-interface ItemInterface extends CacheItemInterface
-{
+interface ItemInterface extends CacheItemInterface {
     /**
      * References the Unix timestamp stating when the item will expire.
      */
@@ -54,12 +53,12 @@ interface ItemInterface extends CacheItemInterface
      * @throws InvalidArgumentException When $tag is not valid
      * @throws CacheException           When the item comes from a pool that is not tag-aware
      */
-    public function tag($tags): self;
+    public function tag($tags);
 
     /**
      * Returns a list of metadata info that were saved alongside with the cached value.
      *
      * See ItemInterface::METADATA_* consts for keys potentially found in the returned array.
      */
-    public function getMetadata(): array;
+    public function getMetadata();
 }

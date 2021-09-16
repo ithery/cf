@@ -13,6 +13,9 @@ class CAjax_Method implements CInterface_Jsonable {
 
     public $method = 'GET';
 
+    /**
+     * @var array
+     */
     public $data = [];
 
     public $type = '';
@@ -31,8 +34,8 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * @param type $key
-     * @param type $data
+     * @param string $key
+     * @param array  $data
      *
      * @return $this
      */
@@ -42,14 +45,14 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * @return type
+     * @return array
      */
     public function getData() {
         return $this->data;
     }
 
     /**
-     * @param type $type
+     * @param string $type
      *
      * @return $this
      */
@@ -83,7 +86,7 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * @param type $method
+     * @param string $method
      *
      * @return $this
      */
@@ -93,7 +96,7 @@ class CAjax_Method implements CInterface_Jsonable {
     }
 
     /**
-     * @return type
+     * @return string
      */
     public function getMethod() {
         return $this->method;

@@ -2,11 +2,17 @@
 
 trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
     private $queryWhere;
+
     private $queryOrderBy;
+
     private $queryLimit;
+
     private $baseQuery;
+
     private $baseOrder;
+
     private $query;
+
     private $columns;
 
     /**
@@ -87,7 +93,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
                         $column = carr::get($columns, intval($request['iSortCol_' . $i]) - $i2);
                         if ($column) {
                             $fieldName = $column->getFieldname();
-                            $sOrder .= '' . $db->escape_column($fieldName) . ' ' . $db->escape_str($request['sSortDir_' . $i]) . ', ';
+                            $sOrder .= '' . $db->escapeColumn($fieldName) . ' ' . $db->escapeStr($request['sSortDir_' . $i]) . ', ';
                         }
                     }
                 }

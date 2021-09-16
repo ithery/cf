@@ -7,6 +7,7 @@
  */
 trait CApp_Concern_Navigation {
     protected $nav = 'nav';
+
     protected $navRenderer = CApp_Navigation_Engine_SideNav::class;
 
     public function setNav($nav) {
@@ -26,6 +27,13 @@ trait CApp_Concern_Navigation {
         return $nav;
     }
 
+    /**
+     * Resolve Nav Engine
+     *
+     * @param mixed $renderer
+     *
+     * @return CApp_Navigation_EngineInterface
+     */
     public function resolveNavRenderer($renderer = null) {
         if ($renderer == null) {
             $renderer = CApp::instance()->getNavRenderer();

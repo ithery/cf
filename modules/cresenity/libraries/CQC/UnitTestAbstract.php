@@ -6,33 +6,30 @@
  * @author Hery
  */
 
-
 use \PHPUnit\Framework\TestCase;
 
 abstract class CQC_UnitTestAbstract extends TestCase {
-
-    
     use CQC_UnitTest_Trait_HttpRequestTrait;
+
     /**
-     *
      * @var CQC_UnitTest_AssertResultCollection
      */
     protected $assertResults;
 
     /**
      * This method is called before each test.
+     *
      * @return void
      */
     public function setUp() {
-        
     }
 
     /**
      * This method is called after each test.
+     *
      * @return void
      */
     public function tearDown() {
-        
     }
 
     public function build() {
@@ -43,7 +40,6 @@ abstract class CQC_UnitTestAbstract extends TestCase {
     }
 
     public function destroy() {
-        
     }
 
     public function result() {
@@ -51,7 +47,6 @@ abstract class CQC_UnitTestAbstract extends TestCase {
     }
 
     public function invoke($uri, $options) {
-
         $postTemporary = $_POST;
         $getTemporary = $_GET;
         $serverTemporary = $_SERVER;
@@ -91,9 +86,6 @@ abstract class CQC_UnitTestAbstract extends TestCase {
             }
         }
 
-
-
         return $result;
     }
-
 }
