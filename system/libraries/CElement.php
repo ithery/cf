@@ -3,6 +3,11 @@
 abstract class CElement extends CObservable {
     use CTrait_Compat_Element;
 
+    /**
+     * Class css for this element
+     *
+     * @var array
+     */
     protected $classes;
 
     protected $tag;
