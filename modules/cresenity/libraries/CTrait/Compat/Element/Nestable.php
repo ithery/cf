@@ -1,19 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 24, 2018, 2:53:27 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 24, 2018, 2:53:27 PM
  */
+//@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_Nestable {
-
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @param CTreeDB $treedb
-     * @param int $parent_id
+     * @param int     $parent_id
+     *
      * @return $this
      */
     public function set_data_from_treedb($treedb, $parent_id = null) {
@@ -32,7 +34,7 @@ trait CTrait_Compat_Element_Nestable {
         return $this->rowActionCount();
     }
 
-    public function add_row_action($id = "") {
+    public function add_row_action($id = '') {
         return $this->addRowAction($id);
     }
 
@@ -40,14 +42,21 @@ trait CTrait_Compat_Element_Nestable {
         return $this->haveRowAction();
     }
 
-    public function display_callback_func($func, $require = "") {
+    public function display_callback_func($func, $require = '') {
         return $this->displayCallbackFunc($func, $require);
     }
 
-    public function filter_action_callback_func($func, $require = "") {
+    public function filter_action_callback_func($func, $require = '') {
         return $this->filterActionCallbackFunc($func, $require);
     }
 
+    /**
+     * @deprecated since 1.2
+     *
+     * @param string $idKey
+     *
+     * @return $this
+     */
     public function set_id_key($idKey) {
         return $this->setIdKey($idKey);
     }
@@ -60,19 +69,34 @@ trait CTrait_Compat_Element_Nestable {
         return $this->setHaveCheckbox($checkbox);
     }
 
+    /**
+     * @deprecated since 1.2
+     *
+     * @param string $valueKey
+     *
+     * @return $this
+     */
     public function set_value_key($valueKey) {
         return $this->setValueKey($valueKey);
     }
 
+    /**
+     * @deprecated since 1.2
+     *
+     * @param string $input
+     *
+     * @return $this
+     */
     public function set_input($input) {
         return $this->setInput($input);
     }
 
-    
     /**
-     * 
      * @deprecated since version 1.2
+     *
      * @return $this
+     *
+     * @param mixed $a
      */
     public function set_data_from_array($a) {
         return $this->setDataFromArray($a);

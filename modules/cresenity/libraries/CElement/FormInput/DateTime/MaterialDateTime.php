@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 17, 2019, 2:08:19 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 17, 2019, 2:08:19 AM
  */
 class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_DateTime {
-
     protected $dateTimeFormat;
     protected $disableYesterday;
     protected $disableTomorrow;
@@ -19,7 +19,7 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
         parent::__construct($id);
         CManager::instance()->registerModule('bootstrap-4-material-datepicker');
 
-        $this->dateTimeFormat = "YYYY-MM-DD";
+        $this->dateTimeFormat = 'YYYY-MM-DD';
         $this->disableYesterday = false;
         $this->disableTomorrow = false;
         $this->disableDate = false;
@@ -54,13 +54,13 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
     }
 
     public function setDisableDate($bool = true) {
-        $this->dateTimeFormat = "HH:mm";
+        $this->dateTimeFormat = 'HH:mm';
         $this->disableDate = $bool;
         return $this;
     }
 
     public function setDisableTime($bool = true) {
-        $this->dateTimeFormat = "YYYY-MM-DD";
+        $this->dateTimeFormat = 'YYYY-MM-DD';
         $this->disableTime = $bool;
         return $this;
     }
@@ -71,39 +71,37 @@ class CElement_FormInput_DateTime_MaterialDateTime extends CElement_FormInput_Da
     }
 
     public function js($indent = 0) {
-
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         $js->append(parent::js($indent))->br();
 
-        $option = " weekStart: 1";
+        $option = ' weekStart: 1';
         $option .= " ,format : '" . $this->dateTimeFormat . "'";
-        $option .= " ,shortTime: true";
+        $option .= ' ,shortTime: true';
 
         if ($this->disableDate) {
-            $option .= " ,date: false";
+            $option .= ' ,date: false';
         }
 
         if ($this->disableTime) {
-            $option .= " ,time: false";
+            $option .= ' ,time: false';
         }
 
         if ($this->disableYesterday) {
-            if (strlen($option) > 0)
-                $option .= ",minDate: new Date()";
+            if (strlen($option) > 0) {
+                $option .= ',minDate: new Date()';
+            }
         }
 
         if ($this->disableTomorrow) {
             if (strlen($option) > 0) {
-                $option .= ",maxDate: new Date()";
+                $option .= ',maxDate: new Date()';
             }
         }
         //$option .= " ,nowButton : true";
         //$option .= " ,minDate : new Date()";
 
-
-        $js->append("$('#" . $this->id . "').bootstrapMaterialDatePicker({" . $option . "});")->br();
+        $js->append("$('#" . $this->id . "').bootstrapMaterialDatePicker({" . $option . '});')->br();
         return $js->text();
     }
-
 }

@@ -1,18 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 24, 2018, 7:54:31 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 24, 2018, 7:54:31 PM
  */
 trait CTrait_Helper_InteractsWithTime {
-
     /**
      * Get the number of seconds until the given DateTime.
      *
-     * @param  \DateTimeInterface|\DateInterval|int  $delay
+     * @param \DateTimeInterface|\DateInterval|int $delay
+     *
      * @return int
      */
     protected function secondsUntil($delay) {
@@ -24,7 +25,8 @@ trait CTrait_Helper_InteractsWithTime {
     /**
      * Get the "available at" UNIX timestamp.
      *
-     * @param  \DateTimeInterface|\DateInterval|int  $delay
+     * @param \DateTimeInterface|\DateInterval|int $delay
+     *
      * @return int
      */
     protected function availableAt($delay = 0) {
@@ -36,7 +38,8 @@ trait CTrait_Helper_InteractsWithTime {
     /**
      * If the given value is an interval, convert it to a DateTime instance.
      *
-     * @param  \DateTimeInterface|\DateInterval|int  $delay
+     * @param \DateTimeInterface|\DateInterval|int $delay
+     *
      * @return \DateTimeInterface|int
      */
     protected function parseDateInterval($delay) {
@@ -55,5 +58,4 @@ trait CTrait_Helper_InteractsWithTime {
     protected function currentTime() {
         return CCarbon::now()->getTimestamp();
     }
-
 }

@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CHTTP_Redirector {
-
     use CTrait_Macroable;
 
     /**
@@ -39,7 +38,8 @@ class CHTTP_Redirector {
     /**
      * Create a new redirect response to the "home" route.
      *
-     * @param  int  $status
+     * @param int $status
+     *
      * @return CHTTP_RedirectResponse
      */
     public function home($status = 302) {
@@ -49,9 +49,10 @@ class CHTTP_Redirector {
     /**
      * Create a new redirect response to the previous location.
      *
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  mixed  $fallback
+     * @param int   $status
+     * @param array $headers
+     * @param mixed $fallback
+     *
      * @return CHTTP_RedirectResponse
      */
     public function back($status = 302, $headers = [], $fallback = false) {
@@ -61,8 +62,9 @@ class CHTTP_Redirector {
     /**
      * Create a new redirect response to the current URI.
      *
-     * @param  int  $status
-     * @param  array  $headers
+     * @param int   $status
+     * @param array $headers
+     *
      * @return CHTTP_RedirectResponse
      */
     public function refresh($status = 302, $headers = []) {
@@ -72,10 +74,11 @@ class CHTTP_Redirector {
     /**
      * Create a new redirect response, while putting the current URL in the session.
      *
-     * @param  string  $path
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  bool|null  $secure
+     * @param string    $path
+     * @param int       $status
+     * @param array     $headers
+     * @param bool|null $secure
+     *
      * @return CHTTP_RedirectResponse
      */
     public function guest($path, $status = 302, $headers = [], $secure = null) {
@@ -93,10 +96,11 @@ class CHTTP_Redirector {
     /**
      * Create a new redirect response to the previously intended location.
      *
-     * @param  string  $default
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  bool|null  $secure
+     * @param string    $default
+     * @param int       $status
+     * @param array     $headers
+     * @param bool|null $secure
+     *
      * @return CHTTP_RedirectResponse
      */
     public function intended($default = '/', $status = 302, $headers = [], $secure = null) {
@@ -108,7 +112,8 @@ class CHTTP_Redirector {
     /**
      * Set the intended url.
      *
-     * @param  string  $url
+     * @param string $url
+     *
      * @return void
      */
     public function setIntendedUrl($url) {
@@ -118,10 +123,11 @@ class CHTTP_Redirector {
     /**
      * Create a new redirect response to the given path.
      *
-     * @param  string  $path
-     * @param  int  $status
-     * @param  array  $headers
-     * @param  bool|null  $secure
+     * @param string    $path
+     * @param int       $status
+     * @param array     $headers
+     * @param bool|null $secure
+     *
      * @return CHTTP_RedirectResponse
      */
     public function to($path, $status = 302, $headers = [], $secure = null) {
@@ -131,9 +137,10 @@ class CHTTP_Redirector {
     /**
      * Create a new redirect response to an external URL (no validation).
      *
-     * @param  string  $path
-     * @param  int  $status
-     * @param  array  $headers
+     * @param string $path
+     * @param int    $status
+     * @param array  $headers
+     *
      * @return CHTTP_RedirectResponse
      */
     public function away($path, $status = 302, $headers = []) {
@@ -143,9 +150,10 @@ class CHTTP_Redirector {
     /**
      * Create a new redirect response to the given HTTPS path.
      *
-     * @param  string  $path
-     * @param  int  $status
-     * @param  array  $headers
+     * @param string $path
+     * @param int    $status
+     * @param array  $headers
+     *
      * @return CHTTP_RedirectResponse
      */
     public function secure($path, $status = 302, $headers = []) {
@@ -155,10 +163,11 @@ class CHTTP_Redirector {
     /**
      * Create a new redirect response to a named route.
      *
-     * @param  string  $route
-     * @param  mixed  $parameters
-     * @param  int  $status
-     * @param  array  $headers
+     * @param string $route
+     * @param mixed  $parameters
+     * @param int    $status
+     * @param array  $headers
+     *
      * @return CHTTP_RedirectResponse
      */
     public function route($route, $parameters = [], $status = 302, $headers = []) {
@@ -168,11 +177,12 @@ class CHTTP_Redirector {
     /**
      * Create a new redirect response to a signed named route.
      *
-     * @param  string  $route
-     * @param  mixed  $parameters
-     * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
-     * @param  int  $status
-     * @param  array  $headers
+     * @param string                                    $route
+     * @param mixed                                     $parameters
+     * @param \DateTimeInterface|\DateInterval|int|null $expiration
+     * @param int                                       $status
+     * @param array                                     $headers
+     *
      * @return CHTTP_RedirectResponse
      */
     public function signedRoute($route, $parameters = [], $expiration = null, $status = 302, $headers = []) {
@@ -182,11 +192,12 @@ class CHTTP_Redirector {
     /**
      * Create a new redirect response to a signed named route.
      *
-     * @param  string  $route
-     * @param  \DateTimeInterface|\DateInterval|int|null  $expiration
-     * @param  mixed  $parameters
-     * @param  int  $status
-     * @param  array  $headers
+     * @param string                                    $route
+     * @param \DateTimeInterface|\DateInterval|int|null $expiration
+     * @param mixed                                     $parameters
+     * @param int                                       $status
+     * @param array                                     $headers
+     *
      * @return CHTTP_RedirectResponse
      */
     public function temporarySignedRoute($route, $expiration, $parameters = [], $status = 302, $headers = []) {
@@ -196,10 +207,11 @@ class CHTTP_Redirector {
     /**
      * Create a new redirect response to a controller action.
      *
-     * @param  string|array  $action
-     * @param  mixed  $parameters
-     * @param  int  $status
-     * @param  array  $headers
+     * @param string|array $action
+     * @param mixed        $parameters
+     * @param int          $status
+     * @param array        $headers
+     *
      * @return CHTTP_RedirectResponse
      */
     public function action($action, $parameters = [], $status = 302, $headers = []) {
@@ -209,20 +221,20 @@ class CHTTP_Redirector {
     /**
      * Create a new redirect response.
      *
-     * @param  string  $path
-     * @param  int  $status
-     * @param  array  $headers
+     * @param string $path
+     * @param int    $status
+     * @param array  $headers
+     *
      * @return CHTTP_RedirectResponse
      */
     protected function createRedirect($path, $status, $headers) {
         return c::tap(new CHTTP_RedirectResponse($path, $status, $headers), function ($redirect) {
-                    if (isset($this->session)) {
-                        
-                        //$redirect->setSession($this->session);
-                    }
+            if (isset($this->session)) {
+                //$redirect->setSession($this->session);
+            }
 
-                    $redirect->setRequest($this->generator->getRequest());
-                });
+            $redirect->setRequest($this->generator->getRequest());
+        });
     }
 
     /**
@@ -237,11 +249,11 @@ class CHTTP_Redirector {
     /**
      * Set the active session store.
      *
-     * @param  CSession  $session
+     * @param CSession $session
+     *
      * @return void
      */
     public function setSession(CSession $session) {
         $this->session = $session;
     }
-
 }

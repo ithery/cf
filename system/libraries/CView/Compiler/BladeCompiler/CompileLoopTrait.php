@@ -6,7 +6,6 @@
  * @author Hery
  */
 trait CView_Compiler_BladeCompiler_CompileLoopTrait {
-
     /**
      * Counter to keep track of nested forelse statements.
      *
@@ -17,7 +16,8 @@ trait CView_Compiler_BladeCompiler_CompileLoopTrait {
     /**
      * Compile the for-else statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileForelse($expression) {
@@ -39,7 +39,8 @@ trait CView_Compiler_BladeCompiler_CompileLoopTrait {
     /**
      * Compile the for-else-empty and empty statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileEmpty($expression) {
@@ -73,7 +74,8 @@ trait CView_Compiler_BladeCompiler_CompileLoopTrait {
     /**
      * Compile the for statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileFor($expression) {
@@ -83,7 +85,8 @@ trait CView_Compiler_BladeCompiler_CompileLoopTrait {
     /**
      * Compile the for-each statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileForeach($expression) {
@@ -103,7 +106,8 @@ trait CView_Compiler_BladeCompiler_CompileLoopTrait {
     /**
      * Compile the break statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileBreak($expression) {
@@ -119,7 +123,8 @@ trait CView_Compiler_BladeCompiler_CompileLoopTrait {
     /**
      * Compile the continue statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileContinue($expression) {
@@ -153,7 +158,8 @@ trait CView_Compiler_BladeCompiler_CompileLoopTrait {
     /**
      * Compile the while statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileWhile($expression) {
@@ -168,5 +174,4 @@ trait CView_Compiler_BladeCompiler_CompileLoopTrait {
     protected function compileEndwhile() {
         return '<?php endwhile; ?>';
     }
-
 }

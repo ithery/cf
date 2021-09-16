@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 1:17:46 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 1:17:46 AM
  */
 class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface {
-
     use CTracker_RepositoryManager_DeviceTrait,
         CTracker_RepositoryManager_GeoIpTrait,
         CTracker_RepositoryManager_AgentTrait,
@@ -26,19 +26,16 @@ class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface 
     protected static $instance;
 
     /**
-     *
-     * @var CTracker_Parser_UserAgentParser 
+     * @var CTracker_Parser_UserAgentParser
      */
     protected $userAgentParser;
 
     /**
-     *
      * @var CTracker_Detect_CrawlerDetect
      */
     protected $crawlerDetector;
 
     /**
-     * 
      * @return CTracker_RepositoryManager
      */
     public static function instance() {
@@ -80,8 +77,9 @@ class CTracker_RepositoryManager implements CTracker_RepositoryManagerInterface 
 
     public function userDevices($minutes, $user_id, $results) {
         return $this->sessionRepository->userDevices(
-                        $minutes, $user_id, $results
+            $minutes,
+            $user_id,
+            $results
         );
     }
-
 }

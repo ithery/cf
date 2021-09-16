@@ -1,15 +1,7 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 abstract class CDevSuite_Configuration {
-
     /**
-     *
      * @var CDevSuite_Filesystem
      */
     public $files;
@@ -58,8 +50,9 @@ abstract class CDevSuite_Configuration {
      */
     public function write($config) {
         $this->files->putAsUser($this->path(), json_encode(
-                        $config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-                ) . PHP_EOL);
+            $config,
+            JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
+        ) . PHP_EOL);
     }
 
     /**
@@ -67,13 +60,14 @@ abstract class CDevSuite_Configuration {
      *
      * @param string $key
      * @param mixed  $value
+     *
      * @return array
      */
     public function updateKey($key, $value) {
         return c::tap($this->read(), function (&$config) use ($key, $value) {
-                    $config[$key] = $value;
-                    $this->write($config);
-                });
+            $config[$key] = $value;
+            $this->write($config);
+        });
     }
 
     /**
@@ -90,6 +84,7 @@ abstract class CDevSuite_Configuration {
      *
      * @param string $key
      * @param mixed  $default
+     *
      * @return mixed
      */
     public function get($key, $default = null) {
@@ -109,35 +104,37 @@ abstract class CDevSuite_Configuration {
         }
 
         $this->write(c::tap($this->read(), function (&$config) {
-                    $config['paths'] = c::collect($config['paths'])->filter(function ($path) {
-                                return $this->files->isDir($path);
-                            })->values()->all();
-                }));
+            $config['paths'] = c::collect($config['paths'])->filter(function ($path) {
+                return $this->files->isDir($path);
+            })->values()->all();
+        }));
     }
 
     /**
      * Remove the given path from the configuration.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return void
      */
     public function removePath($path) {
         if ($path == CDevSuite::homePath() . '/Sites') {
-            info("Cannot remove this directory because this is where DevSuite stores its site definitions.\nRun [devsuite paths] for a list of parked paths.");
+            CDevSuite::info("Cannot remove this directory because this is where DevSuite stores its site definitions.\nRun [devsuite paths] for a list of parked paths.");
             die();
         }
 
         $this->write(c::tap($this->read(), function (&$config) use ($path) {
-                    $config['paths'] = c::collect($config['paths'])->reject(function ($value) use ($path) {
-                                return $value === $path;
-                            })->values()->all();
-                }));
+            $config['paths'] = c::collect($config['paths'])->reject(function ($value) use ($path) {
+                return $value === $path;
+            })->values()->all();
+        }));
     }
 
     /**
      * Prepend the given path to the configuration.
      *
      * @param string $path
+     *
      * @return void
      */
     public function prependPath($path) {
@@ -154,10 +151,10 @@ abstract class CDevSuite_Configuration {
      */
     public function addPath($path, $prepend = false) {
         $this->write(c::tap($this->read(), function (&$config) use ($path, $prepend) {
-                    $method = $prepend ? 'prepend' : 'push';
+            $method = $prepend ? 'prepend' : 'push';
 
-                    $config['paths'] = c::collect($config['paths'])->{$method}($path)->unique()->all();
-                }));
+            $config['paths'] = c::collect($config['paths'])->{$method}($path)->unique()->all();
+        }));
     }
 
     /**
@@ -224,15 +221,25 @@ abstract class CDevSuite_Configuration {
      * @return void
      */
     public function createDriversDirectory() {
-        if ($this->files->isDir($driversDirectory = CDevSuite::homePath() . '/Drivers')) {
+        $driversDirectory = CDevSuite::homePath() . '/Drivers';
+        if ($this->files->isDir($driversDirectory)) {
             return;
         }
 
         $this->files->mkdirAsUser($driversDirectory);
 
         $this->files->putAsUser(
-                $driversDirectory . '/SampleDevSuiteDriver.php', $this->files->get(CDevSuite::stubsPath() . 'SampleDevSuiteDriver.php')
+            $driversDirectory . '/SampleDevSuiteDriver.php',
+            $this->files->get(CDevSuite::stubsPath() . 'SampleDevSuiteDriver.php')
         );
     }
 
+    /**
+     * Create the DevSuite configuration directory.
+     *
+     * @return void
+     */
+    public function createConfigurationDirectory() {
+        $this->files->ensureDirExists(CDevSuite::homePath(), CDevSuite::user());
+    }
 }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,8 +17,7 @@ use League\CommonMark\Node\Block\Document;
 /**
  * Event dispatched when the document is about to be parsed
  */
-final class DocumentPreParsedEvent extends AbstractEvent
-{
+final class DocumentPreParsedEvent extends AbstractEvent {
     /**
      * @var Document
      *
@@ -28,27 +25,25 @@ final class DocumentPreParsedEvent extends AbstractEvent
      */
     private $document;
 
-    /** @var MarkdownInputInterface */
+    /**
+     * @var MarkdownInputInterface
+     */
     private $markdown;
 
-    public function __construct(Document $document, MarkdownInputInterface $markdown)
-    {
+    public function __construct(Document $document, MarkdownInputInterface $markdown) {
         $this->document = $document;
         $this->markdown = $markdown;
     }
 
-    public function getDocument(): Document
-    {
+    public function getDocument() {
         return $this->document;
     }
 
-    public function getMarkdown(): MarkdownInputInterface
-    {
+    public function getMarkdown() {
         return $this->markdown;
     }
 
-    public function replaceMarkdown(MarkdownInputInterface $markdownInput): void
-    {
+    public function replaceMarkdown(MarkdownInputInterface $markdownInput) {
         $this->markdown = $markdownInput;
     }
 }

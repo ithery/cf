@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -16,6 +14,5 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Node\Block;
 
-class Paragraph extends AbstractBlock
-{
+class Paragraph extends AbstractBlock {
 }

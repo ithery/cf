@@ -1,12 +1,24 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @mixin CElement
+ *
+ * @see CRenderable
+ * @see CElement
+ *
+ * @method CElement_Component_Form addForm($id=null)
+ * @method CElement_Element_Div addDiv($id=null)
+ * @method CElement_Template addTemplate($id=null)
+ * @method CElement_Component_DataTable addTable($id=null)
+ * @method CElement_Component_Widget addWidget($id=null)
+ * @method CElement_List_TabList addTabList($id=null)
+ * @method CElement_List_ActionList addActionList($id=null)
+ * @method CElement_Component_FileManager addFileManager($id=null)
+ * @method CElement_Element_Pre addPre($id=null)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
-
     use CTrait_Compat_App,
         CTrait_Macroable,
         CTrait_RequestInfoTrait,
@@ -20,39 +32,54 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Trait_App_Bootstrap,
         CApp_Trait_App_Title;
 
-    private $content = "";
-    private $js = "";
-    private $custom_js = "";
-    private $custom_header = "";
-    private $custom_footer = "";
-    private $custom_data = array();
+    private $content = '';
+
+    private $js = '';
+
+    private $custom_js = '';
+
+    private $custom_header = '';
+
+    private $custom_footer = '';
+
+    private $custom_data = [];
+
     private $signup = false;
+
     private $activation = false;
+
     private $resend = false;
-    private $_org = null;
+
+    private $org = null;
+
     public static $instance = null;
-    private $header_body = '';
+
     private $additional_head = '';
-    private $ajaxData = array();
+
+    private $ajaxData = [];
+
     private $renderMessage = true;
+
     private $keepMessage = false;
+
     private $useRequireJs = false;
+
+    private static $haveScrollToTop = null;
+
     protected $renderer;
-    
+
+    protected $data = [];
+
     private static $renderingElement;
 
     /**
-     *
      * @var CApp_Element
      */
     protected $element;
 
-    
-    
-    
     /**
-     * 
      * @param string $domain
+     *
      * @return CApp_Navigation
      */
     public static function navigation($domain = null) {
@@ -60,8 +87,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * 
      * @param string $domain
+     *
      * @return CApp_Api
      */
     public static function api($domain = null) {
@@ -69,7 +96,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * 
      * @return CApp_SEO
      */
     public static function seo() {
@@ -77,17 +103,18 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * 
      * @param string $domain
+     * @param mixed  $options
+     *
      * @return CApp_Remote
      */
-    public static function remote($domain = null, $options = array()) {
+    public static function remote($domain = null, $options = []) {
         return CApp_Remote::instance($domain, $options);
     }
 
     /**
-     * 
      * @param string $modelName
+     *
      * @return CApp_Model
      */
     public static function model($modelName) {
@@ -96,8 +123,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * 
      * @param string $domain
+     *
      * @return CApp_Navigation
      */
     public static function nav($domain = null) {
@@ -105,11 +132,14 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function isAjax() {
-        return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) AND strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
+        return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
+    }
+
+    public static function auth() {
+        return CApp_Auth::instance();
     }
 
     /**
-     * 
      * @return CApp_Temp
      */
     public static function temp() {
@@ -117,15 +147,14 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * 
      * @return CApp_Data
      */
     public static function data() {
         return new CApp_Data();
     }
 
-    public static function getTranslation($message, $params = array(), $lang = null) {
-        return CApp_Lang::__($message, $params, $lang);
+    public static function getTranslation($message, $params = [], $lang = null) {
+        return CF::lang($message, $params, $lang);
     }
 
     public static function component() {
@@ -133,7 +162,9 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * 
+     * @param null|mixed $domain
+     * @param null|mixed $dbName
+     *
      * @return CDatabase
      */
     public static function db($domain = null, $dbName = null) {
@@ -157,50 +188,44 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $this->keepMessage = $bool;
     }
 
+    /**
+     * Get Translator instance
+     *
+     * @return CTranslation_Translator
+     */
     public function translator() {
-        return new CApp_Translation_Translator(new CApp_Translation_Loader_ArrayLoader(), 'en');
+        return CTranslation::translator();
     }
 
     public function validate(array $data, array $rules, array $messages = [], array $customAttributes = []) {
-        $translator = $this->translator();
-        $validation = new CApp_Validation($translator);
+        $validation = CValidation::factory();
         return $validation->validate($data, $rules, $messages, $customAttributes);
     }
 
-    public function isUseRequireJs() {
-        return $this->useRequireJs ? true : false;
-    }
-
     public function __construct($domain = null) {
-
-
         $this->element = new CApp_Element();
 
-        $this->_org = corg::get(CF::orgCode());
-        $this->useRequireJs = ccfg::get('requireJs');
-
+        $this->org = corg::get(CF::orgCode());
 
         //we load another configuration for this app
         //org configuration
         if (strlen(CF::orgCode()) > 0) {
-            $orgBootFile = DOCROOT . "application" . DS . $this->code() . DS . CF::orgCode() . DS . CF::orgCode() . EXT;
+            $orgBootFile = DOCROOT . 'application' . DS . $this->code() . DS . CF::orgCode() . DS . CF::orgCode() . EXT;
             if (file_exists($orgBootFile)) {
-                include($orgBootFile);
+                include $orgBootFile;
             }
         }
 
-
-        $appBootFile = DOCROOT . "application" . DS . $this->code() . DS . $this->code() . EXT;
+        $appBootFile = DOCROOT . 'application' . DS . $this->code() . DS . $this->code() . EXT;
 
         if (file_exists($appBootFile)) {
-            include($appBootFile);
+            include $appBootFile;
         }
-
 
         $org = $this->org();
 
-        if (ccfg::get("set_timezone")) {
-            $timezone = ccfg::get("default_timezone");
+        if (ccfg::get('set_timezone')) {
+            $timezone = ccfg::get('default_timezone');
             if ($org != null) {
                 //$timezone = $org->timezone;
             }
@@ -208,17 +233,16 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             date_default_timezone_set($timezone);
         }
 
-        $this->id = "capp";
+        $this->id = 'capp';
         //check login
 
-
-        if (ccfg::get("update_last_request")) {
+        if (ccfg::get('update_last_request')) {
             $user = $this->user();
             if ($user != null) {
                 if (!is_array($user) && is_object($user)) {
                     //update last request
                     $db = $this->db();
-                    $db->update("users", array("last_request" => date("Y-m-d H:i:s")), array("user_id" => $user->user_id));
+                    $db->update('users', ['last_request' => date('Y-m-d H:i:s')], ['user_id' => $user->user_id]);
                 }
             }
         }
@@ -252,14 +276,9 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return CApp_Config::get($path, $domain);
     }
 
-    public function set_header_body($header_body) {
-        $this->header_body = $header_body;
-        return $this;
-    }
-
     /**
-     * 
      * @deprecated
+     *
      * @return bool
      */
     public static function isAdmin() {
@@ -267,8 +286,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * 
-     * @param boolean $install
+     * @param bool $install
+     *
      * @return CApp
      */
     public static function factory($install = false) {
@@ -277,8 +296,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * 
-     * @param boolean $install
+     * @param null|string $domain
+     *
      * @return CApp
      */
     public static function instance($domain = null) {
@@ -286,7 +305,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             $domain = CF::domain();
         }
         if (self::$instance == null) {
-            self::$instance = array();
+            self::$instance = [];
         }
         if (!isset(self::$instance[$domain])) {
             self::$instance[$domain] = new CApp($domain);
@@ -347,63 +366,58 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $manager->registerThemeModule('block-ui');
     }
 
-    public function set_additional_head($str) {
-        $this->additional_head = $str;
-    }
-
     public function reset() {
         $this->rendered = false;
         $this->element->clear();
         return $this;
     }
 
+    /**
+     * Alias of setCustomData
+     *
+     * @param string $key
+     * @param string $value
+     *
+     * @return CApp
+     */
     public function addCustomData($key, $value) {
+        return $this->setCustomData($key, $value);
+    }
+
+    public function setCustomData($key, $value = null) {
+        if (is_array($key)) {
+            $this->custom_data = $key;
+            return $this;
+        }
         if (!is_array($this->custom_data)) {
-            $this->custom_data = array();
+            $this->custom_data = [];
         }
         $this->custom_data[$key] = $value;
         return $this;
     }
 
-    public function setCustomData($data) {
-        $this->custom_data = $data;
-        return $this;
-    }
-
-    public function get_all_js() {
-        $cs = CClientScript::instance();
-        $this->js = parent::js();
-        $additional_js = '';
-        $js = "";
-        $vjs = CView::factory('ccore/js');
-        $js .= PHP_EOL . $vjs->render();
-
-        $js .= PHP_EOL . $this->js . $additional_js;
-
-        $js = $cs->renderJsRequire($js);
-
-        if (ccfg::get("minify_js")) {
-            $js = CJSMin::minify($js);
+    public function getCustomData($key = null, $default = null) {
+        if ($key === null) {
+            return $this->custom_data;
         }
-
-        return $js;
+        return carr::get($this->custom_data, $key, $default);
     }
 
     public function org() {
-
-        if ($this->_org == null) {
+        if ($this->org == null) {
             $role = $this->role();
             if ($role != null) {
-                $this->_org = corg::get($role->org_id);
+                $this->org = corg::get($role->org_id);
             }
         }
-        return $this->_org;
+        return $this->org;
     }
 
     public function orgId() {
         $org = $this->org();
-        if ($org == null)
+        if ($org == null) {
             return null;
+        }
         return $org->org_id;
     }
 
@@ -416,13 +430,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         }
 
         $nodes = self::model('Roles')->getDescendantsTree($roleId, $orgId, $type);
-        $childList = array();
+        $childList = [];
 
         $traverse = function ($childs) use (&$traverse, &$childList) {
             foreach ($childs as $child) {
-
                 $depth = carr::get($child, 'depth');
-                $childList[$child["role_id"]] = cutils::indent($depth, "&nbsp;&nbsp;") . $child["name"];
+                $childList[$child['role_id']] = cutils::indent($depth, '&nbsp;&nbsp;') . $child['name'];
                 $traverse($child->getChildren);
             }
         };
@@ -432,16 +445,9 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $childList;
     }
 
-    /**
-     * Get the collection of items as JSON.
-     *
-     * @param  int  $options
-     * @return string
-     */
-    public function toJson($options = 0) {
-
-        $data = array();
-        $data["title"] = $this->title;
+    public function toArray() {
+        $data = [];
+        $data['title'] = $this->title;
         $message = '';
         $messageOrig = '';
         if (!$this->keepMessage) {
@@ -450,34 +456,43 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
                 $message = $messageOrig;
             }
         }
-        $data["html"] = $message . $this->html();
+        $data['html'] = $message . $this->html();
         $asset = CManager::asset();
         $js = $this->js();
 
-
-        if ($this->isUseRequireJs()) {
-            $js = $asset->renderJsRequire($js);
-        } else {
-            $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
-        }
-        if (ccfg::get("minify_js")) {
-            $js = CJSMin::minify($js);
-        }
-        $data["js"] = cbase64::encode($js);
-        $data["css_require"] = $asset->getAllCssFileUrl();
-        $data["message"] = $messageOrig;
-        $data["ajaxData"] = $this->ajaxData;
+        $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
+        $data['js'] = base64_encode($js);
+        $data['css_require'] = $asset->getAllCssFileUrl();
+        $data['message'] = $messageOrig;
+        $data['ajaxData'] = $this->ajaxData;
         $data['html'] = mb_convert_encoding($data['html'], 'UTF-8', 'UTF-8');
+        return $data;
+    }
+
+    /**
+     * Get the collection of items as JSON.
+     *
+     * @param int $options
+     *
+     * @return string
+     */
+    public function toJson($options = 0) {
+        $data = $this->toArray();
         return json_encode($data, $options);
     }
 
-    //override function json
+    /**
+     * Alias of toJson
+     *
+     * @param int $options
+     *
+     * @return string
+     */
     public function json($options = 0) {
         return $this->toJson($options);
     }
 
     /**
-     * 
      * @return void
      */
     public function __destruct() {
@@ -487,11 +502,22 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function sendExceptionEmail(Exception $exception, $email = null) {
+        $ignoredExceptions = [
+            CDaemon_Exception_AlreadyRunningException::class,
+            CDaemon_Exception_AlreadyStoppedException::class
+        ];
 
-
-        if (!($exception instanceof CF_404_Exception)) {
-
-            $html = CApp_ErrorHandler::sendExceptionEmail($exception, $email = null);
+        if (!($exception instanceof CHTTP_Exception_NotFoundHttpException)) {
+            $ignored = false;
+            foreach ($ignoredExceptions as $ignored) {
+                if (is_subclass_of($exception, $ignored) || get_class($exception) === $ignored) {
+                    $ignored = true;
+                    break;
+                }
+            }
+            if (!$ignored) {
+                $html = CApp_ErrorHandler::sendExceptionEmail($exception, $email);
+            }
         }
     }
 
@@ -503,13 +529,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             return call_user_func_array([$this->element, $method], $parameters);
         }
 
-
         throw new Exception('undefined method on CApp: ' . $method);
     }
 
     /**
-     * 
      * @param CHTTP_Request $request
+     *
      * @return CHTTP_Response
      */
     public function toResponse($request) {
@@ -520,19 +545,34 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function isAdministrator() {
-        return carr::first(explode("/", trim(CFRouter::getUri(), "/"))) == "administrator";
+        return carr::first(explode('/', trim(CFRouter::getUri(), '/'))) == 'administrator';
     }
 
     public static function setTheme($theme) {
         CManager::theme()->setTheme($theme);
     }
 
-    
-    public static function renderingElement(){
+    public static function renderingElement() {
         return static::$renderingElement;
     }
-    
+
     public static function setRenderingElement($element) {
         static::$renderingElement = $element;
+    }
+
+    public static function setHaveScrollToTop($bool = true) {
+        static::$haveScrollToTop = $bool;
+    }
+
+    public static function haveScrollToTop() {
+        if (static::$haveScrollToTop === null) {
+            static::$haveScrollToTop = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
+        }
+        return static::$haveScrollToTop;
+    }
+
+    public function setData($key, $value) {
+        $this->data[$key] = $value;
+        return $this;
     }
 }

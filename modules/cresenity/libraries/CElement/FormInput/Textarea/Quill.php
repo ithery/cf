@@ -1,16 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 3, 2019, 7:17:38 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 3, 2019, 7:17:38 PM
  */
 class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
     use CTrait_Element_Property_Value;
-    
+
     protected $theme;
+
     protected $toolbar;
 
     public function __construct($id) {
@@ -24,9 +26,11 @@ class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
         $this->theme = $theme;
         return $this;
     }
+
     public function setToolbarType($toolbar) {
         $this->setToolbar($toolbar);
     }
+
     public function setToolbar($toolbar) {
         if (!is_array($toolbar)) {
             $toolbarValue = $this->getToolbarJson($toolbar);
@@ -42,7 +46,6 @@ class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
     }
 
     protected function getToolbarJson($toolbarType = null) {
-
         $json = null;
         switch ($toolbarType) {
             case 'full':
@@ -72,7 +75,6 @@ class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
         return $json;
     }
 
-    
     public function build() {
         $this->addClass('quill-control');
         $this->add($this->value);
@@ -89,20 +91,18 @@ class CElement_FormInput_Textarea_Quill extends CElement_Element_Div {
         }
 
         $jsOptions = '';
-        $jsOptions .= "{";
+        $jsOptions .= '{';
         $jsOptions .= "theme: '" . $this->theme . "'";
 
-        $jsOptions .= "}";
+        $jsOptions .= '}';
 
         $js = "
-            var editor = new Quill('#" . $this->id . "'," . $jsOptions . ");
-       
-      
-        ";
+            var editor = new Quill('#" . $this->id . "'," . $jsOptions . ');
 
+
+        ';
 
         $js .= $this->jsChild();
         return $js;
     }
-
 }

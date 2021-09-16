@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
-
     /**
      * The name and signature of the console command.
      *
@@ -30,22 +23,24 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
             if (CF::domainExists($defaultDomain)) {
                 $domain = $defaultDomain;
             } else {
-                $domain = $this->ask("Please input the domain for create this application", $defaultDomain);
+                $domain = $this->ask('Please input the domain for create this application', $defaultDomain);
             }
         }
-        if (CConsole::domain() != $domain) {
-            $this->call("domain:switch", [
-                'domain' => $domain,
-                '--no-interaction' => carr::get($this->allOptions(), 'no-interaction'),
-            ]);
-        }
         if (!CF::domainExists($domain)) {
-            $this->call("domain:create", [
+            $this->call('domain:create', [
                 'domain' => $domain,
                 '--appCode' => $appCode,
                 '--no-interaction' => carr::get($this->allOptions(), 'no-interaction'),
             ]);
         }
+        if (CConsole::domain() != $domain) {
+            $this->call('domain:switch', [
+                'domain' => $domain,
+                '--no-interaction' => carr::get($this->allOptions(), 'no-interaction'),
+            ]);
+        }
+        CConfig::instance('app')->refresh();
+
         if ($prefix == null) {
             $defaultPrefix = cstr::toupper(substr($appCode, 0, 2));
             if ($defaultPrefix == 'CF') {
@@ -53,22 +48,20 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
             }
 
             if (strlen(CF::config('app.prefix')) == 0) {
-                $prefix = $this->ask("Please input the prefix for this application", $defaultPrefix);
+                $prefix = $this->ask('Please input the prefix for this application', $defaultPrefix);
             }
         }
-
 
         if ($prefix == 'CF') {
             $this->error('Prefix CF is not available');
             return CConsole::FAILURE_EXIT;
         }
 
-
-
         $this->ensureAppDirectoryExists($appCode);
         $this->buildDefaultConfig($appCode, $prefix);
 
         CConfig::instance('app')->refresh();
+
         $prefix = CF::config('app.prefix');
 
         //reload prefix
@@ -80,7 +73,6 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
         $this->buildControllers($appCode);
         $this->buildNav($appCode);
         $this->buildBootstrapFiles($appCode);
-
 
         $this->devSuiteLinking($appCode);
 
@@ -116,7 +108,6 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
 
         $baseFile = $librariesDir . $prefix . EXT;
         if (!CFile::exists($baseFile)) {
-
             $stubFile = CF::findFile('stubs', 'libraries/base/base', true, 'stub');
             if (!$stubFile) {
                 $this->error('base stub not found');
@@ -132,7 +123,6 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
         $baseModelDir = $librariesDir . $prefix . 'Model';
         $this->ensureDirectoryExists($baseModelDir);
         if (!CFile::exists($baseModelFile)) {
-
             $stubFile = CF::findFile('stubs', 'libraries/base/model', true, 'stub');
             if (!$stubFile) {
                 $this->error('base model stub not found');
@@ -144,12 +134,9 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
             $this->info('Libraries ' . basename($baseModelFile) . ' created on ' . $baseModelFile);
         }
 
-
-
         //create base utils
         $baseUtilsFile = $librariesDir . $prefix . 'Utils' . EXT;
         if (!CFile::exists($baseUtilsFile)) {
-
             $stubFile = CF::findFile('stubs', 'libraries/base/utils', true, 'stub');
             if (!$stubFile) {
                 $this->error('base utils stub not found');
@@ -166,7 +153,6 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
         $baseControllerDir = $librariesDir . $prefix . 'Controller';
         $this->ensureDirectoryExists($baseControllerDir);
         if (!CFile::exists($baseControllerFile)) {
-
             $stubFile = CF::findFile('stubs', 'libraries/base/controller', true, 'stub');
             if (!$stubFile) {
                 $this->error('base controller stub not found');
@@ -199,7 +185,6 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
     }
 
     public function buildNav($appCode) {
-
         $this->call('make:nav', [
             'nav' => 'nav',
             '--no-interaction' => carr::get($this->allOptions(), 'no-interaction'),
@@ -214,8 +199,6 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
     }
 
     public function buildDefaultConfig($appCode, $prefix) {
-
-
         $valueOptions = [
             'prefix' => $prefix,
         ];
@@ -227,7 +210,6 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
     }
 
     /**
-     * 
      * @param string $appCode
      */
     public function ensureAppDirectoryExists($appCode) {
@@ -238,8 +220,10 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
     }
 
     /**
-     * get application base directory path
+     * Get application base directory path
+     *
      * @param string $appCode
+     *
      * @return string
      */
     public function appPath($appCode) {
@@ -247,9 +231,10 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
     }
 
     /**
-     * get application default folder path
-     * 
+     * Get application default folder path
+     *
      * @param string $appCode
+     *
      * @return string
      */
     public function appDefaultPath($appCode) {
@@ -269,5 +254,4 @@ class CConsole_Command_App_AppCreateCommand extends CConsole_Command {
             $this->info("Directory $directory created");
         }
     }
-
 }

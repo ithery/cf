@@ -6,53 +6,57 @@
  * @author Hery
  */
 class CRouting_RouteFinder {
-
     public static function find($uri = null) {
         if ($uri == null) {
             $uri = CHTTP::request()->path();
             $uri = trim($uri, '/');
         }
-        $routeData = static::getRouteData($uri);
+        $routeDataBefore = static::getRouteData($uri);
+        $routedUri = CFRouter::routedUri($uri);
+        $routeData = static::getRouteData($routedUri);
+        if ($uri != $routedUri) {
+            $routeData = $routeDataBefore;
+
+            //cdbg::dd($uri, $routedUri, $routeDataBefore, $routeData);
+            //$routedUri['seg']
+        }
+        CFRouter::applyRouteData($routeData);
+
         $controllerDir = carr::get($routeData, 'controller_dir_ucfirst', '');
         $controllerPrefix = str_replace('/', '_', $controllerDir);
         $controller = carr::get($routeData, 'controller', '');
         $className = 'Controller_' . $controllerPrefix . ucfirst($controller);
 
-        
         $method = carr::get($routeData, 'method');
-        $route=null;
-      
-        
+
+        $route = null;
+
         if (class_exists($className)) {
-            
-            $routedUri = strtolower($controllerDir).$controller;
-            
-            $routedUri.="/".$method;
+            $routedUri = strtolower($controllerDir) . $controller;
+
+            $routedUri .= '/' . $method;
 
             $arguments = carr::get($routeData, 'arguments');
             //cdbg::dd($routeData);
+
+            $parameters = [];
             foreach ($arguments as $key => $argument) {
-                $routedUri.="/{any$key}";
+                $routedUri .= "/{any$key}";
+                $parameters[$key] = $argument;
             }
 
-            
             //cdbg::dd($routedUri);
-            $route = new CRouting_Route(CRouting_Router::$verbs, $routedUri, $className . '@' . $method);
-
+            //$routedUri = 't/ittron/feeds/hashtag/posts/{any0}';
+            $route = new CRouting_Route(CRouting_Router::$verbs, $routedUri, $className . '@' . $method, $parameters);
         }
         return $route;
     }
 
     public static function getRouteData($uri) {
-
-        $currentUri = NULL;
-        $routes = NULL;
+        $currentUri = null;
+        $routes = null;
         if ($uri !== null) {
             $currentUri = $uri;
-        }
-
-        if ($currentUri === null) {
-            $currentUri = self::getUri();
         }
 
         // Load routes
@@ -61,28 +65,27 @@ class CRouting_RouteFinder {
         $routes = array_merge($routesConfig, $routesRuntime);
 
         // Default route status
-        $default_route = FALSE;
+        $default_route = false;
 
         if ($currentUri === '') {
             // Make sure the default route is set
-            if (!isset($routes['_default']))
+            if (!isset($routes['_default'])) {
                 throw new CException('Please set a default route in config/routes.php');
-
+            }
             // Use the default route when no segments exist
             $currentUri = $routes['_default'];
 
             // Default route is in use
-            $default_route = TRUE;
+            $default_route = true;
         }
 
         // Make sure the URL is not tainted with HTML characters
-        $currentUri = chtml::specialchars($currentUri, FALSE);
+        $currentUri = chtml::specialchars($currentUri, false);
 
         // Remove all dot-paths from the URI, they are not valid
         $currentUri = preg_replace('#\.[\s./]*/#', '', $currentUri);
 
-
-        $data = array();
+        $data = [];
         $data['routesConfig'] = $routesConfig;
         $data['routesRuntime'] = $routesRuntime;
         $data['routes'] = $routes;
@@ -91,15 +94,14 @@ class CRouting_RouteFinder {
         $data['complete_uri'] = '';
         $data['routed_uri'] = '';
         $data['url_suffix'] = '';
-        $data['segments'] = NULL;
-        $data['rsegments'] = NULL;
-        $data['controller'] = NULL;
-        $data['controller_dir'] = NULL;
-        $data['controller_dir_ucfirst'] = NULL;
-        $data['controller_path'] = NULL;
+        $data['segments'] = null;
+        $data['rsegments'] = null;
+        $data['controller'] = null;
+        $data['controller_dir'] = null;
+        $data['controller_dir_ucfirst'] = null;
+        $data['controller_path'] = null;
         $data['method'] = 'index';
-        $data['arguments'] = array();
-
+        $data['arguments'] = [];
 
         if (!empty($_SERVER['QUERY_STRING'])) {
             // Set the query string to the current query string
@@ -113,11 +115,12 @@ class CRouting_RouteFinder {
         $data['complete_uri'] = $data['current_uri'] . $data['query_string'];
 
         // Explode the segments by slashes
-        $data['segments'] = ($default_route === TRUE OR $data['segments'] === '') ? array() : explode('/', $data['segments']);
+        $data['segments'] = ($default_route === true or $data['segments'] === '') ? [] : explode('/', $data['segments']);
 
-        if ($default_route === FALSE AND count($data['routes']) > 1) {
+        if ($default_route === false and count($data['routes']) > 1) {
             // Custom routing
-            $data['rsegments'] = self::routedUri($data['current_uri'], $data['routes']);
+
+            $data['rsegments'] = CFRouter::routedUri($data['current_uri'], $data['routes']);
         }
 
         // The routed URI is now complete
@@ -131,7 +134,7 @@ class CRouting_RouteFinder {
         $controller_path_ucfirst = '';
         $c_dir = '';
         $c_dir_ucfirst = '';
-        $method_segment = NULL;
+        $method_segment = null;
 
         // Paths to search
         $paths = CF::paths();
@@ -142,21 +145,20 @@ class CRouting_RouteFinder {
             $c_dir_ucfirst = ucfirst(strtolower($controller_path_ucfirst));
             $controller_path .= $segment;
             $controller_path_ucfirst .= ucfirst($segment);
-            $found = FALSE;
+            $found = false;
 
             foreach ($paths as $dir) {
                 // Search within controllers only
                 $dir .= 'controllers' . DS;
 
-                if (is_dir($dir . $controller_path) OR is_file($dir . $controller_path . EXT)) {
-
+                if (is_dir($dir . $controller_path) or is_file($dir . $controller_path . EXT)) {
                     // Valid path
-                    $found = TRUE;
+                    $found = true;
 
                     // The controller must be a file that exists with the search path
                     if ($c = str_replace('\\', '/', realpath($dir . $controller_path . EXT))
-                            AND is_file($c)) {
-
+                        and is_file($c)
+                    ) {
                         // Set controller name
                         $data['controller'] = $segment;
 
@@ -179,7 +181,7 @@ class CRouting_RouteFinder {
                 //                                echo $c_dir .'<br/>';
             }
 
-            if ($found === FALSE) {
+            if ($found === false) {
                 // Maximum depth has been reached, stop searching
                 break;
             }
@@ -189,7 +191,7 @@ class CRouting_RouteFinder {
             $controller_path_ucfirst .= '/';
         }
 
-        if ($method_segment !== NULL AND isset($data['rsegments'][$method_segment])) {
+        if ($method_segment !== null and isset($data['rsegments'][$method_segment])) {
             // Set method
             $data['method'] = $data['rsegments'][$method_segment];
 
@@ -199,91 +201,6 @@ class CRouting_RouteFinder {
             }
         }
 
-
         return $data;
-    }
-
-    
-    /**
-     * Generates routed URI from given URI.
-     *
-     * @param  string  URI to convert
-     * @return string  Routed uri
-     */
-    public static function routedUri($uri, & $routes = null) {
-        if ($routes === NULL) {
-            // Load routes
-            $routes = self::getRoutes();
-        }
-
-
-
-        // Prepare variables
-        $routedUri = $uri = trim($uri, '/');
-
-        if (isset($routes[$uri])) {
-            // Literal match, no need for regex
-            $routedUri = $routes[$uri];
-        } else {
-            // Loop through the routes and see if anything matches
-            foreach ($routes as $key => $val) {
-                if ($key === '_default')
-                    continue;
-                if (is_callable($val)) {
-                    preg_match_all("/{([\w]*)}/", $key, $matches, PREG_SET_ORDER);
-                    $callbackArgs = array($uri);
-                    $bracketKeys = [];
-                    foreach ($matches as $matchedVal) {
-                        $str = $matchedVal[1]; //matches str without bracket {}
-                        $bStr = $matchedVal[0]; //matches str with bracket {}
-                        $bracketKeys[] = null;
-                        $key = str_replace($bStr, '(.+?)', $key);
-                    }
-
-
-                    $matchesBracket = false;
-                    $key = str_replace("/", "\/", $key);
-                    preg_match('#' . $key . '#ims', $uri, $matches);
-
-                    if (preg_match('#' . $key . '#ims', $uri, $matches)) {
-
-                        $matchesBracket = array_slice($matches, 1);
-                    }
-                    $matchesBracket ? $callbackArgs = array_merge($callbackArgs, $matchesBracket) : $callbackArgs = array_merge($callbackArgs, $bracketKeys);
-                    $val = call_user_func_array($val, $callbackArgs);
-
-                    if ($val == null) {
-                        continue;
-                    }
-                }
-
-                // Trim slashes
-                $key = trim($key, '/');
-                $val = trim($val, '/');
-
-
-                if (preg_match('#^' . $key . '#u', $uri)) {
-
-                    if (strpos($val, '$') !== FALSE) {
-                        // Use regex routing
-
-                        $routedUri = preg_replace('#^' . $key . '$#u', $val, $uri);
-                    } else {
-                        // Standard routing
-                        $routedUri = $val;
-                    }
-
-                    // A valid route has been found
-                    break;
-                }
-            }
-        }
-
-        if (isset($routes[$routedUri])) {
-            // Check for double routing (without regex)
-            $routedUri = $routes[$routedUri];
-        }
-
-        return trim($routedUri, '/');
     }
 }

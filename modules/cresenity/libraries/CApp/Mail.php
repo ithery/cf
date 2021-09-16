@@ -5,16 +5,10 @@
  *
  * @author Hery
  */
-
 class CApp_Mail {
-    
-    
     public function __construct() {
-        
     }
-    
+
     public function sendException($email, Exception $exception) {
-        
     }
-    
 }

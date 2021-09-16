@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CProfiler_StyleRenderer {
-
     public function render() {
         $coreStyle = '
 #cf-profiler-button {
@@ -53,7 +52,7 @@ class CProfiler_StyleRenderer {
 }';
         $tableStyle = '
 #cf-profiler .kp-table {
-            
+
 	font-size: 1.0em;
 	color: #4D6171;
 	width: 100%;
@@ -100,5 +99,4 @@ class CProfiler_StyleRenderer {
 
         return $coreStyle . $tableStyle;
     }
-
 }

@@ -1,22 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2018, 5:55:30 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2018, 5:55:30 AM
  */
 trait CTrait_Element_ActionList_Header {
-
     /**
-     *
      * @var CElement_List_ActionList
      */
     protected $headerActionList;
 
     /**
-     * 
      * @return int
      */
     public function headerActionCount() {
@@ -27,16 +25,15 @@ trait CTrait_Element_ActionList_Header {
     }
 
     /**
-     * 
-     * @return boolean
+     * @return bool
      */
     public function haveHeaderAction() {
         return $this->headerActionCount() > 0;
     }
 
     /**
-     * 
      * @param string $id
+     *
      * @return CElement_Component_Action
      */
     public function addHeaderAction($id = null) {
@@ -49,8 +46,8 @@ trait CTrait_Element_ActionList_Header {
     }
 
     /**
-     * 
      * @param string $style
+     *
      * @return $this
      */
     public function setHeaderActionStyle($style) {
@@ -59,11 +56,9 @@ trait CTrait_Element_ActionList_Header {
     }
 
     /**
-     * 
      * @return CElement_List_ActionList
      */
     public function getHeaderActionList() {
         return $this->headerActionList;
     }
-
 }

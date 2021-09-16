@@ -1,25 +1,42 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 class CElement_Element_A extends CElement_Element {
-
     protected $href;
+
     protected $target;
 
-    public function __construct($id = "") {
-
+    public function __construct($id = '') {
         parent::__construct($id);
-        $this->tag = "a";
-        $this->href = "";
-        $this->target = "";
+        $this->tag = 'a';
+        $this->href = '';
+        $this->target = '';
     }
-    
+
+    /**
+     * Set href attribute
+     *
+     * @param string $href
+     *
+     * @return $this
+     *
+     * @deprecated 1.2 use setHref
+     */
+    // @codingStandardsIgnoreStart
     public function set_href($href) {
+        // @codingStandardsIgnoreEnd
         $this->href = $href;
         return $this;
     }
 
+    /**
+     * Set href attribute
+     *
+     * @param string $href
+     *
+     * @return $this
+     */
     public function setHref($href) {
         $this->href = $href;
         return $this;
@@ -38,5 +55,4 @@ class CElement_Element_A extends CElement_Element {
             $this->addAttr('target', $this->target);
         }
     }
-
 }

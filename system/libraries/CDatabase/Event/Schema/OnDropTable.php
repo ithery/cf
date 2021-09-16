@@ -1,36 +1,36 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 1:05:06 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 1:05:06 PM
  */
 
 /**
  * Event used when the SQL query for dropping tables are generated inside CDatabase_Platform.
  */
 class CDatabase_Event_Schema_OnDropTable extends CDatabase_Event_Schema {
-
     /**
      * @var string|CDatabase_Schema_Table
      */
-    private $_table;
+    private $table;
 
     /**
      * @var CDatabase_Platform
      */
-    private $_platform;
+    private $platform;
 
     /**
      * @var string|null
      */
-    private $_sql = null;
+    private $sql = null;
 
     /**
-     * @param string|CDatabase_Schema_Table        $table
-     * @param CDatabase_Platform $platform
+     * @param string|CDatabase_Schema_Table $table
+     * @param CDatabase_Platform            $platform
      *
      * @throws \InvalidArgumentException
      */
@@ -38,22 +38,22 @@ class CDatabase_Event_Schema_OnDropTable extends CDatabase_Event_Schema {
         if (!$table instanceof CDatabase_Schema_Table && !is_string($table)) {
             throw new \InvalidArgumentException('SchemaDropTableEventArgs expects $table parameter to be string or \Doctrine\DBAL\Schema\Table.');
         }
-        $this->_table = $table;
-        $this->_platform = $platform;
+        $this->table = $table;
+        $this->platform = $platform;
     }
 
     /**
      * @return string|CDatabase_Schema_Table
      */
     public function getTable() {
-        return $this->_table;
+        return $this->table;
     }
 
     /**
      * @return CDatabase_Platform
      */
     public function getPlatform() {
-        return $this->_platform;
+        return $this->platform;
     }
 
     /**
@@ -62,7 +62,7 @@ class CDatabase_Event_Schema_OnDropTable extends CDatabase_Event_Schema {
      * @return CDatabase_Event_Schema_OnDropTable
      */
     public function setSql($sql) {
-        $this->_sql = $sql;
+        $this->sql = $sql;
         return $this;
     }
 
@@ -70,7 +70,6 @@ class CDatabase_Event_Schema_OnDropTable extends CDatabase_Event_Schema {
      * @return string|null
      */
     public function getSql() {
-        return $this->_sql;
+        return $this->sql;
     }
-
 }

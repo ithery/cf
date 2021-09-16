@@ -7,7 +7,8 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\TextUI\XmlConfiguration;
+
+namespace PHPUnit\TextUI\XmlConfiguration\PHP;
 
 use function count;
 use function iterator_count;
@@ -17,8 +18,7 @@ use Iterator;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class ConstantCollectionIterator implements Countable, Iterator
-{
+final class ConstantCollectionIterator implements Countable, Iterator {
     /**
      * @var Constant[]
      */
@@ -29,38 +29,31 @@ final class ConstantCollectionIterator implements Countable, Iterator
      */
     private $position;
 
-    public function __construct(ConstantCollection $constants)
-    {
+    public function __construct(ConstantCollection $constants) {
         $this->constants = $constants->asArray();
     }
 
-    public function count()
-    {
+    public function count() {
         return iterator_count($this);
     }
 
-    public function rewind()
-    {
+    public function rewind() {
         $this->position = 0;
     }
 
-    public function valid()
-    {
+    public function valid() {
         return $this->position < count($this->constants);
     }
 
-    public function key()
-    {
+    public function key() {
         return $this->position;
     }
 
-    public function current()
-    {
+    public function current() {
         return $this->constants[$this->position];
     }
 
-    public function next()
-    {
+    public function next() {
         $this->position++;
     }
 }

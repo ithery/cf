@@ -1,50 +1,49 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 1:14:07 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 1:14:07 PM
  */
 
 /**
  * Event used when the portable index definition is generated inside CDatabase_Schema_Manager.
- *
  */
 class CDatabase_Event_Schema_OnIndexDefinition extends CDatabase_Event_Schema {
-
     /**
      * @var CDatabase_Schema_Index|null
      */
-    private $_index = null;
+    private $index = null;
 
     /**
      * Raw index data as fetched from the database.
      *
      * @var array
      */
-    private $_tableIndex;
+    private $tableIndex;
 
     /**
      * @var string
      */
-    private $_table;
+    private $table;
 
     /**
      * @var CDatabase
      */
-    private $_connection;
+    private $connection;
 
     /**
-     * @param array                     $tableIndex
-     * @param string                    $table
-     * @param CDatabase                 $connection
+     * @param array     $tableIndex
+     * @param string    $table
+     * @param CDatabase $connection
      */
     public function __construct(array $tableIndex, $table, CDatabase $connection) {
-        $this->_tableIndex = $tableIndex;
-        $this->_table = $table;
-        $this->_connection = $connection;
+        $this->tableIndex = $tableIndex;
+        $this->table = $table;
+        $this->connection = $connection;
     }
 
     /**
@@ -55,7 +54,7 @@ class CDatabase_Event_Schema_OnIndexDefinition extends CDatabase_Event_Schema {
      * @return CDatabase_Event_Schema_OnIndexDefinition
      */
     public function setIndex(CDatabase_Schema_Index $index = null) {
-        $this->_index = $index;
+        $this->index = $index;
         return $this;
     }
 
@@ -63,35 +62,34 @@ class CDatabase_Event_Schema_OnIndexDefinition extends CDatabase_Event_Schema {
      * @return CDatabase_Schema_Index|null
      */
     public function getIndex() {
-        return $this->_index;
+        return $this->index;
     }
 
     /**
      * @return array
      */
     public function getTableIndex() {
-        return $this->_tableIndex;
+        return $this->tableIndex;
     }
 
     /**
      * @return string
      */
     public function getTable() {
-        return $this->_table;
+        return $this->table;
     }
 
     /**
      * @return CDatabase
      */
     public function getConnection() {
-        return $this->_connection;
+        return $this->connection;
     }
 
     /**
      * @return CDatabase_Platform
      */
     public function getDatabasePlatform() {
-        return $this->_connection->getDatabasePlatform();
+        return $this->connection->getDatabasePlatform();
     }
-
 }

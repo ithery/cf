@@ -1,7 +1,6 @@
 <?php
 
 class CVendor_OneSignal_Config {
-
     /**
      * @var string
      */
@@ -70,5 +69,4 @@ class CVendor_OneSignal_Config {
     public function getUserAuthKey() {
         return $this->userAuthKey;
     }
-
 }

@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CQueue_PendingChain {
-
     /**
      * The class name of the job being dispatched.
      *
@@ -25,8 +18,9 @@ class CQueue_PendingChain {
     /**
      * Create a new PendingChain instance.
      *
-     * @param  mixed  $job
-     * @param  array  $chain
+     * @param mixed $job
+     * @param array $chain
+     *
      * @return void
      */
     public function __construct($job, $chain) {
@@ -50,5 +44,4 @@ class CQueue_PendingChain {
 
         return (new CQueue_PendingDispatch($firstJob))->chain($this->chain);
     }
-
 }

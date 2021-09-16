@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 3:20:51 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 3:20:51 AM
  */
 class CModel_Identifier {
-
     /**
      * The class name of the model.
      *
@@ -42,10 +42,11 @@ class CModel_Identifier {
     /**
      * Create a new model identifier.
      *
-     * @param  string  $class
-     * @param  mixed  $id
-     * @param  array  $relations
-     * @param  mixed  $connection
+     * @param string $class
+     * @param mixed  $id
+     * @param array  $relations
+     * @param mixed  $connection
+     *
      * @return void
      */
     public function __construct($class, $id, array $relations, $connection) {
@@ -54,5 +55,4 @@ class CModel_Identifier {
         $this->relations = $relations;
         $this->connection = $connection;
     }
-
 }

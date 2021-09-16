@@ -1,20 +1,19 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CResources_TaskQueue_PerformConversions extends CQueue_AbstractTask {
-
-    /** @var CResources_ConversionCollection */
+    /**
+     * @var CResources_ConversionCollection
+     */
     protected $conversions;
 
-    /** @var CApp_Model_Interface_ResourceInterface */
+    /**
+     * @var CApp_Model_Interface_ResourceInterface
+     */
     protected $resource;
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     protected $onlyMissing;
 
     public function __construct(CResources_ConversionCollection $conversions, CApp_Model_Interface_ResourceInterface $resource, $onlyMissing = false) {
@@ -27,5 +26,4 @@ class CResources_TaskQueue_PerformConversions extends CQueue_AbstractTask {
         CResources_Factory::createFileManipulator()->performConversions($this->conversions, $this->resource, $this->onlyMissing);
         return true;
     }
-
 }

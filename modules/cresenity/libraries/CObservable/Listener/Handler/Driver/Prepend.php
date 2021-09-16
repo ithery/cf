@@ -1,34 +1,39 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 4:07:06 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 4:07:06 PM
  */
 class CObservable_Listener_Handler_Driver_Prepend extends CObservable_Listener_Handler_Driver {
-
     use CTrait_Compat_Handler_Driver_Prepend;
 
     protected $target;
+
     protected $method;
+
     protected $content;
+
     protected $param;
+
     protected $param_inputs;
+
     protected $check_duplicate_selector;
 
     public function __construct($owner, $event, $name) {
         parent::__construct($owner, $event, $name);
-        $this->method = "get";
-        $this->target = "";
+        $this->method = 'get';
+        $this->target = '';
         $this->content = CHandlerElement::factory();
-        $this->param_inputs = array();
+        $this->param_inputs = [];
     }
 
     public function addParamInput($inputs) {
         if (!is_array($inputs)) {
-            $inputs = array($inputs);
+            $inputs = [$inputs];
         }
         foreach ($inputs as $inp) {
             $this->param_inputs[] = $inp;
@@ -45,7 +50,7 @@ class CObservable_Listener_Handler_Driver_Prepend extends CObservable_Listener_H
         return $this->content;
     }
 
-    public function set_check_duplicate_selector($selector) {
+    public function setCheckDuplicateSelector($selector) {
         $this->check_duplicate_selector = $selector;
         return $this;
     }
@@ -55,25 +60,25 @@ class CObservable_Listener_Handler_Driver_Prepend extends CObservable_Listener_H
         $data_addition = '';
 
         foreach ($this->param_inputs as $inp) {
-            if (strlen($data_addition) > 0)
+            if (strlen($data_addition) > 0) {
                 $data_addition .= ',';
+            }
             $data_addition .= "'" . $inp . "':$('#" . $inp . "').val()";
         }
         $data_addition = '{' . $data_addition . '}';
-        $js .= "
-                    var is_duplicate = 0;
-                    var check_duplicate = " . (strlen($this->check_duplicate_selector) > 0 ? '1' : '0') . ";
-                    if(check_duplicate==1){
-                        if (jQuery('#" . $this->target . "').find('" . $this->check_duplicate_selector . "').length > 0) {
-                            is_duplicate = 1;
-                        }
-                    }
-                    if (is_duplicate==0) {
-			$.cresenity.prepend('" . $this->target . "','" . $this->generated_url() . "','" . $this->method . "'," . $data_addition . ");
-                    }
-		";
+        $js .= '
+            var is_duplicate = 0;
+            var check_duplicate = ' . (strlen($this->check_duplicate_selector) > 0 ? '1' : '0') . ";
+            if(check_duplicate==1){
+                if (jQuery('#" . $this->target . "').find('" . $this->check_duplicate_selector . "').length > 0) {
+                    is_duplicate = 1;
+                }
+            }
+            if (is_duplicate==0) {
+                $.cresenity.prepend('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $data_addition . ');
+            }
+		';
 
         return $js;
     }
-
 }

@@ -1,17 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * @property array $__data__
  * @property int   $size
  */
 final class CBase_ListCache implements CBase_CacheInterface {
-
     use CBase_Trait_CacheDataTrait;
 
     public function __construct(iterable $entries = null) {
@@ -62,5 +55,4 @@ final class CBase_ListCache implements CBase_CacheInterface {
         --$this->size;
         return true;
     }
-
 }

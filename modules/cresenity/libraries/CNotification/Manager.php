@@ -1,19 +1,11 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CNotification_Manager {
-
     protected $channels;
     protected $vendors;
     protected static $instance;
 
     /**
-     * 
      * @return CNotification_Manager
      */
     public static function instance() {
@@ -28,9 +20,9 @@ class CNotification_Manager {
     }
 
     /**
-     * 
      * @param string $channel
-     * @param array $config
+     * @param array  $config
+     *
      * @return \CNotification_ChannelAbstract
      */
     public function channel($channel, $config = null) {
@@ -45,10 +37,10 @@ class CNotification_Manager {
     }
 
     /**
-     * 
      * @param string $vendor
-     * @param array $data
-     * @param array $config
+     * @param array  $data
+     * @param array  $config
+     *
      * @return \CNotification_MessageAbstract
      */
     public function createMessage($vendor, $config = [], $data = []) {
@@ -59,8 +51,8 @@ class CNotification_Manager {
     }
 
     /**
-     * 
      * @param string $vendor
+     *
      * @return string
      */
     protected function toMessageClass($vendor) {
@@ -76,7 +68,6 @@ class CNotification_Manager {
     }
 
     /**
-     * 
      * @return string
      */
     public function logNotificationModelName() {
@@ -84,12 +75,10 @@ class CNotification_Manager {
     }
 
     /**
-     * 
      * @return \CModel
      */
     public function createLogNotificationModel() {
         $modelName = $this->logNotificationModelName();
         return new $modelName();
     }
-
 }

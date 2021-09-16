@@ -1,21 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 7:10:21 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 7:10:21 PM
  */
 trait CDatabase_Trait_ManageTransaction {
-
     protected $isSavePoint = false;
 
     /**
      * Execute a Closure within a transaction.
      *
-     * @param  \Closure  $callback
-     * @param  int  $attempts
+     * @param \Closure $callback
+     * @param int      $attempts
+     *
      * @return mixed
      *
      * @throws \Exception|\Throwable
@@ -28,15 +29,16 @@ trait CDatabase_Trait_ManageTransaction {
             // gets actually persisted to a database or stored in a permanent fashion.
             try {
                 return CF::tap($callback($this), function () {
-                            $this->commit();
-                        });
-            }
-            // If we catch an exception we'll rollback this transaction and try again if we
-            // are not out of attempts. If we are out of attempts we will just throw the
-            // exception back out and let the developer handle an uncaught exceptions.
-            catch (Exception $e) {
+                    $this->commit();
+                });
+            } catch (Exception $e) {
+                // If we catch an exception we'll rollback this transaction and try again if we
+                // are not out of attempts. If we are out of attempts we will just throw the
+                // exception back out and let the developer handle an uncaught exceptions.
                 $this->handleTransactionException(
-                        $e, $currentAttempt, $attempts
+                    $e,
+                    $currentAttempt,
+                    $attempts
                 );
             } catch (Throwable $e) {
                 $this->rollBack();
@@ -48,9 +50,10 @@ trait CDatabase_Trait_ManageTransaction {
     /**
      * Handle an exception encountered when running a transacted statement.
      *
-     * @param  \Exception  $e
-     * @param  int  $currentAttempt
-     * @param  int  $maxAttempts
+     * @param \Exception $e
+     * @param int        $currentAttempt
+     * @param int        $maxAttempts
+     *
      * @return void
      *
      * @throws \Exception
@@ -59,8 +62,9 @@ trait CDatabase_Trait_ManageTransaction {
         // On a deadlock, MySQL rolls back the entire transaction so we can't just
         // retry the query. We have to throw this exception all the way out and
         // let the developer handle it in another way. We will decrement too.
-        if ($this->causedByDeadlock($e) &&
-                $this->transactions > 1) {
+        if ($this->causedByDeadlock($e)
+            && $this->transactions > 1
+        ) {
             $this->transactions--;
             throw $e;
         }
@@ -77,6 +81,8 @@ trait CDatabase_Trait_ManageTransaction {
     /**
      * Start a new database transaction.
      *
+     * @param bool $isSavePoint
+     *
      * @return void
      *
      * @throws \Exception
@@ -92,8 +98,9 @@ trait CDatabase_Trait_ManageTransaction {
 
     /**
      * Alias of beginTransaction but will not create save point
-     * 
+     *
      * @return void
+     *
      * @throws \Exception
      */
     public function begin() {
@@ -117,8 +124,7 @@ trait CDatabase_Trait_ManageTransaction {
             } catch (Exception $e) {
                 $this->handleBeginTransactionException($e);
             }
-        } elseif ($this->transactions >= 1  && $this->getQueryGrammar()->supportsSavepoints()) {
-
+        } elseif ($this->transactions >= 1 && $this->getQueryGrammar()->supportsSavepoints()) {
             $this->createSavepoint();
         }
     }
@@ -130,14 +136,15 @@ trait CDatabase_Trait_ManageTransaction {
      */
     protected function createSavepoint() {
         $this->driver->query(
-                $this->getQueryGrammar()->compileSavepoint('trans' . ($this->transactions + 1))
+            $this->getQueryGrammar()->compileSavepoint('trans' . ($this->transactions + 1))
         );
     }
 
     /**
      * Handle an exception from a transaction beginning.
      *
-     * @param  \Throwable  $e
+     * @param \Throwable $e
+     *
      * @return void
      *
      * @throws \Exception
@@ -167,7 +174,8 @@ trait CDatabase_Trait_ManageTransaction {
     /**
      * Rollback the active database transaction.
      *
-     * @param  int|null  $toLevel
+     * @param int|null $toLevel
+     *
      * @return void
      *
      * @throws \Exception
@@ -195,7 +203,8 @@ trait CDatabase_Trait_ManageTransaction {
     /**
      * Perform a rollback within the database.
      *
-     * @param  int  $toLevel
+     * @param int $toLevel
+     *
      * @return void
      */
     protected function performRollBack($toLevel) {
@@ -203,7 +212,7 @@ trait CDatabase_Trait_ManageTransaction {
             $this->driver->rollBack();
         } elseif ($this->getQueryGrammar()->supportsSavepoints()) {
             $this->driver->query(
-                    $this->getQueryGrammar()->compileSavepointRollBack('trans' . ($toLevel + 1))
+                $this->getQueryGrammar()->compileSavepointRollBack('trans' . ($toLevel + 1))
             );
         }
     }
@@ -211,7 +220,7 @@ trait CDatabase_Trait_ManageTransaction {
     /**
      * Handle an exception from a rollback.
      *
-     * @param \Exception  $e
+     * @param \Exception $e
      *
      * @throws \Exception
      */
@@ -232,11 +241,9 @@ trait CDatabase_Trait_ManageTransaction {
     }
 
     /**
-     * 
      * @return bool
      */
     public function inTransaction() {
         return $this->transactions > 0;
     }
-
 }

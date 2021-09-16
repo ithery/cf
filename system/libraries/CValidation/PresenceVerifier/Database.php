@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 10:25:47 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 10:25:47 AM
  */
 class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerifierInterface {
-
     /**
      * The database connection instance.
      *
@@ -19,7 +19,8 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
     /**
      * Create a new database presence verifier.
      *
-     * @param  CDatabase  $db
+     * @param CDatabase $db
+     *
      * @return void
      */
     public function __construct(CDatabase $db) {
@@ -29,12 +30,13 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
     /**
      * Count the number of objects in a collection having the given value.
      *
-     * @param  string  $collection
-     * @param  string  $column
-     * @param  string  $value
-     * @param  int|null  $excludeId
-     * @param  string|null  $idColumn
-     * @param  array  $extra
+     * @param string      $collection
+     * @param string      $column
+     * @param string      $value
+     * @param int|null    $excludeId
+     * @param string|null $idColumn
+     * @param array       $extra
+     *
      * @return int
      */
     public function getCount($collection, $column, $value, $excludeId = null, $idColumn = null, array $extra = []) {
@@ -50,10 +52,11 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
     /**
      * Count the number of objects in a collection with the given values.
      *
-     * @param  string  $collection
-     * @param  string  $column
-     * @param  array   $values
-     * @param  array   $extra
+     * @param string $collection
+     * @param string $column
+     * @param array  $values
+     * @param array  $extra
+     *
      * @return int
      */
     public function getMultiCount($collection, $column, array $values, array $extra = []) {
@@ -65,8 +68,9 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
     /**
      * Add the given conditions to the query.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  array  $conditions
+     * @param CDatabase_Query_Builder $query
+     * @param array                   $conditions
+     *
      * @return CDatabase_Query_Builder
      */
     protected function addConditions($query, $conditions) {
@@ -86,9 +90,10 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
     /**
      * Add a "where" clause to the given query.
      *
-     * @param  CDatabase_Query_Builder  $query
-     * @param  string  $key
-     * @param  string  $extraValue
+     * @param CDatabase_Query_Builder $query
+     * @param string                  $key
+     * @param string                  $extraValue
+     *
      * @return void
      */
     protected function addWhere($query, $key, $extraValue) {
@@ -106,7 +111,8 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
     /**
      * Get a query builder for the given table.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return CDatabase_Query_Builder
      */
     protected function table($table) {
@@ -116,11 +122,11 @@ class CValidation_PresenceVerifier_Database implements CValidation_PresenceVerif
     /**
      * Set the connection to be used.
      *
-     * @param  string  $connection
+     * @param string $connection
+     *
      * @return void
      */
     public function setConnection($connection) {
         $this->connection = $connection;
     }
-
 }

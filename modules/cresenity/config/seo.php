@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 return [
     'meta' => [
         /*
@@ -51,8 +45,8 @@ return [
          * The default values to be used by the twitter cards generator.
          */
         'defaults' => [
-        //'card'        => 'summary',
-        //'site'        => '@cresenity',
+            //'card'        => 'summary',
+            //'site'        => '@cresenity',
         ],
     ],
     'jsonld' => [

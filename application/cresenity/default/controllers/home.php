@@ -5,43 +5,12 @@
  *
  * @author Hery
  */
-Class Controller_Home extends CController {
-
-    
-    public function login() {
-        //c::session()->put('user','user');
-        $_SESSION['member']='member';
-    }
-    
-    public function dashboard() {
-        if(!isset($_SESSION['member'])) {
-            return c::redirect(c::url('home'));
-        }
-        /*
-        if(!c::session()->has('user')) {
-            return c::redirect(c::url('home'));
-        }
-         * 
-         */
-    }
-    
-    
-    public function session() {
-        $session = CSession::instance();
-        cdbg::dd($session->all());
-    }
-    
+class Controller_Home extends CController {
     public function index() {
-        
-        $session = CSession::instance();
-        $session->set('a','A');
-        echo $session->get('a');
-       
-        
         $app = CApp::instance();
         $app->setLoginRequired(false);
         $app->setView('welcome');
-        
+
         return $app;
     }
 
@@ -76,7 +45,6 @@ Class Controller_Home extends CController {
         $app->setViewName('test');
         $app->setTheme('cfdocs');
 
-
         $app->addView('member', [
             'members' => \Cresenity\Testing\MemberModel::all()
         ]);
@@ -91,7 +59,7 @@ Class Controller_Home extends CController {
         $app->setTheme('cfdocs');
         /*
           CManager::registerModule('jquery-3.2.1');
-         *  
+         *
          */
         CManager::registerModule('bootstrap-4');
 
@@ -99,14 +67,11 @@ Class Controller_Home extends CController {
         //$div->addComponent('member-table');
         //$template = $app->addTemplate()->setTemplate('testing');
 
-
-
-
         return $app;
     }
 
     public function child() {
-        return CF::response()->view('child');
+        return c::response()->view('child');
     }
 
     public function app() {
@@ -114,5 +79,4 @@ Class Controller_Home extends CController {
 
         echo $app->render();
     }
-
 }

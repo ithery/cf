@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Symfony\Component\CssSelector\Node\Specificity;
 use CParser_Css_Property_Processor as PropertyProcessor;
 
 class CParser_Css_Rule_Processor {
-
     /**
      * Splits a string into separate rules
      *
@@ -30,8 +23,8 @@ class CParser_Css_Rule_Processor {
      * @return string
      */
     private function cleanup($string) {
-        $string = str_replace(array("\r", "\n"), '', $string);
-        $string = str_replace(array("\t"), ' ', $string);
+        $string = str_replace(["\r", "\n"], '', $string);
+        $string = str_replace(["\t"], ' ', $string);
         $string = str_replace('"', '\'', $string);
         $string = preg_replace('|/\*.*?\*/|', '', $string);
         $string = preg_replace('/\s\s+/', ' ', $string);
@@ -55,10 +48,10 @@ class CParser_Css_Rule_Processor {
 
         $chunks = explode('{', $rule);
         if (!isset($chunks[1])) {
-            return array();
+            return [];
         }
         $propertiesProcessor = new PropertyProcessor();
-        $rules = array();
+        $rules = [];
         $selectors = (array) explode(',', trim($chunks[0]));
         $properties = $propertiesProcessor->splitIntoSeparateProperties($chunks[1]);
 
@@ -67,7 +60,10 @@ class CParser_Css_Rule_Processor {
             $specificity = $this->calculateSpecificityBasedOnASelector($selector);
 
             $rules[] = new CParser_Css_Rule(
-                    $selector, $propertiesProcessor->convertArrayToObjects($properties, $specificity), $specificity, $originalOrder
+                $selector,
+                $propertiesProcessor->convertArrayToObjects($properties, $specificity),
+                $specificity,
+                $originalOrder
             );
         }
 
@@ -78,9 +74,9 @@ class CParser_Css_Rule_Processor {
      * Calculates the specificity based on a CSS Selector string,
      * Based on the patterns from premailer/css_parser by Alex Dunae
      *
-     * @see https://github.com/premailer/css_parser/blob/master/lib/css_parser/regexps.rb
-     *
      * @param string $selector
+     *
+     * @see https://github.com/premailer/css_parser/blob/master/lib/css_parser/regexps.rb
      *
      * @return Specificity
      */
@@ -113,7 +109,9 @@ class CParser_Css_Rule_Processor {
                       )";
 
         return new Specificity(
-                preg_match_all("/{$idSelectorsPattern}/ix", $selector, $matches), preg_match_all("/{$classAttributesPseudoClassesSelectorsPattern}/ix", $selector, $matches), preg_match_all("/{$typePseudoElementsSelectorPattern}/ix", $selector, $matches)
+            preg_match_all("/{$idSelectorsPattern}/ix", $selector, $matches),
+            preg_match_all("/{$classAttributesPseudoClassesSelectorsPattern}/ix", $selector, $matches),
+            preg_match_all("/{$typePseudoElementsSelectorPattern}/ix", $selector, $matches)
         );
     }
 
@@ -123,7 +121,7 @@ class CParser_Css_Rule_Processor {
      *
      * @return Rule[]
      */
-    public function convertArrayToObjects(array $rules, array $objects = array()) {
+    public function convertArrayToObjects(array $rules, array $objects = []) {
         $order = 1;
         foreach ($rules as $rule) {
             $objects = array_merge($objects, $this->convertToObjects($rule, $order));
@@ -153,5 +151,4 @@ class CParser_Css_Rule_Processor {
 
         return $value;
     }
-
 }

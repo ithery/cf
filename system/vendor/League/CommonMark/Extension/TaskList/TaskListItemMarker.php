@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -15,8 +13,7 @@ namespace League\CommonMark\Extension\TaskList;
 
 use League\CommonMark\Node\Inline\AbstractInline;
 
-final class TaskListItemMarker extends AbstractInline
-{
+final class TaskListItemMarker extends AbstractInline {
     /**
      * @var bool
      *
@@ -24,20 +21,17 @@ final class TaskListItemMarker extends AbstractInline
      */
     private $checked;
 
-    public function __construct(bool $isCompleted)
-    {
+    public function __construct($isCompleted) {
         parent::__construct();
 
         $this->checked = $isCompleted;
     }
 
-    public function isChecked(): bool
-    {
+    public function isChecked() {
         return $this->checked;
     }
 
-    public function setChecked(bool $checked): void
-    {
+    public function setChecked($checked) {
         $this->checked = $checked;
     }
 }

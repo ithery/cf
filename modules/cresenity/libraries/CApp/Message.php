@@ -1,19 +1,19 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2018, 4:19:33 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2018, 4:19:33 AM
  */
 class CApp_Message {
-
     public static function add($type, $message) {
         $session = CSession::instance();
         $msgs = $session->get('cmsg_' . $type);
         if (!is_array($msgs)) {
-            $msgs = array();
+            $msgs = [];
         }
         $msgs[] = $message;
         $session->set('cmsg_' . $type, $msgs);
@@ -38,14 +38,15 @@ class CApp_Message {
 
     public static function flash($type) {
         $msgs = cmsg::get($type);
-        $message = "";
+        $message = '';
         if (is_array($msgs)) {
             foreach ($msgs as $msg) {
-                $message .= "<p>" . $msg . "</p>";
+                $message .= '<p>' . $msg . '</p>';
             }
-        } else if (is_string($msgs)) {
-            if (strlen($msgs) > 0)
+        } elseif (is_string($msgs)) {
+            if (strlen($msgs) > 0) {
                 $message = $msgs;
+            }
         }
         cmsg::clear($type);
         if (strlen($message) > 0) {
@@ -55,7 +56,6 @@ class CApp_Message {
     }
 
     public static function flashAll() {
-        return cmsg::flash("error") . cmsg::flash("warning") . cmsg::flash("info") . cmsg::flash("success");
+        return cmsg::flash('error') . cmsg::flash('warning') . cmsg::flash('info') . cmsg::flash('success');
     }
-
 }

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 3:33:01 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 3:33:01 PM
  */
-class CModel_Validating_ValidationException extends CValidation_Exception implements CValidation_MessageBagProviderInterface {
-
+class CModel_Validating_ValidationException extends CValidation_Exception implements CBase_MessageProviderInterface {
     /**
      * The model with validation errors.
      *
@@ -19,15 +19,14 @@ class CModel_Validating_ValidationException extends CValidation_Exception implem
     /**
      * Create a new validation exception instance.
      *
-     * @param  CValidation_Validator  $validator
-     * @param  CModel         $model
+     * @param CValidation_Validator $validator
+     * @param CModel                $model
+     *
      * @return void
      */
     public function __construct(CValidation_Validator $validator, CModel $model) {
         parent::__construct($validator);
-        
-        
-        
+
         $this->model = $model;
     }
 
@@ -52,7 +51,7 @@ class CModel_Validating_ValidationException extends CValidation_Exception implem
     /**
      * Get the validation errors.
      *
-     * @return CValidation_Messagebag
+     * @return CBase_Messagebag
      */
     public function errors() {
         return $this->validator->errors();
@@ -61,7 +60,7 @@ class CModel_Validating_ValidationException extends CValidation_Exception implem
     /**
      * Get the validation errors.
      *
-     * @return CValidation_Messagebag
+     * @return CBase_Messagebag
      */
     public function getErrors() {
         return $this->errors();
@@ -70,10 +69,9 @@ class CModel_Validating_ValidationException extends CValidation_Exception implem
     /**
      * Get the messages for the instance.
      *
-     * @return CValidation_Messagebag
+     * @return CBase_Messagebags
      */
     public function getMessageBag() {
         return $this->errors();
     }
-
 }

@@ -7,7 +7,6 @@
  * @author Hery
  */
 class CSession_NativeAdapter implements \ArrayAccess {
-
     public function offsetExists($offset) {
         return c::session()->has($offset);
     }
@@ -24,4 +23,7 @@ class CSession_NativeAdapter implements \ArrayAccess {
         return c::session()->forget($offset);
     }
 
+    public function data() {
+        return c::session()->all();
+    }
 }

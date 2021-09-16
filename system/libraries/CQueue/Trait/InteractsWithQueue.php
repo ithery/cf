@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 3:10:18 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 3:10:18 AM
  */
 trait CQueue_Trait_InteractsWithQueue {
-
     /**
      * The underlying queue job instance.
      *
@@ -39,7 +39,8 @@ trait CQueue_Trait_InteractsWithQueue {
     /**
      * Fail the job from the queue.
      *
-     * @param  \Throwable|null  $exception
+     * @param \Throwable|null $exception
+     *
      * @return void
      */
     public function fail($exception = null) {
@@ -51,7 +52,8 @@ trait CQueue_Trait_InteractsWithQueue {
     /**
      * Release the job back into the queue.
      *
-     * @param  int   $delay
+     * @param int $delay
+     *
      * @return void
      */
     public function release($delay = 0) {
@@ -63,12 +65,12 @@ trait CQueue_Trait_InteractsWithQueue {
     /**
      * Set the base queue job instance.
      *
-     * @param  CQueue_AbstractJob  $job
+     * @param CQueue_AbstractJob $job
+     *
      * @return $this
      */
     public function setJob(CQueue_AbstractJob $job) {
         $this->job = $job;
         return $this;
     }
-
 }

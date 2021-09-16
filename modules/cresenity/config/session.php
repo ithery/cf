@@ -1,4 +1,5 @@
-<?php defined('SYSPATH') OR die('No direct access allowed.');
+<?php
+defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @package Session
  *
@@ -7,13 +8,12 @@
 $config['driver'] = 'native';
 //$config['driver'] = 'database';
 
-
 /**
  * Session storage parameter, used by drivers.
  */
 $config['storage'] = '';
-//	$config['storage'] = 'mysqli://appittro_admin:capp2014@127.0.0.1/temp';
-	// $config['storage'] = 'temp';
+// $config['storage'] = 'mysqli://appittro_admin:capp2014@127.0.0.1/temp';
+// $config['storage'] = 'temp';
 
 /**
  * Session name.
@@ -24,14 +24,14 @@ $config['name'] = 'cresenityapp_session';
 /**
  * Session parameters to validate: user_agent, ip_address, expiration.
  */
-$config['validate'] = array('user_agent');
+$config['validate'] = ['user_agent'];
 
 /**
  * Enable or disable session encryption.
  * Note: this has no effect on the native session driver.
  * Note: the cookie driver always encrypts session data. Set to TRUE for stronger encryption.
  */
-$config['encryption'] = FALSE;
+$config['encryption'] = false;
 
 /**
  * Session lifetime. Number of seconds that each session will last.

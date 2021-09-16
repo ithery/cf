@@ -1,72 +1,88 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * CF Class
+ */
 final class CF {
-
     use CFDeprecatedTrait;
 
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
+
     // Security check that is added to all generated PHP files
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
 
     // The singleton instance of the controller (last of the controller)
     public static $instance;
+
     // The multiple instance of the controller when callback when routing is failed or redirected
     public static $instances;
+
     // The current user agent
     public static $user_agent;
+
     // The current locale
     public static $locale;
+
     // Configuration
     private static $configuration;
 
     /**
      * Include paths cache
+     *
      * @var array
      */
     private static $paths;
 
     /**
      * Chartset used for this application
-     * 
+     *
      * @var string
      */
     public static $charset = 'utf-8';
 
     /* log threshold default , CLogger::LOG_WARNING (4) */
     public static $log_threshold = LOG_WARNING; // 4
-    public static $global_xss_filtering = TRUE;
+
+    public static $global_xss_filtering = true;
+
     // Internal caches and write status
-    private static $internal_cache = array();
+    private static $internal_cache = [];
 
     /**
      * CF Data domain
-     * 
+     *
      * @var array
      */
     private static $data;
 
     /**
-     * sharedAppCode used for CF
-     * 
+     * List of Shared appCode used for CF
+     *
      * @var array
      */
     private static $sharedAppCode = [];
+
     private static $translator;
 
     /**
-     * @var  CLogger  logging object
+     * Logger Instance
+     *
+     * @var CLogger logging object
      */
     public static $logger;
 
     /**
-     * @var  CConfig  config object
+     * Config Instance
+     *
+     * @var CConfig config object
      */
     public static $config;
 
     /**
-     * 
+     * Check CF is running on production
+     *
      * @return bool
      */
     public static function isProduction() {
@@ -75,8 +91,9 @@ final class CF {
 
     /**
      * Check given domain exists or not
-     * 
-     * @param string $domain
+     *
+     * @param string $domain domain to check
+     *
      * @return bool
      */
     public static function domainExists($domain) {
@@ -84,9 +101,11 @@ final class CF {
     }
 
     /**
-     * 
-     * @param type $domain
-     * @param array $domainData
+     * Create domain
+     *
+     * @param string $domain     asd
+     * @param array  $domainData asd
+     *
      * @return bool
      */
     public static function createDomain($domain, array $domainData) {
@@ -107,22 +126,21 @@ final class CF {
      * For security, this function also destroys the $_REQUEST global variable.
      * Using the proper global (GET, POST, COOKIE, etc) is inherently more secure.
      * The recommended way to fetch a global variable is using the Input library.
+     *
      * @see http://www.php.net/globals
      *
-     * @return  void
+     * @return void
      */
     public static function setup() {
         static $run;
 
         // This function can only be run once
-        if ($run === TRUE) {
+        if ($run === true) {
             return;
         }
 
         // Start the environment setup benchmark
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_setup');
-
-
 
         $capppath = APPPATH;
         $defaultpath = APPPATH;
@@ -134,12 +152,11 @@ final class CF {
             $capppath .= self::orgCode() . DS;
         }
 
-
-        if (is_dir($defaultpath . "default" . DS)) {
-            $defaultpath .= "default" . DS;
+        if (is_dir($defaultpath . 'default' . DS)) {
+            $defaultpath .= 'default' . DS;
         }
-        if (is_dir($capppath . "default" . DS)) {
-            $capppath .= "default" . DS;
+        if (is_dir($capppath . 'default' . DS)) {
+            $capppath .= 'default' . DS;
         }
 
         define('CAPPPATH', $capppath);
@@ -154,17 +171,14 @@ final class CF {
         // Define database error constant
         define('E_DATABASE_ERROR', 44);
 
-
-
         // Set autoloader
-        spl_autoload_register(array('CF', 'autoLoad'));
+        spl_autoload_register(['CF', 'autoLoad']);
 
         // Set and test the logger instance, we need to know whats wrong when CF Fail
         self::$logger = CLogger::instance();
 
         // Set and test the config, we need config can loaded normally to run CF
         self::$config = CConfig::instance('app');
-
 
         // Disable notices and "strict" errors
         $ER = error_reporting(~E_NOTICE & ~E_STRICT);
@@ -184,38 +198,40 @@ final class CF {
         error_reporting($ER);
 
         // Send default text/html UTF-8 header
-        header('Content-Type: text/html; charset=UTF-8');
+        //header('Content-Type: text/html; charset=UTF-8');
 
         // Load locales
         $locale = self::config('app.locale');
 
-
         // Set locale information
         self::$locale = setlocale(LC_ALL, $locale);
 
-
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
         static::loadBootstrapFiles();
 
         // Setup is complete, prevent it from being run again
-        $run = TRUE;
+        $run = true;
 
         // Stop the environment setup routine
-
-        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
     }
 
     /**
-     * load all bootstrap files
+     * Load all bootstrap files
+     *
+     * @return void
      */
     private static function loadBootstrapFiles() {
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_bootstrap');
 
-
+        CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_system_bootstrap');
         $bootstrapPath = DOCROOT . 'system' . DS;
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
-        //try to locate bootstrap files for modules 
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_system_bootstrap');
+        //try to locate bootstrap files for modules
+        CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_module_bootstrap');
+
         foreach (CF::modules() as $module) {
             $bootstrapPath = DOCROOT . 'modules' . DS . $module . DS;
             if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
@@ -223,13 +239,15 @@ final class CF {
             }
         }
 
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_module_bootstrap');
 
-        //try to locate bootstrap files for application 
+        //try to locate bootstrap files for application
+        CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_application_bootstrap');
         $bootstrapPath = DOCROOT . 'application' . DS . CF::appCode() . DS;
         if (file_exists($bootstrapPath . 'bootstrap' . EXT)) {
             include $bootstrapPath . 'bootstrap' . EXT;
         }
-
+        CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_application_bootstrap');
 
         //try to locate bootstrap files for org
         if (strlen(CF::orgCode()) > 0) {
@@ -241,8 +259,14 @@ final class CF {
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_bootstrap');
     }
 
+    /**
+     * Invoke
+     *
+     * @param mixed $uri
+     *
+     * @return void
+     */
     public static function invoke($uri) {
-
         $routerData = CFRouter::getRouteData($uri);
         $routes = carr::get($routerData, 'routes');
         $current_uri = carr::get($routerData, 'current_uri');
@@ -276,14 +300,19 @@ final class CF {
                 // Start validation of the controller
             } catch (ReflectionException $e) {
                 // Controller does not exist
-
                 CF::show404();
             }
         }
 
-        if (isset($class) && ($class->isAbstract() OR ( IN_PRODUCTION AND $class->getConstant('ALLOW_PRODUCTION') == FALSE))) {
+        if (isset($class)
+            && ($class->isAbstract()
+            || (IN_PRODUCTION && $class->getConstant('ALLOW_PRODUCTION') == false))
+        ) {
             // Controller is not allowed to run in production
-            throw new CException('class is abstract or not allowed in production in :class_name', array(':class_name' => $class_name));
+            throw new CException(
+                'class is abstract or not allowed in production in :class_name',
+                [':class_name' => $class_name]
+            );
         }
         // Create a new controller instance
         if (isset($class)) {
@@ -296,7 +325,10 @@ final class CF {
             // Method exists
             if (CFRouter::$method[0] === '_') {
                 // Do not allow access to hidden methods
-                throw new CException('method :method is hidden methods in :class_name', array(':method' => $method, ':class_name' => $class_name));
+                throw new CException(
+                    'method :method is hidden methods in :class_name',
+                    [':method' => $method, ':class_name' => $class_name]
+                );
             }
 
             if ($method->isProtected() or $method->isPrivate()) {
@@ -311,7 +343,7 @@ final class CF {
             $method = $class->getMethod('__call');
 
             // Use arguments in __call format
-            $arguments = array($method, $arguments);
+            $arguments = [$method, $arguments];
         }
 
         // Execute the controller method
@@ -321,19 +353,21 @@ final class CF {
     /**
      * Displays a 404 page.
      *
-     * @throws  C_404_Exception
-     * @param   string  URI of page
-     * @param   string  custom template
-     * @return  void
+     * @param string $page     URI of page
+     * @param string $template custom template
+     *
+     * @throws CHTTP_Exception_NotFoundHttpException
+     *
+     * @return void
      */
-    public static function show404($page = FALSE, $template = FALSE) {
+    public static function show404($page = false, $template = false) {
         return c::abort(404);
     }
 
     /**
-     * 
      * @param type $directory
      * @param type $domain
+     *
      * @return string
      */
     public static function getDir($directory = '', $domain = null) {
@@ -351,14 +385,14 @@ final class CF {
     }
 
     /**
-     * 
      * @param string $directory
      * @param string $domain
+     *
      * @return array array of directory
      */
     public static function getDirs($directory, $domain = null) {
         $includePaths = CF::paths($domain);
-        $dirs = array();
+        $dirs = [];
         foreach ($includePaths as $p) {
             $path = $p . $directory . DS;
             if (is_dir($path)) {
@@ -369,20 +403,21 @@ final class CF {
     }
 
     /**
-     * 
      * @param string $directory
      * @param string $filename
      * @param string $domain
+     * @param mixed  $force_reload
+     *
      * @return string[]
      */
-    public static function getFiles($directory, $filename, $domain = null) {
+    public static function getFiles($directory, $filename, $domain = null, $force_reload = false) {
         if ($domain == null) {
             $domain = CF::domain();
         }
-        $include_paths = CF::paths($domain);
 
+        $include_paths = CF::paths($domain, $force_reload);
 
-        $result = array();
+        $result = [];
         foreach ($include_paths as $path) {
             if (file_exists($path . $directory . DS . $filename . EXT)) {
                 $result[] = $path . $directory . DS . $filename . EXT;
@@ -393,10 +428,10 @@ final class CF {
     }
 
     /**
-     * 
      * @param string $directory
      * @param string $filename
      * @param string $domain
+     *
      * @return string
      */
     public static function getFile($directory, $filename, $domain = null) {
@@ -411,8 +446,10 @@ final class CF {
      * Get all include paths. APPPATH is the first path, followed by module
      * paths in the order they are configured, follow by the SYSPATH.
      *
-     * @param   boolean  re-process the include paths
-     * @return  array
+     * @param null|mixed $domain
+     * @param bool       $force_reload
+     *
+     * @return array
      */
     public static function paths($domain = null, $force_reload = false) {
         if ($domain == null) {
@@ -420,11 +457,12 @@ final class CF {
         }
         if (!isset(self::$paths[$domain]) || $force_reload) {
             //we try to search all paths for this domain
-            $paths = array();
+            $paths = [];
             $theme = CF::theme($domain);
             $org_code = CF::orgCode($domain);
             $app_code = CF::appCode($domain);
             $sharedAppCode = CF::getSharedApp($domain);
+
             $modules = CF::modules($domain);
             //when this domain is org
             if (strlen($org_code) > 0) {
@@ -451,22 +489,21 @@ final class CF {
             self::$paths[$domain] = $paths;
         }
 
-
         return self::$paths[$domain];
     }
 
     /**
      * Get a config item or group.
      *
-     * @param   string   item name
-     * @param   boolean  force a forward slash (/) at the end of the item
-     * @param   boolean  is the item required?
-     * @return  mixed
+     * @param mixed      $group
+     * @param null|mixed $default
+     * @param mixed      $required
+     *
+     * @return array|CConfig|mixed
      */
-    public static function config($group, $default = null, $required = TRUE) {
-
+    public static function config($group, $default = null, $required = true) {
         $path = null;
-        if (strpos($group, '.') !== FALSE) {
+        if (strpos($group, '.') !== false) {
             // Split the config group and path
             list($group, $path) = explode('.', $group, 2);
         }
@@ -475,16 +512,16 @@ final class CF {
 
         $value = $config->get($path, $default);
 
-
         return $value;
     }
 
     /**
      * Add a new message to the log.
      *
-     * @param   string  type of message
-     * @param   string  message text
-     * @return  void
+     * @param string $level
+     * @param string $message
+     *
+     * @return void
      */
     public static function log($level, $message) {
         if (class_exists('CLogger')) {
@@ -495,29 +532,31 @@ final class CF {
     /**
      * Provides class auto-loading.
      *
-     * @throws  CException
-     * @param   string  name of class
-     * @return  bool
+     * @param string $class
+     * @param string $directory
+     *
+     * @throws CException
+     *
+     * @return bool
      */
     public static function autoLoad($class, $directory = 'libraries') {
-        if (class_exists($class, FALSE)) {
-            return TRUE;
+        if (class_exists($class, false)) {
+            return true;
         }
         if (($prefix = strpos($class, '_')) > 0) {
             // Find the class suffix
             $prefix = substr($class, 0, $prefix);
         } else {
             // No suffix
-            $prefix = FALSE;
+            $prefix = false;
         }
         if (($suffix = strrpos($class, '_')) > 0) {
             // Find the class suffix
             $suffix = substr($class, $suffix + 1);
         } else {
             // No suffix
-            $suffix = FALSE;
+            $suffix = false;
         }
-
 
         if ($suffix === 'Controller' || $prefix === 'Controller') {
             $type = 'controllers';
@@ -537,22 +576,23 @@ final class CF {
             $file = $class;
         }
 
-        $class_not_found = FALSE;
+        $class_not_found = false;
         if ($type == 'controllers') {
             if ($filename = self::findFile($type, $file)) {
                 require $filename;
-                $class_not_found = TRUE;
-                return TRUE;
+                $class_not_found = true;
+                return true;
             } else {
                 $type = 'libraries';
                 $directory = 'libraries';
                 $file = $class;
             }
         }
+
         if ($filename = self::findFile($type, $file)) {
             require $filename;
-            $class_not_found = TRUE;
-            return TRUE;
+            $class_not_found = true;
+            return true;
         }
 
         if (!$class_not_found) {
@@ -560,7 +600,6 @@ final class CF {
             $routing_class = ltrim($class, '\\');
             $routing_file = '';
             $namespace = '';
-
 
             $is_namespace = false;
             if ($last_namespace_position = strripos($routing_class, '\\')) {
@@ -571,10 +610,7 @@ final class CF {
                 $routing_file = str_replace('\\', DS, $namespace) . DS;
             }
 
-
-
             $routing_file .= str_replace('_', DS, $routing_class);
-
 
             if (substr($routing_file, strlen($routing_file) - 1, 1) == DS) {
                 $routing_file = substr($routing_file, 0, strlen($routing_file) - 1) . '_';
@@ -585,23 +621,36 @@ final class CF {
                 if ($path = self::findFile('vendor', $routing_file)) {
                     // Load the class file
 
-
                     require $path;
 
                     if (class_exists($class) || interface_exists($class)) {
-                        $class_not_found = FALSE;
-                        return TRUE;
+                        $class_not_found = false;
+                        return true;
                     }
                 }
             }
 
+            if ($directory == 'libraries') {
+                if (static::isTesting()) {
+                    if ($path = self::findFile('tests', $routing_file)) {
+                        // Load the class file
+
+                        require $path;
+
+                        if (class_exists($class) || interface_exists($class)) {
+                            $class_not_found = false;
+                            return true;
+                        }
+                    }
+                }
+            }
 
             // find file at libraries
             if ($path = self::findFile($directory, $routing_file)) {
                 // Load the class file
                 require $path;
-                $class_not_found = TRUE;
-                return TRUE;
+                $class_not_found = true;
+                return true;
             }
 
             // check route file at helpers
@@ -615,14 +664,12 @@ final class CF {
                         // Load the class file
 
                         require $path;
-                        $class_not_found = TRUE;
-                        return TRUE;
+                        $class_not_found = true;
+                        return true;
                     }
                 }
             }
         }
-
-
 
         if (!$class_not_found) {
             // The class could not be found
@@ -638,13 +685,13 @@ final class CF {
                 }
             }
 
-            return FALSE;
+            return false;
         }
 
         if ($filename = self::findFile($type, self::$configuration['core']['extension_prefix'] . $class)) {
             // Load the class extension
             require $filename;
-        } elseif ($suffix !== 'Core' AND class_exists($class . '_Core', FALSE)) {
+        } elseif ($suffix !== 'Core' and class_exists($class . '_Core', false)) {
             // Class extension to be evaluated
             $extension = 'class ' . $class . ' extends ' . $class . '_Core { }';
 
@@ -661,31 +708,36 @@ final class CF {
             eval($extension);
         }
 
-        return TRUE;
+        return true;
     }
 
     /**
-     * detect CF is running on console in cf command or not
-     * 
-     * @return boolean
+     * Detect CF is running on console in cf command or not
+     *
+     * @return bool
      */
     public static function isCFCli() {
         return defined('CFCLI');
     }
 
     /**
-     * detect CF is running on console or not 
-     * 
+     * Detect CF is running on console or not
+     *
      * @return type
      */
     public static function isCli() {
         return PHP_SAPI === 'cli';
     }
 
+    /**
+     * To get cliDomain
+     *
+     * @return void
+     */
     public static function cliDomain() {
         $domain = null;
         if (file_exists(static::CFCLI_CURRENT_DOMAIN_FILE)) {
-            $domain = file_get_contents(static::CFCLI_CURRENT_DOMAIN_FILE);
+            $domain = trim(file_get_contents(static::CFCLI_CURRENT_DOMAIN_FILE));
         }
         return $domain;
     }
@@ -694,7 +746,7 @@ final class CF {
         $domain = '';
         if (static::isCli()) {
             // Command line requires a bit of hacking
-            if (static::isCFCli()) {
+            if (static::isCFCli() || static::isTesting()) {
                 $domain = static::cliDomain();
             } else {
                 if (isset($_SERVER['argv'][2])) {
@@ -702,12 +754,12 @@ final class CF {
                 }
             }
         } else {
-            if (isset($_SERVER["SERVER_NAME"])) {
-                $domain = $_SERVER["SERVER_NAME"];
+            if (isset($_SERVER['SERVER_NAME'])) {
+                $domain = $_SERVER['SERVER_NAME'];
             }
             if (strlen($domain) == 0) {
                 if (isset($_SERVER['HTTP_HOST'])) {
-                    $domain = $_SERVER["HTTP_HOST"];
+                    $domain = $_SERVER['HTTP_HOST'];
                 }
             }
         }
@@ -719,14 +771,15 @@ final class CF {
      * to the order of the include paths. Configuration and i18n files will be
      * returned in reverse order.
      *
-     * @throws  CException  if file is required and not found
-     * @param   string   directory to search in
-     * @param   string   filename to look for (without extension)
-     * @param   boolean  file required
-     * @param   string   file extension
-     * @return  array    if the type is config, i18n or l10n
-     * @return  string   if the file is found
-     * @return  FALSE    if the file is not found
+     * @param mixed $directory directory to search in
+     * @param mixed $filename  filename to look for (without extension)
+     * @param mixed $required  file required
+     * @param mixed $ext       file extension
+     * @param mixed $reload
+     *
+     * @throws CException if file is required and not found
+     *
+     * @return array|string|bool if the type is config, i18n or l10n,
      */
     public static function findFile($directory, $filename, $required = false, $ext = false, $reload = false) {
         // NOTE: This test MUST be not be a strict comparison (===), or empty
@@ -747,12 +800,12 @@ final class CF {
         }
 
         // Load include paths
-        $paths = self::paths();
+        $paths = self::paths(null, $reload);
 
         // Nothing found, yet
-        $found = NULL;
+        $found = null;
 
-        if ($directory === 'config' OR $directory === 'i18n') {
+        if ($directory === 'config' or $directory === 'i18n') {
             // Search in reverse, for merging
             $paths = array_reverse($paths);
 
@@ -763,7 +816,6 @@ final class CF {
                 }
             }
         } else {
-
             foreach ($paths as $path) {
                 if (static::isFile($path . $search)) {
                     // A matching file has been found
@@ -775,20 +827,20 @@ final class CF {
             }
         }
 
-        if ($found === NULL) {
-            if ($required === TRUE) {
+        if ($found === null) {
+            if ($required === true) {
                 // If the file is required, throw an exception
                 $lang = static::lang('core.resource_not_found', [':directory' => $directory, ':filename' => $filename]);
                 throw new CException($lang);
             } else {
                 // Nothing was found, return FALSE
-                $found = FALSE;
+                $found = false;
             }
         }
 
         if (!isset(self::$write_cache['find_file_paths'])) {
             // Write cache at shutdown
-            self::$write_cache['find_file_paths'] = TRUE;
+            self::$write_cache['find_file_paths'] = true;
         }
 
         return self::$internal_cache['find_file_paths'][$search] = $found;
@@ -797,51 +849,60 @@ final class CF {
     /**
      * Fetch an i18n language item.
      *
-     * @param   string  language key to fetch
-     * @param   array   additional information to insert into the line
-     * @return  string  i18n language string, or the requested key if the i18n item is not found
+     * @param null|string $key    language key to fetch
+     * @param null|array  $args   argument for replace
+     * @param null|array  $locale additional information to insert into the line
+     *
+     * @return string i18n language string, or the requested key if the i18n item is not found
      */
-    public static function lang($key = null, array $args = array(), $locale = null) {
+    public static function lang($key = null, array $args = [], $locale = null) {
         if ($key == null) {
             return CTranslation::translator();
         }
 
-        return CTranslation::translator()->trans($key, $args);
+        return CTranslation::translator()->trans($key, $args, $locale);
     }
 
     /**
      * Fetch an i18n language item.
      *
-     * @param   string  language key to fetch
-     * @param   array   additional information to insert into the line
-     * @return  string  i18n language string, or the requested key if the i18n item is not found
+     * @param null|mixed $key  language key to fetch
+     * @param array      $args additional information to insert into the line
+     *
+     * @return string i18n language string, or the requested key if the i18n item is not found
      */
-    public static function trans($key = null, array $args = array()) {
+    public static function trans($key = null, array $args = []) {
         static::lang($key, $args);
     }
 
     /**
      * Checks if given data is file, handles mixed input
      *
-     * @param  mixed $value
-     * @return boolean
+     * @param mixed $value
+     *
+     * @return bool
      */
     private static function isFile($value) {
-        $value = strval(str_replace("\0", "", $value));
+        $value = strval(str_replace("\0", '', $value));
 
         return is_file($value);
     }
 
     /**
      * Get data domain
+     *
+     * @param string $domain
+     *
+     * @return array
      */
     public static function data($domain = null) {
         $domain = $domain == null ? self::domain() : $domain;
+
         if (!isset(self::$data[$domain])) {
             self::$data[$domain] = CFData::domain($domain);
             if (self::$data[$domain] == null) {
                 //try to locate wildcard subdomain
-                $wildcardDomain = implode('.', array('$') + array_slice(explode('.', $domain), 0));
+                $wildcardDomain = implode('.', ['$'] + array_slice(explode('.', $domain), 0));
 
                 self::$data[$domain] = CFData::domain($wildcardDomain);
             }
@@ -852,7 +913,9 @@ final class CF {
     /**
      * Get application id for domain
      *
-     * @return  string
+     * @param null|mixed $domain
+     *
+     * @return string
      */
     public static function appId($domain = null) {
         $data = self::data($domain);
@@ -862,7 +925,9 @@ final class CF {
     /**
      * Get application code for domain
      *
-     * @return  string
+     * @param null|mixed $domain
+     *
+     * @return string
      */
     public static function appCode($domain = null) {
         $data = self::data($domain);
@@ -871,8 +936,9 @@ final class CF {
 
     /**
      * Get org id for domain
-     * 
+     *
      * @param string $domain
+     *
      * @return int
      */
     public static function orgId($domain = null) {
@@ -882,8 +948,9 @@ final class CF {
 
     /**
      * Get org code for this domain
-     * 
+     *
      * @param string $domain
+     *
      * @return string
      */
     public static function orgCode($domain = null) {
@@ -893,14 +960,16 @@ final class CF {
 
     /**
      * Add Shared App in runtime
-     * 
-     * @param string $app_code
+     *
+     * @param string $appCode
      */
     public static function addSharedApp($appCode) {
         if (!in_array($appCode, self::$sharedAppCode)) {
             self::$sharedAppCode[] = $appCode;
             //do force reload
-            self::paths(null, true);
+            //self::paths(null, true);
+            self::$paths = [];
+            self::$internal_cache = [];
         }
     }
 
@@ -908,24 +977,26 @@ final class CF {
      * Get shared application code for this domain
      *
      * @param string $domain
-     * @return  array
+     *
+     * @return array
      */
     public static function getSharedApp($domain = null) {
         $data = self::data($domain);
         if (!isset($data['shared_app_code'])) {
-            $data['shared_app_code'] = array();
+            $data['shared_app_code'] = [];
         }
 
         $data['shared_app_code'] = array_merge($data['shared_app_code'], self::$sharedAppCode);
 
-
-        return isset($data['shared_app_code']) ? $data['shared_app_code'] : array();
+        return isset($data['shared_app_code']) ? $data['shared_app_code'] : [];
     }
 
     /**
      * Get theme for this domain
      *
-     * @return  array
+     * @param null|mixed $domain
+     *
+     * @return array
      */
     public static function theme($domain = null) {
         $data = self::data($domain);
@@ -935,19 +1006,24 @@ final class CF {
     /**
      * Get modules for this domain
      *
-     * @return  array
+     * @param null|mixed $domain
+     *
+     * @return array
      */
     public static function modules($domain = null) {
         $data = self::data($domain);
-        return isset($data['modules']) ? $data['modules'] : array('cresenity');
+        return isset($data['modules']) ? $data['modules'] : ['cresenity'];
     }
 
     /**
      * Call the given Closure with the given value then return the value.
      *
-     * @param  mixed  $value
-     * @param  callable|null  $callback
+     * @param mixed         $value
+     * @param callable|null $callback
+     *
      * @return mixed
+     *
+     * @deprecated
      */
     public static function tap($value, $callback = null) {
         return c::tap($value, $callback);
@@ -956,7 +1032,8 @@ final class CF {
     /**
      * Get the class "basename" of the given object / class.
      *
-     * @param  string|object  $class
+     * @param string|object $class
+     *
      * @return string
      */
     public static function classBasename($class) {
@@ -966,7 +1043,8 @@ final class CF {
     /**
      * Returns all traits used by a class, its subclasses and trait of their traits.
      *
-     * @param  object|string  $class
+     * @param object|string $class
+     *
      * @return array
      */
     public static function classUsesRecursive($class) {
@@ -976,7 +1054,8 @@ final class CF {
     /**
      * Returns all traits used by a trait and its traits.
      *
-     * @param  string  $trait
+     * @param string $trait
+     *
      * @return array
      */
     public static function traitUsesRecursive($trait) {
@@ -986,8 +1065,11 @@ final class CF {
     /**
      * Return the default value of the given value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return mixed
+     *
+     * @deprecated 1.2 use c::value
      */
     public static function value($value) {
         return c::value($value);
@@ -996,102 +1078,48 @@ final class CF {
     /**
      * Get an item from an array or object using "dot" notation.
      *
-     * @param  mixed   $target
-     * @param  string|array  $key
-     * @param  mixed   $default
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $default
+     *
      * @return mixed
+     *
+     * @deprecated 1.2 use c::dataGet
      */
     public static function get($target, $key, $default = null) {
-        if (is_null($key)) {
-            return $target;
-        }
-        $key = is_array($key) ? $key : explode('.', $key);
-        while (!is_null($segment = array_shift($key))) {
-            if ($segment === '*') {
-                if ($target instanceof CCollection) {
-                    $target = $target->all();
-                } elseif (!is_array($target)) {
-                    return CF::value($default);
-                }
-                $result = carr::pluck($target, $key);
-                return in_array('*', $key) ? carr::collapse($result) : $result;
-            }
-            if (carr::accessible($target) && carr::exists($target, $segment)) {
-                $target = $target[$segment];
-            } elseif (is_object($target) && isset($target->{$segment})) {
-                $target = $target->{$segment};
-            } else {
-                return CF::value($default);
-            }
-        }
-        return $target;
+        return c::get($target, $key, $default);
     }
 
     /**
      * Set an item on an array or object using dot notation.
      *
-     * @param  mixed  $target
-     * @param  string|array  $key
-     * @param  mixed  $value
-     * @param  bool  $overwrite
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $value
+     * @param bool         $overwrite
+     *
      * @return mixed
+     *
+     * @deprecated 1.2 use c::dataSet
      */
-    function set(&$target, $key, $value, $overwrite = true) {
-        $segments = is_array($key) ? $key : explode('.', $key);
-        if (($segment = array_shift($segments)) === '*') {
-            if (!carr::accessible($target)) {
-                $target = [];
-            }
-            if ($segments) {
-                foreach ($target as &$inner) {
-                    CF::set($inner, $segments, $value, $overwrite);
-                }
-            } elseif ($overwrite) {
-                foreach ($target as &$inner) {
-                    $inner = $value;
-                }
-            }
-        } elseif (carr::accessible($target)) {
-            if ($segments) {
-                if (!carr::exists($target, $segment)) {
-                    $target[$segment] = [];
-                }
-                CF::set($target[$segment], $segments, $value, $overwrite);
-            } elseif ($overwrite || !Arr::exists($target, $segment)) {
-                $target[$segment] = $value;
-            }
-        } elseif (is_object($target)) {
-            if ($segments) {
-                if (!isset($target->{$segment})) {
-                    $target->{$segment} = [];
-                }
-                CF::set($target->{$segment}, $segments, $value, $overwrite);
-            } elseif ($overwrite || !isset($target->{$segment})) {
-                $target->{$segment} = $value;
-            }
-        } else {
-            $target = [];
-            if ($segments) {
-                CF::set($target[$segment], $segments, $value, $overwrite);
-            } elseif ($overwrite) {
-                $target[$segment] = $value;
-            }
-        }
-        return $target;
+    public static function set(&$target, $key, $value, $overwrite = true) {
+        return c::set($target, $key, $value);
     }
 
     /**
      * Create a collection from the given value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return CCollection
+     *
+     * @deprecated 1.1, use c::collect
      */
     public static function collect($value = null) {
         return c::collect($value);
     }
 
     /**
-     * 
      * @return string
      */
     public static function version() {
@@ -1099,7 +1127,6 @@ final class CF {
     }
 
     /**
-     * 
      * @return string
      */
     public static function codeName() {
@@ -1107,12 +1134,11 @@ final class CF {
     }
 
     /**
-     * 
      * @param string $domain
+     *
      * @return string
      */
     public static function appPath($domain = null) {
-
         $appCode = static::appCode($domain);
 
         return DOCROOT . 'application/' . $appCode . '/';
@@ -1128,7 +1154,6 @@ final class CF {
      * @return string
      */
     public static function getLocale() {
-
         return CF::config('app.locale');
     }
 
@@ -1139,7 +1164,7 @@ final class CF {
           CTranslation::translator()->setLocale($locale);
 
           CEvent::dispatch('cf.locale.updated');
-         * 
+         *
          */
         //$this['events']->dispatch(new CBase_Events_LocaleUpdated($locale));
     }
@@ -1156,10 +1181,13 @@ final class CF {
     }
 
     public static function isTesting() {
-        //TODO: this should be true when CF is running in phpunit
+        if (defined('CFTesting')
+            || (is_array($_SERVER) && isset($_SERVER['APP_ENV']) && $_SERVER['APP_ENV'] == 'testing')
+        ) {
+            return true;
+        }
         return false;
     }
-
 }
 
 // End CF

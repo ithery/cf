@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 3:14:32 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 3:14:32 PM
  */
 trait CTracker_RepositoryManager_RefererTrait {
-
     /**
-     *
      * @var CTracker_Repository_Referer
      */
     protected $refererRepository;
@@ -25,17 +24,16 @@ trait CTracker_RepositoryManager_RefererTrait {
             if (!isset($url['host'])) {
                 return;
             }
-//            $parts = explode('.', $url['host']);
-//
-//            $domain = array_pop($parts);
-//            if (count($parts) > 0) {
-//                $domain = array_pop($parts) . '.' . $domain;
-//            }
+            //            $parts = explode('.', $url['host']);
+            //
+            //            $domain = array_pop($parts);
+            //            if (count($parts) > 0) {
+            //                $domain = array_pop($parts) . '.' . $domain;
+            //            }
             $domain = $url['host'];
 
             $domain_id = $this->getDomainId($domain);
             return $this->refererRepository->store($referer, $url['host'], $domain_id);
         }
     }
-
 }

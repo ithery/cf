@@ -1,20 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 30, 2019, 3:28:16 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 30, 2019, 3:28:16 PM
  */
 class CModel_Validating_ValidatingObserver {
-
     /**
      * Register the validation event for saving the model. Saving validation
      * should only occur if creating and updating validation does not.
      *
-     * @param  CModel $model
-     * @return boolean
+     * @param CModel $model
+     *
+     * @return bool
      */
     public function saving(CModel $model) {
         return $this->performValidation($model, 'saving');
@@ -23,8 +24,9 @@ class CModel_Validating_ValidatingObserver {
     /**
      * Register the validation event for restoring the model.
      *
-     * @param  CModel $model
-     * @return boolean
+     * @param CModel $model
+     *
+     * @return bool
      */
     public function restoring(CModel $model) {
         return $this->performValidation($model, 'restoring');
@@ -33,9 +35,10 @@ class CModel_Validating_ValidatingObserver {
     /**
      * Perform validation with the specified ruleset.
      *
-     * @param  CModel $model
-     * @param  string $event
-     * @return boolean
+     * @param CModel $model
+     * @param string $event
+     *
+     * @return bool
      */
     protected function performValidation(CModel $model, $event) {
         // If the model has validating enabled, perform it.
@@ -63,8 +66,9 @@ class CModel_Validating_ValidatingObserver {
     /**
      * Fire the namespaced validating event.
      *
-     * @param  \Illuminate\Database\Eloquent\Model $model
-     * @param  string $event
+     * @param \Illuminate\Database\Eloquent\Model $model
+     * @param string                              $event
+     *
      * @return mixed
      */
     protected function fireValidatingEvent(CModel $model, $event) {
@@ -72,14 +76,15 @@ class CModel_Validating_ValidatingObserver {
         if ($dispatcher == null) {
             return true;
         }
-        return $dispatcher->until("eloquent.validating: " . get_class($model), [$model, $event]);
+        return $dispatcher->until('model.validating: ' . get_class($model), [$model, $event]);
     }
 
     /**
      * Fire the namespaced post-validation event.
      *
-     * @param  CModel $model
-     * @param  string $status
+     * @param CModel $model
+     * @param string $status
+     *
      * @return void
      */
     protected function fireValidatedEvent(CModel $model, $status) {
@@ -88,7 +93,6 @@ class CModel_Validating_ValidatingObserver {
             return true;
         }
 
-        $dispatcher->dispatch("eloquent.validated: " . get_class($model), [$model, $status]);
+        $dispatcher->dispatch('model.validated: ' . get_class($model), [$model, $status]);
     }
-
 }

@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 11, 2019, 11:58:48 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 11, 2019, 11:58:48 PM
  */
 use CManager_File_Connector_FileManager_FM as FM;
 
 class CManager_File_Connector_FileManager_Controller_CropController extends CManager_File_Connector_FileManager_AbstractController {
-
     /**
      * Get list of folders as json to populate treeview.
      *
@@ -22,9 +22,8 @@ class CManager_File_Connector_FileManager_Controller_CropController extends CMan
 
         $workingdir = $fm->input('working_dir');
         $app->addTemplate()->setTemplate('CElement/Component/FileManager/Cropper')->setVar('fm', $fm)
-                ->setVar('working_dir', $workingdir)
-                ->setVar('img', $fm->path()->pretty($fm->input('img')));
+            ->setVar('working_dir', $workingdir)
+            ->setVar('img', $fm->path()->pretty($fm->input('img')));
         echo $app->render();
     }
-
 }

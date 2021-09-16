@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
-
     /**
      * An array of the routes keyed by method.
      *
@@ -38,7 +37,8 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
     /**
      * Add a Route instance to the collection.
      *
-     * @param  CRouting_Route  $route
+     * @param CRouting_Route $route
+     *
      * @return CRouting_Route
      */
     public function add(CRouting_Route $route) {
@@ -52,7 +52,8 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
     /**
      * Add the given route to the arrays of routes.
      *
-     * @param  CRouting_Route  $route
+     * @param CRouting_Route $route
+     *
      * @return void
      */
     protected function addToCollections($route) {
@@ -68,7 +69,8 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
     /**
      * Add the route to any look-up tables if necessary.
      *
-     * @param  CRouting_Route  $route
+     * @param CRouting_Route $route
+     *
      * @return void
      */
     protected function addLookups($route) {
@@ -92,8 +94,9 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
     /**
      * Add a route to the controller action dictionary.
      *
-     * @param  array  $action
-     * @param  CRouting_Route  $route
+     * @param array          $action
+     * @param CRouting_Route $route
+     *
      * @return void
      */
     protected function addToActionList($action, $route) {
@@ -137,7 +140,8 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
     /**
      * Find the first route matching a given request.
      *
-     * @param  CHTTP_Request  $request
+     * @param CHTTP_Request $request
+     *
      * @return CRouting_Route
      *
      * @throws \Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException
@@ -150,21 +154,22 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
         // method. If we can, great, we can just return it so that it can be called
         // by the consumer. Otherwise we will check for routes with another verb.
         $route = $this->matchAgainstRoutes($routes, $request);
-        
+
         //if route still null we will search new route that match with controller
-        if($route==null) {
-           $routeFinder = new CRouting_RouteFinder($request);
-           
-           $route = $routeFinder->find();
+        if ($route == null) {
+            $routeFinder = new CRouting_RouteFinder($request);
+
+            $route = $routeFinder->find();
         }
-        
+
         return $this->handleMatchedRoute($request, $route);
     }
 
     /**
      * Get routes from the collection by method.
      *
-     * @param  string|null  $method
+     * @param string|null $method
+     *
      * @return CRouting_Route[]
      */
     public function get($method = null) {
@@ -174,7 +179,8 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
     /**
      * Determine if the route collection contains a given named route.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return bool
      */
     public function hasNamedRoute($name) {
@@ -184,7 +190,8 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
     /**
      * Get a route instance by its name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return CRouting_Route|null
      */
     public function getByName($name) {
@@ -194,7 +201,8 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
     /**
      * Get a route instance by its controller action.
      *
-     * @param  string  $action
+     * @param string $action
+     *
      * @return CRouting_Route|null
      */
     public function getByAction($action) {
@@ -244,8 +252,9 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
     /**
      * Convert the collection to a CompiledRouteCollection instance.
      *
-     * @param  CRouting_Router  $router
-     * @param  CContainer_Container  $container
+     * @param CRouting_Router      $router
+     * @param CContainer_Container $container
+     *
      * @return CRouting_CompiledRouteCollection
      */
     public function toCompiledRouteCollection(CRouting_Router $router, CContainer_Container $container) {
@@ -253,8 +262,7 @@ class CRouting_RouteCollection extends CRouting_RouteCollectionAbstract {
         $compiled = carr::get($result, 'compiled');
         $attributes = carr::get($result, 'attributes');
         return (new CRouting_CompiledRouteCollection($compiled, $attributes))
-                        ->setRouter($router)
-                        ->setContainer($container);
+            ->setRouter($router)
+            ->setContainer($container);
     }
-
 }

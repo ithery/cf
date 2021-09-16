@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CBootstrap_MiddlewareBootstrapper extends CBootstrap_BootstrapperAbstract {
-
     /**
      * Bootstrap the given application.
      *
@@ -16,5 +15,4 @@ class CBootstrap_MiddlewareBootstrapper extends CBootstrap_BootstrapperAbstract 
         $sessionMiddleware = new CSession_Middleware_SessionMiddleware();
         CMiddleware::manager()->pushMiddleware($sessionMiddleware);
     }
-
 }

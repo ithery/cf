@@ -10,6 +10,22 @@ use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
 class CConsole_Command_ComposerCommand extends CConsole_Command {
+    /**
+     * Command line options that should not be gathered dynamically.
+     *
+     * @var array
+     */
+    protected $ignoreOptions = [
+        '--continue',
+        '--pretend',
+        '--help',
+        '--quiet',
+        '--version',
+        '--asci',
+        '--no-asci',
+        '--no-interactions',
+        '--verbose',
+    ];
 
     /**
      * The name and signature of the console command.
@@ -18,18 +34,24 @@ class CConsole_Command_ComposerCommand extends CConsole_Command {
      */
     protected $signature = 'composer {args?*} {--opts=?*}';
 
+    /**
+     * Configure the command options.
+     *
+     * @return void
+     */
+    protected function configure() {
+        $this->ignoreValidationErrors();
+    }
+
     public function handle() {
         $command = $this->getComposserBinaryCommand();
         $arguments = $this->argument('args');
+
         $domain = CConsole::domain();
         $domainData = CFData::domain($domain);
         $appCode = carr::get($domainData, 'app_code');
         $appDir = DOCROOT . 'application' . DS . $appCode;
         if ($command !== false) {
-            
-            
-            
-            
             foreach ($arguments as $arg) {
                 $command[] = $arg;
             }
@@ -40,19 +62,16 @@ class CConsole_Command_ComposerCommand extends CConsole_Command {
                     $command[] = '--' . $opt;
                 }
             }
-            
-            
-            $process = Process::fromShellCommandline($command,$appDir);
-            
+
+            $process = Process::fromShellCommandline($command, $appDir);
+
             $process->start(function ($type, $buffer) {
                 $this->output->write($buffer);
             });
 
-
             $process->wait();
             // executes after the command finishes
             if (!$process->isSuccessful()) {
-
                 $errMessage = $process->getErrorOutput();
                 if (strlen($errMessage) == 0) {
                     $errMessage = 'Something went wrong on running composer, please manually check the command';
@@ -63,9 +82,6 @@ class CConsole_Command_ComposerCommand extends CConsole_Command {
     }
 
     protected function getComposserBinaryCommand() {
-
-
-
         $command = ['composer'];
         if (!$this->isComposerInstalled()) {
             $command = [$this->phpBinary(), $this->getComposerOnBinPath()];
@@ -134,7 +150,6 @@ class CConsole_Command_ComposerCommand extends CConsole_Command {
                 //$this->output->write($buffer);
             });
 
-
             $process->wait();
             // executes after the command finishes
             if (!$process->isSuccessful()) {
@@ -161,5 +176,4 @@ class CConsole_Command_ComposerCommand extends CConsole_Command {
     protected function phpBinary() {
         return (new PhpExecutableFinder())->find(false);
     }
-
 }

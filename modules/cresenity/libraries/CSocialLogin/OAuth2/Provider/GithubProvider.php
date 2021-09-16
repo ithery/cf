@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 16, 2019, 5:10:14 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 16, 2019, 5:10:14 PM
  */
 class CSocialLogin_OAuth2_Provider_GithubProvider extends CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_OAuth2_ProviderInterface {
-
     /**
      * The scopes being requested.
      *
@@ -36,7 +36,8 @@ class CSocialLogin_OAuth2_Provider_GithubProvider extends CSocialLogin_OAuth2_Ab
     protected function getUserByToken($token) {
         $userUrl = 'https://api.github.com/user?access_token=' . $token;
         $response = $this->getHttpClient()->get(
-                $userUrl, $this->getRequestOptions()
+            $userUrl,
+            $this->getRequestOptions()
         );
         $user = json_decode($response->getBody(), true);
         if (in_array('user:email', $this->scopes)) {
@@ -48,14 +49,16 @@ class CSocialLogin_OAuth2_Provider_GithubProvider extends CSocialLogin_OAuth2_Ab
     /**
      * Get the email for the given access token.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return string|null
      */
     protected function getEmailByToken($token) {
         $emailsUrl = 'https://api.github.com/user/emails?access_token=' . $token;
         try {
             $response = $this->getHttpClient()->get(
-                    $emailsUrl, $this->getRequestOptions()
+                $emailsUrl,
+                $this->getRequestOptions()
             );
         } catch (Exception $e) {
             return;
@@ -72,11 +75,11 @@ class CSocialLogin_OAuth2_Provider_GithubProvider extends CSocialLogin_OAuth2_Ab
      */
     protected function mapUserToObject(array $user) {
         return (new CSocialLogin_OAuth2_User)->setRaw($user)->map([
-                    'id' => $user['id'],
-                    'nickname' => $user['login'],
-                    'name' => carr::get($user, 'name'),
-                    'email' => carr::get($user, 'email'),
-                    'avatar' => $user['avatar_url'],
+            'id' => $user['id'],
+            'nickname' => $user['login'],
+            'name' => carr::get($user, 'name'),
+            'email' => carr::get($user, 'email'),
+            'avatar' => $user['avatar_url'],
         ]);
     }
 
@@ -92,5 +95,4 @@ class CSocialLogin_OAuth2_Provider_GithubProvider extends CSocialLogin_OAuth2_Ab
             ],
         ];
     }
-
 }

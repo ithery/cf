@@ -4,10 +4,10 @@
  * Description of Timer
  *
  * @author Hery
+ *
  * @internal
  */
-final class Timer {
-
+final class CTesting_PhpUnit_Timer {
     /**
      * @var float
      */
@@ -15,6 +15,8 @@ final class Timer {
 
     /**
      * Timer constructor.
+     *
+     * @param mixed $start
      */
     private function __construct($start) {
         $this->start = $start;
@@ -33,5 +35,4 @@ final class Timer {
     public function result() {
         return microtime(true) - $this->start;
     }
-
 }

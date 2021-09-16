@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Dec 6, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Dec 6, 2020
  */
 class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, IteratorAggregate {
-
     use CTrait_Macroable;
 
     /**
@@ -21,7 +21,8 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Create a new component attribute bag instance.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return void
      */
     public function __construct(array $attributes = []) {
@@ -31,7 +32,8 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Get the first attribute's value.
      *
-     * @param  mixed  $default
+     * @param mixed $default
+     *
      * @return mixed
      */
     public function first($default = null) {
@@ -42,8 +44,9 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Get a given attribute from the attribute array.
      *
-     * @param  string  $key
-     * @param  mixed  $default
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
     public function get($key, $default = null) {
@@ -53,7 +56,8 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Only include the given attribute from the attribute array.
      *
-     * @param  mixed|array  $keys
+     * @param mixed|array $keys
+     *
      * @return static
      */
     public function only($keys) {
@@ -71,7 +75,8 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Exclude the given attribute from the attribute array.
      *
-     * @param  mixed|array  $keys
+     * @param mixed|array $keys
+     *
      * @return static
      */
     public function except($keys) {
@@ -89,7 +94,8 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Filter the attributes, returning a bag of attributes that pass the filter.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     *
      * @return static
      */
     public function filter($callback) {
@@ -99,31 +105,34 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Return a bag of attributes that have keys starting with the given value / pattern.
      *
-     * @param  string  $string
+     * @param string $string
+     *
      * @return static
      */
     public function whereStartsWith($string) {
         return $this->filter(function ($value, $key) use ($string) {
-                    return cstr::startsWith($key, $string);
-                });
+            return cstr::startsWith($key, $string);
+        });
     }
 
     /**
      * Return a bag of attributes with keys that do not start with the given value / pattern.
      *
-     * @param  string  $string
+     * @param string $string
+     *
      * @return static
      */
     public function whereDoesntStartWith($string) {
         return $this->filter(function ($value, $key) use ($string) {
-                    return !cstr::startsWith($key, $string);
-                });
+            return !cstr::startsWith($key, $string);
+        });
     }
 
     /**
      * Return a bag of attributes that have keys starting with the given value / pattern.
      *
-     * @param  string  $string
+     * @param string $string
+     *
      * @return static
      */
     public function thatStartWith($string) {
@@ -133,7 +142,8 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Exclude the given attribute from the attribute array.
      *
-     * @param  mixed|array  $keys
+     * @param mixed|array $keys
+     *
      * @return static
      */
     public function exceptProps($keys) {
@@ -152,27 +162,28 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Merge additional attributes / values into the attribute bag.
      *
-     * @param  array  $attributeDefaults
-     * @param  bool  $escape
+     * @param array $attributeDefaults
+     * @param bool  $escape
+     *
      * @return static
      */
     public function merge(array $attributeDefaults = [], $escape = true) {
         $attributeDefaults = array_map(function ($value) use ($escape) {
-            return $this->shouldEscapeAttributeValue($escape, $value) ? e($value) : $value;
+            return $this->shouldEscapeAttributeValue($escape, $value) ? c::e($value) : $value;
         }, $attributeDefaults);
 
         list($appendableAttributes, $nonAppendableAttributes) = c::collect($this->attributes)
                 ->partition(function ($value, $key) use ($attributeDefaults) {
-            return $key === 'class' ||
-                    (isset($attributeDefaults[$key]) &&
-                    $attributeDefaults[$key] instanceof CView_AppendableAttributeValue);
-        });
+                    return $key === 'class'
+                    || (isset($attributeDefaults[$key])
+                    && $attributeDefaults[$key] instanceof CView_AppendableAttributeValue);
+                });
 
         $attributes = $appendableAttributes->mapWithKeys(function ($value, $key) use ($attributeDefaults, $escape) {
-                    $defaultsValue = isset($attributeDefaults[$key]) && $attributeDefaults[$key] instanceof AppendableAttributeValue ? $this->resolveAppendableAttributeDefault($attributeDefaults, $key, $escape) : (carr::get($attributeDefaults, $key, ''));
+            $defaultsValue = isset($attributeDefaults[$key]) && $attributeDefaults[$key] instanceof AppendableAttributeValue ? $this->resolveAppendableAttributeDefault($attributeDefaults, $key, $escape) : (carr::get($attributeDefaults, $key, ''));
 
-                    return [$key => implode(' ', array_unique(array_filter([$defaultsValue, $value])))];
-                })->merge($nonAppendableAttributes)->all();
+            return [$key => implode(' ', array_unique(array_filter([$defaultsValue, $value])))];
+        })->merge($nonAppendableAttributes)->all();
 
         return new static(array_merge($attributeDefaults, $attributes));
     }
@@ -180,8 +191,9 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Determine if the specific attribute value should be escaped.
      *
-     * @param  bool  $escape
-     * @param  mixed  $value
+     * @param bool  $escape
+     * @param mixed $value
+     *
      * @return bool
      */
     protected function shouldEscapeAttributeValue($escape, $value) {
@@ -189,15 +201,16 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
             return false;
         }
 
-        return !is_object($value) &&
-                !is_null($value) &&
-                !is_bool($value);
+        return !is_object($value)
+                && !is_null($value)
+                && !is_bool($value);
     }
 
     /**
      * Create a new appendable attribute value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return CView_AppendableAttributeValue
      */
     public function prepends($value) {
@@ -207,14 +220,15 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Resolve an appendable attribute value default value.
      *
-     * @param  array  $attributeDefaults
-     * @param  string  $key
-     * @param  bool  $escape
+     * @param array  $attributeDefaults
+     * @param string $key
+     * @param bool   $escape
+     *
      * @return mixed
      */
     protected function resolveAppendableAttributeDefault($attributeDefaults, $key, $escape) {
         if ($this->shouldEscapeAttributeValue($escape, $value = $attributeDefaults[$key]->value)) {
-            $value = e($value);
+            $value = c::e($value);
         }
 
         return $value;
@@ -232,12 +246,14 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Set the underlying attributes.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return void
      */
     public function setAttributes(array $attributes) {
-        if (isset($attributes['attributes']) &&
-                $attributes['attributes'] instanceof self) {
+        if (isset($attributes['attributes'])
+            && $attributes['attributes'] instanceof self
+        ) {
             $parentBag = $attributes['attributes'];
 
             unset($attributes['attributes']);
@@ -260,7 +276,8 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Merge additional attributes / values into the attribute bag.
      *
-     * @param  array  $attributeDefaults
+     * @param array $attributeDefaults
+     *
      * @return \Illuminate\Support\HtmlString
      */
     public function __invoke(array $attributeDefaults = []) {
@@ -270,7 +287,8 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Determine if the given offset exists.
      *
-     * @param  string  $offset
+     * @param string $offset
+     *
      * @return bool
      */
     public function offsetExists($offset) {
@@ -280,7 +298,8 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Get the value at the given offset.
      *
-     * @param  string  $offset
+     * @param string $offset
+     *
      * @return mixed
      */
     public function offsetGet($offset) {
@@ -290,8 +309,9 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Set the value at a given offset.
      *
-     * @param  string  $offset
-     * @param  mixed  $value
+     * @param string $offset
+     * @param mixed  $value
+     *
      * @return void
      */
     public function offsetSet($offset, $value) {
@@ -301,7 +321,8 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
     /**
      * Remove the value at the given offset.
      *
-     * @param  string  $offset
+     * @param string $offset
+     *
      * @return void
      */
     public function offsetUnset($offset) {
@@ -339,5 +360,4 @@ class CView_ComponentAttributeBag implements ArrayAccess, CInterface_Htmlable, I
 
         return trim($string);
     }
-
 }

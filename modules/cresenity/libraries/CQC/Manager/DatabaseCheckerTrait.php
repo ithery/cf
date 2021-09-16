@@ -6,18 +6,16 @@
  * @author Hery
  */
 trait CQC_Manager_DatabaseCheckerTrait {
+    protected $databaseChecker = [];
 
-    protected $databaseChecker = array();
-    protected $databaseCheckerGroup = array();
+    protected $databaseCheckerGroup = [];
 
     /**
-     * 
      * @param string $class
      * @param string $name
      * @param string $group
      */
     public function registerDatabaseChecker($class, $name = null, $group = null) {
-
         if ($name == null) {
             $name = carr::last(explode('_', $class));
         }
@@ -31,9 +29,10 @@ trait CQC_Manager_DatabaseCheckerTrait {
     }
 
     /**
-     * 
      * @param string $group
+     *
      * @return array
+     *
      * @throws Exception
      */
     public function databaseCheckers($group = null) {
@@ -56,7 +55,6 @@ trait CQC_Manager_DatabaseCheckerTrait {
     }
 
     /**
-     * 
      * @return array
      */
     public function getDatabaseCheckerGroupsKey() {
@@ -64,11 +62,9 @@ trait CQC_Manager_DatabaseCheckerTrait {
     }
 
     /**
-     * 
-     * @return boolean
+     * @return bool
      */
     public function haveDatabaseCheckerGroup() {
         return count($this->getDatabaseCheckerGroupsKey()) > 0;
     }
-
 }

@@ -1,7 +1,10 @@
 <?php
 
+/**
+ * @deprecated since 1.3 dont use this
+ */
+//@codingStandardsIgnoreStart
 class CList extends CAbstractList {
-
     public function add($name, $object = null) {
         return parent::add($object, $name);
     }
@@ -14,8 +17,9 @@ class CList extends CAbstractList {
     }
 
     public function get_by_index($index) {
-        if ($index < count($this->collection))
+        if ($index < count($this->collection)) {
             return $this->collection[$index];
+        }
         return null;
     }
 
@@ -28,14 +32,14 @@ class CList extends CAbstractList {
     }
 
     public function js() {
-        $resolvedObjs = array();
+        $resolvedObjs = [];
         foreach ($this->collection as &$obj) {
-            $resolvedObjs[] = CJS::js($obj, true);
+            //$resolvedObjs[] = CJS::js($obj, true);
         }
-        if (count($resolvedObjs) == 1 && !$this->_force_array)
+        if (count($resolvedObjs) == 1 && !$this->_force_array) {
             return $resolvedObjs[0];
-        else
-            return "[" . implode(",", $resolvedObjs) . "]";
+        } else {
+            return '[' . implode(',', $resolvedObjs) . ']';
+        }
     }
-
 }

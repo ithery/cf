@@ -8,71 +8,57 @@ export default class ScrollToTop {
             scrollduration: 1000,
             fadeduration: [500, 100]
         };
-        this.controlHTML = '<img src="' + window.capp.base_url + 'media/img/up.png" style="width:51px; height:42px" />'; //HTML for control, which is auto wrapped in DIV w/ ID="topcontrol"
+        //HTML for control, which is auto wrapped in DIV w/ ID="topcontrol"
+        this.controlHTML = '<img src="' + window.capp.base_url + 'media/img/up.png" style="width:51px; height:42px" />';
+        //offset of control relative to right/ bottom of window corner
         this.controlattrs = {
             offsetx: 5,
             offsety: 5
-        }; //offset of control relative to right/ bottom of window corner
-        this.anchorkeyword = '#top'; //Enter href value of HTML anchors on the page that should also act as "Scroll Up" links
+        };
+        //Enter href value of HTML anchors on the page that should also act as "Scroll Up" links
+        this.anchorkeyword = '#top';
 
         this.state = {
             isvisible: false,
             shouldvisible: false
         };
-        this.scrollup = function() {
-                if (!this.cssfixedsupport) //if control is positioned using JavaScript
-                    this.$control.css({
-                        opacity: 0,
-                        zIndex: -1,
-                    }) //hide control immediately after clicking it
-                var dest = isNaN(this.setting.scrollto) ? this.setting.scrollto : parseInt(this.setting.scrollto)
-                if (typeof dest == "string" && jQuery('#' + dest).length == 1) {
-                    //check element set by string exists
-                    dest = jQuery('#' + dest).offset().top;
-                } else {
-                    dest = 0;
-                }
 
-                this.$body.animate({
-                    scrollTop: dest
-                }, this.setting.scrollduration);
-            },
-            this.keepfixed = function() {
-                var $window = jQuery(window)
-                var controlx = $window.scrollLeft() + $window.width() - this.$control.width() - this.controlattrs.offsetx
-                var controly = $window.scrollTop() + $window.height() - this.$control.height() - this.controlattrs.offsety
-                this.$control.css({
-                    left: controlx + 'px',
-                    top: controly + 'px'
-                })
-            };
-        this.togglecontrol = function() {
-            var scrolltop = jQuery(window).scrollTop()
+        this.keepfixed = function () {
+            let $window = jQuery(window);
+            let controlx = $window.scrollLeft() + $window.width() - this.$control.width() - this.controlattrs.offsetx;
+            let controly = $window.scrollTop() + $window.height() - this.$control.height() - this.controlattrs.offsety;
+            this.$control.css({
+                left: controlx + 'px',
+                top: controly + 'px'
+            });
+        };
+        this.togglecontrol = function () {
+            let scrolltop = jQuery(window).scrollTop();
             if (!this.cssfixedsupport) {
                 this.keepfixed();
             }
-            this.state.shouldvisible = (scrolltop >= this.setting.startline) ? true : false
+            this.state.shouldvisible = (scrolltop >= this.setting.startline) ? true : false;
             if (this.state.shouldvisible && !this.state.isvisible) {
                 this.$control.stop().animate({
                     opacity: 1,
-                    zIndex: 99999,
-                }, this.setting.fadeduration[0])
-                this.state.isvisible = true
-            } else if (this.state.shouldvisible == false && this.state.isvisible) {
+                    zIndex: 99999
+                }, this.setting.fadeduration[0]);
+                this.state.isvisible = true;
+            } else if (this.state.shouldvisible === false && this.state.isvisible) {
                 this.$control.stop().animate({
                     opacity: 0,
                     zIndex: -1
-                }, this.setting.fadeduration[1])
-                this.state.isvisible = false
+                }, this.setting.fadeduration[1]);
+                this.state.isvisible = false;
             }
         };
-        this.init = function() {
+        this.init = function () {
             jQuery(document).ready(($) => {
-                var mainobj = this;
-                var iebrws = document.all;
-                mainobj.cssfixedsupport = !iebrws || iebrws && document.compatMode == "CSS1Compat" && window.XMLHttpRequest;
+                let mainobj = this;
+                let iebrws = document.all;
+                mainobj.cssfixedsupport = !iebrws || iebrws && document.compatMode === 'CSS1Compat' && window.XMLHttpRequest;
                 //not IE or IE7+ browsers in standards mode
-                mainobj.$body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body');
+                mainobj.$body = (window.opera) ? (document.compatMode === 'CSS1Compat' ? $('html') : $('body')) : $('html,body');
                 mainobj.$control = $('<div id="topcontrol">' + mainobj.controlHTML + '</div>')
                     .css({
                         position: mainobj.cssfixedsupport ? 'fixed' : 'absolute',
@@ -85,25 +71,48 @@ export default class ScrollToTop {
                     .attr({
                         title: 'Scroll Back to Top'
                     })
-                    .click(function() {
+                    .click(function () {
                         mainobj.scrollup();
-                        return false
+                        return false;
                     })
-                    .appendTo('body')
-                if (document.all && !window.XMLHttpRequest && mainobj.$control.text() != '') { //loose check for IE6 and below, plus whether control contains any text
+                    .appendTo('body');
+                //loose check for IE6 and below, plus whether control contains any text
+                if (document.all && !window.XMLHttpRequest && mainobj.$control.text() !== '') {
+                    //IE6- seems to require an explicit width on a DIV containing text
                     mainobj.$control.css({
                         width: mainobj.$control.width()
-                    }); //IE6- seems to require an explicit width on a DIV containing text
+                    });
                 }
-                mainobj.togglecontrol()
-                $('a[href="' + mainobj.anchorkeyword + '"]').click(function() {
-                    mainobj.scrollup()
-                    return false
-                })
-                $(window).bind('scroll resize', function(e) {
-                    mainobj.togglecontrol()
-                })
-            })
+                mainobj.togglecontrol();
+                $('a[href="' + mainobj.anchorkeyword + '"]').click(function () {
+                    mainobj.scrollup();
+                    return false;
+                });
+                $(window).bind('scroll resize', ()=> {
+                    mainobj.togglecontrol();
+                });
+            });
+        };
+    }
+    scrollup() {
+        if (!this.cssfixedsupport) {
+            //if control is positioned using JavaScript
+            this.$control.css({
+                opacity: 0,
+                zIndex: -1
+            });
         }
+        //hide control immediately after clicking it
+        let dest = isNaN(this.setting.scrollto) ? this.setting.scrollto : parseInt(this.setting.scrollto);
+        if (typeof dest === 'string' && jQuery('#' + dest).length == 1) {
+            //check element set by string exists
+            dest = jQuery('#' + dest).offset().top;
+        } else {
+            dest = 0;
+        }
+
+        this.$body.animate({
+            scrollTop: dest
+        }, this.setting.scrollduration);
     }
 }

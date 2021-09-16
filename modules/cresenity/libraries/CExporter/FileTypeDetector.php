@@ -1,21 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Oct 1, 2019, 3:14:05 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Oct 1, 2019, 3:14:05 PM
  */
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class CExporter_FileTypeDetector {
-
     /**
      * @param             $filePath
      * @param string|null $type
      *
      * @throws NoTypeDetectedException
+     *
      * @return string|null
      */
     public static function detect($filePath, $type = null) {
@@ -31,7 +32,7 @@ class CExporter_FileTypeDetector {
         if (null === $type && trim($extension) === '') {
             throw new CExporter_Exception_NoTypeDetectedException();
         }
-        $data = array(
+        $data = [
             'xlsx' => CExporter::XLSX,
             'xlsm' => CExporter::XLSX,
             'xltx' => CExporter::XLSX,
@@ -48,7 +49,7 @@ class CExporter_FileTypeDetector {
             'csv' => CExporter::CSV,
             'tsv' => CExporter::TSV,
             'pdf' => CExporter::DOMPDF,
-        );
+        ];
         return carr::get($data, strtolower($extension));
     }
 
@@ -57,6 +58,7 @@ class CExporter_FileTypeDetector {
      * @param string|null $type
      *
      * @throws CExporter_Exception_NoTypeDetectedException
+     *
      * @return string
      */
     public static function detectStrict($filePath, $type = null) {
@@ -66,5 +68,4 @@ class CExporter_FileTypeDetector {
         }
         return $type;
     }
-
 }

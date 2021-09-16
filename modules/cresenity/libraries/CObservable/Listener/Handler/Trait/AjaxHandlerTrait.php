@@ -1,43 +1,50 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 17, 2019, 11:23:04 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 17, 2019, 11:23:04 PM
  */
 trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
-
     protected $method;
 
+    protected $callback;
+
     /**
-     * url for ajax handler type
-     * @var string $url
+     * Url for ajax handler type
+     *
+     * @var string
      */
     protected $url;
 
     /**
-     *
-     * @var string $urlParam
+     * @var array
      */
-    protected $urlParam = array();
+    protected $urlParam = [];
 
     public function setUrl($url) {
         $this->url = $url;
         return $this;
     }
 
+    public function setCallback($callback) {
+        $this->callback = $callback;
+        return $this;
+    }
+
     public function setUrlParam($urlParam) {
         if (!is_array($urlParam)) {
-            trigger_error('Invalid URL Param ' . cdbg::var_dump($urlParam, true) . '');
+            throw new Exception('Invalid url param, url param must type array');
         }
         $this->urlParam = $urlParam;
         return $this;
     }
 
     public function addUrlParam($k, $urlParam) {
-        $this->urlParam[$k] = $url_param;
+        $this->urlParam[$k] = $urlParam;
         return $this;
     }
 
@@ -45,9 +52,16 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         $link = $this->url;
 
         if (strlen($link) == 0) {
-            $ajaxUrl = CAjax::createMethod()->setType('handler_' . $this->name)
-                    ->setData('json', $this->content->json())
-                    ->makeUrl();
+            $callback = $this->callback;
+            if ($callback !== null) {
+                $callback = CHelper::closure()->serialize($callback);
+            }
+
+            $ajaxUrl = CAjax::createMethod()->setType('AjaxHandler')
+                ->setData('json', $this->content->json())
+                ->setData('callback', $callback)
+                ->makeUrl();
+
             $link = $ajaxUrl;
         }
 
@@ -64,6 +78,11 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         return $link;
     }
 
+    /**
+     * Add Ajax Success Listener
+     *
+     * @return CObservable_Listener_Pseudo_SuccessListener
+     */
     public function onSuccessListener() {
         if (!isset($this->handlerListeners['ajaxSuccess'])) {
             $this->handlerListeners['ajaxSuccess'] = new CObservable_Listener_Pseudo_SuccessListener($this);
@@ -71,6 +90,11 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         return $this->handlerListeners['ajaxSuccess'];
     }
 
+    /**
+     * Add Ajax Error Listener
+     *
+     * @return CObservable_Listener_Pseudo_ErrorListener
+     */
     public function onErrorListener() {
         if (!isset($this->handlerListeners['ajaxError'])) {
             $this->handlerListeners['ajaxError'] = new CObservable_Listener_Pseudo_ErrorListener($this);
@@ -78,6 +102,11 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         return $this->handlerListeners['ajaxError'];
     }
 
+    /**
+     * Add Ajax Complete Listener
+     *
+     * @return CObservable_Listener_Pseudo_CompleteListener
+     */
     public function onCompleteListener() {
         if (!isset($this->handlerListeners['ajaxComplete'])) {
             $this->handlerListeners['ajaxComplete'] = new CObservable_Listener_Pseudo_CompleteListener($this);
@@ -85,15 +114,30 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         return $this->handlerListeners['ajaxComplete'];
     }
 
+    /**
+     * Check have success listener
+     *
+     * @return bool
+     */
     public function haveSuccessListener() {
         return $this->haveListener('ajaxSuccess');
     }
 
+    /**
+     * Check have error listener
+     *
+     * @return bool
+     */
     public function haveErrorListener() {
         return $this->haveListener('ajaxError');
         return isset($this->handlerListeners['ajaxError']);
     }
 
+    /**
+     * Check have complete listener
+     *
+     * @return bool
+     */
     public function haveCompleteListener() {
         return $this->haveListener('ajaxComplete');
     }
@@ -110,9 +154,12 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
         return $this->getListener('ajaxError');
     }
 
-    
     public function setMethod($method) {
         $this->method = $method;
         return $this;
+    }
+
+    public function getUrl() {
+        return $this->url;
     }
 }

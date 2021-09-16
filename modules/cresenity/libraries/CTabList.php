@@ -1,7 +1,11 @@
 <?php
 
+/**
+ * @see CElement_List_TabList
+ * @deprecated 2.0
+ */
+//@codingStandardsIgnoreStart
 class CTabList extends CElement_Element {
-
     use CTrait_Compat_Element_TabList;
 
     protected $tabs;
@@ -15,23 +19,24 @@ class CTabList extends CElement_Element {
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->tab_position = "left";
-        $this->active_tab = "";
+        $this->tab_position = 'left';
+        $this->active_tab = '';
         $this->ajax = true;
         $this->have_icon = false;
         $this->scrollspy = true;
-        $this->tabs = array();
-        $this->widget_class = array();
+        $this->tabs = [];
+        $this->widget_class = [];
     }
 
     public static function factory($id) {
         return new CTabList($id);
     }
 
-    public function addTab($id = "") {
+    public function addTab($id = '') {
         $tab = CTab::factory($id);
-        if (strlen($this->active_tab) == 0)
+        if (strlen($this->active_tab) == 0) {
             $this->active_tab = $tab->id;
+        }
         $this->tabs[] = $tab;
         return $tab;
     }
@@ -71,8 +76,6 @@ class CTabList extends CElement_Element {
     }
 
     public function html($indent = 0) {
-
-
         /*
           $html = new CStringBuilder();
           $html->setIndent($indent);
@@ -100,10 +103,10 @@ class CTabList extends CElement_Element {
          */
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $ajax_class = "";
+        $ajax_class = '';
         if ($this->ajax) {
-            $ajax_class = "ajax";
-            //we create the ajax url if there are no url on tab
+            $ajax_class = 'ajax';
+        //we create the ajax url if there are no url on tab
         } else {
             foreach ($this->tabs as $tab) {
                 $tab->set_ajax(false);
@@ -111,16 +114,16 @@ class CTabList extends CElement_Element {
         }
 
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
+        $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
-            $classes = " " . $classes;
+            $classes = ' ' . $classes;
         }
         $classes .= ' ' . $ajax_class;
 
         $widget_classes = $this->widget_class;
-        $widget_classes = implode(" ", $widget_classes);
+        $widget_classes = implode(' ', $widget_classes);
         if (strlen($widget_classes) > 0) {
-            $widget_classes = " " . $widget_classes;
+            $widget_classes = ' ' . $widget_classes;
         }
         if ($this->bootstrap >= '3') {
             $html->appendln('<div class="row tab-list' . $classes . '" id="' . $this->id . '">');
@@ -166,10 +169,10 @@ class CTabList extends CElement_Element {
             }
             $tab->set_target('' . $this->id . '-ajax-tab-content');
 
-            $html->appendln($tab->header_html($html->get_indent()));
+            $html->appendln($tab->header_html($html->getIndent()));
         }
-        $active_tab_icon = "";
-        $active_tab_label = "";
+        $active_tab_icon = '';
+        $active_tab_label = '';
 
         if ($active_tab != null) {
             $active_tab_icon = $active_tab->getIcon();
@@ -235,7 +238,7 @@ class CTabList extends CElement_Element {
             $html->appendln('						</div>');
         } else {
             foreach ($this->tabs as $tab) {
-                $html->appendln($tab->html($html->get_indent()));
+                $html->appendln($tab->html($html->getIndent()));
             }
         }
 
@@ -264,7 +267,7 @@ class CTabList extends CElement_Element {
                             border-radius: 0px;
                             background-color: #fff;
                             color: #333;
-                            
+
                             border-bottom: 1px solid #d4d4d6;
                         }
 
@@ -297,33 +300,31 @@ class CTabList extends CElement_Element {
             }
 
             $html->appendln('
-                        }                        
+                        }
                     </style>');
         }
-
 
         return $html->text();
     }
 
     public function js($indent = 0) {
-
         $js = new CStringBuilder();
         $js->setIndent($indent);
         foreach ($this->tabs as $tab) {
-            $js->appendln($tab->js($js->get_indent()));
+            $js->appendln($tab->js($js->getIndent()));
         }
         $js->appendln("
-			
-			jQuery('#" . $this->id . " #" . $this->id . "-tab-nav > li > a.tab-ajax-load').click(function(event) {
+
+			jQuery('#" . $this->id . ' #' . $this->id . "-tab-nav > li > a.tab-ajax-load').click(function(event) {
 				event.preventDefault();
 				var target = jQuery(this).attr('data-target');
 				var url = jQuery(this).attr('data-url');
 				var method = jQuery(this).attr('data-method');
 				if(!method) method='get';
 				var pare = jQuery(this).parent();
-		
+
 				if(pare.prop('tagName')=='LI') {
-                                       
+
 					pare.parent().children().removeClass('active');
 					pare.addClass('active');
                                         pare.parent().find('> li > a').removeClass('active');
@@ -331,39 +332,38 @@ class CTabList extends CElement_Element {
 				}
 				jQuery(this).parent().children().removeClass('active');
 				jQuery(this).addClass('active');
-                               
+
                                 jQuery(this).parent().find('> li > a').removeClass('active');
                                 jQuery(this).find('> a').addClass('active');
 				var widget_tab = jQuery('#" . $this->id . "-tab-widget');
 				if(widget_tab.length>0) {
-					
-					
-					
+
+
+
 					var data_icon = jQuery(this).attr('data-icon');
 					var data_class = jQuery(this).attr('data-class');
 					var data_text = jQuery(this).text();
 					if(data_icon) widget_tab.find('.widget-title .icon i').first().attr('class',data_icon);
-					
+
 					if(data_text) widget_tab.find('.widget-title h5').first().html(data_text);
 					var widget_content = widget_tab.find('.widget-content').first();
 					widget_content.removeAttr('class').addClass('widget-content');
-					
+
 					if(data_class) widget_content.addClass(data_class);
 				}
-				
+
 				if(jQuery('#" . $this->id . "').hasClass('ajax')) {
 					$.cresenity.reload(target,url,method);
-				} 
+				}
                                 else {
 					var tab_id = jQuery(this).attr('data-tab');
 					jQuery('#'+tab_id).parent().children().hide();
 					jQuery('#'+tab_id).show();
 				}
-				
-			});
-		
-		");
 
+			});
+
+		");
 
         $js->appendln("
                         //console.log(jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').attr('data-tab'));
@@ -376,10 +376,10 @@ class CTabList extends CElement_Element {
                                 jQuery('#" . $this->id . "').find('li.active a.tab-ajax-load').click();
                             },500);
                         }
-			
+
 		");
 
         return $js->text();
     }
-
 }
+//@codingStandardsIgnoreEnd

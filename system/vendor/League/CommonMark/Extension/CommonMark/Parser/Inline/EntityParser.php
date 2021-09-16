@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -23,15 +21,12 @@ use League\CommonMark\Parser\InlineParserContext;
 use League\CommonMark\Util\Html5EntityDecoder;
 use League\CommonMark\Util\RegexHelper;
 
-final class EntityParser implements InlineParserInterface
-{
-    public function getMatchDefinition(): InlineParserMatch
-    {
+final class EntityParser implements InlineParserInterface {
+    public function getMatchDefinition() {
         return InlineParserMatch::regex(RegexHelper::PARTIAL_ENTITY);
     }
 
-    public function parse(InlineParserContext $inlineContext): bool
-    {
+    public function parse(InlineParserContext $inlineContext) {
         $entity = $inlineContext->getFullMatch();
 
         $inlineContext->getCursor()->advanceBy($inlineContext->getFullMatchLength());

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -21,8 +19,7 @@ use League\CommonMark\Parser\Block\BlockContinueParserInterface;
 use League\CommonMark\Parser\Cursor;
 use League\CommonMark\Util\RegexHelper;
 
-final class HtmlBlockParser extends AbstractBlockContinueParser
-{
+final class HtmlBlockParser extends AbstractBlockContinueParser {
     /**
      * @var HtmlBlock
      *
@@ -30,27 +27,28 @@ final class HtmlBlockParser extends AbstractBlockContinueParser
      */
     private $block;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $content = '';
 
-    /** @var bool */
+    /**
+     * @var bool
+     */
     private $finished = false;
 
-    public function __construct(int $blockType)
-    {
+    public function __construct($blockType) {
         $this->block = new HtmlBlock($blockType);
     }
 
     /**
      * @return HtmlBlock
      */
-    public function getBlock(): AbstractBlock
-    {
+    public function getBlock() {
         return $this->block;
     }
 
-    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue
-    {
+    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue {
         if ($this->finished) {
             return BlockContinue::none();
         }
@@ -62,8 +60,7 @@ final class HtmlBlockParser extends AbstractBlockContinueParser
         return BlockContinue::at($cursor);
     }
 
-    public function addLine(string $line): void
-    {
+    public function addLine($line) {
         if ($this->content !== '') {
             $this->content .= "\n";
         }
@@ -79,8 +76,7 @@ final class HtmlBlockParser extends AbstractBlockContinueParser
         }
     }
 
-    public function closeBlock(): void
-    {
+    public function closeBlock() {
         $this->block->setLiteral($this->content);
         $this->content = '';
     }

@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -16,11 +14,11 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Node\Inline;
 
-class Newline extends AbstractInline
-{
+class Newline extends AbstractInline {
     // Any changes to these constants should be reflected in .phpstorm.meta.php
-    public const HARDBREAK = 0;
-    public const SOFTBREAK = 1;
+    const HARDBREAK = 0;
+
+    const SOFTBREAK = 1;
 
     /**
      * @var int
@@ -29,15 +27,13 @@ class Newline extends AbstractInline
      */
     protected $type;
 
-    public function __construct(int $breakType = self::HARDBREAK)
-    {
+    public function __construct($breakType = self::HARDBREAK) {
         parent::__construct();
 
         $this->type = $breakType;
     }
 
-    public function getType(): int
-    {
+    public function getType() {
         return $this->type;
     }
 }

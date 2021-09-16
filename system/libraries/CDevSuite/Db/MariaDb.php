@@ -8,15 +8,12 @@
 use Symfony\Component\Process\Process;
 
 abstract class CDevSuite_Db_MariaDb {
-
     /**
-     *
      * @var CDevSuite_Filesystem
      */
     protected $files;
 
     /**
-     *
      * @var CDevSuite_CommandLine
      */
     protected $cli;
@@ -25,8 +22,8 @@ abstract class CDevSuite_Db_MariaDb {
         $this->files = CDevSuite::filesystem();
         $this->cli = CDevSuite::commandLine();
     }
-    
-   /**
+
+    /**
      * Install the configuration files for MariaDb.
      *
      * @return void
@@ -53,10 +50,10 @@ abstract class CDevSuite_Db_MariaDb {
      * @return void
      */
     abstract public function restart();
-    
+
     /**
-     * get ini file location
-     * 
+     * Get ini file location
+     *
      * @return string
      */
     public function mariaDbIniFile() {
@@ -79,7 +76,7 @@ abstract class CDevSuite_Db_MariaDb {
         $dbDumper->setDumpBinaryPath($this->getDumperBinaryPath());
         $this->files->ensureDirExists(dirname($temporaryFilePath));
 
-        CDevSuite::info("Dumping database to:" . $temporaryFilePath);
+        CDevSuite::info('Dumping database to:' . $temporaryFilePath);
 
         //$dbDumper->dumpToFile($temporaryFilePath);
         return $temporaryFilePath;
@@ -90,11 +87,11 @@ abstract class CDevSuite_Db_MariaDb {
     }
 
     public function restore($to, $dumpFile) {
-        $command=$this->getRestoreCommand($to, $dumpFile);
-        
-        $process = Process::fromShellCommandline($command,null,null,null);
+        $command = $this->getRestoreCommand($to, $dumpFile);
+
+        $process = Process::fromShellCommandline($command, null, null, null);
         $output = '';
-        $process->run(function ($type, $line) use(&$output) {
+        $process->run(function ($type, $line) use (&$output) {
             $output .= $line;
         });
 
@@ -103,19 +100,14 @@ abstract class CDevSuite_Db_MariaDb {
 
     protected function getDumperBinaryPath() {
         //echo realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS . 'mysqldump.exe';
-        
-        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin'.DS;
-        
-         
+
+        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS;
     }
-    
-    
+
     protected function getClientBinaryPath() {
         //echo realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS . 'mysqldump.exe';
-        
-        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin'.DS;
-        
-         
+
+        return realpath(CDevSuite::binPath() . 'mariadb') . DS . 'bin' . DS;
     }
 
     protected function getRestoreCommand($dbConfig, $fromFile) {
@@ -128,7 +120,7 @@ abstract class CDevSuite_Db_MariaDb {
         $port = carr::get($connection, 'port');
         $host = carr::first(carr::wrap(carr::get($connection, 'host', '')));
 
-        $command[] = $this->getClientBinaryPath().'mysql';
+        $command[] = $this->getClientBinaryPath() . 'mysql';
         $command[] = '-h';
         $command[] = $host;
         $command[] = '-u';
@@ -139,7 +131,7 @@ abstract class CDevSuite_Db_MariaDb {
         }
 
         $command[] = $database;
-        return implode(" ", $command) . " < " . $fromFile;
+        return implode(' ', $command) . ' < ' . $fromFile;
     }
 
     /**
@@ -155,9 +147,17 @@ abstract class CDevSuite_Db_MariaDb {
         if (!$this->files->isDir($mariaDbDirectory = CDevSuite::homePath() . '/MariaDb')) {
             $this->files->mkdirAsUser($mariaDbDirectory);
         }
-        $this->files->putAsUser($this->mariaDbIniFile(), $this->files->get(CDevSuite::stubsPath() . 'my.mariadb.ini'));
+        CDevSuite::info($this->getSocketPath());
+        $this->files->putAsUser($this->mariaDbIniFile(), str_replace(
+            ['MARIADB_SOCKET_PATH'],
+            [$this->getSocketPath()],
+            $this->files->get(CDevSuite::stubsPath() . 'my.mariadb.ini')
+        ));
 
         $this->files->putAsUser($mariaDbDirectory . '/.keep', "\n");
     }
 
+    public function getSocketPath() {
+        return '/tmp/mariadb.sock';
+    }
 }

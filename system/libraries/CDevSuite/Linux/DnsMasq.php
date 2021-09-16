@@ -6,21 +6,20 @@
  * @author Hery
  */
 class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
-
     public $pm;
+
     public $sm;
+
     public $rclocal;
+
     public $configPath;
+
     public $nmConfigPath;
+
     public $resolvedConfig;
 
     /**
      * Create a new DnsMasq instance.
-     *
-     * @param PackageManager $pm PackageManager object
-     * @param ServiceManager $sm ServiceManager object
-     * @param Filesystem     $files Filesystem     object
-     * @param CommandLine    $cli CommandLine    object
      *
      * @return void
      */
@@ -44,14 +43,15 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
      *
      * @return void
      */
-    private function _lockResolvConf($lock = true) {
+    private function lockResolvConf($lock = true) {
         $arg = $lock ? '+i' : '-i';
 
         if (!$this->files->isLink($this->resolvconf)) {
             $this->cli->run(
-                    "chattr {$arg} {$this->resolvconf}", function ($code, $msg) {
-                CDevSuite::warning($msg);
-            }
+                "chattr {$arg} {$this->resolvconf}",
+                function ($code, $msg) {
+                    CDevSuite::warning($msg);
+                }
             );
         }
     }
@@ -61,16 +61,16 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
      *
      * @return void
      */
-    private function _mergeDns() {
+    private function mergeDns() {
         $optDir = '/opt/devsuite-linux';
         $script = $optDir . '/devsuite-dns';
 
         $this->pm->ensureInstalled('inotify-tools');
         $this->files->removeAsRoot($optDir);
         $this->files->ensureDirExistsAsRoot($optDir);
-        
-        $this->files->copyAsRoot(CDevSuite::stubsPath(). 'devsuite-dns',$script);
-        
+
+        $this->files->copyAsRoot(CDevSuite::stubsPath() . 'devsuite-dns', $script);
+
         //$this->files->putAsRoot($script, $this->files->get(CDevSuite::stubsPath(). 'devsuite-dns'));
         $this->cli->run("sudo chmod +x $script");
         $this->sm->installDevSuiteDns($this->files);
@@ -89,7 +89,7 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
     /**
      * Install and configure DnsMasq.
      *
-     * @param string $domain Domain TLD to use
+     * @param string $tld Domain TLD to use
      *
      * @return void
      */
@@ -141,8 +141,8 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
 
         $this->files->uncommentLine('IGNORE_RESOLVCONF', '/etc/default/dnsmasq');
 
-        $this->_lockResolvConf(false);
-        $this->_mergeDns();
+        $this->lockResolvConf(false);
+        $this->mergeDns();
 
         $this->files->unlink('/etc/dnsmasq.d/network-manager');
         $this->files->backupAsRoot($this->dnsmasqconf);
@@ -180,7 +180,7 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
         $this->files->unlinkAsRoot($this->nmConfigPath);
         $this->files->restore($this->resolvedConfigPath);
 
-        $this->_lockResolvConf(false);
+        $this->lockResolvConf(false);
         $this->files->restoreAsRoot($this->rclocal);
         $this->files->restoreAsRoot($this->resolvconf);
         $this->files->restoreAsRoot($this->dnsmasqconf);
@@ -192,5 +192,4 @@ class CDevSuite_Linux_DnsMasq extends CDevSuite_DnsMasq {
         CDevSuite::info('DevSuite DNS changes have been rolled back');
         CDevSuite::warning('If your system depended on systemd-resolved (like Ubuntu 17.04), please enable it manually');
     }
-
 }

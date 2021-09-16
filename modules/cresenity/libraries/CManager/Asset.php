@@ -1,40 +1,50 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2018, 1:13:38 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2018, 1:13:38 AM
  */
 class CManager_Asset {
-
     /**
      * POS CONST
      */
     const POS_HEAD = 'head';
+
     const POS_BEGIN = 'begin';
+
     const POS_END = 'end';
+
     const POS_READY = 'ready';
+
     const POS_LOAD = 'load';
 
     /**
      * TYPE CONST
      */
     const TYPE_JS_FILE = 'js_file';
+
     const TYPE_JS = 'js';
+
     const TYPE_CSS_FILE = 'css_file';
+
     const TYPE_CSS = 'css';
+
     const TYPE_META = 'meta';
+
     const TYPE_LINK = 'link';
+
     const TYPE_PLAIN = 'plain';
 
     /**
-     * array of all type script
-     * 
+     * Array of all type script
+     *
      * @var array
      */
-    public static $allType = array(
+    public static $allType = [
         self::TYPE_JS_FILE,
         self::TYPE_JS,
         self::TYPE_CSS_FILE,
@@ -43,22 +53,19 @@ class CManager_Asset {
         self::TYPE_JS,
         self::TYPE_LINK,
         self::TYPE_PLAIN,
-    );
+    ];
 
     /**
-     *
      * @var CManager_Asset_Container_Theme
      */
     protected $themeContainer;
 
     /**
-     *
      * @var CManager_Asset_Container_RunTime
      */
     protected $runTimeContainer;
 
     /**
-     *
      * @var CManager_Asset_Module
      */
     protected $module;
@@ -76,15 +83,14 @@ class CManager_Asset {
     }
 
     public static function allAvailablePos() {
-        return array(self::POS_HEAD, self::POS_BEGIN, self::POS_END, self::POS_LOAD, self::POS_READY);
+        return [self::POS_HEAD, self::POS_BEGIN, self::POS_END, self::POS_LOAD, self::POS_READY];
     }
 
     public static function allAvailableType() {
-        return array(self::TYPE_JS_FILE, self::TYPE_JS, self::TYPE_CSS_FILE, self::TYPE_CSS, self::TYPE_META, self::TYPE_LINK);
+        return [self::TYPE_JS_FILE, self::TYPE_JS, self::TYPE_CSS_FILE, self::TYPE_CSS, self::TYPE_META, self::TYPE_LINK];
     }
 
     /**
-     * 
      * @return CManager_Asset_Container_RunTime
      */
     public function runTime() {
@@ -92,7 +98,6 @@ class CManager_Asset {
     }
 
     /**
-     * 
      * @return CManager_Asset_Container_Theme
      */
     public function theme() {
@@ -100,7 +105,6 @@ class CManager_Asset {
     }
 
     /**
-     * 
      * @return CManager_Asset_Module
      */
     public function &module() {
@@ -116,14 +120,10 @@ class CManager_Asset {
     }
 
     public function getAllJsFileUrl() {
-
-
         $moduleThemeJs = $this->module->getThemeContainer()->getAllJsFileUrl();
         $themeJs = $this->themeContainer->getAllJsFileUrl();
         $moduleRunTimeJs = $this->module->getRunTimeContainer()->getAllJsFileUrl();
         $runTimeJs = $this->runTimeContainer->getAllJsFileUrl();
-
-
 
         $allJs = array_merge($moduleThemeJs, $themeJs, $moduleRunTimeJs, $runTimeJs);
 
@@ -131,12 +131,12 @@ class CManager_Asset {
     }
 
     public function varJs() {
-        $varJs = "window.capp = " . json_encode(CApp::variables()) . ";";
+        $varJs = 'window.capp = ' . json_encode(CApp::variables()) . ';';
         return $varJs;
     }
 
     public function wrapJs($js, $documentReady = false) {
-        $js_before = "";
+        $js_before = '';
 
         if ($documentReady) {
             $js = 'jQuery(document).ready(function(){' . $js . '});';
@@ -155,35 +155,29 @@ class CManager_Asset {
 
         ";
 
-
-
         $js .= CJavascript::compile();
         $bar = CDebug::bar();
         if ($bar->isEnabled()) {
             $js .= $bar->getJavascriptReplaceCode();
         }
 
-        return $js_before . $js . PHP_EOL . ";" . PHP_EOL;
+        return $js_before . $js . PHP_EOL . ';' . PHP_EOL;
     }
 
-    public function renderJsRequire($js, $require = 'require') {
+    public function renderJsRequire($js, $require = 'cresenity.cf.require') {
         //return CClientModules::instance()->require_js($js);
         $app = CApp::instance();
-
-
-
 
         $moduleThemejsFiles = $this->module->getThemeContainer()->jsFiles();
         $themejsFiles = $this->themeContainer->jsFiles();
         $moduleRunTimejsFiles = $this->module->getRunTimeContainer()->jsFiles();
         $runTimejsFiles = $this->runTimeContainer->jsFiles();
 
-
         $jsFiles = array_merge($moduleThemejsFiles, $themejsFiles, $moduleRunTimejsFiles, $runTimejsFiles);
 
-        $js_open = "";
-        $js_close = "";
-        $js_before = "";
+        $jsOpen = '';
+        $jsClose = '';
+        $jsBefore = '';
         $i = 0;
         $manager = CManager::instance();
         if ($manager->getUseRequireJs()) {
@@ -196,15 +190,14 @@ class CManager_Asset {
                     }
                 }
 
+                $jsOpen .= str_repeat("\t", $i) . $require . "(['" . $urlJsFile . "'],function(){" . PHP_EOL;
 
-                $js_open .= str_repeat("\t", $i) . $require . "(['" . $urlJsFile . "'],function(){" . PHP_EOL;
-
-                $js_close .= "})";
+                $jsClose .= '})';
                 $i++;
             }
         }
-        $js_before = $this->varJs();
-        return $js_before . $this->wrapJs($js_open . $js . $js_close);
+        $jsBefore = $this->varJs();
+        return $jsBefore . $this->wrapJs($jsOpen . $js . $jsClose);
     }
 
     public function render($pos, $type = null) {
@@ -215,12 +208,10 @@ class CManager_Asset {
         $themeScriptArray = [];
         $runtimeScriptArray = [];
 
-
         $themeScriptArray = carr::merge($themeScriptArray, $moduleThemeScripts);
         $themeScriptArray = carr::merge($themeScriptArray, $themeScripts);
         $runtimeScriptArray = carr::merge($runtimeScriptArray, $moduleRunTimeScripts);
         $runtimeScriptArray = carr::merge($runtimeScriptArray, $runTimeScripts);
-
 
         //do recompile for theme script
         $compileCss = CF::config('assets.css.compile', false);
@@ -253,53 +244,50 @@ class CManager_Asset {
             $type = self::$allType;
         }
         if (!is_array($type)) {
-            $type = array($type);
+            $type = [$type];
         }
         foreach ($scriptArray as $scriptType => $scriptValueArray) {
             if (in_array($scriptType, $type)) {
                 foreach ($scriptValueArray as $scriptValue) {
                     switch ($scriptType) {
                         case self::TYPE_JS_FILE:
-
-                            $urlJsFile = CManager_Asset_Helper::urlJsFile($scriptValue);
-                            if ($manager->is_mobile()) {
-                                $mobilePath = $manager->getMobilePath();
-                                if (strlen($mobilePath) > 0) {
-                                    $urlJsFile = $mobilePath . $scriptValue;
+                            if ($scriptValue instanceof CManager_Asset_File_JsFile) {
+                                $script .= $scriptValue->render() . PHP_EOL;
+                            } else {
+                                $urlJsFile = CManager_Asset_Helper::urlJsFile($scriptValue);
+                                if ($manager->isMobile()) {
+                                    $mobilePath = $manager->getMobilePath();
+                                    if (strlen($mobilePath) > 0) {
+                                        $urlJsFile = $mobilePath . $scriptValue;
+                                    }
                                 }
-                            }
 
-                            $script .= '<script src="' . $urlJsFile . '"></script>' . PHP_EOL;
+                                $script .= '<script src="' . $urlJsFile . '"></script>' . PHP_EOL;
+                            }
 
                             break;
                         case self::TYPE_CSS_FILE:
-
-                            $urlCssFile = CManager_Asset_Helper::urlCssFile($scriptValue);
-                            if ($manager->is_mobile()) {
-                                $mobilePath = $manager->getMobilePath();
-                                if (strlen($mobilePath) > 0) {
-                                    $urlCssFile = $mobilePath . $scriptValue;
+                            if ($scriptValue instanceof CManager_Asset_File_CssFile) {
+                                $script .= $scriptValue->render() . PHP_EOL;
+                            } else {
+                                $urlCssFile = CManager_Asset_Helper::urlCssFile($scriptValue);
+                                if ($manager->isMobile()) {
+                                    $mobilePath = $manager->getMobilePath();
+                                    if (strlen($mobilePath) > 0) {
+                                        $urlCssFile = $mobilePath . $scriptValue;
+                                    }
                                 }
+
+                                $script .= '<link href="' . $urlCssFile . '" rel="stylesheet" />' . PHP_EOL;
                             }
-
-                            $script .= '<link href="' . $urlCssFile . '" rel="stylesheet" />' . PHP_EOL;
-
                             break;
-
                         case self::TYPE_JS:
-
-
                             $script .= '<script>' . $scriptValue . '</script>' . PHP_EOL;
-
                             break;
                         case self::TYPE_CSS:
-
-
                             $script .= '<style>' . $scriptValue . '</style>' . PHP_EOL;
-
                             break;
                         case self::TYPE_PLAIN:
-
                             $script .= $scriptValue . PHP_EOL;
                             break;
                     }
@@ -308,14 +296,6 @@ class CManager_Asset {
         }
 
         return $script;
-    }
-
-    public function isUseRequireJs() {
-        $isUseRequireJs = CApp::instance()->isUseRequireJs();
-        if ($isUseRequireJs === null) {
-            $isUseRequireJs = true;
-        }
-        return $isUseRequireJs;
     }
 
     public function compileCss($files) {
@@ -331,5 +311,4 @@ class CManager_Asset {
         $compiler = new CManager_Asset_Compiler($files, $options);
         return $compiler->compile();
     }
-
 }

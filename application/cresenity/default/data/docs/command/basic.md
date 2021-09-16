@@ -1,11 +1,16 @@
-# Cresenity Command
+# CF Command - Basic
 
-### cek status sekarang ada di domain mana
----
+### Status command
+
+Karena CF bersifat multi aplikasi, maka jalannya command akan mengarah pada 1 aplikasi saja.
+Untuk melakukan check CF Command ada berada pada domain mana, dapat menggunakan command `status`
+
 ```
 php cf status
 ```
-maka akan tampil
+
+Maka akan tampil:
+
 ```
 Domain: yourein.domain
 
@@ -15,8 +20,9 @@ OrgID: 1
 OrgCode: yourorgcode
 ```
 
-### pindah dari domain sekarang ke domain tujuan
----
+### Swith domain
+
+Jika kita ingin berpindah aplikasi, maka dapat dilakukan dengan command `domain:switch`
 ```
 php cf domain:switch domain.name
 ```

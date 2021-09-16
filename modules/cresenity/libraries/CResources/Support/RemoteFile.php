@@ -1,14 +1,8 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CResources_Support_RemoteFile {
-
     protected $key;
+
     protected $disk;
 
     public function __construct($key, $disk) {
@@ -32,5 +26,4 @@ class CResources_Support_RemoteFile {
     public function getName() {
         return pathinfo($this->getFilename(), PATHINFO_FILENAME);
     }
-
 }

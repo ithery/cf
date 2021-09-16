@@ -1,29 +1,27 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 11:48:25 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 11:48:25 PM
  */
 class CJavascript_Statement_JQuery extends CJavascript_Statement {
-
     /**
-     *
      * @var string
      */
     protected $selector;
 
     /**
-     *
      * @var CJavascript_Statement_JQuery_CompilableInterface[]
      */
     protected $needForCompile;
 
     public function __construct($selector = 'this') {
         $this->selector = $selector;
-        $this->methods = array();
+        $this->methods = [];
     }
 
     public function getSelector() {
@@ -35,15 +33,14 @@ class CJavascript_Statement_JQuery extends CJavascript_Statement {
         return $this;
     }
 
-    public function ajax($options = array()) {
+    public function ajax($options = []) {
         $ajaxObject = new CJavascript_Statement_JQuery_Ajax($options);
         $this->needForCompile[] = $ajaxObject;
 
         return $this;
     }
 
-    public function event($eventName, $js, $options = array()) {
-
+    public function event($eventName, $js, $options = []) {
         $eventObject = new CJavascript_Statement_JQuery_Event($eventName, $js, $options);
 
         $this->needForCompile[] = $eventObject;
@@ -69,7 +66,7 @@ class CJavascript_Statement_JQuery extends CJavascript_Statement {
             $str .= $compilable->compile();
         }
         if ($haveAjax) {
-            $jQueryObjectStr = "$";
+            $jQueryObjectStr = '$';
         }
         $str = $jQueryObjectStr . $str . ';';
         return $str;
@@ -79,5 +76,4 @@ class CJavascript_Statement_JQuery extends CJavascript_Statement {
         $statement = $this->compile();
         return $statement;
     }
-
 }

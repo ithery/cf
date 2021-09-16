@@ -1,20 +1,19 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CVendor_Firebase_Messaging_Notification implements \JsonSerializable {
-
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     private $title;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     private $body;
 
-    /** @var string|null */
+    /**
+     * @var string|null
+     */
     private $imageUrl;
 
     private function __construct($title = null, $body = null, $imageUrl = null) {
@@ -34,7 +33,9 @@ class CVendor_Firebase_Messaging_Notification implements \JsonSerializable {
     public static function fromArray(array $data) {
         try {
             return new self(
-                    carr::get($data, 'title'), carr::get($data, 'body'), carr::get($data, 'image')
+                carr::get($data, 'title'),
+                carr::get($data, 'body'),
+                carr::get($data, 'image')
             );
         } catch (Throwable $e) {
             throw new CVendor_Firebase_Exception_InvalidArgumentException($e->getMessage(), $e->getCode(), $e);
@@ -88,9 +89,8 @@ class CVendor_Firebase_Messaging_Notification implements \JsonSerializable {
             'title' => $this->title,
             'body' => $this->body,
             'image' => $this->imageUrl,
-                ], static function ($value) {
+        ], static function ($value) {
             return $value !== null;
         });
     }
-
 }

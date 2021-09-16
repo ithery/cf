@@ -1,22 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 class CConfig implements CInterface_Arrayable, ArrayAccess {
-
-    protected static $instances = array();
+    protected static $instances = [];
     protected $group;
     protected $items;
 
     /**
-     * 
      * @param string $group
+     *
      * @return CConfig
+     *
      * @throws CException
      */
-    public static function & instance($group = 'app') {
+    public static function &instance($group = 'app') {
         if (!is_string($group)) {
-            throw new CException("Config group must be a string");
+            throw new CException('Config group must be a string');
         }
         if (!isset(CConfig::$instances[$group])) {
             // Create a new instance
@@ -45,7 +45,8 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
     /**
      * Get many configuration values.
      *
-     * @param  array  $keys
+     * @param array $keys
+     *
      * @return array
      */
     public function getMany($keys) {
@@ -75,19 +76,16 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
         $this->items = [];
         $files = CF::findFile('config', $this->group, $required = false, $ext = false, $refresh = true);
 
-
         //add backward compatibility
         //TODO: remove folder config in DOCROOT
         if (!is_array($files)) {
-            $files = array();
+            $files = [];
         }
         if (file_exists(DOCROOT . 'config' . DS . $this->group . EXT)) {
             $files[] = DOCROOT . 'config' . DS . $this->group . EXT;
         }
 
         foreach ($files as $file) {
-
-
             $cfg = include $file;
             if (!is_array($cfg)) {
                 //backward compatibility with older config
@@ -98,15 +96,15 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
             }
             if (!is_array($cfg)) {
                 //there is an invalid format
-                throw new CException("Invalid config format in :file", array(':file' => $file));
+                throw new CException('Invalid config format in :file', [':file' => $file]);
             }
             $this->items = carr::merge($this->items, $cfg);
         }
     }
 
     /**
-     * flatten the config array, retrieves information of default value and file which config is created
-     * 
+     * Flatten the config array, retrieves information of default value and file which config is created
+     *
      * @throws CException
      */
     public function getConfigData() {
@@ -115,7 +113,7 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
         //add backward compatibility
         //TODO: remove folder config in DOCROOT
         if (!is_array($files)) {
-            $files = array();
+            $files = [];
         }
         if (file_exists(DOCROOT . 'config' . DS . $this->group . EXT)) {
             $files[] = DOCROOT . 'config' . DS . $this->group . EXT;
@@ -124,11 +122,11 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
         if ($files == null) {
             //var_dump(debug_backtrace());
             //throw new CF_Exception('file config '.$group.' not found');
-            $files = array();
+            $files = [];
         }
 
-        $resultFiles = array();
-        $resultData = array();
+        $resultFiles = [];
+        $resultData = [];
         foreach ($files as $file) {
             $cfg = include $file;
             if (!is_array($cfg)) {
@@ -139,7 +137,7 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
             }
             if (!is_array($cfg)) {
                 //there is an invalid format
-                throw new CException("Invalid config format in :file", array(':file' => $file));
+                throw new CException('Invalid config format in :file', [':file' => $file]);
             }
             $cfgFiles = $cfg;
             foreach ($cfgFiles as $key => $val) {
@@ -150,10 +148,10 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
         }
 
         //we will flatten the array of result Data
-        $result = array();
-        $addToResult = function($key, $value, &$result) use($resultFiles, $files) {
+        $result = [];
+        $addToResult = function ($key, $value, &$result) use ($resultFiles, $files) {
             $keyParts = explode('.', $key);
-            $resultData = array();
+            $resultData = [];
             $resultData['key'] = $key;
             $resultData['value'] = $value;
             $resultData['type'] = gettype($value);
@@ -169,7 +167,7 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
             $resultData['comment'] = $comment;
             $result[] = $resultData;
         };
-        $flatten = function($array, $keyPath = '') use (&$flatten, $addToResult, &$result) {
+        $flatten = function ($array, $keyPath = '') use (&$flatten, $addToResult, &$result) {
             foreach ($array as $key => $value) {
                 $keyDotted = strlen($keyPath) == 0 ? $key : $keyPath . '.' . $key;
                 if (is_array($value)) {
@@ -192,8 +190,9 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
     /**
      * Prepend a value onto an array configuration value.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function prepend($key, $value) {
@@ -207,8 +206,9 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
     /**
      * Push a value onto an array configuration value.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function push($key, $value) {
@@ -235,7 +235,8 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
     /**
      * Determine if the given configuration value exists.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function has($key) {
@@ -257,5 +258,4 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
     public function offsetUnset($key) {
         $this->set($key, null);
     }
-
 }

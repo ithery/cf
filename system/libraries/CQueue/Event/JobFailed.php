@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2019, 6:24:27 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2019, 6:24:27 AM
  */
 class CQueue_Event_JobFailed {
-
     /**
      * The connection name.
      *
@@ -33,9 +33,10 @@ class CQueue_Event_JobFailed {
     /**
      * Create a new event instance.
      *
-     * @param  string  $connectionName
-     * @param  CQueue_AbstractJob  $job
-     * @param  \Exception  $exception
+     * @param string             $connectionName
+     * @param CQueue_AbstractJob $job
+     * @param \Exception         $exception
+     *
      * @return void
      */
     public function __construct($connectionName, $job, $exception) {
@@ -43,5 +44,4 @@ class CQueue_Event_JobFailed {
         $this->exception = $exception;
         $this->connectionName = $connectionName;
     }
-
 }

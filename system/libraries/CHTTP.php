@@ -128,4 +128,11 @@ class CHTTP {
         static::$request = $request;
         CRouting::urlGenerator()->setRequest(static::$request);
     }
+
+    /**
+     * @return CHTTP_ResponseCache
+     */
+    public static function responseCache() {
+        return CHTTP_ResponseCache::instance();
+    }
 }

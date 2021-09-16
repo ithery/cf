@@ -1,9 +1,87 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+if (isset($_COOKIE['cf-strict'])) {
+    error_reporting(E_ALL);
+}
+date_default_timezone_set('Asia/Jakarta');
 
-define('CF_VERSION', '1.1');
-define('CF_CODENAME', 'CF1.1');
+//define all constant needed by framework
+//we using if because it is maybe already defined in old index.php
+
+if (!defined('DS')) {
+    define('DS', DIRECTORY_SEPARATOR);
+}
+/**
+ * Default php file extension
+ */
+if (!defined('EXT')) {
+    define('EXT', '.php');
+}
+
+if (!defined('DOCROOT')) {
+    $docroot = realpath(dirname(__FILE__) . DS . '..' . DS . '..' . DS);
+    define('DOCROOT', $docroot . DS);
+
+    define('KOHANA', DOCROOT . 'index.php');
+
+    // If the front controller is a symlink, change to the real docroot
+    is_link(KOHANA) and chdir(dirname(realpath(__FILE__)));
+}
+
+if (!defined('SYSPATH')) {
+    $sysPath = realpath(DOCROOT . 'system');
+    define('SYSPATH', $sysPath . DS);
+}
+
+if (!defined('MODPATH')) {
+    $modPath = realpath(DOCROOT . 'modules');
+    define('MODPATH', $modPath . DS);
+}
+
+if (!defined('APPPATH')) {
+    $appPath = realpath(DOCROOT . 'application');
+    $file = DOCROOT . 'data' . DIRECTORY_SEPARATOR . 'domain' . DIRECTORY_SEPARATOR;
+    $domain = '';
+    if (PHP_SAPI === 'cli') {
+        if (defined('CFCLI') || defined('CFTesting')) {
+            if (file_exists(DOCROOT . 'data' . DS . 'current-domain')) {
+                $domain = file_get_contents(DOCROOT . 'data' . DS . 'current-domain');
+            }
+        } else {
+            // Command line requires a bit of hacking
+            if (isset($_SERVER['argv'][2])) {
+                $domain = $_SERVER['argv'][2];
+            }
+        }
+    } else {
+        if (isset($_SERVER['SERVER_NAME'])) {
+            $domain = $_SERVER['SERVER_NAME'];
+        }
+    }
+    if (strlen($domain) > 0) {
+        $file .= $domain . EXT;
+
+        if (file_exists($file)) {
+            $data = require_once $file;
+
+            $appCode = $data['app_code'];
+
+            //$appPath = realpath(DOCROOT . 'application' . DS . $appCode);
+        }
+    }
+    define('APPPATH', $appPath . DS);
+}
+
+if (!defined('IN_PRODUCTION')) {
+    define('IN_PRODUCTION', false);
+}
+
+//try to load data domain
+
+//end of constant from index
+
+define('CF_VERSION', '1.2');
+define('CF_CODENAME', 'CF1.2');
 
 // Test of CF is running in Windows
 define('CF_IS_WIN', DIRECTORY_SEPARATOR === '\\');
@@ -33,15 +111,15 @@ require SYSPATH . 'core/CF' . EXT;
 // Prepare the environment
 CF::setup();
 
-
 // End CF Loading
 CFBenchmark::stop(SYSTEM_BENCHMARK . '_cf_loading');
 
-
-if (defined('CFCLI')) {
-    CFConsole::execute();
-} else {
-    CFHTTP::execute();
+if (!CF::isTesting()) {
+    if (defined('CFCLI')) {
+        CFConsole::execute();
+    } else {
+        CFHTTP::execute();
+    }
 }
 
 // stop total_execution

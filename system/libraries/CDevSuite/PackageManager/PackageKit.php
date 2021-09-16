@@ -1,18 +1,11 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CDevSuite_PackageManager_PackageKit extends CDevSuite_PackageManager {
     public $cli;
 
     /**
      * Create a new PackageKit instance.
      *
-     * @param CommandLine $cli
      * @return void
      */
     public function __construct() {
@@ -23,10 +16,10 @@ class CDevSuite_PackageManager_PackageKit extends CDevSuite_PackageManager {
      * Get array of installed packages
      *
      * @param string $package
+     *
      * @return array
      */
-    public function packages($package)
-    {
+    public function packages($package) {
         $query = "pkcon search {$package} | grep '^In' | sed 's/\s\+/ /g' | cut -d' ' -f2 | sed 's/-[0-9].*//'";
 
         return explode(PHP_EOL, $this->cli->run($query));
@@ -36,10 +29,10 @@ class CDevSuite_PackageManager_PackageKit extends CDevSuite_PackageManager {
      * Determine if the given package is installed.
      *
      * @param string $package
+     *
      * @return bool
      */
-    public function installed($package)
-    {
+    public function installed($package) {
         return in_array($package, $this->packages($package));
     }
 
@@ -47,10 +40,10 @@ class CDevSuite_PackageManager_PackageKit extends CDevSuite_PackageManager {
      * Ensure that the given package is installed.
      *
      * @param string $package
+     *
      * @return void
      */
-    public function ensureInstalled($package)
-    {
+    public function ensureInstalled($package) {
         if (!$this->installed($package)) {
             $this->installOrFail($package);
         }
@@ -60,10 +53,10 @@ class CDevSuite_PackageManager_PackageKit extends CDevSuite_PackageManager {
      * Install the given package and throw an exception on failure.
      *
      * @param string $package
+     *
      * @return void
      */
-    public function installOrFail($package)
-    {
+    public function installOrFail($package) {
         CDevSuite::output('<info>[' . $package . '] is not installed, installing it now via PackageKit...</info> 🍻');
 
         $this->cli->run(trim('pkcon install -y ' . $package), function ($exitCode, $errorOutput) use ($package) {
@@ -78,16 +71,16 @@ class CDevSuite_PackageManager_PackageKit extends CDevSuite_PackageManager {
      *
      * @return void
      */
-    public function setup()
-    {
+    public function setup() {
         // Nothing to do
     }
 
     /**
      * Restart dnsmasq in Ubuntu.
+     *
+     * @param mixed $sm
      */
-    public function nmRestart($sm)
-    {
+    public function nmRestart($sm) {
         $sm->restart(['network-manager']);
 
         $version = trim($this->cli->run('cat /etc/*release | grep DISTRIB_RELEASE | cut -d\= -f2'));
@@ -103,8 +96,7 @@ class CDevSuite_PackageManager_PackageKit extends CDevSuite_PackageManager {
      *
      * @return bool
      */
-    public function isAvailable()
-    {
+    public function isAvailable() {
         try {
             $output = $this->cli->run('which pkcon', function ($exitCode, $output) {
                 throw new DomainException('PackageKit not available');

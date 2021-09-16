@@ -1,29 +1,21 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
-
     public $pm;
+
     public $sm;
+
     public $site;
+
     public $nginx_conf;
+
     public $sites_available_conf;
+
     public $sites_enabled_conf;
 
     /**
      * Create a new Nginx instance.
      *
-     * @param PackageManager $pm
-     * @param ServiceManager $sm
-     * @param CommandLine    $cli
-     * @param Filesystem     $files
-     * @param Configuration  $configuration
-     * @param Site           $site
      * @return void
      */
     public function __construct() {
@@ -72,9 +64,8 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
         $this->files->backupAsRoot($nginx);
         CDevSuite::info('Creating file:' . $nginx);
         $this->files->putAsRoot(
-                $nginx, str_replace(['DEVSUITE_USER', 'DEVSUITE_GROUP', 'DEVSUITE_HOME_PATH', 'DEVSUITE_PID']
-                        , [CDevSuite::user(), CDevSuite::group(), rtrim(CDevSuite::homePath(), '/'), $pid_string]
-                        , $contents)
+            $nginx,
+            str_replace(['DEVSUITE_USER', 'DEVSUITE_GROUP', 'DEVSUITE_HOME_PATH', 'DEVSUITE_PID'], [CDevSuite::user(), CDevSuite::group(), rtrim(CDevSuite::homePath(), '/'), $pid_string], $contents)
         );
     }
 
@@ -86,12 +77,12 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
     public function installServer() {
         CDevSuite::info('Creating file:' . $this->sites_available_conf);
         $this->files->putAsRoot(
-                $this->sites_available_conf,
-                str_replace(
-                        ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_PORT'],
-                        [rtrim(CDevSuite::homePath(), '/'), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $this->configuration->read()['port']],
-                        $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
-                )
+            $this->sites_available_conf,
+            str_replace(
+                ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_PORT'],
+                [rtrim(CDevSuite::homePath(), '/'), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $this->configuration->read()['port']],
+                $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
+            )
         );
 
         if ($this->files->exists('/etc/nginx/sites-enabled/default')) {
@@ -103,8 +94,8 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
 
         CDevSuite::info('Creating file:' . '/etc/nginx/fastcgi_params');
         $this->files->putAsRoot(
-                '/etc/nginx/fastcgi_params',
-                $this->files->get(CDevSuite::stubsPath() . 'fastcgi_params')
+            '/etc/nginx/fastcgi_params',
+            $this->files->get(CDevSuite::stubsPath() . 'fastcgi_params')
         );
     }
 
@@ -129,16 +120,17 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
      * Update the port used by Nginx.
      *
      * @param string $newPort
+     *
      * @return void
      */
     public function updatePort($newPort) {
         $this->files->putAsRoot(
-                $this->sites_available_conf,
-                str_replace(
-                        ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_PORT'],
-                        [rtrim(CDevSuite::homePath(), '/'), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $newPort],
-                        $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
-                )
+            $this->sites_available_conf,
+            str_replace(
+                ['DEVSUITE_HOME_PATH', 'DEVSUITE_SERVER_PATH', 'DEVSUITE_STATIC_PREFIX', 'DEVSUITE_PORT'],
+                [rtrim(CDevSuite::homePath(), '/'), CDevSuite::serverPath(), CDevSuite::staticPrefix(), $newPort],
+                $this->files->get(CDevSuite::stubsPath() . 'devsuite.conf')
+            )
         );
     }
 
@@ -201,5 +193,4 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
             $this->files->symlinkAsRoot('/etc/nginx/sites-available/default', '/etc/nginx/sites-enabled/default');
         }
     }
-
 }

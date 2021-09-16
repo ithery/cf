@@ -6,17 +6,19 @@
  * @author Hery
  */
 abstract class CDevSuite_DevCloud {
-
     protected $baseDownloadUrl;
+
     protected $baseBinPath;
+
     protected $requiredFiles = [
     ];
+
     protected $requiredFolders = [
     ];
+
     protected $requiredMariaDBFiles = [];
 
     /**
-     *
      * @var CDevSuite_Filesystem
      */
     protected $files;
@@ -66,9 +68,9 @@ abstract class CDevSuite_DevCloud {
     /**
      * Download from devcloud
      *
+     * @param mixed $file
      */
     public function download($file) {
-
         CDevSuite::info('Downloading ' . $file . '');
         $url = $this->baseDownloadUrl . $file;
         $targetPath = $this->baseBinPath . $file;
@@ -91,7 +93,7 @@ abstract class CDevSuite_DevCloud {
         $chunksize = 10 * (1024 * 1024); // 10 Megs
 
         /**
-         * parse_url breaks a part a URL into it's parts, i.e. host, path,
+         * Parse_url breaks a part a URL into it's parts, i.e. host, path,
          * query string, etc.
          */
         $parts = parse_url($infile);
@@ -120,11 +122,12 @@ abstract class CDevSuite_DevCloud {
          * Now read the headers from the remote server. We'll need
          * to get the content length.
          */
-        $headers = array();
+        $headers = [];
         while (!feof($i_handle)) {
             $line = fgets($i_handle);
-            if ($line == "\r\n")
+            if ($line == "\r\n") {
                 break;
+            }
             $headers[] = $line;
         }
 
@@ -159,8 +162,9 @@ abstract class CDevSuite_DevCloud {
             /**
              * We're done reading when we've reached the conent length
              */
-            if ($cnt >= $length)
+            if ($cnt >= $length) {
                 break;
+            }
         }
         CDevSuite::progressFinish();
 
@@ -172,10 +176,9 @@ abstract class CDevSuite_DevCloud {
     /**
      * Download from devcloud
      *
+     * @param mixed $file
      */
     public function downloadIfNotExists($file) {
-
-
         $targetPath = $this->baseBinPath . $file;
         if (!file_exists($targetPath)) {
             return $this->download($file);
@@ -186,7 +189,8 @@ abstract class CDevSuite_DevCloud {
     /**
      * Get the contents of a URL using the 'proxy' and 'ssl-no-verify' command options.
      *
-     * @param  string  $url
+     * @param string $url
+     *
      * @return string|bool
      */
     protected function getUrl($url) {
@@ -219,5 +223,4 @@ abstract class CDevSuite_DevCloud {
         CDevSuite::info('Deleting ' . $file);
         return $this->files->unlink($this->binPath($file));
     }
-
 }

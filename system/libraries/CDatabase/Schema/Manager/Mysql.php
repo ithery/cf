@@ -1,52 +1,32 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 8:09:14 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 8:09:14 AM
  */
 class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
-
-    	    	
-    public function getDatabaseRowCount() {
-        $databaseName = $this->db->getDatabaseName();
-        return $this->db->getValue('
-    	    	SELECT SUM(table_rows)
-    	    	FROM INFORMATION_SCHEMA.TABLES
-    	    	WHERE table_schema = ' . $this->db->escape($databaseName) . '
-    	    	GROUP BY table_schema
-    	    ');
-    }
-    public function getDatabaseSize() {
-        $databaseName = $this->db->getDatabaseName();
-        return $this->db->getValue('
-    	    	SELECT SUM(data_length + index_length)
-    	    	FROM INFORMATION_SCHEMA.TABLES
-    	    	WHERE table_schema = ' . $this->db->escape($databaseName) . '
-    	    	GROUP BY table_schema
-    	    ');
-    }
-    
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableViewDefinition($view) {
-        return new View($view['TABLE_NAME'], $view['VIEW_DEFINITION']);
+    protected function getPortableViewDefinition($view) {
+        return new CDatabase_Schema_View($view['TABLE_NAME'], $view['VIEW_DEFINITION']);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableTableDefinition($table) {
+    protected function getPortableTableDefinition($table) {
         return array_shift($table);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableUserDefinition($user) {
+    protected function getPortableUserDefinition($user) {
         return [
             'user' => $user['User'],
             'password' => $user['Password'],
@@ -56,7 +36,7 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableTableIndexesList($tableIndexes, $tableName = null) {
+    protected function getPortableTableIndexesList($tableIndexes, $tableName = null) {
         foreach ($tableIndexes as $k => $v) {
             $v = array_change_key_case($v, CASE_LOWER);
             if ($v['key_name'] === 'PRIMARY') {
@@ -72,27 +52,27 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
             $tableIndexes[$k] = $v;
         }
 
-        return parent::_getPortableTableIndexesList($tableIndexes, $tableName);
+        return parent::getPortableTableIndexesList($tableIndexes, $tableName);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableSequenceDefinition($sequence) {
+    protected function getPortableSequenceDefinition($sequence) {
         return end($sequence);
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableDatabaseDefinition($database) {
+    protected function getPortableDatabaseDefinition($database) {
         return $database['Database'];
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableTableColumnDefinition($tableColumn) {
+    protected function getPortableTableColumnDefinition($tableColumn) {
         $tableColumn = array_change_key_case($tableColumn, CASE_LOWER);
 
         $dbType = strtolower($tableColumn['type']);
@@ -203,10 +183,10 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
      *   null in some circumstances (see https://jira.mariadb.org/browse/MDEV-14053)
      * - \' is always stored as '' in information_schema (normalized)
      *
+     * @param null|string $columnDefault default value as stored in information_schema for MariaDB >= 10.2.7
+     *
      * @link https://mariadb.com/kb/en/library/information-schema-columns-table/
      * @link https://jira.mariadb.org/browse/MDEV-13132
-     *
-     * @param null|string $columnDefault default value as stored in information_schema for MariaDB >= 10.2.7
      */
     private function getMariaDb1027ColumnDefault(CDatabase_Platform_MariaDb1027 $platform, $columnDefault = null) {
         if ($columnDefault === 'NULL' || $columnDefault === null) {
@@ -214,8 +194,11 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
         }
         if ($columnDefault[0] === "'") {
             return stripslashes(
-                    str_replace("''", "'", preg_replace('/^\'(.*)\'$/', '$1', $columnDefault)
-                    )
+                str_replace(
+                    "''",
+                    "'",
+                    preg_replace('/^\'(.*)\'$/', '$1', $columnDefault)
+                )
             );
         }
         switch ($columnDefault) {
@@ -232,15 +215,15 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
     /**
      * {@inheritdoc}
      */
-    protected function _getPortableTableForeignKeysList($tableForeignKeys) {
+    protected function getPortableTableForeignKeysList($tableForeignKeys) {
         $list = [];
         foreach ($tableForeignKeys as $value) {
             $value = array_change_key_case($value, CASE_LOWER);
             if (!isset($list[$value['constraint_name']])) {
-                if (!isset($value['delete_rule']) || $value['delete_rule'] === "RESTRICT") {
+                if (!isset($value['delete_rule']) || $value['delete_rule'] === 'RESTRICT') {
                     $value['delete_rule'] = null;
                 }
-                if (!isset($value['update_rule']) || $value['update_rule'] === "RESTRICT") {
+                if (!isset($value['update_rule']) || $value['update_rule'] === 'RESTRICT') {
                     $value['update_rule'] = null;
                 }
 
@@ -260,14 +243,43 @@ class CDatabase_Schema_Manager_Mysql extends CDatabase_Schema_Manager {
         $result = [];
         foreach ($list as $constraint) {
             $result[] = new CDatabase_Schema_ForeignKeyConstraint(
-                    array_values($constraint['local']), $constraint['foreignTable'], array_values($constraint['foreign']), $constraint['name'], [
-                'onDelete' => $constraint['onDelete'],
-                'onUpdate' => $constraint['onUpdate'],
-                    ]
+                array_values($constraint['local']),
+                $constraint['foreignTable'],
+                array_values($constraint['foreign']),
+                $constraint['name'],
+                [
+                    'onDelete' => $constraint['onDelete'],
+                    'onUpdate' => $constraint['onUpdate'],
+                ]
             );
         }
 
         return $result;
     }
 
+    public function getDatabaseRowCount() {
+        $databaseName = $this->db->getDatabaseName();
+        return $this->db->getValue('
+    	    	SELECT SUM(table_rows)
+    	    	FROM INFORMATION_SCHEMA.TABLES
+    	    	WHERE table_schema = ' . $this->db->escape($databaseName) . '
+    	    	GROUP BY table_schema
+    	    ');
+    }
+
+    public function getDatabaseSize() {
+        $databaseName = $this->db->getDatabaseName();
+        return $this->db->getValue(sprintf('SELECT SUM(data_length + index_length)
+            FROM INFORMATION_SCHEMA.TABLES
+            WHERE table_schema = %s
+            GROUP BY table_schema', $this->db->escape($databaseName)));
+    }
+
+    public function isSuperUser() {
+        try {
+            return (bool) $this->db->getValue('SELECT 1 FROM mysql.user LIMIT 1');
+        } catch (Exception $ex) {
+            return false;
+        }
+    }
 }

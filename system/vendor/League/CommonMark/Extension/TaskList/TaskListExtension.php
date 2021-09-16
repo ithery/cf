@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -16,10 +14,8 @@ namespace League\CommonMark\Extension\TaskList;
 use League\CommonMark\Environment\ConfigurableEnvironmentInterface;
 use League\CommonMark\Extension\ExtensionInterface;
 
-final class TaskListExtension implements ExtensionInterface
-{
-    public function register(ConfigurableEnvironmentInterface $environment): void
-    {
+final class TaskListExtension implements ExtensionInterface {
+    public function register(ConfigurableEnvironmentInterface $environment) {
         $environment->addInlineParser(new TaskListItemMarkerParser(), 35);
         $environment->addRenderer(TaskListItemMarker::class, new TaskListItemMarkerRenderer());
     }

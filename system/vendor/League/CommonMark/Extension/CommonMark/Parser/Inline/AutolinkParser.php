@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -22,18 +20,16 @@ use League\CommonMark\Parser\Inline\InlineParserMatch;
 use League\CommonMark\Parser\InlineParserContext;
 use League\CommonMark\Util\UrlEncoder;
 
-final class AutolinkParser implements InlineParserInterface
-{
-    private const EMAIL_REGEX      = '<([a-zA-Z0-9.!#$%&\'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)>';
-    private const OTHER_LINK_REGEX = '<([A-Za-z][A-Za-z0-9.+-]{1,31}:[^<>\x00-\x20]*)>';
+final class AutolinkParser implements InlineParserInterface {
+    const EMAIL_REGEX = '<([a-zA-Z0-9.!#$%&\'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)>';
 
-    public function getMatchDefinition(): InlineParserMatch
-    {
+    const OTHER_LINK_REGEX = '<([A-Za-z][A-Za-z0-9.+-]{1,31}:[^<>\x00-\x20]*)>';
+
+    public function getMatchDefinition() {
         return InlineParserMatch::regex(self::EMAIL_REGEX . '|' . self::OTHER_LINK_REGEX);
     }
 
-    public function parse(InlineParserContext $inlineContext): bool
-    {
+    public function parse(InlineParserContext $inlineContext) {
         $inlineContext->getCursor()->advanceBy($inlineContext->getFullMatchLength());
         $matches = $inlineContext->getMatches();
 

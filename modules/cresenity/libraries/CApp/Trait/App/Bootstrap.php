@@ -1,21 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 trait CApp_Trait_App_Bootstrap {
-
     protected static $registerComponentBooted = false;
+
     protected static $registerControlBooted = false;
+
     protected static $registerBladeBooted = false;
 
     public static function registerComponent() {
         if (!static::$registerComponentBooted) {
-
             CComponent_RenameMe_SupportEvents::init();
             CComponent_RenameMe_SupportLocales::init();
             CComponent_RenameMe_SupportChildren::init();
@@ -26,8 +27,8 @@ trait CApp_Trait_App_Bootstrap {
             CComponent_RenameMe_SupportFileDownloads::init();
             CComponent_RenameMe_SupportActionReturns::init();
             CComponent_RenameMe_SupportBrowserHistory::init();
+
             CComponent_RenameMe_SupportComponentTraits::init();
-            
             CView::blade()->precompiler(function ($string) {
                 return (new CComponent_ComponentTagCompiler())->compile($string);
             });
@@ -36,7 +37,6 @@ trait CApp_Trait_App_Bootstrap {
             CView::blade()->directive('this', [CComponent_BladeDirective::class, 'this']);
             CView::blade()->directive('entangle', [CComponent_BladeDirective::class, 'entangle']);
 
-            
             CView::engineResolver()->register('blade', function () {
                 return new CComponent_ComponentCompilerEngine();
             });
@@ -82,26 +82,23 @@ trait CApp_Trait_App_Bootstrap {
                 [CComponent_HydrationMiddleware_CallHydrationHooks::class, 'initialHydrate'],
             ]);
 
-            
             if (method_exists(CView_ComponentAttributeBag::class, 'macro')) {
                 CView_ComponentAttributeBag::macro('cf', function ($name) {
-                    $entries = carr::head($this->whereStartsWith('cf:'.$name));
-                    
+                    $entries = carr::head($this->whereStartsWith('cf:' . $name));
+
                     $directive = carr::head(array_keys($entries));
                     $value = carr::head(array_values($entries));
 
                     return new CComponent_CFDirective($name, $directive, $value);
                 });
             }
-            
+
             static::$registerComponentBooted = true;
         }
     }
 
     public static function registerBlade() {
         if (!static::$registerBladeBooted) {
-
-
             CView::blade()->directive('CApp', [CApp_Blade_Directive::class, 'directive']);
             CView::blade()->directive('CAppStyles', [CApp_Blade_Directive::class, 'styles']);
             CView::blade()->directive('CAppScripts', [CApp_Blade_Directive::class, 'scripts']);
@@ -116,62 +113,61 @@ trait CApp_Trait_App_Bootstrap {
             CView::blade()->directive('CAppEndPrependScript', [CApp_Blade_Directive::class, 'endPrependScript']);
             CView::blade()->directive('CAppElement', [CApp_Blade_Directive::class, 'element']);
 
-            
-            
-            CView::blade()->component('capp.view-component.modal','modal');
+            CView::blade()->component('capp.view-component.modal', 'modal');
             static::$registerBladeBooted = true;
         }
     }
 
     public static function registerControl() {
         if (!static::$registerControlBooted) {
+            CFBenchmark::start('CApp.RegisterControl');
             $manager = CManager::instance();
+            $manager->registerControls([
+                'text' => CElement_FormInput_Text::class,
+                'textarea' => CElement_FormInput_Textarea::class,
+                'number' => CElement_FormInput_Number::class,
+                'email' => CElement_FormInput_Email::class,
+                'datepicker' => CElement_FormInput_Date::class,
+                'date' => CElement_FormInput_Date::class,
+                'material-datetime' => CElement_FormInput_DateTime_MaterialDateTime::class,
+                'daterange-picker' => CElement_FormInput_DateRange::class,
+                'daterange-dropdown' => CElement_FormInput_DateRange_Dropdown::class,
+                'daterange-button' => CElement_FormInput_DateRange_DropdownButton::class,
+                'currency' => CElement_FormInput_Currency::class,
+                'auto-numeric' => CElement_FormInput_AutoNumeric::class,
+                'time' => CElement_FormInput_Time::class,
+                'timepicker' => CElement_FormInput_Time::class,
+                'clock' => CElement_FormInput_Clock::class,
+                'clockpicker' => CElement_FormInput_Clock::class,
+                'image' => CElement_FormInput_Image::class,
+                'image-ajax' => CElement_FormInput_ImageAjax::class,
+                'multi-image-ajax' => CElement_FormInput_MultipleImageAjax::class,
+                'file-ajax' => CElement_FormInput_FileAjax::class,
+                'password' => CElement_FormInput_Password::class,
+                'select' => CElement_FormInput_Select::class,
+                'minicolor' => CElement_FormInput_MiniColor::class,
+                'map-picker' => CElement_FormInput_MapPicker::class,
+                'hidden' => CElement_FormInput_Hidden::class,
+                'select-tag' => CElement_FormInput_SelectTag::class,
+                'selectsearch' => CFormInputSelectSearch::class,
+                'checkbox' => CElement_FormInput_Checkbox::class,
+                'checkbox-list' => CFormInputCheckboxList::class,
+                'switcher' => CElement_FormInput_Checkbox_Switcher::class,
+                'summernote' => CElement_FormInput_Textarea_Summernote::class,
+                'radio' => CFormInputRadio::class,
+                'label' => CFormInputLabel::class,
+                'quill' => CElement_FormInput_Textarea_Quill::class,
+                'file' => CFormInputFile::class,
+                'ckeditor' => CFormInputCKEditor::class,
+                'filedrop' => CFormInputFileDrop::class,
+                'slider' => CFormInputSlider::class,
+                'tooltip' => CFormInputTooltip::class,
+                'fileupload' => CFormInputFileUpload::class,
+                'wysiwyg' => CFormInputWysiwyg::class,
+            ]);
 
-            $manager->registerControl('text', 'CElement_FormInput_Text');
-            $manager->registerControl('number', 'CElement_FormInput_Number');
-            $manager->registerControl('email', 'CElement_FormInput_Email');
-            $manager->registerControl('datepicker', 'CElement_FormInput_Date');
-            $manager->registerControl('date', 'CElement_FormInput_Date');
-            $manager->registerControl('material-datetime', 'CElement_FormInput_DateTime_MaterialDateTime');
-            $manager->registerControl('daterange-picker', 'CElement_FormInput_DateRange');
-            $manager->registerControl('daterange-dropdown', 'CElement_FormInput_DateRange_Dropdown');
-            $manager->registerControl('daterange-button', 'CElement_FormInput_DateRange_DropdownButton');
-            $manager->registerControl('currency', 'CElement_FormInput_Currency');
-            $manager->registerControl('auto-numeric', 'CElement_FormInput_AutoNumeric');
-            $manager->registerControl('time', CElement_FormInput_Time::class);
-            $manager->registerControl('timepicker', 'CElement_FormInput_Time');
-            $manager->registerControl('clock', 'CElement_FormInput_Clock');
-            $manager->registerControl('clockpicker', 'CElement_FormInput_Clock');
-            $manager->registerControl('image', 'CElement_FormInput_Image');
-            $manager->registerControl('image-ajax', 'CElement_FormInput_ImageAjax');
-            $manager->registerControl('multi-image-ajax', 'CElement_FormInput_MultipleImageAjax');
-            $manager->registerControl('file', 'CFormInputFile');
-            $manager->registerControl('file-ajax', 'CElement_FormInput_FileAjax');
-            $manager->registerControl('password', 'CElement_FormInput_Password');
-            $manager->registerControl('textarea', 'CElement_FormInput_Textarea');
-            $manager->registerControl('select', 'CElement_FormInput_Select');
-            $manager->registerControl('minicolor', 'CElement_FormInput_MiniColor');
-            $manager->registerControl('map-picker', CElement_FormInput_MapPicker::class);
-
-            $manager->registerControl('select-tag', 'CElement_FormInput_SelectTag');
-
-            $manager->registerControl('selectsearch', 'CFormInputSelectSearch');
-            $manager->registerControl('label', 'CFormInputLabel');
-            $manager->registerControl('checkbox', CElement_FormInput_Checkbox::class);
-            $manager->registerControl('checkbox-list', 'CFormInputCheckboxList');
-            $manager->registerControl('switcher', 'CElement_FormInput_Checkbox_Switcher');
-            $manager->registerControl('summernote', 'CElement_FormInput_Textarea_Summernote');
-            $manager->registerControl('quill', 'CElement_FormInput_Textarea_Quill');
-            $manager->registerControl('wysiwyg', 'CFormInputWysiwyg');
-            $manager->registerControl('ckeditor', 'CFormInputCKEditor');
-            $manager->registerControl('hidden', 'CFormInputHidden');
-            $manager->registerControl('radio', 'CFormInputRadio');
-            $manager->registerControl('filedrop', 'CFormInputFileDrop');
-            $manager->registerControl('slider', 'CFormInputSlider');
-            $manager->registerControl('tooltip', 'CFormInputTooltip');
-            $manager->registerControl('fileupload', 'CFormInputFileUpload');
+            CFBenchmark::stop('CApp.RegisterControl');
             static::$registerControlBooted = true;
         }
     }
-
 }

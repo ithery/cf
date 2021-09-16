@@ -1,47 +1,65 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 17, 2019, 7:55:48 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 17, 2019, 7:55:48 PM
  */
 class CVendor_Xendit {
+    protected $factory;
+
+    protected $libVersion;
+
+    const VERSION = '2.5.0';
 
     public function __construct($options) {
         $this->server_domain = 'https://api.xendit.co';
         $this->secret_api_key = $options['secret_api_key'];
+        $this->libVersion = carr::get($options, 'version', self::VERSION);
     }
 
-    public function createInvoice($external_id, $amount, $payer_email, $description, $invoice_options = null) {
-        $curl = curl_init();
-        $headers = array();
-        $headers[] = 'Content-Type: application/json';
-        $end_point = $this->server_domain . '/v2/invoices';
+    public function getLibVersion() {
+        return $this->libVersion;
+    }
+
+    public function getSecretApiKey() {
+        return $this->secret_api_key;
+    }
+
+    public function getServerDomain() {
+        return $this->server_domain;
+    }
+
+    /**
+     * Get Xendit Factory
+     *
+     * @return CVendor_Xendit_Factory
+     */
+    public function factory() {
+        if ($this->factory == null) {
+            $this->factory = new CVendor_Xendit_Factory($this);
+        }
+        return $this->factory;
+    }
+
+    public function createInvoice($external_id, $amount, $payer_email, $description, $invoiceOptions = []) {
         $data['external_id'] = $external_id;
         $data['amount'] = (int) $amount;
         $data['payer_email'] = $payer_email;
         $data['description'] = $description;
-        if (!empty($invoice_options['callback_virtual_account_id'])) {
-            $data['callback_virtual_account_id'] = $invoice_options['callback_virtual_account_id'];
+
+        if (!isset($invoiceOptions['callback_virtual_account_id']) && !empty($invoiceOptions['callback_virtual_account_id'])) {
+            $data['callback_virtual_account_id'] = $invoiceOptions['callback_virtual_account_id'];
         }
-        $payload = json_encode($data);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
-        curl_setopt($curl, CURLOPT_URL, $end_point);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $responseObject = json_decode($response, true);
-        return $responseObject;
+        return $this->factory()->invoice()->create($data);
     }
 
     public function createDisbursement($external_id, $amount, $bank_code, $account_holder_name, $account_number, $disbursement_options = null) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         if (!empty($disbursement_options['X-IDEMPOTENCY-KEY'])) {
             array_push($headers, 'X-IDEMPOTENCY-KEY: ' . $disbursement_options['X-IDEMPOTENCY-KEY']);
@@ -58,7 +76,7 @@ class CVendor_Xendit {
 
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
@@ -69,24 +87,16 @@ class CVendor_Xendit {
         return $responseObject;
     }
 
+    /**
+     * @return array
+     */
     public function getVirtualAccountBanks() {
-        $curl = curl_init();
-        $headers = array();
-        $headers[] = 'Content-Type: application/json';
-        $end_point = $this->server_domain . '/available_virtual_account_banks';
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
-        curl_setopt($curl, CURLOPT_URL, $end_point);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $responseObject = json_decode($response, true);
-        return $responseObject;
+        return $this->factory()->virtualAccount()->getVABanks();
     }
 
-    public function createCallbackVirtualAccount($external_id, $bank_code, $name, $virtual_account_number = null, $options = array()) {
+    public function createCallbackVirtualAccount($external_id, $bank_code, $name, $virtual_account_number = null, $options = []) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         $end_point = $this->server_domain . '/callback_virtual_accounts';
         $data['external_id'] = $external_id;
@@ -119,9 +129,10 @@ class CVendor_Xendit {
         if (!empty($description)) {
             $data['description'] = $expirationDate;
         }
+
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
@@ -133,9 +144,9 @@ class CVendor_Xendit {
         return $responseObject;
     }
 
-    public function updateCallbackVirtualAccount($virtualAccountId, $options = array()) {
+    public function updateCallbackVirtualAccount($virtualAccountId, $options = []) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         $end_point = $this->server_domain . '/callback_virtual_accounts/' . $virtualAccountId;
         $isSingleUse = carr::get($options, 'is_single_use', null);
@@ -143,7 +154,7 @@ class CVendor_Xendit {
         $expectedAmount = carr::get($options, 'expected_amount', null);
         $expirationDate = carr::get($options, 'expiration_date', null);
         $description = carr::get($options, 'description', null);
-        $data = array();
+        $data = [];
         if (!empty($isSingleUse)) {
             $data['is_single_use'] = $isSingleUse;
         }
@@ -161,7 +172,7 @@ class CVendor_Xendit {
         }
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'PATCH');
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
@@ -175,12 +186,12 @@ class CVendor_Xendit {
 
     public function getCallbackVirtualAccount($virtualAccountId) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         $end_point = $this->server_domain . '/callback_virtual_accounts/' . $virtualAccountId;
 
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -193,11 +204,11 @@ class CVendor_Xendit {
 
     public function getDisbursement($disbursement_id) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         $end_point = $this->server_domain . '/disbursements/' . $disbursement_id;
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
@@ -207,53 +218,31 @@ class CVendor_Xendit {
     }
 
     public function getAvailableDisbursementBanks() {
-        $curl = curl_init();
-        $headers = array();
-        $headers[] = 'Content-Type: application/json';
-        $end_point = $this->server_domain . '/available_disbursements_banks';
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
-        curl_setopt($curl, CURLOPT_URL, $end_point);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $responseObject = json_decode($response, true);
-        return $responseObject;
+        return $this->factory()->disbursement()->getAvailableBanks();
     }
 
-    public function getInvoice($invoice_id) {
-        $curl = curl_init();
-        $headers = array();
-        $headers[] = 'Content-Type: application/json';
-        $end_point = $this->server_domain . '/v2/invoices/' . $invoice_id;
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
-        curl_setopt($curl, CURLOPT_URL, $end_point);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $responseObject = json_decode($response, true);
-        return $responseObject;
+    public function getInvoice($invoiceId) {
+        return $this->factory()->invoice()->retrieve($invoiceId);
     }
 
-    public function getBalance() {
-        $curl = curl_init();
-        $headers = array();
-        $headers[] = 'Content-Type: application/json';
-        $end_point = $this->server_domain . '/balance';
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
-        curl_setopt($curl, CURLOPT_URL, $end_point);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        $response = curl_exec($curl);
-        curl_close($curl);
-        $responseObject = json_decode($response, true);
-        return $responseObject;
+    /**
+     * Send GET request to retrieve data
+     *
+     * @param string $accountType account type (CASH|HOLDING|TAX)
+     *
+     * @return array[
+     *                'balance' => int
+     *                ]
+     *
+     * @throws CVendor_Xendit_Exception_ApiException
+     */
+    public function getBalance($accountType = 'CASH') {
+        return $this->factory()->balance()->getBalance($accountType);
     }
 
     public function captureCreditCardPayment($external_id, $token_id, $amount, $capture_options = null) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         $end_point = $this->server_domain . '/credit_card_charges';
         $data['external_id'] = $external_id;
@@ -274,9 +263,12 @@ class CVendor_Xendit {
         if (!empty($capture_options['interval_count'])) {
             $data['interval_count'] = $capture_options['interval_count'];
         }
+        if (!empty($capture_options['installment'])) {
+            $data['installment'] = $capture_options['installment'];
+        }
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
@@ -284,15 +276,21 @@ class CVendor_Xendit {
         $response = curl_exec($curl);
         curl_close($curl);
 
-
-
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
 
+    public function getChargeOptionCreditCard($bin, $amount, $options = null) {
+        $endPoint = $this->server_domain . '/credit_card_charges/option';
+        $data['bin'] = $bin;
+        $data['amount'] = $amount;
+        $response = $this->requestToXendit($endPoint, 'get', $data);
+        return $response;
+    }
+
     public function issueCreditCardRefund($credit_card_charge_id, $amount, $external_id, $options = null) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         if (!empty($options['X-IDEMPOTENCY-KEY'])) {
             array_push($headers, 'X-IDEMPOTENCY-KEY: ' . $options['X-IDEMPOTENCY-KEY']);
@@ -302,7 +300,7 @@ class CVendor_Xendit {
         $data['external_id'] = $external_id;
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->public_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->public_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
@@ -315,14 +313,14 @@ class CVendor_Xendit {
 
     public function validateBankAccountHolderName($bank_account_number, $bank_code) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         $end_point = $this->server_domain . '/bank_account_data_requests';
         $data['bank_account_number'] = $bank_account_number;
         $data['bank_code'] = $bank_code;
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
@@ -335,11 +333,11 @@ class CVendor_Xendit {
 
     public function pauseRecurringPayment($idXendit = null) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         $end_point = $this->server_domain . '/recurring_payments/' . $idXendit . '/pause!';
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -352,32 +350,17 @@ class CVendor_Xendit {
         return $responseObject;
     }
 
-    public function resumeRecurringPayment($idXendit = null) {
-        $curl = curl_init();
-        $headers = array();
-        $headers[] = 'Content-Type: application/json';
-        $end_point = $this->server_domain . '/recurring_payments/' . $idXendit . '/resume!';
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
-        curl_setopt($curl, CURLOPT_URL, $end_point);
-        curl_setopt($curl, CURLOPT_POST, true);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLINFO_HEADER_OUT, true);
-        $response = curl_exec($curl);
-
-        $info = curl_getinfo($curl);
-        curl_close($curl);
-        $responseObject = json_decode($response, true);
-        return $responseObject;
+    public function resumeRecurringPayment($id = null) {
+        return $this->factory()->recurring()->resume($id);
     }
 
     public function getRecurringPayment($id = null) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         $end_point = $this->server_domain . '/recurring_payments/' . $id;
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -390,14 +373,14 @@ class CVendor_Xendit {
 
         return $responseObject;
     }
-    
+
     public function stopRecurringPayment($idXendit = null) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         $end_point = $this->server_domain . '/recurring_payments/' . $idXendit . '/stop!';
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
@@ -411,13 +394,13 @@ class CVendor_Xendit {
         return $responseObject;
     }
 
-    public function createRecurringPayment($externalId, $payerEmail, $interval, $intervalCount, $description, $amount, $options = array()) {
+    public function createRecurringPayment($externalId, $payerEmail, $interval, $intervalCount, $description, $amount, $options = []) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         $end_point = $this->server_domain . '/recurring_payments';
 
-        $data = array();
+        $data = [];
         //string ID of your choice (typically the unique identifier of a recurring payment in your system)
         $data['external_id'] = $externalId;
         //string Email of the end user you're charging
@@ -432,7 +415,7 @@ class CVendor_Xendit {
         //The minimum amount to create an invoice is 10.000 IDR. The maximum amount is 1.000.000.000 IDR
         $data['amount'] = $amount;
         if (!empty($options['invoice_duration'])) {
-            //number duration of time that end user have in order to pay the invoice before it's expired (in Second). If it's not filled, invoice_duration will follow your business default invoice duration. 
+            //number duration of time that end user have in order to pay the invoice before it's expired (in Second). If it's not filled, invoice_duration will follow your business default invoice duration.
             //invoice_duration should and will always be less than the interval-interval_count combination.
             $data['invoice_duration'] = $options['invoice_duration'];
         }
@@ -453,12 +436,12 @@ class CVendor_Xendit {
             $data['start_date'] = $options['start_date'];
         }
         if (!empty($options['success_redirect_url'])) {
-            //string url that end user will be redirected to upon successful payment to invoice created by this recurring payment. 
+            //string url that end user will be redirected to upon successful payment to invoice created by this recurring payment.
             //example : https://yourcompany.com/example_item/10/success_page
             $data['success_redirect_url'] = $options['success_redirect_url'];
         }
         if (!empty($options['failure_redirect_url'])) {
-            //string url that end user will be redirected to upon expireation of invoice created by this recurring payment. 
+            //string url that end user will be redirected to upon expireation of invoice created by this recurring payment.
             //example : https://yourcompany.com/example_item/10/failed_checkout
             $data['failure_redirect_url'] = $options['failure_redirect_url'];
         }
@@ -469,10 +452,9 @@ class CVendor_Xendit {
             $data['charge_immediately'] = $options['charge_immediately'];
         }
 
-
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
@@ -480,15 +462,13 @@ class CVendor_Xendit {
         $response = curl_exec($curl);
         curl_close($curl);
 
-
-
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
 
-    public function createEWallet($external_id, $ewallet_type, $phone, $amount, $options = array()) {
+    public function createEWallet($external_id, $ewallet_type, $phone, $amount, $options = []) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         $end_point = $this->server_domain . '/ewallets';
         $data['external_id'] = $external_id;
@@ -501,10 +481,9 @@ class CVendor_Xendit {
             $data['redirect_url'] = carr::get($options, 'redirectUrl');
         }
 
-
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
@@ -516,9 +495,36 @@ class CVendor_Xendit {
         return $responseObject;
     }
 
-    public function createRetail($external_id, $retail_outlet_name, $name, $amount, $options = array()) {
+    public function createEWalletCharge($externalId, $ewalletType, $amount, $options = []) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
+        $headers[] = 'Content-Type: application/json';
+        $endPoint = $this->server_domain . '/ewallets/charges';
+
+        $data['reference_id'] = $externalId;
+        $data['currency'] = carr::get($options, 'currency', 'IDR');
+        $data['checkout_method'] = 'ONE_TIME_PAYMENT';
+        $data['amount'] = $amount;
+        $data['channel_code'] = $ewalletType;
+        $data['channel_properties'] = carr::get($options, 'channel_properties');
+
+        $payload = json_encode($data);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
+        curl_setopt($curl, CURLOPT_URL, $endPoint);
+        curl_setopt($curl, CURLOPT_POST, true);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($curl);
+
+        curl_close($curl);
+        $responseObject = json_decode($response, true);
+        return $responseObject;
+    }
+
+    public function createRetail($external_id, $retail_outlet_name, $name, $amount, $options = []) {
+        $curl = curl_init();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
         $end_point = $this->server_domain . '/fixed_payment_code';
         $data['external_id'] = $external_id;
@@ -535,7 +541,7 @@ class CVendor_Xendit {
         }
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
@@ -547,17 +553,17 @@ class CVendor_Xendit {
         return $responseObject;
     }
 
-    public function cardlessCredit($externalId, $cardlessCreditType = null, $amount, $paymentType = '', $options = array()) {
+    public function cardlessCredit($externalId, $cardlessCreditType = null, $amount = null, $paymentType = '', $options = []) {
         $curl = curl_init();
-        $headers = array();
-        $data = array();
+        $headers = [];
+        $data = [];
 
         $item = new stdClass();
-        $item->id = "123123";
-        $item->name = "Phone Case";
+        $item->id = '123123';
+        $item->name = 'Phone Case';
         $item->price = 200000;
-        $item->type = "Smartphone";
-        $item->url = "http://example.com/phone/phone_case";
+        $item->type = 'Smartphone';
+        $item->url = 'http://example.com/phone/phone_case';
         $item->quantity = 2;
 
         $headers[] = 'Content-Type: application/json';
@@ -582,10 +588,9 @@ class CVendor_Xendit {
             $data['callback_url'] = 'http://example.com/callback-cardless-credit';
         }
 
-
         $payload = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $end_point);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
@@ -605,15 +610,11 @@ class CVendor_Xendit {
     }
 
     public function balance($accountType = 'CASH') {
-        $endPoint = $this->server_domain . '/balance?account_type=' . $accountType;
-        $response = $this->requestToXendit($endPoint, 'GET');
-        return $response;
+        return $this->factory()->balance()->getBalance($accountType);
     }
 
     public function recurringPayments($id) {
-        $endPoint = $this->server_domain . '/recurring_payments/' . $id;
-        $response = $this->requestToXendit($endPoint, 'GET');
-        return $response;
+        return $this->factory()->recurring()->retrieve($id);
     }
 
     public function virtualAccountSimulatePayment($id, $amount) {
@@ -635,11 +636,11 @@ class CVendor_Xendit {
 
     protected function requestToXendit($endPoint, $method, $data = null) {
         $curl = curl_init();
-        $headers = array();
+        $headers = [];
         $headers[] = 'Content-Type: application/json';
 
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ":");
+        curl_setopt($curl, CURLOPT_USERPWD, $this->secret_api_key . ':');
         curl_setopt($curl, CURLOPT_URL, $endPoint);
         if ($method == 'POST') {
             if ($data != null) {
@@ -649,16 +650,16 @@ class CVendor_Xendit {
             }
         } else {
             if ($data != null) {
-                $payload = curl::as_post_string($data);
+                $payload = curl::asPostString($data);
                 curl_setopt($curl, CURLOPT_URL, $endPoint . '?' . $payload);
             }
         }
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         $response = curl_exec($curl);
 
+
         curl_close($curl);
         $responseObject = json_decode($response, true);
         return $responseObject;
     }
-
 }

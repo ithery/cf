@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 25, 2019, 9:22:47 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 25, 2019, 9:22:47 PM
  */
 
 /**
@@ -17,7 +18,6 @@ use PhpXmlRpc\Value;
 use PhpXmlRpc\Response;
 
 class CVendor_Odoo_Client {
-
     /**
      * The datatypes accepted by the `value` method.
      */
@@ -82,7 +82,7 @@ class CVendor_Odoo_Client {
     protected $xmlRpcClients = [];
 
     /**
-     * int the user ID used to access the endpoints.
+     * The user ID used to access the endpoints.
      */
     protected $userId;
 
@@ -131,7 +131,8 @@ class CVendor_Odoo_Client {
      * the XML RPC client, injected into OdooClient.
      *
      * @param string $type One of: 'common', 'object', 'db'
-     * @return Client 
+     *
+     * @return Client
      */
     public function getXmlRpcClient($type) {
         $type = strtolower($type);
@@ -139,7 +140,9 @@ class CVendor_Odoo_Client {
             return $this->xmlRpcClients[$type];
         }
         $endpoint = str_replace(
-                ['{uri}', '{type}'], [$this->url, $type], $this->endpointTemplate
+            ['{uri}', '{type}'],
+            [$this->url, $type],
+            $this->endpointTemplate
         );
         $xmlRpcClient = new Client($endpoint);
         $this->xmlRpcClients[$type] = $xmlRpcClient;
@@ -169,7 +172,8 @@ class CVendor_Odoo_Client {
         } catch (Exception $e) {
             // Some connection problem.
             throw new Exception(sprintf(
-                    'Cannot connect to Odoo database "%s"', $this->config['database']
+                'Cannot connect to Odoo database "%s"',
+                $this->config['database']
             ), null, $e);
         }
         // Grab the User ID.
@@ -181,12 +185,14 @@ class CVendor_Odoo_Client {
             return $this->userId;
         }
         throw new Exception(sprintf(
-                'Cannot find Odoo user ID for username "%s"', $this->config['username']
+            'Cannot find Odoo user ID for username "%s"',
+            $this->config['username']
         ));
     }
 
     /**
-     *
+     * @param mixed $data
+     * @param mixed $type
      */
     public function value($data, $type) {
         return new Value($data, $type);
@@ -225,10 +231,11 @@ class CVendor_Odoo_Client {
      * OdooApi::getClient()->search('res.partner', $criteria, 0, 10)
      *
      * @param string $modelName example res.partner
-     * @param array $criteria nested array of search criteria (Polish notation logic)
-     * @param int $offset
-     * @param int $limit
-     * @param string $order comma-separated list of fields
+     * @param array  $criteria  nested array of search criteria (Polish notation logic)
+     * @param int    $offset
+     * @param int    $limit
+     * @param string $order     comma-separated list of fields
+     *
      * @return CCollection
      */
     public function search($modelName, array $criteria = [], $offset = 0, $limit = self::DEFAULT_LIMIT, $order = '') {
@@ -239,17 +246,20 @@ class CVendor_Odoo_Client {
         $msg->addParam($this->stringValue($order));
         $this->response = $this->getXmlRpcClient(static::API_TYPE_OBJECT)->send($msg);
 
-        return CF::collect($this->responseAsNative());
+        return c::collect($this->responseAsNative());
     }
 
     /**
      * Example:
      * OdooApi::getClient()->searchCount('res.partner', $criteria)
      *
+     * @param mixed $modelName
+     *
      * @return integer
      */
     public function searchCount(
-    $modelName, array $criteria = []
+        $modelName,
+        array $criteria = []
     ) {
         $msg = $this->getBaseObjectRequest($modelName, 'search_count');
         $msg->addParam($this->nativeToValue($criteria));
@@ -260,15 +270,28 @@ class CVendor_Odoo_Client {
     /**
      * Example:
      * OdooApi::getClient()->search('res.partner', $criteria, 0, 10)
+     *
+     * @param mixed $modelName
+     * @param mixed $offset
+     * @param mixed $limit
+     * @param mixed $order
      */
     public function searchRead(
-    $modelName, array $criteria = [], $offset = 0, $limit = self::DEFAULT_LIMIT, $order = ''
+        $modelName,
+        array $criteria = [],
+        $offset = 0,
+        $limit = self::DEFAULT_LIMIT,
+        $order = ''
     ) {
         if (version_compare('8.0', $this->serverVersion) === 1) {
             // For less than Odoo 8.0, search_read is not supported.
             // However, we will emulate it.
             $ids = $this->search(
-                    $modelName, $criteria, $offset, $limit, $order
+                $modelName,
+                $criteria,
+                $offset,
+                $limit,
+                $order
             );
             return $this->read($modelName, $ids);
         } else {
@@ -285,9 +308,10 @@ class CVendor_Odoo_Client {
     }
 
     /**
-     * @param string $modelName example res.partner
-     * @param array $instanceIds list of model instance IDs to read and return
-     * @param array $options varies with API versions see documentation
+     * @param string $modelName   example res.partner
+     * @param array  $instanceIds list of model instance IDs to read and return
+     * @param array  $options     varies with API versions see documentation
+     *
      * @return CCollection of ModelInterface
      */
     public function read($modelName, $instanceIds = [], array $options = []) {
@@ -299,9 +323,9 @@ class CVendor_Odoo_Client {
         $this->response = $this->getXmlRpcClient(static::API_TYPE_OBJECT)->send($msg);
         $data = $this->responseAsNative();
         $modelName = $this->mapModelName($modelName);
-        return CF::collect($data)->map(function ($item) use ($modelName) {
-                    return new $modelName($item);
-                });
+        return c::collect($data)->map(function ($item) use ($modelName) {
+            return new $modelName($item);
+        });
     }
 
     /**
@@ -318,7 +342,8 @@ class CVendor_Odoo_Client {
     /**
      * Create a new resource.
      *
-     * @param array $fields 
+     * @param array $fields
+     * @param mixed $modelName
      */
     public function create($modelName, array $fields) {
         $msg = $this->getBaseObjectRequest($modelName, 'create');
@@ -330,20 +355,26 @@ class CVendor_Odoo_Client {
     /**
      * Update a resource.
      *
+     * @param mixed $modelName
+     * @param mixed $resourceId
+     *
      * @return bool true if the update was successful.
      */
     public function write($modelName, $resourceId, array $fields) {
         $resourceId = (int) $resourceId;
         $msg = $this->getBaseObjectRequest($modelName, 'write');
-        $msg->addParam($this->nativeToValue(array($resourceId)));
+        $msg->addParam($this->nativeToValue([$resourceId]));
         $msg->addParam($this->nativeToValue($fields));
         $this->response = $this->getXmlRpcClient(static::API_TYPE_OBJECT)->send($msg);
-        
+
         return $this->responseAsNative();
     }
 
     /**
      * Remove a resource.
+     *
+     * @param mixed $modelName
+     * @param mixed $resourceId
      *
      * @return bool true if the removal was successful.
      */
@@ -357,6 +388,8 @@ class CVendor_Odoo_Client {
     /**
      * Get a list of fields for a resource.
      * TODO: there are some more parameters to define the context more.
+     *
+     * @param mixed $modelName
      *
      * @return Collection of arrays (may be collection of models later)
      */
@@ -373,7 +406,8 @@ class CVendor_Odoo_Client {
      * it here.
      *
      * @param string $externalId either "name" or "module.name"
-     * @param string $module optional, but recommended
+     * @param string $model      optional, but recommended
+     *
      * @return int|null
      */
     public function getResourceId($externalId, $model = null) {
@@ -384,14 +418,23 @@ class CVendor_Odoo_Client {
     /**
      * Get multiple resource IDs at once.
      *
-     * @param array $externalIds each either "name" or "module.name"
-     * @param string $module optional, but recommended
+     * @param array  $externalIds each either "name" or "module.name"
+     * @param string $model       optional, but recommended
+     * @param mixed  $offset
+     * @param mixed  $limit
+     * @param mixed  $order
+     *
      * @return collection
      *
      * FIXME: all external IDs must have the same "module" at the moment.
      * Will fix this later if needed and if I can find sufficient documentaion.
      */
-    public function getResourceIds(iterable $externalIds, $model = null, $offset = 0, $limit = self::DEFAULT_LIMIT, $order = ''
+    public function getResourceIds(
+        iterable $externalIds,
+        $model = null,
+        $offset = 0,
+        $limit = self::DEFAULT_LIMIT,
+        $order = ''
     ) {
         $criteria = [];
         if ($model !== null) {
@@ -400,7 +443,7 @@ class CVendor_Odoo_Client {
         $moduleList = [];
         foreach ($externalIds as $externalId) {
             if (strpos($externalId, '.') !== false) {
-                list ($module, $name) = explode('.', $externalId, 2);
+                list($module, $name) = explode('.', $externalId, 2);
             } else {
                 $name = $externalId;
                 $module = '{none}';
@@ -424,25 +467,30 @@ class CVendor_Odoo_Client {
             $criteria[] = ['name', 'in', $externalIds];
         }
         $irModelDataIds = $this->search(
-                'ir.model.data', $criteria, $offset, $limit, $order
+            'ir.model.data',
+            $criteria,
+            $offset,
+            $limit,
+            $order
         );
         if (empty($irModelDataIds)) {
             // No matches found, so give up now.
-            return CF::collect();
+            return c::collect();
         }
         // Now read the full records to get the resource IDs.
         $irModelData = $this->read(
-                'ir.model.data', $irModelDataIds
+            'ir.model.data',
+            $irModelDataIds
         );
         if ($irModelData === null) {
             // We could not find the record.
             // (We really should have, since we just looked it up)
-            return collect();
+            return c::collect();
         }
         // Return the resource IDs.
         return $irModelData->map(function ($item) {
-                    return $item->get('res_id');
-                });
+            return $item->get('res_id');
+        });
     }
 
     /**
@@ -450,8 +498,9 @@ class CVendor_Odoo_Client {
      * Uses the external ID to identify resources, so it is able
      * to create or update resources as necessary.
      *
-     * @param string $modelName
-     * @param iterable $records list of key->value records to load
+     * @param string   $modelName
+     * @param iterable $records   list of key->value records to load
+     *
      * @return array of two collections - 'ids' and 'messages'
      */
     public function load($modelName, iterable $records) {
@@ -474,8 +523,8 @@ class CVendor_Odoo_Client {
             'messages' => [],
             'ids' => [],
         ];
-        $messages = collect();
-        $ids = collect();
+        $messages = c::collect();
+        $ids = c::collect();
         foreach ($groups as $group) {
             $msg = $this->getBaseObjectRequest($modelName, 'load');
             $msg->addParam($this->nativeToValue($group['keys']));
@@ -504,8 +553,9 @@ class CVendor_Odoo_Client {
      * Uses the external ID to identify resources, so it is able
      * to create or update resources as necessary.
      *
-     * @param string $modelName
-     * @param array|mixed $record key->value record to load
+     * @param string      $modelName
+     * @param array|mixed $record    key->value record to load
+     *
      * @return array of two values - 'id' and 'messages'
      */
     public function loadOne($modelName, $record) {
@@ -520,7 +570,9 @@ class CVendor_Odoo_Client {
      * Get the last response as a native PHP value.
      *
      * @param ?Response opional, defaulting to teh last response
+     *
      * @return mixed
+     *
      * @throws Exception if no payload could be decoded
      */
     public function responseAsNative(Response $response = null) {
@@ -534,10 +586,13 @@ class CVendor_Odoo_Client {
             return $this->valueToNative($response->value());
         }
         $errorMessage = sprintf(
-                'Unhandled Odoo API exception code %d: %s', $response->faultCode(), $response->faultString()
+            'Unhandled Odoo API exception code %d: %s',
+            $response->faultCode(),
+            $response->faultString()
         );
         throw new Exception(
-        $errorMessage, $response->faultCode()
+            $errorMessage,
+            $response->faultCode()
         );
     }
 
@@ -545,6 +600,8 @@ class CVendor_Odoo_Client {
      * Map the model name (e.g. "res.partner") to the model class
      * it will be instantiated into.
      * TODO: turn this into a factory.
+     *
+     * @param mixed $modelName
      */
     protected function mapModelName($modelName) {
         if (array_key_exists($modelName, $this->modelMapping)) {
@@ -566,6 +623,9 @@ class CVendor_Odoo_Client {
 
     /**
      * Add a single module name to model class mapping entry
+     *
+     * @param mixed      $modelName
+     * @param null|mixed $className
      */
     public function addModelMapping($modelName, $className = null) {
         if ($className !== null) {
@@ -578,6 +638,8 @@ class CVendor_Odoo_Client {
 
     /**
      * Remove a module name to model class mapping entry.
+     *
+     * @param mixed $modelName
      */
     public function removeModelMapping($modelName) {
         unset($this->modelMapping[$modelName]);
@@ -590,7 +652,8 @@ class CVendor_Odoo_Client {
      * TODO: this should go in the connector factory.
      *
      * @param string|null $modelName
-     * @param string|null $action will be used only the $modelName is provided
+     * @param string|null $action    will be used only the $modelName is provided
+     *
      * @return Request
      */
     public function getBaseObjectRequest($modelName = null, $action = null) {
@@ -611,11 +674,12 @@ class CVendor_Odoo_Client {
      * Adds a new record created from the provided value dict.
      *
      * @param array $values
+     *
      * @return array
      */
     public function relationCreate(array $values) {
         return [[
-        static::RELATION_CREATE, 0, $values
+            static::RELATION_CREATE, 0, $values
         ]];
     }
 
@@ -623,8 +687,9 @@ class CVendor_Odoo_Client {
      * Updates an existing record of id `id` with the values in values.
      * Can not be used in create().
      *
-     * @param int $resourceId the resource to update
+     * @param int   $resourceId the resource to update
      * @param array $values
+     *
      * @return array
      *
      * TODO: as well as an array of values, accept a model.
@@ -635,7 +700,7 @@ class CVendor_Odoo_Client {
      */
     public function relationUpdate($resourceId, array $values) {
         return [[
-        static::RELATION_UPDATE, $resourceId, $values
+            static::RELATION_UPDATE, $resourceId, $values
         ]];
     }
 
@@ -645,11 +710,12 @@ class CVendor_Odoo_Client {
      * Can not be used in create().
      *
      * @param int $resourceId the resource to be removed from the database
+     *
      * @return array
      */
     public function relationDelete($resourceId) {
         return [[
-        static::RELATION_DELETE, $resourceId, 0
+            static::RELATION_DELETE, $resourceId, 0
         ]];
     }
 
@@ -659,11 +725,12 @@ class CVendor_Odoo_Client {
      * Can not be used in create().
      *
      * @param int $resourceId the resource to be removed from the link
+     *
      * @return array
      */
     public function relationRemoveLink($resourceId) {
         return [[
-        static::RELATION_REMOVE_LINK, $resourceId, 0
+            static::RELATION_REMOVE_LINK, $resourceId, 0
         ]];
     }
 
@@ -673,11 +740,12 @@ class CVendor_Odoo_Client {
      * Can not be used on one2many.
      *
      * @param int $resourceId the resource to be added to the link
+     *
      * @return array
      */
     public function relationAddLink($resourceId) {
         return [[
-        static::RELATION_ADD_LINK, $resourceId, 0
+            static::RELATION_ADD_LINK, $resourceId, 0
         ]];
     }
 
@@ -691,7 +759,7 @@ class CVendor_Odoo_Client {
      */
     public function relationRemoveAllLinks() {
         return [[
-        static::RELATION_REMOVE_ALL_LINKS, 0, 0
+            static::RELATION_REMOVE_ALL_LINKS, 0, 0
         ]];
     }
 
@@ -705,7 +773,7 @@ class CVendor_Odoo_Client {
      */
     public function relationReplaceAllLinks(iterable $resourceIds) {
         return [[
-        static::RELATION_REPLACE_ALL_LINKS, 0, $resourceIds
+            static::RELATION_REPLACE_ALL_LINKS, 0, $resourceIds
         ]];
     }
 
@@ -714,6 +782,7 @@ class CVendor_Odoo_Client {
      * XML-RPC objects, and nested arrays to array and struct objects.
      *
      * @param mixed $item
+     *
      * @return mixed
      */
     public function nativeToValue($item) {
@@ -737,7 +806,8 @@ class CVendor_Odoo_Client {
             } else {
                 // No idea what it is, so don't know how to handle it.
                 throw new Exception(sprintf(
-                        'Unrecognised data type %s', gettype($item)
+                    'Unrecognised data type %s',
+                    gettype($item)
                 ));
             }
         }
@@ -768,10 +838,10 @@ class CVendor_Odoo_Client {
      * Basically the reverse of nativeToValue().
      *
      * @param Value the object to convert, which may contain nested objects
+     *
      * @return mixed a null, an array, a scalar, and may be nested
      */
     public function valueToNative(Value $value) {
-
         switch ($value->kindOf()) {
             case 'array':
                 $result = [];
@@ -790,7 +860,8 @@ class CVendor_Odoo_Client {
                 break;
             default:
                 throw new Exception(sprintf(
-                        'Unexpected data type %s', $value->kindOf()
+                    'Unexpected data type %s',
+                    $value->kindOf()
                 ));
         }
         return $result;
@@ -805,5 +876,4 @@ class CVendor_Odoo_Client {
     public function getLastResponse() {
         return $this->response;
     }
-
 }

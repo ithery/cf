@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 3:19:08 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 3:19:08 PM
  */
 
 /**
@@ -13,7 +14,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * a way to log duration of any operations
  */
 class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
-
     /**
      * @var float
      */
@@ -27,12 +27,12 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     /**
      * @var array
      */
-    protected $startedMeasures = array();
+    protected $startedMeasures = [];
 
     /**
      * @var array
      */
-    protected $measures = array();
+    protected $measures = [];
 
     /**
      * @param float $requestStartTime
@@ -51,23 +51,24 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     /**
      * Starts a measure
      *
-     * @param string $name Internal name, used to stop the measure
-     * @param string|null $label Public name
+     * @param string      $name      Internal name, used to stop the measure
+     * @param string|null $label     Public name
      * @param string|null $collector The source of the collector
      */
     public function startMeasure($name, $label = null, $collector = null) {
         $start = microtime(true);
-        $this->startedMeasures[$name] = array(
+        $this->startedMeasures[$name] = [
             'label' => $label ?: $name,
             'start' => $start,
             'collector' => $collector
-        );
+        ];
     }
 
     /**
      * Check a measure exists
      *
      * @param string $name
+     *
      * @return bool
      */
     public function hasStartedMeasure($name) {
@@ -78,16 +79,21 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
      * Stops a measure
      *
      * @param string $name
-     * @param array $params
+     * @param array  $params
+     *
      * @throws DebugBarException
      */
-    public function stopMeasure($name, $params = array()) {
+    public function stopMeasure($name, $params = []) {
         $end = microtime(true);
         if (!$this->hasStartedMeasure($name)) {
             throw new CDebug_Exception("Failed stopping measure '$name' because it hasn't been started");
         }
         $this->addMeasure(
-                $this->startedMeasures[$name]['label'], $this->startedMeasures[$name]['start'], $end, $params, $this->startedMeasures[$name]['collector']
+            $this->startedMeasures[$name]['label'],
+            $this->startedMeasures[$name]['start'],
+            $end,
+            $params,
+            $this->startedMeasures[$name]['collector']
         );
         unset($this->startedMeasures[$name]);
     }
@@ -95,14 +101,14 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     /**
      * Adds a measure
      *
-     * @param string $label
-     * @param float $start
-     * @param float $end
-     * @param array $params
+     * @param string      $label
+     * @param float       $start
+     * @param float       $end
+     * @param array       $params
      * @param string|null $collector
      */
-    public function addMeasure($label, $start, $end, $params = array(), $collector = null) {
-        $this->measures[] = array(
+    public function addMeasure($label, $start, $end, $params = [], $collector = null) {
+        $this->measures[] = [
             'label' => $label,
             'start' => $start,
             'relative_start' => $start - $this->requestStartTime,
@@ -112,21 +118,21 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
             'duration_str' => $this->getDataFormatter()->formatDuration($end - $start),
             'params' => $params,
             'collector' => $collector
-        );
+        ];
     }
 
     /**
      * Utility function to measure the execution of a Closure
      *
-     * @param string $label
-     * @param \Closure $closure
+     * @param string      $label
+     * @param \Closure    $closure
      * @param string|null $collector
      */
     public function measure($label, \Closure $closure, $collector = null) {
         $name = spl_object_hash($closure);
         $this->startMeasure($name, $label, $collector);
         $result = $closure();
-        $params = is_array($result) ? $result : array();
+        $params = is_array($result) ? $result : [];
         $this->stopMeasure($name, $params);
     }
 
@@ -171,6 +177,7 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
 
     /**
      * @return array
+     *
      * @throws DebugBarException
      */
     public function collect() {
@@ -178,19 +185,19 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
         foreach (array_keys($this->startedMeasures) as $name) {
             $this->stopMeasure($name);
         }
-        usort($this->measures, function($a, $b) {
+        usort($this->measures, function ($a, $b) {
             if ($a['start'] == $b['start']) {
                 return 0;
             }
             return $a['start'] < $b['start'] ? -1 : 1;
         });
-        return array(
+        return [
             'start' => $this->requestStartTime,
             'end' => $this->requestEndTime,
             'duration' => $this->getRequestDuration(),
             'duration_str' => $this->getDataFormatter()->formatDuration($this->getRequestDuration()),
             'measures' => array_values($this->measures)
-        );
+        ];
     }
 
     /**
@@ -204,20 +211,19 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
      * @return array
      */
     public function getWidgets() {
-        return array(
-            "time" => array(
-                "icon" => "clock-o",
-                "tooltip" => "Request Duration",
-                "map" => "time.duration_str",
-                "default" => "'0ms'"
-            ),
-            "timeline" => array(
-                "icon" => "tasks",
-                "widget" => "PhpDebugBar.Widgets.TimelineWidget",
-                "map" => "time",
-                "default" => "{}"
-            )
-        );
+        return [
+            'time' => [
+                'icon' => 'clock-o',
+                'tooltip' => 'Request Duration',
+                'map' => 'time.duration_str',
+                'default' => "'0ms'"
+            ],
+            'timeline' => [
+                'icon' => 'tasks',
+                'widget' => 'PhpDebugBar.Widgets.TimelineWidget',
+                'map' => 'time',
+                'default' => '{}'
+            ]
+        ];
     }
-
 }

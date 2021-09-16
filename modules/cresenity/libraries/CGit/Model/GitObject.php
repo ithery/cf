@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 3, 2019, 1:29:49 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 3, 2019, 1:29:49 PM
  */
 class CGit_Model_GitObject extends CGit_ModelAbstract {
-
     protected $hash;
 
     public function isBlob() {
@@ -35,5 +35,4 @@ class CGit_Model_GitObject extends CGit_ModelAbstract {
         $this->hash = $hash;
         return $this;
     }
-
 }

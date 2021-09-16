@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 namespace League\CommonMark\Delimiter;
 
 use League\CommonMark\Delimiter\Processor\DelimiterProcessorCollection;
@@ -17,26 +15,24 @@ use League\CommonMark\Util\RegexHelper;
  *
  * @internal
  */
-final class DelimiterParser implements InlineParserInterface
-{
-    /** @var DelimiterProcessorCollection */
+final class DelimiterParser implements InlineParserInterface {
+    /**
+     * @var DelimiterProcessorCollection
+     */
     private $collection;
 
-    public function __construct(DelimiterProcessorCollection $collection)
-    {
+    public function __construct(DelimiterProcessorCollection $collection) {
         $this->collection = $collection;
     }
 
-    public function getMatchDefinition(): InlineParserMatch
-    {
+    public function getMatchDefinition() {
         return InlineParserMatch::oneOf(...$this->collection->getDelimiterCharacters());
     }
 
-    public function parse(InlineParserContext $inlineContext): bool
-    {
+    public function parse(InlineParserContext $inlineContext) {
         $character = $inlineContext->getFullMatch();
         $numDelims = 0;
-        $cursor    = $inlineContext->getCursor();
+        $cursor = $inlineContext->getCursor();
         $processor = $this->collection->getDelimiterProcessor($character);
 
         if ($processor === null) {
@@ -63,7 +59,7 @@ final class DelimiterParser implements InlineParserInterface
             $charAfter = "\n";
         }
 
-        [$canOpen, $canClose] = self::determineCanOpenOrClose($charBefore, $charAfter, $character, $processor);
+        list($canOpen, $canClose) = self::determineCanOpenOrClose($charBefore, $charAfter, $character, $processor);
 
         $node = new Text(\str_repeat($character, $numDelims), [
             'delim' => true,
@@ -81,22 +77,25 @@ final class DelimiterParser implements InlineParserInterface
 
     /**
      * @return bool[]
+     *
+     * @param mixed $charBefore
+     * @param mixed $charAfter
+     * @param mixed $character
      */
-    private static function determineCanOpenOrClose(string $charBefore, string $charAfter, string $character, DelimiterProcessorInterface $delimiterProcessor): array
-    {
-        $afterIsWhitespace   = \preg_match(RegexHelper::REGEX_UNICODE_WHITESPACE_CHAR, $charAfter);
-        $afterIsPunctuation  = \preg_match(RegexHelper::REGEX_PUNCTUATION, $charAfter);
-        $beforeIsWhitespace  = \preg_match(RegexHelper::REGEX_UNICODE_WHITESPACE_CHAR, $charBefore);
+    private static function determineCanOpenOrClose($charBefore, $charAfter, $character, DelimiterProcessorInterface $delimiterProcessor) {
+        $afterIsWhitespace = \preg_match(RegexHelper::REGEX_UNICODE_WHITESPACE_CHAR, $charAfter);
+        $afterIsPunctuation = \preg_match(RegexHelper::REGEX_PUNCTUATION, $charAfter);
+        $beforeIsWhitespace = \preg_match(RegexHelper::REGEX_UNICODE_WHITESPACE_CHAR, $charBefore);
         $beforeIsPunctuation = \preg_match(RegexHelper::REGEX_PUNCTUATION, $charBefore);
 
-        $leftFlanking  = ! $afterIsWhitespace && (! $afterIsPunctuation || $beforeIsWhitespace || $beforeIsPunctuation);
-        $rightFlanking = ! $beforeIsWhitespace && (! $beforeIsPunctuation || $afterIsWhitespace || $afterIsPunctuation);
+        $leftFlanking = !$afterIsWhitespace && (!$afterIsPunctuation || $beforeIsWhitespace || $beforeIsPunctuation);
+        $rightFlanking = !$beforeIsWhitespace && (!$beforeIsPunctuation || $afterIsWhitespace || $afterIsPunctuation);
 
         if ($character === '_') {
-            $canOpen  = $leftFlanking && (! $rightFlanking || $beforeIsPunctuation);
-            $canClose = $rightFlanking && (! $leftFlanking || $afterIsPunctuation);
+            $canOpen = $leftFlanking && (!$rightFlanking || $beforeIsPunctuation);
+            $canClose = $rightFlanking && (!$leftFlanking || $afterIsPunctuation);
         } else {
-            $canOpen  = $leftFlanking && $character === $delimiterProcessor->getOpeningCharacter();
+            $canOpen = $leftFlanking && $character === $delimiterProcessor->getOpeningCharacter();
             $canClose = $rightFlanking && $character === $delimiterProcessor->getClosingCharacter();
         }
 

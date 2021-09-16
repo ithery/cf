@@ -1,36 +1,41 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 4:04:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 4:04:55 PM
  */
 class CObservable_Listener_Handler_Driver_Reload extends CObservable_Listener_Handler_Driver {
-
     use CTrait_Compat_Handler_Driver_Reload;
 
     protected $method;
+
     protected $content;
+
     protected $param;
+
     protected $param_inputs;
+
     protected $param_inputs_by_name;
+
     protected $paramRequest;
 
     public function __construct($owner, $event, $name) {
         parent::__construct($owner, $event, $name);
-        $this->method = "get";
-        $this->target = "";
+        $this->method = 'get';
+        $this->target = '';
         $this->content = CHandlerElement::factory();
-        $this->param_inputs = array();
-        $this->param_inputs_by_name = array();
-        $this->paramRequest = array();
+        $this->param_inputs = [];
+        $this->param_inputs_by_name = [];
+        $this->paramRequest = [];
     }
 
     public function addParamInput($inputs) {
         if (!is_array($inputs)) {
-            $inputs = array($inputs);
+            $inputs = [$inputs];
         }
         foreach ($inputs as $inp) {
             $this->param_inputs[] = $inp;
@@ -40,7 +45,7 @@ class CObservable_Listener_Handler_Driver_Reload extends CObservable_Listener_Ha
 
     public function addParamRequest($paramRequest) {
         if (!is_array($paramRequest)) {
-            $paramRequest = array($paramRequest);
+            $paramRequest = [$paramRequest];
         }
         foreach ($paramRequest as $reqK => $reqV) {
             $this->paramRequest[$reqK] = $reqV;
@@ -50,7 +55,7 @@ class CObservable_Listener_Handler_Driver_Reload extends CObservable_Listener_Ha
 
     public function addParamInputByName($inputs) {
         if (!is_array($inputs)) {
-            $inputs = array($inputs);
+            $inputs = [$inputs];
         }
         foreach ($inputs as $k => $inp) {
             $this->param_inputs_by_name[$k] = $inp;
@@ -92,10 +97,9 @@ class CObservable_Listener_Handler_Driver_Reload extends CObservable_Listener_Ha
         $dataAddition = '{' . $dataAddition . '}';
 
         $js .= "
-            $.cresenity.reload('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $dataAddition . ");
-         ";
+            $.cresenity.reload('" . $this->target . "','" . $this->generatedUrl() . "','" . $this->method . "'," . $dataAddition . ');
+         ';
 
         return $js;
     }
-
 }

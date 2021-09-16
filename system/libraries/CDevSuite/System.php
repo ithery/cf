@@ -6,13 +6,12 @@
  * @author Hery
  */
 abstract class CDevSuite_System {
-
     public $cli;
+
     public $files;
 
     /**
      * Create a new System instance.
-     *
      */
     public function __construct() {
         $this->cli = CDevSuite::commandLine();
@@ -30,13 +29,12 @@ abstract class CDevSuite_System {
         }
 
         return c::collect($this->files->scandir(CDevSuite::homePath() . '/Extensions'))
-                        ->reject(function ($file) {
-                            return is_dir($file);
-                        })
-                        ->map(function ($file) {
-                            return CDevSuite::homePath() . '/Extensions/' . $file;
-                        })
-                        ->values()->all();
+            ->reject(function ($file) {
+                return is_dir($file);
+            })
+            ->map(function ($file) {
+                return CDevSuite::homePath() . '/Extensions/' . $file;
+            })
+            ->values()->all();
     }
-
 }

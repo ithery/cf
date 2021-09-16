@@ -1,53 +1,64 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Description of Mail
  *
  * @author Hery Kurniawan
- * @since Jan 7, 2018, 12:30:34 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jan 7, 2018, 12:30:34 PM
  */
 
 /**
  * The final request body object
  */
 class CSendGrid_Mail implements \JsonSerializable {
-
     const VERSION = '1.0.0';
 
     protected $namespace = 'SendGrid';
+
     public $from;
+
     public $personalization;
+
     public $subject;
+
     public $contents;
+
     public $attachments;
+
     public $template_id;
+
     public $sections;
+
     public $headers;
+
     public $categories;
+
     public $custom_args;
+
     public $send_at;
+
     public $batch_id;
+
     public $asm;
+
     public $ip_pool_name;
+
     public $mail_settings;
+
     public $tracking_settings;
+
     public $reply_to;
 
     public function __construct($from, $subject, $to, $content) {
         $this->setFrom($from);
         $this->setSubject($subject);
         $personalization = new CSendGrid_Personalization();
-        if($to instanceof CSendGrid_Email) {
-            $to = array($to);
+        if ($to instanceof CSendGrid_Email) {
+            $to = [$to];
         }
-        foreach($to as $toItem) {
+        foreach ($to as $toItem) {
             $personalization->addTo($toItem);
         }
         $personalization->setSubject($subject);
@@ -193,28 +204,28 @@ class CSendGrid_Mail implements \JsonSerializable {
 
     public function jsonSerialize() {
         return array_filter(
-                        [
-                    'from' => $this->getFrom(),
-                    'personalizations' => $this->getPersonalizations(),
-                    'subject' => $this->getSubject(),
-                    'content' => $this->getContents(),
-                    'attachments' => $this->getAttachments(),
-                    'template_id' => $this->getTemplateId(),
-                    'sections' => $this->getSections(),
-                    'headers' => $this->getHeaders(),
-                    'categories' => $this->getCategories(),
-                    'custom_args' => $this->getCustomArgs(),
-                    'send_at' => $this->getSendAt(),
-                    'batch_id' => $this->getBatchId(),
-                    'asm' => $this->getASM(),
-                    'ip_pool_name' => $this->getIpPoolName(),
-                    'mail_settings' => $this->getMailSettings(),
-                    'tracking_settings' => $this->getTrackingSettings(),
-                    'reply_to' => $this->getReplyTo()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'from' => $this->getFrom(),
+                'personalizations' => $this->getPersonalizations(),
+                'subject' => $this->getSubject(),
+                'content' => $this->getContents(),
+                'attachments' => $this->getAttachments(),
+                'template_id' => $this->getTemplateId(),
+                'sections' => $this->getSections(),
+                'headers' => $this->getHeaders(),
+                'categories' => $this->getCategories(),
+                'custom_args' => $this->getCustomArgs(),
+                'send_at' => $this->getSendAt(),
+                'batch_id' => $this->getBatchId(),
+                'asm' => $this->getASM(),
+                'ip_pool_name' => $this->getIpPoolName(),
+                'mail_settings' => $this->getMailSettings(),
+                'tracking_settings' => $this->getTrackingSettings(),
+                'reply_to' => $this->getReplyTo()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

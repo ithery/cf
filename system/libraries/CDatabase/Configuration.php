@@ -1,18 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-/**
- * @author Hery Kurniawan
- * @since Aug 18, 2018, 10:43:47 AM
- * @license Ittron Global Teknologi <ittron.co.id>
- */
+ /**
+  * @author Hery Kurniawan
+  * @license Ittron Global Teknologi <ittron.co.id>
+  *
+  * @since Aug 18, 2018, 10:43:47 AM
+  */
+
+ use \Doctrine\Common\Cache\Cache;
 
 /**
  * Configuration container for the CDatabase.
  */
 class CDatabase_Configuration {
-
     /**
      * The attributes that are contained in the configuration.
      * Values are default values.
@@ -92,7 +94,7 @@ class CDatabase_Configuration {
      * transactions. Otherwise, its SQL statements are grouped into transactions that are terminated by a call to either
      * the method commit or the method rollback. By default, new connections are in auto-commit mode.
      *
-     * @param bool $autoCommit True to enable auto-commit mode; false to disable it.
+     * @param bool $autoCommit true to enable auto-commit mode; false to disable it
      *
      * @see   getAutoCommit
      */
@@ -103,12 +105,11 @@ class CDatabase_Configuration {
     /**
      * Returns the default auto-commit mode for connections.
      *
-     * @return bool True if auto-commit mode is enabled by default for connections, false otherwise.
+     * @return bool true if auto-commit mode is enabled by default for connections, false otherwise
      *
      * @see    setAutoCommit
      */
     public function getAutoCommit() {
         return isset($this->_attributes['autoCommit']) ? $this->_attributes['autoCommit'] : true;
     }
-
 }

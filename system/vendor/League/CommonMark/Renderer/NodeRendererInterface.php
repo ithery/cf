@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -16,8 +14,7 @@ namespace League\CommonMark\Renderer;
 use League\CommonMark\Node\Node;
 use League\CommonMark\Util\HtmlElement;
 
-interface NodeRendererInterface
-{
+interface NodeRendererInterface {
     /**
      * @return HtmlElement|string|null
      */

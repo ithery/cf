@@ -1,22 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2018, 5:58:05 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2018, 5:58:05 AM
  */
 trait CTrait_Element_ActionList_Row {
-
     /**
-     *
      * @var CElement_List_ActionList
      */
     protected $rowActionList;
 
     /**
-     * 
      * @return int
      */
     public function rowActionCount() {
@@ -27,7 +25,6 @@ trait CTrait_Element_ActionList_Row {
     }
 
     /**
-     * 
      * @return bool
      */
     public function haveRowAction() {
@@ -35,19 +32,19 @@ trait CTrait_Element_ActionList_Row {
     }
 
     /**
-     * 
      * @param string $id
+     *
      * @return CElement_Component_Action
      */
-    public function addRowAction($id = "") {
+    public function addRowAction($id = '') {
         $rowAct = CElement_Factory::createComponent('Action', $id);
         $this->rowActionList->add($rowAct);
         return $rowAct;
     }
 
     /**
-     * 
      * @param string $style
+     *
      * @return $this
      */
     public function setRowActionStyle($style) {
@@ -56,7 +53,6 @@ trait CTrait_Element_ActionList_Row {
     }
 
     /**
-     * 
      * @return string
      */
     public function getRowActionStyle() {
@@ -64,11 +60,9 @@ trait CTrait_Element_ActionList_Row {
     }
 
     /**
-     * 
      * @return CElement_List_ActionList
      */
     public function getRowActionList() {
         return $this->rowActionList;
     }
-
 }

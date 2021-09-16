@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CRedis implements CRedis_FactoryInterface {
-
     private static $instance;
 
     /**
@@ -16,6 +9,7 @@ class CRedis implements CRedis_FactoryInterface {
      * @var array
      */
     protected $config;
+
     protected $configName;
 
     /**
@@ -58,9 +52,9 @@ class CRedis implements CRedis_FactoryInterface {
 
     public function __construct($configName, $config = []) {
         $this->configName = $configName;
-        $this->driver='phpredis';
+        $this->driver = 'phpredis';
         if (!is_array($config)) {
-            $config = array();
+            $config = [];
         }
         if (count($config) == 0) {
             $config = CF::config('database.' . $configName);
@@ -71,35 +65,39 @@ class CRedis implements CRedis_FactoryInterface {
     /**
      * Get a Redis connection by name.
      *
-     * @param  string|null  $name
-     * @return CRedis_AbstractConnector
+     * @param string|null $name
+     *
+     * @return CRedis_AbstractConnection
      */
     public function connection($name = null) {
         $name = $name ?: 'default';
         if (isset($this->connections[$name])) {
             return $this->connections[$name];
         }
+
         return $this->connections[$name] = $this->configure(
-                $this->resolve($name), $name
+            $this->resolve($name),
+            $name
         );
     }
 
     /**
      * Resolve the given connection by name.
      *
-     * @param  string|null  $name
-     * @return CRedis_AbstractConnector
+     * @param string|null $name
+     *
+     * @return CRedis_AbstractConnection
      *
      * @throws \InvalidArgumentException
      */
     public function resolve($name = null) {
         $name = $name ?: 'default';
         $options = isset($this->config['options']) ? $this->config['options'] : [];
-        
-        
+
         if (isset($this->config[$name])) {
             return $this->connector()->connect(
-                            $this->parseConnectionConfiguration($this->config[$name]), $options
+                $this->parseConnectionConfiguration($this->config[$name]),
+                $options
             );
         }
         if (isset($this->config['clusters'][$name])) {
@@ -111,22 +109,26 @@ class CRedis implements CRedis_FactoryInterface {
     /**
      * Resolve the given cluster connection by name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return CRedis_AbstractConnection
      */
     protected function resolveCluster($name) {
         return $this->connector()->connectToCluster(
-                        array_map(function ($config) {
-                            return $this->parseConnectionConfiguration($config);
-                        }, $this->config['clusters'][$name]), isset($this->config['clusters']) && isset($this->config['clusters']['options']) ? $this->config['clusters']['options'] : [], isset($this->config['options']) ? $this->config['options'] : []
+            array_map(function ($config) {
+                return $this->parseConnectionConfiguration($config);
+            }, $this->config['clusters'][$name]),
+            isset($this->config['clusters']) && isset($this->config['clusters']['options']) ? $this->config['clusters']['options'] : [],
+            isset($this->config['options']) ? $this->config['options'] : []
         );
     }
 
     /**
      * Configure the given connection to prepare it for commands.
      *
-     * @param  CRedis_AbstractConnection  $connection
-     * @param  string  $name
+     * @param CRedis_AbstractConnection $connection
+     * @param string                    $name
+     *
      * @return CRedis_AbstractConnection
      */
     protected function configure(CRedis_AbstractConnection $connection, $name) {
@@ -158,7 +160,8 @@ class CRedis implements CRedis_FactoryInterface {
     /**
      * Parse the Redis connection configuration.
      *
-     * @param  mixed  $config
+     * @param mixed $config
+     *
      * @return array
      */
     protected function parseConnectionConfiguration($config) {
@@ -198,7 +201,8 @@ class CRedis implements CRedis_FactoryInterface {
     /**
      * Set the default driver.
      *
-     * @param  string  $driver
+     * @param string $driver
+     *
      * @return void
      */
     public function setDriver($driver) {
@@ -208,8 +212,9 @@ class CRedis implements CRedis_FactoryInterface {
     /**
      * Register a custom driver creator Closure.
      *
-     * @param  string  $driver
-     * @param  \Closure  $callback
+     * @param string   $driver
+     * @param \Closure $callback
+     *
      * @return $this
      */
     public function extend($driver, Closure $callback) {
@@ -220,12 +225,12 @@ class CRedis implements CRedis_FactoryInterface {
     /**
      * Pass methods onto the default Redis connection.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters) {
         return $this->connection()->{$method}(...$parameters);
     }
-
 }

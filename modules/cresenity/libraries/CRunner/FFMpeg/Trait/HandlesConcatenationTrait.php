@@ -1,26 +1,26 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 26, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Aug 26, 2020
  */
 trait CRunner_FFMpeg_Trait_HandlesConcatenationTrait {
-
     /**
-     * @var boolean
+     * @var bool
      */
     protected $concatWithTranscoding = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $concatWithVideo = false;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $concatWithAudio = false;
 
@@ -41,10 +41,9 @@ trait CRunner_FFMpeg_Trait_HandlesConcatenationTrait {
         $concatWithAudio = $this->concatWithAudio ? 1 : 0;
 
         $this->addFilter(
-                $sources->implode(''),
-                "concat=n={$sources->count()}:v={$concatWithVideo}:a={$concatWithAudio}",
-                '[concat]'
+            $sources->implode(''),
+            "concat=n={$sources->count()}:v={$concatWithVideo}:a={$concatWithAudio}",
+            '[concat]'
         )->addFormatOutputMapping($this->format, $outputMedia, ['[concat]']);
     }
-
 }

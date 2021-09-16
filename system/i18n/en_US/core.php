@@ -1,15 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-return array(
+return [
     'there_can_be_only_one' => 'There can be only one instance of CF per page request',
     'uncaught_exception' => 'Uncaught %s: %s in file %s on line %s',
     'invalid_method' => 'Invalid method %s called in %s',
     'invalid_property' => 'The %s property does not exist in the %s class.',
     'log_dir_unwritable' => 'The log directory is not writable: %s',
     'resource_not_found' => 'The requested :directory, :filename, could not be found',
-    'invalid_filetype' => 'The requested filetype, .%s, is not allowed in your view configuration file',
+    'invalid_filetype' => 'The requested filetype, .:type, is not allowed in your view configuration file',
     'view_set_filename' => 'You must set the the view filename before calling render',
     'no_default_route' => 'Please set a default route in config/routes.php',
     'no_controller' => 'Kohana was not able to determine a controller to process this request: %s',
@@ -31,4 +31,4 @@ return array(
     'model' => 'model',
     'view' => 'view',
     'template' => 'Template',
-);
+];

@@ -8,10 +8,10 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace FFMpeg\Format;
 
-interface FormatInterface
-{
+interface FormatInterface {
     /**
      * Returns the number of passes.
      *
@@ -22,7 +22,7 @@ interface FormatInterface
     /**
      * Returns an array of extra parameters to add to ffmpeg commandline.
      *
-     * @return array()
+     * @return array
      */
     public function getExtraParams();
 }

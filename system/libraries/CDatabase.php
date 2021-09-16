@@ -1,11 +1,10 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 use Carbon\Carbon;
 
 class CDatabase {
-
     use CTrait_Compat_Database;
     use CDatabase_Trait_DetectDeadlock;
     use CDatabase_Trait_DetectLostConnection;
@@ -13,79 +12,78 @@ class CDatabase {
 
     /**
      * Database instances
-     * @var CDatabase[]
+     *
+     * @var array
      */
-    public static $instances = array();
+    public static $instances = [];
 
     /**
      * Global benchmark
+     *
      * @var array
      */
-    public static $benchmarks = array();
+    public static $benchmarks = [];
 
     /**
-     * default Database
+     * Default Database
+     *
      * @var string
      */
     protected static $defaultConnection = 'default';
+
     public $domain;
+
     public $name;
 
     /**
-     *
      * @var CDatabase_Schema_Manager
      */
     protected $schemaManager;
 
     /**
-     *
      * @var CDatabase_Platform
      */
     protected $platform;
 
     /**
-     *
      * @var string
      */
     protected $driverName;
 
     /**
-     *
      * @var CDatabase_Configuration
      */
     protected $configuration;
-    // Configuration
-    protected $config = array(
-        'benchmark' => TRUE,
-        'persistent' => FALSE,
+
+    /**
+     * @var array
+     */
+    protected $config = [
+        'benchmark' => true,
+        'persistent' => false,
         'connection' => '',
         'character_set' => 'utf8',
         'table_prefix' => '',
-        'object' => TRUE,
-        'cache' => FALSE,
-        'escape' => TRUE,
-    );
-    // Database driver object
+        'object' => true,
+        'cache' => false,
+        'escape' => true,
+    ];
+
+    /**
+     * @var CDatabase_Driver_Mysqli
+     */
     protected $driver;
+
     protected $driver_name;
+
     protected $link;
-    // Un-compiled parts of the SQL query
-    protected $select = array();
-    protected $set = array();
-    protected $from = array();
-    protected $join = array();
-    protected $where = array();
-    protected $orderby = array();
-    protected $order = array();
-    protected $groupby = array();
-    protected $having = array();
-    protected $distinct = FALSE;
-    protected $limit = FALSE;
-    protected $offset = FALSE;
+
     protected $last_query = '';
-    protected $queryLog = array();
+
+    protected $queryLog = [];
+
     // Stack of queries for push/pop
-    protected $query_history = array();
+    protected $query_history = [];
 
     /**
      * The number of active transactions.
@@ -122,10 +120,13 @@ class CDatabase {
     /**
      * Returns a singleton instance of Database.
      *
-     * @param   mixed   configuration array or DSN
-     * @return  CDatabase
+     * @param null|mixed $name
+     * @param null|mixed $config
+     * @param null|mixed $domain
+     *
+     * @return CDatabase
      */
-    public static function &instance($name = null, $config = NULL, $domain = null) {
+    public static function &instance($name = null, $config = null, $domain = null) {
         if ($name == null) {
             $name = static::$defaultConnection;
         }
@@ -139,12 +140,12 @@ class CDatabase {
         }
 
         if (!isset(CDatabase::$instances[$domain])) {
-            CDatabase::$instances[$domain] = array();
+            CDatabase::$instances[$domain] = [];
         }
         if (!isset(CDatabase::$instances[$domain][$name])) {
             // Create a new instance
 
-            CDatabase::$instances[$domain][$name] = new CDatabase($config === NULL ? $name : $config, $domain);
+            CDatabase::$instances[$domain][$name] = new CDatabase($config === null ? $name : $config, $domain);
         }
 
         return CDatabase::$instances[$domain][$name];
@@ -154,18 +155,19 @@ class CDatabase {
      * Returns the name of a given database instance.
      *
      * @param   CDatabase  instance of CDatabase
-     * @return  string
+     * @param null|mixed $domain
+     *
+     * @return string
      */
     public static function instanceName(CDatabase $db, $domain = null) {
         if (strlen($domain) == 0) {
             //get current domain
             $domain = CF::domain();
         }
-        return array_search($db, CDatabase::$instances[$domain], TRUE);
+        return array_search($db, CDatabase::$instances[$domain], true);
     }
 
     /**
-     * 
      * @param type $config
      */
     public function resolveConfig($config) {
@@ -181,10 +183,12 @@ class CDatabase {
     /**
      * Sets up the database configuration, loads the CDatabase_Driver.
      *
-     * @throws  CDatabase_Exception
+     * @param mixed      $config
+     * @param null|mixed $domain
+     *
+     * @throws CDatabase_Exception
      */
-    public function __construct($config = array(), $domain = null) {
-
+    public function __construct($config = [], $domain = null) {
         if ($domain == null) {
             $domain = CF::domain();
         }
@@ -193,15 +197,15 @@ class CDatabase {
         if (!empty($config)) {
             if (is_array($config) && count($config) > 0) {
                 if (!array_key_exists('connection', $config)) {
-                    $config = array('connection' => $config);
+                    $config = ['connection' => $config];
                     $loadConfig = false;
                 } else {
                     $loadConfig = false;
                 }
             }
             if (is_string($config)) {
-                if (strpos($config, '://') !== FALSE) {
-                    $config = array('connection' => $config);
+                if (strpos($config, '://') !== false) {
+                    $config = ['connection' => $config];
                     $loadConfig = false;
                 }
             }
@@ -219,7 +223,6 @@ class CDatabase {
                 $found = true;
             }
 
-
             if ($found == false) {
                 throw new Exception('Config ' . $configName . ' Not Found');
             }
@@ -230,29 +233,27 @@ class CDatabase {
         $this->config = array_merge($this->config, $config);
 
         if (is_string($this->config['connection'])) {
-
             // Make sure the connection is valid
-            if (strpos($this->config['connection'], '://') === FALSE)
-                throw new CDatabase_Exception('The DSN you supplied is not valid: :dsn', array(':dsn' => $this->config['connection']));
-
+            if (strpos($this->config['connection'], '://') === false) {
+                throw new CDatabase_Exception('The DSN you supplied is not valid: :dsn', [':dsn' => $this->config['connection']]);
+            }
             // Parse the DSN, creating an array to hold the connection parameters
-            $db = array
-                (
-                'type' => FALSE,
-                'user' => FALSE,
-                'pass' => FALSE,
-                'host' => FALSE,
-                'port' => FALSE,
-                'socket' => FALSE,
-                'database' => FALSE
-            );
+            $db = [
+                'type' => false,
+                'user' => false,
+                'pass' => false,
+                'host' => false,
+                'port' => false,
+                'socket' => false,
+                'database' => false
+            ];
 
             // Get the protocol and arguments
-            list ($db['type'], $connection) = explode('://', $this->config['connection'], 2);
+            list($db['type'], $connection) = explode('://', $this->config['connection'], 2);
 
-            if (strpos($connection, '@') !== FALSE) {
+            if (strpos($connection, '@') !== false) {
                 // Get the username and password
-                list ($db['pass'], $connection) = explode('@', $connection, 2);
+                list($db['pass'], $connection) = explode('@', $connection, 2);
                 // Check if a password is supplied
                 $logindata = explode(':', $db['pass'], 2);
                 $db['pass'] = (count($logindata) > 1) ? $logindata[1] : '';
@@ -271,10 +272,10 @@ class CDatabase {
                 if (preg_match('/^unix\([^)]++\)/', $connection)) {
                     // This one is a little hairy: we explode based on the end of
                     // the socket, removing the 'unix(' from the connection string
-                    list ($db['socket'], $connection) = explode(')', substr($connection, 5), 2);
-                } elseif (strpos($connection, ':') !== FALSE) {
+                    list($db['socket'], $connection) = explode(')', substr($connection, 5), 2);
+                } elseif (strpos($connection, ':') !== false) {
                     // Fetch the host and port name
-                    list ($db['host'], $db['port']) = explode(':', $connection, 2);
+                    list($db['host'], $db['port']) = explode(':', $connection, 2);
                 } else {
                     $db['host'] = $connection;
                 }
@@ -310,17 +311,17 @@ class CDatabase {
             $class = new ReflectionClass($driver);
             // Initialize the driver
             $this->driver = $class->newInstance($this, $this->config);
-        } catch (ReflectionEcxeption $ex) {
-            throw new CDatabase_Exception('The :driver driver for the :class library could not be found', array(':driver' => $driver, ':class' => get_class($this)));
+        } catch (ReflectionException $ex) {
+            throw new CDatabase_Exception('The :driver driver for the :class library could not be found', [':driver' => $driver, ':class' => get_class($this)]);
         }
 
-        $this->events = CDatabase_Dispatcher::instance();
+        $this->events = CEvent::dispatcher();
         CModel::setEventDispatcher($this->events);
         $this->configuration = new CDatabase_Configuration();
 
         // Validate the driver
         if (!($this->driver instanceof CDatabase_Driver)) {
-            throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', array(':driver' => $driver, ':class' => get_class($this), ':interface' => 'CDatabase_Driver'));
+            throw new CDatabase_Exception('The :driver driver for the :class library must implement the :interface interface', [':driver' => $driver, ':class' => get_class($this), ':interface' => 'CDatabase_Driver']);
         }
 
         CF::log(CLogger::DEBUG, 'Database Library initialized');
@@ -329,17 +330,17 @@ class CDatabase {
     /**
      * Simple connect method to get the database queries up and running.
      *
-     * @return  void
+     * @return void
      */
     public function connect() {
         // A link can be a resource or an object
-        if (!is_resource($this->link) AND!is_object($this->link)) {
+        if (!is_resource($this->link) and !is_object($this->link)) {
             $this->link = $this->driver->connect();
-            if (!is_resource($this->link) AND!is_object($this->link))
-                throw new CDatabase_Exception('There was an error connecting to the database: :error', array(':error' => $this->driver->show_error()));
-
+            if (!is_resource($this->link) and !is_object($this->link)) {
+                throw new CDatabase_Exception('There was an error connecting to the database: :error', [':error' => $this->driver->showError()]);
+            }
             // Clear password after successful connect
-            $this->config['connection']['pass'] = NULL;
+            $this->config['connection']['pass'] = null;
         }
     }
 
@@ -351,24 +352,26 @@ class CDatabase {
     /**
      * Runs a query into the driver and returns the result.
      *
-     * @param   string  SQL query to execute
-     * @return  CDatabase_Result
+     * @param string $sql        SQL query to execute
+     * @param array  $bindings
+     * @param bool   $useReadPdo
+     *
+     * @return CDatabase_Result
      */
-    public function query($sql = '', $bindings = array(), Closure $callback = null) {
-        if ($sql == '')
-            return FALSE;
+    public function query($sql = '', $bindings = [], $useReadPdo = true) {
+        if ($sql == '') {
+            return false;
+        }
 
         // No link? Connect!
         $this->link or $this->connect();
 
         // Start the benchmark
-        $start = microtime(TRUE);
-
+        $start = microtime(true);
 
         // Compile binds if needed
 
         $sql = $this->compileBinds($sql, $bindings);
-
 
         // Fetch the result
         $result = $this->driver->query($this->last_query = $sql);
@@ -382,14 +385,10 @@ class CDatabase {
             //CDatabase::$benchmarks[] = array('query' => $sql, 'time' => $elapsedTime, 'rows' => count($result), 'caller' => cdbg::callerInfo());
         }
 
-
-
-
         // Once we have run the query we will calculate the time that it took to run and
         // then log the query, bindings, and execution time so we will report them on
         // the event that the developer needs them. We'll log time in milliseconds.
         $this->logQuery($sql, $bindings, $elapsedTime, $result->count());
-
 
         return $result;
     }
@@ -397,7 +396,8 @@ class CDatabase {
     /**
      * Get the elapsed time since a given starting point.
      *
-     * @param  int    $start
+     * @param int $start
+     *
      * @return float
      */
     protected function getElapsedTime($start) {
@@ -407,7 +407,8 @@ class CDatabase {
     /**
      * Prepare the query bindings for execution.
      *
-     * @param  array  $bindings
+     * @param array $bindings
+     *
      * @return array
      */
     public function prepareBindings(array $bindings) {
@@ -430,8 +431,9 @@ class CDatabase {
     /**
      * Selects the column names for a database query.
      *
-     * @param   string  string or array of column names to select
-     * @return  Database_Core  This Database object.
+     * @param string $sql string or array of column names to select
+     *
+     * @return CDatabase this Database object
      */
     public function select($sql = '*') {
         if (func_num_args() > 1) {
@@ -443,20 +445,21 @@ class CDatabase {
         }
 
         foreach ($sql as $val) {
-            if (($val = trim($val)) === '')
+            if (($val = trim($val)) === '') {
                 continue;
+            }
 
-            if (strpos($val, '(') === FALSE AND $val !== '*') {
+            if (strpos($val, '(') === false and $val !== '*') {
                 if (preg_match('/^DISTINCT\s++(.+)$/i', $val, $matches)) {
                     // Only prepend with table prefix if table name is specified
-                    $val = (strpos($matches[1], '.') !== FALSE) ? $this->config['table_prefix'] . $matches[1] : $matches[1];
+                    $val = (strpos($matches[1], '.') !== false) ? $this->config['table_prefix'] . $matches[1] : $matches[1];
 
-                    $this->distinct = TRUE;
+                    $this->distinct = true;
                 } else {
-                    $val = (strpos($val, '.') !== FALSE) ? $this->config['table_prefix'] . $val : $val;
+                    $val = (strpos($val, '.') !== false) ? $this->config['table_prefix'] . $val : $val;
                 }
 
-                $val = $this->driver->escape_column($val);
+                $val = $this->driver->escapeColumn($val);
             }
 
             $this->select[] = $val;
@@ -468,8 +471,9 @@ class CDatabase {
     /**
      * Selects the from table(s) for a database query.
      *
-     * @param   string  string or array of tables to select
-     * @return  Database_Core  This Database object.
+     * @param string $sql string or array of tables to select
+     *
+     * @return CDatabase this Database object
      */
     public function from($sql) {
         if (func_num_args() > 1) {
@@ -477,16 +481,17 @@ class CDatabase {
         } elseif (is_string($sql)) {
             $sql = explode(',', $sql);
         } else {
-            $sql = array($sql);
+            $sql = [$sql];
         }
 
         foreach ($sql as $val) {
             if (is_string($val)) {
-                if (($val = trim($val)) === '')
+                if (($val = trim($val)) === '') {
                     continue;
+                }
 
                 // TODO: Temporary solution, this should be moved to database driver (AS is checked for twice)
-                if (stripos($val, ' AS ') !== FALSE) {
+                if (stripos($val, ' AS ') !== false) {
                     $val = str_ireplace(' AS ', ' AS ', $val);
 
                     list($table, $alias) = explode(' AS ', $val);
@@ -505,94 +510,26 @@ class CDatabase {
     }
 
     /**
-     * Generates the JOIN portion of the query.
-     *
-     * @param   string        table name
-     * @param   string|array  where key or array of key => value pairs
-     * @param   string        where value
-     * @param   string        type of join
-     * @return  Database_Core        This Database object.
-     */
-    public function join($table, $key, $value = NULL, $type = '') {
-        $join = array();
-
-        if (!empty($type)) {
-            $type = strtoupper(trim($type));
-
-            if (!in_array($type, array('LEFT', 'RIGHT', 'OUTER', 'INNER', 'LEFT OUTER', 'RIGHT OUTER'), TRUE)) {
-                $type = '';
-            } else {
-                $type .= ' ';
-            }
-        }
-
-        $cond = array();
-        $keys = is_array($key) ? $key : array($key => $value);
-        foreach ($keys as $key => $value) {
-            $key = (strpos($key, '.') !== FALSE) ? $this->config['table_prefix'] . $key : $key;
-
-            if (is_string($value)) {
-                // Only escape if it's a string
-                $value = $this->driver->escape_column($this->config['table_prefix'] . $value);
-            }
-
-            $cond[] = $this->driver->where($key, $value, 'AND ', count($cond), FALSE);
-        }
-
-        if (!is_array($this->join)) {
-            $this->join = array();
-        }
-
-        if (!is_array($table)) {
-            $table = array($table);
-        }
-
-        foreach ($table as $t) {
-            if (is_string($t)) {
-                // TODO: Temporary solution, this should be moved to database driver (AS is checked for twice)
-                if (stripos($t, ' AS ') !== FALSE) {
-                    $t = str_ireplace(' AS ', ' AS ', $t);
-
-                    list($table, $alias) = explode(' AS ', $t);
-
-                    // Attach prefix to both sides of the AS
-                    $t = $this->config['table_prefix'] . $table . ' AS ' . $this->config['table_prefix'] . $alias;
-                } else {
-                    $t = $this->config['table_prefix'] . $t;
-                }
-            }
-
-            $join['tables'][] = $this->driver->escape_column($t);
-        }
-
-        $join['conditions'] = '(' . trim(implode(' ', $cond)) . ')';
-        $join['type'] = $type;
-
-        $this->join[] = $join;
-
-        return $this;
-    }
-
-    /**
      * Selects the where(s) for a database query.
      *
-     * @param   string|array  key name or array of key => value pairs
-     * @param   string        value to match with key
-     * @param   boolean       disable quoting of WHERE clause
-     * @return  Database_Core        This Database object.
+     * @param string|array $key   key name or array of key => value pairs
+     * @param string       $value value to match with key
+     * @param bool         $quote disable quoting of WHERE clause
+     *
+     * @return CDatabase this Database object
      */
-    public function where($key, $value = NULL, $quote = TRUE) {
-        $quote = (func_num_args() < 2 AND!is_array($key)) ? -1 : $quote;
+    public function where($key, $value = null, $quote = true) {
+        $quote = (func_num_args() < 2 and !is_array($key)) ? -1 : $quote;
         if (is_object($key)) {
-            $keys = array((string) $key => '');
+            $keys = [(string) $key => ''];
         } elseif (!is_array($key)) {
-            $keys = array($key => $value);
+            $keys = [$key => $value];
         } else {
             $keys = $key;
         }
 
         foreach ($keys as $key => $value) {
-            $key = (strpos($key, '.') !== FALSE) ? $this->config['table_prefix'] . $key : $key;
+            $key = (strpos($key, '.') !== false) ? $this->config['table_prefix'] . $key : $key;
             $this->where[] = $this->driver->where($key, $value, 'AND ', count($this->where), $quote);
         }
 
@@ -602,23 +539,24 @@ class CDatabase {
     /**
      * Selects the or where(s) for a database query.
      *
-     * @param   string|array  key name or array of key => value pairs
-     * @param   string        value to match with key
-     * @param   boolean       disable quoting of WHERE clause
-     * @return  Database_Core        This Database object.
+     * @param string|array $key   key name or array of key => value pairs
+     * @param string       $value value to match with key
+     * @param bool         $quote disable quoting of WHERE clause
+     *
+     * @return CDatabase this Database object
      */
-    public function orwhere($key, $value = NULL, $quote = TRUE) {
-        $quote = (func_num_args() < 2 AND!is_array($key)) ? -1 : $quote;
+    public function orwhere($key, $value = null, $quote = true) {
+        $quote = (func_num_args() < 2 and !is_array($key)) ? -1 : $quote;
         if (is_object($key)) {
-            $keys = array((string) $key => '');
+            $keys = [(string) $key => ''];
         } elseif (!is_array($key)) {
-            $keys = array($key => $value);
+            $keys = [$key => $value];
         } else {
             $keys = $key;
         }
 
         foreach ($keys as $key => $value) {
-            $key = (strpos($key, '.') !== FALSE) ? $this->config['table_prefix'] . $key : $key;
+            $key = (strpos($key, '.') !== false) ? $this->config['table_prefix'] . $key : $key;
             $this->where[] = $this->driver->where($key, $value, 'OR ', count($this->where), $quote);
         }
 
@@ -628,16 +566,17 @@ class CDatabase {
     /**
      * Selects the like(s) for a database query.
      *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        like value to match with field
-     * @param   boolean       automatically add starting and ending wildcards
-     * @return  Database_Core        This Database object.
+     * @param string|array $field field name or array of field => match pairs
+     * @param string       $match like value to match with field
+     * @param bool         $auto  automatically add starting and ending wildcards
+     *
+     * @return CDatabase this Database object
      */
-    public function like($field, $match = '', $auto = TRUE) {
-        $fields = is_array($field) ? $field : array($field => $match);
+    public function like($field, $match = '', $auto = true) {
+        $fields = is_array($field) ? $field : [$field => $match];
 
         foreach ($fields as $field => $match) {
-            $field = (strpos($field, '.') !== FALSE) ? $this->config['table_prefix'] . $field : $field;
+            $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
             $this->where[] = $this->driver->like($field, $match, $auto, 'AND ', count($this->where));
         }
 
@@ -647,16 +586,17 @@ class CDatabase {
     /**
      * Selects the or like(s) for a database query.
      *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        like value to match with field
-     * @param   boolean       automatically add starting and ending wildcards
-     * @return  Database_Core        This Database object.
+     * @param string|array $field field name or array of field => match pairs
+     * @param string       $match like value to match with field
+     * @param bool         $auto  automatically add starting and ending wildcards
+     *
+     * @return CDatabase this Database object
      */
-    public function orlike($field, $match = '', $auto = TRUE) {
-        $fields = is_array($field) ? $field : array($field => $match);
+    public function orlike($field, $match = '', $auto = true) {
+        $fields = is_array($field) ? $field : [$field => $match];
 
         foreach ($fields as $field => $match) {
-            $field = (strpos($field, '.') !== FALSE) ? $this->config['table_prefix'] . $field : $field;
+            $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
             $this->where[] = $this->driver->like($field, $match, $auto, 'OR ', count($this->where));
         }
 
@@ -666,16 +606,17 @@ class CDatabase {
     /**
      * Selects the not like(s) for a database query.
      *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        like value to match with field
-     * @param   boolean       automatically add starting and ending wildcards
-     * @return  Database_Core        This Database object.
+     * @param string|array $field field name or array of field => match pairs
+     * @param string       $match like value to match with field
+     * @param bool         $auto  automatically add starting and ending wildcards
+     *
+     * @return CDatabase this Database object
      */
-    public function notlike($field, $match = '', $auto = TRUE) {
-        $fields = is_array($field) ? $field : array($field => $match);
+    public function notlike($field, $match = '', $auto = true) {
+        $fields = is_array($field) ? $field : [$field => $match];
 
         foreach ($fields as $field => $match) {
-            $field = (strpos($field, '.') !== FALSE) ? $this->config['table_prefix'] . $field : $field;
+            $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
             $this->where[] = $this->driver->notlike($field, $match, $auto, 'AND ', count($this->where));
         }
 
@@ -685,15 +626,17 @@ class CDatabase {
     /**
      * Selects the or not like(s) for a database query.
      *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        like value to match with field
-     * @return  Database_Core        This Database object.
+     * @param string|array $field field name or array of field => match pairs
+     * @param string       $match like value to match with field
+     * @param mixed        $auto
+     *
+     * @return CDatabase this Database object
      */
-    public function ornotlike($field, $match = '', $auto = TRUE) {
-        $fields = is_array($field) ? $field : array($field => $match);
+    public function ornotlike($field, $match = '', $auto = true) {
+        $fields = is_array($field) ? $field : [$field => $match];
 
         foreach ($fields as $field => $match) {
-            $field = (strpos($field, '.') !== FALSE) ? $this->config['table_prefix'] . $field : $field;
+            $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
             $this->where[] = $this->driver->notlike($field, $match, $auto, 'OR ', count($this->where));
         }
 
@@ -703,15 +646,16 @@ class CDatabase {
     /**
      * Selects the like(s) for a database query.
      *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        like value to match with field
-     * @return  Database_Core        This Database object.
+     * @param string|array $field field name or array of field => match pairs
+     * @param string       $match like value to match with field
+     *
+     * @return CDatabase this Database object
      */
     public function regex($field, $match = '') {
-        $fields = is_array($field) ? $field : array($field => $match);
+        $fields = is_array($field) ? $field : [$field => $match];
 
         foreach ($fields as $field => $match) {
-            $field = (strpos($field, '.') !== FALSE) ? $this->config['table_prefix'] . $field : $field;
+            $field = (strpos($field, '.') !== false) ? $this->config['table_prefix'] . $field : $field;
             $this->where[] = $this->driver->regex($field, $match, 'AND ', count($this->where));
         }
 
@@ -719,188 +663,23 @@ class CDatabase {
     }
 
     /**
-     * Selects the or like(s) for a database query.
-     *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        like value to match with field
-     * @return  Database_Core        This Database object.
-     */
-    public function orregex($field, $match = '') {
-        $fields = is_array($field) ? $field : array($field => $match);
-
-        foreach ($fields as $field => $match) {
-            $field = (strpos($field, '.') !== FALSE) ? $this->config['table_prefix'] . $field : $field;
-            $this->where[] = $this->driver->regex($field, $match, 'OR ', count($this->where));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Selects the not regex(s) for a database query.
-     *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        regex value to match with field
-     * @return  Database_Core        This Database object.
-     */
-    public function notregex($field, $match = '') {
-        $fields = is_array($field) ? $field : array($field => $match);
-
-        foreach ($fields as $field => $match) {
-            $field = (strpos($field, '.') !== FALSE) ? $this->config['table_prefix'] . $field : $field;
-            $this->where[] = $this->driver->notregex($field, $match, 'AND ', count($this->where));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Selects the or not regex(s) for a database query.
-     *
-     * @param   string|array  field name or array of field => match pairs
-     * @param   string        regex value to match with field
-     * @return  Database_Core        This Database object.
-     */
-    public function ornotregex($field, $match = '') {
-        $fields = is_array($field) ? $field : array($field => $match);
-
-        foreach ($fields as $field => $match) {
-            $field = (strpos($field, '.') !== FALSE) ? $this->config['table_prefix'] . $field : $field;
-            $this->where[] = $this->driver->notregex($field, $match, 'OR ', count($this->where));
-        }
-
-        return $this;
-    }
-
-    /**
-     * Chooses the column to group by in a select query.
-     *
-     * @param   string  column name to group by
-     * @return  Database_Core  This Database object.
-     */
-    public function groupby($by) {
-        if (!is_array($by)) {
-            $by = explode(',', (string) $by);
-        }
-
-        foreach ($by as $val) {
-            $val = trim($val);
-
-            if ($val != '') {
-                // Add the table prefix if we are using table.column names
-                if (strpos($val, '.')) {
-                    $val = $this->config['table_prefix'] . $val;
-                }
-
-                $this->groupby[] = $this->driver->escape_column($val);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * Selects the having(s) for a database query.
-     *
-     * @param   string|array  key name or array of key => value pairs
-     * @param   string        value to match with key
-     * @param   boolean       disable quoting of WHERE clause
-     * @return  Database_Core        This Database object.
-     */
-    public function having($key, $value = '', $quote = TRUE) {
-        $this->having[] = $this->driver->where($key, $value, 'AND', count($this->having), TRUE);
-        return $this;
-    }
-
-    /**
-     * Selects the or having(s) for a database query.
-     *
-     * @param   string|array  key name or array of key => value pairs
-     * @param   string        value to match with key
-     * @param   boolean       disable quoting of WHERE clause
-     * @return  Database_Core        This Database object.
-     */
-    public function orhaving($key, $value = '', $quote = TRUE) {
-        $this->having[] = $this->driver->where($key, $value, 'OR', count($this->having), TRUE);
-        return $this;
-    }
-
-    /**
-     * Chooses which column(s) to order the select query by.
-     *
-     * @param   string|array  column(s) to order on, can be an array, single column, or comma seperated list of columns
-     * @param   string        direction of the order
-     * @return  Database_Core        This Database object.
-     */
-    public function orderby($orderby, $direction = NULL) {
-        if (!is_array($orderby)) {
-            $orderby = array($orderby => $direction);
-        }
-
-        foreach ($orderby as $column => $direction) {
-            $direction = strtoupper(trim($direction));
-
-            // Add a direction if the provided one isn't valid
-            if (!in_array($direction, array('ASC', 'DESC', 'RAND()', 'RANDOM()', 'NULL'))) {
-                $direction = 'ASC';
-            }
-
-            // Add the table prefix if a table.column was passed
-            if (strpos($column, '.')) {
-                $column = $this->config['table_prefix'] . $column;
-            }
-
-            $this->orderby[] = $this->driver->escape_column($column) . ' ' . $direction;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Selects the limit section of a query.
-     *
-     * @param   integer  number of rows to limit result to
-     * @param   integer  offset in result to start returning rows from
-     * @return  Database_Core   This Database object.
-     */
-    public function limit($limit, $offset = NULL) {
-        $this->limit = (int) $limit;
-
-        if ($offset !== NULL OR!is_int($this->offset)) {
-            $this->offset($offset);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Sets the offset portion of a query.
-     *
-     * @param   integer  offset value
-     * @return  Database_Core   This Database object.
-     */
-    public function offset($value) {
-        $this->offset = (int) $value;
-
-        return $this;
-    }
-
-    /**
      * Allows key/value pairs to be set for inserting or updating.
      *
-     * @param   string|array  key name or array of key => value pairs
-     * @param   string        value to match with key
-     * @return  Database_Core        This Database object.
+     * @param string|array $key   key name or array of key => value pairs
+     * @param string       $value value to match with key
+     *
+     * @return Database_Core this Database object
      */
     public function set($key, $value = '') {
         if (!is_array($key)) {
-            $key = array($key => $value);
+            $key = [$key => $value];
         }
 
         foreach ($key as $k => $v) {
             // Add a table prefix if the column includes the table.
-            if (strpos($k, '.'))
+            if (strpos($k, '.')) {
                 $k = $this->config['table_prefix'] . $k;
+            }
 
             $this->set[$k] = $this->driver->escape($v);
         }
@@ -909,253 +688,49 @@ class CDatabase {
     }
 
     /**
-     * Compiles the select statement based on the other functions called and runs the query.
-     *
-     * @param   string  table name
-     * @param   string  limit clause
-     * @param   string  offset clause
-     * @return  CDatabase_Result
-     */
-    public function get($table = '', $limit = NULL, $offset = NULL) {
-        if ($table != '') {
-            $this->from($table);
-        }
-
-        if (!is_null($limit)) {
-            $this->limit($limit, $offset);
-        }
-
-        $sql = $this->driver->compile_select(get_object_vars($this));
-
-        $this->reset_select();
-
-        $result = $this->query($sql);
-
-        $this->last_query = $sql;
-
-        return $result;
-    }
-
-    /**
-     * Compiles the select statement based on the other functions called and runs the query.
-     *
-     * @param   string  table name
-     * @param   array   where clause
-     * @param   string  limit clause
-     * @param   string  offset clause
-     * @return  Database_Core  This Database object.
-     */
-    public function getwhere($table = '', $where = NULL, $limit = NULL, $offset = NULL) {
-        if ($table != '') {
-            $this->from($table);
-        }
-
-        if (!is_null($where)) {
-            $this->where($where);
-        }
-
-        if (!is_null($limit)) {
-            $this->limit($limit, $offset);
-        }
-
-        $sql = $this->driver->compile_select(get_object_vars($this));
-
-        $this->reset_select();
-
-        $result = $this->query($sql);
-
-        return $result;
-    }
-
-    /**
-     * Compiles the select statement based on the other functions called and returns the query string.
-     *
-     * @param   string  table name
-     * @param   string  limit clause
-     * @param   string  offset clause
-     * @return  string  sql string
-     */
-    public function compile($table = '', $limit = NULL, $offset = NULL) {
-        if ($table != '') {
-            $this->from($table);
-        }
-
-        if (!is_null($limit)) {
-            $this->limit($limit, $offset);
-        }
-
-        $sql = $this->driver->compile_select(get_object_vars($this));
-
-        $this->reset_select();
-
-        return $sql;
-    }
-
-    /**
      * Compiles an insert string and runs the query.
      *
-     * @param   string  table name
-     * @param   array   array of key/value pairs to insert
-     * @return  CDatabase_Result  Query result
-     */
-    public function insert($table = '', $set = NULL) {
-        if (!is_null($set)) {
-            $this->set($set);
-        }
-
-        if ($this->set == NULL)
-            throw new CDatabase_Exception('You must set a SET clause for your query');
-
-        if ($table == '') {
-            if (!isset($this->from[0]))
-                throw new CDatabase_Exception('You must set a database table for your query');
-
-            $table = $this->from[0];
-        }
-
-        // If caching is enabled, clear the cache before inserting
-        ($this->config['cache'] === TRUE) and $this->clear_cache();
-
-        $sql = $this->driver->insert($this->config['table_prefix'] . $table, array_keys($this->set), array_values($this->set));
-
-        $this->reset_write();
-
-        return $this->query($sql);
-    }
-
-    /**
-     * Adds an "IN" condition to the where clause
+     * @param string $table table name
+     * @param array  $set   array of key/value pairs to insert
      *
-     * @param   string  Name of the column being examined
-     * @param   mixed   An array or string to match against
-     * @param   bool    Generate a NOT IN clause instead
-     * @return  Database_Core  This Database object.
+     * @return CDatabase_Result Query result
      */
-    public function in($field, $values, $not = FALSE) {
-        if (is_array($values)) {
-            $escaped_values = array();
-            foreach ($values as $v) {
-                if (is_numeric($v)) {
-                    $escaped_values[] = $v;
-                } else {
-                    $escaped_values[] = "'" . $this->driver->escape_str($v) . "'";
-                }
-            }
-            $values = implode(",", $escaped_values);
-        }
-
-        $where = $this->driver->escape_column(((strpos($field, '.') !== FALSE) ? $this->config['table_prefix'] : '') . $field) . ' ' . ($not === TRUE ? 'NOT ' : '') . 'IN (' . $values . ')';
-        $this->where[] = $this->driver->where($where, '', 'AND ', count($this->where), -1);
-
-        return $this;
-    }
-
-    /**
-     * Adds a "NOT IN" condition to the where clause
-     *
-     * @param   string  Name of the column being examined
-     * @param   mixed   An array or string to match against
-     * @return  Database_Core  This Database object.
-     */
-    public function notin($field, $values) {
-        return $this->in($field, $values, TRUE);
-    }
-
-    /**
-     * Compiles a merge string and runs the query.
-     *
-     * @param   string  table name
-     * @param   array   array of key/value pairs to merge
-     * @return  CDatabase_Result  Query result
-     */
-    public function merge($table = '', $set = NULL) {
-        if (!is_null($set)) {
-            $this->set($set);
-        }
-
-        if ($this->set == NULL)
-            throw new CDatabase_Exception('You must set a SET clause for your query');
-
-        if ($table == '') {
-            if (!isset($this->from[0]))
-                throw new CDatabase_Exception('You must set a database table for your query');
-
-            $table = $this->from[0];
-        }
-
-        $sql = $this->driver->merge($this->config['table_prefix'] . $table, array_keys($this->set), array_values($this->set));
-
-        $this->reset_write();
-        return $this->query($sql);
+    public function insert($table, $set) {
+        return $this->table($table)->insert($set);
     }
 
     /**
      * Compiles an update string and runs the query.
      *
-     * @param   string  table name
-     * @param   array   associative array of update values
-     * @param   array   where clause
-     * @return  CDatabase_Result  Query result
+     * @param string $table table name
+     * @param array  $set   associative array of update values
+     * @param array  $where where clause
+     *
+     * @return CDatabase_Result Query result
      */
-    public function update($table = '', $set = NULL, $where = NULL) {
-        if (is_array($set)) {
-            $this->set($set);
-        }
-
-        if (!is_null($where)) {
-            $this->where($where);
-        }
-
-        if ($this->set == FALSE)
-            throw new CDatabase_Exception('You must set a SET clause for your query');
-
-        if ($table == '') {
-            if (!isset($this->from[0]))
-                throw new CDatabase_Exception('You must set a database table for your query');
-
-            $table = $this->from[0];
-        }
-
-        $sql = $this->driver->update($this->config['table_prefix'] . $table, $this->set, $this->where);
-
-        $this->reset_write();
-        return $this->query($sql);
+    public function update($table = '', $set = null, $where = null) {
+        return $this->table($table)->where($where)->update($set);
     }
 
     /**
      * Compiles a delete string and runs the query.
      *
-     * @param   string  table name
-     * @param   array   where clause
-     * @return  CDatabase_Result  Query result
+     * @param string $table table name
+     * @param array  $where where clause
+     *
+     * @return CDatabase_Result Query result
      */
-    public function delete($table = '', $where = NULL) {
-        if ($table == '') {
-            if (!isset($this->from[0]))
-                throw new CDatabase_Exception('You must set a database table for your query');
-
-            $table = $this->from[0];
-        } else {
-            $table = $this->config['table_prefix'] . $table;
-        }
-
-        if (!is_null($where)) {
-            $this->where($where);
-        }
-
-        if (count($this->where) < 1)
+    public function delete($table = '', $where = null) {
+        if (count($this->where) < 1) {
             throw new CDatabase_Exception('You must set a WHERE clause for your query');
-
-        $sql = $this->driver->delete($table, $this->where);
-
-        $this->reset_write();
-        return $this->query($sql);
+        }
+        return $this->table($table)->where($where)->delete();
     }
 
     /**
      * Returns the last query run.
      *
-     * @return  string SQL
+     * @return string SQL
      */
     public function lastQuery() {
         return $this->last_query;
@@ -1164,102 +739,54 @@ class CDatabase {
     /**
      * Set the last query run.
      *
-     * @return  string SQL
+     * @param mixed $sql
+     *
+     * @return string SQL
      */
     public function setLastQuery($sql) {
         return $this->last_query = $sql;
     }
 
     /**
-     * Count query records.
-     *
-     * @param   string   table name
-     * @param   array    where clause
-     * @return  integer
-     */
-    public function count_records($table = FALSE, $where = NULL) {
-        if (count($this->from) < 1) {
-            if ($table == FALSE)
-                throw new CDatabase_Exception('You must set a database table for your query');
-
-            $this->from($table);
-        }
-
-        if ($where !== NULL) {
-            $this->where($where);
-        }
-
-        $query = $this->select('COUNT(*) AS ' . $this->escape_column('records_found'))->get()->result(TRUE);
-
-        return (int) $query->current()->records_found;
-    }
-
-    /**
-     * Resets all private select variables.
-     *
-     * @return  void
-     */
-    protected function reset_select() {
-        $this->select = array();
-        $this->from = array();
-        $this->join = array();
-        $this->where = array();
-        $this->orderby = array();
-        $this->groupby = array();
-        $this->having = array();
-        $this->distinct = FALSE;
-        $this->limit = FALSE;
-        $this->offset = FALSE;
-    }
-
-    /**
-     * Resets all private insert and update variables.
-     *
-     * @return  void
-     */
-    protected function reset_write() {
-        $this->set = array();
-        $this->from = array();
-        $this->where = array();
-    }
-
-    /**
      * Lists all the tables in the current database.
      *
-     * @return  array
+     * @return array
      */
     public function listTables() {
         $this->link or $this->connect();
 
-        return $this->driver->list_tables();
+        return $this->driver->listTables();
     }
 
     /**
      * See if a table exists in the database.
      *
-     * @param   string   table name
-     * @param   boolean  True to attach table prefix
-     * @return  boolean
+     * @param string $table_name table name
+     * @param bool   $prefix     True to attach table prefix
+     *
+     * @return bool
      */
-    public function tableExists($table_name, $prefix = TRUE) {
+    public function tableExists($table_name, $prefix = true) {
         if ($prefix) {
-            return in_array($this->config['table_prefix'] . $table_name, $this->list_tables());
+            return in_array($this->config['table_prefix'] . $table_name, $this->listTables());
         }
-        return in_array($table_name, $this->list_tables());
+        return in_array($table_name, $this->listTables());
     }
 
     /**
      * Combine a SQL statement with the bind values. Used for safe queries.
      *
-     * @param   string  query to bind to the values
-     * @param   array   array of values to bind to the query
-     * @return  string
+     * @param string $sql   query to bind to the values
+     * @param array  $binds array of values to bind to the query
+     *
+     * @return string
      */
     public function compileBinds($sql, $binds) {
         foreach ((array) $binds as $val) {
             // If the SQL contains no more bind marks ("?"), we're done.
-            if (($next_bind_pos = strpos($sql, '?')) === FALSE)
+            if (($next_bind_pos = strpos($sql, '?')) === false) {
                 break;
+            }
             if ($val instanceof Carbon) {
                 $val = (string) $val;
             }
@@ -1280,32 +807,34 @@ class CDatabase {
     /**
      * Get the field data for a database table, along with the field's attributes.
      *
-     * @param   string  table name
-     * @return  array
+     * @param string $table table name
+     *
+     * @return array
      */
-    public function field_data($table = '') {
+    public function fieldData($table = '') {
         $this->link or $this->connect();
 
-        return $this->driver->field_data($this->config['table_prefix'] . $table);
+        return $this->driver->fieldData($this->config['table_prefix'] . $table);
     }
 
     /**
      * Get the field data for a database table, along with the field's attributes.
      *
-     * @param   string  table name
-     * @return  array
+     * @param string $table table name
+     *
+     * @return array
      */
     public function listFields($table = '') {
         $this->link or $this->connect();
-
-        return $this->driver->list_fields($this->config['table_prefix'] . $table);
+        return $this->driver->listFields($this->config['table_prefix'] . $table);
     }
 
     /**
      * Escapes a value for a query.
      *
-     * @param   mixed   value to escape
-     * @return  string
+     * @param mixed $value value to escape
+     *
+     * @return string
      */
     public function escape($value) {
         return $this->driver->escape($value);
@@ -1314,161 +843,79 @@ class CDatabase {
     /**
      * Escapes a string for a query.
      *
-     * @param   string  string to escape
-     * @return  string
+     * @param string $str string to escape
+     *
+     * @return string
      */
     public function escapeStr($str) {
-        return $this->driver->escape_str($str);
+        return $this->driver->escapeStr($str);
     }
 
     /**
      * Escapes a table name for a query.
      *
-     * @param   string  string to escape
-     * @return  string
+     * @param string $table string to escape
+     *
+     * @return string
      */
     public function escapeTable($table) {
-        return $this->driver->escape_table($table);
+        return $this->driver->escapeTable($table);
     }
 
     /**
      * Escapes a column name for a query.
      *
-     * @param   string  string to escape
-     * @return  string
+     * @param string $table string to escape
+     *
+     * @return string
      */
     public function escapeColumn($table) {
-        return $this->driver->escape_column($table);
-    }
-
-    /**
-     * Returns table prefix of current configuration.
-     *
-     * @return  string
-     */
-    public function table_prefix() {
-        return $this->config['table_prefix'];
-    }
-
-    /**
-     * Clears the query cache.
-     *
-     * @param   string|TRUE  clear cache by SQL statement or TRUE for last query
-     * @return  Database_Core       This Database object.
-     */
-    public function clear_cache($sql = NULL) {
-        if ($sql === TRUE) {
-            $this->driver->clear_cache($this->last_query);
-        } elseif (is_string($sql)) {
-            $this->driver->clear_cache($sql);
-        } else {
-            $this->driver->clear_cache();
-        }
-
-        return $this;
-    }
-
-    /**
-     * Pushes existing query space onto the query stack.  Use push
-     * and pop to prevent queries from clashing before they are
-     * executed
-     *
-     * @return Database_Core This Databaes object
-     */
-    public function push() {
-        array_push($this->query_history, array(
-            $this->select,
-            $this->from,
-            $this->join,
-            $this->where,
-            $this->orderby,
-            $this->order,
-            $this->groupby,
-            $this->having,
-            $this->distinct,
-            $this->limit,
-            $this->offset
-        ));
-
-        $this->reset_select();
-
-        return $this;
-    }
-
-    /**
-     * Pops from query stack into the current query space.
-     *
-     * @return Database_Core This Databaes object
-     */
-    public function pop() {
-        if (count($this->query_history) == 0) {
-            // No history
-            return $this;
-        }
-
-        list(
-                $this->select,
-                $this->from,
-                $this->join,
-                $this->where,
-                $this->orderby,
-                $this->order,
-                $this->groupby,
-                $this->having,
-                $this->distinct,
-                $this->limit,
-                $this->offset
-                ) = array_pop($this->query_history);
-
-        return $this;
+        return $this->driver->escapeColumn($table);
     }
 
     /**
      * Count the number of records in the last query, without LIMIT or OFFSET applied.
      *
-     * @return  integer
+     * @return int
      */
-    public function count_last_query() {
-        if ($sql = $this->last_query()) {
-            if (stripos($sql, 'LIMIT') !== FALSE) {
+    public function countLastQuery() {
+        if ($sql = $this->lastQuery()) {
+            if (stripos($sql, 'LIMIT') !== false) {
                 // Remove LIMIT from the SQL
                 $sql = preg_replace('/\sLIMIT\s+[^a-z]+/i', ' ', $sql);
             }
 
-            if (stripos($sql, 'OFFSET') !== FALSE) {
+            if (stripos($sql, 'OFFSET') !== false) {
                 // Remove OFFSET from the SQL
                 $sql = preg_replace('/\sOFFSET\s+\d+/i', '', $sql);
             }
 
             // Get the total rows from the last query executed
-            $result = $this->query
-                    (
-                    'SELECT COUNT(*) AS ' . $this->escape_column('total_rows') . ' ' .
-                    'FROM (' . trim($sql) . ') AS ' . $this->escape_table('counted_results')
+            $result = $this->query(
+                'SELECT COUNT(*) AS ' . $this->escapeColumn('total_rows') . ' '
+                    . 'FROM (' . trim($sql) . ') AS ' . $this->escapeTable('counted_results')
             );
 
             // Return the total number of rows from the query
             return (int) $result->current()->total_rows;
         }
 
-        return FALSE;
+        return false;
     }
 
     public function __destruct() {
-        self::rollback();
+        $this->rollback();
 
         try {
             if ($this->driver != null) {
                 $this->driver->close();
             }
         } catch (Exception $ex) {
-            
         }
     }
 
     public function escapeLike($str) {
-        //$str = str_replace(array($e, '_', '%'), array($e.$e, $e.'_', $e.'%'), $s);
-        $str = $this->escape_str($str);
+        $str = $this->escapeStr($str);
         return $str;
     }
 
@@ -1477,18 +924,12 @@ class CDatabase {
     }
 
     /**
-     * Prepares and executes an SQL query and returns the result as an associative array.
+     * Get Query Builder from table
      *
-     * @param string $sql    The SQL query.
-     * @param array  $params The query parameters.
-     * @param array  $types  The query parameter types.
+     * @param string $table
      *
-     * @return array
+     * @return CDatabase_Query_Builder
      */
-    public function fetchAll($sql, array $params = []) {
-        return $this->query($sql, $params)->fetchAll();
-    }
-
     public function table($table) {
         $builderClass = $this->driverName == 'MongoDB' ? CDatabase_Query_Builder_MongoDBBuilder::class : CDatabase_Query_Builder::class;
         $builder = $this->driverName == 'MongoDB' ? new $builderClass($this, new CDatabase_Query_Processor_MongoDB()) : new $builderClass($this);
@@ -1510,7 +951,8 @@ class CDatabase {
     /**
      * Register a database query listener with the connection.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return void
      */
     public function listenOnQueryExecuted(Closure $callback) {
@@ -1528,7 +970,8 @@ class CDatabase {
     /**
      * Fire the given event if possible.
      *
-     * @param  mixed  $event
+     * @param mixed $event
+     *
      * @return void
      */
     protected function dispatchEvent($event) {
@@ -1549,7 +992,8 @@ class CDatabase {
     /**
      * Set the event dispatcher instance on the connection.
      *
-     * @param  CEvent  $events
+     * @param CEvent $events
+     *
      * @return void
      */
     public function setEventDispatcher(CEvent $events) {
@@ -1562,7 +1006,6 @@ class CDatabase {
      * @return CDatabase_Query_Grammar
      */
     public function getQueryGrammar() {
-
         if ($this->queryGrammar == null) {
             $driver_name = $this->driverName();
             $grammar_class = 'CDatabase_Query_Grammar_' . $driver_name;
@@ -1609,7 +1052,7 @@ class CDatabase {
      *
      * Evaluates custom platform class and version in order to set the correct platform.
      *
-     * @throws CDatabase_Exception if an invalid platform was specified for this connection.
+     * @throws CDatabase_Exception if an invalid platform was specified for this connection
      */
     private function detectDatabasePlatform() {
         $version = $this->getDatabasePlatformVersion();
@@ -1648,7 +1091,6 @@ class CDatabase {
         if (isset($this->config['serverVersion'])) {
             return $this->config['serverVersion'];
         }
-
 
         return $this->getServerVersion();
     }
@@ -1692,23 +1134,25 @@ class CDatabase {
     }
 
     public function isBenchmarkQuery() {
-        return carr::get($this->config, 'benchmark', FALSE);
+        return carr::get($this->config, 'benchmark', false);
     }
 
     public function benchmarkQuery($query, $time = null, $rowsCount = null) {
         if ($this->isBenchmarkQuery()) {
             // Benchmark the query
             //static::$benchmarks[] = array('query' => $query, 'time' => $time, 'rows' => $rowsCount, 'caller' => cdbg::getTraceString());
-            static::$benchmarks[] = array('query' => $query, 'time' => $time, 'rows' => $rowsCount, 'caller' => cdbg::callerInfo());
+            static::$benchmarks[] = ['query' => $query, 'time' => $time, 'rows' => $rowsCount, 'caller' => cdbg::callerInfo()];
         }
     }
 
     /**
      * Log a query in the connection's query log.
      *
-     * @param  string  $query
-     * @param  array   $bindings
-     * @param  float|null  $time
+     * @param string     $query
+     * @param array      $bindings
+     * @param float|null $time
+     * @param null|mixed $rowsCount
+     *
      * @return void
      */
     public function logQuery($query, $bindings, $time = null, $rowsCount = null) {
@@ -1735,7 +1179,8 @@ class CDatabase {
     /**
      * Get a new raw query expression.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return CDatabase_Query_Expression
      */
     public static function raw($value) {
@@ -1761,10 +1206,9 @@ class CDatabase {
     }
 
     public function getValue($query) {
-
         $r = $this->query($query);
         $result = $r->result(false);
-        $res = array();
+        $res = [];
         $value = null;
         foreach ($result as $row) {
             foreach ($row as $k => $v) {
@@ -1779,16 +1223,18 @@ class CDatabase {
     public function getArray($query) {
         $r = $this->query($query);
         $result = $r->result(false);
-        $res = array();
+        $res = [];
         foreach ($result as $row) {
             $cnt = 0;
-            $arr_val = "";
+            $arr_val = '';
             foreach ($row as $k => $v) {
-                if ($cnt == 0)
+                if ($cnt == 0) {
                     $arr_val = $v;
+                }
                 $cnt++;
-                if ($cnt > 0)
+                if ($cnt > 0) {
                     break;
+                }
             }
             $res[] = $arr_val;
         }
@@ -1798,19 +1244,22 @@ class CDatabase {
     public function getList($query) {
         $r = $this->query($query);
         $result = $r->result(false);
-        $res = array();
+        $res = [];
         foreach ($result as $row) {
             $cnt = 0;
-            $arr_key = "";
-            $arr_val = "";
+            $arr_key = '';
+            $arr_val = '';
             foreach ($row as $k => $v) {
-                if ($cnt == 0)
+                if ($cnt == 0) {
                     $arr_key = $v;
-                if ($cnt == 1)
+                }
+                if ($cnt == 1) {
                     $arr_val = $v;
+                }
                 $cnt++;
-                if ($cnt > 1)
+                if ($cnt > 1) {
                     break;
+                }
             }
             $res[$arr_key] = $arr_val;
         }
@@ -1829,7 +1278,8 @@ class CDatabase {
     /**
      * Fire an event for this connection.
      *
-     * @param  string  $event
+     * @param string $event
+     *
      * @return array|null
      */
     protected function fireConnectionEvent($event) {
@@ -1877,8 +1327,17 @@ class CDatabase {
         return $this->driver->ping();
     }
 
+    /**
+     * Prepares and executes an SQL query and returns the result as an associative array.
+     *
+     * @param string $sql    the SQL query
+     * @param array  $params the query parameters
+     *
+     * @return array
+     */
+    public function fetchAll($sql, array $params = []) {
+        return $this->query($sql, $params)->fetchAll();
+    }
 }
 
 // End Database Class
-
-

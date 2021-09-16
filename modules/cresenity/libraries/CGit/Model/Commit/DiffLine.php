@@ -1,15 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 3, 2019, 1:45:05 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 3, 2019, 1:45:05 PM
  */
 class CGit_Model_Commit_DiffLine extends CGit_Model_Line {
-
     protected $numNew;
+
     protected $numOld;
 
     public function __construct($data, $numOld, $numNew) {
@@ -53,5 +54,4 @@ class CGit_Model_Commit_DiffLine extends CGit_Model_Line {
     public function setNumNew($num) {
         $this->numNew = $num;
     }
-
 }

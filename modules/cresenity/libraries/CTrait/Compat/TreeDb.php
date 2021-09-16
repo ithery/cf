@@ -1,24 +1,34 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 16, 2018, 5:40:40 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 16, 2018, 5:40:40 AM
  */
-trait CTrait_Compat_TreeDb {
 
+//@codingStandardsIgnoreStart
+trait CTrait_Compat_TreeDb {
     /**
-     * 
-     * @deprecated since version 1.2, please use function getFileInfo
-     * @param type $filename
-     * @return array
+     * @param string $filename
+     *
+     * @return $this
+     *
+     * @deprecated since version 1.2, please use function setDisplayCallback
      */
     public function set_display_callback() {
         return $this->setDisplayCallback();
     }
 
+    /**
+     * @param string $pk_column
+     *
+     * @return $this
+     *
+     * @deprecated since version 1.2, please use function setPkColumn
+     */
     public function set_pk_column($pk_column) {
         return $this->setPkColumn($pk_column);
     }
@@ -43,7 +53,7 @@ trait CTrait_Compat_TreeDb {
         return $this->filterWhere();
     }
 
-    public function get_list($indent = "") {
+    public function get_list($indent = '') {
         return $this->getList($indent);
     }
 
@@ -55,7 +65,7 @@ trait CTrait_Compat_TreeDb {
         return $this->getFirstParent($parent_id);
     }
 
-    public function get_children_list($id = null, $indent = "") {
+    public function get_children_list($id = null, $indent = '') {
         return $this->getChildrenList($id, $indent);
     }
 
@@ -82,5 +92,4 @@ trait CTrait_Compat_TreeDb {
     public function rebuild_tree_ignore_status($id = null, $left = 1, $depth = 0) {
         return $this->rebuildTreeIgnoreStatus($id, $left, $depth);
     }
-
 }

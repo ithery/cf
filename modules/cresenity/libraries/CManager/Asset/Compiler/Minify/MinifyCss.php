@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Aug 11, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Aug 11, 2020
  */
 class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_MinifyAbstract {
-
     /**
      * @var int maximum inport size in kB
      */
@@ -17,7 +17,7 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
     /**
      * @var string[] valid import extensions
      */
-    protected $importExtensions = array(
+    protected $importExtensions = [
         'gif' => 'data:image/gif',
         'png' => 'data:image/png',
         'jpe' => 'data:image/jpeg',
@@ -28,19 +28,18 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
         'tif' => 'image/tiff',
         'tiff' => 'image/tiff',
         'xbm' => 'image/x-xbitmap',
-    );
+    ];
 
     /**
      * Minify the data.
      * Perform CSS optimizations.
      *
-     * @param string[optional] $path    Path to write the data to
-     * @param string[]         $parents Parent paths, for circular reference checks
+     * @param string   $content
+     * @param string[] $parents Parent paths, for circular reference checks
      *
      * @return string The minified data
      */
-    public function execute($content, $parents = array()) {
-
+    public function execute($content, $parents = []) {
         /*
          * Let's first take out strings & comments, since we can't just
          * remove whitespace anywhere. If whitespace occurs inside a string,
@@ -66,14 +65,10 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
         //$content = $this->combineImports($source, $content, $parents);
         //$content = $this->importFiles($source, $content);
 
-      
-
-
         //$content = $this->moveImportsToTop($content);
 
         return $content;
     }
-
 
     /**
      * Set the maximum size if files to be imported.
@@ -125,9 +120,6 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
     /**
      * Combine CSS from import statements.
      *
-     * @import's will be loaded and their content merged into the original file,
-     * to save HTTP requests.
-     *
      * @param string   $source  The file to combine imports for
      * @param string   $content The CSS content to combine imports for
      * @param string[] $parents Parent paths, for circular reference checks
@@ -137,7 +129,7 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
      * @throws FileImportException
      */
     protected function combineImports($source, $content, $parents) {
-        $importRegexes = array(
+        $importRegexes = [
             // @import url(xxx)
             '/
             # import statement
@@ -184,18 +176,18 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
             # (optional) closing semi-colon
             ;?
             /ix',
-        );
+        ];
 
         // find all relative imports in css
-        $matches = array();
+        $matches = [];
         foreach ($importRegexes as $importRegex) {
             if (preg_match_all($importRegex, $content, $regexMatches, PREG_SET_ORDER)) {
                 $matches = array_merge($matches, $regexMatches);
             }
         }
 
-        $search = array();
-        $replace = array();
+        $search = [];
+        $replace = [];
 
         // loop the matches
         foreach ($matches as $match) {
@@ -211,7 +203,7 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
             // check if current file was not imported previously in the same
             // import chain.
             if (in_array($importPath, $parents)) {
-                throw new FileImportException('Failed to import file "' . $importPath . '": circular reference detected.');
+                throw new CManager_Asset_Compiler_Exception_FileImportException('Failed to import file "' . $importPath . '": circular reference detected.');
             }
 
             // grab referenced file & minify it (which may include importing
@@ -238,7 +230,7 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
     /**
      * Import files into the CSS, base64-ized.
      *
-     * @url(image.jpg) images will be loaded and their content merged into the
+     * url(image.jpg) images will be loaded and their content merged into the
      * original file, to save HTTP requests.
      *
      * @param string $source  The file to import files for
@@ -249,8 +241,8 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
     protected function importFiles($source, $content) {
         $regex = '/url\((["\']?)(.+?)\\1\)/i';
         if ($this->importExtensions && preg_match_all($regex, $content, $matches, PREG_SET_ORDER)) {
-            $search = array();
-            $replace = array();
+            $search = [];
+            $replace = [];
 
             // loop the matches
             foreach ($matches as $match) {
@@ -298,7 +290,7 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
         $content = preg_replace('/(?<=[: ])#([0-9a-z]{6})ff?(?=[; }])/i', '#$1', $content);
         $content = preg_replace('/(?<=[: ])#([0-9a-z]{3})f?(?=[; }])/i', '#$1', $content);
 
-        $colors = array(
+        $colors = [
             // we can shorten some even more by replacing them with their color name
             '#F0FFFF' => 'azure',
             '#F5F5DC' => 'beige',
@@ -330,14 +322,14 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
             // or the other way around
             'WHITE' => '#fff',
             'BLACK' => '#000',
-        );
+        ];
 
         return preg_replace_callback(
-                '/(?<=[: ])(' . implode('|', array_keys($colors)) . ')(?=[; }])/i',
-                function ($match) use ($colors) {
-            return $colors[strtoupper($match[0])];
-        },
-                $content
+            '/(?<=[: ])(' . implode('|', array_keys($colors)) . ')(?=[; }])/i',
+            function ($match) use ($colors) {
+                return $colors[strtoupper($match[0])];
+            },
+            $content
         );
     }
 
@@ -349,10 +341,10 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
      * @return string
      */
     protected function shortenFontWeights($content) {
-        $weights = array(
+        $weights = [
             'normal' => 400,
             'bold' => 700,
-        );
+        ];
 
         $callback = function ($match) use ($weights) {
             return $match[1] . $weights[$match[2]];
@@ -470,7 +462,7 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
         // classes, like `:nth-child(3+2n)`
         // not in things like `calc(3px + 2px)`, shorthands like `3px -2px`, or
         // selectors like `div.weird- p`
-        $pseudos = array('nth-child', 'nth-last-child', 'nth-last-of-type', 'nth-of-type');
+        $pseudos = ['nth-child', 'nth-last-child', 'nth-last-of-type', 'nth-of-type'];
         $content = preg_replace('/:(' . implode('|', $pseudos) . ')\(\s*([+-]?)\s*(.+?)\s*([+-]?)\s*(.*?)\s*\)/', ':$1($2$3$4$5)', $content);
 
         // remove semicolon/whitespace followed by closing bracket
@@ -534,5 +526,4 @@ class CManager_Asset_Compiler_Minify_MinifyCss extends CManager_Asset_Compiler_M
     protected function canImportByPath($path) {
         return preg_match('/^(data:|https?:|\\/)/', $path) === 0;
     }
-
 }

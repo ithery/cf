@@ -1,18 +1,10 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CConsole_OutputStyle extends SymfonyStyle
-{
+class CConsole_OutputStyle extends SymfonyStyle {
     /**
      * The output instance.
      *
@@ -23,12 +15,12 @@ class CConsole_OutputStyle extends SymfonyStyle
     /**
      * Create a new Console OutputStyle instance.
      *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @param \Symfony\Component\Console\Input\InputInterface   $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
      * @return void
      */
-    public function __construct(InputInterface $input, OutputInterface $output)
-    {
+    public function __construct(InputInterface $input, OutputInterface $output) {
         $this->output = $output;
 
         parent::__construct($input, $output);
@@ -39,8 +31,7 @@ class CConsole_OutputStyle extends SymfonyStyle
      *
      * @return bool
      */
-    public function isQuiet()
-    {
+    public function isQuiet() {
         return $this->output->isQuiet();
     }
 
@@ -49,8 +40,7 @@ class CConsole_OutputStyle extends SymfonyStyle
      *
      * @return bool
      */
-    public function isVerbose()
-    {
+    public function isVerbose() {
         return $this->output->isVerbose();
     }
 
@@ -59,8 +49,7 @@ class CConsole_OutputStyle extends SymfonyStyle
      *
      * @return bool
      */
-    public function isVeryVerbose()
-    {
+    public function isVeryVerbose() {
         return $this->output->isVeryVerbose();
     }
 
@@ -69,8 +58,7 @@ class CConsole_OutputStyle extends SymfonyStyle
      *
      * @return bool
      */
-    public function isDebug()
-    {
+    public function isDebug() {
         return $this->output->isDebug();
     }
 }

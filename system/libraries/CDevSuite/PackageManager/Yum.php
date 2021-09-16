@@ -1,23 +1,14 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-class CDevSuite_PackageManager_Yum extends CDevSuite_PackageManager
-{
+class CDevSuite_PackageManager_Yum extends CDevSuite_PackageManager {
     public $cli;
 
     /**
      * Create a new Yum instance.
      *
-     * @param CommandLine $cli
      * @return void
      */
-    public function __construct()
-    {
+    public function __construct() {
         $this->cli = CDevSuite::commandLine();
     }
 
@@ -25,10 +16,10 @@ class CDevSuite_PackageManager_Yum extends CDevSuite_PackageManager
      * Determine if the given package is installed.
      *
      * @param string $package
+     *
      * @return bool
      */
-    public function installed($package)
-    {
+    public function installed($package) {
         $query = "yum list installed {$package} | grep {$package} | sed 's_  _\\t_g' | sed 's_\\._\\t_g' | cut -f 1";
 
         $packages = explode(PHP_EOL, $this->cli->run($query));
@@ -40,10 +31,10 @@ class CDevSuite_PackageManager_Yum extends CDevSuite_PackageManager
      * Ensure that the given package is installed.
      *
      * @param string $package
+     *
      * @return void
      */
-    public function ensureInstalled($package)
-    {
+    public function ensureInstalled($package) {
         if (!$this->installed($package)) {
             $this->installOrFail($package);
         }
@@ -53,10 +44,10 @@ class CDevSuite_PackageManager_Yum extends CDevSuite_PackageManager
      * Install the given package and throw an exception on failure.
      *
      * @param string $package
+     *
      * @return void
      */
-    public function installOrFail($package)
-    {
+    public function installOrFail($package) {
         CDevSuite::output('<info>[' . $package . '] is not installed, installing it now via Yum...</info> 🍻');
 
         $this->cli->run(trim('yum install -y ' . $package), function ($exitCode, $errorOutput) use ($package) {
@@ -71,16 +62,16 @@ class CDevSuite_PackageManager_Yum extends CDevSuite_PackageManager
      *
      * @return void
      */
-    public function setup()
-    {
+    public function setup() {
         // Nothing to do
     }
 
     /**
      * Restart dnsmasq in Fedora.
+     *
+     * @param mixed $sm
      */
-    public function nmRestart($sm)
-    {
+    public function nmRestart($sm) {
         $sm->restart('NetworkManager');
     }
 
@@ -89,8 +80,7 @@ class CDevSuite_PackageManager_Yum extends CDevSuite_PackageManager
      *
      * @return bool
      */
-    public function isAvailable()
-    {
+    public function isAvailable() {
         try {
             $output = $this->cli->run('which yum', function ($exitCode, $output) {
                 throw new DomainException('Yum not available');

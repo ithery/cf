@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Nov 5, 2019, 5:26:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Nov 5, 2019, 5:26:55 PM
  */
 use Aws\Sqs\SqsClient;
 
 class CQueue_Job_SqsJob extends CQueue_AbstractJob {
-
     /**
      * The Amazon SQS client instance.
      *
@@ -28,11 +28,12 @@ class CQueue_Job_SqsJob extends CQueue_AbstractJob {
     /**
      * Create a new job instance.
      *
-     * @param  \Illuminate\Container\Container  $container
-     * @param  \Aws\Sqs\SqsClient  $sqs
-     * @param  array   $job
-     * @param  string  $connectionName
-     * @param  string  $queue
+     * @param \Illuminate\Container\Container $container
+     * @param \Aws\Sqs\SqsClient              $sqs
+     * @param array                           $job
+     * @param string                          $connectionName
+     * @param string                          $queue
+     *
      * @return void
      */
     public function __construct(CContainer_Container $container, SqsClient $sqs, array $job, $connectionName, $queue) {
@@ -46,7 +47,8 @@ class CQueue_Job_SqsJob extends CQueue_AbstractJob {
     /**
      * Release the job back into the queue.
      *
-     * @param  int   $delay
+     * @param int $delay
+     *
      * @return void
      */
     public function release($delay = 0) {
@@ -114,5 +116,4 @@ class CQueue_Job_SqsJob extends CQueue_AbstractJob {
     public function getSqsJob() {
         return $this->job;
     }
-
 }

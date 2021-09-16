@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CBase_Pipeline implements CBase_PipelineInterface {
-
     /**
      * The container implementation.
      *
@@ -38,17 +37,22 @@ class CBase_Pipeline implements CBase_PipelineInterface {
     /**
      * Create a new class instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
+     * @param CContainer_Container|null $container
+     *
      * @return void
      */
-    public function __construct(Container $container = null) {
+    public function __construct(CContainer_Container $container = null) {
+        if ($container == null) {
+            $container = c::container();
+        }
         $this->container = $container;
     }
 
     /**
      * Set the object being sent through the pipeline.
      *
-     * @param  mixed  $passable
+     * @param mixed $passable
+     *
      * @return $this
      */
     public function send($passable) {
@@ -60,7 +64,8 @@ class CBase_Pipeline implements CBase_PipelineInterface {
     /**
      * Set the array of pipes.
      *
-     * @param  array|mixed  $pipes
+     * @param array|mixed $pipes
+     *
      * @return $this
      */
     public function through($pipes) {
@@ -72,7 +77,8 @@ class CBase_Pipeline implements CBase_PipelineInterface {
     /**
      * Set the method to call on the pipes.
      *
-     * @param  string  $method
+     * @param string $method
+     *
      * @return $this
      */
     public function via($method) {
@@ -84,12 +90,15 @@ class CBase_Pipeline implements CBase_PipelineInterface {
     /**
      * Run the pipeline with a final destination callback.
      *
-     * @param  \Closure  $destination
+     * @param \Closure $destination
+     *
      * @return mixed
      */
     public function then(Closure $destination) {
         $pipeline = array_reduce(
-                array_reverse($this->pipes()), $this->carry(), $this->prepareDestination($destination)
+            array_reverse($this->pipes()),
+            $this->carry(),
+            $this->prepareDestination($destination)
         );
 
         return $pipeline($this->passable);
@@ -102,14 +111,15 @@ class CBase_Pipeline implements CBase_PipelineInterface {
      */
     public function thenReturn() {
         return $this->then(function ($passable) {
-                    return $passable;
-                });
+            return $passable;
+        });
     }
 
     /**
      * Get the final piece of the Closure onion.
      *
-     * @param  \Closure  $destination
+     * @param \Closure $destination
+     *
      * @return \Closure
      */
     protected function prepareDestination(Closure $destination) {
@@ -165,7 +175,8 @@ class CBase_Pipeline implements CBase_PipelineInterface {
     /**
      * Parse full pipe string to get name and parameters.
      *
-     * @param  string  $pipe
+     * @param string $pipe
+     *
      * @return array
      */
     protected function parsePipeString($pipe) {
@@ -198,11 +209,11 @@ class CBase_Pipeline implements CBase_PipelineInterface {
         return CContainer::getInstance();
     }
 
-
     /**
      * Handle the value returned from each pipe before passing it to the next.
      *
-     * @param  mixed  $carry
+     * @param mixed $carry
+     *
      * @return mixed
      */
     protected function handleCarry($carry) {
@@ -212,8 +223,9 @@ class CBase_Pipeline implements CBase_PipelineInterface {
     /**
      * Handle the given exception.
      *
-     * @param  mixed  $passable
-     * @param  \Throwable  $e
+     * @param mixed      $passable
+     * @param \Throwable $e
+     *
      * @return mixed
      *
      * @throws \Throwable
@@ -221,5 +233,4 @@ class CBase_Pipeline implements CBase_PipelineInterface {
     protected function handleException($passable, $e) {
         throw $e;
     }
-
 }

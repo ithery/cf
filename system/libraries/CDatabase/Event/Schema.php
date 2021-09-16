@@ -1,24 +1,24 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 12:48:44 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 12:48:44 PM
  */
 class CDatabase_Event_Schema {
-
     /**
      * @var bool
      */
-    private $_preventDefault = false;
+    private $preventDefault = false;
 
     /**
      * @return CDatabase_Event_Schema
      */
     public function preventDefault() {
-        $this->_preventDefault = true;
+        $this->preventDefault = true;
         return $this;
     }
 
@@ -26,7 +26,6 @@ class CDatabase_Event_Schema {
      * @return bool
      */
     public function isDefaultPrevented() {
-        return $this->_preventDefault;
+        return $this->preventDefault;
     }
-
 }

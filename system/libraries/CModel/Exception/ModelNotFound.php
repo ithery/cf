@@ -1,7 +1,6 @@
 <?php
 
 class CModel_Exception_ModelNotFound extends CModel_Exception {
-
     /**
      * Name of the affected Eloquent model.
      *
@@ -19,8 +18,9 @@ class CModel_Exception_ModelNotFound extends CModel_Exception {
     /**
      * Set the affected Eloquent model and instance ids.
      *
-     * @param  string  $model
-     * @param  int|array  $ids
+     * @param string    $model
+     * @param int|array $ids
+     *
      * @return $this
      */
     public function setModel($model, $ids = []) {
@@ -55,5 +55,4 @@ class CModel_Exception_ModelNotFound extends CModel_Exception {
     public function getIds() {
         return $this->ids;
     }
-
 }

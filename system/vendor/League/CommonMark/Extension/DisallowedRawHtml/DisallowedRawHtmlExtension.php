@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -20,10 +18,8 @@ use League\CommonMark\Extension\CommonMark\Renderer\Block\HtmlBlockRenderer;
 use League\CommonMark\Extension\CommonMark\Renderer\Inline\HtmlInlineRenderer;
 use League\CommonMark\Extension\ExtensionInterface;
 
-final class DisallowedRawHtmlExtension implements ExtensionInterface
-{
-    public function register(ConfigurableEnvironmentInterface $environment): void
-    {
+final class DisallowedRawHtmlExtension implements ExtensionInterface {
+    public function register(ConfigurableEnvironmentInterface $environment) {
         $environment->addRenderer(HtmlBlock::class, new DisallowedRawHtmlRenderer(new HtmlBlockRenderer()), 50);
         $environment->addRenderer(HtmlInline::class, new DisallowedRawHtmlRenderer(new HtmlInlineRenderer()), 50);
     }

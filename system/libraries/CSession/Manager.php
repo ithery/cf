@@ -6,10 +6,8 @@
  * @author Hery
  */
 class CSession_Manager {
-
     /**
-     *
-     * @var CSession_Manager 
+     * @var CSession_Manager
      */
     private static $instance;
 
@@ -21,7 +19,6 @@ class CSession_Manager {
     protected $drivers = [];
 
     /**
-     * 
      * @return CSession_Manager
      */
     public static function instance() {
@@ -38,7 +35,8 @@ class CSession_Manager {
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $driver
+     * @param string|null $driver
+     *
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -48,7 +46,8 @@ class CSession_Manager {
 
         if (is_null($driver)) {
             throw new InvalidArgumentException(sprintf(
-                            'Unable to resolve NULL driver for [%s].', static::class
+                'Unable to resolve NULL driver for [%s].',
+                static::class
             ));
         }
 
@@ -69,7 +68,8 @@ class CSession_Manager {
     /**
      * Build the session instance.
      *
-     * @param  \SessionHandlerInterface  $handler
+     * @param \SessionHandlerInterface $handler
+     *
      * @return \Illuminate\Session\Store
      */
     protected function buildSession($handler) {
@@ -79,12 +79,15 @@ class CSession_Manager {
     /**
      * Build the encrypted session instance.
      *
-     * @param  \SessionHandlerInterface  $handler
+     * @param \SessionHandlerInterface $handler
+     *
      * @return \Illuminate\Session\EncryptedStore
      */
     protected function buildEncryptedSession($handler) {
         return new CSession_StoreEncrypted(
-                $this->config->get('session.cookie'), $handler, $this->container['encrypter']
+            $this->config->get('session.cookie'),
+            $handler,
+            $this->container['encrypter']
         );
     }
 
@@ -128,5 +131,4 @@ class CSession_Manager {
         //we will replace the $_SESSION with our adapter
         $_SESSION = new CSession_NativeAdapter();
     }
-
 }

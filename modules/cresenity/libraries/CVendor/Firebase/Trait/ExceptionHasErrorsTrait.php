@@ -1,17 +1,12 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * @codeCoverageIgnore
  */
 trait CVendor_Firebase_Trait_ExceptionHasErrorsTrait {
-
-    /** @var string[] */
+    /**
+     * @var string[]
+     */
     protected $errors = [];
 
     /**
@@ -20,5 +15,4 @@ trait CVendor_Firebase_Trait_ExceptionHasErrorsTrait {
     public function errors() {
         return $this->errors;
     }
-
 }

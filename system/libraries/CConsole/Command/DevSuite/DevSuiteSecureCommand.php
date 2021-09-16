@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteSecureCommand extends CConsole_Command_DevSuiteCommand {
-
     /**
      * The class name of the devsuite command.
      *
@@ -14,5 +13,4 @@ class CConsole_Command_DevSuite_DevSuiteSecureCommand extends CConsole_Command_D
      */
     protected $devSuiteCommandClass = CDevSuite_Command_SecureCommand::class;
     protected $signature = 'devsuite:secure';
-
 }

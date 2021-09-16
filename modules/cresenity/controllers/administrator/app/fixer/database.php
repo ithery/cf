@@ -1,16 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 13, 2019, 12:54:46 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 13, 2019, 12:54:46 AM
  */
-
-
 class Controller_Administrator_App_Fixer_Database extends CApp_Administrator_Controller_User {
-
     public function index() {
         $app = CApp::instance();
         $app->title('Database Fixer');
@@ -23,5 +21,4 @@ class Controller_Administrator_App_Fixer_Database extends CApp_Administrator_Con
 
         echo $app->render();
     }
-
 }

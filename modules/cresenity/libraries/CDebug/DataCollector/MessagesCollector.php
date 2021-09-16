@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 22, 2018, 3:10:38 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 22, 2018, 3:10:38 PM
  */
 use Psr\Log\AbstractLogger;
 
@@ -13,10 +14,9 @@ use Psr\Log\AbstractLogger;
  * Provides a way to log messages
  */
 class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements CDebug_Interface_DataCollectorInterface, CDebug_DataCollector_MessagesAggregateInterface, CDebug_Bar_Interface_RenderableInterface, CDebug_DataCollector_AssetProviderInterface {
-
     protected $name;
-    protected $messages = array();
-    protected $aggregates = array();
+    protected $messages = [];
+    protected $aggregates = [];
     protected $dataFormater;
     protected $varDumper;
     // The HTML var dumper requires debug bar users to support the new inline assets, which not all
@@ -34,9 +34,10 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
      * Sets the data formater instance used by this collector
      *
      * @param DataFormatterInterface $formater
+     *
      * @return $this
      */
-    public function setDataFormatter(DataFormatterInterface $formater) {
+    public function setDataFormatter(CDebug_Interface_DataFormatterInterface $formater) {
         $this->dataFormater = $formater;
         return $this;
     }
@@ -54,10 +55,11 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
     /**
      * Sets the variable dumper instance used by this collector
      *
-     * @param DebugBarVarDumper $varDumper
+     * @param CDebug_DataFormatter_DebugBarVarDumper $varDumper
+     *
      * @return $this
      */
-    public function setVarDumper(DebugBarVarDumper $varDumper) {
+    public function setVarDumper(CDebug_DataFormatter_DebugBarVarDumper $varDumper) {
         $this->varDumper = $varDumper;
         return $this;
     }
@@ -80,6 +82,7 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
      * first time.
      *
      * @param bool $value
+     *
      * @return $this
      */
     public function useHtmlVarDumper($value = true) {
@@ -102,8 +105,9 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
      *
      * A message can be anything from an object to a string
      *
-     * @param mixed $message
+     * @param mixed  $message
      * @param string $label
+     * @param mixed  $isString
      */
     public function addMessage($message, $label = 'info', $isString = true) {
         $messageText = $message;
@@ -116,21 +120,21 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
             }
             $isString = false;
         }
-        $this->messages[] = array(
+        $this->messages[] = [
             'message' => $messageText,
             'message_html' => $messageHtml,
             'is_string' => $isString,
             'label' => $label,
             'time' => microtime(true)
-        );
+        ];
     }
 
     /**
      * Aggregates messages from other collectors
      *
-     * @param MessagesAggregateInterface $messages
+     * @param CDebug_DataCollector_MessagesAggregateInterface $messages
      */
-    public function aggregate(MessagesAggregateInterface $messages) {
+    public function aggregate(CDebug_DataCollector_MessagesAggregateInterface $messages) {
         $this->aggregates[] = $messages;
     }
 
@@ -161,7 +165,7 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
      * @param $message
      * @param array $context
      */
-    public function log($level, $message, array $context = array()) {
+    public function log($level, $message, array $context = []) {
         $this->addMessage($message, $level);
     }
 
@@ -169,7 +173,7 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
      * Deletes all messages
      */
     public function clear() {
-        $this->messages = array();
+        $this->messages = [];
     }
 
     /**
@@ -177,10 +181,10 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
      */
     public function collect() {
         $messages = $this->getMessages();
-        return array(
+        return [
             'count' => count($messages),
             'messages' => $messages
-        );
+        ];
     }
 
     /**
@@ -194,7 +198,7 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
      * @return array
      */
     public function getAssets() {
-        return $this->isHtmlVarDumperUsed() ? $this->getVarDumper()->getAssets() : array();
+        return $this->isHtmlVarDumperUsed() ? $this->getVarDumper()->getAssets() : [];
     }
 
     /**
@@ -202,18 +206,17 @@ class CDebug_DataCollector_MessagesCollector extends AbstractLogger implements C
      */
     public function getWidgets() {
         $name = $this->getName();
-        return array(
-            "$name" => array(
+        return [
+            "$name" => [
                 'icon' => 'list-alt',
-                "widget" => "PhpDebugBar.Widgets.MessagesWidget",
-                "map" => "$name.messages",
-                "default" => "[]"
-            ),
-            "$name:badge" => array(
-                "map" => "$name.count",
-                "default" => "null"
-            )
-        );
+                'widget' => 'PhpDebugBar.Widgets.MessagesWidget',
+                'map' => "$name.messages",
+                'default' => '[]'
+            ],
+            "$name:badge" => [
+                'map' => "$name.count",
+                'default' => 'null'
+            ]
+        ];
     }
-
 }

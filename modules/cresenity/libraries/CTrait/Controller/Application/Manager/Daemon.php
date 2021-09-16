@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CTrait_Controller_Application_Manager_Daemon {
-
     protected function getTitle() {
         return 'Service Manager';
     }
@@ -23,18 +16,17 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
         $tableServiceDiv = $app->addDiv('tableService');
 
-        $handlerActionClick = $reloadAction->addListener('click')->addHandler('reload');
+        $handlerActionClick = $reloadAction->addListener('click')->addReloadHandler();
         $handlerActionClick->setTarget('tableService');
         $handlerActionClick->setUrl($this->controllerUrl() . 'reloadTabService');
 
-
-        $reloadOptions = array();
+        $reloadOptions = [];
         static::reloadTabService($tableServiceDiv, $reloadOptions);
 
         echo $app->render();
     }
 
-    public static function reloadTabService($container = null, $options = array()) {
+    public static function reloadTabService($container = null, $options = []) {
         $app = $container;
         if ($container == null) {
             $app = CApp::instance();
@@ -46,7 +38,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
         }
         $db = CDatabase::instance();
         $listService = $daemonManager->daemons();
-        $dataService = array();
+        $dataService = [];
         $groupTab = carr::get($_GET, 'group');
         if ($daemonManager->haveGroup()) {
             $tabList = $app->addTabList()->setAjax(false);
@@ -74,7 +66,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
         }
     }
 
-    public static function reloadTableService($container = null, $options = array()) {
+    public static function reloadTableService($container = null, $options = []) {
         $app = $container;
         if ($container == null) {
             $app = CApp::instance();
@@ -87,9 +79,9 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $db = CDatabase::instance();
         $group = carr::get($request, 'group');
         $listService = $daemonManager->daemons($group);
-        $dataService = array();
+        $dataService = [];
         foreach ($listService as $kService => $vService) {
-            $dService = array();
+            $dService = [];
             $dService['service_class'] = $kService;
             $dService['service_name'] = $vService;
             $dataService[] = $dService;
@@ -100,10 +92,9 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $table->addColumn('service_status')->setLabel('Schedule');
         $table->setTitle('Service List');
         $table->setApplyDataTable(false);
-        $table->cellCallbackFunc(array(__CLASS__, 'cellCallback'), __FILE__);
+        $table->cellCallbackFunc([__CLASS__, 'cellCallback'], __FILE__);
 
         $table->setRowActionStyle('btn-dropdown');
-
 
         $groupQueryString = '';
         if (strlen($group) > 0) {
@@ -111,13 +102,13 @@ trait CTrait_Controller_Application_Manager_Daemon {
         }
 
         $actMonitor = $table->addRowAction();
-        $actMonitor->setIcon("fas fa-file")->setLabel('Log');
+        $actMonitor->setIcon('fas fa-file')->setLabel('Log');
         $actMonitor->setLink(static::controllerUrl() . 'log/index/{service_class}' . $groupQueryString);
         $actStart = $table->addRowAction();
-        $actStart->setIcon("fas fa-play")->setLabel('Start');
+        $actStart->setIcon('fas fa-play')->setLabel('Start');
         $actStart->setLink(static::controllerUrl() . 'start/{service_class}' . $groupQueryString)->setConfirm();
         $actStop = $table->addRowAction();
-        $actStop->setIcon("fas fa-stop")->setLabel('Stop');
+        $actStop->setIcon('fas fa-stop')->setLabel('Stop');
         $actStop->setLink(static::controllerUrl() . 'stop/{service_class}' . $groupQueryString)->setConfirm();
 
         if ($container == null) {
@@ -139,7 +130,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
     public function start($serviceClass) {
         $errCode = 0;
         $errMessage = '';
-
 
         try {
             $started = CManager::daemon()->start($serviceClass);
@@ -212,7 +202,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $backAction = $actionContainer->addAction()->setLabel('Back')->addClass('btn-primary')->setIcon('fas fa-arrow-left')->setLink(static::controllerUrl() . static::groupQueryString());
         $rotateAction = $actionContainer->addAction()->setLabel('Dump Status')->addClass('btn-primary')->setIcon('fas fa-sync')->setLink(static::controllerUrl() . 'log/dump/' . $serviceClass . static::groupQueryString())->setConfirm();
 
-
         $logFileList = CManager::daemon()->getLogFileList($serviceClass);
         $tabList = $app->addTabList()->setAjax(true);
         $logFile = CManager::daemon()->getLogFile($serviceClass);
@@ -228,13 +217,10 @@ trait CTrait_Controller_Application_Manager_Daemon {
             }
         }
 
-
-
         echo $app->render();
     }
 
     public function logFile($serviceClass = null, $filename = null) {
-
         $app = CApp::instance();
         $db = CDatabase::instance();
         $logFile = CManager::daemon()->getLogFile($serviceClass, $filename);
@@ -249,7 +235,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
     }
 
     public function logRestart($serviceClass = null) {
-
         if (strlen($serviceClass) == 0) {
             curl::redirect($this->controllerUrl() . 'log/index' . static::groupQueryString());
         }
@@ -259,7 +244,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
 
         $errCode = 0;
         $errMessage = '';
-
 
         try {
             $started = CManager::daemon()->stop($serviceClass);
@@ -295,8 +279,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $errCode = 0;
         $errMessage = '';
 
-
-
         CManager::daemon()->logDump($serviceClass);
 
         if ($errCode == 0) {
@@ -308,7 +290,6 @@ trait CTrait_Controller_Application_Manager_Daemon {
     }
 
     /**
-     * 
      * @return string
      */
     private static function groupQueryString() {
@@ -319,5 +300,4 @@ trait CTrait_Controller_Application_Manager_Daemon {
         }
         return $groupQueryString;
     }
-
 }

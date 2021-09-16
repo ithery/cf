@@ -6,5 +6,4 @@
  * @author Hery
  */
 class CDevSuite_Server {
-    
 }

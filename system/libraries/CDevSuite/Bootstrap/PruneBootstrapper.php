@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Bootstrap_PruneBootstrapper extends CDevSuite_Bootstrap_Bootstrapper {
-
     public function bootstrap() {
         /*
          * Prune missing directories and symbolic links on every command.
@@ -24,5 +23,4 @@ class CDevSuite_Bootstrap_PruneBootstrapper extends CDevSuite_Bootstrap_Bootstra
             CDevSuite::site()->pruneLinks();
         }
     }
-
 }

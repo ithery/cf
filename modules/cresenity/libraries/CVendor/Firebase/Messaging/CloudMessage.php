@@ -1,44 +1,55 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use CVendor_Firebase_Messaging_MessageTarget as MessageTarget;
 use CVendor_Firebase_Messaging_Notification as Notification;
 use CVendor_Firebase_Messaging_MessageData as MessageData;
+use CVendor_Firebase_Messaging_AndroidConfig as AndroidConfig;
+use CVendor_Firebase_Messaging_ApnsConfig as ApnsConfig;
+use CVendor_Firebase_Messaging_WebPushConfig as WebPushConfig;
+use CVendor_Firebase_Messaging_FcmOptions as FcmOptions;
 
 class CVendor_Firebase_Messaging_CloudMessage implements CVendor_Firebase_Messaging_MessageInterface {
-
-    /** @var MessageTarget|null */
+    /**
+     * @var MessageTarget|null
+     */
     private $target;
 
-    /** @var MessageData|null */
+    /**
+     * @var MessageData|null
+     */
     private $data;
 
-    /** @var Notification|null */
+    /**
+     * @var Notification|null
+     */
     private $notification;
 
-    /** @var AndroidConfig|null */
+    /**
+     * @var AndroidConfig|null
+     */
     private $androidConfig;
 
-    /** @var ApnsConfig|null */
+    /**
+     * @var ApnsConfig|null
+     */
     private $apnsConfig;
 
-    /** @var WebPushConfig|null */
+    /**
+     * @var WebPushConfig|null
+     */
     private $webPushConfig;
 
-    /** @var FcmOptions|null */
+    /**
+     * @var FcmOptions|null
+     */
     private $fcmOptions;
 
     private function __construct() {
-        
     }
 
     /**
-     * @param string $type One of "condition", "token", "topic"
+     * @param string $type  One of "condition", "token", "topic"
+     * @param mixed  $value
      *
      * @throws InvalidArgumentException if the target type or value is invalid
      *
@@ -62,9 +73,9 @@ class CVendor_Firebase_Messaging_CloudMessage implements CVendor_Firebase_Messag
         $new = new static();
 
         if (\count(\array_intersect(\array_keys($data), MessageTarget::TYPES)) > 1) {
-            throw new InvalidArgument(
-            'A message can only have one of the following targets: '
-            . \implode(', ', MessageTarget::TYPES)
+            throw new CVendor_Firebase_Exception_InvalidArgumentException(
+                'A message can only have one of the following targets: '
+                . \implode(', ', MessageTarget::TYPES)
             );
         }
 
@@ -104,7 +115,8 @@ class CVendor_Firebase_Messaging_CloudMessage implements CVendor_Firebase_Messag
     }
 
     /**
-     * @param string $type One of "condition", "token", "topic"
+     * @param string $type  One of "condition", "token", "topic"
+     * @param mixed  $value
      *
      * @throws InvalidArgumentException if the target type or value is invalid
      *
@@ -217,5 +229,4 @@ class CVendor_Firebase_Messaging_CloudMessage implements CVendor_Firebase_Messag
 
         return \array_filter($data);
     }
-
 }

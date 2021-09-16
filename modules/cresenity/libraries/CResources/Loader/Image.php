@@ -1,5 +1,7 @@
 <?php
 
+use DigitalOceanV2\DigitalOceanV2;
+
 /**
  * Description of Image
  *
@@ -7,29 +9,32 @@
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CResources_Loader_Image extends CResources_LoaderAbstract {
-
     protected $appCode = '';
+
     protected $orgCode = '';
+
     protected $resourceName = '';
+
     protected $resourceType = 'image';
+
     protected $sizeName = 'original';
+
     protected $type = '';
+
     protected $s3Options = null;
+
     protected $s3Object = null;
 
-
-    public function __construct($resourceName, $options = array()) {
-
+    public function __construct($resourceName, $options = []) {
         $appCode = carr::get($options, 'app_code');
         $orgCode = carr::get($options, 'org_code');
         $sizeName = carr::get($options, 'size');
-        $sizeOptions = carr::get($options, 'size_options', array());
+        $sizeOptions = carr::get($options, 'size_options', []);
         $type = carr::get($options, 'type');
         if (strlen($appCode) == 0) {
-            $appCode = CF::app_code();
+            $appCode = CF::appCode();
         }
         $s3Options = carr::get($options, 's3_options');
-
 
         //try to get info from resourceName
         $this->appCode = $appCode;
@@ -43,7 +48,6 @@ class CResources_Loader_Image extends CResources_LoaderAbstract {
         $this->type = $type;
         $this->s3Options = $s3Options;
 
-
         $bucket = carr::get($this->s3Options, 'bucket');
         if (strlen($bucket) > 0) {
             $this->s3Object = DigitalOcean_Client::factory();
@@ -54,7 +58,7 @@ class CResources_Loader_Image extends CResources_LoaderAbstract {
     protected function getBasePath($sizeName = null) {
         $filename = $this->resourceName;
         $temp = '';
-        $arrName = explode("_", $this->resourceName);
+        $arrName = explode('_', $this->resourceName);
         //org_code
         if (isset($arrName[0])) {
             $temp .= $arrName[0] . DS;
@@ -91,11 +95,11 @@ class CResources_Loader_Image extends CResources_LoaderAbstract {
         return $this->getSizePath($this->sizeName);
     }
 
-    public function setSize($sizeName, $sizeOptions = array()) {
+    public function setSize($sizeName, $sizeOptions = []) {
         $sizeDefaultWidth = 100;
         $sizeDefaultHeight = 100;
-        if (count(explode("x", $sizeName)) == 2) {
-            $sizeNameArray = explode("x", $sizeName);
+        if (count(explode('x', $sizeName)) == 2) {
+            $sizeNameArray = explode('x', $sizeName);
             if (is_numeric($sizeNameArray[0]) && is_numeric($sizeNameArray[1])) {
                 $sizeDefaultWidth = $sizeNameArray[0];
                 $sizeDefaultHeight = $sizeNameArray[1];
@@ -112,26 +116,25 @@ class CResources_Loader_Image extends CResources_LoaderAbstract {
             //we create new file for this size
             $originalPath = $this->getSizePath(null);
             $engine = new CResources_Engine_Image($this->type, $this->orgCode);
-            $engine->resizeAndSave($originalPath, $sizeName, array(
+            $engine->resizeAndSave($originalPath, $sizeName, [
                 'width' => $width,
                 'height' => $height,
                 'crop' => $crop,
                 'proportional' => $proportional,
                 'whitespace' => $whitespace,
-            ));
+            ]);
         }
         $this->sizeName = $sizeName;
         return $this;
     }
 
     public function getUrl($encoded = false) {
-        
         $size_add = $this->sizeName;
         if (strlen($size_add) > 0) {
             $size_add .= '/';
         }
 
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? "https" : "http";
+        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443) ? 'https' : 'http';
 
         $baseUrl = curl::base(false, $protocol);
 
@@ -144,7 +147,7 @@ class CResources_Loader_Image extends CResources_LoaderAbstract {
         if (!$encoded) {
             $path = $baseUrl . 'application/' . $this->appCode . '/' . (strlen($this->orgCode) > 0 ? $this->orgCode : 'default') . '/resources/';
             $temp = '';
-            $arr_name = explode("_", $this->resourceName);
+            $arr_name = explode('_', $this->resourceName);
             //org_code
             if (isset($arr_name[0])) {
                 $temp .= rawurlencode($arr_name[0]) . '/';
@@ -173,6 +176,7 @@ class CResources_Loader_Image extends CResources_LoaderAbstract {
     public function saveToS3() {
         $resultSave = false;
         if ($this->s3Object != null) {
+            $bucket = carr::get($this->s3Options, 'bucket');
             $this->s3Object->setBucket($bucket);
 
             $fullPath = $this->getSizePath($this->sizeName);
@@ -180,7 +184,7 @@ class CResources_Loader_Image extends CResources_LoaderAbstract {
             $path = trim(trim(dirname($basePath), '/'), DS);
 
             if (file_exists($fullPath)) {
-                $resultSave = $s3Object->upload($path, file_get_contents($fullPath), $this->resourceName);
+                $resultSave = $this->s3Object->upload($path, file_get_contents($fullPath), $this->resourceName);
                 if ($resultSave) {
                     //@unlink($fullPath);
                 }
@@ -195,5 +199,4 @@ class CResources_Loader_Image extends CResources_LoaderAbstract {
 
         @unlink($fullPath);
     }
-
 }

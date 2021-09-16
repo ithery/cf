@@ -6,11 +6,11 @@
  * @author Hery
  */
 trait CView_Compiler_BladeCompiler_CompileEchoTrait {
-
     /**
      * Compile Blade echos into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public function compileEchos($value) {
@@ -37,7 +37,8 @@ trait CView_Compiler_BladeCompiler_CompileEchoTrait {
     /**
      * Compile the "raw" echo statements.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileRawEchos($value) {
@@ -55,7 +56,8 @@ trait CView_Compiler_BladeCompiler_CompileEchoTrait {
     /**
      * Compile the "regular" echo statements.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileRegularEchos($value) {
@@ -75,7 +77,8 @@ trait CView_Compiler_BladeCompiler_CompileEchoTrait {
     /**
      * Compile the escaped echo statements.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileEscapedEchos($value) {
@@ -89,5 +92,4 @@ trait CView_Compiler_BladeCompiler_CompileEchoTrait {
 
         return preg_replace_callback($pattern, $callback, $value);
     }
-
 }

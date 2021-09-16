@@ -1,21 +1,18 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use GuzzleHttp\Exception\RequestException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 trait CVendor_Firebase_Trait_ExceptionHasRequestAndResponseTrait {
-
-    /** @var RequestInterface|null */
+    /**
+     * @var RequestInterface|null
+     */
     protected $request;
 
-    /** @var ResponseInterface|null */
+    /**
+     * @var ResponseInterface|null
+     */
     protected $response;
 
     /**
@@ -93,5 +90,4 @@ trait CVendor_Firebase_Trait_ExceptionHasRequestAndResponseTrait {
 
         return null;
     }
-
 }

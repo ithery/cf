@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CException_ReportableHandler {
-
     use CTrait_ReflectsClosureTrait;
 
     /**
@@ -26,7 +25,8 @@ class CException_ReportableHandler {
     /**
      * Create a new reportable handler instance.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     *
      * @return void
      */
     public function __construct(callable $callback) {
@@ -36,7 +36,8 @@ class CException_ReportableHandler {
     /**
      * Invoke the handler.
      *
-     * @param  \Throwable  $e
+     * @param \Throwable $e
+     *
      * @return bool
      */
     public function __invoke($e) {
@@ -52,7 +53,8 @@ class CException_ReportableHandler {
     /**
      * Determine if the callback handles the given exception.
      *
-     * @param  \Throwable  $e
+     * @param \Throwable $e
+     *
      * @return bool
      */
     public function handles($e) {
@@ -69,5 +71,4 @@ class CException_ReportableHandler {
 
         return $this;
     }
-
 }

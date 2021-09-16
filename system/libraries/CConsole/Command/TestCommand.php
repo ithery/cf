@@ -15,7 +15,6 @@ use Symfony\Component\Process\Process;
  * @final
  */
 class CConsole_Command_TestCommand extends CConsole_Command {
-
     /**
      * The name and signature of the console command.
      *
@@ -67,17 +66,17 @@ class CConsole_Command_TestCommand extends CConsole_Command {
         //}
 
         $options = array_slice($_SERVER['argv'], $this->option('without-tty') ? 3 : 2);
+        $commands = array_merge(
+            $this->binary(),
+            array_merge(
+                $this->arguments,
+                $this->phpunitArguments($options)
+            )
+        );
 
         //$this->clearEnv();
 
-        
-        $process = (new Process(array_merge(
-                                $this->binary(),
-                                array_merge(
-                                        $this->arguments,
-                                        $this->phpunitArguments($options)
-                                )
-                        )))->setTimeout(null);
+        $process = (new Process($commands))->setTimeout(null);
 
         try {
             $process->setTty(!$this->option('without-tty'));
@@ -87,8 +86,8 @@ class CConsole_Command_TestCommand extends CConsole_Command {
 
         try {
             return $process->run(function ($type, $line) {
-                        $this->output->write($line);
-                    });
+                $this->output->write($line);
+            });
         } catch (ProcessSignaledException $e) {
             if (extension_loaded('pcntl') && $e->getSignal() !== SIGINT) {
                 throw $e;
@@ -102,7 +101,11 @@ class CConsole_Command_TestCommand extends CConsole_Command {
      * @return array
      */
     protected function binary() {
-        $command = class_exists(\Pest\Laravel\PestServiceProvider::class) ? c::fixPath(CF::appDir()).'vendor/pestphp/pest/bin/pest' : c::fixPath(CF::appDir()) . 'vendor/phpunit/phpunit/phpunit';
+        $command = class_exists(\Pest\Laravel\PestServiceProvider::class)
+            ? c::fixPath(CF::appDir()) . 'vendor/pestphp/pest/bin/pest'
+            : c::fixPath(CF::appDir()) . 'vendor/phpunit/phpunit/phpunit';
+
+        $command = DOCROOT . '.bin' . DS . 'phpunit' . DS . 'phpunit';
 
         if ('phpdbg' === PHP_SAPI) {
             return [PHP_BINARY, '-qrr', $command];
@@ -120,8 +123,8 @@ class CConsole_Command_TestCommand extends CConsole_Command {
      */
     protected function phpunitArguments($options) {
         $options = array_values(array_filter($options, function ($option) {
-                    return !cstr::startsWith($option, '--env=');
-                }));
+            return !cstr::startsWith($option, '--env=');
+        }));
 
         if (!file_exists($file = c::fixPath(CF::appDir()) . 'phpunit.xml')) {
             $file = c::fixPath(CF::appDir()) . 'phpunit.xml.dist';
@@ -138,10 +141,10 @@ class CConsole_Command_TestCommand extends CConsole_Command {
     protected function clearEnv() {
         if (!$this->option('env')) {
             $vars = self::getEnvironmentVariables(
-                            // @phpstan-ignore-next-line
-                            $this->laravel->environmentPath(),
-                            // @phpstan-ignore-next-line
-                            $this->laravel->environmentFile()
+                // @phpstan-ignore-next-line
+                $this->laravel->environmentPath(),
+                // @phpstan-ignore-next-line
+                $this->laravel->environmentFile()
             );
 
             $repository = CEnv::getRepository();
@@ -161,10 +164,10 @@ class CConsole_Command_TestCommand extends CConsole_Command {
     protected static function getEnvironmentVariables($path, $file) {
         try {
             $content = StoreBuilder::createWithNoNames()
-                    ->addPath($path)
-                    ->addName($file)
-                    ->make()
-                    ->read();
+                ->addPath($path)
+                ->addName($file)
+                ->make()
+                ->read();
         } catch (InvalidPathException $e) {
             return [];
         }
@@ -177,5 +180,4 @@ class CConsole_Command_TestCommand extends CConsole_Command {
 
         return $vars;
     }
-
 }

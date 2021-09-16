@@ -1,27 +1,17 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CConsole_Command_DevSuiteCommand extends CConsole_Command {
-
     /**
-     *
      * @var string
      */
     protected $devSuiteCommandClass;
 
     /**
-     *
      * @var CDevSuite_CommandAbstract
      */
     private $devSuiteCommand;
 
     public function __construct() {
-
         if (strlen($this->devSuiteCommandClass) == 0) {
             print('no dev suite command class defined in ' . get_called_class());
             return 1;
@@ -37,7 +27,7 @@ class CConsole_Command_DevSuiteCommand extends CConsole_Command {
         if (strlen($signatureArgument) > 0) {
             $this->signature .= ' ' . $signatureArgument;
         }
-        
+
         CDevSuite::bootstrap();
         parent::__construct();
     }
@@ -47,8 +37,6 @@ class CConsole_Command_DevSuiteCommand extends CConsole_Command {
     }
 
     public function handle() {
-
         $this->devSuiteCommand()->run($this);
     }
-
 }

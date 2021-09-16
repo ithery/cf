@@ -2,14 +2,14 @@
 
 /**
  * CRON field factory implementing a flyweight factory
+ *
  * @link http://en.wikipedia.org/wiki/Cron
  */
 class CJob_CronExpression_FieldFactory {
-
     /**
      * @var array Cache of instantiated fields
      */
-    private $fields = array();
+    private $fields = [];
 
     /**
      * Get an instance of a field object for a cron expression position
@@ -17,6 +17,7 @@ class CJob_CronExpression_FieldFactory {
      * @param int $position CRON expression position value to retrieve
      *
      * @return FieldInterface
+     *
      * @throws InvalidArgumentException if a position is not valid
      */
     public function getField($position) {
@@ -39,12 +40,11 @@ class CJob_CronExpression_FieldFactory {
                     break;
                 default:
                     throw new InvalidArgumentException(
-                    $position . ' is not a valid position'
+                        $position . ' is not a valid position'
                     );
             }
         }
 
         return $this->fields[$position];
     }
-
 }

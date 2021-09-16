@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -25,8 +23,7 @@ namespace League\CommonMark\Parser;
  *
  * @psalm-immutable
  */
-final class CursorState
-{
+final class CursorState {
     /**
      * @var array<int, mixed>
      *
@@ -39,8 +36,7 @@ final class CursorState
      *
      * @param array<int, mixed> $state
      */
-    public function __construct(array $state)
-    {
+    public function __construct(array $state) {
         $this->state = $state;
     }
 
@@ -49,8 +45,7 @@ final class CursorState
      *
      * @return array<int, mixed>
      */
-    public function toArray(): array
-    {
+    public function toArray() {
         return $this->state;
     }
 }

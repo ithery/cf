@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,10 +17,8 @@ use League\CommonMark\Parser\Cursor;
 use League\CommonMark\Parser\MarkdownParserStateInterface;
 use League\CommonMark\Util\RegexHelper;
 
-class HeadingStartParser implements BlockStartParserInterface
-{
-    public function tryStart(Cursor $cursor, MarkdownParserStateInterface $parserState): ?BlockStart
-    {
+class HeadingStartParser implements BlockStartParserInterface {
+    public function tryStart(Cursor $cursor, MarkdownParserStateInterface $parserState) {
         if ($cursor->isIndented()) {
             return BlockStart::none();
         }
@@ -48,10 +44,9 @@ class HeadingStartParser implements BlockStartParserInterface
         return BlockStart::none();
     }
 
-    private static function getAtxHeader(Cursor $cursor): ?HeadingParser
-    {
+    private static function getAtxHeader(Cursor $cursor) {
         $match = RegexHelper::matchFirst('/^#{1,6}(?:[ \t]+|$)/', $cursor->getLine(), $cursor->getNextNonSpacePosition());
-        if (! $match) {
+        if (!$match) {
             return null;
         }
 
@@ -59,8 +54,8 @@ class HeadingStartParser implements BlockStartParserInterface
         $cursor->advanceBy(\strlen($match[0]));
 
         $level = \strlen(\trim($match[0]));
-        $str   = $cursor->getRemainder();
-        $str   = \preg_replace('/^[ \t]*#+[ \t]*$/', '', $str);
+        $str = $cursor->getRemainder();
+        $str = \preg_replace('/^[ \t]*#+[ \t]*$/', '', $str);
         \assert(\is_string($str));
         $str = \preg_replace('/[ \t]+#+[ \t]*$/', '', $str);
         \assert(\is_string($str));
@@ -68,8 +63,7 @@ class HeadingStartParser implements BlockStartParserInterface
         return new HeadingParser($level, $str);
     }
 
-    private static function getSetextHeadingLevel(Cursor $cursor): int
-    {
+    private static function getSetextHeadingLevel(Cursor $cursor) {
         $match = RegexHelper::matchFirst('/^(?:=+|-+)[ \t]*$/', $cursor->getLine(), $cursor->getNextNonSpacePosition());
         if ($match === null) {
             return 0;

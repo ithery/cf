@@ -1,21 +1,25 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 1, 2018, 3:22:30 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 1, 2018, 3:22:30 PM
  */
+// @codingStandardsIgnoreStart
 trait CTrait_Compat_Handler_Driver_Dialog {
-
     protected $js_class;
+
     protected $js_class_manual;
 
     /**
-     * @deprecated since version 1.2
      * @param type $js_class
+     *
      * @return $this
+     *
+     * @deprecated since version 1.2
      */
     public function set_js_class($js_class) {
         //set js class manual
@@ -24,9 +28,10 @@ trait CTrait_Compat_Handler_Driver_Dialog {
     }
 
     /**
-     * 
-     * @deprecated, please use setTitle
      * @param string $title
+     *
+     * @deprecated, please use setTitle
+     *
      * @return $this
      */
     public function set_title($title) {
@@ -37,4 +42,11 @@ trait CTrait_Compat_Handler_Driver_Dialog {
         return $this->addParamInput($inputs);
     }
 
+    public function add_param_request($paramRequest) {
+        return $this->addparamRequest($paramRequest);
+    }
+
+    public function set_method($method) {
+        return $this->setMethod($method);
+    }
 }

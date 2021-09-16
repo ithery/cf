@@ -1,19 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:09:44 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:09:44 AM
  */
 
 /**
  * Type that maps ab SQL BINARY/VARBINARY to a PHP resource stream.
-
  */
 class CDatabase_Type_BinaryType extends CDatabase_Type {
-
     /**
      * {@inheritdoc}
      */
@@ -37,7 +36,7 @@ class CDatabase_Type_BinaryType extends CDatabase_Type {
         }
 
         if (!is_resource($value)) {
-            throw ConversionException::conversionFailed($value, self::BINARY);
+            throw CDatabase_Schema_Exception_ConversionException::conversionFailed($value, self::BINARY);
         }
 
         return $value;
@@ -56,5 +55,4 @@ class CDatabase_Type_BinaryType extends CDatabase_Type {
     public function getBindingType() {
         return CDatabase_ParameterType::BINARY;
     }
-
 }

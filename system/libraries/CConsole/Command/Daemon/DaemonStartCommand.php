@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CConsole_Command_Daemon_DaemonStartCommand extends CConsole_Command {
-
     /**
      * The name and signature of the console command.
      *
@@ -36,7 +35,6 @@ class CConsole_Command_Daemon_DaemonStartCommand extends CConsole_Command {
             }
         }
 
-
         if ($errCode > 0) {
             $this->error($errMessage);
             return 1;
@@ -44,5 +42,4 @@ class CConsole_Command_Daemon_DaemonStartCommand extends CConsole_Command {
 
         return 0;
     }
-
 }

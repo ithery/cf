@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -21,8 +19,7 @@ use League\CommonMark\Reference\ReferenceMapInterface;
 /**
  * Parser implementation which ensures everything is added to the root-level Document
  */
-final class DocumentBlockParser extends AbstractBlockContinueParser
-{
+final class DocumentBlockParser extends AbstractBlockContinueParser {
     /**
      * @var Document
      *
@@ -30,31 +27,26 @@ final class DocumentBlockParser extends AbstractBlockContinueParser
      */
     private $document;
 
-    public function __construct(ReferenceMapInterface $referenceMap)
-    {
+    public function __construct(ReferenceMapInterface $referenceMap) {
         $this->document = new Document($referenceMap);
     }
 
     /**
      * @return Document
      */
-    public function getBlock(): AbstractBlock
-    {
+    public function getBlock() {
         return $this->document;
     }
 
-    public function isContainer(): bool
-    {
+    public function isContainer() {
         return true;
     }
 
-    public function canContain(AbstractBlock $childBlock): bool
-    {
+    public function canContain(AbstractBlock $childBlock) {
         return true;
     }
 
-    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser): ?BlockContinue
-    {
+    public function tryContinue(Cursor $cursor, BlockContinueParserInterface $activeBlockParser) {
         return BlockContinue::at($cursor);
     }
 }

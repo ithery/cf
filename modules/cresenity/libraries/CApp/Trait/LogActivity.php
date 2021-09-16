@@ -1,18 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 16, 2019, 2:20:52 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 16, 2019, 2:20:52 AM
  */
 trait CApp_Trait_LogActivity {
-
     public static function start($message, $listener = null) {
-
         if ($listener == null) {
-            $listener = array(CApp_Log_Activity::class, 'populate');
+            $listener = [CApp_Log_Activity::class, 'populate'];
         }
         $activity = CModel_Activity::instance();
         $activity->setMessage($message);
@@ -24,5 +23,4 @@ trait CApp_Trait_LogActivity {
         $activity = CModel_Activity::instance();
         $activity->stop();
     }
-
 }

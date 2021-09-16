@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 8:09:14 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 8:09:14 AM
  */
 abstract class CDatabase_Schema_Manager {
-
     /**
      * Holds instance of the connection for this schema manager.
      *
@@ -23,10 +23,12 @@ abstract class CDatabase_Schema_Manager {
      */
     protected $platform;
 
+    protected $isSuperUser;
+
     /**
      * Constructor. Accepts the Connection instance to manage the schema for.
      *
-     * @param CDatabase                      $conn
+     * @param CDatabase               $conn
      * @param CDatabase_Platform|null $platform
      */
     public function __construct(CDatabase $conn, CDatabase_Platform $platform = null) {
@@ -78,7 +80,7 @@ abstract class CDatabase_Schema_Manager {
 
         $databases = $this->db->fetchAll($sql);
 
-        return $this->_getPortableDatabasesList($databases);
+        return $this->getPortableDatabasesList($databases);
     }
 
     /**
@@ -109,7 +111,7 @@ abstract class CDatabase_Schema_Manager {
 
         $sequences = $this->db->fetchAll($sql);
 
-        return $this->filterAssetNames($this->_getPortableSequencesList($sequences));
+        return $this->filterAssetNames($this->getPortableSequencesList($sequences));
     }
 
     /**
@@ -122,7 +124,7 @@ abstract class CDatabase_Schema_Manager {
      * of a table. We're a RDBMS specifies more details these are held
      * in the platformDetails array.
      *
-     * @param string      $table    The name of the table.
+     * @param string      $table    the name of the table
      * @param string|null $database
      *
      * @return \Doctrine\DBAL\Schema\Column[]
@@ -136,7 +138,7 @@ abstract class CDatabase_Schema_Manager {
 
         $tableColumns = $this->db->fetchAll($sql);
 
-        return $this->_getPortableTableColumnList($table, $database, $tableColumns);
+        return $this->getPortableTableColumnList($table, $database, $tableColumns);
     }
 
     /**
@@ -144,7 +146,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * Keys of the portable indexes list are all lower-cased.
      *
-     * @param string $table The name of the table.
+     * @param string $table the name of the table
      *
      * @return \Doctrine\DBAL\Schema\Index[]
      */
@@ -153,7 +155,7 @@ abstract class CDatabase_Schema_Manager {
 
         $tableIndexes = $this->db->fetchAll($sql);
 
-        return $this->_getPortableTableIndexesList($tableIndexes, $table);
+        return $this->getPortableTableIndexesList($tableIndexes, $table);
     }
 
     /**
@@ -178,7 +180,7 @@ abstract class CDatabase_Schema_Manager {
         $sql = $this->platform->getListTablesSQL();
 
         $tables = $this->db->fetchAll($sql);
-        $tableNames = $this->_getPortableTablesList($tables);
+        $tableNames = $this->getPortableTablesList($tables);
 
         return $this->filterAssetNames($tableNames);
     }
@@ -198,11 +200,11 @@ abstract class CDatabase_Schema_Manager {
         }
 
         return array_values(
-                array_filter($assetNames, function ($assetName) use ($filterExpr) {
-                    $assetName = ($assetName instanceof CDatabase_AbstractAsset) ? $assetName->getName() : $assetName;
+            array_filter($assetNames, function ($assetName) use ($filterExpr) {
+                $assetName = ($assetName instanceof CDatabase_AbstractAsset) ? $assetName->getName() : $assetName;
 
-                    return preg_match($filterExpr, $assetName);
-                })
+                return preg_match($filterExpr, $assetName);
+            })
         );
     }
 
@@ -255,13 +257,13 @@ abstract class CDatabase_Schema_Manager {
         $sql = $this->platform->getListViewsSQL($database);
         $views = $this->db->fetchAll($sql);
 
-        return $this->_getPortableViewsList($views);
+        return $this->getPortableViewsList($views);
     }
 
     /**
      * Lists the foreign keys for the given table.
      *
-     * @param string      $table    The name of the table.
+     * @param string      $table    the name of the table
      * @param string|null $database
      *
      * @return \Doctrine\DBAL\Schema\ForeignKeyConstraint[]
@@ -273,7 +275,7 @@ abstract class CDatabase_Schema_Manager {
         $sql = $this->platform->getListTableForeignKeysSQL($table, $database);
         $tableForeignKeys = $this->db->fetchAll($sql);
 
-        return $this->_getPortableTableForeignKeysList($tableForeignKeys);
+        return $this->getPortableTableForeignKeysList($tableForeignKeys);
     }
 
     /* drop*() Methods */
@@ -283,85 +285,85 @@ abstract class CDatabase_Schema_Manager {
      *
      * NOTE: You can not drop the database this SchemaManager is currently connected to.
      *
-     * @param string $database The name of the database to drop.
+     * @param string $database the name of the database to drop
      *
      * @return void
      */
     public function dropDatabase($database) {
-        $this->_execSql($this->platform->getDropDatabaseSQL($database));
+        $this->execSql($this->platform->getDropDatabaseSQL($database));
     }
 
     /**
      * Drops the given table.
      *
-     * @param string $tableName The name of the table to drop.
+     * @param string $tableName the name of the table to drop
      *
      * @return void
      */
     public function dropTable($tableName) {
-        $this->_execSql($this->platform->getDropTableSQL($tableName));
+        $this->execSql($this->platform->getDropTableSQL($tableName));
     }
 
     /**
      * Drops the index from the given table.
      *
-     * @param \Doctrine\DBAL\Schema\Index|string $index The name of the index.
-     * @param \Doctrine\DBAL\Schema\Table|string $table The name of the table.
+     * @param \CDatabase_Schema_Index|string $index the name of the index
+     * @param \CDatabase_Schema_Table|string $table the name of the table
      *
      * @return void
      */
     public function dropIndex($index, $table) {
-        if ($index instanceof Index) {
+        if ($index instanceof CDatabase_Schema_Index) {
             $index = $index->getQuotedName($this->platform);
         }
 
-        $this->_execSql($this->platform->getDropIndexSQL($index, $table));
+        $this->execSql($this->platform->getDropIndexSQL($index, $table));
     }
 
     /**
      * Drops the constraint from the given table.
      *
-     * @param \Doctrine\DBAL\Schema\Constraint   $constraint
-     * @param \Doctrine\DBAL\Schema\Table|string $table      The name of the table.
+     * @param \CDatabase_Schema_Constraint   $constraint
+     * @param \CDatabase_Schema_Table|string $table      the name of the table
      *
      * @return void
      */
-    public function dropConstraint(Constraint $constraint, $table) {
-        $this->_execSql($this->platform->getDropConstraintSQL($constraint, $table));
+    public function dropConstraint(CDatabase_Schema_Constraint $constraint, $table) {
+        $this->execSql($this->platform->getDropConstraintSQL($constraint, $table));
     }
 
     /**
      * Drops a foreign key from a table.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint|string $foreignKey The name of the foreign key.
-     * @param \Doctrine\DBAL\Schema\Table|string                $table      The name of the table with the foreign key.
+     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint|string $foreignKey the name of the foreign key
+     * @param \Doctrine\DBAL\Schema\Table|string                $table      the name of the table with the foreign key
      *
      * @return void
      */
     public function dropForeignKey($foreignKey, $table) {
-        $this->_execSql($this->platform->getDropForeignKeySQL($foreignKey, $table));
+        $this->execSql($this->platform->getDropForeignKeySQL($foreignKey, $table));
     }
 
     /**
      * Drops a sequence with a given name.
      *
-     * @param string $name The name of the sequence to drop.
+     * @param string $name the name of the sequence to drop
      *
      * @return void
      */
     public function dropSequence($name) {
-        $this->_execSql($this->platform->getDropSequenceSQL($name));
+        $this->execSql($this->platform->getDropSequenceSQL($name));
     }
 
     /**
      * Drops a view.
      *
-     * @param string $name The name of the view.
+     * @param string $name the name of the view
      *
      * @return void
      */
     public function dropView($name) {
-        $this->_execSql($this->platform->getDropViewSQL($name));
+        $this->execSql($this->platform->getDropViewSQL($name));
     }
 
     /* create*() Methods */
@@ -369,84 +371,84 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Creates a new database.
      *
-     * @param string $database The name of the database to create.
+     * @param string $database the name of the database to create
      *
      * @return void
      */
     public function createDatabase($database) {
-        $this->_execSql($this->platform->getCreateDatabaseSQL($database));
+        $this->execSql($this->platform->getCreateDatabaseSQL($database));
     }
 
     /**
      * Creates a new table.
      *
-     * @param \Doctrine\DBAL\Schema\Table $table
+     * @param \CDatabase_Schema_Table $table
      *
      * @return void
      */
-    public function createTable(Table $table) {
-        $createFlags = AbstractPlatform::CREATE_INDEXES | AbstractPlatform::CREATE_FOREIGNKEYS;
-        $this->_execSql($this->platform->getCreateTableSQL($table, $createFlags));
+    public function createTable(CDatabase_Schema_Table $table) {
+        $createFlags = CDatabase_Platform::CREATE_INDEXES | CDatabase_Platform::CREATE_FOREIGNKEYS;
+        $this->execSql($this->platform->getCreateTableSQL($table, $createFlags));
     }
 
     /**
      * Creates a new sequence.
      *
-     * @param \Doctrine\DBAL\Schema\Sequence $sequence
+     * @param \CDatabase_Schema_Sequence $sequence
      *
      * @return void
      *
-     * @throws \Doctrine\DBAL\ConnectionException If something fails at database level.
+     * @throws \Doctrine\DBAL\ConnectionException if something fails at database level
      */
     public function createSequence($sequence) {
-        $this->_execSql($this->platform->getCreateSequenceSQL($sequence));
+        $this->execSql($this->platform->getCreateSequenceSQL($sequence));
     }
 
     /**
      * Creates a constraint on a table.
      *
-     * @param \Doctrine\DBAL\Schema\Constraint   $constraint
-     * @param \Doctrine\DBAL\Schema\Table|string $table
+     * @param \CDatabase_Schema_Constraint   $constraint
+     * @param \CDatabase_Schema_Table|string $table
      *
      * @return void
      */
-    public function createConstraint(Constraint $constraint, $table) {
-        $this->_execSql($this->platform->getCreateConstraintSQL($constraint, $table));
+    public function createConstraint(CDatabase_Schema_Constraint $constraint, $table) {
+        $this->execSql($this->platform->getCreateConstraintSQL($constraint, $table));
     }
 
     /**
      * Creates a new index on a table.
      *
-     * @param \Doctrine\DBAL\Schema\Index        $index
-     * @param \Doctrine\DBAL\Schema\Table|string $table The name of the table on which the index is to be created.
+     * @param \CDatabase_Schema_Index        $index
+     * @param \CDatabase_Schema_Table|string $table the name of the table on which the index is to be created
      *
      * @return void
      */
-    public function createIndex(Index $index, $table) {
-        $this->_execSql($this->platform->getCreateIndexSQL($index, $table));
+    public function createIndex(CDatabase_Schema_Index $index, $table) {
+        $this->execSql($this->platform->getCreateIndexSQL($index, $table));
     }
 
     /**
      * Creates a new foreign key.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey The ForeignKey instance.
-     * @param \Doctrine\DBAL\Schema\Table|string         $table      The name of the table on which the foreign key is to be created.
+     * @param \CDatabase_Schema_ForeignKeyConstraint $foreignKey the ForeignKey instance
+     * @param \CDatabase_Schema_Table|string         $table      the name of the table on which the foreign key is to be created
      *
      * @return void
      */
-    public function createForeignKey(ForeignKeyConstraint $foreignKey, $table) {
-        $this->_execSql($this->platform->getCreateForeignKeySQL($foreignKey, $table));
+    public function createForeignKey(CDatabase_Schema_ForeignKeyConstraint $foreignKey, $table) {
+        $this->execSql($this->platform->getCreateForeignKeySQL($foreignKey, $table));
     }
 
     /**
      * Creates a new view.
      *
-     * @param \Doctrine\DBAL\Schema\View $view
+     * @param \CDatabase_Schema_View $view
      *
      * @return void
      */
-    public function createView(View $view) {
-        $this->_execSql($this->platform->getCreateViewSQL($view->getQuotedName($this->platform), $view->getSql()));
+    public function createView(CDatabase_Schema_View $view) {
+        $this->execSql($this->platform->getCreateViewSQL($view->getQuotedName($this->platform), $view->getSql()));
     }
 
     /* dropAndCreate*() Methods */
@@ -454,15 +456,15 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and creates a constraint.
      *
-     * @see dropConstraint()
-     * @see createConstraint()
-     *
-     * @param \Doctrine\DBAL\Schema\Constraint   $constraint
-     * @param \Doctrine\DBAL\Schema\Table|string $table
+     * @param \CDatabase_Schema_Constraint   $constraint
+     * @param \CDatabase_Schema_Table|string $table
      *
      * @return void
+     *
+     * @see dropConstraint()
+     * @see createConstraint()
      */
-    public function dropAndCreateConstraint(Constraint $constraint, $table) {
+    public function dropAndCreateConstraint(CDatabase_Schema_Constraint $constraint, $table) {
         $this->tryMethod('dropConstraint', $constraint, $table);
         $this->createConstraint($constraint, $table);
     }
@@ -470,12 +472,12 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and creates a new index on a table.
      *
-     * @param \Doctrine\DBAL\Schema\Index        $index
-     * @param \Doctrine\DBAL\Schema\Table|string $table The name of the table on which the index is to be created.
+     * @param \CDatabase_Schema_Index        $index
+     * @param \CDatabase_Schema_Table|string $table the name of the table on which the index is to be created
      *
      * @return void
      */
-    public function dropAndCreateIndex(Index $index, $table) {
+    public function dropAndCreateIndex(CDatabase_Schema_Index $index, $table) {
         $this->tryMethod('dropIndex', $index->getQuotedName($this->platform), $table);
         $this->createIndex($index, $table);
     }
@@ -483,12 +485,12 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and creates a new foreign key.
      *
-     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey An associative array that defines properties of the foreign key to be created.
-     * @param \Doctrine\DBAL\Schema\Table|string         $table      The name of the table on which the foreign key is to be created.
+     * @param \CDatabase_Schema_ForeignKeyConstraint $foreignKey an associative array that defines properties of the foreign key to be created
+     * @param \CDatabase_Schema_Table|string         $table      the name of the table on which the foreign key is to be created
      *
      * @return void
      */
-    public function dropAndCreateForeignKey(ForeignKeyConstraint $foreignKey, $table) {
+    public function dropAndCreateForeignKey(CDatabase_Schema_ForeignKeyConstraint $foreignKey, $table) {
         $this->tryMethod('dropForeignKey', $foreignKey, $table);
         $this->createForeignKey($foreignKey, $table);
     }
@@ -496,13 +498,13 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and create a new sequence.
      *
-     * @param \Doctrine\DBAL\Schema\Sequence $sequence
+     * @param \CDatabase_Schema_Sequence $sequence
      *
      * @return void
      *
-     * @throws \Doctrine\DBAL\ConnectionException If something fails at database level.
+     * @throws \Doctrine\DBAL\ConnectionException if something fails at database level
      */
-    public function dropAndCreateSequence(Sequence $sequence) {
+    public function dropAndCreateSequence(CDatabase_Schema_Sequence $sequence) {
         $this->tryMethod('dropSequence', $sequence->getQuotedName($this->platform));
         $this->createSequence($sequence);
     }
@@ -510,11 +512,11 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and creates a new table.
      *
-     * @param \Doctrine\DBAL\Schema\Table $table
+     * @param \CDatabase_Schema_Table $table
      *
      * @return void
      */
-    public function dropAndCreateTable(Table $table) {
+    public function dropAndCreateTable(CDatabase_Schema_Table $table) {
         $this->tryMethod('dropTable', $table->getQuotedName($this->platform));
         $this->createTable($table);
     }
@@ -522,7 +524,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and creates a new database.
      *
-     * @param string $database The name of the database to create.
+     * @param string $database the name of the database to create
      *
      * @return void
      */
@@ -534,11 +536,11 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Drops and creates a new view.
      *
-     * @param \Doctrine\DBAL\Schema\View $view
+     * @param \CDatabase_Schema_View $view
      *
      * @return void
      */
-    public function dropAndCreateView(View $view) {
+    public function dropAndCreateView(CDatabase_Schema_View $view) {
         $this->tryMethod('dropView', $view->getQuotedName($this->platform));
         $this->createView($view);
     }
@@ -548,15 +550,15 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Alters an existing tables schema.
      *
-     * @param \Doctrine\DBAL\Schema\TableDiff $tableDiff
+     * @param \CDatabase_Schema_Table_Diff $tableDiff
      *
      * @return void
      */
-    public function alterTable(TableDiff $tableDiff) {
+    public function alterTable(CDatabase_Schema_Table_Diff $tableDiff) {
         $queries = $this->platform->getAlterTableSQL($tableDiff);
         if (is_array($queries) && count($queries)) {
             foreach ($queries as $ddlQuery) {
-                $this->_execSql($ddlQuery);
+                $this->execSql($ddlQuery);
             }
         }
     }
@@ -564,13 +566,13 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Renames a given table to another name.
      *
-     * @param string $name    The current name of the table.
-     * @param string $newName The new name of the table.
+     * @param string $name    the current name of the table
+     * @param string $newName the new name of the table
      *
      * @return void
      */
     public function renameTable($name, $newName) {
-        $tableDiff = new TableDiff($name);
+        $tableDiff = new CDatabase_Schema_Table_Diff($name);
         $tableDiff->newName = $newName;
         $this->alterTable($tableDiff);
     }
@@ -578,6 +580,8 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Methods for filtering return values of list*() methods to convert
      * the native DBMS data definition to a portable Doctrine definition
+     *
+     * @param mixed $databases
      */
 
     /**
@@ -585,10 +589,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableDatabasesList($databases) {
+    protected function getPortableDatabasesList($databases) {
         $list = [];
         foreach ($databases as $value) {
-            if ($value = $this->_getPortableDatabaseDefinition($value)) {
+            if ($value = $this->getPortableDatabaseDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -599,7 +603,7 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Converts a list of namespace names from the native DBMS data definition to a portable Doctrine definition.
      *
-     * @param array $namespaces The list of namespace names in the native DBMS data definition.
+     * @param array $namespaces the list of namespace names in the native DBMS data definition
      *
      * @return array
      */
@@ -618,14 +622,14 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return mixed
      */
-    protected function _getPortableDatabaseDefinition($database) {
+    protected function getPortableDatabaseDefinition($database) {
         return $database;
     }
 
     /**
      * Converts a namespace definition from the native DBMS data definition to a portable Doctrine definition.
      *
-     * @param array $namespace The native DBMS namespace definition.
+     * @param array $namespace the native DBMS namespace definition
      *
      * @return mixed
      */
@@ -638,10 +642,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableFunctionsList($functions) {
+    protected function getPortableFunctionsList($functions) {
         $list = [];
         foreach ($functions as $value) {
-            if ($value = $this->_getPortableFunctionDefinition($value)) {
+            if ($value = $this->getPortableFunctionDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -654,7 +658,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return mixed
      */
-    protected function _getPortableFunctionDefinition($function) {
+    protected function getPortableFunctionDefinition($function) {
         return $function;
     }
 
@@ -663,10 +667,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableTriggersList($triggers) {
+    protected function getPortableTriggersList($triggers) {
         $list = [];
         foreach ($triggers as $value) {
-            if ($value = $this->_getPortableTriggerDefinition($value)) {
+            if ($value = $this->getPortableTriggerDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -679,7 +683,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return mixed
      */
-    protected function _getPortableTriggerDefinition($trigger) {
+    protected function getPortableTriggerDefinition($trigger) {
         return $trigger;
     }
 
@@ -688,10 +692,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableSequencesList($sequences) {
+    protected function getPortableSequencesList($sequences) {
         $list = [];
         foreach ($sequences as $value) {
-            if ($value = $this->_getPortableSequenceDefinition($value)) {
+            if ($value = $this->getPortableSequenceDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -702,12 +706,12 @@ abstract class CDatabase_Schema_Manager {
     /**
      * @param array $sequence
      *
-     * @return \Doctrine\DBAL\Schema\Sequence
+     * @return \CDatabase_Schema_Sequence
      *
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \CDatabase_Exception
      */
-    protected function _getPortableSequenceDefinition($sequence) {
-        throw DBALException::notSupported('Sequences');
+    protected function getPortableSequenceDefinition($sequence) {
+        throw CDatabase_Exception::notSupported('Sequences');
     }
 
     /**
@@ -715,30 +719,29 @@ abstract class CDatabase_Schema_Manager {
      *
      * The name of the created column instance however is kept in its case.
      *
-     * @param string $table        The name of the table.
+     * @param string $table        the name of the table
      * @param string $database
      * @param array  $tableColumns
      *
      * @return array
      */
-    protected function _getPortableTableColumnList($table, $database, $tableColumns) {
-        $eventManager = $this->platform->getEventManager();
+    protected function getPortableTableColumnList($table, $database, $tableColumns) {
+        $eventDispatcher = $this->platform->getEventDispatcher();
 
         $list = [];
         foreach ($tableColumns as $tableColumn) {
             $column = null;
             $defaultPrevented = false;
-            
-            if (null !== $eventManager && $eventManager->hasListeners(CDatabase_Event::onSchemaColumnDefinition)) {
-                $eventArgs = new SchemaColumnDefinitionEventArgs($tableColumn, $table, $database, $this->db);
-                $eventManager->dispatchEvent(CDatabase_Event::onSchemaColumnDefinition, $eventArgs);
+
+            if (null !== $eventDispatcher) {
+                $eventArgs = new CDatabase_Event_Schema_OnColumnDefinition($tableColumn, $table, $database, $this->db);
+                $eventDispatcher->dispatch($eventArgs);
                 $defaultPrevented = $eventArgs->isDefaultPrevented();
                 $column = $eventArgs->getColumn();
             }
-           
 
             if (!$defaultPrevented) {
-                $column = $this->_getPortableTableColumnDefinition($tableColumn);
+                $column = $this->getPortableTableColumnDefinition($tableColumn);
             }
             if ($column) {
                 $name = strtolower($column->getQuotedName($this->platform));
@@ -754,9 +757,9 @@ abstract class CDatabase_Schema_Manager {
      *
      * @param array $tableColumn
      *
-     * @return \Doctrine\DBAL\Schema\Column
+     * @return \CDatabase_Schema_Column
      */
-    abstract protected function _getPortableTableColumnDefinition($tableColumn);
+    abstract protected function getPortableTableColumnDefinition($tableColumn);
 
     /**
      * Aggregates and groups the index results according to the required data result.
@@ -766,7 +769,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableTableIndexesList($tableIndexRows, $tableName = null) {
+    protected function getPortableTableIndexesList($tableIndexRows, $tableName = null) {
         $result = [];
         foreach ($tableIndexRows as $tableIndex) {
             $indexName = $keyName = $tableIndex['key_name'];
@@ -789,16 +792,16 @@ abstract class CDatabase_Schema_Manager {
             }
         }
 
-        $eventManager = $this->platform->getEventManager();
+        $eventDispatcher = $this->platform->getEventDispatcher();
 
         $indexes = [];
         foreach ($result as $indexKey => $data) {
             $index = null;
             $defaultPrevented = false;
 
-            if (null !== $eventManager && $eventManager->hasListeners(CDatabase_Event::onSchemaIndexDefinition)) {
-                $eventArgs = new SchemaIndexDefinitionEventArgs($data, $tableName, $this->db);
-                $eventManager->dispatchEvent(CDatabase_Event::onSchemaIndexDefinition, $eventArgs);
+            if (null !== $eventDispatcher) {
+                $eventArgs = new CDatabase_Event_Schema_OnIndexDefinition($data, $tableName, $this->db);
+                $eventDispatcher->dispatch($eventArgs);
 
                 $defaultPrevented = $eventArgs->isDefaultPrevented();
                 $index = $eventArgs->getIndex();
@@ -821,10 +824,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableTablesList($tables) {
+    protected function getPortableTablesList($tables) {
         $list = [];
         foreach ($tables as $value) {
-            if ($value = $this->_getPortableTableDefinition($value)) {
+            if ($value = $this->getPortableTableDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -837,7 +840,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableTableDefinition($table) {
+    protected function getPortableTableDefinition($table) {
         return $table;
     }
 
@@ -846,10 +849,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableUsersList($users) {
+    protected function getPortableUsersList($users) {
         $list = [];
         foreach ($users as $value) {
-            if ($value = $this->_getPortableUserDefinition($value)) {
+            if ($value = $this->getPortableUserDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -862,7 +865,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return mixed
      */
-    protected function _getPortableUserDefinition($user) {
+    protected function getPortableUserDefinition($user) {
         return $user;
     }
 
@@ -871,10 +874,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableViewsList($views) {
+    protected function getPortableViewsList($views) {
         $list = [];
         foreach ($views as $value) {
-            if ($view = $this->_getPortableViewDefinition($value)) {
+            if ($view = $this->getPortableViewDefinition($value)) {
                 $viewName = strtolower($view->getQuotedName($this->platform));
                 $list[$viewName] = $view;
             }
@@ -888,7 +891,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return mixed
      */
-    protected function _getPortableViewDefinition($view) {
+    protected function getPortableViewDefinition($view) {
         return false;
     }
 
@@ -897,10 +900,10 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return array
      */
-    protected function _getPortableTableForeignKeysList($tableForeignKeys) {
+    protected function getPortableTableForeignKeysList($tableForeignKeys) {
         $list = [];
         foreach ($tableForeignKeys as $value) {
-            if ($value = $this->_getPortableTableForeignKeyDefinition($value)) {
+            if ($value = $this->getPortableTableForeignKeyDefinition($value)) {
                 $list[] = $value;
             }
         }
@@ -913,7 +916,7 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return mixed
      */
-    protected function _getPortableTableForeignKeyDefinition($tableForeignKey) {
+    protected function getPortableTableForeignKeyDefinition($tableForeignKey) {
         return $tableForeignKey;
     }
 
@@ -922,9 +925,9 @@ abstract class CDatabase_Schema_Manager {
      *
      * @return void
      */
-    protected function _execSql($sql) {
+    protected function execSql($sql) {
         foreach ((array) $sql as $query) {
-            $this->db->executeUpdate($query);
+            $this->db->query($query);
         }
     }
 
@@ -954,14 +957,13 @@ abstract class CDatabase_Schema_Manager {
     /**
      * Creates the configuration for this schema.
      *
-     * @return \Doctrine\DBAL\Schema\SchemaConfig
+     * @return \CDatabase_Schema_Config
      */
     public function createSchemaConfig() {
         $schemaConfig = new CDatabase_Schema_Config();
         $schemaConfig->setMaxIdentifierLength($this->platform->getMaxIdentifierLength());
 
         $searchPaths = $this->getSchemaSearchPaths();
-
 
         if (isset($searchPaths[0])) {
             $schemaConfig->setName($searchPaths[0]);
@@ -1022,4 +1024,15 @@ abstract class CDatabase_Schema_Manager {
         return str_replace('(DC2Type:' . $type . ')', '', $comment);
     }
 
+    public function getDatabaseRowCount() {
+        throw CDatabase_Exception::notSupported('getDatabaseRowCount');
+    }
+
+    public function getDatabaseSize() {
+        throw CDatabase_Exception::notSupported('getDatabaseSize');
+    }
+
+    public function isSuperUser() {
+        throw CDatabase_Exception::notSupported('isSuperUser');
+    }
 }

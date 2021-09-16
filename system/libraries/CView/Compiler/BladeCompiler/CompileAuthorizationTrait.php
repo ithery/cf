@@ -6,11 +6,11 @@
  * @author Hery
  */
 trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
-
     /**
      * Compile the can statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileCan($expression) {
@@ -20,7 +20,8 @@ trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
     /**
      * Compile the cannot statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileCannot($expression) {
@@ -30,7 +31,8 @@ trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
     /**
      * Compile the canany statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileCanany($expression) {
@@ -40,7 +42,8 @@ trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
     /**
      * Compile the else-can statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileElsecan($expression) {
@@ -50,7 +53,8 @@ trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
     /**
      * Compile the else-cannot statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileElsecannot($expression) {
@@ -60,7 +64,8 @@ trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
     /**
      * Compile the else-canany statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileElsecanany($expression) {
@@ -93,5 +98,4 @@ trait CView_Compiler_BladeCompiler_CompilesAuthorizationTrait {
     protected function compileEndcanany() {
         return '<?php endif; ?>';
     }
-
 }

@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:09:44 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:09:44 AM
  */
 
 /**
  * Immutable type of {@see DateTimeTzType}.
  */
 class CDatabase_Type_DateTimeTzImmutableType extends CDatabase_Type_DateTimeTzType {
-
     /**
      * {@inheritdoc}
      */
@@ -32,8 +32,10 @@ class CDatabase_Type_DateTimeTzImmutableType extends CDatabase_Type_DateTimeTzTy
             return $value->format($platform->getDateTimeTzFormatString());
         }
 
-        throw ConversionException::conversionFailedInvalidType(
-                $value, $this->getName(), ['null', \DateTimeImmutable::class]
+        throw CDatabase_Schema_Exception_ConversionException::conversionFailedInvalidType(
+            $value,
+            $this->getName(),
+            ['null', \DateTimeImmutable::class]
         );
     }
 
@@ -48,8 +50,10 @@ class CDatabase_Type_DateTimeTzImmutableType extends CDatabase_Type_DateTimeTzTy
         $dateTime = \DateTimeImmutable::createFromFormat($platform->getDateTimeTzFormatString(), $value);
 
         if (!$dateTime) {
-            throw ConversionException::conversionFailedFormat(
-                    $value, $this->getName(), $platform->getDateTimeTzFormatString()
+            throw CDatabase_Schema_Exception_ConversionException::conversionFailedFormat(
+                $value,
+                $this->getName(),
+                $platform->getDateTimeTzFormatString()
             );
         }
 
@@ -62,5 +66,4 @@ class CDatabase_Type_DateTimeTzImmutableType extends CDatabase_Type_DateTimeTzTy
     public function requiresSQLCommentHint(CDatabase_Platform $platform) {
         return true;
     }
-
 }

@@ -1,17 +1,13 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
- * @license Ittron Global Teknologi
  */
 class CComponent_Manager {
-
     /**
-     *
-     * @var CComponent_Manager 
+     * @var CComponent_Manager
      */
     protected static $instance;
     protected $listeners = [];
@@ -21,7 +17,6 @@ class CComponent_Manager {
     protected static $redirector = null;
 
     /**
-     * 
      * @return CComponent_Manager
      */
     public static function instance() {
@@ -32,7 +27,6 @@ class CComponent_Manager {
     }
 
     public function __construct() {
-        
     }
 
     public function component($alias, $viewClass = null) {
@@ -53,7 +47,6 @@ class CComponent_Manager {
     public function getClass($alias) {
         $finder = CComponent_Finder::instance();
 
-
         $class = carr::get($this->componentAliases, $alias);
 
         if (!$class) {
@@ -65,7 +58,7 @@ class CComponent_Manager {
         }
 
         c::throwUnless($class, new CComponent_Exception_ComponentNotFoundException(
-                        "Unable to find component: [{$alias}]"
+            "Unable to find component: [{$alias}]"
         ));
 
         return $class;
@@ -75,7 +68,7 @@ class CComponent_Manager {
         $componentClass = $this->getClass($component);
 
         c::throwUnless(class_exists($componentClass), new CComponent_Exception_ComponentNotFoundException(
-                        "Component [{$component}] class not found: [{$componentClass}]"
+            "Component [{$component}] class not found: [{$componentClass}]"
         ));
 
         return new $componentClass($id);
@@ -83,8 +76,9 @@ class CComponent_Manager {
 
     public function mount($name, $params = []) {
         // This is if a user doesn't pass params, BUT passes key() as the second argument.
-        if (is_string($params))
+        if (is_string($params)) {
             $params = [];
+        }
 
         $id = cstr::random(20);
 
@@ -93,12 +87,11 @@ class CComponent_Manager {
         }
 
         $response = CComponent_LifecycleManager::fromInitialRequest($name, $id)
-                ->initialHydrate()
-                ->mount($params)
-                ->renderToView()
-                ->initialDehydrate()
-                ->toInitialResponse();
-
+            ->initialHydrate()
+            ->mount($params)
+            ->renderToView()
+            ->initialDehydrate()
+            ->toInitialResponse();
 
         return $response;
     }
@@ -108,7 +101,7 @@ class CComponent_Manager {
     }
 
     public function test($name, $params = []) {
-        return new TestableLivewire($name, $params, $this->queryParamsForTesting);
+        return new TestableComponent($name, $params, $this->queryParamsForTesting);
     }
 
     public function visit($browser, $class, $queryString = '') {
@@ -293,7 +286,6 @@ HTML;
     }
 
     /**
-     * 
      * @param string $alias
      * @param string $class
      */
@@ -319,20 +311,19 @@ HTML;
         return $this->redirector;
     }
 
-    public function getHtml($componentName,$params=[]) {
+    public function getHtml($componentName, $params = []) {
         if (!isset($_instance)) {
-            $html = CApp::component()->mount($componentName,$params)->html();
+            $html = CApp::component()->mount($componentName, $params)->html();
         } elseif ($_instance->childHasBeenRendered($cachedKey)) {
             $componentId = $_instance->getRenderedChildComponentId($cachedKey);
             $componentTag = $_instance->getRenderedChildComponentTagName($cachedKey);
             $html = CApp::component()->dummyMount($componentId, $componentTag);
             $_instance->preserveRenderedChild($cachedKey);
         } else {
-            $response = CApp::component()->mount($componentName,$params);
+            $response = CApp::component()->mount($componentName, $params);
             $html = $response->html();
             $_instance->logRenderedChild($cachedKey, $response->id(), CApp::component()->getRootElementTagName($html));
         }
         return $html;
     }
-
 }

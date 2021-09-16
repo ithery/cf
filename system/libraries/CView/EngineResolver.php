@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CView_EngineResolver {
-
     /**
      * The array of engine resolvers.
      *
@@ -22,13 +21,11 @@ class CView_EngineResolver {
     protected $resolved = [];
 
     /**
-     *
      * @var CView_EngineResolver
      */
     private static $instance;
 
     /**
-     * 
      * @return CView_EngineResolver
      */
     public static function instance() {
@@ -49,8 +46,9 @@ class CView_EngineResolver {
      *
      * The engine string typically corresponds to a file extension.
      *
-     * @param  string  $engine
-     * @param  \Closure  $resolver
+     * @param string   $engine
+     * @param \Closure $resolver
+     *
      * @return void
      */
     public function register($engine, Closure $resolver) {
@@ -62,7 +60,8 @@ class CView_EngineResolver {
     /**
      * Resolve an engine instance by name.
      *
-     * @param  string  $engine
+     * @param string $engine
+     *
      * @return CView_EngineAbstract
      *
      * @throws \InvalidArgumentException
@@ -111,5 +110,4 @@ class CView_EngineResolver {
             return new CView_Engine_CompilerEngine();
         });
     }
-
 }

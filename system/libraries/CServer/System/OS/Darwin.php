@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Feb 7, 2019, 2:18:36 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Feb 7, 2019, 2:18:36 PM
  */
 class CServer_System_OS_Darwin extends CServer_System_OS_Linux {
-
     use CServer_Trait_OS_Darwin;
 
     /**
@@ -18,12 +18,11 @@ class CServer_System_OS_Darwin extends CServer_System_OS_Linux {
      * @return void
      */
     protected function buildLoadAvg() {
-
         $s = $this->grabkey('vm.loadavg');
         $s = preg_replace('/{ /', '', $s);
         $s = preg_replace('/ }/', '', $s);
         $this->info->setLoad($s);
-        if (CServer::config()->loadPercentEnabled() && ( CServer::getOS() != 'Darwin')) {
+        if (CServer::config()->loadPercentEnabled() && (CServer::getOS() != 'Darwin')) {
             if ($fd = $this->grabkey('kern.cp_time')) {
                 // Find out the CPU load
                 // user + sys = load
@@ -41,5 +40,4 @@ class CServer_System_OS_Darwin extends CServer_System_OS_Linux {
             }
         }
     }
-
 }

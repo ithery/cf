@@ -1,28 +1,25 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Dec 5, 2020 
+ *
+ * @since Dec 5, 2020
+ *
  * @license Ittron Global Teknologi
  */
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Environment\Environment;
 use League\CommonMark\Extension\GithubFlavoredMarkdownExtension;
+use Cresenity\Documentation\Renderer;
 
-Class Controller_Docs extends CController {
-
+class Controller_Docs extends CController {
     public function __construct() {
         parent::__construct();
         $app = CApp::instance();
         $app->setLoginRequired(false);
         $app->setTheme('cresenity-docs');
-        $app->setView('docs');
-        $app->setNav('docs');
-        $app->setNavRenderer(function($navs) {
-            return c::view('docs.nav',['navs'=>$navs])->render();
-        });
     }
 
     public function index() {
@@ -57,13 +54,35 @@ Class Controller_Docs extends CController {
         $converter = new CommonMarkConverter([], $environment);
         $html = $converter->convertToHtml($content);
 
-        $app->add($html);
+        $renderer = new Renderer($html);
+        $h3List = $renderer->getH3List();
+
+        $navData = $app->resolveNav('docs');
+
+        $pageLabel = $page;
+        $currentNav = c::collect($navData)->firstWhere('name', '=', $category);
+        $categoryLabel = carr::get($currentNav, 'label', $category);
+
+        $currentSubnav = c::collect(carr::get($currentNav, 'subnav'))->firstWhere('name', '=', $category . '.' . $page);
+
+        $pageLabel = carr::get($currentSubnav, 'label', $page);
+        $app->add($renderer->getHtml());
         $app->setView('docs');
+        $app->setData('rightSubnavs', $h3List);
+        $app->setData('categoryLabel', $categoryLabel);
+        $app->setData('pageLabel', $pageLabel);
+        $app->setNav('docs');
+        $app->setNavRenderer(function ($navs) use ($category, $page) {
+            return c::view('docs.nav', [
+                'navs' => $navs,
+                'category' => $category,
+                'page' => $page,
+            ])->render();
+        });
         return $app;
     }
 
-    
-    public function __call($method,$args) {
-        return $this->page($method,carr::first($args));
+    public function __call($method, $args) {
+        return $this->page($method, carr::first($args));
     }
 }

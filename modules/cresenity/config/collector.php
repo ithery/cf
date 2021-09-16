@@ -5,6 +5,6 @@
  *
  * @author Hery
  */
-return array(
+return [
     'exception' => false,
-);
+];

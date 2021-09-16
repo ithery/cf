@@ -1,23 +1,23 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 11:59:54 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 11:59:54 AM
  */
 class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
-
     /**
      * @var string
      */
-    protected $_name = null;
+    protected $name = null;
 
     /**
      * @var CDatabase_Schema_Column[]
      */
-    protected $_columns = [];
+    protected $columns = [];
 
     /**
      * @var CDatabase_Schema_Index[]
@@ -27,35 +27,35 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
     /**
      * @var CDatabase_Schema_Index[]
      */
-    protected $_indexes = [];
+    protected $indexes = [];
 
     /**
      * @var string
      */
-    protected $_primaryKeyName = false;
+    protected $primaryKeyName = false;
 
     /**
      * @var CDatabase_Schema_ForeignKeyConstraint[]
      */
-    protected $_fkConstraints = [];
+    protected $fkConstraints = [];
 
     /**
      * @var array
      */
-    protected $_options = [];
+    protected $options = [];
 
     /**
      * @var CDatabase_Schema_SchemaConfig|null
      */
-    protected $_schemaConfig = null;
+    protected $schemaConfig = null;
 
     /**
-     * @param string                 $tableName
+     * @param string                                  $tableName
      * @param CDatabase_Schema_Column[]               $columns
      * @param CDatabase_Schema_Index[]                $indexes
      * @param CDatabase_Schema_ForeignKeyConstraint[] $fkConstraints
-     * @param int                    $idGeneratorType
-     * @param array                  $options
+     * @param int                                     $idGeneratorType
+     * @param array                                   $options
      *
      * @throws DBALException
      */
@@ -64,38 +64,38 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
             throw CDatabase_Exception::invalidTableName($tableName);
         }
 
-        $this->_setName($tableName);
+        $this->setName($tableName);
 
         foreach ($columns as $column) {
-            $this->_addColumn($column);
+            $this->protectedAddColumn($column);
         }
 
         foreach ($indexes as $idx) {
-            $this->_addIndex($idx);
+            $this->protectedAddIndex($idx);
         }
 
         foreach ($fkConstraints as $constraint) {
-            $this->_addForeignKeyConstraint($constraint);
+            $this->protectedAddForeignKeyConstraint($constraint);
         }
 
-        $this->_options = $options;
+        $this->options = $options;
     }
 
     /**
-     * @param SchemaConfig $schemaConfig
+     * @param CDatabase_Schema_Config $schemaConfig
      *
      * @return void
      */
     public function setSchemaConfig(CDatabase_Schema_Config $schemaConfig) {
-        $this->_schemaConfig = $schemaConfig;
+        $this->schemaConfig = $schemaConfig;
     }
 
     /**
      * @return int
      */
-    protected function _getMaxIdentifierLength() {
-        if ($this->_schemaConfig instanceof CDatabase_Schema_Config) {
-            return $this->_schemaConfig->getMaxIdentifierLength();
+    protected function getMaxIdentifierLength() {
+        if ($this->schemaConfig instanceof CDatabase_Schema_Config) {
+            return $this->schemaConfig->getMaxIdentifierLength();
         }
 
         return 63;
@@ -104,13 +104,13 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
     /**
      * Sets the Primary Key.
      *
-     * @param array          $columns
-     * @param string|boolean $indexName
+     * @param array       $columns
+     * @param string|bool $indexName
      *
      * @return self
      */
     public function setPrimaryKey(array $columns, $indexName = false) {
-        $this->_addIndex($this->_createIndex($columns, $indexName ?: "primary", true, true));
+        $this->protectedAddIndex($this->protectedCreateIndex($columns, $indexName ?: 'primary', true, true));
 
         foreach ($columns as $columnName) {
             $column = $this->getColumn($columnName);
@@ -130,12 +130,14 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      */
     public function addIndex(array $columnNames, $indexName = null, array $flags = [], array $options = []) {
         if ($indexName == null) {
-            $indexName = $this->_generateIdentifierName(
-                    array_merge([$this->getName()], $columnNames), "idx", $this->_getMaxIdentifierLength()
+            $indexName = $this->generateIdentifierName(
+                array_merge([$this->getName()], $columnNames),
+                'idx',
+                $this->getMaxIdentifierLength()
             );
         }
 
-        return $this->_addIndex($this->_createIndex($columnNames, $indexName, false, false, $flags, $options));
+        return $this->protectedAddIndex($this->protectedCreateIndex($columnNames, $indexName, false, false, $flags, $options));
     }
 
     /**
@@ -144,25 +146,25 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      * @return void
      */
     public function dropPrimaryKey() {
-        $this->dropIndex($this->_primaryKeyName);
-        $this->_primaryKeyName = false;
+        $this->dropIndex($this->primaryKeyName);
+        $this->primaryKeyName = false;
     }
 
     /**
      * Drops an index from this table.
      *
-     * @param string $indexName The index name.
+     * @param string $indexName the index name
      *
      * @return void
      *
-     * @throws SchemaException If the index does not exist.
+     * @throws CDatabase_Exception_SchemaException if the index does not exist
      */
     public function dropIndex($indexName) {
         $indexName = $this->normalizeIdentifier($indexName);
         if (!$this->hasIndex($indexName)) {
-            throw CDatabase_Schema_Exception::indexDoesNotExist($indexName, $this->_name);
+            throw CDatabase_Schema_Exception::indexDoesNotExist($indexName, $this->name);
         }
-        unset($this->_indexes[$indexName]);
+        unset($this->indexes[$indexName]);
     }
 
     /**
@@ -174,25 +176,27 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      */
     public function addUniqueIndex(array $columnNames, $indexName = null, array $options = []) {
         if ($indexName === null) {
-            $indexName = $this->_generateIdentifierName(
-                    array_merge([$this->getName()], $columnNames), "uniq", $this->_getMaxIdentifierLength()
+            $indexName = $this->generateIdentifierName(
+                array_merge([$this->getName()], $columnNames),
+                'uniq',
+                $this->getMaxIdentifierLength()
             );
         }
 
-        return $this->_addIndex($this->_createIndex($columnNames, $indexName, true, false, [], $options));
+        return $this->protectedAddIndex($this->protectedCreateIndex($columnNames, $indexName, true, false, [], $options));
     }
 
     /**
      * Renames an index.
      *
-     * @param string      $oldIndexName The name of the index to rename from.
+     * @param string      $oldIndexName the name of the index to rename from
      * @param string|null $newIndexName The name of the index to rename to.
      *                                  If null is given, the index name will be auto-generated.
      *
-     * @return self This table instance.
+     * @return self this table instance
      *
-     * @throws SchemaException if no index exists for the given current name
-     *                         or if an index with the given new name already exists on this table.
+     * @throws CDatabase_Exception_SchemaException if no index exists for the given current name
+     *                                             or if an index with the given new name already exists on this table
      */
     public function renameIndex($oldIndexName, $newIndexName = null) {
         $oldIndexName = $this->normalizeIdentifier($oldIndexName);
@@ -203,14 +207,14 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
         }
 
         if (!$this->hasIndex($oldIndexName)) {
-            throw SchemaException::indexDoesNotExist($oldIndexName, $this->_name);
+            throw CDatabase_Exception_SchemaException::indexDoesNotExist($oldIndexName, $this->name);
         }
 
         if ($this->hasIndex($normalizedNewIndexName)) {
-            throw SchemaException::indexAlreadyExists($normalizedNewIndexName, $this->_name);
+            throw CDatabase_Exception_SchemaException::indexAlreadyExists($normalizedNewIndexName, $this->name);
         }
 
-        $oldIndex = $this->_indexes[$oldIndexName];
+        $oldIndex = $this->indexes[$oldIndexName];
 
         if ($oldIndex->isPrimary()) {
             $this->dropPrimaryKey();
@@ -218,7 +222,7 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
             return $this->setPrimaryKey($oldIndex->getColumns(), $newIndexName);
         }
 
-        unset($this->_indexes[$oldIndexName]);
+        unset($this->indexes[$oldIndexName]);
 
         if ($oldIndex->isUnique()) {
             return $this->addUniqueIndex($oldIndex->getColumns(), $newIndexName, $oldIndex->getOptions());
@@ -253,11 +257,11 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      * @param array  $flags
      * @param array  $options
      *
-     * @return Index
+     * @return CDatabase_Schema_Index
      *
-     * @throws SchemaException
+     * @throws CDatabase_Exception_SchemaException
      */
-    private function _createIndex(array $columnNames, $indexName, $isUnique, $isPrimary, array $flags = [], array $options = []) {
+    private function protectedCreateIndex(array $columnNames, $indexName, $isUnique, $isPrimary, array $flags = [], array $options = []) {
         if (preg_match('(([^a-zA-Z0-9_]+))', $this->normalizeIdentifier($indexName))) {
             throw CDatabase_Schema_Exception::indexNameInvalid($indexName);
         }
@@ -268,7 +272,7 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
             }
 
             if (!$this->hasColumn($columnName)) {
-                throw CDatabase_Schema_Exception::columnDoesNotExist($columnName, $this->_name);
+                throw CDatabase_Schema_Exception::columnDoesNotExist($columnName, $this->name);
             }
         }
 
@@ -285,9 +289,27 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
     public function addColumn($columnName, $typeName, array $options = []) {
         $column = new CDatabase_Schema_Column($columnName, CDatabase_Type::getType($typeName), $options);
 
-        $this->_addColumn($column);
+        $this->protectedAddColumn($column);
 
         return $column;
+    }
+
+    /**
+     * @param CDatabase_Schema_Column $column
+     *
+     * @return void
+     *
+     * @throws CDatabase_Exception_SchemaException
+     */
+    protected function protectedAddColumn(CDatabase_Schema_Column $column) {
+        $columnName = $column->getName();
+        $columnName = $this->normalizeIdentifier($columnName);
+
+        if (isset($this->columns[$columnName])) {
+            throw CDatabase_Schema_Exception::columnAlreadyExists($this->getName(), $columnName);
+        }
+
+        $this->columns[$columnName] = $column;
     }
 
     /**
@@ -298,12 +320,12 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      *
      * @deprecated
      *
-     * @throws DBALException
+     * @throws CDatabase_Exception
      */
     public function renameColumn($oldColumnName, $newColumnName) {
-        throw new DBALException("Table#renameColumn() was removed, because it drops and recreates " .
-        "the column instead. There is no fix available, because a schema diff cannot reliably detect if a " .
-        "column was renamed or one column was created and another one dropped.");
+        throw new CDatabase_Exception('Table#renameColumn() was removed, because it drops and recreates '
+        . 'the column instead. There is no fix available, because a schema diff cannot reliably detect if a '
+        . 'column was renamed or one column was created and another one dropped.');
     }
 
     /**
@@ -330,7 +352,7 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      */
     public function dropColumn($columnName) {
         $columnName = $this->normalizeIdentifier($columnName);
-        unset($this->_columns[$columnName]);
+        unset($this->columns[$columnName]);
 
         return $this;
     }
@@ -349,7 +371,7 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      * @return self
      */
     public function addForeignKeyConstraint($foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = [], $constraintName = null) {
-        $constraintName = $constraintName ?: $this->_generateIdentifierName(array_merge((array) $this->getName(), $localColumnNames), "fk", $this->_getMaxIdentifierLength());
+        $constraintName = $constraintName ?: $this->generateIdentifierName(array_merge((array) $this->getName(), $localColumnNames), 'fk', $this->getMaxIdentifierLength());
 
         return $this->addNamedForeignKeyConstraint($constraintName, $foreignTable, $localColumnNames, $foreignColumnNames, $options);
     }
@@ -359,12 +381,12 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      *
      * Name is to be generated by the database itself.
      *
-     * @deprecated Use {@link addForeignKeyConstraint}
+     * @param CDatabase_Schema_Table|string $foreignTable       Table schema instance or table name
+     * @param array                         $localColumnNames
+     * @param array                         $foreignColumnNames
+     * @param array                         $options
      *
-     * @param Table|string $foreignTable       Table schema instance or table name
-     * @param array        $localColumnNames
-     * @param array        $foreignColumnNames
-     * @param array        $options
+     * @deprecated Use {@link addForeignKeyConstraint}
      *
      * @return self
      */
@@ -375,17 +397,17 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
     /**
      * Adds a foreign key constraint with a given name.
      *
-     * @deprecated Use {@link addForeignKeyConstraint}
-     *
-     * @param string       $name
-     * @param Table|string $foreignTable       Table schema instance or table name
-     * @param array        $localColumnNames
-     * @param array        $foreignColumnNames
-     * @param array        $options
+     * @param string                        $name
+     * @param CDatabase_Schema_Table|string $foreignTable       Table schema instance or table name
+     * @param array                         $localColumnNames
+     * @param array                         $foreignColumnNames
+     * @param array                         $options
      *
      * @return self
      *
-     * @throws SchemaException
+     * @throws CDatabase_Exception_SchemaException
+     *
+     * @deprecated Use {@link addForeignKeyConstraint}
      */
     public function addNamedForeignKeyConstraint($name, $foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = []) {
         if ($foreignTable instanceof CDatabase_Schema_Table) {
@@ -398,14 +420,18 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
 
         foreach ($localColumnNames as $columnName) {
             if (!$this->hasColumn($columnName)) {
-                throw CDatabase_Schema_Exception::columnDoesNotExist($columnName, $this->_name);
+                throw CDatabase_Schema_Exception::columnDoesNotExist($columnName, $this->name);
             }
         }
 
         $constraint = new CDatabase_Schema_ForeignKeyConstraint(
-                $localColumnNames, $foreignTable, $foreignColumnNames, $name, $options
+            $localColumnNames,
+            $foreignTable,
+            $foreignColumnNames,
+            $name,
+            $options
         );
-        $this->_addForeignKeyConstraint($constraint);
+        $this->protectedAddForeignKeyConstraint($constraint);
 
         return $this;
     }
@@ -417,27 +443,9 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      * @return self
      */
     public function addOption($name, $value) {
-        $this->_options[$name] = $value;
+        $this->options[$name] = $value;
 
         return $this;
-    }
-
-    /**
-     * @param CDatabase_Schema_Column $column
-     *
-     * @return void
-     *
-     * @throws SchemaException
-     */
-    protected function _addColumn(CDatabase_Schema_Column $column) {
-        $columnName = $column->getName();
-        $columnName = $this->normalizeIdentifier($columnName);
-
-        if (isset($this->_columns[$columnName])) {
-            throw CDatabase_Schema_Exception::columnAlreadyExists($this->getName(), $columnName);
-        }
-
-        $this->_columns[$columnName] = $column;
     }
 
     /**
@@ -447,34 +455,34 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      *
      * @return self
      *
-     * @throws SchemaException
+     * @throws CDatabase_Exception_SchemaException
      */
-    protected function _addIndex(CDatabase_Schema_Index $indexCandidate) {
+    protected function protectedAddIndex(CDatabase_Schema_Index $indexCandidate) {
         $indexName = $indexCandidate->getName();
         $indexName = $this->normalizeIdentifier($indexName);
         $replacedImplicitIndexes = [];
 
         foreach ($this->implicitIndexes as $name => $implicitIndex) {
-            if ($implicitIndex->isFullfilledBy($indexCandidate) && isset($this->_indexes[$name])) {
+            if ($implicitIndex->isFullfilledBy($indexCandidate) && isset($this->indexes[$name])) {
                 $replacedImplicitIndexes[] = $name;
             }
         }
 
-        if ((isset($this->_indexes[$indexName]) && !in_array($indexName, $replacedImplicitIndexes, true)) ||
-                ($this->_primaryKeyName != false && $indexCandidate->isPrimary())
+        if ((isset($this->indexes[$indexName]) && !in_array($indexName, $replacedImplicitIndexes, true))
+            || ($this->primaryKeyName != false && $indexCandidate->isPrimary())
         ) {
-            throw SchemaException::indexAlreadyExists($indexName, $this->_name);
+            throw CDatabase_Exception_SchemaException::indexAlreadyExists($indexName, $this->name);
         }
 
         foreach ($replacedImplicitIndexes as $name) {
-            unset($this->_indexes[$name], $this->implicitIndexes[$name]);
+            unset($this->indexes[$name], $this->implicitIndexes[$name]);
         }
 
         if ($indexCandidate->isPrimary()) {
-            $this->_primaryKeyName = $indexName;
+            $this->primaryKeyName = $indexName;
         }
 
-        $this->_indexes[$indexName] = $indexCandidate;
+        $this->indexes[$indexName] = $indexCandidate;
 
         return $this;
     }
@@ -484,35 +492,39 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      *
      * @return void
      */
-    protected function _addForeignKeyConstraint(CDatabase_Schema_ForeignKeyConstraint $constraint) {
+    protected function protectedAddForeignKeyConstraint(CDatabase_Schema_ForeignKeyConstraint $constraint) {
         $constraint->setLocalTable($this);
 
         if (strlen($constraint->getName())) {
             $name = $constraint->getName();
         } else {
-            $name = $this->_generateIdentifierName(
-                    array_merge((array) $this->getName(), $constraint->getLocalColumns()), "fk", $this->_getMaxIdentifierLength()
+            $name = $this->generateIdentifierName(
+                array_merge((array) $this->getName(), $constraint->getLocalColumns()),
+                'fk',
+                $this->getMaxIdentifierLength()
             );
         }
         $name = $this->normalizeIdentifier($name);
 
-        $this->_fkConstraints[$name] = $constraint;
+        $this->fkConstraints[$name] = $constraint;
 
         // add an explicit index on the foreign key columns. If there is already an index that fulfils this requirements drop the request.
         // In the case of __construct calling this method during hydration from schema-details all the explicitly added indexes
         // lead to duplicates. This creates computation overhead in this case, however no duplicate indexes are ever added (based on columns).
-        $indexName = $this->_generateIdentifierName(
-                array_merge([$this->getName()], $constraint->getColumns()), "idx", $this->_getMaxIdentifierLength()
+        $indexName = $this->generateIdentifierName(
+            array_merge([$this->getName()], $constraint->getColumns()),
+            'idx',
+            $this->getMaxIdentifierLength()
         );
-        $indexCandidate = $this->_createIndex($constraint->getColumns(), $indexName, false, false);
+        $indexCandidate = $this->protectedCreateIndex($constraint->getColumns(), $indexName, false, false);
 
-        foreach ($this->_indexes as $existingIndex) {
+        foreach ($this->indexes as $existingIndex) {
             if ($indexCandidate->isFullfilledBy($existingIndex)) {
                 return;
             }
         }
 
-        $this->_addIndex($indexCandidate);
+        $this->protectedAddIndex($indexCandidate);
         $this->implicitIndexes[$this->normalizeIdentifier($indexName)] = $indexCandidate;
     }
 
@@ -526,47 +538,48 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
     public function hasForeignKey($constraintName) {
         $constraintName = $this->normalizeIdentifier($constraintName);
 
-        return isset($this->_fkConstraints[$constraintName]);
+        return isset($this->fkConstraints[$constraintName]);
     }
 
     /**
      * Returns the foreign key constraint with the given name.
      *
-     * @param string $constraintName The constraint name.
+     * @param string $constraintName the constraint name
      *
      * @return ForeignKeyConstraint
      *
-     * @throws SchemaException If the foreign key does not exist.
+     * @throws CDatabase_Exception_SchemaException if the foreign key does not exist
      */
     public function getForeignKey($constraintName) {
         $constraintName = $this->normalizeIdentifier($constraintName);
         if (!$this->hasForeignKey($constraintName)) {
-            throw SchemaException::foreignKeyDoesNotExist($constraintName, $this->_name);
+            throw CDatabase_Exception_SchemaException::foreignKeyDoesNotExist($constraintName, $this->name);
         }
 
-        return $this->_fkConstraints[$constraintName];
+        return $this->fkConstraints[$constraintName];
     }
 
     /**
      * Removes the foreign key constraint with the given name.
      *
-     * @param string $constraintName The constraint name.
+     * @param string $constraintName the constraint name
      *
      * @return void
      *
-     * @throws SchemaException
+     * @throws CDatabase_Exception_SchemaException
      */
     public function removeForeignKey($constraintName) {
         $constraintName = $this->normalizeIdentifier($constraintName);
         if (!$this->hasForeignKey($constraintName)) {
-            throw SchemaException::foreignKeyDoesNotExist($constraintName, $this->_name);
+            throw CDatabase_Exception_SchemaException::foreignKeyDoesNotExist($constraintName, $this->name);
         }
 
-        unset($this->_fkConstraints[$constraintName]);
+        unset($this->fkConstraints[$constraintName]);
     }
 
     /**
      * Returns ordered list of columns (primary keys are first, then foreign keys, then the rest)
+     *
      * @return CDatabase_Schema_Column[]
      */
     public function getColumns() {
@@ -575,11 +588,12 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
             $primaryKeyColumns = $this->filterColumns($this->getPrimaryKey()->getColumns());
         }
 
-        return array_merge($primaryKeyColumns, $this->getForeignKeyColumns(), $this->_columns);
+        return array_merge($primaryKeyColumns, $this->getForeignKeyColumns(), $this->columns);
     }
 
     /**
      * Returns foreign key columns
+     *
      * @return CDatabase_Schema_Column[]
      */
     private function getForeignKeyColumns() {
@@ -593,11 +607,13 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
 
     /**
      * Returns only columns that have specified names
+     *
      * @param array $columnNames
+     *
      * @return CDatabase_Schema_Column[]
      */
     private function filterColumns(array $columnNames) {
-        return array_filter($this->_columns, function ($columnName) use ($columnNames) {
+        return array_filter($this->columns, function ($columnName) use ($columnNames) {
             return in_array($columnName, $columnNames, true);
         }, ARRAY_FILTER_USE_KEY);
     }
@@ -605,45 +621,45 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
     /**
      * Returns whether this table has a Column with the given name.
      *
-     * @param string $columnName The column name.
+     * @param string $columnName the column name
      *
      * @return bool
      */
     public function hasColumn($columnName) {
         $columnName = $this->normalizeIdentifier($columnName);
 
-        return isset($this->_columns[$columnName]);
+        return isset($this->columns[$columnName]);
     }
 
     /**
      * Returns the Column with the given name.
      *
-     * @param string $columnName The column name.
+     * @param string $columnName the column name
      *
      * @return CDatabase_Schema_Column
      *
-     * @throws SchemaException If the column does not exist.
+     * @throws CDatabase_Exception_SchemaException if the column does not exist
      */
     public function getColumn($columnName) {
         $columnName = $this->normalizeIdentifier($columnName);
         if (!$this->hasColumn($columnName)) {
-            throw SchemaException::columnDoesNotExist($columnName, $this->_name);
+            throw CDatabase_Exception_SchemaException::columnDoesNotExist($columnName, $this->name);
         }
 
-        return $this->_columns[$columnName];
+        return $this->columns[$columnName];
     }
 
     /**
      * Returns the primary key.
      *
-     * @return CDatabase_Schema_Index|null The primary key, or null if this Table has no primary key.
+     * @return CDatabase_Schema_Index|null the primary key, or null if this Table has no primary key
      */
     public function getPrimaryKey() {
         if (!$this->hasPrimaryKey()) {
             return null;
         }
 
-        return $this->getIndex($this->_primaryKeyName);
+        return $this->getIndex($this->primaryKeyName);
     }
 
     /**
@@ -651,11 +667,11 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      *
      * @return array
      *
-     * @throws DBALException
+     * @throws CDatabase_Exception
      */
     public function getPrimaryKeyColumns() {
         if (!$this->hasPrimaryKey()) {
-            throw new DBALException("Table " . $this->getName() . " has no primary key.");
+            throw new CDatabase_Exception('Table ' . $this->getName() . ' has no primary key.');
         }
         return $this->getPrimaryKey()->getColumns();
     }
@@ -666,45 +682,45 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      * @return bool
      */
     public function hasPrimaryKey() {
-        return ($this->_primaryKeyName && $this->hasIndex($this->_primaryKeyName));
+        return ($this->primaryKeyName && $this->hasIndex($this->primaryKeyName));
     }
 
     /**
      * Returns whether this table has an Index with the given name.
      *
-     * @param string $indexName The index name.
+     * @param string $indexName the index name
      *
      * @return bool
      */
     public function hasIndex($indexName) {
         $indexName = $this->normalizeIdentifier($indexName);
 
-        return (isset($this->_indexes[$indexName]));
+        return (isset($this->indexes[$indexName]));
     }
 
     /**
      * Returns the Index with the given name.
      *
-     * @param string $indexName The index name.
+     * @param string $indexName the index name
      *
      * @return CDatabase_Schema_Index
      *
-     * @throws SchemaException If the index does not exist.
+     * @throws CDatabase_Exception_SchemaException if the index does not exist
      */
     public function getIndex($indexName) {
         $indexName = $this->normalizeIdentifier($indexName);
         if (!$this->hasIndex($indexName)) {
-            throw SchemaException::indexDoesNotExist($indexName, $this->_name);
+            throw CDatabase_Exception_SchemaException::indexDoesNotExist($indexName, $this->name);
         }
 
-        return $this->_indexes[$indexName];
+        return $this->indexes[$indexName];
     }
 
     /**
      * @return CDatabase_Schema_Index[]
      */
     public function getIndexes() {
-        return $this->_indexes;
+        return $this->indexes;
     }
 
     /**
@@ -713,7 +729,7 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      * @return CDatabase_Schema_ForeignKeyConstraint[]
      */
     public function getForeignKeys() {
-        return $this->_fkConstraints;
+        return $this->fkConstraints;
     }
 
     /**
@@ -722,7 +738,7 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      * @return bool
      */
     public function hasOption($name) {
-        return isset($this->_options[$name]);
+        return isset($this->options[$name]);
     }
 
     /**
@@ -731,14 +747,14 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      * @return mixed
      */
     public function getOption($name) {
-        return $this->_options[$name];
+        return $this->options[$name];
     }
 
     /**
      * @return array
      */
     public function getOptions() {
-        return $this->_options;
+        return $this->options;
     }
 
     /**
@@ -768,15 +784,15 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      * @return void
      */
     public function __clone() {
-        foreach ($this->_columns as $k => $column) {
-            $this->_columns[$k] = clone $column;
+        foreach ($this->columns as $k => $column) {
+            $this->columns[$k] = clone $column;
         }
-        foreach ($this->_indexes as $k => $index) {
-            $this->_indexes[$k] = clone $index;
+        foreach ($this->indexes as $k => $index) {
+            $this->indexes[$k] = clone $index;
         }
-        foreach ($this->_fkConstraints as $k => $fk) {
-            $this->_fkConstraints[$k] = clone $fk;
-            $this->_fkConstraints[$k]->setLocalTable($this);
+        foreach ($this->fkConstraints as $k => $fk) {
+            $this->fkConstraints[$k] = clone $fk;
+            $this->fkConstraints[$k]->setLocalTable($this);
         }
     }
 
@@ -785,12 +801,11 @@ class CDatabase_Schema_Table extends CDatabase_AbstractAsset {
      *
      * Trims quotes and lowercases the given identifier.
      *
-     * @param string $identifier The identifier to normalize.
+     * @param string $identifier the identifier to normalize
      *
-     * @return string The normalized identifier.
+     * @return string the normalized identifier
      */
     private function normalizeIdentifier($identifier) {
         return $this->trimQuotes(strtolower($identifier));
     }
-
 }

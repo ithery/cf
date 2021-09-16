@@ -1,0 +1,76 @@
+<?php
+
+abstract class CManager_Asset_FileAbstract {
+    protected $script;
+
+    protected $type;
+
+    protected $pos;
+
+    protected $mediaPaths = [];
+
+    public function __construct(array $options) {
+        $this->script = carr::get($options, 'script');
+        $this->type = carr::get($options, 'type', 'js');
+    }
+
+    public function getUrl() {
+        $file = $this->script;
+        $dir_file = $this->script;
+        $js_version = '';
+
+        if (!cstr::startsWith($file, 'http')) {
+            if (strpos($file, '?') !== false) {
+                $dir_file = substr($file, 0, strpos($file, '?'));
+                $js_version = substr($file, strpos($file, '?'), strlen($file) - 1);
+            }
+        }
+        $js_file = $this->fullpath($dir_file);
+        if (strpos($dir_file, 'http') !== false) {
+            $js_file = $dir_file;
+        } else {
+            $js_file = $this->fullpath($dir_file);
+            if (!file_exists($js_file)) {
+                throw new Exception('JS File not exists, ' . $file);
+            }
+            if (strlen($js_version) > 0) {
+                $js_file .= $js_version;
+            }
+        }
+        return $js_file;
+    }
+
+    public function getPath() {
+        $file = $this->script;
+        $dirFile = $this->script;
+        $fileVersion = '';
+
+        if (!cstr::startsWith($file, 'http')) {
+            if (strpos($file, '?') !== false) {
+                $dirFile = substr($file, 0, strpos($file, '?'));
+                $fileVersion = substr($file, strpos($file, '?'), strlen($file) - 1);
+            }
+        }
+        $assetFile = $this->fullpath($dirFile);
+        if (strpos($dirFile, 'http') !== false) {
+            $assetFile = $dirFile;
+        } else {
+            $assetFile = $this->fullpath($dirFile);
+            if (!file_exists($assetFile)) {
+                throw new Exception('File not exists, ' . $file);
+            }
+            if (strlen($fileVersion) > 0) {
+                $assetFile .= $fileVersion;
+            }
+        }
+        return $assetFile;
+    }
+
+    abstract protected function fullpath($file);
+
+    abstract protected function render();
+
+    public function __toString() {
+        return $this->getPath();
+    }
+}

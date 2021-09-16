@@ -1,39 +1,35 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
-
-    public function populateAAData($data, $table, $request, &$js) {
-        $aaData = array();
+    public function populateAAData($data, CElement_Component_DataTable $table, $request, &$js) {
+        $aaData = [];
         $rowActionList = $table->getRowActionList();
         $no = carr::get($request, 'iDisplayStart', 0);
         foreach ($data as $row) {
-            $arr = array();
+            $arr = [];
             $no++;
             $key = carr::get($row, $table->getKeyField(), '');
 
             $htmlRowAction = '';
             if ($rowActionList != null && $rowActionList->childCount() > 0) {
-               
                 $html = new CStringBuilder();
 
-                $html->appendln('<td class="low-padding align-center cell-action td-action ">')->inc_indent()->br();
+                $html->appendln('<td class="low-padding align-center cell-action td-action ">')->incIndent()->br();
                 foreach ($row as $k => $v) {
                     $jsparam[$k] = $v;
                 }
-                $jsparam["param1"] = $key;
-                if ($table->getRowActionList()->getStyle() == "btn-dropdown") {
-                    $table->getRowActionList()->add_class("pull-right");
+                $jsparam['param1'] = $key;
+                if ($table->getRowActionList()->getStyle() == 'btn-dropdown') {
+                    if ($table->getActionLocation() == 'first') {
+                        $table->getRowActionList()->addClass('dropdown-menu-left');
+                    } else {
+                        $table->getRowActionList()->addClass('dropdown-menu-right');
+                    }
                 }
                 $rowActionList->regenerateId(true);
-                $rowActionList->apply("setJsParam", $jsparam);
+                $rowActionList->apply('setJsParam', $jsparam);
 
-                $rowActionList->apply("setHandlerUrlParam", $jsparam);
+                $rowActionList->apply('setHandlerUrlParam', $jsparam);
 
                 if (($table->filterActionCallbackFunc) != null) {
                     $actions = $rowActionList->childs();
@@ -42,20 +38,18 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                         $action->removeClass('d-none');
 
                         $visibility = CFunction::factory($table->filterActionCallbackFunc)
-                                ->addArg($table)
-                                ->addArg('action')
-                                ->addArg($row)
-                                ->addArg($action)
-                                ->setRequire($table->requires)
-                                ->execute();
-
+                            ->addArg($table)
+                            ->addArg('action')
+                            ->addArg($row)
+                            ->addArg($action)
+                            ->setRequire($table->requires)
+                            ->execute();
 
                         if ($visibility == false) {
                             $action->addClass('d-none');
                         }
                         $action->setVisibility($visibility);
                     }
-
 
                     //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
                 }
@@ -75,15 +69,28 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
             }
             if ($table->getActionLocation() == 'first') {
                 if ($rowActionList != null && $rowActionList->childCount() > 0) {
-
-
                     $arr[] = $htmlRowAction;
                 }
             }
             foreach ($table->columns as $col) {
                 $col_found = false;
-                $new_v = "";
-                $col_v = carr::get($row, $col->getFieldname());
+                $new_v = '';
+                if ($row instanceof CModel) {
+                    $fieldName = $col->getFieldname();
+                    if (strpos($fieldName, '.') !== false) {
+                        $fields = explode('.', $fieldName);
+                        $col_v = $row;
+
+                        foreach ($fields as $field) {
+                            $col_v = (new COptional($col_v))->{$field};
+                        }
+                    } else {
+                        $col_v = $row->{$col->getFieldname()};
+                    }
+                } else {
+                    $col_v = carr::get($row, $col->getFieldname());
+                }
+
                 $ori_v = $col_v;
                 //do transform
                 foreach ($col->transforms as $trans) {
@@ -94,8 +101,8 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                 if (strlen($col->getFormat()) > 0) {
                     $temp_v = $col->getFormat();
                     foreach ($row as $k2 => $v2) {
-                        if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-                            $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
+                        if (strpos($temp_v, '{' . $k2 . '}') !== false) {
+                            $temp_v = str_replace('{' . $k2 . '}', $v2, $temp_v);
                         }
                         $col_v = $temp_v;
                     }
@@ -112,7 +119,6 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                         $js .= $col_v['js'];
                         $col_v = $col_v['html'];
                     }
-
                 }
                 $new_v = $col_v;
 
@@ -130,32 +136,29 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                         $new_v = $new_v['html'];
                     }
                 }
-                $class = "";
+                $class = '';
                 switch ($col->getAlign()) {
                     case CConstant::ALIGN_LEFT:
-                        $class .= " align-left";
+                        $class .= ' align-left';
                         break;
                     case CConstant::ALIGN_RIGHT:
-                        $class .= " align-right";
+                        $class .= ' align-right';
                         break;
                     case CConstant::ALIGN_CENTER:
-                        $class .= " align-center";
+                        $class .= ' align-center';
                         break;
                 }
                 $arr[] = $new_v;
             }
             if ($table->getActionLocation() == 'last') {
                 if ($rowActionList != null && $rowActionList->childCount() > 0) {
-
-
                     $arr[] = $htmlRowAction;
                 }
             }
 
-            $arr["DT_RowId"] = $key;
+            $arr['DT_RowId'] = $key;
             $aaData[] = $arr;
         }
         return $aaData;
     }
-
 }

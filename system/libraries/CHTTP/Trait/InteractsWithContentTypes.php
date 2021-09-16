@@ -1,19 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 5:37:09 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 5:37:09 AM
  */
 trait CHTTP_Trait_InteractsWithContentTypes {
-
     /**
      * Determine if the given content types match.
      *
-     * @param  string  $actual
-     * @param  string  $type
+     * @param string $actual
+     * @param string $type
+     *
      * @return bool
      */
     public static function matchesType($actual, $type) {
@@ -58,7 +59,8 @@ trait CHTTP_Trait_InteractsWithContentTypes {
     /**
      * Determines whether the current requests accepts a given content type.
      *
-     * @param  string|array  $contentTypes
+     * @param string|array $contentTypes
+     *
      * @return bool
      */
     public function accepts($contentTypes) {
@@ -88,7 +90,8 @@ trait CHTTP_Trait_InteractsWithContentTypes {
     /**
      * Return the most suitable content type from the given array based on content negotiation.
      *
-     * @param  string|array  $contentTypes
+     * @param string|array $contentTypes
+     *
      * @return string|null
      */
     public function prefers($contentTypes) {
@@ -136,7 +139,8 @@ trait CHTTP_Trait_InteractsWithContentTypes {
     /**
      * Get the data format expected in the response.
      *
-     * @param  string  $default
+     * @param string $default
+     *
      * @return string
      */
     public function format($default = 'html') {
@@ -148,5 +152,4 @@ trait CHTTP_Trait_InteractsWithContentTypes {
 
         return $default;
     }
-
 }

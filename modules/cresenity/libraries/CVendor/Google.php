@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CVendor_Google {
-
     /**
-     * 
      * @param array $options
+     *
      * @return \CVendor_Google_Recaptcha_RecaptchaV2
      */
     public static function recaptchaV2($options = []) {
@@ -21,8 +14,8 @@ class CVendor_Google {
     }
 
     /**
-     * 
      * @param array $options
+     *
      * @return \CVendor_Google_Recaptcha_RecaptchaV3
      */
     public static function recaptchaV3($options = []) {
@@ -30,5 +23,4 @@ class CVendor_Google {
         $siteKey = carr::get($options, 'siteKey', CF::config('vendor.google.recaptcha_v3_site_key'));
         return new CVendor_Google_Recaptcha_RecaptchaV3($secretKey, $siteKey);
     }
-
 }

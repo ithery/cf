@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CSession_Store {
-
     /**
      * The session ID.
      *
@@ -45,9 +44,10 @@ class CSession_Store {
     /**
      * Create a new session instance.
      *
-     * @param  string  $name
-     * @param  \SessionHandlerInterface  $handler
-     * @param  string|null  $id
+     * @param string                   $name
+     * @param \SessionHandlerInterface $handler
+     * @param string|null              $id
+     *
      * @return void
      */
     public function __construct($name, SessionHandlerInterface $handler, $id = null) {
@@ -100,7 +100,8 @@ class CSession_Store {
     /**
      * Prepare the raw string data from the session for unserialization.
      *
-     * @param  string  $data
+     * @param string $data
+     *
      * @return string
      */
     protected function prepareForUnserialize($data) {
@@ -114,9 +115,10 @@ class CSession_Store {
      */
     public function save() {
         $this->ageFlashData();
+        file_put_contents('test.txt', json_encode($this->attributes, JSON_PRETTY_PRINT));
 
         $this->handler->write($this->getId(), $this->prepareForStorage(
-                        serialize($this->attributes)
+            serialize($this->attributes)
         ));
 
         $this->started = false;
@@ -125,7 +127,8 @@ class CSession_Store {
     /**
      * Prepare the serialized session data for storage.
      *
-     * @param  string  $data
+     * @param string $data
+     *
      * @return string
      */
     protected function prepareForStorage($data) {
@@ -157,44 +160,48 @@ class CSession_Store {
     /**
      * Get a subset of the session data.
      *
-     * @param  array  $keys
+     * @param array $keys
+     *
      * @return array
      */
     public function only(array $keys) {
-        return Arr::only($this->attributes, $keys);
+        return carr::only($this->attributes, $keys);
     }
 
     /**
      * Checks if a key exists.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return bool
      */
     public function exists($key) {
         $placeholder = new stdClass;
 
         return !c::collect(is_array($key) ? $key : func_get_args())->contains(function ($key) use ($placeholder) {
-                    return $this->get($key, $placeholder) === $placeholder;
-                });
+            return $this->get($key, $placeholder) === $placeholder;
+        });
     }
 
     /**
      * Checks if a key is present and not null.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return bool
      */
     public function has($key) {
         return !c::collect(is_array($key) ? $key : func_get_args())->contains(function ($key) {
-                    return is_null($this->get($key));
-                });
+            return is_null($this->get($key));
+        });
     }
 
     /**
      * Get an item from the session.
      *
-     * @param  string  $key
-     * @param  mixed  $default
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
     public function get($key, $default = null) {
@@ -204,8 +211,9 @@ class CSession_Store {
     /**
      * Get the value of a given key and then forget it.
      *
-     * @param  string  $key
-     * @param  mixed  $default
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
     public function pull($key, $default = null) {
@@ -215,7 +223,8 @@ class CSession_Store {
     /**
      * Determine if the session contains old input.
      *
-     * @param  string|null  $key
+     * @param string|null $key
+     *
      * @return bool
      */
     public function hasOldInput($key = null) {
@@ -227,8 +236,9 @@ class CSession_Store {
     /**
      * Get the requested item from the flashed input array.
      *
-     * @param  string|null  $key
-     * @param  mixed  $default
+     * @param string|null $key
+     * @param mixed       $default
+     *
      * @return mixed
      */
     public function getOldInput($key = null, $default = null) {
@@ -238,7 +248,8 @@ class CSession_Store {
     /**
      * Replace the given session attributes entirely.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return void
      */
     public function replace(array $attributes) {
@@ -248,8 +259,9 @@ class CSession_Store {
     /**
      * Put a key / value pair or array of key / value pairs in the session.
      *
-     * @param  string|array  $key
-     * @param  mixed  $value
+     * @param string|array $key
+     * @param mixed        $value
+     *
      * @return void
      */
     public function put($key, $value = null) {
@@ -266,18 +278,21 @@ class CSession_Store {
      * Set a key / value pair or array of key / value pairs in the session.
      * Alias of put
      *
-     * @param  string|array  $key
-     * @param  mixed  $value
+     * @param string|array $key
+     * @param mixed        $value
+     *
      * @return void
      */
     public function set($key, $value = null) {
-        return $this->put($key,$value);
+        return $this->put($key, $value);
     }
+
     /**
      * Get an item from the session, or store the default value.
      *
-     * @param  string  $key
-     * @param  \Closure  $callback
+     * @param string   $key
+     * @param \Closure $callback
+     *
      * @return mixed
      */
     public function remember($key, Closure $callback) {
@@ -293,8 +308,9 @@ class CSession_Store {
     /**
      * Push a value onto a session array.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function push($key, $value) {
@@ -308,8 +324,9 @@ class CSession_Store {
     /**
      * Increment the value of an item in the session.
      *
-     * @param  string  $key
-     * @param  int  $amount
+     * @param string $key
+     * @param int    $amount
+     *
      * @return mixed
      */
     public function increment($key, $amount = 1) {
@@ -321,8 +338,9 @@ class CSession_Store {
     /**
      * Decrement the value of an item in the session.
      *
-     * @param  string  $key
-     * @param  int  $amount
+     * @param string $key
+     * @param int    $amount
+     *
      * @return int
      */
     public function decrement($key, $amount = 1) {
@@ -332,11 +350,12 @@ class CSession_Store {
     /**
      * Flash a key / value pair to the session.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
-    public function flash( $key, $value = true) {
+    public function flash($key, $value = true) {
         $this->put($key, $value);
 
         $this->push('_flash.new', $key);
@@ -347,8 +366,9 @@ class CSession_Store {
     /**
      * Flash a key / value pair to the session for immediate use.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function now($key, $value) {
@@ -371,7 +391,8 @@ class CSession_Store {
     /**
      * Reflash a subset of the current flash data.
      *
-     * @param  array|mixed  $keys
+     * @param array|mixed $keys
+     *
      * @return void
      */
     public function keep($keys = null) {
@@ -383,7 +404,8 @@ class CSession_Store {
     /**
      * Merge new flash keys into the new flash array.
      *
-     * @param  array  $keys
+     * @param array $keys
+     *
      * @return void
      */
     protected function mergeNewFlashes(array $keys) {
@@ -395,7 +417,8 @@ class CSession_Store {
     /**
      * Remove the given keys from the old flash data.
      *
-     * @param  array  $keys
+     * @param array $keys
+     *
      * @return void
      */
     protected function removeFromOldFlashData(array $keys) {
@@ -405,7 +428,8 @@ class CSession_Store {
     /**
      * Flash an input array to the session.
      *
-     * @param  array  $value
+     * @param array $value
+     *
      * @return void
      */
     public function flashInput(array $value) {
@@ -415,7 +439,8 @@ class CSession_Store {
     /**
      * Remove an item from the session, returning its value.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function remove($key) {
@@ -425,10 +450,22 @@ class CSession_Store {
     /**
      * Remove one or many items from the session.
      *
-     * @param  string|array  $keys
+     * @param string|array $keys
+     *
      * @return void
      */
     public function forget($keys) {
+        carr::forget($this->attributes, $keys);
+    }
+
+    /**
+     * Remove one or many items from the session. (Alias of forget)
+     *
+     * @param string|array $keys
+     *
+     * @return void
+     */
+    public function delete($keys) {
         carr::forget($this->attributes, $keys);
     }
 
@@ -455,7 +492,8 @@ class CSession_Store {
     /**
      * Generate a new session identifier.
      *
-     * @param  bool  $destroy
+     * @param bool $destroy
+     *
      * @return bool
      */
     public function regenerate($destroy = false) {
@@ -467,7 +505,8 @@ class CSession_Store {
     /**
      * Generate a new session ID for the session.
      *
-     * @param  bool  $destroy
+     * @param bool $destroy
+     *
      * @return bool
      */
     public function migrate($destroy = false) {
@@ -503,7 +542,8 @@ class CSession_Store {
     /**
      * Set the name of the session.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return void
      */
     public function setName($name) {
@@ -522,7 +562,8 @@ class CSession_Store {
     /**
      * Set the session ID.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return void
      */
     public function setId($id) {
@@ -532,7 +573,8 @@ class CSession_Store {
     /**
      * Determine if this is a valid session ID.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return bool
      */
     public function isValidId($id) {
@@ -551,7 +593,8 @@ class CSession_Store {
     /**
      * Set the existence of the session on the handler if applicable.
      *
-     * @param  bool  $value
+     * @param bool $value
+     *
      * @return void
      */
     public function setExists($value) {
@@ -590,7 +633,8 @@ class CSession_Store {
     /**
      * Set the "previous" URL in the session.
      *
-     * @param  string  $url
+     * @param string $url
+     *
      * @return void
      */
     public function setPreviousUrl($url) {
@@ -627,7 +671,8 @@ class CSession_Store {
     /**
      * Set the request on the handler instance.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param CHTTP_Request $request
+     *
      * @return void
      */
     public function setRequestOnHandler($request) {
@@ -636,11 +681,10 @@ class CSession_Store {
         }
     }
 
-    
     public function updateLastActivity() {
-        $this->put('_last_activity',time());
+        $this->put('_last_activity', time());
     }
-    
+
     public function updateTotalHits() {
         $this->increment('_total_hit');
     }

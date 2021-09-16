@@ -1,7 +1,6 @@
 <?php
 
 class CVendor_OneSignal_Apps {
-
     protected $api;
     private $resolverFactory;
 
@@ -21,7 +20,7 @@ class CVendor_OneSignal_Apps {
      */
     public function getOne($id) {
         return $this->api->request('GET', '/apps/' . $id, [
-                    'Authorization' => 'Basic ' . $this->api->getConfig()->getUserAuthKey(),
+            'Authorization' => 'Basic ' . $this->api->getConfig()->getUserAuthKey(),
         ]);
     }
 
@@ -34,7 +33,7 @@ class CVendor_OneSignal_Apps {
      */
     public function getAll() {
         return $this->api->request('GET', '/apps', [
-                    'Authorization' => 'Basic ' . $this->api->getConfig()->getUserAuthKey(),
+            'Authorization' => 'Basic ' . $this->api->getConfig()->getUserAuthKey(),
         ]);
     }
 
@@ -51,8 +50,8 @@ class CVendor_OneSignal_Apps {
         $data = $this->resolverFactory->createAppResolver()->resolve($data);
 
         return $this->api->request('POST', '/apps', [
-                    'Authorization' => 'Basic ' . $this->api->getConfig()->getUserAuthKey(),
-                        ], json_encode($data));
+            'Authorization' => 'Basic ' . $this->api->getConfig()->getUserAuthKey(),
+        ], json_encode($data));
     }
 
     /**
@@ -69,8 +68,7 @@ class CVendor_OneSignal_Apps {
         $data = $this->resolverFactory->createAppResolver()->resolve($data);
 
         return $this->api->request('PUT', '/apps/' . $id, [
-                    'Authorization' => 'Basic ' . $this->api->getConfig()->getUserAuthKey(),
-                        ], json_encode($data));
+            'Authorization' => 'Basic ' . $this->api->getConfig()->getUserAuthKey(),
+        ], json_encode($data));
     }
-
 }

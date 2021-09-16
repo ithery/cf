@@ -1,7 +1,6 @@
 <?php
 
 class CDatabase_Resolver implements CDatabase_ResolverInterface {
-
     protected static $instance;
 
     public static function instance($domain = null) {
@@ -9,7 +8,7 @@ class CDatabase_Resolver implements CDatabase_ResolverInterface {
             $domain = CF::domain();
         }
         if (static::$instance == null) {
-            static::$instance = array();
+            static::$instance = [];
         }
         if (!isset(static::$instance[$domain])) {
             $file = CF::getFile('config', 'database', $domain);
@@ -43,7 +42,9 @@ class CDatabase_Resolver implements CDatabase_ResolverInterface {
     /**
      * Create a new connection resolver instance.
      *
-     * @param  array  $connections
+     * @param array      $connections
+     * @param null|mixed $domain
+     *
      * @return void
      */
     public function __construct(array $configs = [], $domain = null) {
@@ -62,7 +63,8 @@ class CDatabase_Resolver implements CDatabase_ResolverInterface {
     /**
      * Get a database connection instance.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return CDatabase
      */
     public function connection($name = null) {
@@ -76,8 +78,9 @@ class CDatabase_Resolver implements CDatabase_ResolverInterface {
     /**
      * Add a connection to the resolver.
      *
-     * @param  string  $name
-     * @param  array  $config
+     * @param string $name
+     * @param array  $config
+     *
      * @return void
      */
     public function addConfig($name, $config) {
@@ -87,7 +90,8 @@ class CDatabase_Resolver implements CDatabase_ResolverInterface {
     /**
      * Check if a connection has been registered.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return bool
      */
     public function hasConnection($name) {
@@ -106,11 +110,11 @@ class CDatabase_Resolver implements CDatabase_ResolverInterface {
     /**
      * Set the default connection name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return void
      */
     public function setDefaultConnection($name) {
         $this->default = $name;
     }
-
 }

@@ -21,6 +21,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         CHTTP_Trait_InteractsWithContentTypes,
         CHTTP_Trait_InteractsWithFlashData;
 
+    protected $browser;
+
     /**
      * The decoded JSON content for the request.
      *
@@ -119,9 +121,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     public function fullUrlWithQuery(array $query) {
         $question = $this->getBaseUrl() . $this->getPathInfo() === '/' ? '/?' : '?';
 
-        return count($this->query()) > 0
-        ? $this->url() . $question . carr::query(array_merge($this->query(), $query))
-        : $this->fullUrl() . $question . carr::query($query);
+        return count($this->query()) > 0 ? $this->url() . $question . carr::query(array_merge($this->query(), $query)) : $this->fullUrl() . $question . carr::query($query);
     }
 
     /**
@@ -340,7 +340,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
             return $this->json;
         }
 
-        return CF::get($this->json->all(), $key, $default);
+        return c::get($this->json->all(), $key, $default);
     }
 
     /**
@@ -359,8 +359,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Create a new request instance from the given Laravel request.
      *
-     * @param \Illuminate\Http\Request      $from
-     * @param \Illuminate\Http\Request|null $to
+     * @param \CHTTP_Request      $from
+     * @param \CHTTP_Request|null $to
      *
      * @return static
      */
@@ -386,7 +386,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         $request->setJson($from->json());
 
         if ($session = $from->getSession()) {
-            $request->setLaravelSession($session);
+            $request->setCFSession($session);
         }
 
         $request->setUserResolver($from->getUserResolver());
@@ -425,14 +425,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * {@inheritdoc}
      */
-    public function duplicate(
-        array $query = null,
-        array $request = null,
-        array $attributes = null,
-        array $cookies = null,
-        array $files = null,
-        array $server = null
-    ) {
+    public function duplicate(array $query = null, array $request = null, array $attributes = null, array $cookies = null, array $files = null, array $server = null) {
         return parent::duplicate($query, $request, $attributes, $cookies, $this->filterFiles($files), $server);
     }
 
@@ -479,7 +472,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Get the session associated with the request.
      *
-     * @return \Illuminate\Session\Store|null
+     * @return \CSession_Store|null
      */
     public function getSession() {
         return $this->session;
@@ -488,11 +481,11 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     /**
      * Set the session instance on the request.
      *
-     * @param \Illuminate\Contracts\Session\Session $session
+     * @param CSession_Store $session
      *
      * @return void
      */
-    public function setLaravelSession($session) {
+    public function setCFSession($session) {
         $this->session = $session;
     }
 
@@ -621,8 +614,9 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return bool
      */
     public function offsetExists($offset) {
+        $routeParameters = $this->route() ? $this->route()->parameters() : [];
         return carr::has(
-            $this->all() + $this->route()->parameters(),
+            $this->all() + $routeParameters,
             $offset
         );
     }
@@ -683,5 +677,17 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         return carr::get($this->all(), $key, function () use ($key) {
             return $this->route($key);
         });
+    }
+
+    /**
+     * Get Browser
+     *
+     * @return CBrowser
+     */
+    public function browser() {
+        if ($this->browser == null) {
+            $this->browser = new CBrowser($this->userAgent());
+        }
+        return $this->browser;
     }
 }

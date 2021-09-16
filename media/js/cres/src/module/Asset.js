@@ -1,18 +1,19 @@
 export default class Asset {
     constructor() {
         this.filesAdded = [];
-
     }
     removeJsCss(filename, filetype) {
-        var targetelement = (filetype == "js") ? "script" : (filetype == "css") ? "link" : "none"; //determine element type to create nodelist from
-        var targetattr = (filetype == "js") ? "src" : (filetype == "css") ? "href" : "none"; //determine corresponding attribute to test for
-        var allsuspects = document.getElementsByTagName(targetelement);
-        for (var i = allsuspects.length; i >= 0; i--) { //search backwards within nodelist for matching elements to remove
+        //determine element type to create nodelist from
+        let targetelement = (filetype == 'js') ? 'script' : (filetype == 'css') ? 'link' : 'none';
+        //determine corresponding attribute to test for
+        let targetattr = (filetype == 'js') ? 'src' : (filetype == 'css') ? 'href' : 'none';
+        let allsuspects = document.getElementsByTagName(targetelement);
+        //search backwards within nodelist for matching elements to remove
+        for (let i = allsuspects.length; i >= 0; i--) {
             if (allsuspects[i] && allsuspects[i].getAttribute(targetattr) != null && allsuspects[i].getAttribute(targetattr).indexOf(filename) != -1) {
-                allsuspects[i].parentNode.removeChild(allsuspects[i]) //remove element by calling parentNode.removeChild()
+                //remove element by calling parentNode.removeChild()
+                allsuspects[i].parentNode.removeChild(allsuspects[i]);
             }
         }
-    };
-
-
+    }
 }

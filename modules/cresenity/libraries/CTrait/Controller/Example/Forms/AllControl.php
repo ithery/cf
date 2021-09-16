@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 24, 2018, 4:09:45 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 24, 2018, 4:09:45 PM
  */
 trait CTrait_Controller_Example_Forms_AllControl {
-
     public function example() {
         $app = CApp::instance();
 
@@ -25,8 +25,6 @@ trait CTrait_Controller_Example_Forms_AllControl {
         $app->addField()->setLabel('Image')->addControl('imageControl', 'image');
         $app->addField()->setLabel('Image Ajax')->addControl('imageAjaxControl', 'image-ajax');
 
-
         echo $app->render();
     }
-
 }

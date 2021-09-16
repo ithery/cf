@@ -1,56 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
-
-    private function toIterator($files) {
-        if (!$files instanceof \Traversable) {
-            $files = new \ArrayObject(is_array($files) ? $files : [$files]);
-        }
-
-        return $files;
-    }
-
-    /**
-     * Delete the specified file or directory with files.
-     *
-     * @param string $files
-     * @return void
-     */
-    public function remove($files) {
-        $files = iterator_to_array($this->toIterator($files));
-        $files = array_reverse($files);
-        foreach ($files as $file) {
-            if (!file_exists($file) && !is_link($file)) {
-                continue;
-            }
-
-            if (is_dir($file) && !is_link($file)) {
-                $this->remove(new \FilesystemIterator($file));
-
-                if (true !== @rmdir($file)) {
-                    throw new \Exception(sprintf('Failed to remove directory "%s".', $file));
-                }
-            } else {
-                // https://bugs.php.net/bug.php?id=52176
-                if ('\\' === DIRECTORY_SEPARATOR && is_dir($file)) {
-                    if (true !== @rmdir($file)) {
-                        throw new \Exception(sprintf('Failed to remove file "%s".', $file));
-                    }
-                } else {
-                    if (true !== @unlink($file)) {
-                        throw new \Exception(sprintf('Failed to remove file "%s".', $file), 0, null, $file);
-                    }
-                }
-            }
-        }
-    }
-
     protected function removeDirectoryAsRoot($file) {
         $command = sprintf('sudo rm %s -rf', $file);
         CDevSuite::commandLine()->run($command);
@@ -59,6 +9,7 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
             throw new \Exception(sprintf('Failed to remove directory "%s".', $file));
         }
     }
+
     protected function removeFileAsRoot($file) {
         $command = sprintf('sudo rm %s -f', $file);
         CDevSuite::commandLine()->run($command);
@@ -72,6 +23,7 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
      * Delete the specified file or directory with files.
      *
      * @param string $files
+     *
      * @return void
      */
     public function removeAsRoot($files) {
@@ -100,7 +52,8 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
     /**
      * Determine if the given file exists.
      *
-     * @param string $path
+     * @param mixed $files
+     *
      * @return bool
      */
     public function exists($files) {
@@ -117,6 +70,7 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
      * Backup the given file.
      *
      * @param string $file
+     *
      * @return bool
      */
     public function backup($file) {
@@ -130,12 +84,12 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
 
         return false;
     }
-    
-    
+
     /**
      * Backup the given file.
      *
      * @param string $file
+     *
      * @return bool
      */
     public function backupAsRoot($file) {
@@ -154,6 +108,7 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
      * Restore a backed up file.
      *
      * @param string $file
+     *
      * @return bool
      */
     public function restore($file) {
@@ -165,11 +120,12 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
 
         return false;
     }
-    
+
     /**
      * Restore a backed up file.
      *
      * @param string $file
+     *
      * @return bool
      */
     public function restoreAsRoot($file) {
@@ -187,6 +143,7 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
      *
      * @param string $line
      * @param string $file
+     *
      * @return void
      */
     public function commentLine($line, $file) {
@@ -201,6 +158,7 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
      *
      * @param string $line
      * @param string $file
+     *
      * @return void
      */
     public function uncommentLine($line, $file) {
@@ -214,6 +172,7 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
      * Resolve the given symbolic link.
      *
      * @param string $path
+     *
      * @return string
      */
     public function readLink($path) {
@@ -225,5 +184,4 @@ class CDevSuite_Linux_Filesystem extends CDevSuite_Filesystem {
 
         return $link;
     }
-
 }

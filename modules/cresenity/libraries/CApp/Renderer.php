@@ -1,22 +1,23 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 7, 2018, 7:10:59 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 7, 2018, 7:10:59 PM
  */
 class CApp_Renderer {
-
     use CTrait_HasOptions;
 
     protected $app;
+
     protected $rendered = false;
 
     public function getConfig($name) {
-        $config = CF::config('renderer.'. $name);
-      
+        $config = CF::config('renderer.' . $name);
+
         return $config;
     }
 
@@ -25,7 +26,7 @@ class CApp_Renderer {
             $configName = CF::config('renderer.default');
             $options = $this->getConfig($configName);
         }
-        $this->rendered=false;
+        $this->rendered = false;
 
         $this->setOptions($options);
         $this->app = $app;
@@ -39,7 +40,6 @@ class CApp_Renderer {
 
         $app->registerCoreModules();
 
-
         CFEvent::run('CApp.beforeRender');
 
         if (crequest::is_ajax()) {
@@ -48,17 +48,17 @@ class CApp_Renderer {
         $v = null;
 
         $viewName = $this->viewName;
-        if (ccfg::get("install")) {
+        if (ccfg::get('install')) {
             $viewName = 'cinstall/page';
-        } else if ($this->signup) {
+        } elseif ($this->signup) {
             $viewName = 'ccore/signup';
-        } else if ($this->resend) {
+        } elseif ($this->resend) {
             $viewName = 'ccore/resend_activation';
-        } else if ($this->activation) {
+        } elseif ($this->activation) {
             $viewName = 'ccore/activation';
-        } else if (!$this->isUserLogin() && $this->config("have_user_login") && $this->loginRequired) {
+        } elseif (!$this->isUserLogin() && $this->config('have_user_login') && $this->loginRequired) {
             $viewName = $this->viewLoginName;
-        } else if (!$this->isUserLogin() && $this->config("have_static_login") && $this->loginRequired) {
+        } elseif (!$this->isUserLogin() && $this->config('have_static_login') && $this->loginRequired) {
             $viewName = 'ccore/static_login';
         }
 
@@ -73,18 +73,14 @@ class CApp_Renderer {
         }
         if ($v == null) {
             if (!CView::exists($viewName)) {
-                throw new CApp_Exception('view :viewName not exists', array(':viewName' => $viewName));
+                throw new CApp_Exception('view :viewName not exists', [':viewName' => $viewName]);
             }
             $v = CView::factory($viewName);
         }
 
-
         $viewData = $this->getViewData();
         $v->set($viewData);
 
-
-
         return $v->render();
     }
-
 }

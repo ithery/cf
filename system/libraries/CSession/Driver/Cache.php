@@ -1,6 +1,6 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Session cache driver.
@@ -14,7 +14,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * overridden by the session expiration setting.
  */
 class CSession_Driver_Cache implements CSession_Driver {
-
     protected $cache;
     protected $encrypt;
 
@@ -37,24 +36,25 @@ class CSession_Driver_Cache implements CSession_Driver {
             $name = $config;
 
             // Test the config group name
-            if (($config = CF::config('cache.' . $config)) === NULL)
-                throw new CException('The :name group is not defined in your configuration.', array(':name'=>$name));
+            if (($config = CF::config('cache.' . $config)) === null) {
+                throw new CException('The :name group is not defined in your configuration.', [':name' => $name]);
+            }
         }
 
-        $config['lifetime'] = (Kohana::config('session.expiration') == 0) ? 86400 : Kohana::config('session.expiration');
+        $config['lifetime'] = (CF::config('session.expiration') == 0) ? 86400 : CF::config('session.expiration');
         $this->cache = new Cache($config);
 
         return is_object($this->cache);
     }
 
     public function close() {
-        return TRUE;
+        return true;
     }
 
     public function read($id) {
         $id = 'session_' . $id;
         if ($data = $this->cache->get($id)) {
-            return Kohana::config('session.encryption') ? $this->encrypt->decode($data) : $data;
+            return CF::config('session.encryption') ? $this->encrypt->decode($data) : $data;
         }
 
         // Return value must be string, NOT a boolean
@@ -63,7 +63,7 @@ class CSession_Driver_Cache implements CSession_Driver {
 
     public function write($id, $data) {
         $id = 'session_' . $id;
-        $data = Kohana::config('session.encryption') ? $this->encrypt->encode($data) : $data;
+        $data = CF::config('session.encryption') ? $this->encrypt->encode($data) : $data;
 
         return $this->cache->set($id, $data);
     }
@@ -74,7 +74,7 @@ class CSession_Driver_Cache implements CSession_Driver {
     }
 
     public function regenerate() {
-        session_regenerate_id(TRUE);
+        session_regenerate_id(true);
 
         // Return new session id
         return session_id();
@@ -82,9 +82,8 @@ class CSession_Driver_Cache implements CSession_Driver {
 
     public function gc($maxlifetime) {
         // Just return, caches are automatically cleaned up
-        return TRUE;
+        return true;
     }
-
 }
 
 // End Session Cache Driver

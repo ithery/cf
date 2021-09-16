@@ -1,33 +1,33 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 3, 2018, 2:52:36 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 3, 2018, 2:52:36 PM
  */
 class CElement_FormInput_Select extends CElement_FormInput {
-
     use CTrait_Compat_Element_FormInput_Select,
         CTrait_Element_Property_ApplyJs;
 
-    protected $group_list = array();
+    protected $group_list = [];
     protected $multiple;
     protected $dropdown_classes;
     protected $hide_search;
     protected $maximumSelectionLength;
     protected $placeholder;
-    
+
     public function __construct($id) {
         parent::__construct($id);
 
-        $this->dropdown_classes = array();
-        $this->tag = "select";
+        $this->dropdown_classes = [];
+        $this->tag = 'select';
         $this->multiple = false;
-        $this->type = "select";
-        $this->placeholder = "";
-        $this->applyJs = "false";
+        $this->type = 'select';
+        $this->placeholder = '';
+        $this->applyJs = 'false';
         $this->hide_search = false;
         $this->maximumSelectionLength = false;
         $this->addClass('form-control select');
@@ -38,62 +38,44 @@ class CElement_FormInput_Select extends CElement_FormInput {
         return $this;
     }
 
-    public function set_lookup($query) {
-        
-    }
-
     public function setMaximumSelectionLength($length) {
         $this->maximumSelectionLength = $length;
         return $this;
     }
 
-    public function add_group_list($group, $list) {
-        $this->group_list[$group] = $list;
-        return $this;
-    }
-
-    public function add_dropdown_class($c) {
-        if (is_array($c)) {
-            $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
-        } else {
-            if ($this->bootstrap == '3.3') {
-                $c = str_replace('span', 'col-md-', $c);
-                $c = str_replace('row-fluid', 'row', $c);
-            }
-            $this->dropdown_classes[] = $c;
-        }
-        return $this;
-    }
     public function setPlaceholder($placeholder) {
         $this->placeholder = $placeholder;
         return $this;
     }
+
     public function toarray() {
-        $data = array();
+        $data = [];
         $data = array_merge_recursive($data, parent::toarray());
         if ($this->multiple) {
-            $data["attr"]["multiple"] = "multiple";
+            $data['attr']['multiple'] = 'multiple';
         }
-        $data["children"] = array();
+        $data['children'] = [];
 
         if ($this->list != null) {
             foreach ($this->list as $k => $v) {
-                $selected = "";
+                $selected = '';
                 if (is_array($this->value)) {
-                    if (in_array($k, $this->value))
+                    if (in_array($k, $this->value)) {
                         $selected = ' selected="selected"';
+                    }
                 } else {
-                    if ($this->value == (string) $k)
+                    if ($this->value == (string) $k) {
                         $selected = ' selected="selected"';
+                    }
                 }
-                $child = array();
-                $child["tag"] = "option";
-                $child["attr"]["value"] = $k;
+                $child = [];
+                $child['tag'] = 'option';
+                $child['attr']['value'] = $k;
                 if (strlen($selected) > 0) {
-                    $child["attr"]["selected"] = 'selected';
+                    $child['attr']['selected'] = 'selected';
                 }
-                $child["text"] = $v;
-                $data["children"][] = $child;
+                $child['text'] = $v;
+                $data['children'][] = $child;
             }
         }
         return $data;
@@ -104,54 +86,58 @@ class CElement_FormInput_Select extends CElement_FormInput {
     }
 
     public function html($indent = 0) {
-
         $html = new CStringBuilder();
-        $html->set_indent($indent);
-        $readonly = "";
+        $html->setIndent($indent);
+        $readonly = '';
         if ($this->readonly) {
             $readonly = ' readonly="readonly"';
         }
-        $disabled = "";
+        $disabled = '';
         if ($this->disabled) {
             $disabled = ' disabled="disabled"';
         }
-        $multiple = "";
+        $multiple = '';
         if ($this->multiple) {
             $multiple = ' multiple="multiple"';
         }
         $name = $this->name;
         if ($this->multiple) {
-            $name = $name . "[]";
+            $name = $name . '[]';
         }
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
+        $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
-            $classes = " " . $classes;
+            $classes = ' ' . $classes;
         }
 
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
-        $addition_attribute = "";
+        $addition_attribute = '';
         foreach ($this->attr as $k => $v) {
-            $addition_attribute .= " " . $k . '="' . $v . '"';
+            $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
-        $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')->inc_indent()->br();
+        $html
+            ->appendln('<select name="' . $name . '" id="' . $this->id . '" class="' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')
+            ->incIndent()
+            ->br();
         if (count($this->group_list) > 0) {
             foreach ($this->group_list as $g => $list) {
                 if (strlen($g) > 0) {
                     $html->appendln('<optgroup label="' . $g . '">')->br();
                 }
                 foreach ($list as $k => $v) {
-                    $selected = "";
+                    $selected = '';
                     if (is_array($this->value)) {
-                        if (in_array($k, $this->value))
+                        if (in_array($k, $this->value)) {
                             $selected = ' selected="selected"';
+                        }
                     } else {
-                        if ($this->value == (string) $k)
+                        if ($this->value == (string) $k) {
                             $selected = ' selected="selected"';
+                        }
                     }
                     $html->appendln('<option value="' . $k . '"' . $selected . '>' . $v . '</option>')->br();
                 }
@@ -162,7 +148,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
         }
         if ($this->list != null) {
             foreach ($this->list as $k => $v) {
-                $selected = "";
+                $selected = '';
                 if (is_array($this->value)) {
                     if (in_array($k, $this->value)) {
                         $selected = ' selected="selected"';
@@ -176,9 +162,9 @@ class CElement_FormInput_Select extends CElement_FormInput {
                 $addition_attribute = ' ';
                 if (is_array($v)) {
                     $value = carr::get($v, 'value');
-                    $attributes = carr::get($v, 'attributes', array());
+                    $attributes = carr::get($v, 'attributes', []);
                     foreach ($attributes as $attribute_k => $attribute_v) {
-                        $addition_attribute .= " " . $attribute_k . '="' . $attribute_v . '"';
+                        $addition_attribute .= ' ' . $attribute_k . '="' . $attribute_v . '"';
                     }
                 }
                 if ($this->readonly) {
@@ -190,68 +176,62 @@ class CElement_FormInput_Select extends CElement_FormInput {
                 }
             }
         }
-        $html->dec_indent()->appendln('</select>')->br();
+        $html->decIndent()->appendln('</select>')->br();
 
         //$html->appendln('<input type="text" name="'.$this->name.'" id="'.$this->id.'" class="input-unstyled'.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.'>')->br();
         return $html->text();
     }
 
     public function js($indent = 0) {
-
         $js = new CStringBuilder();
         $js->setIndent($indent);
         $js->append(parent::js($indent))->br();
-        $placeholder = "";
+        $placeholder = '';
         if (strlen($this->placeholder) > 0) {
             $placeholder = $this->placeholder;
         }
-        if ($this->applyJs == "select2") {
+        if ($this->applyJs == 'select2') {
             if ($this->select2 == '4') {
                 CManager::instance()->registerModule('select2-4.0');
             } else {
                 CManager::instance()->registerModule('select2');
             }
             $classes = $this->classes;
-            $classes = implode(" ", $classes);
+            $classes = implode(' ', $classes);
             if (strlen($classes) > 0) {
-                $classes = " " . $classes;
+                $classes = ' ' . $classes;
             }
 
             $dropdown_classes = $this->dropdown_classes;
-            $dropdown_classes = implode(" ", $dropdown_classes);
+            $dropdown_classes = implode(' ', $dropdown_classes);
             if (strlen($dropdown_classes) > 0) {
-                $dropdown_classes = " " . $dropdown_classes;
+                $dropdown_classes = ' ' . $dropdown_classes;
             }
             $js->append("$('#" . $this->id . "').select2({
                         dropdownCssClass: '" . $dropdown_classes . "', // apply css that makes the dropdown taller
             ");
             if ($this->hide_search) {
-                $js->append("minimumResultsForSearch: Infinity,");
+                $js->append('minimumResultsForSearch: Infinity,');
             }
             if ($this->maximumSelectionLength !== false) {
-                $js->append("maximumSelectionLength: " . $this->maximumSelectionLength . ",");
+                $js->append('maximumSelectionLength: ' . $this->maximumSelectionLength . ',');
             }
             $js->append("containerCssClass : 'tpx-select2-container " . $classes . "',");
             $js->append("placeholder : '" . $placeholder . "'");
-            $js->append("});")->br();
+            $js->append('});')->br();
         }
-        if ($this->applyJs == "chosen") {
+        if ($this->applyJs == 'chosen') {
             $js->append("$('#" . $this->id . "').chosen();")->br();
         }
-        if ($this->applyJs == "dualselect") {
+        if ($this->applyJs == 'dualselect') {
             $js->append("$('#" . $this->id . "').multiSelect();")->br();
         }
 
         return $js->text();
     }
 
-    public function get_hide_search() {
-        return $this->hide_search;
-    }
-
     public function setHideSearch($bool) {
         $this->hide_search = $bool;
         return $this;
     }
-
 }

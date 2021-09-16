@@ -1,6 +1,6 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 return [
     /**
@@ -30,7 +30,7 @@ return [
     /**
      * Session parameters to validate: user_agent, ip_address, expiration.
      */
-    'validate' => array('user_agent'),
+    'validate' => ['user_agent'],
     /**
      * Enable or disable session encryption.
      * Note: this has no effect on the native session driver.
@@ -81,7 +81,3 @@ return [
      */
     'same_site' => null,
 ];
-
-
-
-

@@ -1,27 +1,17 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CSession_Factory {
-
     /**
-     *
      * @var CSession_Factory
      */
     private static $instance;
 
     /**
-     *
      * @var CConfig
      */
     private $config;
 
     /**
-     * 
      * @return CSession_Factory
      */
     public static function instance() {
@@ -41,8 +31,7 @@ class CSession_Factory {
      * @return CSession
      */
     public function createRedisDriver() {
-
-        $cacheOptions = array();
+        $cacheOptions = [];
         $cacheOptions['driver'] = 'Redis';
 
         $redis = CRedis::instance(carr::get($this->config, 'storage'));
@@ -54,7 +43,6 @@ class CSession_Factory {
     }
 
     /**
-     * 
      * @return \CSession_Handler_NullSessionHandler
      */
     public function createNullDriver() {
@@ -67,7 +55,6 @@ class CSession_Factory {
      * @return \CSession_Handler_ArraySessionHandler
      */
     public function createArrayDriver() {
-
         return new CSession_Handler_ArraySessionHandler(carr::get($this->config, 'expiration'));
     }
 
@@ -77,7 +64,6 @@ class CSession_Factory {
      * @return \CSession_Handler_CookieSessionHandler
      */
     public function createCookieDriver() {
-
         return new CSession_Handler_CookieSessionHandler(CHTTP::cookie(), carr::get($this->config, 'expiration'));
     }
 
@@ -105,28 +91,27 @@ class CSession_Factory {
      * @return CSession_Handler_DatabaseSessionHandler
      */
     public function createDatabaseDriver() {
-
         return new CSession_Handler_DatabaseSessionHandler(
-                $this->getDatabaseConnection($this->config),
-                carr::get($this->config, 'table', 'session'),
-                carr::get($this->config, 'expiration')
+            $this->getDatabaseConnection($this->config),
+            carr::get($this->config, 'table', 'session'),
+            carr::get($this->config, 'expiration')
         );
-        }
+    }
 
-        /**
-         * Get the database connection for the database driver.
-         *
-         * @return CDatabase
-         */
-        public function getDatabaseConnection() {
-
+    /**
+     * Get the database connection for the database driver.
+     *
+     * @return CDatabase
+     */
+    public function getDatabaseConnection() {
         return CDatabase::instance(carr::get($this->config, 'storage', 'default'));
     }
 
     /**
      * Create an instance of a cache driven driver.
      *
-     * @param  string  $driver
+     * @param string $driver
+     *
      * @return \Illuminate\Session\Store
      */
     public function createCacheBased($driver) {
@@ -136,7 +121,8 @@ class CSession_Factory {
     /**
      * Create a new driver instance.
      *
-     * @param  string  $driver
+     * @param string $driver
+     *
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -157,5 +143,4 @@ class CSession_Factory {
 
         throw new InvalidArgumentException("Driver [$driver] not supported.");
     }
-
 }

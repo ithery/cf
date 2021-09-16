@@ -1,12 +1,12 @@
 export default class CUtil {
     static tap(output, callback) {
-        callback(output)
+        callback(output);
 
         return output;
     }
     static extend(defaults, options) {
-        var extended = {};
-        var prop;
+        let extended = {};
+        let prop;
         for (prop in defaults) {
             if (Object.prototype.hasOwnProperty.call(defaults, prop)) {
                 extended[prop] = defaults[prop];
@@ -18,5 +18,5 @@ export default class CUtil {
             }
         }
         return extended;
-    };
+    }
 }

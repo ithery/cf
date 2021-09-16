@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 2, 2019, 12:24:32 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 2, 2019, 12:24:32 AM
  */
 trait CApp_Model_Trait_Resource_IsSorted {
-
     public function setHighestOrderNumber() {
         $orderColumnName = $this->determineOrderColumnName();
         $this->$orderColumnName = $this->getHighestOrderNumber() + 1;
@@ -47,5 +47,4 @@ trait CApp_Model_Trait_Resource_IsSorted {
     public function shouldSortWhenCreating() {
         return isset($this->sortable['sort_when_creating']) ? $this->sortable['sort_when_creating'] : true;
     }
-
 }

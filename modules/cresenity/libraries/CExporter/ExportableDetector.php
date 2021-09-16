@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_ExportableDetector {
-
     public static function toExportable($data) {
         if ($data instanceof CExporter_Exportable) {
             return $data;
@@ -23,5 +16,4 @@ class CExporter_ExportableDetector {
         }
         return $data;
     }
-
 }

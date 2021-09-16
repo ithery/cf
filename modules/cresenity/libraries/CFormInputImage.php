@@ -1,20 +1,26 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
+/**
+ * @deprecated since 1.2
+ */
+//@codingStandardsIgnoreStart
 class CFormInputImage extends CFormInput {
-
     protected $imgsrc;
+
     protected $maxwidth;
+
     protected $maxheight;
+
     protected $disabled_upload;
 
     public function __construct($id) {
         parent::__construct($id);
-        $this->type = "text";
-        $this->imgsrc = "";
-        $this->maxwidth = "200";
-        $this->maxheight = "150";
+        $this->type = 'text';
+        $this->imgsrc = '';
+        $this->maxwidth = '200';
+        $this->maxheight = '150';
         $this->disabled_upload = false;
     }
 
@@ -45,13 +51,15 @@ class CFormInputImage extends CFormInput {
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $html->set_indent($indent);
-        $disabled = "";
-        if ($this->disabled)
+        $disabled = '';
+        if ($this->disabled) {
             $disabled = ' disabled="disabled"';
+        }
         $classes = $this->classes;
-        $classes = implode(" ", $classes);
-        if (strlen($classes) > 0)
-            $classes = " " . $classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
         $custom_css = $this->custom_css;
         $custom_css = crenderer::render_style($custom_css);
         if (strlen($custom_css) > 0) {
@@ -92,7 +100,4 @@ class CFormInputImage extends CFormInput {
         $js->set_indent($indent);
         return $js->text();
     }
-
 }
-
-?>

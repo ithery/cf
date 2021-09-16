@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 28, 2019, 3:00:12 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 28, 2019, 3:00:12 AM
  */
 abstract class CManager_File_ConfigAbstract {
-
     protected $options;
 
     public function __construct($options) {
@@ -21,5 +21,4 @@ abstract class CManager_File_ConfigAbstract {
         }
         return carr::get($this->options, $default);
     }
-
 }

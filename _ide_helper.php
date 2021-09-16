@@ -1,14 +1,12 @@
 <?php
 
-class CApp
-{
+class CApp {
     /**
      * @param null|string $id
      *
      * @return CElement_Component_Widget
      */
-    public function addWidget($id = null)
-    {
+    public function addWidget($id = null) {
         return $this->element->addWidget($id);
     }
 
@@ -17,8 +15,7 @@ class CApp
      *
      * @return CElement_Component_DataTable
      */
-    public function addTable($id = null)
-    {
+    public function addTable($id = null) {
         return $this->element->addTable($id);
     }
 
@@ -27,8 +24,7 @@ class CApp
      *
      * @return CElement_Element_Div
      */
-    public function addDiv($id = null)
-    {
+    public function addDiv($id = null) {
         return $this->element->addDiv($id);
     }
 
@@ -39,8 +35,7 @@ class CApp
      *
      * @return CElement_View
      */
-    public function addView($view = null, $data = null, $id = null)
-    {
+    public function addView($view = null, $data = null, $id = null) {
         return $this->element->addView($view, $data, $id);
     }
 
@@ -49,8 +44,7 @@ class CApp
      *
      * @return CElement_List_TabList
      */
-    public function addTabList($id = null)
-    {
+    public function addTabList($id = null) {
         return $this->element->addTabList($id);
     }
 
@@ -59,8 +53,7 @@ class CApp
      *
      * @return CElement_Component_Form
      */
-    public function addForm($id = null)
-    {
+    public function addForm($id = null) {
         return $this->element->addForm($id);
     }
 }

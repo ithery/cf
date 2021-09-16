@@ -6,7 +6,6 @@
  * @author Hery
  */
 trait CTrait_Controller_Application_Manager_CFConsole {
-
     protected function getTitle() {
         return 'CF Console';
     }
@@ -24,7 +23,6 @@ trait CTrait_Controller_Application_Manager_CFConsole {
     }
 
     public function command() {
-
         $request = CApp_Base::getRequest();
 
         $command = carr::get($request, 'command');
@@ -39,8 +37,6 @@ trait CTrait_Controller_Application_Manager_CFConsole {
             return;
         }
 
-
         echo $output;
     }
-
 }

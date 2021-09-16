@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -21,8 +19,7 @@ use League\CommonMark\Normalizer\TextNormalizer;
 /**
  * A collection of references, indexed by label
  */
-final class ReferenceMap implements ReferenceMapInterface
-{
+final class ReferenceMap implements ReferenceMapInterface {
     /**
      * @var TextNormalizer
      *
@@ -37,31 +34,27 @@ final class ReferenceMap implements ReferenceMapInterface
      */
     private $references = [];
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->normalizer = new TextNormalizer();
     }
 
-    public function add(ReferenceInterface $reference): void
-    {
+    public function add(ReferenceInterface $reference) {
         // Normalize the key
         $key = $this->normalizer->normalize($reference->getLabel());
         // Store the reference
         $this->references[$key] = $reference;
     }
 
-    public function contains(string $label): bool
-    {
+    public function contains($label) {
         $label = $this->normalizer->normalize($label);
 
         return isset($this->references[$label]);
     }
 
-    public function get(string $label): ?ReferenceInterface
-    {
+    public function get($label) {
         $label = $this->normalizer->normalize($label);
 
-        if (! isset($this->references[$label])) {
+        if (!isset($this->references[$label])) {
             return null;
         }
 
@@ -71,15 +64,13 @@ final class ReferenceMap implements ReferenceMapInterface
     /**
      * @return \Traversable<string, ReferenceInterface>
      */
-    public function getIterator(): \Traversable
-    {
+    public function getIterator() {
         foreach ($this->references as $normalizedLabel => $reference) {
             yield $normalizedLabel => $reference;
         }
     }
 
-    public function count(): int
-    {
+    public function count() {
         return \count($this->references);
     }
 }

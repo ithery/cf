@@ -1,24 +1,24 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 8, 2018, 1:41:33 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 8, 2018, 1:41:33 AM
  */
 trait CManager_Asset_Trait_CssTrait {
-
     public function fullpathCssFile($file) {
         foreach ($this->mediaPaths as $dir) {
             $path = $dir . 'css' . DS . $file;
-            
+
             if (file_exists($path)) {
                 return $path;
             }
         }
         $dirs = CF::getDirs('media');
-        
+
         foreach ($dirs as $dir) {
             $path = $dir . 'css' . DS . $file;
 
@@ -26,54 +26,50 @@ trait CManager_Asset_Trait_CssTrait {
                 return $path;
             }
         }
-        $path = DOCROOT . "media" . DS . 'css' . DS;
+        $path = DOCROOT . 'media' . DS . 'css' . DS;
         return $path . $file;
     }
 
     public function getAllCssFileUrl() {
         $files = $this->cssFiles();
 
-        $urls = array();
+        $urls = [];
         foreach ($files as $f) {
-            $urls[] = CManager_Asset_Helper::urlCssFile($f);
+            if ($f instanceof CManager_Asset_FileAbstract) {
+                $urls[] = $f->getUrl();
+            } else {
+                $urls[] = CManager_Asset_Helper::urlCssFile($f);
+            }
         }
+
         return $urls;
     }
 
-    public function registerCssFiles($files, $pos = "head") {
-        $files = $files !== null ? (is_array($files) ? $files : array($files)) : array();
+    public function registerCssFiles($files, $pos = 'head') {
+        $files = $files !== null ? (is_array($files) ? $files : [$files]) : [];
         foreach ($files as $file) {
             $this->registerCssFile($file, $pos);
         }
     }
 
-    public function registerCssFile($file, $pos = "head") {
-        $dir_file = $file;
-        $css_version = '';
+    public function registerCssFile($file, $pos = 'head') {
+        $fileOptions = $file;
+        if (!is_array($fileOptions)) {
+            $fileOptions = [
+                'script' => $file,
+            ];
+        }
+        $fileOptions['type'] = 'js';
+        $fileOptions['pos'] = $pos;
 
-        if (strpos($file, '?') !== false) {
-            $dir_file = substr($file, 0, strpos($file, '?'));
-            $css_version = substr($file, strpos($file, '?'), strlen($file) - 1);
-        }
-        if (strpos($dir_file, 'http') !== false) {
-            $css_file = $dir_file;
-            // do nothing
-        } else {
-            $css_file = $this->fullpathCssFile($dir_file);
-            if (!file_exists($css_file)) {
-                throw new Exception('CSS File not exists, ' . $file);
-            }
-            if (strlen($css_version) > 0) {
-                $css_file .= $css_version;
-            }
-        }
-        $this->scripts[$pos]['css_file'][] = $css_file;
+        $this->scripts[$pos]['css_file'][] = new CManager_Asset_File_CssFile($fileOptions);
+
         return $this;
     }
 
     public function unregisterCssFiles($files, $pos = null) {
         if (!is_array($files)) {
-            $files = array($files);
+            $files = [$files];
         }
         foreach ($files as $file) {
             $this->unregisterCssFile($file, $pos);
@@ -87,7 +83,7 @@ trait CManager_Asset_Trait_CssTrait {
             $pos = self::allAvailablePos();
         }
         if (!is_array($pos)) {
-            $pos = array($pos);
+            $pos = [$pos];
         }
         foreach ($pos as $p) {
             $cssFiles = &$this->scripts[$p]['css_file'];
@@ -100,7 +96,7 @@ trait CManager_Asset_Trait_CssTrait {
     }
 
     public function cssFiles() {
-        $cssFileArray = array();
+        $cssFileArray = [];
         foreach ($this->scripts as $script) {
             foreach ($script['css_file'] as $k) {
                 $cssFileArray[] = $k;
@@ -108,5 +104,4 @@ trait CManager_Asset_Trait_CssTrait {
         }
         return $cssFileArray;
     }
-
 }

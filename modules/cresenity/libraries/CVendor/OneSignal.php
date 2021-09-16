@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Http\Client\Common\HttpMethodsClient as Client;
 
 /**
@@ -14,7 +8,6 @@ use Http\Client\Common\HttpMethodsClient as Client;
  * @property-read CVendor_OneSignal_Notifications $notifications Notifications API service
  */
 class CVendor_OneSignal {
-
     const API_URL = 'https://onesignal.com/api/v1';
 
     /**
@@ -52,7 +45,7 @@ class CVendor_OneSignal {
      *
      * @param Config $config
      */
-    public function setConfig(Config $config) {
+    public function setConfig(CVendor_OneSignal_Config $config) {
         $this->config = $config;
     }
 
@@ -99,12 +92,12 @@ class CVendor_OneSignal {
         try {
             $response = $this->client->send($method, self::API_URL . $uri, array_merge([
                 'Content-Type' => 'application/json',
-                            ], $headers), $body);
+            ], $headers), $body);
             return json_decode($response->getBody(), true);
         } catch (\Throwable $t) {
-            throw new OneSignalException($t->getMessage());
+            throw new CVendor_OneSignal_OneSignalException($t->getMessage());
         } catch (\Exception $e) {
-            throw new OneSignalException($e->getMessage());
+            throw new CVendor_OneSignal_OneSignalException($e->getMessage());
         }
     }
 
@@ -127,7 +120,6 @@ class CVendor_OneSignal {
             return $this->services[$name];
         }
         $trace = debug_backtrace();
-        throw new OneSignalException(sprintf('Undefined property via __get(): %s in %s on line %u', $name, $trace[0]['file'], $trace[0]['line']));
+        throw new CVendor_OneSignal_OneSignalException(sprintf('Undefined property via __get(): %s in %s on line %u', $name, $trace[0]['file'], $trace[0]['line']));
     }
-
 }

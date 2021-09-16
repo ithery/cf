@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CConsole_Command_DevSuite_DevSuiteLinkCommand extends CConsole_Command_DevSuiteCommand {
-
     /**
      * The class name of the devsuite command.
      *
@@ -14,5 +13,4 @@ class CConsole_Command_DevSuite_DevSuiteLinkCommand extends CConsole_Command_Dev
      */
     protected $devSuiteCommandClass = CDevSuite_Command_LinkCommand::class;
     protected $signature = 'devsuite:link';
-
 }

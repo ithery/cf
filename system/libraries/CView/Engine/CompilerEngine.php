@@ -6,11 +6,10 @@
  * @author Hery
  */
 class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
-
     /**
      * The Blade compiler instance.
      *
-     * @var CView_CompilerAbstract
+     * @var CView_CompilerInterface
      */
     protected $compiler;
 
@@ -24,7 +23,6 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
     /**
      * Create a new compiler engine instance.
      *
-     * @param  CView_CompilerAbstract  $compiler
      * @return void
      */
     public function __construct() {
@@ -35,8 +33,9 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
     /**
      * Get the evaluated contents of the view.
      *
-     * @param  string  $path
-     * @param  array  $data
+     * @param string $path
+     * @param array  $data
+     *
      * @return string
      */
     public function get($path, array $data = []) {
@@ -62,14 +61,15 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
     /**
      * Handle a view exception.
      *
-     * @param  \Throwable  $e
-     * @param  int  $obLevel
+     * @param \Throwable $e
+     * @param int        $obLevel
+     *
      * @return void
      *
      * @throws \Throwable
      */
     protected function handleViewException($e, $obLevel) {
-        $e = new ErrorException($this->getMessage($e), 0, 1, $e->getFile(), $e->getLine(), $e);
+        //$e = new ErrorException($this->getMessage($e), 0, 1, $e->getFile(), $e->getLine(), $e);
 
         parent::handleViewException($e, $obLevel);
     }
@@ -77,7 +77,8 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
     /**
      * Get the exception message for an exception.
      *
-     * @param  \Throwable  $e
+     * @param \Throwable $e
+     *
      * @return string
      */
     protected function getMessage($e) {
@@ -87,10 +88,9 @@ class CView_Engine_CompilerEngine extends CView_Engine_PhpEngine {
     /**
      * Get the compiler implementation.
      *
-     * @return \Illuminate\View\Compilers\CompilerInterface
+     * @return \CView_CompilerInterface
      */
     public function getCompiler() {
         return $this->compiler;
     }
-
 }

@@ -6,7 +6,6 @@
  * @author Hery
  */
 
-
 class CConsole_Command_DevSuite_DevSuiteUninstallCommand extends CConsole_Command_DevSuiteCommand {
     /**
      * The class name of the devsuite command.
@@ -16,5 +15,4 @@ class CConsole_Command_DevSuite_DevSuiteUninstallCommand extends CConsole_Comman
     protected $devSuiteCommandClass = CDevSuite_Command_UninstallCommand::class;
 
     protected $signature = 'devsuite:uninstall';
-
 }

@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Mar 16, 2019, 4:42:02 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Mar 16, 2019, 4:42:02 AM
  */
 class CDaemon_Worker_Listener_SocketListener extends CDaemon_Worker_ListenerAbstract {
-    
-    public function checkEnvironment(array $errors = array()) {
-        
+    public function checkEnvironment(array $errors = []) {
     }
 
     public function setup() {
@@ -24,8 +23,5 @@ class CDaemon_Worker_Listener_SocketListener extends CDaemon_Worker_ListenerAbst
     }
 
     public function teardown() {
-        
     }
-
-    
 }

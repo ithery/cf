@@ -8,21 +8,20 @@
 use Symfony\Component\Process\Process;
 
 class CDevSuite_Deploy_ParallelSSH extends CDevSuite_Deploy_RemoteProcessor {
-
-    use CDevSuite_Deploy_ConfigurationParserTrait;
+    use CDevSuite_Deploy_Trait_ConfigurationParserTrait;
 
     /**
      * Run the given task over SSH.
      *
-     * @param  CDevSuite_Deploy_Task  $task
-     * @param  \Closure|null  $callback
+     * @param CDevSuite_Deploy_Task $task
+     * @param \Closure|null         $callback
+     *
      * @return int
      */
     public function run(CDevSuite_Deploy_Task $task, Closure $callback = null) {
         $processes = [];
 
         $callback = $callback ?: function () {
-            
         };
 
         // Here we will gather all the process instances by host. We will build them in
@@ -54,7 +53,8 @@ class CDevSuite_Deploy_ParallelSSH extends CDevSuite_Deploy_RemoteProcessor {
     /**
      * Start all of the processes.
      *
-     * @param  array  $processes
+     * @param array $processes
+     *
      * @return void
      */
     protected function startProcesses(array $processes) {
@@ -66,7 +66,8 @@ class CDevSuite_Deploy_ParallelSSH extends CDevSuite_Deploy_RemoteProcessor {
     /**
      * Determine if any of the processes are running.
      *
-     * @param  array  $processes
+     * @param array $processes
+     *
      * @return bool
      */
     protected function areRunning(array $processes) {
@@ -82,8 +83,9 @@ class CDevSuite_Deploy_ParallelSSH extends CDevSuite_Deploy_RemoteProcessor {
     /**
      * Gather the output from all of the processes.
      *
-     * @param  array  $processes
-     * @param  \Closure  $callback
+     * @param array    $processes
+     * @param \Closure $callback
+     *
      * @return void
      */
     protected function gatherOutput(array $processes, Closure $callback) {
@@ -102,5 +104,4 @@ class CDevSuite_Deploy_ParallelSSH extends CDevSuite_Deploy_RemoteProcessor {
             }
         }
     }
-
 }

@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CConsole_Command_Domain_DomainDeleteCommand extends CConsole_Command {
-
     /**
      * The name and signature of the console command.
      *
@@ -19,7 +18,6 @@ class CConsole_Command_Domain_DomainDeleteCommand extends CConsole_Command {
         if ($domain == null) {
             $this->error('Domain not set, please set with php cf domain:switch {domain}');
         }
-
 
         $errCode = 0;
         $errMessage = '';
@@ -42,5 +40,4 @@ class CConsole_Command_Domain_DomainDeleteCommand extends CConsole_Command {
 
         return 0;
     }
-
 }

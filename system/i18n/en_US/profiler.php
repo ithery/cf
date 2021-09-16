@@ -1,8 +1,8 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
-return array(
+return [
     'benchmarks' => 'Benchmarks',
     'post_data' => 'Post Data',
     'no_post' => 'No post data',
@@ -13,4 +13,4 @@ return array(
     'no_database' => 'Database not loaded',
     'cookie_data' => 'Cookie Data',
     'no_cookie' => 'No cookie data',
-);
+];

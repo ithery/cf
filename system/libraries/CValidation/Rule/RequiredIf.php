@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 15, 2019, 12:42:28 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 15, 2019, 12:42:28 PM
  */
 class CValidation_Rule_RequiredIf {
-
     /**
      * The condition that validates the attribute.
      *
@@ -19,7 +19,8 @@ class CValidation_Rule_RequiredIf {
     /**
      * Create a new required validation rule based on a condition.
      *
-     * @param  callable|bool  $condition
+     * @param callable|bool $condition
+     *
      * @return void
      */
     public function __construct($condition) {
@@ -37,5 +38,4 @@ class CValidation_Rule_RequiredIf {
         }
         return $this->condition ? 'required' : '';
     }
-
 }

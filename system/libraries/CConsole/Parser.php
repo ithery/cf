@@ -1,26 +1,19 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
-class CConsole_Parser
-{
+class CConsole_Parser {
     /**
      * Parse the given console command definition into an array.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return array
      *
      * @throws \InvalidArgumentException
      */
-    public static function parse($expression)
-    {
+    public static function parse($expression) {
         $name = static::name($expression);
 
         if (preg_match_all('/\{\s*(.*?)\s*\}/', $expression, $matches)) {
@@ -35,18 +28,18 @@ class CConsole_Parser
     /**
      * Extract the name of the command from the expression.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      *
      * @throws \InvalidArgumentException
      */
-    protected static function name($expression)
-    {
+    protected static function name($expression) {
         if (trim($expression) === '') {
             throw new InvalidArgumentException('Console command definition is empty.');
         }
 
-        if (! preg_match('/[^\s]+/', $expression, $matches)) {
+        if (!preg_match('/[^\s]+/', $expression, $matches)) {
             throw new InvalidArgumentException('Unable to determine command name from signature.');
         }
 
@@ -56,11 +49,11 @@ class CConsole_Parser
     /**
      * Extract all of the parameters from the tokens.
      *
-     * @param  array  $tokens
+     * @param array $tokens
+     *
      * @return array
      */
-    protected static function parameters(array $tokens)
-    {
+    protected static function parameters(array $tokens) {
         $arguments = [];
 
         $options = [];
@@ -79,11 +72,11 @@ class CConsole_Parser
     /**
      * Parse an argument expression.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return \Symfony\Component\Console\Input\InputArgument
      */
-    protected static function parseArgument($token)
-    {
+    protected static function parseArgument($token) {
         list($token, $description) = static::extractDescription($token);
 
         switch (true) {
@@ -105,11 +98,11 @@ class CConsole_Parser
     /**
      * Parse an option expression.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return \Symfony\Component\Console\Input\InputOption
      */
-    protected static function parseOption($token)
-    {
+    protected static function parseOption($token) {
         list($token, $description) = static::extractDescription($token);
 
         $matches = preg_split('/\s*\|\s*/', $token, 2);
@@ -138,11 +131,11 @@ class CConsole_Parser
     /**
      * Parse the token into its token and description segments.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return array
      */
-    protected static function extractDescription($token)
-    {
+    protected static function extractDescription($token) {
         $parts = preg_split('/\s+:\s+/', trim($token), 2);
 
         return count($parts) === 2 ? $parts : [$token, ''];

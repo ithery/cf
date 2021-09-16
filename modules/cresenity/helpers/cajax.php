@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
+//@codingStandardsIgnoreStart
 class cajax {
-
     public static function callback($obj, $input) {
         $callable = $obj->data->callable;
         $requires = cobj::get($obj->data, 'requires');
         if (!is_array($requires)) {
-            $requires = array($requires);
+            $requires = [$requires];
         }
 
         foreach ($requires as $require) {
@@ -26,30 +26,29 @@ class cajax {
     public static function form_process($obj, $input) {
         $db = CDatabase::instance();
         $form = $obj->data->form;
-        $process_id = "";
+        $process_id = '';
 
-        if (isset($input["ajax_process_id"])) {
-            $process_id = $input["ajax_process_id"];
+        if (isset($input['ajax_process_id'])) {
+            $process_id = $input['ajax_process_id'];
         }
-        if (isset($input["ajax_process_id"])) {
+        if (isset($input['ajax_process_id'])) {
             $last_process_id = cprogress::last_process_id();
         }
-        if (isset($input["cancel"])) {
-            $filename = $process_id . "_cancel" . ".tmp";
-            $file = CTemporary::getPath("process", $filename);
+        if (isset($input['cancel'])) {
+            $filename = $process_id . '_cancel' . '.tmp';
+            $file = CTemporary::getPath('process', $filename);
             $disk = CTemporary::disk();
 
-
             $json = $disk->put($file, $form);
-            echo json_encode(array(
-                "result" => "0",
-                "message" => "User cancelled",
-            ));
+            echo json_encode([
+                'result' => '0',
+                'message' => 'User cancelled',
+            ]);
             die();
         }
 
-        $filename = $process_id . ".tmp";
-        $file = CTemporary::getPath("process", $filename);
+        $filename = $process_id . '.tmp';
+        $file = CTemporary::getPath('process', $filename);
         $disk = CTemporary::disk();
         $json = '{"percent":0,"info":"Initializing"}';
         if ($disk->exists($file)) {
@@ -64,15 +63,14 @@ class cajax {
         $param = $obj->data->param;
 
         foreach ($param as $p) {
-
             $val = $input[$p];
-            $q = str_replace("{" . $p . "}", $db->escape($val), $q);
+            $q = str_replace('{' . $p . '}', $db->escape($val), $q);
         }
         $r = $db->query($q);
         $data_list = $r->result(false);
-        $data = array();
+        $data = [];
         foreach ($data_list as $row) {
-            $arr = array();
+            $arr = [];
             foreach ($row as $col => $val) {
                 $arr[$col] = $val;
             }
@@ -87,9 +85,8 @@ class cajax {
         $q = $obj->query;
         $param = $obj->param;
         foreach ($param as $p) {
-
             $val = $input[$p->name];
-            $q = str_replace("{" . $p->name . "}", $db->escape($val), $q);
+            $q = str_replace('{' . $p->name . '}', $db->escape($val), $q);
         }
         $data_list = cdbutils::get_list($q);
         $response = json_encode($data_list);
@@ -98,26 +95,26 @@ class cajax {
 
     public static function searchSelectElastic($obj, $input) {
         $callbackFunction = null;
-        $callback = "";
-        $term = "";
-        $limit = "";
-        $page = "";
+        $callback = '';
+        $term = '';
+        $limit = '';
+        $page = '';
 
-        if (isset($input["callbackFunction"])) {
-            $callbackFunction = $input["callbackFunction"];
+        if (isset($input['callbackFunction'])) {
+            $callbackFunction = $input['callbackFunction'];
         }
-        if (isset($input["callback"])) {
-            $callback = $input["callback"];
+        if (isset($input['callback'])) {
+            $callback = $input['callback'];
         }
-        if (isset($input["term"])) {
-            $term = $input["term"];
+        if (isset($input['term'])) {
+            $term = $input['term'];
         }
 
-        if (isset($input["limit"])) {
-            $limit = $input["limit"];
+        if (isset($input['limit'])) {
+            $limit = $input['limit'];
         }
-        if (isset($input["page"])) {
-            $page = $input["page"];
+        if (isset($input['page'])) {
+            $page = $input['page'];
         }
         $elasticIndex = $obj->elasticIndex;
         $elasticDocumentType = $obj->elasticDocumentType;
@@ -153,41 +150,41 @@ class cajax {
         $elasticData = $search->exec();
         $key_field = $obj->data->key_field;
         $search_field = $obj->data->search_field;
-        $data = array();
+        $data = [];
         $total = 0;
         foreach ($elasticData as $row) {
-            $p = array();
+            $p = [];
             foreach ($row as $k => $v) {
-                $v = ($v == null) ? "" : $v;
+                $v = ($v == null) ? '' : $v;
                 if ($callbackFunction != null && is_callable($callbackFunction)) {
                     $v = call_user_func($callbackFunction, $row, $k, $v);
                 }
                 $p[$k] = $v;
             }
-            $p["id"] = $row->$key_field;
+            $p['id'] = $row->$key_field;
             $data[] = $p;
         }
         if (count($dataCustomRow) > 0) {
             foreach ($dataCustomRow as $row) {
-                $p = array();
-                $temp = array();
+                $p = [];
+                $temp = [];
                 foreach ($row as $k => $v) {
-                    $v = ($v == null) ? "" : $v;
+                    $v = ($v == null) ? '' : $v;
                     $p[$k] = $v;
                 }
-                $p["id"] = $row[$key_field];
+                $p['id'] = $row[$key_field];
                 $temp[] = $p;
                 $data = array_merge($temp, $data);
             }
         }
-        $result = array();
-        $result["data"] = $data;
-        $result["total"] = $total;
+        $result = [];
+        $result['data'] = $data;
+        $result['total'] = $total;
 
-        $response = "";
-        $response .= $callback . "(";
+        $response = '';
+        $response .= $callback . '(';
         $response .= json_encode($result);
-        $response .= ")";
+        $response .= ')';
         return $response;
     }
 
@@ -199,34 +196,34 @@ class cajax {
         $q = $obj->data->query;
         $key_field = $obj->data->key_field;
         $search_field = $obj->data->search_field;
-        $valueCallbackFunction = "";
-        $callback = "";
-        $term = "";
-        $limit = "";
-        $page = "";
+        $valueCallbackFunction = '';
+        $callback = '';
+        $term = '';
+        $limit = '';
+        $page = '';
 
-        if (isset($input["valueCallback"])) {
-            $callbackFunction = $input["valueCallback"];
+        if (isset($input['valueCallback'])) {
+            $callbackFunction = $input['valueCallback'];
         }
-        if (isset($input["callback"])) {
-            $callback = $input["callback"];
+        if (isset($input['callback'])) {
+            $callback = $input['callback'];
         }
-        if (isset($input["term"])) {
-            $term = $input["term"];
+        if (isset($input['term'])) {
+            $term = $input['term'];
         }
-        if (isset($input["q"])) {
-            $term = $input["q"];
+        if (isset($input['q'])) {
+            $term = $input['q'];
         }
-        if (isset($input["limit"])) {
-            $limit = $input["limit"];
+        if (isset($input['limit'])) {
+            $limit = $input['limit'];
         }
-        if (isset($input["page"])) {
-            $page = $input["page"];
+        if (isset($input['page'])) {
+            $page = $input['page'];
         }
         $base_q = $q;
-        $pos_order_by = strpos(strtolower($base_q), "order by", strpos(strtolower($base_q), 'from'));
+        $pos_order_by = strpos(strtolower($base_q), 'order by', strpos(strtolower($base_q), 'from'));
 
-        $pos_last_kurung = strrpos(strtolower($base_q), ")");
+        $pos_last_kurung = strrpos(strtolower($base_q), ')');
         if (isset($_GET['bdebug'])) {
             cdbg::var_dump($pos_order_by);
             cdbg::var_dump($pos_last_kurung);
@@ -243,18 +240,17 @@ class cajax {
         $total = cdbutils::get_row_count_from_base_query($q);
 
         /* Paging */
-        $sLimit = "";
+        $sLimit = '';
         if (strlen($limit) > 0) {
             if (strlen($page) > 0) {
-                $sLimit = "LIMIT " . ((intval($page) - 1) * 10) . ", " . intval($limit);
+                $sLimit = 'LIMIT ' . ((intval($page) - 1) * 10) . ', ' . intval($limit);
             } else {
-                $sLimit = "LIMIT " . intval($limit);
+                $sLimit = 'LIMIT ' . intval($limit);
             }
         }
 
-
         /* Ordering */
-        $sOrder = "";
+        $sOrder = '';
         /*
           if ( isset( $_GET['iSortCol_0'] ) ) {
           $sOrder = "ORDER BY  ";
@@ -272,99 +268,98 @@ class cajax {
 
          */
 
-        $sWhere = "";
+        $sWhere = '';
         if (strlen($term) > 0 && (!empty($search_field))) {
-            $sWhere = "WHERE (";
+            $sWhere = 'WHERE (';
             if (is_array($search_field)) {
                 foreach ($search_field as $f) {
-                    $sWhere .= "`" . $f . "` LIKE '%" . $db->escape_like($term) . "%' OR ";
+                    $sWhere .= '`' . $f . "` LIKE '%" . $db->escape_like($term) . "%' OR ";
                 }
             } else {
-                $sWhere .= "`" . $search_field . "` LIKE '%" . $db->escape_like($term) . "%' OR ";
+                $sWhere .= '`' . $search_field . "` LIKE '%" . $db->escape_like($term) . "%' OR ";
             }
 
-            $sWhere = substr_replace($sWhere, "", -3);
+            $sWhere = substr_replace($sWhere, '', -3);
             $sWhere .= ')';
 
             //order
             if (is_array($search_field)) {
                 foreach ($search_field as $f) {
-                    if (strlen($sOrder) > 0)
-                        $sOrder .= ",";
-                    $sOrder .= "`" . $f . "` = " . $db->escape($term) . " DESC";
+                    if (strlen($sOrder) > 0) {
+                        $sOrder .= ',';
+                    }
+                    $sOrder .= '`' . $f . '` = ' . $db->escape($term) . ' DESC';
                 }
             }
         }
 
         if (strlen($sOrder) > 0) {
-            $sOrder = " ORDER BY " . $sOrder;
+            $sOrder = ' ORDER BY ' . $sOrder;
             $temp_order_by = '';
         }
 
         if (strlen($temp_order_by) > 0) {
-            $sub = explode(",", substr($temp_order_by, 9));
-            $temp_order_by = "";
+            $sub = explode(',', substr($temp_order_by, 9));
+            $temp_order_by = '';
             foreach ($sub as $val) {
-                $kata = explode(".", $val);
-                if (isset($kata[1]))
-                    $temp_order_by .= ", " . $kata[1];
-                else
-                    $temp_order_by .= ", " . $kata[0];
+                $kata = explode('.', $val);
+                if (isset($kata[1])) {
+                    $temp_order_by .= ', ' . $kata[1];
+                } else {
+                    $temp_order_by .= ', ' . $kata[0];
+                }
             }
             $temp_order_by = substr($temp_order_by, 2);
-            $temp_order_by = "ORDER BY " . $temp_order_by;
+            $temp_order_by = 'ORDER BY ' . $temp_order_by;
         }
 
-        $qfilter = "select * from (" . $base_q . ") as a " . $sWhere . ' ' . $sOrder;
+        $qfilter = 'select * from (' . $base_q . ') as a ' . $sWhere . ' ' . $sOrder;
         $total = cdbutils::get_row_count_from_base_query($qfilter);
 
-
-        $qfilter .= " " . $temp_order_by . ' ' . $sLimit;
+        $qfilter .= ' ' . $temp_order_by . ' ' . $sLimit;
 
         $r = $db->query($qfilter);
 
         $result = $r->result(false);
-        $data = array();
+        $data = [];
 
         foreach ($r as $row) {
-            $p = array();
+            $p = [];
             foreach ($row as $k => $v) {
-                $v = ($v == null) ? "" : $v;
+                $v = ($v == null) ? '' : $v;
                 if ($valueCallbackFunction != null && is_callable($valueCallbackFunction)) {
-
                     $v = call_user_func($valueCallbackFunction, $row, $k, $v);
                 }
                 $p[$k] = $v;
             }
-            $p["id"] = $row[$key_field];
+            $p['id'] = $row[$key_field];
             //$p["id"]=$row["item_id"];
             $data[] = $p;
         }
-        $result = array();
-        $result["data"] = $data;
-        $result["total"] = $total;
+        $result = [];
+        $result['data'] = $data;
+        $result['total'] = $total;
 
-        $response = "";
-        $response .= $callback . "(";
+        $response = '';
+        $response .= $callback . '(';
         $response .= json_encode($result);
-        $response .= ")";
+        $response .= ')';
         return $response;
     }
 
     public static function datatable($obj, $input) {
-
+        $db = CDatabase::instance();
         $q = $obj->data->query;
         $param = $obj->param;
-        $js = "";
+        $js = '';
 
         if ($obj->data->is_elastic) {
             return self::dataelastic($obj, $input);
         }
 
         foreach ($param as $p) {
-
             $val = $input[$p->name];
-            $q = str_replace("{" . $p->name . "}", $db->escape($val), $q);
+            $q = str_replace('{' . $p->name . '}', $db->escape($val), $q);
         }
 
         $table = unserialize($obj->data->table);
@@ -374,7 +369,7 @@ class cajax {
 
         $request = $_GET;
 
-        if (strtoupper($table->ajax_method) == "POST") {
+        if (strtoupper($table->ajax_method) == 'POST') {
             $request = $_POST;
         }
         $columns = $obj->data->columns;
@@ -392,9 +387,9 @@ class cajax {
             $max_offset = $max_from;
         }
 
-        $pos_order_by = strrpos(strtolower($base_q), "order by", $max_offset);
+        $pos_order_by = strrpos(strtolower($base_q), 'order by', $max_offset);
 
-        $pos_last_kurung = strrpos(strtolower($base_q), ")");
+        $pos_last_kurung = strrpos(strtolower($base_q), ')');
 
         $temp_order_by = '';
         if ($pos_order_by > $pos_last_kurung) {
@@ -404,146 +399,145 @@ class cajax {
             }
         }
 
-        $qtotal = "select count(*) as cnt from (" . $q . ") as a";
+        $qtotal = 'select count(*) as cnt from (' . $q . ') as a';
         $rtotal = $db->query($qtotal);
         $total_record = 0;
-        if ($rtotal->count() > 0)
+        if ($rtotal->count() > 0) {
             $total_record = $rtotal[0]->cnt;
-
-        /* Paging */
-        $sLimit = "";
-        if (isset($request['iDisplayStart']) && $request['iDisplayLength'] != '-1') {
-            $sLimit = "LIMIT " . intval($request['iDisplayStart']) . ", " . intval($request['iDisplayLength']);
         }
 
+        /* Paging */
+        $sLimit = '';
+        if (isset($request['iDisplayStart']) && $request['iDisplayLength'] != '-1') {
+            $sLimit = 'LIMIT ' . intval($request['iDisplayStart']) . ', ' . intval($request['iDisplayLength']);
+        }
 
         /* Ordering */
-        $sOrder = "";
+        $sOrder = '';
         if (isset($request['iSortCol_0'])) {
-            $sOrder = "ORDER BY  ";
+            $sOrder = 'ORDER BY  ';
             for ($i = 0; $i < intval($request['iSortingCols']); $i++) {
                 $i2 = 0;
                 if ($table->checkbox) {
                     $i2 = -1;
                 }
-                if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == "true") {
-                    $sOrder .= "" . $db->escape_column($columns[intval($request['iSortCol_' . $i]) + $i2]->fieldname) . " " . $db->escape_str($request['sSortDir_' . $i]) . ", ";
+                if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == 'true') {
+                    $sOrder .= '' . $db->escape_column($columns[intval($request['iSortCol_' . $i]) + $i2]->fieldname) . ' ' . $db->escape_str($request['sSortDir_' . $i]) . ', ';
                 }
             }
-            $sOrder = substr_replace($sOrder, "", -2);
-            if ($sOrder == "ORDER BY") {
-                $sOrder = "";
+            $sOrder = substr_replace($sOrder, '', -2);
+            if ($sOrder == 'ORDER BY') {
+                $sOrder = '';
             }
         }
 
         /**
          * Build condition query
          */
-        $sWhere = "";
-        $qs_condition_str = "";
-        if (isset($request['sSearch']) && $request['sSearch'] != "") {
+        $sWhere = '';
+        $qs_condition_str = '';
+        if (isset($request['sSearch']) && $request['sSearch'] != '') {
             for ($i = 0; $i < count($columns); $i++) {
                 $i2 = 0;
                 if ($table->checkbox) {
                     $i2 = -1;
                 }
-                if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == "true") {
-                    $sWhere .= "`" . $columns[$i + $i2]->fieldname . "` LIKE '%" . $db->escape_like($request['sSearch']) . "%' OR ";
+                if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == 'true') {
+                    $sWhere .= '`' . $columns[$i + $i2]->fieldname . "` LIKE '%" . $db->escape_like($request['sSearch']) . "%' OR ";
                 }
             }
-            $sWhere = substr_replace($sWhere, "", -3);
+            $sWhere = substr_replace($sWhere, '', -3);
         }
         // Quick Search
-        $qs_cond = array();
+        $qs_cond = [];
         if (isset($request['dttable_quick_search'])) {
-            $qs_cond = json_decode($request['dttable_quick_search'], TRUE);
+            $qs_cond = json_decode($request['dttable_quick_search'], true);
         }
         if (isset($qs_cond) && count($qs_cond) > 0) {
-
-
             foreach ($qs_cond as $qs_cond_k => $qs_cond_v) {
                 $value = $qs_cond_v['value'];
                 $transforms = carr::get($qs_cond_v, 'transforms');
                 if (strlen($transforms) > 0) {
-                    $transforms = json_decode($transforms, TRUE);
+                    $transforms = json_decode($transforms, true);
 
                     foreach ($transforms as $transforms_k => $transforms_v) {
-                        $value = ctransform::$transforms_v['func']($value, TRUE);
+                        $value = ctransform::$transforms_v['func']($value, true);
                     }
                 }
 
                 $field_name = str_replace('dt_table_qs-', '', $qs_cond_v['name']);
-                $qs_condition_str .= "`" . $field_name . "` LIKE '%" . $db->escape_like($value) . "%' AND ";
+                $qs_condition_str .= '`' . $field_name . "` LIKE '%" . $db->escape_like($value) . "%' AND ";
             }
-            $qs_condition_str = substr_replace($qs_condition_str, "", -4);
-            if (strlen(trim($sWhere)) > 0)
+            $qs_condition_str = substr_replace($qs_condition_str, '', -4);
+            if (strlen(trim($sWhere)) > 0) {
                 $sWhere = ' ( ' . $sWhere . ' ) AND ';
+            }
 
             $sWhere .= $qs_condition_str;
         }
 
         if (strlen($sWhere) > 0) {
-            $sWhere = " WHERE ( " . $sWhere . " )";
+            $sWhere = ' WHERE ( ' . $sWhere . ' )';
         }
 
         /* Individual column filtering */
         for ($i = 0; $i < count($columns); $i++) {
-            if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == "true" && $request['sSearch_' . $i] != '') {
-                if ($sWhere == "") {
-                    $sWhere = "WHERE ";
+            if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == 'true' && $request['sSearch_' . $i] != '') {
+                if ($sWhere == '') {
+                    $sWhere = 'WHERE ';
                 } else {
-                    $sWhere .= " AND ";
+                    $sWhere .= ' AND ';
                 }
-                $sWhere .= "`" . $columns[$i]->fieldname . "` LIKE '%" . $db->escape_like($request['sSearch_' . $i]) . "%' ";
+                $sWhere .= '`' . $columns[$i]->fieldname . "` LIKE '%" . $db->escape_like($request['sSearch_' . $i]) . "%' ";
             }
         }
 
-        $qfilter = "select * from (" . $base_q . ") as a " . $sWhere . ' ' . $sOrder;
+        $qfilter = 'select * from (' . $base_q . ') as a ' . $sWhere . ' ' . $sOrder;
         if (strlen($sOrder) > 0) {
             $temp_order_by = '';
         }
-        $qtotal = "select count(*) as cnt from (" . $qfilter . ") as a";
+        $qtotal = 'select count(*) as cnt from (' . $qfilter . ') as a';
         $rtotal = $db->query($qtotal);
         $filtered_record = 0;
-        if ($rtotal->count() > 0)
+        if ($rtotal->count() > 0) {
             $filtered_record = $rtotal[0]->cnt;
-
+        }
 
         //die($temp_order_by);
         if (strlen($temp_order_by) > 0) {
-            $sub = explode(",", substr($temp_order_by, 9));
-            $temp_order_by = "";
+            $sub = explode(',', substr($temp_order_by, 9));
+            $temp_order_by = '';
             foreach ($sub as $val) {
-                $kata = explode(".", $val);
-                if (isset($kata[1]))
-                    $temp_order_by .= ", " . $kata[1];
-                else
-                    $temp_order_by .= ", " . $kata[0];
+                $kata = explode('.', $val);
+                if (isset($kata[1])) {
+                    $temp_order_by .= ', ' . $kata[1];
+                } else {
+                    $temp_order_by .= ', ' . $kata[0];
+                }
             }
             $temp_order_by = substr($temp_order_by, 2);
-            $temp_order_by = "ORDER BY " . $temp_order_by;
+            $temp_order_by = 'ORDER BY ' . $temp_order_by;
         }
 
-        $qfilter .= " " . $temp_order_by . ' ' . $sLimit;
+        $qfilter .= ' ' . $temp_order_by . ' ' . $sLimit;
         $r = $db->query($qfilter);
 
         //$filtered_record = $r->count();
         $rarr = $r->result(false);
         $data = $rarr;
-        $output = array(
-            "sEcho" => intval(carr::get($request, 'sEcho')),
-            "iTotalRecords" => $total_record,
-            "iTotalDisplayRecords" => $filtered_record,
-            "aaData" => array(),
-        );
+        $output = [
+            'sEcho' => intval(carr::get($request, 'sEcho')),
+            'iTotalRecords' => $total_record,
+            'iTotalDisplayRecords' => $filtered_record,
+            'aaData' => [],
+        ];
         $no = carr::get($request, 'iDisplayStart', 0);
         foreach ($data as $row) {
-            $arr = array();
+            $arr = [];
             $no++;
-            $key = "";
+            $key = '';
 
             if (array_key_exists($table->key_field, $row)) {
-
                 $key = $row[$table->key_field];
             }
             if ($table->numbering) {
@@ -555,9 +549,9 @@ class cajax {
             }
             foreach ($table->columns as $col) {
                 $col_found = false;
-                $new_v = "";
-                $col_v = "";
-                $ori_v = "";
+                $new_v = '';
+                $col_v = '';
+                $ori_v = '';
                 //do print from query
                 foreach ($row as $k => $v) {
                     if ($k == $col->get_fieldname()) {
@@ -572,10 +566,8 @@ class cajax {
                 if (strlen($col->format) > 0) {
                     $temp_v = $col->format;
                     foreach ($row as $k2 => $v2) {
-
-                        if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
-                            $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
+                        if (strpos($temp_v, '{' . $k2 . '}') !== false) {
+                            $temp_v = str_replace('{' . $k2 . '}', $v2, $temp_v);
                         }
                         $col_v = $temp_v;
                     }
@@ -597,13 +589,13 @@ class cajax {
                         $new_v = $new_v['html'];
                     }
                 }
-                $class = "";
+                $class = '';
                 switch ($col->get_align()) {
-                    case "left": $class .= " align-left";
+                    case 'left': $class .= ' align-left';
                         break;
-                    case "right": $class .= " align-right";
+                    case 'right': $class .= ' align-right';
                         break;
-                    case "center": $class .= " align-center";
+                    case 'center': $class .= ' align-center';
                         break;
                 }
                 $arr[] = $new_v;
@@ -614,14 +606,14 @@ class cajax {
                 foreach ($row as $k => $v) {
                     $jsparam[$k] = $v;
                 }
-                $jsparam["param1"] = $key;
-                if ($table->getRowActionStyle() == "btn-dropdown") {
-                    $table->getRowActionList()->add_class("pull-right");
+                $jsparam['param1'] = $key;
+                if ($table->getRowActionStyle() == 'btn-dropdown') {
+                    $table->getRowActionList()->add_class('pull-right');
                 }
                 $row_action_list->regenerateId(true);
-                $row_action_list->apply("jsparam", $jsparam);
+                $row_action_list->apply('jsparam', $jsparam);
 
-                $row_action_list->apply("set_handler_url_param", $jsparam);
+                $row_action_list->apply('set_handler_url_param', $jsparam);
 
                 if (($table->filter_action_callback_func) != null) {
                     $actions = $row_action_list->childs();
@@ -644,40 +636,38 @@ class cajax {
                 $html->dec_indent()->appendln('</td>')->br();
                 //$arr[] = '';
                 $arr[] = $html->text();
-                $arr["DT_RowId"] = $key;
+                $arr['DT_RowId'] = $key;
             }
-            $output["aaData"][] = $arr;
+            $output['aaData'][] = $arr;
         }
 
-
-        $data = array(
-            "datatable" => $output,
-            "js" => cbase64::encode($js),
-        );
+        $data = [
+            'datatable' => $output,
+            'js' => cbase64::encode($js),
+        ];
         $response = json_encode($data);
         return $response;
     }
 
     public static function handler_reload($obj, $input) {
-
         $data = $obj->data->json;
 
         return $data;
     }
 
     public static function imgupload($obj, $input) {
-        $return = array();
+        $return = [];
         $data = $obj->data;
         $input_name = $data->input_name;
         $fileId = '';
         if (isset($_FILES[$input_name]) && isset($_FILES[$input_name]['name'])) {
             for ($i = 0; $i < count($_FILES[$input_name]['name']); $i++) {
-                $extension = "." . pathinfo($_FILES[$input_name]['name'][$i], PATHINFO_EXTENSION);
+                $extension = '.' . pathinfo($_FILES[$input_name]['name'][$i], PATHINFO_EXTENSION);
                 if (strtolower($extension) == 'php') {
                     die('fatal error');
                 }
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
-                $fullfilename = CTemporary::getPath("imgupload", $fileId);
+                $fullfilename = CTemporary::getPath('imgupload', $fileId);
                 $disk = CTemporary::disk();
                 if (!$disk->put($fullfilename, file_get_contents($_FILES[$input_name]['tmp_name'][$i]))) {
                     die('fail upload from ' . $_FILES[$input_name]['tmp_name'][$i] . ' to ' . $fullfilename);
@@ -687,50 +677,49 @@ class cajax {
         }
 
         if (isset($_POST[$input_name])) {
-
             $imageDataArray = $_POST[$input_name];
             $filenameArray = $_POST[$input_name . '_filename'];
 
             if (!is_array($imageDataArray)) {
-                $imageDataArray = array($imageDataArray);
+                $imageDataArray = [$imageDataArray];
             }
             if (!is_array($filenameArray)) {
-                $filenameArray = array($filenameArray);
+                $filenameArray = [$filenameArray];
             }
             foreach ($imageDataArray as $k => $imageData) {
                 $filename = carr::get($filenameArray, $k);
-                $extension = "." . pathinfo($filename, PATHINFO_EXTENSION);
+                $extension = '.' . pathinfo($filename, PATHINFO_EXTENSION);
                 if (strtolower($extension) == 'php') {
                     die('fatal error');
                 }
 
-                $filteredData = substr($imageData, strpos($imageData, ",") + 1);
+                $filteredData = substr($imageData, strpos($imageData, ',') + 1);
                 $unencodedData = base64_decode($filteredData);
                 $fileId = date('Ymd') . cutils::randmd5() . $extension;
-                $fullfilename = CTemporary::getPath("imgupload", $fileId);
+                $fullfilename = CTemporary::getPath('imgupload', $fileId);
                 $disk = CTemporary::disk();
                 $disk->put($fullfilename, $unencodedData);
                 $return[] = $fileId;
             }
         }
-        $return = array(
+        $return = [
             'file_id' => $fileId,
             'url' => CTemporary::getUrl('imgupload', $fileId),
-        );
+        ];
         return json_encode($return);
     }
 
     public static function fileupload($obj, $input) {
-        $return = array();
+        $return = [];
         $data = $obj->data;
         $input_name = $data->input_name;
 
         if (isset($_FILES[$input_name]) && isset($_FILES[$input_name]['name'])) {
             for ($i = 0; $i < count($_FILES[$input_name]['name']); $i++) {
-                $extension = "." . pathinfo($_FILES[$input_name]['name'][$i], PATHINFO_EXTENSION);
+                $extension = '.' . pathinfo($_FILES[$input_name]['name'][$i], PATHINFO_EXTENSION);
                 $file_id = date('Ymd') . cutils::randmd5() . $extension;
 
-                $fullfilename = CTemporary::getPath("fileupload", $file_id . ".tmp");
+                $fullfilename = CTemporary::getPath('fileupload', $file_id . '.tmp');
                 $disk = CTemporary::disk();
                 $disk->put($fullfilename, file_get_contents($_FILES[$input_name]['tmp_name'][$i]));
                 $return[] = $file_id;
@@ -744,12 +733,11 @@ class cajax {
     public static function dataelastic($obj, $input) {
         $ajax_data = $obj->data->query;
         $param = $obj->param;
-        $js = "";
+        $js = '';
 
         foreach ($param as $p) {
-
             $val = $input[$p->name];
-            $q = str_replace("{" . $p->name . "}", $db->escape($val), $q);
+            $q = str_replace('{' . $p->name . '}', $db->escape($val), $q);
         }
 
         $table = unserialize($obj->data->table);
@@ -763,7 +751,7 @@ class cajax {
 
         $request = $_GET;
 
-        if (strtoupper($table->ajax_method) == "POST") {
+        if (strtoupper($table->ajax_method) == 'POST') {
             $request = $_POST;
         }
 
@@ -774,12 +762,10 @@ class cajax {
         $elastic_index = cobj::get($ajax_data, 'index');
         $elastic_document_type = cobj::get($ajax_data, 'document_type');
 
-
         $search = $el->search($elastic_index, $elastic_document_type);
 
         $mapping = $search->indices()->get_mapping();
         $properties = carr::path($mapping, $elastic_index . '.mappings.' . $elastic_document_type . '.properties');
-
 
         $must = cobj::get($ajax_data, 'must');
         foreach ($must as $m) {
@@ -799,26 +785,21 @@ class cajax {
             $select_flip[carr::get($v, 'alias')] = carr::get($v, 'field');
         }
 
-
-
         foreach ($select_raw as $k => $v) {
             $v = (array) $v;
 
             $search->select(carr::get($v, 'field'), carr::get($v, 'alias'));
         }
 
-        $sort = (array) cobj::get($ajax_data, 'sort', array());
+        $sort = (array) cobj::get($ajax_data, 'sort', []);
         $from = cobj::get($ajax_data, 'from', 0);
         $size = cobj::get($ajax_data, 'size', 10);
-
-
 
         /* Paging */
         if (isset($request['iDisplayStart']) && $request['iDisplayLength'] != '-1') {
             $search->from(intval($request['iDisplayStart']));
             $search->size(intval($request['iDisplayLength']));
         }
-
 
         /* Ordering */
         if (isset($request['iSortCol_0'])) {
@@ -827,8 +808,7 @@ class cajax {
                 if ($table->checkbox) {
                     $i2 = -1;
                 }
-                if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == "true") {
-
+                if ($request['bSortable_' . intval($request['iSortCol_' . $i])] == 'true') {
                     $field = $columns[intval($request['iSortCol_' . $i]) + $i2]->fieldname;
 
                     $sort_mode = $request['sSortDir_' . $i];
@@ -847,23 +827,23 @@ class cajax {
             }
         }
 
-        if (isset($request['sSearch']) && $request['sSearch'] != "") {
-            $arr = array();
+        if (isset($request['sSearch']) && $request['sSearch'] != '') {
+            $arr = [];
             if (count($columns) > 0) {
-                carr::set_path($arr, 'bool.should', array());
+                carr::set_path($arr, 'bool.should', []);
                 $should = &$arr['bool']['should'];
                 for ($i = 0; $i < count($columns); $i++) {
                     $i2 = 0;
                     if ($table->checkbox) {
                         $i2 = -1;
                     }
-                    if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == "true") {
+                    if (isset($request['bSearchable_' . $i]) && $request['bSearchable_' . $i] == 'true') {
                         $field = $columns[$i + $i2]->fieldname;
                         if (isset($select_flip[$field])) {
                             $field = $select_flip[$field];
                         }
 
-                        $s = array();
+                        $s = [];
                         $fieldElastic = $search->getElasticField($field);
                         $elastic_field_type = carr::path($properties, $fieldElastic . '.type');
 
@@ -890,7 +870,6 @@ class cajax {
                 }
             }
             if (count($arr) > 0) {
-
                 $search->must($arr);
             }
         }
@@ -902,27 +881,24 @@ class cajax {
 
         $r = $search->exec();
 
-
         $total_record = $r->count_all();
         $filtered_record = min($r->count_all(), 10000);
 
-
         $rarr = $r->result(false);
         $data = $rarr;
-        $output = array(
-            "sEcho" => intval(carr::get($request, 'sEcho')),
-            "iTotalRecords" => $total_record,
-            "iTotalDisplayRecords" => $filtered_record,
-            "aaData" => array(),
-        );
+        $output = [
+            'sEcho' => intval(carr::get($request, 'sEcho')),
+            'iTotalRecords' => $total_record,
+            'iTotalDisplayRecords' => $filtered_record,
+            'aaData' => [],
+        ];
         $no = carr::get($request, 'iDisplayStart', 0);
         foreach ($data as $row) {
-            $arr = array();
+            $arr = [];
             $no++;
-            $key = "";
+            $key = '';
 
             if (array_key_exists($table->key_field, $row)) {
-
                 $key = $row[$table->key_field];
             }
             if ($table->numbering) {
@@ -934,9 +910,9 @@ class cajax {
             }
             foreach ($table->columns as $col) {
                 $col_found = false;
-                $new_v = "";
-                $col_v = "";
-                $ori_v = "";
+                $new_v = '';
+                $col_v = '';
+                $ori_v = '';
                 //do print from query
                 foreach ($row as $k => $v) {
                     if ($k == $col->get_fieldname()) {
@@ -951,10 +927,8 @@ class cajax {
                 if (strlen($col->format) > 0) {
                     $temp_v = $col->format;
                     foreach ($row as $k2 => $v2) {
-
-                        if (strpos($temp_v, "{" . $k2 . "}") !== false) {
-
-                            $temp_v = str_replace("{" . $k2 . "}", $v2, $temp_v);
+                        if (strpos($temp_v, '{' . $k2 . '}') !== false) {
+                            $temp_v = str_replace('{' . $k2 . '}', $v2, $temp_v);
                         }
                         $col_v = $temp_v;
                     }
@@ -976,36 +950,35 @@ class cajax {
                         $new_v = $new_v['html'];
                     }
 
-
                     //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
                 }
-                $class = "";
+                $class = '';
                 switch ($col->get_align()) {
-                    case "left": $class .= " align-left";
+                    case 'left': $class .= ' align-left';
                         break;
-                    case "right": $class .= " align-right";
+                    case 'right': $class .= ' align-right';
                         break;
-                    case "center": $class .= " align-center";
+                    case 'center': $class .= ' align-center';
                         break;
                 }
                 $arr[] = $new_v;
             }
             if (count($row_action_list) > 0) {
                 $html = new CStringBuilder();
-                ;
+
                 $html->appendln('<td class="low-padding align-center cell-action td-action">')->inc_indent()->br();
                 foreach ($row as $k => $v) {
                     $jsparam[$k] = $v;
                 }
-                $jsparam["param1"] = $key;
-                if ($table->getRowActionStyle() == "btn-dropdown") {
-                    $table->getRowActionList()->add_class("pull-right");
+                $jsparam['param1'] = $key;
+                if ($table->getRowActionStyle() == 'btn-dropdown') {
+                    $table->getRowActionList()->add_class('pull-right');
                 }
 
                 $row_action_list->regenerateId(true);
-                $row_action_list->apply("jsparam", $jsparam);
+                $row_action_list->apply('jsparam', $jsparam);
 
-                $row_action_list->apply("set_handler_url_param", $jsparam);
+                $row_action_list->apply('set_handler_url_param', $jsparam);
 
                 if (($table->filter_action_callback_func) != null) {
                     $actions = $row_action_list->childs();
@@ -1022,7 +995,6 @@ class cajax {
                         $action->set_visibility($visibility);
                     }
 
-
                     //call_user_func($this->cell_callback_func,$this,$col->get_fieldname(),$row,$v);
                 }
 
@@ -1031,18 +1003,16 @@ class cajax {
                 $html->dec_indent()->appendln('</td>')->br();
                 //$arr[] = '';
                 $arr[] = $html->text();
-                $arr["DT_RowId"] = $key;
+                $arr['DT_RowId'] = $key;
             }
-            $output["aaData"][] = $arr;
+            $output['aaData'][] = $arr;
         }
 
-
-        $data = array(
-            "datatable" => $output,
-            "js" => cbase64::encode($js),
-        );
+        $data = [
+            'datatable' => $output,
+            'js' => cbase64::encode($js),
+        ];
         $response = json_encode($data);
         return $response;
     }
-
 }

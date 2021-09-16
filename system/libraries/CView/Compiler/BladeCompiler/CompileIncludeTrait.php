@@ -6,11 +6,11 @@
  * @author Hery
  */
 trait CView_Compiler_BladeCompiler_CompileIncludeTrait {
-
     /**
      * Compile the each statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileEach($expression) {
@@ -20,7 +20,8 @@ trait CView_Compiler_BladeCompiler_CompileIncludeTrait {
     /**
      * Compile the include statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileInclude($expression) {
@@ -32,7 +33,8 @@ trait CView_Compiler_BladeCompiler_CompileIncludeTrait {
     /**
      * Compile the include-if statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileIncludeIf($expression) {
@@ -44,7 +46,8 @@ trait CView_Compiler_BladeCompiler_CompileIncludeTrait {
     /**
      * Compile the include-when statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileIncludeWhen($expression) {
@@ -56,7 +59,8 @@ trait CView_Compiler_BladeCompiler_CompileIncludeTrait {
     /**
      * Compile the include-unless statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileIncludeUnless($expression) {
@@ -68,7 +72,8 @@ trait CView_Compiler_BladeCompiler_CompileIncludeTrait {
     /**
      * Compile the include-first statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileIncludeFirst($expression) {
@@ -76,5 +81,4 @@ trait CView_Compiler_BladeCompiler_CompileIncludeTrait {
 
         return "<?php echo \$__env->first({$expression}, \carr::except(get_defined_vars(), ['__data', '__path']))->render(); ?>";
     }
-
 }

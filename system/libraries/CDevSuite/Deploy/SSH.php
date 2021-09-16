@@ -6,20 +6,19 @@
  * @author Hery
  */
 class CDevSuite_Deploy_SSH extends CDevSuite_Deploy_RemoteProcessor {
-
     use CDevSuite_Deploy_Trait_ConfigurationParserTrait;
 
     /**
      * Run the given task over SSH.
      *
-     * @param  CDevSuite_Deploy_Task  $task
-     * @param  \Closure|null  $callback
+     * @param CDevSuite_Deploy_Task $task
+     * @param \Closure|null         $callback
+     *
      * @return int
      */
     public function run(CDevSuite_Deploy_Task $task, Closure $callback = null) {
         $processes = [];
         $callback = $callback ?: function () {
-            
         };
 
         // Here we will gather all the process instances by host. We will build them in
@@ -42,11 +41,10 @@ class CDevSuite_Deploy_SSH extends CDevSuite_Deploy_RemoteProcessor {
             $process->run(function ($type, $output) use ($host, $callback) {
                 $callback($type, $host, $output);
             });
-             * 
+             *
              */
         }
 
         return $this->gatherExitCodes($processes);
     }
-
 }

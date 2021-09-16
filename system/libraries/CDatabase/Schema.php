@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 7:37:37 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 7:37:37 AM
  */
 class CDatabase_Schema extends CDatabase_AbstractAsset {
-
     /**
      * The namespaces in this schema.
      *
@@ -19,41 +19,41 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * @var CDatabase_Schema_Table[]
      */
-    protected $_tables = [];
+    protected $tables = [];
 
     /**
      * @var CDatabase_Schema_Sequence[]
      */
-    protected $_sequences = [];
+    protected $sequences = [];
 
     /**
-     * @var SchemaConfig
+     * @var CDatabase_Schema_Config
      */
-    protected $_schemaConfig = false;
+    protected $schemaConfig = false;
 
     /**
-     * @param CDatabase_Schema_Table[]          $tables
-     * @param CDatabase_Schema_Sequence[]       $sequences
-     * @param CDatabase_Schema_Config           $schemaConfig
-     * @param array                             $namespaces
+     * @param CDatabase_Schema_Table[]    $tables
+     * @param CDatabase_Schema_Sequence[] $sequences
+     * @param CDatabase_Schema_Config     $schemaConfig
+     * @param array                       $namespaces
      */
     public function __construct(array $tables = [], array $sequences = [], CDatabase_Schema_Config $schemaConfig = null, array $namespaces = []) {
         if ($schemaConfig == null) {
             $schemaConfig = new CDatabase_Schema_Config();
         }
-        $this->_schemaConfig = $schemaConfig;
-        $this->_setName($schemaConfig->getName() ?: 'public');
+        $this->schemaConfig = $schemaConfig;
+        $this->setName($schemaConfig->getName() ?: 'public');
 
         foreach ($namespaces as $namespace) {
             $this->createNamespace($namespace);
         }
 
         foreach ($tables as $table) {
-            $this->_addTable($table);
+            $this->addTable($table);
         }
 
         foreach ($sequences as $sequence) {
-            $this->_addSequence($sequence);
+            $this->addSequence($sequence);
         }
     }
 
@@ -61,7 +61,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      * @return bool
      */
     public function hasExplicitForeignKeyIndexes() {
-        return $this->_schemaConfig->hasExplicitForeignKeyIndexes();
+        return $this->schemaConfig->hasExplicitForeignKeyIndexes();
     }
 
     /**
@@ -71,11 +71,11 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      *
      * @throws CDatabase_Schema_Exception
      */
-    protected function _addTable(CDatabase_Schema_Table $table) {
+    protected function addTable(CDatabase_Schema_Table $table) {
         $namespaceName = $table->getNamespaceName();
         $tableName = $table->getFullQualifiedName($this->getName());
 
-        if (isset($this->_tables[$tableName])) {
+        if (isset($this->tables[$tableName])) {
             throw CDatabase_Schema_Exception::tableAlreadyExists($tableName);
         }
 
@@ -83,8 +83,8 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
             $this->createNamespace($namespaceName);
         }
 
-        $this->_tables[$tableName] = $table;
-        $table->setSchemaConfig($this->_schemaConfig);
+        $this->tables[$tableName] = $table;
+        $table->setSchemaConfig($this->schemaConfig);
     }
 
     /**
@@ -94,11 +94,11 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      *
      * @throws CDatabase_Schema_Exception
      */
-    protected function _addSequence(CDatabase_Schema_Sequence $sequence) {
+    protected function addSequence(CDatabase_Schema_Sequence $sequence) {
         $namespaceName = $sequence->getNamespaceName();
         $seqName = $sequence->getFullQualifiedName($this->getName());
 
-        if (isset($this->_sequences[$seqName])) {
+        if (isset($this->sequences[$seqName])) {
             throw CDatabase_Schema_Exception::sequenceAlreadyExists($seqName);
         }
 
@@ -106,13 +106,13 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
             $this->createNamespace($namespaceName);
         }
 
-        $this->_sequences[$seqName] = $sequence;
+        $this->sequences[$seqName] = $sequence;
     }
 
     /**
      * Returns the namespaces of this schema.
      *
-     * @return array A list of namespace names.
+     * @return array a list of namespace names
      */
     public function getNamespaces() {
         return $this->namespaces;
@@ -124,7 +124,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      * @return CDatabase_Schema_Table[]
      */
     public function getTables() {
-        return $this->_tables;
+        return $this->tables;
     }
 
     /**
@@ -136,11 +136,11 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      */
     public function getTable($tableName) {
         $tableName = $this->getFullQualifiedAssetName($tableName);
-        if (!isset($this->_tables[$tableName])) {
+        if (!isset($this->tables[$tableName])) {
             throw CDatabase_Schema_Exception::tableDoesNotExist($tableName);
         }
 
-        return $this->_tables[$tableName];
+        return $this->tables[$tableName];
     }
 
     /**
@@ -150,10 +150,9 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      */
     private function getFullQualifiedAssetName($name) {
         $name = $this->getUnquotedAssetName($name);
-       
 
-        if (strpos($name, ".") === false) {
-            $name = $this->getName() . "." . $name;
+        if (strpos($name, '.') === false) {
+            $name = $this->getName() . '.' . $name;
         }
         return strtolower($name);
     }
@@ -161,7 +160,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * Returns the unquoted representation of a given asset name.
      *
-     * @param string $assetName Quoted or unquoted representation of an asset name.
+     * @param string $assetName quoted or unquoted representation of an asset name
      *
      * @return string
      */
@@ -195,7 +194,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      */
     public function hasTable($tableName) {
         $tableName = $this->getFullQualifiedAssetName($tableName);
-        return isset($this->_tables[$tableName]);
+        return isset($this->tables[$tableName]);
     }
 
     /**
@@ -204,7 +203,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      * @return array
      */
     public function getTableNames() {
-        return array_keys($this->_tables);
+        return array_keys($this->tables);
     }
 
     /**
@@ -215,7 +214,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     public function hasSequence($sequenceName) {
         $sequenceName = $this->getFullQualifiedAssetName($sequenceName);
 
-        return isset($this->_sequences[$sequenceName]);
+        return isset($this->sequences[$sequenceName]);
     }
 
     /**
@@ -228,33 +227,33 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     public function getSequence($sequenceName) {
         $sequenceName = $this->getFullQualifiedAssetName($sequenceName);
         if (!$this->hasSequence($sequenceName)) {
-            throw SchemaException::sequenceDoesNotExist($sequenceName);
+            throw CDatabase_Exception_SchemaException::sequenceDoesNotExist($sequenceName);
         }
 
-        return $this->_sequences[$sequenceName];
+        return $this->sequences[$sequenceName];
     }
 
     /**
      * @return CDatabase_Schema_Sequence[]
      */
     public function getSequences() {
-        return $this->_sequences;
+        return $this->sequences;
     }
 
     /**
      * Creates a new namespace.
      *
-     * @param string $namespaceName The name of the namespace to create.
+     * @param string $namespaceName the name of the namespace to create
      *
-     * @return CDatabase_Schema_Schema This schema instance.
+     * @return CDatabase_Schema_Schema this schema instance
      *
-     * @throws SchemaException
+     * @throws CDatabase_Exception_SchemaException
      */
     public function createNamespace($namespaceName) {
         $unquotedNamespaceName = strtolower($this->getUnquotedAssetName($namespaceName));
 
         if (isset($this->namespaces[$unquotedNamespaceName])) {
-            throw SchemaException::namespaceAlreadyExists($unquotedNamespaceName);
+            throw CDatabase_Exception_SchemaException::namespaceAlreadyExists($unquotedNamespaceName);
         }
 
         $this->namespaces[$unquotedNamespaceName] = $namespaceName;
@@ -271,9 +270,9 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      */
     public function createTable($tableName) {
         $table = new CDatabase_Schema_Table($tableName);
-        $this->_addTable($table);
+        $this->addTable($table);
 
-        foreach ($this->_schemaConfig->getDefaultTableOptions() as $name => $value) {
+        foreach ($this->schemaConfig->getDefaultTableOptions() as $name => $value) {
             $table->addOption($name, $value);
         }
 
@@ -290,10 +289,10 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      */
     public function renameTable($oldTableName, $newTableName) {
         $table = $this->getTable($oldTableName);
-        $table->_setName($newTableName);
+        $table->setName($newTableName);
 
         $this->dropTable($oldTableName);
-        $this->_addTable($table);
+        $this->addTable($table);
 
         return $this;
     }
@@ -308,7 +307,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     public function dropTable($tableName) {
         $tableName = $this->getFullQualifiedAssetName($tableName);
         $this->getTable($tableName);
-        unset($this->_tables[$tableName]);
+        unset($this->tables[$tableName]);
 
         return $this;
     }
@@ -324,7 +323,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      */
     public function createSequence($sequenceName, $allocationSize = 1, $initialValue = 1) {
         $seq = new CDatabase_Schema_Sequence($sequenceName, $allocationSize, $initialValue);
-        $this->_addSequence($seq);
+        $this->addSequence($seq);
 
         return $seq;
     }
@@ -336,7 +335,7 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      */
     public function dropSequence($sequenceName) {
         $sequenceName = $this->getFullQualifiedAssetName($sequenceName);
-        unset($this->_sequences[$sequenceName]);
+        unset($this->sequences[$sequenceName]);
 
         return $this;
     }
@@ -358,20 +357,20 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     /**
      * Return an array of necessary SQL queries to drop the schema on the given platform.
      *
-     * @param CDatabase_Schema $platform
+     * @param CDatabase_Platform $platform
      *
      * @return array
      */
-    public function toDropSql(CDatabase_Schema $platform) {
-        $dropSqlCollector = new DropSchemaSqlCollector($platform);
+    public function toDropSql(CDatabase_Platform $platform) {
+        $dropSqlCollector = new CDatabase_Schema_Visitor_DropSchemaSqlCollector($platform);
         $this->visit($dropSqlCollector);
 
         return $dropSqlCollector->getQueries();
     }
 
     /**
-     * @param CDatabase_Schema_Schema              $toSchema
-     * @param CDatabase_Platform $platform
+     * @param CDatabase_Schema_Schema $toSchema
+     * @param CDatabase_Platform      $platform
      *
      * @return array
      */
@@ -383,8 +382,8 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
     }
 
     /**
-     * @param CDatabase_Schema              $fromSchema
-     * @param CDatabase_Platform            $platform
+     * @param CDatabase_Schema   $fromSchema
+     * @param CDatabase_Platform $platform
      *
      * @return array
      */
@@ -409,11 +408,11 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
             }
         }
 
-        foreach ($this->_tables as $table) {
+        foreach ($this->tables as $table) {
             $table->visit($visitor);
         }
 
-        foreach ($this->_sequences as $sequence) {
+        foreach ($this->sequences as $sequence) {
             $sequence->visit($visitor);
         }
     }
@@ -424,12 +423,11 @@ class CDatabase_Schema extends CDatabase_AbstractAsset {
      * @return void
      */
     public function __clone() {
-        foreach ($this->_tables as $k => $table) {
-            $this->_tables[$k] = clone $table;
+        foreach ($this->tables as $k => $table) {
+            $this->tables[$k] = clone $table;
         }
-        foreach ($this->_sequences as $k => $sequence) {
-            $this->_sequences[$k] = clone $sequence;
+        foreach ($this->sequences as $k => $sequence) {
+            $this->sequences[$k] = clone $sequence;
         }
     }
-
 }

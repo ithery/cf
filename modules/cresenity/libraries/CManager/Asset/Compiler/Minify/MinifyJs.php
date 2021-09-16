@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Oct 2, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Oct 2, 2020
  */
 class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_MinifyAbstract {
-
     /**
      * Var-matching regex based on http://stackoverflow.com/a/9337047/802993.
      *
@@ -27,7 +27,7 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
      *
      * @var string[]
      */
-    protected $keywordsReserved = array();
+    protected $keywordsReserved = [];
 
     /**
      * List of JavaScript reserved words that accept a <variable, value, ...>
@@ -42,7 +42,7 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
      *
      * @var string[]
      */
-    protected $keywordsBefore = array();
+    protected $keywordsBefore = [];
 
     /**
      * List of JavaScript reserved words that accept a <variable, value, ...>
@@ -57,7 +57,7 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
      *
      * @var string[]
      */
-    protected $keywordsAfter = array();
+    protected $keywordsAfter = [];
 
     /**
      * List of all JavaScript operators.
@@ -68,7 +68,7 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
      *
      * @var string[]
      */
-    protected $operators = array();
+    protected $operators = [];
 
     /**
      * List of JavaScript operators that accept a <variable, value, ...> after
@@ -84,7 +84,7 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
      *
      * @var string[]
      */
-    protected $operatorsBefore = array();
+    protected $operatorsBefore = [];
 
     /**
      * List of JavaScript operators that accept a <variable, value, ...> before
@@ -103,13 +103,13 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
      *
      * @var string[]
      */
-    protected $operatorsAfter = array();
+    protected $operatorsAfter = [];
 
     /**
      * {@inheritdoc}
      */
     public function __construct() {
-        call_user_func_array(array('parent', '__construct'), func_get_args());
+        call_user_func_array(['parent', '__construct'], func_get_args());
 
         $dataDir = DOCROOT . 'modules/cresenity/data/minify/js/';
         $options = FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES;
@@ -125,12 +125,11 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
      * Minify the data.
      * Perform JS optimizations.
      *
-     * @param string[optional] $path Path to write the data to
+     * @param string $content
      *
      * @return string The minified data
      */
     public function execute($content) {
-
         /*
          * Let's first take out strings, comments and regular expressions.
          * All of these can contain JS code-like characters, and we should make
@@ -154,16 +153,13 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
         $content = $this->shortenBools($content);
         $content = $this->stripWhitespace($content);
 
-
-
-
         /*
          * Earlier, we extracted strings & regular expressions and replaced them
          * with placeholder text. This will restore them.
          */
         $content = $this->restoreExtractedData($content);
         // combine js: separating the scripts by a ;
-        $content .= ";";
+        $content .= ';';
 
         return $content;
     }
@@ -229,9 +225,9 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
         // a regular expression can only be followed by a few operators or some
         // of the RegExp methods (a `\` followed by a variable or value is
         // likely part of a division, not a regex)
-        $keywords = array('do', 'in', 'new', 'else', 'throw', 'yield', 'delete', 'return', 'typeof');
+        $keywords = ['do', 'in', 'new', 'else', 'throw', 'yield', 'delete', 'return', 'typeof'];
         $before = '([=:,;\+\-\*\/\}\(\{\[&\|!]|^|' . implode('|', $keywords) . ')\s*';
-        $propertiesAndMethods = array(
+        $propertiesAndMethods = [
             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp#Properties_2
             'constructor',
             'flags',
@@ -247,7 +243,7 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
             'test(',
             'toSource(',
             'toString(',
-        );
+        ];
         $delimiters = array_fill(0, count($propertiesAndMethods), '/');
         $propertiesAndMethods = array_map('preg_quote', $propertiesAndMethods, $delimiters);
         $after = '(?=\s*([\.,;\)\}&\|+]|\/\/|$|\.(' . implode('|', $propertiesAndMethods) . ')))';
@@ -296,13 +292,13 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
      */
     protected function stripWhitespace($content) {
         // uniform line endings, make them all line feed
-        $content = str_replace(array("\r\n", "\r"), "\n", $content);
+        $content = str_replace(["\r\n", "\r"], "\n", $content);
 
         // collapse all non-line feed whitespace into a single space
         $content = preg_replace('/[^\S\n]+/', ' ', $content);
 
         // strip leading & trailing whitespace
-        $content = str_replace(array(" \n", "\n "), "\n", $content);
+        $content = str_replace([" \n", "\n "], "\n", $content);
 
         // collapse consecutive line feeds into just 1
         $content = preg_replace('/\n+/', "\n", $content);
@@ -317,22 +313,22 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
         // that allows statements to be broken up over multiple lines
         unset($operatorsBefore['+'], $operatorsBefore['-'], $operatorsAfter['+'], $operatorsAfter['-']);
         $content = preg_replace(
-                array(
-                    '/(' . implode('|', $operatorsBefore) . ')\s+/',
-                    '/\s+(' . implode('|', $operatorsAfter) . ')/',
-                ),
-                '\\1',
-                $content
+            [
+                '/(' . implode('|', $operatorsBefore) . ')\s+/',
+                '/\s+(' . implode('|', $operatorsAfter) . ')/',
+            ],
+            '\\1',
+            $content
         );
 
         // make sure + and - can't be mistaken for, or joined into ++ and --
         $content = preg_replace(
-                array(
-                    '/(?<![\+\-])\s*([\+\-])(?![\+\-])/',
-                    '/(?<![\+\-])([\+\-])\s*(?![\+\-])/',
-                ),
-                '\\1',
-                $content
+            [
+                '/(?<![\+\-])\s*([\+\-])(?![\+\-])/',
+                '/(?<![\+\-])([\+\-])\s*(?![\+\-])/',
+            ],
+            '\\1',
+            $content
         );
 
         // collapse whitespace around reserved words into single space
@@ -580,5 +576,4 @@ class CManager_Asset_Compiler_Minify_MinifyJs extends CManager_Asset_Compiler_Mi
 
         return $content;
     }
-
 }

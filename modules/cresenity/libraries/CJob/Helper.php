@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CJob_Helper {
-
     /**
      * @var int
      */
@@ -73,7 +66,9 @@ EOF;
         $swiftVersion = (int) explode('.', \Swift::VERSION)[0];
         if ($config['mailer'] === 'smtp') {
             $transport = new \Swift_SmtpTransport(
-                    $config['smtpHost'], $config['smtpPort'], $config['smtpSecurity']
+                $config['smtpHost'],
+                $config['smtpPort'],
+                $config['smtpSecurity']
             );
             $transport->setUsername($config['smtpUsername']);
             $transport->setPassword($config['smtpPassword']);
@@ -113,7 +108,7 @@ EOF;
             usleep(250);
             --$attempts;
         }
-        throw new InfoException("Job is still locked (Lockfile: $lockFile)!");
+        throw new CJob_Exception_InfoException("Job is still locked (Lockfile: $lockFile)!");
     }
 
     /**
@@ -219,5 +214,4 @@ EOF;
         }
         return 'NUL';
     }
-
 }

@@ -9,7 +9,6 @@
 use CEmail_Builder_Helper as Helper;
 
 class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
-
     public function getStyles() {
         return [];
     }
@@ -37,21 +36,20 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
     }
 
     public function htmlAttributes($attributes) {
+        return carr::reduce($attributes, function ($output, $v, $name) {
+            $value = $v;
+            if ($name == 'style') {
+                if (is_string($value)) {
+                    $value = carr::get($this->getStyles(), $v);
+                }
+                $value = Helper::renderStyle($value);
+            }
 
-        return carr::reduce($attributes, function($output, $v, $name) {
-                    $value = $v;
-                    if ($name == 'style') {
-                        if (is_string($value)) {
-                            $value = carr::get($this->getStyles(), $v);
-                        }
-                        $value = Helper::renderStyle($value);
-                    }
-
-                    if ($value != null && strlen($value) > 0) {
-                        return $output . ' ' . $name . '="' . $value . '"';
-                    }
-                    return $output;
-                }, '');
+            if ($value != null && strlen($value) > 0) {
+                return $output . ' ' . $name . '="' . $value . '"';
+            }
+            return $output;
+        }, '');
     }
 
     public function getBoxWidths() {
@@ -63,7 +61,6 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
         $parsedWidth = carr::get($widthParserResult, 'parsedWidth');
         $paddings = intval($this->getShorthandAttrValue('padding', 'right')) + intval($this->getShorthandAttrValue('padding', 'left'));
         $borders = intval($this->getShorthandBorderValue('right')) + intval($this->getShorthandBorderValue('left'));
-
 
         return [
             'totalWidth' => $parsedWidth,
@@ -83,12 +80,12 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
                 $stylesArray = $styles;
             }
         }
-        return carr::reduce($stylesArray, function($output, $value, $name) {
-                    if ($value != null) {
-                        return $output . $name . ":" . $value;
-                    }
-                    return $output;
-                }, '');
+        return carr::reduce($stylesArray, function ($output, $value, $name) {
+            if ($value != null) {
+                return $output . $name . ':' . $value;
+            }
+            return $output;
+        }, '');
     }
 
     public function renderChildren($options = []) {
@@ -97,11 +94,8 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
             return '';
         }
 
-
-        $renderer = function($component) {
-
+        $renderer = function ($component) {
             if (!method_exists($component, 'render')) {
-                
             }
             return $component->render();
         };
@@ -114,23 +108,20 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
         $props = carr::get($options, 'props', []);
 
         if ($rawXML) {
-            return carr::reduce($childrens, function($output, $child) {
-                        return $output .= "\n" . Helper::jsonToXML($child->getTagName(), $child->getAttributes(), $children->getChildren(), $child->getContent());
-                    }, '');
+            return carr::reduce($childrens, function ($output, $child) {
+                return $output .= "\n" . Helper::jsonToXML($child->getTagName(), $child->getAttributes(), $child->getChildren(), $child->getContent());
+            }, '');
         }
         $sibling = count($childrens);
-        $rawComponents = carr::filter(CEmail::builder()->components(), function($c) {
+        $rawComponents = carr::filter(CEmail::builder()->components(), function ($c) {
+            return $c::isRawElement();
+        });
 
-                    return $c::isRawElement();
-                });
-
-        $nonRawSiblings = count(carr::filter($childrens, function($child) use ($rawComponents) {
-                    return !carr::find($rawComponents, function($c) use($child) {
-                                return $c::getTagName() == $child->getTagName();
-                            });
-                }));
-
-
+        $nonRawSiblings = count(carr::filter($childrens, function ($child) use ($rawComponents) {
+            return !carr::find($rawComponents, function ($c) use ($child) {
+                return $c::getTagName() == $child->getTagName();
+            });
+        }));
 
         $output = '';
         $index = 0;
@@ -159,9 +150,6 @@ class CEmail_Builder_Component_BodyComponent extends CEmail_Builder_Component {
             $index++;
         };
 
-
-
         return $output;
     }
-
 }

@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use CRunner_WkHtmlToPdf_TmpFile as File;
 use CRunner_WkHtmlToPdf_Command as Command;
 
@@ -15,41 +9,40 @@ use CRunner_WkHtmlToPdf_Command as Command;
  * This class is a slim wrapper around `wkhtmltoimage`.
  *
  * @author Michael Härtl <haertl.mike@gmail.com>
- * @license http://www.opensource.org/licenses/MIT
  */
 class CRunner_WkHtmlToPdf_Image {
-
     // Regular expression to detect HTML strings
     const REGEX_HTML = '/<html/i';
+
     // prefix for tmp files
     const TMP_PREFIX = 'tmp_wkhtmlto_pdf_';
 
     /**
      * @var string the name of the `wkhtmltoimage` binary. Default is
-     * `wkhtmltoimage`. You can also configure a full path here.
+     *             `wkhtmltoimage`. You can also configure a full path here.
      */
     public $binary = 'wkhtmltoimage';
 
     /**
      * @var string the image type. Default is 'png'. Other options are 'jpg'
-     * and 'bmp'.
+     *             and 'bmp'.
      */
     public $type = 'png';
 
     /**
      * @var array options to pass to the Command constructor. Default is none.
      */
-    public $commandOptions = array();
+    public $commandOptions = [];
 
     /**
      * @var string|null the directory to use for temporary files. If `null`
-     * (default) the dir is autodetected.
+     *                  (default) the dir is autodetected.
      */
     public $tmpDir;
 
     /**
      * @var bool whether to ignore any errors if some PDF file was still
-     * created. Default is `false`.
+     *           created. Default is `false`.
      */
     public $ignoreWarnings = false;
 
@@ -60,15 +53,15 @@ class CRunner_WkHtmlToPdf_Image {
 
     /**
      * @var \mikehaertl\tmp\File|string the page input or a `File` instance for
-     * HTML string inputs
+     *                                  HTML string inputs
      */
     protected $_page;
 
     /**
      * @var array options for `wkhtmltoimage` as `['--opt1', '--opt2' => 'val',
-     * ...]`
+     *            ...]`
      */
-    protected $_options = array();
+    protected $_options = [];
 
     /**
      * @var CRunner_WkHtmlToPdf_TmpFile the temporary image file
@@ -87,7 +80,7 @@ class CRunner_WkHtmlToPdf_Image {
 
     /**
      * @param array|string $options global options for wkhtmltoimage, a page
-     * URL, a HTML string or a filename
+     *                              URL, a HTML string or a filename
      */
     public function __construct($options = null) {
         if (is_array($options)) {
@@ -101,6 +94,7 @@ class CRunner_WkHtmlToPdf_Image {
      * Add a page object to the output
      *
      * @param string $page either a URL, a HTML string or a filename
+     *
      * @return static the Image instance for method chaining
      */
     public function setPage($page) {
@@ -113,6 +107,7 @@ class CRunner_WkHtmlToPdf_Image {
      * Save the image to given filename (triggers image creation)
      *
      * @param string $filename to save image as
+     *
      * @return bool whether image was created successfully
      */
     public function saveAs($filename) {
@@ -139,10 +134,11 @@ class CRunner_WkHtmlToPdf_Image {
      * creation)
      *
      * @param string|null $filename the filename to send. If empty, the PDF is
-     * streamed inline. Note, that the file extension must match what you
-     * configured as $type (png, jpg, ...).
-     * @param bool $inline whether to force inline display of the image, even
-     * if filename is present.
+     *                              streamed inline. Note, that the file extension must match what you
+     *                              configured as $type (png, jpg, ...).
+     * @param bool        $inline   whether to force inline display of the image, even
+     *                              if filename is present
+     *
      * @return bool whether image was created successfully
      */
     public function send($filename = null, $inline = false) {
@@ -155,8 +151,9 @@ class CRunner_WkHtmlToPdf_Image {
 
     /**
      * Get the raw Image contents (triggers Image creation).
-     * @return string|bool The Image content as a string or `false` if the
-     * Image wasn't created successfully.
+     *
+     * @return string|bool the Image content as a string or `false` if the
+     *                     Image wasn't created successfully
      */
     public function toString() {
         if (!$this->_isCreated && !$this->createImage()) {
@@ -176,9 +173,10 @@ class CRunner_WkHtmlToPdf_Image {
      * Set options
      *
      * @param array $options list of image options to set as name/value pairs
+     *
      * @return static the Image instance for method chaining
      */
-    public function setOptions($options = array()) {
+    public function setOptions($options = []) {
         foreach ($options as $key => $val) {
             if (is_int($key)) {
                 $this->_options[] = $val;
@@ -224,6 +222,7 @@ class CRunner_WkHtmlToPdf_Image {
 
     /**
      * @return string the mime type for the current image
+     *
      * @throws \Exception
      */
     public function getMimeType() {
@@ -265,9 +264,7 @@ class CRunner_WkHtmlToPdf_Image {
         return true;
     }
 
-    
     public function getExecCommand() {
         return $this->getCommand()->getExecCommand();
-        
     }
 }

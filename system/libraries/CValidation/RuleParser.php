@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 12, 2019, 8:02:12 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 12, 2019, 8:02:12 PM
  */
 class CValidation_RuleParser {
-
     /**
      * The data being validated.
      *
@@ -26,7 +26,8 @@ class CValidation_RuleParser {
     /**
      * Create a new validation rule parser.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return void
      */
     public function __construct(array $data) {
@@ -36,7 +37,8 @@ class CValidation_RuleParser {
     /**
      * Parse the human-friendly rules into a full rules array for the validator.
      *
-     * @param  array  $rules
+     * @param array $rules
+     *
      * @return \stdClass
      */
     public function explode($rules) {
@@ -45,15 +47,16 @@ class CValidation_RuleParser {
         $rules = $this->explodeRules($rules);
 
         return (object) [
-                    'rules' => $rules,
-                    'implicitAttributes' => $this->implicitAttributes,
+            'rules' => $rules,
+            'implicitAttributes' => $this->implicitAttributes,
         ];
     }
 
     /**
      * Explode the rules into an array of explicit rules.
      *
-     * @param  array  $rules
+     * @param array $rules
+     *
      * @return array
      */
     protected function explodeRules($rules) {
@@ -73,7 +76,8 @@ class CValidation_RuleParser {
     /**
      * Explode the explicit rule into an array if necessary.
      *
-     * @param  mixed  $rule
+     * @param mixed $rule
+     *
      * @return array
      */
     protected function explodeExplicitRule($rule) {
@@ -89,7 +93,8 @@ class CValidation_RuleParser {
     /**
      * Prepare the given rule for the Validator.
      *
-     * @param  mixed  $rule
+     * @param mixed $rule
+     *
      * @return mixed
      */
     protected function prepareRule($rule) {
@@ -97,10 +102,11 @@ class CValidation_RuleParser {
             $rule = new CValidation_ClosureValidationRule($rule);
         }
 
-        if (!is_object($rule) ||
-                $rule instanceof CValidation_RuleInterface ||
-                ($rule instanceof CValidation_Rule_Exists && $rule->queryCallbacks()) ||
-                ($rule instanceof CValidation_Rule_Unique && $rule->queryCallbacks())) {
+        if (!is_object($rule)
+            || $rule instanceof CValidation_RuleInterface
+            || ($rule instanceof CValidation_Rule_Exists && $rule->queryCallbacks())
+            || ($rule instanceof CValidation_Rule_Unique && $rule->queryCallbacks())
+        ) {
             return $rule;
         }
 
@@ -110,9 +116,10 @@ class CValidation_RuleParser {
     /**
      * Define a set of rules that apply to each element in an array attribute.
      *
-     * @param  array  $results
-     * @param  string  $attribute
-     * @param  string|array  $rules
+     * @param array        $results
+     * @param string       $attribute
+     * @param string|array $rules
+     *
      * @return array
      */
     protected function explodeWildcardRules($results, $attribute, $rules) {
@@ -136,9 +143,10 @@ class CValidation_RuleParser {
     /**
      * Merge additional rules into a given attribute(s).
      *
-     * @param  array  $results
-     * @param  string|array  $attribute
-     * @param  string|array  $rules
+     * @param array        $results
+     * @param string|array $attribute
+     * @param string|array $rules
+     *
      * @return array
      */
     public function mergeRules($results, $attribute, $rules = []) {
@@ -151,23 +159,27 @@ class CValidation_RuleParser {
         }
 
         return $this->mergeRulesForAttribute(
-                        $results, $attribute, $rules
+            $results,
+            $attribute,
+            $rules
         );
     }
 
     /**
      * Merge additional rules into a given attribute.
      *
-     * @param  array  $results
-     * @param  string  $attribute
-     * @param  string|array  $rules
+     * @param array        $results
+     * @param string       $attribute
+     * @param string|array $rules
+     *
      * @return array
      */
     protected function mergeRulesForAttribute($results, $attribute, $rules) {
         $merge = carr::head($this->explodeRules([$rules]));
 
         $results[$attribute] = array_merge(
-                isset($results[$attribute]) ? $this->explodeExplicitRule($results[$attribute]) : [], $merge
+            isset($results[$attribute]) ? $this->explodeExplicitRule($results[$attribute]) : [],
+            $merge
         );
 
         return $results;
@@ -176,7 +188,8 @@ class CValidation_RuleParser {
     /**
      * Extract the rule name and parameters from a rule.
      *
-     * @param  array|string  $rules
+     * @param array|string $rules
+     *
      * @return array
      */
     public static function parse($rules) {
@@ -198,7 +211,8 @@ class CValidation_RuleParser {
     /**
      * Parse an array based rule.
      *
-     * @param  array  $rules
+     * @param array $rules
+     *
      * @return array
      */
     protected static function parseArrayRule(array $rules) {
@@ -208,7 +222,8 @@ class CValidation_RuleParser {
     /**
      * Parse a string based rule.
      *
-     * @param  string  $rules
+     * @param string $rules
+     *
      * @return array
      */
     protected static function parseStringRule($rules) {
@@ -229,8 +244,9 @@ class CValidation_RuleParser {
     /**
      * Parse a parameter list.
      *
-     * @param  string  $rule
-     * @param  string  $parameter
+     * @param string $rule
+     * @param string $parameter
+     *
      * @return array
      */
     protected static function parseParameters($rule, $parameter) {
@@ -246,7 +262,8 @@ class CValidation_RuleParser {
     /**
      * Normalizes a rule so that we can accept short types.
      *
-     * @param  string  $rule
+     * @param string $rule
+     *
      * @return string
      */
     protected static function normalizeRule($rule) {
@@ -259,5 +276,4 @@ class CValidation_RuleParser {
                 return $rule;
         }
     }
-
 }

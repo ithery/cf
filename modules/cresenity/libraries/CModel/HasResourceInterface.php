@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 1, 2019, 11:58:21 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 1, 2019, 11:58:21 PM
  */
 interface CModel_HasResourceInterface {
-
     /**
      * Set the polymorphic relation.
      *
@@ -21,7 +21,7 @@ interface CModel_HasResourceInterface {
      *
      * @param string|\Symfony\Component\HttpFoundation\File\UploadedFile $file
      *
-     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder
+     * @return \CModel_HasResource_FileAdder_FileAdder
      */
     public function addResource($file);
 
@@ -30,7 +30,7 @@ interface CModel_HasResourceInterface {
      *
      * @param string|\Symfony\Component\HttpFoundation\File\UploadedFile $file
      *
-     * @return \Spatie\ResourceLibrary\FileAdder\FileAdder
+     * @return \CModel_HasResource_FileAdder_FileAdder
      */
     public function copyResource($file);
 
@@ -49,7 +49,7 @@ interface CModel_HasResourceInterface {
      * @param string         $collectionName
      * @param array|callable $filters
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function getResource($collectionName = 'default', $filters = []);
 
@@ -63,8 +63,8 @@ interface CModel_HasResourceInterface {
     /**
      * Remove all resource in the given collection except some.
      *
-     * @param string $collectionName
-     * @param \Spatie\ResourceLibrary\Resource[]|\Illuminate\Support\Collection $excludedResource
+     * @param string                                          $collectionName
+     * @param \Spatie\ResourceLibrary\Resource[]|\CCollection $excludedResource
      *
      * @return string $collectionName
      */
@@ -85,29 +85,32 @@ interface CModel_HasResourceInterface {
      * @return mixed
      */
     public function loadResource($collectionName);
+
     /*
      * Add a conversion.
      */
 
     /**
-     * 
      * @param type $name
+     *
      * @return Conversion
      */
     public function addResourceConversion($name);
-    /*
-     * Register the resource conversions.
-     */
 
+    /**
+     * Register the resource conversions.
+     *
+     * @param CApp_Model_Interface_ResourceInterface $resource
+     */
     public function registerResourceConversions(CApp_Model_Interface_ResourceInterface $resource = null);
-    /*
+
+    /**
      * Register the resource collections.
      */
-
     public function registerResourceCollections();
-    /*
+
+    /**
      * Register the resource conversions and conversions set in resource collections.
      */
-
     public function registerAllResourceConversions();
 }

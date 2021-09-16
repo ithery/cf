@@ -1,24 +1,21 @@
 <?php
 
-
-
-
-
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-
-class CComponent_RenameMe_SupportBrowserHistory
-{
-    static function init() { return new static; }
+class CComponent_RenameMe_SupportBrowserHistory {
+    public static function init() {
+        return new static;
+    }
 
     protected $mergedQueryParamsFromDehydratedComponents;
 
-    function __construct()
-    {
+    public function __construct() {
         $this->mergedQueryParamsFromDehydratedComponents = c::collect($this->getExistingQueryParams());
 
         CComponent_Manager::instance()->listen('component.hydrate.initial', function ($component) {
-            if (! $properties = $this->getQueryParamsFromComponentProperties($component)->keys()) return;
+            if (!$properties = $this->getQueryParamsFromComponentProperties($component)->keys()) {
+                return;
+            }
 
             $queryParams = CHTTP::request()->query();
 
@@ -36,19 +33,25 @@ class CComponent_RenameMe_SupportBrowserHistory
         });
 
         CComponent_Manager::instance()->listen('component.dehydrate.initial', function (CComponent $component, CComponent_Response $response) {
-            if (! $this->shouldSendPath($component)) return;
+            if (!$this->shouldSendPath($component)) {
+                return;
+            }
 
             $queryParams = $this->mergeComponentPropertiesWithExistingQueryParamsFromOtherComponentsAndTheRequest($component);
-            
-            $response->effects['path'] = curl::fullUrl(false).$this->stringifyQueryParams($queryParams);
+
+            $response->effects['path'] = curl::fullUrl(false) . $this->stringifyQueryParams($queryParams);
         });
 
         CComponent_Manager::instance()->listen('component.dehydrate.subsequent', function (CComponent $component, CComponent_Response $response) {
-            if (! $referer = CHTTP::request()->header('Referer')) return;
+            if (!$referer = CHTTP::request()->header('Referer')) {
+                return;
+            }
 
             $route = $this->getRouteFromReferer($referer);
 
-            if ( ! $this->shouldSendPath($component, $route)) return;
+            if (!$this->shouldSendPath($component, $route)) {
+                return;
+            }
 
             $queryParams = $this->mergeComponentPropertiesWithExistingQueryParamsFromOtherComponentsAndTheRequest($component);
 
@@ -64,15 +67,14 @@ class CComponent_RenameMe_SupportBrowserHistory
         });
     }
 
-    protected function getRouteFromReferer($referer)
-    {
+    protected function getRouteFromReferer($referer) {
         try {
             /*
             // See if we can get the route from the referer.
             return app('router')->getRoutes()->match(
                 CHTTP::request()->create($referer, 'GET')
             );
-             * 
+             *
              */
         } catch (NotFoundHttpException $e) {
             // If not, use the current route.
@@ -80,10 +82,11 @@ class CComponent_RenameMe_SupportBrowserHistory
         }
     }
 
-    protected function shouldSendPath($component, $route = null)
-    {
+    protected function shouldSendPath($component, $route = null) {
         // If the component is setting $queryString params.
-        if (! $this->getQueryParamsFromComponentProperties($component)->isEmpty()) return true;
+        if (!$this->getQueryParamsFromComponentProperties($component)->isEmpty()) {
+            return true;
+        }
         /*
         $route = $route ?$route :curl::fullUrl(false);
 
@@ -103,29 +106,28 @@ class CComponent_RenameMe_SupportBrowserHistory
         return false;
     }
 
-    protected function getExistingQueryParams()
-    {
-        return CComponent_Manager::instance()->isLivewireRequest()
+    protected function getExistingQueryParams() {
+        $return = CComponent_Manager::instance()->isLivewireRequest()
             ? $this->getQueryParamsFromRefererHeader()
             : CHTTP::request()->query();
+        return $return;
     }
 
-    public function getQueryParamsFromRefererHeader()
-    {
-        if (empty($referer = CHTTP::request()->header('Referer'))) return [];
+    public function getQueryParamsFromRefererHeader() {
+        if (empty($referer = CHTTP::request()->header('Referer'))) {
+            return [];
+        }
 
         parse_str(parse_url($referer, PHP_URL_QUERY), $refererQueryString);
 
         return $refererQueryString;
     }
 
-    protected function buildPathFromReferer($referer, $queryParams) 
-    {
-        return c::str($referer)->before('?').$this->stringifyQueryParams($queryParams);
+    protected function buildPathFromReferer($referer, $queryParams) {
+        return c::str($referer)->before('?') . $this->stringifyQueryParams($queryParams);
     }
 
-    protected function buildPathFromRoute($component, $route, $queryString)
-    {
+    protected function buildPathFromRoute($component, $route, $queryString) {
         $boundParameters = array_merge(
             $route->parametersWithoutNulls(),
             array_intersect_key(
@@ -137,8 +139,7 @@ class CComponent_RenameMe_SupportBrowserHistory
         return CRouting::urlGenerator()->toRoute($route, $boundParameters + $queryString->toArray(), true);
     }
 
-    protected function mergeComponentPropertiesWithExistingQueryParamsFromOtherComponentsAndTheRequest($component)
-    {
+    protected function mergeComponentPropertiesWithExistingQueryParamsFromOtherComponentsAndTheRequest($component) {
         $excepts = $this->getExceptsFromComponent($component);
 
         $this->mergedQueryParamsFromDehydratedComponents = c::collect(CHTTP::request()->query())
@@ -154,8 +155,7 @@ class CComponent_RenameMe_SupportBrowserHistory
         return $this->mergedQueryParamsFromDehydratedComponents;
     }
 
-    protected function getExceptsFromComponent($component)
-    {
+    protected function getExceptsFromComponent($component) {
         return c::collect($component->getQueryString())
             ->filter(function ($value) {
                 return isset($value['except']);
@@ -165,18 +165,16 @@ class CComponent_RenameMe_SupportBrowserHistory
             });
     }
 
-    protected function getQueryParamsFromComponentProperties($component)
-    {
+    protected function getQueryParamsFromComponentProperties($component) {
         return c::collect($component->getQueryString())
-            ->mapWithKeys(function($value, $key) use ($component) {
+            ->mapWithKeys(function ($value, $key) use ($component) {
                 $key = is_string($key) ? $key : $value;
 
                 return [$key => $component->{$key}];
             });
     }
 
-    protected function stringifyQueryParams($queryParams)
-    {
-        return $queryParams->isEmpty() ? '' : '?'.http_build_query($queryParams->toArray());
+    protected function stringifyQueryParams($queryParams) {
+        return $queryParams->isEmpty() ? '' : '?' . http_build_query($queryParams->toArray());
     }
 }
