@@ -225,13 +225,14 @@ class CElement_Component_DataTable extends CElement_Component {
             CClientModules::instance()->registerModule('jquery.datatable');
         }
 
-        $this->dom = CManager::theme()->getData('table.dom');
+        $this->dom = c::theme('datatable.dom', c::theme('table.dom'));
         $this->actionLocation = CManager::theme()->getData('table.actionLocation', 'last');
         $this->haveRowSelection = CManager::theme()->getData('table.haveRowSelection', false);
+        $this->classes = CElement_Helper::getClasses(c::theme('datatable.class'));
     }
 
     public static function factory($id = '') {
-        return new CElement_Component_DataTable($id);
+        return new static($id);
     }
 
     public function setDatabaseResolver($dbResolver) {
