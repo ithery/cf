@@ -1,6 +1,9 @@
 <?php
 
 trait CElement_Component_DataTable_Trait_HtmlTrait {
+    protected function htmlGetTableClass() {
+    }
+
     public function html($indent = 0) {
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
@@ -18,8 +21,11 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         }
 
         $wrapped = $this->applyDataTable || $this->haveHeaderAction() || $this->haveFooterAction() || strlen($this->title) > 0;
+        $classes = $this->classes;
+        $tableClass = is_array($classes) ? implode(' ', $classes) : '';
+
         if ($wrapped) {
-            $mainClass = ' widget-box ';
+            $mainClass = ' widget-box ' . $tableClass . ' ';
             $mainClassTitle = ' widget-title ';
             $tableViewClass = $this->dataTableView == CConstant::TABLE_VIEW_COL ? ' data-table-col-view' : ' data-table-row-view';
             $mainClassContent = ' widget-content ' . $tableViewClass . ' col-view-count-' . $this->dataTableViewColCount;
@@ -70,8 +76,8 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             $html->appendln('<div class="' . $mainClassContent . ' nopadding">')->incIndent();
         }
 
-        $html->append($this->rawHtml($html->getIndent()));
-        if ($wrapped > 0) {
+        $html->append($this->rawHtml($html->getIndent()), $wrapped);
+        if ($wrapped) {
             $html->decIndent()->appendln('</div>');
             if ($this->haveFooterAction() || strlen($this->footerTitle) > 0) {
                 $mainFooterClass = 'widget-footer';
@@ -294,7 +300,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $js;
     }
 
-    protected function rawHtml($indent = 0) {
+    protected function rawHtml($indent = 0, $wrapped = false) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
 
@@ -321,7 +327,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             $classes .= ' table-bordered ';
         }
 
-        $html->appendln($htmlResponsiveOpen . '<table ' . $this->getPdfTableAttr() . ' class="table responsive ' . $classes . '" id="' . $this->id . '">')
+        $html->appendln($htmlResponsiveOpen . '<table ' . $this->getPdfTableAttr() . ' class="table responsive' . $classes . '" id="' . $this->id . '">')
             ->incIndent()->br();
         if ($this->show_header) {
             $html->appendln('<thead>')

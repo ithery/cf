@@ -137,9 +137,11 @@ class CElement_Component_DataTable extends CElement_Component {
 
     protected $initialSearch;
 
+    protected $customSearchSelector;
+
     public function __construct($id = '') {
         parent::__construct($id);
-        $this->defaultPagingList['-1'] = clang::__('ALL');
+        $this->defaultPagingList['-1'] = c::__('ALL');
         $this->tag = 'table';
         $this->responsive = false;
 
@@ -826,6 +828,19 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function setInitialSearch($initialSearch) {
         $this->initialSearch = $initialSearch;
+        return $this;
+    }
+
+    /**
+     * @param string|CElement $selector
+     *
+     * @return $this
+     */
+    public function setCustomSearchSelector($selector) {
+        if ($selector instanceof CElement) {
+            $selector = '#' . $selector->id();
+        }
+        $this->customSearchSelector = $selector;
         return $this;
     }
 }
