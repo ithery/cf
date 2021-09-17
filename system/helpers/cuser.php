@@ -2,19 +2,11 @@
 
 //@codingStandardsIgnoreStart
 /**
- * @deprecated
+ * @deprecated since 1.2 change to c::app()->user()
  */
 class cuser {
     public static function get($id) {
-        $db = CDatabase::instance();
-        $query = 'select * '
-                . 'from users '
-                . 'where status > 0 and user_id = ' . $db->escape($id) . '';
-        $result = $db->query($query);
-        $value = null;
-        if ($result->count() > 0) {
-            $value = $result[0];
-        }
+        $value=c::app()->user();
         return $value;
     }
 

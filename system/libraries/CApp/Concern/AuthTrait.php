@@ -33,6 +33,15 @@ trait CApp_Concern_AuthTrait {
             $session = CSession::instance();
             $user = $session->get('user');
 
+            if ($user) {
+                $config = CF::config('app');
+                $modelClass =c::get($config, 'model.user');
+                $model = new $modelClass;
+                $keyName=$model->getKeyName();
+                $keyValue=c::get($user, $keyName);
+                $user = $model->find($keyValue);
+            }
+
             if (!$user) {
                 $user = null;
             }
@@ -46,8 +55,13 @@ trait CApp_Concern_AuthTrait {
         if ($this->role == null) {
             $user = $this->user();
 
-            if ($user != null) {
-                $this->role = crole::get(cobj::get($user, 'role_id'));
+            if ($user) {
+                $config = CF::config('app');
+                $modelClass =c::get($config, 'model.role');
+                $model = new $modelClass;
+                $keyName=$model->getKeyName();
+                $keyValue=$user->$keyName;
+                $this->role = $model->find($keyValue);
             }
         }
         return $this->role;
