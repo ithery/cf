@@ -79,13 +79,11 @@ video {
     vertical-align: baseline;
     background: transparent;
 }
-
 article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
     display: block;
 }
 nav ul { list-style: none; }
 blockquote, q { quotes: none; }
-
 blockquote::before,
 blockquote::after,
 q::before,
@@ -131,7 +129,6 @@ label, input[type=button], input[type=submit], button { cursor: pointer; }
 button, input, select, textarea { margin: 0; }
 input:valid, textarea:valid   {  }
 input:invalid, textarea:invalid { border-radius: 1px; -moz-box-shadow: 0 0 5px red; -webkit-box-shadow: 0 0 5px red; box-shadow: 0 0 5px red; }
-
 .no-boxshadow input:invalid,
 .no-boxshadow textarea:invalid { background-color: #f0dddd; }
 
