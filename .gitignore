@@ -100,3 +100,9 @@ botlog.log
 
 # ignore all IIS files
 web.config
+
+# ignore phar archives
+*.phar
+
+# ignore composer.lock
+composer.lock
