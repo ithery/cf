@@ -15,11 +15,13 @@ trait CApp_Concern_RendererTrait {
     protected $viewData = null;
 
     public function renderContent($options = []) {
+        /** @var CApp $this */
         $viewData = $this->getViewData();
         return carr::get($viewData, 'content');
     }
 
     public function renderNavigation($expression = null) {
+        /** @var CApp $this */
         if ($expression != null) {
             $expression = str_replace(['(', ')'], '', $expression);
             $expression = str_replace(['"', '\''], '', $expression);
@@ -39,6 +41,7 @@ trait CApp_Concern_RendererTrait {
     }
 
     public function renderStyles($options = []) {
+        /** @var CApp $this */
         $viewData = $this->getViewData();
         $cresCss = curl::base() . 'media/js/cres/dist/cres.css?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.css'));
 
@@ -72,6 +75,7 @@ HTML;
     }
 
     public function renderScripts($options = []) {
+        /** @var CApp $this */
         $viewData = $this->getViewData();
         $endClientScript = carr::get($viewData, 'end_client_script', '');
         $readyClientScript = carr::get($viewData, 'ready_client_script', '');
@@ -82,7 +86,7 @@ HTML;
         $alpineJs = curl::base() . 'media/js/libs/alpine.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/libs/alpine.js'));
         $alpineScript = '<script src="' . $alpineJs . '"></script>';
 
-        $pushesScript = $this->yieldPushContent('script');
+        $pushesScript = $this->yieldPushContent('capp-script');
 
         $cresJs = curl::base() . 'media/js/cres/dist/cres.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.js'));
         return <<<HTML
@@ -134,6 +138,10 @@ HTML;
     public function renderPageTitle($options = []) {
         $viewData = $this->getViewData();
         return carr::get($viewData, 'pageTitle');
+    }
+
+    public function renderMessages($options = []) {
+        return CApp_Message::flashAll();
     }
 
     public function getViewData() {

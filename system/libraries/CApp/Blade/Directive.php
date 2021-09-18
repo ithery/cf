@@ -31,19 +31,19 @@ class CApp_Blade_Directive {
     }
 
     public static function pushScript($expression) {
-        return '<?php \CApp::instance()->startPush(\'script\') ?>';
+        return '<?php \CApp::instance()->startPush(\'capp-script\') ?>';
     }
 
     public static function endPushScript($expression) {
-        return '<?php \CApp::instance()->stopPush(\'script\'); ?>';
+        return '<?php \CApp::instance()->stopPush(\'capp-script\'); ?>';
     }
 
     public static function prependScript($expression) {
-        return '<?php \CApp::instance()->startPrepend(\'script\'); ?>';
+        return '<?php \CApp::instance()->startPrepend(\'capp-script\'); ?>';
     }
 
     public static function endPrependScript($expression) {
-        return '<?php \CApp::instance()->stopPrepend(\'script\'); ?>';
+        return '<?php \CApp::instance()->stopPrepend(\'capp-script\'); ?>';
     }
 
     public static function element($expression) {

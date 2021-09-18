@@ -98,4 +98,5 @@ botlog.log
 .bin/*
 
 
-
+# ignore all IIS files
+web.config
