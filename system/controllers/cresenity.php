@@ -54,12 +54,13 @@ class Controller_Cresenity extends CController {
         return $response;
     }
 
-    public function api($method, $submethod = null) {
-        $data = CApp::api()->exec($method, $submethod);
-        if (!isset($_GET['noheader'])) {
-            header('content-type:application/json');
+    public function api(...$methods) {
+        if (c::blank($methods)) {
+            return c::response('CF API');
         }
-        echo json_encode($data);
+        $data = CApp::api()->exec(...$methods);
+
+        return c::response()->json($data);
     }
 
     //@codingStandardsIgnoreStart
