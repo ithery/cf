@@ -767,7 +767,7 @@ trait CModel_Trait_Relationships {
         $relatedKey,
         $relationName = null
     ) {
-        return new BelongsToOneRelation($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
+        return new CModel_Relation_BelongsToOne($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
     }
 
     /**
