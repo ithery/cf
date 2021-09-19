@@ -461,4 +461,8 @@ class Controller_Cresenity extends CController {
             }
         }
     }
+
+    public function health() {
+        echo 'OK';
+    }
 }
