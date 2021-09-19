@@ -20,6 +20,12 @@ abstract class CApp_Api_Method_App extends CApp_Api_Method {
             $this->errCode++;
             $this->errMessage = 'appCode is required';
         }
+        $avalableAppList = CF::getAvailableAppCode();
+
+        if (!in_array($this->appCode, $avalableAppList)) {
+            $this->errCode++;
+            $this->errMessage = 'appCode ' . $this->appCode . ' not found';
+        }
     }
 
     public function appCode() {
