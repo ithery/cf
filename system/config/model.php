@@ -151,5 +151,31 @@ return [
             'searchBoolean' => false,
             'maxDocs' => 500,
         ],
-    ]
+    ],
+    'metable' => [
+        /*
+         * Model class to use for Meta.
+         */
+        'model' => CModel_Metable_Meta::class,
+
+        /*
+         * List of handlers for recognized data types.
+         *
+         * Handlers will be evaluated in order, so a value will be handled
+         * by the first appropriate handler in the list.
+         */
+        'datatypes' => [
+            CModel_Metable_DataType_Handler_BooleanHandler::class,
+            CModel_Metable_DataType_Handler_NullHandler::class,
+            CModel_Metable_DataType_Handler_IntegerHandler::class,
+            CModel_Metable_DataType_Handler_FloatHandler::class,
+            CModel_Metable_DataType_Handler_StringHandler::class,
+            CModel_Metable_DataType_Handler_DateTimeHandler::class,
+            CModel_Metable_DataType_Handler_ArrayHandler::class,
+            CModel_Metable_DataType_Handler_ModelHandler::class,
+            CModel_Metable_DataType_Handler_ModelCollectionHandler::class,
+            CModel_Metable_DataType_Handler_SerializableHandler::class,
+            CModel_Metable_DataType_Handler_ObjectHandler::class,
+        ],
+    ],
 ];
