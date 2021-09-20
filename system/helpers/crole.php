@@ -6,6 +6,7 @@
  */
 class crole {
     //@codingStandardsIgnoreEnd
+
     /**
      * Roles cache
      *
@@ -14,7 +15,6 @@ class crole {
     protected static $roles = [];
 
     public static function get($id) {
-        $value = c::app()->role();
-        return $value;
+        return c::app()->getRole($id);
     }
 }

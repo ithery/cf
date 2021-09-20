@@ -35,10 +35,10 @@ trait CApp_Concern_AuthTrait {
 
             if ($user) {
                 $config = CF::config('app');
-                $modelClass =c::get($config, 'model.user');
+                $modelClass = c::get($config, 'model.user');
                 $model = new $modelClass;
-                $keyName=$model->getKeyName();
-                $keyValue=c::get($user, $keyName);
+                $keyName = $model->getKeyName();
+                $keyValue = c::get($user, $keyName);
                 $user = $model->find($keyValue);
             }
 
@@ -56,14 +56,27 @@ trait CApp_Concern_AuthTrait {
             $user = $this->user();
 
             if ($user) {
-                $config = CF::config('app');
-                $modelClass =c::get($config, 'model.role');
+                $modelClass = CF::config('app.model.role', CApp_Model_Roles::class);
                 $model = new $modelClass;
-                $keyName=$model->getKeyName();
-                $keyValue=$user->$keyName;
-                $this->role = $model->find($keyValue);
+                /** @var CApp_Model_Roles $model */
+                $keyName = $model->getKeyName();
+                $roleId = $user->$keyName;
+                $this->role = $this->getRole($roleId);
             }
         }
         return $this->role;
+    }
+
+    /**
+     * @param int $roleId
+     *
+     * @return CModel|CApp_Model_Roles|null
+     */
+    public function getRole($roleId) {
+        if ($roleId == null) {
+            return null;
+        }
+        $modelClass = CF::config('app.model.role', CApp_Model_Roles::class);
+        return $modelClass::find($roleId);
     }
 }
