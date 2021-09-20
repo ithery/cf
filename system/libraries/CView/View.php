@@ -335,9 +335,9 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
         $data = array_merge(CView::factory()->getShared(), $this->data);
 
         foreach ($data as $key => $value) {
-            if ($value instanceof CInterface_Renderable) {
-                $data[$key] = $value->render();
-            }
+            // if ($value instanceof CInterface_Renderable) {
+            //     $data[$key] = $value->render();
+            // }
         }
 
         return $data;
