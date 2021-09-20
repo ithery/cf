@@ -1188,6 +1188,12 @@ final class CF {
         }
         return false;
     }
-}
 
-// End CF
+    public static function getAvailableAppCode() {
+        $path = DOCROOT . 'application';
+        $directories = CFile::directories($path);
+        return c::collect($directories)->map(function ($v) {
+            return basename($v);
+        })->all();
+    }
+}
