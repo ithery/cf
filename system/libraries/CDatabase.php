@@ -720,11 +720,13 @@ class CDatabase {
      *
      * @return CDatabase_Result Query result
      */
-    public function delete($table = '', $where = null) {
-        if (count($this->where) < 1) {
+    public function delete($table = '', $where = []) {
+        if ($where == null || count($where) < 1) {
             throw new CDatabase_Exception('You must set a WHERE clause for your query');
         }
-        return $this->table($table)->where($where)->delete();
+        $builder = $this->table($table);
+
+        return $builder->where($where)->delete();
     }
 
     /**
@@ -933,6 +935,7 @@ class CDatabase {
     public function table($table) {
         $builderClass = $this->driverName == 'MongoDB' ? CDatabase_Query_Builder_MongoDBBuilder::class : CDatabase_Query_Builder::class;
         $builder = $this->driverName == 'MongoDB' ? new $builderClass($this, new CDatabase_Query_Processor_MongoDB()) : new $builderClass($this);
+        /** @var CDatabase_Query_Builder $builder */
         return $builder->from($table);
     }
 
