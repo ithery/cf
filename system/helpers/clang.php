@@ -3,6 +3,7 @@
 //@codingStandardsIgnoreStart
 class clang {
     private static $lang = null;
+
     private static $langs = [
         'default' => 'Default',
         'en' => 'English',
@@ -170,7 +171,7 @@ class clang {
         if ($found === null) {
             if ($required === true) {
                 // Directory i18n key
-                $directory = 'core.' . inflector::singular($directory);
+                $directory = 'core.' . $directory;
 
                 // If the file is required, throw an exception
                 throw new CException('core.resource_not_found', [CF::lang($directory)], $filename);
