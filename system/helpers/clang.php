@@ -184,4 +184,3 @@ class clang {
         return $found;
     }
 }
-//@codingStandardsIgnoreEnd
