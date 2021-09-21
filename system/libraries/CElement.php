@@ -202,7 +202,7 @@ abstract class CElement extends CObservable {
         if (strlen($this->text) > 0) {
             $data['text'] = $this->text;
         }
-        $data = array_merge_recursive($data, parent::toarray());
+        $data = array_merge_recursive($data, parent::toArray());
         return $data;
     }
 

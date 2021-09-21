@@ -223,9 +223,9 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
-    public function toarray($indent = 0) {
+    public function toArray($indent = 0) {
         $data = [];
-        $data = array_merge_recursive($data, parent::toarray());
+        $data = array_merge_recursive($data, parent::toArray());
 
         if (strlen($this->action) > 0) {
             $data['attr']['action'] = $this->action;

@@ -66,7 +66,7 @@ class CElement_Component_Form_Field extends CElement_Component {
     public function toArray() {
         $data = [];
 
-        $control_data = array_merge_recursive($data, parent::toarray());
+        $control_data = array_merge_recursive($data, parent::toArray());
         $data['attr']['class'] = 'control-group';
         $control_label = [];
         $control_label['tag'] = 'label';

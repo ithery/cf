@@ -159,7 +159,7 @@ class CElement_FormInput extends CElement_Element {
         if (strlen($this->name) > 0) {
             $data['attr']['name'] = $this->name;
         }
-        $data = array_merge_recursive($data, parent::toarray());
+        $data = array_merge_recursive($data, parent::toArray());
         return $data;
     }
 

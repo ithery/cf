@@ -136,10 +136,10 @@ class CElement_Component_Action extends CElement_Component {
         }
     }
 
-    public function toarray() {
+    public function toArray() {
         $data = [];
 
-        $data = array_merge_recursive($data, parent::toarray());
+        $data = array_merge_recursive($data, parent::toArray());
         if ($this->submit) {
             $data['tag'] = 'input';
             $data['attr']['type'] = 'submit';

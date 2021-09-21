@@ -56,9 +56,9 @@ class CElement_FormInput_Select extends CElement_FormInput {
         return $this;
     }
 
-    public function toarray() {
+    public function toArray() {
         $data = [];
-        $data = array_merge_recursive($data, parent::toarray());
+        $data = array_merge_recursive($data, parent::toArray());
         if ($this->multiple) {
             $data['attr']['multiple'] = 'multiple';
         }
