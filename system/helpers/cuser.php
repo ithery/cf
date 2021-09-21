@@ -6,8 +6,7 @@
  */
 class cuser {
     public static function get($id) {
-        $value=c::app()->user();
-        return $value;
+        return c::app()->getUser($id);
     }
 
     public static function hit_count($user_id) {
