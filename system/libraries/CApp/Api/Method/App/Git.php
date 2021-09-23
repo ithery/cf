@@ -21,7 +21,7 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
         $command = carr::get($this->request(), 'command');
         $isFramework = carr::get($this->request(), 'isFramework', '0');
         $allowedCommand = ['status', 'fetch', 'pull'];
-        $avalableAppList = explode(PHP_EOL, shell_exec('cd application && ls'));
+        $avalableAppList = CF::getAvailableAppCode();
 
         if (!in_array($command, $allowedCommand)) {
             $errCode++;
