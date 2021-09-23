@@ -22,7 +22,7 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
         $isFramework = carr::get($this->request(), 'isFramework', '0');
         $allowedCommand = ['status', 'fetch', 'pull'];
         $avalableAppList = CF::getAvailableAppCode();
-        $avalableAppList = '';
+
         if (!in_array($command, $allowedCommand)) {
             $errCode++;
             $errMessage = 'Command is not allowed';
@@ -52,8 +52,13 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
                         $execute = "cd application/{$this->appCode} && git {$command}";
                     }
                 } else {
-                    $pwd = shell_exec('pwd');
-                    $execute = "git {$command}";
+                    if (CServer::getOS() == CServer::OS_WINNT) {
+                        $pwd = shell_exec('echo %cd%');
+                        $execute = "git {$command}";
+                    } else {
+                        $pwd = shell_exec('pwd');
+                        $execute = "git {$command}";
+                    }
                 }
 
                 $output .= "working on directory $pwd";
