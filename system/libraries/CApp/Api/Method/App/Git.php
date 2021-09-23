@@ -45,7 +45,7 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
 
                 if ($isFramework == '0') {
                     if (CServer::getOS() == CServer::OS_WINNT) {
-                        $pwd = shell_exec("cd application/{$this->appCode} && echo %cd%");
+                        $pwd = shell_exec("cd application/{$this->appCode} && echo %userprofile%");
                         $execute = "cd application/{$this->appCode} && git {$command}";
                     } else {
                         $pwd = shell_exec("cd application/{$this->appCode} && pwd");
