@@ -53,7 +53,7 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
                     }
                 } else {
                     if (CServer::getOS() == CServer::OS_WINNT) {
-                        $pwd = shell_exec('echo %userprofile%');
+                        $pwd = shell_exec('echo %cd%');
                         $execute = "git {$command}";
                     } else {
                         $pwd = shell_exec('pwd');
