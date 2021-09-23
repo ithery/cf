@@ -61,7 +61,7 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
                     }
                 }
 
-                $output .= "working on directory $pwd user:" . get_current_user();
+                $output .= 'working on directory ' . trim($pwd) . ' user:' . get_current_user() . PHP_EOL;
 
                 $process = new Process($execute);
                 $process->run();
