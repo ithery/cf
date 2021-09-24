@@ -86,12 +86,12 @@ const store = {
     componentsListeningForEventThatAreTreeAncestors(el, event) {
         let parentIds = [];
 
-        let parent = el.parentElement.closest('[cf\\:id]');
+        let parent = el.parentElement.closest('[cres\\:id]');
 
         while (parent) {
-            parentIds.push(parent.getAttribute('cf:id'));
+            parentIds.push(parent.getAttribute('cres:id'));
 
-            parent = parent.parentElement.closest('[cf\\:id]');
+            parent = parent.parentElement.closest('[cres\\:id]');
         }
 
         return this.components().filter(component => {

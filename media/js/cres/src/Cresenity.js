@@ -8,6 +8,8 @@ import {
     dispatch
 } from '@/util';
 
+import php from '@/php';
+
 export default class Cresenity {
     constructor() {
         this.cf = new CF();
@@ -17,8 +19,9 @@ export default class Cresenity {
         this.callback = {};
         this.filesAdded = [];
         this.ui = new CUI();
+        this.php = php;
 
-        this.dispatch('cf:ui:available');
+        this.dispatch('cres:available');
     }
 
     dispatch(eventName) {

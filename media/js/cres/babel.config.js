@@ -6,13 +6,13 @@ module.exports = {
                 targets: {
                     node: 'current',
                     edge: '18',
-                    ie: "11",
-                },
-            },
-        ],
+                    ie: '11'
+                }
+            }
+        ]
     ],
     plugins: [
-        "@babel/plugin-proposal-object-rest-spread",
+        '@babel/plugin-proposal-object-rest-spread'
     ],
     env: {
         test: {
@@ -21,8 +21,8 @@ module.exports = {
                     '@babel/preset-env',
                     {
                         targets: {
-                            node: 'current',
-                        },
+                            node: 'current'
+                        }
                     }
                 ]
             ]

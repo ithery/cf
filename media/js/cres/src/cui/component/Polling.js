@@ -1,64 +1,66 @@
-import MethodAction from '@/cui/action/method'
-import { cfDirectives } from '@/util'
-import store from '@/cui/Store'
+/* eslint-disable camelcase */
+/* eslint-disable no-underscore-dangle */
+import MethodAction from '@/cui/action/method';
+import { cresDirectives } from '@/util';
+import store from '@/cui/Store';
 
-export default function() {
+export default function () {
     store.registerHook('element.initialized', (el, component) => {
-        let directives = cfDirectives(el)
+        let directives = cresDirectives(el);
 
-        if (directives.missing('poll')) return
+        if (directives.missing('poll')) {return;}
 
-        let intervalId = fireActionOnInterval(el, component)
+        let intervalId = fireActionOnInterval(el, component);
 
         component.addListenerForTeardown(() => {
-            clearInterval(intervalId)
-        })
+            clearInterval(intervalId);
+        });
 
-        el.__cresenity_polling_interval = intervalId
-    })
+        el.__cresenity_polling_interval = intervalId;
+    });
 
     store.registerHook('element.updating', (from, to, component) => {
-        if (from.__cresenity_polling_interval !== undefined) return
+        if (from.__cresenity_polling_interval !== undefined) {return;}
 
-        if (cfDirectives(from).missing('poll') && cfDirectives(to).has('poll')) {
+        if (cresDirectives(from).missing('poll') && cresDirectives(to).has('poll')) {
             setTimeout(() => {
-                let intervalId = fireActionOnInterval(from, component)
+                let intervalId = fireActionOnInterval(from, component);
 
                 component.addListenerForTeardown(() => {
-                    clearInterval(intervalId)
-                })
+                    clearInterval(intervalId);
+                });
 
-                from.__cresenity_polling_interval = intervalId
-            }, 0)
+                from.__cresenity_polling_interval = intervalId;
+            }, 0);
         }
-    })
+    });
 }
 
 function fireActionOnInterval(node, component) {
-    let interval = cfDirectives(node).get('poll').durationOr(2000);
+    let interval = cresDirectives(node).get('poll').durationOr(2000);
 
     return setInterval(() => {
-        if (node.isConnected === false) return
+        if (node.isConnected === false) {return;}
 
-        let directives = cfDirectives(node)
+        let directives = cresDirectives(node);
 
         // Don't poll when directive is removed from element.
-        if (directives.missing('poll')) return
+        if (directives.missing('poll')) {return;}
 
-        const directive = directives.get('poll')
-        const method = directive.method || '$refresh'
+        const directive = directives.get('poll');
+        const method = directive.method || '$refresh';
 
         // Don't poll when the tab is in the background.
-        // (unless the "cf:poll.keep-alive" modifier is attached)
+        // (unless the "cres:poll.keep-alive" modifier is attached)
         if (store.cresenityIsInBackground && !directive.modifiers.includes('keep-alive')) {
             // This "Math.random" business effectivlly prevents 95% of requests
             // from executing. We still want "some" requests to get through.
-            if (Math.random() < .95) return
+            if (Math.random() < 0.95) {return;}
         }
 
         // Don't poll if cresenity is offline as well.
-        if (store.cresenityIsOffline) return
+        if (store.cresenityIsOffline) {return;}
 
-        component.addAction(new MethodAction(method, directive.params, node))
+        component.addAction(new MethodAction(method, directive.params, node));
     }, interval);
 }

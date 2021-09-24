@@ -1,75 +1,77 @@
-import store from '@/cui/Store'
-import { cfDirectives } from '@/util'
+/* eslint-disable no-underscore-dangle */
+import store from '@/cui/Store';
+import { cresDirectives } from '@/util';
 
-export default function() {
+export default function () {
     store.registerHook('component.initialized', component => {
-        component.targetedLoadingElsByAction = {}
-        component.genericLoadingEls = []
-        component.currentlyActiveLoadingEls = []
-        component.currentlyActiveUploadLoadingEls = []
-    })
+        component.targetedLoadingElsByAction = {};
+        component.genericLoadingEls = [];
+        component.currentlyActiveLoadingEls = [];
+        component.currentlyActiveUploadLoadingEls = [];
+    });
 
     store.registerHook('element.initialized', (el, component) => {
-        let directives = cfDirectives(el)
+        let directives = cresDirectives(el);
 
-        if (directives.missing('loading')) return
+        if (directives.missing('loading')) {return;}
 
         const loadingDirectives = directives.directives.filter(
             i => i.type === 'loading'
-        )
+        );
 
         loadingDirectives.forEach(directive => {
-            processLoadingDirective(component, el, directive)
-        })
-    })
+            processLoadingDirective(component, el, directive);
+        });
+    });
 
     store.registerHook('message.sent', (message, component) => {
         const actions = message.updateQueue
             .filter(action => {
-                return action.type === 'callMethod'
+                return action.type === 'callMethod';
             })
-            .map(action => action.payload.method)
+            .map(action => action.payload.method);
 
         const models = message.updateQueue
             .filter(action => {
-                return action.type === 'syncInput'
+                return action.type === 'syncInput';
             })
-            .map(action => action.payload.name)
+            .map(action => action.payload.name);
 
-        setLoading(component, actions.concat(models))
-    })
+        setLoading(component, actions.concat(models));
+    });
 
     store.registerHook('message.failed', (message, component) => {
-        unsetLoading(component)
-    })
+        unsetLoading(component);
+    });
 
     store.registerHook('message.received', (message, component) => {
-        unsetLoading(component)
-    })
+        unsetLoading(component);
+    });
 
     store.registerHook('element.removed', (el, component) => {
-        removeLoadingEl(component, el)
-    })
+        removeLoadingEl(component, el);
+    });
 }
 
 function processLoadingDirective(component, el, directive) {
     // If this element is going to be dealing with loading states.
     // We will initialize an "undo" stack upfront, so we don't
     // have to deal with isset() type conditionals later.
-    el.__cresenity_on_finish_loading = []
+    // eslint-disable-next-line camelcase
+    el.__cresenity_on_finish_loading = [];
 
-    var actionNames = false
+    let actionNames = false;
 
-    let directives = cfDirectives(el)
+    let directives = cresDirectives(el);
 
     if (directives.get('target')) {
-        // cf:target overrides any automatic loading scoping we do.
+        // cres:target overrides any automatic loading scoping we do.
         actionNames = directives
             .get('target')
             .value.split(',')
-            .map(s => s.trim())
+            .map(s => s.trim());
     } else {
-        // If there is no cf:target, let's check for the existance of a cf:click="foo" or something,
+        // If there is no cres:target, let's check for the existance of a cres:click="foo" or something,
         // and automatically scope this loading directive to that action.
         const nonActionOrModelCresenityDirectives = [
             'init',
@@ -80,19 +82,19 @@ function processLoadingDirective(component, el, directive) {
             'poll',
             'ignore',
             'key',
-            'id',
-        ]
+            'id'
+        ];
 
         actionNames = directives
             .all()
             .filter(i => !nonActionOrModelCresenityDirectives.includes(i.type))
-            .map(i => i.method)
+            .map(i => i.method);
 
         // If we found nothing, just set the loading directive to the global component. (run on every request)
-        if (actionNames.length < 1) actionNames = false
+        if (actionNames.length < 1) {actionNames = false;}
     }
 
-    addLoadingEl(component, el, directive, actionNames)
+    addLoadingEl(component, el, directive, actionNames);
 }
 
 function addLoadingEl(component, el, directive, actionsNames) {
@@ -101,16 +103,16 @@ function addLoadingEl(component, el, directive, actionsNames) {
             if (component.targetedLoadingElsByAction[actionsName]) {
                 component.targetedLoadingElsByAction[actionsName].push({
                     el,
-                    directive,
-                })
+                    directive
+                });
             } else {
                 component.targetedLoadingElsByAction[actionsName] = [
-                    { el, directive },
-                ]
+                    { el, directive }
+                ];
             }
-        })
+        });
     } else {
-        component.genericLoadingEls.push({ el, directive })
+        component.genericLoadingEls.push({ el, directive });
     }
 }
 
@@ -118,78 +120,78 @@ function removeLoadingEl(component, el) {
     // Look through the global/generic elements for the element to remove.
     component.genericLoadingEls.forEach((element, index) => {
         if (element.el.isSameNode(el)) {
-            component.genericLoadingEls.splice(index, 1)
+            component.genericLoadingEls.splice(index, 1);
         }
-    })
+    });
 
     // Look through the targeted elements to remove.
     Object.keys(component.targetedLoadingElsByAction).forEach(key => {
         component.targetedLoadingElsByAction[
             key
         ] = component.targetedLoadingElsByAction[key].filter(element => {
-            return !element.el.isSameNode(el)
-        })
-    })
+            return !element.el.isSameNode(el);
+        });
+    });
 }
 
 function setLoading(component, actions) {
     const actionTargetedEls = actions
         .map(action => component.targetedLoadingElsByAction[action])
         .filter(el => el)
-        .flat()
+        .flat();
 
-    const allEls = component.genericLoadingEls.concat(actionTargetedEls)
+    const allEls = component.genericLoadingEls.concat(actionTargetedEls);
 
-    startLoading(allEls)
+    startLoading(allEls);
 
-    component.currentlyActiveLoadingEls = allEls
+    component.currentlyActiveLoadingEls = allEls;
 }
 
 export function setUploadLoading(component, modelName) {
     const actionTargetedEls =
-        component.targetedLoadingElsByAction[modelName] || []
+        component.targetedLoadingElsByAction[modelName] || [];
 
-    const allEls = component.genericLoadingEls.concat(actionTargetedEls)
+    const allEls = component.genericLoadingEls.concat(actionTargetedEls);
 
-    startLoading(allEls)
+    startLoading(allEls);
 
-    component.currentlyActiveUploadLoadingEls = allEls
+    component.currentlyActiveUploadLoadingEls = allEls;
 }
 
 export function unsetUploadLoading(component) {
-    endLoading(component.currentlyActiveUploadLoadingEls)
+    endLoading(component.currentlyActiveUploadLoadingEls);
 
-    component.currentlyActiveUploadLoadingEls = []
+    component.currentlyActiveUploadLoadingEls = [];
 }
 
 function unsetLoading(component) {
-    endLoading(component.currentlyActiveLoadingEls)
+    endLoading(component.currentlyActiveLoadingEls);
 
-    component.currentlyActiveLoadingEls = []
+    component.currentlyActiveLoadingEls = [];
 }
 
 function startLoading(els) {
     els.forEach(({ el, directive }) => {
         if (directive.modifiers.includes('class')) {
-            let classes = directive.value.split(' ').filter(Boolean)
+            let classes = directive.value.split(' ').filter(Boolean);
 
             doAndSetCallbackOnElToUndo(
                 el,
                 directive,
                 () => el.classList.add(...classes),
                 () => el.classList.remove(...classes)
-            )
+            );
         } else if (directive.modifiers.includes('attr')) {
             doAndSetCallbackOnElToUndo(
                 el,
                 directive,
                 () => el.setAttribute(directive.value, true),
                 () => el.removeAttribute(directive.value)
-            )
+            );
         } else {
             let cache = window
                 .getComputedStyle(el, null)
-                .getPropertyValue('display')
+                .getPropertyValue('display');
 
             doAndSetCallbackOnElToUndo(
                 el,
@@ -197,42 +199,41 @@ function startLoading(els) {
                 () => {
                     el.style.display = directive.modifiers.includes('remove') ?
                         cache :
-                        getDisplayProperty(directive)
+                        getDisplayProperty(directive);
                 },
                 () => {
-                    el.style.display = 'none'
+                    el.style.display = 'none';
                 }
-            )
+            );
         }
-    })
+    });
 }
 
 function getDisplayProperty(directive) {
     return ['inline', 'block', 'table', 'flex', 'grid']
-        .filter(i => directive.modifiers.includes(i))[0] || 'inline-block'
+        .filter(i => directive.modifiers.includes(i))[0] || 'inline-block';
 }
 
 function doAndSetCallbackOnElToUndo(el, directive, doCallback, undoCallback) {
-    if (directive.modifiers.includes('remove'))
-        [doCallback, undoCallback] = [undoCallback, doCallback]
+    if (directive.modifiers.includes('remove')) {[doCallback, undoCallback] = [undoCallback, doCallback];}
 
     if (directive.modifiers.includes('delay')) {
         let timeout = setTimeout(() => {
-            doCallback()
-            el.__cresenity_on_finish_loading.push(() => undoCallback())
-        }, 200)
+            doCallback();
+            el.__cresenity_on_finish_loading.push(() => undoCallback());
+        }, 200);
 
-        el.__cresenity_on_finish_loading.push(() => clearTimeout(timeout))
+        el.__cresenity_on_finish_loading.push(() => clearTimeout(timeout));
     } else {
-        doCallback()
-        el.__cresenity_on_finish_loading.push(() => undoCallback())
+        doCallback();
+        el.__cresenity_on_finish_loading.push(() => undoCallback());
     }
 }
 
 function endLoading(els) {
     els.forEach(({ el }) => {
         while (el.__cresenity_on_finish_loading.length > 0) {
-            el.__cresenity_on_finish_loading.shift()()
+            el.__cresenity_on_finish_loading.shift()();
         }
-    })
+    });
 }

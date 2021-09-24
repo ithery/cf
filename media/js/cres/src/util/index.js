@@ -1,15 +1,15 @@
-export * from './debounce'
-export * from './cf-directives'
-export * from './walk'
-export * from './dispatch'
-export * from './getCsrfToken'
+export * from './debounce';
+export * from './cres-directives';
+export * from './walk';
+export * from './dispatch';
+export * from './getCsrfToken';
 
 export function kebabCase(subject) {
-    return subject.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[_\s]/, '-').toLowerCase()
+    return subject.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[_\s]/, '-').toLowerCase();
 }
 
 export function tap(output, callback) {
-    callback(output)
+    callback(output);
 
-    return output
+    return output;
 }
