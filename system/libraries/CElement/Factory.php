@@ -148,4 +148,8 @@ class CElement_Factory {
     public static function createControl($id, $type) {
         return CManager::instance()->createControl($id, $type);
     }
+
+    public static function createPseudoElement($id = null) {
+        return new CElement_PseudoElement();
+    }
 }
