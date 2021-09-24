@@ -35,9 +35,9 @@ class Controller_Administrator_App_Fixer_Database_Collation extends CApp_Adminis
 
             if (strlen($sql) > 0) {
                 $template = $app->addTemplate()
-                        ->setTemplate('CApp/Administrator/Fixer/Database/Collation/Result')
-                        ->setVar('table', $table)
-                        ->setVar('sql', $sql);
+                    ->setTemplate('CApp/Administrator/Fixer/Database/Collation/Result')
+                    ->setVar('table', $table)
+                    ->setVar('sql', $sql);
 
                 $resultBody = $template->section('resultBody');
                 $prismCode = $resultBody->addPrismCode();

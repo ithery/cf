@@ -21,7 +21,7 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
         $command = carr::get($this->request(), 'command');
         $isFramework = carr::get($this->request(), 'isFramework', '0');
         $allowedCommand = ['status', 'fetch', 'pull'];
-        $avalableAppList = explode(PHP_EOL, shell_exec('cd application && ls'));
+        $avalableAppList = CF::getAvailableAppCode();
 
         if (!in_array($command, $allowedCommand)) {
             $errCode++;
@@ -35,7 +35,7 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
 
         if (!in_array($this->appCode, $avalableAppList)) {
             $errCode++;
-            $errMessage = 'appCode ' . $this->appCode . ' not found';
+            $errMessage = 'appCode ' . $this->appCode . ' not found on :' . json_encode($avalableAppList);
         }
 
         if ($errCode == 0) {
@@ -44,14 +44,25 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
                 $execute = '';
 
                 if ($isFramework == '0') {
-                    $pwd = shell_exec("cd application/{$this->appCode} && pwd");
-                    $execute = "cd application/{$this->appCode} && git {$command}";
+                    if (CServer::getOS() == CServer::OS_WINNT) {
+                        $pwd = shell_exec("cd application/{$this->appCode} && echo %cd%");
+                        $execute = "cd application/{$this->appCode} && git {$command}";
+                    } else {
+                        $pwd = shell_exec("cd application/{$this->appCode} && pwd");
+                        $execute = "cd application/{$this->appCode} && git {$command}";
+                    }
                 } else {
-                    $pwd = shell_exec('pwd');
-                    $execute = "git {$command}";
+                    if (CServer::getOS() == CServer::OS_WINNT) {
+                        $pwd = shell_exec('echo %cd%');
+                        $execute = "git {$command}";
+                    } else {
+                        $pwd = shell_exec('pwd');
+                        $execute = "git {$command}";
+                    }
                 }
 
-                $output .= "working on directory $pwd";
+                $output .= 'working on directory ' . trim($pwd) . ' user:' . get_current_user() . PHP_EOL;
+
                 $process = new Process($execute);
                 $process->run();
 
@@ -59,7 +70,7 @@ class CApp_Api_Method_App_Git extends CApp_Api_Method_App {
                 $successOutput = $output;
                 $output .= $errorOutput = $process->getErrorOutput();
 
-                if ($command === "pull") {
+                if ($command === 'pull') {
                     CView::blade()->clearCompiled();
                 }
             } catch (Exception $ex) {
