@@ -19,6 +19,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Component_Alert addAlert($id=null)
  * @method CElement_Element_Pre addPre($id=null)
  * @method CElement_Component_Action addAction($id=null)
+ * @method CElement_View addView($view = null, $data = null, $id = null)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
     use CTrait_Compat_App,
