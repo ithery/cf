@@ -257,13 +257,16 @@ export default class Cresenity {
             method: 'get',
             dataAddition: {},
             message: 'Are you sure?',
-            onConfirmed: false
+            onConfirmed: false,
+            confirmCallback: false,
+            owner: null
         }, options);
+        const confirmCallback = settings.confirmCallback ? settings.confirmCallback : settings.onConfirmed;
         if(this.confirmHandler) {
-            return this.confirmHandler(settings.message, settings.onConfirmed);
+            return this.confirmHandler(settings.owner, settings.message, confirmCallback);
         }
         if (window.bootbox) {
-            return window.bootbox.confirm(settings.message, settings.onConfirmed);
+            return window.bootbox.confirm(settings.message, confirmCallback);
         }
     }
     modal(options) {

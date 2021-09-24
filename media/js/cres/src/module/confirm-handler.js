@@ -1,19 +1,19 @@
 
 
-export const defaultConfirmHandler = (message, confirmCallback) => {
+export const defaultConfirmHandler = (el, options, confirmCallback) => {
     if(window.bootbox) {
-        return bootboxConfirmhandler(message, confirmCallback);
+        return bootboxConfirmhandler(el, options, confirmCallback);
     }
 
     // eslint-disable-next-line no-alert
-    let confirmed = window.confirm(message);
+    let confirmed = window.confirm(options.message);
     confirmCallback(confirmed);
 };
 
-const bootboxConfirmhandler = (message, confirmCallback) => {
+const bootboxConfirmhandler = (el, options, confirmCallback) => {
     window.bootbox.confirm({
         className: 'capp-modal-confirm',
-        message: message,
+        message: options.message,
         callback: confirmCallback
     });
 };
@@ -61,6 +61,8 @@ export const confirmFromElement = (el, handler, defaultMessage) => {
 
 
     message = message ? message : (defaultMessage ? defaultMessage : 'Are you sure?');
-
-    handler(message, confirmCallback);
+    const options = {
+        message
+    };
+    handler(btn, options, confirmCallback);
 };

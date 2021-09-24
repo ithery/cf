@@ -1,6 +1,6 @@
 module.exports = {
     purge: {
-        enabled: true,
+        enabled: false,
         content: ['../../../modules/**/*.blade.php']
     },
     darkMode: false, // or 'media' or 'class'
