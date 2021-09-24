@@ -107,7 +107,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
 
             $js->appendln('var tableStyled_' . $this->id . ' = false;')->br()
-                ->appendln('oTable = table.dataTable({')->br()->incIndent();
+                ->appendln('var oTable = table.dataTable({')->br()->incIndent();
 
             //   $js->appendln("responsive: {
             //        details: {
