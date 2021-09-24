@@ -53,13 +53,13 @@ trait CApp_Concern_RendererTrait {
 
         return <<<HTML
 <style>
-    [cf\:loading], [cf\:loading\.delay], [cf\:loading\.inline-block], [cf\:loading\.inline], [cf\:loading\.block], [cf\:loading\.flex], [cf\:loading\.table], [cf\:loading\.grid] {
+    [cres\:loading], [cres\:loading\.delay], [cres\:loading\.inline-block], [cres\:loading\.inline], [cres\:loading\.block], [cres\:loading\.flex], [cres\:loading\.table], [cres\:loading\.grid] {
         display: none;
     }
-    [cf\:offline] {
+    [cres\:offline] {
         display: none;
     }
-    [cf\:dirty]:not(textarea):not(input):not(select) {
+    [cres\:dirty]:not(textarea):not(input):not(select) {
         display: none;
     }
     input:-webkit-autofill, select:-webkit-autofill, textarea:-webkit-autofill {
