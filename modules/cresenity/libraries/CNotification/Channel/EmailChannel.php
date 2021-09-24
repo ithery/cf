@@ -15,7 +15,11 @@ class CNotification_Channel_EmailChannel extends CNotification_ChannelAbstract {
         $errMessage = '';
         if ($errCode == 0) {
             try {
-                $response = cmail::send_smtp($to, $subject, $message, $attachment, $cc, $bcc, $options);
+                $options['cc'] = $cc;
+                $options['bcc'] = $bcc;
+                $options['attachments'] = $attachment;
+
+                $response = CEmail::sender($options)->send($to, $subject, $message, $options);
             } catch (Exception $ex) {
                 $errCode++;
                 $errMessage = $ex->getMessage();
