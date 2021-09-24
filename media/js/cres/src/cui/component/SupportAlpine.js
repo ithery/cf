@@ -3,12 +3,12 @@
 import store from '@/cui/Store';
 
 export default function () {
-    window.addEventListener('cresenity:load', () => {
+    window.addEventListener('cresenity:ui:start', () => {
         if (!window.Alpine) {return;}
 
         refreshAlpineAfterEveryCresenityRequest();
 
-        addDollarSignWire();
+        addDollarSignCres();
 
         supportEntangle();
     });
@@ -30,7 +30,7 @@ function refreshAlpineAfterEveryCresenityRequest() {
     });
 }
 
-function addDollarSignWire() {
+function addDollarSignCres() {
     if (!window.Alpine.addMagicProperty) {return;}
 
     window.Alpine.addMagicProperty('cres', function (componentEl) {

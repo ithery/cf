@@ -65,6 +65,10 @@ class CUI {
         this.components.on(event, callback);
     }
 
+    off(event, callback) {
+        this.components.off(event, callback);
+    }
+
     devTools(enableDevtools) {
         this.devToolsEnabled = enableDevtools;
     }
@@ -84,7 +88,7 @@ class CUI {
         });
 
         this.onLoadCallback();
-        dispatch('cresenity:load');
+        dispatch('cresenity:ui:start');
 
         document.addEventListener(
             'visibilitychange',

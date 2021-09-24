@@ -1,4 +1,4 @@
-import echo from './strings/echo';
+import echo from 'locutus/php/strings/echo';
 
 
 export default {

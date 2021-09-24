@@ -47,6 +47,9 @@ const store = {
     on(event, callback) {
         this.listeners.register(event, callback);
     },
+    off(event, callback) {
+        this.listeners.unregister(event, callback);
+    },
 
     emit(event, ...params) {
         this.listeners.call(event, ...params);

@@ -82,7 +82,7 @@ class CElement_Component_Action extends CElement_Component {
     }
 
     /**
-     * @param bool $bool
+     * @param mixed $message
      *
      * @return $this
      */
@@ -226,10 +226,10 @@ class CElement_Component_Action extends CElement_Component {
         }
         if ($this->style == 'btn-icon-group' && strlen($this->label) > 0) {
             $add_class .= ' tip-top';
-            $add_attr .= ' data-original-title="' . $this->label . '"';
+            $add_attr .= ' data-original-title="' . c::e($this->label) . '"';
         }
         if (strlen($this->confirmMessage) > 0) {
-            $add_attr .= ' data-confirm-message="' . base64_encode($this->confirmMessage) . '"';
+            $add_attr .= ' data-confirm-message="' . c::e($this->confirmMessage) . '"';
         }
 
         if ($this->render_as_input()) {

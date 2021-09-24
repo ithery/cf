@@ -93,8 +93,6 @@ HTML;
             ${endClientScript}
             <script src="${cresJs}"></script>
             <script>
-                window.cresenity = new Cresenity();
-                window.cresenity.init();
 
                 if (window.Alpine) {
                     /* Defer showing the warning so it doesn't get buried under downstream errors. */
@@ -106,7 +104,7 @@ HTML;
                 }
                 /* Make Alpine wait until Livewire is finished rendering to do its thing. */
                 window.deferLoadingAlpine = function (callback) {
-                    window.addEventListener('cresenity:load', function () {
+                    window.addEventListener('cresenity:ui:start', function () {
                         callback();
                     });
                 };
