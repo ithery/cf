@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 30, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 30, 2020
  */
-class CComponent_CFDirective implements CInterface_Htmlable {
-
+class CComponent_CresDirective implements CInterface_Htmlable {
     public function __construct($name, $directive, $value) {
         $this->name = $name;
         $this->directive = $directive;
@@ -29,9 +29,9 @@ class CComponent_CFDirective implements CInterface_Htmlable {
 
     public function modifiers() {
         return c::str($this->directive)
-                        ->replace("wire:{$this->name}", '')
-                        ->explode('.')
-                        ->filter()->values();
+            ->replace("cres:{$this->name}", '')
+            ->explode('.')
+            ->filter()->values();
     }
 
     public function hasModifier($modifier) {
@@ -49,5 +49,4 @@ class CComponent_CFDirective implements CInterface_Htmlable {
     public function __toString() {
         return (string) $this->value;
     }
-
 }
