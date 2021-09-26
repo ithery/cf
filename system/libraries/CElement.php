@@ -20,8 +20,6 @@ abstract class CElement extends CObservable {
 
     protected $text;
 
-    protected $checkbox;
-
     protected $radio;
 
     protected $bootstrap;
@@ -61,7 +59,6 @@ abstract class CElement extends CObservable {
 
         if (isset($theme_data)) {
             $this->bootstrap = carr::get($theme_data, 'bootstrap');
-            $this->checkbox = carr::get($theme_data, 'checkbox', '0');
             $this->radio = carr::get($theme_data, 'radio', '0');
             $this->theme_style = carr::get($theme_data, 'theme_style');
         }

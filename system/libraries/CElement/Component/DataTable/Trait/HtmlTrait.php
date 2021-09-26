@@ -104,6 +104,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
     }
 
     protected function rawTBody($indent = 0) {
+        /** @var CElement_Component_DataTable $this */
         $html = new CStringBuilder();
         $html->setIndent($indent);
 
@@ -132,11 +133,12 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     $html->appendln('<td scope="row" class="align-right">' . $no . '</td>')->br();
                 }
                 if ($this->checkbox) {
-                    $checkbox_checked = '';
-                    if (in_array($key, $this->checkbox_value)) {
-                        $checkbox_checked = ' checked="checked"';
-                    }
-                    $html->appendln('<td scope="row" class="checkbox-cell align-center"><input type="checkbox" class="checkbox-' . $this->id . '" name="' . $this->id . '-check[]" id="' . $this->id . '-' . $key . '" value="' . $key . '"' . $checkbox_checked . '></td>')->br();
+                    $checkboxHtml = $this->callCheckboxRenderer($row);
+                    $html->appendln('
+                        <td scope="row" class="checkbox-cell align-center">
+                            ' . $checkboxHtml . '
+                        </td>
+                    ')->br();
                 }
                 $jsparam = [];
                 if ($this->actionLocation == 'first') {

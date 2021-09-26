@@ -9,7 +9,12 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_ExportTrait,
         CElement_Component_DataTable_Trait_JavascriptTrait,
         CElement_Component_DataTable_Trait_HtmlTrait,
-        CElement_Component_DataTable_Trait_ActionCreationTrait;
+        CElement_Component_DataTable_Trait_ActionCreationTrait,
+        CElement_Component_DataTable_Trait_CheckboxTrait;
+
+    const ACTION_LOCATION_FIRST = 'first';
+
+    const ACTION_LOCATION_LAST = 'last';
 
     public $defaultPagingList = [
         '10' => '10',
@@ -38,12 +43,6 @@ class CElement_Component_DataTable extends CElement_Component {
     public $data;
 
     public $keyField;
-
-    public $checkbox;
-
-    public $checkboxColumnWidth;
-
-    public $checkbox_value;
 
     public $numbering;
 
@@ -162,7 +161,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->footerActionList = CElement_Factory::createList('ActionList');
         $this->footerActionList->setStyle('btn-list');
         $this->checkbox = false;
-        $this->checkbox_value = [];
+        $this->checkboxValue = [];
         $this->numbering = false;
         $this->query = '';
         $this->header_sortable = true;
@@ -227,10 +226,14 @@ class CElement_Component_DataTable extends CElement_Component {
             CClientModules::instance()->registerModule('jquery.datatable');
         }
 
+        //read theme data
+
         $this->dom = c::theme('datatable.dom', c::theme('table.dom'));
-        $this->actionLocation = CManager::theme()->getData('table.actionLocation', 'last');
-        $this->haveRowSelection = CManager::theme()->getData('table.haveRowSelection', false);
+        $this->actionLocation = c::theme('datatable.actionLocation', c::theme('table.actionLocation', static::ACTION_LOCATION_LAST));
+        $this->haveRowSelection = c::theme('datatable.haveRowSelection', c::theme('table.haveRowSelection', false));
         $this->classes = CElement_Helper::getClasses(c::theme('datatable.class'));
+
+        $this->checkboxRenderer = CManager::theme()->getData('datatable.renderer.checkbox', [CElement_Component_DataTable_Renderer::class, 'checkboxCell']);
     }
 
     public static function factory($id = '') {
@@ -328,15 +331,6 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->fixedColumn = $bool;
 
         return $this;
-    }
-
-    /**
-     * @param int $width
-     *
-     * @return \CElement_Component_DataTable
-     */
-    public function setCheckboxColumnWidth($width) {
-        $this->checkboxColumnWidth = $width;
     }
 
     /**
@@ -541,29 +535,6 @@ class CElement_Component_DataTable extends CElement_Component {
      *
      * @return $this
      */
-    public function setCheckbox($bool) {
-        $this->checkbox = $bool;
-        return $this;
-    }
-
-    /**
-     * @param string $val
-     *
-     * @return $this
-     */
-    public function setCheckboxValue($val) {
-        if (!is_array($val)) {
-            $val = [$val];
-        }
-        $this->checkbox_value = $val;
-        return $this;
-    }
-
-    /**
-     * @param bool $bool
-     *
-     * @return $this
-     */
     public function setHeaderSortable($bool = true) {
         $this->header_sortable = $bool;
         return $this;
@@ -596,16 +567,6 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public function disableNumbering() {
         $this->numbering = false;
-        return $this;
-    }
-
-    public function enableCheckbox() {
-        $this->checkbox = true;
-        return $this;
-    }
-
-    public function disableCheckbox() {
-        $this->checkbox = false;
         return $this;
     }
 
@@ -768,7 +729,7 @@ class CElement_Component_DataTable extends CElement_Component {
         if ($this->checkbox) {
             $offset++;
         }
-        if ($this->getActionLocation() == 'first') {
+        if ($this->getActionLocation() == static::ACTION_LOCATION_FIRST) {
             if ($this->rowActionCount() > 0) {
                 $offset++;
             }
