@@ -11,6 +11,7 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_HtmlTrait,
         CElement_Component_DataTable_Trait_ActionCreationTrait,
         CElement_Component_DataTable_Trait_CheckboxTrait,
+        CElement_Component_DataTable_Trait_SearchTrait,
         CElement_Component_DataTable_Trait_FooterTrait;
 
     const ACTION_LOCATION_FIRST = 'first';
@@ -102,8 +103,6 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public $callbackOptions = null;
 
-    public $searchPlaceholder = '';
-
     public $infoText = '';
 
     protected $isModelQuery = false;
@@ -115,8 +114,6 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $tableStriped;
 
     protected $tableBordered;
-
-    protected $quick_search = false;
 
     protected $tbodyId;
 
@@ -133,10 +130,6 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $scrollY;
 
     protected $dbResolver;
-
-    protected $initialSearch;
-
-    protected $customSearchSelector;
 
     protected $actionHeaderLabel = 'Actions';
 
@@ -203,8 +196,6 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->report_header = [];
 
         $this->widget_title = true;
-
-        //$this->add_footer_action($this->id.'_export_excel');
 
         $this->export_filename = $this->id;
         $this->export_sheetname = $this->id;
@@ -317,12 +308,6 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setSearchPlaceholder($placeholder) {
-        $this->searchPlaceholder = $placeholder;
-
-        return $this;
-    }
-
     public function setInfoText($infoText) {
         $this->infoText = $infoText;
 
@@ -405,11 +390,6 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function setShowHeader($bool) {
         $this->show_header = $bool;
-        return $this;
-    }
-
-    public function setQuickSearch($quick_search) {
-        $this->quick_search = $quick_search;
         return $this;
     }
 
@@ -789,23 +769,5 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function queueDownloadExcel($filePath, $disk = null, $writerType = null, $diskOptions = []) {
         return CExporter::queue($this->toExportable(), $filePath, $disk, $writerType, $diskOptions);
-    }
-
-    public function setInitialSearch($initialSearch) {
-        $this->initialSearch = $initialSearch;
-        return $this;
-    }
-
-    /**
-     * @param string|CElement $selector
-     *
-     * @return $this
-     */
-    public function setCustomSearchSelector($selector) {
-        if ($selector instanceof CElement) {
-            $selector = '#' . $selector->id();
-        }
-        $this->customSearchSelector = $selector;
-        return $this;
     }
 }
