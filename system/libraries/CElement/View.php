@@ -52,8 +52,16 @@ class CElement_View extends CElement {
         $this->data = $data;
     }
 
+    /**
+     * Set Data to View
+     *
+     * @param array $data
+     *
+     * @return $this
+     */
     public function setData(array $data) {
         $this->data = $data;
+        return $this;
     }
 
     public function collectHtmlJsOnce() {
@@ -90,6 +98,13 @@ class CElement_View extends CElement {
         return carr::get($this->collectHtmlJsOnce(), 'js');
     }
 
+    /**
+     * Get Element By Key
+     *
+     * @param string $key
+     *
+     * @return CElement_PseudoElement
+     */
     public function viewElement($key) {
         if (!isset($this->viewElement[$key])) {
             $this->viewElement[$key] = new CElement_PseudoElement();

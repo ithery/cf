@@ -302,12 +302,11 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
 
             if ($this->dom == null) {
                 $this->dom = '<""l>t<"F"<".footer_action">frp>';
-            } else {
-                $this->dom = str_replace("'", "\'", $this->dom);
             }
+            $dom = str_replace("'", "\'", $this->dom);
             $js->append('')
                 ->appendln("'sPaginationType': 'full_numbers',")->br()
-                ->appendln("'sDom': '" . $this->dom . "',")->br();
+                ->appendln("'sDom': '" . $dom . "',")->br();
 
             $js->append('')
                 ->decIndent()->appendln('});')->br();
@@ -321,19 +320,17 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
         var haveAction = " . ($this->haveRowAction() ? '1' : '0') . ";
 
 
-        var total_th = jQuery('#" . $this->id . " thead th').length;
+        var totalTh = jQuery('#" . $this->id . " thead th').length;
         var input = '';
         var haveCheckbox = " . ($this->checkbox ? '1' : '0') . ';
         var haveNumbering = ' . ($this->numbering ? '1' : '0') . ';
+        var columnLeftOffset = ' . $this->getColumnLeftOffset() . ';
+        var columnRightOffset = ' . $this->getColumnRightOffset() . ';
+        var currentIndex = jQuery(this).index();
 
-        if((!(haveAction==1&&(total_th-1==jQuery(this).index())))&& (!(haveCheckbox==1&&(0==jQuery(this).index()))) ) {
-            var i2 = 0;
-            if(haveCheckbox) {
-                i2 = i2 - 1;
-            }
-            if(haveNumbering) {
-                i2 = i2 - 1;
-            }
+        if(currentIndex>=columnLeftOffset && currentIndex<= (totalTh-columnRightOffset)) {
+            var i2 = -columnLeftOffset;
+
 
             var allColumn = ' . json_encode($this->columns) . ";
             var column = allColumn[jQuery(this).index()+i2];

@@ -14,10 +14,11 @@ class CElement_Component_DataTable_Renderer {
             $rowKey = $row[$table->getKeyField()];
         }
         $checkboxChecked = in_array($rowKey, $checkboxValue) ? ' checked="checked"' : '';
-
+        $checkboxId = $table->id() . '-' . $rowKey;
         return '
             <div class="capp-table-checkbox-wrapper">
-                <input type="checkbox" class="checkbox-' . $table->id() . '" name="' . $table->id() . '-check[]" id="' . $table->id() . '-' . $rowKey . '" value="' . $rowKey . '"' . $checkboxChecked . '>
+                <input type="checkbox" class="checkbox-' . $table->id() . '" name="' . $table->id() . '-check[]" id="' . $checkboxId . '" value="' . $rowKey . '"' . $checkboxChecked . '>
+                <label for="' . $checkboxId . '"></label>
             </div>
         ';
     }

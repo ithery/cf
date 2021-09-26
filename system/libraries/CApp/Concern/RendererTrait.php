@@ -124,7 +124,10 @@ HTML;
                 }
                 ${customJs}
             </script>
-            ${pushesScript}
+            <script>
+                ${pushesScript}
+            </script>
+
 HTML;
     }
 

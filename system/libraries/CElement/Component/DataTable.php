@@ -10,7 +10,8 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_JavascriptTrait,
         CElement_Component_DataTable_Trait_HtmlTrait,
         CElement_Component_DataTable_Trait_ActionCreationTrait,
-        CElement_Component_DataTable_Trait_CheckboxTrait;
+        CElement_Component_DataTable_Trait_CheckboxTrait,
+        CElement_Component_DataTable_Trait_FooterTrait;
 
     const ACTION_LOCATION_FIRST = 'first';
 
@@ -30,13 +31,12 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public $dbConfig;
 
+    /**
+     * Columns of table
+     *
+     * @var CElement_Component_DataTable_Column[]
+     */
     public $columns;
-
-    public $footerTitle;
-
-    public $footer;
-
-    public $footer_field;
 
     public $requires = [];
 
@@ -138,6 +138,8 @@ class CElement_Component_DataTable extends CElement_Component {
 
     protected $customSearchSelector;
 
+    protected $actionHeaderLabel = 'Actions';
+
     public function __construct($id = '') {
         parent::__construct($id);
         $this->defaultPagingList['-1'] = c::__('ALL');
@@ -167,7 +169,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->header_sortable = true;
         $this->footerTitle = '';
         $this->footer = false;
-        $this->footer_field = [];
+        $this->footerField = [];
         $this->cellCallbackFunc = '';
         $this->filterActionCallbackFunc = '';
         $this->display_length = '10';
@@ -242,6 +244,11 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function setDatabaseResolver($dbResolver) {
         $this->dbResolver = $dbResolver;
+        return $this;
+    }
+
+    public function setActionHeaderLabel($label) {
+        $this->actionHeaderLabel = $label;
         return $this;
     }
 
@@ -363,16 +370,6 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    /**
-     * @param string $title
-     *
-     * @return \CElement_Component_DataTable
-     */
-    public function setFooterTitle($title) {
-        $this->footerTitle = $title;
-        return $this;
-    }
-
     public static function actionDownloadExcel($data) {
         $table = $data->table;
         $table = unserialize($table);
@@ -401,11 +398,6 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setFooter($bool) {
-        $this->footer = $bool;
-        return $this;
-    }
-
     public function setResponsive($bool) {
         $this->responsive = $bool;
         return $this;
@@ -423,17 +415,6 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function setTbodyId($id) {
         $this->tbodyId = $id;
-        return $this;
-    }
-
-    public function addFooterField($label, $value, $align = 'left', $labelcolspan = 0) {
-        $f = [
-            'label' => $label,
-            'value' => $value,
-            'align' => $align,
-            'labelcolspan' => $labelcolspan,
-        ];
-        $this->footer_field[] = $f;
         return $this;
     }
 
@@ -722,14 +703,37 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @return array
+     * @return int
      */
     public function getColumnOffset() {
+        return $this->getColumnLeftOffset();
+    }
+
+    /**
+     * @return int
+     */
+    public function getColumnLeftOffset() {
         $offset = 0;
         if ($this->checkbox) {
             $offset++;
         }
+        if ($this->numbering) {
+            $offset++;
+        }
         if ($this->getActionLocation() == static::ACTION_LOCATION_FIRST) {
+            if ($this->rowActionCount() > 0) {
+                $offset++;
+            }
+        }
+        return $offset;
+    }
+
+    /**
+     * @return int
+     */
+    public function getColumnRightOffset() {
+        $offset = 0;
+        if ($this->getActionLocation() == static::ACTION_LOCATION_LAST) {
             if ($this->rowActionCount() > 0) {
                 $offset++;
             }
