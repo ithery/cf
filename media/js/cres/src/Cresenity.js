@@ -263,7 +263,7 @@ export default class Cresenity {
         }, options);
         const confirmCallback = settings.confirmCallback ? settings.confirmCallback : settings.onConfirmed;
         if(this.confirmHandler) {
-            return this.confirmHandler(settings.owner, settings.message, confirmCallback);
+            return this.confirmHandler(settings.owner, settings, confirmCallback);
         }
         if (window.bootbox) {
             return window.bootbox.confirm(settings.message, confirmCallback);
