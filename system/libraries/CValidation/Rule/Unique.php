@@ -47,8 +47,8 @@ class CValidation_Rule_Unique {
     /**
      * Ignore the given model during the unique check.
      *
-     * @param \Illuminate\Database\Eloquent\Model $model
-     * @param string|null                         $idColumn
+     * @param \CModel     $model
+     * @param string|null $idColumn
      *
      * @return $this
      */
@@ -73,5 +73,19 @@ class CValidation_Rule_Unique {
             $this->idColumn,
             $this->formatWheres()
         ), ',');
+    }
+
+    public function __sleep() {
+        $this->using = c::collect($this->using)->map(function ($item) {
+            return CHelper::closure()->serialize($item);
+        })->all();
+
+        return array_keys(get_object_vars($this));
+    }
+
+    public function __wakeup() {
+        $this->using = c::collect($this->using)->map(function ($item) {
+            return CHelper::closure()->unserialize($item);
+        })->all();
     }
 }
