@@ -12,6 +12,16 @@ export default class MessageBus {
         this.listeners[name].push(callback);
     }
 
+    unregister(name, callback) {
+        if(!callback) {
+            this.listeners[name] = [];
+        }
+        const index = this.listeners[name].indexOf(callback);
+        if (index > -1) {
+            this.listeners[name].splice(index, 1);
+        }
+    }
+
     call(name, ...params) {
         (this.listeners[name] || []).forEach(callback => {
             callback(...params);

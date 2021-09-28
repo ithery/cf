@@ -5,6 +5,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
         $aaData = [];
         $rowActionList = $table->getRowActionList();
         $no = carr::get($request, 'iDisplayStart', 0);
+
         foreach ($data as $row) {
             $arr = [];
             $no++;
@@ -65,7 +66,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
             }
 
             if ($table->checkbox) {
-                $arr[] = '<input type="checkbox" name="' . $table->id() . '-check[]" id="' . $table->id() . '-' . $key . '" value="' . $key . '" class="checkbox-' . $table->id() . '">';
+                $arr[] = $table->callCheckboxRenderer($row);
             }
             if ($table->getActionLocation() == 'first') {
                 if ($rowActionList != null && $rowActionList->childCount() > 0) {

@@ -18,6 +18,8 @@ class CElement_View extends CElement {
 
     protected $htmlJs;
 
+    protected $data;
+
     public function __construct($id, $view = null, $data = []) {
         parent::__construct($id);
         if ($view != null) {
@@ -27,9 +29,11 @@ class CElement_View extends CElement {
         $this->htmlJs = null;
     }
 
-    public function setView($view, $data = null) {
+    public function resolveView() {
+        $view = $this->view;
         if ($view != null) {
             if (!($view instanceof CView_View)) {
+                $data = $this->data;
                 if ($data == null) {
                     $data = [];
                 }
@@ -40,15 +44,33 @@ class CElement_View extends CElement {
             }
         }
 
+        return $view;
+    }
+
+    public function setView($view, $data = null) {
         $this->view = $view;
+        $this->data = $data;
+    }
+
+    /**
+     * Set Data to View
+     *
+     * @param array $data
+     *
+     * @return $this
+     */
+    public function setData(array $data) {
+        $this->data = $data;
+        return $this;
     }
 
     public function collectHtmlJsOnce() {
         if ($this->htmlJs == null) {
+            $view = $this->resolveView();
             $html = '';
             $js = '';
-            if ($this->view != null) {
-                $output = $this->view->render();
+            if ($view != null) {
+                $output = $view->render();
                 //parse the output of view
                 preg_match_all('#<script>(.*?)</script>#ims', $output, $matches);
 
@@ -76,6 +98,13 @@ class CElement_View extends CElement {
         return carr::get($this->collectHtmlJsOnce(), 'js');
     }
 
+    /**
+     * Get Element By Key
+     *
+     * @param string $key
+     *
+     * @return CElement_PseudoElement
+     */
     public function viewElement($key) {
         if (!isset($this->viewElement[$key])) {
             $this->viewElement[$key] = new CElement_PseudoElement();

@@ -12,8 +12,6 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
 
     protected $search_field;
 
-    protected $auto_select;
-
     protected $min_input_length;
 
     protected $dropdown_classes;
@@ -27,7 +25,6 @@ trait CTrait_Compat_Element_FormInput_SelectSearch {
     }
 
     public function set_auto_select($bool) {
-        $this->auto_select = $bool;
         return $this->setAutoSelect($bool);
     }
 

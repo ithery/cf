@@ -7,9 +7,10 @@ import { terser } from 'rollup-plugin-terser';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import outputManifest from 'rollup-plugin-output-manifest';
-import postcss from "rollup-plugin-postcss";
+import postcss from 'rollup-plugin-postcss';
 
-const isProduction = process.env.NODE_ENV === "production";
+// eslint-disable-next-line no-process-env
+const isProduction = process.env.NODE_ENV === 'production';
 
 
 export default {
@@ -18,37 +19,38 @@ export default {
         format: 'umd',
         sourcemap: true,
         name: 'Cresenity',
-        file: 'dist/cres.js',
+        file: 'dist/cres.js'
     },
     plugins: [
 
         resolve(),
         commonjs({
             // These npm packages still use common-js modules. Ugh.
-            include: /node_modules\/(get-value|isobject|core-js)/,
+            include: /node_modules\/(get-value|isobject|core-js|locutus)/
         }),
         postcss({
             config: {
-                path: "./postcss.config.js",
+                path: './postcss.config.js'
             },
-            extensions: [".css"],
+            extensions: ['.css'],
             extract: true,
-            minimize: isProduction,
+            minimize: isProduction
             // modules: true,
         }),
         filesize(),
         terser({
             mangle: false,
             compress: {
-                drop_debugger: false,
-            },
+                // eslint-disable-next-line camelcase
+                drop_debugger: false
+            }
         }),
         babel({
             exclude: 'node_modules/**'
         }),
         alias({
             entries: [
-                { find: '@', replacement: __dirname + '/src' },
+                { find: '@', replacement: __dirname + '/src' }
             ]
         }),
         // Mimic Laravel Mix's mix-manifest file for auto-cache-busting.
@@ -58,9 +60,10 @@ export default {
                 const hash = md5(file).substr(0, 20);
 
                 return JSON.stringify({
-                    '/cres.js': '/cres.js?id=' + hash,
-                })
+                    '/cres.js': '/cres.js?id=' + hash
+                });
             }
-        }),
+        })
     ]
 }
+;

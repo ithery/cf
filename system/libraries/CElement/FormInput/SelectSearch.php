@@ -12,17 +12,29 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectSearch;
 
     protected $query;
+
     protected $formatSelection;
+
     protected $formatResult;
+
     protected $keyField;
+
     protected $searchField;
+
     protected $multiple;
+
     protected $placeholder;
+
     protected $autoSelect;
+
     protected $minInputLength;
+
     protected $dropdownClasses;
+
     protected $delay;
+
     protected $valueCallback;
+
     protected $requires;
 
     public function __construct($id) {
@@ -172,7 +184,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             } else {
                 $q = 'select * from (' . $this->query . ') as a where `' . $this->keyField . '`=' . $db->escape($this->value);
             }
-            $r = $db->query($q)->result_array(false);
+            $r = $db->query($q)->resultArray(false);
             if (count($r) > 0) {
                 $row = $r[0];
                 if (is_object($row)) {
@@ -213,10 +225,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
         $ajaxUrl = $ajaxMethod->makeUrl();
 
-        if (isset($_GET['bdebug'])) {
-            cdbg::var_dump($ajaxUrl);
-            die();
-        }
         return $ajaxUrl;
     }
 
@@ -273,7 +281,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $rjson = 'false';
 
             $q = 'select * from (' . $this->query . ') as a limit 1';
-            $r = $db->query($q)->result_array(false);
+            $r = $db->query($q)->resultArray(false);
             if (count($r) > 0) {
                 $r = $r[0];
                 if ($this->valueCallback != null && is_callable($this->valueCallback)) {

@@ -53,13 +53,13 @@ trait CApp_Concern_RendererTrait {
 
         return <<<HTML
 <style>
-    [cf\:loading], [cf\:loading\.delay], [cf\:loading\.inline-block], [cf\:loading\.inline], [cf\:loading\.block], [cf\:loading\.flex], [cf\:loading\.table], [cf\:loading\.grid] {
+    [cres\:loading], [cres\:loading\.delay], [cres\:loading\.inline-block], [cres\:loading\.inline], [cres\:loading\.block], [cres\:loading\.flex], [cres\:loading\.table], [cres\:loading\.grid] {
         display: none;
     }
-    [cf\:offline] {
+    [cres\:offline] {
         display: none;
     }
-    [cf\:dirty]:not(textarea):not(input):not(select) {
+    [cres\:dirty]:not(textarea):not(input):not(select) {
         display: none;
     }
     input:-webkit-autofill, select:-webkit-autofill, textarea:-webkit-autofill {
@@ -93,8 +93,6 @@ HTML;
             ${endClientScript}
             <script src="${cresJs}"></script>
             <script>
-                window.cresenity = new Cresenity();
-                window.cresenity.init();
 
                 if (window.Alpine) {
                     /* Defer showing the warning so it doesn't get buried under downstream errors. */
@@ -106,7 +104,7 @@ HTML;
                 }
                 /* Make Alpine wait until Livewire is finished rendering to do its thing. */
                 window.deferLoadingAlpine = function (callback) {
-                    window.addEventListener('cresenity:load', function () {
+                    window.addEventListener('cresenity:ui:start', function () {
                         callback();
                     });
                 };
@@ -126,7 +124,10 @@ HTML;
                 }
                 ${customJs}
             </script>
-            ${pushesScript}
+            <script>
+                ${pushesScript}
+            </script>
+
 HTML;
     }
 

@@ -37,7 +37,7 @@ class CElement_Component_Action extends CElement_Component {
 
     protected $style;
 
-    protected $confirm_message;
+    protected $confirmMessage;
 
     protected $button;
 
@@ -61,7 +61,7 @@ class CElement_Component_Action extends CElement_Component {
         $this->style = '';
         $this->disabled = false;
         $this->confirm = false;
-        $this->confirm_message = '';
+        $this->confirmMessage = '';
         $this->button = false;
         $this->btn_style = 'default';
         $this->value = '';
@@ -78,6 +78,16 @@ class CElement_Component_Action extends CElement_Component {
      */
     public function setConfirm($bool = true) {
         $this->confirm = $bool;
+        return $this;
+    }
+
+    /**
+     * @param mixed $message
+     *
+     * @return $this
+     */
+    public function setConfirmMessage($message) {
+        $this->confirmMessage = $message;
         return $this;
     }
 
@@ -129,7 +139,7 @@ class CElement_Component_Action extends CElement_Component {
             //we check the listener
             if (count($this->listeners) > 0) {
                 foreach ($this->listeners as $lis) {
-                    $lis->setConfirm(true)->setConfirmMessage($this->confirm_message);
+                    $lis->setConfirm(true)->setConfirmMessage($this->confirmMessage);
                 }
                 $this->setConfirm(false);
             }
@@ -216,10 +226,10 @@ class CElement_Component_Action extends CElement_Component {
         }
         if ($this->style == 'btn-icon-group' && strlen($this->label) > 0) {
             $add_class .= ' tip-top';
-            $add_attr .= ' data-original-title="' . $this->label . '"';
+            $add_attr .= ' data-original-title="' . c::e($this->label) . '"';
         }
-        if (strlen($this->confirm_message) > 0) {
-            $add_attr .= ' data-confirm-message="' . base64_encode($this->confirm_message) . '"';
+        if (strlen($this->confirmMessage) > 0) {
+            $add_attr .= ' data-confirm-message="' . c::e($this->confirmMessage) . '"';
         }
 
         if ($this->render_as_input()) {

@@ -104,6 +104,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
     }
 
     protected function rawTBody($indent = 0) {
+        /** @var CElement_Component_DataTable $this */
         $html = new CStringBuilder();
         $html->setIndent($indent);
 
@@ -132,11 +133,12 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                     $html->appendln('<td scope="row" class="align-right">' . $no . '</td>')->br();
                 }
                 if ($this->checkbox) {
-                    $checkbox_checked = '';
-                    if (in_array($key, $this->checkbox_value)) {
-                        $checkbox_checked = ' checked="checked"';
-                    }
-                    $html->appendln('<td scope="row" class="checkbox-cell align-center"><input type="checkbox" class="checkbox-' . $this->id . '" name="' . $this->id . '-check[]" id="' . $this->id . '-' . $key . '" value="' . $key . '"' . $checkbox_checked . '></td>')->br();
+                    $checkboxHtml = $this->callCheckboxRenderer($row);
+                    $html->appendln('
+                        <td scope="row" class="checkbox-cell align-center">
+                            ' . $checkboxHtml . '
+                        </td>
+                    ')->br();
                 }
                 $jsparam = [];
                 if ($this->actionLocation == 'first') {
@@ -330,48 +332,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         $html->appendln($htmlResponsiveOpen . '<table ' . $this->getPdfTableAttr() . ' class="table responsive' . $classes . '" id="' . $this->id . '">')
             ->incIndent()->br();
         if ($this->show_header) {
-            $html->appendln('<thead>')
-                ->incIndent()->br();
-            if (strlen($this->customColumnHeader) > 0) {
-                $html->appendln($this->customColumnHeader);
-            } else {
-                $html->appendln('<tr>')
-                    ->incIndent()->br();
-
-                if ($this->numbering) {
-                    $html->appendln('<th data-align="align-right" class="' . $thClass . '" width="20" scope="col">No</th>')->br();
-                }
-                if ($this->checkbox) {
-                    $attrWidth = '';
-                    if (strlen($this->checkboxColumnWidth) > 0) {
-                        $attrWidth = 'width="' . $this->checkboxColumnWidth . '"';
-                    }
-                    $html->appendln('<th class="align-center" data-align="align-center" class="' . $thClass . '" scope="col" ' . $attrWidth . '><input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1"></th>')->br();
-                }
-                if ($this->getActionLocation() == 'first') {
-                    if ($this->haveRowAction()) {
-                        $action_width = 31 * $this->rowActionCount() + 5;
-                        if ($this->getRowActionStyle() == 'btn-dropdown') {
-                            $action_width = 70;
-                        }
-                        $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $thClass . '">' . clang::__('Actions') . '</th>')->br();
-                    }
-                }
-                foreach ($this->columns as $col) {
-                    $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
-                }
-                if ($this->getActionLocation() == 'last') {
-                    if ($this->haveRowAction()) {
-                        $action_width = 31 * $this->rowActionCount() + 5;
-                        if ($this->getRowActionStyle() == 'btn-dropdown') {
-                            $action_width = 70;
-                        }
-                        $html->appendln('<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $action_width . '" class="align-center cell-action th-action' . $thClass . '">' . clang::__('Actions') . '</th>')->br();
-                    }
-                }
-                $html->decIndent()->appendln('</tr>')->br();
-            }
-            $html->decIndent()->appendln('</thead>')->br();
+            $html->append($this->htmlTHead());
         }
 
         $html->append($this->rawTBody($html->getIndent()));
@@ -391,7 +352,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $addition_column++;
             }
 
-            foreach ($this->footer_field as $f) {
+            foreach ($this->footerField as $f) {
                 $html->incIndent()->appendln('<tr>')->br();
                 $colspan = $f['labelcolspan'];
                 if ($colspan == 0) {
@@ -461,5 +422,67 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         $html->decIndent()->appendln('</table>' . $htmlResponsiveClose);
 
         return $html->text();
+    }
+
+    public function htmlTHead() {
+        $thClass = '';
+        if ($this->headerNoLineBreak) {
+            $thClass = ' no-line-break';
+        }
+        $html = new CStringBuilder();
+        $html->appendln('<thead>')
+            ->incIndent()->br();
+        if (strlen($this->customColumnHeader) > 0) {
+            $html->appendln($this->customColumnHeader);
+        } else {
+            $html->appendln('<tr>')
+                ->incIndent()->br();
+
+            if ($this->numbering) {
+                $html->appendln('<th data-align="align-right" class="' . $thClass . '" width="20" scope="col">No</th>')->br();
+            }
+            if ($this->checkbox) {
+                $attrWidth = '';
+                if (strlen($this->checkboxColumnWidth) > 0) {
+                    $attrWidth = 'width="' . $this->checkboxColumnWidth . '"';
+                }
+                $html->appendln('
+                    <th class="align-center" data-align="align-center" class="' . $thClass . '" scope="col" ' . $attrWidth . '>
+                        <div class="capp-table-checkbox-wrapper">
+                            <input type="checkbox" name="' . $this->id . '-check-all" id="' . $this->id . '-check-all" value="1">
+                            <label for="' . $this->id . '-check-all"></label>
+                        </div>
+                    </th>')->br();
+            }
+            if ($this->getActionLocation() == 'first') {
+                $html->appendln($this->htmlActionTh());
+            }
+            foreach ($this->columns as $col) {
+                $html->appendln($col->renderHeaderHtml($this->export_pdf, $thClass, $html->getIndent()))->br();
+            }
+            if ($this->getActionLocation() == 'last') {
+                $html->appendln($this->htmlActionTh());
+            }
+            $html->decIndent()->appendln('</tr>')->br();
+        }
+        $html->decIndent()->appendln('</thead>')->br();
+
+        return $html->text();
+    }
+
+    public function htmlActionTh() {
+        $thClass = '';
+        if ($this->headerNoLineBreak) {
+            $thClass = ' no-line-break';
+        }
+        $html = '';
+        if ($this->haveRowAction()) {
+            $actionWidth = 31 * $this->rowActionCount() + 5;
+            if ($this->getRowActionStyle() == 'btn-dropdown') {
+                $actionWidth = 70;
+            }
+            $html = '<th data-action="cell-action td-action" data-align="align-center" scope="col" width="' . $actionWidth . '" class="align-center cell-action th-action' . $thClass . '">' . c::__($this->actionHeaderLabel) . '</th>';
+        }
+        return $html;
     }
 }

@@ -9,7 +9,14 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_ExportTrait,
         CElement_Component_DataTable_Trait_JavascriptTrait,
         CElement_Component_DataTable_Trait_HtmlTrait,
-        CElement_Component_DataTable_Trait_ActionCreationTrait;
+        CElement_Component_DataTable_Trait_ActionCreationTrait,
+        CElement_Component_DataTable_Trait_CheckboxTrait,
+        CElement_Component_DataTable_Trait_SearchTrait,
+        CElement_Component_DataTable_Trait_FooterTrait;
+
+    const ACTION_LOCATION_FIRST = 'first';
+
+    const ACTION_LOCATION_LAST = 'last';
 
     public $defaultPagingList = [
         '10' => '10',
@@ -25,25 +32,18 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public $dbConfig;
 
+    /**
+     * Columns of table
+     *
+     * @var CElement_Component_DataTable_Column[]
+     */
     public $columns;
-
-    public $footerTitle;
-
-    public $footer;
-
-    public $footer_field;
 
     public $requires = [];
 
     public $data;
 
     public $keyField;
-
-    public $checkbox;
-
-    public $checkboxColumnWidth;
-
-    public $checkbox_value;
 
     public $numbering;
 
@@ -103,8 +103,6 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public $callbackOptions = null;
 
-    public $searchPlaceholder = '';
-
     public $infoText = '';
 
     protected $isModelQuery = false;
@@ -116,8 +114,6 @@ class CElement_Component_DataTable extends CElement_Component {
     protected $tableStriped;
 
     protected $tableBordered;
-
-    protected $quick_search = false;
 
     protected $tbodyId;
 
@@ -135,9 +131,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
     protected $dbResolver;
 
-    protected $initialSearch;
-
-    protected $customSearchSelector;
+    protected $actionHeaderLabel = 'Actions';
 
     public function __construct($id = '') {
         parent::__construct($id);
@@ -162,13 +156,13 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->footerActionList = CElement_Factory::createList('ActionList');
         $this->footerActionList->setStyle('btn-list');
         $this->checkbox = false;
-        $this->checkbox_value = [];
+        $this->checkboxValue = [];
         $this->numbering = false;
         $this->query = '';
         $this->header_sortable = true;
         $this->footerTitle = '';
         $this->footer = false;
-        $this->footer_field = [];
+        $this->footerField = [];
         $this->cellCallbackFunc = '';
         $this->filterActionCallbackFunc = '';
         $this->display_length = '10';
@@ -203,8 +197,6 @@ class CElement_Component_DataTable extends CElement_Component {
 
         $this->widget_title = true;
 
-        //$this->add_footer_action($this->id.'_export_excel');
-
         $this->export_filename = $this->id;
         $this->export_sheetname = $this->id;
         $this->tableStriped = true;
@@ -227,10 +219,14 @@ class CElement_Component_DataTable extends CElement_Component {
             CClientModules::instance()->registerModule('jquery.datatable');
         }
 
+        //read theme data
+
         $this->dom = c::theme('datatable.dom', c::theme('table.dom'));
-        $this->actionLocation = CManager::theme()->getData('table.actionLocation', 'last');
-        $this->haveRowSelection = CManager::theme()->getData('table.haveRowSelection', false);
+        $this->actionLocation = c::theme('datatable.actionLocation', c::theme('table.actionLocation', static::ACTION_LOCATION_LAST));
+        $this->haveRowSelection = c::theme('datatable.haveRowSelection', c::theme('table.haveRowSelection', false));
         $this->classes = CElement_Helper::getClasses(c::theme('datatable.class'));
+
+        $this->checkboxRenderer = CManager::theme()->getData('datatable.renderer.checkbox', [CElement_Component_DataTable_Renderer::class, 'checkboxCell']);
     }
 
     public static function factory($id = '') {
@@ -239,6 +235,11 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function setDatabaseResolver($dbResolver) {
         $this->dbResolver = $dbResolver;
+        return $this;
+    }
+
+    public function setActionHeaderLabel($label) {
+        $this->actionHeaderLabel = $label;
         return $this;
     }
 
@@ -307,12 +308,6 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setSearchPlaceholder($placeholder) {
-        $this->searchPlaceholder = $placeholder;
-
-        return $this;
-    }
-
     public function setInfoText($infoText) {
         $this->infoText = $infoText;
 
@@ -328,15 +323,6 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->fixedColumn = $bool;
 
         return $this;
-    }
-
-    /**
-     * @param int $width
-     *
-     * @return \CElement_Component_DataTable
-     */
-    public function setCheckboxColumnWidth($width) {
-        $this->checkboxColumnWidth = $width;
     }
 
     /**
@@ -369,16 +355,6 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    /**
-     * @param string $title
-     *
-     * @return \CElement_Component_DataTable
-     */
-    public function setFooterTitle($title) {
-        $this->footerTitle = $title;
-        return $this;
-    }
-
     public static function actionDownloadExcel($data) {
         $table = $data->table;
         $table = unserialize($table);
@@ -407,11 +383,6 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setFooter($bool) {
-        $this->footer = $bool;
-        return $this;
-    }
-
     public function setResponsive($bool) {
         $this->responsive = $bool;
         return $this;
@@ -422,24 +393,8 @@ class CElement_Component_DataTable extends CElement_Component {
         return $this;
     }
 
-    public function setQuickSearch($quick_search) {
-        $this->quick_search = $quick_search;
-        return $this;
-    }
-
     public function setTbodyId($id) {
         $this->tbodyId = $id;
-        return $this;
-    }
-
-    public function addFooterField($label, $value, $align = 'left', $labelcolspan = 0) {
-        $f = [
-            'label' => $label,
-            'value' => $value,
-            'align' => $align,
-            'labelcolspan' => $labelcolspan,
-        ];
-        $this->footer_field[] = $f;
         return $this;
     }
 
@@ -541,29 +496,6 @@ class CElement_Component_DataTable extends CElement_Component {
      *
      * @return $this
      */
-    public function setCheckbox($bool) {
-        $this->checkbox = $bool;
-        return $this;
-    }
-
-    /**
-     * @param string $val
-     *
-     * @return $this
-     */
-    public function setCheckboxValue($val) {
-        if (!is_array($val)) {
-            $val = [$val];
-        }
-        $this->checkbox_value = $val;
-        return $this;
-    }
-
-    /**
-     * @param bool $bool
-     *
-     * @return $this
-     */
     public function setHeaderSortable($bool = true) {
         $this->header_sortable = $bool;
         return $this;
@@ -596,16 +528,6 @@ class CElement_Component_DataTable extends CElement_Component {
      */
     public function disableNumbering() {
         $this->numbering = false;
-        return $this;
-    }
-
-    public function enableCheckbox() {
-        $this->checkbox = true;
-        return $this;
-    }
-
-    public function disableCheckbox() {
-        $this->checkbox = false;
         return $this;
     }
 
@@ -761,14 +683,37 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @return array
+     * @return int
      */
     public function getColumnOffset() {
+        return $this->getColumnLeftOffset();
+    }
+
+    /**
+     * @return int
+     */
+    public function getColumnLeftOffset() {
         $offset = 0;
         if ($this->checkbox) {
             $offset++;
         }
-        if ($this->getActionLocation() == 'first') {
+        if ($this->numbering) {
+            $offset++;
+        }
+        if ($this->getActionLocation() == static::ACTION_LOCATION_FIRST) {
+            if ($this->rowActionCount() > 0) {
+                $offset++;
+            }
+        }
+        return $offset;
+    }
+
+    /**
+     * @return int
+     */
+    public function getColumnRightOffset() {
+        $offset = 0;
+        if ($this->getActionLocation() == static::ACTION_LOCATION_LAST) {
             if ($this->rowActionCount() > 0) {
                 $offset++;
             }
@@ -824,23 +769,5 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public function queueDownloadExcel($filePath, $disk = null, $writerType = null, $diskOptions = []) {
         return CExporter::queue($this->toExportable(), $filePath, $disk, $writerType, $diskOptions);
-    }
-
-    public function setInitialSearch($initialSearch) {
-        $this->initialSearch = $initialSearch;
-        return $this;
-    }
-
-    /**
-     * @param string|CElement $selector
-     *
-     * @return $this
-     */
-    public function setCustomSearchSelector($selector) {
-        if ($selector instanceof CElement) {
-            $selector = '#' . $selector->id();
-        }
-        $this->customSearchSelector = $selector;
-        return $this;
     }
 }

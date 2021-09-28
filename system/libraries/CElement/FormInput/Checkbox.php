@@ -63,13 +63,9 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
         if ($this->display_inline) {
             $label_addition_attr = 'style="display:inline-block;padding-right:5px"';
         }
-        $label_class = 'checkbox';
-        if ($this->bootstrap == '3.3') {
-            if ($this->checkbox >= '1.0') {
-                $label_class = 'control-label';
-            }
-        }
-        $html->append('<label class="' . $label_class . '" ' . $label_addition_attr . '>');
+        $labelClass = 'checkbox';
+
+        $html->append('<label class="' . $labelClass . '" ' . $label_addition_attr . '>');
         if ($this->applyjs == 'switch') {
             $html->append('<div class="switch">');
         }
@@ -81,11 +77,7 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
         if ($this->bootstrap == '3') {
             //$classes = $classes ." form-control ";
         }
-        if ($this->bootstrap == '3.3') {
-            if ($this->checkbox >= '1.0') {
-                $classes = $classes . ' ' . $this->style . ' ';
-            }
-        }
+
         $custom_css = $this->custom_css;
         $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {

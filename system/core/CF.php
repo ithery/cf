@@ -856,7 +856,7 @@ final class CF {
      * @return string i18n language string, or the requested key if the i18n item is not found
      */
     public static function lang($key = null, array $args = [], $locale = null) {
-        if ($key == null) {
+        if ($key === null) {
             return CTranslation::translator();
         }
 

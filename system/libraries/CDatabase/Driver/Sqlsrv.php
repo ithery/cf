@@ -233,7 +233,8 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
     }
 
     public function showError() {
-        return $this->link->error;
+        $errors = sqlsrv_errors();
+        return carr::get($errors, 'message');
     }
 
     public function listFields($table) {

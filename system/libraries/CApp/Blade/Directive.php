@@ -11,7 +11,9 @@ class CApp_Blade_Directive {
     }
 
     public static function scripts($expression) {
-        return '{!! CApp::instance()->renderScripts() !!}';
+        return '
+        {!! CApp::instance()->renderScripts() !!}
+        ';
     }
 
     public static function pageTitle($expression) {
@@ -50,14 +52,15 @@ class CApp_Blade_Directive {
         $expression = str_replace(['(', ')'], '', $expression);
         $expression = str_replace(['"', '\''], '', $expression);
         $expression = str_replace(',', ' ', $expression);
+
         $renderingElement = CApp::instance()->renderingElement();
 
         if ($renderingElement != null) {
-            $viewElement = $renderingElement->viewElement($expression);
-            if ($viewElement) {
-                $view = $viewElement->renderToView();
-
-                return $view;
+            if ($renderingElement instanceof CElement_View) {
+                $ownerId = $renderingElement->id();
+                return "<?php echo \CApp::instance()->yieldViewElement('" . $expression . "'); ?>";
+            } else {
+                throw new Exception('Directive CApp Element must be rendered when called from CElement_View');
             }
         }
         return '';

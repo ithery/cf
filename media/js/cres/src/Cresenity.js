@@ -1,28 +1,42 @@
-import Base64 from './module/Base64';
 import Url from './module/Url';
-
 import CF from './CF';
 import ScrollToTop from './module/ScrollToTop';
 import CUI from './cui';
 import {
-    dispatch
-} from '@/util';
+    dispatch as dispatchWindowEvent
+} from './util';
+import {encode as base64encode, decode as base64decode} from './util/base64';
+import php from './php';
+import { elementReady, elementRendered } from './util/dom-observer';
+import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
 
 export default class Cresenity {
     constructor() {
         this.cf = new CF();
-        this.base64 = new Base64();
+        this.base64 = {
+            encode: base64encode,
+            decode: base64decode
+        };
+        this.windowEventList = [
+            'cresenity:confirm',
+            'cresenity:loaded',
+            'cresenity:ui:start'
+        ];
+        this.cresenityEventList = [
+
+        ];
         this.url = new Url();
         this.scrollToTop = new ScrollToTop();
         this.callback = {};
         this.filesAdded = [];
         this.ui = new CUI();
-
-        this.dispatch('cf:ui:available');
-    }
-
-    dispatch(eventName) {
-        dispatch(eventName);
+        this.php = php;
+        this.observer = {
+            elementRendered: elementRendered,
+            elementReady: elementReady
+        };
+        this.confirmHandler = defaultConfirmHandler;
+        this.dispatchWindowEvent = dispatchWindowEvent;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -47,14 +61,19 @@ export default class Cresenity {
             this.callback[name](...args);
         }
     }
-
+    setConfirmHandler(cb) {
+        this.confirmHandler = cb;
+        return this;
+    }
     setCallback(name, cb) {
         this.callback[name] = cb;
+        return this;
     }
 
     isUsingRequireJs() {
         return (typeof this.cf.getConfig().requireJs !== 'undefined') ? this.cf.getConfig().requireJs : true;
     }
+
 
     normalizeRequireJs() {
         if (!this.isUsingRequireJs()) {
@@ -68,6 +87,10 @@ export default class Cresenity {
             return (/^[\],:{}\s]*$/.test(text.replace(/\\["\\\/bfnrtu]/g, '@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').replace(/(?:^|:|,)(?:\s*\[)+/g, '')));
         }
         return false;
+    }
+
+    on(eventName, cb) {
+
     }
 
 
@@ -234,10 +257,16 @@ export default class Cresenity {
             method: 'get',
             dataAddition: {},
             message: 'Are you sure?',
-            onConfirmed: false
+            onConfirmed: false,
+            confirmCallback: false,
+            owner: null
         }, options);
+        const confirmCallback = settings.confirmCallback ? settings.confirmCallback : settings.onConfirmed;
+        if(this.confirmHandler) {
+            return this.confirmHandler(settings.owner, settings, confirmCallback);
+        }
         if (window.bootbox) {
-            window.bootbox.confirm(settings.message, settings.onConfirmed);
+            return window.bootbox.confirm(settings.message, confirmCallback);
         }
     }
     modal(options) {
@@ -793,101 +822,16 @@ export default class Cresenity {
         }
         return elm.html();
     }
-
-
     initConfirm() {
-        let confirmInitialized = $('body').attr('data-confirm-initialized');
-        if (!confirmInitialized) {
-            jQuery(document).on('click', 'a.confirm, button.confirm', function (e) {
-                let ahref = $(this).attr('href');
-                let message = $(this).attr('data-confirm-message');
-                let noDouble = $(this).attr('data-no-double');
-                let clicked = $(this).attr('data-clicked');
-
-
-                let btn = jQuery(this);
-                btn.attr('data-clicked', '1');
-                if (noDouble) {
-                    if (clicked) {
-                        return false;
-                    }
-                }
-
-                if (!message) {
-                    message = window.capp.label_confirm;
-                } else {
-                    message = $.cresenity.base64.decode(message);
-                }
-
-
+        elementRendered('a.confirm, button.confirm, input[type=submit].confirm', (el)=>{
+            $(el).click((e)=>{
                 e.preventDefault();
                 e.stopPropagation();
-                btn.off('click');
-                window.bootbox.confirm({
-                    className: 'capp-modal-confirm',
-                    message: message,
-                    callback: (confirmed) => {
-                        if (confirmed) {
-                            if (ahref) {
-                                window.location.href = ahref;
-                            } else if (btn.attr('type') === 'submit') {
-                                btn.closest('form').submit();
-                            } else {
-                                btn.on('click');
-                            }
-                        } else {
-                            btn.removeAttr('data-clicked');
-                        }
-                        setTimeout(() => {
-                            let modalExists = $('.modal:visible').length > 0;
-                            if (!modalExists) {
-                                $('body').removeClass('modal-open');
-                            } else {
-                                $('body').addClass('modal-open');
-                            }
-                        }, 750);
-                    }
-                });
-
-
+                confirmFromElement(el, this.confirmHandler);
                 return false;
             });
-            $('body').attr('data-confirm-initialized', '1');
-        }
-        let confirmSubmitInitialized = $('body').attr('data-confirm-submit-initialized');
-        if (!confirmSubmitInitialized) {
-            jQuery(document).on('click', 'input[type=submit].confirm', function (e) {
-                let submitted = $(this).attr('data-submitted');
-                let btn = jQuery(this);
-                if (submitted === '1') {
-                    return false;
-                }
-                btn.attr('data-submitted', '1');
+        });
 
-                let message = $(this).attr('data-confirm-message');
-                if (!message) {
-                    message = window.capp.label_confirm;
-                } else {
-                    message = $.cresenity.base64.decode(message);
-                }
-
-                window.bootbox.confirm({
-                    className: 'capp-modal-confirm',
-                    message: message,
-                    callback: (confirmed) => {
-                        if (confirmed) {
-                            jQuery(e.target).closest('form').submit();
-                        } else {
-                            btn.removeAttr('data-submitted');
-                        }
-                    }
-                });
-
-
-                return false;
-            });
-            $('body').attr('data-confirm-submit-initialized', '1');
-        }
         jQuery(document).ready(() => {
             jQuery('#toggle-subnavbar').click(() =>{
                 let cmd = jQuery('#toggle-subnavbar span').html();
@@ -934,6 +878,8 @@ export default class Cresenity {
 
 
         this.cf.init();
+
+        dispatchWindowEvent('cresenity:loaded');
     }
 
     downloadProgress(options) {
