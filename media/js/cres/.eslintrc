@@ -70,7 +70,7 @@
         "no-sparse-arrays": 2, // disallow sparse arrays
         "no-unreachable": 2, // disallow unreachable statements after a return, throw, continue, or break statement
         "use-isnan": 2, // disallow comparisons with the value NaN
-        "valid-jsdoc": 2, // Ensure JSDoc comments are valid (off by default)
+        "valid-jsdoc": 0, // Ensure JSDoc comments are valid (off by default)
         "valid-typeof": 2, // Ensure that the results of typeof are compared against a valid string
 
         //
@@ -127,7 +127,7 @@
         "vars-on-top": 2, // requires to declare all vars on top of their containing scope (off by default)
         "wrap-iife": 2, // require immediate function invocation to be wrapped in parentheses (off by default)
         "yoda": 2, // require or disallow Yoda conditions
-
+        "no-prototype-builtins":0,
         //
         // Strict Mode
         //

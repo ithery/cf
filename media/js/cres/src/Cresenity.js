@@ -9,6 +9,7 @@ import {encode as base64encode, decode as base64decode} from './util/base64';
 import php from './php';
 import { elementReady, elementRendered } from './util/dom-observer';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
+import appValidation from './module/validation';
 
 export default class Cresenity {
     constructor() {
@@ -862,6 +863,11 @@ export default class Cresenity {
             $('body').attr('data-reload-initialized', '1');
         }
     }
+    initValidation() {
+        if($.validator) {
+            appValidation.init();
+        }
+    }
     init() {
         this.cf.onBeforeInit(() => {
             this.normalizeRequireJs();
@@ -874,6 +880,7 @@ export default class Cresenity {
             }
             this.initConfirm();
             this.initReload();
+            this.initValidation();
         });
 
 
