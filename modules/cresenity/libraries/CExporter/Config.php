@@ -1,14 +1,8 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_Config {
-
     protected static $instance;
+
     protected $data;
 
     public static function instance() {
@@ -19,12 +13,11 @@ class CExporter_Config {
     }
 
     public function __construct() {
-        $default = array();
-
+        $default = [];
 
         $this->data = CConfig::instance('exporter')->get();
         if (!is_array($this->data)) {
-            $this->data = array();
+            $this->data = [];
         }
         $this->data = array_merge($default, $this->data);
     }
@@ -39,7 +32,6 @@ class CExporter_Config {
     }
 
     /**
-     * 
      * @return array
      */
     public function getData() {
@@ -50,5 +42,4 @@ class CExporter_Config {
         $this->data[$key] = $value;
         return $this;
     }
-
 }

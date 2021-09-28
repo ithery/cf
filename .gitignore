@@ -109,3 +109,6 @@ web.config
 
 # ignore composer.lock
 composer.lock
+
+#ignore cache of php-cs-fixer
+.php-cs-fixer.cache
