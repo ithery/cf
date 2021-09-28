@@ -1012,4 +1012,27 @@ export default class Cresenity {
             }
         });
     }
+
+
+    handleJsonResponse(response, onSuccess, onError) {
+        let errMessage = 'Unexpected error happen, please relogin ro refresh this page';
+        if (typeof onError == 'string') {
+            errMessage = onError;
+        }
+
+        if (response.errCode == 0) {
+            if (typeof onSuccess == 'function') {
+                onSuccess(response.data);
+            }
+        } else {
+            if (typeof response.errMessage != 'undefined') {
+                errMessage = response.errMessage;
+            }
+            if (typeof onError == 'function') {
+                onError(errMessage);
+            } else {
+                this.showError(errMessage);
+            }
+        }
+    }
 }
