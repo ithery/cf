@@ -98,3 +98,5 @@ botlog.log
 .bin/devsuite/win/acrylic/AcrylicHosts.txt
 .bin/devsuite/win/nginx/logs/*
 
+#ignore cache of php-cs-fixer
+.php-cs-fixer.cache
