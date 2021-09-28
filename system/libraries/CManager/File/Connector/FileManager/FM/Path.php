@@ -13,6 +13,9 @@ use Intervention\Image\Facades\Image;
 // import the Intervention Image Manager Class
 use Intervention\Image\ImageManager;
 
+/**
+ * @property-read CManager_File_Connector_FileManager_FM_StorageRepository $storage
+ */
 class CManager_File_Connector_FileManager_FM_Path {
     private $working_dir;
 
@@ -130,6 +133,7 @@ class CManager_File_Connector_FileManager_FM_Path {
             return false;
         }
         $this->storage->makeDirectory(0777, true, true);
+        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_FolderIsCreated($this->path()));
     }
 
     public function isDirectory() {
