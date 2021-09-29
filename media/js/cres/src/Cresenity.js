@@ -539,7 +539,7 @@ export default class Cresenity {
         }, options);
 
         if(window.toastr) {
-            return window.toastr.type(message, settings.title, {
+            return window.toastr[type](message, settings.title, {
                 positionClass: 'toast-'+settings.position,
                 closeButton: true,
                 progressBar: true,
