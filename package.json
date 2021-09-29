@@ -2,7 +2,14 @@
     "private": true,
     "version": "1.0.0",
     "scripts": {
-        "cf": "node ./bin/cf/cli.js"
+        "cf": "node ./bin/cf/cli.js",
+        "dev": "npm run development",
+        "development": "npm run cf",
+        "watch": "npm run cf watch",
+        "watch-poll": "npm run cf watch -- --watch-options-poll=1000",
+        "hot": "npm run cf watch --hot",
+        "prod": "npm run production",
+        "production": "npm run cf --production"
     },
     "bin": {
         "cf": "./bin/cf/cli.js"
