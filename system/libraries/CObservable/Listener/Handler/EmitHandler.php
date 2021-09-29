@@ -54,18 +54,45 @@ class CObservable_Listener_Handler_EmitHandler extends CObservable_Listener_Hand
         $this->parameters = $params;
     }
 
+    /**
+     * Apply Param Array
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    protected function applyArrayParams(array $array) {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = $this->applyArrayParams($value);
+            }
+            if (is_string($value)) {
+                $array[$key] = CBase::createStringParamable($value, $this->params)->get();
+            }
+        }
+        return $array;
+    }
+
     public function js() {
         $js = '';
         if ($this->method) {
-            $js .= 'window.cresenity.ui.emit(' . c::e($this->method) . "'";
+            $js .= "window.cresenity.ui.emit('" . c::e($this->method) . "'";
 
             if (is_array($this->parameters) && count($this->parameters) > 0) {
                 foreach ($this->parameters as $param) {
+                    if (is_array($param)) {
+                        $param = $this->applyArrayParams($param);
+                    }
+                    if (is_string($param)) {
+                        $param = CBase::createStringParamable($param, $this->params)->get();
+                    }
+
                     $js .= ',' . json_encode($param);
                 }
             }
             $js .= ');';
         }
+
 
         return $js;
     }
