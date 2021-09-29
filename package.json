@@ -1,0 +1,12 @@
+{
+    "private": true,
+    "scripts": {
+        "cf": "node ./.bin/cf/cf.js"
+    },
+    "bin": {
+        "cf": "./.bin/cf/cf.js"
+    },
+    "dependencies": {
+        "commander": "^7.2.0"
+    }
+}
