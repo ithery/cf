@@ -30,14 +30,13 @@ class CBase_StringParamable {
 
     public function get() {
         $string = $this->string;
-        foreach ($this->params as $k => $p) {
-            preg_match_all("/{([\w]*)}/", $string, $matches, PREG_SET_ORDER);
-            foreach ($matches as $val) {
-                $str = $val[1]; //matches str without bracket {}
-                $bStr = $val[0]; //matches str with bracket {}
-                if ($k == $str) {
-                    $string = str_replace($bStr, $p, $string);
-                }
+        preg_match_all("/{([\w]*)}/", $string, $matches, PREG_SET_ORDER);
+        foreach ($matches as $val) {
+            $str = $val[1]; //matches str without bracket {}
+            $bStr = $val[0]; //matches str with bracket {}
+            $value = carr::get($this->params, $str);
+            if ($value !== null) {
+                $string = str_replace($bStr, $value, $string);
             }
         }
         return $string;
