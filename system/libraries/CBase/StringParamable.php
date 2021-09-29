@@ -1,7 +1,7 @@
 <?php
 
 
-class CString_StringParamable {
+class CBase_StringParamable {
     /**
      * String
      *
