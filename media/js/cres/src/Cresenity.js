@@ -10,6 +10,8 @@ import php from './php';
 import { elementReady, elementRendered } from './util/dom-observer';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
 import appValidation from './module/validation';
+import { toggleFullscreen } from './util/window-util';
+import ucfirst from 'locutus/php/strings/ucfirst';
 
 export default class Cresenity {
     constructor() {
@@ -23,6 +25,7 @@ export default class Cresenity {
             'cresenity:loaded',
             'cresenity:ui:start'
         ];
+        this.modalElements = [];
         this.cresenityEventList = [
 
         ];
@@ -529,8 +532,24 @@ export default class Cresenity {
             window.console.log(message);
         }
     }
+    toast(type, message, options) {
+        let settings = $.extend({
+            title: ucfirst(type),
+            position: 'top-right'
+        }, options);
+
+        if(window.toastr) {
+            return window.toastr.type(message, settings.title, {
+                positionClass: 'toast-'+settings.position,
+                closeButton: true,
+                progressBar: true,
+                preventDuplicates: false,
+                newestOnTop: false
+            });
+        }
+        return console.log(type+':'+message);
+    }
     message(type, message, alertType, callback) {
-        this.debug(message);
         alertType = typeof alertType !== 'undefined' ? alertType : 'notify';
         let container = $('#container');
         if (container.length === 0) {
@@ -538,10 +557,9 @@ export default class Cresenity {
         }
         if (alertType === 'bootbox' && window.bootbox) {
             if (typeof callback === 'undefined') {
-                window.bootbox.alert(message);
-            } else {
-                window.bootbox.alert(message, callback);
+                return window.bootbox.alert(message);
             }
+            return window.bootbox.alert(message, callback);
         }
 
         if (alertType === 'notify') {
@@ -550,7 +568,7 @@ export default class Cresenity {
             obj.addClass('notifications');
             obj.addClass('top-right');
             if (typeof obj.notify !== 'undefined') {
-                obj.notify({
+                return obj.notify({
                     message: {
                         text: message
                     },
@@ -558,6 +576,8 @@ export default class Cresenity {
                 }).show();
             }
         }
+
+        return this.toast(type, message);
     }
 
 
@@ -845,7 +865,7 @@ export default class Cresenity {
                 }
             });
             jQuery('#toggle-fullscreen').click(() => {
-                $.cresenity.fullscreen(document.documentElement);
+                toggleFullscreen(document.documentElement);
             });
         });
     }
@@ -864,7 +884,7 @@ export default class Cresenity {
         }
     }
     initValidation() {
-        if($.validator) {
+        if($ && $.validator) {
             appValidation.init();
         }
     }
@@ -1041,5 +1061,9 @@ export default class Cresenity {
                 this.showError(errMessage);
             }
         }
+    }
+
+    showError(errMessage) {
+        this.toast('error', errMessage);
     }
 }
