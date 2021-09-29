@@ -282,9 +282,9 @@ abstract class CObservable extends CRenderable {
         $this->add('<div class="clear-both"></div>');
     }
 
-    public function setHandlerUrlParam($param) {
+    public function setHandlerParam($param) {
         foreach ($this->listeners as $listener) {
-            $listener->setHandlerUrlParam($param);
+            $listener->setHandlerParam($param);
         }
     }
 

@@ -274,7 +274,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
 
             $this->rowActionList->regenerateId(true);
             $this->rowActionList->apply('setJsParam', $jsparam);
-            $this->rowActionList->apply('setHandlerUrlParam', $jsparam);
+            $this->rowActionList->apply('setHandlerParam', $jsparam);
 
             if (($this->filterActionCallbackFunc) != null) {
                 $actions = $this->rowActionList->childs();

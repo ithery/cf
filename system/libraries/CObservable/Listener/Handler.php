@@ -51,10 +51,18 @@ abstract class CObservable_Listener_Handler {
      */
     protected $owner;
 
+    /**
+     * Handler Params
+     *
+     * @var array
+     */
+    protected $params;
+
     public function __construct(CObservable_ListenerAbstract $listener) {
         $this->listener = $listener;
         $this->owner = $this->listener->getOwner();
         $this->event = $this->listener->getEvent();
+        $this->params = [];
     }
 
     public function setOwner($owner) {
@@ -71,6 +79,20 @@ abstract class CObservable_Listener_Handler {
             return $this->handlerListeners[$event];
         }
         return null;
+    }
+
+    public function setParams(array $params) {
+        $this->params = $params;
+        return $this;
+    }
+
+    public function getParams() {
+        return $this->params;
+    }
+
+    public function addParam($key, $value) {
+        $this->params[$key] = $value;
+        return $this;
     }
 
     abstract public function js();

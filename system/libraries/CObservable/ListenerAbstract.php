@@ -52,9 +52,9 @@ abstract class CObservable_ListenerAbstract {
     /**
      * @param type $param
      */
-    public function setHandlerUrlParam($param) {
+    public function setHandlerParam($param) {
         foreach ($this->handlers as $handler) {
-            $handler->setUrlParam($param);
+            $handler->setParam($param);
         }
     }
 
