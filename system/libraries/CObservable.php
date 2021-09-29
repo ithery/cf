@@ -98,8 +98,8 @@ abstract class CObservable extends CRenderable {
 
     /**
      * @param CElement_View}string $view
-     * @param null|array           $data
-     * @param string               $id
+     * @param null|array $data
+     * @param string     $id
      *
      * @return CElement_View
      */
@@ -284,7 +284,7 @@ abstract class CObservable extends CRenderable {
 
     public function setHandlerUrlParam($param) {
         foreach ($this->listeners as $listener) {
-            $listener->set_handler_url_param($param);
+            $listener->setHandlerUrlParam($param);
         }
     }
 
