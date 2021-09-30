@@ -6,9 +6,14 @@
  * @author Hery
  */
 class CDevSuite_Command_SshCommand extends CDevSuite_CommandAbstract {
-    public function run(CConsole_Command $cfCommand) {
-        $collection = CDevSuite::ssh()->getTableData();
+    public function getSignatureArguments() {
+        return '{name}';
+    }
 
-        CDevSuite::table(['Name', 'Host', 'Type', 'User', 'Password'], $collection->all());
+    public function run(CConsole_Command $cfCommand) {
+        $name = $cfCommand->argument('name');
+
+        CDevSuite::devCloud()->installSSH();
+        CDevSuite::ssh()->open($name);
     }
 }

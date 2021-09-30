@@ -20,5 +20,10 @@ class CDevSuite_Bootstrap_WindowsBootstrapper_DependencyChecker extends CDevSuit
 
             exit(1);
         }
+        $bit = (PHP_INT_SIZE == 4 ? 32 : (PHP_INT_SIZE == 8 ? 64 : null));
+        if (!$bit) {
+            echo 'DevSuite requires Windows 32bit or 64bit';
+            exit(1);
+        }
     }
 }
