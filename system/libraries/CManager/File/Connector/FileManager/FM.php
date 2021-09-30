@@ -201,13 +201,13 @@ class CManager_File_Connector_FileManager_FM {
     /**
      * Shorter function of getting localized error message..
      *
-     * @param mixed $error_type key of message in lang file
-     * @param mixed $variables  variables the message needs
+     * @param string $errorType key of message in lang file
+     * @param array  $variables variables the message needs
      *
      * @return string
      */
-    public function error($error_type, $variables = []) {
-        throw new \Exception(clang::__('filemanager.error-' . $error_type, $variables));
+    public function error($errorType, array $variables = []) {
+        throw new \Exception(clang::__('filemanager.error-' . $errorType, $variables));
     }
 
     /**

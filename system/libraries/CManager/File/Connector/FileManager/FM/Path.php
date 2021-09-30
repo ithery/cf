@@ -223,11 +223,8 @@ class CManager_File_Connector_FileManager_FM_Path {
         try {
             $newFileName = $this->saveFile($file, $newFileName);
         } catch (\Exception $e) {
-            // \Log::info($e);
-            // return $this->error('invalid');
             return $this->error($e->getMessage());
         }
-        // TODO should be "FileWasUploaded"
         $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasUploaded($newFilePath));
         return $newFileName;
     }

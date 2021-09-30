@@ -24,7 +24,7 @@ class CManager_File_Connector_FileManager_Controller_DeleteController extends CM
         foreach ($item_names as $nameToDelete) {
             $file_to_delete = $fm->path()->pretty($nameToDelete);
             $filePath = $file_to_delete->path();
-            $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageIsDeleting($filePath));
+            $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileIsDeleting($filePath));
             try {
                 if (is_null($nameToDelete)) {
                     array_push($errors, parent::error('folder-name'));
@@ -53,7 +53,7 @@ class CManager_File_Connector_FileManager_Controller_DeleteController extends CM
                 throw $ex;
             }
 
-            $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasDeleted($filePath));
+            $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileWasDeleted($filePath));
         }
         if (count($errors) > 0) {
             echo json_encode($errors);
