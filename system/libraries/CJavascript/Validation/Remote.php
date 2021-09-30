@@ -43,6 +43,7 @@ class CJavascript_Validation_Remote {
         $validateAll = carr::get($data, $this->field . '_validate_all', false);
         $validationRule = 'bail|' . static::EXTENSION_NAME . ':' . $validateAll;
         $rules = [$this->field => $validationRule] + $rules;
+
         $this->validator = new CValidation_Validator($data, $rules, $messages, $customAttributes);
     }
 
@@ -60,7 +61,9 @@ class CJavascript_Validation_Remote {
         $attribute = $this->parseAttributeName($field);
 
         $validationParams = $this->parseParameters($parameters);
+
         $validationResult = $this->validateJsRemoteRequest($attribute, $validationParams);
+
         return $validationResult;
     }
 
@@ -121,6 +124,7 @@ class CJavascript_Validation_Remote {
      */
     protected function validateJsRemoteRequest($attribute, $parameters) {
         $this->setRemoteValidation($attribute, $parameters['validate_all']);
+
         $validator = $this->validator;
         if ($validator->passes()) {
             return true;
@@ -160,6 +164,7 @@ class CJavascript_Validation_Remote {
      */
     protected function purgeNonRemoteRules($rules, $validator) {
         $protectedValidator = $this->createProtectedCaller($validator);
+
         foreach ($rules as $i => $rule) {
             $parsedRule = CValidation_RuleParser::parse([$rule]);
             if (!$this->isRemoteRule($parsedRule[0])) {

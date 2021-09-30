@@ -11,7 +11,8 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CAjax_Engine_Validation extends CAjax_Engine {
     public function execute() {
         $data = $this->ajaxMethod->getData();
-        $dataValidation = carr::get($data, 'dataValidation');
+        $dataValidation = unserialize(carr::get($data, 'dataValidation'));
+
         $formId = carr::get($data, 'formId');
         $formId = carr::get($data, '');
 
