@@ -127,7 +127,20 @@ var CFileManager = function (options) {
 
     this.displayErrorResponse = (jqXHR) => {
         //console.log('Display Error Response');
-        this.notify('<div style="max-height:50vh;overflow: scroll;">' + jqXHR.responseText + '</div>');
+        //try to get json from this response
+        let data = null;
+        let message = jqXHR.responseText;
+        try {
+            data = JSON.parse(message);
+        } catch(e) {
+            //do nothing
+        }
+        if(typeof data == 'object' && data.message) {
+            message = data.message;
+        }
+
+
+        this.notify('<div style="max-height:50vh;overflow: scroll;">' + message + '</div>');
     };
 
     this.notify = (body, callback) => {

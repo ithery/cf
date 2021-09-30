@@ -45,6 +45,7 @@ class CManager_File_Connector_FileManager_FM {
      * Get Input
      *
      * @param string $key
+     *
      * @return mixed
      */
     public function input($key) {
@@ -65,13 +66,13 @@ class CManager_File_Connector_FileManager_FM {
      * @return string
      */
     public function currentFmType() {
-        $lfm_type = 'file';
+        $fmType = 'file';
         $request_type = lcfirst(cstr::singular($this->input('type') ?: ''));
         $available_types = array_keys($this->config('folder_categories') ?: []);
         if (in_array($request_type, $available_types)) {
-            $lfm_type = $request_type;
+            $fmType = $request_type;
         }
-        return $lfm_type;
+        return $fmType;
     }
 
     public function availableMimeTypes() {
@@ -142,14 +143,14 @@ class CManager_File_Connector_FileManager_FM {
     }
 
     public function getDisplayMode() {
-        $type_key = $this->currentFmType();
-        $startup_view = $this->config('folder_categories.' . $type_key . '.startup_view');
-        $view_type = 'grid';
-        $target_display_type = $this->input('showList') ?: $startup_view;
-        if (in_array($target_display_type, ['list', 'grid'])) {
-            $view_type = $target_display_type;
+        $typeKey = $this->currentFmType();
+        $startupView = $this->config('folder_categories.' . $typeKey . '.startup_view');
+        $viewType = 'grid';
+        $targetDisplayType = $this->input('showList') ?: $startupView;
+        if (in_array($targetDisplayType, ['list', 'grid'])) {
+            $viewType = $targetDisplayType;
         }
-        return $view_type;
+        return $viewType;
     }
 
     public function getStorage($storagePath) {

@@ -39,6 +39,10 @@ class CManager_File_Connector_FileManager_FM_Path {
         return $this->storage->$function_name(...$arguments);
     }
 
+    public function exists() {
+        return $this->storage->exists();
+    }
+
     public function dir($working_dir) {
         $this->working_dir = $working_dir;
         return $this;
@@ -138,6 +142,8 @@ class CManager_File_Connector_FileManager_FM_Path {
 
     public function isDirectory() {
         $working_dir = $this->path('working_dir');
+
+
 
         $parent_dir = substr($working_dir, 0, strrpos($working_dir, '/'));
         if (strlen($parent_dir) == 0) {

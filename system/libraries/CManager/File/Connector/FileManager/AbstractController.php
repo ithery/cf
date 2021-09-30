@@ -16,8 +16,9 @@ class CManager_File_Connector_FileManager_AbstractController {
         $this->fileManager = $fileManager;
         $app = CApp::instance();
         $app->setLoginRequired(false);
-        CManager::theme()->setThemeCallback(function ($theme) {
-            return $this->fm()->config('theme', 'cresenity-filemanager');
+        $filemanagerTheme = $this->fm()->config('theme', 'cresenity-filemanager');
+        CManager::theme()->setThemeCallback(function ($theme) use ($filemanagerTheme) {
+            return $filemanagerTheme;
         });
 
         //do this with facade
@@ -36,5 +37,9 @@ class CManager_File_Connector_FileManager_AbstractController {
 
     public function error($error_type, $variables = []) {
         return $this->fm()->error($error_type, $variables);
+    }
+
+    public function getDisk() {
+        return CStorage::instance()->disk($this->fm()->config('disk'));
     }
 }

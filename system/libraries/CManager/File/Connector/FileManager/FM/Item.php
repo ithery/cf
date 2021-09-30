@@ -11,6 +11,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class CManager_File_Connector_FileManager_FM_Item {
+    /**
+     * @var CManager_File_Connector_FileManager_FM_Path
+     */
     private $fmPath;
 
     private $helper;
@@ -113,13 +116,17 @@ class CManager_File_Connector_FileManager_FM_Item {
     }
 
     public function icon() {
-        if ($this->isDirectory()) {
-            return 'fa-folder-o';
+        //return null if not exists
+        if ($this->fmPath->exists()) {
+            if ($this->isDirectory()) {
+                return 'fa-folder-o';
+            }
+            if ($this->isImage()) {
+                return 'fa-image';
+            }
+            return $this->extension();
         }
-        if ($this->isImage()) {
-            return 'fa-image';
-        }
-        return $this->extension();
+        return null;
     }
 
     public function type() {
