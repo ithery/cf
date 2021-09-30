@@ -36,9 +36,9 @@ class CManager_File_Connector_FileManager_Controller_DoMoveController extends CM
                 $newFile = $fm->path()->setName($item)->dir($target);
                 $fm->path()->setName($item)->move($newFile);
                 if ($isDirectory) {
-                    $fm->dispatch(new CManager_File_Connector_FileManager_Event_FolderWasMoving($oldFile->path(), $newFile->path()));
+                    $fm->dispatch(new CManager_File_Connector_FileManager_Event_FolderWasMoved($oldFile->path(), $newFile->path()));
                 } else {
-                    $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileWasMoving($oldFile->path(), $newFile->path()));
+                    $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileWasMoved($oldFile->path(), $newFile->path()));
                 }
             }
         }

@@ -219,13 +219,13 @@ class CManager_File_Connector_FileManager_FM_Path {
         $newFileName = $this->getNewName($file);
         $newFilePath = $this->setName($newFileName)->path('absolute');
 
-        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_ImageIsUploading($newFilePath));
+        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_FileIsUploading($newFilePath));
         try {
             $newFileName = $this->saveFile($file, $newFileName);
         } catch (\Exception $e) {
             return $this->error($e->getMessage());
         }
-        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasUploaded($newFilePath));
+        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_FileWasUploaded($newFilePath));
         return $newFileName;
     }
 

@@ -44,7 +44,7 @@ class CManager_File_Connector_FileManager_Controller_RenameController extends CM
         if ($is_directory) {
             $fm->dispatch(new CManager_File_Connector_FileManager_Event_FolderIsRenaming($old_file->path(), $new_file));
         } else {
-            $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageIsRenaming($old_file->path(), $new_file));
+            $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileIsRenaming($old_file->path(), $new_file));
         }
         if ($old_file->hasThumb()) {
             $fm->path()->setName($old_name)->thumb()
@@ -55,7 +55,7 @@ class CManager_File_Connector_FileManager_Controller_RenameController extends CM
         if ($is_directory) {
             $fm->dispatch(new CManager_File_Connector_FileManager_Event_FolderWasRenamed($old_file->path(), $new_file));
         } else {
-            $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasRenamed($old_file->path(), $new_file));
+            $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileWasRenamed($old_file->path(), $new_file));
         }
         echo parent::$successResponse;
     }
