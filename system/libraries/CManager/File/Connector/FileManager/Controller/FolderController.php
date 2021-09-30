@@ -34,6 +34,6 @@ class CManager_File_Connector_FileManager_Controller_FolderController extends CM
         }, $folder_types);
 
         $app->addTemplate()->setTemplate('CElement/Component/FileManager/Tree')->setVar('fm', $fm)->setVar('rootFolders', $rootFolders);
-        echo $app->render();
+        return $app;
     }
 }

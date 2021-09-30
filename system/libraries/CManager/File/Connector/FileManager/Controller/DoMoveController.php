@@ -43,6 +43,6 @@ class CManager_File_Connector_FileManager_Controller_DoMoveController extends CM
             }
         }
 
-        echo parent::$successResponse;
+        return c::response(parent::$successResponse);
     }
 }

@@ -54,6 +54,6 @@ class CManager_File_Connector_FileManager_Controller_ResizeController extends CM
             ->setVar('original_width', $original_width)
             ->setVar('scaled', $scaled)
             ->setVar('ratio', $ratio);
-        echo $app->render();
+        return $app;
     }
 }

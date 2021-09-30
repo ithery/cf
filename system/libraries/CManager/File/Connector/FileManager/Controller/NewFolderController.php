@@ -33,6 +33,6 @@ class CManager_File_Connector_FileManager_Controller_NewFolderController extends
             echo $e->getMessage();
             return;
         }
-        echo parent::$successResponse;
+        return c::response(parent::$successResponse);
     }
 }

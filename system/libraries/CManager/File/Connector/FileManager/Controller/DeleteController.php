@@ -59,6 +59,6 @@ class CManager_File_Connector_FileManager_Controller_DeleteController extends CM
             echo json_encode($errors);
             return;
         }
-        echo parent::$successResponse;
+        return c::response(parent::$successResponse);
     }
 }

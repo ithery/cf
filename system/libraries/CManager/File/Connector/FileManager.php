@@ -39,7 +39,7 @@ class CManager_File_Connector_FileManager extends CManager_File_ConnectorAbstrac
 
         //$controllerClass = 'CManager_File_Connector_FileManager_Controller_' . $controllerName . 'Controller';
         $controller = new $controllerClass($this);
-        $controller->execute();
+        return $controller->execute();
     }
 
     protected function getControllerByMethod($method) {

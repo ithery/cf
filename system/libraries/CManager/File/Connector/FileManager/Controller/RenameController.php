@@ -57,6 +57,6 @@ class CManager_File_Connector_FileManager_Controller_RenameController extends CM
         } else {
             $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileWasRenamed($old_file->path(), $new_file));
         }
-        echo parent::$successResponse;
+        return c::response(parent::$successResponse);
     }
 }
