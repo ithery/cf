@@ -38,6 +38,7 @@ class CFConsole {
         CConsole_Command_DevSuite_DevSuiteDbCompareCommand::class,
         CConsole_Command_DevSuite_DevSuiteDbCloneCommand::class,
         CConsole_Command_DevSuite_DevSuiteDbSyncCommand::class,
+        CConsole_Command_DevSuite_DevSuiteSshCommand::class,
         CConsole_Command_DevSuite_DevSuiteSshListCommand::class,
         CConsole_Command_DevSuite_DevSuiteSshCreateCommand::class,
         CConsole_Command_DevSuite_DevSuiteDeployInitCommand::class,
