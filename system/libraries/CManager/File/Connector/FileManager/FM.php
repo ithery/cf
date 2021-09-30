@@ -34,7 +34,9 @@ class CManager_File_Connector_FileManager_FM {
         $args = func_get_args();
         $event = carr::get($args, 0);
         $payload = array_slice($args, 1);
-        CEvent::dispatcher()->dispatch($event, $payload);
+
+
+        return CEvent::dispatcher()->dispatch($event, $payload);
     }
 
     public function path() {

@@ -143,7 +143,8 @@ class CManager_File_Connector_FileManager_FM_Item {
         if (!$this->isImage()) {
             return false;
         }
-        if (!$this->fmPath->thumb()->exists()) {
+        $fmPath = clone($this->fmPath);
+        if (!$fmPath->thumb()->exists()) {
             return false;
         }
         return true;

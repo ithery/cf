@@ -39,6 +39,10 @@ class CManager_File_Connector_FileManager_FM_Path {
         return $this->storage->$function_name(...$arguments);
     }
 
+    public function move($newPath) {
+        $this->storage->move($newPath);
+    }
+
     public function exists() {
         return $this->storage->exists();
     }
@@ -137,6 +141,7 @@ class CManager_File_Connector_FileManager_FM_Path {
             return false;
         }
         $this->storage->makeDirectory(0777, true, true);
+
         $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_FolderIsCreated($this->path()));
     }
 

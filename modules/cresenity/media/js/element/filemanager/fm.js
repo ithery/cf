@@ -152,9 +152,14 @@ var CFileManager = function (options) {
 
         if (window.cresenity.isJson(body)) {
             let json = JSON.parse(body);
-            eval(window.cresenity.base64.decode(json.js));
-            //console.log(cresenity.base64.decode(json.js));
-            $('#notify').find('.modal-body').html(json.html);
+            let message = json.html;
+            if(json.exception && json.message) {
+                message = json.message;
+            }
+            $('#notify').find('.modal-body').html(message);
+            if(json.js) {
+                eval(window.cresenity.base64.decode(json.js));
+            }
             $('#notify').modal('show');
         } else {
             $('#notify').modal('show').find('.modal-body').html(body);
