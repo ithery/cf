@@ -266,11 +266,11 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                         'sFirst' : '" . clang::__('First') . "',
                         'sLast' : '" . clang::__('Last') . "',
                         'sNext' : '" . clang::__('Next') . "',
-                        'sPrevious' : '" . clang::__('Previous	') . "'
+                        'sPrevious' : '" . clang::__('Previous') . "'
                     },
                     sInfo: '" . $this->infoText . "',
-                    sInfoEmpty  : '" . clang::__('No data available in table') . "',
-                    sEmptyTable  : '" . clang::__('No data available in table') . "',
+                    sInfoEmpty  : '" . clang::__($this->labels['noData']) . "',
+                    sEmptyTable  : '" . clang::__($this->labels['noData']) . "',
                     sInfoThousands   : '" . clang::__('') . "',
                 },")->br()
                 ->appendln("'bDeferRender': " . ($this->getOption('bDeferRender') ? 'true' : 'false') . ',')->br()

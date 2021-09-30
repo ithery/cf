@@ -9,6 +9,9 @@ import {encode as base64encode, decode as base64decode} from './util/base64';
 import php from './php';
 import { elementReady, elementRendered } from './util/dom-observer';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
+import appValidation from './module/validation';
+import { toggleFullscreen } from './util/window-util';
+import ucfirst from 'locutus/php/strings/ucfirst';
 
 export default class Cresenity {
     constructor() {
@@ -22,6 +25,7 @@ export default class Cresenity {
             'cresenity:loaded',
             'cresenity:ui:start'
         ];
+        this.modalElements = [];
         this.cresenityEventList = [
 
         ];
@@ -528,8 +532,24 @@ export default class Cresenity {
             window.console.log(message);
         }
     }
+    toast(type, message, options) {
+        let settings = $.extend({
+            title: ucfirst(type),
+            position: 'top-right'
+        }, options);
+
+        if(window.toastr) {
+            return window.toastr[type](message, settings.title, {
+                positionClass: 'toast-'+settings.position,
+                closeButton: true,
+                progressBar: true,
+                preventDuplicates: false,
+                newestOnTop: false
+            });
+        }
+        return console.log(type+':'+message);
+    }
     message(type, message, alertType, callback) {
-        this.debug(message);
         alertType = typeof alertType !== 'undefined' ? alertType : 'notify';
         let container = $('#container');
         if (container.length === 0) {
@@ -537,10 +557,9 @@ export default class Cresenity {
         }
         if (alertType === 'bootbox' && window.bootbox) {
             if (typeof callback === 'undefined') {
-                window.bootbox.alert(message);
-            } else {
-                window.bootbox.alert(message, callback);
+                return window.bootbox.alert(message);
             }
+            return window.bootbox.alert(message, callback);
         }
 
         if (alertType === 'notify') {
@@ -549,7 +568,7 @@ export default class Cresenity {
             obj.addClass('notifications');
             obj.addClass('top-right');
             if (typeof obj.notify !== 'undefined') {
-                obj.notify({
+                return obj.notify({
                     message: {
                         text: message
                     },
@@ -557,6 +576,8 @@ export default class Cresenity {
                 }).show();
             }
         }
+
+        return this.toast(type, message);
     }
 
 
@@ -844,7 +865,7 @@ export default class Cresenity {
                 }
             });
             jQuery('#toggle-fullscreen').click(() => {
-                $.cresenity.fullscreen(document.documentElement);
+                toggleFullscreen(document.documentElement);
             });
         });
     }
@@ -862,6 +883,11 @@ export default class Cresenity {
             $('body').attr('data-reload-initialized', '1');
         }
     }
+    initValidation() {
+        if($ && $.validator) {
+            appValidation.init();
+        }
+    }
     init() {
         this.cf.onBeforeInit(() => {
             this.normalizeRequireJs();
@@ -874,6 +900,7 @@ export default class Cresenity {
             }
             this.initConfirm();
             this.initReload();
+            this.initValidation();
         });
 
 
@@ -1011,5 +1038,32 @@ export default class Cresenity {
                 }
             }
         });
+    }
+
+
+    handleJsonResponse(response, onSuccess, onError) {
+        let errMessage = 'Unexpected error happen, please relogin ro refresh this page';
+        if (typeof onError == 'string') {
+            errMessage = onError;
+        }
+
+        if (response.errCode == 0) {
+            if (typeof onSuccess == 'function') {
+                onSuccess(response.data);
+            }
+        } else {
+            if (typeof response.errMessage != 'undefined') {
+                errMessage = response.errMessage;
+            }
+            if (typeof onError == 'function') {
+                onError(errMessage);
+            } else {
+                this.showError(errMessage);
+            }
+        }
+    }
+
+    showError(errMessage) {
+        this.toast('error', errMessage);
     }
 }

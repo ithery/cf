@@ -189,7 +189,7 @@ class CElement_Component_Form extends CElement_Component {
 
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('Validation');
-            $ajaxMethod->setData('dataValidation', $validationData);
+            $ajaxMethod->setData('dataValidation', serialize($validationData));
             $ajaxMethod->setData('formId', $this->id());
             $ajaxUrl = $ajaxMethod->makeUrl();
 

@@ -134,4 +134,13 @@ trait CObservable_Listener_Trait_HandlerTrait {
         $this->handlers[] = $handler;
         return $handler;
     }
+
+    /**
+     * @return \CObservable_Listener_Handler_EmitHandler
+     */
+    public function addEmitHandler() {
+        $handler = new CObservable_Listener_Handler_EmitHandler($this);
+        $this->handlers[] = $handler;
+        return $handler;
+    }
 }

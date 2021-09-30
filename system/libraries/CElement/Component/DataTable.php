@@ -133,6 +133,15 @@ class CElement_Component_DataTable extends CElement_Component {
 
     protected $actionHeaderLabel = 'Actions';
 
+    protected $labels = [
+        'noData' => 'No data available in table',
+        'first' => 'First',
+        'last' => 'Last',
+        'previous' => 'Previous',
+        'next' => 'Next',
+        'processing' => 'Processing'
+    ];
+
     public function __construct($id = '') {
         parent::__construct($id);
         $this->defaultPagingList['-1'] = c::__('ALL');
@@ -227,10 +236,17 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->classes = CElement_Helper::getClasses(c::theme('datatable.class'));
 
         $this->checkboxRenderer = CManager::theme()->getData('datatable.renderer.checkbox', [CElement_Component_DataTable_Renderer::class, 'checkboxCell']);
+        $this->labels['noData'] = CManager::theme()->getData('datatable.label.noData', 'No data available in table');
+        $this->labels['first'] = CManager::theme()->getData('datatable.label.first', 'First');
     }
 
     public static function factory($id = '') {
         return new static($id);
+    }
+
+    public function setLabelNoData($label) {
+        $this->labels['noData'] = $label;
+        return $this;
     }
 
     public function setDatabaseResolver($dbResolver) {

@@ -105,7 +105,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
         if (isset($request['sSearch']) && $request['sSearch'] != '') {
             $arr = [];
             if (count($columns) > 0) {
-                carr::set_path($arr, 'bool.should', []);
+                carr::set($arr, 'bool.should', []);
                 $should = &$arr['bool']['should'];
                 for ($i = 0; $i < count($columns); $i++) {
                     $i2 = 0;
@@ -124,7 +124,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
 
                         switch ($elastic_field_type) {
                             case 'text':
-                                carr::set_path($s, 'match.' . $fieldElastic, $request['sSearch']);
+                                carr::set($s, 'match.' . $fieldElastic, $request['sSearch']);
 
                                 break;
                             case 'date':
@@ -134,7 +134,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
                             case 'float':
                             default:
                                 if (is_numeric($request['sSearch'])) {
-                                    carr::set_path($s, 'term.' . $fieldElastic, $request['sSearch']);
+                                    carr::set($s, 'term.' . $fieldElastic, $request['sSearch']);
                                 }
                                 break;
                         }
@@ -258,7 +258,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
                 $rowActionList->regenerateId(true);
                 $rowActionList->apply('setJsParam', $jsparam);
 
-                $rowActionList->apply('setHandlerUrlParam', $jsparam);
+                $rowActionList->apply('setHandlerParam', $jsparam);
 
                 if (($table->filterActionCallbackFunc) != null) {
                     $actions = $rowActionList->childs();

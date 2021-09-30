@@ -29,6 +29,13 @@ defined('SYSPATH') or die('No direct access allowed.');
          return $this->setOwner($owner);
      }
 
+     /**
+      * @param mixed $param
+      *
+      * @return $this
+      *
+      * @deprecated since 1.2
+      */
      public function set_handler_url_param($param) {
          return $this->setHandlerUrlParam($param);
      }

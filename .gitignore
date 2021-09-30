@@ -112,3 +112,7 @@ composer.lock
 
 #ignore cache of php-cs-fixer
 .php-cs-fixer.cache
+
+# Node Dependency directories
+node_modules/
+jspm_packages/
