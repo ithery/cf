@@ -14,8 +14,6 @@ class CApp_Api_Method_App_Config_Get extends CApp_Api_Method_App {
             $config = CConfig::instance('app');
             $config->addAppCode($this->appCode());
             $data=$config->getConfigData();
-            // $config = CF::getFile('config', 'app', $domain);
-            // $data = include $config;
         } catch (Exception $ex) {
             $errCode++;
             $errMessage = $ex->getMessage();
