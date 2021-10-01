@@ -4,13 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use Symfony\Component\Process\Process;
 
-/**
- * @author Muhammad Harisuddin Thohir <me@harisuddin.com>
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2020, 11:13:37 AM
- */
-class CApp_Api_Method_App_Git_Checkout extends CApp_Api_Method_App {
+class CApp_Api_Method_Server_Git_Checkout extends CApp_Api_Method_Server {
     public function execute() {
         $output = '';
         $successOutput = '';
@@ -25,8 +19,8 @@ class CApp_Api_Method_App_Git_Checkout extends CApp_Api_Method_App {
                 $pwd = '';
                 $execute = '';
 
-                $pwd = shell_exec("cd application/{$this->appCode} && pwd");
-                $execute = "cd application/{$this->appCode} && git checkout {$branch}";
+                $pwd = shell_exec("pwd");
+                $execute = "git checkout {$branch}";
 
                 $output .= "working on directory $pwd";
                 $process = new Process($execute);

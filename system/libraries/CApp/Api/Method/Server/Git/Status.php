@@ -10,7 +10,7 @@ use Symfony\Component\Process\Process;
  *
  * @since Mar 10, 2020, 11:13:37 AM
  */
-class CApp_Api_Method_Server_Git_Status extends CApp_Api_Method_App {
+class CApp_Api_Method_Server_Git_Status extends CApp_Api_Method_Server {
     public function execute() {
         $output = '';
         $successOutput = '';

@@ -4,29 +4,19 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use Symfony\Component\Process\Process;
 
-/**
- * @author Muhammad Harisuddin Thohir <me@harisuddin.com>
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2020, 11:13:37 AM
- */
-class CApp_Api_Method_App_Git_Checkout extends CApp_Api_Method_App {
+class CApp_Api_Method_Server_Git_Clean extends CApp_Api_Method_Server {
     public function execute() {
         $output = '';
         $successOutput = '';
         $errorOutput = '';
-        $branch = c::get($this->request(), 'branch');
-        if (!$branch) {
-            $this->errCode++;
-            $this->errMessage = "Branch is required";
-        }
+
         if ($this->errCode == 0) {
             try {
                 $pwd = '';
                 $execute = '';
 
-                $pwd = shell_exec("cd application/{$this->appCode} && pwd");
-                $execute = "cd application/{$this->appCode} && git checkout {$branch}";
+                $pwd = shell_exec("pwd");
+                $execute = "git checkout -- .";
 
                 $output .= "working on directory $pwd";
                 $process = new Process($execute);

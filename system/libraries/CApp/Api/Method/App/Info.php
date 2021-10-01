@@ -18,7 +18,6 @@ class CApp_Api_Method_App_Info extends CApp_Api_Method_App {
         $successOutput = '';
         $errorOutput = '';
         $data = [];
-
         $data['CFVersion'] = CF::version();
         $this->errCode = $errCode;
         $this->errMessage = $errMessage;
