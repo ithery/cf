@@ -69,12 +69,12 @@ class Controller_Administrator_Vendor_Letsencrypt extends CApp_Administrator_Con
         $letsEncrypt = $this->letsEncrypt();
         $orderData = $letsEncrypt->getOrderData();
 
-        cdbg::var_dump($orderData);
+        cdbg::varDump($orderData);
         $x509 = new X509();
         $certificateData = $x509->loadX509(file_get_contents($letsEncrypt->getCertificatePath()));
-        cdbg::var_dump($x509->getSubjectDN());
+        cdbg::varDump($x509->getSubjectDN());
         //$certificateData = openssl_x509_parse($letsEncrypt->getCertificatePath());
-        cdbg::var_dump($certificateData);
+        cdbg::varDump($certificateData);
     }
 
     public function delete() {

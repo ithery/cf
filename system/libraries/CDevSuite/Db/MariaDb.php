@@ -66,19 +66,19 @@ abstract class CDevSuite_Db_MariaDb {
         $dbType = mb_strtolower(basename(str_replace('\\', '/', get_class($dbDumper))));
         $dbName = $dbDumper->getDbName();
         if ($dbDumper instanceof CBackup_Database_Dumper_SqliteDumper) {
+            $key = 'sqlite';
             $dbName = $key . '-database';
         }
         $fileName = "{$dbType}-{$dbName}.{$this->getExtension($dbDumper)}";
 
         $temporaryFilePath = DOCROOT . 'temp' . DS . 'devsuite' . DS . 'db' . DS . 'db-dumps' . DS . $fileName;
-        //$temporaryFilePath = DOCROOT . 'temp/devsuite/db/db-dumps/'. $fileName;
 
         $dbDumper->setDumpBinaryPath($this->getDumperBinaryPath());
         $this->files->ensureDirExists(dirname($temporaryFilePath));
 
         CDevSuite::info('Dumping database to:' . $temporaryFilePath);
 
-        //$dbDumper->dumpToFile($temporaryFilePath);
+        $dbDumper->dumpToFile($temporaryFilePath);
         return $temporaryFilePath;
     }
 
@@ -87,9 +87,10 @@ abstract class CDevSuite_Db_MariaDb {
     }
 
     public function restore($to, $dumpFile) {
+        CDevSuite::info('Restoring database from:' . $dumpFile);
         $command = $this->getRestoreCommand($to, $dumpFile);
 
-        $process = Process::fromShellCommandline($command, null, null, null);
+        $process = Process::fromShellCommandline($command, null, null, null, null);
         $output = '';
         $process->run(function ($type, $line) use (&$output) {
             $output .= $line;

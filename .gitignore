@@ -78,6 +78,7 @@ sftp-config*.json
 .well-known
 .well-known/*
 __sublime_sftp_offset
+.rnd
 
 #SEO
 robots.txt
