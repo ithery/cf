@@ -99,3 +99,46 @@ carr::divide method menghasilkan 2 array: 1 berisi keys array dan 1 lagi berisi 
  */
 list($keys, $values) = carr::divide(['name' => 'Desk']);
 ```
+
+### carr::dot
+carr::dot method merubah multi-dimensional menjadi single array dengan "dot" notation untuk mengindikasikan kedalaman array
+
+```php
+$array = ['products' => ['desk' => ['price' => 100]]];
+
+$flattened = carr::dot($array);
+
+// ['products.desk.price' => 100]
+
+```
+
+### carr::except
+
+carr::except method membuang key/value pair dari parameter yang dipassing ke suatu array
+
+```php
+$array = ['name' => 'Desk', 'price' => 100];
+
+$filtered = carr::except($array, ['price']);
+
+// ['name' => 'Desk']
+
+
+```
+
+
+### carr::exists
+carr::exists method melakukan pengecheckan apakah key yang dipassing terpada pada array yang diberikan
+```php
+
+$array = ['name' => 'John Doe', 'age' => 17];
+
+$exists = carr::exists($array, 'name');
+
+// true
+
+$exists = carr::exists($array, 'salary');
+
+// false
+
+```
