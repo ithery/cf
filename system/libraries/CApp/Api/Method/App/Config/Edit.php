@@ -11,7 +11,7 @@ class CApp_Api_Method_App_Config_Edit extends CApp_Api_Method_App {
         $data = [];
 
         try {
-            $appConfigFile = DOCROOT . 'application' . DS .$this->appCode() . DS . 'default'. DS .'config' . DS . 'app' . EXT;
+            $appConfigFile = DOCROOT . 'application' . DS . $this->appCode() . DS . 'default' . DS . 'config' . DS . 'app' . EXT;
             $config = CConfig::instance('app');
             $config->addAppCode($this->appCode());
             foreach ($config->getConfigData() as $d) {
@@ -26,9 +26,16 @@ class CApp_Api_Method_App_Config_Edit extends CApp_Api_Method_App {
             if (file_exists($appConfigFile)) {
                 $currentConfig = include $appConfigFile;
             }
+            if ($type == 'boolean') {
+                if ($newValue == 0) {
+                    $newValue = false;
+                } else {
+                    $newValue = true;
+                }
+            }
             c::set($currentConfig, $key, $newValue);
-            $data=$currentConfig;
-            $data['path']=$appConfigFile;
+            $data = $currentConfig;
+            $data['path'] = $appConfigFile;
             CFile::putPhpValue($appConfigFile, $currentConfig);
         } catch (Exception $ex) {
             $errCode++;
