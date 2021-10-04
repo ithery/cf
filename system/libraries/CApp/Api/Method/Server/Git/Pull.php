@@ -4,7 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use Symfony\Component\Process\Process;
 
-class CApp_Api_Method_App_Git_Pull extends CApp_Api_Method_Server {
+class CApp_Api_Method_Server_Git_Pull extends CApp_Api_Method_Server {
     public function execute() {
         $output = '';
         $successOutput = '';
@@ -15,8 +15,8 @@ class CApp_Api_Method_App_Git_Pull extends CApp_Api_Method_Server {
                 $pwd = '';
                 $execute = '';
 
-                $pwd = shell_exec("pwd");
-                $execute = "git pull";
+                $pwd = shell_exec('pwd');
+                $execute = 'git pull';
 
                 $output .= "working on directory $pwd";
                 $process = new Process($execute);

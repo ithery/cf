@@ -12,14 +12,14 @@ class CApp_Api_Method_Server_Git_Checkout extends CApp_Api_Method_Server {
         $branch = c::get($this->request(), 'branch');
         if (!$branch) {
             $this->errCode++;
-            $this->errMessage = "Branch is required";
+            $this->errMessage = 'Branch is required';
         }
         if ($this->errCode == 0) {
             try {
                 $pwd = '';
                 $execute = '';
 
-                $pwd = shell_exec("pwd");
+                $pwd = shell_exec('pwd');
                 $execute = "git checkout {$branch}";
 
                 $output .= "working on directory $pwd";

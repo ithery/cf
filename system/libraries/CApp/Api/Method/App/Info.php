@@ -19,63 +19,60 @@ class CApp_Api_Method_App_Info extends CApp_Api_Method_App {
         $errorOutput = '';
         $data = [];
         $data['CFVersion'] = CF::version();
-        $data['api']=[
-            "appConfigGet"=>[
-                "class"=>'CApp_Api_Method_App_Config_Get',
-                "exist"=>false,
+        $data['ability'] = [
+            'appConfigGet' => [
+                'class' => 'CApp_Api_Method_App_Config_Get',
+                'exist' => false,
             ],
-            "appConfigEdit"=>[
-                "class"=>'CApp_Api_Method_App_Config_Edit',
-                "exist"=>false,
+            'appConfigEdit' => [
+                'class' => 'CApp_Api_Method_App_Config_Edit',
+                'exist' => false,
             ],
-            "appGitStatus"=>[
-                "class"=>'CApp_Api_Method_App_Git_Status',
-                "exist"=>false,
+            'appGitStatus' => [
+                'class' => 'CApp_Api_Method_App_Git_Status',
+                'exist' => false,
             ],
-            "appGitFetch"=>[
-                "class"=>'CApp_Api_Method_App_Git_Fetch',
-                "exist"=>false,
+            'appGitFetch' => [
+                'class' => 'CApp_Api_Method_App_Git_Fetch',
+                'exist' => false,
             ],
-            "appGitPull"=>[
-                "class"=>'CApp_Api_Method_App_Git_Pull',
-                "exist"=>false,
+            'appGitPull' => [
+                'class' => 'CApp_Api_Method_App_Git_Pull',
+                'exist' => false,
             ],
-            "appGitClean"=>[
-                "class"=>'CApp_Api_Method_App_Git_Clean',
-                "exist"=>false,
+            'appGitClean' => [
+                'class' => 'CApp_Api_Method_App_Git_Clean',
+                'exist' => false,
             ],
-            "appGitCheckout"=>[
-                "class"=>'CApp_Api_Method_App_Git_Checkout',
-                "exist"=>false,
+            'appGitCheckout' => [
+                'class' => 'CApp_Api_Method_App_Git_Checkout',
+                'exist' => false,
             ],
-            "serverGitStatus"=>[
-                "class"=>'CApp_Api_Method_Server_Git_Status',
-                "exist"=>false,
+            'serverGitStatus' => [
+                'class' => 'CApp_Api_Method_Server_Git_Status',
+                'exist' => false,
             ],
-            "serverGitFetch"=>[
-                "class"=>'CApp_Api_Method_Server_Git_Fetch',
-                "exist"=>false,
+            'serverGitFetch' => [
+                'class' => 'CApp_Api_Method_Server_Git_Fetch',
+                'exist' => false,
             ],
-            "serverGitPull"=>[
-                "class"=>'CApp_Api_Method_Server_Git_Pull',
-                "exist"=>false,
+            'serverGitPull' => [
+                'class' => 'CApp_Api_Method_Server_Git_Pull',
+                'exist' => false,
             ],
-            "serverGitClean"=>[
-                "class"=>'CApp_Api_Method_Server_Git_Clean',
-                "exist"=>false,
+            'serverGitClean' => [
+                'class' => 'CApp_Api_Method_Server_Git_Clean',
+                'exist' => false,
             ],
-            "serverGitCheckout"=>[
-                "class"=>'CApp_Api_Method_Server_Git_Checkout',
-                "exist"=>false,
+            'serverGitCheckout' => [
+                'class' => 'CApp_Api_Method_Server_Git_Checkout',
+                'exist' => false,
             ],
         ];
-        //git status
-
-        //git fetch
-        //git pull
-        //git clean
-        //git checkout
-
+        foreach ($data['ability'] as $key => $val) {
+            $exist = class_exists($val['class']);
+            $data['ability'][$key]['exist'] = $exist;
+        }
         $this->errCode = $errCode;
         $this->errMessage = $errMessage;
         $this->data = $data;
