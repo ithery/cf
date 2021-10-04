@@ -77,27 +77,17 @@ class CServer {
     }
 
     /**
-     * @param mixed $deviceName
-     *
-     * @return CServer_System_Device
-     */
-    public static function createDevice($deviceName) {
-        $class = 'CServer_Device_' . $deviceName;
-        return new $class();
-    }
-
-    /**
      * @return CServer_Device_Cpu
      */
     public static function createDeviceCpu() {
-        return self::createDevice('Cpu');
+        return new CServer_Device_Cpu();
     }
 
     /**
      * @return CServer_Device_Disk
      */
     public static function createDeviceDisk() {
-        return self::createDevice('Disk');
+        return new CServer_Device_Disk();
     }
 
     public static function isProcOpenDisabled() {
@@ -134,6 +124,11 @@ class CServer {
 
     public static function isNpmInstalled() {
         exec('npm -v', $output, $exitCode);
+        return $exitCode === 0;
+    }
+
+    public static function isComposerInstalled() {
+        exec('composer -v', $output, $exitCode);
         return $exitCode === 0;
     }
 }
