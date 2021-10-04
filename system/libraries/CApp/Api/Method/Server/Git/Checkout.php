@@ -4,25 +4,23 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 use Symfony\Component\Process\Process;
 
-/**
- * @author Muhammad Harisuddin Thohir <me@harisuddin.com>
- * @license Ittron Global Teknologi <ittron.co.id>
- *
- * @since Mar 10, 2020, 11:13:37 AM
- */
-class CApp_Api_Method_Server_Git_Status extends CApp_Api_Method_Server {
+class CApp_Api_Method_Server_Git_Checkout extends CApp_Api_Method_Server {
     public function execute() {
         $output = '';
         $successOutput = '';
         $errorOutput = '';
-
+        $branch = c::get($this->request(), 'branch');
+        if (!$branch) {
+            $this->errCode++;
+            $this->errMessage = 'Branch is required';
+        }
         if ($this->errCode == 0) {
             try {
                 $pwd = '';
                 $execute = '';
 
                 $pwd = shell_exec('pwd');
-                $execute = 'git status';
+                $execute = "git checkout {$branch}";
 
                 $output .= "working on directory $pwd";
                 $process = new Process($execute);
@@ -31,6 +29,8 @@ class CApp_Api_Method_Server_Git_Status extends CApp_Api_Method_Server {
                 $output .= $process->getOutput();
                 $successOutput = $output;
                 $output .= $errorOutput = $process->getErrorOutput();
+
+                CView::blade()->clearCompiled();
             } catch (Exception $ex) {
                 $this->errCode++;
                 $this->errMessage = $ex->getMessage();

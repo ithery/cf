@@ -10,19 +10,23 @@ use Symfony\Component\Process\Process;
  *
  * @since Mar 10, 2020, 11:13:37 AM
  */
-class CApp_Api_Method_Server_Git_Status extends CApp_Api_Method_Server {
+class CApp_Api_Method_App_Git_Checkout extends CApp_Api_Method_App {
     public function execute() {
         $output = '';
         $successOutput = '';
         $errorOutput = '';
-
+        $branch = c::get($this->request(), 'gitBranch');
+        if (!$branch) {
+            $this->errCode++;
+            $this->errMessage = 'Branch is required';
+        }
         if ($this->errCode == 0) {
             try {
                 $pwd = '';
                 $execute = '';
 
-                $pwd = shell_exec('pwd');
-                $execute = 'git status';
+                $pwd = shell_exec("cd application/{$this->appCode} && pwd");
+                $execute = "cd application/{$this->appCode} && git checkout {$branch}";
 
                 $output .= "working on directory $pwd";
                 $process = new Process($execute);
@@ -31,6 +35,8 @@ class CApp_Api_Method_Server_Git_Status extends CApp_Api_Method_Server {
                 $output .= $process->getOutput();
                 $successOutput = $output;
                 $output .= $errorOutput = $process->getErrorOutput();
+
+                CView::blade()->clearCompiled();
             } catch (Exception $ex) {
                 $this->errCode++;
                 $this->errMessage = $ex->getMessage();

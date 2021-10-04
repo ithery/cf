@@ -4,7 +4,11 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class CConfig implements CInterface_Arrayable, ArrayAccess {
     protected static $instances = [];
+
     protected $group;
+
+    protected $appCode;
+
     protected $items;
 
     /**
@@ -29,6 +33,11 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
     protected function __construct($group) {
         $this->group = $group;
         $this->refresh();
+    }
+
+    public function addAppCode($appCode) {
+        $this->appCode = $appCode;
+        return $this;
     }
 
     public function get($key = null, $default = null) {
@@ -75,6 +84,11 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
     public function refresh() {
         $this->items = [];
         $files = CF::findFile('config', $this->group, $required = false, $ext = false, $refresh = true);
+        if ($this->appCode) {
+            if (file_exists(DOCROOT . 'application' . DS . $this->appCode . DS . 'default' . DS . 'config' . DS . $this->group . EXT)) {
+                $files[] = DOCROOT . 'application' . DS . $this->appCode . DS . 'default' . DS . 'config' . DS . $this->group . EXT;
+            }
+        }
 
         //add backward compatibility
         //TODO: remove folder config in DOCROOT
@@ -109,6 +123,11 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
      */
     public function getConfigData() {
         $files = CF::findFile('config', $this->group);
+        if ($this->appCode) {
+            if (file_exists(DOCROOT . 'application' . DS . $this->appCode . DS . 'default' . DS . 'config' . DS . $this->group . EXT)) {
+                $files[] = DOCROOT . 'application' . DS . $this->appCode . DS . 'default' . DS . 'config' . DS . $this->group . EXT;
+            }
+        }
 
         //add backward compatibility
         //TODO: remove folder config in DOCROOT
@@ -118,6 +137,7 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
         if (file_exists(DOCROOT . 'config' . DS . $this->group . EXT)) {
             $files[] = DOCROOT . 'config' . DS . $this->group . EXT;
         }
+
         //reverse ordering to set priority
         if ($files == null) {
             //var_dump(debug_backtrace());
@@ -127,6 +147,7 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
 
         $resultFiles = [];
         $resultData = [];
+        $i = 1;
         foreach ($files as $file) {
             $cfg = include $file;
             if (!is_array($cfg)) {
@@ -145,6 +166,9 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
             }
             $resultFiles = carr::merge($resultFiles, $cfgFiles);
             $resultData = carr::merge($resultData, $cfg);
+            CFile::putPhpValue(DOCROOT . 'resultfiles' . $i . '.txt', $resultFiles);
+            CFile::putPhpValue(DOCROOT . 'resultData' . $i . '.txt', $resultData);
+            $i++;
         }
 
         //we will flatten the array of result Data
