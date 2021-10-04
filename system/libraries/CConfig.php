@@ -4,6 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class CConfig implements CInterface_Arrayable, ArrayAccess {
     protected static $instances = [];
+
     protected $group;
     protected $appCode;
     protected $items;
