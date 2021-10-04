@@ -147,7 +147,6 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
 
         $resultFiles = [];
         $resultData = [];
-        $i = 1;
         foreach ($files as $file) {
             $cfg = include $file;
             if (!is_array($cfg)) {
@@ -166,9 +165,6 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
             }
             $resultFiles = carr::merge($resultFiles, $cfgFiles);
             $resultData = carr::merge($resultData, $cfg);
-            CFile::putPhpValue(DOCROOT . 'resultfiles' . $i . '.txt', $resultFiles);
-            CFile::putPhpValue(DOCROOT . 'resultData' . $i . '.txt', $resultData);
-            $i++;
         }
 
         //we will flatten the array of result Data

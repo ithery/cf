@@ -64,6 +64,11 @@ return [
                 'name' => 'helper.carr',
                 'label' => c::__('carr'),
                 'uri' => 'docs/helper/carr',
+            ],
+            [
+                'name' => 'helper.cstr',
+                'label' => c::__('cstr'),
+                'uri' => 'docs/helper/cstr',
             ]
         ]
     ],
