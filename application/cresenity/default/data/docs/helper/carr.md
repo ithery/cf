@@ -29,3 +29,25 @@ $array = ['products' => ['desk' => ['price' => 100]]];
 
 $price = carr::get($array, 'products.desk.price');
 ```
+
+### carr::add
+`carr::add` method menambahkan key/value pair ke array walaupun key tidak tersedia ataupun berisi null
+
+```php
+$array = carr::add(['name' => 'Desk'], 'price', 100);
+
+// ['name' => 'Desk', 'price' => 100]
+
+$array = carr::add(['name' => 'Desk', 'price' => null], 'price', 100);
+
+// ['name' => 'Desk', 'price' => 100]
+```
+
+### carr::collapse
+`carr::collapse` method membuat multidimesi menjadi array satu dimensi
+
+```php
+$array = carr::collapse([[1, 2, 3], [4, 5, 6], [7, 8, 9]]);
+
+// [1, 2, 3, 4, 5, 6, 7, 8, 9]
+```
