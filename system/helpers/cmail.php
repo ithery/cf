@@ -91,6 +91,8 @@ class cmail {
         $options['bcc'] = $bcc;
         $options['attachments'] = $attachments;
 
+
+
         return CEmail::sender($options)->send($to, $subject, $message, $options);
 
         // $smtp_username = carr::get($options, 'smtp_username');

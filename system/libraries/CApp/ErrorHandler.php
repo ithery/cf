@@ -45,6 +45,7 @@ class CApp_ErrorHandler {
         if ($email == null) {
             $email = ccfg::get('admin_email');
         }
+
         $smtpOptions = [];
         if (ccfg::get('mail_error_smtp')) {
             $smtpUsername = ccfg::get('smtp_username_error');
