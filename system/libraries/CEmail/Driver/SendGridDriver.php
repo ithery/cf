@@ -74,7 +74,6 @@ class CEmail_Driver_SendGridDriver extends CEmail_DriverAbstract {
 
         $sg = new CVendor_SendGrid($apiKey);
 
-        //cdbg::var_dump(json_encode($mail, JSON_PRETTY_PRINT));
 
         $response = $sg->send($mail);
         if ($response->statusCode() > 400) {
