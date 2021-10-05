@@ -126,8 +126,10 @@ $cf_system = DOCROOT . $cf_system;
 define('APPPATH', str_replace('\\', '/', realpath($cf_application)) . '/');
 define('MODPATH', str_replace('\\', '/', realpath($cf_modules)) . '/');
 define('SYSPATH', str_replace('\\', '/', realpath($cf_system)) . '/');
-
 // Clean up
 unset($cf_application, $cf_modules, $cf_system);
+
+define('CFPUBLIC', true);
+
 
 require DOCROOT . 'system/core/Bootstrap.php';

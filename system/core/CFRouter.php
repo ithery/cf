@@ -47,6 +47,19 @@ class CFRouter {
 
         if (self::$controller === null) {
             // No controller was found, so no page can be rendered
+            if (defined('CFPUBLIC')) {
+                if (carr::get(static::$segments, 0) == 'media' || carr::get(static::$segments, 2) == 'media') {
+                    $file = DOCROOT . static::$current_uri;
+                    $content = file_get_contents($file);
+                    $ext = pathinfo($file, PATHINFO_EXTENSION);
+                    if ($ext == 'css') {
+                        header('content-type:text/css');
+                    }
+
+                    echo $content;
+                    die;
+                }
+            }
 
             CF::show404();
         }

@@ -101,14 +101,5 @@ return [
     'admin_email' => 'contact@cresenitytech.com',
     'set_timezone' => true, //deprecated
     'default_timezone' => 'Asia/Jakarta', //deprecated
-    'multilang' => true,
-    'top_menu_cashier' => false,
-    'update_last_request' => true,
-    'ip_address' => '192.168.1.19',
-    'code_test' => false,
-    'require_js' => true,
-    'merge_js' => false,
-    'minify_js' => false,
-    'merge_css' => false,
-    'minify_css' => false,
+
 ];
