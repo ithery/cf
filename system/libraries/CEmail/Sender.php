@@ -31,6 +31,7 @@ class CEmail_Sender {
         $to = carr::wrap($to);
 
         $options = $this->rebuildOptions($options);
+
         return $this->driver->send($to, $subject, $message, $options);
     }
 
