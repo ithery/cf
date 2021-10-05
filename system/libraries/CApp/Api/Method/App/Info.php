@@ -40,6 +40,10 @@ class CApp_Api_Method_App_Info extends CApp_Api_Method_App {
                 'class' => 'CApp_Api_Method_App_Git_Pull',
                 'exist' => false,
             ],
+            'appGitDiscard' => [
+                'class' => 'CApp_Api_Method_App_Git_Discard',
+                'exist' => false,
+            ],
             'appGitClean' => [
                 'class' => 'CApp_Api_Method_App_Git_Clean',
                 'exist' => false,
@@ -58,6 +62,10 @@ class CApp_Api_Method_App_Info extends CApp_Api_Method_App {
             ],
             'serverGitPull' => [
                 'class' => 'CApp_Api_Method_Server_Git_Pull',
+                'exist' => false,
+            ],
+            'serverGitDiscard' => [
+                'class' => 'CApp_Api_Method_Server_Git_Discard',
                 'exist' => false,
             ],
             'serverGitClean' => [
