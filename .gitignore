@@ -121,3 +121,7 @@ jspm_packages/
 # Public folder
 public/*
 !public/index.php.sample
+
+# Deployment file
+deploy.blade.php
+**/deploy.blade.php
