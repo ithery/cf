@@ -440,7 +440,7 @@ s    * @return void
     }
 
     /**
-     * Map the given exception into an Illuminate response.
+     * Map the given exception into an http response.
      *
      * @param \Symfony\Component\HttpFoundation\Response $response
      * @param \Exception                                 $e
