@@ -51,6 +51,7 @@ class CHTTP_FileServeDriver {
         $path = [];
         $path[] = DOCROOT . 'public' . DS . 'media';
         $path[] = DOCROOT . 'public' . DS . 'application' . DS . CF::appCode();
+        $path[] = DOCROOT . 'public' . DS . 'compiled';
         foreach ($path as $p) {
             CFile::deleteDirectory($p);
         }
