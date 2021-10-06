@@ -283,6 +283,10 @@ final class CF {
         $method = carr::get($routerData, 'method');
         $arguments = carr::get($routerData, 'arguments');
 
+
+        if ($controller instanceof \Symfony\Component\HttpFoundation\Response) {
+            return $controller;
+        }
         // Include the Controller file
         if (strlen($controller_path) > 0) {
             require_once $controller_path;

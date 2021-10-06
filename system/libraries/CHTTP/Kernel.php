@@ -118,6 +118,9 @@ class CHTTP_Kernel {
 
     public function invokeController(CHTTP_Request $request) {
         CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
+        if (CFRouter::$controller instanceof \Symfony\Component\HttpFoundation\Response) {
+            return CFRouter::$controller;
+        }
         $reflectionClass = $this->getReflectionControllerClass();
         $reflectionMethod = null;
         $arguments = [];
