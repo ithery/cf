@@ -46,4 +46,13 @@ class CHTTP_FileServeDriver {
             ]);
         }
     }
+
+    public static function clearPublic() {
+        $path = [];
+        $path[] = DOCROOT . 'public' . DS . 'media';
+        $path[] = DOCROOT . 'public' . DS . 'application' . DS . CF::appCode();
+        foreach ($path as $p) {
+            CFile::deleteDirectory($p);
+        }
+    }
 }

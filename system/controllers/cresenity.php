@@ -466,4 +466,9 @@ class Controller_Cresenity extends CController {
     public function health() {
         echo 'OK';
     }
+
+    public function clear() {
+        CView::blade()->clearCompiled();
+        CHTTP_FileServeDriver::clearPublic();
+    }
 }
