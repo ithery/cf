@@ -1,5 +1,7 @@
 <?php
 
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+
 /**
  * @deprecated since 1.2
  */
@@ -233,7 +235,7 @@ class CForm extends CElement_Element {
             $classes = ' ' . $classes;
         }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }

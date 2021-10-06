@@ -283,6 +283,10 @@ final class CF {
         $method = carr::get($routerData, 'method');
         $arguments = carr::get($routerData, 'arguments');
 
+
+        if ($controller instanceof \Symfony\Component\HttpFoundation\Response) {
+            return $controller;
+        }
         // Include the Controller file
         if (strlen($controller_path) > 0) {
             require_once $controller_path;
@@ -856,7 +860,7 @@ final class CF {
      * @return string i18n language string, or the requested key if the i18n item is not found
      */
     public static function lang($key = null, array $args = [], $locale = null) {
-        if ($key == null) {
+        if ($key === null) {
             return CTranslation::translator();
         }
 

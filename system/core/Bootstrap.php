@@ -80,8 +80,8 @@ if (!defined('IN_PRODUCTION')) {
 
 //end of constant from index
 
-define('CF_VERSION', '1.1');
-define('CF_CODENAME', 'CF1.1');
+define('CF_VERSION', '1.2');
+define('CF_CODENAME', 'CF1.2');
 
 // Test of CF is running in Windows
 define('CF_IS_WIN', DIRECTORY_SEPARATOR === '\\');

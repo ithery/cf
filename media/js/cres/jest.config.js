@@ -5,7 +5,7 @@ module.exports = {
     notify: true,
     clearMocks: true,
     moduleDirectories: [
-        "node_modules",
-        "js"
+        'node_modules',
+        'js'
     ]
 };

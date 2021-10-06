@@ -32,40 +32,39 @@ namespace LEClient\Exceptions;
  * @author     Youri van Weegberg <youri@yourivw.nl>
  * @copyright  2020 Youri van Weegberg
  * @license    https://opensource.org/licenses/mit-license.php  MIT License
+ *
  * @link       https://github.com/yourivw/LEClient
  * @since      Class available since Release 1.2.0
  */
-class LEConnectorException extends LEException
-{
-	public const NONEWNONCEEXCEPTION 			= 0x11;
-	public const ACCOUNTDEACTIVATEDEXCEPTION 	= 0x12;
-	public const METHODNOTSUPPORTEDEXCEPTION 	= 0x13;
-	public const CURLERROREXCEPTION 			= 0x14;
-	public const INVALIDRESPONSEEXCEPTION 		= 0x15;
-	
-	public static function NoNewNonceException()
-	{
-		return new static('No new nonce.', self::NONEWNONCEEXCEPTION);
-	}
-	
-	public static function AccountDeactivatedException()
-	{
-		return new static('The account was deactivated. No further requests can be made.', self::ACCOUNTDEACTIVATEDEXCEPTION);
-	}
-	
-	public static function MethodNotSupportedException(string $method)
-	{
-		return new static(sprintf('HTTP request %s not supported.', $method), self::METHODNOTSUPPORTEDEXCEPTION);
-	}
-	
-	public static function CurlErrorException(string $error)
-	{
-		return new static(sprintf('Curl error: %s', $error), self::CURLERROREXCEPTION);
-	}
-	
-	public static function InvalidResponseException(array $response)
-	{
-		$statusCode = array_key_exists('status', $response) ? $response['status'] : 'unknown';
-		return new static(sprintf('Invalid response: %s', $statusCode), self::INVALIDRESPONSEEXCEPTION, null, $response);
-	}
+class LEConnectorException extends LEException {
+    public const NONEWNONCEEXCEPTION = 0x11;
+
+    public const ACCOUNTDEACTIVATEDEXCEPTION = 0x12;
+
+    public const METHODNOTSUPPORTEDEXCEPTION = 0x13;
+
+    public const CURLERROREXCEPTION = 0x14;
+
+    public const INVALIDRESPONSEEXCEPTION = 0x15;
+
+    public static function NoNewNonceException() {
+        return new static('No new nonce.', self::NONEWNONCEEXCEPTION);
+    }
+
+    public static function AccountDeactivatedException() {
+        return new static('The account was deactivated. No further requests can be made.', self::ACCOUNTDEACTIVATEDEXCEPTION);
+    }
+
+    public static function MethodNotSupportedException(string $method) {
+        return new static(sprintf('HTTP request %s not supported.', $method), self::METHODNOTSUPPORTEDEXCEPTION);
+    }
+
+    public static function CurlErrorException(string $error) {
+        return new static(sprintf('Curl error: %s', $error), self::CURLERROREXCEPTION);
+    }
+
+    public static function InvalidResponseException(array $response) {
+        $statusCode = array_key_exists('status', $response) ? $response['status'] : 'unknown';
+        return new static(sprintf('Invalid response: %s', $statusCode), self::INVALIDRESPONSEEXCEPTION, null, $response);
+    }
 }

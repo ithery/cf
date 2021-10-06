@@ -1,17 +1,13 @@
 <?php
 
-
-
-
-
-class CComponent_RenameMe_OptimizeRenderedDom
-{
-    static function init() { return new static; }
+class CComponent_RenameMe_OptimizeRenderedDom {
+    public static function init() {
+        return new static;
+    }
 
     protected $htmlHashesByComponent = [];
 
-    function __construct()
-    {
+    public function __construct() {
         CComponent_Manager::instance()->listen('component.dehydrate.initial', function ($component, $response) {
             $response->memo['htmlHash'] = hash('crc32b', $response->effects['html']);
         });
@@ -21,7 +17,7 @@ class CComponent_RenameMe_OptimizeRenderedDom
         });
 
         CComponent_Manager::instance()->listen('component.dehydrate.subsequent', function ($component, $response) {
-            $oldHash = isset($this->htmlHashesByComponent[$component->id]) ?$this->htmlHashesByComponent[$component->id]: null;
+            $oldHash = isset($this->htmlHashesByComponent[$component->id]) ? $this->htmlHashesByComponent[$component->id] : null;
 
             $response->memo['htmlHash'] = $newHash = hash('crc32b', $response->effects['html']);
 

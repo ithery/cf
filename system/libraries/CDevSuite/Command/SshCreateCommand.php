@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Command_SshCreateCommand extends CDevSuite_CommandAbstract {
-
     public function getSignatureArguments() {
         return '{name}';
     }
@@ -15,7 +14,7 @@ class CDevSuite_Command_SshCreateCommand extends CDevSuite_CommandAbstract {
         $name = $cfCommand->argument('name');
 
         if (CDevSuite::ssh()->exists($name)) {
-            CDevSuite::error('Ssh configuration: ' . $key . ' already exists');
+            CDevSuite::error('Ssh configuration: ' . $name . ' already exists');
             exit(CConsole::FAILURE_EXIT);
         }
         $data = [];
@@ -31,16 +30,16 @@ class CDevSuite_Command_SshCreateCommand extends CDevSuite_CommandAbstract {
             $password = $cfCommand->secret('Password:');
         } else {
             $password = $cfCommand->ask('File Path:', '~/.ssh/id_rsa');
-            if(!file_exists($password)) {
-                CDevSuite::error($password.' not found');
+            if (!file_exists($password)) {
+                CDevSuite::error($password . ' not found');
                 $password = $cfCommand->ask('File Path:', '~/.ssh/id_rsa');
-                if(!file_exists($password)){
-                    CDevSuite::error($password.' not found, please try again');
+                if (!file_exists($password)) {
+                    CDevSuite::error($password . ' not found, please try again');
                     return CConsole::FAILURE_EXIT;
-                } 
+                }
             }
         }
-        
+
         if ($passwordType != 'password') {
             $password = realpath($password);
         }
@@ -56,5 +55,4 @@ class CDevSuite_Command_SshCreateCommand extends CDevSuite_CommandAbstract {
             CDevSuite::success('A [' . $name . '] database configuration has been created');
         }
     }
-
 }

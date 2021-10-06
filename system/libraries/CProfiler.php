@@ -12,6 +12,9 @@ class CProfiler {
     protected static $enabled = false;
 
     use CProfiler_Trait_PopulateBenchmarkTrait,
+        CProfiler_Trait_PopulateCookiesTrait,
+        CProfiler_Trait_PopulateSessionTrait,
+        CProfiler_Trait_PopulatePostTrait,
         CProfiler_Trait_PopulateDatabaseTrait;
 
     public static function enable() {
@@ -47,6 +50,9 @@ class CProfiler {
         $profilerTables = [];
         $profilerTables[] = static::createBenchmarkTable();
         $profilerTables[] = static::createDatabaseTable();
+        $profilerTables[] = static::createCookiesTable();
+        $profilerTables[] = static::createSessionTable();
+        $profilerTables[] = static::createPostTable();
 
         $html = '';
         $html .= '<style type="text/css">' . $styles . '</style>';
@@ -71,87 +77,5 @@ class CProfiler {
         ";
 
         return $html . $js;
-    }
-
-    /**
-     * Session data.
-     *
-     * @return void
-     */
-    public function session() {
-        if (empty($_SESSION)) {
-            return;
-        }
-
-        if (!$table = $this->table('session')) {
-            return;
-        }
-
-        $table->add_column('kp-name');
-        $table->add_column();
-        $table->add_row(['Session', 'Value'], 'kp-title', 'background-color: #CCE8FB');
-
-        text::alternate();
-        foreach ($_SESSION as $name => $value) {
-            if (is_object($value)) {
-                $value = get_class($value) . ' [object]';
-            }
-
-            $data = [$name, $value];
-            $class = text::alternate('', 'kp-altrow');
-            $table->add_row($data, $class);
-        }
-    }
-
-    /**
-     * POST data.
-     *
-     * @return void
-     */
-    public function post() {
-        if (empty($_POST)) {
-            return;
-        }
-
-        if (!$table = $this->table('post')) {
-            return;
-        }
-
-        $table->add_column('kp-name');
-        $table->add_column();
-        $table->add_row(['POST', 'Value'], 'kp-title', 'background-color: #E0E0FF');
-
-        text::alternate();
-        foreach ($_POST as $name => $value) {
-            $data = [$name, $value];
-            $class = text::alternate('', 'kp-altrow');
-            $table->add_row($data, $class);
-        }
-    }
-
-    /**
-     * Cookie data.
-     *
-     * @return void
-     */
-    public function cookies() {
-        if (empty($_COOKIE)) {
-            return;
-        }
-
-        if (!$table = $this->table('cookies')) {
-            return;
-        }
-
-        $table->add_column('kp-name');
-        $table->add_column();
-        $table->add_row(['Cookies', 'Value'], 'kp-title', 'background-color: #FFF4D7');
-
-        text::alternate();
-        foreach ($_COOKIE as $name => $value) {
-            $data = [$name, $value];
-            $class = text::alternate('', 'kp-altrow');
-            $table->add_row($data, $class);
-        }
     }
 }

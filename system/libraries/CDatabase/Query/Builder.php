@@ -1616,7 +1616,7 @@ class CDatabase_Query_Builder {
      *
      * @param array $values
      *
-     * @return bool
+     * @return CDatabase_Result
      */
     public function insert(array $values) {
         // Since every insert gets treated like a batch insert, we will make sure the
@@ -1653,7 +1653,7 @@ class CDatabase_Query_Builder {
      *
      * @param array $values
      *
-     * @return int
+     * @return CDatabase_Result
      */
     public function insertOrIgnore(array $values) {
         if (empty($values)) {

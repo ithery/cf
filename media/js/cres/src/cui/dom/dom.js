@@ -1,6 +1,6 @@
-import { cfDirectives } from '@/util'
-import get from 'get-value'
-import store from '@/cui/Store'
+import { cresDirectives } from '@/util';
+import get from 'get-value';
+import store from '@/cui/Store';
 
 /**
  * This is intended to isolate all native DOM operations. The operations that happen
@@ -9,12 +9,12 @@ import store from '@/cui/Store'
  */
 export default {
     rootComponentElements() {
-        return Array.from(document.querySelectorAll(`[cf\\:id]`))
+        return Array.from(document.querySelectorAll('[cres\\:id]'));
     },
 
     rootComponentElementsWithNoParents(node = null) {
         if (node === null) {
-            node = document
+            node = document;
         }
 
         // In CSS, it's simple to select all elements that DO have a certain ancestor.
@@ -23,160 +23,159 @@ export default {
         // have a root ancestor, then select all roots that DONT, then diff the two.
 
         // Convert NodeLists to Arrays so we can use ".includes()". Ew.
-        const allEls = Array.from(node.querySelectorAll(`[cf\\:initial-data]`))
-        const onlyChildEls = Array.from(node.querySelectorAll(`[cf\\:initial-data] [cf\\:initial-data]`))
+        const allEls = Array.from(node.querySelectorAll('[cres\\:initial-data]'));
+        const onlyChildEls = Array.from(node.querySelectorAll('[cres\\:initial-data] [cres\\:initial-data]'));
 
-        return allEls.filter(el => !onlyChildEls.includes(el))
+        return allEls.filter(el => !onlyChildEls.includes(el));
     },
 
     allModelElementsInside(root) {
-        return Array.from(root.querySelectorAll(`[cf\\:model]`))
+        return Array.from(root.querySelectorAll('[cres\\:model]'));
     },
 
     getByAttributeAndValue(attribute, value) {
-        return document.querySelector(`[cf\\:${attribute}="${value}"]`)
+        return document.querySelector(`[cres\\:${attribute}="${value}"]`);
     },
 
     nextFrame(fn) {
         requestAnimationFrame(() => {
-            requestAnimationFrame(fn.bind(this))
-        })
+            requestAnimationFrame(fn.bind(this));
+        });
     },
 
     closestRoot(el) {
-        return this.closestByAttribute(el, 'id')
+        return this.closestByAttribute(el, 'id');
     },
 
     closestByAttribute(el, attribute) {
-        const closestEl = el.closest(`[cf\\:${attribute}]`)
+        const closestEl = el.closest(`[cres\\:${attribute}]`);
 
         if (!closestEl) {
+            // eslint-disable-next-line no-throw-literal
             throw `
 Cresenity Error:\n
-Cannot find parent element in DOM tree containing attribute: [cf:${attribute}].\n
+Cannot find parent element in DOM tree containing attribute: [cres:${attribute}].\n
 Usually this is caused by Cresenity's DOM-differ not being able to properly track changes.\n
 Reference the following guide for common causes: https://laravel-cresenity.com/docs/troubleshooting \n
 Referenced element:\n
 ${el.outerHTML}
-`
+`;
         }
 
-        return closestEl
+        return closestEl;
     },
 
     isComponentRootEl(el) {
-        return this.hasAttribute(el, 'id')
+        return this.hasAttribute(el, 'id');
     },
 
     hasAttribute(el, attribute) {
-        return el.hasAttribute(`cf:${attribute}`)
+        return el.hasAttribute(`cres:${attribute}`);
     },
 
     getAttribute(el, attribute) {
-        return el.getAttribute(`cf:${attribute}`)
+        return el.getAttribute(`cres:${attribute}`);
     },
 
     removeAttribute(el, attribute) {
-        return el.removeAttribute(`cf:${attribute}`)
+        return el.removeAttribute(`cres:${attribute}`);
     },
 
     setAttribute(el, attribute, value) {
-        return el.setAttribute(`cf:${attribute}`, value)
+        return el.setAttribute(`cres:${attribute}`, value);
     },
 
     hasFocus(el) {
-        return el === document.activeElement
+        return el === document.activeElement;
     },
 
     isInput(el) {
         return ['INPUT', 'TEXTAREA', 'SELECT'].includes(
             el.tagName.toUpperCase()
-        )
+        );
     },
 
     isTextInput(el) {
         return (
             ['INPUT', 'TEXTAREA'].includes(el.tagName.toUpperCase()) &&
             !['checkbox', 'radio'].includes(el.type)
-        )
+        );
     },
 
     valueFromInput(el, component) {
         if (el.type === 'checkbox') {
-            let modelName = cfDirectives(el).get('model').value
-                // If there is an update from cf:model.defer in the chamber,
-                // we need to pretend that is the actual data from the server.
+            let modelName = cresDirectives(el).get('model').value;
+            // If there is an update from cres:model.defer in the chamber,
+            // we need to pretend that is the actual data from the server.
             let modelValue = component.deferredActions[modelName] ?
                 component.deferredActions[modelName].payload.value :
-                get(component.data, modelName)
+                get(component.data, modelName);
 
             if (Array.isArray(modelValue)) {
-                return this.mergeCheckboxValueIntoArray(el, modelValue)
+                return this.mergeCheckboxValueIntoArray(el, modelValue);
             }
 
             if (el.checked) {
-                return el.getAttribute('value') || true
-            } else {
-                return false
+                return el.getAttribute('value') || true;
             }
+            return false;
         } else if (el.tagName === 'SELECT' && el.multiple) {
-            return this.getSelectValues(el)
+            return this.getSelectValues(el);
         }
 
-        return el.value
+        return el.value;
     },
 
     mergeCheckboxValueIntoArray(el, arrayValue) {
         if (el.checked) {
             return arrayValue.includes(el.value) ?
                 arrayValue :
-                arrayValue.concat(el.value)
+                arrayValue.concat(el.value);
         }
 
-        return arrayValue.filter(item => item !== el.value)
+        return arrayValue.filter(item => item !== el.value);
     },
 
     setInputValueFromModel(el, component) {
-        const modelString = cfDirectives(el).get('model').value
-        const modelValue = get(component.data, modelString)
+        const modelString = cresDirectives(el).get('model').value;
+        const modelValue = get(component.data, modelString);
 
         // Don't manually set file input's values.
         if (
             el.tagName.toLowerCase() === 'input' &&
             el.type === 'file'
-        )
-            return
+        ) {return;}
 
-        this.setInputValue(el, modelValue)
+        this.setInputValue(el, modelValue);
     },
 
     setInputValue(el, value) {
-        store.callHook('interceptWireModelSetValue', value, el)
+        store.callHook('interceptWireModelSetValue', value, el);
 
         if (el.type === 'radio') {
-            el.checked = el.value == value
+            el.checked = el.value == value;
         } else if (el.type === 'checkbox') {
             if (Array.isArray(value)) {
                 // I'm purposely not using Array.includes here because it's
                 // strict, and because of Numeric/String mis-casting, I
                 // want the "includes" to be "fuzzy".
-                let valueFound = false
+                let valueFound = false;
                 value.forEach(val => {
                     if (val == el.value) {
-                        valueFound = true
+                        valueFound = true;
                     }
-                })
+                });
 
-                el.checked = valueFound
+                el.checked = valueFound;
             } else {
-                el.checked = !!value
+                el.checked = !!value;
             }
         } else if (el.tagName === 'SELECT') {
-            this.updateSelect(el, value)
+            this.updateSelect(el, value);
         } else {
-            value = value === undefined ? '' : value
+            value = value === undefined ? '' : value;
 
-            el.value = value
+            el.value = value;
         }
     },
 
@@ -184,17 +183,18 @@ ${el.outerHTML}
         return Array.from(el.options)
             .filter(option => option.selected)
             .map(option => {
-                return option.value || option.text
-            })
+                return option.value || option.text;
+            });
     },
 
     updateSelect(el, value) {
         const arrayWrappedValue = [].concat(value).map(value => {
-            return value + ''
-        })
+            return value + '';
+        });
 
         Array.from(el.options).forEach(option => {
-            option.selected = arrayWrappedValue.includes(option.value)
-        })
+            option.selected = arrayWrappedValue.includes(option.value);
+        });
     }
 }
+;

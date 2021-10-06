@@ -57,14 +57,11 @@ class Controller_Home extends CController {
         $app->setLoginRequired(false);
         $app->setViewName('test');
         $app->setTheme('cfdocs');
-        /*
-          CManager::registerModule('jquery-3.2.1');
-         *
-         */
+
         CManager::registerModule('bootstrap-4');
 
-        //$div = $app->addDiv()->setAttr('style','width:100px');
-        //$div->addComponent('member-table');
+        $div = $app->addDiv()->setAttr('style', 'width:100px');
+        $div->addComponent('member-table');
         //$template = $app->addTemplate()->setTemplate('testing');
 
         return $app;

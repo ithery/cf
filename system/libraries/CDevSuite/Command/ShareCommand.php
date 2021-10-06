@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CDevSuite_Command_ShareCommand extends CDevSuite_CommandAbstract {
-
     public function getSignatureArguments() {
         return '{name}';
     }
@@ -33,7 +32,6 @@ class CDevSuite_Command_ShareCommand extends CDevSuite_CommandAbstract {
 
                 break;
             case CServer::OS_WINNT:
-
                 $ngrok = realpath(CDevSuite::binPath() . 'ngrok.exe');
 
                 $ngrokCommand = "\"$ngrok\" http $host.$tld:$port -host-header=rewrite";
@@ -41,5 +39,4 @@ class CDevSuite_Command_ShareCommand extends CDevSuite_CommandAbstract {
                 break;
         }
     }
-
 }

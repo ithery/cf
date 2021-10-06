@@ -12,11 +12,11 @@
  * The exceptions are converted to HTTP responses for proper middleware handling.
  */
 class CHTTP_Pipeline extends CBase_Pipeline {
-
     /**
      * Handles the value returned from each pipe before passing it to the next.
      *
-     * @param  mixed  $carry
+     * @param mixed $carry
+     *
      * @return mixed
      */
     protected function handleCarry($carry) {
@@ -26,8 +26,9 @@ class CHTTP_Pipeline extends CBase_Pipeline {
     /**
      * Handle the given exception.
      *
-     * @param  mixed  $passable
-     * @param  \Throwable  $e
+     * @param mixed      $passable
+     * @param \Throwable $e
+     *
      * @return mixed
      *
      * @throws \Throwable
@@ -44,10 +45,10 @@ class CHTTP_Pipeline extends CBase_Pipeline {
         $response = $handler->render($passable, $e);
 
         if (is_object($response) && method_exists($response, 'withException')) {
+            /** @var CHTTP_Response $response */
             $response->withException($e);
         }
 
         return $response;
     }
-
 }

@@ -1,41 +1,44 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CVendor_SendGrid_Mail_EmailAddress implements \JsonSerializable {
-
-    /** @var $name string The name of the person associated with the email */
+    /**
+     * @var string The name of the person associated with the email
+     */
     private $name;
 
-    /** @var $email string The email address */
+    /**
+     * @var string The email address
+     */
     private $email;
 
-    /** @var $substitutions Substitution[] An array of key/value substitutions
+    /** @var Substitution[] An array of key/value substitutions
      * to be be applied to the text and html content of the email body
      */
     private $substitutions;
 
-    /** @var $subject Subject The personalized subject of the email */
+    /**
+     * @var Subject The personalized subject of the email
+     */
     private $subject;
 
     /**
      * Optional constructor
      *
-     * @param string|null $emailAddress The email address
-     * @param string|null $name The name of the person associated with
+     * @param string|null $emailAddress  The email address
+     * @param string|null $name          The name of the person associated with
      *                                   the email
-     * @param array|null $substitutions An array of key/value substitutions to
+     * @param array|null  $substitutions An array of key/value substitutions to
      *                                   be be applied to the text and html content
      *                                   of the email body
-     * @param string|null $subject The personalized subject of the email
-     * @throws CVendor_SendGrid_Mail_TypeException
+     * @param string|null $subject       The personalized subject of the email
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function __construct(
-    $emailAddress = null, $name = null, $substitutions = null, $subject = null
+        $emailAddress = null,
+        $name = null,
+        $substitutions = null,
+        $subject = null
     ) {
         if (isset($emailAddress)) {
             $this->setEmailAddress($emailAddress);
@@ -55,14 +58,15 @@ class CVendor_SendGrid_Mail_EmailAddress implements \JsonSerializable {
      * Add the email address to a EmailAddress object
      *
      * @param string $emailAddress The email address
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setEmailAddress($emailAddress) {
-        if (!(is_string($emailAddress) &&
-                filter_var($emailAddress, FILTER_VALIDATE_EMAIL))
+        if (!(is_string($emailAddress)
+            && filter_var($emailAddress, FILTER_VALIDATE_EMAIL))
         ) {
-            throw new CVendor_SendGrid_Mail_TypeException(
-            "{$emailAddress} must be valid and of type string."
+            throw new CVendor_SendGrid_Exception_TypeException(
+                "{$emailAddress} must be valid and of type string."
             );
         }
         $this->email = $emailAddress;
@@ -90,11 +94,12 @@ class CVendor_SendGrid_Mail_EmailAddress implements \JsonSerializable {
      * Add a name to a EmailAddress object
      *
      * @param string $name The name of the person associated with the email
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setName($name) {
         if (!is_string($name)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$name must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$name must be of type string.');
         }
         /*
           Issue #368
@@ -135,11 +140,12 @@ class CVendor_SendGrid_Mail_EmailAddress implements \JsonSerializable {
      * @param array $substitutions An array of key/value substitutions to
      *                             be be applied to the text and html content
      *                             of the email body
+     *
      * @throws TypeException
      */
     public function setSubstitutions($substitutions) {
         if (!is_array($substitutions)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$substitutions must be an array.');
+            throw new CVendor_SendGrid_Exception_TypeException('$substitutions must be an array.');
         }
         $this->substitutions = $substitutions;
     }
@@ -155,11 +161,12 @@ class CVendor_SendGrid_Mail_EmailAddress implements \JsonSerializable {
      * Add a subject to a EmailAddress object
      *
      * @param string $subject The personalized subject of the email
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setSubject($subject) {
         if (!is_string($subject)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$subject must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$subject must be of type string.');
         }
         // Now that we know it is a string, we can safely create a new subject
         $this->subject = new CVendor_SendGrid_Mail_Subject($subject);
@@ -181,13 +188,13 @@ class CVendor_SendGrid_Mail_EmailAddress implements \JsonSerializable {
      */
     public function jsonSerialize() {
         return array_filter(
-                        [
-                    'name' => $this->getName(),
-                    'email' => $this->getEmail()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'name' => $this->getName(),
+                'email' => $this->getEmail()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

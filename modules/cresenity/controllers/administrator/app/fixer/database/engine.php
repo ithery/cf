@@ -1,17 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 23, 2019, 2:32:55 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 23, 2019, 2:32:55 AM
  */
 
 use CApp_Administrator_Fixer_Database as DatabaseFixer;
 
 class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administrator_Controller_User {
-
     public function index() {
         $app = CApp::instance();
         $app->title('Fix Database Table Engine');
@@ -36,9 +36,9 @@ class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administra
 
             if (strlen($sql) > 0) {
                 $template = $app->addTemplate()
-                        ->setTemplate('CApp/Administrator/Fixer/Database/TableEngine/Result')
-                        ->setVar('table', $table)
-                        ->setVar('sql', $sql);
+                    ->setTemplate('CApp/Administrator/Fixer/Database/TableEngine/Result')
+                    ->setVar('table', $table)
+                    ->setVar('sql', $sql);
 
                 $resultBody = $template->section('resultBody');
                 $prismCode = $resultBody->addPrismCode();
@@ -84,9 +84,9 @@ class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administra
             $columnSchema = $tableSchema->getColumn($column);
 
             if (in_array($columnSchema->getType()->getName(), [CDatabase_Type::STRING, CDatabase_Type::TEXT])) {
-                $targetOptions = array(
+                $targetOptions = [
                     'unsigned' => true,
-                );
+                ];
                 $targetColumnSchema = clone $columnSchema;
                 $targetColumnSchema->setPlatformOption('collation', 'utf8mb4_unicode_ci');
                 // See if column has changed properties in table 2.
@@ -108,5 +108,4 @@ class Controller_Administrator_App_Fixer_Database_Engine extends CApp_Administra
         }
         return $sql;
     }
-
 }

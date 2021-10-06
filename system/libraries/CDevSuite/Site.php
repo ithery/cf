@@ -104,23 +104,6 @@ abstract class CDevSuite_Site {
     }
 
     /**
-     * Get link name based on the current directory.
-     *
-     * @return null|string
-     */
-    private function getLinkNameByCurrentDir() {
-        $count = count($links = $this->links()->where('path', getcwd()));
-
-        if ($count == 1) {
-            return $links->shift()['site'];
-        }
-
-        if ($count > 1) {
-            throw new DomainException("There are {$count} links related to the current directory, please specify the name: devsuite:unlink <name>.");
-        }
-    }
-
-    /**
      * Get the name of the site.
      *
      * @param string|null $name
@@ -137,6 +120,23 @@ abstract class CDevSuite_Site {
         }
 
         return basename(getcwd());
+    }
+
+    /**
+     * Get link name based on the current directory.
+     *
+     * @return null|string
+     */
+    private function getLinkNameByCurrentDir() {
+        $count = count($links = $this->links()->where('path', getcwd()));
+
+        if ($count == 1) {
+            return $links->shift()['site'];
+        }
+
+        if ($count > 1) {
+            throw new DomainException("There are {$count} links related to the current directory, please specify the name: devsuite:unlink <name>.");
+        }
     }
 
     /**
@@ -232,31 +232,31 @@ abstract class CDevSuite_Site {
         }
 
         $proxies = c::collect($this->files->scandir($dir))
-                        ->filter(function ($site, $key) use ($tld) {
-                            // keep sites that match our TLD
-                            return cstr::endsWith($site, '.' . $tld);
-                        })->map(function ($site, $key) use ($tld) {
-                            // remove the TLD suffix for consistency
-                            return str_replace('.' . $tld, '', $site);
-                        })->reject(function ($site, $key) use ($links) {
-                            return $links->has($site);
-                        })->mapWithKeys(function ($site) {
-                            $host = $this->getProxyHostForSite($site) ?: '(other)';
-                            return [$site => $host];
-                        })->reject(function ($host, $site) {
-                            // If proxy host is null, it may be just a normal SSL stub, or something else; either way we exclude it from the list
-                            return $host === '(other)';
-                        })->map(function ($host, $site) use ($certs, $tld) {
-                            $secured = $certs->has($site);
-                            $url = ($secured ? 'https' : 'http') . '://' . $site . '.' . $tld;
+            ->filter(function ($site, $key) use ($tld) {
+                // keep sites that match our TLD
+                return cstr::endsWith($site, '.' . $tld);
+            })->map(function ($site, $key) use ($tld) {
+                // remove the TLD suffix for consistency
+                return str_replace('.' . $tld, '', $site);
+            })->reject(function ($site, $key) use ($links) {
+                return $links->has($site);
+            })->mapWithKeys(function ($site) {
+                $host = $this->getProxyHostForSite($site) ?: '(other)';
+                return [$site => $host];
+            })->reject(function ($host, $site) {
+                // If proxy host is null, it may be just a normal SSL stub, or something else; either way we exclude it from the list
+                return $host === '(other)';
+            })->map(function ($host, $site) use ($certs, $tld) {
+                $secured = $certs->has($site);
+                $url = ($secured ? 'https' : 'http') . '://' . $site . '.' . $tld;
 
-                            return [
-                                'site' => $site,
-                                'secured' => $secured ? ' X' : '',
-                                'url' => $url,
-                                'path' => $host,
-                            ];
-                        });
+                return [
+                    'site' => $site,
+                    'secured' => $secured ? ' X' : '',
+                    'url' => $url,
+                    'path' => $host,
+                ];
+            });
 
         return $proxies;
     }
@@ -378,5 +378,144 @@ abstract class CDevSuite_Site {
         }
 
         return 80;
+    }
+
+    /**
+     * Get all certificates from config folder.
+     *
+     * @param string $path
+     *
+     * @return \CCollection
+     */
+    public function getCertificates($path = null) {
+        $path = $path ?: $this->certificatesPath();
+
+        $this->files->ensureDirExists($path, CDevSuite::user());
+
+        $config = $this->config->read();
+
+        return c::collect($this->files->scandir($path))->filter(function ($value, $key) {
+            return cstr::endsWith($value, '.crt');
+        })->map(function ($cert) use ($config) {
+            $certWithoutSuffix = substr($cert, 0, -4);
+            $trimToString = '.';
+
+            // If we have the cert ending in our tld strip that tld specifically
+            // if not then just strip the last segment for  backwards compatibility.
+            if (cstr::endsWith($certWithoutSuffix, $config['tld'])) {
+                $trimToString .= $config['tld'];
+            }
+
+            return substr($certWithoutSuffix, 0, strrpos($certWithoutSuffix, $trimToString));
+        })->flip();
+    }
+
+    /**
+     * Secure the given host with TLS.
+     *
+     * @param string $url
+     * @param string $siteConf pregenerated Nginx config file contents
+     *
+     * @return void
+     */
+    public function secure($url, $siteConf = null) {
+        CDevSuite::error('Not implemented yet');
+    }
+
+    /**
+     * Trust the given root certificate file in the Mac Keychain.
+     *
+     * @param string $caPemPath
+     *
+     * @return void
+     */
+    public function trustCa($caPemPath) {
+        $this->cli->run(sprintf(
+            'sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain "%s"',
+            $caPemPath
+        ));
+    }
+
+    /**
+     * Trust the given certificate file in the Mac Keychain.
+     *
+     * @param string $crtPath
+     *
+     * @return void
+     */
+    public function trustCertificate($crtPath) {
+        $this->cli->run(sprintf(
+            'sudo security add-trusted-cert -d -r trustAsRoot -k /Library/Keychains/System.keychain "%s"',
+            $crtPath
+        ));
+    }
+
+    /**
+     * Build the SSL config for the given URL.
+     *
+     * @param string $url
+     * @param mixed  $path
+     *
+     * @return string
+     */
+    public function buildCertificateConf($path, $url) {
+        $config = str_replace('VALET_DOMAIN', $url, $this->files->get(__DIR__ . '/../stubs/openssl.conf'));
+        $this->files->putAsUser($path, $config);
+    }
+
+    /**
+     * Unsecure the given URL so that it will use HTTP again.
+     *
+     * @param string $url
+     *
+     * @return void
+     */
+    public function unsecure($url) {
+        if ($this->files->exists($this->certificatesPath($url, 'crt'))) {
+            $this->files->unlink($this->nginxPath($url));
+
+            $this->files->unlink($this->certificatesPath($url, 'conf'));
+            $this->files->unlink($this->certificatesPath($url, 'key'));
+            $this->files->unlink($this->certificatesPath($url, 'csr'));
+            $this->files->unlink($this->certificatesPath($url, 'crt'));
+        }
+
+        $this->cli->run(sprintf('sudo security delete-certificate -c "%s" /Library/Keychains/System.keychain', $url));
+        $this->cli->run(sprintf('sudo security delete-certificate -c "*.%s" /Library/Keychains/System.keychain', $url));
+        $this->cli->run(sprintf(
+            'sudo security find-certificate -e "%s%s" -a -Z | grep SHA-1 | sudo awk \'{system("security delete-certificate -Z \'$NF\' /Library/Keychains/System.keychain")}\'',
+            $url,
+            '@laravel.valet'
+        ));
+    }
+
+    public function unsecureAll() {
+        $tld = $this->config->read()['tld'];
+
+        $secured = $this->parked()
+            ->merge($this->links())
+            ->sort()
+            ->where('secured', ' X');
+
+        if ($secured->count() === 0) {
+            return CDevSuite::info('No sites to unsecure. You may list all servable sites or links by running <comment>valet parked</comment> or <comment>valet links</comment>.');
+        }
+
+        CDevSuite::info('Attempting to unsecure the following sites:');
+        CDevSuite::table(['Site', 'SSL', 'URL', 'Path'], $secured->toArray());
+
+        foreach ($secured->pluck('site') as $url) {
+            $this->unsecure($url . '.' . $tld);
+        }
+
+        $remaining = $this->parked()
+            ->merge($this->links())
+            ->sort()
+            ->where('secured', ' X');
+        if ($remaining->count() > 0) {
+            CDevSuite::warning('We were not succesful in unsecuring the following sites:');
+            CDevSuite::table(['Site', 'SSL', 'URL', 'Path'], $remaining->toArray());
+        }
+        CDevSuite::info('unsecure --all was successful.');
     }
 }

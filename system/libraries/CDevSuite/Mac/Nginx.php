@@ -7,7 +7,14 @@
  * @since Nov 15, 2020
  */
 class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
+    /**
+     * @var CDevSuite_Brew
+     */
     public $brew;
+
+    /**
+     * @var CDevsuite_Mac_Site
+     */
     public $site;
 
     const NGINX_CONF = '/usr/local/etc/nginx/nginx.conf';
@@ -115,8 +122,15 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      */
     public function rewriteSecureNginxFiles() {
         $tld = $this->configuration->read()['tld'];
+        $loopback = $this->configuration->read()['loopback'];
 
-        $this->site->resecureForNewTld($tld, $tld);
+        if ($loopback !== CDevSuite::loopback()) {
+            $this->site->aliasLoopback(CDevSuite::loopback(), $loopback);
+        }
+
+        $config = compact('tld', 'loopback');
+
+        $this->site->resecureForNewConfiguration($config, $config);
     }
 
     /**

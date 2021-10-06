@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * This class is used to construct a Substitution object for the /mail/send API call
  *
@@ -18,17 +12,20 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_Substitution implements \JsonSerializable {
-
-    /** @var $key string Substitution key */
+    /**
+     * @var string Substitution key
+     */
     private $key;
 
-    /** @var $value string Substitution value */
+    /**
+     * @var string Substitution value
+     */
     private $value;
 
     /**
      * Optional constructor
      *
-     * @param string|null $key Substitution key
+     * @param string|null $key   Substitution key
      * @param string|null $value Substitution value
      */
     public function __construct($key = null, $value = null) {
@@ -44,13 +41,14 @@ class CVendor_SendGrid_Mail_Substitution implements \JsonSerializable {
      * Add the key on a Substitution object
      *
      * @param string $key Substitution key
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
+     *
      * @return null
      */
     public function setKey($key) {
         if (!is_string($key)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$key must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$key must be of type string.');
         }
         $this->key = (string) $key;
     }
@@ -68,13 +66,14 @@ class CVendor_SendGrid_Mail_Substitution implements \JsonSerializable {
      * Add the value on a Substitution object
      *
      * @param string|array|bool|int $value Substitution value
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
+     *
      * @return null
      */
     public function setValue($value) {
         if (!is_string($value) && !is_array($value) && !is_object($value) && !is_bool($value) && !is_int($value)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$value must be of type string, array or object.');
+            throw new CVendor_SendGrid_Exception_TypeException('$value must be of type string, array or object.');
         }
         $this->value = $value;
     }
@@ -95,13 +94,13 @@ class CVendor_SendGrid_Mail_Substitution implements \JsonSerializable {
      */
     public function jsonSerialize() {
         return array_filter(
-                        [
-                    'key' => $this->getKey(),
-                    'value' => $this->getValue()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'key' => $this->getKey(),
+                'value' => $this->getValue()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

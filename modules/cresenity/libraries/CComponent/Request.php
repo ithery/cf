@@ -1,16 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 class CComponent_Request {
-
     public $fingerprint;
+
     public $updates;
+
     public $memo;
 
     public function __construct($payload) {
@@ -26,5 +28,4 @@ class CComponent_Request {
     public function name() {
         return $this->fingerprint['name'];
     }
-
 }

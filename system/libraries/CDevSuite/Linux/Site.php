@@ -8,7 +8,8 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
      *
      * @return \CCollection
      */
-    public function getCertificates($path) {
+    public function getCertificates($path = null) {
+        $path = $path ?: $this->certificatesPath();
         return c::collect($this->files->scanDir($path))->filter(function ($value, $key) {
             return cstr::endsWith($value, '.crt');
         })->map(function ($cert) {
@@ -65,11 +66,12 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
     /**
      * Secure the given host with TLS.
      *
-     * @param string $url
+     * @param string     $url
+     * @param null|mixed $siteConf
      *
      * @return void
      */
-    public function secure($url) {
+    public function secure($url, $siteConf = null) {
         $this->unsecure($url);
 
         $this->files->ensureDirExists($this->caPath(), CDevSuite::user());
@@ -196,36 +198,6 @@ class CDevSuite_Linux_Site extends CDevSuite_Site {
     public function buildCertificateConf($path, $url) {
         $config = str_replace('DEVSUITE_DOMAIN', $url, $this->files->get(CDevSuite::stubsPath() . 'openssl.conf'));
         $this->files->putAsUser($path, $config);
-    }
-
-    /**
-     * Trust the given certificate file in the Mac Keychain.
-     *
-     * @param string $crtPath
-     * @param mixed  $url
-     *
-     * @return void
-     */
-    public function trustCertificate($crtPath, $url) {
-        $commandTrust1 = sprintf(
-            'certutil -d sql:$HOME/.pki/nssdb -A -t TC -n "%s" -i "%s"',
-            $url,
-            $crtPath
-        );
-
-        $commandTrust2 = sprintf(
-            'certutil -d $HOME/.mozilla/firefox/*.default -A -t TC -n "%s" -i "%s"',
-            $url,
-            $crtPath
-        );
-
-        CDevSuite::info('Executing Command:' . $commandTrust1);
-
-        $this->cli->run($commandTrust1);
-
-        CDevSuite::info('Executing Command:' . $commandTrust2);
-
-        $this->cli->run($commandTrust2);
     }
 
     /**

@@ -12,8 +12,9 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_GroupId implements \JsonSerializable {
-
-    /** @var $group_id int The unsubscribe group to associate with this email */
+    /**
+     * @var int The unsubscribe group to associate with this email
+     */
     private $group_id;
 
     /**
@@ -31,12 +32,12 @@ class CVendor_SendGrid_Mail_GroupId implements \JsonSerializable {
      * Add the group id to a GroupId object
      *
      * @param int $group_id The unsubscribe group to associate with this email
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setGroupId($group_id) {
         if (!is_int($group_id)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$group_id must be of type int.');
+            throw new CVendor_SendGrid_Exception_TypeException('$group_id must be of type int.');
         }
         $this->group_id = $group_id;
     }
@@ -58,5 +59,4 @@ class CVendor_SendGrid_Mail_GroupId implements \JsonSerializable {
     public function jsonSerialize() {
         return $this->getGroupId();
     }
-
 }
