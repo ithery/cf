@@ -69,7 +69,13 @@ return [
                 'name' => 'helper.cstr',
                 'label' => c::__('cstr'),
                 'uri' => 'docs/helper/cstr',
+            ],
+            [
+                'name' => 'helper.curl',
+                'label' => c::__('curl'),
+                'uri' => 'docs/helper/curl',
             ]
+
         ]
     ],
     [
