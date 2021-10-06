@@ -117,3 +117,7 @@ composer.lock
 # Node Dependency directories
 node_modules/
 jspm_packages/
+
+# Public folder
+public/*
+!public/index.php.sample
