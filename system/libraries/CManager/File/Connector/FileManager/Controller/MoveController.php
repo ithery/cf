@@ -38,6 +38,6 @@ class CManager_File_Connector_FileManager_Controller_MoveController extends CMan
         $app->addTemplate()->setTemplate('CElement/Component/FileManager/Move')->setVar('fm', $fm)
             ->setVar('rootFolders', $rootFolders)
             ->setVar('items', $items);
-        echo $app->render();
+        return $app;
     }
 }

@@ -24,6 +24,6 @@ class CManager_File_Connector_FileManager_Controller_ResizeImageController exten
         $imageManager = new ImageManager();
         $imageManager->make($image_path)->resize($dataWidth, $dataHeight)->save();
         $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasResized($image_path));
-        echo parent::$successResponse;
+        return c::response(parent::$successResponse);
     }
 }

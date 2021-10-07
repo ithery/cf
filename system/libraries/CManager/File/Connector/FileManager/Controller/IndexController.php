@@ -18,6 +18,6 @@ class CManager_File_Connector_FileManager_Controller_IndexController extends CMa
         CManager::registerJs('element/filemanager/fm.js?v=1');
         $app->setViewName('cresenity/filemanager/index');
         $app->addTemplate()->setTemplate('CElement/Component/FileManager/Index')->setVar('fm', $fm);
-        echo $app->render();
+        return $app;
     }
 }

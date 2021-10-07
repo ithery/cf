@@ -19,17 +19,24 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
 
     private $path;
 
+    /**
+     * @var CManager_File_Connector_FileManager_FM
+     */
     private $helper;
 
-    public function __construct($storage_path, $helper) {
+    public function __construct($storage_path, CManager_File_Connector_FileManager_FM $helper) {
         $this->helper = $helper;
         $this->disk = CStorage::instance()->disk($this->helper->config('disk'));
         $this->path = $storage_path;
     }
 
     public function __call($functionName, $arguments) {
-        // TODO: check function exists
+        // TODO: remove __call, define all function which storage must support
         return $this->disk->$functionName($this->path, ...$arguments);
+    }
+
+    public function exists() {
+        return $this->disk->exists($this->path);
     }
 
     public function rootPath() {
@@ -117,5 +124,12 @@ class CManager_File_Connector_FileManager_FM_StorageRepository {
 
     public function extension() {
         return pathinfo($this->path, PATHINFO_EXTENSION);
+    }
+
+    /**
+     * @return CStorage_Adapter
+     */
+    public function disk() {
+        return $this->disk;
     }
 }
