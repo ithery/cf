@@ -27,6 +27,6 @@ class CManager_File_Connector_FileManager_Controller_ItemController extends CMan
             'working_dir' => $fm->path()->path('working_dir'),
         ];
 
-        echo json_encode($data);
+        return c::response()->json($data);
     }
 }

@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Aug 11, 2019, 9:58:50 PM
  */
-class CManager_File_Connector_FileManager_Event_ImageWasRenamed {
+class CManager_File_Connector_FileManager_Event_FileWasRenamed {
     private $old_path;
 
     private $new_path;

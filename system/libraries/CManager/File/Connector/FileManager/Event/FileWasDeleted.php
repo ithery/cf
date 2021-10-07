@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Aug 11, 2019, 9:42:35 PM
  */
-class CManager_File_Connector_FileManager_Event_ImageWasDeleted {
+class CManager_File_Connector_FileManager_Event_FileWasDeleted {
     private $path;
 
     public function __construct($path) {
