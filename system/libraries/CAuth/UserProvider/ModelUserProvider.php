@@ -4,7 +4,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     /**
      * The hasher implementation.
      *
-     * @var CCrypt_Hasher
+     * @var CCrypt_HasherInterface
      */
     protected $hasher;
 
@@ -178,7 +178,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     /**
      * Gets the hasher implementation.
      *
-     * @return \Illuminate\Contracts\Hashing\Hasher
+     * @return \CCrypt_HasherInterface
      */
     public function getHasher() {
         return $this->hasher;
