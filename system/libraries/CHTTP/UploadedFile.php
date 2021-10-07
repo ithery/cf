@@ -91,7 +91,7 @@ class CHTTP_UploadedFile extends SymfonyUploadedFile {
      *
      * @return bool|string
      *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws \CStorage_Exception_FileNotFoundException
      */
     public function get() {
         if (!$this->isValid()) {

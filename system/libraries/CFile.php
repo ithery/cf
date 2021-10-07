@@ -462,4 +462,84 @@ class CFile {
             false
         );
     }
+
+    /**
+     * Move a file to a new location.
+     *
+     * @param string $path
+     * @param string $target
+     *
+     * @return bool
+     */
+    public static function move($path, $target) {
+        return rename($path, $target);
+    }
+
+    /**
+     * Copy a file to a new location.
+     *
+     * @param string $path
+     * @param string $target
+     *
+     * @return bool
+     */
+    public static function copy($path, $target) {
+        return copy($path, $target);
+    }
+
+    /**
+     * Create a symlink to the target file or directory. On Windows, a hard link is created if the target is a file.
+     *
+     * @param string $target
+     * @param string $link
+     *
+     * @return void
+     */
+    public static function link($target, $link) {
+        if (!CServer::isWindows()) {
+            return symlink($target, $link);
+        }
+
+        $mode = static::isDirectory($target) ? 'J' : 'H';
+
+        exec("mklink /{$mode} " . escapeshellarg($link) . ' ' . escapeshellarg($target));
+    }
+
+    /**
+     * Create a relative symlink to the target file or directory.
+     *
+     * @param string $target
+     * @param string $link
+     *
+     * @return void
+     *
+     * @throws \RuntimeException
+     */
+    public static function relativeLink($target, $link) {
+        if (!class_exists(SymfonyFilesystem::class)) {
+            throw new RuntimeException(
+                'To enable support for relative links, please install the symfony/filesystem package.'
+            );
+        }
+
+        $relativeTarget = (new SymfonyFilesystem)->makePathRelative($target, dirname($link));
+
+        static::link($relativeTarget, $link);
+    }
+
+    /**
+     * Get or set UNIX mode of a file or directory.
+     *
+     * @param string   $path
+     * @param int|null $mode
+     *
+     * @return mixed
+     */
+    public static function chmod($path, $mode = null) {
+        if ($mode) {
+            return chmod($path, $mode);
+        }
+
+        return substr(sprintf('%o', fileperms($path)), -4);
+    }
 }

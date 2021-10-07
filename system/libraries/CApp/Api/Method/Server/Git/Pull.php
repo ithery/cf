@@ -27,6 +27,7 @@ class CApp_Api_Method_Server_Git_Pull extends CApp_Api_Method_Server {
                 $output .= $errorOutput = $process->getErrorOutput();
 
                 CView::blade()->clearCompiled();
+                CHTTP_FileServeDriver::clearPublic();
             } catch (Exception $ex) {
                 $this->errCode++;
                 $this->errMessage = $ex->getMessage();

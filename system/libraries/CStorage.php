@@ -152,7 +152,7 @@ class CStorage {
      *
      * @param array $config
      *
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \CStorage_FilesystemInterface
      */
     public function createGoogleDriver(array $config) {
         $client = new \Google_Client;
@@ -190,7 +190,7 @@ class CStorage {
      *
      * @param array $config
      *
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \CStorage_FilesystemInterface
      */
     public function createFtpDriver(array $config) {
         return $this->adapt($this->createFlysystem(
@@ -204,7 +204,7 @@ class CStorage {
      *
      * @param array $config
      *
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \CStorage_FilesystemInterface
      */
     public function createSftpDriver(array $config) {
         return $this->adapt($this->createFlysystem(
@@ -218,7 +218,7 @@ class CStorage {
      *
      * @param array $config
      *
-     * @return \Illuminate\Contracts\Filesystem\Cloud
+     * @return \CStorage_CloudInterface
      */
     public function createS3Driver(array $config) {
         $s3Config = $this->formatS3Config($config);

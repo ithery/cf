@@ -27,7 +27,7 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
      *
      * @param string $path
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function getCertificates($path = null) {
         $path = $path ?: $this->certificatesPath();

@@ -372,7 +372,7 @@ class Controller_Cresenity extends CController {
                 $i = 0;
                 foreach ($dataArray as $value) {
                     $i++;
-                    carr::set_path($transposedDataArray, $i . '.' . $dataKey, $value);
+                    carr::set($transposedDataArray, $i . '.' . $dataKey, $value);
                 }
             }
             foreach ($transposedDataArray as $transposedData) {
@@ -465,5 +465,10 @@ class Controller_Cresenity extends CController {
 
     public function health() {
         echo 'OK';
+    }
+
+    public function clear() {
+        CView::blade()->clearCompiled();
+        CHTTP_FileServeDriver::clearPublic();
     }
 }

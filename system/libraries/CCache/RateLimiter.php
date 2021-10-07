@@ -6,7 +6,7 @@ class CCache_RateLimiter {
     /**
      * The cache store implementation.
      *
-     * @var \Illuminate\Contracts\Cache\Repository
+     * @var \CCache_Repository
      */
     protected $cache;
 
