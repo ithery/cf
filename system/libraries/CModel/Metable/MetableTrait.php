@@ -200,7 +200,7 @@ trait CModel_Metable_MetableTrait {
      *
      * @return void
      */
-    public function removeMeta(string $key): void {
+    public function removeMeta($key) {
         if ($this->hasMeta($key)) {
             $this->getMetaCollection()->pull($key)->delete();
         }
