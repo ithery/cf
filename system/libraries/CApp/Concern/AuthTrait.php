@@ -15,6 +15,11 @@ trait CApp_Concern_AuthTrait {
 
     private $loginRequired = true;
 
+    /**
+     * @param string|null $guard
+     *
+     * @return CApp_Auth
+     */
     public function auth($guard = null) {
         if ($guard === null) {
             if ($this->guard === null) {
