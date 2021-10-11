@@ -1,21 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Aug 11, 2019, 2:32:44 AM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use CManager_File_Connector_FileManager_FM as FM;
 
 class CManager_File_Connector_FileManager_Controller_ErrorController extends CManager_File_Connector_FileManager_AbstractController {
-
     public function execute() {
         $fm = $this->fm();
         $arr_errors = [];
         if (!extension_loaded('gd') && !extension_loaded('imagick')) {
-            array_push($arr_errors, trans('laravel-filemanager::lfm.message-extension_not_found'));
+            array_push($arr_errors, c::trans('filemanager::message-extension_not_found'));
         }
         if (!extension_loaded('exif')) {
             array_push($arr_errors, 'EXIF extension not found.');
@@ -31,5 +32,4 @@ class CManager_File_Connector_FileManager_Controller_ErrorController extends CMa
         }
         echo json_encode($arr_errors);
     }
-
 }
