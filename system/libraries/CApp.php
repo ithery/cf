@@ -136,10 +136,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
     }
 
-    public static function auth() {
-        return CApp_Auth::instance();
-    }
-
     /**
      * @return CApp_Temp
      */

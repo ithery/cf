@@ -67,7 +67,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'model',
-            'model' => CAuth_Model_UsersModel::class,
+            'model' => CApp_Model_Users::class,
             'hasher' => 'md5',
         ],
 

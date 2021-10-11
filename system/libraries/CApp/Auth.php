@@ -23,24 +23,41 @@ class CApp_Auth {
     public static $confirmPasswordsUsingCallback;
 
     protected $loginView;
+
     protected $twoFactorChallengeView;
+
     protected $registerView;
+
     protected $resetPasswordView;
+
     protected $confirmPasswordView;
+
     protected $requestPasswordResetLinkView;
 
+    /**
+     * @var array
+     */
     private static $instance;
 
     protected $features;
 
-    public static function instance() {
+    /**
+     * @var string
+     */
+    protected $guard;
+
+    public static function instance($guard) {
         if (static::$instance == null) {
-            static::$instance = new static();
+            static::$instance = [];
         }
-        return static::$instance;
+        if (!isset(static::$instance[$guard])) {
+            static::$instance[$guard] = new static($guard);
+        }
+        return static::$instance[$guard];
     }
 
-    public function __construct() {
+    public function __construct($guard) {
+        $this->guard = $guard;
         $this->features = new CApp_Auth_Features();
     }
 
@@ -155,11 +172,26 @@ class CApp_Auth {
         return CF::config('app.auth.username', 'username');
     }
 
-    public static function guard() {
-        return c::auth(CF::config('app.auth.guard'));
+    /**
+     * @return CAuth_StatefulGuardInterface
+     */
+    public function guard() {
+        return c::auth($this->guard);
     }
 
     public static function loginRateLimiter() {
         return new CApp_Auth_LoginRateLimiter(new CCache_RateLimiter(CCache::repository()));
+    }
+
+    public function attempt(array $credentials = [], $remember = false) {
+        return $this->guard()->attempt($credentials, $remember);
+    }
+
+    public function logout() {
+        return $this->guard()->logout();
+    }
+
+    public function user() {
+        return $this->guard()->user();
     }
 }

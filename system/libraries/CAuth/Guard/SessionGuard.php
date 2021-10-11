@@ -473,7 +473,6 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
      */
     public function logout() {
         $user = $this->user();
-
         $this->clearUserDataFromStorage();
 
         if (!is_null($this->user) && !empty($user->getRememberToken())) {
@@ -529,7 +528,6 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
      */
     protected function clearUserDataFromStorage() {
         $this->session->remove($this->getName());
-
         if (!is_null($this->recaller())) {
             $this->getCookieJar()->queue($this->getCookieJar()
                 ->forget($this->getRecallerName()));
