@@ -25,22 +25,41 @@ class CConsole_Command_StatusCommand extends CConsole_Command {
         $this->info('OrgCode: ' . CF::orgCode());
         $this->output->newLine();
 
+        $this->databaseInformation();
+    }
+
+    protected function databaseInformation() {
         $db = CDatabase::instance();
-        $config = $db->config();
 
-        $configConnection = carr::get($config, 'connection');
-
-        $rows = [];
-        $rows[] = ['Type', carr::get($configConnection, 'type')];
-        $rows[] = ['Host', carr::get($configConnection, 'host')];
-        $rows[] = ['Port', carr::get($configConnection, 'port')];
-        $rows[] = ['Username', carr::get($configConnection, 'user')];
-        $rows[] = ['Database', carr::get($configConnection, 'database')];
-
-        $this->info('Database Configuration');
+        $this->info('Database Information');
 
         $this->info('======================');
 
-        $this->table(['Description', 'Value'], $rows);
+        $results = new CConsole_Result();
+        $connectionName = $db->getName();
+        $results->add(
+            'Connection name',
+            $connectionName
+        );
+
+        $tablePrefix = $db->getTablePrefix();
+        $results->add(
+            'Table prefix',
+            $tablePrefix
+        );
+
+        $driverName = $db->driverName();
+        $results->add(
+            'Driver name',
+            $driverName
+        );
+
+        $databaseName = $db->getDatabaseName();
+        $results->add(
+            'Database name',
+            $databaseName
+        );
+
+        $results->printToConsole($this, ['Description', 'Value']);
     }
 }

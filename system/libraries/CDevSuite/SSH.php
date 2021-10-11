@@ -5,6 +5,9 @@
  *
  * @author Hery
  */
+
+use Symfony\Component\Process\Process;
+
 class CDevSuite_Ssh {
     public $files;
 
@@ -95,13 +98,15 @@ class CDevSuite_Ssh {
     }
 
     public function isCanConnect($key) {
-        try {
-            $ssh = $this->getRemoteSsh($key);
-            $output = $ssh->run('ls')->output();
-        } catch (Exception $ex) {
-            $errMessage = $ex->getMessage();
-            CDevSuite::info($ex->getMessage());
-            return false;
+        if (!CServer::isWindows()) {
+            try {
+                $ssh = $this->getRemoteSsh($key);
+                $output = $ssh->run('ls')->output();
+            } catch (Exception $ex) {
+                $errMessage = $ex->getMessage();
+                CDevSuite::info($ex->getMessage());
+                return false;
+            }
         }
         return true;
     }
@@ -138,5 +143,56 @@ class CDevSuite_Ssh {
             $config['keytext'] = $keytext;
         }
         return $config;
+    }
+
+    public function executableName() {
+        if (CServer::isWindows()) {
+            $bit = PHP_INT_SIZE * 8;
+            return 'putty-' . $bit . '-x86.exe';
+        }
+        return 'ssh';
+    }
+
+    public function open($name) {
+        $configArray = carr::get($this->read(), $name);
+
+
+        $host = carr::get($configArray, 'host');
+        $username = carr::get($configArray, 'user');
+        $password = carr::get($configArray, 'password');
+        $port = carr::get($configArray, 'port');
+        $passwordType = carr::get($configArray, 'passwordType');
+        $executable = 'ssh';
+        $cmdArguments = [
+            $executable,
+            $username . '@' . $host,
+            '-p',
+            $port
+        ];
+
+        if (CServer::isWindows()) {
+            $executable = CDevSuite::binPath() . 'putty' . DS . $this->executableName();
+            $cmdArguments = [
+                $executable,
+                '-ssh',
+                $username . '@' . $host,
+                $port,
+            ];
+            if ($passwordType == 'password') {
+                $cmdArguments[] = '-pw';
+                $cmdArguments[] = $password;
+            }
+        }
+
+        if ($passwordType != 'password') {
+            $cmdArguments[] = '-i';
+            $cmdArguments[] = $password;
+        }
+        $process = new Process($cmdArguments);
+
+        $process->setTimeout(null);
+        $process->setIdleTimeout(null);
+
+        $process->run();
     }
 }

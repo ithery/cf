@@ -1,9 +1,9 @@
 export function dispatch(eventName) {
-    const event = document.createEvent('Events')
+    const event = document.createEvent('Events');
 
-    event.initEvent(eventName, true, true)
+    event.initEvent(eventName, true, true);
 
-    document.dispatchEvent(event)
+    document.dispatchEvent(event);
 
-    return event
+    return event;
 }

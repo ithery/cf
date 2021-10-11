@@ -1,15 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 30, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 30, 2020
  */
 class CComponent_TemporaryUploadedFile extends CHTTP_UploadedFile {
-
     protected $storage;
+
     protected $path;
 
     public function __construct($path, $disk) {
@@ -53,16 +54,16 @@ class CComponent_TemporaryUploadedFile extends CHTTP_UploadedFile {
     public function temporaryUrl() {
         if (CComponent_FileUploadConfiguration::isUsingS3() && !CF::isTesting()) {
             return $this->storage->temporaryUrl(
-                            $this->path,
-                            c::now()->addDay(),
-                            ['ResponseContentDisposition' => 'filename="' . $this->getClientOriginalName() . '"']
+                $this->path,
+                c::now()->addDay(),
+                ['ResponseContentDisposition' => 'filename="' . $this->getClientOriginalName() . '"']
             );
         }
 
         $supportedPreviewTypes = CF::config('component.temporary_file_upload.preview_mimes', [
-                    'png', 'gif', 'bmp', 'svg', 'wav', 'mp4',
-                    'mov', 'avi', 'wmv', 'mp3', 'm4a',
-                    'jpeg', 'mpga', 'webp', 'wma',
+            'png', 'gif', 'bmp', 'svg', 'wav', 'mp4',
+            'mov', 'avi', 'wmv', 'mp3', 'm4a',
+            'jpeg', 'mpga', 'webp', 'wma',
         ]);
 
         if (!in_array($this->guessExtension(), $supportedPreviewTypes)) {
@@ -71,11 +72,13 @@ class CComponent_TemporaryUploadedFile extends CHTTP_UploadedFile {
         }
 
         //TODO: get from route
-        /**
-          return c::url()->temporarySignedRoute(
-          'component.preview-file', c::now()->addMinutes(30), ['filename' => $this->getFilename()]
-          );
-         */
+
+        // return c::url()->temporarySignedRoute(
+        //     'component.preview-file',
+        //     c::now()->addMinutes(30),
+        //     ['filename' => $this->getFilename()]
+        // );
+
         return curl::base() . 'cresenity/component/preview?filename=' . $this->getFilename();
     }
 
@@ -100,11 +103,12 @@ class CComponent_TemporaryUploadedFile extends CHTTP_UploadedFile {
 
         $disk = carr::pull($options, 'disk') ?: $this->disk;
 
-        
         $newPath = trim($path . '/' . $name, '/');
-       
+
         CStorage::instance()->disk($disk)->put(
-                $newPath, $this->storage->readStream($this->path), $options
+            $newPath,
+            $this->storage->readStream($this->path),
+            $options
         );
 
         return $newPath;
@@ -119,7 +123,7 @@ class CComponent_TemporaryUploadedFile extends CHTTP_UploadedFile {
     }
 
     public function extractOriginalNameFromFilePath($path) {
-        return base64_decode(head(explode('-', last(explode('-meta', str($path)->replace('_', '/'))))));
+        return base64_decode(c::head(explode('-', c::last(explode('-meta', c::str($path)->replace('_', '/'))))));
     }
 
     public static function createFromComponent($filePath) {
@@ -133,8 +137,8 @@ class CComponent_TemporaryUploadedFile extends CHTTP_UploadedFile {
 
         if (is_array($subject)) {
             return c::collect($subject)->contains(function ($value) {
-                        return static::canUnserialize($value);
-                    });
+                return static::canUnserialize($value);
+            });
         }
 
         return false;
@@ -146,12 +150,12 @@ class CComponent_TemporaryUploadedFile extends CHTTP_UploadedFile {
                 return static::createFromComponent(c::str($subject)->after('component-file:'));
             }
 
-            if (str($subject)->startsWith('component-files:')) {
-                $paths = json_decode(str($subject)->after('component-files:'), true);
+            if (c::str($subject)->startsWith('component-files:')) {
+                $paths = json_decode(c::str($subject)->after('component-files:'), true);
 
                 return c::collect($paths)->map(function ($path) {
-                            return static::createFromComponent($path);
-                        })->toArray();
+                    return static::createFromComponent($path);
+                })->toArray();
             }
 
             return $subject;
@@ -171,7 +175,6 @@ class CComponent_TemporaryUploadedFile extends CHTTP_UploadedFile {
     }
 
     public static function serializeMultipleForComponentResponse($files) {
-        return 'component-files:' . json_encode(collect($files)->map->getFilename());
+        return 'component-files:' . json_encode(c::collect($files)->map->getFilename());
     }
-
 }

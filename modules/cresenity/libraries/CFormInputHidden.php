@@ -3,14 +3,14 @@
  * @deprecated since 1.2
  */
 //@codingStandardsIgnoreStart
-class CFormInputHidden extends CFormInput {
+class CFormInputHidden extends CElement_FormInput {
     public function __construct($id) {
         parent::__construct($id);
         $this->type = 'text';
     }
 
     public static function factory($id = '') {
-        return new CFormInputHidden($id);
+        return new static($id);
     }
 
     public function toarray() {

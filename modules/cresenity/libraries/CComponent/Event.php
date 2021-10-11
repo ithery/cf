@@ -1,18 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 class CComponent_Event {
-
     protected $name;
+
     protected $params;
+
     protected $up;
+
     protected $self;
+
     protected $component;
 
     public function __construct($name, $params) {
@@ -48,14 +52,16 @@ class CComponent_Event {
             'params' => $this->params,
         ];
 
-        if ($this->up)
+        if ($this->up) {
             $output['ancestorsOnly'] = true;
-        if ($this->self)
+        }
+        if ($this->self) {
             $output['selfOnly'] = true;
-        if ($this->component)
+        }
+        if ($this->component) {
             $output['to'] = $this->component;
+        }
 
         return $output;
     }
-
 }

@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * This class is used to construct a OpenTracking object for the /mail/send API call
  *
@@ -16,17 +10,20 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_OpenTracking implements \JsonSerializable {
-
-    /** @var $enable bool Indicates if this setting is enabled */
+    /**
+     * @var bool Indicates if this setting is enabled
+     */
     private $enable;
 
-    /** @var $substitution_tag string Allows you to specify a substitution tag that you can insert in the body of your email at a location that you desire. This tag will be replaced by the open tracking pixel */
+    /**
+     * @var string Allows you to specify a substitution tag that you can insert in the body of your email at a location that you desire. This tag will be replaced by the open tracking pixel
+     */
     private $substitution_tag;
 
     /**
      * Optional constructor
      *
-     * @param bool|null $enable Indicates if this setting is enabled
+     * @param bool|null   $enable           Indicates if this setting is enabled
      * @param string|null $substitution_tag Allows you to specify a substitution
      *                                      tag that you can insert in the body
      *                                      of your email at a location that you
@@ -46,12 +43,12 @@ class CVendor_SendGrid_Mail_OpenTracking implements \JsonSerializable {
      * Update the enable setting on a OpenTracking object
      *
      * @param bool $enable Indicates if this setting is enabled
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setEnable($enable) {
         if (!is_bool($enable)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$enable must be of type bool');
+            throw new CVendor_SendGrid_Exception_TypeException('$enable must be of type bool');
         }
         $this->enable = $enable;
     }
@@ -73,12 +70,12 @@ class CVendor_SendGrid_Mail_OpenTracking implements \JsonSerializable {
      *                                 of your email at a location that you
      *                                 desire. This tag will be replaced by
      *                                 the open tracking pixel
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setSubstitutionTag($substitution_tag) {
         if (!is_string($substitution_tag)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$substitution_tag must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$substitution_tag must be of type string.');
         }
         $this->substitution_tag = $substitution_tag;
     }
@@ -99,13 +96,13 @@ class CVendor_SendGrid_Mail_OpenTracking implements \JsonSerializable {
      */
     public function jsonSerialize() {
         return array_filter(
-                        [
-                    'enable' => $this->getEnable(),
-                    'substitution_tag' => $this->getSubstitutionTag()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'enable' => $this->getEnable(),
+                'substitution_tag' => $this->getSubstitutionTag()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

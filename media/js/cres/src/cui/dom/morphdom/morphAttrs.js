@@ -5,13 +5,13 @@
  */
 
 export default function morphAttrs(fromNode, toNode) {
-    var attrs = toNode.attributes;
-    var i;
-    var attr;
-    var attrName;
-    var attrNamespaceURI;
-    var attrValue;
-    var fromValue;
+    let attrs = toNode.attributes;
+    let i;
+    let attr;
+    let attrName;
+    let attrNamespaceURI;
+    let attrValue;
+    let fromValue;
 
     // update attributes on original DOM element
     for (i = attrs.length - 1; i >= 0; --i) {
@@ -25,7 +25,7 @@ export default function morphAttrs(fromNode, toNode) {
             fromValue = fromNode.getAttributeNS(attrNamespaceURI, attrName);
 
             if (fromValue !== attrValue) {
-                if (attr.prefix === 'xmlns'){
+                if (attr.prefix === 'xmlns') {
                     attrName = attr.name; // It's not allowed to set an attribute with the XMLNS namespace without specifying the `xmlns` prefix
                 }
                 fromNode.setAttributeNS(attrNamespaceURI, attrName, attrValue);
@@ -55,10 +55,8 @@ export default function morphAttrs(fromNode, toNode) {
                 if (!toNode.hasAttributeNS(attrNamespaceURI, attrName)) {
                     fromNode.removeAttributeNS(attrNamespaceURI, attrName);
                 }
-            } else {
-                if (!toNode.hasAttribute(attrName)) {
-                    fromNode.removeAttribute(attrName);
-                }
+            } else if (!toNode.hasAttribute(attrName)) {
+                fromNode.removeAttribute(attrName);
             }
         }
     }

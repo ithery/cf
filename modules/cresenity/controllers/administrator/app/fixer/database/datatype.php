@@ -1,17 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 13, 2019, 1:21:26 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 13, 2019, 1:21:26 AM
  */
 
 use CApp_Administrator_Fixer_Database as DatabaseFixer;
 
 class Controller_Administrator_App_Fixer_Database_Datatype extends CApp_Administrator_Controller_User {
-
     public function index() {
         $app = CApp::instance();
         $app->title('Fix Database Data Type');
@@ -32,13 +32,13 @@ class Controller_Administrator_App_Fixer_Database_Datatype extends CApp_Administ
         $tables = $schemaManager->listTableNames();
         $haveChanged = false;
         foreach ($tables as $table) {
-            $sql =  DatabaseFixer::sqlDataType($table);
+            $sql = DatabaseFixer::sqlDataType($table);
 
             if (strlen($sql) > 0) {
                 $template = $app->addTemplate()
-                        ->setTemplate('CApp/Administrator/Fixer/Database/DataType/Result')
-                        ->setVar('table', $table)
-                        ->setVar('sql', $sql);
+                    ->setTemplate('CApp/Administrator/Fixer/Database/DataType/Result')
+                    ->setVar('table', $table)
+                    ->setVar('sql', $sql);
 
                 $resultBody = $template->section('resultBody');
                 $prismCode = $resultBody->addPrismCode();
@@ -67,5 +67,4 @@ class Controller_Administrator_App_Fixer_Database_Datatype extends CApp_Administ
         }
         echo CApp_Base::jsonResponse($errCode, $errMessage);
     }
-
 }

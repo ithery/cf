@@ -674,8 +674,8 @@ class cdbg {
         $body .= 'Domain:' . CF::domain() . '<br/>';
         $body .= 'App Code:' . CF::appCode() . '<br/>';
         $body .= 'Org Code:' . CF::orgCode() . '<br/>';
-        $body .= 'User Agent:' . crequest::user_agent() . '<br/>';
-        $body .= 'Remote Address:' . crequest::remote_address() . '<br/>';
+        $body .= 'User Agent:' . CHTTP::request()->userAgent() . '<br/>';
+        $body .= 'Remote Address:' . CHTTP::request()->ip() . '<br/>';
         $body .= 'Browser:' . crequest::browser() . '<br/>';
         $body .= '<br/><br/>';
 

@@ -12,18 +12,21 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_BccSettings implements \JsonSerializable {
-
-    /** @var $enable bool Indicates if this setting is enabled */
+    /**
+     * @var bool Indicates if this setting is enabled
+     */
     private $enable;
 
-    /** @var $email string The email address that you would like to receive the BCC */
+    /**
+     * @var string The email address that you would like to receive the BCC
+     */
     private $email;
 
     /**
      * Optional constructor
      *
-     * @param bool|null $enable Indicates if this setting is enabled
-     * @param string|null $email The email address that you would like
+     * @param bool|null   $enable Indicates if this setting is enabled
+     * @param string|null $email  The email address that you would like
      *                            to receive the BCC
      */
     public function __construct($enable = null, $email = null) {
@@ -39,12 +42,12 @@ class CVendor_SendGrid_Mail_BccSettings implements \JsonSerializable {
      * Update the enable setting on a CVendor_SendGrid_Mail_BccSettings object
      *
      * @param bool $enable Indicates if this setting is enabled
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setEnable($enable) {
         if (!is_bool($enable)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$enable must be of type bool.');
+            throw new CVendor_SendGrid_Exception_TypeException('$enable must be of type bool.');
         }
         $this->enable = $enable;
     }
@@ -63,15 +66,15 @@ class CVendor_SendGrid_Mail_BccSettings implements \JsonSerializable {
      *
      * @param string $email The email address that you would like
      *                      to receive the BCC
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setEmail($email) {
-        if (!is_string($email) &&
-                filter_var($email, FILTER_VALIDATE_EMAIL)
+        if (!is_string($email)
+            && filter_var($email, FILTER_VALIDATE_EMAIL)
         ) {
-            throw new CVendor_SendGrid_Mail_TypeException(
-            '$email must valid and be of type string.'
+            throw new CVendor_SendGrid_Exception_TypeException(
+                '$email must valid and be of type string.'
             );
         }
         $this->email = $email;
@@ -93,13 +96,13 @@ class CVendor_SendGrid_Mail_BccSettings implements \JsonSerializable {
      */
     public function jsonSerialize() {
         return array_filter(
-                        [
-                    'enable' => $this->getEnable(),
-                    'email' => $this->getEmail()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'enable' => $this->getEnable(),
+                'email' => $this->getEmail()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

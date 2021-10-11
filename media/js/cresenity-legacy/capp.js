@@ -1,12 +1,14 @@
 if (!Object.assign) {
     Object.assign = function assign(target, source) {
-        var result = {}
-        for (var i in target)
-            result[i] = target[i]
-        for (var i in source)
-            result[i] = source[i]
-        return result
-    }
+        var result = {};
+        for (var i in target) {
+            result[i] = target[i];
+        }
+        for (var i in source) {
+            result[i] = source[i];
+        }
+        return result;
+    };
 }
 
 String.prototype.contains = function (a) {
@@ -16,14 +18,11 @@ String.prototype.toNumber = function () {
     var n = parseFloat(this);
     if (!isNaN(n)) {
         return n;
-    } else {
-        return 0;
     }
-}
+    return 0;
+};
 
 var CF = function () {
-
-
     this.required = typeof this.required === 'undefined' ? [] : this.required;
 
     this.window = window;
@@ -35,27 +34,26 @@ var CF = function () {
     this.onBeforeInit = function (callback) {
         this.beforeInitCallback.push(callback);
         return this;
-    }
+    };
     this.onAfterInit = function (callback) {
         this.afterInitCallback.push(callback);
         return this;
-    }
+    };
 
 
     this.getConfig = function () {
         return this.window.capp;
-    }
+    };
 
 
     this.isUseRequireJs = function () {
         return this.getConfig().requireJs;
-    }
+    };
     this.CFVersion = function () {
         return this.getConfig().CFVersion;
-    }
+    };
     this.require = function (url, callback) {
-
-        if (typeof url != "string") {
+        if (typeof url != 'string') {
             url = url[0];
         }
 
@@ -63,25 +61,23 @@ var CF = function () {
             return;
         }
 
-        var toPush = url
+        var toPush = url;
 
         var t = url.split('.').pop();
         //url = url.contains('//') ? url : (t !== "css" ? "<?php print( mw_includes_url() ); ?>api/" + url : "<?php print( mw_includes_url() ); ?>css/" + url);
 
         if (!~this.required.indexOf(toPush)) {
             this.required.push(toPush);
-            url = url.contains("?") ? url + '&cappv=' + this.CFVersion() : url + "?cappv=" + this.CFVersion();
+            url = url.contains('?') ? url + '&cappv=' + this.CFVersion() : url + '?cappv=' + this.CFVersion();
             if (document.querySelector('link[href="' + url + '"],script[src="' + url + '"]') !== null) {
-                return
+                return;
             }
-            var string = t !== "css" ? "<script type='text/javascript'  src='" + url + "'></script>" : "<link rel='stylesheet' type='text/css' href='" + url + "' />";
+            var string = t !== 'css' ? '<script type=\'text/javascript\'  src=\'' + url + '\'></script>' : '<link rel=\'stylesheet\' type=\'text/css\' href=\'' + url + '\' />';
             if ((document.readyState === 'loading'/* || mwd.readyState === 'interactive'*/) && !!window.CanvasRenderingContext2D && self === parent) {
                 document.write(string);
             } else {
-
                 var el;
-                if (t !== "css") {
-
+                if (t !== 'css') {
                     el = this.document.createElement('script');
                     el.src = url;
                     el.setAttribute('type', 'text/javascript');
@@ -92,7 +88,7 @@ var CF = function () {
                             if (this.readyState == 'complete') {
                                 callback();
                             }
-                        }
+                        };
                     }
                     this.head.appendChild(el);
                 } else {
@@ -107,25 +103,21 @@ var CF = function () {
                             if (this.readyState == 'complete') {
                                 callback();
                             }
-                        }
+                        };
                     }
                     this.head.appendChild(el);
                 }
-
             }
-        } else {
-            if (typeof (callback) === 'function') {
-                callback();
-            }
+        } else if (typeof (callback) === 'function') {
+            callback();
         }
     };
 
     this.loadJQuery = function (callback) {
-
         if (typeof jQuery == 'undefined') {
             var fileref = this.document.createElement('script');
-            fileref.setAttribute("type", "text/javascript");
-            fileref.setAttribute("src", this.getConfig().defaultJQueryUrl);
+            fileref.setAttribute('type', 'text/javascript');
+            fileref.setAttribute('src', this.getConfig().defaultJQueryUrl);
             // IE 6 & 7
             if (typeof (callback) === 'function') {
                 fileref.onload = callback;
@@ -133,13 +125,13 @@ var CF = function () {
                     if (this.readyState == 'complete') {
                         callback();
                     }
-                }
+                };
             }
             this.head.appendChild(fileref);
         } else {
             callback();
         }
-    }
+    };
 
     this.init = function () {
         var arrayJsUrl = this.getConfig().jsUrl;
@@ -148,10 +140,6 @@ var CF = function () {
         });
 
         this.loadJQuery(() => {
-
-
-
-
             if (typeof arrayJsUrl !== 'undefined') {
                 //todo add required for script already written in <script
 
@@ -163,24 +151,19 @@ var CF = function () {
                     //}
                 });
 
-//                arrayJsUrl.forEach((item) => {
-//
-//                    this.require(item);
-//                });
+                //                arrayJsUrl.forEach((item) => {
+                //
+                //                    this.require(item);
+                //                });
             }
         });
-
 
 
         this.afterInitCallback.forEach(function (item) {
             item();
         });
-
-
-
-    }
-}
-
+    };
+};
 
 
 var CUploader = function (options) {
@@ -191,7 +174,7 @@ var CUploader = function (options) {
         inputElement: null,
         accept: null,
         pageType: null,
-        onUploadSuccess: null,
+        onUploadSuccess: null
     }, options);
 
     this.filename = '';
@@ -230,19 +213,14 @@ var CUploader = function (options) {
                     });
                     inputTemp.remove();
                 });
-
-
-
             }
             inputTemp.trigger('click');
-        })(this);
+        }(this));
         return false;
-    }
-
+    };
 
 
     this.uploadFile = function () {
-
         (function (cUploader) {
             cUploader.isUploading = true;
             cUploader.showLoading();
@@ -267,7 +245,6 @@ var CUploader = function (options) {
                             var loaded = e.loaded;
                             var percent = loaded * 100 / total;
                             if (cUploader.getProgressBar()) {
-
                                 cUploader.getProgressBar().css('width', percent + '%');
                                 cUploader.getProgressBarInfo().html(dcUpload.getSizeFormatted(loaded) + ' / ' + dcUpload.getSizeFormatted(total));
                             }
@@ -301,7 +278,7 @@ var CUploader = function (options) {
                     // Log the error, show an alert, whatever works for you
                 }
             });
-        })(this);
+        }(this));
     };
 
 
@@ -310,51 +287,50 @@ var CUploader = function (options) {
         this.setMimeType(fileObject.type);
         this.setFilename(fileObject.name);
         this.setSize(fileObject.size);
-
-    }
+    };
     this.setInput = function (fileId) {
         if (this.inputElement) {
             this.inputElement.val(fileId);
         }
-    }
+    };
     this.setFilename = function (filename) {
         this.filename = filename;
-    }
+    };
     this.getFilename = function () {
         return this.filename;
-    }
+    };
     this.setSize = function (size) {
         this.size = size;
-    }
+    };
     this.getSize = function () {
         return this.size;
-    }
+    };
     this.getSizeFormatted = function (size) {
         if (typeof size == 'undefined') {
             size = this.size;
         }
-        var sizeStr = "";
+        var sizeStr = '';
         var sizeKB = size / 1024;
         if (parseInt(sizeKB) > 1024) {
             var sizeMB = sizeKB / 1024;
             if (parseInt(sizeMB) > 1024) {
                 var sizeGB = sizeMB / 1024;
-                sizeStr = sizeGB.toFixed(2) + " GB";
+                sizeStr = sizeGB.toFixed(2) + ' GB';
             } else {
-                sizeStr = sizeMB.toFixed(2) + " MB";
+                sizeStr = sizeMB.toFixed(2) + ' MB';
             }
         } else {
-            sizeStr = sizeKB.toFixed(2) + " KB";
+            sizeStr = sizeKB.toFixed(2) + ' KB';
         }
         return sizeStr;
-    }
+    };
 
     this.setMimeType = function (mimeType) {
         this.mimeType = mimeType;
-    }
+    };
     this.getMimeType = function () {
         return this.mimeType;
-    }
+    };
 
     this.setUrl = function (url) {
         this.url = url;
@@ -390,11 +366,11 @@ var CUploader = function (options) {
             var filePreview = $('<i>', {class: 'media-preview far fa-file fa-10x text-center'});
             this.previewElement.prepend(filePreview);
         }
-    }
+    };
 
     this.getUrl = function () {
-        return this.url
-    }
+        return this.url;
+    };
 
     this.showLoading = function (imgSrc) {
         $.blockUI({
@@ -416,18 +392,16 @@ var CUploader = function (options) {
     };
     this.getProgressBar = function () {
         return $('.dc-progress-upload-container .progress-bar');
-    }
+    };
 
     this.getProgressBarInfo = function () {
         return $('.dc-progress-upload-container .progress-bar-info');
-
-    }
-}
+    };
+};
 
 var CBlocker = function () {
 
-}
-
+};
 
 
 function strlen(string) {
@@ -447,44 +421,44 @@ function strlen(string) {
     //   example 2: strlen('A\ud87e\udc04Z');
     //   returns 2: 3
 
-    var str = string + ''
+    var str = string + '';
     var i = 0,
-            chr = '',
-            lgth = 0;
+        chr = '',
+        lgth = 0;
 
     if (!this.php_js || !this.php_js.ini || !this.php_js.ini['unicode.semantics'] || this.php_js.ini['unicode.semantics'].local_value.toLowerCase() !== 'on') {
-        return string.length
+        return string.length;
     }
 
     var getWholeChar = function (str, i) {
         var code = str.charCodeAt(i);
         var next = '';
         var prev = '';
-        if (0xD800 <= code && code <= 0xDBFF) {
+        if (code >= 0xD800 && code <= 0xDBFF) {
             // High surrogate (could change last hex to 0xDB7F to treat high private surrogates as single characters)
             if (str.length <= (i + 1)) {
-                throw 'High surrogate without following low surrogate'
+                throw 'High surrogate without following low surrogate';
             }
             next = str.charCodeAt(i + 1);
-            if (0xDC00 > next || next > 0xDFFF) {
-                throw 'High surrogate without following low surrogate'
+            if (next < 0xDC00 || next > 0xDFFF) {
+                throw 'High surrogate without following low surrogate';
             }
-            return str.charAt(i) + str.charAt(i + 1)
-        } else if (0xDC00 <= code && code <= 0xDFFF) {
+            return str.charAt(i) + str.charAt(i + 1);
+        } else if (code >= 0xDC00 && code <= 0xDFFF) {
             // Low surrogate
             if (i === 0) {
-                throw 'Low surrogate without preceding high surrogate'
+                throw 'Low surrogate without preceding high surrogate';
             }
             prev = str.charCodeAt(i - 1);
-            if (0xD800 > prev || prev > 0xDBFF) {
+            if (prev < 0xD800 || prev > 0xDBFF) {
                 // (could change last hex to 0xDB7F to treat high private surrogates as single characters)
-                throw 'Low surrogate without preceding high surrogate'
+                throw 'Low surrogate without preceding high surrogate';
             }
             // We can pass over low surrogates now as the second component in a pair which we have already processed
-            return false
+            return false;
         }
-        return str.charAt(i)
-    }
+        return str.charAt(i);
+    };
 
     for (i = 0, lgth = 0; i < str.length; i++) {
         if ((chr = getWholeChar(str, i)) === false) {
@@ -493,7 +467,7 @@ function strlen(string) {
         // Adapt this line at the top of any loop, passing in the whole string and the current iteration and returning a variable to represent the individual character; purpose is to treat the first part of a surrogate pair as the whole character and then ignore the second part
         lgth++;
     }
-    return lgth
+    return lgth;
 }
 
 //** jQuery Scroll to Top Control script- (c) Dynamic Drive DHTML code library: http://www.dynamicdrive.com.
@@ -508,7 +482,7 @@ var capp_started_event_initialized = false;
 /*
  cresenity.func.js
  */
-;
+
 
 var Cresenity = function () {
     var scrollToTop = function () {
@@ -533,12 +507,14 @@ var Cresenity = function () {
         };
         this.scrollup = function () {
             if (!this.cssfixedsupport) //if control is positioned using JavaScript
+            {
                 this.$control.css({
                     opacity: 0,
-                    zIndex: -1,
-                }) //hide control immediately after clicking it
-            var dest = isNaN(this.setting.scrollto) ? this.setting.scrollto : parseInt(this.setting.scrollto)
-            if (typeof dest == "string" && jQuery('#' + dest).length == 1) {
+                    zIndex: -1
+                });
+            } //hide control immediately after clicking it
+            var dest = isNaN(this.setting.scrollto) ? this.setting.scrollto : parseInt(this.setting.scrollto);
+            if (typeof dest == 'string' && jQuery('#' + dest).length == 1) {
                 //check element set by string exists
                 dest = jQuery('#' + dest).offset().top;
             } else {
@@ -549,121 +525,121 @@ var Cresenity = function () {
                 scrollTop: dest
             }, this.setting.scrollduration);
         },
-                this.keepfixed = function () {
-                    var $window = jQuery(window)
-                    var controlx = $window.scrollLeft() + $window.width() - this.$control.width() - this.controlattrs.offsetx
-                    var controly = $window.scrollTop() + $window.height() - this.$control.height() - this.controlattrs.offsety
-                    this.$control.css({
-                        left: controlx + 'px',
-                        top: controly + 'px'
-                    })
-                };
+        this.keepfixed = function () {
+            var $window = jQuery(window);
+            var controlx = $window.scrollLeft() + $window.width() - this.$control.width() - this.controlattrs.offsetx;
+            var controly = $window.scrollTop() + $window.height() - this.$control.height() - this.controlattrs.offsety;
+            this.$control.css({
+                left: controlx + 'px',
+                top: controly + 'px'
+            });
+        };
         this.togglecontrol = function () {
-            var scrolltop = jQuery(window).scrollTop()
+            var scrolltop = jQuery(window).scrollTop();
             if (!this.cssfixedsupport) {
                 this.keepfixed();
             }
-            this.state.shouldvisible = (scrolltop >= this.setting.startline) ? true : false
+            this.state.shouldvisible = (scrolltop >= this.setting.startline) ? true : false;
             if (this.state.shouldvisible && !this.state.isvisible) {
                 this.$control.stop().animate({
                     opacity: 1,
-                    zIndex: 99999,
-                }, this.setting.fadeduration[0])
-                this.state.isvisible = true
+                    zIndex: 99999
+                }, this.setting.fadeduration[0]);
+                this.state.isvisible = true;
             } else if (this.state.shouldvisible == false && this.state.isvisible) {
                 this.$control.stop().animate({
                     opacity: 0,
                     zIndex: -1
-                }, this.setting.fadeduration[1])
-                this.state.isvisible = false
+                }, this.setting.fadeduration[1]);
+                this.state.isvisible = false;
             }
         };
         this.init = function () {
             jQuery(document).ready(($) => {
                 var mainobj = this;
                 var iebrws = document.all;
-                mainobj.cssfixedsupport = !iebrws || iebrws && document.compatMode == "CSS1Compat" && window.XMLHttpRequest;
+                mainobj.cssfixedsupport = !iebrws || iebrws && document.compatMode == 'CSS1Compat' && window.XMLHttpRequest;
                 //not IE or IE7+ browsers in standards mode
-                mainobj.$body = (window.opera) ? (document.compatMode == "CSS1Compat" ? $('html') : $('body')) : $('html,body');
+                mainobj.$body = (window.opera) ? (document.compatMode == 'CSS1Compat' ? $('html') : $('body')) : $('html,body');
                 mainobj.$control = $('<div id="topcontrol">' + mainobj.controlHTML + '</div>')
-                        .css({
-                            position: mainobj.cssfixedsupport ? 'fixed' : 'absolute',
-                            bottom: mainobj.controlattrs.offsety,
-                            right: mainobj.controlattrs.offsetx,
-                            opacity: 0,
-                            cursor: 'pointer',
-                            zIndex: 99999
-                        })
-                        .attr({
-                            title: 'Scroll Back to Top'
-                        })
-                        .click(function () {
-                            mainobj.scrollup();
-                            return false
-                        })
-                        .appendTo('body')
+                    .css({
+                        position: mainobj.cssfixedsupport ? 'fixed' : 'absolute',
+                        bottom: mainobj.controlattrs.offsety,
+                        right: mainobj.controlattrs.offsetx,
+                        opacity: 0,
+                        cursor: 'pointer',
+                        zIndex: 99999
+                    })
+                    .attr({
+                        title: 'Scroll Back to Top'
+                    })
+                    .click(function () {
+                        mainobj.scrollup();
+                        return false;
+                    })
+                    .appendTo('body');
                 if (document.all && !window.XMLHttpRequest && mainobj.$control.text() != '') { //loose check for IE6 and below, plus whether control contains any text
                     mainobj.$control.css({
                         width: mainobj.$control.width()
                     }); //IE6- seems to require an explicit width on a DIV containing text
                 }
-                mainobj.togglecontrol()
+                mainobj.togglecontrol();
                 $('a[href="' + mainobj.anchorkeyword + '"]').click(function () {
-                    mainobj.scrollup()
-                    return false
-                })
+                    mainobj.scrollup();
+                    return false;
+                });
                 $(window).bind('scroll resize', function (e) {
-                    mainobj.togglecontrol()
-                })
-            })
-        }
-    }
+                    mainobj.togglecontrol();
+                });
+            });
+        };
+    };
 
     var Base64 = function (cresenity) {
         this.cresenity = cresenity;
-        this._keyStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+        this._keyStr = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
         this._utf8_encode = function (e) {
-            e = e.replace(/rn/g, "n");
-            var t = "";
+            e = e.replace(/rn/g, 'n');
+            var t = '';
             for (var n = 0; n < e.length; n++) {
                 var r = e.charCodeAt(n);
                 if (r < 128) {
-                    t += String.fromCharCode(r)
+                    t += String.fromCharCode(r);
                 } else if (r > 127 && r < 2048) {
                     t += String.fromCharCode(r >> 6 | 192);
-                    t += String.fromCharCode(r & 63 | 128)
+                    t += String.fromCharCode(r & 63 | 128);
                 } else {
                     t += String.fromCharCode(r >> 12 | 224);
                     t += String.fromCharCode(r >> 6 & 63 | 128);
-                    t += String.fromCharCode(r & 63 | 128)
+                    t += String.fromCharCode(r & 63 | 128);
                 }
             }
-            return t
+            return t;
         };
         this._utf8_decode = function (e) {
-            var t = "";
+            var t = '';
             var n = 0;
             var r = c1 = c2 = 0;
             while (n < e.length) {
                 r = e.charCodeAt(n);
                 if (r < 128) {
                     t += String.fromCharCode(r);
-                    n++
+                    n++;
                 } else if (r > 191 && r < 224) {
                     c2 = e.charCodeAt(n + 1);
                     t += String.fromCharCode((r & 31) << 6 | c2 & 63);
-                    n += 2
+                    n += 2;
                 } else {
                     c2 = e.charCodeAt(n + 1);
                     c3 = e.charCodeAt(n + 2);
                     t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63);
-                    n += 3
+                    n += 3;
                 }
             }
-            return t
+            return t;
         };
         this.encode = function (e) {
-            var t = "";
+            var t = '';
             var n, r, i, s, o, u, a;
             var f = 0;
             e = this._utf8_encode(e);
@@ -676,21 +652,21 @@ var Cresenity = function () {
                 u = (r & 15) << 2 | i >> 6;
                 a = i & 63;
                 if (isNaN(r)) {
-                    u = a = 64
+                    u = a = 64;
                 } else if (isNaN(i)) {
-                    a = 64
+                    a = 64;
                 }
-                t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a)
+                t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a);
             }
-            return t
+            return t;
         };
 
         this.decode = function (e) {
-            var t = "";
+            var t = '';
             var n, r, i;
             var s, o, u, a;
             var f = 0;
-            e = e.replace(/[^A-Za-z0-9+/=]/g, "");
+            e = e.replace(/[^A-Za-z0-9+/=]/g, '');
             while (f < e.length) {
                 s = this._keyStr.indexOf(e.charAt(f++));
                 o = this._keyStr.indexOf(e.charAt(f++));
@@ -701,17 +677,16 @@ var Cresenity = function () {
                 i = (u & 3) << 6 | a;
                 t = t + String.fromCharCode(n);
                 if (u != 64) {
-                    t = t + String.fromCharCode(r)
+                    t = t + String.fromCharCode(r);
                 }
                 if (a != 64) {
-                    t = t + String.fromCharCode(i)
+                    t = t + String.fromCharCode(i);
                 }
             }
             t = this._utf8_decode(t);
-            return t
+            return t;
         };
-
-    }
+    };
 
     var Url = function (cresenity) {
         this.cresenity = cresenity;
@@ -741,8 +716,7 @@ var Cresenity = function () {
             }
 
             queryString = kvp.join('&');
-            if (queryString.substr(0, 1) == '&')
-                queryString = queryString.substr(1);
+            if (queryString.substr(0, 1) == '&') {queryString = queryString.substr(1);}
             return baseUrl + '?' + queryString;
         };
         this.replaceParam = function (url) {
@@ -764,18 +738,17 @@ var Cresenity = function () {
                 } else {
                     available = false;
                 }
-
             }
             return url;
-        }
-    }
+        };
+    };
 
     this.url = new Url(this);
     this.base64 = new Base64(this);
 
     this.cf = new CF();
 
-    this.filesAdded = "";
+    this.filesAdded = '';
     this.modalElements = [];
     this.callback = {};
     this.haveCallback = (name) => {
@@ -792,18 +765,15 @@ var Cresenity = function () {
     };
 
     this.isUsingRequireJs = function () {
-        return (typeof capp.requireJs !== "undefined") ? capp.requireJs : true;
-    }
+        return (typeof capp.requireJs !== 'undefined') ? capp.requireJs : true;
+    };
     this.normalizeRequireJs = function () {
         if (!this.isUsingRequireJs()) {
-
             if (typeof define === 'function' && define.amd) {
-
                 window.define = undefined;
-
             }
         }
-    }
+    };
     this.isJson = function (text) {
         if (typeof text == 'string') {
             return (/^[\],:{}\s]*$/.test(text.replace(/\\["\\\/bfnrtu]/g, '@').replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']').replace(/(?:^|:|,)(?:\s*\[)+/g, '')));
@@ -812,8 +782,8 @@ var Cresenity = function () {
     };
     this.loadJs = function (filename, callback) {
         var fileref = document.createElement('script');
-        fileref.setAttribute("type", "text/javascript");
-        fileref.setAttribute("src", filename);
+        fileref.setAttribute('type', 'text/javascript');
+        fileref.setAttribute('src', filename);
         // IE 6 & 7
         if (typeof (callback) === 'function') {
             fileref.onload = callback;
@@ -821,23 +791,22 @@ var Cresenity = function () {
                 if (this.readyState == 'complete') {
                     callback();
                 }
-            }
+            };
         }
-        document.getElementsByTagName("head")[0].appendChild(fileref);
-
+        document.getElementsByTagName('head')[0].appendChild(fileref);
     };
     this.loadJsCss = function (filename, filetype, callback) {
-        if (filetype == "js") { //if filename is a external JavaScript file
-            var fileref = document.createElement('script')
-            fileref.setAttribute("type", "text/javascript")
-            fileref.setAttribute("src", filename)
-        } else if (filetype == "css") { //if filename is an external CSS file
-            var fileref = document.createElement("link")
-            fileref.setAttribute("rel", "stylesheet")
-            fileref.setAttribute("type", "text/css")
-            fileref.setAttribute("href", filename)
+        if (filetype == 'js') { //if filename is a external JavaScript file
+            var fileref = document.createElement('script');
+            fileref.setAttribute('type', 'text/javascript');
+            fileref.setAttribute('src', filename);
+        } else if (filetype == 'css') { //if filename is an external CSS file
+            var fileref = document.createElement('link');
+            fileref.setAttribute('rel', 'stylesheet');
+            fileref.setAttribute('type', 'text/css');
+            fileref.setAttribute('href', filename);
         }
-        if (typeof fileref != "undefined") {
+        if (typeof fileref != 'undefined') {
             //fileref.onload = callback;
             // IE 6 & 7
             if (typeof (callback) === 'function') {
@@ -846,18 +815,18 @@ var Cresenity = function () {
                     if (this.readyState == 'complete') {
                         cresenity.handleResponseCallback(callback);
                     }
-                }
+                };
             }
-            document.getElementsByTagName("head")[0].appendChild(fileref);
+            document.getElementsByTagName('head')[0].appendChild(fileref);
         }
     };
     this.removeJsCss = function (filename, filetype) {
-        var targetelement = (filetype == "js") ? "script" : (filetype == "css") ? "link" : "none"; //determine element type to create nodelist from
-        var targetattr = (filetype == "js") ? "src" : (filetype == "css") ? "href" : "none"; //determine corresponding attribute to test for
+        var targetelement = (filetype == 'js') ? 'script' : (filetype == 'css') ? 'link' : 'none'; //determine element type to create nodelist from
+        var targetattr = (filetype == 'js') ? 'src' : (filetype == 'css') ? 'href' : 'none'; //determine corresponding attribute to test for
         var allsuspects = document.getElementsByTagName(targetelement);
         for (var i = allsuspects.length; i >= 0; i--) { //search backwards within nodelist for matching elements to remove
             if (allsuspects[i] && allsuspects[i].getAttribute(targetattr) != null && allsuspects[i].getAttribute(targetattr).indexOf(filename) != -1) {
-                allsuspects[i].parentNode.removeChild(allsuspects[i]) //remove element by calling parentNode.removeChild()
+                allsuspects[i].parentNode.removeChild(allsuspects[i]); //remove element by calling parentNode.removeChild()
             }
         }
     };
@@ -868,8 +837,6 @@ var Cresenity = function () {
             }
         }
         require(data.js_require, callback);
-
-
     };
     this.handleResponseCallback = function (callback) {
         cresenity.filesLoaded++;
@@ -897,22 +864,22 @@ var Cresenity = function () {
                 cresenity.showError(errMessage);
             }
         }
-    }
+    };
 
     this.showError = function (message) {
-        toastr['error'](message, 'Error', {
+        toastr.error(message, 'Error', {
             positionClass: 'toast-top-right',
             closeButton: true,
             progressBar: true,
             preventDuplicates: false,
-            newestOnTop: false,
+            newestOnTop: false
 
         });
-    }
+    };
     this.require = function (filename, filetype, callback) {
-        if (cresenity.filesAdded.indexOf("[" + filename + "]") == -1) {
+        if (cresenity.filesAdded.indexOf('[' + filename + ']') == -1) {
             cresenity.loadJsCss(filename, filetype, callback);
-            cresenity.filesAdded += "[" + filename + "]" //List of files added in the form "[filename1],[filename2],etc"
+            cresenity.filesAdded += '[' + filename + ']'; //List of files added in the form "[filename1],[filename2],etc"
         } else {
             cresenity.filesLoaded++;
 
@@ -931,7 +898,7 @@ var Cresenity = function () {
             onComplete: false,
             onSuccess: false,
             onBlock: false,
-            onUnblock: false,
+            onUnblock: false
         }, options);
 
 
@@ -1005,7 +972,6 @@ var Cresenity = function () {
                             if (thrownError != 'abort') {
                                 cresenity.message('error', 'Error, please call administrator... (' + thrownError + ')');
                             }
-
                         },
                         complete: function () {
                             $(element).data('xhr', false);
@@ -1020,10 +986,9 @@ var Cresenity = function () {
                             }
                         }
                     }));
-                })(this);
+                }(this));
             });
-        })(settings);
-
+        }(settings));
     };
     this.append = function (options) {
         options.reloadType = 'append';
@@ -1047,13 +1012,11 @@ var Cresenity = function () {
             method: 'get',
             dataAddition: {},
             message: 'Are you sure?',
-            onConfirmed: false,
+            onConfirmed: false
         }, options);
         bootbox.confirm(settings.message, settings.onConfirmed);
-
     };
     this.modal = function (options) {
-
         var settings = $.extend({
             // These are the defaults.
             haveHeader: false,
@@ -1115,9 +1078,8 @@ var Cresenity = function () {
         modalContainer.appendTo(appendTo);
         modalContainer.addClass('capp-modal');
         modalContainer.on('hidden.bs.modal', function (e) {
-
             if (cresenity.modalElements.length > 0) {
-                var lastModal = cresenity.modalElements[cresenity.modalElements.length - 1];
+                var lastModal = window.cresenity.modalElements[cresenity.modalElements.length - 1];
                 if (lastModal && lastModal.get(0) === $(e.target).get(0)) {
                     (function (modal) {
                         var Next = function () {
@@ -1131,43 +1093,37 @@ var Cresenity = function () {
                                 }
 
                                 setTimeout(function () {
-
                                     $(modal).remove();
                                     cresenity.modalElements.pop();
-
 
 
                                     var modalExists = $('.modal:visible').length > 0;
                                     if (!modalExists) {
                                         $('body').removeClass('modal-open');
-                                    } else {
-                                        if (!$('body').hasClass('modal-open')) {
-                                            $('body').addClass('modal-open');
-                                        }
-
+                                    } else if (!$('body').hasClass('modal-open')) {
+                                        $('body').addClass('modal-open');
                                     }
-
-
                                 }, delay);
                                 this.isRunning = true;
-                            }
-                        }
+                            };
+                        };
                         next = new Next();
                         if (typeof settings.onClose == 'function') {
                             settings.onClose(e, next.callback);
                         }
                         if (!next.isRunning) {
-
                             next.callback();
                         }
-                    })(lastModal);
+                    }(lastModal));
                 }
             }
-
         });
 
         modalContainer.on('shown.bs.modal', function (e) {
             cresenity.modalElements.push($(this));
+            if(!$('body').hasClass('modal-open')) {
+                $('body').addClass('modal-open');
+            }
         });
 
         if (settings.message) {
@@ -1191,15 +1147,15 @@ var Cresenity = function () {
 
             lastModal.modal('hide');
         }
-    }
+    };
     this.closeDialog = function (options) {
         this.closeLastModal(options);
-    }
+    };
     this.ajax = function (options) {
         var settings = $.extend({
             block: true,
             url: window.location.href,
-            method: 'post',
+            method: 'post'
         }, options);
         var dataAddition = settings.dataAddition;
         var url = settings.url;
@@ -1221,7 +1177,7 @@ var Cresenity = function () {
             success: function (response) {
                 var onSuccess = function () {};
                 var onError = function (errMessage) {
-                    cresenity.showError(errMessage)
+                    cresenity.showError(errMessage);
                 };
                 if (typeof settings.onSuccess == 'function' && validationIsValid) {
                     onSuccess = settings.onSuccess;
@@ -1236,7 +1192,6 @@ var Cresenity = function () {
                     } else {
                         onSuccess(response);
                     }
-
                 }
             },
             error: function (xhr, ajaxOptions, thrownError) {
@@ -1244,7 +1199,6 @@ var Cresenity = function () {
                     console.log(thrownError);
                     cresenity.showError(thrownError);
                 }
-
             },
 
             complete: function () {
@@ -1255,11 +1209,10 @@ var Cresenity = function () {
                 if (typeof settings.onComplete == 'function' && validationIsValid) {
                     settings.onComplete();
                 }
-            },
+            }
         };
 
         return $.ajax(ajaxOptions);
-
     };
     this.ajaxSubmit = function (options) {
         var settings = $.extend({}, options);
@@ -1286,9 +1239,9 @@ var Cresenity = function () {
                     success: function (response) {
                         var onSuccess = function () {};
                         var onError = function (errMessage) {
-                            cresenity.showError(errMessage)
+                            cresenity.showError(errMessage);
                         };
-                        
+
                         haveOnSuccess = false;
                         if (typeof settings.onSuccess == 'function' && validationIsValid) {
                             onSuccess = settings.onSuccess;
@@ -1304,7 +1257,6 @@ var Cresenity = function () {
                             } else {
                                 onSuccess(response);
                             }
-
                         }
                     },
 
@@ -1314,11 +1266,10 @@ var Cresenity = function () {
                         if (typeof settings.onComplete == 'function' && validationIsValid) {
                             settings.onComplete();
                         }
-                    },
+                    }
                 };
                 $(element).ajaxSubmit(ajaxOptions);
-            })(this);
-
+            }(this));
         });
         //always return false to prevent submit
         return false;
@@ -1330,7 +1281,6 @@ var Cresenity = function () {
             container = $('body');
         }
         if (alertType == 'bootbox') {
-
             if (typeof callback == 'undefined') {
                 bootbox.alert(message);
             } else {
@@ -1350,12 +1300,11 @@ var Cresenity = function () {
                 type: type
             }).show();
         }
-
     };
 
     this.blockPage = function (options) {
         var settings = $.extend({
-            innerMessage: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>',
+            innerMessage: '<div class="sk-folding-cube sk-primary"><div class="sk-cube1 sk-cube"></div><div class="sk-cube2 sk-cube"></div><div class="sk-cube4 sk-cube"></div><div class="sk-cube3 sk-cube"></div></div><h5 style="color: #444">LOADING...</h5>'
         }, options);
         $.blockUI({
             message: settings.innerMessage,
@@ -1382,22 +1331,22 @@ var Cresenity = function () {
     };
 
     this.formatCurrency = function (rp) {
-        rp = "" + rp;
-        var rupiah = "";
-        var vfloat = "";
+        rp = '' + rp;
+        var rupiah = '';
+        var vfloat = '';
         var ds = window.capp.decimal_separator;
         var ts = window.capp.thousand_separator;
         var dd = window.capp.decimal_digit;
         var dd = parseInt(dd);
-        var minus_str = "";
-        if (rp.indexOf("-") >= 0) {
-            minus_str = rp.substring(rp.indexOf("-"), 1);
-            rp = rp.substring(rp.indexOf("-") + 1);
+        var minus_str = '';
+        if (rp.indexOf('-') >= 0) {
+            minus_str = rp.substring(rp.indexOf('-'), 1);
+            rp = rp.substring(rp.indexOf('-') + 1);
         }
 
-        if (rp.indexOf(".") >= 0) {
-            vfloat = rp.substring(rp.indexOf("."));
-            rp = rp.substring(0, rp.indexOf("."));
+        if (rp.indexOf('.') >= 0) {
+            vfloat = rp.substring(rp.indexOf('.'));
+            rp = rp.substring(0, rp.indexOf('.'));
         }
         p = rp.length;
         while (p > 3) {
@@ -1408,18 +1357,17 @@ var Cresenity = function () {
         }
         rupiah = rp + rupiah;
         vfloat = vfloat.replace('.', ds);
-        if (vfloat.length > dd)
-            vfloat = vfloat.substring(0, dd + 1);
+        if (vfloat.length > dd) {vfloat = vfloat.substring(0, dd + 1);}
         return minus_str + rupiah + vfloat;
-    }
+    };
     this.unblockPage = function () {
         $.unblockUI();
     };
     this.blockElement = function (selector, options) {
         var settings = $.extend({
-            innerMessage: '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>',
+            innerMessage: '<div class="sk-wave sk-primary"><div class="sk-rect sk-rect1"></div> <div class="sk-rect sk-rect2"></div> <div class="sk-rect sk-rect3"></div> <div class="sk-rect sk-rect4"></div> <div class="sk-rect sk-rect5"></div></div>'
         }, options);
-        
+
         $(selector).block({
             message: settings.innerMessage,
             css: {
@@ -1431,7 +1379,6 @@ var Cresenity = function () {
                 opacity: 0.8
             }
         });
-
     };
     this.unblockElement = function (selector) {
         $(selector).unblock();
@@ -1463,7 +1410,6 @@ var Cresenity = function () {
 
 
     this.initConfirm = function () {
-
         var confirmInitialized = $('body').attr('data-confirm-initialized');
         if (!confirmInitialized) {
             jQuery(document).on('click', 'a.confirm, button.confirm', function (e) {
@@ -1476,8 +1422,7 @@ var Cresenity = function () {
                 var btn = jQuery(this);
                 btn.attr('data-clicked', '1');
                 if (no_double) {
-                    if (clicked == 1)
-                        return false;
+                    if (clicked == 1) {return false;}
                 }
 
                 if (!message) {
@@ -1492,19 +1437,16 @@ var Cresenity = function () {
                 e.stopPropagation();
                 btn.off('click');
                 bootbox.confirm({
-                    className: "capp-modal-confirm",
+                    className: 'capp-modal-confirm',
                     message: message,
                     callback: function (confirmed) {
                         if (confirmed) {
                             if (ahref) {
                                 window.location.href = ahref;
+                            } else if (btn.attr('type') == 'submit') {
+                                btn.closest('form').submit();
                             } else {
-                                if (btn.attr('type') == 'submit') {
-                                    btn.closest('form').submit();
-                                } else {
-                                    btn.on('click');
-                                }
-
+                                btn.on('click');
                             }
                         } else {
                             btn.removeAttr('data-clicked');
@@ -1528,11 +1470,9 @@ var Cresenity = function () {
         var confirmSubmitInitialized = $('body').attr('data-confirm-submit-initialized');
         if (!confirmSubmitInitialized) {
             jQuery(document).on('click', 'input[type=submit].confirm', function (e) {
-
                 var submitted = $(this).attr('data-submitted');
                 var btn = jQuery(this);
-                if (submitted == '1')
-                    return false;
+                if (submitted == '1') {return false;}
                 btn.attr('data-submitted', '1');
 
                 var message = $(this).attr('data-confirm-message');
@@ -1558,53 +1498,48 @@ var Cresenity = function () {
             $('body').attr('data-confirm-submit-initialized', '1');
         }
         jQuery(document).ready(function () {
-            jQuery("#toggle-subnavbar").click(function () {
-                var cmd = jQuery("#toggle-subnavbar span").html();
+            jQuery('#toggle-subnavbar').click(function () {
+                var cmd = jQuery('#toggle-subnavbar span').html();
                 if (cmd == 'Hide') {
                     jQuery('#subnavbar').slideUp('slow');
-                    jQuery("#toggle-subnavbar span").html('Show');
+                    jQuery('#toggle-subnavbar span').html('Show');
                 } else {
                     jQuery('#subnavbar').slideDown('slow');
-                    jQuery("#toggle-subnavbar span").html('Hide');
+                    jQuery('#toggle-subnavbar span').html('Hide');
                 }
-
             });
-            jQuery("#toggle-fullscreen").click(function () {
+            jQuery('#toggle-fullscreen').click(function () {
                 $.cresenity.fullscreen(document.documentElement);
             });
         });
-
-    }
+    };
 
     this.initClock = function () {
-        if (!!this.cf.getConfig().haveClock) {
+        if (this.cf.getConfig().haveClock) {
             $(document).ready(function () {
                 $('#servertime').serverTime({
                     ajaxFile: window.capp.base_url + 'cresenity/server_time',
-                    displayDateFormat: "yyyy-mm-dd HH:MM:ss"
+                    displayDateFormat: 'yyyy-mm-dd HH:MM:ss'
                 });
             });
         }
-    }
+    };
     this.init = function () {
         this.cf.onBeforeInit(() => {
             this.normalizeRequireJs();
         });
         this.cf.onAfterInit(() => {
-            if (!!this.cf.getConfig().haveScrollToTop) {
+            if (this.cf.getConfig().haveScrollToTop) {
                 if (!document.getElementById('topcontrol')) {
                     new scrollToTop().init();
                 }
             }
             this.initConfirm();
-
         });
 
 
         this.cf.init();
-
-
-    }
+    };
 
     this.downloadProgress = function (options) {
         let settings = $.extend({
@@ -1615,7 +1550,7 @@ var Cresenity = function () {
             onComplete: false,
             onSuccess: false,
             onBlock: false,
-            onUnblock: false,
+            onUnblock: false
         }, options);
 
 
@@ -1634,7 +1569,6 @@ var Cresenity = function () {
         }
 
         (function (settings) {
-
             (function (element) {
                 if (typeof settings.onBlock == 'function') {
                     settings.onBlock();
@@ -1648,7 +1582,6 @@ var Cresenity = function () {
                     dataType: 'json',
                     data: dataAddition,
                     success: function (response) {
-
                         cresenity.handleJsonResponse(response, function (data) {
                             var progressUrl = data.progressUrl;
                             var progressContainer = $('<div>').addClass('progress-container');
@@ -1663,54 +1596,53 @@ var Cresenity = function () {
                                             if (data.state == 'DONE') {
                                                 progressContainer.find('.progress-container-status').empty();
                                                 var innerStatus = $('<div>');
-                                                
-                                                var innerStatusLabel = $('<label>', {class:'mb-3 d-block'}).append("Your file is ready");
-                                                var linkDownload = $('<a>', {target:'_blank', href:data.fileUrl, class:'btn btn-primary'}).append("Download");
-                                                var linkClose = $('<a>', {href:'javascript:;', class:'btn btn-primary ml-3'}).append("Close");
-                                                
+
+                                                var innerStatusLabel = $('<label>', {class: 'mb-3 d-block'}).append('Your file is ready');
+                                                var linkDownload = $('<a>', {target: '_blank', href: data.fileUrl, class: 'btn btn-primary'}).append('Download');
+                                                var linkClose = $('<a>', {href: 'javascript:;', class: 'btn btn-primary ml-3'}).append('Close');
+
                                                 innerStatus.append(innerStatusLabel);
                                                 innerStatus.append(linkDownload);
                                                 innerStatus.append(linkClose);
-                                                
+
                                                 progressContainer.find('.progress-container-status').append(innerStatus);
-                                                linkClose.click(function(){
+                                                linkClose.click(function () {
                                                     cresenity.closeLastModal();
-                                                })
+                                                });
                                                 clearInterval(interval);
                                             }
                                         });
                                     }
                                 });
                             }, 3000);
-                            
+
                             var innerStatus = $('<div>');
-                                var innerStatusLabel = $('<label>', {class:'mb-4'}).append("Please Wait...");
-                                var innerStatusAnimation = $('<div>').append('<div class="sk-fading-circle sk-primary"><div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div><div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div><div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div><div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div></div>');
-                                var innerStatusAction = $('<div>', {class:'text-center my-3'});
-                                var innerStatusCancelButton = $('<button>', {class:'btn btn-primary'}).append('Cancel');
-                                innerStatusAction.append(innerStatusCancelButton);
-                                innerStatus.append(innerStatusLabel);
-                                innerStatus.append(innerStatusAnimation);
-                                innerStatus.append(innerStatusAction);
+                            var innerStatusLabel = $('<label>', {class: 'mb-4'}).append('Please Wait...');
+                            var innerStatusAnimation = $('<div>').append('<div class="sk-fading-circle sk-primary"><div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div><div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div><div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div><div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div></div>');
+                            var innerStatusAction = $('<div>', {class: 'text-center my-3'});
+                            var innerStatusCancelButton = $('<button>', {class: 'btn btn-primary'}).append('Cancel');
+                            innerStatusAction.append(innerStatusCancelButton);
+                            innerStatus.append(innerStatusLabel);
+                            innerStatus.append(innerStatusAnimation);
+                            innerStatus.append(innerStatusAction);
                             progressContainer.append($('<div>').addClass('progress-container-status').append(innerStatus));
-                            
-                            innerStatusCancelButton.click(function(){
+
+                            innerStatusCancelButton.click(function () {
                                 clearInterval(interval);
                                 cresenity.closeLastModal();
                             });
-                            
+
 
                             cresenity.modal({
                                 message: progressContainer,
                                 modalClass: 'modal-download-progress'
-                            })
+                            });
                         });
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
                         if (thrownError != 'abort') {
                             cresenity.message('error', 'Error, please call administrator... (' + thrownError + ')');
                         }
-
                     },
                     complete: function () {
                         $(element).data('xhr', false);
@@ -1725,58 +1657,53 @@ var Cresenity = function () {
                         }
                     }
                 }));
-            })(this);
-
-        })(settings);
-
+            }(this));
+        }(settings));
     };
 };
 if (!window.cresenity) {
     window.cresenity = new Cresenity();
     window.cresenity.init();
-
 }
 (function ($, window, document, undefined) {
     $.cresenity = {
-        _filesAdded: "",
+        _filesAdded: '',
         _loadjscss: function (filename, filetype, callback) {
-            if (filetype == "js") { //if filename is a external JavaScript file
-                var fileref = document.createElement('script')
-                fileref.setAttribute("type", "text/javascript")
-                fileref.setAttribute("src", filename)
-            } else if (filetype == "css") { //if filename is an external CSS file
-                var fileref = document.createElement("link")
-                fileref.setAttribute("rel", "stylesheet")
-                fileref.setAttribute("type", "text/css")
-                fileref.setAttribute("href", filename)
+            if (filetype == 'js') { //if filename is a external JavaScript file
+                var fileref = document.createElement('script');
+                fileref.setAttribute('type', 'text/javascript');
+                fileref.setAttribute('src', filename);
+            } else if (filetype == 'css') { //if filename is an external CSS file
+                var fileref = document.createElement('link');
+                fileref.setAttribute('rel', 'stylesheet');
+                fileref.setAttribute('type', 'text/css');
+                fileref.setAttribute('href', filename);
             }
-            if (typeof fileref != "undefined") {
+            if (typeof fileref != 'undefined') {
                 //fileref.onload = callback;
                 // IE 6 & 7
                 fileref.onload = $.cresenity._handle_response_callback(callback);
                 if (typeof (callback) === 'function') {
                     fileref.onreadystatechange = function () {
-
                         if (this.readyState == 'complete') {
                             $.cresenity._handle_response_callback(callback);
                         }
-                    }
+                    };
                 }
-                document.getElementsByTagName("head")[0].appendChild(fileref);
+                document.getElementsByTagName('head')[0].appendChild(fileref);
             }
         },
         _removejscss: function (filename, filetype) {
-            var targetelement = (filetype == "js") ? "script" : (filetype == "css") ? "link" : "none"; //determine element type to create nodelist from
-            var targetattr = (filetype == "js") ? "src" : (filetype == "css") ? "href" : "none"; //determine corresponding attribute to test for
+            var targetelement = (filetype == 'js') ? 'script' : (filetype == 'css') ? 'link' : 'none'; //determine element type to create nodelist from
+            var targetattr = (filetype == 'js') ? 'src' : (filetype == 'css') ? 'href' : 'none'; //determine corresponding attribute to test for
             var allsuspects = document.getElementsByTagName(targetelement);
             for (var i = allsuspects.length; i >= 0; i--) { //search backwards within nodelist for matching elements to remove
                 if (allsuspects[i] && allsuspects[i].getAttribute(targetattr) != null && allsuspects[i].getAttribute(targetattr).indexOf(filename) != -1) {
-                    allsuspects[i].parentNode.removeChild(allsuspects[i]) //remove element by calling parentNode.removeChild()
+                    allsuspects[i].parentNode.removeChild(allsuspects[i]); //remove element by calling parentNode.removeChild()
                 }
             }
         },
         _handle_response: function (data, callback) {
-
             if (data.css_require && data.css_require.length > 0) {
                 for (var i = 0; i < data.css_require.length; i++) {
                     $.cresenity.require(data.css_require[i], 'css');
@@ -1786,10 +1713,8 @@ if (!window.cresenity) {
             return;
             $.cresenity._filesloaded = 0;
             $.cresenity._filesneeded = 0;
-            if (data.css_require && data.css_require.length > 0)
-                $.cresenity._filesneeded += data.css_require.length;
-            if (data.js_require && data.js_require.length > 0)
-                $.cresenity._filesneeded += data.js_require.length;
+            if (data.css_require && data.css_require.length > 0) {$.cresenity._filesneeded += data.css_require.length;}
+            if (data.js_require && data.js_require.length > 0) {$.cresenity._filesneeded += data.js_require.length;}
             if (data.css_require && data.css_require.length > 0) {
                 for (var i = 0; i < data.css_require.length; i++) {
                     $.cresenity.require(data.css_require[i], 'css', callback);
@@ -1811,9 +1736,9 @@ if (!window.cresenity) {
             }
         },
         require: function (filename, filetype, callback) {
-            if ($.cresenity._filesAdded.indexOf("[" + filename + "]") == -1) {
+            if ($.cresenity._filesAdded.indexOf('[' + filename + ']') == -1) {
                 $.cresenity._loadjscss(filename, filetype, callback);
-                $.cresenity._filesAdded += "[" + filename + "]" //List of files added in the form "[filename1],[filename2],etc"
+                $.cresenity._filesAdded += '[' + filename + ']'; //List of files added in the form "[filename1],[filename2],etc"
             } else {
                 $.cresenity._filesloaded++;
                 if ($.cresenity._filesloaded == $.cresenity._filesneeded) {
@@ -1822,27 +1747,25 @@ if (!window.cresenity) {
             }
         },
         days_between: function (date1, date2) {
-
             // The number of milliseconds in one day
-            var ONE_DAY = 1000 * 60 * 60 * 24
+            var ONE_DAY = 1000 * 60 * 60 * 24;
 
             // Convert both dates to milliseconds
-            var date1_ms = date1.getTime()
-            var date2_ms = date2.getTime()
+            var date1_ms = date1.getTime();
+            var date2_ms = date2.getTime();
 
             // Calculate the difference in milliseconds
-            var difference_ms = Math.abs(date1_ms - date2_ms)
+            var difference_ms = Math.abs(date1_ms - date2_ms);
 
             // Convert back to days and return
-            return Math.round(difference_ms / ONE_DAY)
-
+            return Math.round(difference_ms / ONE_DAY);
         },
         set_confirm: function (selector) {
             $(selector).click(function (e) {
                 var ahref = $(this).attr('href');
                 e.preventDefault();
                 e.stopPropagation();
-                bootbox.confirm("Are you sure?", function (confirmed) {
+                bootbox.confirm('Are you sure?', function (confirmed) {
                     if (confirmed) {
                         window.location.href = ahref;
                     }
@@ -1853,27 +1776,23 @@ if (!window.cresenity) {
             return !isNaN(parseFloat(n)) && isFinite(n);
         },
         get_dialog: function (dlg_id, title) {
-
             var div_content = $('body #' + dlg_id + ' #' + dlg_id + '_content');
             if (div_content.length) {
                 $('body #' + dlg_id + ' #' + dlg_id + '_header h3').html(title);
                 return div_content;
             }
-            if (title == "undefined")
-                title = "";
-            if (!title)
-                title = "";
+            if (title == 'undefined') {title = '';}
+            if (!title) {title = '';}
             //not exists create the modal div
             var div = $('<div>').attr('id', dlg_id);
             var btnClose = '<a href="' + 'javascript:;' + '" class="close" data-dismiss="modal">&times;</a>';
             btnClose = '';
-            div.append('<div class="modal-header" id="' + dlg_id + '_header">' + btnClose + '<h3>' + title + '</h3></div>')
+            div.append('<div class="modal-header" id="' + dlg_id + '_header">' + btnClose + '<h3>' + title + '</h3></div>');
             div_content = $('<div class="modal-body" id="' + dlg_id + '_content"></div>');
             div.append(div_content);
             var btn_close = $('<a id="' + dlg_id + '_close">').addClass('btn').attr('href', 'javascript:void(0)');
             btn_close.append('<i class="icon icon-close"></i> Close');
             btn_close.click(function () {
-
                 $('#' + dlg_id + '').modal('hide');
                 $('#' + dlg_id + '').remove();
             });
@@ -1883,7 +1802,7 @@ if (!window.cresenity) {
             div.css('overflow', 'hidden');
             div.addClass('modal');
             // stick the modal right at the bottom of the main body out of the way
-            $("body").append(div);
+            $('body').append(div);
             return div_content;
         },
         message: function (type, message, alert_type, callback) {
@@ -1893,7 +1812,6 @@ if (!window.cresenity) {
                 container = $('body');
             }
             if (alert_type == 'bootbox') {
-
                 if (typeof callback == 'undefined') {
                     bootbox.alert(message);
                 } else {
@@ -1913,25 +1831,24 @@ if (!window.cresenity) {
                     type: type
                 }).show();
             }
-
         },
         thousand_separator: function (rp) {
-            rp = "" + rp;
-            var rupiah = "";
-            var vfloat = "";
+            rp = '' + rp;
+            var rupiah = '';
+            var vfloat = '';
             var ds = window.capp.decimal_separator;
             var ts = window.capp.thousand_separator;
             var dd = window.capp.decimal_digit;
             var dd = parseInt(dd);
-            var minus_str = "";
-            if (rp.indexOf("-") >= 0) {
-                minus_str = rp.substring(rp.indexOf("-"), 1);
-                rp = rp.substring(rp.indexOf("-") + 1);
+            var minus_str = '';
+            if (rp.indexOf('-') >= 0) {
+                minus_str = rp.substring(rp.indexOf('-'), 1);
+                rp = rp.substring(rp.indexOf('-') + 1);
             }
 
-            if (rp.indexOf(".") >= 0) {
-                vfloat = rp.substring(rp.indexOf("."));
-                rp = rp.substring(0, rp.indexOf("."));
+            if (rp.indexOf('.') >= 0) {
+                vfloat = rp.substring(rp.indexOf('.'));
+                rp = rp.substring(0, rp.indexOf('.'));
             }
             p = rp.length;
             while (p > 3) {
@@ -1942,19 +1859,18 @@ if (!window.cresenity) {
             }
             rupiah = rp + rupiah;
             vfloat = vfloat.replace('.', ds);
-            if (vfloat.length > dd)
-                vfloat = vfloat.substring(0, dd + 1);
+            if (vfloat.length > dd) {vfloat = vfloat.substring(0, dd + 1);}
             return minus_str + rupiah + vfloat;
         },
         replace_all: function (string, find, replace) {
-            escaped_find = find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
+            escaped_find = find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
             return string.replace(new RegExp(escaped_find, 'g'), replace);
         },
         format_currency: function (rp) {
             return $.cresenity.thousand_separator(rp);
         },
         unformat_currency: function (rp) {
-            if (typeof rp == "undefined") {
+            if (typeof rp == 'undefined') {
                 rp = '';
             }
             var ds = window.capp.decimal_separator;
@@ -1965,20 +1881,20 @@ if (!window.cresenity) {
                 rp = this.replace_all(rp, ts, '');
             }
 
-            rp = rp.replace(ds, ".");
+            rp = rp.replace(ds, '.');
             return rp;
         },
         base64: {
-            _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+            _keyStr: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=',
             encode: function (e) {
-                var t = "";
+                var t = '';
                 var n,
-                        r,
-                        i,
-                        s,
-                        o,
-                        u,
-                        a;
+                    r,
+                    i,
+                    s,
+                    o,
+                    u,
+                    a;
                 var f = 0;
                 e = this._utf8_encode(e);
                 while (f < e.length) {
@@ -1990,25 +1906,25 @@ if (!window.cresenity) {
                     u = (r & 15) << 2 | i >> 6;
                     a = i & 63;
                     if (isNaN(r)) {
-                        u = a = 64
+                        u = a = 64;
                     } else if (isNaN(i)) {
-                        a = 64
+                        a = 64;
                     }
-                    t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a)
+                    t = t + this._keyStr.charAt(s) + this._keyStr.charAt(o) + this._keyStr.charAt(u) + this._keyStr.charAt(a);
                 }
-                return t
+                return t;
             },
             decode: function (e) {
-                var t = "";
+                var t = '';
                 var n,
-                        r,
-                        i;
+                    r,
+                    i;
                 var s,
-                        o,
-                        u,
-                        a;
+                    o,
+                    u,
+                    a;
                 var f = 0;
-                e = e.replace(/[^A-Za-z0-9+/=]/g, "");
+                e = e.replace(/[^A-Za-z0-9+/=]/g, '');
                 while (f < e.length) {
                     s = this._keyStr.indexOf(e.charAt(f++));
                     o = this._keyStr.indexOf(e.charAt(f++));
@@ -2019,54 +1935,54 @@ if (!window.cresenity) {
                     i = (u & 3) << 6 | a;
                     t = t + String.fromCharCode(n);
                     if (u != 64) {
-                        t = t + String.fromCharCode(r)
+                        t = t + String.fromCharCode(r);
                     }
                     if (a != 64) {
-                        t = t + String.fromCharCode(i)
+                        t = t + String.fromCharCode(i);
                     }
                 }
                 t = this._utf8_decode(t);
-                return t
+                return t;
             },
             _utf8_encode: function (e) {
-                e = e.replace(/rn/g, "n");
-                var t = "";
+                e = e.replace(/rn/g, 'n');
+                var t = '';
                 for (var n = 0; n < e.length; n++) {
                     var r = e.charCodeAt(n);
                     if (r < 128) {
-                        t += String.fromCharCode(r)
+                        t += String.fromCharCode(r);
                     } else if (r > 127 && r < 2048) {
                         t += String.fromCharCode(r >> 6 | 192);
-                        t += String.fromCharCode(r & 63 | 128)
+                        t += String.fromCharCode(r & 63 | 128);
                     } else {
                         t += String.fromCharCode(r >> 12 | 224);
                         t += String.fromCharCode(r >> 6 & 63 | 128);
-                        t += String.fromCharCode(r & 63 | 128)
+                        t += String.fromCharCode(r & 63 | 128);
                     }
                 }
-                return t
+                return t;
             },
             _utf8_decode: function (e) {
-                var t = "";
+                var t = '';
                 var n = 0;
                 var r = c1 = c2 = 0;
                 while (n < e.length) {
                     r = e.charCodeAt(n);
                     if (r < 128) {
                         t += String.fromCharCode(r);
-                        n++
+                        n++;
                     } else if (r > 191 && r < 224) {
                         c2 = e.charCodeAt(n + 1);
                         t += String.fromCharCode((r & 31) << 6 | c2 & 63);
-                        n += 2
+                        n += 2;
                     } else {
                         c2 = e.charCodeAt(n + 1);
                         c3 = e.charCodeAt(n + 2);
                         t += String.fromCharCode((r & 15) << 12 | (c2 & 63) << 6 | c3 & 63);
-                        n += 3
+                        n += 3;
                     }
                 }
-                return t
+                return t;
             }
         },
         url: {
@@ -2076,8 +1992,7 @@ if (!window.cresenity) {
                 var url_array = url.split('?');
                 var query_string = '';
                 var base_url = url_array[0];
-                if (url_array.length > 1)
-                    query_string = url_array[1];
+                if (url_array.length > 1) {query_string = url_array[1];}
                 var kvp = query_string.split('&');
                 var i = kvp.length;
                 var x;
@@ -2095,8 +2010,7 @@ if (!window.cresenity) {
                 }
 
                 query_string = kvp.join('&');
-                if (query_string.substr(0, 1) == '&')
-                    query_string = query_string.substr(1);
+                if (query_string.substr(0, 1) == '&') {query_string = query_string.substr(1);}
                 return base_url + '?' + query_string;
             },
             replace_param: function (url) {
@@ -2118,7 +2032,6 @@ if (!window.cresenity) {
                     } else {
                         available = false;
                     }
-
                 }
                 return url;
             }
@@ -2127,22 +2040,19 @@ if (!window.cresenity) {
         reload: function (id_target, url, method, data_addition) {
             if (typeof id_target == 'object') {
                 return cresenity.reload(id_target);
-            } else {
-                var options = {};
-                options.selector = '#' + id_target;
-                options.url = url;
-                options.method = method;
-                options.dataAddition = data_addition;
-                return cresenity.reload(options);
             }
-            if (!method)
-                method = "get";
+            var options = {};
+            options.selector = '#' + id_target;
+            options.url = url;
+            options.method = method;
+            options.dataAddition = data_addition;
+            return cresenity.reload(options);
+
+            if (!method) {method = 'get';}
             var xhr = jQuery('#' + id_target).data('xhr');
-            if (xhr)
-                xhr.abort();
+            if (xhr) {xhr.abort();}
             url = $.cresenity.url.replace_param(url);
-            if (typeof data_addition == 'undefined')
-                data_addition = {};
+            if (typeof data_addition == 'undefined') {data_addition = {};}
             url = $.cresenity.url.add_query_string(url, 'capp_current_container_id', id_target);
             if (window.capp.bootstrap >= 3.3) {
                 jQuery('#' + id_target).empty();
@@ -2150,7 +2060,7 @@ if (!window.cresenity) {
             } else {
                 jQuery('#' + id_target).addClass('loading');
                 jQuery('#' + id_target).empty();
-                jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').css('text-align', 'center').css('margin-top', '100px').css('margin-bottom', '100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
+                jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').css('text-align', 'center').css('margin-top', '100px').css('margin-bottom', '100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')));
             }
 
             $.cresenity.blockElement(jQuery('#' + id_target));
@@ -2180,7 +2090,6 @@ if (!window.cresenity) {
                     if (thrownError != 'abort') {
                         $.cresenity.message('error', 'Error, please call administrator... (' + thrownError + ')');
                     }
-
                 },
                 complete: function () {
                     $.cresenity.unblockElement(jQuery('#' + id_target));
@@ -2188,22 +2097,16 @@ if (!window.cresenity) {
             }));
         },
         append: function (id_target, url, method, data_addition) {
-
-            if (!method)
-                method = "get";
+            if (!method) {method = 'get';}
             var xhr = jQuery('#' + id_target).data('xhr');
             url = $.cresenity.url.replace_param(url);
-            if (typeof data_addition == 'undefined')
-                data_addition = {};
+            if (typeof data_addition == 'undefined') {data_addition = {};}
             url = $.cresenity.url.add_query_string(url, 'capp_current_container_id', id_target);
             if (window.capp.bootstrap >= '3.3') {
-
                 jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').addClass('loading'));
             } else {
-
                 jQuery('#' + id_target).addClass('loading');
-                jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').css('text-align', 'center').css('margin-top', '100px').css('margin-bottom', '100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
-
+                jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').css('text-align', 'center').css('margin-top', '100px').css('margin-bottom', '100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')));
             }
 
             $.cresenity.blockElement(jQuery('#' + id_target));
@@ -2214,7 +2117,6 @@ if (!window.cresenity) {
                 dataType: 'json',
                 data: data_addition,
                 success: function (data) {
-
                     $.cresenity._handle_response(data, function () {
                         jQuery('#' + id_target).append(data.html);
                         jQuery('#' + id_target).find('#' + id_target + '-loading').remove();
@@ -2238,22 +2140,16 @@ if (!window.cresenity) {
             }));
         },
         prepend: function (id_target, url, method, data_addition) {
-
-            if (!method)
-                method = "get";
+            if (!method) {method = 'get';}
             var xhr = jQuery('#' + id_target).data('xhr');
             url = $.cresenity.url.replace_param(url);
-            if (typeof data_addition == 'undefined')
-                data_addition = {};
+            if (typeof data_addition == 'undefined') {data_addition = {};}
             url = $.cresenity.url.add_query_string(url, 'capp_current_container_id', id_target);
             if (window.capp.bootstrap >= '3.3') {
-
                 jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').addClass('loading'));
             } else {
-
                 jQuery('#' + id_target).addClass('loading');
-                jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').css('text-align', 'center').css('margin-top', '100px').css('margin-bottom', '100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
-
+                jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').css('text-align', 'center').css('margin-top', '100px').css('margin-bottom', '100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')));
             }
 
             $.cresenity.blockElement(jQuery('#' + id_target));
@@ -2264,7 +2160,6 @@ if (!window.cresenity) {
                 dataType: 'json',
                 data: data_addition,
                 success: function (data) {
-
                     $.cresenity._handle_response(data, function () {
                         jQuery('#' + id_target).prepend(data.html);
                         jQuery('#' + id_target).find('#' + id_target + '-loading').remove();
@@ -2288,20 +2183,16 @@ if (!window.cresenity) {
             }));
         },
         show_tooltip: function (id_target, url, method, text, toggle, position, title, data_addition) {
-            if (typeof title == 'undefined')
-                title = '';
-            if (typeof position == 'undefined')
-                position = 'auto';
-            if (typeof data_addition == 'undefined')
-                data_addition = {};
-            if (typeof text == 'undefined')
-                text = ' ';
+            if (typeof title == 'undefined') {title = '';}
+            if (typeof position == 'undefined') {position = 'auto';}
+            if (typeof data_addition == 'undefined') {data_addition = {};}
+            if (typeof text == 'undefined') {text = ' ';}
             var _tooltip_html = '<div class="popover" id="popover' + id_target + '" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content" id="popover-content' + id_target + '"></div></div>';
             var selection = jQuery('#' + id_target);
             var handle;
             var html_content = text;
             var parent = $(jQuery('#' + id_target).html());
-            var close_button = "<a id='closetooltip" + id_target + "' class='close' style='margin-left:10px;'>X</a>";
+            var close_button = '<a id=\'closetooltip' + id_target + '\' class=\'close\' style=\'margin-left:10px;\'>X</a>';
             if (typeof jQuery('#popover' + id_target).html() == 'undefined') {
                 if (url.length > 0) {
                     text = jQuery('<div>').attr('id', id_target + '-loading').css('text-align', 'center').css('margin-top', '100px').css('margin-bottom', '100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x'));
@@ -2311,29 +2202,28 @@ if (!window.cresenity) {
                         container: 'body',
                         title: close_button + title,
                         html: true,
-                        trigger: "manual",
+                        trigger: 'manual',
                         content: text,
                         selector: true,
-                        template: _tooltip_html,
+                        template: _tooltip_html
                     });
                 } else {
                     $('#' + id_target).popover({
                         container: 'body',
                         title: close_button + title,
                         html: true,
-                        trigger: "manual",
+                        trigger: 'manual',
                         content: text,
                         placement: position,
                         selector: true,
-                        template: _tooltip_html,
+                        template: _tooltip_html
                     });
                 }
                 $('#' + id_target).popover('show');
                 handle = $('.tooltip-inner', parent);
                 if (url.length > 0) {
                     var xhr = handle.data('xhr');
-                    if (xhr)
-                        xhr.abort();
+                    if (xhr) {xhr.abort();}
                     url = $.cresenity.url.add_query_string(url, 'capp_current_container_id', '#tooltip_' + id_target);
                     handle.data('xhr', jQuery.ajax({
                         type: method,
@@ -2348,21 +2238,21 @@ if (!window.cresenity) {
                                         animation: false,
                                         title: close_button + title,
                                         html: true,
-                                        trigger: "manual",
+                                        trigger: 'manual',
                                         content: html_content + data.html,
                                         selector: true,
-                                        template: _tooltip_html,
+                                        template: _tooltip_html
                                     });
                                 } else {
                                     $('#' + id_target).popover({
                                         animation: false,
                                         title: close_button + title,
                                         html: true,
-                                        trigger: "manual",
+                                        trigger: 'manual',
                                         content: html_content + data.html,
                                         placement: position,
                                         selector: true,
-                                        template: _tooltip_html,
+                                        template: _tooltip_html
                                     });
                                 }
                                 $('#' + id_target).popover('show');
@@ -2370,7 +2260,7 @@ if (!window.cresenity) {
                                     var script = $.cresenity.base64.decode(data.js);
                                     eval(script);
                                 }
-                                $("#closetooltip" + id_target).on("click", function () {
+                                $('#closetooltip' + id_target).on('click', function () {
                                     $('#' + id_target).popover('destroy');
                                 });
                             });
@@ -2383,17 +2273,13 @@ if (!window.cresenity) {
                         }
                     }));
                 } else {
-                    $("#closetooltip" + id_target).on("click", function () {
+                    $('#closetooltip' + id_target).on('click', function () {
                         $('#' + id_target).popover('destroy');
                     });
                 }
-
-            } else {
-                if (toggle == "1") {
-                    $('#' + id_target).popover('destroy');
-                }
+            } else if (toggle == '1') {
+                $('#' + id_target).popover('destroy');
             }
-
         },
         show_real_notification: function (id_target, url) {
             var selection = jQuery('#' + id_target);
@@ -2406,7 +2292,7 @@ if (!window.cresenity) {
             handle.data('xhr', jQuery.ajax({
                 type: 'post',
                 data: {
-                    title: document.title,
+                    title: document.title
                 },
                 url: url,
                 dataType: 'json',
@@ -2434,15 +2320,15 @@ if (!window.cresenity) {
         show_dialog: function (id_target, url, method, options, data_addition) {
             if (typeof id_target == 'object') {
                 return cresenity.modal(id_target);
-            } else {
-                options.selector = '#' + id_target;
-                options.reload = {};
-                options.reload.method = method;
-                options.reload.dataAddition = data_addition;
-                options.reload.url = url;
-
-                return cresenity.modal(options);
             }
+            options.selector = '#' + id_target;
+            options.reload = {};
+            options.reload.method = method;
+            options.reload.dataAddition = data_addition;
+            options.reload.url = url;
+
+            return cresenity.modal(options);
+
             var title = options;
             if (typeof options != 'object') {
                 options = {};
@@ -2459,7 +2345,6 @@ if (!window.cresenity) {
             title = settings.title;
             if (title) {
                 settings.haveHeader = true;
-
             }
             var bootstrapVersion = $.fn.tooltip.Constructor.VERSION;
             if (typeof bootstrapVersion == 'undefined') {
@@ -2467,25 +2352,23 @@ if (!window.cresenity) {
             }
 
             if (window.capp.bootstrap >= '3.3') {
-
                 if (!title) {
                     title = 'Dialog';
                 }
-                if (typeof data_addition == 'undefined')
-                    data_addition = {};
-                var _dialog_html = "<div class='modal fade'>"
-                        + "<div class='modal-dialog'>"
-                        + "<div class='modal-content'>"
-                        + "<div class='modal-header'>"
-                        + "<button type='button' class='close' data-dismiss='modal' aria-label='Close'><span aria-hidden='true'>�</span></button>"
-                        + "<h4 class='modal-title'></h4>"
-                        + "</div>"
-                        + "<div class='modal-body loading'>"
-                        + "</div>"
+                if (typeof data_addition == 'undefined') {data_addition = {};}
+                var _dialog_html = '<div class=\'modal fade\'>'
+                        + '<div class=\'modal-dialog\'>'
+                        + '<div class=\'modal-content\'>'
+                        + '<div class=\'modal-header\'>'
+                        + '<button type=\'button\' class=\'close\' data-dismiss=\'modal\' aria-label=\'Close\'><span aria-hidden=\'true\'>�</span></button>'
+                        + '<h4 class=\'modal-title\'></h4>'
+                        + '</div>'
+                        + '<div class=\'modal-body loading\'>'
+                        + '</div>'
 
-                        + "</div>"
-                        + "</div>"
-                        + "</div>";
+                        + '</div>'
+                        + '</div>'
+                        + '</div>';
 
                 var selection = jQuery('#' + id_target);
 
@@ -2496,24 +2379,24 @@ if (!window.cresenity) {
                     dialog_is_remove = true;
                 }
                 url = $.cresenity.url.add_query_string(url, 'capp_current_container_id', id_target);
-                if (!selection.is(".modal-body")) {
+                if (!selection.is('.modal-body')) {
                     var parent = modalContainer;
                     parent.attr('id', id_target + '_modal');
-                    jQuery(".modal-header .close[data-dismiss='modal']", parent).click(function (event) {
+                    jQuery('.modal-header .close[data-dismiss=\'modal\']', parent).click(function (event) {
                         event.preventDefault();
                         if (dialog_is_remove) {
-                            jQuery(this).parents(".modal").remove();
+                            jQuery(this).parents('.modal').remove();
                         } else {
-                            jQuery(this).parents(".modal").removeClass('in').hide();
+                            jQuery(this).parents('.modal').removeClass('in').hide();
                         }
                     });
 
-                    jQuery("body").append(parent);
-                    jQuery(".modal-header .modal-title", parent).html(title);
-                    handle = $(".modal-body", parent);
-                    if (selection.is("div") && selection.length == 1) {
+                    jQuery('body').append(parent);
+                    jQuery('.modal-header .modal-title', parent).html(title);
+                    handle = $('.modal-body', parent);
+                    if (selection.is('div') && selection.length == 1) {
                         handle.replaceWith(selection);
-                        selection.addClass("modal-body").show();
+                        selection.addClass('modal-body').show();
                         handle = selection;
                     }
                     // If not, append current selection to dialog body
@@ -2523,18 +2406,15 @@ if (!window.cresenity) {
                 } else {
                     handle = selection;
                 }
-                if (!method)
-                    method = "get";
+                if (!method) {method = 'get';}
                 var xhr = handle.data('xhr');
-                if (xhr)
-                    xhr.abort();
+                if (xhr) {xhr.abort();}
 
                 url = $.cresenity.url.replace_param(url);
                 jQuery('#' + id_target).empty();
                 jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').addClass('loading'));
-                if (!handle.is(".opened")) {
-                    handle.parents('.modal').addClass("in").show();
-
+                if (!handle.is('.opened')) {
+                    handle.parents('.modal').addClass('in').show();
                 }
                 handle.data('xhr', jQuery.ajax({
                     type: method,
@@ -2557,8 +2437,6 @@ if (!window.cresenity) {
                                 jQuery('#' + id_target + '').parent().find('.modal-header .modal-title').html(data.title);
                             }
                         });
-
-
                     },
                     error: function (obj, t, msg) {
                         if (msg != 'abort') {
@@ -2566,19 +2444,15 @@ if (!window.cresenity) {
                         }
                     }
                 }));
-
             } else {
                 // do Old show_dialog
 
-                if (!title)
-                    title = 'Dialog';
-                if (typeof data_addition == 'undefined')
-                    data_addition = {};
+                if (!title) {title = 'Dialog';}
+                if (typeof data_addition == 'undefined') {data_addition = {};}
 
                 var modalContainer = jQuery('<div>').addClass('modal capp-modal ').css('display', 'none');
                 if (settings.isSidebar) {
                     modalContainer.addClass('sidebar');
-
                 }
                 var modalDialog = jQuery('<div>').addClass('modal-dialog');
                 var modalContent = jQuery('<div>').addClass('modal-content animated bounceInRight');
@@ -2610,70 +2484,66 @@ if (!window.cresenity) {
                 }
 
                 url = $.cresenity.url.add_query_string(url, 'capp_current_container_id', id_target);
-                if (!selection.is(".modal-body")) {
+                if (!selection.is('.modal-body')) {
                     var overlay = $('<div class="modal-backdrop"></div>').hide();
                     var parent = modalContainer;
-                    jQuery(".modal-header a.close", parent).text(unescape("%D7")).click(function (event) {
+                    jQuery('.modal-header a.close', parent).text(unescape('%D7')).click(function (event) {
                         event.preventDefault();
                         if (dialog_is_remove) {
-                            jQuery(this).parents(".modal").find(".modal-body").closest('.modal').hide(400, function () {
+                            jQuery(this).parents('.modal').find('.modal-body').closest('.modal').hide(400, function () {
                                 handle.closest('.modal').remove();
                             });
-                            handle.closest('.modal').prev(".modal-backdrop").hide(400, function () {
-                                handle.closest('.modal').prev(".modal-backdrop").remove();
+                            handle.closest('.modal').prev('.modal-backdrop').hide(400, function () {
+                                handle.closest('.modal').prev('.modal-backdrop').remove();
                                 var modalExists = $('.modal:visible').length > 0;
                                 if (!modalExists) {
                                     $('body').removeClass('modal-open');
                                 }
-
                             });
                         } else {
-                            handle.closest('.modal').prev(".modal-backdrop").hide(400);
-                            jQuery(this).parents(".modal").find(".modal-body").closest('.modal').hide(400, function () {
+                            handle.closest('.modal').prev('.modal-backdrop').hide(400);
+                            jQuery(this).parents('.modal').find('.modal-body').closest('.modal').hide(400, function () {
                                 var modalExists = $('.modal:visible').length > 0;
                                 if (!modalExists) {
                                     $('body').removeClass('modal-open');
                                 }
-
                             });
                         }
                     });
                     jQuery(document).on('click', '[data-dismiss="modal"]', function (event) {
                         event.preventDefault();
                         if (dialog_is_remove) {
-                            jQuery(this).parents(".modal").find(".modal-body").closest('.modal').hide(400, function () {
+                            jQuery(this).parents('.modal').find('.modal-body').closest('.modal').hide(400, function () {
                                 handle.closest('.modal').remove();
                             });
-                            handle.closest('.modal').prev(".modal-backdrop").hide(400, function () {
-                                handle.closest('.modal').prev(".modal-backdrop").remove();
+                            handle.closest('.modal').prev('.modal-backdrop').hide(400, function () {
+                                handle.closest('.modal').prev('.modal-backdrop').remove();
                                 var modalExists = $('.modal:visible').length > 0;
                                 if (!modalExists) {
                                     $('body').removeClass('modal-open');
                                 }
-
                             });
                         } else {
-                            handle.closest('.modal').prev(".modal-backdrop").hide(400);
-                            jQuery(this).parents(".modal").find(".modal-body").closest('.modal').hide(400, function () {
+                            handle.closest('.modal').prev('.modal-backdrop').hide(400);
+                            jQuery(this).parents('.modal').find('.modal-body').closest('.modal').hide(400, function () {
                                 var modalExists = $('.modal:visible').length > 0;
                                 if (!modalExists) {
                                     $('body').removeClass('modal-open');
                                 }
-
                             });
                         }
                     });
-                    jQuery("body").append(overlay).append(parent);
-                    jQuery(".modal-header h3", parent).html(title);
-                    handle = $(".modal-body", parent);
+                    jQuery('body').append(overlay).append(parent);
+                    jQuery('.modal-header h3', parent).html(title);
+                    handle = $('.modal-body', parent);
                     // Create dialog body from current jquery selection
                     // If specified body is a div element and only one element is
                     // specified, make it the new modal dialog body
                     // Allows us to do something like this
                     // $('<div id="foo"></div>').dialog2(); $("#foo").dialog2("open");
-                    if (selection.is("div") && selection.length == 1) {
+                    if (selection.is('div') && selection.length == 1) {
                         handle.replaceWith(selection);
-                        selection.addClass("modal-body").show();
+                        selection.addClass('modal-body').show();
                         handle = selection;
                     }
                     // If not, append current selection to dialog body
@@ -2683,18 +2553,16 @@ if (!window.cresenity) {
                 } else {
                     handle = selection;
                 }
-                if (!method)
-                    method = "get";
+                if (!method) {method = 'get';}
                 var xhr = handle.data('xhr');
-                if (xhr)
-                    xhr.abort();
+                if (xhr) {xhr.abort();}
 
                 url = $.cresenity.url.replace_param(url);
-                jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').css('text-align', 'center').css('margin-top', '100px').css('margin-bottom', '100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
-                if (!handle.is(".opened")) {
+                jQuery('#' + id_target).append(jQuery('<div>').attr('id', id_target + '-loading').css('text-align', 'center').css('margin-top', '100px').css('margin-bottom', '100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')));
+                if (!handle.is('.opened')) {
                     overlay.show();
                     $('body').addClass('modal-open');
-                    handle.addClass("opened").closest('.modal').show();
+                    handle.addClass('opened').closest('.modal').show();
                     if (!$.fn.modal.Constructor.VERSION) {
                     }
                 }
@@ -2704,7 +2572,6 @@ if (!window.cresenity) {
                     dataType: 'json',
                     data: data_addition,
                     success: function (data) {
-
                         $.cresenity._handle_response(data, function () {
                             jQuery('#' + id_target).html(data.html);
                             if (data.js && data.js.length > 0) {
@@ -2719,7 +2586,6 @@ if (!window.cresenity) {
                             if (data.title) {
                                 jQuery('#' + id_target + '').parent().find('.modal-header h4').html(data.title);
                             }
-
                         });
                     },
                     error: function (obj, t, msg) {
@@ -2732,16 +2598,13 @@ if (!window.cresenity) {
         },
         value: function (elm) {
             elm = jQuery(elm);
-            if (elm.length == 0)
-                return null;
+            if (elm.length == 0) {return null;}
             if (elm.attr('type') == 'checkbox') {
-
                 if (!elm.is(':checked')) {
                     return null;
                 }
             }
             if (elm.attr('type') == 'radio') {
-
                 if (!elm.is(':checked')) {
                     return null;
                 }
@@ -2750,7 +2613,6 @@ if (!window.cresenity) {
                 return elm.val();
             }
             if (elm.attr('value') != 'undefined') {
-
                 return elm.attr('value');
             }
             return elm.html();
@@ -2766,16 +2628,13 @@ if (!window.cresenity) {
                 $.fn.dialog2.helpers.confirm(message, {});
             },
             show: function (selector, options) {
-
                 $(selector).dialog2(options);
             }
         },
 
         fullscreen: function (element) {
-
-            if (!$('body').hasClass("full-screen")) {
-
-                $('body').addClass("full-screen");
+            if (!$('body').hasClass('full-screen')) {
+                $('body').addClass('full-screen');
                 if (element.requestFullscreen) {
                     element.requestFullscreen();
                 } else if (element.mozRequestFullScreen) {
@@ -2785,10 +2644,8 @@ if (!window.cresenity) {
                 } else if (element.msRequestFullscreen) {
                     element.msRequestFullscreen();
                 }
-
             } else {
-
-                $('body').removeClass("full-screen");
+                $('body').removeClass('full-screen');
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
                 } else if (document.mozCancelFullScreen) {
@@ -2796,9 +2653,7 @@ if (!window.cresenity) {
                 } else if (document.webkitExitFullscreen) {
                     document.webkitExitFullscreen();
                 }
-
             }
-
         },
         blockPage: function () {
             cresenity.blockPage();
@@ -2808,19 +2663,18 @@ if (!window.cresenity) {
         },
         blockElement: function (selector) {
             cresenity.blockElement(selector);
-
         },
         unblockElement: function (selector) {
             cresenity.unblockElement(selector);
-        },
-    }
+        }
+    };
     String.prototype.format_currency = function () {
-        return $.cresenity.format_currency(this)
+        return $.cresenity.format_currency(this);
     };
     String.prototype.unformat_currency = function () {
         return $.cresenity.unformat_currency(this);
     };
-})(this.jQuery, window, document);
+}(this.jQuery, window, document));
 
 var appValidation;
 appValidation = {
@@ -2835,7 +2689,7 @@ appValidation = {
             // Disable class rules and attribute rules
             $.validator.classRuleSettings = {};
             $.validator.attributeRules = function () {
-                this.rules = {}
+                this.rules = {};
             };
 
             $.validator.dataRules = this.arrayRules;
@@ -2846,10 +2700,9 @@ appValidation = {
     },
 
     arrayRules: function (element) {
-
         var rules = {},
-                validator = $.data(element.form, "validator"),
-                cache = validator.arrayRulesCache;
+            validator = $.data(element.form, 'validator'),
+            cache = validator.arrayRulesCache;
 
         // Is not an Array
         if (element.name.indexOf('[') === -1) {
@@ -2878,13 +2731,12 @@ appValidation = {
     },
 
     setupValidations: function () {
-
         /**
          * Create JQueryValidation check to validate Laravel rules.
          */
 
 
-        $.validator.addMethod("appValidation", function (value, element, params) {
+        $.validator.addMethod('appValidation', function (value, element, params) {
             var validator = this;
             var validated = true;
             var previous = this.previousValue(element);
@@ -2905,7 +2757,7 @@ appValidation = {
                 var message = param[2];
 
                 if (!implicit && validator.optional(element)) {
-                    validated = "dependency-mismatch";
+                    validated = 'dependency-mismatch';
                     return false;
                 }
 
@@ -2939,33 +2791,31 @@ appValidation = {
                     validator.settings.messages[element.name].appValidation = message;
                     return false;
                 }
-
             });
             return validated;
-
         }, '');
 
         /**
          * Create JQueryValidation check to validate Remote Laravel rules.
          */
-        $.validator.addMethod("appValidationRemote", function (value, element, params) {
+        $.validator.addMethod('appValidationRemote', function (value, element, params) {
             var implicit = false,
-                    check = params[0][1],
-                    attribute = element.name,
-                    token = check[1],
-                    validateAll = check[2];
+                check = params[0][1],
+                attribute = element.name,
+                token = check[1],
+                validateAll = check[2];
 
             $.each(params, function (i, parameters) {
                 implicit = implicit || parameters[3];
             });
 
             if (!implicit && this.optional(element)) {
-                return "dependency-mismatch";
+                return 'dependency-mismatch';
             }
 
             var previous = this.previousValue(element),
-                    validator,
-                    data;
+                validator,
+                data;
 
             if (!this.settings.messages[element.name]) {
                 this.settings.messages[element.name] = {};
@@ -2973,7 +2823,7 @@ appValidation = {
             previous.originalMessage = this.settings.messages[element.name].appValidationRemote;
             this.settings.messages[element.name].appValidationRemote = previous.message;
 
-            var param = typeof param === "string" && {
+            var param = typeof param === 'string' && {
                 url: param
             }
             || param;
@@ -2989,13 +2839,13 @@ appValidation = {
             data = $(validator.currentForm).serializeArray();
 
             data.push({
-                'name': '_jsvalidation',
-                'value': attribute
+                name: '_jsvalidation',
+                value: attribute
             });
 
             data.push({
-                'name': '_jsvalidation_validate_all',
-                'value': validateAll
+                name: '_jsvalidation_validate_all',
+                value: validateAll
             });
 
             var formMethod = $(validator.currentForm).attr('method');
@@ -3004,9 +2854,9 @@ appValidation = {
             }
 
             $.ajax($.extend(true, {
-                mode: "abort",
-                port: "validate" + element.name,
-                dataType: "json",
+                mode: 'abort',
+                port: 'validate' + element.name,
+                dataType: 'json',
                 data: data,
                 context: validator.currentForm,
                 url: $(validator.currentForm).attr('remote-validation-url'),
@@ -3019,15 +2869,15 @@ appValidation = {
                 }
             }, param)).always(function (response, textStatus) {
                 var errors,
-                        message,
-                        submitted,
-                        valid;
+                    message,
+                    submitted,
+                    valid;
 
                 if (textStatus === 'error') {
                     valid = false;
                     response = appValidation.helpers.parseErrorResponse(response);
                 } else if (textStatus === 'success') {
-                    valid = response === true || response === "true";
+                    valid = response === true || response === 'true';
                 } else {
                     return;
                 }
@@ -3043,7 +2893,7 @@ appValidation = {
                     validator.showErrors();
                 } else {
                     errors = {};
-                    message = response || validator.defaultMessage(element, "remote");
+                    message = response || validator.defaultMessage(element, 'remote');
                     errors[element.name] = previous.message = $.isFunction(message) ? message(value) : message[0];
                     validator.invalid[element.name] = true;
                     validator.showErrors(errors);
@@ -3052,7 +2902,7 @@ appValidation = {
                 previous.valid = valid;
                 validator.stopRequest(element, valid);
             });
-            return "pending";
+            return 'pending';
         }, '');
     }
 };
@@ -3112,7 +2962,7 @@ $.extend(true, appValidation, {
                 names = [names];
             }
             for (var i = 0; i < names.length; i++) {
-                selector.push("[name='" + names[i] + "']");
+                selector.push('[name=\'' + names[i] + '\']');
             }
             return selector.join();
         },
@@ -3135,13 +2985,12 @@ $.extend(true, appValidation, {
          * @returns {boolean}
          */
         hasRules: function (element, rules) {
-
             var found = false;
             if (typeof rules === 'string') {
                 rules = [rules];
             }
 
-            var validator = $.data(element.form, "validator");
+            var validator = $.data(element.form, 'validator');
             var listRules = [];
             var cache = validator.arrayRulesCache;
             if (element.name in cache) {
@@ -3187,7 +3036,6 @@ $.extend(true, appValidation, {
          * @returns int
          */
         getSize: function getSize(obj, element, value) {
-
             if (this.hasNumericRules(element) && this.is_numeric(value)) {
                 return parseFloat(value);
             } else if ($.isArray(value)) {
@@ -3207,10 +3055,9 @@ $.extend(true, appValidation, {
          * @returns object
          */
         getAppValidation: function (rule, element) {
-
             var found = undefined;
             $.each($.validator.staticRules(element), function (key, rules) {
-                if (key === "appValidation") {
+                if (key === 'appValidation') {
                     $.each(rules, function (i, value) {
                         if (value[0] === rule) {
                             found = value;
@@ -3230,7 +3077,6 @@ $.extend(true, appValidation, {
          * @returns {boolean|int}
          */
         parseTime: function (value, format) {
-
             var timeValue = false;
             var fmt = new DateFormatter();
 
@@ -3264,7 +3110,7 @@ $.extend(true, appValidation, {
          */
         guessDate: function (value, format) {
             var fmt = new DateFormatter();
-            return fmt.guessDate(value, format)
+            return fmt.guessDate(value, format);
         },
 
         /**
@@ -3277,7 +3123,7 @@ $.extend(true, appValidation, {
          * @returns {*}
          */
         strtotime: function (text, now) {
-            return strtotime(text, now)
+            return strtotime(text, now);
         },
 
         /**
@@ -3289,7 +3135,7 @@ $.extend(true, appValidation, {
          * @returns {*}
          */
         is_numeric: function (mixed_var) {
-            return is_numeric(mixed_var)
+            return is_numeric(mixed_var);
         },
 
         /**
@@ -3333,7 +3179,6 @@ $.extend(true, appValidation, {
          * @returns {*}
          */
         dependentElement: function (validator, element, name) {
-
             var el = validator.findByName(name);
 
             if (el[0] !== undefined && validator.settings.onfocusout) {
@@ -3347,10 +3192,10 @@ $.extend(true, appValidation, {
 
                 var ruleName = '.validate-appValidation';
                 el.off(ruleName)
-                        .off(event + ruleName + '-' + element.name)
-                        .on(event + ruleName + '-' + element.name, function () {
-                            $(element).valid();
-                        });
+                    .off(event + ruleName + '-' + element.name)
+                    .on(event + ruleName + '-' + element.name, function () {
+                        $(element).valid();
+                    });
             }
 
             return el[0];
@@ -3380,7 +3225,7 @@ $.extend(true, appValidation, {
          * @returns string
          */
         escapeRegExp: function (str) {
-            return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+            return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
         },
 
         /**
@@ -3390,7 +3235,7 @@ $.extend(true, appValidation, {
          * @returns {RegExp}
          */
         regexFromWildcard: function (name) {
-            var nameParts = name.split("[*]");
+            var nameParts = name.split('[*]');
             if (nameParts.length === 1) {
                 nameParts.push('');
             }
@@ -3427,448 +3272,447 @@ $.extend(true, appValidation, {
          * @returns {boolean}
          */
         isTimezone: function (value) {
-
             var timezones = {
-                "africa": [
-                    "abidjan",
-                    "accra",
-                    "addis_ababa",
-                    "algiers",
-                    "asmara",
-                    "bamako",
-                    "bangui",
-                    "banjul",
-                    "bissau",
-                    "blantyre",
-                    "brazzaville",
-                    "bujumbura",
-                    "cairo",
-                    "casablanca",
-                    "ceuta",
-                    "conakry",
-                    "dakar",
-                    "dar_es_salaam",
-                    "djibouti",
-                    "douala",
-                    "el_aaiun",
-                    "freetown",
-                    "gaborone",
-                    "harare",
-                    "johannesburg",
-                    "juba",
-                    "kampala",
-                    "khartoum",
-                    "kigali",
-                    "kinshasa",
-                    "lagos",
-                    "libreville",
-                    "lome",
-                    "luanda",
-                    "lubumbashi",
-                    "lusaka",
-                    "malabo",
-                    "maputo",
-                    "maseru",
-                    "mbabane",
-                    "mogadishu",
-                    "monrovia",
-                    "nairobi",
-                    "ndjamena",
-                    "niamey",
-                    "nouakchott",
-                    "ouagadougou",
-                    "porto-novo",
-                    "sao_tome",
-                    "tripoli",
-                    "tunis",
-                    "windhoek"
+                africa: [
+                    'abidjan',
+                    'accra',
+                    'addis_ababa',
+                    'algiers',
+                    'asmara',
+                    'bamako',
+                    'bangui',
+                    'banjul',
+                    'bissau',
+                    'blantyre',
+                    'brazzaville',
+                    'bujumbura',
+                    'cairo',
+                    'casablanca',
+                    'ceuta',
+                    'conakry',
+                    'dakar',
+                    'dar_es_salaam',
+                    'djibouti',
+                    'douala',
+                    'el_aaiun',
+                    'freetown',
+                    'gaborone',
+                    'harare',
+                    'johannesburg',
+                    'juba',
+                    'kampala',
+                    'khartoum',
+                    'kigali',
+                    'kinshasa',
+                    'lagos',
+                    'libreville',
+                    'lome',
+                    'luanda',
+                    'lubumbashi',
+                    'lusaka',
+                    'malabo',
+                    'maputo',
+                    'maseru',
+                    'mbabane',
+                    'mogadishu',
+                    'monrovia',
+                    'nairobi',
+                    'ndjamena',
+                    'niamey',
+                    'nouakchott',
+                    'ouagadougou',
+                    'porto-novo',
+                    'sao_tome',
+                    'tripoli',
+                    'tunis',
+                    'windhoek'
                 ],
-                "america": [
-                    "adak",
-                    "anchorage",
-                    "anguilla",
-                    "antigua",
-                    "araguaina",
-                    "argentina\/buenos_aires",
-                    "argentina\/catamarca",
-                    "argentina\/cordoba",
-                    "argentina\/jujuy",
-                    "argentina\/la_rioja",
-                    "argentina\/mendoza",
-                    "argentina\/rio_gallegos",
-                    "argentina\/salta",
-                    "argentina\/san_juan",
-                    "argentina\/san_luis",
-                    "argentina\/tucuman",
-                    "argentina\/ushuaia",
-                    "aruba",
-                    "asuncion",
-                    "atikokan",
-                    "bahia",
-                    "bahia_banderas",
-                    "barbados",
-                    "belem",
-                    "belize",
-                    "blanc-sablon",
-                    "boa_vista",
-                    "bogota",
-                    "boise",
-                    "cambridge_bay",
-                    "campo_grande",
-                    "cancun",
-                    "caracas",
-                    "cayenne",
-                    "cayman",
-                    "chicago",
-                    "chihuahua",
-                    "costa_rica",
-                    "creston",
-                    "cuiaba",
-                    "curacao",
-                    "danmarkshavn",
-                    "dawson",
-                    "dawson_creek",
-                    "denver",
-                    "detroit",
-                    "dominica",
-                    "edmonton",
-                    "eirunepe",
-                    "el_salvador",
-                    "fortaleza",
-                    "glace_bay",
-                    "godthab",
-                    "goose_bay",
-                    "grand_turk",
-                    "grenada",
-                    "guadeloupe",
-                    "guatemala",
-                    "guayaquil",
-                    "guyana",
-                    "halifax",
-                    "havana",
-                    "hermosillo",
-                    "indiana\/indianapolis",
-                    "indiana\/knox",
-                    "indiana\/marengo",
-                    "indiana\/petersburg",
-                    "indiana\/tell_city",
-                    "indiana\/vevay",
-                    "indiana\/vincennes",
-                    "indiana\/winamac",
-                    "inuvik",
-                    "iqaluit",
-                    "jamaica",
-                    "juneau",
-                    "kentucky\/louisville",
-                    "kentucky\/monticello",
-                    "kralendijk",
-                    "la_paz",
-                    "lima",
-                    "los_angeles",
-                    "lower_princes",
-                    "maceio",
-                    "managua",
-                    "manaus",
-                    "marigot",
-                    "martinique",
-                    "matamoros",
-                    "mazatlan",
-                    "menominee",
-                    "merida",
-                    "metlakatla",
-                    "mexico_city",
-                    "miquelon",
-                    "moncton",
-                    "monterrey",
-                    "montevideo",
-                    "montreal",
-                    "montserrat",
-                    "nassau",
-                    "new_york",
-                    "nipigon",
-                    "nome",
-                    "noronha",
-                    "north_dakota\/beulah",
-                    "north_dakota\/center",
-                    "north_dakota\/new_salem",
-                    "ojinaga",
-                    "panama",
-                    "pangnirtung",
-                    "paramaribo",
-                    "phoenix",
-                    "port-au-prince",
-                    "port_of_spain",
-                    "porto_velho",
-                    "puerto_rico",
-                    "rainy_river",
-                    "rankin_inlet",
-                    "recife",
-                    "regina",
-                    "resolute",
-                    "rio_branco",
-                    "santa_isabel",
-                    "santarem",
-                    "santiago",
-                    "santo_domingo",
-                    "sao_paulo",
-                    "scoresbysund",
-                    "shiprock",
-                    "sitka",
-                    "st_barthelemy",
-                    "st_johns",
-                    "st_kitts",
-                    "st_lucia",
-                    "st_thomas",
-                    "st_vincent",
-                    "swift_current",
-                    "tegucigalpa",
-                    "thule",
-                    "thunder_bay",
-                    "tijuana",
-                    "toronto",
-                    "tortola",
-                    "vancouver",
-                    "whitehorse",
-                    "winnipeg",
-                    "yakutat",
-                    "yellowknife"
+                america: [
+                    'adak',
+                    'anchorage',
+                    'anguilla',
+                    'antigua',
+                    'araguaina',
+                    'argentina\/buenos_aires',
+                    'argentina\/catamarca',
+                    'argentina\/cordoba',
+                    'argentina\/jujuy',
+                    'argentina\/la_rioja',
+                    'argentina\/mendoza',
+                    'argentina\/rio_gallegos',
+                    'argentina\/salta',
+                    'argentina\/san_juan',
+                    'argentina\/san_luis',
+                    'argentina\/tucuman',
+                    'argentina\/ushuaia',
+                    'aruba',
+                    'asuncion',
+                    'atikokan',
+                    'bahia',
+                    'bahia_banderas',
+                    'barbados',
+                    'belem',
+                    'belize',
+                    'blanc-sablon',
+                    'boa_vista',
+                    'bogota',
+                    'boise',
+                    'cambridge_bay',
+                    'campo_grande',
+                    'cancun',
+                    'caracas',
+                    'cayenne',
+                    'cayman',
+                    'chicago',
+                    'chihuahua',
+                    'costa_rica',
+                    'creston',
+                    'cuiaba',
+                    'curacao',
+                    'danmarkshavn',
+                    'dawson',
+                    'dawson_creek',
+                    'denver',
+                    'detroit',
+                    'dominica',
+                    'edmonton',
+                    'eirunepe',
+                    'el_salvador',
+                    'fortaleza',
+                    'glace_bay',
+                    'godthab',
+                    'goose_bay',
+                    'grand_turk',
+                    'grenada',
+                    'guadeloupe',
+                    'guatemala',
+                    'guayaquil',
+                    'guyana',
+                    'halifax',
+                    'havana',
+                    'hermosillo',
+                    'indiana\/indianapolis',
+                    'indiana\/knox',
+                    'indiana\/marengo',
+                    'indiana\/petersburg',
+                    'indiana\/tell_city',
+                    'indiana\/vevay',
+                    'indiana\/vincennes',
+                    'indiana\/winamac',
+                    'inuvik',
+                    'iqaluit',
+                    'jamaica',
+                    'juneau',
+                    'kentucky\/louisville',
+                    'kentucky\/monticello',
+                    'kralendijk',
+                    'la_paz',
+                    'lima',
+                    'los_angeles',
+                    'lower_princes',
+                    'maceio',
+                    'managua',
+                    'manaus',
+                    'marigot',
+                    'martinique',
+                    'matamoros',
+                    'mazatlan',
+                    'menominee',
+                    'merida',
+                    'metlakatla',
+                    'mexico_city',
+                    'miquelon',
+                    'moncton',
+                    'monterrey',
+                    'montevideo',
+                    'montreal',
+                    'montserrat',
+                    'nassau',
+                    'new_york',
+                    'nipigon',
+                    'nome',
+                    'noronha',
+                    'north_dakota\/beulah',
+                    'north_dakota\/center',
+                    'north_dakota\/new_salem',
+                    'ojinaga',
+                    'panama',
+                    'pangnirtung',
+                    'paramaribo',
+                    'phoenix',
+                    'port-au-prince',
+                    'port_of_spain',
+                    'porto_velho',
+                    'puerto_rico',
+                    'rainy_river',
+                    'rankin_inlet',
+                    'recife',
+                    'regina',
+                    'resolute',
+                    'rio_branco',
+                    'santa_isabel',
+                    'santarem',
+                    'santiago',
+                    'santo_domingo',
+                    'sao_paulo',
+                    'scoresbysund',
+                    'shiprock',
+                    'sitka',
+                    'st_barthelemy',
+                    'st_johns',
+                    'st_kitts',
+                    'st_lucia',
+                    'st_thomas',
+                    'st_vincent',
+                    'swift_current',
+                    'tegucigalpa',
+                    'thule',
+                    'thunder_bay',
+                    'tijuana',
+                    'toronto',
+                    'tortola',
+                    'vancouver',
+                    'whitehorse',
+                    'winnipeg',
+                    'yakutat',
+                    'yellowknife'
                 ],
-                "antarctica": [
-                    "casey",
-                    "davis",
-                    "dumontdurville",
-                    "macquarie",
-                    "mawson",
-                    "mcmurdo",
-                    "palmer",
-                    "rothera",
-                    "south_pole",
-                    "syowa",
-                    "vostok"
+                antarctica: [
+                    'casey',
+                    'davis',
+                    'dumontdurville',
+                    'macquarie',
+                    'mawson',
+                    'mcmurdo',
+                    'palmer',
+                    'rothera',
+                    'south_pole',
+                    'syowa',
+                    'vostok'
                 ],
-                "arctic": [
-                    "longyearbyen"
+                arctic: [
+                    'longyearbyen'
                 ],
-                "asia": [
-                    "aden",
-                    "almaty",
-                    "amman",
-                    "anadyr",
-                    "aqtau",
-                    "aqtobe",
-                    "ashgabat",
-                    "baghdad",
-                    "bahrain",
-                    "baku",
-                    "bangkok",
-                    "beirut",
-                    "bishkek",
-                    "brunei",
-                    "choibalsan",
-                    "chongqing",
-                    "colombo",
-                    "damascus",
-                    "dhaka",
-                    "dili",
-                    "dubai",
-                    "dushanbe",
-                    "gaza",
-                    "harbin",
-                    "hebron",
-                    "ho_chi_minh",
-                    "hong_kong",
-                    "hovd",
-                    "irkutsk",
-                    "jakarta",
-                    "jayapura",
-                    "jerusalem",
-                    "kabul",
-                    "kamchatka",
-                    "karachi",
-                    "kashgar",
-                    "kathmandu",
-                    "khandyga",
-                    "kolkata",
-                    "krasnoyarsk",
-                    "kuala_lumpur",
-                    "kuching",
-                    "kuwait",
-                    "macau",
-                    "magadan",
-                    "makassar",
-                    "manila",
-                    "muscat",
-                    "nicosia",
-                    "novokuznetsk",
-                    "novosibirsk",
-                    "omsk",
-                    "oral",
-                    "phnom_penh",
-                    "pontianak",
-                    "pyongyang",
-                    "qatar",
-                    "qyzylorda",
-                    "rangoon",
-                    "riyadh",
-                    "sakhalin",
-                    "samarkand",
-                    "seoul",
-                    "shanghai",
-                    "singapore",
-                    "taipei",
-                    "tashkent",
-                    "tbilisi",
-                    "tehran",
-                    "thimphu",
-                    "tokyo",
-                    "ulaanbaatar",
-                    "urumqi",
-                    "ust-nera",
-                    "vientiane",
-                    "vladivostok",
-                    "yakutsk",
-                    "yekaterinburg",
-                    "yerevan"
+                asia: [
+                    'aden',
+                    'almaty',
+                    'amman',
+                    'anadyr',
+                    'aqtau',
+                    'aqtobe',
+                    'ashgabat',
+                    'baghdad',
+                    'bahrain',
+                    'baku',
+                    'bangkok',
+                    'beirut',
+                    'bishkek',
+                    'brunei',
+                    'choibalsan',
+                    'chongqing',
+                    'colombo',
+                    'damascus',
+                    'dhaka',
+                    'dili',
+                    'dubai',
+                    'dushanbe',
+                    'gaza',
+                    'harbin',
+                    'hebron',
+                    'ho_chi_minh',
+                    'hong_kong',
+                    'hovd',
+                    'irkutsk',
+                    'jakarta',
+                    'jayapura',
+                    'jerusalem',
+                    'kabul',
+                    'kamchatka',
+                    'karachi',
+                    'kashgar',
+                    'kathmandu',
+                    'khandyga',
+                    'kolkata',
+                    'krasnoyarsk',
+                    'kuala_lumpur',
+                    'kuching',
+                    'kuwait',
+                    'macau',
+                    'magadan',
+                    'makassar',
+                    'manila',
+                    'muscat',
+                    'nicosia',
+                    'novokuznetsk',
+                    'novosibirsk',
+                    'omsk',
+                    'oral',
+                    'phnom_penh',
+                    'pontianak',
+                    'pyongyang',
+                    'qatar',
+                    'qyzylorda',
+                    'rangoon',
+                    'riyadh',
+                    'sakhalin',
+                    'samarkand',
+                    'seoul',
+                    'shanghai',
+                    'singapore',
+                    'taipei',
+                    'tashkent',
+                    'tbilisi',
+                    'tehran',
+                    'thimphu',
+                    'tokyo',
+                    'ulaanbaatar',
+                    'urumqi',
+                    'ust-nera',
+                    'vientiane',
+                    'vladivostok',
+                    'yakutsk',
+                    'yekaterinburg',
+                    'yerevan'
                 ],
-                "atlantic": [
-                    "azores",
-                    "bermuda",
-                    "canary",
-                    "cape_verde",
-                    "faroe",
-                    "madeira",
-                    "reykjavik",
-                    "south_georgia",
-                    "st_helena",
-                    "stanley"
+                atlantic: [
+                    'azores',
+                    'bermuda',
+                    'canary',
+                    'cape_verde',
+                    'faroe',
+                    'madeira',
+                    'reykjavik',
+                    'south_georgia',
+                    'st_helena',
+                    'stanley'
                 ],
-                "australia": [
-                    "adelaide",
-                    "brisbane",
-                    "broken_hill",
-                    "currie",
-                    "darwin",
-                    "eucla",
-                    "hobart",
-                    "lindeman",
-                    "lord_howe",
-                    "melbourne",
-                    "perth",
-                    "sydney"
+                australia: [
+                    'adelaide',
+                    'brisbane',
+                    'broken_hill',
+                    'currie',
+                    'darwin',
+                    'eucla',
+                    'hobart',
+                    'lindeman',
+                    'lord_howe',
+                    'melbourne',
+                    'perth',
+                    'sydney'
                 ],
-                "europe": [
-                    "amsterdam",
-                    "andorra",
-                    "athens",
-                    "belgrade",
-                    "berlin",
-                    "bratislava",
-                    "brussels",
-                    "bucharest",
-                    "budapest",
-                    "busingen",
-                    "chisinau",
-                    "copenhagen",
-                    "dublin",
-                    "gibraltar",
-                    "guernsey",
-                    "helsinki",
-                    "isle_of_man",
-                    "istanbul",
-                    "jersey",
-                    "kaliningrad",
-                    "kiev",
-                    "lisbon",
-                    "ljubljana",
-                    "london",
-                    "luxembourg",
-                    "madrid",
-                    "malta",
-                    "mariehamn",
-                    "minsk",
-                    "monaco",
-                    "moscow",
-                    "oslo",
-                    "paris",
-                    "podgorica",
-                    "prague",
-                    "riga",
-                    "rome",
-                    "samara",
-                    "san_marino",
-                    "sarajevo",
-                    "simferopol",
-                    "skopje",
-                    "sofia",
-                    "stockholm",
-                    "tallinn",
-                    "tirane",
-                    "uzhgorod",
-                    "vaduz",
-                    "vatican",
-                    "vienna",
-                    "vilnius",
-                    "volgograd",
-                    "warsaw",
-                    "zagreb",
-                    "zaporozhye",
-                    "zurich"
+                europe: [
+                    'amsterdam',
+                    'andorra',
+                    'athens',
+                    'belgrade',
+                    'berlin',
+                    'bratislava',
+                    'brussels',
+                    'bucharest',
+                    'budapest',
+                    'busingen',
+                    'chisinau',
+                    'copenhagen',
+                    'dublin',
+                    'gibraltar',
+                    'guernsey',
+                    'helsinki',
+                    'isle_of_man',
+                    'istanbul',
+                    'jersey',
+                    'kaliningrad',
+                    'kiev',
+                    'lisbon',
+                    'ljubljana',
+                    'london',
+                    'luxembourg',
+                    'madrid',
+                    'malta',
+                    'mariehamn',
+                    'minsk',
+                    'monaco',
+                    'moscow',
+                    'oslo',
+                    'paris',
+                    'podgorica',
+                    'prague',
+                    'riga',
+                    'rome',
+                    'samara',
+                    'san_marino',
+                    'sarajevo',
+                    'simferopol',
+                    'skopje',
+                    'sofia',
+                    'stockholm',
+                    'tallinn',
+                    'tirane',
+                    'uzhgorod',
+                    'vaduz',
+                    'vatican',
+                    'vienna',
+                    'vilnius',
+                    'volgograd',
+                    'warsaw',
+                    'zagreb',
+                    'zaporozhye',
+                    'zurich'
                 ],
-                "indian": [
-                    "antananarivo",
-                    "chagos",
-                    "christmas",
-                    "cocos",
-                    "comoro",
-                    "kerguelen",
-                    "mahe",
-                    "maldives",
-                    "mauritius",
-                    "mayotte",
-                    "reunion"
+                indian: [
+                    'antananarivo',
+                    'chagos',
+                    'christmas',
+                    'cocos',
+                    'comoro',
+                    'kerguelen',
+                    'mahe',
+                    'maldives',
+                    'mauritius',
+                    'mayotte',
+                    'reunion'
                 ],
-                "pacific": [
-                    "apia",
-                    "auckland",
-                    "chatham",
-                    "chuuk",
-                    "easter",
-                    "efate",
-                    "enderbury",
-                    "fakaofo",
-                    "fiji",
-                    "funafuti",
-                    "galapagos",
-                    "gambier",
-                    "guadalcanal",
-                    "guam",
-                    "honolulu",
-                    "johnston",
-                    "kiritimati",
-                    "kosrae",
-                    "kwajalein",
-                    "majuro",
-                    "marquesas",
-                    "midway",
-                    "nauru",
-                    "niue",
-                    "norfolk",
-                    "noumea",
-                    "pago_pago",
-                    "palau",
-                    "pitcairn",
-                    "pohnpei",
-                    "port_moresby",
-                    "rarotonga",
-                    "saipan",
-                    "tahiti",
-                    "tarawa",
-                    "tongatapu",
-                    "wake",
-                    "wallis"
+                pacific: [
+                    'apia',
+                    'auckland',
+                    'chatham',
+                    'chuuk',
+                    'easter',
+                    'efate',
+                    'enderbury',
+                    'fakaofo',
+                    'fiji',
+                    'funafuti',
+                    'galapagos',
+                    'gambier',
+                    'guadalcanal',
+                    'guam',
+                    'honolulu',
+                    'johnston',
+                    'kiritimati',
+                    'kosrae',
+                    'kwajalein',
+                    'majuro',
+                    'marquesas',
+                    'midway',
+                    'nauru',
+                    'niue',
+                    'norfolk',
+                    'noumea',
+                    'pago_pago',
+                    'palau',
+                    'pitcairn',
+                    'pohnpei',
+                    'port_moresby',
+                    'rarotonga',
+                    'saipan',
+                    'tahiti',
+                    'tarawa',
+                    'tongatapu',
+                    'wake',
+                    'wallis'
                 ],
-                "utc": [
-                    ""
+                utc: [
+                    ''
                 ]
             };
 
@@ -3879,7 +3723,7 @@ $.extend(true, appValidation, {
                 city = tzparts[1].toLowerCase();
             }
 
-            return (continent in timezones && (timezones[continent].length === 0 || timezones[continent].indexOf(city) !== -1))
+            return (continent in timezones && (timezones[continent].length === 0 || timezones[continent].indexOf(city) !== -1));
         }
     }
 });
@@ -3940,17 +3784,17 @@ $.extend(true, appValidation, {
          */
         RequiredWith: function (value, element, params) {
             var validator = this,
-                    required = false;
+                required = false;
             var currentObject = this;
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
-                        currentObject, element, param);
+                    currentObject, element, param);
                 required = required || (
-                        target !== undefined &&
+                    target !== undefined &&
                         $.validator.methods.required.call(
-                                validator,
-                                currentObject.elementValue(target),
-                                target, true));
+                            validator,
+                            currentObject.elementValue(target),
+                            target, true));
             });
             if (required) {
                 return $.validator.methods.required.call(this, value, element, true);
@@ -3964,17 +3808,17 @@ $.extend(true, appValidation, {
          */
         RequiredWithAll: function (value, element, params) {
             var validator = this,
-                    required = true;
+                required = true;
             var currentObject = this;
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
-                        currentObject, element, param);
+                    currentObject, element, param);
                 required = required && (
-                        target !== undefined &&
+                    target !== undefined &&
                         $.validator.methods.required.call(
-                                validator,
-                                currentObject.elementValue(target),
-                                target, true));
+                            validator,
+                            currentObject.elementValue(target),
+                            target, true));
             });
             if (required) {
                 return $.validator.methods.required.call(this, value, element, true);
@@ -3988,17 +3832,17 @@ $.extend(true, appValidation, {
          */
         RequiredWithout: function (value, element, params) {
             var validator = this,
-                    required = false;
+                required = false;
             var currentObject = this;
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
-                        currentObject, element, param);
+                    currentObject, element, param);
                 required = required ||
                         target === undefined ||
                         !$.validator.methods.required.call(
-                                validator,
-                                currentObject.elementValue(target),
-                                target, true);
+                            validator,
+                            currentObject.elementValue(target),
+                            target, true);
             });
             if (required) {
                 return $.validator.methods.required.call(this, value, element, true);
@@ -4012,17 +3856,17 @@ $.extend(true, appValidation, {
          */
         RequiredWithoutAll: function (value, element, params) {
             var validator = this,
-                    required = true,
-                    currentObject = this;
+                required = true,
+                currentObject = this;
             $.each(params, function (i, param) {
                 var target = appValidation.helpers.dependentElement(
-                        currentObject, element, param);
+                    currentObject, element, param);
                 required = required && (
-                        target === undefined ||
+                    target === undefined ||
                         !$.validator.methods.required.call(
-                                validator,
-                                currentObject.elementValue(target),
-                                target, true));
+                            validator,
+                            currentObject.elementValue(target),
+                            target, true));
             });
             if (required) {
                 return $.validator.methods.required.call(this, value, element, true);
@@ -4035,16 +3879,15 @@ $.extend(true, appValidation, {
          * @return {boolean}
          */
         RequiredIf: function (value, element, params) {
-
             var target = appValidation.helpers.dependentElement(
-                    this, element, params[0]);
+                this, element, params[0]);
             if (target !== undefined) {
                 var val = String(this.elementValue(target));
                 if (typeof val !== 'undefined') {
                     var data = params.slice(1);
                     if ($.inArray(val, data) !== -1) {
                         return $.validator.methods.required.call(
-                                this, value, element, true);
+                            this, value, element, true);
                     }
                 }
             }
@@ -4058,9 +3901,8 @@ $.extend(true, appValidation, {
          * @return {boolean}
          */
         RequiredUnless: function (value, element, params) {
-
             var target = appValidation.helpers.dependentElement(
-                    this, element, params[0]);
+                this, element, params[0]);
             if (target !== undefined) {
                 var val = String(this.elementValue(target));
                 if (typeof val !== 'undefined') {
@@ -4072,7 +3914,7 @@ $.extend(true, appValidation, {
             }
 
             return $.validator.methods.required.call(
-                    this, value, element, true);
+                this, value, element, true);
         },
         /**
          * Validate that an attribute has a matching confirmation.
@@ -4088,9 +3930,8 @@ $.extend(true, appValidation, {
          * @return {boolean}
          */
         Same: function (value, element, params) {
-
             var target = appValidation.helpers.dependentElement(
-                    this, element, params[0]);
+                this, element, params[0]);
             if (target !== undefined) {
                 return String(value) === String(this.elementValue(target));
             }
@@ -4163,7 +4004,7 @@ $.extend(true, appValidation, {
          * @return {boolean}
          */
         Accepted: function (value) {
-            var regex = new RegExp("^(?:(yes|on|1|true))$", 'i');
+            var regex = new RegExp('^(?:(yes|on|1|true))$', 'i');
             return regex.test(value);
         },
         /**
@@ -4185,7 +4026,7 @@ $.extend(true, appValidation, {
          * @return {boolean}
          */
         Boolean: function (value) {
-            var regex = new RegExp("^(?:(true|false|1|0))$", 'i');
+            var regex = new RegExp('^(?:(true|false|1|0))$', 'i');
             return regex.test(value);
         },
         /**
@@ -4194,7 +4035,7 @@ $.extend(true, appValidation, {
          * @return {boolean}
          */
         Integer: function (value) {
-            var regex = new RegExp("^(?:-?\\d+)$", 'i');
+            var regex = new RegExp('^(?:-?\\d+)$', 'i');
             return regex.test(value);
         },
         /**
@@ -4216,7 +4057,7 @@ $.extend(true, appValidation, {
          */
         Digits: function (value, element, params) {
             return (
-                    $.validator.methods.number.call(this, value, element, true) &&
+                $.validator.methods.number.call(this, value, element, true) &&
                     value.length === parseInt(params, 10));
         },
         /**
@@ -4265,7 +4106,7 @@ $.extend(true, appValidation, {
          * @return {boolean}
          */
         In: function (value, element, params) {
-            if ($.isArray(value) && appValidation.helpers.hasRules(element, "Array")) {
+            if ($.isArray(value) && appValidation.helpers.hasRules(element, 'Array')) {
                 var diff = appValidation.helpers.arrayDiff(value, params);
                 return Object.keys(diff).length === 0;
             }
@@ -4368,20 +4209,20 @@ $.extend(true, appValidation, {
                 return false;
             }
 
-            var fr = new FileReader;
+            var fr = new FileReader();
             fr.onload = function () {
                 var img = new Image();
                 img.onload = function () {
                     var height = parseFloat(img.naturalHeight);
                     var width = parseFloat(img.naturalWidth);
                     var ratio = width / height;
-                    var notValid = ((params['width']) && parseFloat(params['width'] !== width)) ||
-                            ((params['min_width']) && parseFloat(params['min_width']) > width) ||
-                            ((params['max_width']) && parseFloat(params['max_width']) < width) ||
-                            ((params['height']) && parseFloat(params['height']) !== height) ||
-                            ((params['min_height']) && parseFloat(params['min_height']) > height) ||
-                            ((params['max_height']) && parseFloat(params['max_height']) < height) ||
-                            ((params['ratio']) && ratio !== parseFloat(eval(params['ratio'])));
+                    var notValid = ((params.width) && parseFloat(params.width !== width)) ||
+                            ((params.min_width) && parseFloat(params.min_width) > width) ||
+                            ((params.max_width) && parseFloat(params.max_width) < width) ||
+                            ((params.height) && parseFloat(params.height) !== height) ||
+                            ((params.min_height) && parseFloat(params.min_height) > height) ||
+                            ((params.max_height) && parseFloat(params.max_height) < height) ||
+                            ((params.ratio) && ratio !== parseFloat(eval(params.ratio)));
                     callback(!notValid);
                 };
                 img.onerror = function () {
@@ -4402,7 +4243,7 @@ $.extend(true, appValidation, {
                 return false;
             }
 
-            var regex = new RegExp("^(?:^[a-z\u00E0-\u00FC]+$)$", 'i');
+            var regex = new RegExp('^(?:^[a-z\u00E0-\u00FC]+$)$', 'i');
             return regex.test(value);
         },
         /**
@@ -4414,7 +4255,7 @@ $.extend(true, appValidation, {
             if (typeof value !== 'string') {
                 return false;
             }
-            var regex = new RegExp("^(?:^[a-z0-9\u00E0-\u00FC]+$)$", 'i');
+            var regex = new RegExp('^(?:^[a-z0-9\u00E0-\u00FC]+$)$', 'i');
             return regex.test(value);
         },
         /**
@@ -4426,7 +4267,7 @@ $.extend(true, appValidation, {
             if (typeof value !== 'string') {
                 return false;
             }
-            var regex = new RegExp("^(?:^[a-z0-9\u00E0-\u00FC_-]+$)$", 'i');
+            var regex = new RegExp('^(?:^[a-z0-9\u00E0-\u00FC_-]+$)$', 'i');
             return regex.test(value);
         },
         /**
@@ -4452,7 +4293,7 @@ $.extend(true, appValidation, {
                     }
                 }
             }
-            var regex = new RegExp("^(?:" + matches[1] + ")$", php_modifiers.join());
+            var regex = new RegExp('^(?:' + matches[1] + ')$', php_modifiers.join());
             return regex.test(value);
         },
         /**
@@ -4477,7 +4318,6 @@ $.extend(true, appValidation, {
          * @return {boolean}
          */
         Before: function (value, element, params) {
-
             var timeCompare = parseFloat(params);
             if (isNaN(timeCompare)) {
                 var target = appValidation.helpers.dependentElement(this, element, params);
@@ -4533,13 +4373,8 @@ $.extend(true, appValidation, {
 });
 
 
-
-
-
 if (!window.cresenity) {
-
     window.cresenity = new Cresenity();
 
     window.cresenity.init();
-
 }

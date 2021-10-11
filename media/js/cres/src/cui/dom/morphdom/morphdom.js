@@ -13,10 +13,10 @@
 import { compareNodeNames, toElement, moveChildren, createElementNS, doc } from './util';
 import specialElHandlers from './specialElHandlers';
 
-var ELEMENT_NODE = 1;
-var DOCUMENT_FRAGMENT_NODE = 11;
-var TEXT_NODE = 3;
-var COMMENT_NODE = 8;
+let ELEMENT_NODE = 1;
+let DOCUMENT_FRAGMENT_NODE = 11;
+let TEXT_NODE = 3;
+let COMMENT_NODE = 8;
 
 function noop() {}
 
@@ -30,13 +30,12 @@ function callHook(hook, ...params) {
     }
 
     // Don't call hook on non-"DOMElement" elements.
-    if (typeof params[0].hasAttribute !== 'function') return
+    if (typeof params[0].hasAttribute !== 'function') {return;}
 
-    return hook(...params)
+    return hook(...params);
 }
 
 export default function morphdomFactory(morphAttrs) {
-
     return function morphdom(fromNode, toNode, options) {
         if (!options) {
             options = {};
@@ -44,7 +43,7 @@ export default function morphdomFactory(morphAttrs) {
 
         if (typeof toNode === 'string') {
             if (fromNode.nodeName === '#document' || fromNode.nodeName === 'HTML') {
-                var toNodeHtml = toNode;
+                let toNodeHtml = toNode;
                 toNode = doc.createElement('html');
                 toNode.innerHTML = toNodeHtml;
             } else {
@@ -52,19 +51,19 @@ export default function morphdomFactory(morphAttrs) {
             }
         }
 
-        var getNodeKey = options.getNodeKey || defaultGetNodeKey;
-        var onBeforeNodeAdded = options.onBeforeNodeAdded || noop;
-        var onNodeAdded = options.onNodeAdded || noop;
-        var onBeforeElUpdated = options.onBeforeElUpdated || noop;
-        var onElUpdated = options.onElUpdated || noop;
-        var onBeforeNodeDiscarded = options.onBeforeNodeDiscarded || noop;
-        var onNodeDiscarded = options.onNodeDiscarded || noop;
-        var onBeforeElChildrenUpdated = options.onBeforeElChildrenUpdated || noop;
-        var childrenOnly = options.childrenOnly === true;
+        let getNodeKey = options.getNodeKey || defaultGetNodeKey;
+        let onBeforeNodeAdded = options.onBeforeNodeAdded || noop;
+        let onNodeAdded = options.onNodeAdded || noop;
+        let onBeforeElUpdated = options.onBeforeElUpdated || noop;
+        let onElUpdated = options.onElUpdated || noop;
+        let onBeforeNodeDiscarded = options.onBeforeNodeDiscarded || noop;
+        let onNodeDiscarded = options.onNodeDiscarded || noop;
+        let onBeforeElChildrenUpdated = options.onBeforeElChildrenUpdated || noop;
+        let childrenOnly = options.childrenOnly === true;
 
         // This object is used as a lookup to quickly find all keyed elements in the original DOM tree.
-        var fromNodesLookup = Object.create(null);
-        var keyedRemovalList = [];
+        let fromNodesLookup = Object.create(null);
+        let keyedRemovalList = [];
 
         function addKeyedRemoval(key) {
             keyedRemovalList.push(key);
@@ -72,10 +71,9 @@ export default function morphdomFactory(morphAttrs) {
 
         function walkDiscardedChildNodes(node, skipKeyedNodes) {
             if (node.nodeType === ELEMENT_NODE) {
-                var curChild = node.firstChild;
+                let curChild = node.firstChild;
                 while (curChild) {
-
-                    var key = undefined;
+                    let key;
 
                     if (skipKeyedNodes && (key = callHook(getNodeKey, curChild))) {
                         // If we are skipping keyed nodes then we add the key
@@ -119,9 +117,9 @@ export default function morphdomFactory(morphAttrs) {
 
         function indexTree(node) {
             if (node.nodeType === ELEMENT_NODE || node.nodeType === DOCUMENT_FRAGMENT_NODE) {
-                var curChild = node.firstChild;
+                let curChild = node.firstChild;
                 while (curChild) {
-                    var key = callHook(getNodeKey, curChild);
+                    let key = callHook(getNodeKey, curChild);
                     if (key) {
                         fromNodesLookup[key] = curChild;
                     }
@@ -140,16 +138,16 @@ export default function morphdomFactory(morphAttrs) {
             callHook(onNodeAdded, el);
 
             if (el.skipAddingChildren) {
-                return
+                return;
             }
 
-            var curChild = el.firstChild;
+            let curChild = el.firstChild;
             while (curChild) {
-                var nextSibling = curChild.nextSibling;
+                let nextSibling = curChild.nextSibling;
 
-                var key = callHook(getNodeKey, curChild);
+                let key = callHook(getNodeKey, curChild);
                 if (key) {
-                    var unmatchedFromEl = fromNodesLookup[key];
+                    let unmatchedFromEl = fromNodesLookup[key];
                     if (unmatchedFromEl && compareNodeNames(curChild, unmatchedFromEl)) {
                         curChild.parentNode.replaceChild(unmatchedFromEl, curChild);
                         morphEl(unmatchedFromEl, curChild);
@@ -157,7 +155,7 @@ export default function morphdomFactory(morphAttrs) {
                         // @cresenityModification
                         // Otherwise, "curChild" will be unnatached when it is passed to "handleNodeAdde"
                         // things like .parent and .closest will break.
-                        curChild = unmatchedFromEl
+                        curChild = unmatchedFromEl;
                     }
                 }
 
@@ -171,7 +169,7 @@ export default function morphdomFactory(morphAttrs) {
             // non-null then we still have some from nodes left over that need
             // to be removed
             while (curFromNodeChild) {
-                var fromNextSibling = curFromNodeChild.nextSibling;
+                let fromNextSibling = curFromNodeChild.nextSibling;
                 if ((curFromNodeKey = callHook(getNodeKey, curFromNodeChild))) {
                     // Since the node is keyed it might be matched up later so we defer
                     // the actual removal to later
@@ -179,7 +177,7 @@ export default function morphdomFactory(morphAttrs) {
                 } else {
                     // NOTE: we skip nested keyed nodes from being removed since there is
                     //       still a chance they will be matched up later
-                    removeNode(curFromNodeChild, fromEl, true /* skip keyed nodes */ );
+                    removeNode(curFromNodeChild, fromEl, true /* skip keyed nodes */);
                 }
                 curFromNodeChild = fromNextSibling;
             }
@@ -187,7 +185,7 @@ export default function morphdomFactory(morphAttrs) {
 
 
         function morphEl(fromEl, toEl, childrenOnly) {
-            var toElKey = callHook(getNodeKey, toEl);
+            let toElKey = callHook(getNodeKey, toEl);
 
             if (toElKey) {
                 // If an element with an ID is being morphed then it will be in the final
@@ -201,7 +199,7 @@ export default function morphdomFactory(morphAttrs) {
                 }
 
                 // @cresenityModification.
-                // I added this check to enable cf:ignore.self to not fire
+                // I added this check to enable cres:ignore.self to not fire
                 // morphAttrs, but not skip updating children as well.
                 // A task that's currently impossible with the provided hooks.
                 if (!fromEl.skipElUpdatingButStillUpdateChildren) {
@@ -217,25 +215,23 @@ export default function morphdomFactory(morphAttrs) {
 
             if (fromEl.nodeName !== 'TEXTAREA') {
                 morphChildren(fromEl, toEl);
-            } else {
-                if (fromEl.innerHTML != toEl.innerHTML) {
-                    // @cresenityModification
-                    // Only mess with the "value" of textarea if the new dom has something
-                    // inside the <textarea></textarea> tag.
-                    specialElHandlers.TEXTAREA(fromEl, toEl);
-                }
+            } else if (fromEl.innerHTML != toEl.innerHTML) {
+                // @cresenityModification
+                // Only mess with the "value" of textarea if the new dom has something
+                // inside the <textarea></textarea> tag.
+                specialElHandlers.TEXTAREA(fromEl, toEl);
             }
         }
 
         function morphChildren(fromEl, toEl) {
-            var curToNodeChild = toEl.firstChild;
-            var curFromNodeChild = fromEl.firstChild;
-            var curToNodeKey;
-            var curFromNodeKey;
+            let curToNodeChild = toEl.firstChild;
+            let curFromNodeChild = fromEl.firstChild;
+            let curToNodeKey;
+            let curFromNodeKey;
 
-            var fromNextSibling;
-            var toNextSibling;
-            var matchingFromEl;
+            let fromNextSibling;
+            let toNextSibling;
+            let matchingFromEl;
 
             // walk the children
             outer: while (curToNodeChild) {
@@ -254,10 +250,10 @@ export default function morphdomFactory(morphAttrs) {
 
                     curFromNodeKey = callHook(getNodeKey, curFromNodeChild);
 
-                    var curFromNodeType = curFromNodeChild.nodeType;
+                    let curFromNodeType = curFromNodeChild.nodeType;
 
                     // this means if the curFromNodeChild doesnt have a match with the curToNodeChild
-                    var isCompatible = undefined;
+                    let isCompatible;
 
                     if (curFromNodeType === curToNodeChild.nodeType) {
                         if (curFromNodeType === ELEMENT_NODE) {
@@ -296,7 +292,7 @@ export default function morphdomFactory(morphAttrs) {
                                             } else {
                                                 // NOTE: we skip nested keyed nodes from being removed since there is
                                                 //       still a chance they will be matched up later
-                                                removeNode(curFromNodeChild, fromEl, true /* skip keyed nodes */ );
+                                                removeNode(curFromNodeChild, fromEl, true /* skip keyed nodes */);
                                             }
 
                                             curFromNodeChild = matchingFromEl;
@@ -319,10 +315,10 @@ export default function morphdomFactory(morphAttrs) {
                                 // we can assume that the new node is meant to be inserted, instead of
                                 // used as a morph target.
                                 if (!curToNodeChild.isEqualNode(curFromNodeChild) &&
-                                    curToNodeChild.nextElementSibling &&
-                                    curToNodeChild.nextElementSibling.isEqualNode(curFromNodeChild)
+                                        curToNodeChild.nextElementSibling &&
+                                        curToNodeChild.nextElementSibling.isEqualNode(curFromNodeChild)
                                 ) {
-                                    isCompatible = false
+                                    isCompatible = false;
                                 } else {
                                     // We found compatible DOM elements so transform
                                     // the current "from" node to match the current
@@ -331,7 +327,6 @@ export default function morphdomFactory(morphAttrs) {
                                     morphEl(curFromNodeChild, curToNodeChild);
                                 }
                             }
-
                         } else if (curFromNodeType === TEXT_NODE || curFromNodeType == COMMENT_NODE) {
                             // Both nodes being compared are Text or Comment nodes
                             isCompatible = true;
@@ -357,9 +352,9 @@ export default function morphdomFactory(morphAttrs) {
                     // element before the original one instead of removing it. This is kind of
                     // a "look-ahead".
                     if (curToNodeChild.nextElementSibling && curToNodeChild.nextElementSibling.isEqualNode(curFromNodeChild)) {
-                        const nodeToBeAdded = curToNodeChild.cloneNode(true)
-                        fromEl.insertBefore(nodeToBeAdded, curFromNodeChild)
-                        handleNodeAdded(nodeToBeAdded)
+                        const nodeToBeAdded = curToNodeChild.cloneNode(true);
+                        fromEl.insertBefore(nodeToBeAdded, curFromNodeChild);
+                        handleNodeAdded(nodeToBeAdded);
                         curToNodeChild = curToNodeChild.nextElementSibling.nextSibling;
                         curFromNodeChild = fromNextSibling;
                         continue outer;
@@ -377,7 +372,7 @@ export default function morphdomFactory(morphAttrs) {
                         } else {
                             // NOTE: we skip nested keyed nodes from being removed since there is
                             //       still a chance they will be matched up later
-                            removeNode(curFromNodeChild, fromEl, true /* skip keyed nodes */ );
+                            removeNode(curFromNodeChild, fromEl, true /* skip keyed nodes */);
                         }
                     }
 
@@ -393,7 +388,7 @@ export default function morphdomFactory(morphAttrs) {
                     // MORPH
                     morphEl(matchingFromEl, curToNodeChild);
                 } else {
-                    var onBeforeNodeAddedResult = callHook(onBeforeNodeAdded, curToNodeChild);
+                    let onBeforeNodeAddedResult = callHook(onBeforeNodeAdded, curToNodeChild);
                     if (onBeforeNodeAddedResult !== false) {
                         if (onBeforeNodeAddedResult) {
                             curToNodeChild = onBeforeNodeAddedResult;
@@ -413,15 +408,15 @@ export default function morphdomFactory(morphAttrs) {
 
             cleanupFromEl(fromEl, curFromNodeChild, curFromNodeKey);
 
-            var specialElHandler = specialElHandlers[fromEl.nodeName];
+            let specialElHandler = specialElHandlers[fromEl.nodeName];
             if (specialElHandler && !fromEl.isCresenityModel) {
                 specialElHandler(fromEl, toEl);
             }
         } // END: morphChildren(...)
 
-        var morphedNode = fromNode;
-        var morphedNodeType = morphedNode.nodeType;
-        var toNodeType = toNode.nodeType;
+        let morphedNode = fromNode;
+        let morphedNodeType = morphedNode.nodeType;
+        let toNodeType = toNode.nodeType;
 
         if (!childrenOnly) {
             // Handle the case where we are given two DOM nodes that are not
@@ -443,10 +438,9 @@ export default function morphdomFactory(morphAttrs) {
                     }
 
                     return morphedNode;
-                } else {
-                    // Text node to something else
-                    morphedNode = toNode;
                 }
+                // Text node to something else
+                morphedNode = toNode;
             }
         }
 
@@ -467,8 +461,8 @@ export default function morphdomFactory(morphAttrs) {
             // it out of fromNodesLookup and we use fromNodesLookup to determine
             // if a keyed node has been matched up or not
             if (keyedRemovalList) {
-                for (var i = 0, len = keyedRemovalList.length; i < len; i++) {
-                    var elToRemove = fromNodesLookup[keyedRemovalList[i]];
+                for (let i = 0, len = keyedRemovalList.length; i < len; i++) {
+                    let elToRemove = fromNodesLookup[keyedRemovalList[i]];
                     if (elToRemove) {
                         removeNode(elToRemove, elToRemove.parentNode, false);
                     }

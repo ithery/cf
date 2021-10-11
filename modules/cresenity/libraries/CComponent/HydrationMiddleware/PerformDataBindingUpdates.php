@@ -1,19 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 class CComponent_HydrationMiddleware_PerformDataBindingUpdates implements CComponent_HydrationMiddlewareInterface {
-
     public static function hydrate($unHydratedInstance, $request) {
         try {
             foreach ($request->updates as $update) {
-                if ($update['type'] !== 'syncInput')
+                if ($update['type'] !== 'syncInput') {
                     continue;
+                }
 
                 $data = $update['payload'];
 
@@ -29,5 +30,4 @@ class CComponent_HydrationMiddleware_PerformDataBindingUpdates implements CCompo
     public static function dehydrate($instance, $response) {
         //
     }
-
 }

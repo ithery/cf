@@ -12,6 +12,9 @@ application/*
 application/cresenity/default/config/*
 application/cresenity/config/*
 
+config/*
+!config/client_modules.php
+
 #ignore data domain or org
 /data
 /data/*
@@ -75,6 +78,7 @@ sftp-config*.json
 .well-known
 .well-known/*
 __sublime_sftp_offset
+.rnd
 
 #SEO
 robots.txt
@@ -98,4 +102,26 @@ botlog.log
 .bin/*
 
 
+# ignore all IIS files
+web.config
 
+# ignore phar archives
+*.phar
+
+# ignore composer.lock
+composer.lock
+
+#ignore cache of php-cs-fixer
+.php-cs-fixer.cache
+
+# Node Dependency directories
+node_modules/
+jspm_packages/
+
+# Public folder
+public/*
+!public/index.php.sample
+
+# Deployment file
+deploy.blade.php
+**/deploy.blade.php

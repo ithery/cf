@@ -158,7 +158,7 @@ class CDaemon {
         $output = isset($config['debug']) && $config['debug'] ? 'debug.log' : '/dev/null';
 
         $commandToExecute = "NSS_STRICT_NOFORK=DISABLED $binary $command 1> $output 2>&1 &";
-
+        //cdbg::dd($commandToExecute);
         if (defined('CFCLI')) {
             $process = new Process($commandToExecute);
             $process->run();
@@ -191,7 +191,9 @@ class CDaemon {
      */
     protected function getExecutableCommand() {
         $domain = carr::get($this->config, 'domain', CF::domain());
+
         $cmd = sprintf('"%s" "%s" "%s" "%s"', $this->script, $this->uri, $domain, http_build_query($this->config));
+
         return $cmd;
     }
 

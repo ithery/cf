@@ -18,6 +18,8 @@ abstract class CDevSuite_DevCloud {
 
     protected $requiredMariaDBFiles = [];
 
+    protected $requiredSSHFiles = [];
+
     /**
      * @var CDevSuite_Filesystem
      */
@@ -45,6 +47,18 @@ abstract class CDevSuite_DevCloud {
             if (!$this->files->isDir($this->binPath($folder))) {
                 $this->files->mkdir($this->binPath($folder));
             }
+        }
+    }
+
+    public function installSSH() {
+        foreach ($this->requiredSSHFiles as $file) {
+            $this->downloadIfNotExists($file);
+        }
+    }
+
+    public function uninstallSSH() {
+        foreach ($this->requiredSSHFiles as $file) {
+            $this->binDelete($file);
         }
     }
 

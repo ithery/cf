@@ -201,7 +201,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
     /**
      * Get the container instance.
      *
-     * @return \Illuminate\Contracts\Container\Container
+     * @return \CContainer_ContainerInterface
      *
      * @throws \RuntimeException
      */

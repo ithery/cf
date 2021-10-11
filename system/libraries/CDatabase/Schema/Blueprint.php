@@ -21,14 +21,14 @@ class CDatabase_Schema_Blueprint {
     /**
      * The columns that should be added to the table.
      *
-     * @var \Illuminate\Support\Fluent[]
+     * @var CBase_Fluent[]
      */
     protected $columns = [];
 
     /**
      * The commands that should be run for the table.
      *
-     * @var \Illuminate\Support\Fluent[]
+     * @var CBase_Fluent[]
      */
     protected $commands = [];
 
@@ -163,7 +163,7 @@ class CDatabase_Schema_Blueprint {
      * @return bool
      */
     protected function creating() {
-        return collect($this->commands)->contains(function ($command) {
+        return c::collect($this->commands)->contains(function ($command) {
             return $command->name == 'create';
         });
     }
@@ -171,7 +171,7 @@ class CDatabase_Schema_Blueprint {
     /**
      * Indicate that the table needs to be created.
      *
-     * @return \Illuminate\Support\Fluent
+     * @return \CBase_Fluent
      */
     public function create() {
         return $this->addCommand('create');
@@ -189,7 +189,7 @@ class CDatabase_Schema_Blueprint {
     /**
      * Indicate that the table should be dropped.
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function drop() {
         return $this->addCommand('drop');
@@ -198,7 +198,7 @@ class CDatabase_Schema_Blueprint {
     /**
      * Indicate that the table should be dropped if it exists.
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function dropIfExists() {
         return $this->addCommand('dropIfExists');
@@ -209,7 +209,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param array|mixed $columns
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function dropColumn($columns) {
         $columns = is_array($columns) ? $columns : func_get_args();
@@ -223,7 +223,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $from
      * @param string $to
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function renameColumn($from, $to) {
         return $this->addCommand('renameColumn', compact('from', 'to'));
@@ -234,7 +234,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string|array $index
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function dropPrimary($index = null) {
         return $this->dropIndexCommand('dropPrimary', 'primary', $index);
@@ -245,7 +245,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string|array $index
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function dropUnique($index) {
         return $this->dropIndexCommand('dropUnique', 'unique', $index);
@@ -256,7 +256,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string|array $index
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function dropIndex($index) {
         return $this->dropIndexCommand('dropIndex', 'index', $index);
@@ -267,7 +267,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string|array $index
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function dropSpatialIndex($index) {
         return $this->dropIndexCommand('dropSpatialIndex', 'spatialIndex', $index);
@@ -278,7 +278,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string|array $index
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function dropForeign($index) {
         return $this->dropIndexCommand('dropForeign', 'foreign', $index);
@@ -334,7 +334,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $to
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function rename($to) {
         return $this->addCommand('rename', compact('to'));
@@ -347,7 +347,7 @@ class CDatabase_Schema_Blueprint {
      * @param string       $name
      * @param string|null  $algorithm
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function primary($columns, $name = null, $algorithm = null) {
         return $this->indexCommand('primary', $columns, $name, $algorithm);
@@ -360,7 +360,7 @@ class CDatabase_Schema_Blueprint {
      * @param string       $name
      * @param string|null  $algorithm
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function unique($columns, $name = null, $algorithm = null) {
         return $this->indexCommand('unique', $columns, $name, $algorithm);
@@ -373,7 +373,7 @@ class CDatabase_Schema_Blueprint {
      * @param string       $name
      * @param string|null  $algorithm
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function index($columns, $name = null, $algorithm = null) {
         return $this->indexCommand('index', $columns, $name, $algorithm);
@@ -385,7 +385,7 @@ class CDatabase_Schema_Blueprint {
      * @param string|array $columns
      * @param string       $name
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function spatialIndex($columns, $name = null) {
         return $this->indexCommand('spatialIndex', $columns, $name);
@@ -397,7 +397,7 @@ class CDatabase_Schema_Blueprint {
      * @param string|array $columns
      * @param string       $name
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function foreign($columns, $name = null) {
         return $this->indexCommand('foreign', $columns, $name);
@@ -408,7 +408,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function increments($column) {
         return $this->unsignedInteger($column, true);
@@ -419,7 +419,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function tinyIncrements($column) {
         return $this->unsignedTinyInteger($column, true);
@@ -430,7 +430,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function smallIncrements($column) {
         return $this->unsignedSmallInteger($column, true);
@@ -441,7 +441,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function mediumIncrements($column) {
         return $this->unsignedMediumInteger($column, true);
@@ -452,7 +452,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function bigIncrements($column) {
         return $this->unsignedBigInteger($column, true);
@@ -464,7 +464,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param int    $length
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function char($column, $length = null) {
         $length = $length ?: Builder::$defaultStringLength;
@@ -478,7 +478,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param int    $length
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function string($column, $length = null) {
         $length = $length ?: Builder::$defaultStringLength;
@@ -491,7 +491,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function text($column) {
         return $this->addColumn('text', $column);
@@ -502,7 +502,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function mediumText($column) {
         return $this->addColumn('mediumText', $column);
@@ -513,7 +513,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function longText($column) {
         return $this->addColumn('longText', $column);
@@ -526,7 +526,7 @@ class CDatabase_Schema_Blueprint {
      * @param bool   $autoIncrement
      * @param bool   $unsigned
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function integer($column, $autoIncrement = false, $unsigned = false) {
         return $this->addColumn('integer', $column, compact('autoIncrement', 'unsigned'));
@@ -539,7 +539,7 @@ class CDatabase_Schema_Blueprint {
      * @param bool   $autoIncrement
      * @param bool   $unsigned
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function tinyInteger($column, $autoIncrement = false, $unsigned = false) {
         return $this->addColumn('tinyInteger', $column, compact('autoIncrement', 'unsigned'));
@@ -552,7 +552,7 @@ class CDatabase_Schema_Blueprint {
      * @param bool   $autoIncrement
      * @param bool   $unsigned
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function smallInteger($column, $autoIncrement = false, $unsigned = false) {
         return $this->addColumn('smallInteger', $column, compact('autoIncrement', 'unsigned'));
@@ -565,7 +565,7 @@ class CDatabase_Schema_Blueprint {
      * @param bool   $autoIncrement
      * @param bool   $unsigned
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function mediumInteger($column, $autoIncrement = false, $unsigned = false) {
         return $this->addColumn('mediumInteger', $column, compact('autoIncrement', 'unsigned'));
@@ -578,7 +578,7 @@ class CDatabase_Schema_Blueprint {
      * @param bool   $autoIncrement
      * @param bool   $unsigned
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function bigInteger($column, $autoIncrement = false, $unsigned = false) {
         return $this->addColumn('bigInteger', $column, compact('autoIncrement', 'unsigned'));
@@ -590,7 +590,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param bool   $autoIncrement
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function unsignedInteger($column, $autoIncrement = false) {
         return $this->integer($column, $autoIncrement, true);
@@ -602,7 +602,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param bool   $autoIncrement
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function unsignedTinyInteger($column, $autoIncrement = false) {
         return $this->tinyInteger($column, $autoIncrement, true);
@@ -614,7 +614,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param bool   $autoIncrement
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function unsignedSmallInteger($column, $autoIncrement = false) {
         return $this->smallInteger($column, $autoIncrement, true);
@@ -626,7 +626,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param bool   $autoIncrement
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function unsignedMediumInteger($column, $autoIncrement = false) {
         return $this->mediumInteger($column, $autoIncrement, true);
@@ -638,7 +638,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param bool   $autoIncrement
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function unsignedBigInteger($column, $autoIncrement = false) {
         return $this->bigInteger($column, $autoIncrement, true);
@@ -651,7 +651,7 @@ class CDatabase_Schema_Blueprint {
      * @param int    $total
      * @param int    $places
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function float($column, $total = 8, $places = 2) {
         return $this->addColumn('float', $column, compact('total', 'places'));
@@ -664,7 +664,7 @@ class CDatabase_Schema_Blueprint {
      * @param int|null $total
      * @param int|null $places
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function double($column, $total = null, $places = null) {
         return $this->addColumn('double', $column, compact('total', 'places'));
@@ -677,7 +677,7 @@ class CDatabase_Schema_Blueprint {
      * @param int    $total
      * @param int    $places
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function decimal($column, $total = 8, $places = 2) {
         return $this->addColumn('decimal', $column, compact('total', 'places'));
@@ -690,7 +690,7 @@ class CDatabase_Schema_Blueprint {
      * @param int    $total
      * @param int    $places
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function unsignedDecimal($column, $total = 8, $places = 2) {
         return $this->addColumn('decimal', $column, [
@@ -703,7 +703,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function boolean($column) {
         return $this->addColumn('boolean', $column);
@@ -715,7 +715,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param array  $allowed
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function enum($column, array $allowed) {
         return $this->addColumn('enum', $column, compact('allowed'));
@@ -726,7 +726,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function json($column) {
         return $this->addColumn('json', $column);
@@ -737,7 +737,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function jsonb($column) {
         return $this->addColumn('jsonb', $column);
@@ -748,7 +748,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function date($column) {
         return $this->addColumn('date', $column);
@@ -760,7 +760,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param int    $precision
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function dateTime($column, $precision = 0) {
         return $this->addColumn('dateTime', $column, compact('precision'));
@@ -772,7 +772,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param int    $precision
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function dateTimeTz($column, $precision = 0) {
         return $this->addColumn('dateTimeTz', $column, compact('precision'));
@@ -784,7 +784,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param int    $precision
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function time($column, $precision = 0) {
         return $this->addColumn('time', $column, compact('precision'));
@@ -796,7 +796,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param int    $precision
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function timeTz($column, $precision = 0) {
         return $this->addColumn('timeTz', $column, compact('precision'));
@@ -808,7 +808,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param int    $precision
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function timestamp($column, $precision = 0) {
         return $this->addColumn('timestamp', $column, compact('precision'));
@@ -820,7 +820,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param int    $precision
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function timestampTz($column, $precision = 0) {
         return $this->addColumn('timestampTz', $column, compact('precision'));
@@ -871,7 +871,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $column
      * @param int    $precision
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function softDeletes($column = 'deleted_at', $precision = 0) {
         return $this->timestamp($column, $precision)->nullable();
@@ -882,7 +882,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param int $precision
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function softDeletesTz($precision = 0) {
         return $this->timestampTz('deleted_at', $precision)->nullable();
@@ -893,7 +893,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function binary($column) {
         return $this->addColumn('binary', $column);
@@ -904,7 +904,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function uuid($column) {
         return $this->addColumn('uuid', $column);
@@ -915,7 +915,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function ipAddress($column) {
         return $this->addColumn('ipAddress', $column);
@@ -926,7 +926,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function macAddress($column) {
         return $this->addColumn('macAddress', $column);
@@ -937,7 +937,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function geometry($column) {
         return $this->addColumn('geometry', $column);
@@ -948,7 +948,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function point($column) {
         return $this->addColumn('point', $column);
@@ -959,7 +959,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function lineString($column) {
         return $this->addColumn('linestring', $column);
@@ -970,7 +970,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function polygon($column) {
         return $this->addColumn('polygon', $column);
@@ -981,7 +981,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function geometryCollection($column) {
         return $this->addColumn('geometrycollection', $column);
@@ -992,7 +992,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function multiPoint($column) {
         return $this->addColumn('multipoint', $column);
@@ -1003,7 +1003,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function multiLineString($column) {
         return $this->addColumn('multilinestring', $column);
@@ -1014,7 +1014,7 @@ class CDatabase_Schema_Blueprint {
      *
      * @param string $column
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function multiPolygon($column) {
         return $this->addColumn('multipolygon', $column);
@@ -1055,7 +1055,7 @@ class CDatabase_Schema_Blueprint {
     /**
      * Adds the `remember_token` column to the table.
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function rememberToken() {
         return $this->string('remember_token', 100)->nullable();
@@ -1069,7 +1069,7 @@ class CDatabase_Schema_Blueprint {
      * @param string       $index
      * @param string|null  $algorithm
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     protected function indexCommand($type, $columns, $index, $algorithm = null) {
         $columns = (array) $columns;
@@ -1092,7 +1092,7 @@ class CDatabase_Schema_Blueprint {
      * @param string       $type
      * @param string|array $index
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     protected function dropIndexCommand($command, $type, $index) {
         $columns = [];
@@ -1128,10 +1128,10 @@ class CDatabase_Schema_Blueprint {
      * @param string $name
      * @param array  $parameters
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     public function addColumn($type, $name, array $parameters = []) {
-        $this->columns[] = $column = new   Fluent(
+        $this->columns[] = $column = new CBase_Fluent(
             array_merge(compact('type', 'name'), $parameters)
         );
 
@@ -1159,7 +1159,7 @@ class CDatabase_Schema_Blueprint {
      * @param string $name
      * @param array  $parameters
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     protected function addCommand($name, array $parameters = []) {
         $this->commands[] = $command = $this->createCommand($name, $parameters);
@@ -1173,10 +1173,10 @@ class CDatabase_Schema_Blueprint {
      * @param string $name
      * @param array  $parameters
      *
-     * @return \Illuminate\Support\Fluent
+     * @return CBase_Fluent
      */
     protected function createCommand($name, array $parameters = []) {
-        return new  Fluent(array_merge(compact(
+        return new CBase_Fluent(array_merge(compact(
             'name'
         ), $parameters));
     }
@@ -1193,7 +1193,7 @@ class CDatabase_Schema_Blueprint {
     /**
      * Get the columns on the blueprint.
      *
-     * @return \Illuminate\Support\Fluent[]
+     * @return CBase_Fluent[]
      */
     public function getColumns() {
         return $this->columns;
@@ -1202,7 +1202,7 @@ class CDatabase_Schema_Blueprint {
     /**
      * Get the commands on the blueprint.
      *
-     * @return \Illuminate\Support\Fluent[]
+     * @return CBase_Fluent[]
      */
     public function getCommands() {
         return $this->commands;
@@ -1211,7 +1211,7 @@ class CDatabase_Schema_Blueprint {
     /**
      * Get the columns on the blueprint that should be added.
      *
-     * @return \Illuminate\Support\Fluent[]
+     * @return CBase_Fluent[]
      */
     public function getAddedColumns() {
         return array_filter($this->columns, function ($column) {
@@ -1222,7 +1222,7 @@ class CDatabase_Schema_Blueprint {
     /**
      * Get the columns on the blueprint that should be changed.
      *
-     * @return \Illuminate\Support\Fluent[]
+     * @return CBase_Fluent[]
      */
     public function getChangedColumns() {
         return array_filter($this->columns, function ($column) {

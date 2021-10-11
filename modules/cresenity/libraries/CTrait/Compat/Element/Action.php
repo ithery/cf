@@ -88,11 +88,15 @@ trait CTrait_Compat_Element_Action {
     public function reassign_confirm() {
         return $this->reassignConfirm();
     }
-
+     /**
+     * @deprecated since 1.2
+     */
     public function set_submit_to($url, $target = '') {
         return $this->setSubmitTo($url, $target);
     }
-
+     /**
+     * @deprecated since 1.2
+     */
     public function set_disabled($bool) {
         return $this->setDisabled($bool);
     }
@@ -105,26 +109,36 @@ trait CTrait_Compat_Element_Action {
         return $this->setJsParam($jsparam);
     }
 
+    /**
+     * @deprecated since 1.2
+     */
     public function set_confirm_message($message) {
-        $this->confirm_message = $message;
-        return $this;
+        return $this->setConfirmMessage($message);
     }
-
+     /**
+     * @deprecated since 1.2
+     */
     public function set_type($type) {
         $this->type = $type;
         return $this;
     }
-
+     /**
+     * @deprecated since 1.2
+     */
     public function set_value($value) {
         $this->value = $value;
         return $this;
     }
-
+     /**
+     * @deprecated since 1.2
+     */
     public function set_jsfunc($jsfunc) {
         $this->jsfunc = $jsfunc;
         return $this;
     }
-
+     /**
+     * @deprecated since 1.2
+     */
     public function set_button($bool) {
         $this->button = $bool;
         return $this;

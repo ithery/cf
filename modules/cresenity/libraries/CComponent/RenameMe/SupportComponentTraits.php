@@ -1,14 +1,13 @@
 <?php
 
 class CComponent_RenameMe_SupportComponentTraits {
-
-    static function init() {
+    public static function init() {
         return new static;
     }
 
     protected $componentIdMethodMap = [];
 
-    function __construct() {
+    public function __construct() {
         CComponent_Manager::instance()->listen('component.hydrate', function ($component) {
             $component->initializeTraits();
 
@@ -87,5 +86,4 @@ class CComponent_RenameMe_SupportComponentTraits {
             }
         });
     }
-
 }

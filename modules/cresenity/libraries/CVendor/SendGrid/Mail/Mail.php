@@ -7,10 +7,13 @@
  * PHP Version - 5.6, 7.0, 7.1, 7.2
  *
  * @package   SendGrid\Mail
+ *
  * @author    Elmer Thomas <dx@sendgrid.com>
  * @copyright 2018-19 Twilio SendGrid
  * @license   https://opensource.org/licenses/MIT The MIT License
+ *
  * @version   GIT: <git_id>
+ *
  * @link      http://packagist.org/packages/sendgrid/sendgrid
  */
 
@@ -20,62 +23,97 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
-
-    /** @var $from CVendor_SendGrid_Mail_From Email address of the sender */
+    /**
+     * @var CVendor_SendGrid_Mail_From Email address of the sender
+     */
     private $from;
 
-    /** @var $subject CVendor_SendGrid_Mail_Subject Subject of the email */
+    /**
+     * @var CVendor_SendGrid_Mail_Subject Subject of the email
+     */
     private $subject;
 
-    /** @var $contents CVendor_SendGrid_Mail_Content[] Content(s) of the email */
+    /**
+     * @var CVendor_SendGrid_Mail_Content[] Content(s) of the email
+     */
     private $contents;
 
-    /** @var $attachments CVendor_SendGrid_Mail_Attachment[] Email attachments */
+    /**
+     * @var CVendor_SendGrid_Mail_Attachment[] Email attachments
+     */
     private $attachments;
 
-    /** @var $template_id CVendor_SendGrid_Mail_TemplateId Id of a template that you would like to use */
+    /**
+     * @var CVendor_SendGrid_Mail_TemplateId Id of a template that you would like to use
+     */
     private $template_id;
 
-    /** @var $sections CVendor_SendGrid_Mail_Section[] Key/value pairs that define block sections of code to be used as substitutions */
+    /**
+     * @var CVendor_SendGrid_Mail_Section[] Key/value pairs that define block sections of code to be used as substitutions
+     */
     private $sections;
 
-    /** @var $headers CVendor_SendGrid_Mail_Header[] Header names and the value to substitute for them */
+    /**
+     * @var CVendor_SendGrid_Mail_Header[] Header names and the value to substitute for them
+     */
     private $headers;
 
-    /** @var $categories CVendor_SendGrid_Mail_Category[] Category names for this message */
+    /**
+     * @var CVendor_SendGrid_Mail_Category[] Category names for this message
+     */
     private $categories;
 
-    /** @var $custom_args CVendor_SendGrid_Mail_CustomArg[] Values that are specific to the entire send that will be carried along with the email and its activity data */
+    /**
+     * @var CVendor_SendGrid_Mail_CustomArg[] Values that are specific to the entire send that will be carried along with the email and its activity data
+     */
     private $custom_args;
 
-    /** @var $substitutions CVendor_SendGrid_Mail_Substitution[] Substitutions that will apply to the text and html content of the body of your email, in addition to the subject and reply-to parameters */
+    /**
+     * @var CVendor_SendGrid_Mail_Substitution[] Substitutions that will apply to the text and html content of the body of your email, in addition to the subject and reply-to parameters
+     */
     private $substitutions;
 
-    /** @var $send_at CVendor_SendGrid_Mail_SendAt A unix timestamp allowing you to specify when you want your email to be delivered */
+    /**
+     * @var CVendor_SendGrid_Mail_SendAt A unix timestamp allowing you to specify when you want your email to be delivered
+     */
     private $send_at;
 
-    /** @var $batch_id CVendor_SendGrid_Mail_BatchId This ID represents a batch of emails to be sent at the same time */
+    /**
+     * @var CVendor_SendGrid_Mail_BatchId This ID represents a batch of emails to be sent at the same time
+     */
     private $batch_id;
 
-    /** @var $asm CVendor_SendGrid_Mail_Asm Specifies how to handle unsubscribes */
+    /**
+     * @var CVendor_SendGrid_Mail_Asm Specifies how to handle unsubscribes
+     */
     private $asm;
 
-    /** @var $ip_pool_name CVendor_SendGrid_Mail_IpPoolName The IP Pool that you would like to send this email from */
+    /**
+     * @var CVendor_SendGrid_Mail_IpPoolName The IP Pool that you would like to send this email from
+     */
     private $ip_pool_name;
 
-    /** @var $mail_settings CVendor_SendGrid_Mail_MailSettings A collection of different mail settings that you can use to specify how you would like this email to be handled */
+    /**
+     * @var CVendor_SendGrid_Mail_MailSettings A collection of different mail settings that you can use to specify how you would like this email to be handled
+     */
     private $mail_settings;
 
-    /** @var $tracking_settings CVendor_SendGrid_Mail_TrackingSettings Settings to determine how you would like to track the metrics of how your recipients interact with your email */
+    /**
+     * @var CVendor_SendGrid_Mail_TrackingSettings Settings to determine how you would like to track the metrics of how your recipients interact with your email
+     */
     private $tracking_settings;
 
-    /** @var $reply_to CVendor_SendGrid_Mail_ReplyTo Email to be use when replied to */
+    /**
+     * @var CVendor_SendGrid_Mail_ReplyTo Email to be use when replied to
+     */
     private $reply_to;
 
-    /** @var $personalization CVendor_SendGrid_Mail_Personalization[] Messages and their metadata */
+    /**
+     * @var CVendor_SendGrid_Mail_Personalization[] Messages and their metadata
+     */
     private $personalization;
 
-    const VERSION = "7.0.0";
+    const VERSION = '7.0.0';
 
     /**
      * If passing parameters into this constructor include
@@ -83,18 +121,23 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * $htmlContent at a minimum. In that case, a Personalization
      * object will be created for you.
      *
-     * @param CVendor_SendGrid_Mail_From|null $from Email address of the sender
-     * @param CVendor_SendGrid_Mail_To|CVendor_SendGrid_Mail_To[]|null $to Recipient(s) email
-     *                                                    address(es)
-     * @param CVendor_SendGrid_Mail_Subject|Subject[]|null $subject Subject(s)
-     * @param CVendor_SendGrid_Mail_PlainTextContent|null $plainTextContent Plain text version of
-     *                                                    content
-     * @param CVendor_SendGrid_Mail_HtmlContent|null $htmlContent Html version of content
-     * @param CVendor_SendGrid_Mail_Substitution[]|null $globalSubstitutions Substitutions for entire
-     *                                                    email
+     * @param CVendor_SendGrid_Mail_From|null                          $from                Email address of the sender
+     * @param CVendor_SendGrid_Mail_To|CVendor_SendGrid_Mail_To[]|null $to                  Recipient(s) email
+     *                                                                                      address(es)
+     * @param CVendor_SendGrid_Mail_Subject|Subject[]|null             $subject             Subject(s)
+     * @param CVendor_SendGrid_Mail_PlainTextContent|null              $plainTextContent    Plain text version of
+     *                                                                                      content
+     * @param CVendor_SendGrid_Mail_HtmlContent|null                   $htmlContent         Html version of content
+     * @param CVendor_SendGrid_Mail_Substitution[]|null                $globalSubstitutions Substitutions for entire
+     *                                                                                      email
      */
     public function __construct(
-    $from = null, $to = null, $subject = null, $plainTextContent = null, $htmlContent = null, array $globalSubstitutions = null
+        $from = null,
+        $to = null,
+        $subject = null,
+        $plainTextContent = null,
+        $htmlContent = null,
+        array $globalSubstitutions = null
     ) {
         if (!isset($from) && !isset($to) && !isset($subject) && !isset($plainTextContent) && !isset($htmlContent) && !isset($globalSubstitutions)
         ) {
@@ -112,7 +155,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
             $personalization = new CVendor_SendGrid_Mail_Personalization();
             foreach ($to as $email) {
                 if ($subs = $email->getSubstitutions()) {
-                    $personalization = new Personalization();
+                    $personalization = new CVendor_SendGrid_Mail_Personalization();
                 }
                 $personalization->addTo($email);
                 if ($subs = $email->getSubstitutions()) {
@@ -160,30 +203,37 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
     /**
      * Adds a To, Cc or Bcc object to a Personalization object
      *
-     * @param string $emailType Object type name:
-     *                                                         To, Cc or Bcc
-     * @param string $email Recipient email
-     *                                                         address
-     * @param string|null $name Recipient name
-     * @param CVendor_SendGrid_Mail_Substitution[]|array|null $substitutions Personalized
-     *                                                         substitutions
-     * @param int|null $personalizationIndex Index into an array
-     *                                                         of existing
-     *                                                         Personalization
-     *                                                         objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                         Personalization object
+     * @param string                                          $emailType            Object type name:
+     *                                                                              To, Cc or Bcc
+     * @param string                                          $email                Recipient email
+     *                                                                              address
+     * @param string|null                                     $name                 Recipient name
+     * @param CVendor_SendGrid_Mail_Substitution[]|array|null $substitutions        Personalized
+     *                                                                              substitutions
+     * @param int|null                                        $personalizationIndex Index into an array
+     *                                                                              of existing
+     *                                                                              Personalization
+     *                                                                              objects
+     * @param CVendor_SendGrid_Mail_Personalization|null      $personalization      A pre-created
+     *                                                                              Personalization object
      *
      * @return null
      */
     private function addRecipientEmail(
-    $emailType, $email, $name = null, $substitutions = null, $personalizationIndex = null, $personalization = null
+        $emailType,
+        $email,
+        $name = null,
+        $substitutions = null,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
-        $personalizationFunctionCall = "add" . $emailType;
-        $emailType = "CVendor_SendGrid_Mail_" . $emailType;
+        $personalizationFunctionCall = 'add' . $emailType;
+        $emailType = 'CVendor_SendGrid_Mail_' . $emailType;
         if (!($email instanceof $emailType)) {
             $email = new $emailType(
-                    $email, $name, $substitutions
+                $email,
+                $name,
+                $substitutions
             );
         }
         if ($personalization != null) {
@@ -211,12 +261,13 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
                     }
                 }
                 return;
-            } else if ($this->personalization[$personalizationIndex] != null) {
+            } elseif ($this->personalization[$personalizationIndex] != null) {
                 $this->personalization[$personalizationIndex]->$personalizationFunctionCall($email);
                 if ($subs = $email->getSubstitutions()) {
                     foreach ($subs as $key => $value) {
                         $this->personalization[$personalizationIndex]->addSubstitution(
-                                $key, $value
+                            $key,
+                            $value
                         );
                     }
                 }
@@ -243,28 +294,37 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
     /**
      * Adds an array of To, Cc or Bcc objects to a Personalization object
      *
-     * @param string $emailType Object type name: To, Cc
-     *                                                   or Bcc
-     * @param CVendor_SendGrid_Mail_To[]|CVendor_SendGrid_Mail_Cc[]|CVendor_SendGrid_Mail_Bcc[] $emails Array of email recipients
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                   existing Personalization
-     *                                                   objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A Personalization object
+     * @param string                                                                            $emailType            Object type name: To, Cc
+     *                                                                                                                or Bcc
+     * @param CVendor_SendGrid_Mail_To[]|CVendor_SendGrid_Mail_Cc[]|CVendor_SendGrid_Mail_Bcc[] $emails               Array of email recipients
+     * @param int|null                                                                          $personalizationIndex Index into an array of
+     *                                                                                                                existing Personalization
+     *                                                                                                                objects
+     * @param CVendor_SendGrid_Mail_Personalization|null                                        $personalization      A Personalization object
      */
     private function addRecipientEmails(
-    $emailType, $emails, $personalizationIndex = null, $personalization = null
+        $emailType,
+        $emails,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
-        $emailFunctionCall = "add" . $emailType;
+        $emailFunctionCall = 'add' . $emailType;
         if (current($emails) instanceof CVendor_SendGrid_Mail_EmailAddress) {
             foreach ($emails as $email) {
                 $this->$emailFunctionCall(
-                        $email, $name = null, $personalizationIndex, $personalization
+                    $email,
+                    $name = null,
+                    $personalizationIndex,
+                    $personalization
                 );
             }
         } else {
             foreach ($emails as $email => $name) {
                 $this->$emailFunctionCall(
-                        $email, $name, $personalizationIndex, $personalization
+                    $email,
+                    $name,
+                    $personalizationIndex,
+                    $personalization
                 );
             }
         }
@@ -300,17 +360,21 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
     /**
      * Adds an email recipient to a Personalization object
      *
-     * @param string|CVendor_SendGrid_Mail_To $to Email address or To object
-     * @param string $name Recipient name
-     * @param array|CVendor_SendGrid_Mail_Substitution[] $substitutions Personalized substitutions
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                    existing Personalization
-     *                                                    objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                    Personalization object
+     * @param string|CVendor_SendGrid_Mail_To            $to                   Email address or To object
+     * @param string                                     $name                 Recipient name
+     * @param array|CVendor_SendGrid_Mail_Substitution[] $substitutions        Personalized substitutions
+     * @param int|null                                   $personalizationIndex Index into an array of
+     *                                                                         existing Personalization
+     *                                                                         objects
+     * @param CVendor_SendGrid_Mail_Personalization|null $personalization      A pre-created
+     *                                                                         Personalization object
      */
     public function addTo(
-    $to, $name = null, $substitutions = null, $personalizationIndex = null, $personalization = null
+        $to,
+        $name = null,
+        $substitutions = null,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         if ($to instanceof CVendor_SendGrid_Mail_To) {
             $name = $to->getName();
@@ -318,117 +382,155 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
             $to = $to->getEmailAddress();
         }
         $this->addRecipientEmail(
-                "To", $to, $name, $substitutions, $personalizationIndex, $personalization
+            'To',
+            $to,
+            $name,
+            $substitutions,
+            $personalizationIndex,
+            $personalization
         );
     }
 
     /**
      * Adds multiple email recipients to a Personalization object
      *
-     * @param CVendor_SendGrid_Mail_To[]|array $toEmails Array of To objects or
-     *                                                   key/value pairs of email
-     *                                                   address/recipient names
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                   existing Personalization
-     *                                                   objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                   Personalization object
+     * @param CVendor_SendGrid_Mail_To[]|array           $toEmails             Array of To objects or
+     *                                                                         key/value pairs of email
+     *                                                                         address/recipient names
+     * @param int|null                                   $personalizationIndex Index into an array of
+     *                                                                         existing Personalization
+     *                                                                         objects
+     * @param CVendor_SendGrid_Mail_Personalization|null $personalization      A pre-created
+     *                                                                         Personalization object
      */
     public function addTos(
-    $toEmails, $personalizationIndex = null, $personalization = null
+        $toEmails,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         $this->addRecipientEmails(
-                "To", $toEmails, $personalizationIndex, $personalization
+            'To',
+            $toEmails,
+            $personalizationIndex,
+            $personalization
         );
     }
 
     /**
      * Adds an email cc recipient to a Personalization object
      *
-     * @param string|Cc $cc Email address or Cc object
-     * @param string $name Recipient name
-     * @param CVendor_SendGrid_Mail_Substitution[]|array|null $substitutions Personalized
-     *                                                         substitutions
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                   existing Personalization
-     *                                                   objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                   Personalization object
+     * @param string|Cc                                       $cc                   Email address or Cc object
+     * @param string                                          $name                 Recipient name
+     * @param CVendor_SendGrid_Mail_Substitution[]|array|null $substitutions        Personalized
+     *                                                                              substitutions
+     * @param int|null                                        $personalizationIndex Index into an array of
+     *                                                                              existing Personalization
+     *                                                                              objects
+     * @param CVendor_SendGrid_Mail_Personalization|null      $personalization      A pre-created
+     *                                                                              Personalization object
      */
     public function addCc(
-    $cc, $name = null, $substitutions = null, $personalizationIndex = null, $personalization = null
+        $cc,
+        $name = null,
+        $substitutions = null,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         if ($cc instanceof CVendor_SendGrid_Mail_Cc) {
             $name = $cc->getName();
             $cc = $cc->getEmailAddress();
         }
         $this->addRecipientEmail(
-                "Cc", $cc, $name, $substitutions, $personalizationIndex, $personalization
+            'Cc',
+            $cc,
+            $name,
+            $substitutions,
+            $personalizationIndex,
+            $personalization
         );
     }
 
     /**
      * Adds multiple email cc recipients to a Personalization object
      *
-     * @param CVendor_SendGrid_Mail_Cc[]|array $ccEmails Array of Cc objects or
-     *                                                   key/value pairs of email
-     *                                                   address/recipient names
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                   existing Personalization
-     *                                                   objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                   Personalization object
+     * @param CVendor_SendGrid_Mail_Cc[]|array           $ccEmails             Array of Cc objects or
+     *                                                                         key/value pairs of email
+     *                                                                         address/recipient names
+     * @param int|null                                   $personalizationIndex Index into an array of
+     *                                                                         existing Personalization
+     *                                                                         objects
+     * @param CVendor_SendGrid_Mail_Personalization|null $personalization      A pre-created
+     *                                                                         Personalization object
      */
     public function addCcs(
-    $ccEmails, $personalizationIndex = null, $personalization = null
+        $ccEmails,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         $this->addRecipientEmails(
-                "Cc", $ccEmails, $personalizationIndex, $personalization
+            'Cc',
+            $ccEmails,
+            $personalizationIndex,
+            $personalization
         );
     }
 
     /**
      * Adds an email bcc recipient to a Personalization object
      *
-     * @param string|Bcc $bcc Email address or Bcc object
-     * @param string $name Recipient name
-     * @param CVendor_SendGrid_Mail_Substitution[]|array|null $substitutions Personalized
-     *                                                         substitutions
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                   existing Personalization
-     *                                                   objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                   Personalization object
+     * @param string|Bcc                                      $bcc                  Email address or Bcc object
+     * @param string                                          $name                 Recipient name
+     * @param CVendor_SendGrid_Mail_Substitution[]|array|null $substitutions        Personalized
+     *                                                                              substitutions
+     * @param int|null                                        $personalizationIndex Index into an array of
+     *                                                                              existing Personalization
+     *                                                                              objects
+     * @param CVendor_SendGrid_Mail_Personalization|null      $personalization      A pre-created
+     *                                                                              Personalization object
      */
     public function addBcc(
-    $bcc, $name = null, $substitutions = null, $personalizationIndex = null, $personalization = null
+        $bcc,
+        $name = null,
+        $substitutions = null,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         if ($bcc instanceof CVendor_SendGrid_Mail_Bcc) {
             $name = $bcc->getName();
             $bcc = $bcc->getEmailAddress();
         }
         $this->addRecipientEmail(
-                "Bcc", $bcc, $name, $substitutions, $personalizationIndex, $personalization
+            'Bcc',
+            $bcc,
+            $name,
+            $substitutions,
+            $personalizationIndex,
+            $personalization
         );
     }
 
     /**
      * Adds multiple email bcc recipients to a Personalization object
      *
-     * @param CVendor_SendGrid_Mail_Bcc[]|array $bccEmails Array of Bcc objects or
-     *                                                   key/value pairs of email
-     *                                                   address/recipient names
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                   existing Personalization
-     *                                                   objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                   Personalization object
+     * @param CVendor_SendGrid_Mail_Bcc[]|array          $bccEmails            Array of Bcc objects or
+     *                                                                         key/value pairs of email
+     *                                                                         address/recipient names
+     * @param int|null                                   $personalizationIndex Index into an array of
+     *                                                                         existing Personalization
+     *                                                                         objects
+     * @param CVendor_SendGrid_Mail_Personalization|null $personalization      A pre-created
+     *                                                                         Personalization object
      */
     public function addBccs(
-    $bccEmails, $personalizationIndex = null, $personalization = null
+        $bccEmails,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         $this->addRecipientEmails(
-                "Bcc", $bccEmails, $personalizationIndex, $personalization
+            'Bcc',
+            $bccEmails,
+            $personalizationIndex,
+            $personalization
         );
     }
 
@@ -440,15 +542,17 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * subjects added to Personalization objects override
      * global subjects.
      *
-     * @param string|CVendor_SendGrid_Mail_Subject $subject Email subject
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                   existing Personalization
-     *                                                   objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                   Personalization object
+     * @param string|CVendor_SendGrid_Mail_Subject       $subject              Email subject
+     * @param int|null                                   $personalizationIndex Index into an array of
+     *                                                                         existing Personalization
+     *                                                                         objects
+     * @param CVendor_SendGrid_Mail_Personalization|null $personalization      A pre-created
+     *                                                                         Personalization object
      */
     public function setSubject(
-    $subject, $personalizationIndex = null, $personalization = null
+        $subject,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         if (!($subject instanceof CVendor_SendGrid_Mail_Subject)) {
             $subject = new CVendor_SendGrid_Mail_Subject($subject);
@@ -487,16 +591,19 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * headers added to Personalization objects override
      * global headers.
      *
-     * @param string|CVendor_SendGrid_Mail_Header $key Key or Header object
-     * @param string|null $value Value
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                   existing Personalization
-     *                                                   objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                   Personalization object
+     * @param string|CVendor_SendGrid_Mail_Header        $key                  Key or Header object
+     * @param string|null                                $value                Value
+     * @param int|null                                   $personalizationIndex Index into an array of
+     *                                                                         existing Personalization
+     *                                                                         objects
+     * @param CVendor_SendGrid_Mail_Personalization|null $personalization      A pre-created
+     *                                                                         Personalization object
      */
     public function addHeader(
-    $key, $value = null, $personalizationIndex = null, $personalization = null
+        $key,
+        $value = null,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         $header = null;
         if ($key instanceof CVendor_SendGrid_Mail_Header) {
@@ -512,7 +619,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
         } else {
             if ($this->personalization[0] != null) {
                 $this->personalization[0]->addHeader($header);
-            } else if ($this->personalization[$personalizationIndex] != null) {
+            } elseif ($this->personalization[$personalizationIndex] != null) {
                 $this->personalization[$personalizationIndex]->addHeader($header);
             } else {
                 $personalization = new CVendor_SendGrid_Mail_Personalization();
@@ -536,16 +643,18 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * headers added to Personalization objects override
      * global headers.
      *
-     * @param array|Header[] $headers Array of Header objects
-     *                                                   or key values
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                   existing Personalization
-     *                                                   objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                   Personalization object
+     * @param array|Header[]                             $headers              Array of Header objects
+     *                                                                         or key values
+     * @param int|null                                   $personalizationIndex Index into an array of
+     *                                                                         existing Personalization
+     *                                                                         objects
+     * @param CVendor_SendGrid_Mail_Personalization|null $personalization      A pre-created
+     *                                                                         Personalization object
      */
     public function addHeaders(
-    $headers, $personalizationIndex = null, $personalization = null
+        $headers,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         if (current($headers) instanceof CVendor_SendGrid_Mail_Header) {
             foreach ($headers as $header) {
@@ -554,7 +663,10 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
         } else {
             foreach ($headers as $key => $value) {
                 $this->addHeader(
-                        $key, $value, $personalizationIndex, $personalization
+                    $key,
+                    $value,
+                    $personalizationIndex,
+                    $personalization
                 );
             }
         }
@@ -576,17 +688,19 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
     /**
      * Add a CVendor_SendGrid_Mail_DynamicTemplateData object or key/value to a Personalization object
      *
-     * @param CVendor_SendGrid_Mail_DynamicTemplateData|string $data DynamicTemplateData object or the key of a
-     *                                         dynamic data
-     * @param string|null $value Value
-     * @param int|null $personalizationIndex Index into an array of
-     *                                       existing Personalization
-     *                                       objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                              Personalization object
+     * @param string|CVendor_SendGrid_Mail_Substitution  $key                  Key or Substitution object
+     * @param string|null                                $value                Value
+     * @param int|null                                   $personalizationIndex Index into an array of
+     *                                                                         existing Personalization
+     *                                                                         objects
+     * @param CVendor_SendGrid_Mail_Personalization|null $personalization      A pre-created
+     *                                                                         Personalization object
      */
     public function addDynamicTemplateData(
-    $key, $value = null, $personalizationIndex = null, $personalization = null
+        $key,
+        $value = null,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         $this->addSubstitution($key, $value, $personalizationIndex, $personalization);
     }
@@ -594,15 +708,17 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
     /**
      * Add a CVendor_SendGrid_Mail_DynamicTemplateData object or key/value to a Personalization object
      *
-     * @param array|CVendor_SendGrid_Mail_DynamicTemplateData[] $data Array of DynamicTemplateData objects or key/values
-     * @param int|null $personalizationIndex Index into an array of
-     *                                       existing Personalization
-     *                                       objects
-     * @param Personalization|null $personalization A pre-created
-     *                                              Personalization object
+     * @param array|CVendor_SendGrid_Mail_DynamicTemplateData[] $datas                Array of DynamicTemplateData objects or key/values
+     * @param int|null                                          $personalizationIndex Index into an array of
+     *                                                                                existing Personalization
+     *                                                                                objects
+     * @param CVendor_SendGrid_Mail_Personalization|null        $personalization      A pre-created
+     *                                                                                Personalization object
      */
     public function addDynamicTemplateDatas(
-    $datas, $personalizationIndex = null, $personalization = null
+        $datas,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         $this->addSubstitutions($datas);
     }
@@ -628,18 +744,21 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * substitutions added to Personalization objects override
      * global substitutions.
      *
-     * @param string|CVendor_SendGrid_Mail_Substitution $key Key or Substitution object
-     * @param string|null $value Value
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                   existing Personalization
-     *                                                   objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                   Personalization object
+     * @param string|CVendor_SendGrid_Mail_Substitution  $key                  Key or Substitution object
+     * @param string|null                                $value                Value
+     * @param int|null                                   $personalizationIndex Index into an array of
+     *                                                                         existing Personalization
+     *                                                                         objects
+     * @param CVendor_SendGrid_Mail_Personalization|null $personalization      A pre-created
+     *                                                                         Personalization object
      *
      * @return null
      */
     public function addSubstitution(
-    $key, $value = null, $personalizationIndex = null, $personalization = null
+        $key,
+        $value = null,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         $substitution = null;
         if ($key instanceof CVendor_SendGrid_Mail_Substitution) {
@@ -655,7 +774,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
         } else {
             if ($this->personalization[0] != null) {
                 $this->personalization[0]->addSubstitution($substitution);
-            } else if ($this->personalization[$personalizationIndex] != null) {
+            } elseif ($this->personalization[$personalizationIndex] != null) {
                 $this->personalization[$personalizationIndex]->addSubstitution($substitution);
             } else {
                 $personalization = new CVendor_SendGrid_Mail_Personalization();
@@ -679,16 +798,18 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * substitutions added to Personalization objects override
      * global headers.
      *
-     * @param array|CVendor_SendGrid_Mail_Substitution[] $substitutions Array of Substitution
-     *                                            objects or key/values
-     * @param int|null $personalizationIndex Index into an array of
-     *                                       existing Personalization
-     *                                       objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                              ersonalization object
+     * @param array|CVendor_SendGrid_Mail_Substitution[] $substitutions        Array of Substitution
+     *                                                                         objects or key/values
+     * @param int|null                                   $personalizationIndex Index into an array of
+     *                                                                         existing Personalization
+     *                                                                         objects
+     * @param CVendor_SendGrid_Mail_Personalization|null $personalization      A pre-created
+     *                                                                         ersonalization object
      */
     public function addSubstitutions(
-    $substitutions, $personalizationIndex = null, $personalization = null
+        $substitutions,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         if (current($substitutions) instanceof CVendor_SendGrid_Mail_Substitution) {
             foreach ($substitutions as $substitution) {
@@ -697,7 +818,10 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
         } else {
             foreach ($substitutions as $key => $value) {
                 $this->addSubstitution(
-                        $key, $value, $personalizationIndex, $personalization
+                    $key,
+                    $value,
+                    $personalizationIndex,
+                    $personalization
                 );
             }
         }
@@ -722,16 +846,19 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * Note that custom args added to Personalization objects
      * override global custom args.
      *
-     * @param string|CVendor_SendGrid_Mail_CustomArg $key Key or CustomArg object
-     * @param string|null $value Value
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                   existing Personalization
-     *                                                   objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                   Personalization object
+     * @param string|CVendor_SendGrid_Mail_CustomArg     $key                  Key or CustomArg object
+     * @param string|null                                $value                Value
+     * @param int|null                                   $personalizationIndex Index into an array of
+     *                                                                         existing Personalization
+     *                                                                         objects
+     * @param CVendor_SendGrid_Mail_Personalization|null $personalization      A pre-created
+     *                                                                         Personalization object
      */
     public function addCustomArg(
-    $key, $value = null, $personalizationIndex = null, $personalization = null
+        $key,
+        $value = null,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         $custom_arg = null;
         if ($key instanceof CVendor_SendGrid_Mail_CustomArg) {
@@ -747,9 +874,9 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
         } else {
             if ($this->personalization[0] != null) {
                 $this->personalization[0]->addCustomArg($custom_arg);
-            } else if ($this->personalization[$personalizationIndex] != null) {
+            } elseif ($this->personalization[$personalizationIndex] != null) {
                 $this->personalization[$personalizationIndex]->addCustomArg(
-                        $custom_arg
+                    $custom_arg
                 );
             } else {
                 $personalization = new CVendor_SendGrid_Mail_Personalization();
@@ -773,16 +900,18 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * custom args added to Personalization objects override
      * global custom args.
      *
-     * @param array|CVendor_SendGrid_Mail_CustomArg[] $custom_args Array of CustomArg objects
-     *                                                   or key/values
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                   existing Personalization
-     *                                                   objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                   Personalization object
+     * @param array|CVendor_SendGrid_Mail_CustomArg[]    $custom_args          Array of CustomArg objects
+     *                                                                         or key/values
+     * @param int|null                                   $personalizationIndex Index into an array of
+     *                                                                         existing Personalization
+     *                                                                         objects
+     * @param CVendor_SendGrid_Mail_Personalization|null $personalization      A pre-created
+     *                                                                         Personalization object
      */
     public function addCustomArgs(
-    $custom_args, $personalizationIndex = null, $personalization = null
+        $custom_args,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         if (current($custom_args) instanceof CVendor_SendGrid_Mail_CustomArg) {
             foreach ($custom_args as $custom_arg) {
@@ -791,7 +920,10 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
         } else {
             foreach ($custom_args as $key => $value) {
                 $this->addCustomArg(
-                        $key, $value, $personalizationIndex, $personalization
+                    $key,
+                    $value,
+                    $personalizationIndex,
+                    $personalization
                 );
             }
         }
@@ -819,15 +951,17 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * timestamps added to Personalization objects override
      * global timestamps.
      *
-     * @param int|CVendor_SendGrid_Mail_SendAt $send_at A unix timestamp
-     * @param int|null $personalizationIndex Index into an array of
-     *                                                   existing Personalization
-     *                                                   objects
-     * @param CVendor_SendGrid_Mail_Personalization|null $personalization A pre-created
-     *                                                   Personalization object
+     * @param int|CVendor_SendGrid_Mail_SendAt           $send_at              A unix timestamp
+     * @param int|null                                   $personalizationIndex Index into an array of
+     *                                                                         existing Personalization
+     *                                                                         objects
+     * @param CVendor_SendGrid_Mail_Personalization|null $personalization      A pre-created
+     *                                                                         Personalization object
      */
     public function setSendAt(
-    $send_at, $personalizationIndex = null, $personalization = null
+        $send_at,
+        $personalizationIndex = null,
+        $personalization = null
     ) {
         if (!($send_at instanceof CVendor_SendGrid_Mail_SendAt)) {
             $send_at = new CVendor_SendGrid_Mail_SendAt($send_at);
@@ -840,7 +974,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
             if ($this->personalization[0] != null) {
                 $this->personalization[0]->setSendAt($send_at);
                 return;
-            } else if ($this->personalization[$personalizationIndex] != null) {
+            } elseif ($this->personalization[$personalizationIndex] != null) {
                 $this->personalization[$personalizationIndex]->setSendAt($send_at);
                 return;
             } else {
@@ -874,21 +1008,19 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * Add the sender email address to a Mail object
      *
      * @param string|CVendor_SendGrid_Mail_From $email Email address or From object
-     * @param string|null $name  Sender name
+     * @param string|null                       $name  Sender name
      *
-     * @throws CVendor_SendGrid_Mail_TypeException
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setFrom($email, $name = null) {
         if ($email instanceof CVendor_SendGrid_Mail_From) {
             $this->from = $email;
         } else {
-            if (
-                    is_string($email) && filter_var($email, FILTER_VALIDATE_EMAIL)
-            ) {
+            if (is_string($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->from = new CVendor_SendGrid_Mail_From($email, $name);
             } else {
-                throw new CVendor_SendGrid_Mail_TypeException(
-                '$email must be valid and of type string.'
+                throw new CVendor_SendGrid_Exception_TypeException(
+                    '$email must be valid and of type string.'
                 );
             }
         }
@@ -908,7 +1040,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * Add the reply to email address to a Mail object
      *
      * @param string|CVendor_SendGrid_Mail_ReplyTo $email Email address or From object
-     * @param string|null $name Reply to name
+     * @param string|null                          $name  Reply to name
      */
     public function setReplyTo($email, $name = null) {
         if ($email instanceof CVendor_SendGrid_Mail_ReplyTo) {
@@ -958,8 +1090,8 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * For a list of pre-configured mime types, please see
      * MimeType.php
      *
-     * @param string|CVendor_SendGrid_Mail_Content $type Mime type or Content object
-     * @param string|null $value Contents (e.g. text or html)
+     * @param string|CVendor_SendGrid_Mail_Content $type  Mime type or Content object
+     * @param string|null                          $value Contents (e.g. text or html)
      */
     public function addContent($type, $value = null) {
         if ($type instanceof CVendor_SendGrid_Mail_Content) {
@@ -974,7 +1106,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * Adds multiple Content objects to a Mail object
      *
      * @param array|CVendor_SendGrid_Mail_Content[] $contents Array of Content objects
-     *                                  or key value pairs
+     *                                                        or key value pairs
      */
     public function addContents($contents) {
         if (current($contents) instanceof CVendor_SendGrid_Mail_Content) {
@@ -1018,27 +1150,39 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
     /**
      * Add an attachment to a Mail object
      *
-     * @param string|CVendor_SendGrid_Mail_Attachment $attachment Attachment object or
-     *                                       Base64 encoded content
-     * @param string|null $type Mime type of the attachment
-     * @param string|null $filename File name of the attachment
-     * @param string|null $disposition How the attachment should be
-     *                                       displayed: inline or attachment
-     *                                       default is attachment
-     * @param string|null $content_id Used when disposition is inline
-     *                                       to diplay the file within the
-     *                                       body of the email
+     * @param string|CVendor_SendGrid_Mail_Attachment $attachment  Attachment object or
+     *                                                             Base64 encoded content
+     * @param string|null                             $type        Mime type of the attachment
+     * @param string|null                             $filename    File name of the attachment
+     * @param string|null                             $disposition How the attachment should be
+     *                                                             displayed: inline or attachment
+     *                                                             default is attachment
+     * @param string|null                             $content_id  Used when disposition is inline
+     *                                                             to diplay the file within the
+     *                                                             body of the email
      */
     public function addAttachment(
-    $attachment, $type = null, $filename = null, $disposition = null, $content_id = null
+        $attachment,
+        $type = null,
+        $filename = null,
+        $disposition = null,
+        $content_id = null
     ) {
         if (is_array($attachment)) {
             $attachment = new CVendor_SendGrid_Mail_Attachment(
-                    $attachment[0], $attachment[1], $attachment[2], $attachment[3], $attachment[4]
+                $attachment[0],
+                $attachment[1],
+                $attachment[2],
+                $attachment[3],
+                $attachment[4]
             );
-        } else if (!($attachment instanceof CVendor_SendGrid_Mail_Attachment)) {
+        } elseif (!($attachment instanceof CVendor_SendGrid_Mail_Attachment)) {
             $attachment = new CVendor_SendGrid_Mail_Attachment(
-                    $attachment, $type, $filename, $disposition, $content_id
+                $attachment,
+                $type,
+                $filename,
+                $disposition,
+                $content_id
             );
         }
         $this->attachments[] = $attachment;
@@ -1048,7 +1192,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * Adds multiple attachments to a Mail object
      *
      * @param array|CVendor_SendGrid_Mail_Attachment[] $attachments Array of Attachment objects
-     *                                         or arrays
+     *                                                              or arrays
      */
     public function addAttachments($attachments) {
         foreach ($attachments as $attachment) {
@@ -1090,8 +1234,8 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
     /**
      * Add a section to a Mail object
      *
-     * @param string|Section $key Key or Section object
-     * @param string|null $value Value
+     * @param string|Section $key   Key or Section object
+     * @param string|null    $value Value
      */
     public function addSection($key, $value = null) {
         if ($key instanceof CVendor_SendGrid_Mail_Section) {
@@ -1106,7 +1250,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * Adds multiple sections to a Mail object
      *
      * @param array|CVendor_SendGrid_Mail_Section[] $sections Array of CustomArg objects
-     *                                  or key/values
+     *                                                        or key/values
      */
     public function addSections($sections) {
         if (current($sections) instanceof CVendor_SendGrid_Mail_Section) {
@@ -1135,8 +1279,8 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * Note that headers added to Personalization objects override
      * global headers.
      *
-     * @param string|CVendor_SendGrid_Mail_Header $key Key or Header object
-     * @param string|null $value Value
+     * @param string|CVendor_SendGrid_Mail_Header $key   Key or Header object
+     * @param string|null                         $value Value
      */
     public function addGlobalHeader($key, $value = null) {
         if ($key instanceof CVendor_SendGrid_Mail_Header) {
@@ -1154,7 +1298,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * global headers.
      *
      * @param array|CVendor_SendGrid_Mail_Header[] $headers Array of Header objects
-     *                                or key values
+     *                                                      or key values
      */
     public function addGlobalHeaders($headers) {
         if (current($headers) instanceof CVendor_SendGrid_Mail_Header) {
@@ -1183,8 +1327,8 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * Note that substitutions added to Personalization objects override
      * global substitutions.
      *
-     * @param string|CVendor_SendGrid_Mail_Substitution $key Key or Substitution object
-     * @param string|null $value Value
+     * @param string|CVendor_SendGrid_Mail_Substitution $key   Key or Substitution object
+     * @param string|null                               $value Value
      */
     public function addGlobalSubstitution($key, $value = null) {
         if ($key instanceof CVendor_SendGrid_Mail_Substitution) {
@@ -1202,7 +1346,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * global headers.
      *
      * @param array|CVendor_SendGrid_Mail_Substitution[] $substitutions Array of Substitution
-     *                                            objects or key/values
+     *                                                                  objects or key/values
      */
     public function addGlobalSubstitutions($substitutions) {
         if (current($substitutions) instanceof CVendor_SendGrid_Mail_Substitution) {
@@ -1241,7 +1385,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * Adds multiple categories to a Mail object
      *
      * @param array|CVendor_SendGrid_Mail_Category[] $categories Array of Category objects
-     *                                     or arrays
+     *                                                           or arrays
      */
     public function addCategories($categories) {
         foreach ($categories as $category) {
@@ -1265,8 +1409,8 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * Note that custom args added to Personalization objects override
      * global custom args.
      *
-     * @param string|CVendor_SendGrid_Mail_CustomArg $key Key or CustomArg object
-     * @param string|null $value Value
+     * @param string|CVendor_SendGrid_Mail_CustomArg $key   Key or CustomArg object
+     * @param string|null                            $value Value
      */
     public function addGlobalCustomArg($key, $value = null) {
         if ($key instanceof CVendor_SendGrid_Mail_CustomArg) {
@@ -1284,7 +1428,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * global custom args.
      *
      * @param array|CVendor_SendGrid_Mail_CustomArg[] $custom_args Array of CustomArg objects
-     *                                       or key/values
+     *                                                             or key/values
      */
     public function addGlobalCustomArgs($custom_args) {
         if (current($custom_args) instanceof CVendor_SendGrid_Mail_CustomArg) {
@@ -1336,7 +1480,7 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * Add a batch id to a Mail object
      *
      * @param string|CVendor_SendGrid_Mail_BatchId $batch_id Id for a batch of emails
-     *                                 to be sent at the same time
+     *                                                       to be sent at the same time
      */
     public function setBatchId($batch_id) {
         if (!($batch_id instanceof CVendor_SendGrid_Mail_BatchId)) {
@@ -1357,11 +1501,11 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
     /**
      * Add a Asm describing how to handle unsubscribes to a Mail object
      *
-     * @param int|CVendor_SendGrid_Mail_Asm $group_id Asm object or unsubscribe group id
-     *                                   to associate this email with
-     * @param array $groups_to_display Array of integer ids of unsubscribe
-     *                                   groups to be displayed on the
-     *                                   unsubscribe preferences page
+     * @param int|CVendor_SendGrid_Mail_Asm $group_id          Asm object or unsubscribe group id
+     *                                                         to associate this email with
+     * @param array                         $groups_to_display Array of integer ids of unsubscribe
+     *                                                         groups to be displayed on the
+     *                                                         unsubscribe preferences page
      */
     public function setAsm($group_id, $groups_to_display = null) {
         if ($group_id instanceof CVendor_SendGrid_Mail_Asm) {
@@ -1412,12 +1556,13 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      *                                    mail settings that you can
      *                                    use to specify how you would
      *                                    like this email to be handled
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setMailSettings($mail_settings) {
         if (!($mail_settings instanceof CVendor_SendGrid_Mail_MailSettings)) {
-            throw new CVendor_SendGrid_Mail_TypeException(
-            '$mail_settings must be an instance of SendGrid\Mail\MailSettings'
+            throw new CVendor_SendGrid_Exception_TypeException(
+                '$mail_settings must be an instance of SendGrid\Mail\MailSettings'
             );
         }
         $this->mail_settings = $mail_settings;
@@ -1436,8 +1581,8 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * Set the Bcc settings on a MailSettings object
      *
      * @param bool|CVendor_SendGrid_Mail_BccSettings $enable A BccSettings object or a boolean
-     *                                 to determine if this setting is active
-     * @param string|null $email The email address to be bcc'ed
+     *                                                       to determine if this setting is active
+     * @param string|null                            $email  The email address to be bcc'ed
      */
     public function setBccSettings($enable, $email = null) {
         if (!($this->mail_settings instanceof CVendor_SendGrid_Mail_MailSettings)) {
@@ -1481,8 +1626,8 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      *
      * @param bool|Footer $enable A Footer object or a boolean
      *                            to determine if this setting is active
-     * @param string|null $text The plain text content of the footer
-     * @param string|null $html The HTML content of the footer
+     * @param string|null $text   The plain text content of the footer
+     * @param string|null $html   The HTML content of the footer
      */
     public function setFooter($enable = null, $text = null, $html = null) {
         if (!$this->mail_settings instanceof CVendor_SendGrid_Mail_MailSettings) {
@@ -1520,15 +1665,15 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
     /**
      * Set the spam check settings on a MailSettings object
      *
-     * @param bool|CVendor_SendGrid_Mail_SpamCheck $enable A SpamCheck object or a boolean
-     *                                    to determine if this setting is active
-     * @param int|null $threshold The threshold used to determine if your
-     *                                    content qualifies as spam on a scale from
-     *                                    1 to 10, with 10 being most strict, or
-     *                                    most likely to be considered as spam
-     * @param string|null $post_to_url An Inbound Parse URL that you would like
-     *                                    a copy of your email along with the spam
-     *                                    report to be sent to
+     * @param bool|CVendor_SendGrid_Mail_SpamCheck $enable      A SpamCheck object or a boolean
+     *                                                          to determine if this setting is active
+     * @param int|null                             $threshold   The threshold used to determine if your
+     *                                                          content qualifies as spam on a scale from
+     *                                                          1 to 10, with 10 being most strict, or
+     *                                                          most likely to be considered as spam
+     * @param string|null                          $post_to_url An Inbound Parse URL that you would like
+     *                                                          a copy of your email along with the spam
+     *                                                          report to be sent to
      */
     public function setSpamCheck($enable = null, $threshold = null, $post_to_url = null) {
         if (!$this->mail_settings instanceof CVendor_SendGrid_Mail_MailSettings) {
@@ -1541,15 +1686,16 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
      * Add a TrackingSettings object to a Mail object
      *
      * @param CVendor_SendGrid_Mail_TrackingSettings $tracking_settings Settings to determine how you
-     *                                            would like to track the metrics
-     *                                            of how your recipients interact
-     *                                            with your email
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *                                                                  would like to track the metrics
+     *                                                                  of how your recipients interact
+     *                                                                  with your email
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setTrackingSettings($tracking_settings) {
         if (!($tracking_settings instanceof CVendor_SendGrid_Mail_TrackingSettings)) {
-            throw new CVendor_SendGrid_Mail_TypeException(
-            '$tracking_settings must be an instance of SendGrid\Mail\TrackingSettings'
+            throw new CVendor_SendGrid_Exception_TypeException(
+                '$tracking_settings must be an instance of SendGrid\Mail\TrackingSettings'
             );
         }
         $this->tracking_settings = $tracking_settings;
@@ -1567,11 +1713,11 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
     /**
      * Set the click tracking settings on a TrackingSettings object
      *
-     * @param bool|CVendor_SendGrid_Mail_ClickTracking $enable A ClickTracking object or a boolean
-     *                                        to determine if this setting is active
-     * @param bool|null $enable_text Indicates if this setting should be
-     *                                        included in the text/plain portion of
-     *                                        your email
+     * @param bool|CVendor_SendGrid_Mail_ClickTracking $enable      A ClickTracking object or a boolean
+     *                                                              to determine if this setting is active
+     * @param bool|null                                $enable_text Indicates if this setting should be
+     *                                                              included in the text/plain portion of
+     *                                                              your email
      */
     public function setClickTracking($enable = null, $enable_text = null) {
         if (!($this->tracking_settings instanceof CVendor_SendGrid_Mail_TrackingSettings)) {
@@ -1583,15 +1729,15 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
     /**
      * Set the open tracking settings on a TrackingSettings object
      *
-     * @param bool|CVendor_SendGrid_Mail_OpenTracking $enable A OpenTracking object or a boolean
-     *                                            to determine if this setting is
-     *                                            active
-     * @param string|null $substitution_tag Allows you to specify a
-     *                                            substitution tag that you can
-     *                                            insert in the body of your email
-     *                                            at a location that you desire.
-     *                                            This tag will be replaced by the
-     *                                            open tracking pixel
+     * @param bool|CVendor_SendGrid_Mail_OpenTracking $enable           A OpenTracking object or a boolean
+     *                                                                  to determine if this setting is
+     *                                                                  active
+     * @param string|null                             $substitution_tag Allows you to specify a
+     *                                                                  substitution tag that you can
+     *                                                                  insert in the body of your email
+     *                                                                  at a location that you desire.
+     *                                                                  This tag will be replaced by the
+     *                                                                  open tracking pixel
      */
     public function setOpenTracking($enable = null, $substitution_tag = null) {
         if (!($this->tracking_settings instanceof CVendor_SendGrid_Mail_TrackingSettings)) {
@@ -1603,70 +1749,86 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
     /**
      * Set the subscription tracking settings on a TrackingSettings object
      *
-     * @param bool|CVendor_SendGrid_Mail_SubscriptionTracking $enable A SubscriptionTracking
-     *                                                    object or a boolean to
-     *                                                    determine if this setting
-     *                                                    is active
-     * @param string|null $text Text to be appended to the
-     *                                                    email, with the
-     *                                                    subscription tracking
-     *                                                    link. You may control
-     *                                                    where the link is by using
-     *                                                    the tag <% %>
-     * @param string|null $html HTML to be appended to the
-     *                                                    email, with the
-     *                                                    subscription tracking
-     *                                                    link. You may control
-     *                                                    where the link is by using
-     *                                                    the tag <% %>
-     * @param string|null $substitution_tag A tag that will be
-     *                                                    replaced with the
-     *                                                    unsubscribe URL. for
-     *                                                    example:
-     *                                                    [unsubscribe_url]. If this
-     *                                                    parameter is used, it will
-     *                                                    override both the text and
-     *                                                    html parameters. The URL
-     *                                                    of the link will be placed
-     *                                                    at the substitution tag’s
-     *                                                    location, with no
-     *                                                    additional formatting
+     * @param bool|CVendor_SendGrid_Mail_SubscriptionTracking $enable           A SubscriptionTracking
+     *                                                                          object or a boolean to
+     *                                                                          determine if this setting
+     *                                                                          is active
+     * @param string|null                                     $text             Text to be appended to the
+     *                                                                          email, with the
+     *                                                                          subscription tracking
+     *                                                                          link. You may control
+     *                                                                          where the link is by using
+     *                                                                          the tag <% %>
+     * @param string|null                                     $html             HTML to be appended to the
+     *                                                                          email, with the
+     *                                                                          subscription tracking
+     *                                                                          link. You may control
+     *                                                                          where the link is by using
+     *                                                                          the tag <% %>
+     * @param string|null                                     $substitution_tag A tag that will be
+     *                                                                          replaced with the
+     *                                                                          unsubscribe URL. for
+     *                                                                          example:
+     *                                                                          [unsubscribe_url]. If this
+     *                                                                          parameter is used, it will
+     *                                                                          override both the text and
+     *                                                                          html parameters. The URL
+     *                                                                          of the link will be placed
+     *                                                                          at the substitution tag’s
+     *                                                                          location, with no
+     *                                                                          additional formatting
      */
     public function setSubscriptionTracking(
-    $enable = null, $text = null, $html = null, $substitution_tag = null
+        $enable = null,
+        $text = null,
+        $html = null,
+        $substitution_tag = null
     ) {
         if (!($this->tracking_settings instanceof CVendor_SendGrid_Mail_TrackingSettings)) {
             $this->tracking_settings = new CVendor_SendGrid_Mail_TrackingSettings();
         }
         $this->tracking_settings->setSubscriptionTracking(
-                $enable, $text, $html, $substitution_tag
+            $enable,
+            $text,
+            $html,
+            $substitution_tag
         );
     }
 
     /**
      * Set the Google anatlyics settings on a TrackingSettings object
      *
-     * @param bool|CVendor_SendGrid_Mail_Ganalytics $enable A Ganalytics object or a boolean to
-     *                                      determine if this setting
-     *                                      is active
-     * @param string|null $utm_source Name of the referrer source. (e.g.
-     *                                      Google, SomeDomain.com, or
-     *                                      Marketing Email)
-     * @param string|null $utm_medium Name of the marketing medium.
-     *                                      (e.g. Email)
-     * @param string|null $utm_term Used to identify any paid keywords.
-     * @param string|null $utm_content Used to differentiate your campaign
-     *                                      from advertisements
-     * @param string|null $utm_campaign The name of the campaign
+     * @param bool|CVendor_SendGrid_Mail_Ganalytics $enable       A Ganalytics object or a boolean to
+     *                                                            determine if this setting
+     *                                                            is active
+     * @param string|null                           $utm_source   Name of the referrer source. (e.g.
+     *                                                            Google, SomeDomain.com, or
+     *                                                            Marketing Email)
+     * @param string|null                           $utm_medium   Name of the marketing medium.
+     *                                                            (e.g. Email)
+     * @param string|null                           $utm_term     used to identify any paid keywords
+     * @param string|null                           $utm_content  Used to differentiate your campaign
+     *                                                            from advertisements
+     * @param string|null                           $utm_campaign The name of the campaign
      */
     public function setGanalytics(
-    $enable = null, $utm_source = null, $utm_medium = null, $utm_term = null, $utm_content = null, $utm_campaign = null
+        $enable = null,
+        $utm_source = null,
+        $utm_medium = null,
+        $utm_term = null,
+        $utm_content = null,
+        $utm_campaign = null
     ) {
-        if (!($this->tracking_settings instanceof TrackingSettings)) {
+        if (!($this->tracking_settings instanceof CVendor_SendGrid_Mail_TrackingSettings)) {
             $this->tracking_settings = new CVendor_SendGrid_Mail_TrackingSettings();
         }
         $this->tracking_settings->setGanalytics(
-                $enable, $utm_source, $utm_medium, $utm_term, $utm_content, $utm_campaign
+            $enable,
+            $utm_source,
+            $utm_medium,
+            $utm_term,
+            $utm_content,
+            $utm_campaign
         );
     }
 
@@ -1679,40 +1841,41 @@ class CVendor_SendGrid_Mail_Mail implements \JsonSerializable {
         // Detect if we are using the new dynamic templates
         $template_id = $this->getTemplateId();
         if ($template_id != null) {
-            if (substr((string) $template_id->getTemplateId(), 0, 2) == "d-") {
+            if (substr((string) $template_id->getTemplateId(), 0, 2) == 'd-') {
                 foreach ($this->personalization as $personalization) {
                     $personalization->setHasDynamicTemplate(true);
                 }
             }
         }
         return array_filter(
-                        [
-                    'personalizations' => array_values(array_filter(
-                                    $this->getPersonalizations(), function ($value) {
-                                        return null !== $value && null !== $value->jsonSerialize();
-                                    }
-                    )),
-                    'from' => $this->getFrom(),
-                    'reply_to' => $this->getReplyTo(),
-                    'subject' => $this->getGlobalSubject(),
-                    'content' => $this->getContents(),
-                    'attachments' => $this->getAttachments(),
-                    'template_id' => $this->getTemplateId(),
-                    'sections' => $this->getSections(),
-                    'headers' => $this->getGlobalHeaders(),
-                    'categories' => $this->getCategories(),
-                    'custom_args' => $this->getGlobalCustomArgs(),
-                    'send_at' => $this->getGlobalSendAt(),
-                    'batch_id' => $this->getBatchId(),
-                    'asm' => $this->getASM(),
-                    'ip_pool_name' => $this->getIpPoolName(),
-                    'substitutions' => $this->getGlobalSubstitutions(),
-                    'mail_settings' => $this->getMailSettings(),
-                    'tracking_settings' => $this->getTrackingSettings()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'personalizations' => array_values(array_filter(
+                    $this->getPersonalizations(),
+                    function ($value) {
+                        return null !== $value && null !== $value->jsonSerialize();
+                    }
+                )),
+                'from' => $this->getFrom(),
+                'reply_to' => $this->getReplyTo(),
+                'subject' => $this->getGlobalSubject(),
+                'content' => $this->getContents(),
+                'attachments' => $this->getAttachments(),
+                'template_id' => $this->getTemplateId(),
+                'sections' => $this->getSections(),
+                'headers' => $this->getGlobalHeaders(),
+                'categories' => $this->getCategories(),
+                'custom_args' => $this->getGlobalCustomArgs(),
+                'send_at' => $this->getGlobalSendAt(),
+                'batch_id' => $this->getBatchId(),
+                'asm' => $this->getASM(),
+                'ip_pool_name' => $this->getIpPoolName(),
+                'substitutions' => $this->getGlobalSubstitutions(),
+                'mail_settings' => $this->getMailSettings(),
+                'tracking_settings' => $this->getTrackingSettings()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

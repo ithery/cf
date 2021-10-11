@@ -7,7 +7,7 @@ import 'core-js/features/object/entries';
 import 'core-js/features/object/values';
 import 'core-js/features/promise';
 import 'core-js/features/string/starts-with';
-import 'whatwg-fetch'
+import 'whatwg-fetch';
 import './modules/es.element.get-attribute-names';
 import './modules/es.element.matches';
 import './modules/es.element.closest';

@@ -12,8 +12,9 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_IpPoolName implements \JsonSerializable {
-
-    /** @var $ip_pool_name string The IP Pool that you would like to send this email from. Minimum length: 2, Maximum Length: 64 */
+    /**
+     * @var string The IP Pool that you would like to send this email from. Minimum length: 2, Maximum Length: 64
+     */
     private $ip_pool_name;
 
     /**
@@ -35,12 +36,12 @@ class CVendor_SendGrid_Mail_IpPoolName implements \JsonSerializable {
      * @param string $ip_pool_name The IP Pool that you would like to
      *                             send this email from. Minimum length:
      *                             2, Maximum Length: 64
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setIpPoolName($ip_pool_name) {
         if (!is_string($ip_pool_name)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$ip_pool_name must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$ip_pool_name must be of type string.');
         }
         $this->ip_pool_name = $ip_pool_name;
     }
@@ -62,5 +63,4 @@ class CVendor_SendGrid_Mail_IpPoolName implements \JsonSerializable {
     public function jsonSerialize() {
         return $this->getIpPoolName();
     }
-
 }

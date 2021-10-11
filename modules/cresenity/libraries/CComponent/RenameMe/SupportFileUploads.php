@@ -1,18 +1,17 @@
 <?php
 
+class CComponent_RenameMe_SupportFileUploads {
+    public static function init() {
+        return new static;
+    }
 
-
-
-class CComponent_RenameMe_SupportFileUploads
-{
-    static function init() { return new static; }
-
-    function __construct()
-    {
+    public function __construct() {
         CComponent_Manager::instance()->listen('property.hydrate', function ($property, $value, $component, $request) {
             $uses = array_flip(c::classUsesRecursive($component));
 
-            if (! in_array(CComponent_Trait_WithFileUploads::class, $uses)) return;
+            if (!in_array(CComponent_Trait_WithFileUploads::class, $uses)) {
+                return;
+            }
 
             if (CComponent_TemporaryUploadedFile::canUnserialize($value)) {
                 $component->{$property} = CComponent_TemporaryUploadedFile::unserializeFromComponentRequest($value);
@@ -22,7 +21,9 @@ class CComponent_RenameMe_SupportFileUploads
         CComponent_Manager::instance()->listen('property.dehydrate', function ($property, $value, $component, $response) {
             $uses = array_flip(c::classUsesRecursive($component));
 
-            if (! in_array(CComponent_Trait_WithFileUploads::class, $uses)) return;
+            if (!in_array(CComponent_Trait_WithFileUploads::class, $uses)) {
+                return;
+            }
 
             $newValue = $this->dehydratePropertyFromWithFileUploads($value);
 
@@ -32,8 +33,7 @@ class CComponent_RenameMe_SupportFileUploads
         });
     }
 
-    public function dehydratePropertyFromWithFileUploads($value)
-    {
+    public function dehydratePropertyFromWithFileUploads($value) {
         if (CComponent_TemporaryUploadedFile::canUnserialize($value)) {
             return CComponent_TemporaryUploadedFile::unserializeFromComponentRequest($value);
         }

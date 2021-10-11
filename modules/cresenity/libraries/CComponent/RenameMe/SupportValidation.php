@@ -1,15 +1,11 @@
 <?php
 
+class CComponent_RenameMe_SupportValidation {
+    public static function init() {
+        return new static;
+    }
 
-
-
-
-class CComponent_RenameMe_SupportValidation
-{
-    static function init() { return new static; }
-
-    function __construct()
-    {
+    public function __construct() {
         CComponent_Manager::instance()->listen('component.dehydrate', function ($component, $response) {
             $errors = $component->getErrorBag()->toArray();
 
@@ -24,7 +20,7 @@ class CComponent_RenameMe_SupportValidation
 
         CComponent_Manager::instance()->listen('component.hydrate', function ($component, $request) {
             $component->setErrorBag(
-                isset($request->memo['errors']) ?$request->memo['errors']: []
+                isset($request->memo['errors']) ? $request->memo['errors'] : []
             );
         });
     }

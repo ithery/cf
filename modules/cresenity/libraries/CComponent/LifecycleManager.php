@@ -1,56 +1,61 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 class CComponent_LifecycleManager {
-
     protected static $hydrationMiddleware = [];
+
     protected static $initialHydrationMiddleware = [];
+
     protected static $initialDehydrationMiddleware = [];
+
     public $request;
+
     public $instance;
+
     public $response;
 
     public static function fromSubsequentRequest($payload) {
         return c::tap(new static, function ($instance) use ($payload) {
-                    $instance->request = new CComponent_Request($payload);
-                    $instance->instance = CComponent_Manager::instance()->getInstance($instance->request->name(), $instance->request->id());
-                });
+            $instance->request = new CComponent_Request($payload);
+            $instance->instance = CComponent_Manager::instance()->getInstance($instance->request->name(), $instance->request->id());
+        });
     }
 
     /**
-     * 
      * @param string $name
      * @param string $id
+     *
      * @return CComponent_LifecycleManager
      */
     public static function fromInitialRequest($name, $id) {
         return c::tap(new static, function ($instance) use ($name, $id) {
-                    $instance->instance = CComponent_Manager::instance()->getInstance($name, $id);
-                    $instance->request = new CComponent_Request([
-                        'fingerprint' => ['id' => $id, 'name' => $name, 'locale' => CF::getLocale()],
-                        'updates' => [],
-                        'serverMemo' => [],
-                    ]);
-                });
+            $instance->instance = CComponent_Manager::instance()->getInstance($name, $id);
+            $instance->request = new CComponent_Request([
+                'fingerprint' => ['id' => $id, 'name' => $name, 'locale' => CF::getLocale()],
+                'updates' => [],
+                'serverMemo' => [],
+            ]);
+        });
     }
 
     public static function fromInitialInstance($component) {
         $name = CComponent_Manager::instance()->getAlias(get_class($component), $component->getName());
 
         return c::tap(new static, function ($instance) use ($component, $name) {
-                    $instance->instance = $component;
-                    $instance->request = new CComponent_Request([
-                        'fingerprint' => ['id' => $component->id, 'name' => $name, 'locale' => CF::getLocale()],
-                        'updates' => [],
-                        'serverMemo' => [],
-                    ]);
-                });
+            $instance->instance = $component;
+            $instance->request = new CComponent_Request([
+                'fingerprint' => ['id' => $component->id, 'name' => $name, 'locale' => CF::getLocale()],
+                'updates' => [],
+                'serverMemo' => [],
+            ]);
+        });
     }
 
     public static function registerHydrationMiddleware(array $classes) {
@@ -74,7 +79,6 @@ class CComponent_LifecycleManager {
     }
 
     /**
-     * 
      * @return $this
      */
     public function initialHydrate() {
@@ -86,8 +90,8 @@ class CComponent_LifecycleManager {
     }
 
     /**
-     * 
      * @param array $params
+     *
      * @return $thiss
      */
     public function mount($params = []) {
@@ -151,5 +155,4 @@ class CComponent_LifecycleManager {
     public function toSubsequentResponse() {
         return $this->response->toSubsequentResponse();
     }
-
 }

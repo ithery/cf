@@ -24,4 +24,8 @@ class CBase {
     public static function createMapCache() {
         return new CBase_MapCache();
     }
+
+    public static function createStringParamable($string, array $params = []) {
+        return new CBase_StringParamable($string, $params);
+    }
 }

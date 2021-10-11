@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 class CComponent_ChecksumManager {
-
     public function generate($fingerprint, $memo) {
         $hashKey = CF::config('app.key');
 
@@ -27,5 +27,4 @@ class CComponent_ChecksumManager {
     public function check($checksum, $fingerprint, $memo) {
         return hash_equals($this->generate($fingerprint, $memo), $checksum);
     }
-
 }

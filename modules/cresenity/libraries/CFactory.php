@@ -18,14 +18,7 @@ class CFactory {
      * @throws CException
      */
     public static function createControl($id, $type) {
-        $control = null;
-        if (CManager::instance()->isRegisteredControl($type)) {
-            $control = CManager::instance()->createControl($id, $type);
-        } else {
-            throw new CException('Unknown control type ' . $type);
-        }
-
-        return $control;
+        return CElement_Factory::createControl($id, $type);
     }
 
     /**
