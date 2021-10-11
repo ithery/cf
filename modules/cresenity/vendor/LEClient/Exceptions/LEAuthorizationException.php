@@ -32,15 +32,14 @@ namespace LEClient\Exceptions;
  * @author     Youri van Weegberg <youri@yourivw.nl>
  * @copyright  2020 Youri van Weegberg
  * @license    https://opensource.org/licenses/mit-license.php  MIT License
+ *
  * @link       https://github.com/yourivw/LEClient
  * @since      Class available since Release 1.2.0
  */
-class LEAuthorizationException extends LEException
-{
-	public const NOCHALLENGEFOUNDEEXCEPTION	= 0x41;
-	
-	public static function NoChallengeFoundException($type, $identifier)
-	{
-		return new static(sprintf('No challenge found for type \'%s\' and identifier \'%s\'.', $type, $identifier), self::NOCHALLENGEFOUNDEEXCEPTION);
-	}
+class LEAuthorizationException extends LEException {
+    public const NOCHALLENGEFOUNDEEXCEPTION = 0x41;
+
+    public static function NoChallengeFoundException($type, $identifier) {
+        return new static(sprintf('No challenge found for type \'%s\' and identifier \'%s\'.', $type, $identifier), self::NOCHALLENGEFOUNDEEXCEPTION);
+    }
 }

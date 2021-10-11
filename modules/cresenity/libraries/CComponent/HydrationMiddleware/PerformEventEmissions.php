@@ -1,19 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 class CComponent_HydrationMiddleware_PerformEventEmissions implements CComponent_HydrationMiddlewareInterface {
-
     public static function hydrate($unHydratedInstance, $request) {
         try {
             foreach ($request->updates as $update) {
-                if ($update['type'] !== 'fireEvent')
+                if ($update['type'] !== 'fireEvent') {
                     continue;
+                }
 
                 $event = $update['payload']['event'];
                 $params = $update['payload']['params'];
@@ -30,5 +31,4 @@ class CComponent_HydrationMiddleware_PerformEventEmissions implements CComponent
     public static function dehydrate($instance, $response) {
         //
     }
-
 }

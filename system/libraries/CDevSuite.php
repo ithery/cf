@@ -421,4 +421,8 @@ class CDevSuite {
     public static function isInstalled() {
         return static::filesystem()->isDir(static::homePath());
     }
+
+    public static function loopback() {
+        return '127.0.0.1';
+    }
 }

@@ -12,16 +12,18 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_ClickTracking implements \JsonSerializable {
-
-    /** @var $enable bool Indicates if this setting is enabled */
+    /**
+     * @var bool Indicates if this setting is enabled
+     */
     private $enable;
+
     /* @var $enable_text bool Indicates if this setting should be included in the text/plain portion of your email */
     private $enable_text;
 
     /**
      * Optional constructor
      *
-     * @param bool|null $enable Indicates if this setting is enabled
+     * @param bool|null $enable      Indicates if this setting is enabled
      * @param bool|null $enable_text Indicates if this setting should be
      *                               included in the text/plain portion of
      *                               your email
@@ -39,12 +41,12 @@ class CVendor_SendGrid_Mail_ClickTracking implements \JsonSerializable {
      * Update the enable setting on a ClickTracking object
      *
      * @param bool $enable Indicates if this setting is enabled
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setEnable($enable) {
         if (!is_bool($enable)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$enable must be of type bool.');
+            throw new CVendor_SendGrid_Exception_TypeException('$enable must be of type bool.');
         }
         $this->enable = $enable;
     }
@@ -62,12 +64,12 @@ class CVendor_SendGrid_Mail_ClickTracking implements \JsonSerializable {
      * Update the enable text setting on a ClickTracking object
      *
      * @param bool $enable_text Indicates if this setting is enabled
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setEnableText($enable_text) {
         if (!is_bool($enable_text)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$enable_text must be of type bool');
+            throw new CVendor_SendGrid_Exception_TypeException('$enable_text must be of type bool');
         }
         $this->enable_text = $enable_text;
     }
@@ -88,13 +90,13 @@ class CVendor_SendGrid_Mail_ClickTracking implements \JsonSerializable {
      */
     public function jsonSerialize() {
         return array_filter(
-                        [
-                    'enable' => $this->getEnable(),
-                    'enable_text' => $this->getEnableText()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'enable' => $this->getEnable(),
+                'enable_text' => $this->getEnableText()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

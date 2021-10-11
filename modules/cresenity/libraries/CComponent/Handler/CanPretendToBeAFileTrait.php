@@ -6,7 +6,6 @@
  * @author Hery
  */
 trait CComponent_Handler_CanPretendToBeAFileTrait {
-
     public function pretendResponseIsFile($file) {
         $expires = strtotime('+1 year');
         $lastModified = filemtime($file);
@@ -14,15 +13,15 @@ trait CComponent_Handler_CanPretendToBeAFileTrait {
 
         if ($this->matchesCache($lastModified)) {
             return c::response()->make('', 304, [
-                        'Expires' => $this->httpDate($expires),
-                        'Cache-Control' => $cacheControl,
+                'Expires' => $this->httpDate($expires),
+                'Cache-Control' => $cacheControl,
             ]);
         }
         return c::response()->file($file, [
-                    //'Content-Type' => 'application/javascript; charset=utf-8',
-//                    'Expires' => $this->httpDate($expires),
-//                    'Cache-Control' => $cacheControl,
-//                    'Last-Modified' => $this->httpDate($lastModified),
+            // 'Content-Type' => 'application/javascript; charset=utf-8',
+            // 'Expires' => $this->httpDate($expires),
+            // 'Cache-Control' => $cacheControl,
+            // 'Last-Modified' => $this->httpDate($lastModified),
         ]);
     }
 
@@ -35,5 +34,4 @@ trait CComponent_Handler_CanPretendToBeAFileTrait {
     protected function httpDate($timestamp) {
         return sprintf('%s GMT', gmdate('D, d M Y H:i:s', $timestamp));
     }
-
 }

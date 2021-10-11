@@ -1,19 +1,14 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * This class is used to construct a Subject object for the /mail/send API call
  *
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_Subject implements \JsonSerializable {
-
-    /** @var $subject string The email subject */
+    /**
+     * @var string The email subject
+     */
     private $subject;
 
     /**
@@ -31,12 +26,12 @@ class CVendor_SendGrid_Mail_Subject implements \JsonSerializable {
      * Set the subject on a Subject object
      *
      * @param string $subject The email subject
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setSubject($subject) {
         if (!is_string($subject)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$subject must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$subject must be of type string.');
         }
 
         $this->subject = $subject;
@@ -59,5 +54,4 @@ class CVendor_SendGrid_Mail_Subject implements \JsonSerializable {
     public function jsonSerialize() {
         return $this->getSubject();
     }
-
 }

@@ -22,30 +22,63 @@ trait CTrait_Compat_Element_Nestable {
         return $this->setDataFromTreeDb($treedb, $parent_id);
     }
 
+    /**
+     * @deprecated since 1.2
+     *
+     * @param mixed $boolean
+     */
     public function set_applyjs($boolean) {
         return $this->setApplyJs($boolean);
     }
 
+    /**
+     * @deprecated since 1.2
+     *
+     * @param mixed $style
+     */
     public function set_action_style($style) {
         return $this->setRowActionStyle($style);
     }
 
+    /**
+     * @deprecated since 1.2
+     */
     public function action_count() {
         return $this->rowActionCount();
     }
 
+    /**
+     * @deprecated since 1.2
+     *
+     * @param mixed $id
+     */
     public function add_row_action($id = '') {
         return $this->addRowAction($id);
     }
 
+    /**
+     * @deprecated since 1.2
+     */
     public function have_action() {
         return $this->haveRowAction();
     }
 
+    /**
+     * @deprecated since 1.2
+     *
+     * @param mixed $func
+     * @param mixed $require
+     */
     public function display_callback_func($func, $require = '') {
         return $this->displayCallbackFunc($func, $require);
     }
 
+    /**
+     * @deprecated since 1.2
+     *
+     * @param mixed $func
+     * @param mixed $require
+     */
     public function filter_action_callback_func($func, $require = '') {
         return $this->filterActionCallbackFunc($func, $require);
     }
@@ -61,10 +94,20 @@ trait CTrait_Compat_Element_Nestable {
         return $this->setIdKey($idKey);
     }
 
+    /**
+     * @deprecated since 1.2
+     *
+     * @param mixed $disableDnd
+     */
     public function set_disable_dnd($disableDnd) {
         return $this->setDisableDnd($disableDnd);
     }
 
+    /**
+     * @deprecated since 1.2
+     *
+     * @param mixed $checkbox
+     */
     public function set_have_checkbox($checkbox) {
         return $this->setHaveCheckbox($checkbox);
     }

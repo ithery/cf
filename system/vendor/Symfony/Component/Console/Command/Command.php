@@ -27,34 +27,46 @@ use Symfony\Component\Console\Exception\LogicException;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class Command
-{
+class Command {
     /**
      * @var string|null The default command name
      */
     protected static $defaultName;
 
     private $application;
+
     private $name;
+
     private $processTitle;
-    private $aliases = array();
+
+    private $aliases = [];
+
     private $definition;
+
     private $hidden = false;
+
     private $help;
+
     private $description;
+
     private $ignoreValidationErrors = false;
+
     private $applicationDefinitionMerged = false;
+
     private $applicationDefinitionMergedWithArgs = false;
+
     private $code;
-    private $synopsis = array();
-    private $usages = array();
+
+    private $synopsis = [];
+
+    private $usages = [];
+
     private $helperSet;
 
     /**
      * @return string|null The default command name or null when no default name is set
      */
-    public static function getDefaultName()
-    {
+    public static function getDefaultName() {
         $class = get_called_class();
         $r = new \ReflectionProperty($class, 'defaultName');
 
@@ -66,8 +78,7 @@ class Command
      *
      * @throws LogicException When the command name is empty
      */
-    public function __construct($name = null)
-    {
+    public function __construct($name = null) {
         $this->definition = new InputDefinition();
 
         if (null !== $name || null !== $name = static::getDefaultName()) {
@@ -82,13 +93,11 @@ class Command
      *
      * This is mainly useful for the help command.
      */
-    public function ignoreValidationErrors()
-    {
+    public function ignoreValidationErrors() {
         $this->ignoreValidationErrors = true;
     }
 
-    public function setApplication(Application $application = null)
-    {
+    public function setApplication(Application $application = null) {
         $this->application = $application;
         if ($application) {
             $this->setHelperSet($application->getHelperSet());
@@ -97,8 +106,7 @@ class Command
         }
     }
 
-    public function setHelperSet(HelperSet $helperSet)
-    {
+    public function setHelperSet(HelperSet $helperSet) {
         $this->helperSet = $helperSet;
     }
 
@@ -107,8 +115,7 @@ class Command
      *
      * @return HelperSet A HelperSet instance
      */
-    public function getHelperSet()
-    {
+    public function getHelperSet() {
         return $this->helperSet;
     }
 
@@ -117,8 +124,7 @@ class Command
      *
      * @return Application An Application instance
      */
-    public function getApplication()
-    {
+    public function getApplication() {
         return $this->application;
     }
 
@@ -130,16 +136,14 @@ class Command
      *
      * @return bool
      */
-    public function isEnabled()
-    {
+    public function isEnabled() {
         return true;
     }
 
     /**
      * Configures the current command.
      */
-    protected function configure()
-    {
+    protected function configure() {
     }
 
     /**
@@ -156,8 +160,7 @@ class Command
      *
      * @see setCode()
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
+    protected function execute(InputInterface $input, OutputInterface $output) {
         throw new LogicException('You must override the execute() method in the concrete command class.');
     }
 
@@ -168,8 +171,7 @@ class Command
      * This means that this is the only place where the command can
      * interactively ask for values of missing required arguments.
      */
-    protected function interact(InputInterface $input, OutputInterface $output)
-    {
+    protected function interact(InputInterface $input, OutputInterface $output) {
     }
 
     /**
@@ -178,8 +180,7 @@ class Command
      * This is mainly useful when a lot of commands extends one main command
      * where some things need to be initialized based on the input arguments and options.
      */
-    protected function initialize(InputInterface $input, OutputInterface $output)
-    {
+    protected function initialize(InputInterface $input, OutputInterface $output) {
     }
 
     /**
@@ -196,8 +197,7 @@ class Command
      * @see setCode()
      * @see execute()
      */
-    public function run(InputInterface $input, OutputInterface $output)
-    {
+    public function run(InputInterface $input, OutputInterface $output) {
         // force the creation of the synopsis before the merge with the app definition
         $this->getSynopsis(true);
         $this->getSynopsis(false);
@@ -268,8 +268,7 @@ class Command
      *
      * @see execute()
      */
-    public function setCode(callable $code)
-    {
+    public function setCode(callable $code) {
         if ($code instanceof \Closure) {
             $r = new \ReflectionFunction($code);
             if (null === $r->getClosureThis()) {
@@ -297,8 +296,7 @@ class Command
      *
      * @param bool $mergeArgs Whether to merge or not the Application definition arguments to Command definition arguments
      */
-    public function mergeApplicationDefinition($mergeArgs = true)
-    {
+    public function mergeApplicationDefinition($mergeArgs = true) {
         if (null === $this->application || (true === $this->applicationDefinitionMerged && ($this->applicationDefinitionMergedWithArgs || !$mergeArgs))) {
             return;
         }
@@ -324,8 +322,7 @@ class Command
      *
      * @return $this
      */
-    public function setDefinition($definition)
-    {
+    public function setDefinition($definition) {
         if ($definition instanceof InputDefinition) {
             $this->definition = $definition;
         } else {
@@ -342,8 +339,7 @@ class Command
      *
      * @return InputDefinition An InputDefinition instance
      */
-    public function getDefinition()
-    {
+    public function getDefinition() {
         return $this->definition;
     }
 
@@ -357,8 +353,7 @@ class Command
      *
      * @return InputDefinition An InputDefinition instance
      */
-    public function getNativeDefinition()
-    {
+    public function getNativeDefinition() {
         return $this->getDefinition();
     }
 
@@ -372,8 +367,7 @@ class Command
      *
      * @return $this
      */
-    public function addArgument($name, $mode = null, $description = '', $default = null)
-    {
+    public function addArgument($name, $mode = null, $description = '', $default = null) {
         $this->definition->addArgument(new InputArgument($name, $mode, $description, $default));
 
         return $this;
@@ -390,8 +384,7 @@ class Command
      *
      * @return $this
      */
-    public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null)
-    {
+    public function addOption($name, $shortcut = null, $mode = null, $description = '', $default = null) {
         $this->definition->addOption(new InputOption($name, $shortcut, $mode, $description, $default));
 
         return $this;
@@ -411,8 +404,7 @@ class Command
      *
      * @throws InvalidArgumentException When the name is invalid
      */
-    public function setName($name)
-    {
+    public function setName($name) {
         $this->validateName($name);
 
         $this->name = $name;
@@ -432,8 +424,7 @@ class Command
      *
      * @return $this
      */
-    public function setProcessTitle($title)
-    {
+    public function setProcessTitle($title) {
         $this->processTitle = $title;
 
         return $this;
@@ -444,8 +435,7 @@ class Command
      *
      * @return string The command name
      */
-    public function getName()
-    {
+    public function getName() {
         return $this->name;
     }
 
@@ -454,8 +444,7 @@ class Command
      *
      * @return Command The current instance
      */
-    public function setHidden($hidden)
-    {
+    public function setHidden($hidden) {
         $this->hidden = (bool) $hidden;
 
         return $this;
@@ -464,8 +453,7 @@ class Command
     /**
      * @return bool whether the command should be publicly shown or not
      */
-    public function isHidden()
-    {
+    public function isHidden() {
         return $this->hidden;
     }
 
@@ -476,8 +464,7 @@ class Command
      *
      * @return $this
      */
-    public function setDescription($description)
-    {
+    public function setDescription($description) {
         $this->description = $description;
 
         return $this;
@@ -488,8 +475,7 @@ class Command
      *
      * @return string The description for the command
      */
-    public function getDescription()
-    {
+    public function getDescription() {
         return $this->description;
     }
 
@@ -500,8 +486,7 @@ class Command
      *
      * @return $this
      */
-    public function setHelp($help)
-    {
+    public function setHelp($help) {
         $this->help = $help;
 
         return $this;
@@ -512,8 +497,7 @@ class Command
      *
      * @return string The help for the command
      */
-    public function getHelp()
-    {
+    public function getHelp() {
         return $this->help;
     }
 
@@ -523,18 +507,17 @@ class Command
      *
      * @return string The processed help for the command
      */
-    public function getProcessedHelp()
-    {
+    public function getProcessedHelp() {
         $name = $this->name;
 
-        $placeholders = array(
+        $placeholders = [
             '%command.name%',
             '%command.full_name%',
-        );
-        $replacements = array(
+        ];
+        $replacements = [
             $name,
-            $_SERVER['PHP_SELF'].' '.$name,
-        );
+            $_SERVER['PHP_SELF'] . ' ' . $name,
+        ];
 
         return str_replace($placeholders, $replacements, $this->getHelp() ?: $this->getDescription());
     }
@@ -548,8 +531,7 @@ class Command
      *
      * @throws InvalidArgumentException When an alias is invalid
      */
-    public function setAliases($aliases)
-    {
+    public function setAliases($aliases) {
         if (!is_array($aliases) && !$aliases instanceof \Traversable) {
             throw new InvalidArgumentException('$aliases must be an array or an instance of \Traversable');
         }
@@ -568,8 +550,7 @@ class Command
      *
      * @return array An array of aliases for the command
      */
-    public function getAliases()
-    {
+    public function getAliases() {
         return $this->aliases;
     }
 
@@ -580,8 +561,7 @@ class Command
      *
      * @return string The synopsis
      */
-    public function getSynopsis($short = false)
-    {
+    public function getSynopsis($short = false) {
         $key = $short ? 'short' : 'long';
 
         if (!isset($this->synopsis[$key])) {
@@ -598,8 +578,7 @@ class Command
      *
      * @return $this
      */
-    public function addUsage($usage)
-    {
+    public function addUsage($usage) {
         if (0 !== strpos($usage, $this->name)) {
             $usage = sprintf('%s %s', $this->name, $usage);
         }
@@ -614,8 +593,7 @@ class Command
      *
      * @return array
      */
-    public function getUsages()
-    {
+    public function getUsages() {
         return $this->usages;
     }
 
@@ -629,8 +607,7 @@ class Command
      * @throws LogicException           if no HelperSet is defined
      * @throws InvalidArgumentException if the helper is not defined
      */
-    public function getHelper($name)
-    {
+    public function getHelper($name) {
         if (null === $this->helperSet) {
             throw new LogicException(sprintf('Cannot retrieve helper "%s" because there is no HelperSet defined. Did you forget to add your command to the application or to set the application on the command using the setApplication() method? You can also set the HelperSet directly using the setHelperSet() method.', $name));
         }
@@ -647,8 +624,7 @@ class Command
      *
      * @throws InvalidArgumentException When the name is invalid
      */
-    private function validateName($name)
-    {
+    private function validateName($name) {
         if (!preg_match('/^[^\:]++(\:[^\:]++)*$/', $name)) {
             throw new InvalidArgumentException(sprintf('Command name "%s" is invalid.', $name));
         }

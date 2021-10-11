@@ -685,4 +685,99 @@ trait CModel_Trait_Relationships {
     protected function newBelongsToThrough(CModel_Query $query, CModel $parent, array $throughParents, $localKey, $prefix, array $foreignKeyLookup) {
         return new CModel_Relation_BelongsToThrough($query, $parent, $throughParents, $localKey, $prefix, $foreignKeyLookup);
     }
+
+    /**
+     * Define a one-to-one via pivot relationship.
+     *
+     * @param string $related
+     * @param string $table
+     * @param string $foreignPivotKey
+     * @param string $relatedPivotKey
+     * @param string $parentKey
+     * @param string $relatedKey
+     * @param string $relation
+     *
+     * @return CModel_Relation_BelongsToOne
+     */
+    public function belongsToOne(
+        $related,
+        $table = null,
+        $foreignPivotKey = null,
+        $relatedPivotKey = null,
+        $parentKey = null,
+        $relatedKey = null,
+        $relation = null
+    ) {
+        // If no relationship name was passed, we will pull backtraces to get the
+        // name of the calling function. We will use that function name as the
+        // title of this relation since that is a great convention to apply.
+        if (is_null($relation)) {
+            $relation = $this->guessBelongsToOneRelation();
+        }
+
+        // First, we'll need to determine the foreign key and "other key" for the
+        // relationship. Once we have determined the keys we'll make the query
+        // instances as well as the relationship instances we need for this.
+        $instance = $this->newRelatedInstance($related);
+
+        $foreignPivotKey = $foreignPivotKey ?: $this->getForeignKey();
+
+        $relatedPivotKey = $relatedPivotKey ?: $instance->getForeignKey();
+
+        // If no table name was provided, we can guess it by concatenating the two
+        // models using underscores in alphabetical order. The two model names
+        // are transformed to snake case from their default CamelCase also.
+        if (is_null($table)) {
+            $table = $this->joiningTable($related);
+        }
+
+        return $this->newBelongsToOne(
+            $instance->newQuery(),
+            $this,
+            $table,
+            $foreignPivotKey,
+            $relatedPivotKey,
+            $parentKey ?: $this->getKeyName(),
+            $relatedKey ?: $instance->getKeyName(),
+            $relation
+        );
+    }
+
+    /**
+     * Instantiate a new BelongsToOne relationship.
+     *
+     * @param \CModel_Query $query
+     * @param \CModel       $parent
+     * @param string        $table
+     * @param string        $foreignPivotKey
+     * @param string        $relatedPivotKey
+     * @param string        $parentKey
+     * @param string        $relatedKey
+     * @param string        $relationName
+     *
+     * @return CModel_Relation_BelongsToOne
+     */
+    protected function newBelongsToOne(
+        CModel_Query $query,
+        CModel $parent,
+        $table,
+        $foreignPivotKey,
+        $relatedPivotKey,
+        $parentKey,
+        $relatedKey,
+        $relationName = null
+    ) {
+        return new CModel_Relation_BelongsToOne($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
+    }
+
+    /**
+     * Get the relationship name of the belongs to many.
+     *
+     * @return string
+     */
+    protected function guessBelongsToOneRelation() {
+        list($one, $two, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+
+        return $caller['function'];
+    }
 }

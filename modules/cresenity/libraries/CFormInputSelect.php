@@ -6,7 +6,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @deprecated since 1.2
  */
 //@codingStandardsIgnoreStart
-class CFormInputSelect extends CFormInput {
+class CFormInputSelect extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Select;
 
     protected $group_list = [];
@@ -25,6 +25,8 @@ class CFormInputSelect extends CFormInput {
 
     protected $placeholder;
 
+    protected $select2Version;
+
     public function __construct($id) {
         parent::__construct($id);
 
@@ -37,10 +39,11 @@ class CFormInputSelect extends CFormInput {
         $this->hide_search = false;
         $this->readonly = false;
         $this->maximumSelectionLength = false;
+        $this->select2Version = c::theme('select2.version');
     }
 
     public static function factory($id) {
-        return new CFormInputSelect($id);
+        return new static($id);
     }
 
     public function set_multiple($bool) {
@@ -124,7 +127,7 @@ class CFormInputSelect extends CFormInput {
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $readonly = '';
         if ($this->readonly) {
             $readonly = ' readonly="readonly"';
@@ -150,7 +153,7 @@ class CFormInputSelect extends CFormInput {
             $classes = $classes . ' form-control ';
         }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
@@ -158,7 +161,7 @@ class CFormInputSelect extends CFormInput {
         foreach ($this->attr as $k => $v) {
             $addition_attribute .= ' ' . $k . '="' . $v . '"';
         }
-        $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="select' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')->inc_indent()->br();
+        $html->appendln('<select name="' . $name . '" id="' . $this->id . '" class="select' . $classes . $this->validation->validation_class() . '"' . $custom_css . $disabled . $readonly . $multiple . $addition_attribute . '>')->incIndent()->br();
         if (count($this->group_list) > 0) {
             foreach ($this->group_list as $g => $list) {
                 if (strlen($g) > 0) {
@@ -212,7 +215,7 @@ class CFormInputSelect extends CFormInput {
                 }
             }
         }
-        $html->dec_indent()->appendln('</select>')->br();
+        $html->decIndent()->appendln('</select>')->br();
 
         //$html->appendln('<input type="text" name="'.$this->name.'" id="'.$this->id.'" class="input-unstyled'.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.'>')->br();
         return $html->text();
@@ -220,17 +223,17 @@ class CFormInputSelect extends CFormInput {
 
     public function js($indent = 0) {
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         $js->append(parent::js($indent))->br();
         $placeholder = '';
         if (strlen($this->placeholder) > 0) {
             $placeholder = $this->placeholder;
         }
         if ($this->applyjs == 'select2') {
-            if ($this->select2 == '4') {
-                CManager::instance()->register_module('select2-4.0');
+            if ($this->select2Version == '4') {
+                CManager::instance()->registerModule('select2-4.0');
             } else {
-                CManager::instance()->register_module('select2');
+                CManager::instance()->registerModule('select2');
             }
             $classes = $this->classes;
             $classes = implode(' ', $classes);

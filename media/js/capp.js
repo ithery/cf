@@ -22,6 +22,119 @@ String.prototype.toNumber = function () {
     return 0;
 };
 
+const bootboxConfirmhandler = (el, options, confirmCallback) => {
+    window.bootbox.confirm({
+        className: 'capp-modal-confirm',
+        message: options.message,
+        callback: confirmCallback
+    });
+};
+
+const defaultConfirmHandler = (el, options, confirmCallback) => {
+    if(window.bootbox) {
+        return bootboxConfirmhandler(el, options, confirmCallback);
+    }
+
+    // eslint-disable-next-line no-alert
+    let confirmed = window.confirm(options.message);
+    confirmCallback(confirmed);
+};
+
+const confirmFromElement = (el, handler, defaultMessage) => {
+    let ahref = $(el).attr('href');
+    let message = $(el).attr('data-confirm-message');
+    let noDouble = $(el).attr('data-no-double');
+    let clicked = $(el).attr('data-clicked');
+
+
+    let btn = $(el);
+    btn.attr('data-clicked', '1');
+    if(btn.attr('type') === 'submit') {
+        btn.attr('data-submitted', '1');
+    }
+    if (noDouble) {
+        if (clicked) {
+            return false;
+        }
+    }
+
+    const confirmCallback = (confirmed) => {
+        if (confirmed) {
+            if (ahref) {
+                window.location.href = ahref;
+            } else if (btn.attr('type') === 'submit') {
+                btn.closest('form').submit();
+            } else {
+                btn.on('click');
+            }
+        } else {
+            btn.removeAttr('data-clicked');
+            btn.removeAttr('data-submitted');
+        }
+        setTimeout(() => {
+            let modalExists = $('.modal:visible').length > 0;
+            if (!modalExists) {
+                $('body').removeClass('modal-open');
+            } else {
+                $('body').addClass('modal-open');
+            }
+        }, 750);
+    };
+
+
+    message = message ? message : (defaultMessage ? defaultMessage : 'Are you sure?');
+    const options = {
+        message
+    };
+    handler(btn, options, confirmCallback);
+};
+
+/**
+ * Returns a promise that resolves when an element with a selector appears on the page for the first time.
+ * Note: Use elementReadyRAF if this is too slow or unreliable.
+ * @param {string} selector querySelector string
+ * @return {Promise} promise onready
+ */
+const elementReady = (selector) => {
+    // eslint-disable-next-line no-unused-vars
+    return new Promise((resolve, reject) => {
+        // eslint-disable-next-line no-unused-vars
+        const observer = new MutationObserver((mutations) => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach((element) => {
+                if (!element.ready) {
+                    element.ready = true;
+                    observer.disconnect();
+                    resolve(element);
+                }
+            });
+        });
+        observer.observe(document.documentElement, { childList: true, subtree: true });
+    });
+};
+
+/**
+ * Calls the callback function whenever an element with the selector gets rendered
+ * @param {string} selector querySelector string
+ * @param {function} callback function to fire when an element gets rendered
+ * @return {MutationObserver} the object that checks for the elements
+ */
+const elementRendered = (selector, callback) => {
+    const renderedElements = [];
+    // eslint-disable-next-line no-unused-vars
+    const observer = new MutationObserver((mutations) => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach((element) => {
+            if (!renderedElements.includes(element)) {
+                renderedElements.push(element);
+                callback(element);
+            }
+        });
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    return observer;
+};
+
 let CF = function () {
     this.required = typeof this.required === 'undefined' ? [] : this.required;
     this.cssRequired = typeof this.cssRequired === 'undefined' ? [] : this.cssRequired;
@@ -194,6 +307,7 @@ let CF = function () {
 };
 
 
+// eslint-disable-next-line no-unused-vars
 let CUploader = function (options) {
     this.settings = $.extend({
         // These are the defaults.
@@ -427,6 +541,7 @@ let CUploader = function (options) {
     };
 };
 
+// eslint-disable-next-line no-unused-vars
 let CBlocker = function () {
 
 };
@@ -496,6 +611,10 @@ function strlen(string) {
     return lgth;
 }
 let Cresenity = function () {
+    this.observer = {
+        elementReady: elementReady,
+        elementRendered: elementRendered
+    };
     let ScrollToTop = function () {
         //startline: Integer. Number of pixels from top of doc scrollbar is scrolled before showing control
         //scrollto: Keyword (Integer, or "Scroll_to_Element_ID"). How far to scroll document up when control is clicked on (0=top).
@@ -759,7 +878,7 @@ let Cresenity = function () {
     this.ui = {
         start: () => {}
     };
-
+    this.confirmHandler = defaultConfirmHandler;
     this.url = new Url(this);
     this.base64 = new Base64(this);
 
@@ -1028,15 +1147,27 @@ let Cresenity = function () {
         options.reloadType = 'before';
         this.reload(options);
     };
-    this.confirm = function (options) {
+    this.setConfirmHandler = (cb) =>{
+        this.confirmHandler = cb;
+        return this;
+    };
+    this.confirm = (options) => {
         let settings = $.extend({
             // These are the defaults.
             method: 'get',
             dataAddition: {},
             message: 'Are you sure?',
-            onConfirmed: false
+            onConfirmed: false,
+            confirmCallback: false,
+            owner: null
         }, options);
-        window.bootbox.confirm(settings.message, settings.onConfirmed);
+        const confirmCallback = settings.confirmCallback ? settings.confirmCallback : settings.onConfirmed;
+        if(this.confirmHandler) {
+            return this.confirmHandler(settings.owner, settings, confirmCallback);
+        }
+        if (window.bootbox) {
+            return window.bootbox.confirm(settings.message, confirmCallback);
+        }
     };
     this.modal = function (options) {
         let settings = $.extend({
@@ -1601,94 +1732,14 @@ let Cresenity = function () {
 
 
     this.initConfirm = function () {
-        let confirmInitialized = $('body').attr('data-confirm-initialized');
-        if (!confirmInitialized) {
-            jQuery(document).on('click', 'a.confirm, button.confirm', function (e) {
-                let ahref = $(this).attr('href');
-                let message = $(this).attr('data-confirm-message');
-                let no_double = $(this).attr('data-no-double');
-                let clicked = $(this).attr('data-clicked');
-
-
-                let btn = jQuery(this);
-                btn.attr('data-clicked', '1');
-                if (no_double) {
-                    if (clicked == 1) {return false;}
-                }
-
-                if (!message) {
-                    message = window.capp.label_confirm;
-                } else {
-                    message = window.cresenity.base64.decode(message);
-                }
-
-
+        elementRendered('a.confirm, button.confirm, input[type=submit].confirm', (el)=>{
+            $(el).click((e)=>{
                 e.preventDefault();
                 e.stopPropagation();
-                btn.off('click');
-                window.bootbox.confirm({
-                    className: 'capp-modal-confirm',
-                    message: message,
-                    callback: function (confirmed) {
-                        if (confirmed) {
-                            if (ahref) {
-                                window.location.href = ahref;
-                            } else if (btn.attr('type') == 'submit') {
-                                btn.closest('form').submit();
-                            } else {
-                                btn.on('click');
-                            }
-                        } else {
-                            btn.removeAttr('data-clicked');
-                        }
-                        setTimeout(function () {
-                            let modalExists = $('.modal:visible').length > 0;
-                            if (!modalExists) {
-                                $('body').removeClass('modal-open');
-                            } else {
-                                $('body').addClass('modal-open');
-                            }
-                        }, 750);
-                    }
-                });
-
-
+                confirmFromElement(el, this.confirmHandler);
                 return false;
             });
-            $('body').attr('data-confirm-initialized', '1');
-        }
-        let confirmSubmitInitialized = $('body').attr('data-confirm-submit-initialized');
-        if (!confirmSubmitInitialized) {
-            jQuery(document).on('click', 'input[type=submit].confirm', function (e) {
-                let submitted = $(this).attr('data-submitted');
-                let btn = jQuery(this);
-                if (submitted == '1') {return false;}
-                btn.attr('data-submitted', '1');
-
-                let message = $(this).attr('data-confirm-message');
-                if (!message) {
-                    message = window.capp.label_confirm;
-                } else {
-                    message = window.cresenity.base64.decode(message);
-                }
-
-                window.bootbox.confirm({
-                    className: 'capp-modal-confirm',
-                    message: message,
-                    callback: function (confirmed) {
-                        if (confirmed) {
-                            jQuery(e.target).closest('form').submit();
-                        } else {
-                            btn.removeAttr('data-submitted');
-                        }
-                    }
-                });
-
-
-                return false;
-            });
-            $('body').attr('data-confirm-submit-initialized', '1');
-        }
+        });
         jQuery(document).ready(function () {
             jQuery('#toggle-subnavbar').click(function () {
                 let cmd = jQuery('#toggle-subnavbar span').html();
@@ -2540,9 +2591,11 @@ if (!window.cresenity) {
             window.cresenity.unblockElement(selector);
         }
     };
+    // eslint-disable-next-line no-extend-native
     String.prototype.format_currency = function () {
         return $.cresenity.format_currency(this);
     };
+    // eslint-disable-next-line no-extend-native
     String.prototype.unformat_currency = function () {
         return $.cresenity.unformat_currency(this);
     };

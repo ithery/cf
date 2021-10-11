@@ -877,6 +877,9 @@ class c {
      * @return CHTTP_Redirector|CHttp_RedirectResponse
      */
     public static function redirect($to = null, $status = 302, $headers = [], $secure = null) {
+        if ($to instanceof CController) {
+            $to = $to->controllerUrl();
+        }
         if (is_null($to)) {
             return CHTTP::redirector();
         }
@@ -1076,6 +1079,15 @@ class c {
      */
     public static function app() {
         return CApp::instance();
+    }
+
+    /**
+     * Get the CApp instance.
+     *
+     * @return \CManager
+     */
+    public static function manager() {
+        return CManager::instance();
     }
 
     /**
@@ -1324,6 +1336,17 @@ class c {
      */
     public static function untrailingslashit($string) {
         return rtrim($string, '/');
+    }
+
+    public static function theme($key = null, $default = null) {
+        if ($key !== null) {
+            return static::manager()->theme()->getData($key, $default);
+        }
+        return static::manager()->theme();
+    }
+
+    public static function locale() {
+        return str_replace('_', '-', CF::getLocale());
     }
 }
 

@@ -32,15 +32,14 @@ namespace LEClient\Exceptions;
  * @author     Youri van Weegberg <youri@yourivw.nl>
  * @copyright  2020 Youri van Weegberg
  * @license    https://opensource.org/licenses/mit-license.php  MIT License
+ *
  * @link       https://github.com/yourivw/LEClient
  * @since      Class available since Release 1.2.0
  */
-class LEAccountException extends LEException
-{
-	public const ACCOUNTNOTFOUNDEEXCEPTION 	= 0x21;
-	
-	public static function AccountNotFoundException()
-	{
-		return new static('Account not found or deactivated.', self::ACCOUNTNOTFOUNDEEXCEPTION);
-	}
+class LEAccountException extends LEException {
+    public const ACCOUNTNOTFOUNDEEXCEPTION = 0x21;
+
+    public static function AccountNotFoundException() {
+        return new static('Account not found or deactivated.', self::ACCOUNTNOTFOUNDEEXCEPTION);
+    }
 }

@@ -4,10 +4,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
+ * @license Ittron Global Teknologi
  *
  * @since Dec 5, 2020
- *
- * @license Ittron Global Teknologi
  */
 return [
     [
@@ -65,7 +64,18 @@ return [
                 'name' => 'helper.carr',
                 'label' => c::__('carr'),
                 'uri' => 'docs/helper/carr',
+            ],
+            [
+                'name' => 'helper.cstr',
+                'label' => c::__('cstr'),
+                'uri' => 'docs/helper/cstr',
+            ],
+            [
+                'name' => 'helper.curl',
+                'label' => c::__('curl'),
+                'uri' => 'docs/helper/curl',
             ]
+
         ]
     ],
     [

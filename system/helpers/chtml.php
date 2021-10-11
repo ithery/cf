@@ -214,29 +214,6 @@ class chtml {
         return '<a href="&#109;&#097;&#105;&#108;&#116;&#111;&#058;' . $safe . $params . '"' . $attributes . '>' . $title . '</a>';
     }
 
-    /**
-     * Generate a "breadcrumb" list of anchors representing the URI.
-     *
-     * @param   array   segments to use as breadcrumbs, defaults to using Router::$segments
-     *
-     * @return string
-     */
-    public static function breadcrumb($segments = null) {
-        empty($segments) and $segments = CFRouter::$segments;
-
-        $array = [];
-        while ($segment = array_pop($segments)) {
-            $array[] = chtml::anchor(
-                // Complete URI for the URL
-                implode('/', $segments) . '/' . $segment,
-                // Title for the current segment
-                ucwords(inflector::humanize($segment))
-            );
-        }
-
-        // Retrun the array of all the segments
-        return array_reverse($array);
-    }
 
     /**
      * Creates a meta tag.

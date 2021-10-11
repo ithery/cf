@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * This class is used to construct a Personalization object for
  * the /mail/send API call
@@ -16,35 +10,54 @@
  * @package SendGrid\Mail
  */
 class CVendor_SendGrid_Mail_Personalization implements \JsonSerializable {
-
-    /** @var $tos CVendor_SendGrid_Mail_To[] objects */
+    /**
+     * @var CVendor_SendGrid_Mail_To[] objects
+     */
     private $tos;
 
-    /** @var $ccs CVendor_SendGrid_Mail_Cc[] objects */
+    /**
+     * @var CVendor_SendGrid_Mail_Cc[] objects
+     */
     private $ccs;
 
-    /** @var $bccs CVendor_SendGrid_Mail_Bcc[] objects */
+    /**
+     * @var CVendor_SendGrid_Mail_Bcc[] objects
+     */
     private $bccs;
 
-    /** @var $subject CVendor_SendGrid_Mail_Subject object */
+    /**
+     * @var CVendor_SendGrid_Mail_Subject object
+     */
     private $subject;
 
-    /** @var $headers CVendor_SendGrid_Mail_Header[] array of header key values */
+    /**
+     * @var CVendor_SendGrid_Mail_Header[] array of header key values
+     */
     private $headers;
 
-    /** @var $substitutions CVendor_SendGrid_Mail_Substitution[] array of substitution key values, used for legacy templates */
+    /**
+     * @var CVendor_SendGrid_Mail_Substitution[] array of substitution key values, used for legacy templates
+     */
     private $substitutions;
 
-    /** @var array of dynamic template data key values */
+    /**
+     * @var array of dynamic template data key values
+     */
     private $dynamic_template_data;
 
-    /** @var bool if we are using dynamic templates this will be true */
+    /**
+     * @var bool if we are using dynamic templates this will be true
+     */
     private $has_dynamic_template = false;
 
-    /** @var $custom_args CVendor_SendGrid_Mail_CustomArg[] array of custom arg key values */
+    /**
+     * @var CVendor_SendGrid_Mail_CustomArg[] array of custom arg key values
+     */
     private $custom_args;
 
-    /** @var $send_at CVendor_SendGrid_Mail_SendAt object */
+    /**
+     * @var CVendor_SendGrid_Mail_SendAt object
+     */
     private $send_at;
 
     /**
@@ -105,13 +118,13 @@ class CVendor_SendGrid_Mail_Personalization implements \JsonSerializable {
      * Add a subject object to a CVendor_SendGrid_Mail_Personalization object
      *
      * @param CVendor_SendGrid_Mail_Subject $subject Subject object
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setSubject($subject) {
         if (!($subject instanceof CVendor_SendGrid_Mail_Subject)) {
-            throw new CVendor_SendGrid_Mail_TypeException(
-            '$subject must be an instance of SendGrid\Mail\Subject'
+            throw new CVendor_SendGrid_Exception_TypeException(
+                '$subject must be an instance of SendGrid\Mail\Subject'
             );
         }
         $this->subject = $subject;
@@ -147,10 +160,10 @@ class CVendor_SendGrid_Mail_Personalization implements \JsonSerializable {
     /**
      * Add a CVendor_SendGrid_Mail_Substitution object or key/value to a CVendor_SendGrid_Mail_Personalization object
      *
-     * @param CVendor_SendGrid_Mail_Substitution|string $data DynamicTemplateData object or the key of a
-     *                                  dynamic data
-     * @param string|null         $value The value of dynmic data
-     * 
+     * @param CVendor_SendGrid_Mail_Substitution|string $data  DynamicTemplateData object or the key of a
+     *                                                         dynamic data
+     * @param string|null                               $value The value of dynmic data
+     *
      * @return null
      */
     public function addDynamicTemplateData($data, $value = null) {
@@ -159,7 +172,7 @@ class CVendor_SendGrid_Mail_Personalization implements \JsonSerializable {
 
     /**
      * Retrieve dynamic template data key/value pairs from a Personalization object
-     * 
+     *
      * @return array
      */
     public function getDynamicTemplateData() {
@@ -170,8 +183,8 @@ class CVendor_SendGrid_Mail_Personalization implements \JsonSerializable {
      * Add a CVendor_SendGrid_Mail_Substitution object or key/value to a CVendor_SendGrid_Mail_Personalization object
      *
      * @param CVendor_SendGrid_Mail_Substitution|string $substitution Substitution object or the key of a
-     *                                          substitution
-     * @param string|null $value The value of a substitution
+     *                                                                substitution
+     * @param string|null                               $value        The value of a substitution
      */
     public function addSubstitution($substitution, $value = null) {
         if (!($substitution instanceof CVendor_SendGrid_Mail_Substitution)) {
@@ -212,13 +225,13 @@ class CVendor_SendGrid_Mail_Personalization implements \JsonSerializable {
      * Add a CVendor_SendGrid_Mail_SendAt object to a CVendor_SendGrid_Mail_Personalization object
      *
      * @param CVendor_SendGrid_Mail_SendAt $send_at SendAt object
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setSendAt($send_at) {
         if (!($send_at instanceof CVendor_SendGrid_Mail_SendAt)) {
-            throw new CVendor_SendGrid_Mail_TypeException(
-            '$send_at must be an instance of SendGrid\Mail\SendAt'
+            throw new CVendor_SendGrid_Exception_TypeException(
+                '$send_at must be an instance of SendGrid\Mail\SendAt'
             );
         }
         $this->send_at = $send_at;
@@ -237,13 +250,13 @@ class CVendor_SendGrid_Mail_Personalization implements \JsonSerializable {
      * Specify if this personalization is using dynamic templates
      *
      * @param bool $has_dynamic_template are we using dynamic templates
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
      */
     public function setHasDynamicTemplate($has_dynamic_template) {
         if (is_bool($has_dynamic_template) != true) {
-            throw new CVendor_SendGrid_Mail_TypeException(
-            '$has_dynamic_template must be an instance of bool'
+            throw new CVendor_SendGrid_Exception_TypeException(
+                '$has_dynamic_template must be an instance of bool'
             );
         }
         $this->has_dynamic_template = $has_dynamic_template;
@@ -273,20 +286,20 @@ class CVendor_SendGrid_Mail_Personalization implements \JsonSerializable {
         }
 
         return array_filter(
-                        [
-                    'to' => $this->getTos(),
-                    'cc' => $this->getCcs(),
-                    'bcc' => $this->getBccs(),
-                    'subject' => $this->getSubject(),
-                    'headers' => $this->getHeaders(),
-                    'substitutions' => $substitutions,
-                    'dynamic_template_data' => $dynamic_substitutions,
-                    'custom_args' => $this->getCustomArgs(),
-                    'send_at' => $this->getSendAt()
-                        ], function ($value) {
-                    return $value !== null;
-                }
-                ) ?: null;
+            [
+                'to' => $this->getTos(),
+                'cc' => $this->getCcs(),
+                'bcc' => $this->getBccs(),
+                'subject' => $this->getSubject(),
+                'headers' => $this->getHeaders(),
+                'substitutions' => $substitutions,
+                'dynamic_template_data' => $dynamic_substitutions,
+                'custom_args' => $this->getCustomArgs(),
+                'send_at' => $this->getSendAt()
+            ],
+            function ($value) {
+                return $value !== null;
+            }
+        ) ?: null;
     }
-
 }

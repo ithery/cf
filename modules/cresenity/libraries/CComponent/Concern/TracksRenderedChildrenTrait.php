@@ -1,15 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 trait CComponent_Concern_TracksRenderedChildrenTrait {
-
     protected $renderedChildren = [];
+
     protected $previouslyRenderedChildren = [];
 
     public function getRenderedChildComponentId($id) {
@@ -39,5 +40,4 @@ trait CComponent_Concern_TracksRenderedChildrenTrait {
     public function getRenderedChildren() {
         return $this->renderedChildren;
     }
-
 }

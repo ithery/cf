@@ -1,15 +1,17 @@
 <?php
 
+/**
+ * @deprecated since 1.2
+ */
 class CFormValidation {
-
     private $validation = null;
 
     public function __construct() {
-        $this->validation = array();
+        $this->validation = [];
     }
 
     public static function factory() {
-        return new CFormValidation();
+        return new static();
     }
 
     public function add_validation($name, $param) {
@@ -17,37 +19,37 @@ class CFormValidation {
     }
 
     public function required() {
-        $this->validation["required"] = "required";
+        $this->validation['required'] = 'required';
         return $this;
     }
 
     public function condrequired($input) {
-        $this->validation["condrequired"] = $input;
+        $this->validation['condrequired'] = $input;
         return $this;
     }
 
     public function min($n) {
-        $this->validation["min"] = $n;
+        $this->validation['min'] = $n;
         return $this;
     }
 
     public function max($n) {
-        $this->validation["max"] = $n;
+        $this->validation['max'] = $n;
         return $this;
     }
 
     public function equals($n) {
-        $this->validation["equals"] = $n;
+        $this->validation['equals'] = $n;
         return $this;
     }
 
     public function notequals($n) {
-        $this->validation["notequals"] = $n;
+        $this->validation['notequals'] = $n;
         return $this;
     }
 
     public function custom($n) {
-        $this->validation["custom"] = $n;
+        $this->validation['custom'] = $n;
         return $this;
     }
 
@@ -56,42 +58,40 @@ class CFormValidation {
     }
 
     public function render_class() {
-        $validation_class = "";
+        $validation_class = '';
         foreach ($this->validation as $k => $v) {
             if ($v != false) {
-                if (strlen($validation_class) > 0)
-                    $validation_class.=", ";
+                if (strlen($validation_class) > 0) {
+                    $validation_class .= ', ';
+                }
                 switch (strtolower($k)) {
-                    case "required":
-                        $validation_class.="required";
+                    case 'required':
+                        $validation_class .= 'required';
                         break;
-                    case "condrequired":
-                        $validation_class.="condRequired[" . $v . "]";
+                    case 'condrequired':
+                        $validation_class .= 'condRequired[' . $v . ']';
                         break;
-                    case "min":
-                        $validation_class.="min[" . $v . "]";
+                    case 'min':
+                        $validation_class .= 'min[' . $v . ']';
                         break;
-                    case "max":
-                        $validation_class.="max[" . $v . "]";
+                    case 'max':
+                        $validation_class .= 'max[' . $v . ']';
                         break;
-                    case "equals":
-                        $validation_class.="equals[" . $v . "]";
+                    case 'equals':
+                        $validation_class .= 'equals[' . $v . ']';
                         break;
-                    case "notequals":
-                        $validation_class.="notequals[" . $v . "]";
+                    case 'notequals':
+                        $validation_class .= 'notequals[' . $v . ']';
                         break;
-                    case "custom":
-                        $validation_class.="custom[" . $v . "]";
+                    case 'custom':
+                        $validation_class .= 'custom[' . $v . ']';
                         break;
                     default:
-                        $validation_class.="" . $k . "[" . $v . "]";
+                        $validation_class .= '' . $k . '[' . $v . ']';
                         break;
                 }
             }
         }
         return $validation_class;
     }
-
 }
-
-?>

@@ -1084,4 +1084,8 @@ class cstr {
     public static function padRight($value, $length, $pad = ' ') {
         return str_pad($value, $length, $pad, STR_PAD_RIGHT);
     }
+
+    public static function isAscii($str) {
+        return $str == static::ascii($str);
+    }
 }

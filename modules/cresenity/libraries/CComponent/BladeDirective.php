@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 class CComponent_BladeDirective {
-
     public static function component($expression) {
-
         $lastArg = c::str(carr::last(explode(',', $expression)))->trim();
 
         if ($lastArg->startsWith('key(') && $lastArg->endsWith(')')) {
@@ -21,7 +20,6 @@ class CComponent_BladeDirective {
         } else {
             $cachedKey = "'" . cstr::random(7) . "'";
         }
-
 
         return <<<EOT
 <?php
@@ -48,8 +46,7 @@ EOT;
 
     public static function entangle($expression) {
         return <<<EOT
-<?php if ((object) ({$expression}) instanceof \CComponent_CFDirective) : ?>window.cresenity.ui.find('{{ \$_instance->id }}').entangle('{{ {$expression}->value() }}'){{ {$expression}->hasModifier('defer') ? '.defer' : '' }} <?php else : ?> window.cresenity.ui.find('{{ \$_instance->id }}').entangle('{{ {$expression} }}') <?php endif; ?>
+<?php if ((object) ({$expression}) instanceof \CComponent_CresDirective) : ?>window.cresenity.ui.find('{{ \$_instance->id }}').entangle('{{ {$expression}->value() }}'){{ {$expression}->hasModifier('defer') ? '.defer' : '' }} <?php else : ?> window.cresenity.ui.find('{{ \$_instance->id }}').entangle('{{ {$expression} }}') <?php endif; ?>
 EOT;
     }
-
 }

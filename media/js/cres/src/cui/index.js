@@ -4,7 +4,7 @@ import store from '@/cui/Store';
 import Connection from '@/cui/connection';
 import Polling from '@/cui/component/Polling';
 import Component from '@/cui/component/index';
-import { dispatch, cfDirectives } from '@/util';
+import { dispatch, cresDirectives } from '@/util';
 import FileUploads from '@/cui/component/FileUploads';
 import LaravelEcho from '@/cui/component/LaravelEcho';
 import DirtyStates from '@/cui/component/DirtyStates';
@@ -24,16 +24,16 @@ class CUI {
     }
 
     first() {
-        return Object.values(this.components.componentsById)[0].$cf;
+        return Object.values(this.components.componentsById)[0].$cres;
     }
 
     find(componentId) {
-        return this.components.componentsById[componentId].$cf;
+        return this.components.componentsById[componentId].$cres;
     }
 
     all() {
         return Object.values(this.components.componentsById).map(
-            component => component.$cf
+            component => component.$cres
         );
     }
 
@@ -65,6 +65,10 @@ class CUI {
         this.components.on(event, callback);
     }
 
+    off(event, callback) {
+        this.components.off(event, callback);
+    }
+
     devTools(enableDevtools) {
         this.devToolsEnabled = enableDevtools;
     }
@@ -84,7 +88,7 @@ class CUI {
         });
 
         this.onLoadCallback();
-        dispatch('cresenity:load');
+        dispatch('cresenity:ui:start');
 
         document.addEventListener(
             'visibilitychange',
@@ -99,7 +103,7 @@ class CUI {
 
     rescan(node = null) {
         DOM.rootComponentElementsWithNoParents(node).forEach(el => {
-            const componentId = cfDirectives(el).get('id').value;
+            const componentId = cresDirectives(el).get('id').value;
 
             if (this.components.hasComponent(componentId)) {return;}
 

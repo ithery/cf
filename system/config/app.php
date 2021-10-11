@@ -54,13 +54,44 @@ return [
      * services the application utilizes. Override this in your application config file
      */
     'environment' => CBase::ENVIRONMENT_DEVELOPMENT,
-    /*
+
+    /**
      * When your application is in debug mode, detailed error messages with
      * stack traces will be shown on every error that occurs within your
      * application. If disabled, a simple generic error page is shown.
-     *
      */
     'debug' => !IN_PRODUCTION,
+
+    'auth' => [
+        'guard' => 'web',
+        'middleware' => ['web'],
+        'passwords' => 'users',
+        'username' => 'username',
+        'email' => 'email',
+        'hasher' => 'md5',
+        'views' => true,
+        'home' => '/home',
+        'prefix' => '',
+        'domain' => null,
+        'limiters' => [
+            'login' => null,
+        ],
+        'features' => [
+            CApp_Auth_Features::registration(),
+            CApp_Auth_Features::resetPasswords(),
+            CApp_Auth_Features::emailVerification(),
+            CApp_Auth_Features::updateProfileInformation(),
+            CApp_Auth_Features::updatePasswords(),
+            //CApp_Auth_Features::twoFactorAuthentication(),
+        ],
+    ],
+    'model' => [
+        'org' => CApp_Model_Org::class,
+        'user' => CApp_Model_Users::class,
+        'role' => CApp_Model_Roles::class,
+        'role_nav' => CApp_Model_RoleNav::class,
+    ],
+
     'lang' => 'id', //deprecated
     'app_id' => 1,
     'install' => false,
@@ -70,14 +101,5 @@ return [
     'admin_email' => 'contact@cresenitytech.com',
     'set_timezone' => true, //deprecated
     'default_timezone' => 'Asia/Jakarta', //deprecated
-    'multilang' => true,
-    'top_menu_cashier' => false,
-    'update_last_request' => true,
-    'ip_address' => '192.168.1.19',
-    'code_test' => false,
-    'require_js' => true,
-    'merge_js' => false,
-    'minify_js' => false,
-    'merge_css' => false,
-    'minify_css' => false,
+
 ];

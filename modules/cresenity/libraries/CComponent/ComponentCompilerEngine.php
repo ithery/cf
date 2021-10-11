@@ -1,15 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 class CComponent_ComponentCompilerEngine extends CComponent_CompilerEngine {
-
     protected $component;
+
     protected $isRenderingComponent = false;
 
     public function startComponentRendering($component) {
@@ -38,7 +39,7 @@ class CComponent_ComponentCompilerEngine extends CComponent_CompilerEngine {
         // flush out any stray output that might get out before an error occurs or
         // an exception is thrown. This prevents any partial views from leaking.
         try {
-            $closure = \Closure::bind(function() use($__path, $__data) {
+            $closure = \Closure::bind(function () use ($__path, $__data) {
                 extract($__data, EXTR_SKIP);
                 include $__path;
             }, $this->component ? $this->component : $this);
@@ -51,5 +52,4 @@ class CComponent_ComponentCompilerEngine extends CComponent_CompilerEngine {
 
         return ltrim(ob_get_clean());
     }
-
 }

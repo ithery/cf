@@ -1,18 +1,15 @@
 <?php
 
-
-
-
 use Livewire\Redirector;
 
-class CComponent_RenameMe_SupportRedirects
-{
-    static function init() { return new static; }
+class CComponent_RenameMe_SupportRedirects {
+    public static function init() {
+        return new static;
+    }
 
     public static $redirectorCacheStack = [];
 
-    function __construct()
-    {
+    public function __construct() {
         CComponent_Manager::instance()->listen('component.hydrate', function ($component, $request) {
             // Put Laravel's redirector aside and replace it with our own custom one.
             static::$redirectorCacheStack[] = CHTTP::redirector();

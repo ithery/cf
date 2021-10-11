@@ -10,6 +10,7 @@ class CStringBuilder {
     use CTrait_Compat_StringBuilder;
 
     private $text = '';
+
     private $indent = 0;
 
     public function __construct($str = '') {

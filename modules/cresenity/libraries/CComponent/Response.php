@@ -1,17 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 class CComponent_Response {
-
     public $request;
+
     public $fingerprint;
+
     public $effects;
+
     public $memo;
 
     public static function fromRequest($request) {
@@ -82,8 +85,9 @@ class CComponent_Response {
             }
 
             // If the memo values are the same, skip adding them.
-            if ($requestMemo[$key] === $newValue)
+            if ($requestMemo[$key] === $newValue) {
                 continue;
+            }
 
             $dirtyMemo[$key] = $newValue;
         }
@@ -98,10 +102,10 @@ class CComponent_Response {
         }
 
         // Make sure any data marked as "dirty" is present in the resulting data payload.
-        foreach (CF::get($this, 'effects.dirty', []) as $property) {
+        foreach (c::get($this, 'effects.dirty', []) as $property) {
             $property = carr::head(explode('.', $property));
 
-            CF::set($dirtyMemo, 'data.' . $property, $responseMemo['data'][$property]);
+            c::set($dirtyMemo, 'data.' . $property, $responseMemo['data'][$property]);
         }
 
         return [
@@ -109,5 +113,4 @@ class CComponent_Response {
             'serverMemo' => $dirtyMemo,
         ];
     }
-
 }

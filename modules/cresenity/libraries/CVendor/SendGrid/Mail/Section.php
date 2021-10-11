@@ -1,11 +1,5 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * This class is used to construct a Section object for the /mail/send API call
  *
@@ -14,21 +8,24 @@
  *
  * @package SendGrid\Mail
  */
-class CVendor_SendGrid_Mail_Section implements \JsonSerializable
-{
-    /** @var $key string Section key */
+class CVendor_SendGrid_Mail_Section implements \JsonSerializable {
+    /**
+     * @var string Section key
+     */
     private $key;
-    /** @var $value string Section value */
+
+    /**
+     * @var string Section value
+     */
     private $value;
 
     /**
      * Optional constructor
      *
-     * @param string|null $key Section key
+     * @param string|null $key   Section key
      * @param string|null $value Section value
      */
-    public function __construct($key = null, $value = null)
-    {
+    public function __construct($key = null, $value = null) {
         if (isset($key)) {
             $this->setKey($key);
         }
@@ -41,13 +38,12 @@ class CVendor_SendGrid_Mail_Section implements \JsonSerializable
      * Add the key on a Section object
      *
      * @param string $key Section key
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
-     */ 
-    public function setKey($key)
-    {
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
+     */
+    public function setKey($key) {
         if (!is_string($key)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$key must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$key must be of type string.');
         }
         $this->key = $key;
     }
@@ -57,8 +53,7 @@ class CVendor_SendGrid_Mail_Section implements \JsonSerializable
      *
      * @return string
      */
-    public function getKey()
-    {
+    public function getKey() {
         return $this->key;
     }
 
@@ -66,13 +61,12 @@ class CVendor_SendGrid_Mail_Section implements \JsonSerializable
      * Add the value on a Section object
      *
      * @param string $value Section value
-     * 
-     * @throws CVendor_SendGrid_Mail_TypeException
-     */ 
-    public function setValue($value)
-    {
+     *
+     * @throws CVendor_SendGrid_Exception_TypeException
+     */
+    public function setValue($value) {
         if (!is_string($value)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$value must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$value must be of type string.');
         }
         $this->value = $value;
     }
@@ -82,8 +76,7 @@ class CVendor_SendGrid_Mail_Section implements \JsonSerializable
      *
      * @return string
      */
-    public function getValue()
-    {
+    public function getValue() {
         return $this->value;
     }
 
@@ -92,8 +85,7 @@ class CVendor_SendGrid_Mail_Section implements \JsonSerializable
      *
      * @return null|array
      */
-    public function jsonSerialize()
-    {
+    public function jsonSerialize() {
         return array_filter(
             [
                 'key' => $this->getKey(),

@@ -232,7 +232,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     protected function shouldBroadcast(array $payload) {
         return isset($payload[0])
-                && $payload[0] instanceof ShouldBroadcast
+                && $payload[0] instanceof CBroadcast_ShouldBroadcastInterface
                 && $this->broadcastWhen($payload[0]);
     }
 
@@ -267,7 +267,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     public function getListeners($eventName) {
         if (is_array($eventName) || strlen($eventName) == 0) {
-            cdbg::var_dump(cdbg::trace());
+            cdbg::varDump(cdbg::trace());
             die;
         }
         $listeners = isset($this->listeners[$eventName]) ? $this->listeners[$eventName] : [];
@@ -462,7 +462,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
         $listener = (new ReflectionClass($class))->newInstanceWithoutConstructor();
         return [$listener, $this->propagateListenerOptions(
             $listener,
-            new CallQueuedListener($class, $method, $arguments)
+            new CEvent_CallQueuedListener($class, $method, $arguments)
         )];
     }
 
