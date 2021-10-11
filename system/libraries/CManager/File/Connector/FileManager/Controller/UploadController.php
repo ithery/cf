@@ -50,6 +50,7 @@ class CManager_File_Connector_FileManager_Controller_UploadController extends CM
                     </script>";
             }
         }
-        echo(is_string($response) ? $response : json_encode($response));
+
+        return is_string($response) ? c::response($response) : c::response()->json($response);
     }
 }

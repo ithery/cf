@@ -19,6 +19,7 @@ abstract class CManager_File_ConfigAbstract {
         if ($key == null) {
             return $this->options;
         }
-        return carr::get($this->options, $default);
+
+        return carr::get($this->options, $key, $default);
     }
 }

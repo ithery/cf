@@ -19,6 +19,13 @@ class CElement_Component_FileManager extends CElement_Component {
 
     protected $asPicker = false;
 
+    /**
+     * Overrides controllers for filemanager
+     *
+     * @var array
+     */
+    protected $controller = [];
+
     public function __construct($id = '') {
         parent::__construct($id);
 
@@ -46,6 +53,11 @@ class CElement_Component_FileManager extends CElement_Component {
 
     public function setTheme($theme) {
         $this->theme = $theme;
+        return $this;
+    }
+
+    public function setController($method, $controllerClass) {
+        $this->controller[$method] = $controllerClass;
         return $this;
     }
 
@@ -83,6 +95,8 @@ class CElement_Component_FileManager extends CElement_Component {
         if ($this->theme != null) {
             $config['theme'] = $this->theme;
         }
+
+        $config['controller'] = $this->controller;
         $config['action'] = [
             'use' => false,
             'preview' => true,

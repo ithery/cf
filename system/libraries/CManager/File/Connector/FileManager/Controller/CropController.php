@@ -24,6 +24,6 @@ class CManager_File_Connector_FileManager_Controller_CropController extends CMan
         $app->addTemplate()->setTemplate('CElement/Component/FileManager/Cropper')->setVar('fm', $fm)
             ->setVar('working_dir', $workingdir)
             ->setVar('img', $fm->path()->pretty($fm->input('img')));
-        echo $app->render();
+        return $app;
     }
 }

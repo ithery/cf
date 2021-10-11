@@ -13,6 +13,9 @@ use Intervention\Image\Facades\Image;
 // import the Intervention Image Manager Class
 use Intervention\Image\ImageManager;
 
+/**
+ * @property-read CManager_File_Connector_FileManager_FM_StorageRepository $storage
+ */
 class CManager_File_Connector_FileManager_FM_Path {
     private $working_dir;
 
@@ -34,6 +37,14 @@ class CManager_File_Connector_FileManager_FM_Path {
 
     public function __call($function_name, $arguments) {
         return $this->storage->$function_name(...$arguments);
+    }
+
+    public function move($newPath) {
+        $this->storage->move($newPath);
+    }
+
+    public function exists() {
+        return $this->storage->exists();
     }
 
     public function dir($working_dir) {
@@ -130,10 +141,14 @@ class CManager_File_Connector_FileManager_FM_Path {
             return false;
         }
         $this->storage->makeDirectory(0777, true, true);
+
+        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_FolderIsCreated($this->path()));
     }
 
     public function isDirectory() {
         $working_dir = $this->path('working_dir');
+
+
 
         $parent_dir = substr($working_dir, 0, strrpos($working_dir, '/'));
         if (strlen($parent_dir) == 0) {
@@ -209,16 +224,13 @@ class CManager_File_Connector_FileManager_FM_Path {
         $newFileName = $this->getNewName($file);
         $newFilePath = $this->setName($newFileName)->path('absolute');
 
-        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_ImageIsUploading($newFilePath));
+        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_FileIsUploading($newFilePath));
         try {
             $newFileName = $this->saveFile($file, $newFileName);
         } catch (\Exception $e) {
-            // \Log::info($e);
-            // return $this->error('invalid');
             return $this->error($e->getMessage());
         }
-        // TODO should be "FileWasUploaded"
-        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasUploaded($newFilePath));
+        $this->helper->dispatch(new CManager_File_Connector_FileManager_Event_FileWasUploaded($newFilePath));
         return $newFileName;
     }
 
