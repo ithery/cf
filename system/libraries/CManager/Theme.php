@@ -10,7 +10,9 @@ class CManager_Theme {
      * @var callable
      */
     protected static $themeCallback;
+
     protected static $themeData = [];
+
     protected static $theme = null;
 
     public static function setThemeCallback(callable $themeCallback) {
