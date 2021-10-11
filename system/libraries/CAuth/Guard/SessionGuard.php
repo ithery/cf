@@ -126,7 +126,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
             $this->user = $this->userFromRecaller($recaller);
 
             if ($this->user) {
-                $this->updateSession($this->user->getAuthIdentifier());
+                $this->updateSession($this->user);
 
                 $this->fireLoginEvent($this->user, true);
             }
@@ -156,7 +156,6 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
             $recaller->id(),
             $recaller->token()
         ));
-
         return $user;
     }
 
@@ -405,7 +404,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
             $this->ensureRememberTokenIsSet($user);
 
             //$this->queueRecallerCookie($user);
-            setcookie($this->getRecallerName(), $user->getAuthIdentifier() . '|' . $user->getRememberToken() . '|' . $user->getAuthPassword(), time() + 60 * 60 * 24 * 365 * 100);
+            setcookie($this->getRecallerName(), $user->getAuthIdentifier() . '|' . $user->getRememberToken() . '|' . $user->getAuthPassword(), time() + 60 * 60 * 24 * 365 * 100, '/');
         }
 
         // If we have an event dispatcher instance set we will fire an event so that
