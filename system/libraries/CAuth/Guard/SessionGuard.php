@@ -405,7 +405,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
             $this->ensureRememberTokenIsSet($user);
 
             //$this->queueRecallerCookie($user);
-            setcookie($this->getRecallerName(), $user->getAuthIdentifier() . '|' . $user->getRememberToken() . '|' . $user->getAuthPassword());
+            setcookie($this->getRecallerName(), $user->getAuthIdentifier() . '|' . $user->getRememberToken() . '|' . $user->getAuthPassword(), time() + 60 * 60 * 24 * 365 * 100);
         }
 
         // If we have an event dispatcher instance set we will fire an event so that
