@@ -314,6 +314,13 @@ final class CManager {
         return $transformManager->addCallback($method, $callback);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return void
+     *
+     * @deprecated since 1.2
+     */
     public static function setUseRequireJs($bool) {
         self::$useRequireJs = $bool;
     }
