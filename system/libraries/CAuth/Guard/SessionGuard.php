@@ -758,7 +758,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
     /**
      * Get the event dispatcher instance.
      *
-     * @return \Illuminate\Contracts\Events\Dispatcher
+     * @return \CEvent_DispatcherInterface
      */
     public function getDispatcher() {
         return $this->events;
@@ -778,7 +778,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
     /**
      * Get the session store used by the guard.
      *
-     * @return \Illuminate\Contracts\Session\Session
+     * @return \CSession
      */
     public function getSession() {
         return $this->session;
@@ -787,7 +787,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
     /**
      * Return the currently cached user.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return CAuth_AuthenticatableInterface|null
      */
     public function getUser() {
         return $this->user;
