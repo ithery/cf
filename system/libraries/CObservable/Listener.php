@@ -73,7 +73,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
                 $confirm_message = clang::__('Are you sure ?');
             }
             $confirmStartScript = "
-                bootbox.confirm('" . $confirm_message . "', function(confirmed) {
+                window.cresenity.confirm({owner:thiselm, message:'" . c::e($confirm_message) . "',confirmCallback: function(confirmed) {
                     if(confirmed) {
             ";
 
@@ -89,7 +89,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
                             $('body').addClass('modal-open');
                         }
                     },750);
-                });
+                }});
             ";
         }
         $compiledJs = $startScript . $confirmStartScript . $handlersScript . $confirmEndScript;

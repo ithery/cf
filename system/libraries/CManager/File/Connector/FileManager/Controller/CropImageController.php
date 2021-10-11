@@ -47,6 +47,6 @@ class CManager_File_Connector_FileManager_Controller_CropImageController extends
         $fm->path()->makeThumbnail($image_name);
         $fm->dispatch(new CManager_File_Connector_FileManager_Event_ImageWasCropped($image_path));
 
-        echo parent::$successResponse;
+        return c::response(parent::$successResponse);
     }
 }

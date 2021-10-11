@@ -10,19 +10,45 @@ use phpseclib\File\X509;
 
 class CDevSuite_Windows_Site extends CDevSuite_Site {
     /**
+     * Get the path to Nginx site configuration files.
+     *
+     * @param null|string $additionalPath
+     */
+    public function nginxPath($additionalPath = null) {
+        if ($additionalPath && !cstr::endsWith($additionalPath, '.conf')) {
+            $additionalPath = $additionalPath . '.conf';
+        }
+
+        return $this->devSuiteHomePath() . '/Nginx' . ($additionalPath ? '/' . $additionalPath : '');
+    }
+
+    /**
      * Get all certificates from config folder.
      *
      * @param string $path
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
-    public function getCertificates($path) {
-        return c::collect($this->files->scanDir($path))->filter(function ($value, $key) {
-            return cstr::endsWith($value, '.crt');
-        })->map(function ($cert) {
-            $certWithoutSuffix = substr($cert, 0, -4);
+    public function getCertificates($path = null) {
+        $path = $path ?: $this->certificatesPath();
 
-            return substr($certWithoutSuffix, 0, strrpos($certWithoutSuffix, '.'));
+        $this->files->ensureDirExists($path, CDevsuite::user());
+
+        $config = $this->config->read();
+
+        return c::collect($this->files->scandir($path))->filter(function ($value, $key) {
+            return cstr::endsWith($value, '.crt');
+        })->map(function ($cert) use ($config) {
+            $certWithoutSuffix = substr($cert, 0, -4);
+            $trimToString = '.';
+
+            // If we have the cert ending in our tld strip that tld specifically
+            // if not then just strip the last segment for  backwards compatibility.
+            if (cstr::endsWith($certWithoutSuffix, $config['tld'])) {
+                $trimToString .= $config['tld'];
+            }
+
+            return substr($certWithoutSuffix, 0, strrpos($certWithoutSuffix, $trimToString));
         })->flip();
     }
 
@@ -51,23 +77,55 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
     }
 
     /**
+     * Get all of the URLs that are currently secured.
+     *
+     * @return array
+     */
+    public function secured() {
+        return c::collect($this->files->scandir($this->certificatesPath()))
+            ->map(function ($file) {
+                return str_replace(['.key', '.csr', '.crt', '.conf'], '', $file);
+            })->unique()->values()->all();
+    }
+
+    /**
      * Secure the given host with TLS.
      *
      * @param string $url
+     * @param string $siteConf pregenerated Nginx config file contents
      *
      * @return void
      */
-    public function secure($url) {
+    public function secure($url, $siteConf = null) {
         $this->unsecure($url);
 
-        $this->files->ensureDirExists($this->certificatesPath(), CDevSuite::user());
+        $this->files->ensureDirExists($this->certificatesPath(), CDevsuite::user());
+
+        $this->files->ensureDirExists($this->nginxPath(), CDevsuite::user());
 
         $this->createCertificate($url);
 
         $this->files->putAsUser(
-            CDevSuite::homePath() . "/Nginx/$url.conf",
-            $this->buildSecureNginxServer($url)
+            $this->nginxPath($url),
+            $this->buildSecureNginxServer($url, $siteConf)
         );
+    }
+
+    /**
+     * Get the port of the given host.
+     *
+     * @param string $url
+     *
+     * @return int
+     */
+    public function port($url) {
+        if ($this->files->exists($path = $this->nginxPath($url))) {
+            if (strpos($this->files->get($path), '443') !== false) {
+                return 443;
+            }
+        }
+
+        return 80;
     }
 
     /**
@@ -126,6 +184,12 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
             ['dNSName' => "*.$url"],
         ]);
 
+        $x509->setExtension('id-ce-keyUsage', [
+            'digitalSignature',
+            'nonRepudiation',
+            'keyEncipherment',
+        ]);
+
         $csr = $x509->saveCSR($x509->signCSR());
 
         $this->files->putAsUser($csrPath, $csr);
@@ -169,6 +233,7 @@ class CDevSuite_Windows_Site extends CDevSuite_Site {
      * @return void
      */
     public function trustCertificate($crtPath) {
+        CDevSuite::info('Trust Certificate ' . $crtPath);
         $this->cli->run(sprintf('cmd "/C certutil -addstore "Root" "%s""', $crtPath));
     }
 

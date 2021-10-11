@@ -23,7 +23,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 /**
  * @mixin \League\Flysystem\FilesystemInterface
  */
-class CStorage_Adapter implements CStorage_FilesystemInterface, CStorage_CloudInterface {
+class CStorage_Adapter implements CStorage_CloudInterface {
     /**
      * The Flysystem filesystem implementation.
      *

@@ -20,17 +20,24 @@ class CElement_Component_Widget extends CElement_Component {
      * @var CElement_Element_Div
      */
     protected $content;
+
     public $scroll;
+
     public $nopadding;
+
     public $height;
+
     protected $switcher;
+
     private $collapse;
+
     private $close;
+
     private $js_collapse;
 
     public function __construct($id) {
         parent::__construct($id);
-        $this->header = CElement_Factory::createComponent('Widget_Header');
+        $this->header = CElement_Factory::createComponent(CElement_Component_Widget_Header::class);
         $this->add($this->header);
         $this->content = $this->addDiv()->addClass('widget-content clearfix');
         $this->addClass('widget-box');

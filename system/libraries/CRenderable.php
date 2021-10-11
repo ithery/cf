@@ -5,6 +5,11 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CRenderable extends CObject implements CApp_Interface_Renderable {
     use CTrait_Compat_Renderable;
 
+    /**
+     * Renderable Child Array
+     *
+     * @var CRenderable[]
+     */
     protected $renderable;
 
     protected $additional_js;

@@ -11,7 +11,9 @@ class CApp_Blade_Directive {
     }
 
     public static function scripts($expression) {
-        return '{!! CApp::instance()->renderScripts() !!}';
+        return '
+        {!! CApp::instance()->renderScripts() !!}
+        ';
     }
 
     public static function pageTitle($expression) {
@@ -31,33 +33,34 @@ class CApp_Blade_Directive {
     }
 
     public static function pushScript($expression) {
-        return '<?php \CApp::instance()->startPush(\'script\') ?>';
+        return '<?php \CApp::instance()->startPush(\'capp-script\') ?>';
     }
 
     public static function endPushScript($expression) {
-        return '<?php \CApp::instance()->stopPush(\'script\'); ?>';
+        return '<?php \CApp::instance()->stopPush(\'capp-script\'); ?>';
     }
 
     public static function prependScript($expression) {
-        return '<?php \CApp::instance()->startPrepend(\'script\'); ?>';
+        return '<?php \CApp::instance()->startPrepend(\'capp-script\'); ?>';
     }
 
     public static function endPrependScript($expression) {
-        return '<?php \CApp::instance()->stopPrepend(\'script\'); ?>';
+        return '<?php \CApp::instance()->stopPrepend(\'capp-script\'); ?>';
     }
 
     public static function element($expression) {
         $expression = str_replace(['(', ')'], '', $expression);
         $expression = str_replace(['"', '\''], '', $expression);
         $expression = str_replace(',', ' ', $expression);
+
         $renderingElement = CApp::instance()->renderingElement();
 
         if ($renderingElement != null) {
-            $viewElement = $renderingElement->viewElement($expression);
-            if ($viewElement) {
-                $view = $viewElement->renderToView();
-
-                return $view;
+            if ($renderingElement instanceof CElement_View) {
+                $ownerId = $renderingElement->id();
+                return "<?php echo \CApp::instance()->yieldViewElement('" . $expression . "'); ?>";
+            } else {
+                throw new Exception('Directive CApp Element must be rendered when called from CElement_View');
             }
         }
         return '';

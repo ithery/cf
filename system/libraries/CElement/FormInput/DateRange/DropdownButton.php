@@ -4,10 +4,9 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Jun 13, 2019, 6:38:34 PM
- *
- * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Carbon\Carbon;
 
@@ -82,8 +81,8 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
         $jsSpan = '';
         if ($this->maxSpan) {
             $jsSpan = "maxSpan: {
-                    'days': " . $this->maxSpan . "
-                },";
+                    'days': " . $this->maxSpan . '
+                },';
         }
 
         $jsRange = '';
@@ -111,31 +110,31 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
             $('#" . $this->id . "').daterangepicker({
                 startDate: moment('" . $this->dateStart . "'),
                 endDate: moment('" . $this->dateEnd . "'),
-                " . $jsRangeProperty . "
-                " . $jsCustomRange . "
-                " . $jsSpan . "
+                " . $jsRangeProperty . '
+                ' . $jsCustomRange . '
+                ' . $jsSpan . "
                 opens: '" . $this->openDirection . "',
                 locale: {
                     format: '" . $this->momentFormat . "'
                 },
                 isInvalidDate: function() {
-                    
+
                 }
             }, function (start, end) {
                 $('#" . $this->id . "').html(start.format('" . $this->momentFormat . "') + ' - ' + end.format('" . $this->momentFormat . "'));
                 $('#" . $this->id . "-start').val(start.format('" . $this->momentFormat . "'));
                 $('#" . $this->id . "-end').val(end.format('" . $this->momentFormat . "'));
-                if(start.format('" . $this->momentFormat . "')=='1970-01-01') { 
+                if(start.format('" . $this->momentFormat . "')=='1970-01-01') {
                     $('#" . $this->id . "').html('Until ' + end.format('" . $this->momentFormat . "'));
                 }
                 " . $jsChange . "
             });
-            
+
             $('#" . $this->id . "').html(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "') + ' - ' + moment('" . $this->dateEnd . "').format('" . $this->momentFormat . "'));
-            if(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "')=='1970-01-01') { 
+            if(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "')=='1970-01-01') {
                 $('#" . $this->id . "').html('Until ' + moment('" . $this->dateEnd . "').format('" . $this->momentFormat . "'));
             }
-            $('#" . $this->id . "').removeClass('uninit');   
+            $('#" . $this->id . "').removeClass('uninit');
         ";
         return $js;
     }

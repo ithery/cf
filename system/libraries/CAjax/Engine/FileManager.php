@@ -8,6 +8,6 @@ class CAjax_Engine_FileManager extends CAjax_Engine {
         $config = carr::get($data, 'config');
         $method = carr::get($args, 1);
         $connector = CManager_File::createConnector('FileManager', $config);
-        $connector->run($method);
+        return $connector->run($method);
     }
 }

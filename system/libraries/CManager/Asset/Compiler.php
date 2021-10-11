@@ -62,7 +62,8 @@ class CManager_Asset_Compiler {
     }
 
     protected function determineOutFile() {
-        $this->outFile = DOCROOT . 'compiled/asset/' . $this->type . '/' . md5(implode(':', $this->files)) . '.' . $this->type;
+        $basePath = defined('CFPUBLIC') ? DOCROOT . 'public' . DS : DOCROOT;
+        $this->outFile = $basePath . 'compiled/asset/' . $this->type . '/' . md5(implode(':', $this->files)) . '.' . $this->type;
     }
 
     protected function determineLastModified() {

@@ -112,7 +112,7 @@ class CApp_Navigation_Helper {
             $roleId = null;
         }
 
-        $role = crole::get($roleId);
+        $role = c::app()->getRole($roleId);
 
         if ($role != null && $role->parent_id == null) {
             //is is superadmin
@@ -154,7 +154,7 @@ class CApp_Navigation_Helper {
         }
         $db = CDatabase::instance(null, null, $domain);
 
-        /** @var CApp_Model_Roles $role  */
+        /** @var CApp_Model_Roles $role */
         $role = CApp_Auth_Role::getModel($roleId);
         if ($role == null) {
             return false;
@@ -283,12 +283,12 @@ class CApp_Navigation_Helper {
 
         if (strlen($appRoleId) == 0) {
             if ($app->user() != null) {
-                $appRoleId = cobj::get($app->user(), 'role_id');
+                $appRoleId = c::get($app->user(), 'role_id');
             }
         }
 
         if (strlen($appRoleId) > 0) {
-            $app_role = crole::get($appRoleId);
+            $app_role = c::app()->getRole($appRoleId);
             if ($app_role != null && $app_role->parent_id == null) {
                 return true;
             }

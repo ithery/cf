@@ -286,6 +286,7 @@ class carr {
      * @param string $delimiter Path delimiter
      *
      * @see carr::path()
+     * @deprecated since 1.2 use set
      */
     //@codingStandardsIgnoreStart
     public static function set_path(&$array, $path, $value, $delimiter = null) {

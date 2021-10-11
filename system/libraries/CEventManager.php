@@ -1,14 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 9:14:00 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 9:14:00 AM
+ * @deprecated since 1.2 use CEvent
  */
 class CEventManager {
-
     /**
      * Map of registered listeners.
      * <event> => <listeners>
@@ -20,10 +21,10 @@ class CEventManager {
     /**
      * Dispatches an event to all registered listeners.
      *
-     * @param string                    $eventName The name of the event to dispatch. The name of the event is
-     *                                  the name of the method that is invoked on listeners.
-     * @param CEventManager_Args|null   $eventArgs The event arguments to pass to the event handlers/listeners.
-     *                                  If not supplied, the single empty EventArgs instance is used.
+     * @param string                  $eventName The name of the event to dispatch. The name of the event is
+     *                                           the name of the method that is invoked on listeners.
+     * @param CEventManager_Args|null $eventArgs The event arguments to pass to the event handlers/listeners.
+     *                                           If not supplied, the single empty EventArgs instance is used.
      *
      * @return void
      */
@@ -42,9 +43,9 @@ class CEventManager {
     /**
      * Gets the listeners of a specific event or all listeners.
      *
-     * @param string|null $event The name of the event.
+     * @param string|null $event the name of the event
      *
-     * @return object[]|object[][] The event listeners for the specified event, or all event listeners.
+     * @return object[]|object[][] the event listeners for the specified event, or all event listeners
      */
     public function getListeners($event = null) {
         return $event ? $this->_listeners[$event] : $this->_listeners;
@@ -55,7 +56,7 @@ class CEventManager {
      *
      * @param string $event
      *
-     * @return bool TRUE if the specified event has any listeners, FALSE otherwise.
+     * @return bool TRUE if the specified event has any listeners, FALSE otherwise
      */
     public function hasListeners($event) {
         return !empty($this->_listeners[$event]);
@@ -64,8 +65,8 @@ class CEventManager {
     /**
      * Adds an event listener that listens on the specified events.
      *
-     * @param string|string[] $events   The event(s) to listen on.
-     * @param object          $listener The listener object.
+     * @param string|string[] $events   the event(s) to listen on
+     * @param object          $listener the listener object
      *
      * @return void
      */
@@ -101,7 +102,7 @@ class CEventManager {
      * Adds an EventSubscriber. The subscriber is asked for all the events it is
      * interested in and added as a listener for these events.
      *
-     * @param EventSubscriber $subscriber The subscriber.
+     * @param EventSubscriber $subscriber the subscriber
      *
      * @return void
      */
@@ -113,12 +114,11 @@ class CEventManager {
      * Removes an EventSubscriber. The subscriber is asked for all the events it is
      * interested in and removed as a listener for these events.
      *
-     * @param EventSubscriber $subscriber The subscriber.
+     * @param EventSubscriber $subscriber the subscriber
      *
      * @return void
      */
     public function removeEventSubscriber(CEventManager_Subscriber $subscriber) {
         $this->removeEventListener($subscriber->getSubscribedEvents(), $subscriber);
     }
-
 }

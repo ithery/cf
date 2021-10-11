@@ -12,6 +12,7 @@ class CEmail_Factory {
      */
     public static function createDriver(CEmail_Config $config) {
         $driver = $config->getDriver();
+
         $class = carr::get(static::$driverMap, $driver);
         if (!$class) {
             if (class_exists('CEmail_Driver_' . cstr::camel($driver) . 'Driver')) {

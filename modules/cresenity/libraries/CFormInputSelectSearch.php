@@ -4,7 +4,7 @@
  * @deprecated since 1.2
  */
 //@codingStandardsIgnoreStart
-class CFormInputSelectSearch extends CFormInput {
+class CFormInputSelectSearch extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectSearch;
 
     protected $query;
@@ -14,6 +14,8 @@ class CFormInputSelectSearch extends CFormInput {
     protected $placeholder;
 
     protected $delay;
+
+    protected $select2Version;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -30,6 +32,7 @@ class CFormInputSelectSearch extends CFormInput {
         $this->auto_select = false;
         $this->min_input_length = 0;
         $this->delay = 100;
+        $this->select2Version = c::theme('select2.version', 2);
     }
 
     public static function factory($id) {
@@ -102,7 +105,7 @@ class CFormInputSelectSearch extends CFormInput {
     public function html($indent = 0) {
         $html = new CStringBuilder();
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
         $disabled = '';
         if ($this->disabled) {
             $disabled = ' disabled="disabled"';
@@ -123,7 +126,7 @@ class CFormInputSelectSearch extends CFormInput {
         if ($this->bootstrap >= '3') {
             $classes = $classes . ' form-control ';
         }
-        $html->set_indent($indent);
+        $html->setIndent($indent);
         $value = $this->value;
         if ($this->auto_select) {
             $db = CDatabase::instance();
@@ -136,7 +139,7 @@ class CFormInputSelectSearch extends CFormInput {
             $value = $this->value;
         }
 
-        if ($this->select2 >= '4') {
+        if ($this->select2Version >= '4') {
             $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $disabled . $custom_css . $multiple . '">');
 
             // select2 4.0 using option to set default value
@@ -246,7 +249,7 @@ class CFormInputSelectSearch extends CFormInput {
 			';
         }
 
-        if ($this->select2 >= '4') {
+        if ($this->select2Version >= '4') {
             // change concept, using select at function html()
         } else {
             if (strlen($this->value) > 0) {
@@ -288,7 +291,7 @@ class CFormInputSelectSearch extends CFormInput {
         if (strlen($dropdown_classes) > 0) {
             $dropdown_classes = ' ' . $dropdown_classes;
         }
-        if ($this->select2 >= '4') {
+        if ($this->select2Version >= '4') {
             $str = "
                     $('#" . $this->id . "').select2({
                         width: '100%',
@@ -391,7 +394,7 @@ class CFormInputSelectSearch extends CFormInput {
 
         $js = new CStringBuilder();
         $js->append(parent::js($indent))->br();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         //echo $str;
         $js->append($str)->br();
 

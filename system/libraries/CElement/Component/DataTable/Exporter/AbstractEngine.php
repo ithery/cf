@@ -1,21 +1,13 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 abstract class CElement_Component_DataTable_Exporter_AbstractEngine implements CElement_Component_DataTable_Exporter_EngineInterface {
-
     /**
-     *
      * @var CElement_Component_DataTable
      */
     protected $dataTable;
+
     /**
-     *
-     * @var string 
+     * @var string
      */
     protected $filename;
 
@@ -24,8 +16,8 @@ abstract class CElement_Component_DataTable_Exporter_AbstractEngine implements C
     }
 
     /**
-     * 
      * @param string $filename
+     *
      * @return $this
      */
     public function setFilename($filename) {
@@ -34,11 +26,9 @@ abstract class CElement_Component_DataTable_Exporter_AbstractEngine implements C
     }
 
     /**
-     * 
      * @return string
      */
     public function getFilename() {
         return $this->filename;
     }
-
 }

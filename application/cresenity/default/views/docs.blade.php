@@ -4,12 +4,12 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Cresenity Framework - Documentation</title>
+        <title>Documentation - Cresenity Framework</title>
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet"/>
         <link rel="shortcut icon" href="{{ c::media('img/favico.png') }}" />
-        @CApp('styles')
+        @CAppStyles
         <style>
             body {
                 font-family: 'Nunito';
@@ -123,6 +123,6 @@
             <!-- page-content" -->
         </div>
 
-        @CApp('scripts')
+        @CAppScripts
     </body>
 </html>

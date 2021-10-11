@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 3, 2019, 1:46:52 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 3, 2019, 1:46:52 AM
  */
 
 /**
  * @method string setDataFromCallback($callback,$require)
  */
 class CElement_Component_Kanban_List extends CElement_Component_Widget {
-
     protected $kanbanBox;
 
     public function __construct($id) {
@@ -27,12 +27,11 @@ class CElement_Component_Kanban_List extends CElement_Component_Widget {
     }
 
     public function __call($method, $parameters) {
-        if (is_callable(array($this->kanbanBox, $method))) {
-            return call_user_func_array(array($this->kanbanBox, $method), $parameters);
+        if (is_callable([$this->kanbanBox, $method])) {
+            return call_user_func_array([$this->kanbanBox, $method], $parameters);
         } else {
-            throw new Exception('not callable method:'.$method);
+            throw new Exception('not callable method:' . $method);
         }
         parent::__call($method, $parameters);
     }
-
 }

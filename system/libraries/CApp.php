@@ -8,16 +8,18 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @see CRenderable
  * @see CElement
  *
- * @method CElement_Component_Form addForm($id=null)
- * @method CElement_Element_Div addDiv($id=null)
- * @method CElement_Template addTemplate($id=null)
- * @method CElement_Component_DataTable addTable($id=null)
- * @method CElement_Component_Widget addWidget($id=null)
- * @method CElement_List_TabList addTabList($id=null)
- * @method CElement_List_ActionList addActionList($id=null)
+ * @method CElement_Component_Form        addForm($id=null)
+ * @method CElement_Element_Div           addDiv($id=null)
+ * @method CElement_Template              addTemplate($id=null)
+ * @method CElement_Component_DataTable   addTable($id=null)
+ * @method CElement_Component_Widget      addWidget($id=null)
+ * @method CElement_List_TabList          addTabList($id=null)
+ * @method CElement_List_ActionList       addActionList($id=null)
  * @method CElement_Component_FileManager addFileManager($id=null)
- * @method CElement_Component_Alert addAlert($id=null)
- * @method CElement_Element_Pre addPre($id=null)
+ * @method CElement_Component_Alert       addAlert($id=null)
+ * @method CElement_Element_Pre           addPre($id=null)
+ * @method CElement_Component_Action      addAction($id=null)
+ * @method CElement_View                  addView($view = null, $data = null, $id = null)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
     use CTrait_Compat_App,
@@ -25,6 +27,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CTrait_RequestInfoTrait,
         CApp_Concern_OrgTrait,
         CApp_Concern_NavigationTrait,
+        CApp_Concern_ViewElementTrait,
         CApp_Concern_ManageStackTrait,
         CApp_Concern_BreadcrumbTrait,
         CApp_Concern_VariablesTrait,
@@ -69,8 +72,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     protected $renderer;
 
     protected $data = [];
-
-    private static $renderingElement;
 
     /**
      * @var CApp_Element
@@ -433,10 +434,12 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         }
         $data['html'] = $message . $this->html();
         $asset = CManager::asset();
-        $js = $this->js();
-
+        $js = $this->element->js();
+        $cappScript = $this->yieldPushContent('capp-script');
+        $js .= $cappScript;
         $js = $asset->renderJsRequire($js, 'cresenity.cf.require');
         $data['js'] = base64_encode($js);
+        $data['jsRaw'] = $js;
         $data['css_require'] = $asset->getAllCssFileUrl();
         $data['message'] = $messageOrig;
         $data['ajaxData'] = $this->ajaxData;
@@ -453,6 +456,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     public function toJson($options = 0) {
         $data = $this->toArray();
+
         return json_encode($data, $options);
     }
 
@@ -484,12 +488,13 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
         if (!($exception instanceof CHTTP_Exception_NotFoundHttpException)) {
             $ignored = false;
-            foreach ($ignoredExceptions as $ignored) {
-                if (is_subclass_of($exception, $ignored) || get_class($exception) === $ignored) {
+            foreach ($ignoredExceptions as $ignoredException) {
+                if (is_subclass_of($exception, $ignoredException) || get_class($exception) === $ignoredException) {
                     $ignored = true;
                     break;
                 }
             }
+
             if (!$ignored) {
                 $html = CApp_ErrorHandler::sendExceptionEmail($exception, $email);
             }
@@ -525,14 +530,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     public static function setTheme($theme) {
         CManager::theme()->setTheme($theme);
-    }
-
-    public static function renderingElement() {
-        return static::$renderingElement;
-    }
-
-    public static function setRenderingElement($element) {
-        static::$renderingElement = $element;
     }
 
     public static function setHaveScrollToTop($bool = true) {

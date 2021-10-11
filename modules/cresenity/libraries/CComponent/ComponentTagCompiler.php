@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 class CComponent_ComponentTagCompiler extends CView_Compiler_ComponentTagCompiler {
-
     public function compile($value) {
         return $this->compileComponentSelfClosingTags($value);
     }
@@ -40,14 +40,12 @@ class CComponent_ComponentTagCompiler extends CView_Compiler_ComponentTagCompile
         /x";
 
         return preg_replace_callback($pattern, function (array $matches) {
-           
             $attributes = $this->getAttributesFromAttributeString($matches['attributes']);
 
             // Convert kebab attributes to camel-case.
             $attributes = c::collect($attributes)->mapWithKeys(function ($value, $key) {
-                        return [(string) str($key)->camel() => $value];
-                    })->toArray();
-
+                return [(string) c::str($key)->camel() => $value];
+            })->toArray();
 
             return $this->componentString($matches[1], $attributes);
         }, $value);
@@ -63,5 +61,4 @@ class CComponent_ComponentTagCompiler extends CView_Compiler_ComponentTagCompile
 
         return "@CAppComponent('{$component}', [" . $this->attributesToString($attributes, $escapeBound = false) . '])';
     }
-
 }

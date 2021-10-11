@@ -2,6 +2,7 @@
 
 trait CElement_Component_DataTable_Trait_JavascriptTrait {
     public function js($indent = 0) {
+        /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
         $ajax_url = '';
         if ($this->ajax) {
@@ -34,31 +35,19 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $ajax_url = $ajaxMethod->makeUrl();
         }
 
-        foreach ($this->footerActionList->childs() as $row_act) {
-            $id = $row_act->id();
-            if ((strpos($id, 'export_excel') !== false)) {
-                $row_act->set_label('Download Excel')->set_icon('file');
-
-                $action_url = CAjaxMethod::factory()->set_type('callback')
-                    ->set_data('callable', ['CTable', 'action_download_excel'])
-                    ->set_data('query', $this->query)
-                    ->set_data('row_action_list', $this->rowActionList)
-                    ->set_data('key_field', $this->key_field)
-                    ->set_data('table', serialize($this))
-                    ->makeurl();
-                $row_act->add_listener('click')->add_handler('custom')->set_js("window.location.href='" . $action_url . "';");
-            }
-        }
         $js = new CStringBuilder();
 
         $js->setIndent($indent);
 
-        $total_column = count($this->columns);
+        $totalColumn = count($this->columns);
         if ($this->haveRowAction()) {
-            $total_column++;
+            $totalColumn++;
         }
         if ($this->checkbox) {
-            $total_column++;
+            $totalColumn++;
+        }
+        if ($this->numbering) {
+            $totalColumn++;
         }
 
         if ($this->applyDataTable > 0) {
@@ -120,7 +109,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             $js->appendln('var tableStyled_' . $this->id . ' = false;')->br()
                 ->appendln('var oTable = table.dataTable({')->br()->incIndent();
 
-            //            $js->appendln("responsive: {
+            //   $js->appendln("responsive: {
             //        details: {
             //            renderer: $.fn.dataTable.Responsive.renderer.tableAll()
             //        }
@@ -136,74 +125,72 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                     ->appendln("'sAjaxSource': '" . $ajax_url . "',")->br()
                     ->appendln("'sServerMethod': '" . strtoupper($this->ajax_method) . "',")->br()
                     ->appendln("'fnServerData': function ( sSource, aoData, fnCallback, oSettings ) {
-                                    var data_quick_search = [];
-                                    jQuery('.data_table-quick_search').each(function(){
-                                        if (jQuery(this).val() != '') {
-                                            var input_name = jQuery(this).attr('name');
-                                            var cur_transforms = jQuery(this).attr('transforms');
-                                            data_quick_search.push({'name': input_name, 'value': jQuery(this).val(), 'transforms': cur_transforms});
-                                        }
-                                    });
-                                    aoData.push({'name': 'dttable_quick_search', 'value': JSON.stringify(data_quick_search)});
-                                    oSettings.jqXHR = $.ajax( {
-                                        'dataType': 'json',
-                                        'type': '" . strtoupper($this->ajax_method) . "',
-                                        'url': sSource,
-                                        'data': aoData,
-                                        'success': function(data) {
-                                            fnCallback(data.datatable);
-                                            if(data.js && data.js.length>0) {
-                                                var script = data.js;
-                                                if(cresenity) {
-                                                    script = cresenity.base64.decode(script);
-                                                } else {
-                                                    script = $.cresenity.base64.decode(script);
-                                                }
-                                                if(script.trim().length > 0) {
-                                                    eval(script);
-                                                }
-                                            }
-                                            jQuery('#" . $this->id . "-check-all').removeAttr('checked');
-                                            jQuery('#" . $this->id . "-check-all').prop('checked',false);
-                                        },
-                                        'error': function(a,b,c) {
-                                            if(cresenity) {
-                                                cresenity.message(a);
-                                            } else {
-                                                $.cresenity.message(a);
-                                            }
-                                        }
-                                    })
-                                },
-                                ")
+        var data_quick_search = [];
+        jQuery('.data_table-quick_search').each(function(){
+            if (jQuery(this).val() != '') {
+                var input_name = jQuery(this).attr('name');
+                var cur_transforms = jQuery(this).attr('transforms');
+                data_quick_search.push({'name': input_name, 'value': jQuery(this).val(), 'transforms': cur_transforms});
+            }
+        });
+        aoData.push({'name': 'dttable_quick_search', 'value': JSON.stringify(data_quick_search)});
+        oSettings.jqXHR = $.ajax( {
+            'dataType': 'json',
+            'type': '" . strtoupper($this->ajax_method) . "',
+            'url': sSource,
+            'data': aoData,
+            'success': function(data) {
+                fnCallback(data.datatable);
+                if(data.js && data.js.length>0) {
+                    var script = data.js;
+                    if(cresenity) {
+                        script = cresenity.base64.decode(script);
+                    } else {
+                        script = $.cresenity.base64.decode(script);
+                    }
+                    if(script.trim().length > 0) {
+                        eval(script);
+                    }
+                }
+                jQuery('#" . $this->id . "-check-all').removeAttr('checked');
+                jQuery('#" . $this->id . "-check-all').prop('checked',false);
+            },
+            'error': function(a,b,c) {
+                if(window.cresenity) {
+                    window.cresenity.message(a);
+                } else {
+                    $.cresenity.message(a);
+                }
+            }
+        })
+    },")
+                    ->br()
                     ->appendln("'fnRowCallback': function( nRow, aData, iDisplayIndex, iDisplayIndexFull ) {
+        var footer_action = $('#" . $this->id . "_wrapper .footer_action');
+        " . ($this->haveFooterAction() ? 'footer_action.html(' . json_encode($this->footerActionList->html()) . ');' : '') . '
+        ' . ($this->haveFooterAction() ? '' . $this->footerActionList->js() . '' : '') . "
 
-                                    var footer_action = $('#" . $this->id . "_wrapper .footer_action');
-                                    " . ($this->haveFooterAction() ? 'footer_action.html(' . json_encode($this->footerActionList->html()) . ');' : '') . '
-                                    ' . ($this->haveFooterAction() ? '' . $this->footerActionList->js() . '' : '') . "
-
-                                    footer_action.css('position','absolute').css('left','275px').css('margin','4px 8px 2px 10px');
-                                    for(var i=0;i<$(nRow).find('td').length;i++) {
-                                        //get head data align
-                                        var data_align = $('#" . $this->id . "').find('thead th:eq('+i+')').data('align');
-                                        var data_action = $('#" . $this->id . "').find('thead th:eq('+i+')').data('action');
-                                        var data_no_line_break = $('#" . $this->id . "').find('thead th:eq('+i+')').data('no-line-break');
-                                        if(data_action) {
-                                            $('td:eq('+i+')', nRow).addClass(data_action);
-                                        }
-                                        if(data_align) {
-                                            $('td:eq('+i+')', nRow).addClass(data_align);
-                                        }
-                                        if(data_no_line_break) {
-                                            $('td:eq('+i+')', nRow).addClass(data_no_line_break);
-                                        }
-                                    }
-                                },
-                    ")
+        footer_action.css('position','absolute').css('left','275px').css('margin','4px 8px 2px 10px');
+        for(var i=0;i<$(nRow).find('td').length;i++) {
+            //get head data align
+            var dataAlign = $('#" . $this->id . "').find('thead th:eq('+i+')').data('align');
+            var dataAction = $('#" . $this->id . "').find('thead th:eq('+i+')').data('action');
+            var dataNoLineBreak = $('#" . $this->id . "').find('thead th:eq('+i+')').data('no-line-break');
+            if(dataAction) {
+                $('td:eq('+i+')', nRow).addClass(dataAction);
+            }
+            if(dataAlign) {
+                $('td:eq('+i+')', nRow).addClass(dataAlign);
+            }
+            if(dataNoLineBreak) {
+                $('td:eq('+i+')', nRow).addClass(dataNoLineBreak);
+            }
+        }
+    },")
+                    ->br()
                     ->appendln("'fnInitComplete': function() {
-                            this.fnAdjustColumnSizing(true);
-                        },
-                    ");
+        this.fnAdjustColumnSizing(true);
+    },")->br();
             }
             /*
               $js->append("")
@@ -276,14 +263,14 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                     sProcessing : '" . clang::__('Processing') . "',
                     sLengthMenu  : '" . clang::__('Show') . ' _MENU_ ' . clang::__('Entries') . "',
                     oPaginate  : {
-                                                'sFirst' : '" . clang::__('First') . "',
-                                                'sLast' : '" . clang::__('Last') . "',
-                                                'sNext' : '" . clang::__('Next') . "',
-                                                'sPrevious' : '" . clang::__('Previous	') . "'
-                                            },
-                                            sInfo: '" . $this->infoText . "',
-                    sInfoEmpty  : '" . clang::__('No data available in table') . "',
-                    sEmptyTable  : '" . clang::__('No data available in table') . "',
+                        'sFirst' : '" . clang::__('First') . "',
+                        'sLast' : '" . clang::__('Last') . "',
+                        'sNext' : '" . clang::__('Next') . "',
+                        'sPrevious' : '" . clang::__('Previous') . "'
+                    },
+                    sInfo: '" . $this->infoText . "',
+                    sInfoEmpty  : '" . clang::__($this->labels['noData']) . "',
+                    sEmptyTable  : '" . clang::__($this->labels['noData']) . "',
                     sInfoThousands   : '" . clang::__('') . "',
                 },")->br()
                 ->appendln("'bDeferRender': " . ($this->getOption('bDeferRender') ? 'true' : 'false') . ',')->br()
@@ -294,8 +281,8 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln("'aoColumns': vaoColumns,")->br()
                 ->appendln("'autoWidth': false,")->br()
                 ->appendln("'aLengthMenu': [
-                [" . $km . '],
-                [' . $vm . ']
+                    [" . $km . '],
+                    [' . $vm . ']
 				],')->br();
 
             /*
@@ -315,102 +302,112 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
 
             if ($this->dom == null) {
                 $this->dom = '<""l>t<"F"<".footer_action">frp>';
-            } else {
-                $this->dom = str_replace("'", "\'", $this->dom);
             }
+            $dom = str_replace("'", "\'", $this->dom);
             $js->append('')
                 ->appendln("'sPaginationType': 'full_numbers',")->br()
-                ->appendln("'sDom': '" . $this->dom . "',")->br();
+                ->appendln("'sDom': '" . $dom . "',")->br();
 
             $js->append('')
                 ->decIndent()->appendln('});')->br();
 
             $js->appendln('function buildFilters_' . $this->id . '() {')->br()
+                ->incIndent()
                 ->appendln("var quick_search = jQuery('<tr>');")->br()
                 ->appendln("
-                    jQuery('#" . $this->id . " thead th').each( function (i) {
-                        var title = jQuery('#" . $this->id . " thead th').eq( jQuery(this).index() ).text();
-                        var have_action = " . ($this->haveRowAction() ? '1' : '0') . ";
+    jQuery('#" . $this->id . " thead th').each( function (i) {
+        var title = jQuery('#" . $this->id . " thead th').eq( jQuery(this).index() ).text();
+        var haveAction = " . ($this->haveRowAction() ? '1' : '0') . ";
 
 
-                        var total_th = jQuery('#" . $this->id . " thead th').length;
-                        var input = '';
-                        var have_checkbox = " . ($this->checkbox ? '1' : '0') . ';
+        var totalTh = jQuery('#" . $this->id . " thead th').length;
+        var input = '';
+        var haveCheckbox = " . ($this->checkbox ? '1' : '0') . ';
+        var haveNumbering = ' . ($this->numbering ? '1' : '0') . ';
+        var columnLeftOffset = ' . $this->getColumnLeftOffset() . ';
+        var columnRightOffset = ' . $this->getColumnRightOffset() . ';
+        var currentIndex = jQuery(this).index();
 
-                        if((!(have_action==1&&(total_th-1==jQuery(this).index())))&& (!(have_checkbox==1&&(0==jQuery(this).index()))) ) {
-                            var i2 = 0;
-                            if(have_checkbox) {
-                                    i2 = -1;
-                            }
+        if(currentIndex>=columnLeftOffset && currentIndex<= (totalTh-columnRightOffset)) {
+            var i2 = -columnLeftOffset;
 
-                            var all_column = ' . json_encode($this->columns) . ";
-                            var column = all_column[jQuery(this).index()+i2];
-                            var transforms = {};
-                            if(column) {
-                                if(hasOwnProperty.call(column, 'transforms')) {
 
-                                    transforms = JSON.stringify(column.transforms);
-                                }
+            var allColumn = ' . json_encode($this->columns) . ";
+            var column = allColumn[jQuery(this).index()+i2];
+            var transforms = {};
+            if(column) {
+                if(hasOwnProperty.call(column, 'transforms')) {
+                    transforms = JSON.stringify(column.transforms);
+                }
 
-                                if(column.searchable) {
+                if(column.searchable) {
+                    var searchType = column.searchType || 'text';
+                    if(searchType=='text') {
+                        input = jQuery('<input>');
+                        input.attr('type', 'text');
+                        input.attr('name', 'dt_table_qs-' + jQuery(this).attr('field_name'));
+                        input.attr('class', 'data_table-quick_search');
 
-                                    var searchType = column.searchType || 'text';
+                        input.attr('transforms', transforms);
+                        input.attr('placeholder', 'Search ' + title );
+                    }
+                    if(searchType=='select') {
+                        input = jQuery('<select>');
+                        input.attr('name', 'dt_table_qs-' + jQuery(this).attr('field_name'));
+                        input.attr('class', 'data_table-quick_search');
 
-                                    if(searchType=='text') {
-                                        input = jQuery('<input>');
-                                        input.attr('type', 'text');
-                                        input.attr('name', 'dt_table_qs-' + jQuery(this).attr('field_name'));
-                                        input.attr('class', 'data_table-quick_search');
+                        input.attr('transforms', transforms);
+                        input.attr('placeholder', 'Search ' + title );
 
-                                        input.attr('transforms', transforms);
-                                        input.attr('placeholder', 'Search ' + title );
-                                    }
-                                    if(searchType=='select') {
-                                        input = jQuery('<select>');
-                                        input.attr('name', 'dt_table_qs-' + jQuery(this).attr('field_name'));
-                                        input.attr('class', 'data_table-quick_search');
-
-                                        input.attr('transforms', transforms);
-                                        input.attr('placeholder', 'Search ' + title );
-
-                                        var options = column.searchOptions||[];
-                                        for(optionKey in options) {
-                                            var optionElement = jQuery('<option>');
-                                            optionElement.attr('value',optionKey);
-                                            optionElement.append(options[optionKey]);
-                                            input.append(optionElement);
-                                        }
-                                    }
-                                }
-                            }
-
+                        var options = column.searchOptions||[];
+                        for(optionKey in options) {
+                            var optionElement = jQuery('<option>');
+                            optionElement.attr('value',optionKey);
+                            optionElement.append(options[optionKey]);
+                            input.append(optionElement);
                         }
-                        var td = jQuery('<td>').append(input);
-                        quick_search.append(td);
-                    });
-                ")->br()
+                    }
+                }
+            }
+
+        }
+        if(input) {
+            input.attr('data-column-index',i);
+        }
+        var td = jQuery('<td>').append(input);
+        quick_search.append(td);
+    });")->br()
                 ->appendln("table.children('thead').append(quick_search);")->br()
+                ->decIndent()
                 ->appendln('}')->br()
                 ->appendln('var dttable_quick_search = ' . ($this->quick_search ? '1' : '0') . ';')->br()
                 ->appendln('if (dttable_quick_search == "1") { buildFilters_' . $this->id . '(); }');
+            if ($this->customSearchSelector != null) {
+                $js->appendln("
+$('" . $this->customSearchSelector . "').keyup(() => {
 
+    oTable.fnFilter($('" . $this->customSearchSelector . "').val());
+});
+                ");
+            }
             $js->appendln("
-                jQuery('.data_table-quick_search').on('keyup change', function(){
-                    table.fnClearTable( 0 );
-                    table.fnDraw();
-                });
-            ");
+jQuery('.data_table-quick_search').on('keyup change', function(){
+    " . ($this->ajax ? 'table.fnClearTable( 0 );table.fnDraw();' : "table.fnFilter($(this).val(),$(this).attr('data-column-index'));") . '
+
+
+});
+            ');
         }
         if ($this->checkbox) {
             $js->appendln("
                 jQuery('#" . $this->id . "-check-all').click(function() {
-                        if(jQuery(this).is(':checked')) {
-                                jQuery('.checkbox-" . $this->id . "').attr('checked','checked');
-                                jQuery('.checkbox-" . $this->id . "').prop('checked',true);
-                        } else {
-                                jQuery('.checkbox-" . $this->id . "').removeAttr('checked');
-                                jQuery('.checkbox-" . $this->id . "').prop('checked',false);
-                        }
+                    if(jQuery(this).is(':checked')) {
+                        jQuery('.checkbox-" . $this->id . "').attr('checked','checked');
+                        jQuery('.checkbox-" . $this->id . "').prop('checked',true);
+                    } else {
+                        jQuery('.checkbox-" . $this->id . "').removeAttr('checked');
+                        jQuery('.checkbox-" . $this->id . "').prop('checked',false);
+                    }
                 });
             ");
         }

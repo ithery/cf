@@ -12,7 +12,7 @@ class CComponent_HydrationMiddleware_AddAttributesToRootTagOfHtml {
     public function __invoke($dom, $data) {
         $attributesFormattedForHtmlElement = c::collect($data)
             ->mapWithKeys(function ($value, $key) {
-                return ["cf:{$key}" => $this->escapeStringForHtml($value)];
+                return ["cres:{$key}" => $this->escapeStringForHtml($value)];
             })->map(function ($value, $key) {
                 return sprintf('%s="%s"', $key, $value);
             })->implode(' ');

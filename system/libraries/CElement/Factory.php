@@ -88,7 +88,10 @@ class CElement_Factory {
      * @throws CApp_Exception
      */
     public static function createComponent($name, $id = '') {
-        $className = 'CElement_Component_' . $name;
+        $className = $name;
+        if (!class_exists($className)) {
+            $className = 'CElement_Component_' . $name;
+        }
         if (!class_exists($className)) {
             throw new CApp_Exception('component [:name] not found', [':name' => $name]);
         }
@@ -132,5 +135,21 @@ class CElement_Factory {
 
     public static function createViewComponent($componentName, $id) {
         return new CElement_ViewComponent($id, $componentName);
+    }
+
+    /**
+     * @param string $id
+     * @param string $type
+     *
+     * @return CElement_FormInput
+     *
+     * @throws CException
+     */
+    public static function createControl($id, $type) {
+        return CManager::instance()->createControl($id, $type);
+    }
+
+    public static function createPseudoElement($id = null) {
+        return new CElement_PseudoElement();
     }
 }

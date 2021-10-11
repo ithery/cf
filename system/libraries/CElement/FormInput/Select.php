@@ -24,6 +24,8 @@ class CElement_FormInput_Select extends CElement_FormInput {
 
     protected $placeholder;
 
+    protected $select2Version;
+
     public function __construct($id) {
         parent::__construct($id);
 
@@ -35,6 +37,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $this->applyJs = 'false';
         $this->hide_search = false;
         $this->maximumSelectionLength = false;
+        $this->select2Version = c::theme('select2.version');
         $this->addClass('form-control select');
     }
 
@@ -53,9 +56,9 @@ class CElement_FormInput_Select extends CElement_FormInput {
         return $this;
     }
 
-    public function toarray() {
+    public function toArray() {
         $data = [];
-        $data = array_merge_recursive($data, parent::toarray());
+        $data = array_merge_recursive($data, parent::toArray());
         if ($this->multiple) {
             $data['attr']['multiple'] = 'multiple';
         }
@@ -196,7 +199,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
             $placeholder = $this->placeholder;
         }
         if ($this->applyJs == 'select2') {
-            if ($this->select2 == '4') {
+            if ($this->select2Version == '4') {
                 CManager::instance()->registerModule('select2-4.0');
             } else {
                 CManager::instance()->registerModule('select2');

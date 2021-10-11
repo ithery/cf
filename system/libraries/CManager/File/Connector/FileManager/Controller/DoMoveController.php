@@ -23,26 +23,28 @@ class CManager_File_Connector_FileManager_Controller_DoMoveController extends CM
         if ((is_array($items))) {
             foreach ($items as $item) {
                 $oldFile = $fm->path()->pretty($item);
+
                 $isDirectory = $oldFile->isDirectory();
-                if ($oldFile->hasThumb()) {
-                    $newFile = $fm->path()->setName($item)->thumb()->dir($target);
-                    $fm->path()->setName($item)->thumb()->move($newFile);
-                    if ($isDirectory) {
-                        $fm->dispatch(new CManager_File_Connector_FileManager_Event_FolderIsMoving($oldFile->path(), $newFile->path()));
-                    } else {
-                        $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileIsMoving($oldFile->path(), $newFile->path()));
-                    }
-                }
                 $newFile = $fm->path()->setName($item)->dir($target);
+                if ($isDirectory) {
+                    $fm->dispatch(new CManager_File_Connector_FileManager_Event_FolderIsMoving($oldFile->path(), $newFile->path()));
+                } else {
+                    $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileIsMoving($oldFile->path(), $newFile->path()));
+                }
+                if ($oldFile->hasThumb()) {
+                    $newThumbFile = $fm->path()->setName($item)->thumb()->dir($target);
+                    $fm->path()->setName($item)->thumb()->move($newThumbFile);
+                }
+
                 $fm->path()->setName($item)->move($newFile);
                 if ($isDirectory) {
-                    $fm->dispatch(new CManager_File_Connector_FileManager_Event_FolderWasMoving($oldFile->path(), $newFile->path()));
+                    $fm->dispatch(new CManager_File_Connector_FileManager_Event_FolderWasMoved($oldFile->path(), $newFile->path()));
                 } else {
-                    $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileWasMoving($oldFile->path(), $newFile->path()));
+                    $fm->dispatch(new CManager_File_Connector_FileManager_Event_FileWasMoved($oldFile->path(), $newFile->path()));
                 }
             }
         }
 
-        echo parent::$successResponse;
+        return c::response(parent::$successResponse);
     }
 }

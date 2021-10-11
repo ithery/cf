@@ -5,6 +5,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
         $aaData = [];
         $rowActionList = $table->getRowActionList();
         $no = carr::get($request, 'iDisplayStart', 0);
+
         foreach ($data as $row) {
             $arr = [];
             $no++;
@@ -15,10 +16,11 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                 $html = new CStringBuilder();
 
                 $html->appendln('<td class="low-padding align-center cell-action td-action ">')->incIndent()->br();
-                foreach ($row as $k => $v) {
-                    $jsparam[$k] = $v;
+                $jsparam = $row;
+                if (!isset($jsparam['param1'])) {
+                    $jsparam['param1'] = $key;
                 }
-                $jsparam['param1'] = $key;
+
                 if ($table->getRowActionList()->getStyle() == 'btn-dropdown') {
                     if ($table->getActionLocation() == 'first') {
                         $table->getRowActionList()->addClass('dropdown-menu-left');
@@ -29,7 +31,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                 $rowActionList->regenerateId(true);
                 $rowActionList->apply('setJsParam', $jsparam);
 
-                $rowActionList->apply('setHandlerUrlParam', $jsparam);
+                $rowActionList->apply('setHandlerParam', $jsparam);
 
                 if (($table->filterActionCallbackFunc) != null) {
                     $actions = $rowActionList->childs();
@@ -65,7 +67,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
             }
 
             if ($table->checkbox) {
-                $arr[] = '<input type="checkbox" name="' . $table->id() . '-check[]" id="' . $table->id() . '-' . $key . '" value="' . $key . '" class="checkbox-' . $table->id() . '">';
+                $arr[] = $table->callCheckboxRenderer($row);
             }
             if ($table->getActionLocation() == 'first') {
                 if ($rowActionList != null && $rowActionList->childCount() > 0) {

@@ -350,7 +350,7 @@ s    * @return void
         try {
             return CException_LegacyExceptionHandler::getContent($e);
             //return $this->isDebug() && class_exists(Whoops::class) ? $this->renderExceptionWithWhoops($e) : $this->renderExceptionWithSymfony($e, $this->isDebug());
-            //return $this->renderExceptionWithSymfony($e, $this->isDebug());
+            //return $this->renderExceptionWithSymfony($e, false);
         } catch (Exception $e) {
             return $this->renderExceptionWithSymfony($e, $this->isDebug());
         }
@@ -440,7 +440,7 @@ s    * @return void
     }
 
     /**
-     * Map the given exception into an Illuminate response.
+     * Map the given exception into an http response.
      *
      * @param \Symfony\Component\HttpFoundation\Response $response
      * @param \Exception                                 $e

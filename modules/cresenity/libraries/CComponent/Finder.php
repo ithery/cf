@@ -87,15 +87,15 @@ class CComponent_Finder {
 
     public function getClassNames() {
         return c::collect(CFile::allFiles($this->path))
-                        ->map(function (SplFileInfo $file) {
-                            return
-                                    c::str($file->getPathname())
-                                    ->after(CF::appDir() . '/')
-                                    ->replace(['/', '.php'], ['\\', ''])->__toString();
-                        })
-                        ->filter(function ($class) {
-                            return is_subclass_of($class, CComponent::class)
-                                    && !(new ReflectionClass($class))->isAbstract();
-                        });
+            ->map(function (SplFileInfo $file) {
+                return
+                        c::str($file->getPathname())
+                        ->after(CF::appDir() . '/')
+                        ->replace(['/', '.php'], ['\\', ''])->__toString();
+            })
+            ->filter(function ($class) {
+                return is_subclass_of($class, CComponent::class)
+                        && !(new ReflectionClass($class))->isAbstract();
+            });
     }
 }

@@ -17,7 +17,7 @@ class CVendor_LetsEncrypt {
     private static $instance;
 
     /**
-     * @var LEClient\LEClient
+     * @var \LEClient\LEClient
      */
     private $client;
 
@@ -25,6 +25,7 @@ class CVendor_LetsEncrypt {
      * @var array
      */
     private $config;
+
     private $certificateKeys;
 
     public static function instance($config = null) {
@@ -123,7 +124,7 @@ class CVendor_LetsEncrypt {
     }
 
     /**
-     * @return LEClient\LEClient
+     * @return \LEClient\LEClient
      */
     public function client() {
         return $this->client;

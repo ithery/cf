@@ -76,4 +76,13 @@ class CObject {
         $traits = c::classUsesRecursive(get_class($this));
         return isset($traits[$trait]);
     }
+
+    /**
+     * @deprecated since 1.2
+     *
+     * @return string
+     */
+    public function domain() {
+        return CF::domain();
+    }
 }

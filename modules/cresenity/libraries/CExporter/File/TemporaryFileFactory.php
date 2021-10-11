@@ -1,16 +1,8 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_File_TemporaryFileFactory {
-
     /**
-     *
-     * @var CExporter_File_TemporaryFileFactory 
+     * @var CExporter_File_TemporaryFileFactory
      */
     private static $instance;
 
@@ -31,10 +23,6 @@ class CExporter_File_TemporaryFileFactory {
         return static::$instance;
     }
 
-    /**
-     * @param string|null $temporaryPath
-     * @param string|null $temporaryDisk
-     */
     private function __construct() {
         $this->temporaryPath = CExporter::config()->get('temporary.path', DOCROOT . 'temp');
         $this->temporaryDisk = CExporter::config()->get('temporary.disk', 'local');
@@ -55,7 +43,6 @@ class CExporter_File_TemporaryFileFactory {
 
     /**
      * @param string|null $fileName
-     *
      * @param string|null $fileExtension
      *
      * @return CExporter_File_LocalTemporaryFile
@@ -66,7 +53,7 @@ class CExporter_File_TemporaryFileFactory {
         }
 
         return new CExporter_File_LocalTemporaryFile(
-                $this->temporaryPath . DIRECTORY_SEPARATOR . ($fileName ?: $this->generateFilename($fileExtension))
+            $this->temporaryPath . DIRECTORY_SEPARATOR . ($fileName ?: $this->generateFilename($fileExtension))
         );
     }
 
@@ -77,7 +64,9 @@ class CExporter_File_TemporaryFileFactory {
         $filename = $this->generateFilename();
 
         return new CExporter_File_RemoteTemporaryFile(
-                $this->temporaryDisk, CExporter::config()->get('temporary.remote_prefix') . $filename, $this->makeLocal($filename)
+            $this->temporaryDisk,
+            CExporter::config()->get('temporary.remote_prefix') . $filename,
+            $this->makeLocal($filename)
         );
     }
 
@@ -89,5 +78,4 @@ class CExporter_File_TemporaryFileFactory {
     private function generateFilename($fileExtension = null) {
         return 'capp-exporter-' . cstr::random(32) . ($fileExtension ? '.' . $fileExtension : '');
     }
-
 }

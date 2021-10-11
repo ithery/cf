@@ -14,7 +14,7 @@ String.prototype.toNumber = function () {
 
 
 import './index.css';
-import Cresenity from '@/Cresenity';
+import Cresenity from './Cresenity';
 
 window.Cresenity = Cresenity;
 if (!window.cresenity) {

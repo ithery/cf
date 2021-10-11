@@ -33,6 +33,14 @@ trait CApp_Concern_AuthTrait {
             $session = CSession::instance();
             $user = $session->get('user');
 
+            if ($user) {
+                $modelClass = CF::config('app.model.user');
+                $model = new $modelClass;
+                $keyName = $model->getKeyName();
+                $keyValue = c::get($user, $keyName);
+                $user = $model->find($keyValue);
+            }
+
             if (!$user) {
                 $user = null;
             }
@@ -46,10 +54,41 @@ trait CApp_Concern_AuthTrait {
         if ($this->role == null) {
             $user = $this->user();
 
-            if ($user != null) {
-                $this->role = crole::get(cobj::get($user, 'role_id'));
+            if ($user) {
+                $modelClass = CF::config('app.model.role', CApp_Model_Roles::class);
+                $model = new $modelClass;
+                /** @var CApp_Model_Roles $model */
+                $keyName = $model->getKeyName();
+                $roleId = $user->$keyName;
+                $this->role = $this->getRole($roleId);
             }
         }
         return $this->role;
+    }
+
+    /**
+     * @param int $roleId
+     *
+     * @return CModel|CApp_Model_Roles|null
+     */
+    public function getRole($roleId) {
+        if ($roleId == null) {
+            return null;
+        }
+        $modelClass = CF::config('app.model.role', CApp_Model_Roles::class);
+        return $modelClass::find($roleId);
+    }
+
+    /**
+     * @param int $userId
+     *
+     * @return CModel|CApp_Model_Users|null
+     */
+    public function getUser($userId) {
+        if ($userId == null) {
+            return null;
+        }
+        $modelClass = CF::config('app.model.user', CApp_Model_Users::class);
+        return $modelClass::find($userId);
     }
 }

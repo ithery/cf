@@ -189,7 +189,7 @@ class CElement_Component_Form extends CElement_Component {
 
             $ajaxMethod = CAjax::createMethod();
             $ajaxMethod->setType('Validation');
-            $ajaxMethod->setData('dataValidation', $validationData);
+            $ajaxMethod->setData('dataValidation', serialize($validationData));
             $ajaxMethod->setData('formId', $this->id());
             $ajaxUrl = $ajaxMethod->makeUrl();
 
@@ -223,9 +223,9 @@ class CElement_Component_Form extends CElement_Component {
         return $this;
     }
 
-    public function toarray($indent = 0) {
+    public function toArray($indent = 0) {
         $data = [];
-        $data = array_merge_recursive($data, parent::toarray());
+        $data = array_merge_recursive($data, parent::toArray());
 
         if (strlen($this->action) > 0) {
             $data['attr']['action'] = $this->action;

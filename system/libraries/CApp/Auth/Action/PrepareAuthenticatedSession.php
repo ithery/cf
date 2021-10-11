@@ -31,8 +31,8 @@ class CApp_Auth_Action_PrepareAuthenticatedSession {
     /**
      * Handle the incoming request.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param callable                 $next
+     * @param \CHTTP_Request $request
+     * @param callable       $next
      *
      * @return mixed
      */

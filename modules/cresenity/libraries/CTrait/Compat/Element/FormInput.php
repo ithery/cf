@@ -7,6 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Feb 17, 2018, 2:29:43 AM
+ * @see CElement_FormInput
  */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_FormInput {
@@ -152,13 +153,6 @@ trait CTrait_Compat_Element_FormInput {
      */
     public function hide_updown() {
         return $this->hideUpdown();
-    }
-
-    /**
-     * @deprecated since version 1.2
-     */
-    public function toarray() {
-        return $this->toArray();
     }
 
     /**

@@ -3,6 +3,11 @@
 abstract class CElement extends CObservable {
     use CTrait_Compat_Element;
 
+    /**
+     * Class css for this element
+     *
+     * @var array
+     */
     protected $classes;
 
     protected $tag;
@@ -15,13 +20,9 @@ abstract class CElement extends CObservable {
 
     protected $text;
 
-    protected $checkbox;
-
     protected $radio;
 
     protected $bootstrap;
-
-    protected $select2;
 
     protected $theme;
 
@@ -57,9 +58,7 @@ abstract class CElement extends CObservable {
         $this->theme_data = $theme_data;
 
         if (isset($theme_data)) {
-            $this->select2 = carr::get($theme_data, 'select2');
             $this->bootstrap = carr::get($theme_data, 'bootstrap');
-            $this->checkbox = carr::get($theme_data, 'checkbox', '0');
             $this->radio = carr::get($theme_data, 'radio', '0');
             $this->theme_style = carr::get($theme_data, 'theme_style');
         }
@@ -200,7 +199,7 @@ abstract class CElement extends CObservable {
         if (strlen($this->text) > 0) {
             $data['text'] = $this->text;
         }
-        $data = array_merge_recursive($data, parent::toarray());
+        $data = array_merge_recursive($data, parent::toArray());
         return $data;
     }
 
@@ -226,23 +225,5 @@ abstract class CElement extends CObservable {
                 . '</code>'
                 . '</pre>';
         return $return;
-    }
-
-    public function renderToView() {
-        $html = $this->html();
-        $js = $this->js();
-        return <<<HTML
-        ${html}
-        <?php \CApp::instance()->startPush('script'); ?>
-        <script>
-            jQuery(document).ready(function() {
-                ${js}
-            });
-
-        </script>
-
-        <?php \CApp::instance()->stopPush('script'); ?>
-
-HTML;
     }
 }

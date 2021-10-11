@@ -1,35 +1,37 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Sep 14, 2018, 7:54:55 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Sep 14, 2018, 7:54:55 PM
  */
 class CElement_Component_Terminal extends CElement_Component {
-
     use CApp_Trait_Template,
         CTrait_Element_Property_Height;
 
-
     protected $ajaxUrl;
+
     protected $ajaxMethod;
+
     protected $greetings = '';
+
     protected $prompt = '';
 
     public function __construct($id = null) {
         parent::__construct($id);
-        $this->templateData = array();
+        $this->templateData = [];
         $this->templateName = 'CElement/Component/Terminal';
         $this->greetings = '';
         $this->prompt = '';
         $this->height = '400';
         $this->ajaxMethod = 'post';
-        
+
         CManager::instance()->registerModule('terminal');
-        $this->onBeforeParse(function() {
-            $data = array();
+        $this->onBeforeParse(function () {
+            $data = [];
             $data['ajaxUrl'] = $this->ajaxUrl;
             $data['ajaxMethod'] = $this->ajaxMethod;
             $data['prompt'] = $this->prompt;
@@ -43,7 +45,7 @@ class CElement_Component_Terminal extends CElement_Component {
     public function setAjaxUrl($url) {
         $this->ajaxUrl = $url;
     }
-    
+
     public function setAjaxMethod($method) {
         $this->ajaxMethod = $method;
     }
@@ -63,5 +65,4 @@ class CElement_Component_Terminal extends CElement_Component {
     public function js($indent = 0) {
         return $this->getTemplateJs();
     }
-
 }

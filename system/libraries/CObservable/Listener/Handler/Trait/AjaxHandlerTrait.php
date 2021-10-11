@@ -20,11 +20,6 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
      */
     protected $url;
 
-    /**
-     * @var array
-     */
-    protected $urlParam = [];
-
     public function setUrl($url) {
         $this->url = $url;
         return $this;
@@ -32,19 +27,6 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
 
     public function setCallback($callback) {
         $this->callback = $callback;
-        return $this;
-    }
-
-    public function setUrlParam($urlParam) {
-        if (!is_array($urlParam)) {
-            throw new Exception('Invalid url param, url param must type array');
-        }
-        $this->urlParam = $urlParam;
-        return $this;
-    }
-
-    public function addUrlParam($k, $urlParam) {
-        $this->urlParam[$k] = $urlParam;
         return $this;
     }
 
@@ -65,16 +47,8 @@ trait CObservable_Listener_Handler_Trait_AjaxHandlerTrait {
             $link = $ajaxUrl;
         }
 
-        foreach ($this->urlParam as $k => $p) {
-            preg_match_all("/{([\w]*)}/", $link, $matches, PREG_SET_ORDER);
-            foreach ($matches as $val) {
-                $str = $val[1]; //matches str without bracket {}
-                $b_str = $val[0]; //matches str with bracket {}
-                if ($k == $str) {
-                    $link = str_replace($b_str, $p, $link);
-                }
-            }
-        }
+        $link = CBase::createStringParamable($link, $this->params)->get();
+
         return $link;
     }
 
