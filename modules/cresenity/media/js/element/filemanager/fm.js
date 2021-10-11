@@ -127,7 +127,20 @@ var CFileManager = function (options) {
 
     this.displayErrorResponse = (jqXHR) => {
         //console.log('Display Error Response');
-        this.notify('<div style="max-height:50vh;overflow: scroll;">' + jqXHR.responseText + '</div>');
+        //try to get json from this response
+        let data = null;
+        let message = jqXHR.responseText;
+        try {
+            data = JSON.parse(message);
+        } catch(e) {
+            //do nothing
+        }
+        if(typeof data == 'object' && data.message) {
+            message = data.message;
+        }
+
+
+        this.notify('<div style="max-height:50vh;overflow: scroll;">' + message + '</div>');
     };
 
     this.notify = (body, callback) => {
@@ -139,9 +152,14 @@ var CFileManager = function (options) {
 
         if (window.cresenity.isJson(body)) {
             let json = JSON.parse(body);
-            eval(window.cresenity.base64.decode(json.js));
-            //console.log(cresenity.base64.decode(json.js));
-            $('#notify').find('.modal-body').html(json.html);
+            let message = json.html;
+            if(json.exception && json.message) {
+                message = json.message;
+            }
+            $('#notify').find('.modal-body').html(message);
+            if(json.js) {
+                eval(window.cresenity.base64.decode(json.js));
+            }
             $('#notify').modal('show');
         } else {
             $('#notify').modal('show').find('.modal-body').html(body);
@@ -224,6 +242,9 @@ var CFileManager = function (options) {
 
 
     this.controllerMethod.move = (items) => {
+        if(items.length==0) {
+            return this.displayErrorResponse('No items selected, please select item');
+        }
         this.performFmRequest('move', {items: items.map(function (item) {
             return item.name;
         })}).done(this.refreshFoldersAndItems);

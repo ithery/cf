@@ -11,10 +11,10 @@ class Controller_Starter extends CController {
     public function index() {
         $app = CApp::instance();
 
-        $view = $app->addView('starter.content');
-        $viewElement = $view->viewElement('field-email');
-        $table = $viewElement->addTable();
-        $table->addColumn('name');
+        // $view = $app->addView('starter.content');
+        // $viewElement = $view->viewElement('field-email');
+        // $table = $viewElement->addTable();
+        // $table->addColumn('name');
 
         return $app;
     }

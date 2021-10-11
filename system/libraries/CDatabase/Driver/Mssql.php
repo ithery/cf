@@ -1,12 +1,11 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * MSSQL Database Driver
  */
-class Database_Driver_Mssql extends Database_Driver {
-
+class Database_Driver_Mssql extends CDatabase_Driver {
     /**
      * Database connection link
      */
@@ -21,6 +20,7 @@ class Database_Driver_Mssql extends Database_Driver {
      * Sets the config for the class.
      *
      * @param  array  database configuration
+     * @param mixed $config
      */
     public function __construct($config) {
         $this->db_config = $config;
@@ -42,23 +42,24 @@ class Database_Driver_Mssql extends Database_Driver {
      */
     public function connect() {
         // Check if link already exists
-        if (is_resource($this->link))
+        if (is_resource($this->link)) {
             return $this->link;
+        }
 
         // Import the connect variables
         extract($this->db_config['connection']);
 
         // Persistent connections enabled?
-        $connect = ($this->db_config['persistent'] == TRUE) ? 'mssql_pconnect' : 'mssql_connect';
+        $connect = ($this->db_config['persistent'] == true) ? 'mssql_pconnect' : 'mssql_connect';
 
         // Build the connection info
         $host = isset($host) ? $host : $socket;
 
         // Windows uses a comma instead of a colon
-        $port = (isset($port) AND is_string($port)) ? (KOHANA_IS_WIN ? ',' : ':') . $port : '';
+        $port = (isset($port) and is_string($port)) ? (KOHANA_IS_WIN ? ',' : ':') . $port : '';
 
         // Make the connection and select the database
-        if (($this->link = $connect($host . $port, $user, $pass, TRUE)) AND mssql_select_db($database, $this->link)) {
+        if (($this->link = $connect($host . $port, $user, $pass, true)) and mssql_select_db($database, $this->link)) {
             /* This is being removed so I can use it, will need to come up with a more elegant workaround in the future...
              *
               if ($charset = $this->db_config['character_set'])
@@ -68,17 +69,17 @@ class Database_Driver_Mssql extends Database_Driver {
              */
 
             // Clear password after successful connect
-            $this->db_config['connection']['pass'] = NULL;
+            $this->db_config['connection']['pass'] = null;
 
             return $this->link;
         }
 
-        return FALSE;
+        return false;
     }
 
     public function query($sql) {
         // Only cache if it's turned on, and only cache if it's not a write statement
-        if ($this->db_config['cache'] AND ! preg_match('#\b(?:INSERT|UPDATE|REPLACE|SET)\b#i', $sql)) {
+        if ($this->db_config['cache'] and !preg_match('#\b(?:INSERT|UPDATE|REPLACE|SET)\b#i', $sql)) {
             $hash = $this->query_hash($sql);
 
             if (!isset($this->query_cache[$hash])) {
@@ -97,12 +98,12 @@ class Database_Driver_Mssql extends Database_Driver {
     }
 
     public function escape_table($table) {
-        if (stripos($table, ' AS ') !== FALSE) {
+        if (stripos($table, ' AS ') !== false) {
             // Force 'AS' to uppercase
             $table = str_ireplace(' AS ', ' AS ', $table);
 
             // Runs escape_table on both sides of an AS statement
-            $table = array_map(array($this, __FUNCTION__), explode(' AS ', $table));
+            $table = array_map([$this, __FUNCTION__], explode(' AS ', $table));
 
             // Re-create the AS statement
             return implode(' AS ', $table);
@@ -111,29 +112,31 @@ class Database_Driver_Mssql extends Database_Driver {
     }
 
     public function escape_column($column) {
-        if (!$this->db_config['escape'])
+        if (!$this->db_config['escape']) {
             return $column;
+        }
 
-        if ($column == '*')
+        if ($column == '*') {
             return $column;
+        }
 
         // This matches any functions we support to SELECT.
         if (preg_match('/(avg|count|sum|max|min)\(\s*(.*)\s*\)(\s*as\s*(.+)?)?/i', $column, $matches)) {
             if (count($matches) == 3) {
                 return $matches[1] . '(' . $this->escape_column($matches[2]) . ')';
-            } else if (count($matches) == 5) {
+            } elseif (count($matches) == 5) {
                 return $matches[1] . '(' . $this->escape_column($matches[2]) . ') AS ' . $this->escape_column($matches[2]);
             }
         }
 
         // This matches any modifiers we support to SELECT.
         if (!preg_match('/\b(?:rand|all|distinct(?:row)?|high_priority|sql_(?:small_result|b(?:ig_result|uffer_result)|no_cache|ca(?:che|lc_found_rows)))\s/i', $column)) {
-            if (stripos($column, ' AS ') !== FALSE) {
+            if (stripos($column, ' AS ') !== false) {
                 // Force 'AS' to uppercase
                 $column = str_ireplace(' AS ', ' AS ', $column);
 
                 // Runs escape_column on both sides of an AS statement
-                $column = array_map(array($this, __FUNCTION__), explode(' AS ', $column));
+                $column = array_map([$this, __FUNCTION__], explode(' AS ', $column));
 
                 // Re-create the AS statement
                 return implode(' AS ', $column);
@@ -163,6 +166,8 @@ class Database_Driver_Mssql extends Database_Driver {
      * functionality, a fancy query needs to be built.
      *
      * @param unknown_type $limit
+     * @param null|mixed   $offset
+     *
      * @return unknown
      */
     public function limit($limit, $offset = null) {
@@ -170,20 +175,21 @@ class Database_Driver_Mssql extends Database_Driver {
     }
 
     public function compile_select($database) {
-        $sql = ($database['distinct'] == TRUE) ? 'SELECT DISTINCT ' : 'SELECT ';
+        $sql = ($database['distinct'] == true) ? 'SELECT DISTINCT ' : 'SELECT ';
         $sql .= (count($database['select']) > 0) ? implode(', ', $database['select']) : '*';
 
         if (count($database['from']) > 0) {
             // Escape the tables
-            $froms = array();
-            foreach ($database['from'] as $from)
+            $froms = [];
+            foreach ($database['from'] as $from) {
                 $froms[] = $this->escape_column($from);
+            }
             $sql .= "\nFROM ";
             $sql .= implode(', ', $froms);
         }
 
         if (count($database['join']) > 0) {
-            foreach ($database['join'] AS $join) {
+            foreach ($database['join'] as $join) {
                 $sql .= "\n" . $join['type'] . 'JOIN ' . implode(', ', $join['tables']) . ' ON ' . $join['conditions'];
             }
         }
@@ -218,22 +224,23 @@ class Database_Driver_Mssql extends Database_Driver {
     }
 
     public function escape_str($str) {
-        if (!$this->db_config['escape'])
+        if (!$this->db_config['escape']) {
             return $str;
+        }
 
         is_resource($this->link) or $this->connect();
         //mssql_real_escape_string($str, $this->link); <-- this function doesn't exist
 
-        $characters = array('/\x00/', '/\x1a/', '/\n/', '/\r/', '/\\\/', '/\'/');
-        $replace = array('\\\x00', '\\x1a', '\\n', '\\r', '\\\\', "''");
+        $characters = ['/\x00/', '/\x1a/', '/\n/', '/\r/', '/\\\/', '/\'/'];
+        $replace = ['\\\x00', '\\x1a', '\\n', '\\r', '\\\\', "''"];
         return preg_replace($characters, $replace, $str);
     }
 
     public function list_tables() {
         $sql = 'SHOW TABLES FROM [' . $this->db_config['connection']['database'] . ']';
-        $result = $this->query($sql)->result(FALSE, MSSQL_ASSOC);
+        $result = $this->query($sql)->result(false, MSSQL_ASSOC);
 
-        $retval = array();
+        $retval = [];
         foreach ($result as $row) {
             $retval[] = current($row);
         }
@@ -246,7 +253,7 @@ class Database_Driver_Mssql extends Database_Driver {
     }
 
     public function list_fields($table) {
-        $result = array();
+        $result = [];
 
         foreach ($this->field_data($table) as $row) {
             // Make an associative array
@@ -259,18 +266,17 @@ class Database_Driver_Mssql extends Database_Driver {
     public function field_data($table) {
         $query = $this->query("SELECT COLUMN_NAME AS Field, DATA_TYPE as Type  FROM INFORMATION_SCHEMA.Columns WHERE TABLE_NAME = '" . $this->escape_table($table) . "'", $this->link);
 
-        return $query->result_array(TRUE);
+        return $query->result_array(true);
     }
-
 }
 
 /**
  * MSSQL Result
  */
 class Mssql_Result extends Database_Result {
-
     // Fetch function and return type
     protected $fetch_type = 'mssql_fetch_object';
+
     protected $return_type = MSSQL_ASSOC;
 
     /**
@@ -278,21 +284,25 @@ class Mssql_Result extends Database_Result {
      *
      * @param  resource  query result
      * @param  resource  database link
-     * @param  boolean   return objects or arrays
+     * @param  bool   return objects or arrays
      * @param  string    SQL query that was run
+     * @param mixed $result
+     * @param mixed $link
+     * @param mixed $object
+     * @param mixed $sql
      */
-    public function __construct($result, $link, $object = TRUE, $sql) {
+    public function __construct($result, $link, $object = true, $sql) {
         $this->result = $result;
 
         // If the query is a resource, it was a SELECT, SHOW, DESCRIBE, EXPLAIN query
         if (is_resource($result)) {
             $this->current_row = 0;
             $this->total_rows = mssql_num_rows($this->result);
-            $this->fetch_type = ($object === TRUE) ? 'mssql_fetch_object' : 'mssql_fetch_array';
+            $this->fetch_type = ($object === true) ? 'mssql_fetch_object' : 'mssql_fetch_array';
         } elseif (is_bool($result)) {
-            if ($result == FALSE) {
+            if ($result == false) {
                 // SQL error
-                throw new CDatabase_Exception('There was an SQL error: :error', array(':error'=>mssql_get_last_message($link) . ' - ' . $sql));
+                throw new CDatabase_Exception('There was an SQL error: :error', [':error' => mssql_get_last_message($link) . ' - ' . $sql]);
             } else {
                 // Its an DELETE, INSERT, REPLACE, or UPDATE querys
                 $last_id = mssql_query('SELECT @@IDENTITY AS last_id', $link);
@@ -318,7 +328,7 @@ class Mssql_Result extends Database_Result {
         }
     }
 
-    public function result($object = TRUE, $type = MSSQL_ASSOC) {
+    public function result($object = true, $type = MSSQL_ASSOC) {
         $this->fetch_type = ((bool) $object) ? 'mssql_fetch_object' : 'mssql_fetch_array';
 
         // This check has to be outside the previous statement, because we do not
@@ -326,7 +336,7 @@ class Mssql_Result extends Database_Result {
         // NOTE - The class set by $type must be defined before fetching the result,
         // autoloading is disabled to save a lot of stupid overhead.
         if ($this->fetch_type == 'mssql_fetch_object') {
-            $this->return_type = (is_string($type) AND CF::auto_load($type)) ? $type : 'stdClass';
+            $this->return_type = (is_string($type) and CF::auto_load($type)) ? $type : 'stdClass';
         } else {
             $this->return_type = $type;
         }
@@ -334,22 +344,22 @@ class Mssql_Result extends Database_Result {
         return $this;
     }
 
-    public function as_array($object = NULL, $type = MSSQL_ASSOC) {
+    public function as_array($object = null, $type = MSSQL_ASSOC) {
         return $this->result_array($object, $type);
     }
 
-    public function result_array($object = NULL, $type = MSSQL_ASSOC) {
-        $rows = array();
+    public function result_array($object = null, $type = MSSQL_ASSOC) {
+        $rows = [];
 
         if (is_string($object)) {
             $fetch = $object;
         } elseif (is_bool($object)) {
-            if ($object === TRUE) {
+            if ($object === true) {
                 $fetch = 'mssql_fetch_object';
 
                 // NOTE - The class set by $type must be defined before fetching the result,
                 // autoloading is disabled to save a lot of stupid overhead.
-                $type = (is_string($type) AND CF::auto_load($type)) ? $type : 'stdClass';
+                $type = (is_string($type) and CF::auto_load($type)) ? $type : 'stdClass';
             } else {
                 $fetch = 'mssql_fetch_array';
             }
@@ -358,7 +368,7 @@ class Mssql_Result extends Database_Result {
             $fetch = $this->fetch_type;
 
             if ($fetch == 'mssql_fetch_object') {
-                $type = (is_string($type) AND CF::auto_load($type)) ? $type : 'stdClass';
+                $type = (is_string($type) and CF::auto_load($type)) ? $type : 'stdClass';
             }
         }
 
@@ -371,11 +381,11 @@ class Mssql_Result extends Database_Result {
             }
         }
 
-        return isset($rows) ? $rows : array();
+        return isset($rows) ? $rows : [];
     }
 
     public function list_fields() {
-        $field_names = array();
+        $field_names = [];
         while ($field = mssql_fetch_field($this->result)) {
             $field_names[] = $field->name;
         }
@@ -384,12 +394,12 @@ class Mssql_Result extends Database_Result {
     }
 
     public function seek($offset) {
-        if (!$this->offsetExists($offset))
-            return FALSE;
+        if (!$this->offsetExists($offset)) {
+            return false;
+        }
 
         return mssql_data_seek($this->result, $offset);
     }
-
 }
 
 // End mssql_Result Class

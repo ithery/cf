@@ -1,6 +1,6 @@
 <?php
 
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -11,9 +11,10 @@
  *
  * @package SendGrid\Mail
  */
-class CVendor_SendGrid_Mail_Category implements \JsonSerializable
-{
-    /** @var $category string A category name for an email message. Each category name may not exceed 255 characters */
+class CVendor_SendGrid_Mail_Category implements \JsonSerializable {
+    /**
+     * @var string A category name for an email message. Each category name may not exceed 255 characters
+     */
     private $category;
 
     /**
@@ -23,8 +24,7 @@ class CVendor_SendGrid_Mail_Category implements \JsonSerializable
      *                              Each category name may not exceed 255
      *                              characters
      */
-    public function __construct($category = null)
-    {
+    public function __construct($category = null) {
         if (isset($category)) {
             $this->setCategory($category);
         }
@@ -37,12 +37,11 @@ class CVendor_SendGrid_Mail_Category implements \JsonSerializable
      *                         Each category name may not exceed 255
      *                         characters
      *
-     * @throws CVendor_SendGrid_Mail_TypeException
-     */ 
-    public function setCategory($category)
-    {
+     * @throws CVendor_SendGrid_Exception_TypeException
+     */
+    public function setCategory($category) {
         if (!is_string($category)) {
-            throw new CVendor_SendGrid_Mail_TypeException('$category must be of type string.');
+            throw new CVendor_SendGrid_Exception_TypeException('$category must be of type string.');
         }
         $this->category = $category;
     }
@@ -52,8 +51,7 @@ class CVendor_SendGrid_Mail_Category implements \JsonSerializable
      *
      * @return string
      */
-    public function getCategory()
-    {
+    public function getCategory() {
         return $this->category;
     }
 
@@ -62,8 +60,7 @@ class CVendor_SendGrid_Mail_Category implements \JsonSerializable
      *
      * @return string
      */
-    public function jsonSerialize()
-    {
+    public function jsonSerialize() {
         return $this->getCategory();
     }
 }

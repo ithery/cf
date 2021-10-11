@@ -150,4 +150,11 @@ class CDevSuite_Windows_DevCloud extends CDevSuite_DevCloud {
         'mariadb/share/errmsg-utf8.txt',
         'mariadb/share/english/errmsg.sys',
     ];
+
+    public function __construct() {
+        parent::__construct();
+        $this->requiredSSHFiles = [
+            'putty/' . CDevSuite::ssh()->executableName()
+        ];
+    }
 }

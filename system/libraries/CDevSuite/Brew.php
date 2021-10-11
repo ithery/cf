@@ -65,7 +65,7 @@ class CDevSuite_Brew {
     /**
      * Get a list of supported PHP versions.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function supportedPhpVersions() {
         return c::collect(static::SUPPORTED_PHP_VERSIONS);
@@ -345,7 +345,7 @@ class CDevSuite_Brew {
     /**
      * Get the currently running brew services.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function getRunningServices() {
         return c::collect(array_filter(explode(PHP_EOL, $this->cli->runAsUser(

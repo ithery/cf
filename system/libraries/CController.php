@@ -13,6 +13,16 @@ abstract class CController {
     protected $baseUri;
 
     /**
+     * @var CController_Input
+     */
+    protected $input;
+
+    /**
+     * @var URI
+     */
+    protected $uri;
+
+    /**
      * Loads URI, and Input into this controller.
      *
      * @return void
@@ -27,7 +37,7 @@ abstract class CController {
         $this->uri = URI::instance();
 
         // Input should always be available
-        $this->input = Input::instance();
+        $this->input = CController_Input::instance();
 
         $this->baseUri = CFRouter::controllerUri();
     }

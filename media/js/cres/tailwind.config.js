@@ -1,13 +1,14 @@
 module.exports = {
-    purge: [
-        '../../../modules/**/*.blade.php'
-    ],
+    purge: {
+        enabled: false,
+        content: ['../../../modules/**/*.blade.php']
+    },
     darkMode: false, // or 'media' or 'class'
     theme: {
-        extend: {},
+        extend: {}
     },
     variants: {
-        extend: {},
+        extend: {}
     },
-    plugins: [],
-}
+    plugins: []
+};

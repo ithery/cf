@@ -1,16 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 trait CComponent_Concern_ReceivesEventsTrait {
-
     protected $eventQueue = [];
+
     protected $dispatchQueue = [];
+
     protected $listeners = [];
 
     protected function getListeners() {
@@ -66,5 +68,4 @@ trait CComponent_Concern_ReceivesEventsTrait {
 
         $this->callMethod($method, $params);
     }
-
 }

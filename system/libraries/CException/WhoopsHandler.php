@@ -10,7 +10,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
 use Whoops\Handler\PrettyPageHandler;
 
-class WhoopsHandler {
+class CException_WhoopsHandler {
     /**
      * Create a new Whoops handler for debug mode.
      *

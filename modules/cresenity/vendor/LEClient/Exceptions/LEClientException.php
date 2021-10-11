@@ -32,21 +32,20 @@ namespace LEClient\Exceptions;
  * @author     Youri van Weegberg <youri@yourivw.nl>
  * @copyright  2020 Youri van Weegberg
  * @license    https://opensource.org/licenses/mit-license.php  MIT License
+ *
  * @link       https://github.com/yourivw/LEClient
  * @since      Class available since Release 1.2.0
  */
-class LEClientException extends LEException
-{
-	public const INVALIDARGUMENTEXCEPTION 	= 0x01;
-	public const INVALIDDIRECTORYEXCEPTION 	= 0x02;
-	
-	public static function InvalidArgumentException(string $message)
-	{
-		return new static($message, self::INVALIDARGUMENTEXCEPTION);
-	}
-	
-	public static function InvalidDirectoryException(string $directory)
-	{
-		return new static(sprintf('%s directory not found.', $directory), self::INVALIDDIRECTORYEXCEPTION);
-	}
+class LEClientException extends LEException {
+    public const INVALIDARGUMENTEXCEPTION = 0x01;
+
+    public const INVALIDDIRECTORYEXCEPTION = 0x02;
+
+    public static function InvalidArgumentException(string $message) {
+        return new static($message, self::INVALIDARGUMENTEXCEPTION);
+    }
+
+    public static function InvalidDirectoryException(string $directory) {
+        return new static(sprintf('%s directory not found.', $directory), self::INVALIDDIRECTORYEXCEPTION);
+    }
 }

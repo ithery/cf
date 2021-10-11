@@ -59,13 +59,13 @@ class CZip {
                 continue;
             }
 
-            $needed_dirs[] = $to . cformatting::untrailingslashit($file['folder'] ? $file['filename'] : dirname($file['filename']));
+            $needed_dirs[] = $to . c::untrailingslashit($file['folder'] ? $file['filename'] : dirname($file['filename']));
         }
 
         $needed_dirs = array_unique($needed_dirs);
         foreach ($needed_dirs as $dir) {
             // Check the parent folders of the folders all exist within the creation array.
-            if (cformatting::untrailingslashit($to) == $dir) { // Skip over the working directory, We know this exists (or will exist)
+            if (c::untrailingslashit($to) == $dir) { // Skip over the working directory, We know this exists (or will exist)
                 continue;
             }
             if (strpos($dir, $to) === false) { // If the directory is not within the working directory, Skip it
@@ -73,7 +73,7 @@ class CZip {
             }
 
             $parent_folder = dirname($dir);
-            while (!empty($parent_folder) && cformatting::untrailingslashit($to) != $parent_folder && !in_array($parent_folder, $needed_dirs)) {
+            while (!empty($parent_folder) && c::untrailingslashit($to) != $parent_folder && !in_array($parent_folder, $needed_dirs)) {
                 $needed_dirs[] = $parent_folder;
                 $parent_folder = dirname($parent_folder);
             }

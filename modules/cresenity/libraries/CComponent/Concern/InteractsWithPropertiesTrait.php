@@ -1,14 +1,13 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *ž@since Nov 29, 2020
  */
 trait CComponent_Concern_InteractsWithPropertiesTrait {
-
     public function handleHydrateProperty($property, $value) {
         $newValue = $value;
 
@@ -16,8 +15,8 @@ trait CComponent_Concern_InteractsWithPropertiesTrait {
             $newValue = $this->hydrateProperty($property, $newValue);
         }
 
-        foreach (array_diff(class_uses_recursive($this), class_uses(self::class)) as $trait) {
-            $method = 'hydratePropertyFrom' . class_basename($trait);
+        foreach (array_diff(c::classUsesRecursive($this), class_uses(self::class)) as $trait) {
+            $method = 'hydratePropertyFrom' . c::classBasename($trait);
 
             if (method_exists($this, $method)) {
                 $newValue = $this->{$method}($property, $newValue);
@@ -34,8 +33,8 @@ trait CComponent_Concern_InteractsWithPropertiesTrait {
             $newValue = $this->dehydrateProperty($property, $newValue);
         }
 
-        foreach (array_diff(class_uses_recursive($this), class_uses(self::class)) as $trait) {
-            $method = 'dehydratePropertyFrom' . class_basename($trait);
+        foreach (array_diff(c::classUsesRecursive($this), class_uses(self::class)) as $trait) {
+            $method = 'dehydratePropertyFrom' . c::classBasename($trait);
 
             if (method_exists($this, $method)) {
                 $newValue = $this->{$method}($property, $newValue);
@@ -84,8 +83,8 @@ trait CComponent_Concern_InteractsWithPropertiesTrait {
 
     public function hasProperty($prop) {
         return property_exists(
-                $this,
-                $this->beforeFirstDot($prop)
+            $this,
+            $this->beforeFirstDot($prop)
         );
     }
 
@@ -93,7 +92,7 @@ trait CComponent_Concern_InteractsWithPropertiesTrait {
         $value = $this->{$this->beforeFirstDot($name)};
 
         if ($this->containsDots($name)) {
-            return CF::get($value, $this->afterFirstDot($name));
+            return c::get($value, $this->afterFirstDot($name));
         }
 
         return $value;
@@ -127,13 +126,13 @@ trait CComponent_Concern_InteractsWithPropertiesTrait {
     public function fill($values) {
         $publicProperties = array_keys($this->getPublicPropertiesDefinedBySubClass());
 
-        if ($values instanceof Model) {
+        if ($values instanceof CModel) {
             $values = $values->toArray();
         }
 
         foreach ($values as $key => $value) {
             if (in_array($this->beforeFirstDot($key), $publicProperties)) {
-                CF::set($this, $key, $value);
+                c::set($this, $key, $value);
             }
         }
     }
@@ -167,5 +166,4 @@ trait CComponent_Concern_InteractsWithPropertiesTrait {
 
         return $results;
     }
-
 }

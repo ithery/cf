@@ -1,4 +1,4 @@
-import { kebabCase, debounce, cfDirectives } from '@/util';
+import { kebabCase, debounce, cresDirectives } from '@/util';
 import ModelAction from '@/cui/action/model';
 import DeferredModelAction from '@/cui/action/deferred-model';
 import MethodAction from '@/cui/action/method';
@@ -12,7 +12,7 @@ export default {
             return false;
         }
 
-        cfDirectives(el).all().forEach(directive => {
+        cresDirectives(el).all().forEach(directive => {
             switch (directive.type) {
                 case 'init':
                     this.fireActionRightAway(el, directive, component);
@@ -195,7 +195,7 @@ export default {
 
                 directive.setEventContext(e);
 
-                // This is outside the conditional below so "cf:click.prevent" without
+                // This is outside the conditional below so "cres:click.prevent" without
                 // a value still prevents default.
                 this.preventAndStop(e, directive.modifiers);
                 const method = directive.method;

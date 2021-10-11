@@ -57,17 +57,19 @@ abstract class CNotification_ChannelAbstract implements CNotification_ChannelInt
             if ($errCode == 0) {
                 try {
                     $result = $this->handleMessage($value, $logNotificationModel);
-                    $vendorResponse = $result;
-                    if (is_array($vendorResponse) || is_object($vendorResponse)) {
-                        if (is_array($vendorResponse)) {
-                            $vendorResponse['headerResponse'] = $result->headers(true);
-                        }
-                        if (is_object($vendorResponse)) {
-                            $vendorResponse->headerResponse = $result->headers(true);
-                        }
-                        $vendorResponse = json_encode($vendorResponse);
-                    }
 
+                    $vendorResponse = $result;
+                    if ($vendorResponse instanceof CVendor_SendGrid_Response) {
+                        $vendorResponse = [
+                            'statusCode' => $vendorResponse->statusCode(),
+                            'body' => $vendorResponse->body(),
+                            'headers' => $vendorResponse->headers()
+                        ];
+                    }
+                    if (is_object($vendorResponse)) {
+                        $vendorResponse->headerResponse = $result->headers(true);
+                    }
+                    $vendorResponse = json_encode($vendorResponse);
                     $logNotificationModel->vendor_response = $vendorResponse;
 
                     CDaemon::log('vendor response:' . $vendorResponse);

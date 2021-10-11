@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * Holds the response from an API call.
  */
 class CVendor_SendGrid_Response {
-
     /**
      * @var int
      */
@@ -29,9 +22,9 @@ class CVendor_SendGrid_Response {
     /**
      * Setup the response data
      *
-     * @param int    $statusCode the status code.
-     * @param string $body       the response body.
-     * @param array  $headers    an array of response headers.
+     * @param int    $statusCode the status code
+     * @param string $body       the response body
+     * @param array  $headers    an array of response headers
      */
     public function __construct($statusCode = 200, $body = '', array $headers = []) {
         $this->statusCode = $statusCode;
@@ -81,20 +74,20 @@ class CVendor_SendGrid_Response {
      */
     private function prettifyHeaders(array $headers) {
         return array_reduce(
-                array_filter($headers), function ($result, $header) {
+            array_filter($headers),
+            function ($result, $header) {
+                if (false === strpos($header, ':')) {
+                    $result['Status'] = trim($header);
 
-            if (false === strpos($header, ':')) {
-                $result['Status'] = trim($header);
+                    return $result;
+                }
+
+                list($key, $value) = explode(':', $header, 2);
+                $result[trim($key)] = trim($value);
 
                 return $result;
-            }
-
-            list($key, $value) = explode(':', $header, 2);
-            $result[trim($key)] = trim($value);
-
-            return $result;
-        }, []
+            },
+            []
         );
     }
-
 }

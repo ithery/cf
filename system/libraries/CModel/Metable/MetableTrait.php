@@ -1,0 +1,536 @@
+<?php
+
+/**
+ * Trait for giving Eloquent models the ability to handle Meta.
+ *
+ * @property CCollection|CModel_Metable_Meta[] $meta
+ *
+ * @method static CModel_Query whereHasMeta($key): void
+ * @method static CModel_Query whereDoesntHaveMeta($key)
+ * @method static CModel_Query whereHasMetaKeys(array $keys)
+ * @method static CModel_Query whereMeta(string $key, $operator, $value = null)
+ * @method static CModel_Query whereMetaNumeric(string $key, string $operator, $value)
+ * @method static CModel_Query whereMetaIn(string $key, array $values)
+ * @method static CModel_Query orderByMeta(string $key, string $direction = 'asc', $strict = false)
+ * @method static CModel_Query orderByMetaNumeric(string $key, string $direction = 'asc', $strict = false)
+ */
+trait CModel_Metable_MetableTrait {
+    /**
+     * @var CCollection|CModel_Metable_Meta[]
+     */
+    private $indexedMetaCollection;
+
+    /**
+     * Initialize the trait.
+     *
+     * @return void
+     */
+    public static function bootMetableTrait() {
+        // delete all attached meta on deletion
+        static::deleted(function ($model) {
+            $model->purgeMeta();
+        });
+    }
+
+    /**
+     * Relationship to the `Meta` model.
+     *
+     * @return CModel_Relation_MorphMany
+     */
+    public function meta() {
+        return $this->morphMany($this->getMetaClassName(), 'metable');
+    }
+
+    /**
+     * Add or update the value of the `Meta` at a given key.
+     *
+     * @param string $key
+     * @param mixed  $value
+     */
+    public function setMeta($key, $value) {
+        if ($this->hasMeta($key)) {
+            $meta = $this->getMetaRecord($key);
+            $meta->setAttribute('value', $value);
+            $meta->save();
+        } else {
+            $meta = $this->makeMeta($key, $value);
+            $this->meta()->save($meta);
+            $this->meta[] = $meta;
+            $this->indexedMetaCollection[$key] = $meta;
+        }
+    }
+
+    /**
+     * Add or update many `Meta` values.
+     *
+     * @param array<string,mixed> $metaDictionary key-value pairs
+     *
+     * @return void
+     */
+    public function setManyMeta(array $metaDictionary) {
+        if (empty($metaDictionary)) {
+            return;
+        }
+
+        $prototype = $this->meta()->newModelInstance();
+        $builder = c::db()->table($prototype->getTable());
+        $needReload = $this->relationLoaded('meta');
+
+        if (method_exists($builder, 'upsert')) {
+            // use upsert if available to store all data in a single query
+            // requires Laravel >8.0
+            $metaModels = new CCollection();
+            foreach ($metaDictionary as $key => $value) {
+                $metaModels[$key] = $this->makeMeta($key, $value);
+            }
+
+            $builder->upsert(
+                $metaModels->toArray(),
+                ['metable_type', 'metable_id', 'key'],
+                ['type', 'value']
+            );
+        } else {
+            // otherwise insert manually.
+            // Clear local cache to speed things up since we will reload it afterwards
+            $this->unsetRelation('meta');
+            foreach ($metaDictionary as $key => $value) {
+                $this->setMeta($key, $value);
+            }
+        }
+
+        if ($needReload) {
+            // reload media relation and indexed cache
+            $this->load('meta');
+        }
+    }
+
+    /**
+     * Replace all associated `Meta` with the keys and values provided.
+     *
+     * @param array|Traversable $array
+     *
+     * @return void
+     */
+    public function syncMeta($array) {
+        $meta = [];
+
+        foreach ($array as $key => $value) {
+            $meta[$key] = $this->makeMeta($key, $value);
+        }
+
+        $this->meta()->delete();
+        $this->meta()->saveMany($meta);
+
+        // Update cached relationship.
+        $collection = $this->makeMeta()->newCollection($meta);
+        $this->setRelation('meta', $collection);
+    }
+
+    /**
+     * Retrieve the value of the `Meta` at a given key.
+     *
+     * @param string $key
+     * @param mixed  $default fallback value if no Meta is found
+     *
+     * @return mixed
+     */
+    public function getMeta($key, $default = null) {
+        if ($this->hasMeta($key)) {
+            return $this->getMetaRecord($key)->getAttribute('value');
+        }
+
+        // If we have only one argument provided (i.e. default is not set)
+        // then we check the model for the defaultMetaValues
+        if (func_num_args() == 1 && $this->hasDefaultMetaValue($key)) {
+            return $this->getDefaultMetaValue($key);
+        }
+
+        return $default;
+    }
+
+    /**
+     * Check if the default meta array exists and the key is set
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    protected function hasDefaultMetaValue($key) {
+        return property_exists($this, 'defaultMetaValues')
+                && array_key_exists($key, $this->defaultMetaValues);
+    }
+
+    /**
+     * Get the default meta value by key
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
+    protected function getDefaultMetaValue($key) {
+        return $this->defaultMetaValues[$key];
+    }
+
+    /**
+     * Retrieve all meta attached to the model as a key/value map.
+     *
+     * @return \CCollection
+     */
+    public function getAllMeta() {
+        return $this->getMetaCollection()->toBase()->map(function (CModel_Metable_Meta $meta) {
+            return $meta->getAttribute('value');
+        });
+    }
+
+    /**
+     * Check if a `Meta` has been set at a given key.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function hasMeta($key) {
+        return $this->getMetaCollection()->has($key);
+    }
+
+    /**
+     * Delete the `Meta` at a given key.
+     *
+     * @param string $key
+     *
+     * @return void
+     */
+    public function removeMeta($key) {
+        if ($this->hasMeta($key)) {
+            $this->getMetaCollection()->pull($key)->delete();
+        }
+    }
+
+    /**
+     * Delete many `Meta` keys.
+     *
+     * @param string[] $keys
+     *
+     * @return void
+     */
+    public function removeManyMeta(array $keys) {
+        $relation = $this->meta();
+        $relation->newQuery()
+            ->where($relation->getMorphType(), $this->getMorphClass())
+            ->where($relation->getForeignKeyName(), $this->getKey())
+            ->whereIn('key', $keys)
+            ->delete();
+
+        if ($this->relationLoaded('meta')) {
+            $this->load('meta');
+        }
+    }
+
+    /**
+     * Delete all meta attached to the model.
+     *
+     * @return void
+     */
+    public function purgeMeta() {
+        $this->meta()->delete();
+        $this->setRelation('meta', $this->makeMeta()->newCollection([]));
+    }
+
+    /**
+     * Retrieve the `Meta` model instance attached to a given key.
+     *
+     * @param string $key
+     *
+     * @return CModel_Metable_Meta|null
+     */
+    public function getMetaRecord($key) {
+        return $this->getMetaCollection()->get($key);
+    }
+
+    /**
+     * Query scope to restrict the query to records which have `Meta` attached to a given key.
+     *
+     * If an array of keys is passed instead, will restrict the query to records having one or more Meta with any of the keys.
+     *
+     * @param CModel_Query $q
+     * @param string|array $key
+     *
+     * @return void
+     */
+    public function scopeWhereHasMeta(CModel_Query $q, $key) {
+        $q->whereHas('meta', function (CModel_Query $q) use ($key) {
+            $q->whereIn('key', (array)$key);
+        });
+    }
+
+    /**
+     * Query scope to restrict the query to records which doesnt have `Meta` attached to a given key.
+     *
+     * If an array of keys is passed instead, will restrict the query to records having one or more Meta with any of the keys.
+     *
+     * @param CModel_Query $q
+     * @param string|array $key
+     *
+     * @return void
+     */
+    public function scopeWhereDoesntHaveMeta(CModel_Query $q, $key) {
+        $q->whereDoesntHave('meta', function (CModel_Query $q) use ($key) {
+            $q->whereIn('key', (array)$key);
+        });
+    }
+
+    /**
+     * Query scope to restrict the query to records which have `Meta` for all of the provided keys.
+     *
+     * @param CModel_Query $q
+     * @param array        $keys
+     *
+     * @return void
+     */
+    public function scopeWhereHasMetaKeys(CModel_Query $q, array $keys) {
+        $q->whereHas(
+            'meta',
+            function (CModel_Query $q) use ($keys) {
+                $q->whereIn('key', $keys);
+            },
+            '=',
+            count($keys)
+        );
+    }
+
+    /**
+     * Query scope to restrict the query to records which have `Meta` with a specific key and value.
+     *
+     * If the `$value` parameter is omitted, the $operator parameter will be considered the value.
+     *
+     * Values will be serialized to a string before comparison. If using the `>`, `>=`, `<`, or `<=` comparison operators, note that the value will be compared as a string. If comparing numeric values, use `Metable::scopeWhereMetaNumeric()` instead.
+     *
+     * @param CModel_Query $q
+     * @param string       $key
+     * @param mixed        $operator
+     * @param mixed        $value
+     *
+     * @return void
+     */
+    public function scopeWhereMeta(CModel_Query $q, $key, $operator, $value = null) {
+        // Shift arguments if no operator is present.
+        if (!isset($value)) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        // Convert value to its serialized version for comparison.
+        if (!is_string($value)) {
+            $value = $this->makeMeta($key, $value)->getRawValue();
+        }
+
+        $q->whereHas('meta', function (CModel_Query $q) use ($key, $operator, $value) {
+            $q->where('key', $key);
+            $q->where('value', $operator, $value);
+        });
+    }
+
+    /**
+     * Query scope to restrict the query to records which have `Meta` with a specific key and numeric value.
+     *
+     * Performs numeric comparison instead of string comparison.
+     *
+     * @param CModel_Query $q
+     * @param string       $key
+     * @param string       $operator
+     * @param int|float    $value
+     *
+     * @return void
+     */
+    public function scopeWhereMetaNumeric(CModel_Query $q, $key, $operator, $value) {
+        // Since we are manually interpolating into the query,
+        // escape the operator to protect against injection.
+        $validOperators = ['<', '<=', '>', '>=', '=', '<>', '!='];
+        $operator = in_array($operator, $validOperators) ? $operator : '=';
+        $field = $q->getQuery()
+            ->getGrammar()
+            ->wrap($this->meta()->getRelated()->getTable() . '.value');
+
+        $q->whereHas('meta', function (CModel_Query $q) use ($key, $operator, $value, $field) {
+            $q->where('key', $key);
+            $q->whereRaw("cast({$field} as decimal) {$operator} ?", [(float)$value]);
+        });
+    }
+
+    /**
+     * Query scope to restrict the query to records which have `Meta` with a specific key and a value within a specified set of options.
+     *
+     * @param CModel_Query $q
+     * @param string       $key
+     * @param array        $values
+     *
+     * @return void
+     */
+    public function scopeWhereMetaIn(CModel_Query $q, $key, array $values) {
+        $values = array_map(function ($val) use ($key) {
+            return is_string($val) ? $val : $this->makeMeta($key, $val)->getRawValue();
+        }, $values);
+
+        $q->whereHas('meta', function (CModel_Query $q) use ($key, $values) {
+            $q->where('key', $key);
+            $q->whereIn('value', $values);
+        });
+    }
+
+    /**
+     * Query scope to order the query results by the string value of an attached meta.
+     *
+     * @param CModel_Query $q
+     * @param string       $key
+     * @param string       $direction
+     * @param bool         $strict    if true, will exclude records that do not have meta for the provided `$key`
+     *
+     * @return void
+     */
+    public function scopeOrderByMeta(
+        CModel_Query $q,
+        $key,
+        $direction = 'asc',
+        $strict = false
+    ) {
+        $table = $this->joinMetaTable($q, $key, $strict ? 'inner' : 'left');
+        $q->orderBy("{$table}.value", $direction);
+    }
+
+    /**
+     * Query scope to order the query results by the numeric value of an attached meta.
+     *
+     * @param CModel_Query $q
+     * @param string       $key
+     * @param string       $direction
+     * @param bool         $strict    if true, will exclude records that do not have meta for the provided `$key`
+     *
+     * @return void
+     */
+    public function scopeOrderByMetaNumeric(
+        CModel_Query $q,
+        $key,
+        $direction = 'asc',
+        $strict = false
+    ) {
+        $table = $this->joinMetaTable($q, $key, $strict ? 'inner' : 'left');
+        $direction = strtolower($direction) == 'asc' ? 'asc' : 'desc';
+        $field = $q->getQuery()->getGrammar()->wrap("{$table}.value");
+
+        $q->orderByRaw("cast({$field} as decimal) $direction");
+    }
+
+    /**
+     * Join the meta table to the query.
+     *
+     * @param CModel_Query $q
+     * @param string       $key
+     * @param string       $type join type
+     *
+     * @return string
+     */
+    private function joinMetaTable(CModel_Query $q, $key, $type = 'left') {
+        $relation = $this->meta();
+        $metaTable = $relation->getRelated()->getTable();
+
+        // Create an alias for the join, to allow the same
+        // table to be joined multiple times for different keys.
+        $alias = $metaTable . '__' . $key;
+
+        // If no explicit select columns are specified,
+        // avoid column collision by excluding meta table from select.
+        if (!$q->getQuery()->columns) {
+            $q->select($this->getTable() . '.*');
+        }
+
+        // Join the meta table to the query
+        $q->join("{$metaTable} as {$alias}", function (CDatabase_Query_JoinClause $q) use ($relation, $key, $alias) {
+            $q->on($relation->getQualifiedParentKeyName(), '=', $alias . '.' . $relation->getForeignKeyName())
+                ->where($alias . '.key', '=', $key)
+                ->where($alias . '.' . $relation->getMorphType(), '=', $this->getMorphClass());
+        }, null, null, $type);
+
+        // Return the alias so that the calling context can
+        // reference the table.
+        return $alias;
+    }
+
+    /**
+     * Fetch all meta for the model, if necessary.
+     *
+     * In Laravel versions prior to 5.3, relations that are lazy loaded by the
+     * `getRelationFromMethod()` method ( invoked by the `__get()` magic method)
+     * are not passed through the `setRelation()` method, so we load the relation
+     * manually.
+     *
+     * @return mixed
+     */
+    private function getMetaCollection() {
+        if (!$this->relationLoaded('meta')) {
+            $this->setRelation('meta', $this->meta()->get());
+        }
+
+        return $this->indexedMetaCollection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRelation($relation, $value) {
+        if ($relation == 'meta') {
+            // keep the meta relation indexed by key.
+            /** @var Collection $value */
+            $this->indexedMetaCollection = $value->keyBy('key');
+        }
+
+        return parent::setRelation($relation, $value);
+    }
+
+    /**
+     * Set the entire relations array on the model.
+     *
+     * @param array $relations
+     *
+     * @return $this
+     */
+    public function setRelations(array $relations) {
+        // keep the meta relation indexed by key.
+        if (isset($relations['meta'])) {
+            $this->indexedMetaCollection = (new CCollection($relations['meta']))->keyBy('key');
+        } else {
+            $this->indexedMetaCollection = $this->makeMeta()->newCollection();
+        }
+
+        return parent::setRelations($relations);
+    }
+
+    /**
+     * Retrieve the FQCN of the class to use for Meta models.
+     *
+     * @return string
+     */
+    protected function getMetaClassName() {
+        return CF::config('model.metable.model', CModel_Metable_Meta::class);
+    }
+
+    /**
+     * Create a new `Meta` record.
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return CModel_Metable_Meta
+     */
+    protected function makeMeta($key = '', $value = '') {
+        $className = $this->getMetaClassName();
+
+        $meta = new $className([
+            'key' => $key,
+            'value' => $value,
+        ]);
+        $meta->metable_type = $this->getMorphClass();
+        $meta->metable_id = $this->getKey();
+
+        return $meta;
+    }
+}

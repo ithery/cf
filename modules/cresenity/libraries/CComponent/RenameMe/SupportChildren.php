@@ -1,15 +1,11 @@
 <?php
 
+class CComponent_RenameMe_SupportChildren {
+    public static function init() {
+        return new static;
+    }
 
-
-
-
-class CComponent_RenameMe_SupportChildren
-{
-    static function init() { return new static; }
-
-    function __construct()
-    {
+    public function __construct() {
         CComponent_Manager::instance()->listen('component.dehydrate', function ($component, $response) {
             $response->memo['children'] = $component->getRenderedChildren();
         });

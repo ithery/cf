@@ -1,18 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
-
-
-trait CComponent_Concern_HandlesActionsTrait
-{
-    public function syncInput($name, $value, $rehash = true)
-    {
+trait CComponent_Concern_HandlesActionsTrait {
+    public function syncInput($name, $value, $rehash = true) {
         $propertyName = $this->beforeFirstDot($name);
 
         c::throwIf(
@@ -34,13 +31,13 @@ trait CComponent_Concern_HandlesActionsTrait
 
                 // Get existing data from model property.
                 $results = [];
-                $results[$targetKey] = CF::get($this->{$propertyName}, $targetKey, []);
+                $results[$targetKey] = c::get($this->{$propertyName}, $targetKey, []);
 
                 // Merge in new data.
-                CF::set($results, $keyName, $value);
+                c::set($results, $keyName, $value);
 
                 // Re-assign data to model.
-                CF::set($this->{$propertyName}, $targetKey, $results[$targetKey]);
+                c::set($this->{$propertyName}, $targetKey, $results[$targetKey]);
             } else {
                 $this->{$name} = $value;
             }
@@ -49,23 +46,22 @@ trait CComponent_Concern_HandlesActionsTrait
         });
     }
 
-    protected function callBeforeAndAfterSyncHooks($name, $value, $callback)
-    {
+    protected function callBeforeAndAfterSyncHooks($name, $value, $callback) {
         $name = c::str($name);
 
         $propertyName = $name->studly()->before('.');
         $keyAfterFirstDot = $name->contains('.') ? $name->after('.') : null;
         $keyAfterLastDot = $name->contains('.') ? $name->afterLast('.') : null;
 
-        $beforeMethod = 'updating'.$propertyName;
-        $afterMethod = 'updated'.$propertyName;
+        $beforeMethod = 'updating' . $propertyName;
+        $afterMethod = 'updated' . $propertyName;
 
         $beforeNestedMethod = $name->contains('.')
-            ? 'updating'.$name->replace('.', '_')->studly()
+            ? 'updating' . $name->replace('.', '_')->studly()
             : false;
 
         $afterNestedMethod = $name->contains('.')
-            ? 'updated'.$name->replace('.', '_')->studly()
+            ? 'updated' . $name->replace('.', '_')->studly()
             : false;
 
         $name = $name->__toString();
@@ -97,12 +93,11 @@ trait CComponent_Concern_HandlesActionsTrait
         CComponent_Manager::instance()->dispatch('component.updated', $this, $name, $value);
     }
 
-    public function callMethod($method, $params = [])
-    {
+    public function callMethod($method, $params = []) {
         switch ($method) {
             case '$sync':
                 $prop = array_shift($params);
-                $this->syncInput($prop, head($params));
+                $this->syncInput($prop, c::head($params));
 
                 return;
 
@@ -114,7 +109,7 @@ trait CComponent_Concern_HandlesActionsTrait
 
             case '$toggle':
                 $prop = array_shift($params);
-                $this->syncInput($prop, ! $this->{$prop}, $rehash = false);
+                $this->syncInput($prop, !$this->{$prop}, $rehash = false);
 
                 return;
 
@@ -122,7 +117,7 @@ trait CComponent_Concern_HandlesActionsTrait
                 return;
         }
 
-        if (! method_exists($this, $method)) {
+        if (!method_exists($this, $method)) {
             c::throwIf($method === 'startUpload', new CComponent_Exception_MissingFileUploadsTraitException($this));
 
             throw new CComponent_Exception_MethodNotFoundException($method, $this::getName());
@@ -135,8 +130,7 @@ trait CComponent_Concern_HandlesActionsTrait
         CComponent_Manager::instance()->dispatch('action.returned', $this, $method, $returned);
     }
 
-    protected function methodIsPublicAndNotDefinedOnBaseClass($methodName)
-    {
+    protected function methodIsPublicAndNotDefinedOnBaseClass($methodName) {
         return c::collect((new \ReflectionClass($this))->getMethods(\ReflectionMethod::IS_PUBLIC))
             ->reject(function ($method) {
                 // The "render" method is a special case. This method might be called by event listeners or other ways.

@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 29, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 29, 2020
  */
 abstract class CComponent_HydrationMiddleware_NormalizeDataForJavaScript {
-
     protected static function reindexArrayWithNumericKeysOtherwiseJavaScriptWillMessWithTheOrder($value) {
         if (!is_array($value)) {
             return $value;
@@ -33,5 +33,4 @@ abstract class CComponent_HydrationMiddleware_NormalizeDataForJavaScript {
             return static::reindexArrayWithNumericKeysOtherwiseJavaScriptWillMessWithTheOrder($value);
         }, $normalizedData);
     }
-
 }

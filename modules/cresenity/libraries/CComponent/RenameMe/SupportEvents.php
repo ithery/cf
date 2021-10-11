@@ -1,11 +1,11 @@
 <?php
 
-class CComponent_RenameMe_SupportEvents
-{
-    static function init() { return new static; }
+class CComponent_RenameMe_SupportEvents {
+    public static function init() {
+        return new static;
+    }
 
-    function __construct()
-    {
+    public function __construct() {
         CComponent_Manager::instance()->listen('component.hydrate', function ($component, $request) {
             //
         });

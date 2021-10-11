@@ -26,7 +26,7 @@ class CDatabase_Query_Processor {
     public function processInsertGetId(CDatabase_Query_Builder $query, $sql, $values, $sequence = null) {
         $resultInsert = $query->getConnection()->query($sql, $values);
 
-        $id = $resultInsert->insert_id($sequence);
+        $id = $resultInsert->insertId($sequence);
 
         return is_numeric($id) ? (int) $id : $id;
     }

@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Nov 30, 2020 
  * @license Ittron Global Teknologi
+ *
+ * @since Nov 30, 2020
  */
 use League\Flysystem\Util;
 
 class CComponent_FileUploadConfiguration {
-
     public static function storage() {
         if (CF::isTesting()) {
             // We want to "fake" the first time in a test run, but not again because
@@ -32,7 +32,7 @@ class CComponent_FileUploadConfiguration {
             return 'tmp-for-tests';
         }
 
-        return CF::config('storage.temp') ?: config('storage.default');
+        return CF::config('storage.temp') ?: CF::config('storage.default');
     }
 
     public static function diskConfig() {
@@ -40,10 +40,8 @@ class CComponent_FileUploadConfiguration {
     }
 
     public static function isUsingS3() {
+        $diskBeforeTestFake = CF::config('storage.temp') ?: CF::config('storage.default');
 
-        $diskBeforeTestFake = CF::config('storage.temp') ?: config('storage.default');
-
-        
         return CF::config('storage.disks.' . strtolower($diskBeforeTestFake) . '.driver') === 's3';
     }
 
@@ -71,13 +69,14 @@ class CComponent_FileUploadConfiguration {
     public static function rules() {
         //$rules = config('livewire.temporary_file_upload.rules');
         $rules = null;
-        if (is_null($rules))
+        if (is_null($rules)) {
             return ['required', 'file', 'max:12288'];
+        }
 
-        if (is_array($rules))
+        if (is_array($rules)) {
             return $rules;
+        }
 
         return explode('|', $rules);
     }
-
 }

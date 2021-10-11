@@ -1,22 +1,21 @@
 <?php
 
-
-
-
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
-class CComponent_RenameMe_SupportFileDownloads
-{
-    static function init() { return new static; }
+class CComponent_RenameMe_SupportFileDownloads {
+    public static function init() {
+        return new static;
+    }
 
     protected $downloadsById = [];
 
-    function __construct()
-    {
+    public function __construct() {
         CComponent_Manager::instance()->listen('action.returned', function ($component, $action, $returned) {
-            if ($this->valueIsntAFileResponse($returned)) return;
+            if ($this->valueIsntAFileResponse($returned)) {
+                return;
+            }
 
             $response = $returned;
 
@@ -39,20 +38,20 @@ class CComponent_RenameMe_SupportFileDownloads
         });
 
         CComponent_Manager::instance()->listen('component.dehydrate.subsequent', function ($component, $response) {
-            if (! $download = (isset($this->downloadsById[$component->id])) ?$this->downloadsById[$component->id]: false) return;
+            if (!$download = (isset($this->downloadsById[$component->id])) ? $this->downloadsById[$component->id] : false) {
+                return;
+            }
 
             $response->effects['download'] = $download;
         });
     }
 
-    function valueIsntAFileResponse($value)
-    {
-        return ! $value instanceof StreamedResponse
-            && ! $value instanceof BinaryFileResponse;
+    public function valueIsntAFileResponse($value) {
+        return !$value instanceof StreamedResponse
+            && !$value instanceof BinaryFileResponse;
     }
 
-    function captureOutput($callback)
-    {
+    public function captureOutput($callback) {
         ob_start();
 
         $callback();
@@ -60,8 +59,7 @@ class CComponent_RenameMe_SupportFileDownloads
         return ob_get_clean();
     }
 
-    function getFilenameFromContentDispositionHeader($header)
-    {
+    public function getFilenameFromContentDispositionHeader($header) {
         /**
          * The following conditionals are here to allow for quoted and
          * non quoted filenames in the Content-Disposition header.
@@ -71,7 +69,6 @@ class CComponent_RenameMe_SupportFileDownloads
          * Content-Disposition: attachment; filename=filename.jpg
          * Content-Disposition: attachment; filename="test file.jpg"
          */
-
         if (preg_match('/.*?filename="(.+?)"/', $header, $matches)) {
             return $matches[1];
         }

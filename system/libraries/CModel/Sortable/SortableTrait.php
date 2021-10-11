@@ -12,7 +12,7 @@ trait CModel_Sortable_SortableTrait {
     public static function bootSortableTrait() {
         static::creating(function ($model) {
             $traitUses = c::traitUsesRecursive($model);
-            if (in_array('CModel_Sortable_SortableTrait', $traitUses) && $model->shouldSortWhenCreating()) {
+            if (in_array(CModel_Sortable_SortableTrait::class, $traitUses) && $model->shouldSortWhenCreating()) {
                 $model->setHighestOrderNumber();
             }
         });
