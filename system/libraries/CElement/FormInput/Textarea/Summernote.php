@@ -174,6 +174,8 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
 
         $('#" . $this->id . "').summernote({
             height: '300px',
+            codeviewFilter: true,
+			codeviewIframeFilter: true,
             " . $additionalOptions . '
             maximumImageFileSize:1024*1024, // 1 MB
             onCreateLink: function(originalLink) {
