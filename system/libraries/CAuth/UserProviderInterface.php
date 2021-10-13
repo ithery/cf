@@ -19,13 +19,13 @@ interface CAuth_UserProviderInterface {
     public function retrieveById($identifier);
 
     /**
-     * Retrieve a user by their unique identifier.
+     * Retrieve a user by stdclass object
      *
-     * @param mixed $identifier
+     * @param object|stdclass $object
      *
      * @return CAuth_AuthenticatableInterface|null
      */
-    public function retrieveByObject($identifier);
+    public function retrieveByObject($object);
 
     /**
      * Retrieve a user by their unique identifier and "remember me" token.

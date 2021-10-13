@@ -44,18 +44,17 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     }
 
     /**
-     * Retrieve a user by their unique identifier.
+     * Retrieve a user by stdclass object
      *
-     * @param mixed $identifier
+     * @param mixed $object
      *
      * @return CAuth_AuthenticatableInterface|null
      */
-    public function retrieveByObject($identifier) {
-        $model = $this->createModel();
-        $identifierName = $model->getAuthIdentifierName();
-        return $this->newModelQuery($model)
-            ->where($identifierName, $identifier->$identifierName)
-            ->first();
+    public function retrieveByObject($object) {
+        $identifierName = $this->createModel()->getAuthIdentifierName();
+        $id = $object->$identifierName;
+
+        return $this->retrieveById($id);
     }
 
     /**

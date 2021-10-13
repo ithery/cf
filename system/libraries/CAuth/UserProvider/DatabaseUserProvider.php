@@ -51,6 +51,18 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
     }
 
     /**
+     * Retrieve a user by stdclass object
+     *
+     * @param mixed $object
+     *
+     * @return CAuth_AuthenticatableInterface|null
+     */
+    public function retrieveByObject($object) {
+        $identifier = c::get($object, 'user_id');
+        return $this->retrieveById($identifier);
+    }
+
+    /**
      * Retrieve a user by their unique identifier and "remember me" token.
      *
      * @param mixed  $identifier
@@ -75,7 +87,7 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
      *
      * @return void
      */
-    public function updateRememberToken(CAuth_AuthenticatableInterface $user, $token) {
+    public function updateRememberToken($user, $token) {
         $this->conn->table($this->table)
             ->where($user->getAuthIdentifierName(), $user->getAuthIdentifier())
             ->update([$user->getRememberTokenName() => $token]);
