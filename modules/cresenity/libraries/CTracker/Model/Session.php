@@ -1,17 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 2:19:58 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 2:19:58 AM
  */
 class CTracker_Model_Session extends CTracker_Model {
-
     use CModel_Tracker_TrackerSessionTrait;
 
     protected $table = 'log_session';
+
     protected $fillable = [
         'org_id',
         'uuid',
@@ -25,5 +26,4 @@ class CTracker_Model_Session extends CTracker_Model {
         'log_geoip_id',
         'is_robot',
     ];
-
 }

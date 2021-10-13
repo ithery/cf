@@ -1,28 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 3:21:02 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 3:21:02 AM
  */
 use CHelper_File as File;
 
 class CTracker_Config {
-
     protected static $instance;
+
     protected $data;
 
-    public static function instance() {
-        if (static::$instance == null) {
-            static::$instance = new CTracker_Config();
-        }
-        return static::$instance;
-    }
-
     public function __construct() {
-        $default = array();
+        $default = [];
         $default['sessionModel'] = CTracker_Model_Session::class;
         $default['pathModel'] = CTracker_Model_Path::class;
         $default['logModel'] = CTracker_Model_Log::class;
@@ -63,7 +57,7 @@ class CTracker_Config {
         $default['robotEnabled'] = false;
         $default['consoleEnabled'] = false;
         $default['isQueued'] = false;
-        
+
         $default['queueConnection'] = 'database';
         $default['trackQueueClass'] = CTracker_TaskQueue_TrackQueue::class;
         $default['database'] = 'default';
@@ -81,7 +75,7 @@ class CTracker_Config {
             'cresenity/ajax/*',
             'cresenity/noimage',
             'cresenity/noimage/*',
-//            'unittest/*',
+            //            'unittest/*',
             'unit_test/*',
             'test/*',
             'ccore/*',
@@ -96,9 +90,17 @@ class CTracker_Config {
         $default['excludeRoute'] = [];
         $this->data = CConfig::instance('tracker')->get();
         if (!is_array($this->data)) {
-            $this->data = array();
+            $this->data = [];
         }
         $this->data = array_merge($default, $this->data);
+    }
+
+    public static function instance() {
+        if (static::$instance == null) {
+            static::$instance = new CTracker_Config();
+        }
+
+        return static::$instance;
     }
 
     public function get($key, $default = null) {
@@ -107,11 +109,11 @@ class CTracker_Config {
 
     public function setData($data) {
         $this->data = $data;
+
         return $this;
     }
 
     /**
-     * 
      * @return array
      */
     public function getData() {
@@ -120,6 +122,7 @@ class CTracker_Config {
 
     public function set($key, $value) {
         $this->data[$key] = $value;
+
         return $this;
     }
 
@@ -227,7 +230,7 @@ class CTracker_Config {
 
     public function isMongo() {
         $driver = CF::config('database.' . $this->get('database') . '.connection.type');
+
         return $driver == 'mongodb';
     }
-
 }
