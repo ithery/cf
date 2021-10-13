@@ -317,9 +317,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln("
     jQuery('#" . $this->id . " thead th').each( function (i) {
         var title = jQuery('#" . $this->id . " thead th').eq( jQuery(this).index() ).text();
-        var haveAction = " . ($this->haveRowAction() ? '1' : '0') . ";
+        var haveAction = " . ($this->haveRowAction() ? '1' : '0') . ';
 
-
+        var placeholder =  ' . ($this->haveQuickSearchPlaceholder ? "'Search ' + title" : "''") . ";
         var totalTh = jQuery('#" . $this->id . " thead th').length;
         var input = '';
         var haveCheckbox = " . ($this->checkbox ? '1' : '0') . ';
@@ -349,7 +349,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                         input.attr('class', 'data_table-quick_search');
 
                         input.attr('transforms', transforms);
-                        input.attr('placeholder', 'Search ' + title );
+                        input.attr('placeholder', placeholder );
                     }
                     if(searchType=='select') {
                         input = jQuery('<select>');
@@ -380,7 +380,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln("table.children('thead').append(quick_search);")->br()
                 ->decIndent()
                 ->appendln('}')->br()
-                ->appendln('var dttable_quick_search = ' . ($this->quick_search ? '1' : '0') . ';')->br()
+                ->appendln('var dttable_quick_search = ' . ($this->quickSearch ? '1' : '0') . ';')->br()
                 ->appendln('if (dttable_quick_search == "1") { buildFilters_' . $this->id . '(); }');
             if ($this->customSearchSelector != null) {
                 $js->appendln("
