@@ -114,7 +114,9 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
         // First we will try to load the user using the identifier in the session if
         // one exists. Otherwise we will check for a "remember me" cookie in this
         // request, and if one exists, attempt to retrieve the user using that.
-        if (!is_null($id) && $this->user = $this->provider->retrieveByObject($id)) {
+        if (!is_null($id)
+            && $this->user = (is_object($id) ? $this->provider->retrieveByObject($id) : $this->provider->retrieveById($id))
+        ) {
             $this->fireAuthenticatedEvent($this->user);
         }
 
@@ -373,7 +375,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
      * @param mixed $id
      * @param bool  $remember
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|false
+     * @return \CAuth_AuthenticatableInterface|false
      */
     public function loginUsingId($id, $remember = false) {
         if (!is_null($user = $this->provider->retrieveById($id))) {
