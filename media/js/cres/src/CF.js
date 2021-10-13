@@ -101,7 +101,7 @@ export default class CF {
                         }
                     };
                 }
-                this.body.appendChild(el);
+                this.document.body.appendChild(el);
             }
         } else if (typeof (callback) === 'function') {
             callback();
