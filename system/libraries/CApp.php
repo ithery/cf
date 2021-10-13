@@ -8,18 +8,18 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @see CRenderable
  * @see CElement
  *
- * @method CElement_Component_Form        addForm($id=null)
- * @method CElement_Element_Div           addDiv($id=null)
- * @method CElement_Template              addTemplate($id=null)
- * @method CElement_Component_DataTable   addTable($id=null)
- * @method CElement_Component_Widget      addWidget($id=null)
- * @method CElement_List_TabList          addTabList($id=null)
- * @method CElement_List_ActionList       addActionList($id=null)
- * @method CElement_Component_FileManager addFileManager($id=null)
- * @method CElement_Component_Alert       addAlert($id=null)
- * @method CElement_Element_Pre           addPre($id=null)
  * @method CElement_Component_Action      addAction($id=null)
+ * @method CElement_List_ActionList       addActionList($id=null)
+ * @method CElement_Component_Alert       addAlert($id=null)
+ * @method CElement_Element_Div           addDiv($id=null)
+ * @method CElement_Component_FileManager addFileManager($id=null)
+ * @method CElement_Component_Form        addForm($id=null)
+ * @method CElement_Element_Pre           addPre($id=null)
+ * @method CElement_Component_DataTable   addTable($id=null)
+ * @method CElement_List_TabList          addTabList($id=null)
+ * @method CElement_Template              addTemplate($id=null)
  * @method CElement_View                  addView($view = null, $data = null, $id = null)
+ * @method CElement_Component_Widget      addWidget($id=null)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
     use CTrait_Compat_App,
@@ -36,6 +36,17 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Concern_AuthTrait,
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
+
+    public static $instance = null;
+
+    protected $renderer;
+
+    protected $data = [];
+
+    /**
+     * @var CApp_Element
+     */
+    protected $element;
 
     private $content = '';
 
@@ -55,8 +66,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     private $resend = false;
 
-    public static $instance = null;
-
     private $additional_head = '';
 
     private $ajaxData = [];
@@ -69,14 +78,64 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     private static $haveScrollToTop = null;
 
-    protected $renderer;
+    public function __construct($domain = null) {
+        $this->element = new CApp_Element();
 
-    protected $data = [];
+        //we load another configuration for this app
+        //org configuration
+        if (strlen(CF::orgCode()) > 0) {
+            $orgBootFile = DOCROOT . 'application' . DS . $this->code() . DS . CF::orgCode() . DS . CF::orgCode() . EXT;
+            if (file_exists($orgBootFile)) {
+                include $orgBootFile;
+            }
+        }
+
+        $appBootFile = DOCROOT . 'application' . DS . $this->code() . DS . $this->code() . EXT;
+
+        if (file_exists($appBootFile)) {
+            include $appBootFile;
+        }
+
+        if (ccfg::get('set_timezone')) {
+            $timezone = ccfg::get('default_timezone');
+
+            date_default_timezone_set($timezone);
+        }
+
+        $this->id = 'capp';
+        //check login
+
+        if (ccfg::get('update_last_request')) {
+            $user = $this->user();
+            if ($user != null) {
+                if (!is_array($user) && is_object($user)) {
+                    //update last request
+                    $db = $this->db();
+                    $db->update('users', ['last_request' => date('Y-m-d H:i:s')], ['user_id' => $user->user_id]);
+                }
+            }
+        }
+    }
 
     /**
-     * @var CApp_Element
+     * @return void
      */
-    protected $element;
+    public function __destruct() {
+        if (function_exists('gc_collect_cycles')) {
+            gc_collect_cycles();
+        }
+    }
+
+    public function __call($method, $parameters) {
+        if (method_exists($this->element, $method)) {
+            return call_user_func_array([$this->element, $method], $parameters);
+        }
+        if ($this->element->hasMacro($method)) {
+            return call_user_func_array([$this->element, $method], $parameters);
+        }
+
+        throw new Exception('undefined method on CApp: ' . $method);
+    }
 
     /**
      * @param string $domain
@@ -120,6 +179,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
      */
     public static function model($modelName) {
         $modelClass = 'CApp_Model_' . $modelName;
+
         return new $modelClass();
     }
 
@@ -133,7 +193,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function isAjax() {
-        return (isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
+        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
     public static function auth() {
@@ -178,6 +238,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         } else {
             $this->ajaxData[$key] = $value;
         }
+
         return $this;
     }
 
@@ -200,46 +261,8 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     public function validate(array $data, array $rules, array $messages = [], array $customAttributes = []) {
         $validation = CValidation::factory();
+
         return $validation->validate($data, $rules, $messages, $customAttributes);
-    }
-
-    public function __construct($domain = null) {
-        $this->element = new CApp_Element();
-
-        //we load another configuration for this app
-        //org configuration
-        if (strlen(CF::orgCode()) > 0) {
-            $orgBootFile = DOCROOT . 'application' . DS . $this->code() . DS . CF::orgCode() . DS . CF::orgCode() . EXT;
-            if (file_exists($orgBootFile)) {
-                include $orgBootFile;
-            }
-        }
-
-        $appBootFile = DOCROOT . 'application' . DS . $this->code() . DS . $this->code() . EXT;
-
-        if (file_exists($appBootFile)) {
-            include $appBootFile;
-        }
-
-        if (ccfg::get('set_timezone')) {
-            $timezone = ccfg::get('default_timezone');
-
-            date_default_timezone_set($timezone);
-        }
-
-        $this->id = 'capp';
-        //check login
-
-        if (ccfg::get('update_last_request')) {
-            $user = $this->user();
-            if ($user != null) {
-                if (!is_array($user) && is_object($user)) {
-                    //update last request
-                    $db = $this->db();
-                    $db->update('users', ['last_request' => date('Y-m-d H:i:s')], ['user_id' => $user->user_id]);
-                }
-            }
-        }
     }
 
     public function appId() {
@@ -304,26 +327,31 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if (!isset(self::$instance[$domain])) {
             self::$instance[$domain] = new CApp($domain);
         }
+
         return self::$instance[$domain];
     }
 
     public function signup($bool = true) {
         $this->signup = $bool;
+
         return $this;
     }
 
     public function resend($bool = true) {
         $this->resend = $bool;
+
         return $this;
     }
 
     public function activation($bool = true) {
         $this->activation = $bool;
+
         return $this;
     }
 
     public function addCustomJs($js) {
         $this->custom_js .= $js;
+
         return $this;
     }
 
@@ -363,6 +391,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     public function reset() {
         $this->rendered = false;
         $this->element->clear();
+
         return $this;
     }
 
@@ -381,12 +410,14 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     public function setCustomData($key, $value = null) {
         if (is_array($key)) {
             $this->custom_data = $key;
+
             return $this;
         }
         if (!is_array($this->custom_data)) {
             $this->custom_data = [];
         }
         $this->custom_data[$key] = $value;
+
         return $this;
     }
 
@@ -394,6 +425,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if ($key === null) {
             return $this->custom_data;
         }
+
         return carr::get($this->custom_data, $key, $default);
     }
 
@@ -444,6 +476,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $data['message'] = $messageOrig;
         $data['ajaxData'] = $this->ajaxData;
         $data['html'] = mb_convert_encoding($data['html'], 'UTF-8', 'UTF-8');
+
         return $data;
     }
 
@@ -471,15 +504,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return $this->toJson($options);
     }
 
-    /**
-     * @return void
-     */
-    public function __destruct() {
-        if (function_exists('gc_collect_cycles')) {
-            gc_collect_cycles();
-        }
-    }
-
     public static function sendExceptionEmail(Exception $exception, $email = null) {
         $ignoredExceptions = [
             CDaemon_Exception_AlreadyRunningException::class,
@@ -491,6 +515,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
             foreach ($ignoredExceptions as $ignoredException) {
                 if (is_subclass_of($exception, $ignoredException) || get_class($exception) === $ignoredException) {
                     $ignored = true;
+
                     break;
                 }
             }
@@ -499,17 +524,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
                 $html = CApp_ErrorHandler::sendExceptionEmail($exception, $email);
             }
         }
-    }
-
-    public function __call($method, $parameters) {
-        if (method_exists($this->element, $method)) {
-            return call_user_func_array([$this->element, $method], $parameters);
-        }
-        if ($this->element->hasMacro($method)) {
-            return call_user_func_array([$this->element, $method], $parameters);
-        }
-
-        throw new Exception('undefined method on CApp: ' . $method);
     }
 
     /**
@@ -521,6 +535,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if (c::request()->ajax()) {
             return c::response()->json($this);
         }
+
         return CHTTP::createResponse($this->render());
     }
 
@@ -540,11 +555,13 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         if (static::$haveScrollToTop === null) {
             static::$haveScrollToTop = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
         }
+
         return static::$haveScrollToTop;
     }
 
     public function setData($key, $value) {
         $this->data[$key] = $value;
+
         return $this;
     }
 }
