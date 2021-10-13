@@ -38,6 +38,7 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+            'sessionName' => 'user'
         ],
 
         'api' => [

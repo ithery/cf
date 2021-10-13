@@ -111,11 +111,10 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
         }
 
         $id = $this->session->get($this->getName());
-
         // First we will try to load the user using the identifier in the session if
         // one exists. Otherwise we will check for a "remember me" cookie in this
         // request, and if one exists, attempt to retrieve the user using that.
-        if (!is_null($id) && $this->user = $this->provider->retrieveById($id)) {
+        if (!is_null($id) && $this->user = $this->provider->retrieveByObject($id)) {
             $this->fireAuthenticatedEvent($this->user);
         }
 
@@ -707,7 +706,10 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
      * @return string
      */
     public function getName() {
-        return 'login_' . $this->name . '_' . sha1(static::class);
+        $sessionName = CF::config('auth.guards.' . $this->name . '.sessionName', 'login_' . $this->name . '_' . sha1(static::class));
+        // cdbg::varDump($sessionName);
+        // die;
+        return $sessionName;
     }
 
     /**

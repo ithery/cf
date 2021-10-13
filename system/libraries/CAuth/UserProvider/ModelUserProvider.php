@@ -44,6 +44,21 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     }
 
     /**
+     * Retrieve a user by their unique identifier.
+     *
+     * @param mixed $identifier
+     *
+     * @return CAuth_AuthenticatableInterface|null
+     */
+    public function retrieveByObject($identifier) {
+        $model = $this->createModel();
+        $identifierName = $model->getAuthIdentifierName();
+        return $this->newModelQuery($model)
+            ->where($identifierName, $identifier->$identifierName)
+            ->first();
+    }
+
+    /**
      * Retrieve a user by their unique identifier and "remember me" token.
      *
      * @param mixed  $identifier
