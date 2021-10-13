@@ -113,7 +113,7 @@ return $config->setRules([
     'phpdoc_separation' => true,
     'phpdoc_var_annotation_correct_order' => true,
     'phpdoc_single_line_var_spacing' => true,
-    'ordered_class_elements' => true,
+    // 'ordered_class_elements' => true,
     // 'phpdoc_summary' => true,
     // 'phpdoc_to_comment' => true,
     'phpdoc_trim' => true,
