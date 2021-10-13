@@ -97,7 +97,7 @@ trait CApp_Trait_Base {
      */
     public static function orgCode($orgId = null) {
         $org = self::org($orgId);
-        return cobj::get($org, 'code');
+        return c::get($org, 'code');
     }
 
     /**
@@ -119,7 +119,7 @@ trait CApp_Trait_Base {
      */
     public static function orgName($orgId = null) {
         $org = self::org($orgId);
-        return cobj::get($org, 'name');
+        return c::get($org, 'name');
     }
 
     /**
@@ -189,7 +189,7 @@ trait CApp_Trait_Base {
      * @return int
      */
     public static function userId() {
-        return cobj::get(self::user(), 'user_id');
+        return c::get(self::user(), 'user_id');
     }
 
     /**
