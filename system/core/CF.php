@@ -736,7 +736,7 @@ final class CF {
     /**
      * To get cliDomain
      *
-     * @return void
+     * @return string
      */
     public static function cliDomain() {
         $domain = null;
