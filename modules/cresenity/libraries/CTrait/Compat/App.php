@@ -173,6 +173,7 @@ trait CTrait_Compat_App {
             }
             $this->_admin = $admin;
         }
+
         return $this->_admin;
     }
 
@@ -188,6 +189,7 @@ trait CTrait_Compat_App {
             }
             $this->_member = $member;
         }
+
         return $this->_member;
     }
 

@@ -1,18 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 3:29:11 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 3:29:11 PM
  */
 use Ramsey\Uuid\Uuid as UUID;
 
 class CTracker_Repository_Cookie extends CTracker_AbstractRepository {
-
     /**
-     *
      * @var CCookie_Jar
      */
     private $cookieJar;
@@ -29,7 +28,7 @@ class CTracker_Repository_Cookie extends CTracker_AbstractRepository {
             return;
         }
         $cookieUuid = CTracker::populator()->get('cookie.uuid');
+
         return $this->findOrCreate(['uuid' => $cookieUuid]);
     }
-
 }
