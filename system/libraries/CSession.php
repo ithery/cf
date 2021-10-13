@@ -497,7 +497,7 @@ class CSession {
      * @return mixed
      */
     public function remove($key) {
-        return $this->pull($key);
+        return $this->forget($key);
     }
 
     public function all() {

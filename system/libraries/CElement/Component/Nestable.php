@@ -197,7 +197,7 @@ class CElement_Component_Nestable extends CElement_Component {
                     }
                     $this->rowActionList->regenerateId(true);
                     $this->rowActionList->apply('jsparam', $jsparam);
-                    $this->rowActionList->apply('set_handler_url_param', $jsparam);
+                    $this->rowActionList->apply('setHandlerParam', $jsparam);
 
                     if (($this->filterActionCallbackFunc) != null) {
                         $actions = $this->rowActionList->childs();

@@ -42,7 +42,6 @@ $httpReferer = carr::get($_SERVER, 'HTTP_REFERER', '');
         </style>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <title><?php echo $error ?></title>
-        <base href="http://php.net/" />
     </head>
     <body>
 
