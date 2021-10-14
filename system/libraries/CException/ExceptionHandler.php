@@ -2,18 +2,18 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+use Whoops\Run as Whoops;
+use Whoops\Handler\HandlerInterface;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Console\Application as ConsoleApplication;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface as ExceptionHttpExceptionInterface;
-use Whoops\Handler\HandlerInterface;
-use Whoops\Run as Whoops;
 
 /**
  * @author Hery Kurniawans
@@ -78,7 +78,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     /**
      * Create a new exception handler instance.
      *
-s    * @return void
+     * s    * @return void
      */
     public function __construct() {
         $this->container = c::container();
@@ -89,9 +89,9 @@ s    * @return void
      *
      * @param \Exception $e
      *
-     * @return mixed
-     *
      * @throws \Exception
+     *
+     * @return mixed
      */
     public function report($e) {
         if ($this->shouldntReport($e)) {
@@ -141,6 +141,7 @@ s    * @return void
      */
     protected function shouldntReport($e) {
         $dontReport = array_merge($this->dontReport, $this->internalDontReport);
+
         return !is_null(carr::first($dontReport, function ($type) use ($e) {
             return $e instanceof $type;
         }));
@@ -176,7 +177,8 @@ s    * @return void
     public function render($request, $e) {
         if (method_exists($e, 'render') && $response = $e->render($request)) {
             return c::router()->toResponse($request, $response);
-        } elseif ($e instanceof CInterface_Responsable) {
+        }
+        if ($e instanceof CInterface_Responsable) {
             return $e->toResponse($request);
         }
 
@@ -211,9 +213,11 @@ s    * @return void
 
         if ($e instanceof CHTTP_Exception_ResponseException) {
             return $e->getResponse();
-        } elseif ($e instanceof CAuth_Exception_AuthenticationException) {
+        }
+        if ($e instanceof CAuth_Exception_AuthenticationException) {
             return $this->unauthenticated($request, $e);
-        } elseif ($e instanceof CValidation_Exception) {
+        }
+        if ($e instanceof CValidation_Exception) {
             return $this->convertValidationExceptionToResponse($e, $request);
         }
 
@@ -230,13 +234,14 @@ s    * @return void
     protected function prepareException($e) {
         if ($e instanceof CModel_Exception_ModelNotFound) {
             $e = new CHTTP_Exception_NotFoundHttpException($e->getMessage(), $e);
-        } elseif ($e instanceof AuthorizationException) {
+        } elseif ($e instanceof CAuth_Exception_AuthorizationException) {
             $e = new AccessDeniedHttpException($e->getMessage(), $e);
-        } elseif ($e instanceof TokenMismatchException) {
+        } elseif ($e instanceof CSession_Exception_TokenMismatchException) {
             $e = new CHTTP_Exception_HttpException(419, $e->getMessage(), $e);
         } elseif ($e instanceof SuspiciousOperationException) {
             $e = new CHTTP_Exception_NotFoundHttpException('Bad hostname provided.', $e);
         }
+
         return $e;
     }
 
@@ -264,6 +269,7 @@ s    * @return void
         if ($e->response) {
             return $e->response;
         }
+
         return $request->expectsJson() ? $this->invalidJson($request, $e) : $this->invalid($request, $e);
     }
 
@@ -277,8 +283,8 @@ s    * @return void
      */
     protected function invalid($request, CValidation_Exception $exception) {
         return c::redirect(isset($exception->redirectTo) ? $exception->redirectTo : c::url()->previous())
-                        ->withInput(carr::except($request->input(), $this->dontFlash))
-                        ->withErrors($exception->errors(), $exception->errorBag);
+            ->withInput(carr::except($request->input(), $this->dontFlash))
+            ->withErrors($exception->errors(), $exception->errorBag);
     }
 
     /**
@@ -332,8 +338,8 @@ s    * @return void
     protected function convertExceptionToResponse($e) {
         $response = SymfonyResponse::create(
             $this->renderExceptionContent($e),
-            $this->isHttpException($e) ? $e->getStatusCode() : 500,
-            $this->isHttpException($e) ? $e->getHeaders() : []
+            $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500,
+            $e instanceof HttpExceptionInterface ? $e->getHeaders() : []
         );
 
         return $response;
@@ -364,7 +370,7 @@ s    * @return void
      * @return string
      */
     protected function renderExceptionWithWhoops($e) {
-        return c::tap(new Whoops, function ($whoops) {
+        return c::tap(new Whoops(), function ($whoops) {
             $whoops->appendHandler($this->whoopsHandler());
             $whoops->writeToOutput(false);
             $whoops->allowQuit(false);
@@ -379,8 +385,8 @@ s    * @return void
     protected function whoopsHandler() {
         try {
             return new \Whoops\Handler\PrettyPageHandler();
-        } catch (BindingResolutionException $e) {
-            return (new WhoopsHandler)->forDebug();
+        } catch (CContainer_Exception_BindingResolutionException $e) {
+            return (new CException_WhoopsHandler())->forDebug();
         }
     }
 
@@ -476,8 +482,8 @@ s    * @return void
     protected function prepareJsonResponse($request, $e) {
         return new CHTTP_JsonResponse(
             $this->convertExceptionToArray($e),
-            $this->isHttpException($e) ? $e->getStatusCode() : 500,
-            $this->isHttpException($e) ? $e->getHeaders() : [],
+            $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500,
+            $e instanceof HttpExceptionInterface ? $e->getHeaders() : [],
             JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
         );
     }
@@ -505,6 +511,7 @@ s    * @return void
                 'trace' => $trace,
             ];
         }
+
         return $result;
     }
 
@@ -526,7 +533,7 @@ s    * @return void
      * @return void
      */
     public function renderForConsole($output, $e) {
-        (new ConsoleApplication)->renderException($e, $output);
+        (new ConsoleApplication())->renderException($e, $output);
     }
 
     /**
