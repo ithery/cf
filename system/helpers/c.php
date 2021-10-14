@@ -5,11 +5,11 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Common helper class.
  */
-use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
-use Symfony\Component\VarDumper\VarDumper;
+use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 //@codingStandardsIgnoreStart
 class c {
@@ -22,6 +22,7 @@ class c {
      */
     public static function fixPath($str) {
         $str = str_replace(['/', '\\'], DS, $str);
+
         return rtrim($str, DS) . DS;
     }
 
@@ -29,6 +30,7 @@ class c {
         if ($b == 0) {
             return $a;
         }
+
         return ($a >> $b) & ~(1 << (8 * PHP_INT_SIZE - 1) >> ($b - 1));
     }
 
@@ -46,12 +48,14 @@ class c {
         if (\is_array($value)) {
             return 2 === \count($value) && [0, 1] === \array_keys($value) ? static::baseMatchesProperty($value[0], $value[1]) : static::baseMatches($value);
         }
+
         return static::property($value);
     }
 
     public static function baseMatchesProperty($property, $source) {
         return function ($value, $index, $collection) use ($property, $source) {
             $propertyVal = static::property($property);
+
             return static::isEqual($propertyVal($value, $index, $collection), $source);
         };
     }
@@ -68,8 +72,10 @@ class c {
                         return false;
                     }
                 }
+
                 return true;
             }
+
             return false;
         };
     }
@@ -77,8 +83,10 @@ class c {
     public static function isEqual($value, $other) {
         $factory = CComparator::createFactory();
         $comparator = $factory->getComparatorFor($value, $other);
+
         try {
             $comparator->assertEquals($value, $other);
+
             return true;
         } catch (CComparator_Exception_ComparisonFailureException $failure) {
             return false;
@@ -110,6 +118,7 @@ class c {
         $propertyAccess = PropertyAccess::createPropertyAccessorBuilder()
             ->disableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
+
         return function ($value, $index = 0, $collection = []) use ($path, $propertyAccess) {
             $path = \implode('.', (array) $path);
             if (\is_array($value)) {
@@ -119,13 +128,15 @@ class c {
                         $propPath = static::property($path);
                         $value = $propPath($value, $index, $collection);
                     }
+
                     return $value;
                 }
 
                 if (\is_string($path) && $path[0] !== '[' && $path[strlen($path) - 1] !== ']') {
-                    $path = "[$path]";
+                    $path = "[${path}]";
                 }
             }
+
             try {
                 return $propertyAccess->getValue($value, $path);
             } catch (NoSuchPropertyException $e) {
@@ -144,6 +155,7 @@ class c {
             $property = static::property(static::toKey($path[$index++]));
             $object = $property($object);
         }
+
         return ($index > 0 && $index === $length) ? $object : $defaultValue;
     }
 
@@ -159,6 +171,7 @@ class c {
             return $value;
         }
         $result = (string) $value;
+
         return ('0' === $result && (1 / $value) === -INF) ? '-0' : $result;
     }
 
@@ -166,6 +179,7 @@ class c {
         if (\is_array($value)) {
             return $value;
         }
+
         return static::isKey($value, $object) ? [$value] : static::stringToPath((string) $value);
     }
 
@@ -188,6 +202,7 @@ class c {
             return true;
         }
         $forceObject = ((object) $object);
+
         return \preg_match($reIsPlainProp, $value) || !\preg_match($reIsDeepProp, $value) || (null !== $object && isset($forceObject->$value));
     }
 
@@ -205,8 +220,10 @@ class c {
             foreach ($matches as $match) {
                 $result[] = isset($match[1]) ? $match[1] : $match[0];
             }
+
             return $result;
         });
+
         return $memoizeCapped(...$args);
     }
 
@@ -216,8 +233,10 @@ class c {
             if ($this->cache->getSize() === $MaxMemoizeSize) {
                 $this->cache->clear();
             }
+
             return $key;
         });
+
         return $result;
     }
 
@@ -263,6 +282,7 @@ class c {
     public static function memoize(callable $func, callable $resolver = null) {
         $memoized = CBase::createMemoizeResolver($func, $resolver);
         $memoized->cache = CBase::createMapCache();
+
         return $memoized;
     }
 
@@ -273,6 +293,7 @@ class c {
                 return $length;
             }
         }
+
         return -1;
     }
 
@@ -350,6 +371,7 @@ class c {
 
         $basename = basename(str_replace('\\', '/', $class));
         $basename = carr::last(explode('_', $basename));
+
         return $basename;
     }
 
@@ -505,6 +527,7 @@ class c {
         }
         $mt = microtime();
         $s = floor($mt);
+
         return [$s, ($mt - $s) * 1e+6];
     }
 
@@ -531,7 +554,8 @@ class c {
     public static function optional($value = null, callable $callback = null) {
         if (is_null($callback)) {
             return new COptional($value);
-        } elseif (!is_null($value)) {
+        }
+        if (!is_null($value)) {
             return $callback($value);
         }
     }
@@ -576,9 +600,9 @@ class c {
      * @param \Throwable|string $exception
      * @param array             ...$parameters
      *
-     * @return mixed
-     *
      * @throws \Throwable
+     *
+     * @return mixed
      */
     public static function throwUnless($condition, $exception, ...$parameters) {
         if (!$condition) {
@@ -595,9 +619,9 @@ class c {
      * @param \Throwable|string $exception
      * @param array             ...$parameters
      *
-     * @return mixed
-     *
      * @throws \Throwable
+     *
+     * @return mixed
      */
     public static function throwIf($condition, $exception, ...$parameters) {
         if ($condition) {
@@ -731,10 +755,10 @@ class c {
      * @param string                                     $message
      * @param array                                      $headers
      *
-     * @return void
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
+     * @return void
      */
     public static function abortUnless($boolean, $code, $message = '', array $headers = []) {
         if (!$boolean) {
@@ -757,7 +781,8 @@ class c {
     public static function abort($code, $message = '', array $headers = []) {
         if ($code instanceof CHTTP_Response) {
             throw new CHttp_Exception_ResponseException($code);
-        } elseif ($code instanceof CInterface_Responsable) {
+        }
+        if ($code instanceof CInterface_Responsable) {
             throw new CHttp_Exception_ResponseException($code->toResponse(CHTTP::request()));
         }
 
@@ -776,10 +801,10 @@ class c {
      * @param string                                     $message
      * @param array                                      $headers
      *
-     * @return void
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
+     * @return void
      */
     public static function abortIf($boolean, $code, $message = '', array $headers = []) {
         if ($boolean) {
@@ -965,9 +990,9 @@ class c {
      * @param int           $sleep
      * @param callable|null $when
      *
-     * @return mixed
-     *
      * @throws \Exception
+     *
+     * @return mixed
      */
     public static function retry($times, $callback, $sleep = 0, $when = null) {
         $attempts = 0;
@@ -1042,9 +1067,9 @@ class c {
     /**
      * Get the CSRF token value.
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     public static function csrfToken() {
         $session = CSession::instance();
@@ -1100,7 +1125,7 @@ class c {
     }
 
     public static function userAgent() {
-        return (!empty($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '');
+        return !empty($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '';
     }
 
     /**
@@ -1264,6 +1289,7 @@ class c {
         if ($a == $b) {
             return 0;
         }
+
         return $a > $b ? 1 : -1;
     }
 
@@ -1342,11 +1368,16 @@ class c {
         if ($key !== null) {
             return static::manager()->theme()->getData($key, $default);
         }
+
         return static::manager()->theme();
     }
 
     public static function locale() {
         return str_replace('_', '-', CF::getLocale());
+    }
+
+    public static function isIterable($obj) {
+        return is_array($obj) || (is_object($obj) && ($obj instanceof \Traversable));
     }
 }
 
