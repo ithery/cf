@@ -11,9 +11,35 @@ defined('SYSPATH') or die('No direct access allowed.');
 trait CApp_Concern_AuthTrait {
     private $role = null;
 
-    private $user = null;
+    private $guard = null;
 
     private $loginRequired = true;
+
+    /**
+     * @param string|null $guard
+     *
+     * @return CApp_Auth
+     */
+    public function auth($guard = null) {
+        if ($guard === null) {
+            if ($this->guard === null) {
+                $guard = CF::config('app.auth.guard');
+            }
+        }
+
+        return CApp_Auth::instance($guard);
+    }
+
+    /**
+     * Get Auth Instance
+     *
+     * @param null|mixed $guard
+     *
+     * @return CApp_Auth;
+     */
+    public function setAuth($guard = null) {
+        return $this->guard = $guard;
+    }
 
     public function isUserLogin() {
         return $this->user() != null;
@@ -29,25 +55,7 @@ trait CApp_Concern_AuthTrait {
     }
 
     public function user() {
-        if ($this->user == null) {
-            $session = CSession::instance();
-            $user = $session->get('user');
-
-            if ($user) {
-                $modelClass = CF::config('app.model.user');
-                $model = new $modelClass;
-                $keyName = $model->getKeyName();
-                $keyValue = c::get($user, $keyName);
-                $user = $model->find($keyValue);
-            }
-
-            if (!$user) {
-                $user = null;
-            }
-
-            $this->user = $user;
-        }
-        return $this->user;
+        return $this->auth()->user();
     }
 
     public function role() {

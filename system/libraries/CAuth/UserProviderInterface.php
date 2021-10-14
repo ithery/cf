@@ -8,7 +8,6 @@
  * @see CAuth_UserProvider_DatabaseUserProvider
  * @see CAuth_UserProvider_ModelUserProvider
  */
-
 interface CAuth_UserProviderInterface {
     /**
      * Retrieve a user by their unique identifier.
@@ -18,6 +17,15 @@ interface CAuth_UserProviderInterface {
      * @return CAuth_AuthenticatableInterface|null
      */
     public function retrieveById($identifier);
+
+    /**
+     * Retrieve a user by stdclass object
+     *
+     * @param object|stdclass $object
+     *
+     * @return CAuth_AuthenticatableInterface|null
+     */
+    public function retrieveByObject($object);
 
     /**
      * Retrieve a user by their unique identifier and "remember me" token.

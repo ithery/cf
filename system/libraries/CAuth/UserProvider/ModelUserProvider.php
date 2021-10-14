@@ -4,7 +4,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     /**
      * The hasher implementation.
      *
-     * @var CCrypt_Hasher
+     * @var CCrypt_HasherInterface
      */
     protected $hasher;
 
@@ -41,6 +41,20 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
         return $this->newModelQuery($model)
             ->where($model->getAuthIdentifierName(), $identifier)
             ->first();
+    }
+
+    /**
+     * Retrieve a user by stdclass object
+     *
+     * @param mixed $object
+     *
+     * @return CAuth_AuthenticatableInterface|null
+     */
+    public function retrieveByObject($object) {
+        $identifierName = $this->createModel()->getAuthIdentifierName();
+        $id = $object->$identifierName;
+
+        return $this->retrieveById($id);
     }
 
     /**
@@ -178,7 +192,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     /**
      * Gets the hasher implementation.
      *
-     * @return \Illuminate\Contracts\Hashing\Hasher
+     * @return \CCrypt_HasherInterface
      */
     public function getHasher() {
         return $this->hasher;

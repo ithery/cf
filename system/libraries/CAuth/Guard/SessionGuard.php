@@ -111,11 +111,12 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
         }
 
         $id = $this->session->get($this->getName());
-
         // First we will try to load the user using the identifier in the session if
         // one exists. Otherwise we will check for a "remember me" cookie in this
         // request, and if one exists, attempt to retrieve the user using that.
-        if (!is_null($id) && $this->user = $this->provider->retrieveById($id)) {
+        if (!is_null($id)
+            && $this->user = (is_object($id) ? $this->provider->retrieveByObject($id) : $this->provider->retrieveById($id))
+        ) {
             $this->fireAuthenticatedEvent($this->user);
         }
 
@@ -126,7 +127,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
             $this->user = $this->userFromRecaller($recaller);
 
             if ($this->user) {
-                $this->updateSession($this->user->getAuthIdentifier());
+                $this->updateSession($this->user);
 
                 $this->fireLoginEvent($this->user, true);
             }
@@ -156,7 +157,6 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
             $recaller->id(),
             $recaller->token()
         ));
-
         return $user;
     }
 
@@ -375,7 +375,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
      * @param mixed $id
      * @param bool  $remember
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|false
+     * @return \CAuth_AuthenticatableInterface|false
      */
     public function loginUsingId($id, $remember = false) {
         if (!is_null($user = $this->provider->retrieveById($id))) {
@@ -404,7 +404,8 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
         if ($remember) {
             $this->ensureRememberTokenIsSet($user);
 
-            $this->queueRecallerCookie($user);
+            //$this->queueRecallerCookie($user);
+            setcookie($this->getRecallerName(), $user->getAuthIdentifier() . '|' . $user->getRememberToken() . '|' . $user->getAuthPassword(), time() + 60 * 60 * 24 * 365 * 100, '/');
         }
 
         // If we have an event dispatcher instance set we will fire an event so that
@@ -473,7 +474,6 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
      */
     public function logout() {
         $user = $this->user();
-
         $this->clearUserDataFromStorage();
 
         if (!is_null($this->user) && !empty($user->getRememberToken())) {
@@ -529,7 +529,6 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
      */
     protected function clearUserDataFromStorage() {
         $this->session->remove($this->getName());
-
         if (!is_null($this->recaller())) {
             $this->getCookieJar()->queue($this->getCookieJar()
                 ->forget($this->getRecallerName()));
@@ -709,7 +708,10 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
      * @return string
      */
     public function getName() {
-        return 'login_' . $this->name . '_' . sha1(static::class);
+        $sessionName = CF::config('auth.guards.' . $this->name . '.sessionName', 'login_' . $this->name . '_' . sha1(static::class));
+        // cdbg::varDump($sessionName);
+        // die;
+        return $sessionName;
     }
 
     /**
@@ -759,7 +761,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
     /**
      * Get the event dispatcher instance.
      *
-     * @return \Illuminate\Contracts\Events\Dispatcher
+     * @return \CEvent_DispatcherInterface
      */
     public function getDispatcher() {
         return $this->events;
@@ -779,7 +781,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
     /**
      * Get the session store used by the guard.
      *
-     * @return \Illuminate\Contracts\Session\Session
+     * @return \CSession
      */
     public function getSession() {
         return $this->session;
@@ -788,7 +790,7 @@ class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_Su
     /**
      * Return the currently cached user.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return CAuth_AuthenticatableInterface|null
      */
     public function getUser() {
         return $this->user;
