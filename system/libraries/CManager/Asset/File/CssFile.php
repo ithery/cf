@@ -40,7 +40,7 @@ class CManager_Asset_File_CssFile extends CManager_Asset_FileAbstract {
             }
         }
         $dirs = CF::getDirs('media');
-
+        $dirs = array_merge($this->mediaPaths, $dirs);
         foreach ($dirs as $dir) {
             $path = $dir . 'css' . DS . $file;
 
