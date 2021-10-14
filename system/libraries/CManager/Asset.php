@@ -116,6 +116,7 @@ class CManager_Asset {
         $runTimeCss = $this->runTimeContainer->getAllCssFileUrl();
         $moduleThemeCss = $this->module->getThemeContainer()->getAllCssFileUrl();
         $moduleRunTimeCss = $this->module->getRunTimeContainer()->getAllCssFileUrl();
+
         return array_merge($moduleThemeCss, $themeCss, $moduleRunTimeCss, $runTimeCss);
     }
 
@@ -132,6 +133,7 @@ class CManager_Asset {
 
     public function varJs() {
         $varJs = 'window.capp = ' . json_encode(CApp::variables()) . ';';
+
         return $varJs;
     }
 
@@ -197,6 +199,7 @@ class CManager_Asset {
             }
         }
         $jsBefore = $this->varJs();
+
         return $jsBefore . $this->wrapJs($jsOpen . $js . $jsClose);
     }
 
@@ -280,15 +283,19 @@ class CManager_Asset {
 
                                 $script .= '<link href="' . $urlCssFile . '" rel="stylesheet" />' . PHP_EOL;
                             }
+
                             break;
                         case self::TYPE_JS:
                             $script .= '<script>' . $scriptValue . '</script>' . PHP_EOL;
+
                             break;
                         case self::TYPE_CSS:
                             $script .= '<style>' . $scriptValue . '</style>' . PHP_EOL;
+
                             break;
                         case self::TYPE_PLAIN:
                             $script .= $scriptValue . PHP_EOL;
+
                             break;
                     }
                 }
@@ -302,6 +309,7 @@ class CManager_Asset {
         $options = [];
         $options['type'] = 'css';
         $compiler = new CManager_Asset_Compiler($files, $options);
+
         return $compiler->compile();
     }
 
@@ -309,6 +317,7 @@ class CManager_Asset {
         $options = [];
         $options['type'] = 'js';
         $compiler = new CManager_Asset_Compiler($files, $options);
+
         return $compiler->compile();
     }
 }
