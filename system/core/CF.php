@@ -111,8 +111,10 @@ final class CF {
     public static function createDomain($domain, array $domainData) {
         if (!static::domainExists($domain)) {
             CFData::set($domain, $domainData, 'domain');
+
             return true;
         }
+
         return false;
     }
 
@@ -283,7 +285,6 @@ final class CF {
         $method = carr::get($routerData, 'method');
         $arguments = carr::get($routerData, 'arguments');
 
-
         if ($controller instanceof \Symfony\Component\HttpFoundation\Response) {
             return $controller;
         }
@@ -292,6 +293,7 @@ final class CF {
             require_once $controller_path;
         }
         $class_name = '';
+
         try {
             // Start validation of the controller
             $class_name = str_replace('/', '_', $controller_dir_ucfirst);
@@ -322,6 +324,7 @@ final class CF {
         if (isset($class)) {
             $controller = $class->newInstance();
         }
+
         try {
             // Load the controller method
             $method = $class->getMethod($method);
@@ -385,6 +388,7 @@ final class CF {
                 return $path;
             }
         }
+
         return null;
     }
 
@@ -403,6 +407,7 @@ final class CF {
                 $dirs[] = $path;
             }
         }
+
         return $dirs;
     }
 
@@ -443,6 +448,7 @@ final class CF {
         if (count($files) > 0) {
             return $files[0];
         }
+
         return null;
     }
 
@@ -462,25 +468,23 @@ final class CF {
         if (!isset(self::$paths[$domain]) || $force_reload) {
             //we try to search all paths for this domain
             $paths = [];
-            $theme = CF::theme($domain);
-            $org_code = CF::orgCode($domain);
-            $app_code = CF::appCode($domain);
+            $orgCode = CF::orgCode($domain);
+            $appCode = CF::appCode($domain);
             $sharedAppCode = CF::getSharedApp($domain);
 
             $modules = CF::modules($domain);
             //when this domain is org
-            if (strlen($org_code) > 0) {
-                //add theme path if theme exists
-                $paths[] = APPPATH . $app_code . DS . $org_code . DS;
+            if (strlen($orgCode) > 0) {
+                $paths[] = APPPATH . $appCode . DS . $orgCode . DS;
             }
-            if (strlen($app_code) > 0) {
+            if (strlen($appCode) > 0) {
                 //add theme path if theme exists
-                $paths[] = APPPATH . $app_code . DS . 'default' . DS;
+                $paths[] = APPPATH . $appCode . DS . 'default' . DS;
             }
             foreach ($sharedAppCode as $key => $value) {
-                if (strlen($org_code) > 0) {
+                if (strlen($orgCode) > 0) {
                     //add theme path if theme exists
-                    $paths[] = APPPATH . $value . DS . $org_code . DS;
+                    $paths[] = APPPATH . $value . DS . $orgCode . DS;
                 }
                 $paths[] = APPPATH . $value . DS . 'default' . DS;
             }
@@ -585,6 +589,7 @@ final class CF {
             if ($filename = self::findFile($type, $file)) {
                 require $filename;
                 $class_not_found = true;
+
                 return true;
             } else {
                 $type = 'libraries';
@@ -596,6 +601,7 @@ final class CF {
         if ($filename = self::findFile($type, $file)) {
             require $filename;
             $class_not_found = true;
+
             return true;
         }
 
@@ -629,6 +635,7 @@ final class CF {
 
                     if (class_exists($class) || interface_exists($class)) {
                         $class_not_found = false;
+
                         return true;
                     }
                 }
@@ -643,6 +650,7 @@ final class CF {
 
                         if (class_exists($class) || interface_exists($class)) {
                             $class_not_found = false;
+
                             return true;
                         }
                     }
@@ -654,6 +662,7 @@ final class CF {
                 // Load the class file
                 require $path;
                 $class_not_found = true;
+
                 return true;
             }
 
@@ -669,6 +678,7 @@ final class CF {
 
                         require $path;
                         $class_not_found = true;
+
                         return true;
                     }
                 }
@@ -743,6 +753,7 @@ final class CF {
         if (file_exists(static::CFCLI_CURRENT_DOMAIN_FILE)) {
             $domain = trim(file_get_contents(static::CFCLI_CURRENT_DOMAIN_FILE));
         }
+
         return $domain;
     }
 
@@ -767,6 +778,7 @@ final class CF {
                 }
             }
         }
+
         return $domain;
     }
 
@@ -835,6 +847,7 @@ final class CF {
             if ($required === true) {
                 // If the file is required, throw an exception
                 $lang = static::lang('core.resource_not_found', [':directory' => $directory, ':filename' => $filename]);
+
                 throw new CException($lang);
             } else {
                 // Nothing was found, return FALSE
@@ -911,6 +924,7 @@ final class CF {
                 self::$data[$domain] = CFData::domain($wildcardDomain);
             }
         }
+
         return self::$data[$domain];
     }
 
@@ -923,6 +937,7 @@ final class CF {
      */
     public static function appId($domain = null) {
         $data = self::data($domain);
+
         return isset($data['app_id']) ? $data['app_id'] : null;
     }
 
@@ -935,6 +950,7 @@ final class CF {
      */
     public static function appCode($domain = null) {
         $data = self::data($domain);
+
         return isset($data['app_code']) ? $data['app_code'] : null;
     }
 
@@ -947,6 +963,7 @@ final class CF {
      */
     public static function orgId($domain = null) {
         $data = self::data($domain);
+
         return isset($data['org_id']) ? $data['org_id'] : null;
     }
 
@@ -959,6 +976,7 @@ final class CF {
      */
     public static function orgCode($domain = null) {
         $data = self::data($domain);
+
         return isset($data['org_code']) ? $data['org_code'] : null;
     }
 
@@ -1001,9 +1019,12 @@ final class CF {
      * @param null|mixed $domain
      *
      * @return array
+     *
+     * @deprecated since 1.2
      */
     public static function theme($domain = null) {
         $data = self::data($domain);
+
         return isset($data['theme']) ? $data['theme'] : null;
     }
 
@@ -1016,6 +1037,7 @@ final class CF {
      */
     public static function modules($domain = null) {
         $data = self::data($domain);
+
         return isset($data['modules']) ? $data['modules'] : ['cresenity'];
     }
 
@@ -1177,6 +1199,7 @@ final class CF {
         if ($appCode == null) {
             $appCode = static::appCode();
         }
+
         return DOCROOT . 'application' . DS . $appCode;
     }
 
@@ -1190,12 +1213,14 @@ final class CF {
         ) {
             return true;
         }
+
         return false;
     }
 
     public static function getAvailableAppCode() {
         $path = DOCROOT . 'application';
         $directories = CFile::directories($path);
+
         return c::collect($directories)->map(function ($v) {
             return basename($v);
         })->all();
