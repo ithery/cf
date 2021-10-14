@@ -1,20 +1,21 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 11:48:23 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 11:48:23 AM
  */
 class CTranslation_MessageSelector {
-
     /**
      * Select a proper translation string based on the given number.
      *
-     * @param  string  $line
-     * @param  int  $number
-     * @param  string  $locale
+     * @param string $line
+     * @param int    $number
+     * @param string $locale
+     *
      * @return mixed
      */
     public function choose($line, $number, $locale) {
@@ -38,8 +39,9 @@ class CTranslation_MessageSelector {
     /**
      * Extract a translation string using inline conditions.
      *
-     * @param  array  $segments
-     * @param  int  $number
+     * @param array $segments
+     * @param int   $number
+     *
      * @return mixed
      */
     private function extract($segments, $number) {
@@ -53,8 +55,9 @@ class CTranslation_MessageSelector {
     /**
      * Get the translation string if the condition matches.
      *
-     * @param  string  $part
-     * @param  int  $number
+     * @param string $part
+     * @param int    $number
+     *
      * @return mixed
      */
     private function extractFromString($part, $number) {
@@ -73,9 +76,11 @@ class CTranslation_MessageSelector {
 
             if ($to == '*' && $number >= $from) {
                 return $value;
-            } elseif ($from == '*' && $number <= $to) {
+            }
+            if ($from == '*' && $number <= $to) {
                 return $value;
-            } elseif ($number >= $from && $number <= $to) {
+            }
+            if ($number >= $from && $number <= $to) {
                 return $value;
             }
         }
@@ -86,13 +91,14 @@ class CTranslation_MessageSelector {
     /**
      * Strip the inline conditions from each segment, just leaving the text.
      *
-     * @param  array  $segments
+     * @param array $segments
+     *
      * @return array
      */
     private function stripConditions($segments) {
-        return collect($segments)->map(function ($part) {
-                    return preg_replace('/^[\{\[]([^\[\]\{\}]*)[\}\]]/', '', $part);
-                })->all();
+        return c::collect($segments)->map(function ($part) {
+            return preg_replace('/^[\{\[]([^\[\]\{\}]*)[\}\]]/', '', $part);
+        })->all();
     }
 
     /**
@@ -102,8 +108,9 @@ class CTranslation_MessageSelector {
      * is subject to the new BSD license (http://framework.zend.com/license/new-bsd)
      * Copyright (c) 2005-2010 - Zend Technologies USA Inc. (http://www.zend.com)
      *
-     * @param  string  $locale
-     * @param  int  $number
+     * @param string $locale
+     * @param int    $number
+     *
      * @return int
      */
     public function getPluralIndex($locale, $number) {
@@ -407,5 +414,4 @@ class CTranslation_MessageSelector {
                 return 0;
         }
     }
-
 }

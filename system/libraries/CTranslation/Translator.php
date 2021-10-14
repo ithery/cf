@@ -247,7 +247,8 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
 
         if (is_string($line)) {
             return $this->makeReplacements($line, $replace);
-        } elseif (is_array($line) && count($line) > 0) {
+        }
+        if (is_array($line) && count($line) > 0) {
             return $line;
         }
     }
@@ -307,7 +308,7 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
         foreach ($lines as $key => $value) {
             list($group, $item) = explode('.', $key, 2);
 
-            carr::set($this->loaded, "$namespace.$group.$locale.$item", $value);
+            carr::set($this->loaded, "${namespace}.${group}.${locale}.${item}", $value);
         }
     }
 
@@ -404,7 +405,7 @@ class CTranslation_Translator extends CBase_NamespacedItemResolver implements CT
      */
     public function getSelector() {
         if (!isset($this->selector)) {
-            $this->selector = new CTranslation_MessageSelector;
+            $this->selector = new CTranslation_MessageSelector();
         }
 
         return $this->selector;

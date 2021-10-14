@@ -1,9 +1,9 @@
 <?php
 
-defined('SYSPATH') OR die('No direct script access.');
+defined('SYSPATH') or die('No direct script access.');
 
 final class {prefix}Utils  {
-    
+
     use CBase_Trait_UtilsTrait;
 
 }

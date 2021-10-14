@@ -199,7 +199,8 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->pdf_orientation = 'P';
         $this->requires = [];
         $this->js_cell = '';
-        $this->quick_search = false;
+        $this->quickSearch = false;
+        $this->haveQuickSearchPlaceholder = true;
         $this->tbodyId = '';
 
         $this->report_header = [];

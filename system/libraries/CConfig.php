@@ -14,9 +14,9 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
     /**
      * @param string $group
      *
-     * @return CConfig
-     *
      * @throws CException
+     *
+     * @return CConfig
      */
     public static function &instance($group = 'app') {
         if (!is_string($group)) {

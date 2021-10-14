@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 10:32:24 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 10:32:24 PM
  */
 class CTracker_Repository_SqlQuery extends CTracker_AbstractRepository {
-
     use CModel_Tracker_TrackerSqlQueryTrait;
-    
+
     private $queries = [];
 
     /**
@@ -91,15 +91,17 @@ class CTracker_Repository_SqlQuery extends CTracker_AbstractRepository {
             return;
         }
         $connectionId = $this->connectionRepository->findOrCreate(
-                ['name' => $name], ['name']
+            ['name' => $name],
+            ['name']
         );
         $sqlQueryId = $this->findOrCreate(
-                [
-            'sha1' => sha1($sqlQuery),
-            'statement' => $sqlQuery,
-            'time' => $time,
-            'log_connection_id' => $connectionId,
-                ], ['sha1']
+            [
+                'sha1' => sha1($sqlQuery),
+                'statement' => $sqlQuery,
+                'time' => $time,
+                'log_connection_id' => $connectionId,
+            ],
+            ['sha1']
         );
         if ($bindings && $this->canLogBindings()) {
             $bindingsSerialized = $this->serializeBindings($bindings);
@@ -132,5 +134,4 @@ class CTracker_Repository_SqlQuery extends CTracker_AbstractRepository {
     private function clear() {
         return $this->queries = [];
     }
-
 }

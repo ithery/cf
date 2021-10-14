@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 10:17:38 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 10:17:38 PM
  */
 class CTracker_Repository_Route extends CTracker_AbstractRepository {
-
     protected $config;
 
     public function __construct() {
@@ -21,17 +21,16 @@ class CTracker_Repository_Route extends CTracker_AbstractRepository {
     public function isTrackable($route) {
         $forbidden = $this->config->getExcludeRoute();
         return
-                !$forbidden ||
-                !$route->currentRouteName() ||
-                !carr::inArrayWildcard($route->currentRouteName(), $forbidden);
+                !$forbidden
+                || !$route->currentRouteName()
+                || !carr::inArrayWildcard($route->currentRouteName(), $forbidden);
     }
 
     public function pathIsTrackable($path) {
         $forbidden = $this->config->getExcludePath();
         return
-                !$forbidden ||
-                empty($path) ||
-                !carr::inArrayWildcard($path, $forbidden);
+                !$forbidden
+                || empty($path)
+                || !carr::inArrayWildcard($path, $forbidden);
     }
-
 }

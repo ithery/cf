@@ -117,7 +117,7 @@ trait CTrait_EnumeratesValuesTrait {
      */
     public static function times($number, callable $callback = null) {
         if ($number < 1) {
-            return new static;
+            return new static();
         }
 
         return static::range(1, $number)
@@ -451,7 +451,8 @@ trait CTrait_EnumeratesValuesTrait {
 
         if ($value) {
             return $callback($this, $value);
-        } elseif ($default) {
+        }
+        if ($default) {
             return $default($this, $value);
         }
 
@@ -813,9 +814,11 @@ trait CTrait_EnumeratesValuesTrait {
         return array_map(function ($value) {
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
-            } elseif ($value instanceof Cinterface_Jsonable) {
+            }
+            if ($value instanceof Cinterface_Jsonable) {
                 return json_decode($value->toJson(), true);
-            } elseif ($value instanceof Cinterface_Arrayable) {
+            }
+            if ($value instanceof Cinterface_Arrayable) {
                 return $value->toArray();
             }
 
@@ -870,9 +873,9 @@ trait CTrait_EnumeratesValuesTrait {
      *
      * @param string $key
      *
-     * @return mixed
-     *
      * @throws \Exception
+     *
+     * @return mixed
      */
     public function __get($key) {
         if (!in_array($key, static::$proxies)) {
@@ -892,15 +895,20 @@ trait CTrait_EnumeratesValuesTrait {
     protected function getArrayableItems($items) {
         if (is_array($items)) {
             return $items;
-        } elseif ($items instanceof CInterface_Enumerable) {
+        }
+        if ($items instanceof CInterface_Enumerable) {
             return $items->all();
-        } elseif ($items instanceof CInterface_Arrayable) {
+        }
+        if ($items instanceof CInterface_Arrayable) {
             return $items->toArray();
-        } elseif ($items instanceof CInterface_Jsonable) {
+        }
+        if ($items instanceof CInterface_Jsonable) {
             return json_decode($items->toJson(), true);
-        } elseif ($items instanceof JsonSerializable) {
+        }
+        if ($items instanceof JsonSerializable) {
             return (array) $items->jsonSerialize();
-        } elseif ($items instanceof Traversable) {
+        }
+        if ($items instanceof Traversable) {
             return iterator_to_array($items);
         }
 
