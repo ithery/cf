@@ -50,6 +50,7 @@ class CManager_Asset_File_CssFile extends CManager_Asset_FileAbstract {
         }
 
         $path = DOCROOT . 'media' . DS . 'css' . DS;
+
         return $path . $file;
     }
 
@@ -58,6 +59,7 @@ class CManager_Asset_File_CssFile extends CManager_Asset_FileAbstract {
         $url = $this->getUrl($withHttp);
 
         $script = '<link href="' . $url . '"' . $attrMedia . ' rel="stylesheet" />';
+
         return $script;
     }
 }
