@@ -43,6 +43,11 @@ final class CF {
     private static $internal_cache = [];
 
     /**
+     * @var array
+     */
+    private static $internalCache = [];
+
+    /**
      * CF Data domain.
      *
      * @var array
@@ -413,20 +418,27 @@ final class CF {
      * paths in the order they are configured, follow by the SYSPATH.
      *
      * @param null|mixed $domain
-     * @param bool       $force_reload
+     * @param bool       $forceReload
+     * @param mixed      $withShared
      *
      * @return array
      */
-    public static function paths($domain = null, $force_reload = false) {
+    public static function paths($domain = null, $forceReload = false, $withShared = true) {
         if ($domain == null) {
             $domain = CF::domain($domain);
         }
-        if (!isset(self::$paths[$domain]) || $force_reload) {
+
+        $cacheKey = 'paths.' . $domain . '.' . ($withShared ? 'withShared' : 'withoutShared');
+        $paths = null;
+        if (!$forceReload) {
+            $paths = static::getInternalCache($cacheKey);
+        }
+        if ($paths === null) {
+
             //we try to search all paths for this domain
             $paths = [];
             $orgCode = CF::orgCode($domain);
             $appCode = CF::appCode($domain);
-            $sharedAppCode = CF::getSharedApp($domain);
 
             $modules = CF::modules($domain);
             //when this domain is org
@@ -437,12 +449,15 @@ final class CF {
                 //add theme path if theme exists
                 $paths[] = APPPATH . $appCode . DS . 'default' . DS;
             }
-            foreach ($sharedAppCode as $key => $value) {
-                if (strlen($orgCode) > 0) {
-                    //add theme path if theme exists
-                    $paths[] = APPPATH . $value . DS . $orgCode . DS;
+            if ($withShared) {
+                $sharedAppCode = CF::getSharedApp($domain);
+                foreach ($sharedAppCode as $key => $value) {
+                    if (strlen($orgCode) > 0) {
+                        //add theme path if theme exists
+                        $paths[] = APPPATH . $value . DS . $orgCode . DS;
+                    }
+                    $paths[] = APPPATH . $value . DS . 'default' . DS;
                 }
-                $paths[] = APPPATH . $value . DS . 'default' . DS;
             }
 
             foreach ($modules as $module) {
@@ -450,10 +465,10 @@ final class CF {
             }
             $paths[] = SYSPATH;
             $paths[] = DOCROOT;
-            self::$paths[$domain] = $paths;
+            static::setInternalCache($cacheKey, $paths);
         }
 
-        return self::$paths[$domain];
+        return $paths;
     }
 
     /**
@@ -542,9 +557,8 @@ final class CF {
 
         $classNotFound = false;
         if ($type == 'controllers') {
-            if ($filename = self::findFile($type, $file)) {
+            if ($filename = self::findFile($type, $file, false, false, false, false)) {
                 require $filename;
-                $classNotFound = true;
 
                 return true;
             } else {
@@ -743,17 +757,18 @@ final class CF {
      * to the order of the include paths. Configuration and i18n files will be
      * returned in reverse order.
      *
-     * @param mixed $directory directory to search in
-     * @param mixed $filename  filename to look for (without extension)
-     * @param mixed $required  file required
-     * @param mixed $ext       file extension
+     * @param mixed $directory  directory to search in
+     * @param mixed $filename   filename to look for (without extension)
+     * @param mixed $required   file required
+     * @param mixed $ext        file extension
      * @param mixed $reload
+     * @param mixed $withShared
      *
      * @throws CException if file is required and not found
      *
      * @return array|string|bool if the type is config, i18n or l10n,
      */
-    public static function findFile($directory, $filename, $required = false, $ext = false, $reload = false) {
+    public static function findFile($directory, $filename, $required = false, $ext = false, $reload = false, $withShared = true) {
         // NOTE: This test MUST be not be a strict comparison (===), or empty
         // extensions will be allowed!
         if ($ext == '') {
@@ -772,7 +787,7 @@ final class CF {
         }
 
         // Load include paths
-        $paths = self::paths(null, $reload);
+        $paths = self::paths(null, $reload, $withShared);
 
         // Nothing found, yet
         $found = null;
@@ -948,6 +963,7 @@ final class CF {
             //self::paths(null, true);
             self::$paths = [];
             self::$internal_cache = [];
+            static::clearInternalCache();
         }
     }
 
@@ -1186,5 +1202,21 @@ final class CF {
         return c::collect($directories)->map(function ($v) {
             return basename($v);
         })->all();
+    }
+
+    private static function getInternalCache($key, $default = null) {
+        if (isset(static::$internalCache[$key])) {
+            return static::$internalCache[$key];
+        }
+
+        return $default;
+    }
+
+    private static function setInternalCache($key, $value) {
+        static::$internalCache[$key] = $value;
+    }
+
+    private static function clearInternalCache() {
+        static::$internalCache = [];
     }
 }
