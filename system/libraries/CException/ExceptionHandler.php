@@ -20,7 +20,6 @@ use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface as ExceptionHt
  */
 class CException_ExceptionHandler implements CException_ExceptionHandlerInterface {
     use CTrait_ReflectsClosureTrait;
-
     /**
      * The container implementation.
      *

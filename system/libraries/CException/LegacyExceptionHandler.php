@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of LegacyExceptionHandler
+ * Description of LegacyExceptionHandler.
  *
  * @author Hery
  */
@@ -58,8 +58,7 @@ class CException_LegacyExceptionHandler {
             //CF::log(LOG_ERR, self::lang('core.uncaught_exception', $type, $message, $file, $line . " on uri:" . $uri . " with trace:\n" . $trace));
         }
 
-        ob_start();
-        require CF::findFile('views', empty($template) ? 'kohana_error_page' : $template);
+        require CF::findFile('views', $template);
         $output = ob_get_clean();
 
         // Fetch memory usage in MB
