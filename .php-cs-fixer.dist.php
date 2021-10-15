@@ -94,10 +94,10 @@ return $config->setRules([
     'phpdoc_annotation_without_dot' => true,
     'phpdoc_indent' => true,
     'phpdoc_line_span' => true,
-    'phpdoc_order' => true,
-    'phpdoc_order_by_value' => [
-        'annotations' => ['author', 'covers', 'coversNothing', 'dataProvider', 'depends', 'group', 'internal', 'method', 'property', 'property-read', 'property-write', 'requires', 'throws', 'uses']
-    ],
+    // 'phpdoc_order' => true,
+    // 'phpdoc_order_by_value' => [
+    //     'annotations' => ['author', 'covers', 'coversNothing', 'dataProvider', 'depends', 'group', 'internal', 'method', 'property', 'property-read', 'property-write', 'requires', 'throws', 'uses']
+    // ],
     // 'phpdoc_inline_tag' => true,
     'phpdoc_no_access' => true,
     // 'phpdoc_no_alias_tag' => true,
