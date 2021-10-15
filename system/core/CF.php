@@ -3,11 +3,10 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * CF Class
+ * CF Class.
  */
 final class CF {
     use CFDeprecatedTrait;
-
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
 
     // Security check that is added to all generated PHP files
@@ -25,18 +24,8 @@ final class CF {
     // The current locale
     public static $locale;
 
-    // Configuration
-    private static $configuration;
-
     /**
-     * Include paths cache
-     *
-     * @var array
-     */
-    private static $paths;
-
-    /**
-     * Chartset used for this application
+     * Chartset used for this application.
      *
      * @var string
      */
@@ -47,18 +36,42 @@ final class CF {
 
     public static $global_xss_filtering = true;
 
+    /**
+     * Logger Instance.
+     *
+     * @var CLogger logging object
+     */
+    public static $logger;
+
+    /**
+     * Config Instance.
+     *
+     * @var CConfig config object
+     */
+    public static $config;
+
+    // Configuration
+    private static $configuration;
+
+    /**
+     * Include paths cache.
+     *
+     * @var array
+     */
+    private static $paths;
+
     // Internal caches and write status
     private static $internal_cache = [];
 
     /**
-     * CF Data domain
+     * CF Data domain.
      *
      * @var array
      */
     private static $data;
 
     /**
-     * List of Shared appCode used for CF
+     * List of Shared appCode used for CF.
      *
      * @var array
      */
@@ -67,21 +80,7 @@ final class CF {
     private static $translator;
 
     /**
-     * Logger Instance
-     *
-     * @var CLogger logging object
-     */
-    public static $logger;
-
-    /**
-     * Config Instance
-     *
-     * @var CConfig config object
-     */
-    public static $config;
-
-    /**
-     * Check CF is running on production
+     * Check CF is running on production.
      *
      * @return bool
      */
@@ -90,7 +89,7 @@ final class CF {
     }
 
     /**
-     * Check given domain exists or not
+     * Check given domain exists or not.
      *
      * @param string $domain domain to check
      *
@@ -101,7 +100,7 @@ final class CF {
     }
 
     /**
-     * Create domain
+     * Create domain.
      *
      * @param string $domain     asd
      * @param array  $domainData asd
@@ -218,7 +217,7 @@ final class CF {
     }
 
     /**
-     * Load all bootstrap files
+     * Load all bootstrap files.
      *
      * @return void
      */
@@ -262,7 +261,7 @@ final class CF {
     }
 
     /**
-     * Invoke
+     * Invoke.
      *
      * @param mixed $uri
      *
@@ -726,7 +725,7 @@ final class CF {
     }
 
     /**
-     * Detect CF is running on console in cf command or not
+     * Detect CF is running on console in cf command or not.
      *
      * @return bool
      */
@@ -735,7 +734,7 @@ final class CF {
     }
 
     /**
-     * Detect CF is running on console or not
+     * Detect CF is running on console or not.
      *
      * @return type
      */
@@ -744,7 +743,7 @@ final class CF {
     }
 
     /**
-     * To get cliDomain
+     * To get cliDomain.
      *
      * @return string
      */
@@ -893,7 +892,7 @@ final class CF {
     }
 
     /**
-     * Checks if given data is file, handles mixed input
+     * Checks if given data is file, handles mixed input.
      *
      * @param mixed $value
      *
@@ -906,7 +905,7 @@ final class CF {
     }
 
     /**
-     * Get data domain
+     * Get data domain.
      *
      * @param string $domain
      *
@@ -929,7 +928,7 @@ final class CF {
     }
 
     /**
-     * Get application id for domain
+     * Get application id for domain.
      *
      * @param null|mixed $domain
      *
@@ -942,7 +941,7 @@ final class CF {
     }
 
     /**
-     * Get application code for domain
+     * Get application code for domain.
      *
      * @param null|mixed $domain
      *
@@ -955,7 +954,7 @@ final class CF {
     }
 
     /**
-     * Get org id for domain
+     * Get org id for domain.
      *
      * @param string $domain
      *
@@ -968,7 +967,7 @@ final class CF {
     }
 
     /**
-     * Get org code for this domain
+     * Get org code for this domain.
      *
      * @param string $domain
      *
@@ -981,7 +980,7 @@ final class CF {
     }
 
     /**
-     * Add Shared App in runtime
+     * Add Shared App in runtime.
      *
      * @param string $appCode
      */
@@ -996,7 +995,7 @@ final class CF {
     }
 
     /**
-     * Get shared application code for this domain
+     * Get shared application code for this domain.
      *
      * @param string $domain
      *
@@ -1014,7 +1013,7 @@ final class CF {
     }
 
     /**
-     * Get theme for this domain
+     * Get theme for this domain.
      *
      * @param null|mixed $domain
      *
@@ -1029,7 +1028,7 @@ final class CF {
     }
 
     /**
-     * Get modules for this domain
+     * Get modules for this domain.
      *
      * @param null|mixed $domain
      *
@@ -1045,7 +1044,7 @@ final class CF {
      * Call the given Closure with the given value then return the value.
      *
      * @param mixed         $value
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return mixed
      *
