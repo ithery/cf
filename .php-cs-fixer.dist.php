@@ -88,7 +88,20 @@ return $config->setRules([
     // 'normalize_index_brace' => true,
     'object_operator_without_whitespace' => true,
     // 'php_unit_fqcn_annotation' => true,
-    'phpdoc_align' => true,
+    'phpdoc_align' => [
+        'align' => 'vertical',
+        'tags' => [
+            'method',
+            'param',
+            'property',
+            'property-read',
+            'property-write',
+            'return',
+            'throws',
+            'type',
+            'var',
+        ]
+    ],
     'phpdoc_add_missing_param_annotation' => true,
 
     'phpdoc_annotation_without_dot' => true,
