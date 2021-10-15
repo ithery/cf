@@ -33,16 +33,8 @@ final class CF {
     public static $logger;
 
     /**
-     * Include paths cache.
+     *  Internal caches for faster loading.
      *
-     * @var array
-     */
-    private static $paths;
-
-    // Internal caches and write status
-    private static $internal_cache = [];
-
-    /**
      * @var array
      */
     private static $internalCache = [];
@@ -782,56 +774,55 @@ final class CF {
         // Search path
         $search = $directory . '/' . $filename . $ext;
 
-        if (isset(self::$internal_cache['find_file_paths'][$search]) && !$reload) {
-            return self::$internal_cache['find_file_paths'][$search];
-        }
-
-        // Load include paths
-        $paths = self::paths(null, $reload, $withShared);
-
         // Nothing found, yet
         $found = null;
-
-        if ($directory === 'config' or $directory === 'i18n') {
-            // Search in reverse, for merging
-            $paths = array_reverse($paths);
-
-            foreach ($paths as $path) {
-                if (static::isFile($path . $search)) {
-                    // A matching file has been found
-                    $found[] = $path . $search;
-                }
-            }
-        } else {
-            foreach ($paths as $path) {
-                if (static::isFile($path . $search)) {
-                    // A matching file has been found
-                    $found = $path . $search;
-
-                    // Stop searching
-                    break;
-                }
-            }
+        $cacheKey = 'find_file_paths.' . $search . '.' . ($withShared ? 'withShared' : 'withoutShared');
+        if (!$reload) {
+            $found = static::getInternalCache($cacheKey);
         }
 
         if ($found === null) {
-            if ($required === true) {
-                // If the file is required, throw an exception
-                $lang = static::lang('core.resource_not_found', [':directory' => $directory, ':filename' => $filename]);
+            // Load include paths
+            $paths = self::paths(null, $reload, $withShared);
 
-                throw new CException($lang);
+            if ($directory === 'config' or $directory === 'i18n') {
+                // Search in reverse, for merging
+                $paths = array_reverse($paths);
+
+                foreach ($paths as $path) {
+                    if (static::isFile($path . $search)) {
+                        // A matching file has been found
+                        $found[] = $path . $search;
+                    }
+                }
             } else {
-                // Nothing was found, return FALSE
-                $found = false;
+                foreach ($paths as $path) {
+                    if (static::isFile($path . $search)) {
+                        // A matching file has been found
+                        $found = $path . $search;
+
+                        // Stop searching
+                        break;
+                    }
+                }
             }
+
+            if ($found === null) {
+                if ($required === true) {
+                    // If the file is required, throw an exception
+                    $lang = static::lang('core.resource_not_found', [':directory' => $directory, ':filename' => $filename]);
+
+                    throw new CException($lang);
+                } else {
+                    // Nothing was found, return FALSE
+                    $found = false;
+                }
+            }
+
+            static::setInternalCache($cacheKey, $found);
         }
 
-        if (!isset(self::$write_cache['find_file_paths'])) {
-            // Write cache at shutdown
-            self::$write_cache['find_file_paths'] = true;
-        }
-
-        return self::$internal_cache['find_file_paths'][$search] = $found;
+        return $found;
     }
 
     /**
@@ -959,10 +950,7 @@ final class CF {
     public static function addSharedApp($appCode) {
         if (!in_array($appCode, self::$sharedAppCode)) {
             self::$sharedAppCode[] = $appCode;
-            //do force reload
-            //self::paths(null, true);
-            self::$paths = [];
-            self::$internal_cache = [];
+            //clear all internal cache
             static::clearInternalCache();
         }
     }

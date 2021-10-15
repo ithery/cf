@@ -4,11 +4,11 @@
  * Description of CFDeprecatedTrait.
  *
  * @author Hery
+ *
+ * @see CF
  */
 // @codingStandardsIgnoreStart
 trait CFDeprecatedTrait {
-    private static $write_cache;
-
     public static function doDeprecated() {
         if (class_exists('cdbg')) {
             cdbg::deprecated();
@@ -255,23 +255,6 @@ trait CFDeprecatedTrait {
      */
     public static function close_buffers($flush = true) {
         return static::closeBuffers($flush);
-    }
-
-    /**
-     * Clears a config group from the cached configuration.
-     *
-     * @param   string  config group
-     * @param mixed $group
-     *
-     * @return void
-     *
-     * @deprecated
-     */
-    public static function config_clear($group) {
-        if (!isset(self::$write_cache['configuration'])) {
-            // Cache has changed
-            self::$write_cache['configuration'] = true;
-        }
     }
 
     /**
