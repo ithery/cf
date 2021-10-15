@@ -9,7 +9,7 @@ final class CManager {
 
     protected $controls = [];
 
-    protected $controls_code = [];
+    protected $controlsCode = [];
 
     protected $elements = [];
 
@@ -52,6 +52,7 @@ final class CManager {
         if (self::$instance == null) {
             self::$instance = new CManager();
         }
+
         return self::$instance;
     }
 
@@ -75,6 +76,7 @@ final class CManager {
         if (self::$theme == null) {
             self::$theme = new CManager_Theme();
         }
+
         return self::$theme;
     }
 
@@ -85,6 +87,7 @@ final class CManager {
         if (self::$navigation == null) {
             self::$navigation = new CManager_Navigation();
         }
+
         return self::$navigation;
     }
 
@@ -108,6 +111,7 @@ final class CManager {
 
     public function setThemeData($themeData) {
         $this->theme()->setThemeData($themeData);
+
         return $this;
     }
 
@@ -124,6 +128,7 @@ final class CManager {
         if (!CClientModules::instance()->isRegisteredModule($module)) {
             return CClientModules::instance()->registerModule($module);
         }
+
         return false;
     }
 
@@ -131,6 +136,7 @@ final class CManager {
         if (!empty($data)) {
             CClientModules::instance()->defineModule($module, $data);
         }
+
         return CClientModules::instance()->registerThemeModule($module);
     }
 
@@ -154,29 +160,30 @@ final class CManager {
     public function registerControls($controls) {
         foreach ($controls as $type => $class) {
             $this->controls[$type] = $class;
-            $this->controls_code[$type] = '';
+            $this->controlsCode[$type] = '';
         }
     }
 
     /**
      * @param string $type
      * @param string $class
-     * @param string $code_path
-     *
-     * @return bool
+     * @param string $codePath
      *
      * @throws CException
+     *
+     * @return bool
      */
-    public function registerControl($type, $class, $code_path = '') {
+    public function registerControl($type, $class, $codePath = '') {
         $this->controls[$type] = $class;
-        $this->controls_code[$type] = $code_path;
-        if (strlen($code_path) > 0) {
-            if (file_exists($code_path)) {
-                include $code_path;
+        $this->controlsCode[$type] = $codePath;
+        if (strlen($codePath) > 0) {
+            if (file_exists($codePath)) {
+                include $codePath;
             } else {
                 throw new CException('File :code_path not exists', [':code_path' => $code_path]);
             }
         }
+
         return true;
     }
 
@@ -185,9 +192,9 @@ final class CManager {
      * @param string $class
      * @param string $code_path optional
      *
-     * @return bool true if no error
-     *
      * @throws CException
+     *
+     * @return bool true if no error
      */
     public function registerElement($type, $class, $code_path = '') {
         $this->elements[$type] = $class;
@@ -199,6 +206,7 @@ final class CManager {
                 throw new CException('File :code_path not exists', [':code_path' => $code_path]);
             }
         }
+
         return true;
     }
 
@@ -231,9 +239,9 @@ final class CManager {
      * @param string $id
      * @param string $type
      *
-     * @return CElement_FormInput
-     *
      * @throws CException
+     *
+     * @return CElement_FormInput
      */
     public function createControl($id, $type) {
         $class = null;
@@ -254,6 +262,7 @@ final class CManager {
         if (cstr::startsWith($class, 'CElement_FormInput')) {
             return CElement_Factory::createFormInput($class, $id);
         }
+
         return call_user_func([$class, 'factory'], ($id));
     }
 
@@ -261,9 +270,9 @@ final class CManager {
      * @param string $id
      * @param string $type
      *
-     * @return CElement_Element
-     *
      * @throws CException
+     *
+     * @return CElement_Element
      */
     public function createElement($id, $type) {
         if (!isset($this->elements[$type])) {
@@ -274,6 +283,7 @@ final class CManager {
         if (cstr::startsWith($class, 'CElement_Element')) {
             return CElement_Factory::createElement($id);
         }
+
         return call_user_func([$class, 'factory'], ($id));
     }
 
@@ -284,6 +294,7 @@ final class CManager {
      */
     public function setMobilePath($path) {
         $this->mobile_path = $path;
+
         return $this;
     }
 
@@ -302,6 +313,7 @@ final class CManager {
         if (self::$langObjectCallback != null) {
             return call_user_func(self::$langObjectCallback);
         }
+
         return new CManager_Lang();
     }
 
@@ -311,6 +323,7 @@ final class CManager {
 
     public static function addTransformCallback($method, callable $callback) {
         $transformManager = CManager_Transform::instance();
+
         return $transformManager->addCallback($method, $callback);
     }
 
@@ -332,8 +345,10 @@ final class CManager {
             if ($require === null) {
                 return true;
             }
+
             return $require;
         }
+
         return self::$useRequireJs;
     }
 
@@ -352,6 +367,7 @@ final class CManager {
         if (self::$javascript == null) {
             self::$javascript = new CManager_Javascript();
         }
+
         return self::$javascript;
     }
 
@@ -362,6 +378,7 @@ final class CManager {
         if (self::$asset == null) {
             self::$asset = new CManager_Asset();
         }
+
         return self::$asset;
     }
 
@@ -373,7 +390,21 @@ final class CManager {
         return CManager_Daemon::instance()->daemons();
     }
 
+    /**
+     * Get Daemon Manager
+     *
+     * @return CManager_Daemon
+     */
     public static function daemon() {
         return CManager_Daemon::instance();
+    }
+
+    /**
+     * Get View Manager
+     *
+     * @return CView_Factory
+     */
+    public static function view() {
+        return CView_Factory::instance();
     }
 }

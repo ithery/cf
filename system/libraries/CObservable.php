@@ -12,6 +12,7 @@ abstract class CObservable extends CRenderable {
         CObservable_Trait_ComponentTrait,
         CObservable_Trait_ListTrait,
         CObservable_Trait_EventsTrait,
+        CObservable_Trait_ControlTrait,
         CObservable_Trait_ListenerTrait;
 
     protected $manager;
@@ -81,6 +82,7 @@ abstract class CObservable extends CRenderable {
     public function addTemplate($id = '') {
         $template = CElement_Factory::createTemplate($id);
         $this->wrapper->add($template);
+
         return $template;
     }
 
@@ -93,6 +95,7 @@ abstract class CObservable extends CRenderable {
     public function addComponent($componentName, $id = '') {
         $viewComponent = CElement_Factory::createViewComponent($componentName, $id);
         $this->wrapper->add($viewComponent);
+
         return $viewComponent;
     }
 
@@ -111,6 +114,7 @@ abstract class CObservable extends CRenderable {
         $viewElement = CElement_Factory::createView($id, $view, $data);
 
         $this->wrapper->add($viewElement);
+
         return $viewElement;
     }
 
@@ -124,6 +128,7 @@ abstract class CObservable extends CRenderable {
     public function addField($id = '') {
         $field = CElement_Factory::createComponent('Form_Field', $id);
         $this->add($field);
+
         return $field;
     }
 
@@ -139,54 +144,63 @@ abstract class CObservable extends CRenderable {
     public function addRow($id = '') {
         $row = CTableRow::factory($id);
         $this->add($row);
+
         return $row;
     }
 
     public function addCalendar($calendar_id = '') {
         $calendar = CCalendar::factory($calendar_id);
         $this->add($calendar);
+
         return $calendar;
     }
 
     public function addTabStaticList($tabs_id = '') {
         $tabs = CTabStaticList::factory($tabs_id);
         $this->add($tabs);
+
         return $tabs;
     }
 
     public function addRowFluid($id = '') {
         $rowf = CRowFluid::factory($id);
         $this->add($rowf);
+
         return $rowf;
     }
 
     public function addSpan($id = '') {
         $span = CElement_Factory::createElement('span', $id);
         $this->add($span);
+
         return $span;
     }
 
     public function addBasicSpan($id = '') {
         $span = CBasicSpan::factory($id);
         $this->add($span);
+
         return $span;
     }
 
     public function addPrismCode($id = '') {
         $code = CElement_Factory::createComponent('PrismCode', $id);
         $this->add($code);
+
         return $code;
     }
 
     public function addBlockly($id = '') {
         $code = CElement_Factory::createComponent('Blockly', $id);
         $this->add($code);
+
         return $code;
     }
 
     public function addPdfViewer($id = '') {
         $code = CElement_Factory::createComponent('PdfViewer', $id);
         $this->add($code);
+
         return $code;
     }
 
@@ -195,6 +209,7 @@ abstract class CObservable extends CRenderable {
      */
     public function addHr() {
         $this->add('<hr />');
+
         return $this;
     }
 
@@ -203,6 +218,7 @@ abstract class CObservable extends CRenderable {
      */
     public function addBr() {
         $this->add('<br />');
+
         return $this;
     }
 
@@ -229,6 +245,7 @@ abstract class CObservable extends CRenderable {
     public function addAction($id = '') {
         $act = CElement_Factory::createComponent('Action', $id);
         $this->add($act);
+
         return $act;
     }
 
@@ -240,6 +257,7 @@ abstract class CObservable extends CRenderable {
     public function addAlert($id = '') {
         $element = CElement_Factory::createComponent('Alert', $id);
         $this->add($element);
+
         return $element;
     }
 
@@ -251,6 +269,7 @@ abstract class CObservable extends CRenderable {
     public function addAccordion($id = '') {
         $element = CElement_Factory::createComponent('Accordion', $id);
         $this->add($element);
+
         return $element;
     }
 
@@ -262,6 +281,7 @@ abstract class CObservable extends CRenderable {
     public function addIcon($id = '') {
         $icon = CElement_Factory::createComponent('Icon', $id);
         $this->add($icon);
+
         return $icon;
     }
 
@@ -275,6 +295,7 @@ abstract class CObservable extends CRenderable {
     public function addPieChart($id = '') {
         $pie_chart = CPieChartElement::factory($id);
         $this->add($pie_chart);
+
         return $pie_chart;
     }
 

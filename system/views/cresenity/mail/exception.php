@@ -41,7 +41,7 @@ $httpReferer = carr::get($_SERVER, 'HTTP_REFERER', '');
 
         </style>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-        <title><?php echo $error ?></title>
+        <title><?php echo $error; ?></title>
     </head>
     <body>
 
@@ -54,15 +54,15 @@ $httpReferer = carr::get($_SERVER, 'HTTP_REFERER', '');
                             <tr>
                                 <td >
                                     <div id="framework_error" >
-                                        <h3><?php echo chtml::specialchars('CRESENITY APP ERROR') ?></h3>
+                                        <h3><?php echo c::e('CRESENITY APP ERROR'); ?></h3>
                                         <p><strong>Domain</strong>:<?php echo CF::domain(); ?></p>
                                         <?php if ($org != null): ?>
                                             <p><strong>Name</strong>:<?php echo $org->name; ?></p>
-                                        <?php endif ?>
+                                        <?php endif; ?>
                                         <?php if ($user != null): ?>
                                             <p><strong>Username</strong>:<?php echo $user->username; ?></p>
                                             <p><strong>Role name</strong>:<?php echo $role == null ? '' : $role->name; ?></p>
-                                        <?php endif ?>
+                                        <?php endif; ?>
                                         <p><strong>Time</strong>:<?php echo date('Y-m-d H:i:s'); ?></p>
                                         <p><strong>Browser</strong>:<?php echo CApp::browserName(); ?></p>
                                         <p><strong>Browser Version</strong>:<?php echo CApp::browserVersion(); ?></p>
@@ -70,27 +70,24 @@ $httpReferer = carr::get($_SERVER, 'HTTP_REFERER', '');
                                         <p><strong>Platform Version</strong>:<?php echo CApp::platformVersion(); ?></p>
                                         <p><strong>User Agent</strong>:<?php echo CApp::userAgent(); ?></p>
                                         <p><strong>Remote Address</strong>:<?php echo CApp::remoteAddress(); ?></p>
-                                        <p><strong>Complete Uri</strong>:<?php echo crouter::complete_uri(); ?></p>
-                                        <p><strong>Controller</strong>:<?php echo crouter::controller(); ?></p>
-                                        <p><strong>Method</strong>:<?php echo crouter::method(); ?></p>
+                                        <p><strong>Complete Uri</strong>:<?php echo CFRouter::getCompleteUri(); ?></p>
+                                        <p><strong>Controller</strong>:<?php echo CFRouter::getController(); ?></p>
+                                        <p><strong>Method</strong>:<?php echo CFRouter::getControllerMethod(); ?></p>
                                         <p><strong>Referer</strong>:<?php echo $httpReferer; ?></p>
                                         <p><strong>Post Data</strong>:<?php echo json_encode($_POST); ?></p>
-                                        <h3><?php echo c::e($error) ?></h3>
-                                        <p><?php echo c::e($description) ?></p>
+                                        <h3><?php echo c::e($error); ?></h3>
+                                        <p><?php echo c::e($description); ?></p>
                                         <?php if (!empty($line) and !empty($file)): ?>
-                                            <p><?php echo CF::lang('core.error_file_line', ['file' => $file, 'line' => $line]) ?></p>
-                                        <?php endif ?>
+                                            <p><?php echo c::__('core.error_file_line', ['file' => $file, 'line' => $line]); ?></p>
+                                        <?php endif; ?>
                                         <p>
-                                            <code class="block"><?php echo $message ?></code>
+                                            <code class="block"><?php echo $message; ?></code>
                                         </p>
 
-                                        <h3><?php echo 'Trace String' ?></h3>
-                                        <?php echo nl2br($exception->getTraceAsString()); ?>
-
                                         <?php if (!empty($trace)): ?>
-                                            <h3><?php echo CF::lang('core.stack_trace') ?></h3>
-                                            <?php echo $trace; ?>
-                                        <?php endif ?>
+                                            <h3><?php echo c::__('core.stack_trace'); ?></h3>
+                                            <pre><?php echo $trace; ?></pre>
+                                        <?php endif; ?>
                                 </td>
                             </tr>
                         </table>

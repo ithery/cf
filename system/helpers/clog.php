@@ -1,8 +1,24 @@
 <?php
 //@codingStandardsIgnoreStart
 class clog {
+    const EMERGENCY = LOG_EMERG;    // 0
+
+    const ALERT = LOG_ALERT;    // 1
+
+    const CRITICAL = LOG_CRIT;     // 2
+
+    const ERROR = LOG_ERR;      // 3
+
+    const WARNING = LOG_WARNING;  // 4
+
+    const NOTICE = LOG_NOTICE;   // 5
+
+    const INFO = LOG_INFO;     // 6
+
+    const DEBUG = LOG_DEBUG;    // 7
+
     /**
-     * Log login
+     * Log login.
      *
      * @param int $user_id
      *
@@ -19,12 +35,11 @@ class clog {
         $platform = CHTTP::request()->browser()->getPlatform();
         $platform_version = '';
 
-        $user = cuser::get($user_id);
         $org_id = CF::orgId();
         $data = [
             'login_date' => date('Y-m-d H:i:s'),
             'org_id' => $org_id,
-            'user_agent' => CF::userAgent(),
+            'user_agent' => CHTTP::request()->userAgent(),
             'browser' => $browser,
             'browser_version' => $browser_version,
             'platform' => $platform,
@@ -55,42 +70,8 @@ class clog {
             'session_id' => CSession::instance()->id(),
             'app_id' => $app->appId(),
         ];
+
         return CDatabase::instance()->insert('log_login_fail', $data);
-    }
-
-    public static function log_print($user_id, $print_mode, $printer_type, $printer_name, $data_type, $print_ref_id, $print_ref_code) {
-        $app = CApp::instance();
-        $app_id = $app->app_id();
-        $db = CDatabase::instance();
-        $user = cuser::get($user_id);
-        $user_id = $user->user_id;
-        $org_id = $user->org_id;
-        $ip_address = crequest::remote_address();
-        $browser = crequest::browser();
-        $browser_version = crequest::browser_version();
-        $platform = crequest::platform();
-        $platform_version = crequest::platform_version();
-
-        $data = [
-            'print_date' => date('Y-m-d H:i:s'),
-            'org_id' => $org_id,
-            'session_id' => CSession::instance()->id(),
-            'user_agent' => CHTTP::request()->userAgent(),
-            'browser' => $browser,
-            'browser_version' => $browser_version,
-            'platform' => $platform,
-            'platform_version' => $platform_version,
-            'remote_addr' => $ip_address,
-            'user_id' => $user_id,
-            'print_mode' => $print_mode,
-            'printer_type' => $printer_type,
-            'printer_name' => $printer_name,
-            'data_type' => $data_type,
-            'print_ref_id' => $print_ref_id,
-            'print_ref_code' => $print_ref_code,
-            'app_id' => $app_id,
-        ];
-        $db->insert('log_print', $data);
     }
 
     public static function request($user_id = null) {
@@ -113,31 +94,31 @@ class clog {
 
         $db = CDatabase::instance();
         $app = CApp::instance();
-        $app_id = $app->app_id();
+        $app_id = $app->appId();
         $db = CDatabase::instance();
         $app = CApp::instance();
-        $ip_address = crequest::remote_address();
+        $ip_address = CHTTP::request()->ip();
         $session_id = CSession::instance()->id();
         $browser = crequest::browser();
-        $browser_version = crequest::browser_version();
+        $browser_version = CHTTP::request()->browser()->getVersion();
         $platform = crequest::platform();
-        $platform_version = crequest::platform_version();
+        $platform_version = '';
         $nav_name = '';
         $nav_label = '';
         $action_label = '';
         $action_name = '';
-        $controller = crouter::controller();
+        $controller = CFRouter::getController();
         if ($controller == 'cresenity') {
             return false;
         }
-        $method = crouter::method();
+        $method = CFRouter::getControllerMethod();
         $nav = cnav::nav();
         if ($nav != null) {
             $nav_name = $nav['name'];
             $nav_label = $nav['label'];
             if (isset($nav['action'])) {
                 foreach ($nav['action'] as $act) {
-                    if (isset($act['controller']) && isset($act['method']) && $act['controller'] == $controller && $act['method'] == $method) {
+                    if (isset($act['controller'], $act['method']) && $act['controller'] == $controller && $act['method'] == $method) {
                         $action_name = $act['name'];
                         $action_label = $act['label'];
                     }
@@ -145,17 +126,12 @@ class clog {
             }
         }
         $org_id = CF::orgId();
-        if ($org_id == null) {
-            $user = cuser::get($user_id);
-            if ($user != null) {
-                $org_id = $user->org_id;
-            }
-        }
+
         $data = [
             'activity_date' => date('Y-m-d H:i:s'),
             'org_id' => $org_id,
             'session_id' => CSession::instance()->id(),
-            'user_agent' => CF::userAgent(),
+            'user_agent' => CHTTP::request()->userAgent(),
             'browser' => $browser,
             'browser_version' => $browser_version,
             'platform' => $platform,
@@ -164,8 +140,8 @@ class clog {
             'user_id' => $user_id,
             'uri' => crouter::complete_uri(),
             'routed_uri' => crouter::routed_uri(),
-            'controller' => crouter::controller(),
-            'method' => crouter::method(),
+            'controller' => CFRouter::getController(),
+            'method' => CFRouter::getControllerMethod(),
             'query_string' => crouter::query_string(),
             'nav' => $nav_name,
             'nav_label' => $nav_label,
@@ -233,7 +209,7 @@ class clog {
      *  <code>
      *      <?php clog::write('Test');?>
      *  </code>
-     * </pre>
+     * </pre>.
      *
      * @param array/string $options
      *
@@ -252,24 +228,9 @@ class clog {
 
             $param['path'] = $path;
         }
+
         return $clogger_instance->add($level, $message);
     }
-
-    const EMERGENCY = LOG_EMERG;    // 0
-
-    const ALERT = LOG_ALERT;    // 1
-
-    const CRITICAL = LOG_CRIT;     // 2
-
-    const ERROR = LOG_ERR;      // 3
-
-    const WARNING = LOG_WARNING;  // 4
-
-    const NOTICE = LOG_NOTICE;   // 5
-
-    const INFO = LOG_INFO;     // 6
-
-    const DEBUG = LOG_DEBUG;    // 7
 
     public static function emergency($message) {
         return CLogger::instance()->add(CLogger::EMERGENCY, $message);

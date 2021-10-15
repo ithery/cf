@@ -7,7 +7,14 @@ return $config->setRules([
     'array_syntax' => ['syntax' => 'short'],
     'combine_consecutive_unsets' => true,
     'combine_consecutive_issets' => true,
-    'class_attributes_separation' => true,
+    'class_attributes_separation' => [
+        'elements' => [
+            'const' => 'one',
+            'method' => 'one',
+            'property' => 'one',
+            'trait_import' => 'none'
+        ]
+    ],
     'multiline_whitespace_before_semicolons' => [
         'strategy' => 'no_multi_line',
     ],
@@ -71,10 +78,12 @@ return $config->setRules([
     // 'no_mixed_echo_print' => array('use' => 'echo'),
     'no_multiline_whitespace_around_double_arrow' => true,
     // 'no_short_bool_cast' => true,
+    'elseif' => true,
     'no_singleline_whitespace_before_semicolons' => true,
     'no_spaces_around_offset' => true,
     'no_spaces_inside_parenthesis' => true,
-    'no_superfluous_elseif' => true,
+    //'ereg_to_preg' => true, // risky
+    //'no_superfluous_elseif' => true,
     'no_superfluous_phpdoc_tags' => true,
     'no_trailing_whitespace' => true,
     'no_unneeded_control_parentheses' => true,
@@ -88,16 +97,41 @@ return $config->setRules([
     // 'normalize_index_brace' => true,
     'object_operator_without_whitespace' => true,
     // 'php_unit_fqcn_annotation' => true,
-    'phpdoc_align' => true,
+    'phpdoc_align' => [
+        'align' => 'vertical',
+        'tags' => [
+            'method',
+            'param',
+            'property',
+            'property-read',
+            'property-write',
+            'return',
+            'throws',
+            'type',
+            'var',
+        ]
+    ],
     'phpdoc_add_missing_param_annotation' => true,
-
+    'phpdoc_inline_tag_normalizer' => [
+        'tags' => [
+            'example',
+            'id',
+            'internal',
+            'inheritdoc',
+            'inheritdocs',
+            'link',
+            'source',
+            'toc',
+            'tutorial',
+        ]
+    ],
     'phpdoc_annotation_without_dot' => true,
     'phpdoc_indent' => true,
     'phpdoc_line_span' => true,
     'phpdoc_order' => true,
-    'phpdoc_order_by_value' => [
-        'annotations' => ['author', 'covers', 'coversNothing', 'dataProvider', 'depends', 'group', 'internal', 'method', 'property', 'property-read', 'property-write', 'requires', 'throws', 'uses']
-    ],
+    // 'phpdoc_order_by_value' => [
+    //     'annotations' => ['author', 'covers', 'coversNothing', 'dataProvider', 'depends', 'group', 'internal', 'method', 'property', 'property-read', 'property-write', 'requires', 'throws', 'uses']
+    // ],
     // 'phpdoc_inline_tag' => true,
     'phpdoc_no_access' => true,
     // 'phpdoc_no_alias_tag' => true,
@@ -113,10 +147,51 @@ return $config->setRules([
     'phpdoc_separation' => true,
     'phpdoc_var_annotation_correct_order' => true,
     'phpdoc_single_line_var_spacing' => true,
-    // 'ordered_class_elements' => true,
+    'phpdoc_summary' => true,
+    'phpdoc_tag_type' => [
+        'tags' => ['api' => 'annotation',
+            'author' => 'annotation',
+            'copyright' => 'annotation',
+            'deprecated' => 'annotation',
+            'example' => 'annotation',
+            'global' => 'annotation',
+            'inheritDoc' => 'annotation',
+            'internal' => 'annotation',
+            'license' => 'annotation',
+            'method' => 'annotation',
+            'package' => 'annotation',
+            'param' => 'annotation',
+            'property' => 'annotation',
+            'return' => 'annotation',
+            'see' => 'annotation',
+            'since' => 'annotation',
+            'throws' => 'annotation',
+            'todo' => 'annotation',
+            'uses' => 'annotation',
+            'var' => 'annotation',
+            'version' => 'annotation'
+        ]
+    ],
+    'ordered_class_elements' => [
+        'order' => [
+            'use_trait',
+            'constant_public',
+            'constant_protected',
+            'constant_private',
+            'property_public',
+            'property_protected',
+            'property_private',
+        ],
+    ],
     // 'phpdoc_summary' => true,
     // 'phpdoc_to_comment' => true,
     'phpdoc_trim' => true,
+    'phpdoc_trim_consecutive_blank_line_separation' => true,
+    'phpdoc_var_annotation_correct_order' => true,
+    'phpdoc_types_order' => [
+        'null_adjustment' => 'always_first',
+        'sort_algorithm' => 'none',
+    ],
     'phpdoc_types' => true,
     'phpdoc_var_without_name' => true,
     'general_phpdoc_tag_rename' => [
@@ -160,8 +235,16 @@ return $config->setRules([
         'keep_multiple_spaces_after_comma' => false,
         'on_multiline' => 'ensure_fully_multiline',
     ],
-
+    'semicolon_after_instruction' => true,
     'new_with_braces' => true,
+    'types_spaces' => [
+        'space' => 'none',
+    ],
+    'echo_tag_syntax' => [
+        'format' => 'long',
+        'long_function' => 'echo',
+        'shorten_simple_statements_only' => true,
+    ],
     'method_chaining_indentation' => true,
     'no_superfluous_phpdoc_tags' => false,
     'multiline_comment_opening_closing' => true,

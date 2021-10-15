@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Finder
+ * Description of Finder.
  *
  * @author Hery
  */
@@ -46,6 +46,7 @@ class CView_Finder {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -95,9 +96,9 @@ class CView_Finder {
      *
      * @param string $name
      *
-     * @return array
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return array
      */
     protected function parseNamespaceSegments($name) {
         $segments = explode(CView::HINT_PATH_DELIMITER, $name);
@@ -119,12 +120,12 @@ class CView_Finder {
      * @param string $name
      * @param array  $paths
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     protected function findInPaths($name, $paths) {
-        $cfPath = CF::getDirs(CView::VIEW_FOLDER);
+        $cfPath = CF::getDirs(CView::VIEW_FOLDER, null, false);
 
         $paths = array_merge($cfPath, $paths);
 

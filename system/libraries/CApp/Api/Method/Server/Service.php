@@ -10,7 +10,7 @@ use Symfony\Component\Process\Process;
  *
  * @since Aug 31, 2021, 06:57:37 PM
  */
-class CApp_Api_Method_App_Service extends CApp_Api_Method_App {
+class CApp_Api_Method_Server_Service extends CApp_Api_Method_Server {
     public function execute() {
         $errCode = 0;
         $errMessage = '';
@@ -42,9 +42,9 @@ class CApp_Api_Method_App_Service extends CApp_Api_Method_App {
 
         if ($errCode == 0) {
             try {
-                $execute = "sudo systemctl $command $service | grep \"Active:\"";
+                $execute = "sudo systemctl ${command} ${service} | grep \"Active:\"";
                 $output = '';
-                $errorOutput  = '';
+                $errorOutput = '';
 
                 $process = new Process($execute);
                 $process->run();

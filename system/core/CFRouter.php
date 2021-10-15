@@ -5,10 +5,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class CFRouter {
-    protected static $routesRuntime = [];
-
-    protected static $routes;
-
     public static $current_uri = '';
 
     public static $query_string = '';
@@ -37,6 +33,10 @@ class CFRouter {
 
     public static $routeData = [];
 
+    protected static $routesRuntime = [];
+
+    protected static $routes;
+
     /**
      * CFRouter setup routine. Automatically called during CF setup process.
      *
@@ -63,7 +63,7 @@ class CFRouter {
     }
 
     /**
-     * CFRouter get route data
+     * CFRouter get route data.
      *
      * @param null|mixed $uri
      *
@@ -162,7 +162,7 @@ class CFRouter {
             $method_segment = null;
 
             // Paths to search
-            $paths = CF::paths();
+            $paths = CF::paths(null, false, false);
 
             foreach ($data['rsegments'] as $key => $segment) {
                 // Add the segment to the search path
@@ -227,6 +227,7 @@ class CFRouter {
             }
             self::$routeData[$currentUri] = $data;
         }
+
         return self::$routeData[$currentUri];
     }
 
@@ -290,7 +291,7 @@ class CFRouter {
                         parse_str($query, $_GET);
 
                         // Convert $_GET to UTF-8
-                        $_GET = utf8::clean($_GET);
+                        $_GET = CUTF8::clean($_GET);
                     }
                 }
             }
@@ -331,9 +332,9 @@ class CFRouter {
             $currentUri = $_SERVER['PHP_SELF'];
         }
 
-        if (($strpos_fc = strpos($currentUri, KOHANA)) !== false) {
+        if (($strpos_fc = strpos($currentUri, CFINDEX)) !== false) {
             // Remove the front controller from the current uri
-            $currentUri = (string) substr($currentUri, $strpos_fc + strlen(KOHANA));
+            $currentUri = (string) substr($currentUri, $strpos_fc + strlen(CFINDEX));
         }
 
         // Remove slashes from the start and end of the URI
@@ -362,12 +363,14 @@ class CFRouter {
      */
     public static function findUri() {
         self::$current_uri = self::getUri();
+
         return self::$current_uri;
     }
 
     public static function getRoutes() {
         $routesConfig = CF::config('routes');
         $routesRuntime = self::$routesRuntime;
+
         return array_merge($routesConfig, $routesRuntime);
     }
 
@@ -488,6 +491,18 @@ class CFRouter {
 
     public static function getRoutesRuntime() {
         return CFRouter::$routesRuntime;
+    }
+
+    public static function getController() {
+        return static::$controller;
+    }
+
+    public static function getControllerMethod() {
+        return static::$method;
+    }
+
+    public static function getCompleteUri() {
+        return static::$complete_uri;
     }
 }
 

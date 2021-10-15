@@ -1,9 +1,11 @@
 <?php
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Jun 29, 2019, 6:34:42 PM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 ?>
@@ -37,7 +39,7 @@ See https://github.com/adobe-type-tools/cmap-resources
         <meta name="google" content="notranslate">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title><?php echo $title; ?></title>
-     
+
         <link rel="stylesheet" href="/media/css/plugins/pdfjs/viewer.css">
 
 
@@ -47,7 +49,7 @@ See https://github.com/adobe-type-tools/cmap-resources
 
 
         <script src="/media/js/plugins/pdfjs/viewer.js"></script>
-     
+
     </head>
 
     <body tabindex="1" class="loadingInProgress">
@@ -218,7 +220,7 @@ See https://github.com/adobe-type-tools/cmap-resources
                                 <button id="presentationMode" class="toolbarButton presentationMode hiddenLargeView" title="Switch to Presentation Mode" tabindex="31" data-l10n-id="presentation_mode">
                                     <span data-l10n-id="presentation_mode_label">Presentation Mode</span>
                                 </button>
-                                
+
                                 <button id="openFile" class="toolbarButton openFile hiddenLargeView" title="Open File" tabindex="32" data-l10n-id="open_file">
                                     <span data-l10n-id="open_file_label">Open</span>
                                 </button>
@@ -402,4 +404,3 @@ See https://github.com/adobe-type-tools/cmap-resources
 
     </body>
 </html>
-

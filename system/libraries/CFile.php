@@ -6,8 +6,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan
  */
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 use Symfony\Component\Mime\MimeTypes;
+use Symfony\Component\Filesystem\Filesystem as SymfonyFilesystem;
 
 class CFile {
     /**
@@ -24,10 +24,13 @@ class CFile {
                 $headers = stream_get_meta_data($content);
                 fclose($content);
                 $status = substr($headers['wrapper_data'][0], 9, 3);
+
                 return $status >= 200 && $status < 400;
             }
+
             return false;
         }
+
         return file_exists($file) && is_file($file);
     }
 
@@ -80,14 +83,15 @@ class CFile {
      * @param string $path
      * @param bool   $lock
      *
-     * @return string
-     *
      * @throws CFile_Exception_FileNotFoundException
+     *
+     * @return string
      */
     public static function get($path, $lock = false) {
         if (static::isFile($path)) {
             return $lock ? static::sharedGet($path) : file_get_contents($path);
         }
+
         throw new CStorage_Exception_FileNotFoundException("File does not exist at path {$path}");
     }
 
@@ -110,6 +114,7 @@ class CFile {
                 $success = false;
             }
         }
+
         return $success;
     }
 
@@ -127,6 +132,7 @@ class CFile {
         if ($force) {
             return @mkdir($path, $mode, $recursive);
         }
+
         return mkdir($path, $mode, $recursive);
     }
 
@@ -157,6 +163,7 @@ class CFile {
         if (is_string($time)) {
             $time = strtotime($time);
         }
+
         return $time - self::lastModified($filename);
     }
 
@@ -213,6 +220,7 @@ class CFile {
             $filesize = ftell($fp);
             fclose($fp);
         }
+
         return $filesize;
     }
 
@@ -327,6 +335,7 @@ class CFile {
         foreach (Finder::create()->in($directory)->directories()->depth(0)->sortByName() as $dir) {
             $directories[] = $dir->getPathname();
         }
+
         return $directories;
     }
 
@@ -361,6 +370,7 @@ class CFile {
         if (!$preserve) {
             @rmdir($directory);
         }
+
         return true;
     }
 
@@ -377,8 +387,10 @@ class CFile {
             foreach ($allDirectories as $directoryName) {
                 static::deleteDirectory($directoryName);
             }
+
             return true;
         }
+
         return false;
     }
 
@@ -399,9 +411,9 @@ class CFile {
      * @param string $path
      * @param array  $data
      *
-     * @return mixed
-     *
      * @throws CStorage_Exception_FileNotFoundException
+     *
+     * @return mixed
      */
     public static function getRequire($path, array $data = []) {
         if (static::isFile($path)) {
@@ -412,6 +424,7 @@ class CFile {
 
                 return require $__path;
             };
+
             return $function();
         }
 
@@ -439,6 +452,7 @@ class CFile {
         } else {
             $str .= "'" . addslashes($val) . "'";
         }
+
         return $str;
     }
 
@@ -511,9 +525,9 @@ class CFile {
      * @param string $target
      * @param string $link
      *
-     * @return void
-     *
      * @throws \RuntimeException
+     *
+     * @return void
      */
     public static function relativeLink($target, $link) {
         if (!class_exists(SymfonyFilesystem::class)) {
@@ -522,7 +536,7 @@ class CFile {
             );
         }
 
-        $relativeTarget = (new SymfonyFilesystem)->makePathRelative($target, dirname($link));
+        $relativeTarget = (new SymfonyFilesystem())->makePathRelative($target, dirname($link));
 
         static::link($relativeTarget, $link);
     }
@@ -541,5 +555,32 @@ class CFile {
         }
 
         return substr(sprintf('%o', fileperms($path)), -4);
+    }
+
+    /**
+     * Find path names matching a given pattern.
+     *
+     * @param string $pattern
+     * @param int    $flags
+     *
+     * @return array
+     */
+    public static function glob($pattern, $flags = 0) {
+        return glob($pattern, $flags);
+    }
+
+    /**
+     * Get an array of all files in a directory.
+     *
+     * @param string $directory
+     * @param bool   $hidden
+     *
+     * @return \Symfony\Component\Finder\SplFileInfo[]
+     */
+    public static function files($directory, $hidden = false) {
+        return iterator_to_array(
+            Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->depth(0)->sortByName(),
+            false
+        );
     }
 }
