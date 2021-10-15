@@ -64,7 +64,11 @@ final class CF {
      * @return bool
      */
     public static function isProduction() {
-        return defined('IN_PRODUCTION') && IN_PRODUCTION;
+        if (defined('IN_PRODUCTION') && IN_PRODUCTION) {
+            return true;
+        }
+
+        return CF::config('app.environment') === 'production';
     }
 
     /**
