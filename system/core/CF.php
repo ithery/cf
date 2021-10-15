@@ -15,9 +15,6 @@ final class CF {
     // The singleton instance of the controller (last of the controller)
     public static $instance;
 
-    // The multiple instance of the controller when callback when routing is failed or redirected
-    public static $instances;
-
     // The current locale
     public static $locale;
 
