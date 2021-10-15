@@ -1150,14 +1150,9 @@ final class CF {
     }
 
     public static function setLocale($locale) {
-        /*
-          CF::config('app')->set('locale', $locale);
-
-          CTranslation::translator()->setLocale($locale);
-
-          CEvent::dispatch('cf.locale.updated');
-         *
-         */
+        // CF::config('app')->set('locale', $locale);
+        // CTranslation::translator()->setLocale($locale);
+        // CEvent::dispatch('cf.locale.updated');
         //$this['events']->dispatch(new CBase_Events_LocaleUpdated($locale));
     }
 
