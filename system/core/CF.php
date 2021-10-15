@@ -35,9 +35,6 @@ final class CF {
      */
     public static $logger;
 
-    // Configuration
-    private static $configuration;
-
     /**
      * Include paths cache.
      *
@@ -660,7 +657,7 @@ final class CF {
             return false;
         }
 
-        if ($filename = self::findFile($type, self::$configuration['core']['extension_prefix'] . $class)) {
+        if ($filename = self::findFile($type, $class)) {
             // Load the class extension
             require $filename;
         } elseif ($suffix !== 'Core' and class_exists($class . '_Core', false)) {
