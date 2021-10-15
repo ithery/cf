@@ -28,8 +28,6 @@ final class CF {
      */
     public static $charset = 'utf-8';
 
-    public static $global_xss_filtering = true;
-
     /**
      * Logger Instance.
      *

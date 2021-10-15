@@ -1,7 +1,5 @@
 <?php
 
-use Mpdf\Tag\P;
-
 class CHTTP_InputSanitizer {
     /**
      * Sanitizes global GET, POST and COOKIE data. Also takes care of
@@ -10,8 +8,6 @@ class CHTTP_InputSanitizer {
      * @return void
      */
     public function __construct() {
-        // Use XSS clean?
-        $this->use_xss_clean = (bool) CF::$global_xss_filtering;
         $this->originalPost = $_POST;
         $this->originalGet = $_GET;
         $this->originalFiles = $_FILES;
