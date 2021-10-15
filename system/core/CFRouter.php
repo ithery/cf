@@ -5,10 +5,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\Routing\Route as SymfonyRoute;
 
 class CFRouter {
-    protected static $routesRuntime = [];
-
-    protected static $routes;
-
     public static $current_uri = '';
 
     public static $query_string = '';
@@ -37,6 +33,10 @@ class CFRouter {
 
     public static $routeData = [];
 
+    protected static $routesRuntime = [];
+
+    protected static $routes;
+
     /**
      * CFRouter setup routine. Automatically called during CF setup process.
      *
@@ -63,7 +63,7 @@ class CFRouter {
     }
 
     /**
-     * CFRouter get route data
+     * CFRouter get route data.
      *
      * @param null|mixed $uri
      *
@@ -227,6 +227,7 @@ class CFRouter {
             }
             self::$routeData[$currentUri] = $data;
         }
+
         return self::$routeData[$currentUri];
     }
 
@@ -362,12 +363,14 @@ class CFRouter {
      */
     public static function findUri() {
         self::$current_uri = self::getUri();
+
         return self::$current_uri;
     }
 
     public static function getRoutes() {
         $routesConfig = CF::config('routes');
         $routesRuntime = self::$routesRuntime;
+
         return array_merge($routesConfig, $routesRuntime);
     }
 
@@ -488,6 +491,14 @@ class CFRouter {
 
     public static function getRoutesRuntime() {
         return CFRouter::$routesRuntime;
+    }
+
+    public static function getController() {
+        return static::$controller;
+    }
+
+    public static function getControllerMethod() {
+        return static::$method;
     }
 }
 
