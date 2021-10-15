@@ -90,6 +90,7 @@ class curl {
         if ($qs && strlen($requestUri) > 0) {
             return trim(curl::httpbase(), '/') . $requestUri;
         }
+
         return curl::httpbase() . curl::current() . ($qs ? CFRouter::$query_string : '');
     }
 
@@ -176,7 +177,7 @@ class curl {
         $separator = ($separator === '-') ? '-' : '_';
 
         // Replace accented characters by their unaccented equivalents
-        $title = utf8::transliterate_to_ascii($title);
+        $title = CUTF8::transliterate_to_ascii($title);
 
         // Remove all characters that are not the separator, a-z, 0-9, or whitespace
         $title = preg_replace('/[^' . $separator . 'a-z0-9\s]+/', '', strtolower($title));
@@ -253,7 +254,7 @@ class curl {
 
     /**
      * @param string      $val
-     * @param string|null $key pass null to no key
+     * @param null|string $key pass null to no key
      *
      * @return string
      */
@@ -285,7 +286,7 @@ class curl {
 
     /**
      * @param string      $val
-     * @param string|null $key
+     * @param null|string $key
      *
      * @return string
      *
