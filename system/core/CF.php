@@ -13,10 +13,13 @@ final class CF {
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
 
     // The singleton instance of the controller (last of the controller)
-    public static $instance;
 
-    // The current locale
-    public static $locale;
+    /**
+     * @var null
+     *
+     * @deprecated since 1.2, use CF::controller()
+     */
+    public static $instance;
 
     /**
      * Chartset used for this application.
@@ -31,6 +34,20 @@ final class CF {
      * @var CLogger logging object
      */
     public static $logger;
+
+    /**
+     * The current locale.
+     *
+     * @var string
+     */
+    private static $locale;
+
+    /**
+     * The fallback locale.
+     *
+     * @var string
+     */
+    private static $fallbackLocale;
 
     /**
      *  Internal caches for faster loading.
@@ -52,8 +69,6 @@ final class CF {
      * @var array
      */
     private static $sharedAppCode = [];
-
-    private static $translator;
 
     /**
      * Check CF is running on production.
@@ -160,6 +175,8 @@ final class CF {
 
         // Set locale information
         self::$locale = setlocale(LC_ALL, $locale);
+        // Set locale information
+        self::$fallbackLocale = self::config('app.fallback_locale');
 
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
         static::loadBootstrapFiles();
@@ -971,103 +988,6 @@ final class CF {
     }
 
     /**
-     * Call the given Closure with the given value then return the value.
-     *
-     * @param mixed         $value
-     * @param null|callable $callback
-     *
-     * @return mixed
-     *
-     * @deprecated since 1.2, use c::tap
-     */
-    public static function tap($value, $callback = null) {
-        return c::tap($value, $callback);
-    }
-
-    /**
-     * Get the class "basename" of the given object / class.
-     *
-     * @param string|object $class
-     *
-     * @return string
-     *
-     * @deprecated  since 1.2, use c::classBlasename
-     */
-    public static function classBasename($class) {
-        return c::classBasename($class);
-    }
-
-    /**
-     * Returns all traits used by a class, its subclasses and trait of their traits.
-     *
-     * @param object|string $class
-     *
-     * @return array
-     *
-     * @deprecated since 1.2, use c::classUsesRecursive
-     */
-    public static function classUsesRecursive($class) {
-        return c::classUsesRecursive($class);
-    }
-
-    /**
-     * Returns all traits used by a trait and its traits.
-     *
-     * @param string $trait
-     *
-     * @return array
-     *
-     * @deprecated since 1.2, use c::traitUsesRecursive
-     */
-    public static function traitUsesRecursive($trait) {
-        return c::traitUsesRecursive($trait);
-    }
-
-    /**
-     * Return the default value of the given value.
-     *
-     * @param mixed $value
-     *
-     * @return mixed
-     *
-     * @deprecated 1.2 use c::value
-     */
-    public static function value($value) {
-        return c::value($value);
-    }
-
-    /**
-     * Get an item from an array or object using "dot" notation.
-     *
-     * @param mixed        $target
-     * @param string|array $key
-     * @param mixed        $default
-     *
-     * @return mixed
-     *
-     * @deprecated 1.2 use c::dataGet
-     */
-    public static function get($target, $key, $default = null) {
-        return c::get($target, $key, $default);
-    }
-
-    /**
-     * Set an item on an array or object using dot notation.
-     *
-     * @param mixed        $target
-     * @param string|array $key
-     * @param mixed        $value
-     * @param bool         $overwrite
-     *
-     * @return mixed
-     *
-     * @deprecated 1.2 use c::dataSet
-     */
-    public static function set(&$target, $key, $value, $overwrite = true) {
-        return c::set($target, $key, $value);
-    }
-
-    /**
      * Create a collection from the given value.
      *
      * @param mixed $value
@@ -1105,6 +1025,11 @@ final class CF {
         return DOCROOT . 'application/' . $appCode . '/';
     }
 
+    /**
+     * Get current running controller.
+     *
+     * @return CController
+     */
     public static function currentController() {
         return CHTTP::kernel()->controller();
     }
@@ -1115,16 +1040,50 @@ final class CF {
      * @return string
      */
     public static function getLocale() {
-        return CF::config('app.locale');
+        return static::$locale;
     }
 
+    /**
+     * Get the current application fallback locale.
+     *
+     * @return string
+     */
+    public static function getFallbackLocale() {
+        return static::$fallbackLocale;
+    }
+
+    /**
+     * Set the current application locale.
+     *
+     * @param string $locale
+     *
+     * @return void
+     */
     public static function setLocale($locale) {
-        // CF::config('app')->set('locale', $locale);
+        // static::$locale = $locale;
         // CTranslation::translator()->setLocale($locale);
         // CEvent::dispatch('cf.locale.updated');
-        //$this['events']->dispatch(new CBase_Events_LocaleUpdated($locale));
     }
 
+    /**
+     * Set the current application fallback locale.
+     *
+     * @param string $fallbackLocale
+     *
+     * @return void
+     */
+    public function setFallbackLocale($fallbackLocale) {
+        // static::$fallbackLocale = $fallbackLocale;
+        // CTranslation::translator()->setFallback($locale);
+    }
+
+    /**
+     * Get current application directory.
+     *
+     * @param null|string $appCode
+     *
+     * @return bool
+     */
     public static function appDir($appCode = null) {
         if ($appCode == null) {
             $appCode = static::appCode();
@@ -1133,10 +1092,20 @@ final class CF {
         return DOCROOT . 'application' . DS . $appCode;
     }
 
+    /**
+     * Check if CF is run under devsuite.
+     *
+     * @return bool
+     */
     public static function isDevSuite() {
         return cstr::endsWith(CF::domain(), '.test');
     }
 
+    /**
+     * Check if CF is run under testing.
+     *
+     * @return bool
+     */
     public static function isTesting() {
         if (defined('CFTesting')
             || (is_array($_SERVER) && isset($_SERVER['APP_ENV']) && $_SERVER['APP_ENV'] == 'testing')
@@ -1147,6 +1116,11 @@ final class CF {
         return false;
     }
 
+    /**
+     * Return all app availables.
+     *
+     * @return array
+     */
     public static function getAvailableAppCode() {
         $path = DOCROOT . 'application';
         $directories = CFile::directories($path);
@@ -1156,6 +1130,14 @@ final class CF {
         })->all();
     }
 
+    /**
+     * Get CF internal cache.
+     *
+     * @param string     $key
+     * @param null|mixed $default
+     *
+     * @return mixed
+     */
     private static function getInternalCache($key, $default = null) {
         if (isset(static::$internalCache[$key])) {
             return static::$internalCache[$key];
@@ -1164,10 +1146,23 @@ final class CF {
         return $default;
     }
 
+    /**
+     * Set CF internal cache.
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return void
+     */
     private static function setInternalCache($key, $value) {
         static::$internalCache[$key] = $value;
     }
 
+    /**
+     * Clear CF internal cache.
+     *
+     * @return void
+     */
     private static function clearInternalCache() {
         static::$internalCache = [];
     }

@@ -161,11 +161,11 @@ trait CFDeprecatedTrait {
      * Get org code for this domain
      * This function is deprecated, use CF::orgCode.
      *
-     * @deprecated
-     *
      * @param string $domain
      *
      * @return string
+     *
+     * @deprecated
      */
     public static function org_code($domain = null) {
         return self::orgCode($domain);
@@ -500,6 +500,103 @@ trait CFDeprecatedTrait {
      */
     public static function lang($key = null, array $args = [], $locale = null) {
         return c::__($key, $args, $locale);
+    }
+
+    /**
+     * Call the given Closure with the given value then return the value.
+     *
+     * @param mixed         $value
+     * @param null|callable $callback
+     *
+     * @return mixed
+     *
+     * @deprecated since 1.2, use c::tap
+     */
+    public static function tap($value, $callback = null) {
+        return c::tap($value, $callback);
+    }
+
+    /**
+     * Get the class "basename" of the given object / class.
+     *
+     * @param string|object $class
+     *
+     * @return string
+     *
+     * @deprecated  since 1.2, use c::classBlasename
+     */
+    public static function classBasename($class) {
+        return c::classBasename($class);
+    }
+
+    /**
+     * Returns all traits used by a class, its subclasses and trait of their traits.
+     *
+     * @param object|string $class
+     *
+     * @return array
+     *
+     * @deprecated since 1.2, use c::classUsesRecursive
+     */
+    public static function classUsesRecursive($class) {
+        return c::classUsesRecursive($class);
+    }
+
+    /**
+     * Returns all traits used by a trait and its traits.
+     *
+     * @param string $trait
+     *
+     * @return array
+     *
+     * @deprecated since 1.2, use c::traitUsesRecursive
+     */
+    public static function traitUsesRecursive($trait) {
+        return c::traitUsesRecursive($trait);
+    }
+
+    /**
+     * Return the default value of the given value.
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     *
+     * @deprecated 1.2 use c::value
+     */
+    public static function value($value) {
+        return c::value($value);
+    }
+
+    /**
+     * Get an item from an array or object using "dot" notation.
+     *
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $default
+     *
+     * @return mixed
+     *
+     * @deprecated 1.2 use c::get
+     */
+    public static function get($target, $key, $default = null) {
+        return c::get($target, $key, $default);
+    }
+
+    /**
+     * Set an item on an array or object using dot notation.
+     *
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $value
+     * @param bool         $overwrite
+     *
+     * @return mixed
+     *
+     * @deprecated 1.2 use c::set
+     */
+    public static function set(&$target, $key, $value, $overwrite = true) {
+        return c::set($target, $key, $value);
     }
 }
 // @codingStandardsIgnoreStart
