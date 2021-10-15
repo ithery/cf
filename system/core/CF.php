@@ -18,9 +18,6 @@ final class CF {
     // The multiple instance of the controller when callback when routing is failed or redirected
     public static $instances;
 
-    // The current user agent
-    public static $user_agent;
-
     // The current locale
     public static $locale;
 
@@ -163,9 +160,6 @@ final class CF {
 
         // Disable notices and "strict" errors
         $ER = error_reporting(~E_NOTICE & ~E_STRICT);
-
-        // Set the user agent
-        self::$user_agent = (!empty($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '');
 
         if (function_exists('date_default_timezone_set')) {
             $timezone = self::config('app.timezone');
