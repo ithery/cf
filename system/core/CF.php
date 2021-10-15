@@ -35,13 +35,6 @@ final class CF {
      */
     public static $logger;
 
-    /**
-     * Config Instance.
-     *
-     * @var CConfig config object
-     */
-    public static $config;
-
     // Configuration
     private static $configuration;
 
@@ -149,9 +142,6 @@ final class CF {
 
         // Set and test the logger instance, we need to know whats wrong when CF Fail
         self::$logger = CLogger::instance();
-
-        // Set and test the config, we need config can loaded normally to run CF
-        self::$config = CConfig::instance('app');
 
         // Disable notices and "strict" errors
         $ER = error_reporting(~E_NOTICE & ~E_STRICT);
