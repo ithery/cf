@@ -7,7 +7,14 @@ return $config->setRules([
     'array_syntax' => ['syntax' => 'short'],
     'combine_consecutive_unsets' => true,
     'combine_consecutive_issets' => true,
-    'class_attributes_separation' => true,
+    'class_attributes_separation' => [
+        'elements' => [
+            'const' => 'one',
+            'method' => 'one',
+            'property' => 'one',
+            'trait_import' => 'none'
+        ]
+    ],
     'multiline_whitespace_before_semicolons' => [
         'strategy' => 'no_multi_line',
     ],
@@ -75,7 +82,7 @@ return $config->setRules([
     'no_singleline_whitespace_before_semicolons' => true,
     'no_spaces_around_offset' => true,
     'no_spaces_inside_parenthesis' => true,
-    'ereg_to_preg' => true,
+    //'ereg_to_preg' => true, // risky
     //'no_superfluous_elseif' => true,
     'no_superfluous_phpdoc_tags' => true,
     'no_trailing_whitespace' => true,
@@ -165,7 +172,19 @@ return $config->setRules([
             'version' => 'annotation'
         ]
     ],
-    // 'ordered_class_elements' => true,
+    'ordered_class_elements' => [
+        'order' => [
+            'use_trait',
+            'constant_public',
+            'constant_protected',
+            'constant_private',
+            'property_public',
+            'property_protected',
+            'property_private',
+            'construct',
+            'destruct',
+        ],
+    ],
     // 'phpdoc_summary' => true,
     // 'phpdoc_to_comment' => true,
     'phpdoc_trim' => true,

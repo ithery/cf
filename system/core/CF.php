@@ -3,11 +3,10 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * CF Class
+ * CF Class.
  */
 final class CF {
     use CFDeprecatedTrait;
-
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
 
     // Security check that is added to all generated PHP files
@@ -25,18 +24,8 @@ final class CF {
     // The current locale
     public static $locale;
 
-    // Configuration
-    private static $configuration;
-
     /**
-     * Include paths cache
-     *
-     * @var array
-     */
-    private static $paths;
-
-    /**
-     * Chartset used for this application
+     * Chartset used for this application.
      *
      * @var string
      */
@@ -47,18 +36,42 @@ final class CF {
 
     public static $global_xss_filtering = true;
 
+    /**
+     * Logger Instance.
+     *
+     * @var CLogger logging object
+     */
+    public static $logger;
+
+    /**
+     * Config Instance.
+     *
+     * @var CConfig config object
+     */
+    public static $config;
+
+    // Configuration
+    private static $configuration;
+
+    /**
+     * Include paths cache.
+     *
+     * @var array
+     */
+    private static $paths;
+
     // Internal caches and write status
     private static $internal_cache = [];
 
     /**
-     * CF Data domain
+     * CF Data domain.
      *
      * @var array
      */
     private static $data;
 
     /**
-     * List of Shared appCode used for CF
+     * List of Shared appCode used for CF.
      *
      * @var array
      */
@@ -67,21 +80,7 @@ final class CF {
     private static $translator;
 
     /**
-     * Logger Instance
-     *
-     * @var CLogger logging object
-     */
-    public static $logger;
-
-    /**
-     * Config Instance
-     *
-     * @var CConfig config object
-     */
-    public static $config;
-
-    /**
-     * Check CF is running on production
+     * Check CF is running on production.
      *
      * @return bool
      */
@@ -90,7 +89,7 @@ final class CF {
     }
 
     /**
-     * Check given domain exists or not
+     * Check given domain exists or not.
      *
      * @param string $domain domain to check
      *
@@ -101,7 +100,7 @@ final class CF {
     }
 
     /**
-     * Create domain
+     * Create domain.
      *
      * @param string $domain     asd
      * @param array  $domainData asd
@@ -111,8 +110,10 @@ final class CF {
     public static function createDomain($domain, array $domainData) {
         if (!static::domainExists($domain)) {
             CFData::set($domain, $domainData, 'domain');
+
             return true;
         }
+
         return false;
     }
 
@@ -216,7 +217,7 @@ final class CF {
     }
 
     /**
-     * Load all bootstrap files
+     * Load all bootstrap files.
      *
      * @return void
      */
@@ -260,7 +261,7 @@ final class CF {
     }
 
     /**
-     * Invoke
+     * Invoke.
      *
      * @param mixed $uri
      *
@@ -283,7 +284,6 @@ final class CF {
         $method = carr::get($routerData, 'method');
         $arguments = carr::get($routerData, 'arguments');
 
-
         if ($controller instanceof \Symfony\Component\HttpFoundation\Response) {
             return $controller;
         }
@@ -292,6 +292,7 @@ final class CF {
             require_once $controller_path;
         }
         $class_name = '';
+
         try {
             // Start validation of the controller
             $class_name = str_replace('/', '_', $controller_dir_ucfirst);
@@ -322,6 +323,7 @@ final class CF {
         if (isset($class)) {
             $controller = $class->newInstance();
         }
+
         try {
             // Load the controller method
             $method = $class->getMethod($method);
@@ -385,6 +387,7 @@ final class CF {
                 return $path;
             }
         }
+
         return null;
     }
 
@@ -403,6 +406,7 @@ final class CF {
                 $dirs[] = $path;
             }
         }
+
         return $dirs;
     }
 
@@ -443,6 +447,7 @@ final class CF {
         if (count($files) > 0) {
             return $files[0];
         }
+
         return null;
     }
 
@@ -585,6 +590,7 @@ final class CF {
             if ($filename = self::findFile($type, $file)) {
                 require $filename;
                 $class_not_found = true;
+
                 return true;
             } else {
                 $type = 'libraries';
@@ -596,6 +602,7 @@ final class CF {
         if ($filename = self::findFile($type, $file)) {
             require $filename;
             $class_not_found = true;
+
             return true;
         }
 
@@ -629,6 +636,7 @@ final class CF {
 
                     if (class_exists($class) || interface_exists($class)) {
                         $class_not_found = false;
+
                         return true;
                     }
                 }
@@ -643,6 +651,7 @@ final class CF {
 
                         if (class_exists($class) || interface_exists($class)) {
                             $class_not_found = false;
+
                             return true;
                         }
                     }
@@ -654,6 +663,7 @@ final class CF {
                 // Load the class file
                 require $path;
                 $class_not_found = true;
+
                 return true;
             }
 
@@ -669,6 +679,7 @@ final class CF {
 
                         require $path;
                         $class_not_found = true;
+
                         return true;
                     }
                 }
@@ -716,7 +727,7 @@ final class CF {
     }
 
     /**
-     * Detect CF is running on console in cf command or not
+     * Detect CF is running on console in cf command or not.
      *
      * @return bool
      */
@@ -725,7 +736,7 @@ final class CF {
     }
 
     /**
-     * Detect CF is running on console or not
+     * Detect CF is running on console or not.
      *
      * @return type
      */
@@ -734,7 +745,7 @@ final class CF {
     }
 
     /**
-     * To get cliDomain
+     * To get cliDomain.
      *
      * @return string
      */
@@ -743,6 +754,7 @@ final class CF {
         if (file_exists(static::CFCLI_CURRENT_DOMAIN_FILE)) {
             $domain = trim(file_get_contents(static::CFCLI_CURRENT_DOMAIN_FILE));
         }
+
         return $domain;
     }
 
@@ -767,6 +779,7 @@ final class CF {
                 }
             }
         }
+
         return $domain;
     }
 
@@ -835,6 +848,7 @@ final class CF {
             if ($required === true) {
                 // If the file is required, throw an exception
                 $lang = static::lang('core.resource_not_found', [':directory' => $directory, ':filename' => $filename]);
+
                 throw new CException($lang);
             } else {
                 // Nothing was found, return FALSE
@@ -880,7 +894,7 @@ final class CF {
     }
 
     /**
-     * Checks if given data is file, handles mixed input
+     * Checks if given data is file, handles mixed input.
      *
      * @param mixed $value
      *
@@ -893,7 +907,7 @@ final class CF {
     }
 
     /**
-     * Get data domain
+     * Get data domain.
      *
      * @param string $domain
      *
@@ -911,11 +925,12 @@ final class CF {
                 self::$data[$domain] = CFData::domain($wildcardDomain);
             }
         }
+
         return self::$data[$domain];
     }
 
     /**
-     * Get application id for domain
+     * Get application id for domain.
      *
      * @param null|mixed $domain
      *
@@ -923,11 +938,12 @@ final class CF {
      */
     public static function appId($domain = null) {
         $data = self::data($domain);
+
         return isset($data['app_id']) ? $data['app_id'] : null;
     }
 
     /**
-     * Get application code for domain
+     * Get application code for domain.
      *
      * @param null|mixed $domain
      *
@@ -935,11 +951,12 @@ final class CF {
      */
     public static function appCode($domain = null) {
         $data = self::data($domain);
+
         return isset($data['app_code']) ? $data['app_code'] : null;
     }
 
     /**
-     * Get org id for domain
+     * Get org id for domain.
      *
      * @param string $domain
      *
@@ -947,11 +964,12 @@ final class CF {
      */
     public static function orgId($domain = null) {
         $data = self::data($domain);
+
         return isset($data['org_id']) ? $data['org_id'] : null;
     }
 
     /**
-     * Get org code for this domain
+     * Get org code for this domain.
      *
      * @param string $domain
      *
@@ -959,11 +977,12 @@ final class CF {
      */
     public static function orgCode($domain = null) {
         $data = self::data($domain);
+
         return isset($data['org_code']) ? $data['org_code'] : null;
     }
 
     /**
-     * Add Shared App in runtime
+     * Add Shared App in runtime.
      *
      * @param string $appCode
      */
@@ -978,7 +997,7 @@ final class CF {
     }
 
     /**
-     * Get shared application code for this domain
+     * Get shared application code for this domain.
      *
      * @param string $domain
      *
@@ -996,7 +1015,7 @@ final class CF {
     }
 
     /**
-     * Get theme for this domain
+     * Get theme for this domain.
      *
      * @param null|mixed $domain
      *
@@ -1004,11 +1023,12 @@ final class CF {
      */
     public static function theme($domain = null) {
         $data = self::data($domain);
+
         return isset($data['theme']) ? $data['theme'] : null;
     }
 
     /**
-     * Get modules for this domain
+     * Get modules for this domain.
      *
      * @param null|mixed $domain
      *
@@ -1016,6 +1036,7 @@ final class CF {
      */
     public static function modules($domain = null) {
         $data = self::data($domain);
+
         return isset($data['modules']) ? $data['modules'] : ['cresenity'];
     }
 
@@ -1023,7 +1044,7 @@ final class CF {
      * Call the given Closure with the given value then return the value.
      *
      * @param mixed         $value
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return mixed
      *
@@ -1177,6 +1198,7 @@ final class CF {
         if ($appCode == null) {
             $appCode = static::appCode();
         }
+
         return DOCROOT . 'application' . DS . $appCode;
     }
 
@@ -1190,12 +1212,14 @@ final class CF {
         ) {
             return true;
         }
+
         return false;
     }
 
     public static function getAvailableAppCode() {
         $path = DOCROOT . 'application';
         $directories = CFile::directories($path);
+
         return c::collect($directories)->map(function ($v) {
             return basename($v);
         })->all();
