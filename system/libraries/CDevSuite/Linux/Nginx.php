@@ -5,6 +5,9 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
 
     public $sm;
 
+    /**
+     * @var CDevSuite_Linux_Site
+     */
     public $site;
 
     public $nginx_conf;
@@ -12,6 +15,11 @@ class CDevSuite_Linux_Nginx extends CDevSuite_Nginx {
     public $sites_available_conf;
 
     public $sites_enabled_conf;
+
+    /**
+     * @var CDevSuite_Linux_Filesystem
+     */
+    public $files;
 
     /**
      * Create a new Nginx instance.
