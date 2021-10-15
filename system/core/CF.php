@@ -28,9 +28,6 @@ final class CF {
      */
     public static $charset = 'utf-8';
 
-    /* log threshold default , CLogger::LOG_WARNING (4) */
-    public static $log_threshold = LOG_WARNING; // 4
-
     public static $global_xss_filtering = true;
 
     /**

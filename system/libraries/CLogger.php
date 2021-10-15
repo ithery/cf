@@ -41,6 +41,8 @@ class CLogger {
 
     protected static $writeOnAdd = false;
 
+    protected $threshold;
+
     /**
      * @var CLogger Singleton instance container
      */
@@ -48,6 +50,7 @@ class CLogger {
 
     private function __construct() {
         $options['path'] = 'system';
+        $this->threshold = CF::config('log.threshold', static::DEBUG);
         $this->createWriter('file', $options);
     }
 
@@ -112,6 +115,10 @@ class CLogger {
         }
         if (!is_numeric($level)) {
             $level = static::EMERGENCY;
+        }
+
+        if ($level >= $this->threshold) {
+            return;
         }
 
         if ($values) {
