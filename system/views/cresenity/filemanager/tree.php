@@ -1,13 +1,13 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 11, 2019, 2:40:06 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 11, 2019, 2:40:06 AM
  */
-
 ?>
 
 <!DOCTYPE html>
@@ -44,7 +44,7 @@ echo $ready_client_script;
 <?php echo $load_client_script; ?>
                 }
             }
-<?php echo $custom_js ?>
+<?php echo $custom_js; ?>
         </script>
         <?php echo $custom_footer; ?>
     </body>
