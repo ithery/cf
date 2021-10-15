@@ -162,7 +162,7 @@ class CFRouter {
             $method_segment = null;
 
             // Paths to search
-            $paths = CF::paths();
+            $paths = CF::paths(null, false, false);
 
             foreach ($data['rsegments'] as $key => $segment) {
                 // Add the segment to the search path
