@@ -1,22 +1,26 @@
 <?php
 
 /**
- * Description of Kernel
+ * Description of Kernel.
  *
  * @author Hery
  */
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class CHTTP_Kernel {
     use CHTTP_Trait_OutputBufferTrait,
         CHTTP_Concern_KernelRouting;
-
     protected $isHandled = false;
 
     protected $terminated;
 
+    /**
+     * Current controller running on HTTP Kernel.
+     *
+     * @var CController
+     */
     protected $controller;
 
     public function __construct() {
@@ -52,9 +56,9 @@ class CHTTP_Kernel {
     }
 
     /**
-     * @return ReflectionClass
-     *
      * @throws ReflectionException
+     *
+     * @return ReflectionClass
      */
     public function getReflectionControllerClass() {
         CFBenchmark::start(SYSTEM_BENCHMARK . '_controller_setup');
@@ -89,6 +93,7 @@ class CHTTP_Kernel {
     public static function getReflectionControllerMethodAndArguments(ReflectionClass $reflectionClass) {
         $method = null;
         $arguments = [];
+
         try {
             // Load the controller method
             $method = $reflectionClass->getMethod(CFRouter::$method);
@@ -149,6 +154,11 @@ class CHTTP_Kernel {
         return $response;
     }
 
+    /**
+     * Get current controller executed.
+     *
+     * @return CController
+     */
     public function controller() {
         return $this->controller;
     }
@@ -167,6 +177,7 @@ class CHTTP_Kernel {
         });
         $output = '';
         $response = null;
+
         try {
             //$response = $this->sendRequestThroughRouter($request);
 
@@ -210,6 +221,7 @@ class CHTTP_Kernel {
                 CEvent::dispatch(new CHTTP_ResponseCache_Event_CacheHit($request));
 
                 $response = $responseCache->getCachedResponseFor($request);
+
                 return $response;
             }
         }
@@ -229,6 +241,7 @@ class CHTTP_Kernel {
         CHTTP::setRequest($request);
         CBootstrap::instance()->boot();
         $response = null;
+
         try {
             $this->setupRouter();
             $response = $this->handleRequest($request);
@@ -276,7 +289,7 @@ class CHTTP_Kernel {
         }
 
         if ($response instanceof PsrResponseInterface) {
-            $response = (new HttpFoundationFactory)->createResponse($response);
+            $response = (new HttpFoundationFactory())->createResponse($response);
         } elseif ($response instanceof CModel && $response->wasRecentlyCreated) {
             $response = new CHTTP_JsonResponse($response, 201);
         } elseif (!$response instanceof SymfonyResponse
