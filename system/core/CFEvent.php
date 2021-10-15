@@ -4,14 +4,14 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
 final class CFEvent {
+    // Data that can be processed during events
+    public static $data;
+
     // CFEvent callbacks
     private static $events = [];
 
     // Cache of events that have been run
-    private static $has_run = [];
-
-    // Data that can be processed during events
-    public static $data;
+    private static $hasRun = [];
 
     /**
      * Add a callback to an event queue.
@@ -190,7 +190,7 @@ final class CFEvent {
         }
 
         // The event has been run!
-        self::$has_run[$name] = $name;
+        self::$hasRun[$name] = $name;
     }
 
     /**
@@ -200,8 +200,8 @@ final class CFEvent {
      *
      * @return bool
      */
-    public static function has_run($name) {
-        return isset(self::$has_run[$name]);
+    public static function hasRun($name) {
+        return isset(self::$hasRun[$name]);
     }
 }
 

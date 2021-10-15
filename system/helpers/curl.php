@@ -198,7 +198,7 @@ class curl {
      * @return void
      */
     public static function redirect($uri = '', $method = '302') {
-        if (CFEvent::has_run('system.send_headers')) {
+        if (CFEvent::hasRun('system.send_headers')) {
             return false;
         }
 
