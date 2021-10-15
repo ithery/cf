@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CFDeprecatedTrait
+ * Description of CFDeprecatedTrait.
  *
  * @author Hery
  */
@@ -33,7 +33,7 @@ trait CFDeprecatedTrait {
      * @param string $directory
      * @param string $domain
      *
-     * @return string|null directory
+     * @return null|string directory
      */
     public static function get_dir($directory = '', $domain = null) {
         return static::getDir($directory, $domain);
@@ -66,19 +66,6 @@ trait CFDeprecatedTrait {
     }
 
     /**
-     * get path with theme (theme is not supported again, dont use this function)
-     *
-     * @deprecated
-     *
-     * @param type $process
-     *
-     * @return type
-     */
-    public static function include_paths_theme($process = false) {
-        return self::include_paths($process, true);
-    }
-
-    /**
      * @param type $filename
      * @param type $domain
      *
@@ -94,6 +81,7 @@ trait CFDeprecatedTrait {
             $cfg = include $file;
             $ret = array_merge($ret, $cfg);
         }
+
         return $ret;
     }
 
@@ -103,7 +91,7 @@ trait CFDeprecatedTrait {
      *
      * @deprecated
      *
-     * @param   boolean  re-process the include paths
+     * @param   bool  re-process the include paths
      * @param mixed $process
      * @param mixed $with_theme
      *
@@ -117,7 +105,7 @@ trait CFDeprecatedTrait {
 
     /**
      * Add Shared App in runtime
-     * This function is deprecated, use CF::addSharedApp
+     * This function is deprecated, use CF::addSharedApp.
      *
      * @deprecated
      *
@@ -129,13 +117,13 @@ trait CFDeprecatedTrait {
 
     /**
      * Get application id for domain
-     * This function is deprecated, use CF::appId
-     *
-     * @return string
+     * This function is deprecated, use CF::appId.
      *
      * @deprecated
      *
      * @param null|mixed $domain
+     *
+     * @return string
      */
     public static function app_id($domain = null) {
         return self::appId($domain);
@@ -143,13 +131,13 @@ trait CFDeprecatedTrait {
 
     /**
      * Get application code for domain
-     * This function is deprecated, use CF::appCode
+     * This function is deprecated, use CF::appCode.
      *
      * @deprecated
      *
-     * @return string
-     *
      * @param null|mixed $domain
+     *
+     * @return string
      */
     public static function app_code($domain = null) {
         return self::appCode($domain);
@@ -157,7 +145,7 @@ trait CFDeprecatedTrait {
 
     /**
      * Get org id for domain
-     * This function is deprecated, use CF::orgId
+     * This function is deprecated, use CF::orgId.
      *
      * @deprecated
      *
@@ -171,7 +159,7 @@ trait CFDeprecatedTrait {
 
     /**
      * Get org code for this domain
-     * This function is deprecated, use CF::orgCode
+     * This function is deprecated, use CF::orgCode.
      *
      * @deprecated
      *
@@ -225,12 +213,12 @@ trait CFDeprecatedTrait {
     /**
      * Displays a 404 page.
      *
-     * @throws C_404_Exception
-     *
      * @param   string  URI of page
      * @param   string  custom template
      * @param mixed $page
      * @param mixed $template
+     *
+     * @throws C_404_Exception
      *
      * @return void
      *
@@ -258,7 +246,7 @@ trait CFDeprecatedTrait {
      * Closes all open output buffers, either by flushing or cleaning, and stores the C
      * output buffer for display during shutdown.
      *
-     * @param   boolean  disable to clear buffers, rather than flushing
+     * @param   bool  disable to clear buffers, rather than flushing
      * @param mixed $flush
      *
      * @return void
@@ -280,9 +268,6 @@ trait CFDeprecatedTrait {
      * @deprecated
      */
     public static function config_clear($group) {
-        // Remove the group from config
-        unset(self::$configuration[$group], self::$internal_cache['configuration'][$group]);
-
         if (!isset(self::$write_cache['configuration'])) {
             // Cache has changed
             self::$write_cache['configuration'] = true;
@@ -292,16 +277,16 @@ trait CFDeprecatedTrait {
     /**
      * Retrieves current user agent information:
      * keys:  browser, version, platform, mobile, robot, referrer, languages, charsets
-     * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset
+     * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset.
      *
      * @param   string   key or test name
      * @param   string   used with "accept" tests: user_agent(accept_lang, en)
      * @param mixed      $key
      * @param null|mixed $compare
      *
-     * @return array   languages and charsets
-     * @return string  all other keys
-     * @return boolean all tests
+     * @return array  languages and charsets
+     * @return string all other keys
+     * @return bool   all tests
      *
      * @deprecated
      */
@@ -422,25 +407,25 @@ trait CFDeprecatedTrait {
     /**
      * Retrieves current user agent information:
      * keys:  browser, version, platform, mobile, robot, referrer, languages, charsets
-     * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset
+     * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset.
      *
      * @param   string   key or test name
      * @param   string   used with "accept" tests: user_agent(accept_lang, en)
      * @param mixed      $key
      * @param null|mixed $compare
      *
-     * @return array   languages and charsets
-     * @return string  all other keys
-     * @return boolean all tests
+     * @return array  languages and charsets
+     * @return string all other keys
+     * @return bool   all tests
      *
      * @deprecated
      */
     public static function userAgent($key = 'agent', $compare = null) {
         static $info;
-
+        $userAgent = CHTTP::request()->userAgent();
         // Return the raw string
         if ($key === 'agent') {
-            return self::$user_agent;
+            return $userAgent;
         }
 
         if ($info === null) {
@@ -449,14 +434,15 @@ trait CFDeprecatedTrait {
 
             foreach ($agents as $type => $data) {
                 foreach ($data as $agent => $name) {
-                    if (stripos(self::$user_agent, $agent) !== false) {
-                        if ($type === 'browser' and preg_match('|' . preg_quote($agent) . '[^0-9.]*+([0-9.][0-9.a-z]*)|i', self::$user_agent, $match)) {
+                    if (stripos($userAgent, $agent) !== false) {
+                        if ($type === 'browser' and preg_match('|' . preg_quote($agent) . '[^0-9.]*+([0-9.][0-9.a-z]*)|i', $userAgent, $match)) {
                             // Set the browser version
                             $info['version'] = $match[1];
                         }
 
                         // Set the agent name
                         $info[$type] = $name;
+
                         break;
                     }
                 }
@@ -470,6 +456,7 @@ trait CFDeprecatedTrait {
                 case 'is_mobile':
                     // A boolean result
                     $return = !empty($info[substr($key, 3)]);
+
                     break;
                 case 'languages':
                     $return = [];
@@ -479,6 +466,7 @@ trait CFDeprecatedTrait {
                             $return = $matches[0];
                         }
                     }
+
                     break;
                 case 'charsets':
                     $return = [];
@@ -488,12 +476,14 @@ trait CFDeprecatedTrait {
                             $return = $matches[0];
                         }
                     }
+
                     break;
                 case 'referrer':
                     if (!empty($_SERVER['HTTP_REFERER'])) {
                         // Found a result
                         $return = trim($_SERVER['HTTP_REFERER']);
                     }
+
                     break;
             }
 
@@ -508,133 +498,24 @@ trait CFDeprecatedTrait {
             switch ($key) {
                 case 'accept_lang':
                     // Check if the lange is accepted
-                    return in_array($compare, self::user_agent('languages'));
+                    return in_array($compare, static::userAgent('languages'));
+
                     break;
                 case 'accept_charset':
                     // Check if the charset is accepted
-                    return in_array($compare, self::user_agent('charsets'));
+                    return in_array($compare, static::userAgent('charsets'));
+
                     break;
                 default:
                     // Invalid comparison
                     return false;
+
                     break;
             }
         }
 
         // Return the key, if set
         return isset($info[$key]) ? $info[$key] : null;
-    }
-
-    /**
-     * Load a config file.
-     *
-     * @param   string   config filename, without extension
-     * @param   boolean  is the file required?
-     * @param mixed $name
-     * @param mixed $required
-     *
-     * @return array
-     *
-     * @deprecated
-     */
-    public static function config_load($name, $required = true) {
-        if ($name === 'core') {
-            $found = false;
-
-            // find config file at all available paths
-            if ($files = self::findFile('config', 'config', $required)) {
-                foreach ($files as $file) {
-                    if (file_exists($file)) {
-                        require $file;
-                        $found = true;
-                    }
-                }
-            }
-
-            if ($found == false) {
-                // Load the application configuration file
-                if (file_exists(DOCROOT . 'config/config' . EXT)) {
-                    require DOCROOT . 'config/config' . EXT;
-                    $found = true;
-                }
-            }
-
-            if (!isset($config['site_domain'])) {
-                // Invalid config file
-                die('Your CF application configuration file is not valid.');
-            }
-
-            return $config;
-        }
-
-        if (isset(self::$internal_cache['configuration'][$name])) {
-            return self::$internal_cache['configuration'][$name];
-        }
-
-        // Load matching configs
-        $configuration = [];
-
-        if ($files = self::findFile('config', $name, $required)) {
-            foreach ($files as $file) {
-                require $file;
-
-                if (isset($config) and is_array($config)) {
-                    // Merge in configuration
-                    $configuration = array_merge($configuration, $config);
-                }
-            }
-        }
-
-        if (!isset(self::$write_cache['configuration'])) {
-            // Cache has changed
-            self::$write_cache['configuration'] = true;
-        }
-
-        return self::$internal_cache['configuration'][$name] = $configuration;
-    }
-
-    /**
-     * Sets a configuration item, if allowed.
-     *
-     * @param   string   config key string
-     * @param   string   config value
-     * @param mixed $key
-     * @param mixed $value
-     *
-     * @return boolean
-     *
-     * @deprecated
-     */
-    public static function config_set($key, $value) {
-        // Do this to make sure that the config array is already loaded
-        self::config($key);
-
-        if (substr($key, 0, 7) === 'routes.') {
-            // Routes cannot contain sub keys due to possible dots in regex
-            $keys = explode('.', $key, 2);
-        } else {
-            // Convert dot-noted key string to an array
-            $keys = explode('.', $key);
-        }
-
-        // Used for recursion
-        $conf = &self::$configuration;
-        $last = count($keys) - 1;
-
-        foreach ($keys as $i => $k) {
-            if ($i === $last) {
-                $conf[$k] = $value;
-            } else {
-                $conf = &$conf[$k];
-            }
-        }
-
-        if ($key === 'core.modules') {
-            // Reprocess the include paths
-            self::include_paths(true);
-        }
-
-        return true;
     }
 
     /**
@@ -729,6 +610,7 @@ trait CFDeprecatedTrait {
             $result['shared_app_code'] = isset($data['shared_app_code']) ? $data['shared_app_code'] : [];
             $result['theme'] = isset($data['theme']) ? $data['theme'] : null;
         }
+
         return $result;
     }
 }
