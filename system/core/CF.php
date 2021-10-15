@@ -756,7 +756,7 @@ final class CF {
      * @param mixed $reload
      * @param mixed $withShared
      *
-     * @throws CException if file is required and not found
+     * @throws Exception if file is required and not found
      *
      * @return array|string|bool if the type is config, i18n or l10n,
      */
@@ -810,9 +810,7 @@ final class CF {
             if ($found === null) {
                 if ($required === true) {
                     // If the file is required, throw an exception
-                    $lang = static::lang('core.resource_not_found', [':directory' => $directory, ':filename' => $filename]);
-
-                    throw new CException($lang);
+                    throw new Exception(c::__('core.resource_not_found', [':directory' => $directory, ':filename' => $filename]));
                 } else {
                     // Nothing was found, return FALSE
                     $found = false;
@@ -823,35 +821,6 @@ final class CF {
         }
 
         return $found;
-    }
-
-    /**
-     * Fetch an i18n language item.
-     *
-     * @param null|string $key    language key to fetch
-     * @param null|array  $args   argument for replace
-     * @param null|array  $locale additional information to insert into the line
-     *
-     * @return string i18n language string, or the requested key if the i18n item is not found
-     */
-    public static function lang($key = null, array $args = [], $locale = null) {
-        if ($key === null) {
-            return CTranslation::translator();
-        }
-
-        return CTranslation::translator()->trans($key, $args, $locale);
-    }
-
-    /**
-     * Fetch an i18n language item.
-     *
-     * @param null|mixed $key  language key to fetch
-     * @param array      $args additional information to insert into the line
-     *
-     * @return string i18n language string, or the requested key if the i18n item is not found
-     */
-    public static function trans($key = null, array $args = []) {
-        static::lang($key, $args);
     }
 
     /**

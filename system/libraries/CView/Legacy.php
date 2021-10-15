@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Legacy
+ * Description of Legacy.
  *
  * @author Hery
  */
@@ -9,7 +9,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class CView_Legacy {
     use CTrait_Compat_View;
-
     protected static $viewFolder = 'views';
 
     // The view file name and type
@@ -44,6 +43,7 @@ class CView_Legacy {
      */
     public static function exists($name) {
         $filename = CF::findFile(self::$viewFolder, $name, false);
+
         return strlen($filename) > 0;
     }
 
@@ -71,7 +71,7 @@ class CView_Legacy {
     }
 
     /**
-     * Magic method access to test for view property
+     * Magic method access to test for view property.
      *
      * @param string $key CView property to test for
      *
@@ -85,7 +85,7 @@ class CView_Legacy {
      * Sets the view filename.
      *
      * @param string      $name view filename
-     * @param string|null $type view file type
+     * @param null|string $type view file type
      *
      * @return object
      */
@@ -97,7 +97,7 @@ class CView_Legacy {
         } else {
             // Check if the filetype is allowed by the configuration
             if (!in_array($type, CF::config('view.allowed_filetypes'))) {
-                throw new CException(CF::lang('core.invalid_filetype', [':type' => $type]));
+                throw new Exception(c::__('core.invalid_filetype', [':type' => $type]));
             }
             // Load the filename and set the content type
             $this->filename = CF::findFile(self::$viewFolder, $name, true, $type);
@@ -194,7 +194,7 @@ class CView_Legacy {
      *
      * @param string $key variable key
      *
-     * @return mixed|null variable value if the key is found, null if the key is not found
+     * @return null|mixed variable value if the key is found, null if the key is not found
      */
     public function &__get($key) {
         if (isset($this->local_data[$key])) {
@@ -250,6 +250,7 @@ class CView_Legacy {
             include $view_filename;
         } catch (Exception $e) {
             ob_end_clean();
+
             throw $e;
         }
 
@@ -267,7 +268,7 @@ class CView_Legacy {
      */
     public function render($print = false, $renderer = false) {
         if (empty($this->filename)) {
-            throw new Exception(CF::lang('core.view_set_filename'));
+            throw new Exception(c::__('core.view_set_filename'));
         }
         if (is_string($this->filetype)) {
             // Merge global and local data, local overrides global with the same name
@@ -284,6 +285,7 @@ class CView_Legacy {
             if ($print === true) {
                 // Display the output
                 echo $output;
+
                 return;
             }
         } else {
@@ -296,6 +298,7 @@ class CView_Legacy {
                     fpassthru($file);
                     fclose($file);
                 }
+
                 return;
             }
 

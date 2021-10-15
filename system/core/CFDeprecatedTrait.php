@@ -231,30 +231,18 @@ trait CFDeprecatedTrait {
     /**
      * @deprecated
      *
-     * @param type $directory
-     * @param type $filename
-     * @param type $required
-     * @param type $ext
+     * @param string $directory
+     * @param string $filename
+     * @param bool   $required
+     * @param bool   $ext
+     * @param bool   $reload
+     * @param bool   $withShared
      *
-     * @return type
+     * @return string|bool
      */
-    public static function find_file($directory, $filename, $required = false, $ext = false) {
-        return static::findFile($directory, $filename, $required, $ext);
-    }
-
-    /**
-     * Closes all open output buffers, either by flushing or cleaning, and stores the C
-     * output buffer for display during shutdown.
-     *
-     * @param   bool  disable to clear buffers, rather than flushing
-     * @param mixed $flush
-     *
-     * @return void
-     *
-     * @deprecated
-     */
-    public static function close_buffers($flush = true) {
-        return static::closeBuffers($flush);
+    public static function find_file($directory, $filename, $required = false, $ext = false, $reload = false, $withShared = true) {
+        /** @var CF $this */
+        return static::findFile($directory, $filename, $required, $ext, $reload, $withShared);
     }
 
     /**
@@ -262,10 +250,8 @@ trait CFDeprecatedTrait {
      * keys:  browser, version, platform, mobile, robot, referrer, languages, charsets
      * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset.
      *
-     * @param   string   key or test name
-     * @param   string   used with "accept" tests: user_agent(accept_lang, en)
-     * @param mixed      $key
-     * @param null|mixed $compare
+     * @param string $key     key or test name
+     * @param string $compare used with "accept" tests: user_agent(accept_lang, en)
      *
      * @return array  languages and charsets
      * @return string all other keys
@@ -275,116 +261,6 @@ trait CFDeprecatedTrait {
      */
     public static function user_agent($key = 'agent', $compare = null) {
         return static::userAgent($key, $compare);
-    }
-
-    /**
-     * Returns the value of a key, defined by a 'dot-noted' string, from an array.
-     *
-     * @param   array   array to search
-     * @param   string  dot-noted string: foo.bar.baz
-     * @param mixed $array
-     * @param mixed $keys
-     *
-     * @return string if the key is found
-     * @return void   if the key is not found
-     *
-     * @deprecated
-     */
-    public static function key_string($array, $keys) {
-        if (empty($array)) {
-            return null;
-        }
-
-        // Prepare for loop
-        $keys = explode('.', $keys);
-
-        do {
-            // Get the next key
-            $key = array_shift($keys);
-
-            if (isset($array[$key])) {
-                if (is_array($array[$key]) and !empty($keys)) {
-                    // Dig down to prepare the next loop
-                    $array = $array[$key];
-                } else {
-                    // Requested key was found
-                    return $array[$key];
-                }
-            } else {
-                // Requested key is not set
-                break;
-            }
-        } while (!empty($keys));
-
-        return null;
-    }
-
-    /**
-     * Sets values in an array by using a 'dot-noted' string.
-     *
-     * @param   array   array to set keys in (reference)
-     * @param   string  dot-noted string: foo.bar.baz
-     * @param mixed      $array
-     * @param mixed      $keys
-     * @param null|mixed $fill
-     *
-     * @return mixed fill value for the key
-     * @return void
-     *
-     * @deprecated
-     */
-    public static function key_string_set(&$array, $keys, $fill = null) {
-        if (is_object($array) and ($array instanceof ArrayObject)) {
-            // Copy the array
-            $array_copy = $array->getArrayCopy();
-
-            // Is an object
-            $array_object = true;
-        } else {
-            if (!is_array($array)) {
-                // Must always be an array
-                $array = (array) $array;
-            }
-
-            // Copy is a reference to the array
-            $array_copy = &$array;
-        }
-
-        if (empty($keys)) {
-            return $array;
-        }
-
-        // Create keys
-        $keys = explode('.', $keys);
-
-        // Create reference to the array
-        $row = &$array_copy;
-
-        for ($i = 0, $end = count($keys) - 1; $i <= $end; $i++) {
-            // Get the current key
-            $key = $keys[$i];
-
-            if (!isset($row[$key])) {
-                if (isset($keys[$i + 1])) {
-                    // Make the value an array
-                    $row[$key] = [];
-                } else {
-                    // Add the fill key
-                    $row[$key] = $fill;
-                }
-            } elseif (isset($keys[$i + 1])) {
-                // Make the value an array
-                $row[$key] = (array) $row[$key];
-            }
-
-            // Go down a level, creating a new row reference
-            $row = &$row[$key];
-        }
-
-        if (isset($array_object)) {
-            // Swap the array back in
-            $array->exchangeArray($array_copy);
-        }
     }
 
     /**
@@ -549,7 +425,7 @@ trait CFDeprecatedTrait {
                         $arg = preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $arg);
                     }
 
-                    $temp .= $sep . chtml::specialchars(@print_r($arg, true));
+                    $temp .= $sep . c::e(@print_r($arg, true));
 
                     // Change separator to a comma
                     $sep = ', ';
@@ -565,9 +441,9 @@ trait CFDeprecatedTrait {
     }
 
     /**
-     * @param type $domain
+     * @param string $domain
      *
-     * @return type
+     * @return array
      *
      * @deprecated
      */
@@ -595,6 +471,35 @@ trait CFDeprecatedTrait {
         }
 
         return $result;
+    }
+
+    /**
+     * Fetch an i18n language item.
+     *
+     * @param null|mixed $key  language key to fetch
+     * @param array      $args additional information to insert into the line
+     *
+     * @return string i18n language string, or the requested key if the i18n item is not found
+     *
+     * @deprecated since 1.2, use c::__
+     */
+    public static function trans($key = null, array $args = []) {
+        return c::__($key, $args);
+    }
+
+    /**
+     * Fetch an i18n language item.
+     *
+     * @param null|string $key    language key to fetch
+     * @param null|array  $args   argument for replace
+     * @param null|array  $locale additional information to insert into the line
+     *
+     * @return string i18n language string, or the requested key if the i18n item is not found
+     *
+     * @deprecated since 1.2, use c::__
+     */
+    public static function lang($key = null, array $args = [], $locale = null) {
+        return c::__($key, $args, $locale);
     }
 }
 // @codingStandardsIgnoreStart

@@ -78,14 +78,14 @@ $httpReferer = carr::get($_SERVER, 'HTTP_REFERER', '');
                                         <h3><?php echo c::e($error); ?></h3>
                                         <p><?php echo c::e($description); ?></p>
                                         <?php if (!empty($line) and !empty($file)): ?>
-                                            <p><?php echo CF::lang('core.error_file_line', ['file' => $file, 'line' => $line]); ?></p>
+                                            <p><?php echo c::__('core.error_file_line', ['file' => $file, 'line' => $line]); ?></p>
                                         <?php endif; ?>
                                         <p>
                                             <code class="block"><?php echo $message; ?></code>
                                         </p>
 
                                         <?php if (!empty($trace)): ?>
-                                            <h3><?php echo CF::lang('core.stack_trace'); ?></h3>
+                                            <h3><?php echo c::__('core.stack_trace'); ?></h3>
                                             <pre><?php echo $trace; ?></pre>
                                         <?php endif; ?>
                                 </td>

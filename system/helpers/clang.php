@@ -70,6 +70,7 @@ class clang {
                 return $v;
             }
         }
+
         return null;
     }
 
@@ -103,6 +104,7 @@ class clang {
         if ($file != null) {
             return $file;
         }
+
         return null;
     }
 
@@ -111,6 +113,7 @@ class clang {
         if ($file != null) {
             return $file;
         }
+
         return null;
     }
 
@@ -174,7 +177,7 @@ class clang {
                 $directory = 'core.' . $directory;
 
                 // If the file is required, throw an exception
-                throw new CException('core.resource_not_found', [CF::lang($directory)], $filename);
+                throw new CException('core.resource_not_found', [c::__($directory)], $filename);
             } else {
                 // Nothing was found, return FALSE
                 $found = false;

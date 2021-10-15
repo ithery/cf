@@ -34,14 +34,14 @@
             <p><?php echo chtml::specialchars($description); ?></p>
             <?php if (!IN_PRODUCTION || (isset($_GET['show_debug_error']) && $_GET['show_debug_error'] == '1') || (isset($show_debug_error) && $show_debug_error)): ?>
                 <?php if (!empty($line) and !empty($file)): ?>
-                    <p><?php echo CF::lang('core.error_file_line', ['file' => $file, 'line' => $line]); ?></p>
+                    <p><?php echo c::__('core.error_file_line', ['file' => $file, 'line' => $line]); ?></p>
                 <?php endif; ?>
                 <p><code class="block"><?php echo $message; ?></code></p>
                 <?php if (!empty($trace)): ?>
-                    <h3><?php echo CF::lang('core.stack_trace'); ?></h3>
+                    <h3><?php echo c::__('core.stack_trace'); ?></h3>
                     <pre><?php echo $trace; ?></pre>
                 <?php endif; ?>
-                <p class="stats"><?php echo CF::lang('core.stats_footer'); ?></p>
+                <p class="stats"><?php echo c::__('core.stats_footer'); ?></p>
             <?php endif; ?>
         </div>
     </body>
