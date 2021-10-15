@@ -12,7 +12,7 @@ if (!defined('DS')) {
     define('DS', DIRECTORY_SEPARATOR);
 }
 /**
- * Default php file extension
+ * Default php file extension.
  */
 if (!defined('EXT')) {
     define('EXT', '.php');
@@ -22,10 +22,10 @@ if (!defined('DOCROOT')) {
     $docroot = realpath(dirname(__FILE__) . DS . '..' . DS . '..' . DS);
     define('DOCROOT', $docroot . DS);
 
-    define('KOHANA', DOCROOT . 'index.php');
+    define('CFINDEX', DOCROOT . 'index.php');
 
     // If the front controller is a symlink, change to the real docroot
-    is_link(KOHANA) and chdir(dirname(realpath(__FILE__)));
+    is_link(CFINDEX) and chdir(dirname(realpath(__FILE__)));
 }
 
 if (!defined('SYSPATH')) {
@@ -99,7 +99,7 @@ CFBenchmark::start(SYSTEM_BENCHMARK . '_total_execution');
 CFBenchmark::start(SYSTEM_BENCHMARK . '_cf_loading');
 
 // Load core files
-require SYSPATH . 'core/utf8' . EXT;
+
 require SYSPATH . 'core/CFEvent' . EXT;
 require SYSPATH . 'core/CFData' . EXT;
 require SYSPATH . 'core/CFRouter' . EXT;
