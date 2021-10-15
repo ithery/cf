@@ -356,11 +356,12 @@ final class CF {
     /**
      * @param string $directory
      * @param string $domain
+     * @param mixed  $withShared
      *
      * @return array array of directory
      */
-    public static function getDirs($directory, $domain = null) {
-        $includePaths = CF::paths($domain);
+    public static function getDirs($directory, $domain = null, $withShared = true) {
+        $includePaths = CF::paths($domain, false, $withShared);
         $dirs = [];
         foreach ($includePaths as $p) {
             $path = $p . $directory . DS;
@@ -434,7 +435,6 @@ final class CF {
             $paths = static::getInternalCache($cacheKey);
         }
         if ($paths === null) {
-
             //we try to search all paths for this domain
             $paths = [];
             $orgCode = CF::orgCode($domain);
