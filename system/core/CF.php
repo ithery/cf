@@ -143,26 +143,6 @@ final class CF {
         // Start the environment setup benchmark
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_setup');
 
-        $capppath = APPPATH;
-        $defaultpath = APPPATH;
-        if (strlen(self::appCode()) > 0) {
-            $capppath .= self::appCode() . DS;
-            $defaultpath .= self::appCode() . DS;
-        }
-        if (strlen(self::orgCode()) > 0) {
-            $capppath .= self::orgCode() . DS;
-        }
-
-        if (is_dir($defaultpath . 'default' . DS)) {
-            $defaultpath .= 'default' . DS;
-        }
-        if (is_dir($capppath . 'default' . DS)) {
-            $capppath .= 'default' . DS;
-        }
-
-        define('CAPPPATH', $capppath);
-        define('DEFAULTPATH', $defaultpath);
-
         // Define CF error constant
         define('E_CF', 42);
 
