@@ -71,7 +71,7 @@ class CApp_ErrorHandler {
             }
         }
 
-        $ret = cmail::send_smtp($email, $subject . ' [FOR ADMINISTRATOR]', $message, [], [], [], $smtpOptions);
+        return CEmail::sender($smtpOptions)->send($email, $subject . ' [FOR ADMINISTRATOR]', $message, $smtpOptions);
     }
 
     public static function getHtml(Exception $exception) {
@@ -108,10 +108,7 @@ class CApp_ErrorHandler {
         $traceArray = false;
         if ($line != false) {
             // Remove the first entry of debug_backtrace(), it is the exception_handler call
-            $traceArray = $exception->getTrace();
-
-            // Beautify backtrace
-            $trace = CF::backtrace($traceArray);
+            $trace = $exception->getTraceAsString();
         }
 
         $v = CView::factory('cresenity/mail/exception');
