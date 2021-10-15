@@ -291,7 +291,7 @@ class CFRouter {
                         parse_str($query, $_GET);
 
                         // Convert $_GET to UTF-8
-                        $_GET = utf8::clean($_GET);
+                        $_GET = CUTF8::clean($_GET);
                     }
                 }
             }
@@ -332,9 +332,9 @@ class CFRouter {
             $currentUri = $_SERVER['PHP_SELF'];
         }
 
-        if (($strpos_fc = strpos($currentUri, KOHANA)) !== false) {
+        if (($strpos_fc = strpos($currentUri, CFINDEX)) !== false) {
             // Remove the front controller from the current uri
-            $currentUri = (string) substr($currentUri, $strpos_fc + strlen(KOHANA));
+            $currentUri = (string) substr($currentUri, $strpos_fc + strlen(CFINDEX));
         }
 
         // Remove slashes from the start and end of the URI
