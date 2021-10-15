@@ -33,7 +33,7 @@ class CApp_ErrorHandler {
 
         $ymd = date('Ymd');
         if ($subject == null) {
-            $subject = 'Error Cresenity APP - ' . $orgName . ' on ' . crouter::complete_uri() . ' [' . $ymd . ']';
+            $subject = 'Error Cresenity APP - ' . $orgName . ' on ' . CFRouter::getCompleteUri() . ' [' . $ymd . ']';
         }
         $headers = 'From: ' . strip_tags($orgEmail) . "\r\n";
         $headers .= 'Reply-To: ' . strip_tags($orgEmail) . "\r\n";

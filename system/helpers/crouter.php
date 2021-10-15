@@ -38,8 +38,13 @@ class crouter {
         return CFRouter::$routed_uri;
     }
 
+    /**
+     * @return string
+     *
+     * @deprecated since 1.2, use CFRouter::getCompleteUri()
+     */
     public static function complete_uri() {
-        return CFRouter::$complete_uri;
+        return CFRouter::getCompleteUri();
     }
 
     public static function query_string() {

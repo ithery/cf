@@ -54,7 +54,7 @@ $httpReferer = carr::get($_SERVER, 'HTTP_REFERER', '');
                             <tr>
                                 <td >
                                     <div id="framework_error" >
-                                        <h3><?php echo chtml::specialchars('CRESENITY APP ERROR'); ?></h3>
+                                        <h3><?php echo c::e('CRESENITY APP ERROR'); ?></h3>
                                         <p><strong>Domain</strong>:<?php echo CF::domain(); ?></p>
                                         <?php if ($org != null): ?>
                                             <p><strong>Name</strong>:<?php echo $org->name; ?></p>
@@ -70,9 +70,9 @@ $httpReferer = carr::get($_SERVER, 'HTTP_REFERER', '');
                                         <p><strong>Platform Version</strong>:<?php echo CApp::platformVersion(); ?></p>
                                         <p><strong>User Agent</strong>:<?php echo CApp::userAgent(); ?></p>
                                         <p><strong>Remote Address</strong>:<?php echo CApp::remoteAddress(); ?></p>
-                                        <p><strong>Complete Uri</strong>:<?php echo crouter::complete_uri(); ?></p>
-                                        <p><strong>Controller</strong>:<?php echo crouter::controller(); ?></p>
-                                        <p><strong>Method</strong>:<?php echo crouter::method(); ?></p>
+                                        <p><strong>Complete Uri</strong>:<?php echo CFRouter::getCompleteUri(); ?></p>
+                                        <p><strong>Controller</strong>:<?php echo CFRouter::getController(); ?></p>
+                                        <p><strong>Method</strong>:<?php echo CFRouter::getControllerMethod(); ?></p>
                                         <p><strong>Referer</strong>:<?php echo $httpReferer; ?></p>
                                         <p><strong>Post Data</strong>:<?php echo json_encode($_POST); ?></p>
                                         <h3><?php echo c::e($error); ?></h3>

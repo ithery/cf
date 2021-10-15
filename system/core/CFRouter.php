@@ -500,6 +500,10 @@ class CFRouter {
     public static function getControllerMethod() {
         return static::$method;
     }
+
+    public static function getCompleteUri() {
+        return static::$complete_uri;
+    }
 }
 
 // End CFRouter
