@@ -467,25 +467,23 @@ final class CF {
         if (!isset(self::$paths[$domain]) || $force_reload) {
             //we try to search all paths for this domain
             $paths = [];
-            $theme = CF::theme($domain);
-            $org_code = CF::orgCode($domain);
-            $app_code = CF::appCode($domain);
+            $orgCode = CF::orgCode($domain);
+            $appCode = CF::appCode($domain);
             $sharedAppCode = CF::getSharedApp($domain);
 
             $modules = CF::modules($domain);
             //when this domain is org
-            if (strlen($org_code) > 0) {
-                //add theme path if theme exists
-                $paths[] = APPPATH . $app_code . DS . $org_code . DS;
+            if (strlen($orgCode) > 0) {
+                $paths[] = APPPATH . $appCode . DS . $orgCode . DS;
             }
-            if (strlen($app_code) > 0) {
+            if (strlen($appCode) > 0) {
                 //add theme path if theme exists
-                $paths[] = APPPATH . $app_code . DS . 'default' . DS;
+                $paths[] = APPPATH . $appCode . DS . 'default' . DS;
             }
             foreach ($sharedAppCode as $key => $value) {
-                if (strlen($org_code) > 0) {
+                if (strlen($orgCode) > 0) {
                     //add theme path if theme exists
-                    $paths[] = APPPATH . $value . DS . $org_code . DS;
+                    $paths[] = APPPATH . $value . DS . $orgCode . DS;
                 }
                 $paths[] = APPPATH . $value . DS . 'default' . DS;
             }
@@ -585,11 +583,11 @@ final class CF {
             $file = $class;
         }
 
-        $class_not_found = false;
+        $classNotFound = false;
         if ($type == 'controllers') {
             if ($filename = self::findFile($type, $file)) {
                 require $filename;
-                $class_not_found = true;
+                $classNotFound = true;
 
                 return true;
             } else {
@@ -601,15 +599,15 @@ final class CF {
 
         if ($filename = self::findFile($type, $file)) {
             require $filename;
-            $class_not_found = true;
+            $classNotFound = true;
 
             return true;
         }
 
-        if (!$class_not_found) {
+        if (!$classNotFound) {
             // Transform the class name according to PSR-0
             $routing_class = ltrim($class, '\\');
-            $routing_file = '';
+            $routingFile = '';
             $namespace = '';
 
             $is_namespace = false;
@@ -618,24 +616,24 @@ final class CF {
                 $namespace = substr($routing_class, 0, $last_namespace_position);
 
                 $routing_class = substr($routing_class, $last_namespace_position + 1);
-                $routing_file = str_replace('\\', DS, $namespace) . DS;
+                $routingFile = str_replace('\\', DS, $namespace) . DS;
             }
 
-            $routing_file .= str_replace('_', DS, $routing_class);
+            $routingFile .= str_replace('_', DS, $routing_class);
 
-            if (substr($routing_file, strlen($routing_file) - 1, 1) == DS) {
-                $routing_file = substr($routing_file, 0, strlen($routing_file) - 1) . '_';
+            if (substr($routingFile, strlen($routingFile) - 1, 1) == DS) {
+                $routingFile = substr($routingFile, 0, strlen($routingFile) - 1) . '_';
             }
 
             if ($directory == 'libraries') {
                 // find file at vendor first
-                if ($path = self::findFile('vendor', $routing_file)) {
+                if ($path = self::findFile('vendor', $routingFile)) {
                     // Load the class file
 
                     require $path;
 
                     if (class_exists($class) || interface_exists($class)) {
-                        $class_not_found = false;
+                        $classNotFound = false;
 
                         return true;
                     }
@@ -644,13 +642,13 @@ final class CF {
 
             if ($directory == 'libraries') {
                 if (static::isTesting()) {
-                    if ($path = self::findFile('tests', $routing_file)) {
+                    if ($path = self::findFile('tests', $routingFile)) {
                         // Load the class file
 
                         require $path;
 
                         if (class_exists($class) || interface_exists($class)) {
-                            $class_not_found = false;
+                            $classNotFound = false;
 
                             return true;
                         }
@@ -659,26 +657,26 @@ final class CF {
             }
 
             // find file at libraries
-            if ($path = self::findFile($directory, $routing_file)) {
+            if ($path = self::findFile($directory, $routingFile)) {
                 // Load the class file
                 require $path;
-                $class_not_found = true;
+                $classNotFound = true;
 
                 return true;
             }
 
             // check route file at helpers
-            if (!$class_not_found) {
-                $temp_routing_file = explode(DS, $routing_file);
-                if (strtolower($temp_routing_file[0]) == 'helpers') {
-                    $temp_routing_file[0] = 'helpers';
-                    $routing_file = str_replace('Helpers' . DS, '', $routing_file);
+            if (!$classNotFound) {
+                $tempRoutingFile = explode(DS, $routingFile);
+                if (strtolower($tempRoutingFile[0]) == 'helpers') {
+                    $tempRoutingFile[0] = 'helpers';
+                    $routingFile = str_replace('Helpers' . DS, '', $routingFile);
                     $directory = 'helpers';
-                    if ($path = self::findFile($directory, $routing_file)) {
+                    if ($path = self::findFile($directory, $routingFile)) {
                         // Load the class file
 
                         require $path;
-                        $class_not_found = true;
+                        $classNotFound = true;
 
                         return true;
                     }
@@ -686,7 +684,7 @@ final class CF {
             }
         }
 
-        if (!$class_not_found) {
+        if (!$classNotFound) {
             // The class could not be found
             $appPath = DOCROOT . 'application' . DS . static::appCode() . DS;
             if (file_exists($appPath . 'composer.json')) {
@@ -1020,6 +1018,8 @@ final class CF {
      * @param null|mixed $domain
      *
      * @return array
+     *
+     * @deprecated since 1.2
      */
     public static function theme($domain = null) {
         $data = self::data($domain);
@@ -1048,7 +1048,7 @@ final class CF {
      *
      * @return mixed
      *
-     * @deprecated
+     * @deprecated since 1.2, use c::tap
      */
     public static function tap($value, $callback = null) {
         return c::tap($value, $callback);
@@ -1060,6 +1060,8 @@ final class CF {
      * @param string|object $class
      *
      * @return string
+     *
+     * @deprecated  since 1.2, use c::classBlasename
      */
     public static function classBasename($class) {
         return c::classBasename($class);
@@ -1071,6 +1073,8 @@ final class CF {
      * @param object|string $class
      *
      * @return array
+     *
+     * @deprecated since 1.2, use c::classUsesRecursive
      */
     public static function classUsesRecursive($class) {
         return c::classUsesRecursive($class);
@@ -1082,6 +1086,8 @@ final class CF {
      * @param string $trait
      *
      * @return array
+     *
+     * @deprecated since 1.2, use c::traitUsesRecursive
      */
     public static function traitUsesRecursive($trait) {
         return c::traitUsesRecursive($trait);
