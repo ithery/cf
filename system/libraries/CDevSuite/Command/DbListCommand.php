@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DbListCommand
+ * Description of DbListCommand.
  *
  * @author Hery
  */

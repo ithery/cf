@@ -1,14 +1,17 @@
 <?php
 
 /**
- * Description of DnsMasq
+ * Description of DnsMasq.
  *
  * @author Hery
  */
 class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
     public $brew;
+
     public $dnsmasqMasterConfigFile = BREW_PREFIX . '/etc/dnsmasq.conf';
+
     public $dnsmasqSystemConfDir = BREW_PREFIX . '/etc/dnsmasq.d';
+
     public $resolverPath = '/etc/resolver';
 
     /**
@@ -57,7 +60,7 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
     }
 
     /**
-     * Tell Homebrew to restart dnsmasq
+     * Tell Homebrew to restart dnsmasq.
      *
      * @return void
      */
@@ -66,7 +69,7 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
     }
 
     /**
-     * Ensure the DnsMasq configuration primary config is set to read custom configs
+     * Ensure the DnsMasq configuration primary config is set to read custom configs.
      *
      * @return void
      */
@@ -102,7 +105,7 @@ class CDevSuite_Mac_DnsMasq extends CDevSuite_DnsMasq {
     }
 
     /**
-     * Create the TLD-specific dnsmasq config file
+     * Create the TLD-specific dnsmasq config file.
      *
      * @param string $tld
      *

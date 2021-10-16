@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Site
+ * Description of Site.
  *
  * @author Hery
  */
@@ -140,6 +140,7 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
                 $siteConf = str_replace($match, $replaced, $siteConf);
             }
         }
+
         return $siteConf;
     }
 
@@ -176,6 +177,7 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
                 $siteConf = str_replace($match, $replaced, $siteConf);
             }
         }
+
         return $siteConf;
     }
 
@@ -470,7 +472,7 @@ class CDevSuite_Mac_Site extends CDevSuite_Site {
     }
 
     /**
-     * Build the Nginx proxy config for the specified domain
+     * Build the Nginx proxy config for the specified domain.
      *
      * @param string $url  The domain name to serve
      * @param string $host The URL to proxy to, eg: http://127.0.0.1:8080
