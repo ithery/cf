@@ -11,6 +11,12 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_Component_Widget extends CElement_Component {
     use CTrait_Compat_Element_Widget;
 
+    public $scroll;
+
+    public $nopadding;
+
+    public $height;
+
     /**
      * @var CElement_Component_Widget_Header
      */
@@ -21,12 +27,6 @@ class CElement_Component_Widget extends CElement_Component {
      */
     protected $content;
 
-    public $scroll;
-
-    public $nopadding;
-
-    public $height;
-
     protected $switcher;
 
     private $collapse;
@@ -35,12 +35,17 @@ class CElement_Component_Widget extends CElement_Component {
 
     private $js_collapse;
 
+    private $wrapperClass;
+
+    private $bodyClass;
+
     public function __construct($id) {
         parent::__construct($id);
+        $this->wrapperClass = c::theme('widget.class.wrapper', 'widget-box');
+        $this->bodyClass = c::theme('widget.class.body', 'widget-content');
         $this->header = CElement_Factory::createComponent(CElement_Component_Widget_Header::class);
         $this->add($this->header);
-        $this->content = $this->addDiv()->addClass('widget-content clearfix');
-        $this->addClass('widget-box');
+        $this->content = $this->addDiv();
         $this->wrapper = $this->content;
 
         $this->height = '';
@@ -76,6 +81,7 @@ class CElement_Component_Widget extends CElement_Component {
 
     public function setHeaderActionStyle($style) {
         $this->header()->actions()->setStyle($style);
+
         return $this;
     }
 
@@ -85,16 +91,18 @@ class CElement_Component_Widget extends CElement_Component {
 
     public function setSwitcherBehaviour($behaviour = 'hide') {
         $this->header->setSwitcherBehaviour($behaviour);
+
         return $this;
     }
 
     public function setSwitcherBlockMessage($blockMessage = '') {
         $this->header->setSwitcherBlockMessage($blockMessage);
+
         return $this;
     }
 
     /**
-     * Set the title of the widget
+     * Set the title of the widget.
      *
      * @param string $title
      * @param string $lang
@@ -103,11 +111,12 @@ class CElement_Component_Widget extends CElement_Component {
      */
     public function setTitle($title, $lang = true) {
         $this->header()->setTitle($title, $lang);
+
         return $this;
     }
 
     /**
-     * Set the icon of the widget
+     * Set the icon of the widget.
      *
      * @param mixed $icon
      *
@@ -115,17 +124,23 @@ class CElement_Component_Widget extends CElement_Component {
      */
     public function setIcon($icon) {
         $this->header()->setIcon($icon);
+
         return $this;
     }
 
     public function setNoPadding($bool = true) {
         $this->nopadding = $bool;
+
         return $this;
     }
 
     public function build() {
+        $this->addClass($this->wrapperClass);
+
         if ($this->nopadding) {
             $this->content->addClass('nopadding p-0');
         }
+
+        $this->content->addClass($this->bodyClass . ' clearfix');
     }
 }
