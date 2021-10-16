@@ -4,6 +4,8 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
+ *
+ * @see CApp
  */
 class CApp_Blade_Directive {
     public static function styles($expression) {
@@ -58,11 +60,13 @@ class CApp_Blade_Directive {
         if ($renderingElement != null) {
             if ($renderingElement instanceof CElement_View) {
                 $ownerId = $renderingElement->id();
+
                 return "<?php echo \CApp::instance()->yieldViewElement('" . $expression . "'); ?>";
             } else {
                 throw new Exception('Directive CApp Element must be rendered when called from CElement_View');
             }
         }
+
         return '';
     }
 
@@ -84,6 +88,7 @@ class CApp_Blade_Directive {
             default:
                 throw new InvalidArgumentException('Argument ' . $expression . ' is invalid on CApp directive');
         }
+
         return $expression;
     }
 }
