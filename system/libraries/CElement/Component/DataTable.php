@@ -154,7 +154,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->dbName = $db->getName();
         $this->display_length = '10';
         $this->paging_list = $this->defaultPagingList;
-        $this->options = CElement_Component_DataTable_Options::factory();
+        $this->options = new CElement_Component_DataTable_Options();
         $this->data = [];
         $this->keyField = '';
         $this->columns = [];
@@ -430,13 +430,13 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setOption($key, $val) {
-        $this->options->add($key, $val);
+        $this->options->setOption($key, $val);
 
         return $this;
     }
 
     public function getOption($key) {
-        return $this->options->get_by_name($key);
+        return $this->options->getOption($key);
     }
 
     public function setAjax($bool = true) {
