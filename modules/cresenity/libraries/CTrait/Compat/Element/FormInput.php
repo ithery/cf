@@ -94,7 +94,7 @@ trait CTrait_Compat_Element_FormInput {
      *
      * @return $this
      */
-    public function set_list(array $list) {
+    public function set_list($list) {
         return $this->setList($list);
     }
 

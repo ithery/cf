@@ -110,7 +110,7 @@ class CElement_FormInput extends CElement_Element {
         return $this;
     }
 
-    public function setList(array $list) {
+    public function setList($list) {
         $this->list = $list;
 
         return $this;

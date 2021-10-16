@@ -12,13 +12,21 @@ class CElement_List_TabList extends CElement_List {
     use CTrait_Compat_Element_TabList;
 
     protected $tabs;
+
     protected $tabPosition;
+
     protected $activeTab;
+
     protected $ajax;
+
     protected $haveIcon;
+
     protected $widgetClass;
+
     protected $header;
+
     protected $jsHeader;
+
     protected $paramRequest;
 
     public function __construct($id) {
@@ -51,6 +59,7 @@ class CElement_List_TabList extends CElement_List {
         if ($this->header == null) {
             $this->header = CElement_Factory::createElement('div')->addClass('ml-auto');
         }
+
         return $this->header;
     }
 
@@ -65,6 +74,7 @@ class CElement_List_TabList extends CElement_List {
             $this->activeTab = $tab->id();
         }
         $this->tabs[] = $tab;
+
         return $tab;
     }
 
@@ -75,6 +85,7 @@ class CElement_List_TabList extends CElement_List {
      */
     public function setActiveTab($tabId) {
         $this->activeTab = $tabId;
+
         return $this;
     }
 
@@ -85,6 +96,7 @@ class CElement_List_TabList extends CElement_List {
      */
     public function setAjax($bool = true) {
         $this->ajax = $bool;
+
         return $this;
     }
 
@@ -95,6 +107,7 @@ class CElement_List_TabList extends CElement_List {
      */
     public function setTabPosition($tabPosition) {
         $this->tabPosition = $tabPosition;
+
         return $this;
     }
 
@@ -105,6 +118,7 @@ class CElement_List_TabList extends CElement_List {
      */
     public function setParamRequest(array $paramRequest) {
         $this->paramRequest = $paramRequest;
+
         return $this;
     }
 
@@ -119,6 +133,7 @@ class CElement_List_TabList extends CElement_List {
         } else {
             $this->widgetClass[] = $class;
         }
+
         return $this;
     }
 
@@ -147,43 +162,32 @@ class CElement_List_TabList extends CElement_List {
         }
         $classes .= ' ' . $ajaxClass;
 
+        if ($this->tabPosition == 'left') {
+            $classes .= ' vtabs';
+        }
         $widgetClasses = $this->widgetClass;
         $widgetClasses = implode(' ', $widgetClasses);
         if (strlen($widgetClasses) > 0) {
             $widgetClasses = ' ' . $widgetClasses;
         }
-        if ($this->bootstrap >= '3') {
-            $html->appendln('<div class="row tab-list' . $classes . '" id="' . $this->id . '">');
-            $html->appendln('   <div class="col-md-12">');
 
-            $html->appendln('       <div class="row">');
-            if ($this->tabPosition == 'top') {
-                $html->appendln('           <div class="row-tab-menu">');
-            } else {
-                $html->appendln('           <div class="col-md-2">');
-            }
+        $html->appendln('<div class="row-fluid tab-list ' . $classes . '" id="' . $this->id . '">');
+        $html->appendln('	<div class="span12">');
+
+        $html->appendln('		<div class="row-fluid">');
+        if ($this->tabPosition == 'top') {
+            $html->appendln('           <div class="row-tab-menu">');
         } else {
-            $html->appendln('<div class="row-fluid tab-list ' . $classes . '" id="' . $this->id . '">');
-            $html->appendln('	<div class="span12">');
-
-            $html->appendln('		<div class="row-fluid">');
-            if ($this->tabPosition == 'top') {
-                $html->appendln('           <div class="row-tab-menu">');
-            } else {
-                $html->appendln('			<div class="span2">');
-            }
+            $html->appendln('			<div class="span2">');
         }
+
         if ($this->tabPosition == 'top') {
             $html->appendln('               <div class="top-nav-container d-flex align-items-center">');
         } else {
-            $html->appendln('				<div class="side-nav-container affix-top">');
+            $html->appendln('				<div class="side-nav-container affix-top ">');
         }
 
-        if ($this->bootstrap >= '3') {
-            $html->appendln('<ul id="' . $this->id . '-tab-nav" class="nav nav-pills nav-stacked">');
-        } else {
-            $html->appendln('<ul id="' . $this->id . '-tab-nav" class="nav nav-tabs nav-stacked">');
-        }
+        $html->appendln('<ul id="' . $this->id . '-tab-nav" class="nav nav-tabs nav-stacked ' . ($this->tabPosition == 'left' ? 'tabs-vertical' : '') . '">');
 
         $activeTab = null;
         foreach ($this->tabs as $tab) {
