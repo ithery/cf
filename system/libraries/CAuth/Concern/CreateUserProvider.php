@@ -11,11 +11,11 @@ trait CAuth_Concern_CreateUserProvider {
     /**
      * Create the user provider implementation for the driver.
      *
-     * @param string|null $provider
-     *
-     * @return CAuth_UserProviderInterface|null
+     * @param null|string $provider
      *
      * @throws \InvalidArgumentException
+     *
+     * @return null|CAuth_UserProviderInterface
      */
     public function createUserProvider($provider = null) {
         if (is_null($config = $this->getProviderConfiguration($provider))) {
@@ -29,7 +29,6 @@ trait CAuth_Concern_CreateUserProvider {
                 $config
             );
         }
-
         switch ($driver) {
             case 'database':
                 return $this->createDatabaseProvider($config);
@@ -45,9 +44,9 @@ trait CAuth_Concern_CreateUserProvider {
     /**
      * Get the user provider configuration.
      *
-     * @param string|null $provider
+     * @param null|string $provider
      *
-     * @return array|null
+     * @return null|array
      */
     protected function getProviderConfiguration($provider) {
         if ($provider = $provider ?: $this->getDefaultUserProvider()) {

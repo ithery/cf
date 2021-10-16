@@ -176,6 +176,7 @@ class CSession {
                         if ($_SESSION[$valid] !== CHTTP::request()->userAgent()) {
                             return $this->create();
                         }
+
                         break;
 
                     // Check ip address for consistency
@@ -183,6 +184,7 @@ class CSession {
                         if ($_SESSION[$valid] !== CHTTP::request()->ip()) {
                             return $this->create();
                         }
+
                         break;
 
                     // Check expiration time to prevent users from manually modifying it
@@ -190,6 +192,7 @@ class CSession {
                         if (time() - $_SESSION['last_activity'] > ini_get('session.gc_maxlifetime')) {
                             return $this->create();
                         }
+
                         break;
                 }
             }

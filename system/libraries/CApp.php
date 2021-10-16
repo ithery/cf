@@ -107,6 +107,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
         if (ccfg::get('update_last_request')) {
             $user = $this->user();
+
             if ($user != null) {
                 if (!is_array($user) && is_object($user)) {
                     //update last request

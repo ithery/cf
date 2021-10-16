@@ -206,10 +206,25 @@ trait CTrait_Compat_Observable {
         return $this->addElement($type, $id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @return CElement_List_ActionList
+     *
+     * @deprecated since 1.2, use addActionList
+     */
     public function add_action_list($id = '') {
+        /** @var CObservable $this */
         return $this->addActionList($id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @return CElement_Component_Action
+     *
+     * @deprecated since 1.2, use addAction
+     */
     public function add_action($id = '') {
         return $this->addAction($id);
     }
@@ -221,9 +236,9 @@ trait CTrait_Compat_Observable {
     /**
      * @deprecated since version 1.2, please use function addDashboard
      *
-     * @return CElement
-     *
      * @param mixed $id
+     *
+     * @return CElement
      */
     public function add_dashboard($id = '') {
         return $this->addDashboard($id);
@@ -241,9 +256,9 @@ trait CTrait_Compat_Observable {
     /**
      * @deprecated since version 1.2, please use function setHandlerUrlParam
      *
-     * @return $this
-     *
      * @param mixed $param
+     *
+     * @return $this
      */
     public function set_handler_url_param($param) {
         return $this->setHandlerUrlParam($param);
@@ -252,9 +267,9 @@ trait CTrait_Compat_Observable {
     /**
      * @deprecated since version 1.2, please use function regenerateId
      *
-     * @return $this
-     *
      * @param mixed $recursive
+     *
+     * @return $this
      */
     public function regenerate_id($recursive = false) {
         return $this->regenerateId($recursive);
@@ -263,6 +278,7 @@ trait CTrait_Compat_Observable {
     public function add_span($id = '') {
         $span = CSpan::factory($id);
         $this->add($span);
+
         return $span;
     }
 }

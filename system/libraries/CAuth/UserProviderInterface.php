@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Interface of UserProvider
+ * Interface of UserProvider.
  *
  * see implementation below
  *
@@ -14,16 +14,16 @@ interface CAuth_UserProviderInterface {
      *
      * @param mixed $identifier
      *
-     * @return CAuth_AuthenticatableInterface|null
+     * @return null|CAuth_AuthenticatableInterface
      */
     public function retrieveById($identifier);
 
     /**
-     * Retrieve a user by stdclass object
+     * Retrieve a user by stdclass object.
      *
      * @param object|stdclass $object
      *
-     * @return CAuth_AuthenticatableInterface|null
+     * @return null|CAuth_AuthenticatableInterface
      */
     public function retrieveByObject($object);
 
@@ -33,7 +33,7 @@ interface CAuth_UserProviderInterface {
      * @param mixed  $identifier
      * @param string $token
      *
-     * @return CAuth_AuthenticatableInterface|null
+     * @return null|CAuth_AuthenticatableInterface
      */
     public function retrieveByToken($identifier, $token);
 
@@ -52,7 +52,7 @@ interface CAuth_UserProviderInterface {
      *
      * @param array $credentials
      *
-     * @return CAuth_AuthenticatableInterface|null
+     * @return null|CAuth_AuthenticatableInterface
      */
     public function retrieveByCredentials(array $credentials);
 

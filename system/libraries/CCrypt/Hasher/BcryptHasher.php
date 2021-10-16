@@ -33,9 +33,9 @@ class CCrypt_Hasher_BcryptHasher extends CCrypt_HasherAbstract implements CCrypt
      * @param string $value
      * @param array  $options
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     public function make($value, array $options = []) {
         $hash = password_hash($value, PASSWORD_BCRYPT, [
@@ -56,9 +56,9 @@ class CCrypt_Hasher_BcryptHasher extends CCrypt_HasherAbstract implements CCrypt
      * @param string $hashedValue
      * @param array  $options
      *
-     * @return bool
-     *
      * @throws \RuntimeException
+     *
+     * @return bool
      */
     public function check($value, $hashedValue, array $options = []) {
         if ($this->verifyAlgorithm && $this->info($hashedValue)['algoName'] !== 'bcrypt') {

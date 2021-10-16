@@ -4,7 +4,7 @@ abstract class CElement extends CObservable {
     use CTrait_Compat_Element;
 
     /**
-     * Class css for this element
+     * Class css for this element.
      *
      * @var array
      */
@@ -38,6 +38,7 @@ abstract class CElement extends CObservable {
 
     public function validTag() {
         $availableTag = ['div', 'a', 'p', 'span'];
+
         return $availableTag;
     }
 
@@ -70,6 +71,7 @@ abstract class CElement extends CObservable {
 
     public function setRadio($radio) {
         $this->radio = $radio;
+
         return $this;
     }
 
@@ -77,8 +79,17 @@ abstract class CElement extends CObservable {
         $this->text = $text;
     }
 
+    /**
+     * Set custom css style.
+     *
+     * @param string $key
+     * @param string $val
+     *
+     * @return $this
+     */
     public function customCss($key, $val) {
         $this->custom_css[$key] = $val;
+
         return $this;
     }
 
@@ -87,7 +98,7 @@ abstract class CElement extends CObservable {
     }
 
     /**
-     * Add class attribute for the element
+     * Add class attribute for the element.
      *
      * @param string $c
      *
@@ -103,6 +114,7 @@ abstract class CElement extends CObservable {
             }
             $this->classes[] = $c;
         }
+
         return $this;
     }
 
@@ -126,6 +138,7 @@ abstract class CElement extends CObservable {
         if (isset($this->attr[$k])) {
             unset($this->attr[$k]);
         }
+
         return $this;
     }
 
@@ -134,6 +147,7 @@ abstract class CElement extends CObservable {
             return $this->setAttrFromArray($k);
         }
         $this->attr[$k] = $v;
+
         return $this;
     }
 
@@ -153,6 +167,7 @@ abstract class CElement extends CObservable {
         if (isset($this->attr[$k])) {
             return $this->attr[$k];
         }
+
         return null;
     }
 
@@ -177,6 +192,7 @@ abstract class CElement extends CObservable {
                 }
             }
         }
+
         return $classes;
     }
 
@@ -186,6 +202,7 @@ abstract class CElement extends CObservable {
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
         }
+
         return $classes;
     }
 
@@ -200,6 +217,7 @@ abstract class CElement extends CObservable {
             $data['text'] = $this->text;
         }
         $data = array_merge_recursive($data, parent::toArray());
+
         return $data;
     }
 
@@ -224,6 +242,7 @@ abstract class CElement extends CObservable {
                 . htmlspecialchars($this->js())
                 . '</code>'
                 . '</pre>';
+
         return $return;
     }
 }

@@ -11,7 +11,7 @@ class CAuth_Access_Response implements CInterface_Arrayable {
     /**
      * The response message.
      *
-     * @var string|null
+     * @var null|string
      */
     protected $message;
 
@@ -40,7 +40,7 @@ class CAuth_Access_Response implements CInterface_Arrayable {
     /**
      * Create a new "allow" Response.
      *
-     * @param string|null $message
+     * @param null|string $message
      * @param mixed       $code
      *
      * @return CAuth_Access_Response
@@ -52,7 +52,7 @@ class CAuth_Access_Response implements CInterface_Arrayable {
     /**
      * Create a new "deny" Response.
      *
-     * @param string|null $message
+     * @param null|string $message
      * @param mixed       $code
      *
      * @return CAuth_Access_Response
@@ -82,7 +82,7 @@ class CAuth_Access_Response implements CInterface_Arrayable {
     /**
      * Get the response message.
      *
-     * @return string|null
+     * @return null|string
      */
     public function message() {
         return $this->message;
@@ -100,9 +100,9 @@ class CAuth_Access_Response implements CInterface_Arrayable {
     /**
      * Throw authorization exception if response was denied.
      *
-     * @return CAuth_Access_Response
-     *
      * @throws CAuth_Exception_AuthorizationException
+     *
+     * @return CAuth_Access_Response
      */
     public function authorize() {
         if ($this->denied()) {
