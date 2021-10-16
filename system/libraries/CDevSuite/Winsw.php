@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Winsw
+ * Description of Winsw.
  *
  * @author Hery
  */
@@ -36,14 +36,14 @@ class CDevSuite_Winsw {
         $this->createConfiguration($service, $args);
 
         $bin = realpath(CDevSuite::binPath());
-        $this->files->copy("$bin/winsw.exe", CDevSuite::homePath() . "Services/$service.exe");
+        $this->files->copy("${bin}/winsw.exe", CDevSuite::homePath() . "Services/${service}.exe");
         //$command = 'cmd "/C ' . escapeshellarg(CDevSuite::homePath() . 'Services/' . $service) . ' install"';
         $command = [
             CDevSuite::homePath() . 'Services/' . $service,
             'install'
         ];
         $this->cli->runOrDie($command, function ($code, $output) use ($service) {
-            CDevSuite::warning("Could not install the $service service. Check ~/.devsuite/Log for errors.");
+            CDevSuite::warning("Could not install the ${service} service. Check ~/.devsuite/Log for errors.");
             CDevSuite::warning('Output:' . $output);
         });
     }
@@ -59,10 +59,10 @@ class CDevSuite_Winsw {
     protected function createConfiguration($service, $args = []) {
         $args['DEVSUITE_HOME_PATH'] = CDevSuite::homePath();
 
-        $contents = $this->files->get(CDevSuite::stubsPath() . "$service.xml");
+        $contents = $this->files->get(CDevSuite::stubsPath() . "${service}.xml");
 
         $this->files->putAsUser(
-            CDevSuite::homePath() . "/Services/$service.xml",
+            CDevSuite::homePath() . "/Services/${service}.xml",
             str_replace(array_keys($args), array_values($args), $contents)
         );
     }
@@ -83,8 +83,8 @@ class CDevSuite_Winsw {
         ];
         $this->cli->run($command);
 
-        $this->files->unlink(CDevSuite::homePath() . "Services/$service.exe");
-        $this->files->unlink(CDevSuite::homePath() . "Services/$service.xml");
+        $this->files->unlink(CDevSuite::homePath() . "Services/${service}.exe");
+        $this->files->unlink(CDevSuite::homePath() . "Services/${service}.xml");
     }
 
     /**
@@ -106,7 +106,7 @@ class CDevSuite_Winsw {
             sleep(2);
 
             $this->cli->runOrDie($command, function () use ($service) {
-                CDevSuite::warning("Could not start the $service service. Check ~/.devsuite/Log for errors.");
+                CDevSuite::warning("Could not start the ${service} service. Check ~/.devsuite/Log for errors.");
             });
         });
     }

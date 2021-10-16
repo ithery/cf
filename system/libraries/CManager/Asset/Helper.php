@@ -16,7 +16,7 @@ class CManager_Asset_Helper {
         $path = carr::first(explode('?', $file));
 
         $base_url = curl::base();
-        if ($withHttp || CManager::instance()->isMobile()) {
+        if ($withHttp) {
             $base_url = curl::base(false, 'http');
         }
         $file = str_replace($docroot, $base_url, $file);
@@ -40,7 +40,7 @@ class CManager_Asset_Helper {
         $docroot = str_replace(DS, '/', DOCROOT);
         $file = str_replace(DS, '/', $file);
         $base_url = curl::base();
-        if ($withHttp || CManager::instance()->isMobile()) {
+        if ($withHttp) {
             $base_url = curl::base(false, 'http');
         }
 
@@ -63,6 +63,7 @@ class CManager_Asset_Helper {
             $mod = $version % $roundVar;
             $version = $version - $mod;
         }
+
         return $version;
     }
 }

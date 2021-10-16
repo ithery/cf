@@ -37,21 +37,25 @@ class CTab extends CElement {
 
     public function setActive($bool) {
         $this->active = $bool;
+
         return $this;
     }
 
     public function setNoPadding($bool = true) {
         $this->nopadding = $bool;
+
         return $this;
     }
 
     public function setTarget($target) {
         $this->target = $target;
+
         return $this;
     }
 
     public function setAjaxUrl($url) {
         $this->ajax_url = $url;
+
         return $this;
     }
 
@@ -61,6 +65,7 @@ class CTab extends CElement {
 
     public function setAjax($bool) {
         $this->ajax = $bool;
+
         return $this;
     }
 
@@ -68,8 +73,8 @@ class CTab extends CElement {
         if (strlen($this->ajax_url) == 0) {
             if ($this->ajax) {
                 $ajax_url = CAjaxMethod::factory()->set_type('reload')
-                        ->set_data('json', $this->json())
-                        ->makeurl();
+                    ->set_data('json', $this->json())
+                    ->makeurl();
                 $this->set_ajax_url($ajax_url);
             }
         }
@@ -196,6 +201,7 @@ class CTab extends CElement {
         $html->appendln(parent::htmlChild($html->get_indent()));
         $html->appendln('</div>');
         $html->appendln('</div>');
+
         return $html->text();
     }
 

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Server
+ * Description of Server.
  *
  * @author Hery
  */
