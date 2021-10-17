@@ -20,13 +20,13 @@ trait CApp_Model_Trait_Users {
      * @return CModel_Relation_BelongsTo
      */
     public function org() {
-        return $this->belongsTo('CApp_Model_Org');
+        return $this->belongsTo(CApp_Model_Org::class);
     }
 
     /**
      * @return CModel_Relation_BelongsTo
      */
     public function role() {
-        return $this->belongsTo('CApp_Model_Roles');
+        return $this->belongsTo(CApp_Model_Roles::class);
     }
 }
