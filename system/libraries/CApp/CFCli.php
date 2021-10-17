@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Description of CFCli
+ * Description of CFCli.
  *
  * @author Hery
  */
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 class CApp_CFCli {
     use CTrait_HasOptions;
@@ -20,6 +20,7 @@ class CApp_CFCli {
      */
     protected function getPhpBinary() {
         $executableFinder = new PhpExecutableFinder();
+
         return $executableFinder->find();
     }
 
@@ -32,6 +33,7 @@ class CApp_CFCli {
         $script = DOCROOT . 'cf';
 
         $cmd = sprintf('"%s" %s', $script, $cfCommand);
+
         return $cmd;
     }
 
@@ -52,6 +54,7 @@ class CApp_CFCli {
     public function run($cfCommand) {
         $process = new Process($this->getCommand($cfCommand));
         $process->run();
+
         return $process;
     }
 }

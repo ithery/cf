@@ -17,6 +17,7 @@ class CApp_Project_AbstractGenerator {
 
     protected function mergeOptions($options) {
         $this->options = array_merge($this->options, $options);
+
         return $this;
     }
 

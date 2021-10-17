@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jun 1, 2018, 12:11:34 PM
  */
-use \CApp_Navigation_Helper as Helper;
+use CApp_Navigation_Helper as Helper;
 
 abstract class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface {
     protected $roleNavs = [];

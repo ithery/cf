@@ -21,6 +21,7 @@ class CApp_Config {
         if (File::exists($file)) {
             $data = include $file;
         }
+
         return $data;
     }
 
@@ -47,6 +48,7 @@ class CApp_Config {
             self::$configData[$domain] = $config;
         }
         $domainData = carr::get(self::$configData, $domain);
+
         return carr::get($domainData, $camelKey, carr::get($domainData, $key));
     }
 }

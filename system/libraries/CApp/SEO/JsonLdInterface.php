@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 interface CApp_SEO_JsonLdInterface {
-
     /**
      * Generates linked data script tag.
      *
@@ -61,7 +54,7 @@ interface CApp_SEO_JsonLdInterface {
     public function setDescription($description);
 
     /**
-     * @param string|null|bool $url
+     * @param null|string|bool $url
      *
      * @return static
      */

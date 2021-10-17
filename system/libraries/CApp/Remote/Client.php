@@ -10,6 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CApp_Remote_Client {
     protected $domain = '';
+
     protected $remote;
 
     public function __construct(CApp_Remote $remote) {
@@ -19,6 +20,7 @@ class CApp_Remote_Client {
 
     private function createEngine($engineName) {
         $className = 'CApp_Remote_Client_Engine_' . $engineName;
+
         return new $className($this->engineOptions());
     }
 
@@ -26,6 +28,7 @@ class CApp_Remote_Client {
         $remoteOptions = $this->remote->getOptions();
         $domain = $this->remote->getDomain();
         $options = array_merge($remoteOptions, ['domain' => $domain]);
+
         return $options;
     }
 
