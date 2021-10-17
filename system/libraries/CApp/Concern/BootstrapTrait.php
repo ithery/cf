@@ -111,6 +111,7 @@ trait CApp_Concern_BootstrapTrait {
             CView::blade()->directive('CAppPrependScript', [CApp_Blade_Directive::class, 'prependScript']);
             CView::blade()->directive('CAppEndPrependScript', [CApp_Blade_Directive::class, 'endPrependScript']);
             CView::blade()->directive('CAppElement', [CApp_Blade_Directive::class, 'element']);
+            CView::blade()->directive('CAppMessage', [CApp_Blade_Directive::class, 'message']);
 
             CView::blade()->component('capp.view-component.modal', 'modal');
             static::$registerBladeBooted = true;

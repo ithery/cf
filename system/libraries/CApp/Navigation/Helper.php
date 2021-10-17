@@ -28,6 +28,7 @@ class CApp_Navigation_Helper {
             if ($navs == null) {
                 return null;
             }
+
             foreach ($navs as $nav) {
                 $res = self::nav($nav, $controller, $method);
                 if ($res !== false) {

@@ -10,12 +10,16 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 //@codingStandardsIgnoreStart
 trait CTrait_Compat_Element_Form_Field {
+    /**
+     * @param string $text
+     * @param bool   $lang
+     *
+     * @deprecated since 1.2 use setLabel
+     *
+     * @return $this
+     */
     public function set_label($text, $lang = true) {
         return $this->setLabel($text, $lang);
-    }
-
-    public function toarray() {
-        return $this->toArray();
     }
 
     public function set_style_form_group($style_form_group) {

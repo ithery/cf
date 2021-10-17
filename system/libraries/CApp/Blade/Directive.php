@@ -12,6 +12,10 @@ class CApp_Blade_Directive {
         return '{!! CApp::instance()->renderStyles() !!}';
     }
 
+    public static function message($expression) {
+        return '{!! CApp_Message::flashAll() !!}';
+    }
+
     public static function scripts($expression) {
         return '
         {!! CApp::instance()->renderScripts() !!}

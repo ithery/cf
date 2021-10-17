@@ -7,6 +7,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Jun 23, 2018, 1:33:26 AM
+ *
+ * @property string  $createdby
+ * @property string  $updatedby
+ * @property CCarbon $created
+ * @property CCarbon $updated
+ * @property int     $status
  */
 trait CApp_Model_Trait_RoleNav {
     public function __construct(array $attributes = []) {

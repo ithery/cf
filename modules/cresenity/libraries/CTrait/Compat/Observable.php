@@ -48,6 +48,14 @@ trait CTrait_Compat_Observable {
         return $this->detachListener($event);
     }
 
+    /**
+     * @param string $id
+     * @param string $type
+     *
+     * @return CElement_FormInput
+     *
+     * @deprecated since 1.2
+     */
     public function add_control($id, $type) {
         return $this->addControl($id, $type);
     }
@@ -104,6 +112,8 @@ trait CTrait_Compat_Observable {
      * @param mixed $field_id
      *
      * @deprecated
+     *
+     * @return CElement_Component_Form_Field
      */
     public function add_field($field_id = '') {
         return $this->addField($field_id);
