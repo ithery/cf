@@ -42,7 +42,7 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
      *
      * @param mixed $identifier
      *
-     * @return CAuth_AuthenticatableInterface|null
+     * @return null|CAuth_AuthenticatableInterface
      */
     public function retrieveById($identifier) {
         $user = $this->conn->table($this->table)->find($identifier);
@@ -51,12 +51,25 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
     }
 
     /**
+     * Retrieve a user by stdclass object.
+     *
+     * @param mixed $object
+     *
+     * @return null|CAuth_AuthenticatableInterface
+     */
+    public function retrieveByObject($object) {
+        $identifier = c::get($object, 'user_id');
+
+        return $this->retrieveById($identifier);
+    }
+
+    /**
      * Retrieve a user by their unique identifier and "remember me" token.
      *
      * @param mixed  $identifier
      * @param string $token
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return null|\Illuminate\Contracts\Auth\Authenticatable
      */
     public function retrieveByToken($identifier, $token) {
         $user = $this->getGenericUser(
@@ -75,7 +88,7 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
      *
      * @return void
      */
-    public function updateRememberToken(CAuth_AuthenticatableInterface $user, $token) {
+    public function updateRememberToken($user, $token) {
         $this->conn->table($this->table)
             ->where($user->getAuthIdentifierName(), $user->getAuthIdentifier())
             ->update([$user->getRememberTokenName() => $token]);
@@ -86,7 +99,7 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
      *
      * @param array $credentials
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return null|\Illuminate\Contracts\Auth\Authenticatable
      */
     public function retrieveByCredentials(array $credentials) {
         if (empty($credentials)
@@ -126,7 +139,7 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
      *
      * @param mixed $user
      *
-     * @return CAuth_GenericUser|null
+     * @return null|CAuth_GenericUser
      */
     protected function getGenericUser($user) {
         if (!is_null($user)) {

@@ -13,6 +13,7 @@ class CTranslation {
         if ($locale == null) {
             $locale = CF::getLocale();
         }
+
         return new CTranslation_Translator(new CTranslation_Loader_FileLoader(new CFile(), 'i18n'), $locale);
     }
 }

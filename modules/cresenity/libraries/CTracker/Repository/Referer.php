@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 3:15:50 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 3:15:50 PM
  */
 class CTracker_Repository_Referer extends CTracker_AbstractRepository {
-
     /**
      * @var RefererParser
      */
@@ -50,18 +50,19 @@ class CTracker_Repository_Referer extends CTracker_AbstractRepository {
             'source' => null,
             'search_terms_hash' => null,
         ];
-       
+
         $parsed = $this->refererParser->parse($refererUrl, $this->currentUrl);
         if ($parsed->isKnown()) {
             $attributes['medium'] = $parsed->getMedium();
             $attributes['source'] = $parsed->getSource();
             $attributes['search_terms_hash'] = sha1($parsed->getSearchTerm());
         }
-        
+
         $referer = $this->findOrCreate(
-                $attributes, ['url', 'search_terms_hash']
+            $attributes,
+            ['url', 'search_terms_hash']
         );
-       
+
         $referer = $this->find($referer);
         if ($parsed->isKnown()) {
             $this->storeSearchTerms($referer, $parsed);
@@ -72,12 +73,14 @@ class CTracker_Repository_Referer extends CTracker_AbstractRepository {
     private function storeSearchTerms($referer, $parsed) {
         foreach (explode(' ', $parsed->getSearchTerm()) as $term) {
             $this->findOrCreate(
-                    [
-                'log_referer_id' => $referer->log_referer_id,
-                'search_term' => $term,
-                    ], ['log_referer_id', 'search_term'], $created, $this->searchTermModel
+                [
+                    'log_referer_id' => $referer->log_referer_id,
+                    'search_term' => $term,
+                ],
+                ['log_referer_id', 'search_term'],
+                $created,
+                $this->searchTermModel
             );
         }
     }
-
 }

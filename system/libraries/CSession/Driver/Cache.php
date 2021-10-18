@@ -15,12 +15,13 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CSession_Driver_Cache implements CSession_Driver {
     protected $cache;
+
     protected $encrypt;
 
     public function __construct() {
         // Load Encrypt library
         if (CF::config('session.encryption')) {
-            $this->encrypt = new Encrypt;
+            $this->encrypt = new Encrypt();
         }
 
         CF::log(CLogger::DEBUG, 'Session Cache Driver Initialized');
@@ -70,6 +71,7 @@ class CSession_Driver_Cache implements CSession_Driver {
 
     public function destroy($id) {
         $id = 'session_' . $id;
+
         return $this->cache->delete($id);
     }
 

@@ -1,17 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
-
     /**
-     * Singleton instance of this class
-     * 
-     * @var CApp_SEO_MetaTags 
+     * Singleton instance of this class.
+     *
+     * @var CApp_SEO_MetaTags
      */
     protected $instance = null;
 
@@ -58,7 +51,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     protected $keywords = [];
 
     /**
-     * extra metatags.
+     * Extra metatags.
      *
      * @var array
      */
@@ -130,13 +123,13 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * 
      * @return CApp_SEO_MetaTags
      */
     public static function instance() {
         if (self::$instance == null) {
             self::$instance = new static();
         }
+
         return self::$instance;
     }
 
@@ -160,7 +153,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
         $html = [];
 
         if ($title) {
-            $html[] = carr::get($this->config, 'add_notranslate_class', false) ? "<title class=\"notranslate\">$title</title>" : "<title>$title</title>";
+            $html[] = carr::get($this->config, 'add_notranslate_class', false) ? "<title class=\"notranslate\">${title}</title>" : "<title>${title}</title>";
         }
 
         if ($description) {
@@ -168,7 +161,6 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
         }
 
         if (!empty($keywords)) {
-
             if ($keywords instanceof CCollection) {
                 $keywords = $keywords->toArray();
             }
@@ -217,7 +209,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTitle($title, $appendDefault = true) {
         // clean title
@@ -237,7 +229,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTitleDefault($default) {
         $this->title_default = $default;
@@ -246,7 +238,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTitleSeparator($separator) {
         $this->title_separator = $separator;
@@ -255,7 +247,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setDescription($description) {
         // clean and store description
@@ -266,7 +258,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setKeywords($keywords) {
         if (!is_array($keywords)) {
@@ -283,7 +275,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addKeyword($keyword) {
         if (is_array($keyword)) {
@@ -296,7 +288,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function removeMeta($key) {
         carr::forget($this->metatags, $key);
@@ -305,7 +297,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addMeta($meta, $value = null, $name = 'name') {
         // multiple metas
@@ -321,7 +313,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setCanonical($url) {
         $this->canonical = $url;
@@ -343,7 +335,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setPrev($url) {
         $this->prev = $url;
@@ -352,7 +344,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setNext($url) {
         $this->next = $url;
@@ -361,7 +353,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addAlternateLanguage($lang, $url) {
         $this->alternateLanguages[] = ['lang' => $lang, 'url' => $url];
@@ -370,7 +362,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addAlternateLanguages(array $languages) {
         $this->alternateLanguages = array_merge($this->alternateLanguages, $languages);
@@ -392,14 +384,14 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTitle() {
         return $this->title ?: $this->getDefaultTitle();
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getDefaultTitle() {
         if (empty($this->title_default)) {
@@ -410,35 +402,35 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTitleSession() {
         return $this->title_session ?: $this->getTitle();
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTitleSeparator() {
         return $this->title_separator ?: carr::get($this->config, 'defaults.separator', ' - ');
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getKeywords() {
         return $this->keywords ?: carr::get($this->config, 'defaults.keywords', []);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getMetatags() {
         return $this->metatags;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getDescription() {
         if (false === $this->description) {
@@ -449,12 +441,12 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getCanonical() {
         $canonical_config = carr::get($this->config, 'defaults.canonical', false);
 
-        return $this->canonical ?: (($canonical_config === null) ? app('url')->full() : $canonical_config);
+        return $this->canonical ?: (($canonical_config === null) ? c::url()->full() : $canonical_config);
     }
 
     /**
@@ -467,21 +459,21 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getPrev() {
         return $this->prev;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getNext() {
         return $this->next;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getAlternateLanguages() {
         return $this->alternateLanguages;
@@ -497,7 +489,7 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function reset() {
         $this->description = null;
@@ -541,5 +533,4 @@ class CApp_SEO_MetaTags implements CApp_SEO_MetaTagsInterface {
             }
         }
     }
-
 }

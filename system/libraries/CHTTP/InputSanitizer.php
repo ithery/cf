@@ -1,6 +1,6 @@
 <?php
 
-class HTTP_InputSanitizer {
+class CHTTP_InputSanitizer {
     /**
      * Sanitizes global GET, POST and COOKIE data. Also takes care of
      * magic_quotes and register_globals, if they have been enabled.
@@ -8,8 +8,6 @@ class HTTP_InputSanitizer {
      * @return void
      */
     public function __construct() {
-        // Use XSS clean?
-        $this->use_xss_clean = (bool) CF::$global_xss_filtering;
         $this->originalPost = $_POST;
         $this->originalGet = $_GET;
         $this->originalFiles = $_FILES;
@@ -43,7 +41,7 @@ class HTTP_InputSanitizer {
         if (is_array($_GET)) {
             foreach ($_GET as $key => $val) {
                 // Sanitize $_GET
-                $_GET[$this->clean_input_keys($key)] = $this->clean_input_data($val);
+                $_GET[$this->cleanInputKeys($key)] = $this->cleanInputData($val);
             }
         } else {
             $_GET = [];
@@ -52,7 +50,7 @@ class HTTP_InputSanitizer {
         if (is_array($_POST)) {
             foreach ($_POST as $key => $val) {
                 // Sanitize $_POST
-                $_POST[$this->clean_input_keys($key)] = $this->clean_input_data($val);
+                $_POST[$this->cleanInputKeys($key)] = $this->cleanInputData($val);
             }
         } else {
             $_POST = [];
@@ -66,15 +64,51 @@ class HTTP_InputSanitizer {
                 }
 
                 // Sanitize $_COOKIE
-                $_COOKIE[$this->clean_input_keys($key)] = $this->clean_input_data($val);
+                $_COOKIE[$this->cleanInputKeys($key)] = $this->cleanInputData($val);
             }
         } else {
             $_COOKIE = [];
         }
 
-        // Create a singleton
-        Input::$instance = $this;
-
         CF::log(CLogger::DEBUG, 'Global GET, POST and COOKIE data sanitized');
+    }
+
+    /**
+     * This is a helper method. It enforces W3C specifications for allowed
+     * key name strings, to prevent malicious exploitation.
+     *
+     * @param string $str string to clean
+     *
+     * @return string
+     */
+    public function cleanInputKeys($str) {
+        return $str;
+    }
+
+    /**
+     * This is a helper method. It escapes data and forces all newline
+     * characters to "\n".
+     *
+     * @param array|string $str string to clean
+     *
+     * @return string
+     */
+    public function cleanInputData($str) {
+        if (is_array($str)) {
+            $newArray = [];
+            foreach ($str as $key => $val) {
+                // Recursion!
+                $newArray[$this->cleanInputKeys($key)] = $this->cleanInputData($val);
+            }
+
+            return $newArray;
+        }
+
+        if (strpos($str, "\r") !== false) {
+            // Standardize newlines
+            $str = str_replace(["\r\n", "\r"], "\n", $str);
+        }
+
+        return $str;
     }
 }

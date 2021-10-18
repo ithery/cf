@@ -48,6 +48,7 @@ abstract class CApp_Remote_Client_Engine {
             throw new CApp_Exception_RemoteRequestException($errMessage, null, $errCode);
         }
         $data = carr::get($responseData, 'data');
+
         return $data;
     }
 }

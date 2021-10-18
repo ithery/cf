@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DbInstallCommand
+ * Description of DbInstallCommand.
  *
  * @author Hery
  */

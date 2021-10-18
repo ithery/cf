@@ -16,9 +16,9 @@ trait CTrait_ForwardsCalls {
      * @param string $method
      * @param array  $parameters
      *
-     * @return mixed
-     *
      * @throws \BadMethodCallException
+     *
+     * @return mixed
      */
     protected function forwardCallTo($object, $method, $parameters) {
         try {
@@ -45,9 +45,9 @@ trait CTrait_ForwardsCalls {
      *
      * @param string $method
      *
-     * @return void
-     *
      * @throws \BadMethodCallException
+     *
+     * @return void
      */
     protected static function throwBadMethodCallException($method) {
         throw new BadMethodCallException(sprintf(

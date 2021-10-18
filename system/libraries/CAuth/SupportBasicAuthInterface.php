@@ -7,7 +7,7 @@ interface CAuth_SupportBasicAuthInterface {
      * @param string $field
      * @param array  $extraConditions
      *
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return null|\Symfony\Component\HttpFoundation\Response
      */
     public function basic($field = 'email', $extraConditions = []);
 
@@ -17,7 +17,7 @@ interface CAuth_SupportBasicAuthInterface {
      * @param string $field
      * @param array  $extraConditions
      *
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return null|\Symfony\Component\HttpFoundation\Response
      */
     public function onceBasic($field = 'email', $extraConditions = []);
 }

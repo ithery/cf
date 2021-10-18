@@ -44,7 +44,6 @@ class CTranslation_Loader_ArrayLoader extends CTranslation_LoaderAbstract {
      * @return void
      */
     public function addNamespace($namespace, $hint) {
-        //
     }
 
     /**
@@ -55,7 +54,6 @@ class CTranslation_Loader_ArrayLoader extends CTranslation_LoaderAbstract {
      * @return void
      */
     public function addJsonPath($path) {
-        //
     }
 
     /**

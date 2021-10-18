@@ -15,6 +15,8 @@ trait CTrait_Compat_Element_FormInput {
      * @param mixed $val
      *
      * @deprecated since version 1.2
+     *
+     * @return $this
      */
     public function set_value($val) {
         return $this->setValue($val);
@@ -24,6 +26,8 @@ trait CTrait_Compat_Element_FormInput {
      * @deprecated since version 1.2
      *
      * @param mixed $bool
+     *
+     * @return $this
      */
     public function set_submit_onchange($bool) {
         return $this->setSubmitOnchange($bool);
@@ -38,6 +42,12 @@ trait CTrait_Compat_Element_FormInput {
         return $this->setAjax($bool);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param mixed $size
+     * @param mixed $bool
+     */
     public function set_disabled($bool) {
         return $this->setDisabled($bool);
     }
@@ -80,7 +90,9 @@ trait CTrait_Compat_Element_FormInput {
     /**
      * @deprecated since version 1.2
      *
-     * @param mixed $list
+     * @param array $list
+     *
+     * @return $this
      */
     public function set_list($list) {
         return $this->setList($list);

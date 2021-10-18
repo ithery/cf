@@ -1,19 +1,24 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 1:27:20 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 1:27:20 AM
  */
 abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterface {
-
     protected $builder;
+
     protected $model;
+
     protected $result;
+
     protected $connection;
+
     protected $className;
+
     protected $relations;
 
     /**
@@ -41,9 +46,8 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         list($model, $cacheKey) = $this->cache->findCached($id, null, $this->className);
         if (!$model) {
             $model = $this->newQuery();
-           
+
             if ($this->relations) {
-                
                 $model->with($this->relations);
             }
             if ($model = $model->find($id)) {
@@ -89,7 +93,10 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
     }
 
     /**
-     * @param string[] $keys
+     * @param string[]   $keys
+     * @param mixed      $attributes
+     * @param mixed      $created
+     * @param null|mixed $otherModel
      */
     public function findOrCreate($attributes, $keys = null, &$created = false, $otherModel = null) {
         list($model, $cacheKey) = $this->cache->findCached($attributes, $keys, $this->className);
@@ -127,7 +134,6 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
     }
 
     public function createModel($modelClass = null) {
-
         $className = $this->className;
 
         $this->model = new $className();
@@ -139,7 +145,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         if ($model) {
             $className = get_class($model);
         }
-       
+
         $this->model = new $className();
         return $this->getModel();
     }
@@ -155,5 +161,4 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         }
         return $this->builder->newQuery();
     }
-
 }

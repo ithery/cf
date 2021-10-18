@@ -22,7 +22,7 @@ class CAuth_Guard_RequestGuard implements CAuth_GuardInterface {
      *
      * @param callable                         $callback
      * @param CHTTP_Request                    $request
-     * @param CAuth_UserProviderInterface|null $provider
+     * @param null|CAuth_UserProviderInterface $provider
      *
      * @return void
      */
@@ -35,7 +35,7 @@ class CAuth_Guard_RequestGuard implements CAuth_GuardInterface {
     /**
      * Get the currently authenticated user.
      *
-     * @return CAuth_AuthenticatableInterface|null
+     * @return null|CAuth_AuthenticatableInterface
      */
     public function user() {
         // If we've already retrieved the user for the current request we can just

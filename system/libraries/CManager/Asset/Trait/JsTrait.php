@@ -17,7 +17,7 @@ trait CManager_Asset_Trait_JsTrait {
             }
         }
         $dirs = CF::getDirs('media');
-
+        $dirs = array_merge($this->mediaPaths, $dirs);
         foreach ($dirs as $dir) {
             $path = $dir . 'js' . DS . $file;
 
@@ -27,6 +27,7 @@ trait CManager_Asset_Trait_JsTrait {
         }
 
         $path = DOCROOT . 'media' . DS . 'js' . DS;
+
         return $path . $file;
     }
 
@@ -41,6 +42,7 @@ trait CManager_Asset_Trait_JsTrait {
                 $urls[] = CManager_Asset_Helper::urlJsFile($f);
             }
         }
+
         return $urls;
     }
 
@@ -49,6 +51,7 @@ trait CManager_Asset_Trait_JsTrait {
         foreach ($files as $file) {
             $this->registerJsFile($file, $pos);
         }
+
         return $this;
     }
 
@@ -61,6 +64,7 @@ trait CManager_Asset_Trait_JsTrait {
         }
         $fileOptions['type'] = 'js';
         $fileOptions['pos'] = $pos;
+        $fileOptions['mediaPaths'] = $this->mediaPaths;
 
         $this->scripts[$pos]['js_file'][] = new CManager_Asset_File_JsFile($fileOptions);
 
@@ -102,6 +106,7 @@ trait CManager_Asset_Trait_JsTrait {
                 $js_file_array[] = $k;
             }
         }
+
         return $js_file_array;
     }
 }

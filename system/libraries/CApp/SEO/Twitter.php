@@ -1,17 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
-
     /**
-     * Singleton instance of this class
-     * 
-     * @var CApp_SEO_OpenGraph 
+     * Singleton instance of this class.
+     *
+     * @var CApp_SEO_OpenGraph
      */
     protected $instance = null;
 
@@ -47,22 +40,23 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
     }
 
     /**
-     * 
      * @return CApp_SEO_MetaTags
      */
     public static function instance() {
         if (self::$instance == null) {
             self::$instance = new static();
         }
+
         return self::$instance;
     }
 
     /**
      * @param array $defaults
+     * @param mixed $minify
      */
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function generate($minify = false) {
         $this->eachValue($this->values);
@@ -80,19 +74,19 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
      * @internal param array $properties
      */
     protected function eachValue(array $values, $prefix = null) {
-        foreach ($values as $key => $value):
-            if (is_array($value)):
+        foreach ($values as $key => $value) {
+            if (is_array($value)) {
                 $this->eachValue($value, $key);
-            else:
-                if (is_numeric($key)):
+            } else {
+                if (is_numeric($key)) {
                     $key = $prefix . $key;
-                elseif (is_string($prefix)):
+                } elseif (is_string($prefix)) {
                     $key = $prefix . ':' . $key;
-                endif;
+                }
 
                 $this->html[] = $this->makeTag($key, $value);
-            endif;
-        endforeach;
+            }
+        }
     }
 
     /**
@@ -108,7 +102,7 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addValue($key, $value) {
         $this->values[$key] = $value;
@@ -117,42 +111,42 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTitle($title) {
         return $this->addValue('title', $title);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setType($type) {
         return $this->addValue('card', $type);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setSite($site) {
         return $this->addValue('site', $site);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setDescription($description) {
         return $this->addValue('description', htmlspecialchars($description, ENT_QUOTES, 'UTF-8', false));
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setUrl($url) {
         return $this->addValue('url', $url);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @deprecated use setImage($image) instead
      */
@@ -165,7 +159,7 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @deprecated use setImage($image) instead
      */
@@ -177,10 +171,10 @@ class CApp_SEO_Twitter implements CApp_SEO_TwitterInterface {
 
     /**
      * @param $image
+     *
      * @return TwitterCardsContract
      */
     public function setImage($image) {
         return $this->addValue('image', $image);
     }
-
 }

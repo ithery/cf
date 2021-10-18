@@ -1,4 +1,3 @@
-
 <?php
 
 class CHTTP_Exception_RedirectHttpException extends CHTTP_Exception_HttpException {

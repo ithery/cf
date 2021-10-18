@@ -4,7 +4,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     /**
      * The hasher implementation.
      *
-     * @var CCrypt_Hasher
+     * @var CCrypt_HasherInterface
      */
     protected $hasher;
 
@@ -33,7 +33,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
      *
      * @param mixed $identifier
      *
-     * @return CAuth_AuthenticatableInterface|null
+     * @return null|CAuth_AuthenticatableInterface
      */
     public function retrieveById($identifier) {
         $model = $this->createModel();
@@ -44,12 +44,26 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     }
 
     /**
+     * Retrieve a user by stdclass object.
+     *
+     * @param mixed $object
+     *
+     * @return null|CAuth_AuthenticatableInterface
+     */
+    public function retrieveByObject($object) {
+        $identifierName = $this->createModel()->getAuthIdentifierName();
+        $id = $object->$identifierName;
+
+        return $this->retrieveById($id);
+    }
+
+    /**
      * Retrieve a user by their unique identifier and "remember me" token.
      *
      * @param mixed  $identifier
      * @param string $token
      *
-     * @return CAuth_AuthenticatableInterface|null
+     * @return null|CAuth_AuthenticatableInterface
      */
     public function retrieveByToken($identifier, $token) {
         $model = $this->createModel();
@@ -94,7 +108,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
      *
      * @param array $credentials
      *
-     * @return CAuth_AuthenticatableInterface|null
+     * @return null|CAuth_AuthenticatableInterface
      */
     public function retrieveByCredentials(array $credentials) {
         if (empty($credentials)
@@ -129,7 +143,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
      *
      * @param array $credentials
      *
-     * @return string|null
+     * @return null|string
      */
     protected function firstCredentialKey(array $credentials) {
         foreach ($credentials as $key => $value) {
@@ -154,7 +168,7 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     /**
      * Get a new query builder for the model instance.
      *
-     * @param CModel|null $model
+     * @param null|CModel $model
      *
      * @return CModel_Query
      */
@@ -172,13 +186,13 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
     public function createModel() {
         $class = '\\' . ltrim($this->model, '\\');
 
-        return new $class;
+        return new $class();
     }
 
     /**
      * Gets the hasher implementation.
      *
-     * @return \Illuminate\Contracts\Hashing\Hasher
+     * @return \CCrypt_HasherInterface
      */
     public function getHasher() {
         return $this->hasher;

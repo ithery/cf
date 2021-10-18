@@ -1,12 +1,11 @@
 <?php
 
 /**
- * Description of System
+ * Description of System.
  *
  * @author Hery
  */
 class CDevSuite_Mac_System extends CDevSuite_System {
-
     public $devSuiteBin = '/usr/local/bin/devsuite';
 
     /**
@@ -49,5 +48,4 @@ class CDevSuite_Mac_System extends CDevSuite_System {
     public function removeSudoersEntry() {
         $this->cli->quietly('rm /etc/sudoers.d/devsuite');
     }
-
 }

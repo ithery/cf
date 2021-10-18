@@ -12,6 +12,7 @@ abstract class CManager_Asset_FileAbstract {
     public function __construct(array $options) {
         $this->script = carr::get($options, 'script');
         $this->type = carr::get($options, 'type', 'js');
+        $this->mediaPaths = carr::get($options, 'mediaPaths', []);
     }
 
     public function getUrl() {
@@ -37,6 +38,7 @@ abstract class CManager_Asset_FileAbstract {
                 $js_file .= $js_version;
             }
         }
+
         return $js_file;
     }
 
@@ -63,6 +65,7 @@ abstract class CManager_Asset_FileAbstract {
                 $assetFile .= $fileVersion;
             }
         }
+
         return $assetFile;
     }
 

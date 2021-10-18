@@ -36,9 +36,7 @@
         "ecmaVersion": 8
     },
 
-    "ignorePatterns": ["**/media/assets/*.js"],
-
-
+    "ignorePatterns": ["**/media/assets/*.js","**/*.min.js"],
     "rules": {
 
         //
@@ -105,7 +103,7 @@
         "no-multi-spaces": 2, // disallow use of multiple spaces
         "no-multi-str": 2, // disallow use of multiline strings
         "no-native-reassign": 2, // disallow reassignments of native objects
-        "no-new": 2, // disallow use of new operator when not part of the assignment or comparison
+        "no-new": 0, // disallow use of new operator when not part of the assignment or comparison
         "no-new-func": 2, // disallow use of new operator for Function object
         "no-new-wrappers": 2, // disallows creating new instances of String,Number, and Boolean
         "no-octal": 2, // disallow use of octal literals
@@ -127,7 +125,7 @@
         "vars-on-top": 0, // requires to declare all vars on top of their containing scope (off by default)
         "wrap-iife": 2, // require immediate function invocation to be wrapped in parentheses (off by default)
         "yoda": 2, // require or disallow Yoda conditions
-
+        "no-prototype-builtins": 0,
         //
         // Strict Mode
         //
@@ -149,7 +147,7 @@
         "no-undef-init": 2, // disallow use of undefined when initializing variables
         "no-undefined": 0, // disallow use of undefined variable (off by default)
         "no-unused-vars": 2, // disallow declaration of variables that are not used in the code
-        "no-use-before-define": 2, // disallow use of variables before they are defined
+        "no-use-before-define": 0, // disallow use of variables before they are defined
         "no-useless-escape":0,
         //
         //Stylistic Issues

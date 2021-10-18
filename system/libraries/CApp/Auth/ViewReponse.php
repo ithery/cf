@@ -1,4 +1,3 @@
-
 <?php
 
 class CApp_Auth_ViewResponse {

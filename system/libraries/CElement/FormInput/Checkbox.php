@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Checkbox
+ * Description of Checkbox.
  *
  * @author Alvin
  * @license Ittron Global Teknologi <ittron.co.id>
@@ -44,6 +44,7 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
 
     public function setChecked($bool) {
         $this->checked = $bool;
+
         return $this;
     }
 
@@ -74,9 +75,6 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
         }
-        if ($this->bootstrap == '3') {
-            //$classes = $classes ." form-control ";
-        }
 
         $custom_css = $this->custom_css;
         $custom_css = $this->renderStyle($custom_css);
@@ -90,19 +88,16 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
         $html->append('<input type="checkbox" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . '' . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $checked . $addition_attribute . '>');
         //$html->append('<span></span>');
         if (strlen($this->label) > 0) {
-            if ($this->label_wrap) {
-                $html->appendln('<label for="' . $this->id . '" class="checkbox-label"><span></span>');
-            }
+            $html->appendln('<label for="' . $this->id . '" class="checkbox-label"><span></span>');
             $html->appendln('&nbsp;' . $this->label);
-            if ($this->label_wrap) {
-                $html->appendln('</label>');
-            }
+            $html->appendln('</label>');
         }
         if ($this->applyjs == 'switch') {
             $html->append('</div>');
         }
         $html->append('</label>');
         $html->br();
+
         return $html->text();
     }
 

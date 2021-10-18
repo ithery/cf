@@ -1,16 +1,33 @@
 <?php
 
 class CController_Input {
-    // Input singleton
+    /**
+     * Input singleton.
+     *
+     * @var CController_Input
+     */
     protected static $instance;
 
-    // Enable or disable automatic XSS cleaning
+    /**
+     * Enable or disable automatic XSS cleaning.
+     *
+     * @var bool
+     */
     protected $useXssClean = true;
 
+    /**
+     * @var array
+     */
     protected $originalPost;
 
+    /**
+     * @var array
+     */
     protected $originalGet;
 
+    /**
+     * @var array
+     */
     protected $originalFiles;
 
     /**
@@ -231,6 +248,7 @@ class CController_Input {
         $purifier = new HTMLPurifier($config);
         $data = $purifier->purify($data);
         $data = htmlspecialchars_decode($data);
+
         return $data;
     }
 
@@ -261,6 +279,7 @@ class CController_Input {
                 // Recursion!
                 $new_array[$this->cleanInputKeys($key)] = $this->cleanInputData($val);
             }
+
             return $new_array;
         }
 

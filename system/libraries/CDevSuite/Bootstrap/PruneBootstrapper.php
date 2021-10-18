@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of PruneBootstrapper
+ * Description of PruneBootstrapper.
  *
  * @author Hery
  */

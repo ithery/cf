@@ -2,16 +2,15 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
-//@codingStandardsIgnoreStart
 final class CFEvent {
+    // Data that can be processed during events
+    public static $data;
+
     // CFEvent callbacks
     private static $events = [];
 
     // Cache of events that have been run
-    private static $has_run = [];
-
-    // Data that can be processed during events
-    public static $data;
+    private static $hasRun = [];
 
     /**
      * Add a callback to an event queue.
@@ -48,13 +47,13 @@ final class CFEvent {
      *
      * @return bool
      */
-    public static function add_before($name, $existing, $callback) {
+    public static function addBefore($name, $existing, $callback) {
         if (empty(self::$events[$name]) or ($key = array_search($existing, self::$events[$name])) === false) {
             // Just add the event if there are no events
             return self::add($name, $callback);
         } else {
             // Insert the event immediately before the existing event
-            return self::insert_event($name, $key, $callback);
+            return self::insertEvent($name, $key, $callback);
         }
     }
 
@@ -67,13 +66,13 @@ final class CFEvent {
      *
      * @return bool
      */
-    public static function add_after($name, $existing, $callback) {
+    public static function addAfter($name, $existing, $callback) {
         if (empty(self::$events[$name]) or ($key = array_search($existing, self::$events[$name])) === false) {
             // Just add the event if there are no events
             return self::add($name, $callback);
         } else {
             // Insert the event immediately after the existing event
-            return self::insert_event($name, $key + 1, $callback);
+            return self::insertEvent($name, $key + 1, $callback);
         }
     }
 
@@ -86,7 +85,7 @@ final class CFEvent {
      *
      * @return void
      */
-    private static function insert_event($name, $key, $callback) {
+    private static function insertEvent($name, $key, $callback) {
         if (in_array($callback, self::$events[$name], true)) {
             return false;
         }
@@ -190,7 +189,7 @@ final class CFEvent {
         }
 
         // The event has been run!
-        self::$has_run[$name] = $name;
+        self::$hasRun[$name] = $name;
     }
 
     /**
@@ -200,8 +199,8 @@ final class CFEvent {
      *
      * @return bool
      */
-    public static function has_run($name) {
-        return isset(self::$has_run[$name]);
+    public static function hasRun($name) {
+        return isset(self::$hasRun[$name]);
     }
 }
 

@@ -5,10 +5,10 @@ class ccfg {
     /**
      * Undocumented function
      *
-     * @param [type] $name
-     * @param [type] $appCode
+     * @param string $name
+     * @param string $appCode
      *
-     * @return void
+     * @return array
      *
      * @deprecated 1.1
      */

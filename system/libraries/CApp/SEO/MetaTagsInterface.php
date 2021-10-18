@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 interface CApp_SEO_MetaTagsInterface {
-
     /**
      * Generates meta tags HTML.
      *
@@ -177,7 +170,7 @@ interface CApp_SEO_MetaTagsInterface {
     /**
      * Get the Meta description.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getDescription();
 

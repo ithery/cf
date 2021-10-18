@@ -41,8 +41,6 @@ class CJob {
 
         $this->script = carr::get($config, 'script', DOCROOT . 'index.php');
         $this->uri = carr::get($config, 'uri', 'cresenity/cron');
-
-        CJob_EventManager::initialize();
     }
 
     /**
@@ -151,13 +149,8 @@ class CJob {
             } else {
                 $this->runWindows($job, $config);
             }
-            $eventManager = CJob_EventManager::getEventManager();
-            if ($eventManager->hasListeners(CJob_Events::onJobPostRun)) {
-                $eventArgs = new CJob_EventManager_Args();
-                $eventArgs->addArg('job', $job);
-                $eventArgs->addArg('config', $config);
-                $eventManager->dispatchEvent(CJob_Events::onJobPostRun, $eventArgs);
-            }
+
+            static::dispatcher()->dispatch(new CJob_Event_OnJobPostRun($job, $config));
         }
     }
 
@@ -229,19 +222,23 @@ class CJob {
         $job->run();
     }
 
+    public static function dispatcher() {
+        return CEvent::dispatcher();
+    }
+
     public static function onJobPreRun($callback) {
-        CJob_EventManager::addEventCallback(CJob_Events::onJobPreRun, $callback);
+        return static::dispatcher()->listen(CJob_Event_OnJobPreRun::class, $callback);
     }
 
     public static function onJobPostRun($callback) {
-        CJob_EventManager::addEventCallback(CJob_Events::onJobPostRun, $callback);
+        return static::dispatcher()->listen(CJob_Event_OnJobPostRun::class, $callback);
     }
 
     public static function onBackgroundJobPreRun($callback) {
-        CJob_EventManager::addEventCallback(CJob_Events::onBackgroundJobPreRun, $callback);
+        return static::dispatcher()->listen(CJob_Event_OnBackgroundJobPreRun::class, $callback);
     }
 
     public static function onBackgroundJobPostRun($callback) {
-        CJob_EventManager::addEventCallback(CJob_Events::onBackgroundJobPostRun, $callback);
+        return static::dispatcher()->listen(CJob_Event_OnBackgroundJobPostRun::class, $callback);
     }
 }

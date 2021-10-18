@@ -27,7 +27,7 @@ trait CAuth_Concern_MustVerifyEmailTrait {
      * @return void
      */
     public function sendEmailVerificationNotification() {
-        $this->notify(new VerifyEmail);
+        $this->notify(new VerifyEmail());
     }
 
     /**

@@ -82,7 +82,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      */
     public static function times($number, callable $callback = null) {
         if ($number < 1) {
-            return new static;
+            return new static();
         }
 
         if (is_null($callback)) {
@@ -169,7 +169,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
 
         $collection = isset($key) ? $this->pluck($key) : $this;
 
-        $counts = new self;
+        $counts = new self();
 
         $collection->each(function ($value) use ($counts) {
             $counts[$value] = isset($counts[$value]) ? $counts[$value] + 1 : 1;
@@ -205,7 +205,8 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     public function contains($key, $operator = null, $value = null) {
         if ($operator === null && $value === null) {
             if ($this->useAsCallable($key)) {
-                $placeholder = new stdClass;
+                $placeholder = new stdClass();
+
                 return $this->first($key, $placeholder) !== $placeholder;
             }
 
@@ -248,6 +249,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      */
     public function crossJoin($lists = null) {
         $lists = func_get_args();
+
         return new static(carr::crossJoin(
             $this->items,
             array_map([$this, 'getArrayableItems'], $lists)
@@ -282,7 +284,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         (new static(func_get_args()))
             ->push($this)
             ->each(function ($item) {
-                (new Illuminate\Support\Debug\Dumper)->dump($item);
+                (new Illuminate\Support\Debug\Dumper())->dump($item);
             });
 
         return $this;
@@ -419,7 +421,8 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     public function when($value, callable $callback, callable $default = null) {
         if ($value) {
             return $callback($this, $value);
-        } elseif ($default) {
+        }
+        if ($default) {
             return $default($this, $value);
         }
 
@@ -689,7 +692,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
                 $groupKey = is_bool($groupKey) ? (int) $groupKey : $groupKey;
 
                 if (!array_key_exists($groupKey, $results)) {
-                    $results[$groupKey] = new static;
+                    $results[$groupKey] = new static();
                 }
 
                 $results[$groupKey]->offsetSet($preserveKeys ? $key : null, $value);
@@ -1098,7 +1101,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      * @return static
      */
     public function partition($callback) {
-        $partitions = [new static, new static];
+        $partitions = [new static(), new static()];
 
         $callback = $this->valueRetriever($callback);
 
@@ -1204,9 +1207,9 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      *
      * @param int|null $number
      *
-     * @return mixed
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return mixed
      */
     public function random($number = null) {
         if (is_null($number)) {
@@ -1331,7 +1334,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      */
     public function split($numberOfGroups) {
         if ($this->isEmpty()) {
-            return new static;
+            return new static();
         }
 
         $groupSize = ceil($this->count() / $numberOfGroups);
@@ -1348,7 +1351,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      */
     public function chunk($size) {
         if ($size <= 0) {
-            return new static;
+            return new static();
         }
 
         $chunks = [];
@@ -1614,9 +1617,11 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         return array_map(function ($value) {
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
-            } elseif ($value instanceof CInterface_Jsonable) {
+            }
+            if ($value instanceof CInterface_Jsonable) {
                 return json_decode($value->toJson(), true);
-            } elseif ($value instanceof CInterface_Arrayable) {
+            }
+            if ($value instanceof CInterface_Arrayable) {
                 return $value->toArray();
             } else {
                 return $value;
@@ -1741,15 +1746,20 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     protected function getArrayableItems($items) {
         if (is_array($items)) {
             return $items;
-        } elseif ($items instanceof self) {
+        }
+        if ($items instanceof self) {
             return $items->all();
-        } elseif ($items instanceof CInterface_Arrayable) {
+        }
+        if ($items instanceof CInterface_Arrayable) {
             return $items->toArray();
-        } elseif ($items instanceof CInterface_Jsonable) {
+        }
+        if ($items instanceof CInterface_Jsonable) {
             return json_decode($items->toJson(), true);
-        } elseif ($items instanceof JsonSerializable) {
+        }
+        if ($items instanceof JsonSerializable) {
             return $items->jsonSerialize();
-        } elseif ($items instanceof Traversable) {
+        }
+        if ($items instanceof Traversable) {
             return iterator_to_array($items);
         }
 
@@ -1772,9 +1782,9 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      *
      * @param string $key
      *
-     * @return mixed
-     *
      * @throws \Exception
+     *
+     * @return mixed
      */
     public function __get($key) {
         if (!in_array($key, static::$proxies)) {

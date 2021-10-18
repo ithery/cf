@@ -1,23 +1,31 @@
 <?php
 
 /**
- * Interface of UserProvider
+ * Interface of UserProvider.
  *
  * see implementation below
  *
  * @see CAuth_UserProvider_DatabaseUserProvider
  * @see CAuth_UserProvider_ModelUserProvider
  */
-
 interface CAuth_UserProviderInterface {
     /**
      * Retrieve a user by their unique identifier.
      *
      * @param mixed $identifier
      *
-     * @return CAuth_AuthenticatableInterface|null
+     * @return null|CAuth_AuthenticatableInterface
      */
     public function retrieveById($identifier);
+
+    /**
+     * Retrieve a user by stdclass object.
+     *
+     * @param object|stdclass $object
+     *
+     * @return null|CAuth_AuthenticatableInterface
+     */
+    public function retrieveByObject($object);
 
     /**
      * Retrieve a user by their unique identifier and "remember me" token.
@@ -25,7 +33,7 @@ interface CAuth_UserProviderInterface {
      * @param mixed  $identifier
      * @param string $token
      *
-     * @return CAuth_AuthenticatableInterface|null
+     * @return null|CAuth_AuthenticatableInterface
      */
     public function retrieveByToken($identifier, $token);
 
@@ -44,7 +52,7 @@ interface CAuth_UserProviderInterface {
      *
      * @param array $credentials
      *
-     * @return CAuth_AuthenticatableInterface|null
+     * @return null|CAuth_AuthenticatableInterface
      */
     public function retrieveByCredentials(array $credentials);
 
