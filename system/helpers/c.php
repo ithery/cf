@@ -1383,6 +1383,10 @@ class c {
     public static function isIterable($obj) {
         return is_array($obj) || (is_object($obj) && ($obj instanceof \Traversable));
     }
+
+    public static function msg($type, $message) {
+        return CApp_Message::add($type, $message);
+    }
 }
 
 // End c

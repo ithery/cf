@@ -36,6 +36,7 @@ trait CApp_Model_Trait_Roles {
     }
 
     public function getDescendantsTree($rootId = null, $orgId = null, $type = null) {
+        /** @var CApp_Model_Roles $this */
         $root = $this;
         if (strlen($rootId) > 0) {
             $root = $this->find($rootId);
