@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @property string  $createdby
+ * @property string  $updatedby
+ * @property CCarbon $created
+ * @property CCarbon $updated
+ * @property int     $status
+ */
 trait CApp_Model_Trait_LogActivity {
     public function __construct(array $attributes = []) {
         parent::__construct($attributes);

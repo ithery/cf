@@ -27,7 +27,7 @@ class CApp_Log_Activity {
             $navLabel = $nav['label'];
             if (isset($nav['action'])) {
                 foreach ($nav['action'] as $act) {
-                    if (isset($act['controller']) && isset($act['method']) && $act['controller'] == $controller && $act['method'] == $method) {
+                    if (isset($act['controller'], $act['method']) && $act['controller'] == $controller && $act['method'] == $method) {
                         $actionName = $act['name'];
                         $actionLabel = $act['label'];
                     }
@@ -37,19 +37,18 @@ class CApp_Log_Activity {
         $appId = Base::appId();
         $orgId = Base::orgId();
         $userId = Base::userId();
-        $browser = CHTTP::request()->browser();
         $model->fill([
             'org_id' => $orgId,
             'app_id' => $appId,
             'session_id' => CSession::instance()->id(),
             'remote_addr' => CHTTP::request()->ip(),
-            'user_agent' => $browser->getUserAgent(),
-            'browser' => $browser->getBrowser(),
-            'browser_version' => $browser->getVersion(),
-            'platform' => $browser->getPlatform(),
-            'platform_version' => null,
+            'user_agent' => CHTTP::request()->userAgent(),
+            'browser' => CApp::browserName(),
+            'browser_version' => CApp::browserVersion(),
+            'platform' => CApp::platformName(),
+            'platform_version' => CApp::platformVersion(),
             'user_id' => $userId,
-            'uri' => crouter::complete_uri(),
+            'uri' => CFRouter::getCompleteUri(),
             'routed_uri' => crouter::routed_uri(),
             'controller' => crouter::controller(),
             'method' => crouter::method(),

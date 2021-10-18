@@ -5,8 +5,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 final class CManager {
     use CTrait_Compat_Manager;
 
-    private static $instance;
-
     protected $controls = [];
 
     protected $controlsCode = [];
@@ -44,6 +42,8 @@ final class CManager {
      * @var CManager_Navigation
      */
     protected static $navigation = null;
+
+    private static $instance;
 
     /**
      * @return CManager
@@ -288,9 +288,11 @@ final class CManager {
     }
 
     /**
-     * @param type $path
+     * @param string $path
      *
      * @return $this
+     *
+     * @deprecated since 1.2, dont use this anymore
      */
     public function setMobilePath($path) {
         $this->mobile_path = $path;
@@ -300,11 +302,18 @@ final class CManager {
 
     /**
      * @return string
+     *
+     * @deprecated  since 1.2 dont use this anymore
      */
     public function getMobilePath() {
         return $this->mobile_path;
     }
 
+    /**
+     * @return bool
+     *
+     * @deprecated since 1.2 dont use this anymore
+     */
     public function isMobile() {
         return $this->is_mobile;
     }
@@ -391,7 +400,7 @@ final class CManager {
     }
 
     /**
-     * Get Daemon Manager
+     * Get Daemon Manager.
      *
      * @return CManager_Daemon
      */
@@ -400,7 +409,7 @@ final class CManager {
     }
 
     /**
-     * Get View Manager
+     * Get View Manager.
      *
      * @return CView_Factory
      */

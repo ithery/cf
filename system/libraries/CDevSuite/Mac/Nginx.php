@@ -7,6 +7,8 @@
  * @since Nov 15, 2020
  */
 class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
+    const NGINX_CONF = '/usr/local/etc/nginx/nginx.conf';
+
     /**
      * @var CDevSuite_Brew
      */
@@ -16,8 +18,6 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
      * @var CDevsuite_Mac_Site
      */
     public $site;
-
-    const NGINX_CONF = '/usr/local/etc/nginx/nginx.conf';
 
     /**
      * Create a new Nginx instance.
@@ -110,7 +110,7 @@ class CDevSuite_Mac_Nginx extends CDevSuite_Nginx {
         $this->cli->run(
             'sudo nginx -c ' . static::NGINX_CONF . ' -t',
             function ($exitCode, $outputMessage) {
-                throw new DomainException("Nginx cannot start; please check your nginx.conf [$exitCode: $outputMessage].");
+                throw new DomainException("Nginx cannot start; please check your nginx.conf [${exitCode}: ${outputMessage}].");
             }
         );
     }

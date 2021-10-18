@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 interface CApp_SEO_OpenGraphInterface {
-
     /**
      * Generates open graph tags.
      *
@@ -94,7 +87,7 @@ interface CApp_SEO_OpenGraphInterface {
     /**
      * Define type property.
      *
-     * @param string|null $type set the opengraph type
+     * @param null|string $type set the opengraph type
      *
      * @return static
      */

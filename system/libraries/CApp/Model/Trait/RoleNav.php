@@ -7,6 +7,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Jun 23, 2018, 1:33:26 AM
+ *
+ * @property string  $createdby
+ * @property string  $updatedby
+ * @property CCarbon $created
+ * @property CCarbon $updated
+ * @property int     $status
  */
 trait CApp_Model_Trait_RoleNav {
     public function __construct(array $attributes = []) {
@@ -20,13 +26,13 @@ trait CApp_Model_Trait_RoleNav {
      * @return CModel_Relation_BelongsTo
      */
     public function org() {
-        return $this->belongsTo('CApp_Model_Org');
+        return $this->belongsTo(CApp_Model_Org::class);
     }
 
     /**
      * @return CModel_Relation_BelongsTo
      */
     public function roles() {
-        return $this->belongsTo('CMModel_Roles');
+        return $this->belongsTo(CApp_Model_Roles::class);
     }
 }

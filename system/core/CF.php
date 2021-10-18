@@ -7,6 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 final class CF {
     use CFDeprecatedTrait;
+
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
 
     // Security check that is added to all generated PHP files
@@ -1165,5 +1166,32 @@ final class CF {
      */
     private static function clearInternalCache() {
         static::$internalCache = [];
+    }
+
+    public static function isDownForMaintenance() {
+        $file = CF::findFile('data', 'down');
+
+        if ($file != null) {
+            $data = @include $file;
+            $viewName = 'system.maintenance';
+            $down = false;
+            if (is_array($data)) {
+                $down = carr::get($data, 'down', true);
+                if ($down) {
+                    $request = CHTTP::request();
+
+                    if (isset($request->cookie()[carr::get($data, 'cookie', '')])) {
+                        return false;
+                    }
+                    $viewName = carr::get($data, 'view', $viewName);
+                }
+            }
+
+            if ($down) {
+                return c::response()->view($viewName, ['data' => $data], 503);
+            }
+        }
+
+        return false;
     }
 }

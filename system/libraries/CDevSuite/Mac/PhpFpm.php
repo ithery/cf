@@ -1,13 +1,15 @@
 <?php
 
 /**
- * Description of PhpFpm
+ * Description of PhpFpm.
  *
  * @author Hery
  */
 class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
     public $cli;
+
     public $files;
+
     public $brew;
 
     public $taps = [
@@ -16,10 +18,6 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
 
     /**
      * Create a new PHP FPM class instance.
-     *
-     * @param Brew        $brew
-     * @param CommandLine $cli
-     * @param Filesystem  $files
      *
      * @return void
      */
@@ -47,7 +45,7 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
     }
 
     /**
-     * Forcefully uninstall all of DevSuite's supported PHP versions and configurations
+     * Forcefully uninstall all of DevSuite's supported PHP versions and configurations.
      *
      * @return void
      */
@@ -142,20 +140,20 @@ class CDevSuite_Mac_PhpFpm extends CDevSuite_PhpFpm {
     }
 
     /**
-     * Only stop running php services
+     * Only stop running php services.
      */
     public function stopRunning() {
         $this->brew->stopService(
             $this->brew->getRunningServices()
-                        ->filter(function ($service) {
-                            return substr($service, 0, 3) === 'php';
-                        })
-                        ->all()
+                ->filter(function ($service) {
+                    return substr($service, 0, 3) === 'php';
+                })
+                ->all()
         );
     }
 
     /**
-     * Use a specific version of php
+     * Use a specific version of php.
      *
      * @param $version
      *

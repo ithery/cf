@@ -1,12 +1,11 @@
-
 <?php
 
 /**
  * @mixin \Illuminate\Http\Response
  */
 
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use CTesting_Assert as PHPUnit;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CTesting_TestResponse implements ArrayAccess {
     use CTrait_Tappable, CTrait_Macroable {
@@ -176,7 +175,7 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Assert whether the response is redirecting to a given URI.
      *
-     * @param string|null $uri
+     * @param null|string $uri
      *
      * @return $this
      */
@@ -368,7 +367,7 @@ class CTesting_TestResponse implements ArrayAccess {
      *
      * @param string $cookieName
      *
-     * @return \Symfony\Component\HttpFoundation\Cookie|null
+     * @return null|\Symfony\Component\HttpFoundation\Cookie
      */
     protected function getCookie($cookieName) {
         foreach ($this->headers->getCookies() as $cookie) {
@@ -591,8 +590,8 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Assert that the response has a given JSON structure.
      *
-     * @param array|null $structure
-     * @param array|null $responseData
+     * @param null|array $structure
+     * @param null|array $responseData
      *
      * @return $this
      */
@@ -606,7 +605,7 @@ class CTesting_TestResponse implements ArrayAccess {
      * Assert that the response JSON has the expected count of items at the given key.
      *
      * @param int         $count
-     * @param string|null $key
+     * @param null|string $key
      *
      * @return $this
      */
@@ -656,7 +655,7 @@ class CTesting_TestResponse implements ArrayAccess {
 
                 if (!$hasError) {
                     PHPUnit::fail(
-                        "Failed to find a validation error in the response for key and message: '$key' => '$value'" . PHP_EOL . PHP_EOL . $errorMessage
+                        "Failed to find a validation error in the response for key and message: '${key}' => '${value}'" . PHP_EOL . PHP_EOL . $errorMessage
                     );
                 }
             }
@@ -668,7 +667,7 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Assert that the response has no JSON validation errors for the given keys.
      *
-     * @param string|array|null $keys
+     * @param null|string|array $keys
      * @param string            $responseKey
      *
      * @return $this
@@ -710,9 +709,9 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Validate and return the decoded response JSON.
      *
-     * @return CTesting_AssertableJsonString
-     *
      * @throws \Throwable
+     *
+     * @return CTesting_AssertableJsonString
      */
     public function decodeResponseJson() {
         $testJson = new CTesting_AssertableJsonString($this->getContent());
@@ -733,7 +732,7 @@ class CTesting_TestResponse implements ArrayAccess {
     /**
      * Validate and return the decoded response JSON.
      *
-     * @param string|null $key
+     * @param null|string $key
      *
      * @return mixed
      */
@@ -952,7 +951,7 @@ class CTesting_TestResponse implements ArrayAccess {
 
         foreach ($keys as $key => $value) {
             if (is_int($key)) {
-                PHPUnit::assertTrue($errors->has($value), "Session missing error: $value");
+                PHPUnit::assertTrue($errors->has($value), "Session missing error: ${value}");
             } else {
                 PHPUnit::assertContains(is_bool($value) ? (string) $value : $value, $errors->get($key, $format));
             }
@@ -965,7 +964,7 @@ class CTesting_TestResponse implements ArrayAccess {
      * Assert that the session is missing the given errors.
      *
      * @param string|array $keys
-     * @param string|null  $format
+     * @param null|string  $format
      * @param string       $errorBag
      *
      * @return $this
@@ -987,7 +986,7 @@ class CTesting_TestResponse implements ArrayAccess {
 
         foreach ($keys as $key => $value) {
             if (is_int($key)) {
-                PHPUnit::assertFalse($errors->has($value), "Session has unexpected error: $value");
+                PHPUnit::assertFalse($errors->has($value), "Session has unexpected error: ${value}");
             } else {
                 PHPUnit::assertNotContains($value, $errors->get($key, $format));
             }
@@ -1183,9 +1182,9 @@ class CTesting_TestResponse implements ArrayAccess {
      * @param string $offset
      * @param mixed  $value
      *
-     * @return void
-     *
      * @throws \LogicException
+     *
+     * @return void
      */
     public function offsetSet($offset, $value) {
         throw new LogicException('Response data may not be mutated using array access.');
@@ -1196,9 +1195,9 @@ class CTesting_TestResponse implements ArrayAccess {
      *
      * @param string $offset
      *
-     * @return void
-     *
      * @throws \LogicException
+     *
+     * @return void
      */
     public function offsetUnset($offset) {
         throw new LogicException('Response data may not be mutated using array access.');

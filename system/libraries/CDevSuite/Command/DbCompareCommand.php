@@ -1,12 +1,11 @@
 <?php
 
 /**
- * Description of DbCompareCommand
+ * Description of DbCompareCommand.
  *
  * @author Hery
  */
 class CDevSuite_Command_DbCompareCommand extends CDevSuite_CommandAbstract {
-
     public function getSignatureArguments() {
         return '{--from=} {--to=}';
     }
@@ -18,5 +17,4 @@ class CDevSuite_Command_DbCompareCommand extends CDevSuite_CommandAbstract {
         CDevSuite::db()->existsOrExit($to);
         CDevSuite::db()->compare($from, $to);
     }
-
 }

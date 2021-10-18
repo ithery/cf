@@ -1,16 +1,15 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 19, 2019, 6:58:10 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 19, 2019, 6:58:10 PM
  */
 class CRouting {
-
     /**
-     * 
      * @return CRouting_UrlGenerator
      */
     public static function urlGenerator() {
@@ -18,11 +17,9 @@ class CRouting {
     }
 
     /**
-     * 
      * @return CRouting_Router
      */
     public static function router() {
         return CRouting_Router::instance();
     }
-
 }

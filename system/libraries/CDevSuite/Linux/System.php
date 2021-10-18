@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of System
+ * Description of System.
  *
  * @author Hery
  */
@@ -22,7 +22,7 @@ class CDevSuite_Linux_System extends CDevSuite_System {
 
     /**
      * Unlink the DevSuite Bash script from the user's local bin
-     * and the sudoers.d entry
+     * and the sudoers.d entry.
      *
      * @return void
      */

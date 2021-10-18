@@ -8,9 +8,9 @@ class CCrypt_Hasher_Argon2IdHasher extends CCrypt_Hasher_ArgonHasher {
      * @param string $hashedValue
      * @param array  $options
      *
-     * @return bool
-     *
      * @throws \RuntimeException
+     *
+     * @return bool
      */
     public function check($value, $hashedValue, array $options = []) {
         if ($this->verifyAlgorithm && $this->info($hashedValue)['algoName'] !== 'argon2id') {

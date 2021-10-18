@@ -1,8 +1,7 @@
-
 <?php
+use GuzzleHttp\RequestOptions;
 use GuzzleHttp\Client as Guzzle;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\RequestOptions;
 
 class CVendor_Xendit_HttpClient_GuzzleClient implements CVendor_Xendit_HttpClient_HttpClientInterface {
     protected $http;
@@ -12,7 +11,7 @@ class CVendor_Xendit_HttpClient_GuzzleClient implements CVendor_Xendit_HttpClien
     protected $secretApiKey;
 
     /**
-     * XenditClient constructor
+     * XenditClient constructor.
      *
      * @param mixed $secretApiKey
      * @param mixed $baseUri
@@ -30,16 +29,16 @@ class CVendor_Xendit_HttpClient_GuzzleClient implements CVendor_Xendit_HttpClien
     }
 
     /**
-     * Create a request to execute in _executeRequest
+     * Create a request to execute in _executeRequest.
      *
      * @param string $method         request method
      * @param string $url            url
      * @param array  $defaultHeaders request headers
      * @param array  $params         parameters
      *
-     * @return array
-     *
      * @throws CVendor_Xendit_Exception_ApiException
+     *
+     * @return array
      */
     public function sendRequest($method, $url, array $defaultHeaders, $params) {
         $method = strtoupper($method);
@@ -60,20 +59,21 @@ class CVendor_Xendit_HttpClient_GuzzleClient implements CVendor_Xendit_HttpClien
     }
 
     /**
-     * Execute request
+     * Execute request.
      *
      * @param array  $opts request options (headers, params)
      * @param string $url  request url
      *
-     * @return array
-     *
      * @throws CVendor_Xendit_Exception_ApiException
+     *
+     * @return array
      */
     private function executeRequest(array $opts, $url) {
         $headers = $opts['headers'];
         $params = $opts['params'];
         $apiKey = $this->secretApiKey;
         $url = strval($url);
+
         try {
             if (count($params) > 0) {
                 $response = $this->http->request(
@@ -116,13 +116,13 @@ class CVendor_Xendit_HttpClient_GuzzleClient implements CVendor_Xendit_HttpClien
     }
 
     /**
-     * Handles API Error
+     * Handles API Error.
      *
      * @param array $response response from GuzzleClient
      *
-     * @return void
-     *
      * @throws CVendor_Xendit_Exception_ApiException
+     *
+     * @return void
      */
     private static function handleAPIError($response) {
         $rbody = $response['body'];

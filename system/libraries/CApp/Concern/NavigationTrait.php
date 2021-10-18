@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Navigation
+ * Description of Navigation.
  *
  * @author Hery
  */
@@ -22,13 +22,16 @@ trait CApp_Concern_NavigationTrait {
             // }
             if ($fileNav != null) {
                 $nav = include $fileNav;
+            } else {
+                throw new Exception('nav ' . $nav . ' is not found');
             }
         }
+
         return $nav;
     }
 
     /**
-     * Resolve Nav Engine
+     * Resolve Nav Engine.
      *
      * @param mixed $renderer
      *
@@ -58,6 +61,7 @@ trait CApp_Concern_NavigationTrait {
         if (!($renderer instanceof CApp_Navigation_Engine)) {
             throw new Exception('Renderer must extends CNavigation_Engine');
         }
+
         return $renderer;
     }
 

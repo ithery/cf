@@ -21,6 +21,9 @@ class CApp_Navigation_Engine_Bootstrap extends CApp_Navigation_Engine {
         }
         $html = '';
         $child_count = 0;
+        if (!is_array($navs)) {
+            $navs = [];
+        }
         foreach ($navs as $d) {
             $child = 0;
             $pass = 0;

@@ -8,9 +8,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jun 15, 2019, 12:02:21 PM
  */
-
 trait CApp_Trait_VarTrait {
     protected static $globalVars;
+
     protected static $vars;
 
     public static function getGlobalVar($key, $default = null) {
@@ -22,6 +22,7 @@ trait CApp_Trait_VarTrait {
             }
             self::$globalVars[$key] = $value;
         }
+
         return self::$globalVars[$key];
     }
 
@@ -42,6 +43,7 @@ trait CApp_Trait_VarTrait {
             $db->update('var', $data, ['var_id' => $row->var_id]);
         }
         self::$globalVars[$key] = $val;
+
         return true;
     }
 
@@ -61,6 +63,7 @@ trait CApp_Trait_VarTrait {
 
             self::$vars[$orgId][$key] = $value;
         }
+
         return self::$vars[$orgId][$key];
     }
 
@@ -88,6 +91,7 @@ trait CApp_Trait_VarTrait {
             $db->update('var', $data, ['var_id' => $row->var_id]);
         }
         self::$vars[$orgId][$key] = $val;
+
         return true;
     }
 }

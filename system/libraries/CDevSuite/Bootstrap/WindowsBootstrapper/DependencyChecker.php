@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DependencyBootstrapper
+ * Description of DependencyBootstrapper.
  *
  * @author Hery
  */

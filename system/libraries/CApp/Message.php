@@ -21,6 +21,7 @@ class CApp_Message {
 
     public static function get($type) {
         $session = CSession::instance();
+
         return $session->get('cmsg_' . $type);
     }
 
@@ -57,6 +58,7 @@ class CApp_Message {
                 ->setTitle($header)
                 ->setDismissable()->add($message)->html();
         }
+
         return $message;
     }
 

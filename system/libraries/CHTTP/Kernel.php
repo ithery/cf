@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class CHTTP_Kernel {
     use CHTTP_Trait_OutputBufferTrait,
         CHTTP_Concern_KernelRouting;
+
     protected $isHandled = false;
 
     protected $terminated;
@@ -242,17 +243,25 @@ class CHTTP_Kernel {
         CBootstrap::instance()->boot();
         $response = null;
 
-        try {
-            $this->setupRouter();
-            $response = $this->handleRequest($request);
-        } catch (Exception $e) {
-            $this->reportException($e);
+        if ($response = CF::isDownForMaintenance()) {
+            if (!$response instanceof SymfonyResponse) {
+                $response = c::response('Down For Maintenance', 503);
+            }
+        }
 
-            $response = $this->renderException($request, $e);
-        } catch (Throwable $e) {
-            $this->reportException($e);
+        if ($response == null) {
+            try {
+                $this->setupRouter();
+                $response = $this->handleRequest($request);
+            } catch (Exception $e) {
+                $this->reportException($e);
 
-            $response = $this->renderException($request, $e);
+                $response = $this->renderException($request, $e);
+            } catch (Throwable $e) {
+                $this->reportException($e);
+
+                $response = $this->renderException($request, $e);
+            }
         }
 
         CEvent::dispatch(new CHTTP_Event_RequestHandled($request, $response));

@@ -27,8 +27,11 @@ class CElement_Component_Widget_Header extends CElement_Element {
 
     protected $switcherBlockMessage = '';
 
+    protected $headerClass;
+
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
+        $this->headerClass = c::theme('widget.class.header', 'widget-title');
         $this->icon = '';
         $this->title = '';
         $this->titleWrapper = $this->addDiv()->addClass('widget-title-wrapper');
@@ -40,17 +43,19 @@ class CElement_Component_Widget_Header extends CElement_Element {
             $this->actions->setStyle('widget-action')->addClass('ml-auto');
             $this->add($this->actions);
         }
+
         return $this->actions;
     }
 
     public function addAction($id = '') {
         $action = CElement_Factory::createComponent('Action', $id);
         $this->actions()->add($action);
+
         return $action;
     }
 
     public function build() {
-        $this->addClass('widget-title clearfix');
+        $this->addClass($this->headerClass . ' clearfix');
         if ($this->actions != null) {
             $this->addClass('with-elements');
         }
@@ -66,11 +71,13 @@ class CElement_Component_Widget_Header extends CElement_Element {
             $this->switcher = CElement_Factory::createControl($id, 'switcher');
             $this->switcherWrapper->add($this->switcher);
         }
+
         return $this->switcher;
     }
 
     public function setSwitcherBehaviour($behaviour = 'hide') {
         $this->switcherBehaviour = $behaviour;
+
         return $this;
     }
 
@@ -123,6 +130,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
             }
         }
         $js->append($this->jsChild($js->getIndent()));
+
         return $js->text();
     }
 }

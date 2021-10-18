@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CApp_Mail
+ * Description of CApp_Mail.
  *
  * @author Hery
  */

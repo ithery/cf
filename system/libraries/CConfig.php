@@ -37,6 +37,7 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
 
     public function addAppCode($appCode) {
         $this->appCode = $appCode;
+
         return $this;
     }
 
@@ -78,6 +79,7 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
         foreach ($keys as $key => $value) {
             carr::set($this->items, $key, $value);
         }
+
         return $this;
     }
 
@@ -117,7 +119,7 @@ class CConfig implements CInterface_Arrayable, ArrayAccess {
     }
 
     /**
-     * Flatten the config array, retrieves information of default value and file which config is created
+     * Flatten the config array, retrieves information of default value and file which config is created.
      *
      * @throws CException
      */

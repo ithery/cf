@@ -2,21 +2,20 @@
 
 class CCrypt_HashManager extends CBase_ManagerAbstract implements CCrypt_HasherInterface {
     /**
-     * Current singleton instance
+     * Get current instances.
+     *
+     * @return CCrypt_HashManager
+     */
+    protected $config;
+
+    protected $driverName;
+
+    /**
+     * Current singleton instance.
      *
      * @var CCrypt_HashManager
      */
     private static $instance;
-
-    /**
-     * Get current instances
-     *
-     * @return CCrypt_HashManager
-     */
-
-    protected $config;
-
-    protected $driverName;
 
     public static function instance($driver = null) {
         if (static::$instance == null) {
@@ -25,6 +24,7 @@ class CCrypt_HashManager extends CBase_ManagerAbstract implements CCrypt_HasherI
         if (!isset(static::$instance[$driver])) {
             static::$instance[$driver] = new static($driver);
         }
+
         return static::$instance[$driver];
     }
 
@@ -141,6 +141,7 @@ class CCrypt_HashManager extends CBase_ManagerAbstract implements CCrypt_HasherI
         if ($driver == null) {
             $driver = $this->driverName;
         }
+
         return parent::driver($driver);
     }
 }
