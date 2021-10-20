@@ -1,4 +1,4 @@
-import store from '@/cui/Store';
+import store from '@/ui/Store';
 import componentStore from '../Store';
 import { getCsrfToken } from '@/util';
 import { showHtmlModal } from '../../util/window-util';

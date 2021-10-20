@@ -1,5 +1,5 @@
-import store from '@/cui/Store';
-import Message from '@/cui/Message';
+import store from '@/ui/Store';
+import Message from '@/ui/Message';
 
 export default function () {
     let initializedPath = false;

@@ -1,17 +1,17 @@
 /* eslint-disable no-underscore-dangle */
-import Message from '@/cui/Message';
+import Message from '@/ui/Message';
 import dataGet from 'get-value';
-import PrefetchMessage from '@/cui/PrefetchMessage';
+import PrefetchMessage from '@/ui/PrefetchMessage';
 import { dispatch, debounce, cresDirectives, walk } from '@/util';
-import morphdom from '@/cui/dom/morphdom';
-import DOM from '@/cui/dom/dom';
-import nodeInitializer from '@/cui/node_initializer';
-import store from '@/cui/Store';
+import morphdom from '@/ui/dom/morphdom';
+import DOM from '@/ui/dom/dom';
+import nodeInitializer from '@/ui/node_initializer';
+import store from '@/ui/Store';
 import PrefetchManager from './PrefetchManager';
 import UploadManager from './UploadManager';
-import MethodAction from '@/cui/action/method';
-import ModelAction from '@/cui/action/model';
-import DeferredModelAction from '@/cui/action/deferred-model';
+import MethodAction from '@/ui/action/method';
+import ModelAction from '@/ui/action/model';
+import DeferredModelAction from '@/ui/action/deferred-model';
 import MessageBus from '../MessageBus';
 import { alpinifyElementsForMorphdom } from './SupportAlpine';
 

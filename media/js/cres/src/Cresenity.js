@@ -1,7 +1,7 @@
 import Url from './module/Url';
 import CF from './CF';
 import ScrollToTop from './module/ScrollToTop';
-import CUI from './cui';
+import UI from './ui';
 import {
     dispatch as dispatchWindowEvent,
     showHtmlModal,
@@ -33,7 +33,7 @@ export default class Cresenity {
         this.scrollToTop = new ScrollToTop();
         this.callback = {};
         this.filesAdded = [];
-        this.ui = new CUI();
+        this.ui = new UI();
         this.php = php;
         this.observer = {
             elementRendered: elementRendered,

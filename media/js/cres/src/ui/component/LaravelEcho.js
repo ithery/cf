@@ -1,4 +1,4 @@
-import store from '@/cui/Store';
+import store from '@/ui/Store';
 
 export default function () {
     store.registerHook('component.initialized', component => {

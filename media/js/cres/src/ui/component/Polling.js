@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-underscore-dangle */
-import MethodAction from '@/cui/action/method';
+import MethodAction from '@/ui/action/method';
 import { cresDirectives } from '@/util';
-import store from '@/cui/Store';
+import store from '@/ui/Store';
 
 export default function () {
     store.registerHook('element.initialized', (el, component) => {

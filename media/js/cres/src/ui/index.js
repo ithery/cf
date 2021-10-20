@@ -1,26 +1,30 @@
-import DOM from '@/cui/dom/dom';
-import '@/cui/dom/polyfills/index';
-import store from '@/cui/Store';
-import Connection from '@/cui/connection';
-import Polling from '@/cui/component/Polling';
-import Component from '@/cui/component/index';
+import DOM from '@/ui/dom/dom';
+import '@/ui/dom/polyfills/index';
+import store from '@/ui/Store';
+import Connection from '@/ui/connection';
+import Polling from '@/ui/component/Polling';
+import Component from '@/ui/component/index';
 import { dispatch, cresDirectives } from '@/util';
-import FileUploads from '@/cui/component/FileUploads';
-import LaravelEcho from '@/cui/component/LaravelEcho';
-import DirtyStates from '@/cui/component/DirtyStates';
-import DisableForms from '@/cui/component/DisableForms';
-import FileDownloads from '@/cui/component/FileDownloads';
-import LoadingStates from '@/cui/component/LoadingStates';
-import OfflineStates from '@/cui/component/OfflineStates';
-import SyncBrowserHistory from '@/cui/component/SyncBrowserHistory';
-import SupportAlpine from '@/cui/component/SupportAlpine';
+import FileUploads from '@/ui/component/FileUploads';
+import LaravelEcho from '@/ui/component/LaravelEcho';
+import DirtyStates from '@/ui/component/DirtyStates';
+import DisableForms from '@/ui/component/DisableForms';
+import FileDownloads from '@/ui/component/FileDownloads';
+import LoadingStates from '@/ui/component/LoadingStates';
+import OfflineStates from '@/ui/component/OfflineStates';
+import SyncBrowserHistory from '@/ui/component/SyncBrowserHistory';
+import SupportAlpine from '@/ui/component/SupportAlpine';
+import { attachWaves } from './waves';
 
-class CUI {
+class UI {
     constructor() {
         this.connection = new Connection();
         this.components = store;
         this.devToolsEnabled = false;
         this.onLoadCallback = () => {};
+        this.waves = {
+            attach: attachWaves
+        };
     }
 
     first() {
@@ -124,4 +128,4 @@ LaravelEcho();
 DirtyStates();
 Polling();
 
-export default CUI;
+export default UI;

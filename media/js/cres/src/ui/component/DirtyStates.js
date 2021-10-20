@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 /* eslint-disable no-underscore-dangle */
-import store from '@/cui/Store';
+import store from '../Store';
 import DOM from '../dom/dom';
 import { cresDirectives } from '@/util';
 

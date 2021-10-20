@@ -1,8 +1,8 @@
 import { kebabCase, debounce, cresDirectives } from '@/util';
-import ModelAction from '@/cui/action/model';
-import DeferredModelAction from '@/cui/action/deferred-model';
-import MethodAction from '@/cui/action/method';
-import store from '@/cui/Store';
+import ModelAction from '@/ui/action/model';
+import DeferredModelAction from '@/ui/action/deferred-model';
+import MethodAction from '@/ui/action/method';
+import store from '@/ui/Store';
 import DOM from './dom/dom';
 
 export default {

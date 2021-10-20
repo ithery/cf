@@ -1,5 +1,5 @@
-import EventAction from '@/cui/action/event';
-import HookManager from '@/cui/HookManager';
+import EventAction from '@/ui/action/event';
+import HookManager from '@/ui/HookManager';
 import MessageBus from './MessageBus';
 import DirectiveManager from './DirectiveManager';
 

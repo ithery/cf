@@ -1,4 +1,4 @@
-import Message from '@/cui/Message';
+import Message from '@/ui/Message';
 
 export default class extends Message {
     constructor(component, action) {

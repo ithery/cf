@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import store from '@/cui/Store';
+import store from '@/ui/Store';
 import { cresDirectives } from '@/util';
 
 export default function () {

@@ -1,6 +1,6 @@
 import { cresDirectives } from '@/util';
 import get from 'get-value';
-import store from '@/cui/Store';
+import store from '@/ui/Store';
 
 /**
  * This is intended to isolate all native DOM operations. The operations that happen
