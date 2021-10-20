@@ -3,16 +3,16 @@ import CF from './CF';
 import ScrollToTop from './module/ScrollToTop';
 import CUI from './cui';
 import {
-    dispatch as dispatchWindowEvent
+    dispatch as dispatchWindowEvent,
+    showHtmlModal,
+    toggleFullscreen
 } from './util';
 import {encode as base64encode, decode as base64decode} from './util/base64';
 import php from './php';
 import { elementReady, elementRendered } from './util/dom-observer';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
 import appValidation from './module/validation';
-import { toggleFullscreen } from './util/window-util';
 import ucfirst from 'locutus/php/strings/ucfirst';
-
 export default class Cresenity {
     constructor() {
         this.cf = new CF();
@@ -99,6 +99,12 @@ export default class Cresenity {
 
 
     handleResponse(data, callback) {
+        if (data.cssRequire && data.cssRequire.length > 0) {
+            for (let i = 0; i < data.cssRequire.length; i++) {
+                this.cf.require(data.cssRequire[i], 'css');
+            }
+        }
+
         if (data.css_require && data.css_require.length > 0) {
             for (let i = 0; i < data.css_require.length; i++) {
                 this.cf.require(data.css_require[i], 'css');
@@ -106,6 +112,9 @@ export default class Cresenity {
         }
 
         callback();
+    }
+    htmlModal(html) {
+        showHtmlModal(html);
     }
 
     reload(options) {
@@ -182,45 +191,57 @@ export default class Cresenity {
                 dataType: 'json',
                 data: dataAddition,
                 success: (data) => {
-                    this.doCallback('onReloadSuccess', data);
-                    this.handleResponse(data, () => {
-                        switch (settings.reloadType) {
-                            case 'after':
-                                $(element).after(data.html);
-                                break;
-                            case 'before':
-                                $(element).before(data.html);
-                                break;
-                            case 'append':
-                                $(element).append(data.html);
-                                break;
-                            case 'prepend':
-                                $(element).prepend(data.html);
-                                break;
-                            default:
-                                $(element).html(data.html);
-                                break;
-                        }
+                    let isError = false;
+                    if(!data.html) {
+                        //error
+                        this.htmlModal(data);
+                        isError = true;
+                    }
+                    if(!isError) {
+                        this.doCallback('onReloadSuccess', data);
 
-                        if (data.js && data.js.length > 0) {
-                            let script = this.base64.decode(data.js);
-                            eval(script);
-                        }
-
-
-                        if ($(element).find('.prettyprint').length > 0) {
-                            if (window.prettyPrint) {
-                                window.prettyPrint();
+                        this.handleResponse(data, () => {
+                            switch (settings.reloadType) {
+                                case 'after':
+                                    $(element).after(data.html);
+                                    break;
+                                case 'before':
+                                    $(element).before(data.html);
+                                    break;
+                                case 'append':
+                                    $(element).append(data.html);
+                                    break;
+                                case 'prepend':
+                                    $(element).prepend(data.html);
+                                    break;
+                                default:
+                                    $(element).html(data.html);
+                                    break;
                             }
-                        }
-                        if (typeof settings.onSuccess === 'function') {
-                            settings.onSuccess(data);
-                        }
-                    });
+
+                            if (data.js && data.js.length > 0) {
+                                let script = this.base64.decode(data.js);
+                                eval(script);
+                            }
+
+
+                            if ($(element).find('.prettyprint').length > 0) {
+                                if (window.prettyPrint) {
+                                    window.prettyPrint();
+                                }
+                            }
+                            if (typeof settings.onSuccess === 'function') {
+                                settings.onSuccess(data);
+                            }
+                        });
+                    }
                 },
                 error: (errorXhr, ajaxOptions, thrownError) => {
                     if (thrownError !== 'abort') {
                         this.message('error', 'Error, please call administrator... (' + thrownError + ')');
+                        if(window.capp && window.capp.environment && window.capp.environment!='production') {
+                            this.htmlModal(thrownError);
+                        }
                     }
                 },
                 complete: () => {

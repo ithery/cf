@@ -1,21 +1,21 @@
-import MessageBus from "./MessageBus"
+import MessageBus from './MessageBus';
 
 export default {
-    directives: new MessageBus,
+    directives: new MessageBus(),
 
     register(name, callback) {
         if (this.has(name)) {
-            throw `Cresenity: Directive already registered: [${name}]`
+            throw Error(`Cresenity: Directive already registered: [${name}]`);
         }
 
-        this.directives.register(name, callback)
+        this.directives.register(name, callback);
     },
 
     call(name, el, directive, component) {
-        this.directives.call(name, el, directive, component)
+        this.directives.call(name, el, directive, component);
     },
 
     has(name) {
-        return this.directives.has(name)
-    },
-}
+        return this.directives.has(name);
+    }
+};

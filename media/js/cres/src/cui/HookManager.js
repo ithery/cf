@@ -1,4 +1,4 @@
-import MessageBus from './MessageBus'
+import MessageBus from './MessageBus';
 
 export default {
     availableHooks: [
@@ -21,20 +21,20 @@ export default {
         'interceptWireModelSetValue',
         'interceptWireModelAttachListener',
         'beforeReplaceState',
-        'beforePushState',
+        'beforePushState'
     ],
 
     bus: new MessageBus(),
 
     register(name, callback) {
         if (!this.availableHooks.includes(name)) {
-            throw `Cresenity: Referencing unknown hook: [${name}]`
+            throw Error(`Cresenity: Referencing unknown hook: [${name}]`);
         }
 
-        this.bus.register(name, callback)
+        this.bus.register(name, callback);
     },
 
     call(name, ...params) {
-        this.bus.call(name, ...params)
-    },
-}
+        this.bus.call(name, ...params);
+    }
+};
