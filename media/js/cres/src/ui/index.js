@@ -12,7 +12,7 @@ import DisableForms from '@/ui/component/DisableForms';
 import FileDownloads from '@/ui/component/FileDownloads';
 import LoadingStates from '@/ui/component/LoadingStates';
 import OfflineStates from '@/ui/component/OfflineStates';
-import SyncBrowserHistory from '@/ui/component/SyncBrowserHistory';
+import SyncBrowserHistory from './component/SyncBrowserHistory';
 import SupportAlpine from '@/ui/component/SupportAlpine';
 import { attachWaves } from './waves';
 
