@@ -10,14 +10,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_Component_Form_Field extends CElement_Component {
     use CTrait_Compat_Element_Form_Field;
-
+    use CTrait_Element_Property_Label;
     protected $group_classes = [];
 
     protected $group_id = '';
 
     protected $group_custom_css = [];
-
-    protected $label = [];
 
     protected $show_label = [];
 
@@ -60,6 +58,7 @@ class CElement_Component_Form_Field extends CElement_Component {
 
     public function setLabelRequired($bool = true) {
         $this->labelRequired = $bool;
+
         return $this;
     }
 
@@ -83,6 +82,7 @@ class CElement_Component_Form_Field extends CElement_Component {
         $data['children'][] = $control_label;
         $data['children'][] = $control_wrapper;
         $data['tag'] = $this->tag;
+
         return $data;
     }
 
@@ -237,21 +237,25 @@ class CElement_Component_Form_Field extends CElement_Component {
 
     public function setStyleFormGroup($style_form_group) {
         $this->style_form_group = $style_form_group;
+
         return $this;
     }
 
     public function setGroupId($id) {
         $this->group_id = $id;
+
         return $this;
     }
 
     public function addGroupClass($class) {
         $this->group_classes[] = $class;
+
         return $this;
     }
 
     public function groupCustomCss($key, $val) {
         $this->group_custom_css[$key] = $val;
+
         return $this;
     }
 
@@ -259,50 +263,43 @@ class CElement_Component_Form_Field extends CElement_Component {
         if (in_array($size, ['small', 'medium', 'large', 'none']) || is_numeric($size)) {
             $this->label_size = $size;
         }
+
         return $this;
     }
 
     public function setInfoText($info_text) {
         $this->info_text = $info_text;
-        return $this;
-    }
 
-    /**
-     * @param string $text
-     * @param bool   $lang
-     *
-     * @return $this
-     */
-    public function setLabel($text, $lang = true) {
-        if ($lang) {
-            $text = clang::__($text);
-        }
-        $this->label = $text;
         return $this;
     }
 
     public function showLabel() {
         $this->show_label = true;
+
         return $this;
     }
 
     public function hideLabel() {
         $this->show_label = false;
+
         return $this;
     }
 
     public function styleFormInline() {
         $this->style_form_group = 'inline';
+
         return $this;
     }
 
     public function addLabelClass($label_class) {
         $this->label_class[] = $label_class;
+
         return $this;
     }
 
     public function addControlClass($control_class) {
         $this->control_class[] = $control_class;
+
         return $this;
     }
 
@@ -312,6 +309,7 @@ class CElement_Component_Form_Field extends CElement_Component {
 
     public function setInlineWithoutDefault($inline_without_default) {
         $this->inline_without_default = $inline_without_default;
+
         return $this;
     }
 }
