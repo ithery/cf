@@ -7,7 +7,6 @@
  */
 class CElement_FormInput extends CElement_Element {
     use CTrait_Compat_Element_FormInput;
-
     protected $transforms = [];
 
     protected $name;
@@ -56,7 +55,7 @@ class CElement_FormInput extends CElement_Element {
         $this->validation = CFormValidation::factory();
     }
 
-    public function setSubmitOnchange($bool) {
+    public function setSubmitOnChange($bool = true) {
         $this->submit_onchange = $bool;
 
         return $this;
