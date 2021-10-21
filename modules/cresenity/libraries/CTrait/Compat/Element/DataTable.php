@@ -375,7 +375,7 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2
      *
-     * @param mixed $a
+     * @param array $a
      *
      * @return $this
      */
@@ -383,30 +383,81 @@ trait CTrait_Compat_Element_DataTable {
         return $this->setDataFromArray($a);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $size
+     *
+     * @return $this
+     */
     public function set_pdf_font_size($size) {
         return $this->setPdfFontSize($size);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $orientation
+     *
+     * @return $this
+     */
     public function set_pdf_orientation($orientation) {
         return $this->setPdfOrientation($orientation);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $filename
+     *
+     * @return $this
+     */
     public function export_pdf($filename) {
         return $this->exportPdf($filename);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $filename
+     *
+     * @return $this
+     */
     public function export_excelcsv($filename) {
         return $this->exportExcelcsv($filename);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $filename
+     * @param string $sheet_name
+     *
+     * @return $this
+     */
     public function export_excelxml($filename, $sheet_name = null) {
         return $this->exportExcelxml($filename, $sheet_name);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $line
+     *
+     * @return $this
+     */
     public function add_report_header($line) {
         return $this->addReportHeader($line);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $filename
+     * @param string $sheet_name
+     *
+     * @return $this
+     */
     public function export_excel($filename, $sheet_name) {
         return $this->exportExcel($filename, $sheet_name);
     }
