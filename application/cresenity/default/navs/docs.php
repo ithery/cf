@@ -110,9 +110,9 @@ return [
         'label' => c::__('Other'),
         'subnav' => [
             [
-                'name' => 'other.basic',
-                'label' => c::__('Basic'),
-                'uri' => 'docs/other/basic',
+                'name' => 'other.maintenance',
+                'label' => c::__('Maintenance'),
+                'uri' => 'docs/other/maintenance',
             ],
         ]
     ],
