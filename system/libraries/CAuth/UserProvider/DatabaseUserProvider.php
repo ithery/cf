@@ -161,4 +161,8 @@ class CAuth_UserProvider_DatabaseUserProvider extends CAuth_UserProviderAbstract
             $user->getAuthPassword()
         );
     }
+
+    public function hasher() {
+        return $this->hasher;
+    }
 }
