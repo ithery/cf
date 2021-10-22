@@ -24,13 +24,10 @@ class CApp_Administrator_Controller_User extends CApp_Administrator_Controller {
 
         parent::__construct();
 
-        CManager::instance()->navigation()->setNavigationCallback(function ($navs) {
+        c::app()->setNav(function () {
             $navFile = CF::getFile('data', 'Administrator/Navigation');
 
-            $navFile = include $navFile;
-            $navAddition = CApp_Administrator::getNav();
-
-            $navs = array_merge($navFile, $navAddition);
+            $navs = include $navFile;
 
             return $navs;
         });
