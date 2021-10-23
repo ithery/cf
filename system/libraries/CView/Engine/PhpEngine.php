@@ -1,11 +1,13 @@
 <?php
 
 /**
- * Description of PhpEngine
+ * Description of PhpEngine.
  *
  * @author Hery
  */
 class CView_Engine_PhpEngine extends CView_EngineAbstract {
+    use CView_Concern_BladeCollectViewExceptionTrait;
+
     /**
      * The filesystem instance.
      *
@@ -67,15 +69,20 @@ class CView_Engine_PhpEngine extends CView_EngineAbstract {
      * @param \Throwable $e
      * @param int        $obLevel
      *
-     * @return void
-     *
      * @throws \Throwable
+     *
+     * @return void
      */
     protected function handleViewException($e, $obLevel) {
+        $exception = new CView_Exception_ViewException($e->getMessage(), 0, 1, $e->getFile(), $e->getLine(), $e);
+
+        $exception->setView($this->getCompiledViewName($e->getFile()));
+        $exception->setViewData($this->getCompiledViewData($e->getFile()));
+
         while (ob_get_level() > $obLevel) {
             ob_end_clean();
         }
 
-        throw $e;
+        throw $exception;
     }
 }

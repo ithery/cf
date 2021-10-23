@@ -28,7 +28,7 @@ class CException_LegacyExceptionHandler {
         $line = $exception->getLine();
         $trace = $exception->getTraceAsString();
         $uri = CFRouter::$current_uri;
-        $template = 'errors/exception';
+        $template = 'errors/exception-legacy';
 
         if (is_numeric($code)) {
             $codes = static::$errorLang;

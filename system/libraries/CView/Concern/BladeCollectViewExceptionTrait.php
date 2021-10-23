@@ -23,19 +23,19 @@ trait CView_Concern_BladeCollectViewExceptionTrait {
         }, ARRAY_FILTER_USE_BOTH);
     }
 
-    public function getCompiledViewData($compiledPath): array {
+    public function getCompiledViewData($compiledPath) {
         $compiledView = $this->findCompiledView($compiledPath);
 
-        return $compiledView['data'] ?? [];
+        return isset($compiledView['data']) && $compiledPath['data'] !== null ? $compiledPath['data'] : [];
     }
 
-    public function getCompiledViewName($compiledPath): string {
+    public function getCompiledViewName($compiledPath) {
         $compiledView = $this->findCompiledView($compiledPath);
 
-        return $compiledView['path'] ?? $compiledPath;
+        return isset($compiledView['path']) && $compiledPath['path'] !== null ? $compiledPath['path'] : [];
     }
 
-    protected function findCompiledView($compiledPath): ?array {
+    protected function findCompiledView($compiledPath) {
         return CCollection::make($this->lastCompiledData)
             ->first(function ($compiledData) use ($compiledPath) {
                 $comparePath = $compiledData['compiledPath'];
@@ -45,7 +45,7 @@ trait CView_Concern_BladeCollectViewExceptionTrait {
     }
 
     protected function getCompiledPath($path) {
-        if ($this instanceof CView_Engine_BladeCompilerEngine) {
+        if ($this instanceof CView_Engine_CompilerEngine) {
             return $this->getCompiler()->getCompiledPath($path);
         }
 

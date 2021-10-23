@@ -20,6 +20,7 @@ use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface as ExceptionHt
  */
 class CException_ExceptionHandler implements CException_ExceptionHandlerInterface {
     use CTrait_ReflectsClosureTrait;
+
     /**
      * The container implementation.
      *
@@ -353,11 +354,17 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function renderExceptionContent($e) {
         try {
-            return CException_LegacyExceptionHandler::getContent($e);
+            $exceptionRenderer = new CException_Renderer_ExceptionRenderer();
+
+            return $exceptionRenderer->render($e);
             //return $this->isDebug() && class_exists(Whoops::class) ? $this->renderExceptionWithWhoops($e) : $this->renderExceptionWithSymfony($e, $this->isDebug());
             //return $this->renderExceptionWithSymfony($e, false);
-        } catch (Exception $e) {
-            return $this->renderExceptionWithSymfony($e, $this->isDebug());
+        } catch (\Throwable|\Exception $e) {
+            try {
+                return CException_LegacyExceptionHandler::getContent($e);
+            } catch (\Throwable|\Exception $e) {
+                return $this->renderExceptionWithSymfony($e, $this->isDebug());
+            }
         }
     }
 
