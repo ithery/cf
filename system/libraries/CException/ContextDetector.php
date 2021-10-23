@@ -11,7 +11,7 @@ class CException_ContextDetector implements CException_Contract_ContextDetectorI
             return new CException_Context_ConsoleContext(isset($_SERVER['argv']) ? $_SERVER['argv'] : []);
         }
 
-        return new CException_Context_RequestContext();
+        return new CException_Context_RequestContext(CHTTP::request());
     }
 
     private function runningInConsole(): bool {

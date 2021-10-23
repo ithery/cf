@@ -1,6 +1,6 @@
 <?php
 
-class CException_Context_ConsoleContext implements CException_Contract_ContextInterface {
+class CException_Context_ConsoleContext extends CException_ContextAbstract implements CException_Contract_ContextInterface {
     /**
      * @var array
      */
@@ -13,6 +13,7 @@ class CException_Context_ConsoleContext implements CException_Contract_ContextIn
     public function toArray() {
         return [
             'arguments' => $this->arguments,
+            'git' => $this->getGit(),
         ];
     }
 }

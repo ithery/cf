@@ -4,7 +4,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 
-class CException_Context_RequestContext implements CException_Contract_ContextInterface {
+class CException_Context_RequestContext extends CException_ContextAbstract implements CException_Contract_ContextInterface {
     /**
      * @var null|\Symfony\Component\HttpFoundation\Request
      */
@@ -66,7 +66,8 @@ class CException_Context_RequestContext implements CException_Contract_ContextIn
 
     public function getSession() {
         try {
-            $session = $this->request->getSession();
+            //$session = $this->request->getSession();
+            $session = CSession::instance();
         } catch (\Exception $exception) {
             $session = [];
         }
@@ -112,6 +113,45 @@ class CException_Context_RequestContext implements CException_Contract_ContextIn
             'headers' => $this->getHeaders(),
             'cookies' => $this->getCookies(),
             'session' => $this->getSession(),
+            'user' => $this->getUser(),
+            'route' => $this->getRoute(),
+            'git' => $this->getGit(),
         ];
+    }
+
+    public function getRoute() {
+        return [
+            'route' => CFRouter::$routed_uri,
+            'routeParameters' => CFRouter::$arguments,
+            'controllerAction' => CFRouter::$controller . '@' . CFRouter::$method,
+            'middleware' => [],
+        ];
+    }
+
+    public function getUser() {
+        try {
+            $user = c::app()->user();
+
+            if (!$user) {
+                return [];
+            }
+        } catch (Throwable $e) {
+            return [];
+        }
+
+        try {
+            if ($user instanceof CInterface_Arrayable) {
+                return $user->toArray();
+            }
+            if ($user instanceof CModel) {
+                return $user->getAttributes();
+            }
+
+            return (array) $user;
+        } catch (Throwable $e) {
+            return [];
+        }
+
+        return [];
     }
 }

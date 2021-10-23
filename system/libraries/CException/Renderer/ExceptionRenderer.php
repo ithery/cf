@@ -20,7 +20,7 @@ class CException_Renderer_ExceptionRenderer implements CException_Contract_Excep
         $viewModel = CException::manager()->createErrorModel($throwable);
 
         try {
-            $template = 'errors/exception';
+            $template = 'errors/exception-ignition';
             $data = $viewModel->toArray();
             $viewFile = CF::findFile('views', $template);
 
