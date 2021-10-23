@@ -360,12 +360,20 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             return $exceptionRenderer->render($e);
             //return $this->isDebug() && class_exists(Whoops::class) ? $this->renderExceptionWithWhoops($e) : $this->renderExceptionWithSymfony($e, $this->isDebug());
             //return $this->renderExceptionWithSymfony($e, false);
-        } catch (\Throwable|\Exception $e) {
-            try {
-                return CException_LegacyExceptionHandler::getContent($e);
-            } catch (\Throwable|\Exception $e) {
-                return $this->renderExceptionWithSymfony($e, $this->isDebug());
-            }
+        } catch (\Throwable $e) {
+            return $this->renderExceptionWithLegacy($e);
+        } catch (\Exception $e) {
+            return $this->renderExceptionWithLegacy($e);
+        }
+    }
+
+    protected function renderExceptionWithLegacy($e) {
+        try {
+            return CException_LegacyExceptionHandler::getContent($e);
+        } catch (\Throwable $e) {
+            return $this->renderExceptionWithSymfony($e, $this->isDebug());
+        } catch (\Exception $e) {
+            return $this->renderExceptionWithSymfony($e, $this->isDebug());
         }
     }
 
