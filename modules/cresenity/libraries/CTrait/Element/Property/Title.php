@@ -10,14 +10,16 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CTrait_Element_Property_Title {
     protected $title;
+
     protected $rawTitle;
 
     public function setTitle($title, $lang = true) {
         $this->rawTitle = $title;
         if ($lang) {
-            $title = clang::__($title);
+            $title = c::__($title);
         }
         $this->title = $title;
+
         return $this;
     }
 
@@ -35,7 +37,7 @@ trait CTrait_Element_Property_Title {
 
     /**
      * Call getTitle if parameter title is not passed
-     * Call setTitle if parameter title is passed
+     * Call setTitle if parameter title is passed.
      *
      * @param string $title
      * @param bool   $lang
@@ -46,6 +48,7 @@ trait CTrait_Element_Property_Title {
         if ($title != null) {
             return $this->setTitle($title, $lang);
         }
+
         return $this->getTitle();
     }
 }

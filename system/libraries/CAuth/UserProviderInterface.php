@@ -65,4 +65,6 @@ interface CAuth_UserProviderInterface {
      * @return bool
      */
     public function validateCredentials(CAuth_AuthenticatableInterface $user, array $credentials);
+
+    public function hasher();
 }

@@ -92,6 +92,9 @@ return [
         'role' => CApp_Model_Roles::class,
         'role_nav' => CApp_Model_RoleNav::class,
     ],
+    'classes' => [
+        'base' => CApp_Base::class,
+    ],
 
     'lang' => 'id', //deprecated
     'app_id' => 1,

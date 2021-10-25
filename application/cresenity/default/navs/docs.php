@@ -79,13 +79,13 @@ return [
         ]
     ],
     [
-        'name' => 'component',
-        'label' => c::__('Components'),
+        'name' => 'module',
+        'label' => c::__('Modules'),
         'subnav' => [
             [
-                'name' => 'component.started',
-                'label' => c::__('Get Started Component'),
-                'uri' => 'docs/component/started',
+                'name' => 'module.queue',
+                'label' => c::__('Queue'),
+                'uri' => 'docs/module/queue',
             ],
         ]
     ],
@@ -110,9 +110,9 @@ return [
         'label' => c::__('Other'),
         'subnav' => [
             [
-                'name' => 'other.basic',
-                'label' => c::__('Basic'),
-                'uri' => 'docs/other/basic',
+                'name' => 'other.maintenance',
+                'label' => c::__('Maintenance'),
+                'uri' => 'docs/other/maintenance',
             ],
         ]
     ],

@@ -54,9 +54,7 @@ $appTitle = ccfg::get('title');
 
                         <div class="sidenav-divider mt-0"></div>
                         <div class="sidenav-inner py-1 ps">
-                            <?php
-                            echo CApp::navigation()->render(['engine' => 'SideNav']);
-                            ?>
+                            @CAppNav
                         </div> <!-- /sidebar-collapse -->
                     </nav> <!-- /nav -->
                 <?php endif; ?>

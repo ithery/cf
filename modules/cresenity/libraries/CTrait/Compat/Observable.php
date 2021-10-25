@@ -59,7 +59,13 @@ trait CTrait_Compat_Observable {
     public function add_control($id, $type) {
         return $this->addControl($id, $type);
     }
-
+    /**
+     * @param string $id
+     *
+     * @return CElement_Element_Div
+     *
+     * @deprecated since 1.2
+     */
     public function add_div($id = '') {
         return $this->addDiv($id);
     }

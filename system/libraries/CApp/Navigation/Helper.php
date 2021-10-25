@@ -154,6 +154,7 @@ class CApp_Navigation_Helper {
         if ($appId == null) {
             $appId = $app->appId();
         }
+
         $db = CDatabase::instance(null, null, $domain);
 
         /** @var CApp_Model_Roles $role */
