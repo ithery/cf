@@ -23,7 +23,7 @@ class CException_Solution_SolutionProvider_MergeConflictSolutionProvider impleme
         return true;
     }
 
-    public function getSolutions($throwable): array {
+    public function getSolutions($throwable) {
         $file = file_get_contents($throwable->getFile());
         preg_match('/\>\>\>\>\>\>\> (.*?)\n/', $file, $matches);
         $source = $matches[1];

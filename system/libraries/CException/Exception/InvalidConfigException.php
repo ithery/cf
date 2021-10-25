@@ -1,12 +1,19 @@
 <?php
 class CException_Exception_InvalidConfigException extends Exception implements CException_Contract_ProvideSolutionInterface {
-    public static function invalidLogLevel($logLevel): self {
+    /**
+     * @param int $logLevel
+     *
+     * @return self
+     */
+    public static function invalidLogLevel($logLevel) {
         return new static("Invalid log level `{$logLevel}` specified.");
     }
 
     public function getSolution() {
         $validLogLevels = array_map(
-            fn (string $level) => strtolower($level),
+            function ($level) {
+                return strtolower($level);
+            },
             array_keys(CLogger::getLevels())
         );
 

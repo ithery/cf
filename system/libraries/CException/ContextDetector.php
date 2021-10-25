@@ -14,7 +14,7 @@ class CException_ContextDetector implements CException_Contract_ContextDetectorI
         return new CException_Context_RequestContext(CHTTP::request());
     }
 
-    private function runningInConsole(): bool {
+    private function runningInConsole() {
         if (isset($_ENV['APP_RUNNING_IN_CONSOLE'])) {
             return $_ENV['APP_RUNNING_IN_CONSOLE'] === 'true';
         }

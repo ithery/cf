@@ -39,7 +39,7 @@ class CException_ErrorModel implements CInterface_Arrayable {
         $this->report = CException_Manager::instance()->createReport($throwable);
     }
 
-    public function throwableString(): string {
+    public function throwableString() {
         if (!$this->throwable) {
             return '';
         }
@@ -74,7 +74,7 @@ class CException_ErrorModel implements CInterface_Arrayable {
         return $solutions;
     }
 
-    public function jsonEncode($data): string {
+    public function jsonEncode($data) {
         $jsonOptions = JSON_PARTIAL_OUTPUT_ON_ERROR | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
 
         return json_encode($data, $jsonOptions);

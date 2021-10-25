@@ -26,13 +26,13 @@ trait CView_Concern_BladeCollectViewExceptionTrait {
     public function getCompiledViewData($compiledPath) {
         $compiledView = $this->findCompiledView($compiledPath);
 
-        return isset($compiledView['data']) && $compiledPath['data'] !== null ? $compiledPath['data'] : [];
+        return isset($compiledView['data']) && $compiledView['data'] !== null ? $compiledView['data'] : [];
     }
 
     public function getCompiledViewName($compiledPath) {
         $compiledView = $this->findCompiledView($compiledPath);
 
-        return isset($compiledView['path']) && $compiledPath['path'] !== null ? $compiledPath['path'] : [];
+        return isset($compiledView['path']) && $compiledView['path'] !== null ? $compiledView['path'] : [];
     }
 
     protected function findCompiledView($compiledPath) {

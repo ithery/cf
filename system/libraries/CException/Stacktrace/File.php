@@ -10,7 +10,7 @@ class CException_Stacktrace_File {
         $this->file = new SplFileObject($path);
     }
 
-    public function numberOfLines(): int {
+    public function numberOfLines() {
         $this->file->seek(PHP_INT_MAX);
 
         return $this->file->key() + 1;

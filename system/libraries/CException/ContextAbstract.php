@@ -40,7 +40,7 @@ abstract class CException_ContextAbstract {
         return empty($this->command('git status -s', $baseDir));
     }
 
-    protected function getGitBaseDirectory(): ?string {
+    protected function getGitBaseDirectory() {
         /** @var Process $process */
         $process = Process::fromShellCommandline('echo $(git rev-parse --show-toplevel)');
 

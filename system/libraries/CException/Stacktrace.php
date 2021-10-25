@@ -128,7 +128,7 @@ class CException_Stacktrace {
     /**
      * @return array
      */
-    public function toArray(): array {
+    public function toArray() {
         return array_map(function (CException_Stacktrace_Frame $frame) {
             return $frame->toArray();
         }, $this->frames);

@@ -10,7 +10,10 @@ trait CException_Concern_UseTimeTrait {
         self::$time = $time;
     }
 
-    public function getCurrentTime(): int {
+    /**
+     * @return int
+     */
+    public function getCurrentTime() {
         $time = self::$time ?: new CException_SystemTime();
 
         return $time->getCurrentTime();

@@ -34,7 +34,7 @@ class CException_IgnitionWhoopsHandler extends Handler {
     /**
      * @param \Throwable $exception
      */
-    public function setException($exception): void {
+    public function setException($exception) {
         $this->exception = $exception;
     }
 }

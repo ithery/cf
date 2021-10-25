@@ -5,7 +5,12 @@ class CException_Truncation_Strategy_TrimContextItemsStrategy extends CException
         return [100, 50, 25, 10];
     }
 
-    public function execute(array $payload): array {
+    /**
+     * @param array $payload
+     *
+     * @return array
+     */
+    public function execute(array $payload) {
         foreach (static::thresholds() as $threshold) {
             if (!$this->reportTrimmer->needsToBeTrimmed($payload)) {
                 break;
@@ -17,13 +22,13 @@ class CException_Truncation_Strategy_TrimContextItemsStrategy extends CException
         return $payload;
     }
 
-    protected function iterateContextItems(array $contextItems, int $threshold): array {
+    protected function iterateContextItems(array $contextItems, $threshold) {
         array_walk($contextItems, [$this, 'trimContextItems'], $threshold);
 
         return $contextItems;
     }
 
-    protected function trimContextItems(&$value, $key, int $threshold) {
+    protected function trimContextItems(&$value, $key, $threshold) {
         if (is_array($value)) {
             if (count($value) > $threshold) {
                 $value = array_slice($value, $threshold * -1, $threshold);

@@ -59,13 +59,13 @@ class CException_Manager {
         return $this;
     }
 
-    public function useDarkMode(): self {
+    public function useDarkMode() {
         $this->theme('dark');
 
         return $this;
     }
 
-    public function theme($theme): self {
+    public function theme($theme) {
         $this->config()->setOption('theme', $theme);
 
         return $this;
