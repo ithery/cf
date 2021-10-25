@@ -11,14 +11,14 @@ class CApp_Api_Method_Server_Ssl_AddCertificate extends CApp_Api_Method_Server {
         $public = carr::get($request, 'public', null);
         $domain = carr::get($request, 'domain', null);
 
-        if (empty($filename)) {
+        if (empty($private)) {
             $this->errCode++;
-            $this->errMessage = "Filename required";
+            $this->errMessage = "Private Key required";
         }
 
-        if (empty($content)) {
+        if (empty($public)) {
             $this->errCode++;
-            $this->errMessage = "Content required";
+            $this->errMessage = "Public Key required";
         }
 
         if (empty($domain)) {
