@@ -26,8 +26,8 @@ class CApp_Api_Method_Server_Ssl_AddCertificate extends CApp_Api_Method_Server {
             $this->errMessage = "Domain required";
         }
 
+        $certDirectory = DOCROOT . "certificate/letsencrypt/$domain";
         if ($this->errCode == 0) {
-            $certDirectory = DOCROOT . "certificate/letsencrypt/$domain/account";
             if (!file_exists($certDirectory)) {
                 mkdir($certDirectory, 0777, true);
             }
@@ -39,6 +39,12 @@ class CApp_Api_Method_Server_Ssl_AddCertificate extends CApp_Api_Method_Server {
                 $this->errCode++;
                 $this->errMessage = "Failed to write certificate";
             }
+        }
+
+        if ($this->errCode == 0) {
+            $data = [
+                "path" => $certDirectory
+            ];
         }
 
         $this->data = $data;
