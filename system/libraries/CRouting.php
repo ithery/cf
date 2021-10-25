@@ -22,4 +22,11 @@ class CRouting {
     public static function router() {
         return CRouting_Router::instance();
     }
+
+    /**
+     * @return CRouting_Factory
+     */
+    public static function factory() {
+        return CRouting_Factory::instance();
+    }
 }
