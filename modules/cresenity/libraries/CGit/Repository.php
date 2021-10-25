@@ -48,6 +48,7 @@ class CGit_Repository {
             $command .= ' --bare';
         }
         $this->getClient()->run($this, $command);
+
         return $this;
     }
 
@@ -58,6 +59,7 @@ class CGit_Repository {
      */
     public function getConfig($key) {
         $key = $this->getClient()->run($this, 'config ' . $key);
+
         return trim($key);
     }
 
@@ -68,7 +70,8 @@ class CGit_Repository {
      * @param string $value Configuration value
      */
     public function setConfig($key, $value) {
-        $this->getClient()->run($this, "config $key \"$value\"");
+        $this->getClient()->run($this, "config ${key} \"${value}\"");
+
         return $this;
     }
 
@@ -99,6 +102,7 @@ class CGit_Repository {
         foreach ($this->statistics as $statistic) {
             $statistic->sortCommits();
         }
+
         return $this->statistics;
     }
 
@@ -113,7 +117,8 @@ class CGit_Repository {
         } else {
             $files = escapeshellarg($files);
         }
-        $this->getClient()->run($this, "add $files");
+        $this->getClient()->run($this, "add ${files}");
+
         return $this;
     }
 
@@ -122,6 +127,7 @@ class CGit_Repository {
      */
     public function addAll() {
         $this->getClient()->run($this, 'add -A');
+
         return $this;
     }
 
@@ -131,7 +137,8 @@ class CGit_Repository {
      * @param string $message Description of the changes made
      */
     public function commit($message) {
-        $this->getClient()->run($this, "commit -m \"$message\"");
+        $this->getClient()->run($this, "commit -m \"${message}\"");
+
         return $this;
     }
 
@@ -141,7 +148,8 @@ class CGit_Repository {
      * @param string $branch Branch to be checked out
      */
     public function checkout($branch) {
-        $this->getClient()->run($this, "checkout $branch");
+        $this->getClient()->run($this, "checkout ${branch}");
+
         return $this;
     }
 
@@ -150,6 +158,7 @@ class CGit_Repository {
      */
     public function pull() {
         $this->getClient()->run($this, 'pull');
+
         return $this;
     }
 
@@ -162,12 +171,13 @@ class CGit_Repository {
     public function push($repository = null, $refspec = null) {
         $command = 'push';
         if ($repository) {
-            $command .= " $repository";
+            $command .= " ${repository}";
         }
         if ($refspec) {
-            $command .= " $refspec";
+            $command .= " ${refspec}";
         }
         $this->getClient()->run($this, $command);
+
         return $this;
     }
 
@@ -181,6 +191,7 @@ class CGit_Repository {
         if (strstr($name, DIRECTORY_SEPARATOR)) {
             $name = substr($name, strrpos($name, DIRECTORY_SEPARATOR) + 1);
         }
+
         return trim($name);
     }
 
@@ -206,6 +217,7 @@ class CGit_Repository {
         if ((0 === strpos($branches[0], '(detachedfrom')) || ('(nobranch)' === $branches[0])) {
             $branches = array_slice($branches, 1);
         }
+
         return $cache[$this->path] = $branches;
     }
 
@@ -223,6 +235,7 @@ class CGit_Repository {
                 if (preg_match('/(detached|no branch)/', $branch)) {
                     return null;
                 }
+
                 return substr($branch, 2);
             }
         }
@@ -238,6 +251,7 @@ class CGit_Repository {
     public function hasBranch($branch) {
         $branches = $this->getBranches();
         $status = in_array($branch, $branches);
+
         return $status;
     }
 
@@ -247,7 +261,7 @@ class CGit_Repository {
      * @param string $branch Branch name
      */
     public function createBranch($branch) {
-        $this->getClient()->run($this, "branch $branch");
+        $this->getClient()->run($this, "branch ${branch}");
     }
 
     /**
@@ -259,9 +273,9 @@ class CGit_Repository {
     public function createTag($tag, $message = null) {
         $command = 'tag';
         if ($message) {
-            $command .= " -a -m '$message'";
+            $command .= " -a -m '${message}'";
         }
-        $command .= " $tag";
+        $command .= " ${tag}";
         $this->getClient()->run($this, $command);
     }
 
@@ -281,6 +295,7 @@ class CGit_Repository {
         if (empty($tags[0])) {
             return $cache[$this->path] = null;
         }
+
         return $cache[$this->path] = $tags;
     }
 
@@ -293,11 +308,12 @@ class CGit_Repository {
      */
     public function getTotalCommits($file = null) {
         if (defined('PHP_WINDOWS_VERSION_BUILD')) {
-            $command = "rev-list --count --all $file";
+            $command = "rev-list --count --all ${file}";
         } else {
-            $command = "rev-list --all $file | wc -l";
+            $command = "rev-list --all ${file} | wc -l";
         }
         $commits = $this->getClient()->run($this, $command);
+
         return trim($commits);
     }
 
@@ -311,7 +327,7 @@ class CGit_Repository {
     public function getCommits($file = null) {
         $command = 'log --pretty=format:"<item><hash>%H</hash><short_hash>%h</short_hash><tree>%T</tree><parents>%P</parents><author>%an</author><author_email>%ae</author_email><date>%at</date><commiter>%cn</commiter><commiter_email>%ce</commiter_email><commiter_date>%ct</commiter_date><message><![CDATA[%s]]></message></item>"';
         if ($file) {
-            $command .= " $file";
+            $command .= " ${file}";
         }
         $logs = $this->getPrettyFormat($command);
         foreach ($logs as $log) {
@@ -323,6 +339,7 @@ class CGit_Repository {
             }
         }
         $this->setCommitsHaveBeenParsed(true);
+
         return $commits;
     }
 
@@ -335,9 +352,9 @@ class CGit_Repository {
      */
     public function getCommit($commitHash) {
         if (version_compare($this->getClient()->getVersion(), '1.8.4', '>=')) {
-            $logs = $this->getClient()->run($this, "show --ignore-blank-lines -w -b --pretty=format:\"<item><hash>%H</hash><short_hash>%h</short_hash><tree>%T</tree><parents>%P</parents><author>%an</author><author_email>%ae</author_email><date>%at</date><commiter>%cn</commiter><commiter_email>%ce</commiter_email><commiter_date>%ct</commiter_date><message><![CDATA[%s]]></message><body><![CDATA[%b]]></body></item>\" $commitHash");
+            $logs = $this->getClient()->run($this, "show --ignore-blank-lines -w -b --pretty=format:\"<item><hash>%H</hash><short_hash>%h</short_hash><tree>%T</tree><parents>%P</parents><author>%an</author><author_email>%ae</author_email><date>%at</date><commiter>%cn</commiter><commiter_email>%ce</commiter_email><commiter_date>%ct</commiter_date><message><![CDATA[%s]]></message><body><![CDATA[%b]]></body></item>\" ${commitHash}");
         } else {
-            $logs = $this->getClient()->run($this, "show --pretty=format:\"<item><hash>%H</hash><short_hash>%h</short_hash><tree>%T</tree><parents>%P</parents><author>%an</author><author_email>%ae</author_email><date>%at</date><commiter>%cn</commiter><commiter_email>%ce</commiter_email><commiter_date>%ct</commiter_date><message><![CDATA[%s]]></message><body><![CDATA[%b]]></body></item>\" $commitHash");
+            $logs = $this->getClient()->run($this, "show --pretty=format:\"<item><hash>%H</hash><short_hash>%h</short_hash><tree>%T</tree><parents>%P</parents><author>%an</author><author_email>%ae</author_email><date>%at</date><commiter>%cn</commiter><commiter_email>%ce</commiter_email><commiter_date>%ct</commiter_date><message><![CDATA[%s]]></message><body><![CDATA[%b]]></body></item>\" ${commitHash}");
         }
         $xmlEnd = strpos($logs, '</item>') + 7;
         $commitInfo = substr($logs, 0, $xmlEnd);
@@ -345,7 +362,7 @@ class CGit_Repository {
         $logs = explode("\n", $commitData);
         array_shift($logs);
         // Read commit metadata
-        $format = new PrettyFormat();
+        $format = new CGit_PrettyFormat();
         $data = $format->parse($commitInfo);
         $commit = new CGit_Model_Commit();
         $commit->importData($data[0]);
@@ -353,6 +370,7 @@ class CGit_Repository {
             $logs = explode("\n", $this->getClient()->run($this, 'diff ' . $commitHash . '~1..' . $commitHash));
         }
         $commit->setDiffs($this->readDiffLogs($logs));
+
         return $commit;
     }
 
@@ -376,18 +394,22 @@ class CGit_Repository {
                 if (preg_match('/^diff --[\S]+ a\/?(.+) b\/?/', $log, $name)) {
                     $diff->setFile($name[1]);
                 }
+
                 continue;
             }
             if ('index' === substr($log, 0, 5)) {
                 $diff->setIndex($log);
+
                 continue;
             }
             if ('---' === substr($log, 0, 3)) {
                 $diff->setOld($log);
+
                 continue;
             }
             if ('+++' === substr($log, 0, 3)) {
                 $diff->setNew($log);
+
                 continue;
             }
             // Handle binary files properly.
@@ -405,12 +427,15 @@ class CGit_Repository {
                         preg_match('/@@ -([0-9]+)/', $log, $matches);
                         $lineNumOld = $matches[1] - 1;
                         $lineNumNew = $matches[1] - 1;
+
                         break;
                     case '-':
                         $lineNumOld++;
+
                         break;
                     case '+':
                         $lineNumNew++;
+
                         break;
                     default:
                         $lineNumOld++;
@@ -427,6 +452,7 @@ class CGit_Repository {
         if (isset($diff)) {
             $diffs[] = $diff;
         }
+
         return $diffs;
     }
 
@@ -476,8 +502,9 @@ class CGit_Repository {
      * @return string
      */
     public function getBranchTree($branch) {
-        $hash = $this->getClient()->run($this, "log --pretty=\"%T\" --max-count=1 $branch");
+        $hash = $this->getClient()->run($this, "log --pretty=\"%T\" --max-count=1 ${branch}");
         $hash = trim($hash, "\r\n ");
+
         return $hash ?: false;
     }
 
@@ -491,6 +518,7 @@ class CGit_Repository {
     public function getTree($tree) {
         $tree = new CGit_Model_Tree($tree, $this);
         $tree->parse();
+
         return $tree;
     }
 
@@ -514,7 +542,7 @@ class CGit_Repository {
      */
     public function getBlame($file) {
         $blame = [];
-        $logs = $this->getClient()->run($this, "blame -s $file");
+        $logs = $this->getClient()->run($this, "blame -s ${file}");
         $logs = explode("\n", $logs);
         $i = 0;
         $previousCommit = '';
@@ -531,6 +559,7 @@ class CGit_Repository {
             $blame[$i]['line'] .= PHP_EOL . $match[3][0];
             $previousCommit = $currentCommit;
         }
+
         return $blame;
     }
 
@@ -568,6 +597,7 @@ class CGit_Repository {
      */
     public function setClient(CGit_Client $client) {
         $this->client = $client;
+
         return $this;
     }
 
@@ -580,7 +610,8 @@ class CGit_Repository {
      */
     public function getPrettyFormat($command) {
         $output = $this->getClient()->run($this, $command);
-        $format = new PrettyFormat();
+        $format = new CGit_PrettyFormat();
+
         return $format->parse($output);
     }
 }

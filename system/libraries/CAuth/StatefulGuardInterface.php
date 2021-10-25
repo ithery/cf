@@ -61,4 +61,6 @@ interface CAuth_StatefulGuardInterface extends CAuth_GuardInterface {
      * @return void
      */
     public function logout();
+
+    public function hasher();
 }

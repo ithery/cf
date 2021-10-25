@@ -232,4 +232,8 @@ class CAuth_UserProvider_ModelUserProvider extends CAuth_UserProviderAbstract {
 
         return $this;
     }
+
+    public function hasher() {
+        return $this->hasher;
+    }
 }
