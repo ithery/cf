@@ -54,8 +54,9 @@ trait CTrait_Compat_Element_Action {
     /**
      * @deprecated since version 1.2, please use setLink
      *
-     * @param $this
-     * @param mixed $link
+     * @param string $link
+     *
+     * @return $this
      */
     public function set_link($link) {
         return $this->setLink($link);
