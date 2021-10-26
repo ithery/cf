@@ -10,6 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDebug_AbstractBar implements ArrayAccess {
     public static $useOpenHandlerWhenSendingDataHeaders = false;
+
     protected $data;
 
     /**
@@ -18,7 +19,7 @@ class CDebug_AbstractBar implements ArrayAccess {
     protected $collectors = [];
 
     /**
-     * Config of this bar
+     * Config of this bar.
      *
      * @var CDebug_Bar_Config
      */
@@ -28,14 +29,18 @@ class CDebug_AbstractBar implements ArrayAccess {
      * @var CDebug_Bar_Interface_RequestIdGeneratorInterface
      */
     protected $requestIdGenerator;
+
     protected $requestId;
+
     protected $storage;
 
     /**
      * @var CDebug_Bar_Interface_HttpDriverInterface
      */
     protected $httpDriver;
+
     protected $stackSessionNamespace = 'PHPDEBUGBAR_STACK_DATA';
+
     protected $stackAlwaysUseSessionStorage = false;
 
     /**
@@ -55,11 +60,12 @@ class CDebug_AbstractBar implements ArrayAccess {
      */
     public function setOptions(array $options) {
         $this->config->setOptions($options);
+
         return $this;
     }
 
     /**
-     * Adds a data collector
+     * Adds a data collector.
      *
      * @param DataCollectorInterface $collector
      *
@@ -75,27 +81,29 @@ class CDebug_AbstractBar implements ArrayAccess {
             throw new CDebug_Bar_Exception("'{$collector->getName()}' is already a registered collector");
         }
         $this->collectors[$collector->getName()] = $collector;
+
         return $this;
     }
 
     /**
-     * Returns a data collector
+     * Returns a data collector.
      *
      * @param string $name
      *
-     * @return CDebug_Interface_DataCollectorInterface
-     *
      * @throws CDebug_Bar_Exception
+     *
+     * @return CDebug_Interface_DataCollectorInterface
      */
     public function getCollector($name) {
         if (!isset($this->collectors[$name])) {
-            throw new CDebug_Bar_Exception("'$name' is not a registered collector");
+            throw new CDebug_Bar_Exception("'${name}' is not a registered collector");
         }
+
         return $this->collectors[$name];
     }
 
     /**
-     * Returns an array of all data collectors
+     * Returns an array of all data collectors.
      *
      * @return CDebug_Interface_DataCollectorInterface[]
      */
@@ -104,18 +112,18 @@ class CDebug_AbstractBar implements ArrayAccess {
     }
 
     /**
-     * Checks if a data collector has been added
+     * Checks if a data collector has been added.
      *
      * @param string $name
      *
-     * @return boolean
+     * @return bool
      */
     public function hasCollector($name) {
         return isset($this->collectors[$name]);
     }
 
     /**
-     * Sets the request id generator
+     * Sets the request id generator.
      *
      * @param RequestIdGeneratorInterface $generator
      *
@@ -123,6 +131,7 @@ class CDebug_AbstractBar implements ArrayAccess {
      */
     public function setRequestIdGenerator(RequestIdGeneratorInterface $generator) {
         $this->requestIdGenerator = $generator;
+
         return $this;
     }
 
@@ -133,11 +142,12 @@ class CDebug_AbstractBar implements ArrayAccess {
         if ($this->requestIdGenerator === null) {
             $this->requestIdGenerator = new CDebug_Bar_RequestIdGenerator();
         }
+
         return $this->requestIdGenerator;
     }
 
     /**
-     * Returns the id of the current request
+     * Returns the id of the current request.
      *
      * @return string
      */
@@ -145,15 +155,16 @@ class CDebug_AbstractBar implements ArrayAccess {
         if ($this->requestId === null) {
             $this->requestId = $this->getRequestIdGenerator()->generate();
         }
+
         return $this->requestId;
     }
 
     /**
-     * Returns an array of HTTP headers containing the data
+     * Returns an array of HTTP headers containing the data.
      *
-     * @param string  $headerName
-     * @param integer $maxHeaderLength
-     * @param mixed   $maxTotalHeaderLength
+     * @param string $headerName
+     * @param int    $maxHeaderLength
+     * @param mixed  $maxTotalHeaderLength
      *
      * @return array
      */
@@ -176,18 +187,19 @@ class CDebug_AbstractBar implements ArrayAccess {
         $chunks[] = $data;
         $headers = [];
         for ($i = 0, $c = count($chunks); $i < $c; $i++) {
-            $name = $headerName . ($i > 0 ? "-$i" : '');
+            $name = $headerName . ($i > 0 ? "-${i}" : '');
             $headers[$name] = $chunks[$i];
         }
+
         return $headers;
     }
 
     /**
-     * Sends the data through the HTTP headers
+     * Sends the data through the HTTP headers.
      *
-     * @param bool    $useOpenHandler
-     * @param string  $headerName
-     * @param integer $maxHeaderLength
+     * @param bool   $useOpenHandler
+     * @param string $headerName
+     * @param int    $maxHeaderLength
      *
      * @return $this
      */
@@ -204,11 +216,12 @@ class CDebug_AbstractBar implements ArrayAccess {
         }
 
         $this->getHttpDriver()->setHeaders($headers);
+
         return $this;
     }
 
     /**
-     * Stacks the data in the session for later rendering
+     * Stacks the data in the session for later rendering.
      */
     public function stackData() {
         $http = $this->initStackSession();
@@ -221,13 +234,14 @@ class CDebug_AbstractBar implements ArrayAccess {
         $stack = $http->getSessionValue($this->stackSessionNamespace);
         $stack[$this->getCurrentRequestId()] = $data;
         $http->setSessionValue($this->stackSessionNamespace, $stack);
+
         return $this;
     }
 
     /**
-     * Checks if there is stacked data in the session
+     * Checks if there is stacked data in the session.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasStackedData() {
         try {
@@ -235,13 +249,14 @@ class CDebug_AbstractBar implements ArrayAccess {
         } catch (CDebug_Bar_Exception $e) {
             return false;
         }
+
         return count($http->getSessionValue($this->stackSessionNamespace)) > 0;
     }
 
     /**
-     * Returns the data stacked in the session
+     * Returns the data stacked in the session.
      *
-     * @param boolean $delete Whether to delete the data in the session
+     * @param bool $delete Whether to delete the data in the session
      *
      * @return array
      */
@@ -259,11 +274,12 @@ class CDebug_AbstractBar implements ArrayAccess {
         } else {
             $datasets = $stackedData;
         }
+
         return $datasets;
     }
 
     /**
-     * Sets the key to use in the $_SESSION array
+     * Sets the key to use in the $_SESSION array.
      *
      * @param string $ns
      *
@@ -271,11 +287,12 @@ class CDebug_AbstractBar implements ArrayAccess {
      */
     public function setStackDataSessionNamespace($ns) {
         $this->stackSessionNamespace = $ns;
+
         return $this;
     }
 
     /**
-     * Returns the key used in the $_SESSION array
+     * Returns the key used in the $_SESSION array.
      *
      * @return string
      */
@@ -285,47 +302,53 @@ class CDebug_AbstractBar implements ArrayAccess {
 
     /**
      * Sets whether to only use the session to store stacked data even
-     * if a storage is enabled
+     * if a storage is enabled.
      *
-     * @param boolean $enabled
+     * @param bool $enabled
      *
      * @return $this
      */
     public function setStackAlwaysUseSessionStorage($enabled = true) {
         $this->stackAlwaysUseSessionStorage = $enabled;
+
         return $this;
     }
 
     /**
      * Checks if the session is always used to store stacked data
-     * even if a storage is enabled
+     * even if a storage is enabled.
      *
-     * @return boolean
+     * @return bool
      */
     public function isStackAlwaysUseSessionStorage() {
         return $this->stackAlwaysUseSessionStorage;
     }
 
     /**
-     * Initializes the session for stacked data
-     *
-     * @return HttpDriverInterface
+     * Initializes the session for stacked data.
      *
      * @throws DebugBarException
+     *
+     * @return HttpDriverInterface
      */
     protected function initStackSession() {
         $http = $this->getHttpDriver();
+        //TODO: enable debugbar on middleware and remove this line
+        if (!isset($_SESSION)) {
+            $_SESSION = [];
+        }
         if (!$http->isSessionStarted()) {
             throw new CDebug_Exception('Session must be started before using stack data in the debug bar');
         }
         if (!$http->hasSessionValue($this->stackSessionNamespace)) {
             $http->setSessionValue($this->stackSessionNamespace, []);
         }
+
         return $http;
     }
 
     /**
-     * Returns the HTTP driver
+     * Returns the HTTP driver.
      *
      * If no http driver where defined, a PhpHttpDriver is automatically created
      *
@@ -335,11 +358,12 @@ class CDebug_AbstractBar implements ArrayAccess {
         if ($this->httpDriver === null) {
             $this->httpDriver = new CDebug_Bar_PhpHttpDriver();
         }
+
         return $this->httpDriver;
     }
 
     /**
-     * Collects the data from the collectors
+     * Collects the data from the collectors.
      *
      * @return array
      */
@@ -385,11 +409,12 @@ class CDebug_AbstractBar implements ArrayAccess {
         if ($this->storage !== null) {
             $this->storage->save($this->getCurrentRequestId(), $this->data);
         }
+
         return $this->data;
     }
 
     /**
-     * Returns collected data
+     * Returns collected data.
      *
      * Will collect the data if none have been collected yet
      *
@@ -399,6 +424,7 @@ class CDebug_AbstractBar implements ArrayAccess {
         if ($this->data === null) {
             $this->collect();
         }
+
         return $this->data;
     }
 

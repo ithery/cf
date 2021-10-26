@@ -20,7 +20,8 @@ class CBootstrap {
      * @var string[]
      */
     protected $defaultBootstrapperClass = [
-        CBootstrap_HandleExceptionBootstrapper::class
+        CBootstrap_HandleExceptionBootstrapper::class,
+        CBootstrap_MiddlewareBootstrapper::class,
     ];
 
     /**
