@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CController_Dispatcher
+ * Description of CController_Dispatcher.
  *
  * @author Hery
  */

@@ -709,11 +709,11 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      */
     public function gatherRouteMiddleware(CRouting_Route $route) {
         $excluded = c::collect($route->excludedMiddleware())->map(function ($name) {
-            return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
+            return (array) CMiddleware_MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->values()->all();
 
         $middleware = c::collect($route->gatherMiddleware())->map(function ($name) {
-            return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
+            return (array) CMiddleware_MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->reject(function ($name) use ($excluded) {
             if (empty($excluded)) {
                 return false;

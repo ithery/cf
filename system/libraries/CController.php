@@ -23,6 +23,13 @@ abstract class CController {
     protected $uri;
 
     /**
+     * The middleware registered on the controller.
+     *
+     * @var array
+     */
+    protected $middleware = [];
+
+    /**
      * Loads URI, and Input into this controller.
      *
      * @return void
@@ -40,6 +47,46 @@ abstract class CController {
         $this->input = CController_Input::instance();
 
         $this->baseUri = CFRouter::controllerUri();
+    }
+
+    /**
+     * Register middleware on the controller.
+     *
+     * @param \Closure|array|string $middleware
+     * @param array                 $options
+     *
+     * @return \CController_MiddlewareOptions
+     */
+    public function middleware($middleware, array $options = []) {
+        foreach ((array) $middleware as $m) {
+            $this->middleware[] = [
+                'middleware' => $m,
+                'options' => &$options,
+            ];
+        }
+
+        return new CController_MiddlewareOptions($options);
+    }
+
+    /**
+     * Get the middleware assigned to the controller.
+     *
+     * @return array
+     */
+    public function getMiddleware() {
+        return $this->middleware;
+    }
+
+    /**
+     * Execute an action on the controller.
+     *
+     * @param string $method
+     * @param array  $parameters
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
+     */
+    public function callAction($method, $parameters) {
+        return $this->{$method}(...array_values($parameters));
     }
 
     /**
