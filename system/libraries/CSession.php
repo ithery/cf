@@ -52,6 +52,7 @@ class CSession {
     public function store() {
         if ($this->store == null) {
             $this->store = CSession_Manager::instance()->createStore();
+            $this->store->start();
         }
 
         return $this->store;
