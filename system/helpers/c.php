@@ -1387,6 +1387,32 @@ class c {
     public static function msg($type, $message) {
         return CApp_Message::add($type, $message);
     }
+
+    public static function docRoot($path = null) {
+        $docRoot = rtrim(DOCROOT, DS);
+        if ($path != null) {
+            if (is_string($path)) {
+                $docRoot .= DS . trim($path, DS);
+            }
+        }
+
+        return $docRoot . DS;
+    }
+
+    public static function appRoot($path = null, $appCode = null) {
+        if ($appCode == null) {
+            $appCode = CF::appCode();
+        }
+
+        $appRoot = static::docRoot('application/' . $appCode);
+        if ($path != null) {
+            if (is_string($path)) {
+                $appRoot .= DS . trim($path, DS);
+            }
+        }
+
+        return $appRoot . DS;
+    }
 }
 
 // End c
