@@ -250,7 +250,7 @@ class CSession_Middleware_SessionMiddleware {
     protected function getCookieExpirationDate() {
         $config = CSession::manager()->getSessionConfig();
 
-        return $config['expire_on_close'] ? 0 : CCarbon::now()->addSeconds($config['expiration']);
+        return (isset($config['expire_on_close']) && $config['expire_on_close']) ? 0 : CCarbon::now()->addSeconds($config['expiration']);
     }
 
     /**

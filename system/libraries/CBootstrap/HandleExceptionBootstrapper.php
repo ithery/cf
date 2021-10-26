@@ -73,7 +73,6 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
 
             $this->getExceptionHandler()->report($e);
         } catch (Exception $e) {
-
         }
 
         if (CF::isCli()) {

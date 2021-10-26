@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of KernelRouting
+ * Description of KernelRouting.
  *
  * @author Hery
  */
@@ -9,16 +9,16 @@ trait CHTTP_Concern_KernelRouting {
     /**
      * Send the given request through the middleware / router.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param \CHttp_Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @return \CHttp_Response
      */
     protected function sendRequestThroughRouter($request) {
         //$this->bootstrap();
 
         return (new CHTTP_Pipeline())
             ->send($request)
-            ->through(CHTTP::shouldSkipMiddleware() ? [] : $this->middleware)
+            ->through(CHTTP::shouldSkipMiddleware() ? [] : CMiddleware::middleware())
             ->then($this->dispatchToRouter());
     }
 
