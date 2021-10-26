@@ -11,7 +11,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_Component_Widget_Header extends CElement_Element {
     use CTrait_Element_Property_Icon,
         CTrait_Element_Property_Title;
-
     /**
      * @var CElement_List_ActionList
      */
@@ -34,18 +33,27 @@ class CElement_Component_Widget_Header extends CElement_Element {
         $this->titleWrapper = $this->addDiv()->addClass('widget-title-wrapper');
     }
 
+    /**
+     * @return CElement_Component_Widget
+     */
+    public function getWidget() {
+        return $this->parent;
+    }
+
     public function actions() {
         if ($this->actions == null) {
             $this->actions = CElement_Factory::createList('ActionList', $this->parent->id . '_header');
             $this->actions->setStyle('widget-action')->addClass('ml-auto');
             $this->add($this->actions);
         }
+
         return $this->actions;
     }
 
     public function addAction($id = '') {
         $action = CElement_Factory::createComponent('Action', $id);
         $this->actions()->add($action);
+
         return $action;
     }
 
@@ -60,17 +68,24 @@ class CElement_Component_Widget_Header extends CElement_Element {
         $this->titleWrapper->addH5()->add($this->title);
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Checkbox_Switcher
+     */
     public function addSwitcher($id = null) {
         if ($this->switcher == null) {
             $this->switcherWrapper = $this->addDiv()->addClass('widget-switcher-wrapper pull-right');
             $this->switcher = CElement_Factory::createControl($id, 'switcher');
             $this->switcherWrapper->add($this->switcher);
         }
+
         return $this->switcher;
     }
 
     public function setSwitcherBehaviour($behaviour = 'hide') {
         $this->switcherBehaviour = $behaviour;
+
         return $this;
     }
 
@@ -123,6 +138,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
             }
         }
         $js->append($this->jsChild($js->getIndent()));
+
         return $js->text();
     }
 }
