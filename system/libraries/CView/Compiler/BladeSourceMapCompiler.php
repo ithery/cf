@@ -9,7 +9,7 @@ class CView_Compiler_BladeSourceMapCompiler extends CView_Compiler_BladeCompiler
 
         $map = explode("\n", $map);
 
-        $line = $map[$exceptionLineNumber - 1] ?? $exceptionLineNumber;
+        $line = carr::get($map, $exceptionLineNumber - 1, $exceptionLineNumber);
         $pattern = '/\|---LINE:([0-9]+)---\|/m';
 
         if (preg_match($pattern, (string) $line, $matches)) {
