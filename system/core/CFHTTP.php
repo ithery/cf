@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CFHTTP
+ * Description of CFHTTP.
  *
  * @author Hery
  */

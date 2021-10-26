@@ -4,6 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * CF Class.
+ * This class is core of Cresenity Framework loaded in Bootstrap.php.
  */
 final class CF {
     use CFDeprecatedTrait;
@@ -988,19 +989,6 @@ final class CF {
     }
 
     /**
-     * Create a collection from the given value.
-     *
-     * @param mixed $value
-     *
-     * @return CCollection
-     *
-     * @deprecated 1.1, use c::collect
-     */
-    public static function collect($value = null) {
-        return c::collect($value);
-    }
-
-    /**
      * @return string
      */
     public static function version() {
@@ -1060,9 +1048,9 @@ final class CF {
      * @return void
      */
     public static function setLocale($locale) {
-        // static::$locale = $locale;
-        // CTranslation::translator()->setLocale($locale);
-        // CEvent::dispatch('cf.locale.updated');
+        static::$locale = $locale;
+        CTranslation::translator()->setLocale($locale);
+        CEvent::dispatch('cf.locale.updated');
     }
 
     /**
@@ -1192,5 +1180,17 @@ final class CF {
         }
 
         return false;
+    }
+
+    public static function asAppCode($appCode, $callback) {
+        if (is_callable($callback)) {
+            $domain = CF::domain();
+            $originalAppCode = static::appCode();
+            if ($originalAppCode) {
+                static::$data[$domain]['app_code'] = $appCode;
+                $callback();
+                static::$data[$domain]['app_code'] = $originalAppCode;
+            }
+        }
     }
 }

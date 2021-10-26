@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of RouteFinder
+ * Description of RouteFinder.
  *
  * @author Hery
  */
@@ -41,7 +41,7 @@ class CRouting_RouteFinder {
 
             $parameters = [];
             foreach ($arguments as $key => $argument) {
-                $routedUri .= "/{any$key}";
+                $routedUri .= "/{any${key}}";
                 $parameters[$key] = $argument;
             }
 
@@ -49,6 +49,7 @@ class CRouting_RouteFinder {
             //$routedUri = 't/ittron/feeds/hashtag/posts/{any0}';
             $route = new CRouting_Route(CRouting_Router::$verbs, $routedUri, $className . '@' . $method, $parameters);
         }
+
         return $route;
     }
 

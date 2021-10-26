@@ -4,7 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 class CTreeDB {
     use CTrait_Compat_TreeDb;
-
     protected $db = null;
 
     protected $pk_column = '';
@@ -69,6 +68,7 @@ class CTreeDB {
 
     public function setPkColumn($pk_column) {
         $this->pk_column = $pk_column;
+
         return $this;
     }
 
@@ -80,16 +80,19 @@ class CTreeDB {
 
     public function addFilter($k, $v) {
         $this->filters[$k] = $v;
+
         return $this;
     }
 
     public function setDeleteChild($bool) {
         $this->delete_child = $bool;
+
         return $this;
     }
 
     public function setHavePriority($boolean) {
         $this->have_priority = $boolean;
+
         return $this;
     }
 
@@ -122,6 +125,7 @@ class CTreeDB {
 			' . $this->filterWhere() . '
 			ORDER BY node.lft
 		';
+
         return cdbutils::get_list($q);
     }
 
@@ -187,6 +191,7 @@ class CTreeDB {
         }
 
         $r = $db->insert($this->table_name, $data);
+
         return $r->insert_id();
     }
 
@@ -267,6 +272,7 @@ class CTreeDB {
         $q .= ' order by depth asc';
 
         $r = $db->query($q);
+
         return $r;
     }
 
@@ -287,6 +293,7 @@ class CTreeDB {
         $q .= ' order by lft asc limit 1';
 
         $r = cdbutils::get_row($q);
+
         return $r;
     }
 
@@ -330,6 +337,7 @@ class CTreeDB {
             }
             $q .= ' ORDER BY node.lft';
         }
+
         return cdbutils::get_list($q);
     }
 
@@ -402,7 +410,6 @@ class CTreeDB {
             }
             $q .= ' order by lft asc';
         }
-
         $r = $db->query($q)->result(false);
 
         return $r;

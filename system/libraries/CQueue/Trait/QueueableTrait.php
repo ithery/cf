@@ -12,35 +12,35 @@ trait CQueue_Trait_QueueableTrait {
     /**
      * The name of the connection the job should be sent to.
      *
-     * @var string|null
+     * @var null|string
      */
     public $connection;
 
     /**
      * The name of the queue the job should be sent to.
      *
-     * @var string|null
+     * @var null|string
      */
     public $queue;
 
     /**
      * The name of the connection the chain should be sent to.
      *
-     * @var string|null
+     * @var null|string
      */
     public $chainConnection;
 
     /**
      * The name of the queue the chain should be sent to.
      *
-     * @var string|null
+     * @var null|string
      */
     public $chainQueue;
 
     /**
      * The number of seconds before the job should be made available.
      *
-     * @var \DateTimeInterface|\DateInterval|int|null
+     * @var null|\DateTimeInterface|\DateInterval|int
      */
     public $delay;
 
@@ -59,62 +59,67 @@ trait CQueue_Trait_QueueableTrait {
     /**
      * Set the desired connection for the job.
      *
-     * @param string|null $connection
+     * @param null|string $connection
      *
      * @return $this
      */
     public function onConnection($connection) {
         $this->connection = $connection;
+
         return $this;
     }
 
     /**
      * Set the desired queue for the job.
      *
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return $this
      */
     public function onQueue($queue) {
         $this->queue = $queue;
+
         return $this;
     }
 
     /**
      * Set the desired connection for the chain.
      *
-     * @param string|null $connection
+     * @param null|string $connection
      *
      * @return $this
      */
     public function allOnConnection($connection) {
         $this->chainConnection = $connection;
         $this->connection = $connection;
+
         return $this;
     }
 
     /**
      * Set the desired queue for the chain.
      *
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return $this
      */
     public function allOnQueue($queue) {
         $this->chainQueue = $queue;
         $this->queue = $queue;
+
         return $this;
     }
 
     /**
      * Set the desired delay for the job.
      *
-     * @param \DateTimeInterface|\DateInterval|int|null $delay
+     * @param null|\DateTimeInterface|\DateInterval|int $delay
      *
      * @return $this
      */
     public function delay($delay) {
         $this->delay = $delay;
+
         return $this;
     }
 
@@ -136,6 +141,7 @@ trait CQueue_Trait_QueueableTrait {
      */
     public function through($middleware) {
         $this->middleware = carr::wrap($middleware);
+
         return $this;
     }
 
@@ -147,9 +153,10 @@ trait CQueue_Trait_QueueableTrait {
      * @return $this
      */
     public function chain($chain) {
-        $this->chained = CF::collect($chain)->map(function ($job) {
+        $this->chained = c::collect($chain)->map(function ($job) {
             return serialize($job);
         })->all();
+
         return $this;
     }
 
