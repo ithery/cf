@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of StartSessionMiddleware
+ * Description of StartSessionMiddleware.
  *
  * @author Hery
  */
@@ -12,7 +12,7 @@ class CSession_Middleware_SessionMiddleware {
     /**
      * The callback that can resolve an instance of the cache factory.
      *
-     * @var callable|null
+     * @var null|callable
      */
     protected $cacheFactoryResolver;
 
@@ -176,6 +176,7 @@ class CSession_Middleware_SessionMiddleware {
             $maxLottery = carr::get($lottery, 1);
             $lottery = carr::get($lottery, 0);
         }
+
         return random_int(1, $maxLottery) <= $lottery;
     }
 
@@ -264,7 +265,7 @@ class CSession_Middleware_SessionMiddleware {
     /**
      * Determine if the configured session driver is persistent.
      *
-     * @param array|null $config
+     * @param null|array $config
      *
      * @return bool
      */
