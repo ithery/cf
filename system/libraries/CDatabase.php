@@ -9,31 +9,30 @@ class CDatabase {
     use CDatabase_Trait_DetectDeadlock;
     use CDatabase_Trait_DetectLostConnection;
     use CDatabase_Trait_ManageTransaction;
-
     /**
-     * Database instances
+     * Database instances.
      *
      * @var array
      */
     public static $instances = [];
 
     /**
-     * Global benchmark
+     * Global benchmark.
      *
      * @var array
      */
     public static $benchmarks = [];
 
+    public $domain;
+
+    public $name;
+
     /**
-     * Default Database
+     * Default Database.
      *
      * @var string
      */
     protected static $defaultConnection = 'default';
-
-    public $domain;
-
-    public $name;
 
     /**
      * @var CDatabase_Schema_Manager
@@ -112,73 +111,6 @@ class CDatabase {
      * @var CDatabase_Query_Grammar_Processor
      */
     protected $postProcessor;
-
-    public function config() {
-        return $this->config;
-    }
-
-    /**
-     * Returns a singleton instance of Database.
-     *
-     * @param null|mixed $name
-     * @param null|mixed $config
-     * @param null|mixed $domain
-     *
-     * @return CDatabase
-     */
-    public static function &instance($name = null, $config = null, $domain = null) {
-        if ($name == null) {
-            $name = static::$defaultConnection;
-        }
-
-        if (strlen($domain) == 0) {
-            //get current domain
-            $domain = CF::domain();
-        }
-        if ($name == null) {
-            $name = 'default';
-        }
-
-        if (!isset(CDatabase::$instances[$domain])) {
-            CDatabase::$instances[$domain] = [];
-        }
-        if (!isset(CDatabase::$instances[$domain][$name])) {
-            // Create a new instance
-
-            CDatabase::$instances[$domain][$name] = new CDatabase($config === null ? $name : $config, $domain);
-        }
-
-        return CDatabase::$instances[$domain][$name];
-    }
-
-    /**
-     * Returns the name of a given database instance.
-     *
-     * @param   CDatabase  instance of CDatabase
-     * @param null|mixed $domain
-     *
-     * @return string
-     */
-    public static function instanceName(CDatabase $db, $domain = null) {
-        if (strlen($domain) == 0) {
-            //get current domain
-            $domain = CF::domain();
-        }
-        return array_search($db, CDatabase::$instances[$domain], true);
-    }
-
-    /**
-     * @param type $config
-     */
-    public function resolveConfig($config) {
-        if (!is_array($config)) {
-            $config = CF::config('database.' . $config);
-            if (is_string($config)) {
-                $config = $this->resolveConfig($config);
-            }
-        }
-        return $config;
-    }
 
     /**
      * Sets up the database configuration, loads the CDatabase_Driver.
@@ -299,13 +231,16 @@ class CDatabase {
         switch ($this->config['connection']['type']) {
             case 'mongodb':
                 $this->driverName = 'MongoDB';
+
                 break;
             default:
                 $this->driverName = ucfirst($this->config['connection']['type']);
+
                 break;
         }
 
         $driver = 'CDatabase_Driver_' . $this->driverName;
+
         try {
             // Validation of the driver
             $class = new ReflectionClass($driver);
@@ -325,6 +260,86 @@ class CDatabase {
         }
 
         CF::log(CLogger::DEBUG, 'Database Library initialized');
+    }
+
+    public function __destruct() {
+        $this->rollback();
+
+        try {
+            if ($this->driver != null) {
+                $this->driver->close();
+            }
+        } catch (Exception $ex) {
+        }
+    }
+
+    public function config() {
+        return $this->config;
+    }
+
+    /**
+     * Returns a singleton instance of Database.
+     *
+     * @param null|mixed $name
+     * @param null|mixed $config
+     * @param null|mixed $domain
+     *
+     * @return CDatabase
+     */
+    public static function &instance($name = null, $config = null, $domain = null) {
+        if ($name == null) {
+            $name = static::$defaultConnection;
+        }
+
+        if (strlen($domain) == 0) {
+            //get current domain
+            $domain = CF::domain();
+        }
+        if ($name == null) {
+            $name = 'default';
+        }
+
+        if (!isset(CDatabase::$instances[$domain])) {
+            CDatabase::$instances[$domain] = [];
+        }
+        if (!isset(CDatabase::$instances[$domain][$name])) {
+            // Create a new instance
+
+            CDatabase::$instances[$domain][$name] = new CDatabase($config === null ? $name : $config, $domain);
+        }
+
+        return CDatabase::$instances[$domain][$name];
+    }
+
+    /**
+     * Returns the name of a given database instance.
+     *
+     * @param   CDatabase  instance of CDatabase
+     * @param null|mixed $domain
+     *
+     * @return string
+     */
+    public static function instanceName(CDatabase $db, $domain = null) {
+        if (strlen($domain) == 0) {
+            //get current domain
+            $domain = CF::domain();
+        }
+
+        return array_search($db, CDatabase::$instances[$domain], true);
+    }
+
+    /**
+     * @param type $config
+     */
+    public function resolveConfig($config) {
+        if (!is_array($config)) {
+            $config = CF::config('database.' . $config);
+            if (is_string($config)) {
+                $config = $this->resolveConfig($config);
+            }
+        }
+
+        return $config;
     }
 
     /**
@@ -772,6 +787,7 @@ class CDatabase {
         if ($prefix) {
             return in_array($this->config['table_prefix'] . $table_name, $this->listTables());
         }
+
         return in_array($table_name, $this->listTables());
     }
 
@@ -828,6 +844,7 @@ class CDatabase {
      */
     public function listFields($table = '') {
         $this->link or $this->connect();
+
         return $this->driver->listFields($this->config['table_prefix'] . $table);
     }
 
@@ -905,19 +922,9 @@ class CDatabase {
         return false;
     }
 
-    public function __destruct() {
-        $this->rollback();
-
-        try {
-            if ($this->driver != null) {
-                $this->driver->close();
-            }
-        } catch (Exception $ex) {
-        }
-    }
-
     public function escapeLike($str) {
         $str = $this->escapeStr($str);
+
         return $str;
     }
 
@@ -926,7 +933,7 @@ class CDatabase {
     }
 
     /**
-     * Get Query Builder from table
+     * Get Query Builder from table.
      *
      * @param string $table
      *
@@ -942,9 +949,9 @@ class CDatabase {
     /**
      * Reconnect to the database.
      *
-     * @return void
-     *
      * @throws \LogicException
+     *
+     * @return void
      */
     public function reconnect() {
         $this->driver->close();
@@ -1014,6 +1021,7 @@ class CDatabase {
             $grammar_class = 'CDatabase_Query_Grammar_' . $driver_name;
             $this->queryGrammar = new $grammar_class();
         }
+
         return $this->queryGrammar;
     }
 
@@ -1038,9 +1046,9 @@ class CDatabase {
     /**
      * Gets the DatabasePlatform for the connection.
      *
-     * @return CDatabase_Platform
-     *
      * @throws CDatabase_Exception
+     *
+     * @return CDatabase_Platform
      */
     public function getDatabasePlatform() {
         if (null === $this->platform) {
@@ -1079,9 +1087,9 @@ class CDatabase {
      * or the underlying driver connection cannot determine the platform
      * version without having to query it (performance reasons).
      *
-     * @return string|null
-     *
      * @throws Exception
+     *
+     * @return null|string
      */
     private function getDatabasePlatformVersion() {
         // Driver does not support version specific platforms.
@@ -1101,7 +1109,7 @@ class CDatabase {
     /**
      * Returns the database server version if the underlying driver supports it.
      *
-     * @return string|null
+     * @return null|string
      */
     private function getServerVersion() {
         // Automatic platform version detection.
@@ -1153,7 +1161,7 @@ class CDatabase {
      *
      * @param string     $query
      * @param array      $bindings
-     * @param float|null $time
+     * @param null|float $time
      * @param null|mixed $rowsCount
      *
      * @return void
@@ -1196,7 +1204,7 @@ class CDatabase {
      * @return string
      */
     public function getDatabaseName() {
-        return carr::path($this->config, 'connection.database');
+        return carr::get($this->config, 'connection.database');
     }
 
     public function getRow($query) {
@@ -1205,6 +1213,7 @@ class CDatabase {
         if ($r->count() > 0) {
             $result = $r[0];
         }
+
         return $result;
     }
 
@@ -1216,10 +1225,13 @@ class CDatabase {
         foreach ($result as $row) {
             foreach ($row as $k => $v) {
                 $value = $v;
+
                 break;
             }
+
             break;
         }
+
         return $value;
     }
 
@@ -1241,6 +1253,7 @@ class CDatabase {
             }
             $res[] = $arr_val;
         }
+
         return $res;
     }
 
@@ -1266,6 +1279,7 @@ class CDatabase {
             }
             $res[$arr_key] = $arr_val;
         }
+
         return $res;
     }
 
@@ -1283,7 +1297,7 @@ class CDatabase {
      *
      * @param string $event
      *
-     * @return array|null
+     * @return null|array
      */
     protected function fireConnectionEvent($event) {
         if (!isset($this->events)) {
@@ -1319,6 +1333,7 @@ class CDatabase {
             $processorClass = 'CDatabase_Query_Processor_' . $driverName;
             $this->postProcessor = new $processorClass();
         }
+
         return $this->postProcessor;
     }
 

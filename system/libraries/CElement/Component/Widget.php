@@ -10,6 +10,11 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_Component_Widget extends CElement_Component {
     use CTrait_Compat_Element_Widget;
+    public $scroll;
+
+    public $nopadding;
+
+    public $height;
 
     public $scroll;
 
@@ -85,6 +90,11 @@ class CElement_Component_Widget extends CElement_Component {
         return $this;
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Checkbox_Switcher
+     */
     public function addSwitcher($id = '') {
         return $this->header->addSwitcher($id);
     }

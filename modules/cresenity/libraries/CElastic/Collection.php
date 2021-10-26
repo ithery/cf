@@ -1,7 +1,6 @@
 <?php
 
 class CElastic_Collection implements ArrayAccess, Iterator, Countable {
-
     /**
      * Time needed to execute the query.
      *
@@ -45,14 +44,14 @@ class CElastic_Collection implements ArrayAccess, Iterator, Countable {
     /**
      * The aggregations result.
      *
-     * @var array|null
+     * @var null|array
      */
     protected $aggregations = null;
 
     /**
      * The aggregations result.
      *
-     * @var CElastic_Database_Result|null
+     * @var null|CElastic_Database_Result
      */
     protected $result = null;
 
@@ -61,7 +60,7 @@ class CElastic_Collection implements ArrayAccess, Iterator, Countable {
      *
      * @param array $results
      */
-    public function __construct(array $results, array $select = array()) {
+    public function __construct(array $results, array $select = []) {
         $this->took = $results['took'];
 
         $this->timed_out = $results['timed_out'];
@@ -169,8 +168,8 @@ class CElastic_Collection implements ArrayAccess, Iterator, Countable {
         return $this->result;
     }
 
-    public function count_all() {
-        return $this->result()->count_all();
+    public function countAll() {
+        return $this->result()->countAll();
     }
 
     public function count() {
@@ -212,5 +211,4 @@ class CElastic_Collection implements ArrayAccess, Iterator, Countable {
     public function valid() {
         return $this->result()->valid();
     }
-
 }

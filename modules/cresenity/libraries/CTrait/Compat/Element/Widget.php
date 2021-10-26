@@ -35,7 +35,7 @@ trait CTrait_Compat_Element_Widget {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param [type] $bool
      *
@@ -48,7 +48,7 @@ trait CTrait_Compat_Element_Widget {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param string $id
      *
@@ -61,7 +61,7 @@ trait CTrait_Compat_Element_Widget {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param [type] $style
      *
@@ -74,20 +74,22 @@ trait CTrait_Compat_Element_Widget {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
-     * @param string $id
+     * @param string      $id
+     * @param null|string $id
      *
-     * @return void
+     * @return CElement_FormInput_Checkbox_Switcher
      *
      * @deprecated 1.1
      */
     public function add_switcher($id = '') {
+        /** @var CElement_Component_Widget $this */
         return $this->addSwitcher($id);
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @return void
      *
@@ -98,7 +100,7 @@ trait CTrait_Compat_Element_Widget {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @return void
      *
@@ -109,10 +111,10 @@ trait CTrait_Compat_Element_Widget {
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param [type] $collapse
-     * @param bool   $js_collapse
+     * @param bool $js_collapse
      *
      * @return void
      *
@@ -121,11 +123,12 @@ trait CTrait_Compat_Element_Widget {
     public function set_collapse($collapse, $js_collapse = false) {
         $this->collapse = $collapse;
         $this->js_collapse = $js_collapse;
+
         return $this;
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param [type] $close
      *
@@ -135,11 +138,12 @@ trait CTrait_Compat_Element_Widget {
      */
     public function set_close($close) {
         $this->close = $close;
+
         return $this;
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param [type] $height
      *
@@ -147,11 +151,12 @@ trait CTrait_Compat_Element_Widget {
      */
     public function set_height($height) {
         $this->height = $height;
+
         return $this;
     }
 
     /**
-     * Undocumented function
+     * Undocumented function.
      *
      * @param [type] $bool
      *
@@ -159,6 +164,7 @@ trait CTrait_Compat_Element_Widget {
      */
     public function set_scroll($bool) {
         $this->scroll = $bool;
+
         return $this;
     }
 }

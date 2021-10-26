@@ -639,7 +639,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->query = $el;
         $this->isElastic = true;
         if ($el instanceof CElastic_Search) {
-            $this->query = $el->ajax_data();
+            $this->query = $el->ajaxData();
         }
 
         return $this;

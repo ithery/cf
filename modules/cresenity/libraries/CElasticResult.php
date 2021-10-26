@@ -1,30 +1,31 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Oct 18, 2017, 10:26:29 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Oct 18, 2017, 10:26:29 PM
  */
 abstract class CElasticResult extends CDatabase_Result {
+    protected $raw_response = [];
 
-    protected $raw_response = array();
     protected $count_all = 0;
+
     private $result_object = null;
 
     public function __construct($elastic_response) {
-
         $this->raw_response = $elastic_response;
-        $this->count_all = carr::path($this->raw_response, 'hits.total', 0);
+        $this->count_all = carr::get($this->raw_response, 'hits.total', 0);
         $this->fetch_type = 'object';
-        $this->result = $this->_get_result();
+        $this->result = $this->getElasticResult();
         $this->total_rows = count($this->result);
     }
 
-    abstract protected function _get_result();
+    abstract protected function getElasticResult();
 
-    protected function _result_object() {
+    protected function getResultObject() {
         if ($this->result_object == null) {
             $result = $this->result;
             foreach ($result as $k => $row) {
@@ -36,11 +37,11 @@ abstract class CElasticResult extends CDatabase_Result {
         return $this->result_object;
     }
 
-    public function list_fields() {
+    public function listFields() {
         return array_keys($this->result);
     }
 
-    public function result($object = TRUE, $type = FALSE) {
+    public function result($object = true, $type = false) {
         $this->fetch_type = ((bool) $object) ? 'object' : 'array';
 
         // This check has to be outside the previous statement, because we do not
@@ -52,11 +53,11 @@ abstract class CElasticResult extends CDatabase_Result {
         return $this;
     }
 
-    public function result_array($object = NULL, $type = FALSE) {
+    public function resultArray($object = null, $type = false) {
         if (is_string($object)) {
             $fetch = $object;
         } elseif (is_bool($object)) {
-            if ($object === TRUE) {
+            if ($object === true) {
                 $fetch = 'object';
             } else {
                 $fetch = 'array';
@@ -68,42 +69,43 @@ abstract class CElasticResult extends CDatabase_Result {
 
         $result = $this->result;
         if ($fetch == 'object') {
-            $result = $this->_result_object();
+            $result = $this->getResultObject();
         }
 
         return $result;
     }
 
     public function seek($offset) {
-        if ($this->offsetExists($offset) AND isset($this->result[$offset])) {
+        if ($this->offsetExists($offset) and isset($this->result[$offset])) {
             // Set the current row to the offset
             $this->current_row = $offset;
 
-            return TRUE;
+            return true;
         } else {
-            return FALSE;
+            return false;
         }
     }
 
     /**
-     * ArrayAccess: offsetGet
+     * ArrayAccess: offsetGet.
+     *
+     * @param mixed $offset
      */
     public function offsetGet($offset) {
-        if (!$this->seek($offset))
-            return FALSE;
+        if (!$this->seek($offset)) {
+            return false;
+        }
 
         // Return the row by check current fetch_type
         $result = $this->result;
-        if($this->fetch_type=='object') {
-            $result = $this->_result_object();
+        if ($this->fetch_type == 'object') {
+            $result = $this->getResultObject();
         }
+
         return $result[$this->current_row];
     }
 
-    public function count_all() {
+    public function countAll() {
         return $this->count_all;
     }
-    
-    
-
 }

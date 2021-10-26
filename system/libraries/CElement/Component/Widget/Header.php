@@ -11,7 +11,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_Component_Widget_Header extends CElement_Element {
     use CTrait_Element_Property_Icon,
         CTrait_Element_Property_Title;
-
     /**
      * @var CElement_List_ActionList
      */
@@ -35,6 +34,13 @@ class CElement_Component_Widget_Header extends CElement_Element {
         $this->icon = '';
         $this->title = '';
         $this->titleWrapper = $this->addDiv()->addClass('widget-title-wrapper');
+    }
+
+    /**
+     * @return CElement_Component_Widget
+     */
+    public function getWidget() {
+        return $this->parent;
     }
 
     public function actions() {
@@ -65,6 +71,11 @@ class CElement_Component_Widget_Header extends CElement_Element {
         $this->titleWrapper->addH5()->add($this->title);
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Checkbox_Switcher
+     */
     public function addSwitcher($id = null) {
         if ($this->switcher == null) {
             $this->switcherWrapper = $this->addDiv()->addClass('widget-switcher-wrapper pull-right');
