@@ -23,6 +23,13 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract implements
     protected $connection;
 
     /**
+     * The name of the connection that should be used for locks.
+     *
+     * @var string
+     */
+    protected $lockConnection;
+
+    /**
      * Create a new Redis store.
      *
      * @param CRedis $redis
@@ -46,6 +53,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract implements
      */
     public function get($key) {
         $value = $this->connection()->get($this->prefix . $key);
+
         return !is_null($value) ? $this->unserialize($value) : null;
     }
 
@@ -66,6 +74,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract implements
         foreach ($values as $index => $value) {
             $results[$keys[$index]] = !is_null($value) ? $this->unserialize($value) : null;
         }
+
         return $results;
     }
 
@@ -102,6 +111,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract implements
             $manyResult = is_null($manyResult) ? $result : $result && $manyResult;
         }
         $this->connection()->exec();
+
         return $manyResult ?: false;
     }
 
@@ -116,6 +126,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract implements
      */
     public function add($key, $value, $seconds) {
         $lua = "return redis.call('exists',KEYS[1])<1 and redis.call('setex',KEYS[1],ARGV[2],ARGV[1])";
+
         return (bool) $this->connection()->doEval(
             $lua,
             1,
@@ -166,7 +177,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract implements
      *
      * @param string      $name
      * @param int         $seconds
-     * @param string|null $owner
+     * @param null|string $owner
      *
      * @return CCache_LockInterface
      */
@@ -204,6 +215,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract implements
      */
     public function flush() {
         $this->connection()->flushdb();
+
         return true;
     }
 

@@ -7,7 +7,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @author Hery Kurniawan
  */
-class CCache_Repository implements ArrayAccess {
+class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
     use CTrait_Helper_InteractsWithTime;
 
     /**
@@ -18,7 +18,7 @@ class CCache_Repository implements ArrayAccess {
     /**
      * The default number of seconds to store items.
      *
-     * @var int|null
+     * @var null|int
      */
     protected $default = 3600;
 
@@ -51,10 +51,13 @@ class CCache_Repository implements ArrayAccess {
         switch ($driverName) {
             case 'Redis':
                 $redis = CRedis::instance(carr::get($options, 'group', 'redis'));
+
                 return new CCache_Driver_RedisDriver($redis, carr::get($options, 'prefix', ''), carr::get($options, 'connection', 'default'));
+
                 break;
             default:
                 $driverClass = 'CCache_Driver_' . ucfirst($driverName) . 'Driver';
+
                 return new $driverClass($options);
         }
     }
@@ -131,7 +134,7 @@ class CCache_Repository implements ArrayAccess {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getMultiple($keys, $default = null) {
         $defaults = [];
@@ -189,7 +192,7 @@ class CCache_Repository implements ArrayAccess {
      *
      * @param string                                    $key
      * @param mixed                                     $value
-     * @param \DateTimeInterface|\DateInterval|int|null $ttl
+     * @param null|\DateTimeInterface|\DateInterval|int $ttl
      *
      * @return bool
      */
@@ -214,7 +217,7 @@ class CCache_Repository implements ArrayAccess {
      * Store multiple items in the cache for a given number of seconds.
      *
      * @param array                                     $values
-     * @param \DateTimeInterface|\DateInterval|int|null $ttl
+     * @param null|\DateTimeInterface|\DateInterval|int $ttl
      *
      * @return bool
      */
@@ -260,7 +263,7 @@ class CCache_Repository implements ArrayAccess {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setMultiple($values, $ttl = null) {
         return $this->putMany(is_array($values) ? $values : iterator_to_array($values), $ttl);
@@ -271,7 +274,7 @@ class CCache_Repository implements ArrayAccess {
      *
      * @param string                                    $key
      * @param mixed                                     $value
-     * @param \DateTimeInterface|\DateInterval|int|null $ttl
+     * @param null|\DateTimeInterface|\DateInterval|int $ttl
      *
      * @return bool
      */
@@ -351,7 +354,7 @@ class CCache_Repository implements ArrayAccess {
      * Get an item from the cache, or execute the given Closure and store the result.
      *
      * @param string                                    $key
-     * @param \DateTimeInterface|\DateInterval|int|null $ttl
+     * @param null|\DateTimeInterface|\DateInterval|int $ttl
      * @param \Closure                                  $callback
      *
      * @return mixed
@@ -422,14 +425,14 @@ class CCache_Repository implements ArrayAccess {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function delete($key) {
         return $this->forget($key);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function deleteMultiple($keys) {
         $result = true;
@@ -444,7 +447,7 @@ class CCache_Repository implements ArrayAccess {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function clear() {
         return $this->driver->flush();
@@ -455,9 +458,9 @@ class CCache_Repository implements ArrayAccess {
      *
      * @param array|mixed $names
      *
-     * @return CCache_TaggedCache
-     *
      * @throws \BadMethodCallException
+     *
+     * @return CCache_TaggedCache
      */
     public function tags($names) {
         if ($this->driver instanceof CCache_DriverTaggableAbstract) {
@@ -472,6 +475,7 @@ class CCache_Repository implements ArrayAccess {
         if (!$this->supportsTags()) {
             throw new BadMethodCallException('This cache store does not support tagging.');
         }
+
         return null;
     }
 
@@ -507,12 +511,13 @@ class CCache_Repository implements ArrayAccess {
     /**
      * Set the default cache time in seconds.
      *
-     * @param int|null $seconds
+     * @param null|int $seconds
      *
      * @return $this
      */
     public function setDefaultCacheTime($seconds) {
         $this->default = $seconds;
+
         return $this;
     }
 
@@ -615,6 +620,7 @@ class CCache_Repository implements ArrayAccess {
         if ($duration instanceof DateTimeInterface) {
             $duration = CCarbon::now()->diffInRealSeconds($duration, false);
         }
+
         return (int) $duration > 0 ? $duration : 0;
     }
 
@@ -632,7 +638,7 @@ class CCache_Repository implements ArrayAccess {
      *
      * @param string      $name
      * @param int         $seconds
-     * @param string|null $owner
+     * @param null|string $owner
      *
      * @return CCache_LockInterface
      *
@@ -644,6 +650,7 @@ class CCache_Repository implements ArrayAccess {
         } else {
             throw new BadMethodCallException('This cache store does not support lock.');
         }
+
         return false;
     }
 
@@ -661,6 +668,7 @@ class CCache_Repository implements ArrayAccess {
         } else {
             throw new BadMethodCallException('This cache store does not support lock.');
         }
+
         return false;
     }
 }
