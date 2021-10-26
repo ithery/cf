@@ -84,7 +84,7 @@ class CException_Manager {
         return new CException_ErrorModel(
             $throwable,
             $this->solutionProviderRepository->getSolutionsForThrowable($throwable),
-            $this->solutionTransformerClass,
+            $this->solutionTransformerClass
         );
     }
 
@@ -98,7 +98,7 @@ class CException_Manager {
             $throwable,
             $this->contextDetector->detectCurrentContext(),
             c::docRoot(),
-            CF::version(),
+            CF::version()
         );
 
         //return $this->applyMiddlewareToReport($report);
