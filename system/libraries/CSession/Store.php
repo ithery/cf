@@ -4,6 +4,8 @@
  * Description of Store.
  *
  * @author Hery
+ *
+ * @see CSession
  */
 class CSession_Store {
     /**
