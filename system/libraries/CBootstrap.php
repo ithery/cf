@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CBoostrap
+ * Description of CBoostrap.
  *
  * @author Hery <hery@ittron.co.id>
  */
@@ -28,6 +28,7 @@ class CBootstrap {
      * @var CBootstrap_BootstrapperAbstract[]
      */
     protected $bootstrapper;
+
     protected $booted;
 
     /**
@@ -58,7 +59,7 @@ class CBootstrap {
         if (!$this->booted) {
             //we boot all bootstrapper
             $this->bootstrapper = c::collect($this->getBootstrapperClass())->map(function ($item) {
-                return c::tap((new $item), function ($bootstrapper) {
+                return c::tap((new $item()), function ($bootstrapper) {
                     $this->bootstrapper[] = $bootstrapper;
                     $bootstrapper->bootstrap();
                 });
@@ -74,6 +75,7 @@ class CBootstrap {
         foreach ($classArr as $c) {
             $this->bootsrapperClass[] = $c;
         }
+
         return $this;
     }
 }

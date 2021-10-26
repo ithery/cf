@@ -17,7 +17,6 @@ CPagination_Paginator::useBootstrap();
  * @since Apr 4, 2019, 9:20:01 PM
  */
 CBootstrap::instance()->addBootstrapper([
-    CBootstrap_MiddlewareBootstrapper::class,
     CApp_Bootstrapper_DependencyChecker::class,
 ]);
 
