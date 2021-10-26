@@ -14,6 +14,7 @@ final class CManager_Daemon {
         if (self::$instance == null) {
             self::$instance = new self();
         }
+
         return self::$instance;
     }
 
@@ -39,6 +40,7 @@ final class CManager_Daemon {
             foreach ($this->daemonsGroup as $groupArray) {
                 $allDaemons = array_diff_key($allDaemons, $groupArray);
             }
+
             return $allDaemons;
         }
         if ($group !== null) {
@@ -46,6 +48,7 @@ final class CManager_Daemon {
                 throw new Exception('group daemon ' . $group . ' not available');
             }
         }
+
         return $this->daemonsGroup[$group];
     }
 
@@ -74,6 +77,7 @@ final class CManager_Daemon {
         $config['stdout'] = false;
         $config['command'] = $command;
         $daemon = new CDaemon($config);
+
         return $daemon;
     }
 
@@ -87,7 +91,12 @@ final class CManager_Daemon {
 
     protected function runDaemon($className, $command) {
         $daemon = $this->getDaemon($className, $command);
+
         return $daemon->run();
+    }
+
+    public function debug($className) {
+        return $this->runDaemon($className, 'debug');
     }
 
     public function status($className) {
@@ -104,16 +113,19 @@ final class CManager_Daemon {
 
     public function isRunning($className) {
         $daemon = $this->getDaemon($className);
+
         return $daemon->isRunning();
     }
 
     public function rotateLog($className) {
         $daemon = $this->getDaemon($className);
+
         return $daemon->rotateLog();
     }
 
     public function logDump($className) {
         $daemon = $this->getDaemon($className);
+
         return $daemon->logDump();
     }
 
@@ -123,6 +135,7 @@ final class CManager_Daemon {
         if ($serviceNameExploded > 0) {
             $serviceName = carr::get($serviceNameExploded, count($serviceNameExploded) - 1);
         }
+
         return $serviceName;
     }
 
@@ -130,6 +143,7 @@ final class CManager_Daemon {
         if ($filename == null) {
             $filename = $className . '.log';
         }
+
         return $this->logPath() . $className . '/' . $filename;
     }
 

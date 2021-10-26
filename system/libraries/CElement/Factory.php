@@ -5,9 +5,9 @@ class CElement_Factory {
      * @param string $tag
      * @param string $id  optional
      *
-     * @return \CElement_Element|bool
-     *
      * @throws CApp_Exception
+     *
+     * @return \CElement_Element|bool
      */
     public static function createElement($tag = 'div', $id = '') {
         $class_name = 'CElement_Element_';
@@ -40,12 +40,16 @@ class CElement_Factory {
             case 'img':
             case 'button':
                 $class_name = 'CElement_Element_' . ucfirst($tag);
+
                 return new $class_name($id);
+
                 break;
             default:
                 throw new CApp_Exception('element [:tag] not found', [':tag' => $tag]);
+
                 break;
         }
+
         return false;
     }
 
@@ -60,8 +64,8 @@ class CElement_Factory {
 
     /**
      * @param string                 $id   optional
-     * @param CView_View|string|null $view optional
-     * @param array|null             $data optional
+     * @param null|CView_View|string $view optional
+     * @param null|array             $data optional
      *
      * @return \CElement_View
      */
@@ -83,9 +87,9 @@ class CElement_Factory {
      * @param string $name
      * @param string $id   optional
      *
-     * @return \CElement_Component
-     *
      * @throws CApp_Exception
+     *
+     * @return \CElement_Component
      */
     public static function createComponent($name, $id = '') {
         $className = $name;
@@ -103,9 +107,9 @@ class CElement_Factory {
      * @param string $name
      * @param string $id   optional
      *
-     * @return \CElement_Composite
-     *
      * @throws CApp_Exception
+     *
+     * @return \CElement_Composite
      */
     public static function createComposite($name, $id = '') {
         $className = 'CElement_Composite_' . $name;
@@ -120,11 +124,13 @@ class CElement_Factory {
      * @param string $name
      * @param string $id   optional
      *
-     * @return \CElement_List
-     *
      * @throws CApp_Exception
+     *
+     * @return \CElement_List
      */
     public static function createList($name, $id = '') {
+        $name = c::classBasename($name);
+
         $className = 'CElement_List_' . $name;
         if (!class_exists($className)) {
             throw new CApp_Exception('list element [:name] not found', [':name' => $name]);
@@ -141,9 +147,9 @@ class CElement_Factory {
      * @param string $id
      * @param string $type
      *
-     * @return CElement_FormInput
-     *
      * @throws CException
+     *
+     * @return CElement_FormInput
      */
     public static function createControl($id, $type) {
         return CManager::instance()->createControl($id, $type);

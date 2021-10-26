@@ -711,27 +711,27 @@ class cdbg {
         }
 
         if (isset($trace[2])) {
-            $file = carr::path($trace, '1.file');
-            $line = carr::path($trace, '1.line');
-            $func = carr::path($trace, '2.function');
+            $file = carr::get($trace, '1.file');
+            $line = carr::get($trace, '1.line');
+            $func = carr::get($trace, '2.function');
             if ((substr($func, 0, 7) == 'include') || (substr($func, 0, 7) == 'require')) {
                 $func = '';
             }
         } elseif (isset($trace[1])) {
-            $file = carr::path($trace, '1.file');
-            $line = carr::path($trace, '1.line');
+            $file = carr::get($trace, '1.file');
+            $line = carr::get($trace, '1.line');
             $func = '';
         }
         if (isset($trace[3]['class'])) {
-            $class = carr::path($trace, '3.class');
-            $func = carr::path($trace, '3.function');
-            $file = carr::path($trace, '2.file');
-            $line = carr::path($trace, '2.line');
+            $class = carr::get($trace, '3.class');
+            $func = carr::get($trace, '3.function');
+            $file = carr::get($trace, '2.file');
+            $line = carr::get($trace, '2.line');
         } elseif (isset($trace[2]['class'])) {
-            $class = carr::path($trace, '2.class');
-            $func = carr::path($trace, '2.function');
-            $file = carr::path($trace, '1.file');
-            $line = carr::path($trace, '1.line');
+            $class = carr::get($trace, '2.class');
+            $func = carr::get($trace, '2.function');
+            $file = carr::get($trace, '1.file');
+            $line = carr::get($trace, '1.line');
         }
 
         $c = $file . ':' . $line . ' ';

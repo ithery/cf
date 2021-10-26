@@ -13,7 +13,7 @@ String.prototype.toNumber = function () {
 };
 
 
-// import './index.css';
+import './index.scss';
 import Cresenity from './Cresenity';
 
 window.Cresenity = Cresenity;

@@ -30,7 +30,7 @@ trait CTrait_Compat_Element_FormInput {
      * @return $this
      */
     public function set_submit_onchange($bool) {
-        return $this->setSubmitOnchange($bool);
+        return $this->setSubmitOnChange($bool);
     }
 
     /**

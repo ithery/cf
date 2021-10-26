@@ -1,25 +1,26 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Nov 18, 2017, 9:05:59 PM
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 class CElastic_Document {
-
     protected $index;
+
     protected $document_type;
 
     /*
      * @var CElastic
      */
     protected $elastic;
+
     /*
      * @var Elasticsearch\Client
      */
     protected $client;
+
     /*
      * @var CElastic_Indices
      */
@@ -33,23 +34,23 @@ class CElastic_Document {
         $this->indices = $this->elastic->indices($this->index, $this->document_type);
     }
 
-    public function bulk($query, $index_field_name = "") {
+    public function bulk($query, $index_field_name = '') {
         $params = ['body' => []];
-        
+
         $i = 0;
 
         $error = 0;
-        $error_message = "";
+        $error_message = '';
 
         $db = CDatabase::instance();
         $results = $db->query($query);
-        $list_field = $results->list_fields();
+        $list_field = $results->listFields();
 
-        $mapping = $this->indices->get_mapping();
+        $mapping = $this->indices->getMapping();
 
-        $properties = carr::path($mapping, $this->index . '.mappings.' . $this->document_type . '.properties');
+        $properties = carr::get($mapping, $this->index . '.mappings.' . $this->document_type . '.properties');
 
-        $result = array();
+        $result = [];
         foreach ($results as $key => $value) {
             $row = (array) $value;
 
@@ -66,12 +67,11 @@ class CElastic_Document {
                 ]
             ];
 
-
             foreach ($row as $key => $val) {
                 //we transform the mapping date to elastic date format
-                if (carr::path($properties, $key . '.type') == 'date') {
-                    if($val!==null) {
-                        $row[$key] = date_format(date_create($val), "Y-m-d") . "T" . date_format(date_create($val), "H:i:s") . ".000Z";
+                if (carr::get($properties, $key . '.type') == 'date') {
+                    if ($val !== null) {
+                        $row[$key] = date_format(date_create($val), 'Y-m-d') . 'T' . date_format(date_create($val), 'H:i:s') . '.000Z';
                     }
                 }
             }
@@ -87,20 +87,20 @@ class CElastic_Document {
 
                 $params = ['body' => []];
 
-                if (isset($result["items"])) {
-                    foreach ($result["items"] as $key => $value) {
-                        if (isset($value["index"]["status"])) {
-                            if ($value["index"]["status"] != 200 && $value["index"]["status"] != 201) {
+                if (isset($result['items'])) {
+                    foreach ($result['items'] as $key => $value) {
+                        if (isset($value['index']['status'])) {
+                            if ($value['index']['status'] != 200 && $value['index']['status'] != 201) {
                                 $error++;
 
-                                $error_message .= $value["index"]["_id"] . ": ";
+                                $error_message .= $value['index']['_id'] . ': ';
 
-                                if (isset($value["index"]["error"]["caused_by"]["reason"])) {
-                                    $error_message .= $value["index"]["error"]["caused_by"]["reason"] . ", ";
+                                if (isset($value['index']['error']['caused_by']['reason'])) {
+                                    $error_message .= $value['index']['error']['caused_by']['reason'] . ', ';
                                 }
 
-                                if (isset($value["index"]["error"]["reason"])) {
-                                    $error_message .= $value["index"]["error"]["reason"];
+                                if (isset($value['index']['error']['reason'])) {
+                                    $error_message .= $value['index']['error']['reason'];
                                 }
                             }
                         }
@@ -118,23 +118,22 @@ class CElastic_Document {
         }
 
         if (!empty($params['body']) && $error == 0) {
-           
             $result = $this->client->bulk($params);
 
-            if (isset($result["items"])) {
-                foreach ($result["items"] as $key => $value) {
-                    if (isset($value["index"]["status"])) {
-                        if ($value["index"]["status"] != 200 && $value["index"]["status"] != 201) {
+            if (isset($result['items'])) {
+                foreach ($result['items'] as $key => $value) {
+                    if (isset($value['index']['status'])) {
+                        if ($value['index']['status'] != 200 && $value['index']['status'] != 201) {
                             $error++;
 
-                            $error_message .= $value["index"]["_id"] . ": ";
+                            $error_message .= $value['index']['_id'] . ': ';
 
-                            if (isset($value["index"]["error"]["caused_by"]["reason"])) {
-                                $error_message .= $value["index"]["error"]["caused_by"]["reason"] . ", ";
+                            if (isset($value['index']['error']['caused_by']['reason'])) {
+                                $error_message .= $value['index']['error']['caused_by']['reason'] . ', ';
                             }
 
-                            if (isset($value["index"]["error"]["reason"])) {
-                                $error_message .= $value["index"]["error"]["reason"];
+                            if (isset($value['index']['error']['reason'])) {
+                                $error_message .= $value['index']['error']['reason'];
                             }
                         }
                     }
@@ -145,11 +144,12 @@ class CElastic_Document {
                 throw new Exception('Elastic Error:' . $error_message);
             }
         }
+
         return $result;
     }
 
     public function delete($id) {
-        $params = array();
+        $params = [];
         $params['index'] = $this->index;
         $params['type'] = $this->type;
         $params['id'] = $this->id;
@@ -157,8 +157,7 @@ class CElastic_Document {
         try {
             $this->client->delete($params);
         } catch (Exception $e) {
-            throw new Exception($this->index . " - Delete Document Failed", 1);
+            throw new Exception($this->index . ' - Delete Document Failed', 1);
         }
     }
-
 }

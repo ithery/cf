@@ -35,19 +35,48 @@ trait CTrait_Compat_Element_DataTable_Column {
         return $this->getFieldname();
     }
 
+    /**
+     * @return $string
+     *
+     * @deprecated since version 1.2
+     */
     public function get_align() {
         return $this->getAlign();
     }
 
-    public function set_hidden_phone($bool) {
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     *
+     * @deprecated since version 1.2
+     */
+    public function set_hidden_phone($bool = true) {
+        /** @var CElement_Component_DataTable_Column $this */
         return $this->setHiddenPhone($bool);
     }
 
-    public function set_hidden_tablet($bool) {
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     *
+     * @deprecated since version 1.2
+     */
+    public function set_hidden_tablet($bool = true) {
+        /** @var CElement_Component_DataTable_Column $this */
         return $this->setHiddenTablet($bool);
     }
 
-    public function set_hidden_desktop($bool) {
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     *
+     * @deprecated since version 1.2
+     */
+    public function set_hidden_desktop($bool = true) {
+        /** @var CElement_Component_DataTable_Column $this */
         return $this->setHiddenDesktop($bool);
     }
 
@@ -55,26 +84,66 @@ trait CTrait_Compat_Element_DataTable_Column {
         return $this->setInputType($type);
     }
 
+    /**
+     * @return $bool
+     *
+     * @deprecated since version 1.2
+     */
     public function get_no_line_break() {
         return $this->getNoLineBreak();
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     *
+     * @deprecated since version 1.2
+     */
     public function set_no_line_break($bool) {
         return $this->setNoLineBreak($bool);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     *
+     * @deprecated since version 1.2
+     */
     public function set_visible($bool) {
         return $this->setVisible($bool);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     *
+     * @deprecated since version 1.2
+     */
     public function set_sortable($bool) {
         return $this->setSortable($bool);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     *
+     * @deprecated since version 1.2
+     */
     public function set_searchable($bool) {
         return $this->setSearchable($bool);
     }
 
+    /**
+     * @param bool $bool
+     *
+     * @return $this
+     *
+     * @deprecated since version 1.2
+     */
     public function set_editable($bool) {
         return $this->setEditable($bool);
     }
@@ -83,10 +152,25 @@ trait CTrait_Compat_Element_DataTable_Column {
         return $this->setWidth($w);
     }
 
-    public function set_align($al) {
-        return $this->setAlign($al);
+    /**
+     * @param string $align
+     *
+     * @return $this
+     *
+     * @deprecated since version 1.2
+     */
+    public function set_align($align) {
+        return $this->setAlign($align);
     }
 
+    /**
+     * @param string $name
+     * @param array  $args
+     *
+     * @return $this
+     *
+     * @deprecated since version 1.2
+     */
     public function add_transform($name, $args = []) {
         return $this->addTransform($name, $args);
     }
