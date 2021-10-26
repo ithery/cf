@@ -16,6 +16,12 @@ class CElement_Component_Widget extends CElement_Component {
 
     public $height;
 
+    public $scroll;
+
+    public $nopadding;
+
+    public $height;
+
     /**
      * @var CElement_Component_Widget_Header
      */
@@ -34,12 +40,17 @@ class CElement_Component_Widget extends CElement_Component {
 
     private $js_collapse;
 
+    private $wrapperClass;
+
+    private $bodyClass;
+
     public function __construct($id) {
         parent::__construct($id);
+        $this->wrapperClass = c::theme('widget.class.wrapper', 'widget-box');
+        $this->bodyClass = c::theme('widget.class.body', 'widget-content');
         $this->header = CElement_Factory::createComponent(CElement_Component_Widget_Header::class);
         $this->add($this->header);
-        $this->content = $this->addDiv()->addClass('widget-content clearfix');
-        $this->addClass('widget-box');
+        $this->content = $this->addDiv();
         $this->wrapper = $this->content;
 
         $this->height = '';
@@ -134,8 +145,12 @@ class CElement_Component_Widget extends CElement_Component {
     }
 
     public function build() {
+        $this->addClass($this->wrapperClass);
+
         if ($this->nopadding) {
             $this->content->addClass('nopadding p-0');
         }
+
+        $this->content->addClass($this->bodyClass . ' clearfix');
     }
 }

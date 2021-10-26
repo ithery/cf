@@ -545,4 +545,14 @@ class CView_Factory {
     public function getShared() {
         return $this->shared;
     }
+
+    public static function compiledPath() {
+        $path = CF::config('view.compiled');
+        $path = rtrim($path, '/');
+        $appCode = CF::appCode();
+        if (strlen($appCode) > 0) {
+            $path .= '/' . $appCode;
+        }
+        return $path;
+    }
 }

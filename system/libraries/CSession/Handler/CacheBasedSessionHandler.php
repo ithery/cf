@@ -6,7 +6,6 @@
  * @author Hery
  */
 class CSession_Handler_CacheBasedSessionHandler implements SessionHandlerInterface {
-
     /**
      * The cache repository instance.
      *
@@ -24,8 +23,9 @@ class CSession_Handler_CacheBasedSessionHandler implements SessionHandlerInterfa
     /**
      * Create a new cache driven handler instance.
      *
-     * @param  CCache_Repository  $cache
-     * @param  int  $minutes
+     * @param CCache_Repository $cache
+     * @param int               $seconds
+     *
      * @return void
      */
     public function __construct(CCache_Repository $cache, $seconds) {
@@ -83,5 +83,4 @@ class CSession_Handler_CacheBasedSessionHandler implements SessionHandlerInterfa
     public function getCache() {
         return $this->cache;
     }
-
 }

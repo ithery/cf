@@ -118,10 +118,11 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 $js->appendln("'oSearch': {'sSearch': '" . $this->initialSearch . "'},")->br();
             }
             if ($this->ajax) {
+                $this->options->setOption('serverSide', true);
                 $js->append('')
                     ->appendln("'bRetrieve': true,")->br()
-                    ->appendln("'bProcessing': true,")->br()
-                    ->appendln("'bServerSide': true,")->br()
+                    ->appendln($this->options->toJsonRow('processing'))->br()
+                    ->appendln($this->options->toJsonRow('serverSide'))->br()
                     ->appendln("'sAjaxSource': '" . $ajax_url . "',")->br()
                     ->appendln("'sServerMethod': '" . strtoupper($this->ajax_method) . "',")->br()
                     ->appendln("'fnServerData': function ( sSource, aoData, fnCallback, oSettings ) {
@@ -192,24 +193,12 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
         this.fnAdjustColumnSizing(true);
     },")->br();
             }
-            /*
-              $js->append("")
-              ->appendln("'sScrollX': '100%',")->br()
-              ->appendln("'bScrollCollapse': true,")->br()
-              ;
-             */
 
             $jqueryui = "'bJQueryUI': false,";
             if (CClientModules::instance()->isRegisteredModule('jquery.ui') || CClientModules::instance()->isRegisteredModule('jquery-ui-1.12.1.custom')) {
                 $jqueryui = "'bJQueryUI': true,";
             }
-            if ($this->scrollX) {
-                $scrollX = $this->scrollX;
-                if (is_bool($scrollX)) {
-                    $scrollX = 'true';
-                }
-                $js->appendln('scrollX:        ' . $scrollX . ',')->br();
-            }
+
             if ($this->scrollY) {
                 $scrollY = $this->scrollY;
                 if (is_bool($scrollY)) {
@@ -273,27 +262,24 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                     sEmptyTable  : '" . clang::__($this->labels['noData']) . "',
                     sInfoThousands   : '" . clang::__('') . "',
                 },")->br()
-                ->appendln("'bDeferRender': " . ($this->getOption('bDeferRender') ? 'true' : 'false') . ',')->br()
-                ->appendln("'bFilter': " . ($this->getOption('bFilter') ? 'true' : 'false') . ',')->br()
-                ->appendln("'bInfo': " . ($this->getOption('bInfo') ? 'true' : 'false') . ',')->br()
-                ->appendln("'bPaginate': " . ($this->getOption('bPaginate') ? 'true' : 'false') . ',')->br()
-                ->appendln("'bLengthChange': " . ($this->getOption('bLengthChange') ? 'true' : 'false') . ',')->br()
                 ->appendln("'aoColumns': vaoColumns,")->br()
-                ->appendln("'autoWidth': false,")->br()
                 ->appendln("'aLengthMenu': [
                     [" . $km . '],
                     [' . $vm . ']
 				],')->br();
 
-            /*
-              $js->append("")
-              ->appendln("'sScrollX': '100%',")->br()
-              ->appendln("'sScrollXInner': '100%',")->br()
-              ->appendln("'bScrollCollapse': true,")->br()
-              ;
-             */
+            //data table options
+            $js->appendln($this->options->toJsonRow('paging'))->br()
+                ->appendln($this->options->toJsonRow('pagingType'))->br()
+                ->appendln($this->options->toJsonRow('lengthChange'))->br()
+                ->appendln($this->options->toJsonRow('searching'))->br()
+                ->appendln($this->options->toJsonRow('info'))->br()
+                ->appendln($this->options->toJsonRow('deferRender'))->br()
+                ->appendln($this->options->toJsonRow('autoWidth'))->br()
+                ->appendln($this->options->toJsonRow('ordering'))->br()
+                ->appendln($this->options->toJsonRow('scrollX'))->br()
+                ->br();
 
-            // if ($this->bootstrap == '3') {
             if ($this->bootstrap >= '3') {
                 if ($this->dom == null) {
                     $this->dom = "<'row'<'col-sm-6'l><'col-sm-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>";
@@ -305,7 +291,6 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
             $dom = str_replace("'", "\'", $this->dom);
             $js->append('')
-                ->appendln("'sPaginationType': 'full_numbers',")->br()
                 ->appendln("'sDom': '" . $dom . "',")->br();
 
             $js->append('')
@@ -418,6 +403,7 @@ jQuery('.data_table-quick_search').on('keyup change', function(){
                 foreach ($this->data as $row) {
                     if ($row instanceof CRenderable) {
                         $js->appendln($row->js())->br();
+
                         continue;
                     }
                     foreach ($row as $row_k => $row_v) {

@@ -1,10 +1,9 @@
-
 <?php
 
 use GuzzleHttp\Psr7\Request;
-use function GuzzleHttp\Psr7\stream_for;
 use function GuzzleHttp\Psr7\uri_for;
 use Psr\Http\Message\RequestInterface;
+use function GuzzleHttp\Psr7\stream_for;
 
 /**
  * @deprecated 5.14.0 use {@see SendMessage} instead
@@ -12,7 +11,9 @@ use Psr\Http\Message\RequestInterface;
 final class CVendor_Firebase_Messaging_Request_ValidateMessageRequest implements CVendor_Firebase_Messaging_Request_MessageRequestInterface, RequestInterface {
     use CVendor_Firebase_Trait_WrappedPsr7RequestTrait;
 
-    /** @var CVendor_Firebase_Messaging_MessageInterface */
+    /**
+     * @var CVendor_Firebase_Messaging_MessageInterface
+     */
     private $message;
 
     public function __construct(string $projectId, CVendor_Firebase_Messaging_MessageInterface $message) {

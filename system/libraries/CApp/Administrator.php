@@ -17,6 +17,7 @@ class CApp_Administrator {
     public static function isLogin() {
         $session = CSession::instance();
         $admin = $session->get(self::ADMIN_SESSSION_KEY);
+
         return $admin != null;
     }
 
@@ -31,8 +32,10 @@ class CApp_Administrator {
 
             $session = CSession::instance();
             $admin = $session->set(self::ADMIN_SESSSION_KEY, $adminData);
+
             return true;
         }
+
         return false;
     }
 

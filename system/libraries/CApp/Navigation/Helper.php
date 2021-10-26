@@ -28,6 +28,7 @@ class CApp_Navigation_Helper {
             if ($navs == null) {
                 return null;
             }
+
             foreach ($navs as $nav) {
                 $res = self::nav($nav, $controller, $method);
                 if ($res !== false) {
@@ -73,6 +74,7 @@ class CApp_Navigation_Helper {
                 }
             }
         }
+
         return false;
     }
 
@@ -152,6 +154,7 @@ class CApp_Navigation_Helper {
         if ($appId == null) {
             $appId = $app->appId();
         }
+
         $db = CDatabase::instance(null, null, $domain);
 
         /** @var CApp_Model_Roles $role */
@@ -171,6 +174,7 @@ class CApp_Navigation_Helper {
 
     public static function appUserRightsArray($appId, $roleId, $appRoleId = '', $domain = null) {
         $navs = CApp_Navigation_Data::get($domain);
+
         return self::asUserRightsArray($appId, $roleId, $navs, $appRoleId, $domain);
     }
 
@@ -207,6 +211,7 @@ class CApp_Navigation_Helper {
             $result[] = $res;
             $result = array_merge($result, $subnav);
         }
+
         return $result;
     }
 
@@ -214,6 +219,7 @@ class CApp_Navigation_Helper {
         if (isset($nav['is_public']) && $nav['is_public']) {
             return true;
         }
+
         return false;
     }
 
@@ -223,6 +229,7 @@ class CApp_Navigation_Helper {
                 return count($nav['subnav']);
             }
         }
+
         return 0;
     }
 

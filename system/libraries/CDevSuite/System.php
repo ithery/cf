@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of System
+ * Description of System.
  *
  * @author Hery
  */
@@ -37,4 +37,6 @@ abstract class CDevSuite_System {
             })
             ->values()->all();
     }
+
+    abstract public function symlinkToUsersBin();
 }

@@ -17,18 +17,18 @@ trait CApp_Concern_RendererTrait {
     public function renderContent($options = []) {
         /** @var CApp $this */
         $viewData = $this->getViewData();
+
         return carr::get($viewData, 'content');
     }
 
-    public function renderNavigation($expression = null) {
+    public function renderNavigation($nav = null, $renderer = null) {
         /** @var CApp $this */
-        if ($expression != null) {
-            $expression = str_replace(['(', ')'], '', $expression);
-            $expression = str_replace(['"', '\''], '', $expression);
-            $expression = str_replace(',', ' ', $expression);
-        }
+        // if ($expression != null) {
+        //     $expression = str_replace(['(', ')'], '', $expression);
+        //     $expression = str_replace(['"', '\''], '', $expression);
+        //     $expression = str_replace(',', ' ', $expression);
+        // }
 
-        $nav = $expression;
         if ($nav == null) {
             $nav = $this->nav;
         }
@@ -36,7 +36,12 @@ trait CApp_Concern_RendererTrait {
         /** @var CApp $this */
         $nav = $this->resolveNav($nav);
 
+        if ($renderer != null) {
+            $this->setNavRenderer($renderer);
+        }
+
         $renderer = $this->resolveNavRenderer();
+
         return $renderer->render($nav);
     }
 
@@ -89,6 +94,7 @@ HTML;
         $pushesScript = $this->yieldPushContent('capp-script');
 
         $cresJs = curl::base() . 'media/js/cres/dist/cres.js?v=' . md5(CFile::lastModified(DOCROOT . 'media/js/cres/dist/cres.js'));
+
         return <<<HTML
             ${endClientScript}
             <script src="${cresJs}"></script>
@@ -133,11 +139,13 @@ HTML;
 
     public function renderTitle($options = []) {
         $viewData = $this->getViewData();
+
         return carr::get($viewData, 'title');
     }
 
     public function renderPageTitle($options = []) {
         $viewData = $this->getViewData();
+
         return carr::get($viewData, 'pageTitle');
     }
 
@@ -229,6 +237,7 @@ HTML;
 
             $this->viewData = $viewData;
         }
+
         return $this->viewData;
     }
 
@@ -253,12 +262,12 @@ HTML;
     }
 
     /**
-     * Render the html of this
-     *
-     * @return void
+     * Render the html of this.
      *
      * @throws CException
      * @throws CApp_Exception
+     *
+     * @return void
      */
     public function render() {
         /** @var CApp $this */
@@ -277,7 +286,7 @@ HTML;
 
         CView::factory()->share(
             'errors',
-            CSession::instance()->get('errors') ?: new CBase_ViewErrorBag
+            CSession::instance()->get('errors') ?: new CBase_ViewErrorBag()
         );
 
         $viewData = $this->getViewData();

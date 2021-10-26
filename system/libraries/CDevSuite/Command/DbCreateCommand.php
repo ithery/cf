@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DbCreateCommand
+ * Description of DbCreateCommand.
  *
  * @author Hery
  */

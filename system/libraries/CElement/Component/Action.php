@@ -78,6 +78,7 @@ class CElement_Component_Action extends CElement_Component {
      */
     public function setConfirm($bool = true) {
         $this->confirm = $bool;
+
         return $this;
     }
 
@@ -88,27 +89,32 @@ class CElement_Component_Action extends CElement_Component {
      */
     public function setConfirmMessage($message) {
         $this->confirmMessage = $message;
+
         return $this;
     }
 
     public function setJsParam($jsparam) {
         $this->jsparam = $jsparam;
+
         return $this;
     }
 
     public function setLink($link) {
         $this->type = 'link';
         $this->link = $link;
+
         return $this;
     }
 
     public function setLinkTarget($linkTarget) {
         $this->link_target = $linkTarget;
+
         return $this;
     }
 
     public function setSubmit($bool = true) {
         $this->submit = $bool;
+
         return $this;
     }
 
@@ -118,11 +124,13 @@ class CElement_Component_Action extends CElement_Component {
         if (strlen($target) > 0) {
             $this->submitToTarget = $target;
         }
+
         return $this;
     }
 
     public function setDisabled($bool = true) {
         $this->disabled = $bool;
+
         return $this;
     }
 
@@ -131,6 +139,7 @@ class CElement_Component_Action extends CElement_Component {
         if ($this->submit) {
             $render_as_input = true;
         }
+
         return $render_as_input;
     }
 
@@ -276,6 +285,7 @@ class CElement_Component_Action extends CElement_Component {
                 $html->appendln('</li>');
             }
         }
+
         return $html->text();
     }
 

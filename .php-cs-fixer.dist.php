@@ -181,8 +181,6 @@ return $config->setRules([
             'property_public',
             'property_protected',
             'property_private',
-            'construct',
-            'destruct',
         ],
     ],
     // 'phpdoc_summary' => true,

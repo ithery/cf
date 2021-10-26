@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DbDeleteCommand
+ * Description of DbDeleteCommand.
  *
  * @author Hery
  */

@@ -36,7 +36,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Concern_AuthTrait,
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
-
     public static $instance = null;
 
     protected $renderer;
@@ -107,6 +106,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
         if (ccfg::get('update_last_request')) {
             $user = $this->user();
+
             if ($user != null) {
                 if (!is_array($user) && is_object($user)) {
                     //update last request
@@ -196,10 +196,6 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         return isset($_SERVER['HTTP_X_REQUESTED_WITH']) and strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest';
     }
 
-    public static function auth() {
-        return CApp_Auth::instance();
-    }
-
     /**
      * @return CApp_Temp
      */
@@ -215,7 +211,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function getTranslation($message, $params = [], $lang = null) {
-        return CF::lang($message, $params, $lang);
+        return c::__($message, $params, $lang);
     }
 
     public static function component() {
@@ -251,7 +247,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * Get Translator instance
+     * Get Translator instance.
      *
      * @return CTranslation_Translator
      */
@@ -396,7 +392,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * Alias of setCustomData
+     * Alias of setCustomData.
      *
      * @param string $key
      * @param string $value
@@ -459,7 +455,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         $message = '';
         $messageOrig = '';
         if (!$this->keepMessage) {
-            $messageOrig = cmsg::flash_all();
+            $messageOrig = CApp_Message::flashAll();
             if ($this->renderMessage) {
                 $message = $messageOrig;
             }
@@ -494,7 +490,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     /**
-     * Alias of toJson
+     * Alias of toJson.
      *
      * @param int $options
      *

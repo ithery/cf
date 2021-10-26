@@ -11,7 +11,7 @@ trait CApp_Concern_OrgTrait {
     private $orgId = null;
 
     /**
-     * Get the model of org
+     * Get the model of org.
      *
      * @return CModel|CApp_Model_Org
      */
@@ -20,6 +20,7 @@ trait CApp_Concern_OrgTrait {
             return $this->org;
         }
         $orgId = $this->orgId();
+
         if (c::filled($orgId)) {
             $orgModelClass = CF::config('app.model.org', CApp_Model_Org::class);
             if (class_exists($orgModelClass)) {
@@ -31,6 +32,6 @@ trait CApp_Concern_OrgTrait {
     }
 
     public function orgId() {
-        CApp_Base::orgId();
+        return CApp_Base::orgId();
     }
 }

@@ -37,7 +37,7 @@ trait CAuth_Concern_AuthenticatableTrait {
     /**
      * Get the token value for the "remember me" session.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getRememberToken() {
         if (!empty($this->getRememberTokenName())) {

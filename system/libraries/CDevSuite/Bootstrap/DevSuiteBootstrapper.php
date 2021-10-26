@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DevSuiteBootstrapper
+ * Description of DevSuiteBootstrapper.
  *
  * @author Hery
  */

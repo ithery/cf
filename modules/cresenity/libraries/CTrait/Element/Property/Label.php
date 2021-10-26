@@ -10,14 +10,14 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CTrait_Element_Property_Label {
     /**
-     * Label of element
+     * Label of element.
      *
      * @var string
      */
     protected $label;
 
     /**
-     * Label of element before translation
+     * Label of element before translation.
      *
      * @var string
      */
@@ -32,9 +32,10 @@ trait CTrait_Element_Property_Label {
     public function setLabel($label, $lang = true) {
         $this->rawLabel = $label;
         if ($lang) {
-            $label = clang::__($label);
+            $label = c::__($label);
         }
         $this->label = $label;
+
         return $this;
     }
 

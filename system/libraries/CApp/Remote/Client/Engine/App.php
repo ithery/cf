@@ -12,6 +12,7 @@ class CApp_Remote_Client_Engine_App extends CApp_Remote_Client_Engine {
         $post = [];
         $post['domain'] = $domain;
         $data = $this->request($this->baseUrl . 'GetConfig', $post);
+
         return $data;
     }
 }

@@ -65,8 +65,8 @@ class CFConsole {
         });
 
         $status = $kernel->handle(
-            $input = new Symfony\Component\Console\Input\ArgvInput,
-            new Symfony\Component\Console\Output\ConsoleOutput
+            $input = new Symfony\Component\Console\Input\ArgvInput(),
+            new Symfony\Component\Console\Output\ConsoleOutput()
         );
 
         $kernel->terminate($input, $status);

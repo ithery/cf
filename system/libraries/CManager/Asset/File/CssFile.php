@@ -16,7 +16,7 @@ class CManager_Asset_File_CssFile extends CManager_Asset_FileAbstract {
         $docroot = str_replace(DS, '/', DOCROOT);
         $file = str_replace(DS, '/', $file);
         $base_url = curl::base();
-        if ($withHttp || CManager::instance()->isMobile()) {
+        if ($withHttp) {
             $base_url = curl::base(false, 'http');
         }
 

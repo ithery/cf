@@ -26,8 +26,11 @@ class CElement_Component_Widget_Header extends CElement_Element {
 
     protected $switcherBlockMessage = '';
 
+    protected $headerClass;
+
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
+        $this->headerClass = c::theme('widget.class.header', 'widget-title');
         $this->icon = '';
         $this->title = '';
         $this->titleWrapper = $this->addDiv()->addClass('widget-title-wrapper');
@@ -58,7 +61,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
     }
 
     public function build() {
-        $this->addClass('widget-title clearfix');
+        $this->addClass($this->headerClass . ' clearfix');
         if ($this->actions != null) {
             $this->addClass('with-elements');
         }

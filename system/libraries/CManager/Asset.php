@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CManager_Asset {
     /**
-     * POS CONST
+     * POS CONST.
      */
     const POS_HEAD = 'head';
 
@@ -23,7 +23,7 @@ class CManager_Asset {
     const POS_LOAD = 'load';
 
     /**
-     * TYPE CONST
+     * TYPE CONST.
      */
     const TYPE_JS_FILE = 'js_file';
 
@@ -40,7 +40,7 @@ class CManager_Asset {
     const TYPE_PLAIN = 'plain';
 
     /**
-     * Array of all type script
+     * Array of all type script.
      *
      * @var array
      */
@@ -185,12 +185,6 @@ class CManager_Asset {
         if ($manager->getUseRequireJs()) {
             foreach ($jsFiles as $f) {
                 $urlJsFile = CManager_Asset_Helper::urlJsFile($f);
-                if ($manager->isMobile()) {
-                    $mobilePath = $manager->getMobilePath();
-                    if (strlen($mobilePath) > 0) {
-                        $urlJsFile = $mobilePath . $f;
-                    }
-                }
 
                 $jsOpen .= str_repeat("\t", $i) . $require . "(['" . $urlJsFile . "'],function(){" . PHP_EOL;
 
@@ -258,13 +252,6 @@ class CManager_Asset {
                                 $script .= $scriptValue->render() . PHP_EOL;
                             } else {
                                 $urlJsFile = CManager_Asset_Helper::urlJsFile($scriptValue);
-                                if ($manager->isMobile()) {
-                                    $mobilePath = $manager->getMobilePath();
-                                    if (strlen($mobilePath) > 0) {
-                                        $urlJsFile = $mobilePath . $scriptValue;
-                                    }
-                                }
-
                                 $script .= '<script src="' . $urlJsFile . '"></script>' . PHP_EOL;
                             }
 
@@ -274,13 +261,6 @@ class CManager_Asset {
                                 $script .= $scriptValue->render() . PHP_EOL;
                             } else {
                                 $urlCssFile = CManager_Asset_Helper::urlCssFile($scriptValue);
-                                if ($manager->isMobile()) {
-                                    $mobilePath = $manager->getMobilePath();
-                                    if (strlen($mobilePath) > 0) {
-                                        $urlCssFile = $mobilePath . $scriptValue;
-                                    }
-                                }
-
                                 $script .= '<link href="' . $urlCssFile . '" rel="stylesheet" />' . PHP_EOL;
                             }
 

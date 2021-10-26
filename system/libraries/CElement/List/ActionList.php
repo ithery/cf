@@ -33,7 +33,7 @@ class CElement_List_ActionList extends CElement_List {
     }
 
     /**
-     * Set style of action list
+     * Set style of action list.
      *
      * @param string $style
      *
@@ -48,6 +48,7 @@ class CElement_List_ActionList extends CElement_List {
         if ($this->id == 'test-123') {
             //echo($this->style);
         }
+
         return $this;
     }
 
@@ -57,6 +58,7 @@ class CElement_List_ActionList extends CElement_List {
 
     public function removeCaret() {
         $this->withCaret = false;
+
         return $this;
     }
 
@@ -121,19 +123,24 @@ class CElement_List_ActionList extends CElement_List {
                 } else {
                     $pretag = '<div class="form-actions clear-both ' . $classes . '">';
                 }
+
                 break;
             case 'btn-group':
             case 'btn-icon-group':
                 $pretag = '<div class="btn-group ' . $classes . '">';
+
                 break;
             case 'widget-action':
                 $pretag = '<div class="buttons ' . $classes . '">';
+
                 break;
             case 'table-header-action':
                 $pretag = '<div class="buttons ' . $classes . '">';
+
                 break;
             case 'btn-dropdown':
                 $pretag = '<div id="' . $this->id . '" class="btn-group ' . $classes . '">';
+
                 break;
         }
         $html->appendln($pretag)->incIndent()->br();
@@ -145,11 +152,11 @@ class CElement_List_ActionList extends CElement_List {
             $caretClass = $this->withCaret ? '' : 'no-caret';
             $ulId = uniqid();
             $html->appendln('
-                    <a class="btn ' . $btn_dropdown_classes . ' dropdown-toggle ' . $caretClass . '" data-toggle="dropdown" href="javascript:;">
-                            ' . $iconHtml . $this->label . '
-                            ' . $this->htmlCaret() . '
-                    </a>
-                    <ul class="dropdown-menu ' . $ulDropdownClasses . ' align-left ' . $classes . '">
+                <a class="btn ' . $btn_dropdown_classes . ' dropdown-toggle ' . $caretClass . '" data-toggle="dropdown" data-bs-toggle="dropdown" href="javascript:;">
+                        ' . $iconHtml . $this->label . '
+                        ' . $this->htmlCaret() . '
+                </a>
+                <ul class="dropdown-menu ' . $ulDropdownClasses . ' align-left ' . $classes . '">
 
             ');
         }
@@ -163,6 +170,7 @@ class CElement_List_ActionList extends CElement_List {
         switch ($this->style) {
             case 'btn-dropdown':
                 $posttag = '</div>';
+
                 break;
             case 'form-action':
                 if ($this->bootstrap == '3.3') {
@@ -170,12 +178,15 @@ class CElement_List_ActionList extends CElement_List {
                 } else {
                     $posttag = '</div>';
                 }
+
                 break;
             default:
                 $posttag = '</div>';
+
                 break;
         }
         $html->decIndent()->appendln($posttag)->br();
+
         return $html->text();
     }
 
@@ -183,6 +194,7 @@ class CElement_List_ActionList extends CElement_List {
         $js = new CStringBuilder();
         $js->setIndent($indent);
         $js->appendln($this->jsChild($js->getIndent()));
+
         return $js->text();
     }
 }

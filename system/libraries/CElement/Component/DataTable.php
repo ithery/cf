@@ -5,6 +5,7 @@ class CElement_Component_DataTable extends CElement_Component {
         CTrait_Element_ActionList_Row,
         CTrait_Element_ActionList_Header,
         CTrait_Element_ActionList_Footer,
+        CTrait_Element_Property_Title,
         CElement_Component_DataTable_Trait_GridViewTrait,
         CElement_Component_DataTable_Trait_ExportTrait,
         CElement_Component_DataTable_Trait_JavascriptTrait,
@@ -67,8 +68,6 @@ class CElement_Component_DataTable extends CElement_Component {
     public $applyDataTable;
 
     public $group_by;
-
-    public $title;
 
     public $ajax;
 
@@ -153,7 +152,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->dbName = $db->getName();
         $this->display_length = '10';
         $this->paging_list = $this->defaultPagingList;
-        $this->options = CElement_Component_DataTable_Options::factory();
+        $this->options = new CElement_Component_DataTable_Options();
         $this->data = [];
         $this->keyField = '';
         $this->columns = [];
@@ -218,15 +217,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->scrollY = false;
 
         $this->infoText = clang::__('Showing') . ' _START_ ' . clang::__('to') . ' _END_ ' . clang::__('of') . ' _TOTAL_ ' . clang::__('entries') . '';
-        if (isset($this->theme)) {
-            if ($this->bootstrap >= '3.3') {
-                CClientModules::instance()->registerModule('jquery.datatable-bootstrap3');
-            } else {
-                CClientModules::instance()->registerModule('jquery.datatable');
-            }
-        } else {
-            CClientModules::instance()->registerModule('jquery.datatable');
-        }
+        CClientModules::instance()->registerModule('jquery.datatable');
 
         //read theme data
 
@@ -391,15 +382,6 @@ class CElement_Component_DataTable extends CElement_Component {
         self::exportExcelxmlStatic($export_filename, $table->export_sheetname, $table);
     }
 
-    public function setTitle($title, $lang = true) {
-        if ($lang) {
-            $title = clang::__($title);
-        }
-        $this->title = $title;
-
-        return $this;
-    }
-
     public function setDom($dom) {
         $this->dom = $dom;
 
@@ -437,13 +419,13 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     public function setOption($key, $val) {
-        $this->options->add($key, $val);
+        $this->options->setOption($key, $val);
 
         return $this;
     }
 
     public function getOption($key) {
-        return $this->options->get_by_name($key);
+        return $this->options->getOption($key);
     }
 
     public function setAjax($bool = true) {

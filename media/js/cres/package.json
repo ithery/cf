@@ -22,6 +22,7 @@
         "fs-extra": "^10.0.0",
         "get-value": "^3.0.1",
         "md5": "^2.3.0",
+        "node-sass": "^6.0.1",
         "postcss": "^8.3.7",
         "rollup": "^2.57.0",
         "rollup-plugin-babel": "^4.3.3",

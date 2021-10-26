@@ -750,7 +750,9 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
     }
 
     public function clearCompiled() {
+        //$path = CView_Factory::compiledPath();
         $path = CF::config('view.compiled');
+        $path = rtrim($path, '/');
         $files = glob($path . '/*');
 
         CFile::delete($files);

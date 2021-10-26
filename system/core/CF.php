@@ -4,6 +4,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * CF Class.
+ * This class is core of Cresenity Framework loaded in Bootstrap.php.
  */
 final class CF {
     use CFDeprecatedTrait;
@@ -13,16 +14,13 @@ final class CF {
     const FILE_SECURITY = '<?php defined(\'SYSPATH\') OR die(\'No direct script access.\');';
 
     // The singleton instance of the controller (last of the controller)
+
+    /**
+     * @var null
+     *
+     * @deprecated since 1.2, use CF::controller()
+     */
     public static $instance;
-
-    // The multiple instance of the controller when callback when routing is failed or redirected
-    public static $instances;
-
-    // The current user agent
-    public static $user_agent;
-
-    // The current locale
-    public static $locale;
 
     /**
      * Chartset used for this application.
@@ -30,11 +28,6 @@ final class CF {
      * @var string
      */
     public static $charset = 'utf-8';
-
-    /* log threshold default , CLogger::LOG_WARNING (4) */
-    public static $log_threshold = LOG_WARNING; // 4
-
-    public static $global_xss_filtering = true;
 
     /**
      * Logger Instance.
@@ -44,24 +37,25 @@ final class CF {
     public static $logger;
 
     /**
-     * Config Instance.
+     * The current locale.
      *
-     * @var CConfig config object
+     * @var string
      */
-    public static $config;
-
-    // Configuration
-    private static $configuration;
+    private static $locale;
 
     /**
-     * Include paths cache.
+     * The fallback locale.
+     *
+     * @var string
+     */
+    private static $fallbackLocale;
+
+    /**
+     *  Internal caches for faster loading.
      *
      * @var array
      */
-    private static $paths;
-
-    // Internal caches and write status
-    private static $internal_cache = [];
+    private static $internalCache = [];
 
     /**
      * CF Data domain.
@@ -77,15 +71,17 @@ final class CF {
      */
     private static $sharedAppCode = [];
 
-    private static $translator;
-
     /**
      * Check CF is running on production.
      *
      * @return bool
      */
     public static function isProduction() {
-        return defined('IN_PRODUCTION') && IN_PRODUCTION;
+        if (defined('IN_PRODUCTION') && IN_PRODUCTION) {
+            return true;
+        }
+
+        return CF::config('app.environment') === 'production';
     }
 
     /**
@@ -143,26 +139,6 @@ final class CF {
         // Start the environment setup benchmark
         CFBenchmark::start(SYSTEM_BENCHMARK . '_environment_setup');
 
-        $capppath = APPPATH;
-        $defaultpath = APPPATH;
-        if (strlen(self::appCode()) > 0) {
-            $capppath .= self::appCode() . DS;
-            $defaultpath .= self::appCode() . DS;
-        }
-        if (strlen(self::orgCode()) > 0) {
-            $capppath .= self::orgCode() . DS;
-        }
-
-        if (is_dir($defaultpath . 'default' . DS)) {
-            $defaultpath .= 'default' . DS;
-        }
-        if (is_dir($capppath . 'default' . DS)) {
-            $capppath .= 'default' . DS;
-        }
-
-        define('CAPPPATH', $capppath);
-        define('DEFAULTPATH', $defaultpath);
-
         // Define CF error constant
         define('E_CF', 42);
 
@@ -178,14 +154,8 @@ final class CF {
         // Set and test the logger instance, we need to know whats wrong when CF Fail
         self::$logger = CLogger::instance();
 
-        // Set and test the config, we need config can loaded normally to run CF
-        self::$config = CConfig::instance('app');
-
         // Disable notices and "strict" errors
         $ER = error_reporting(~E_NOTICE & ~E_STRICT);
-
-        // Set the user agent
-        self::$user_agent = (!empty($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '');
 
         if (function_exists('date_default_timezone_set')) {
             $timezone = self::config('app.timezone');
@@ -206,6 +176,8 @@ final class CF {
 
         // Set locale information
         self::$locale = setlocale(LC_ALL, $locale);
+        // Set locale information
+        self::$fallbackLocale = self::config('app.fallback_locale');
 
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
         static::loadBootstrapFiles();
@@ -394,11 +366,12 @@ final class CF {
     /**
      * @param string $directory
      * @param string $domain
+     * @param mixed  $withShared
      *
      * @return array array of directory
      */
-    public static function getDirs($directory, $domain = null) {
-        $includePaths = CF::paths($domain);
+    public static function getDirs($directory, $domain = null, $withShared = true) {
+        $includePaths = CF::paths($domain, false, $withShared);
         $dirs = [];
         foreach ($includePaths as $p) {
             $path = $p . $directory . DS;
@@ -456,20 +429,26 @@ final class CF {
      * paths in the order they are configured, follow by the SYSPATH.
      *
      * @param null|mixed $domain
-     * @param bool       $force_reload
+     * @param bool       $forceReload
+     * @param mixed      $withShared
      *
      * @return array
      */
-    public static function paths($domain = null, $force_reload = false) {
+    public static function paths($domain = null, $forceReload = false, $withShared = true) {
         if ($domain == null) {
             $domain = CF::domain($domain);
         }
-        if (!isset(self::$paths[$domain]) || $force_reload) {
+
+        $cacheKey = 'paths.' . $domain . '.' . ($withShared ? 'withShared' : 'withoutShared');
+        $paths = null;
+        if (!$forceReload) {
+            $paths = static::getInternalCache($cacheKey);
+        }
+        if ($paths === null) {
             //we try to search all paths for this domain
             $paths = [];
             $orgCode = CF::orgCode($domain);
             $appCode = CF::appCode($domain);
-            $sharedAppCode = CF::getSharedApp($domain);
 
             $modules = CF::modules($domain);
             //when this domain is org
@@ -480,12 +459,15 @@ final class CF {
                 //add theme path if theme exists
                 $paths[] = APPPATH . $appCode . DS . 'default' . DS;
             }
-            foreach ($sharedAppCode as $key => $value) {
-                if (strlen($orgCode) > 0) {
-                    //add theme path if theme exists
-                    $paths[] = APPPATH . $value . DS . $orgCode . DS;
+            if ($withShared) {
+                $sharedAppCode = CF::getSharedApp($domain);
+                foreach ($sharedAppCode as $key => $value) {
+                    if (strlen($orgCode) > 0) {
+                        //add theme path if theme exists
+                        $paths[] = APPPATH . $value . DS . $orgCode . DS;
+                    }
+                    $paths[] = APPPATH . $value . DS . 'default' . DS;
                 }
-                $paths[] = APPPATH . $value . DS . 'default' . DS;
             }
 
             foreach ($modules as $module) {
@@ -493,10 +475,10 @@ final class CF {
             }
             $paths[] = SYSPATH;
             $paths[] = DOCROOT;
-            self::$paths[$domain] = $paths;
+            static::setInternalCache($cacheKey, $paths);
         }
 
-        return self::$paths[$domain];
+        return $paths;
     }
 
     /**
@@ -585,9 +567,8 @@ final class CF {
 
         $classNotFound = false;
         if ($type == 'controllers') {
-            if ($filename = self::findFile($type, $file)) {
+            if ($filename = self::findFile($type, $file, false, false, false, false)) {
                 require $filename;
-                $classNotFound = true;
 
                 return true;
             } else {
@@ -701,7 +682,7 @@ final class CF {
             return false;
         }
 
-        if ($filename = self::findFile($type, self::$configuration['core']['extension_prefix'] . $class)) {
+        if ($filename = self::findFile($type, $class)) {
             // Load the class extension
             require $filename;
         } elseif ($suffix !== 'Core' and class_exists($class . '_Core', false)) {
@@ -786,17 +767,18 @@ final class CF {
      * to the order of the include paths. Configuration and i18n files will be
      * returned in reverse order.
      *
-     * @param mixed $directory directory to search in
-     * @param mixed $filename  filename to look for (without extension)
-     * @param mixed $required  file required
-     * @param mixed $ext       file extension
+     * @param mixed $directory  directory to search in
+     * @param mixed $filename   filename to look for (without extension)
+     * @param mixed $required   file required
+     * @param mixed $ext        file extension
      * @param mixed $reload
+     * @param mixed $withShared
      *
-     * @throws CException if file is required and not found
+     * @throws Exception if file is required and not found
      *
      * @return array|string|bool if the type is config, i18n or l10n,
      */
-    public static function findFile($directory, $filename, $required = false, $ext = false, $reload = false) {
+    public static function findFile($directory, $filename, $required = false, $ext = false, $reload = false, $withShared = true) {
         // NOTE: This test MUST be not be a strict comparison (===), or empty
         // extensions will be allowed!
         if ($ext == '') {
@@ -810,85 +792,53 @@ final class CF {
         // Search path
         $search = $directory . '/' . $filename . $ext;
 
-        if (isset(self::$internal_cache['find_file_paths'][$search]) && !$reload) {
-            return self::$internal_cache['find_file_paths'][$search];
-        }
-
-        // Load include paths
-        $paths = self::paths(null, $reload);
-
         // Nothing found, yet
         $found = null;
-
-        if ($directory === 'config' or $directory === 'i18n') {
-            // Search in reverse, for merging
-            $paths = array_reverse($paths);
-
-            foreach ($paths as $path) {
-                if (static::isFile($path . $search)) {
-                    // A matching file has been found
-                    $found[] = $path . $search;
-                }
-            }
-        } else {
-            foreach ($paths as $path) {
-                if (static::isFile($path . $search)) {
-                    // A matching file has been found
-                    $found = $path . $search;
-
-                    // Stop searching
-                    break;
-                }
-            }
+        $cacheKey = 'find_file_paths.' . $search . '.' . ($withShared ? 'withShared' : 'withoutShared');
+        if (!$reload) {
+            $found = static::getInternalCache($cacheKey);
         }
 
         if ($found === null) {
-            if ($required === true) {
-                // If the file is required, throw an exception
-                $lang = static::lang('core.resource_not_found', [':directory' => $directory, ':filename' => $filename]);
+            // Load include paths
+            $paths = self::paths(null, $reload, $withShared);
 
-                throw new CException($lang);
+            if ($directory === 'config' or $directory === 'i18n') {
+                // Search in reverse, for merging
+                $paths = array_reverse($paths);
+
+                foreach ($paths as $path) {
+                    if (static::isFile($path . $search)) {
+                        // A matching file has been found
+                        $found[] = $path . $search;
+                    }
+                }
             } else {
-                // Nothing was found, return FALSE
-                $found = false;
+                foreach ($paths as $path) {
+                    if (static::isFile($path . $search)) {
+                        // A matching file has been found
+                        $found = $path . $search;
+
+                        // Stop searching
+                        break;
+                    }
+                }
             }
+
+            if ($found === null) {
+                if ($required === true) {
+                    // If the file is required, throw an exception
+                    throw new Exception(c::__('core.resource_not_found', [':directory' => $directory, ':filename' => $filename]));
+                } else {
+                    // Nothing was found, return FALSE
+                    $found = false;
+                }
+            }
+
+            static::setInternalCache($cacheKey, $found);
         }
 
-        if (!isset(self::$write_cache['find_file_paths'])) {
-            // Write cache at shutdown
-            self::$write_cache['find_file_paths'] = true;
-        }
-
-        return self::$internal_cache['find_file_paths'][$search] = $found;
-    }
-
-    /**
-     * Fetch an i18n language item.
-     *
-     * @param null|string $key    language key to fetch
-     * @param null|array  $args   argument for replace
-     * @param null|array  $locale additional information to insert into the line
-     *
-     * @return string i18n language string, or the requested key if the i18n item is not found
-     */
-    public static function lang($key = null, array $args = [], $locale = null) {
-        if ($key === null) {
-            return CTranslation::translator();
-        }
-
-        return CTranslation::translator()->trans($key, $args, $locale);
-    }
-
-    /**
-     * Fetch an i18n language item.
-     *
-     * @param null|mixed $key  language key to fetch
-     * @param array      $args additional information to insert into the line
-     *
-     * @return string i18n language string, or the requested key if the i18n item is not found
-     */
-    public static function trans($key = null, array $args = []) {
-        static::lang($key, $args);
+        return $found;
     }
 
     /**
@@ -987,10 +937,8 @@ final class CF {
     public static function addSharedApp($appCode) {
         if (!in_array($appCode, self::$sharedAppCode)) {
             self::$sharedAppCode[] = $appCode;
-            //do force reload
-            //self::paths(null, true);
-            self::$paths = [];
-            self::$internal_cache = [];
+            //clear all internal cache
+            static::clearInternalCache();
         }
     }
 
@@ -1041,116 +989,6 @@ final class CF {
     }
 
     /**
-     * Call the given Closure with the given value then return the value.
-     *
-     * @param mixed         $value
-     * @param null|callable $callback
-     *
-     * @return mixed
-     *
-     * @deprecated since 1.2, use c::tap
-     */
-    public static function tap($value, $callback = null) {
-        return c::tap($value, $callback);
-    }
-
-    /**
-     * Get the class "basename" of the given object / class.
-     *
-     * @param string|object $class
-     *
-     * @return string
-     *
-     * @deprecated  since 1.2, use c::classBlasename
-     */
-    public static function classBasename($class) {
-        return c::classBasename($class);
-    }
-
-    /**
-     * Returns all traits used by a class, its subclasses and trait of their traits.
-     *
-     * @param object|string $class
-     *
-     * @return array
-     *
-     * @deprecated since 1.2, use c::classUsesRecursive
-     */
-    public static function classUsesRecursive($class) {
-        return c::classUsesRecursive($class);
-    }
-
-    /**
-     * Returns all traits used by a trait and its traits.
-     *
-     * @param string $trait
-     *
-     * @return array
-     *
-     * @deprecated since 1.2, use c::traitUsesRecursive
-     */
-    public static function traitUsesRecursive($trait) {
-        return c::traitUsesRecursive($trait);
-    }
-
-    /**
-     * Return the default value of the given value.
-     *
-     * @param mixed $value
-     *
-     * @return mixed
-     *
-     * @deprecated 1.2 use c::value
-     */
-    public static function value($value) {
-        return c::value($value);
-    }
-
-    /**
-     * Get an item from an array or object using "dot" notation.
-     *
-     * @param mixed        $target
-     * @param string|array $key
-     * @param mixed        $default
-     *
-     * @return mixed
-     *
-     * @deprecated 1.2 use c::dataGet
-     */
-    public static function get($target, $key, $default = null) {
-        return c::get($target, $key, $default);
-    }
-
-    /**
-     * Set an item on an array or object using dot notation.
-     *
-     * @param mixed        $target
-     * @param string|array $key
-     * @param mixed        $value
-     * @param bool         $overwrite
-     *
-     * @return mixed
-     *
-     * @deprecated 1.2 use c::dataSet
-     */
-    public static function set(&$target, $key, $value, $overwrite = true) {
-        return c::set($target, $key, $value);
-    }
-
-    /**
-     * Create a collection from the given value.
-     *
-     * @param mixed $value
-     *
-     * @return CCollection
-     *
-     * @deprecated 1.1, use c::collect
-     */
-    public static function collect($value = null) {
-        return c::collect($value);
-    }
-
-    /**
      * @return string
      */
     public static function version() {
@@ -1175,6 +1013,11 @@ final class CF {
         return DOCROOT . 'application/' . $appCode . '/';
     }
 
+    /**
+     * Get current running controller.
+     *
+     * @return CController
+     */
     public static function currentController() {
         return CHTTP::kernel()->controller();
     }
@@ -1185,21 +1028,50 @@ final class CF {
      * @return string
      */
     public static function getLocale() {
-        return CF::config('app.locale');
+        return static::$locale;
     }
 
+    /**
+     * Get the current application fallback locale.
+     *
+     * @return string
+     */
+    public static function getFallbackLocale() {
+        return static::$fallbackLocale;
+    }
+
+    /**
+     * Set the current application locale.
+     *
+     * @param string $locale
+     *
+     * @return void
+     */
     public static function setLocale($locale) {
-        /*
-          CF::config('app')->set('locale', $locale);
-
-          CTranslation::translator()->setLocale($locale);
-
-          CEvent::dispatch('cf.locale.updated');
-         *
-         */
-        //$this['events']->dispatch(new CBase_Events_LocaleUpdated($locale));
+        static::$locale = $locale;
+        CTranslation::translator()->setLocale($locale);
+        CEvent::dispatch('cf.locale.updated');
     }
 
+    /**
+     * Set the current application fallback locale.
+     *
+     * @param string $fallbackLocale
+     *
+     * @return void
+     */
+    public function setFallbackLocale($fallbackLocale) {
+        // static::$fallbackLocale = $fallbackLocale;
+        // CTranslation::translator()->setFallback($locale);
+    }
+
+    /**
+     * Get current application directory.
+     *
+     * @param null|string $appCode
+     *
+     * @return bool
+     */
     public static function appDir($appCode = null) {
         if ($appCode == null) {
             $appCode = static::appCode();
@@ -1208,10 +1080,20 @@ final class CF {
         return DOCROOT . 'application' . DS . $appCode;
     }
 
+    /**
+     * Check if CF is run under devsuite.
+     *
+     * @return bool
+     */
     public static function isDevSuite() {
         return cstr::endsWith(CF::domain(), '.test');
     }
 
+    /**
+     * Check if CF is run under testing.
+     *
+     * @return bool
+     */
     public static function isTesting() {
         if (defined('CFTesting')
             || (is_array($_SERVER) && isset($_SERVER['APP_ENV']) && $_SERVER['APP_ENV'] == 'testing')
@@ -1222,6 +1104,11 @@ final class CF {
         return false;
     }
 
+    /**
+     * Return all app availables.
+     *
+     * @return array
+     */
     public static function getAvailableAppCode() {
         $path = DOCROOT . 'application';
         $directories = CFile::directories($path);
@@ -1229,5 +1116,81 @@ final class CF {
         return c::collect($directories)->map(function ($v) {
             return basename($v);
         })->all();
+    }
+
+    /**
+     * Get CF internal cache.
+     *
+     * @param string     $key
+     * @param null|mixed $default
+     *
+     * @return mixed
+     */
+    private static function getInternalCache($key, $default = null) {
+        if (isset(static::$internalCache[$key])) {
+            return static::$internalCache[$key];
+        }
+
+        return $default;
+    }
+
+    /**
+     * Set CF internal cache.
+     *
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return void
+     */
+    private static function setInternalCache($key, $value) {
+        static::$internalCache[$key] = $value;
+    }
+
+    /**
+     * Clear CF internal cache.
+     *
+     * @return void
+     */
+    private static function clearInternalCache() {
+        static::$internalCache = [];
+    }
+
+    public static function isDownForMaintenance() {
+        $file = CF::findFile('data', 'down');
+
+        if ($file != null) {
+            $data = @include $file;
+            $viewName = 'system.maintenance';
+            $down = false;
+            if (is_array($data)) {
+                $down = carr::get($data, 'down', true);
+                if ($down) {
+                    $request = CHTTP::request();
+
+                    if (isset($request->cookie()[carr::get($data, 'cookie', '')])) {
+                        return false;
+                    }
+                    $viewName = carr::get($data, 'view', $viewName);
+                }
+            }
+
+            if ($down) {
+                return c::response()->view($viewName, ['data' => $data], 503);
+            }
+        }
+
+        return false;
+    }
+
+    public static function asAppCode($appCode, $callback) {
+        if (is_callable($callback)) {
+            $domain = CF::domain();
+            $originalAppCode = static::appCode();
+            if ($originalAppCode) {
+                static::$data[$domain]['app_code'] = $appCode;
+                $callback();
+                static::$data[$domain]['app_code'] = $originalAppCode;
+            }
+        }
     }
 }

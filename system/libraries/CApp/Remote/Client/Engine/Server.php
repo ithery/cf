@@ -16,11 +16,13 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
 
     public function getPHPInfo() {
         $data = $this->request($this->baseUrl . 'GetPHPInfo');
+
         return $data;
     }
 
     public function getDomainList() {
         $data = $this->request($this->baseUrl . 'GetDomainList');
+
         return $data;
     }
 
@@ -28,16 +30,19 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
         $post = [];
         $post['domain'] = $domain;
         $data = $this->request($this->baseUrl . 'GetDomainInfo', $post);
+
         return $data;
     }
 
     public function getServerInfo() {
         $data = $this->request($this->baseUrl . 'GetServerInfo');
+
         return $data;
     }
 
     public function getServerStorageInfo() {
         $data = $this->request($this->baseUrl . 'GetServerStorageInfo');
+
         return $data;
     }
 
@@ -45,6 +50,7 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
         $post = [];
         $post['domain'] = $domain;
         $data = $this->request($this->baseUrl . 'DomainDelete', $post);
+
         return $data;
     }
 
@@ -52,11 +58,13 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
         $post = [];
         $post['directory'] = $directory;
         $data = $this->request($this->baseUrl . 'GetFileList', $post);
+
         return $data;
     }
 
     public function temp($post) {
         $data = $this->request($this->baseUrl . 'Temp', $post);
+
         return $data;
     }
 
@@ -64,6 +72,7 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
         $post = [];
         $post['command'] = 'listFile';
         $post['directory'] = $directory;
+
         return $this->temp($post);
     }
 
@@ -71,6 +80,7 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
         $post = [];
         $post['command'] = 'content';
         $post['file'] = $file;
+
         return $this->temp($post);
     }
 
@@ -78,6 +88,7 @@ class CApp_Remote_Client_Engine_Server extends CApp_Remote_Client_Engine {
         $post = [];
         $post['command'] = 'content';
         $post['file'] = $file;
+
         return $this->temp($post);
     }
 }
