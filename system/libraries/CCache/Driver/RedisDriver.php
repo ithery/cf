@@ -182,6 +182,14 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract implements
      * @return CCache_LockInterface
      */
     public function lock($name, $seconds = 0, $owner = null) {
+        $lockName = $this->prefix . $name;
+
+        $lockConnection = $this->lockConnection();
+
+        if ($lockConnection instanceof CRedis_Connection_PhpRedisConnection) {
+            return new CCache_Lock_PhpRedisLock($lockConnection, $lockName, $seconds, $owner);
+        }
+
         return new CCache_Lock_RedisLock($this->connection(), $this->prefix . $name, $seconds, $owner);
     }
 
@@ -243,6 +251,15 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract implements
     }
 
     /**
+     * Get the Redis connection instance that should be used to manage locks.
+     *
+     * @return \CRedis_Connection_PhpRedisConnection
+     */
+    public function lockConnection() {
+        return $this->redis->connection($this->lockConnection ?? $this->connection);
+    }
+
+    /**
      * Set the connection name to be used.
      *
      * @param string $connection
@@ -251,6 +268,19 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract implements
      */
     public function setConnection($connection) {
         $this->connection = $connection;
+    }
+
+    /**
+     * Specify the name of the connection that should be used to manage locks.
+     *
+     * @param string $connection
+     *
+     * @return $this
+     */
+    public function setLockConnection($connection) {
+        $this->lockConnection = $connection;
+
+        return $this;
     }
 
     /**

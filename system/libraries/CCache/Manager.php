@@ -1,4 +1,5 @@
 <?php
+use Aws\DynamoDb\DynamoDbClient;
 
 class CCache_Manager {
     /**
@@ -168,7 +169,7 @@ class CCache_Manager {
      * @return \CCache_Repository
      */
     protected function createNullDriver() {
-        return $this->repository(new CCache_Driver_NullDriver());
+        return $this->repository(new CCache_Driver_NullDriver([]));
     }
 
     /**
@@ -224,7 +225,7 @@ class CCache_Manager {
         $client = $this->newDynamodbClient($config);
 
         return $this->repository(
-            new DynamoDbStore(
+            new CCache_Driver_DynamoDbDriver(
                 $client,
                 $config['table'],
                 $config['attributes']['key'] ?? 'key',
@@ -248,7 +249,7 @@ class CCache_Manager {
         ];
 
         if (isset($config['key'], $config['secret'])) {
-            $dynamoConfig['credentials'] = Arr::only(
+            $dynamoConfig['credentials'] = carr::only(
                 $config,
                 ['key', 'secret', 'token']
             );
