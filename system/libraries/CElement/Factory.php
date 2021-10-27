@@ -147,7 +147,7 @@ class CElement_Factory {
      * @param string $id
      * @param string $type
      *
-     * @throws CException
+     * @throws Exception
      *
      * @return CElement_FormInput
      */
