@@ -10,7 +10,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable {
     use CTrait_Macroable;
-
     /**
      * The items contained in the collection.
      *
@@ -104,7 +103,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     /**
      * Get the average value of a given key.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -117,7 +116,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     /**
      * Alias for the "avg" method.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -158,7 +157,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      *
      * @param mixed $key
      *
-     * @return array|null
+     * @return null|array
      */
     public function mode($key = null) {
         $count = $this->count();
@@ -229,7 +228,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     public function containsStrict($key, $value = null) {
         if (func_num_args() == 2) {
             return $this->contains(function ($item) use ($key, $value) {
-                return carr::path($item, $key) === $value;
+                return carr::get($item, $key) === $value;
             });
         }
 
@@ -397,7 +396,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     /**
      * Run a filter over each of the items.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return static
      */
@@ -421,8 +420,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     public function when($value, callable $callback, callable $default = null) {
         if ($value) {
             return $callback($this, $value);
-        }
-        if ($default) {
+        } elseif ($default) {
             return $default($this, $value);
         }
 
@@ -534,7 +532,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         $values = $this->getArrayableItems($values);
 
         return $this->filter(function ($item) use ($key, $values, $strict) {
-            return in_array(carr::path($item, $key), $values, $strict);
+            return in_array(carr::get($item, $key), $values, $strict);
         });
     }
 
@@ -563,7 +561,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         $values = $this->getArrayableItems($values);
 
         return $this->reject(function ($item) use ($key, $values, $strict) {
-            return in_array(carr::path($item, $key), $values, $strict);
+            return in_array(carr::get($item, $key), $values, $strict);
         });
     }
 
@@ -595,7 +593,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     /**
      * Get the first item from the collection.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      * @param mixed         $default
      *
      * @return mixed
@@ -830,7 +828,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     /**
      * Get the last item from the collection.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      * @param mixed         $default
      *
      * @return mixed
@@ -843,7 +841,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      * Get the values of a given key.
      *
      * @param string|array $value
-     * @param string|null  $key
+     * @param null|string  $key
      *
      * @return static
      */
@@ -966,7 +964,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     /**
      * Get the max value of a given key.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -1018,7 +1016,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     /**
      * Get the min value of a given key.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -1205,7 +1203,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     /**
      * Get one or a specified number of items randomly from the collection.
      *
-     * @param int|null $number
+     * @param null|int $number
      *
      * @throws \InvalidArgumentException
      *
@@ -1366,7 +1364,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     /**
      * Sort through each item with a callback.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return static
      */
@@ -1427,7 +1425,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
      * Splice a portion of the underlying collection array.
      *
      * @param int      $offset
-     * @param int|null $length
+     * @param null|int $length
      * @param mixed    $replacement
      *
      * @return static
@@ -1443,7 +1441,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     /**
      * Get the sum of the given values.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -1503,7 +1501,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     /**
      * Return only unique items from the collection array.
      *
-     * @param string|callable|null $key
+     * @param null|string|callable $key
      * @param bool                 $strict
      *
      * @return static
@@ -1529,7 +1527,7 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     /**
      * Return only unique items from the collection array using strict comparison.
      *
-     * @param string|callable|null $key
+     * @param null|string|callable $key
      *
      * @return static
      */
@@ -1617,11 +1615,9 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
         return array_map(function ($value) {
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
-            }
-            if ($value instanceof CInterface_Jsonable) {
+            } elseif ($value instanceof CInterface_Jsonable) {
                 return json_decode($value->toJson(), true);
-            }
-            if ($value instanceof CInterface_Arrayable) {
+            } elseif ($value instanceof CInterface_Arrayable) {
                 return $value->toArray();
             } else {
                 return $value;
@@ -1746,20 +1742,15 @@ class CCollection implements ArrayAccess, Countable, IteratorAggregate, JsonSeri
     protected function getArrayableItems($items) {
         if (is_array($items)) {
             return $items;
-        }
-        if ($items instanceof self) {
+        } elseif ($items instanceof self) {
             return $items->all();
-        }
-        if ($items instanceof CInterface_Arrayable) {
+        } elseif ($items instanceof CInterface_Arrayable) {
             return $items->toArray();
-        }
-        if ($items instanceof CInterface_Jsonable) {
+        } elseif ($items instanceof CInterface_Jsonable) {
             return json_decode($items->toJson(), true);
-        }
-        if ($items instanceof JsonSerializable) {
+        } elseif ($items instanceof JsonSerializable) {
             return $items->jsonSerialize();
-        }
-        if ($items instanceof Traversable) {
+        } elseif ($items instanceof Traversable) {
             return iterator_to_array($items);
         }
 

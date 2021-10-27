@@ -1,23 +1,27 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Nov 18, 2017, 9:05:59 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Nov 18, 2017, 9:05:59 PM
  */
 class CElastic_Indices {
-
     protected $index;
+
     protected $document_type;
 
     /*
      * @var Elasticsearch\Client
      */
     protected $elastic;
+
     protected $client;
+
     protected $mappings;
+
     protected $settings;
 
     public function __construct(CElastic $elastic, $index, $document_type) {
@@ -25,33 +29,33 @@ class CElastic_Indices {
         $this->client = $elastic->client();
         $this->index = $index;
         $this->document_type = $document_type;
-        $this->mappings = array();
-        $this->settings = array();
+        $this->mappings = [];
+        $this->settings = [];
     }
 
-    public function add_mapping($document_type, $field_name, $type, $fielddata = true) {
-        $properties = array();
-        if (isset($this->mappings[$document_type]["properties"])) {
-            $properties = $this->mappings[$document_type]["properties"];
+    public function addMapping($document_type, $field_name, $type, $fielddata = true) {
+        $properties = [];
+        if (isset($this->mappings[$document_type]['properties'])) {
+            $properties = $this->mappings[$document_type]['properties'];
         }
-        $properties[$field_name] = array(
+        $properties[$field_name] = [
             'type' => $type,
             'fielddata' => $fielddata
-        );
-        $this->mappings[$document_type]["properties"] = $properties;
+        ];
+        $this->mappings[$document_type]['properties'] = $properties;
     }
 
-    public function add_setting($key, $value) {
+    public function addSetting($key, $value) {
         $this->settings[$key] = $value;
     }
 
     public function create() {
-        $params = array();
+        $params = [];
         $params['index'] = $this->index;
-        
+
         //build the body
-        $body = array();
-        if(count($this->settings) > 0) {
+        $body = [];
+        if (count($this->settings) > 0) {
             $body['settings'] = $this->settings;
         }
         if (count($this->mappings) > 0) {
@@ -60,141 +64,139 @@ class CElastic_Indices {
 
         $params['body'] = $body;
 
-        if (self::exists() != 1) {
+        if ($this->exists() != 1) {
             try {
                 $this->client->indices()->create($params);
-            } catch(Exception $e) {
-                throw new Exception($this->index . "-" . $e->getMessage(), 1);
+            } catch (Exception $e) {
+                throw new Exception($this->index . '-' . $e->getMessage(), 1);
             }
         } else {
-            throw new Exception($this->index . " - Index is Exists", 1);
+            throw new Exception($this->index . ' - Index is Exists', 1);
         }
     }
 
-    public function put_mapping() {
-        $params = array();
+    public function putMapping() {
+        $params = [];
         $params['index'] = $this->index;
-        if(strlen($this->document_type) > 0) {
+        if (strlen($this->document_type) > 0) {
             $params['type'] = $this->document_type;
         }
-        
+
         //build the body
         if (count($this->mappings) > 0) {
             $params['body'] = $this->mappings;
         }
 
-        if (self::exists() == 1) {
+        if ($this->exists() == 1) {
             try {
                 $this->client->indices()->putMapping($params);
-            } catch(Exception $e) {
-                throw new Exception($this->index . " " . $this->document_type . "-" . $e->getMessage(), 1);
+            } catch (Exception $e) {
+                throw new Exception($this->index . ' ' . $this->document_type . '-' . $e->getMessage(), 1);
             }
         } else {
-            throw new Exception($this->index . " - Index Not Found", 1);
+            throw new Exception($this->index . ' - Index Not Found', 1);
         }
     }
 
-    public function put_setting() {
-        $params = array();
+    public function putSetting() {
+        $params = [];
         $params['index'] = $this->index;
-        
+
         //build the body
-        $body = array();
-        if(count($this->settings) > 0) {
+        $body = [];
+        if (count($this->settings) > 0) {
             $body['settings'] = $this->settings;
         }
 
         $params['body'] = $body;
 
-        if (self::exists() == 1) {
+        if ($this->exists() == 1) {
             try {
                 $this->client->indices()->putSettings($params);
-            } catch(Exception $e) {
-                throw new Exception($this->index . "-" . $e->getMessage(), 1);
+            } catch (Exception $e) {
+                throw new Exception($this->index . '-' . $e->getMessage(), 1);
             }
         } else {
-            throw new Exception($this->index . " - Index Not Found", 1);
+            throw new Exception($this->index . ' - Index Not Found', 1);
         }
     }
 
-    public function get_mapping() {
-        $params = array();
+    public function getMapping() {
+        $params = [];
         $params['index'] = $this->index;
-        if(strlen($this->document_type) > 0) {
+        if (strlen($this->document_type) > 0) {
             $params['type'] = $this->document_type;
         }
 
-        $result;
-        if (self::exists() == 1) {
+        if ($this->exists() == 1) {
             try {
                 $result = $this->client->indices()->getMapping($params);
-            } catch(Exception $e) {
-                throw new Exception($this->index . " " . $this->document_type . "-" . $e->getMessage(), 1);
+
+                return $result;
+            } catch (Exception $e) {
+                throw new Exception($this->index . ' ' . $this->document_type . '-' . $e->getMessage(), 1);
             }
         } else {
-            throw new Exception($this->index . " - Index Not Found", 1);
+            throw new Exception($this->index . ' - Index Not Found', 1);
         }
-
-        return $result;
     }
 
-    public function get_setting() {
-        $params = array();
+    public function getSetting() {
+        $params = [];
         $params['index'] = $this->index;
 
-        $result;
-        if (self::exists() == 1) {
+        if ($this->exists() == 1) {
             try {
                 $result = $this->client->indices()->getSettings($params);
-            } catch(Exception $e) {
-                throw new Exception($this->index . "-" . $e->getMessage(), 1);
+
+                return $result;
+            } catch (Exception $e) {
+                throw new Exception($this->index . '-' . $e->getMessage(), 1);
             }
         } else {
-            throw new Exception($this->index . " - Index Not Found", 1);
+            throw new Exception($this->index . ' - Index Not Found', 1);
         }
-
-        return $result;
     }
 
     public function delete() {
-        $params = array();
+        $params = [];
         $params['index'] = $this->index;
 
-        $result;
-        if (self::exists() == 1) {
+        if ($this->exists() == 1) {
             try {
                 $result = $this->client->indices()->delete($params);
-            } catch(Exception $e) {
-                throw new Exception($this->index . "-" . $e->getMessage(), 1);
+
+                return $result;
+            } catch (Exception $e) {
+                throw new Exception($this->index . '-' . $e->getMessage(), 1);
             }
         } else {
-            throw new Exception($this->index . " - Index Not Found", 1);
+            throw new Exception($this->index . ' - Index Not Found', 1);
         }
-        return $result;
     }
 
-    public function delete_mapping() {
-        $params = array();
+    public function deleteMapping() {
+        $params = [];
         $params['index'] = $this->index;
-        if(strlen($this->document_type) > 0) {
+        if (strlen($this->document_type) > 0) {
             $params['type'] = $this->document_type;
         }
 
-        $result;
-        if (self::exists() == 1) {
+        if ($this->exists() == 1) {
             try {
                 $result = $this->client->indices()->deleteMapping($params);
-            } catch(Exception $e) {
-                throw new Exception($this->index . "-" . $e->getMessage(), 1);
+
+                return $result;
+            } catch (Exception $e) {
+                throw new Exception($this->index . '-' . $e->getMessage(), 1);
             }
         } else {
-            throw new Exception($this->index . " - Index Not Found", 1);
+            throw new Exception($this->index . ' - Index Not Found', 1);
         }
-        return $result;
     }
 
     public function exists() {
-        $params = array();
+        $params = [];
         $params['index'] = $this->index;
 
         $result = $this->client->indices()->exists($params);

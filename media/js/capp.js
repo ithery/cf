@@ -1460,6 +1460,12 @@ let Cresenity = function () {
         });
     };
 
+    this.replaceAll = function (string, find, replace) {
+        let escapedFind = find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
+        return string.replace(new RegExp(escapedFind, 'g'), replace);
+    };
+
+
     this.formatCurrency = function (rp) {
         rp = '' + rp;
         let rupiah = '';
@@ -1489,6 +1495,22 @@ let Cresenity = function () {
         vfloat = vfloat.replace('.', ds);
         if (vfloat.length > dd) {vfloat = vfloat.substring(0, dd + 1);}
         return minus_str + rupiah + vfloat;
+    };
+
+    this.unformatCurrency = function (rp) {
+        if (typeof rp == 'undefined') {
+            rp = '';
+        }
+        let ds = window.capp.decimal_separator;
+        let ts = window.capp.thousand_separator;
+        let last3 = rp.substr(rp.length - 3);
+        let char_last3 = last3.charAt(0);
+        if (char_last3 != ts) {
+            rp = this.replaceAll(rp, ts, '');
+        }
+
+        rp = rp.replace(ds, '.');
+        return rp;
     };
 
     this.getStyles = (selector, only, except) => {
