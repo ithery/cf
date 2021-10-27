@@ -611,6 +611,11 @@ export default class Cresenity {
         });
     }
 
+    replaceAll(string, find, replace) {
+        let escapedFind = find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
+        return string.replace(new RegExp(escapedFind, 'g'), replace);
+    }
+
     formatCurrency(rp) {
         rp = '' + rp;
         let rupiah = '';
@@ -642,6 +647,22 @@ export default class Cresenity {
             vfloat = vfloat.substring(0, dd + 1);
         }
         return minusStr + rupiah + vfloat;
+    }
+
+    unformatCurrency(rp) {
+        if (typeof rp == 'undefined') {
+            rp = '';
+        }
+        let ds = window.capp.decimal_separator;
+        let ts = window.capp.thousand_separator;
+        let last3 = rp.substr(rp.length - 3);
+        let char_last3 = last3.charAt(0);
+        if (char_last3 != ts) {
+            rp = this.replaceAll(rp, ts, '');
+        }
+
+        rp = rp.replace(ds, '.');
+        return rp;
     }
 
     getStyles(selector, only, except) {

@@ -2,6 +2,7 @@
 class CAjax_Engine_DataTableExporter extends CAjax_Engine {
     public function createProcessor($type) {
         $class = 'CAjax_Engine_DataTable_ExporterProcessor_' . $type;
+
         return new $class($this);
     }
 

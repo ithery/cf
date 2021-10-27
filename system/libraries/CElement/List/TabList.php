@@ -10,7 +10,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_List_TabList extends CElement_List {
     use CTrait_Compat_Element_TabList;
-
     protected $tabs;
 
     protected $tabPosition;
@@ -29,6 +28,12 @@ class CElement_List_TabList extends CElement_List {
 
     protected $paramRequest;
 
+    protected $widgetWrapperClass;
+
+    protected $widgetBodyClass;
+
+    protected $widgetHeaderClass;
+
     public function __construct($id) {
         parent::__construct($id);
 
@@ -41,6 +46,9 @@ class CElement_List_TabList extends CElement_List {
         $this->header = null;
         $this->jsHeader = '';
         $this->paramRequest = [];
+        $this->widgetWrapperClass = c::theme('widget.class.wrapper', 'widget-box');
+        $this->widgetBodyClass = c::theme('widget.class.body', 'widget-content');
+        $this->widgetHeaderClass = c::theme('widget.class.header', 'widget-title');
     }
 
     /**
@@ -236,14 +244,10 @@ class CElement_List_TabList extends CElement_List {
                 $html->appendln('           <div class="span10">');
             }
         }
-        if ($this->bootstrap >= '3') {
-            $html->appendln('               <div id="' . $this->id . '-tab-widget" class="box box-warning ' . $widgetClasses . '">');
-            $html->appendln('                   <div class="box-header with-border">');
-        } else {
-            $html->appendln('				<div id="' . $this->id . '-tab-widget" class="widget-box nomargin widget-transaction-tab ' . $widgetClasses . '">');
-            if ($this->tabPosition != 'top') {
-                $html->appendln('					<div class="widget-title">');
-            }
+
+        $html->appendln('				<div id="' . $this->id . '-tab-widget" class="' . $this->widgetWrapperClass . ' nomargin widget-transaction-tab ' . $widgetClasses . '">');
+        if ($this->tabPosition != 'top') {
+            $html->appendln('					<div class="' . $this->widgetHeaderClass . '">');
         }
 
         if ($this->tabPosition != 'top') {
@@ -252,15 +256,11 @@ class CElement_List_TabList extends CElement_List {
                 $html->appendln('							<i class="icon-' . $activeTabIcon . '"></i>');
                 $html->appendln('						</span>');
             }
-            //$html->appendln('<h5>' . $activeTabLabel . '</h5>');
+            $html->appendln('<h5>' . $activeTabLabel . '</h5>');
             $html->appendln('					</div>');
         }
 
-        if ($this->bootstrap >= '3') {
-            $html->appendln('                                       <div class="box-body">');
-        } else {
-            $html->appendln('					<div class="widget-content">');
-        }
+        $html->appendln('					<div class="' . $this->widgetBodyClass . '">');
 
         if ($this->ajax) {
             $html->appendln('						<div id="' . $this->id . '-ajax-tab-content" class="ajax-tab-content">');
@@ -317,11 +317,12 @@ class CElement_List_TabList extends CElement_List {
                     var data_icon = jQuery(this).attr('data-icon');
                     var data_class = jQuery(this).attr('data-class');
                     var data_text = jQuery(this).text();
-                    if(data_icon) widget_tab.find('> .widget-title .icon i').first().attr('class',data_icon);
 
-                    if(data_text) widget_tab.find('> .widget-title h5').first().html(data_text);
-                    var widget_content = widget_tab.find('.widget-content').first();
-                    widget_content.removeAttr('class').addClass('widget-content');
+                    if(data_icon) widget_tab.find('> ." . $this->widgetHeaderClass . " .icon i').first().attr('class',data_icon);
+
+                    if(data_text) widget_tab.find('> ." . $this->widgetHeaderClass . " h5').first().html(data_text);
+                    var widget_content = widget_tab.find('." . $this->widgetBodyClass . "').first();
+                    widget_content.removeAttr('class').addClass('" . $this->widgetBodyClass . "');
 
                     if(data_class) widget_content.addClass(data_class);
                 }

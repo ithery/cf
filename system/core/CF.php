@@ -553,11 +553,9 @@ final class CF {
             // Lowercase filename
 
             $file = substr($class, 0, -11);
-
             if ($prefix) {
                 $file = substr($class, 11);
             }
-
             //$file = str_replace('_', DS, $file);
             $file = implode(DS, array_map(function ($item) {
                 return lcfirst($item);

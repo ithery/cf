@@ -16,12 +16,6 @@ class CElement_Component_Widget extends CElement_Component {
 
     public $height;
 
-    public $scroll;
-
-    public $nopadding;
-
-    public $height;
-
     /**
      * @var CElement_Component_Widget_Header
      */
@@ -80,6 +74,11 @@ class CElement_Component_Widget extends CElement_Component {
         return $this->content;
     }
 
+    /**
+     * @param string $id
+     *
+     * @return CElement_Component_Action
+     */
     public function addHeaderAction($id = '') {
         return $this->header()->addAction($id);
     }
