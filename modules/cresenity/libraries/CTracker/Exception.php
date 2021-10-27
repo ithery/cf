@@ -1,12 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 4:02:27 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 4:02:27 AM
  */
-class CTracker_Exception extends CException {
-    
+class CTracker_Exception extends Exception {
 }
