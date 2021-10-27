@@ -57,3 +57,7 @@ if (isset($_COOKIE['capp-debugbar'])) {
 }
 
 CApp_Auth_Features::setFeatures(CF::config('app.auth.features'));
+
+c::tap(CSession::instance()->store(), function ($session) {
+    $session->setId(c::request()->cookies->get($session->getName()));
+})->start();
