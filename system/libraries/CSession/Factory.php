@@ -18,6 +18,7 @@ class CSession_Factory {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -39,6 +40,7 @@ class CSession_Factory {
         $redisStore = new CCache_Repository($driver);
         $expirationSeconds = carr::get($this->config, 'expiration');
         $handler = new CSession_Driver_Redis($redisStore, $expirationSeconds);
+
         return $handler;
     }
 
@@ -46,7 +48,7 @@ class CSession_Factory {
      * @return \CSession_Handler_NullSessionHandler
      */
     public function createNullDriver() {
-        return new CSession_Handler_NullSessionHandler;
+        return new CSession_Handler_NullSessionHandler();
     }
 
     /**
@@ -112,10 +114,26 @@ class CSession_Factory {
      *
      * @param string $driver
      *
-     * @return \Illuminate\Session\Store
+     * @return \CSession_Store
      */
     public function createCacheBased($driver) {
         return $this->createCacheHandler($driver);
+    }
+
+    /**
+     * Create the cache based session handler instance.
+     *
+     * @param string $driver
+     *
+     * @return CSession_Handler_CacheBasedSessionHandler
+     */
+    protected function createCacheHandler($driver) {
+        $store = $this->config->get('session.store') ?: $driver;
+
+        return new CSession_Handler_CacheBasedSessionHandler(
+            clone $this->container->make('cache')->store($store),
+            $this->config->get('session.lifetime')
+        );
     }
 
     /**
@@ -123,9 +141,9 @@ class CSession_Factory {
      *
      * @param string $driver
      *
-     * @return mixed
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return mixed
      */
     public function createDriver($driver) {
         // First, we will determine if a custom driver creator exists for the given driver and
@@ -135,12 +153,11 @@ class CSession_Factory {
             return $this->callCustomCreator($driver);
         } else {
             $method = 'create' . cstr::studly($driver) . 'Driver';
-
             if (method_exists($this, $method)) {
                 return $this->$method();
             }
         }
 
-        throw new InvalidArgumentException("Driver [$driver] not supported.");
+        throw new InvalidArgumentException("Driver [${driver}] not supported.");
     }
 }
