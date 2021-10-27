@@ -3,6 +3,7 @@
 /**
  * @deprecated 1.2
  */
+//@codingStandardsIgnoreStart
 class CCalendar extends CElement {
     protected $html;
 
@@ -160,6 +161,7 @@ class CCalendar extends CElement {
 
         $html->appendln('</div>');
         $html->appendln($modal_data);
+
         return $html->text();
     }
 
@@ -363,7 +365,7 @@ class CCalendar extends CElement {
     }
 
     /**
-     * This function is used to create new Calendar
+     * This function is used to create new Calendar.
      *
      * @param string $id
      *
@@ -487,16 +489,19 @@ class CCalendar extends CElement {
 
     public function set_url($url) {
         $this->url = $url;
+
         return $this;
     }
 
     public function set_dialog_url($url) {
         $this->dialog_url = $url;
+
         return $this;
     }
 
     public function set_month($month) {
         $this->curr_month = $month;
+
         return $this;
     }
 
@@ -526,11 +531,13 @@ class CCalendar extends CElement {
 
     public function add_data_calendar($key, $value) {
         $this->data_calendar[$key] = $value;
+
         return $this;
     }
 
     public function set_data_calendar($data_calendar) {
         $this->data_calendar = $data_calendar;
+
         return $this;
     }
 
@@ -544,6 +551,7 @@ class CCalendar extends CElement {
 
     public function set_title($title) {
         $this->title = $title;
+
         return $this;
     }
 
@@ -553,11 +561,13 @@ class CCalendar extends CElement {
 
     public function set_http_method($http_method) {
         $this->http_method = $http_method;
+
         return $this;
     }
 
     public function set_attributes($attributes) {
         $this->attributes = $attributes;
+
         return $this;
     }
 

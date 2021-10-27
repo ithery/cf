@@ -61,7 +61,7 @@ class CDetector_Mobile {
     const VERSION_TYPE_FLOAT = 'float';
 
     /**
-     * A cache for resolved matches
+     * A cache for resolved matches.
      *
      * @var array
      */
@@ -100,7 +100,7 @@ class CDetector_Mobile {
      * The matches extracted from the regex expression.
      * This is good for debug.
      *
-     * @var string
+     * @var array
      */
     protected $matchesArray = null;
 
@@ -678,7 +678,7 @@ class CDetector_Mobile {
      * so people can check on what version they are testing
      * for mobile devices.
      *
-     * @return string The version number in semantic version format.
+     * @return string the version number in semantic version format
      */
     public static function getScriptVersion() {
         return self::VERSION;
@@ -725,7 +725,7 @@ class CDetector_Mobile {
      *                       "User-Agent" or "X-Device-User-Agent" or can be php-esque with the
      *                       all-caps, HTTP_ prefixed, underscore seperated awesomeness.
      *
-     * @return string|null The value of the header.
+     * @return null|string the value of the header
      */
     public function getHttpHeader($header) {
         // are we using PHP-flavored headers?
@@ -741,6 +741,7 @@ class CDetector_Mobile {
         } elseif (isset($this->httpHeaders[$altHeader])) {
             return $this->httpHeaders[$altHeader];
         }
+
         return null;
     }
 
@@ -752,7 +753,7 @@ class CDetector_Mobile {
      * Get all possible HTTP headers that
      * can contain the User-Agent string.
      *
-     * @return array List of HTTP headers.
+     * @return array list of HTTP headers
      */
     public function getUaHttpHeaders() {
         return self::$uaHttpHeaders;
@@ -760,11 +761,11 @@ class CDetector_Mobile {
 
     /**
      * Set CloudFront headers
-     * http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/header-caching.html#header-caching-web-device
+     * http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/header-caching.html#header-caching-web-device.
      *
      * @param array $cfHeaders List of HTTP headers
      *
-     * @return boolean If there were CloudFront headers to be set
+     * @return bool If there were CloudFront headers to be set
      */
     public function setCfHeaders($cfHeaders = null) {
         // use global _SERVER if $cfHeaders aren't defined
@@ -782,6 +783,7 @@ class CDetector_Mobile {
                 $response = true;
             }
         }
+
         return $response;
     }
 
@@ -802,15 +804,16 @@ class CDetector_Mobile {
     private function prepareUserAgent($userAgent) {
         $userAgent = trim($userAgent);
         $userAgent = substr($userAgent, 0, 500);
+
         return $userAgent;
     }
 
     /**
      * Set the User-Agent to be used.
      *
-     * @param string $userAgent The user agent string to set.
+     * @param string $userAgent the user agent string to set
      *
-     * @return string|null
+     * @return null|string
      */
     public function setUserAgent($userAgent = null) {
         // Invalidate cache due to #375
@@ -831,13 +834,14 @@ class CDetector_Mobile {
         if (count($this->getCfHeaders()) > 0) {
             return $this->userAgent = 'Amazon CloudFront';
         }
+
         return $this->userAgent = null;
     }
 
     /**
      * Retrieve the User-Agent.
      *
-     * @return string|null The user agent if it's set.
+     * @return null|string the user agent if it's set
      */
     public function getUserAgent() {
         return $this->userAgent;
@@ -873,7 +877,7 @@ class CDetector_Mobile {
     /**
      * Retrieve the list of known phone devices.
      *
-     * @return array List of phone devices.
+     * @return array list of phone devices
      */
     public static function getPhoneDevices() {
         return self::$phoneDevices;
@@ -882,7 +886,7 @@ class CDetector_Mobile {
     /**
      * Retrieve the list of known tablet devices.
      *
-     * @return array List of tablet devices.
+     * @return array list of tablet devices
      */
     public static function getTabletDevices() {
         return self::$tabletDevices;
@@ -891,7 +895,7 @@ class CDetector_Mobile {
     /**
      * Alias for getBrowsers() method.
      *
-     * @return array List of user agents.
+     * @return array list of user agents
      */
     public static function getUserAgents() {
         return self::getBrowsers();
@@ -900,7 +904,7 @@ class CDetector_Mobile {
     /**
      * Retrieve the list of known browsers. Specifically, the user agents.
      *
-     * @return array List of browsers / user agents.
+     * @return array list of browsers / user agents
      */
     public static function getBrowsers() {
         return self::$browsers;
@@ -909,7 +913,7 @@ class CDetector_Mobile {
     /**
      * Retrieve the list of known utilities.
      *
-     * @return array List of utilities.
+     * @return array list of utilities
      */
     public static function getUtilities() {
         return self::$utilities;
@@ -920,7 +924,7 @@ class CDetector_Mobile {
      *
      * @deprecated since version 2.6.9
      *
-     * @return array All the rules (but not extended).
+     * @return array all the rules (but not extended)
      */
     public static function getMobileDetectionRules() {
         static $rules;
@@ -932,6 +936,7 @@ class CDetector_Mobile {
                 self::$browsers
             );
         }
+
         return $rules;
     }
 
@@ -943,9 +948,9 @@ class CDetector_Mobile {
      *
      * @deprecated since version 2.6.9
      *
-     * @return array All the rules + extended.
+     * @return array all the rules + extended
      */
-    public function getMobileDetectionRulesExtended() {
+    public static function getMobileDetectionRulesExtended() {
         static $rules;
         if (!$rules) {
             // Merge all rules together.
@@ -957,6 +962,7 @@ class CDetector_Mobile {
                 self::$utilities
             );
         }
+
         return $rules;
     }
 
@@ -978,7 +984,7 @@ class CDetector_Mobile {
     /**
      * Retrieve the list of mobile operating systems.
      *
-     * @return array The list of mobile operating systems.
+     * @return array the list of mobile operating systems
      */
     public static function getOperatingSystems() {
         return self::$operatingSystems;
@@ -1000,12 +1006,14 @@ class CDetector_Mobile {
                             return true;
                         }
                     }
+
                     return false;
                 } else {
                     return true;
                 }
             }
         }
+
         return false;
     }
 
@@ -1015,19 +1023,20 @@ class CDetector_Mobile {
      * @param string $name
      * @param array  $arguments
      *
+     * @throws BadMethodCallException when the method doesn't exist and doesn't start with 'is'
+     *
      * @return mixed
      *
-     * @method boolean is[...]()
-     *
-     * @throws BadMethodCallException when the method doesn't exist and doesn't start with 'is'
+     * @method bool is[...]()
      */
     public function __call($name, $arguments) {
         // make sure the name starts with 'is', otherwise
         if (substr($name, 0, 2) !== 'is') {
-            throw new BadMethodCallException("No such method exists: $name");
+            throw new BadMethodCallException("No such method exists: ${name}");
         }
         $this->setDetectionType(self::DETECTION_TYPE_MOBILE);
         $key = substr($name, 2);
+
         return $this->matchUAAgainstKey($key);
     }
 
@@ -1036,7 +1045,7 @@ class CDetector_Mobile {
      *
      * @param null $userAgent deprecated
      *
-     * @return boolean
+     * @return bool
      */
     protected function matchDetectionRulesAgainstUA($userAgent = null) {
         // Begin general search.
@@ -1048,6 +1057,7 @@ class CDetector_Mobile {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -1058,7 +1068,7 @@ class CDetector_Mobile {
      *
      * @param string $key
      *
-     * @return boolean
+     * @return bool
      */
     protected function matchUAAgainstKey($key) {
         // Make the keys lowercase so we can match: isIphone(), isiPhone(), isiphone(), etc.
@@ -1073,12 +1083,13 @@ class CDetector_Mobile {
                 $this->cache[$key] = false;
             }
         }
+
         return $this->cache[$key];
     }
 
     /**
      * Check if the device is mobile.
-     * Returns true if any type of mobile device detected, including special ones
+     * Returns true if any type of mobile device detected, including special ones.
      *
      * @param null $userAgent   deprecated
      * @param null $httpHeaders deprecated
@@ -1130,6 +1141,7 @@ class CDetector_Mobile {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -1143,7 +1155,7 @@ class CDetector_Mobile {
      *
      * @todo: The httpHeaders part is not yet used.
      *
-     * @return bool|int|null
+     * @return null|bool|int
      */
     public function is($key, $userAgent = null, $httpHeaders = null) {
         // Set the UA and HTTP headers only if needed (eg. batch mode).
@@ -1154,6 +1166,7 @@ class CDetector_Mobile {
             $this->setUserAgent($userAgent);
         }
         $this->setDetectionType(self::DETECTION_TYPE_EXTENDED);
+
         return $this->matchUAAgainstKey($key);
     }
 
@@ -1180,6 +1193,7 @@ class CDetector_Mobile {
             $this->matchingRegex = $regex;
             $this->matchesArray = $matches;
         }
+
         return $match;
     }
 
@@ -1207,12 +1221,13 @@ class CDetector_Mobile {
         if (isset($arrVer[1])) {
             $arrVer[1] = @str_replace('.', '', $arrVer[1]); // @todo: treat strings versions.
         }
+
         return (float) implode('.', $arrVer);
     }
 
     /**
      * Check the version of the given property in the User-Agent.
-     * Will return a float number. (eg. 2_0 will return 2.0, 4.3.1 will return 4.31)
+     * Will return a float number. (eg. 2_0 will return 2.0, 4.3.1 will return 4.31).
      *
      * @param string $propertyName The name of the property. See self::getProperties() array
      *                             keys for all possible properties.
@@ -1221,7 +1236,7 @@ class CDetector_Mobile {
      *                             is optional and defaults to self::VERSION_TYPE_STRING. Passing an
      *                             invalid parameter will default to the this type as well.
      *
-     * @return string|float The version of the property we are trying to extract.
+     * @return string|float the version of the property we are trying to extract
      */
     public function version($propertyName, $type = self::VERSION_TYPE_STRING) {
         if (empty($propertyName)) {
@@ -1243,17 +1258,19 @@ class CDetector_Mobile {
                 preg_match(sprintf('#%s#is', $propertyPattern), $this->userAgent, $match);
                 if (false === empty($match[1])) {
                     $version = ($type == self::VERSION_TYPE_FLOAT ? $this->prepareVersionNo($match[1]) : $match[1]);
+
                     return $version;
                 }
             }
         }
+
         return false;
     }
 
     /**
      * Retrieve the mobile grading, using self::MOBILE_GRADE_* constants.
      *
-     * @return string One of the self::MOBILE_GRADE_* constants.
+     * @return string one of the self::MOBILE_GRADE_* constants
      */
     public function mobileGrade() {
         $isMobile = $this->isMobile();

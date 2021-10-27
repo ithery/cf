@@ -257,7 +257,7 @@ final class CManager {
         }
         if ($class == null) {
             //check for class exists
-            throw new CException('Type of control :type not registered', [':type' => $type]);
+            throw new Exception(c::__('Type of control :type not registered', [':type' => $type]));
         }
         if (cstr::startsWith($class, 'CElement_FormInput')) {
             return CElement_Factory::createFormInput($class, $id);

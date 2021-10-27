@@ -20,6 +20,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @method CElement_Template              addTemplate($id=null)
  * @method CElement_View                  addView($view = null, $data = null, $id = null)
  * @method CElement_Component_Widget      addWidget($id=null)
+ * @method $this                          addJs($js)
  */
 class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_Jsonable {
     use CTrait_Compat_App,
@@ -427,7 +428,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     public function getRoleChildList($roleId = null, $orgId = null, $type = null) {
         if (strlen($roleId) == 0) {
-            $roleId = $this->role()->role_id;
+            $roleId = c::optional($this->role())->role_id;
         }
         if (strlen($orgId) == 0) {
             $orgId = CApp_Base::orgId();

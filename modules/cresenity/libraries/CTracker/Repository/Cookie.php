@@ -17,7 +17,7 @@ class CTracker_Repository_Cookie extends CTracker_AbstractRepository {
     private $cookieJar;
 
     public function __construct() {
-        $this->className = CTracker::config()->get('cookieModel', 'CTracker_Model_Cookie');
+        $this->className = CTracker::config()->get('cookieModel', CTracker_Model_Cookie::class);
         $this->createModel();
         $this->config = CTracker::config();
         parent::__construct();

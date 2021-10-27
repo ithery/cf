@@ -9,18 +9,18 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Nov 29, 2020
  */
 trait CApp_Concern_ViewTrait {
+    protected static $viewCallback;
+
     private $viewName = 'capp/page';
 
     private $viewLoginName = 'capp/login';
 
     /**
-     * View
+     * View.
      *
      * @var CView_View}string
      */
     private $view;
-
-    protected static $viewCallback;
 
     public function setView($view) {
         if (!($view instanceof CView_View)) {
@@ -32,6 +32,7 @@ trait CApp_Concern_ViewTrait {
         if ($this->isUsingBlade()) {
             $this->useRequireJs = false;
         }
+
         return $this;
     }
 
@@ -61,7 +62,7 @@ trait CApp_Concern_ViewTrait {
             }
             if ($v == null) {
                 if (!CView::exists($viewName)) {
-                    throw new CApp_Exception('view :viewName not exists', [':viewName' => $viewName]);
+                    throw new CApp_Exception(c::__('view :viewName not exists', ['viewName' => $viewName]));
                 }
                 $v = CView::factory($viewName);
             }
@@ -94,6 +95,7 @@ trait CApp_Concern_ViewTrait {
                 }
             }
         }
+
         return false;
     }
 }

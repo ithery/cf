@@ -12,6 +12,7 @@ class CManager_Transform {
         if (self::$instance == null) {
             self::$instance = new CManager_Transform();
         }
+
         return self::$instance;
     }
 
@@ -30,9 +31,10 @@ class CManager_Transform {
 
     public function call($method, $value) {
         if (!$this->methodExists($method)) {
-            throw new CException("method :method doesn't exists", [':method' => $method]);
+            throw new Exception(c::__("method :method doesn't exists", [':method' => $method]));
         }
         $callable = $this->callbacks[$method];
+
         return call_user_func_array($callable, $value);
     }
 }

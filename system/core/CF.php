@@ -8,6 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 final class CF {
     use CFDeprecatedTrait;
+
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
 
     // Security check that is added to all generated PHP files
@@ -286,10 +287,10 @@ final class CF {
             || (IN_PRODUCTION && $class->getConstant('ALLOW_PRODUCTION') == false))
         ) {
             // Controller is not allowed to run in production
-            throw new CException(
+            throw new Exception(c::__(
                 'class is abstract or not allowed in production in :class_name',
                 [':class_name' => $class_name]
-            );
+            ));
         }
         // Create a new controller instance
         if (isset($class)) {
@@ -303,10 +304,10 @@ final class CF {
             // Method exists
             if (CFRouter::$method[0] === '_') {
                 // Do not allow access to hidden methods
-                throw new CException(
+                throw new Exception(c::__(
                     'method :method is hidden methods in :class_name',
                     [':method' => $method, ':class_name' => $class_name]
-                );
+                ));
             }
 
             if ($method->isProtected() or $method->isPrivate()) {
@@ -524,8 +525,6 @@ final class CF {
      * @param string $class
      * @param string $directory
      *
-     * @throws CException
-     *
      * @return bool
      */
     public static function autoLoad($class, $directory = 'libraries') {
@@ -552,11 +551,14 @@ final class CF {
             $directory = 'controllers';
             // Lowercase filename
 
-            $file = strtolower(substr($class, 0, -11));
+            $file = substr($class, 0, -11);
             if ($prefix) {
-                $file = strtolower(substr($class, 11));
+                $file = substr($class, 11);
             }
-            $file = str_replace('_', DS, $file);
+            //$file = str_replace('_', DS, $file);
+            $file = implode(DS, array_map(function ($item) {
+                return lcfirst($item);
+            }, explode('_', $file)));
         } else {
             // This could be either a library or a helper, but libraries must
             // always be capitalized, so we check if the first character is
