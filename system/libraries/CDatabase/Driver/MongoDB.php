@@ -4,9 +4,8 @@ use MongoDB\Client;
 
 class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     use CTrait_Compat_Database_Driver_MongoDB;
-
     /**
-     * Database connection link
+     * Database connection link.
      */
     protected $link;
 
@@ -21,7 +20,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     protected $mongoDB;
 
     /**
-     * Database configuration
+     * Database configuration.
      */
     protected $dbConfig;
 
@@ -62,6 +61,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         }
 
         $connection = carr::get($config, 'connection');
+
         return isset($connection['dsn']) && !empty($connection['dsn']);
     }
 
@@ -78,6 +78,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         }
 
         $connection = carr::get($config, 'connection');
+
         return carr::get($connection, 'dsn');
     }
 
@@ -117,6 +118,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
 
         // Check if we want to authenticate against a specific database.
         $auth_database = isset($configConnection['options']) && !empty($configConnection['options']['database']) ? $configConnection['options']['database'] : null;
+
         return 'mongodb://' . $authString . implode(',', $hosts) . ($auth_database ? '/' . $auth_database : '');
     }
 
@@ -131,6 +133,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         if ($config == null) {
             $config = $this->dbConfig;
         }
+
         return $this->hasDsnString($config) ? $this->getDsnString($config) : $this->getHostDsn($config);
     }
 
@@ -174,6 +177,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
 
         $this->link = $this->createConnection($dsn, $this->dbConfig, $options);
         $this->mongoDB = $this->link->selectDatabase(carr::get($this->dbConfig, 'connection.database'));
+
         return $this->link;
     }
 
@@ -201,6 +205,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
         if (!isset($options['password']) && !empty($connectionData['password'])) {
             $options['password'] = $connectionData['password'];
         }
+
         return new Client($dsn, $options, $driverOptions);
     }
 
@@ -280,7 +285,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return CDatabase_Schema_Manager_MongoDB
      */
@@ -289,7 +294,7 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return CDatabase_Platform_MongooDB
      */
@@ -303,6 +308,6 @@ class CDatabase_Driver_MongoDB extends CDatabase_Driver {
      * @return string
      */
     public function getDatabaseName() {
-        return carr::path($this->dbConfig, 'connection.database');
+        return carr::get($this->dbConfig, 'connection.database');
     }
 }

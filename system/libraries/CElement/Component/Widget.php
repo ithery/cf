@@ -16,12 +16,6 @@ class CElement_Component_Widget extends CElement_Component {
 
     public $height;
 
-    public $scroll;
-
-    public $nopadding;
-
-    public $height;
-
     /**
      * @var CElement_Component_Widget_Header
      */

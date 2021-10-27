@@ -65,6 +65,7 @@ class CServer {
         if ($os == null) {
             $os = PHP_OS;
         }
+
         return $os;
     }
 
@@ -96,6 +97,7 @@ class CServer {
             $isDisabled = true;
         }
         $process = null;
+
         try {
             $descriptorspec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
             $pipes = [];
@@ -124,11 +126,17 @@ class CServer {
 
     public static function isNpmInstalled() {
         exec('npm -v', $output, $exitCode);
+
         return $exitCode === 0;
     }
 
     public static function isComposerInstalled() {
         exec('composer -v', $output, $exitCode);
+
         return $exitCode === 0;
+    }
+
+    public static function dns() {
+        return new CServer_Dns();
     }
 }
