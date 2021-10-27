@@ -1,17 +1,17 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 5:06:17 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 5:06:17 PM
  */
 use GeoIp2\Database\Reader as GeoIpReader;
 use GeoIp2\Exception\AddressNotFoundException;
 
 class CTracker_GeoIp_GeoIp2 extends CTracker_GeoIp_GeoIpAbstract {
-
     const DATABASE_FILE_NAME = 'GeoLite2-City.mmdb';
 
     private $reader;
@@ -27,6 +27,7 @@ class CTracker_GeoIp_GeoIp2 extends CTracker_GeoIp_GeoIpAbstract {
         if ($this->geoIpData = $this->getCity($addr)) {
             return $this->renderData();
         }
+
         return null;
     }
 
@@ -34,6 +35,7 @@ class CTracker_GeoIp_GeoIp2 extends CTracker_GeoIp_GeoIpAbstract {
      * Get the GeoIp database file name and path.
      *
      * @param null $databasePath
+     *
      * @return string
      */
     private function getGeoliteFileName($databasePath = null) {
@@ -59,6 +61,7 @@ class CTracker_GeoIp_GeoIp2 extends CTracker_GeoIp_GeoIpAbstract {
 
     /**
      * @param $addr
+     *
      * @return \GeoIp2\Model\City
      */
     private function getCity($addr) {
@@ -67,7 +70,7 @@ class CTracker_GeoIp_GeoIp2 extends CTracker_GeoIp_GeoIpAbstract {
         } catch (AddressNotFoundException $e) {
             $city = null;
         }
+
         return $city;
     }
-
 }

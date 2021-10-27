@@ -10,26 +10,26 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CTracker_Repository_Referer extends CTracker_AbstractRepository {
     /**
-     * @var RefererParser
+     * @var CTracker_Parser_RefererParser
      */
     private $refererParser;
 
     /**
-     * @var
+     * @var string
      */
     private $currentUrl;
 
     /**
-     * @var
+     * @var CTracker_Model_RefererSearchTerm
      */
     private $searchTermModel;
 
     public function __construct() {
-        $this->className = CTracker::config()->get('refererModel', 'CTracker_Model_Referer');
+        $this->className = CTracker::config()->get('refererModel', CTracker_Model_Referer::class);
         $this->createModel();
         $this->refererParser = new CTracker_Parser_RefererParser();
         $this->currentUrl = curl::current(true);
-        $searchTermModelClass = CTracker::config()->get('refererSearchTermModel', 'CTracker_Model_RefererSearchTerm');
+        $searchTermModelClass = CTracker::config()->get('refererSearchTermModel', CTracker_Model_RefererSearchTerm::class);
         $this->searchTermModel = new $searchTermModelClass();
         parent::__construct();
     }
@@ -67,6 +67,7 @@ class CTracker_Repository_Referer extends CTracker_AbstractRepository {
         if ($parsed->isKnown()) {
             $this->storeSearchTerms($referer, $parsed);
         }
+
         return $referer->log_referer_id;
     }
 

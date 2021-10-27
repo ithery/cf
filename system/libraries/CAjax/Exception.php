@@ -8,6 +8,5 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Feb 16, 2018, 11:37:52 PM
  */
-
-class CAjax_Exception extends CException {
+class CAjax_Exception extends Exception {
 }

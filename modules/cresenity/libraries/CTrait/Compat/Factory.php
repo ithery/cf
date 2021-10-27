@@ -43,4 +43,28 @@ trait CTrait_Compat_Factory {
     public static function create_table($tableId = '') {
         return self::createTable($tableId);
     }
+
+    /**
+     * @param string $calendarId
+     *
+     * @deprecated since version 1.2, please use createTable
+     *
+     * @return CCalendar
+     */
+    public static function create_calendar($calendarId = '') {
+        $calendar = CCalendar::factory($calendarId);
+
+        return $calendar;
+    }
+
+    /**
+     * @param string $id
+     *
+     * @deprecated since version 1.2, please use createTable
+     *
+     * @return CElement_Component_Nestable
+     */
+    public static function create_nestable($id = '') {
+        return static::createNestable($id);
+    }
 }
