@@ -51,8 +51,10 @@ class CSession {
      */
     public function store() {
         if ($this->store == null) {
-            $this->store = CSession_Manager::instance()->createStore();
-            $this->store->start();
+            $this->store = c::tap(CSession_Manager::instance()->createStore(), function ($session) {
+                $session->setId(c::request()->cookies->get($session->getName()));
+                $session->start();
+            });
         }
 
         return $this->store;
