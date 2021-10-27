@@ -552,11 +552,14 @@ final class CF {
             $directory = 'controllers';
             // Lowercase filename
 
-            $file = strtolower(substr($class, 0, -11));
+            $file = substr($class, 0, -11);
             if ($prefix) {
-                $file = strtolower(substr($class, 11));
+                $file = substr($class, 11);
             }
-            $file = str_replace('_', DS, $file);
+            //$file = str_replace('_', DS, $file);
+            $file = implode(DS, array_map(function ($item) {
+                return lcfirst($item);
+            }, explode('_', $file)));
         } else {
             // This could be either a library or a helper, but libraries must
             // always be capitalized, so we check if the first character is

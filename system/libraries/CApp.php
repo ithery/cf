@@ -428,7 +428,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     public function getRoleChildList($roleId = null, $orgId = null, $type = null) {
         if (strlen($roleId) == 0) {
-            $roleId = $this->role()->role_id;
+            $roleId = c::optional($this->role())->role_id;
         }
         if (strlen($orgId) == 0) {
             $orgId = CApp_Base::orgId();

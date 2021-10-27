@@ -52,11 +52,12 @@ trait CTrait_Compat_Element_Widget {
      *
      * @param string $id
      *
-     * @return void
+     * @return CElement_Component_Action
      *
-     * @deprecated 1.1
+     * @deprecated 1.1 please use addHeaderAction
      */
     public function add_header_action($id = '') {
+        /** @var CElement_Component_Widget $this */
         return $this->addHeaderAction($id);
     }
 
