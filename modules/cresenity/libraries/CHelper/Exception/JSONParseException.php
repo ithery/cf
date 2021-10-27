@@ -8,5 +8,5 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jul 7, 2018, 9:01:44 PM
  */
-class CHelper_Exception_JSONParseException extends CException {
+class CHelper_Exception_JSONParseException extends Exception {
 }

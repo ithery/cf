@@ -15,6 +15,9 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
 
     protected $result;
 
+    /**
+     * @var CDatabase
+     */
     protected $connection;
 
     protected $className;
@@ -34,11 +37,13 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
     public function where($key, $operation, $value = null) {
         $this->builder = $this->builder ?: $this->newQuery();
         $this->builder = $this->builder->where($key, $operation, $value = null);
+
         return $this;
     }
 
     public function first() {
         $this->result = $this->builder->first();
+
         return $this->result ? $this : null;
     }
 
@@ -56,6 +61,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         }
         $this->model = $model;
         $this->result = $model;
+
         return $model;
     }
 
@@ -70,6 +76,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
             }
         }
         $model->save();
+
         return $model;
     }
 
@@ -130,6 +137,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         if ($this->connection) {
             $this->model->setConnection($this->connection->getName());
         }
+
         return $this->model;
     }
 
@@ -137,6 +145,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         $className = $this->className;
 
         $this->model = new $className();
+
         return $this->getModel();
     }
 
@@ -147,6 +156,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         }
 
         $this->model = new $className();
+
         return $this->getModel();
     }
 
@@ -159,6 +169,7 @@ abstract class CTracker_AbstractRepository implements CTracker_RepositoryInterfa
         if ($this->connection) {
             $this->builder = $this->builder->on($this->connection->getName());
         }
+
         return $this->builder->newQuery();
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * CFactory class
+ * CFactory class.
  *
  * @deprecated  since 1.2 use CElement_Factory
  */
@@ -13,9 +13,9 @@ class CFactory {
      * @param string $id
      * @param string $type
      *
-     * @return CElement_FormInput
+     * @throws Exception
      *
-     * @throws CException
+     * @return CElement_FormInput
      */
     public static function createControl($id, $type) {
         return CElement_Factory::createControl($id, $type);
@@ -44,12 +44,6 @@ class CFactory {
         $row = CTableRow::factory($row_id);
 
         return $row;
-    }
-
-    public static function create_calendar($calendar_id = '') {
-        $calendar = CCalendar::factory($calendar_id);
-
-        return $calendar;
     }
 
     public static function create_tab_list($tabs_id = '') {
@@ -125,23 +119,29 @@ class CFactory {
         return $form;
     }
 
-    public static function create_nestable($id = '') {
-        $nestable = CNestable::factory($id);
+    public static function createNestable($id = '') {
+        $nestable = CElement_Component_Nestable::factory($id);
 
         return $nestable;
     }
 
-    public static function create_hr() {
+    /**
+     * @param string $id
+     *
+     * @return CElement_Element_Hr
+     */
+    public static function createHr($id = '') {
+        return CElement_Factory::createElement('hr', $id);
     }
 
-    public static function create_br() {
+    /**
+     * @param string $id
+     *
+     * @return CElement_Element_Br
+     */
+    public static function createBr($id = '') {
+        return CElement_Factory::createElement('br', $id);
     }
-
-    // public static function create_element($tag, $id = "") {
-    // $elm = CElement::factory($id, $tag);
-    // $
-    // return $elm;
-    // }
 
     public static function create_element($type, $id = '') {
         $element = null;
@@ -150,6 +150,7 @@ class CFactory {
         } else {
             trigger_error('Unknown element type ' . $type);
         }
+
         return $element;
     }
 

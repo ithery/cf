@@ -8,5 +8,5 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Nov 12, 2017, 3:32:00 AM
  */
-class CApp_Exception extends CException {
+class CApp_Exception extends Exception {
 }

@@ -119,7 +119,7 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
-     * Add Form Field
+     * Add Form Field.
      *
      * @param string $id
      *
@@ -133,7 +133,7 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
-     * Add Row
+     * Add Row.
      *
      * @param string $id
      *
@@ -227,7 +227,7 @@ abstract class CObservable extends CRenderable {
         if (CManager::instance()->isRegisteredElement($type)) {
             $element = CManager::instance()->createElement($id, $type);
         } else {
-            throw new CException('Unknow element type :elementType', [':elementType' => $type]);
+            throw new Exception(c::__('Unknown element type :elementType', ['elementType' => $type]));
         }
 
         $this->add($element);
@@ -236,7 +236,7 @@ abstract class CObservable extends CRenderable {
     }
 
     /**
-     * Add Action Element
+     * Add Action Element.
      *
      * @param string $id optional
      *

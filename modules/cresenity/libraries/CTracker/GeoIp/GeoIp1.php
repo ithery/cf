@@ -16,6 +16,7 @@ class CTracker_GeoIp_GeoIp1 extends CTracker_GeoIp_GeoIpAbstract {
         $this->open();
         $this->geoIpData = $this->generateGeoIpData($addr);
         $this->close();
+
         return $this->geoIpData;
     }
 
@@ -23,6 +24,7 @@ class CTracker_GeoIp_GeoIp1 extends CTracker_GeoIp_GeoIpAbstract {
         if (!function_exists('geoip_country_code_by_addr')) {
             return false;
         }
+
         return true;
     }
 

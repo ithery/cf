@@ -40,7 +40,7 @@ class CApp_Config {
                 foreach ($appFiles as $file) {
                     $appConfig = include $file;
                     if (!is_array($appConfig)) {
-                        throw new CApp_Exception('Invalid config format on :file', [':file' => $file]);
+                        throw new CApp_Exception(c::__('Invalid config format on :file', [':file' => $file]));
                     }
                     $config = array_merge($config, $appConfig);
                 }

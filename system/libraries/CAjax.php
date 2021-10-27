@@ -20,6 +20,7 @@ class CAjax {
                 return CAjax_Method::createFromJson($options);
             }
         }
+
         return new CAjax_Method($options);
     }
 
@@ -30,11 +31,12 @@ class CAjax {
 
         $disk = CTemporary::disk();
         if (!$disk->exists($file)) {
-            throw new CException('failed to get temporary file :filename', [':filename' => $file]);
+            throw new Exception(c::__('failed to get temporary file :filename', [':filename' => $file]));
         }
         $json = $disk->get($file);
 
         $data = json_decode($json, true);
+
         return $data;
     }
 
