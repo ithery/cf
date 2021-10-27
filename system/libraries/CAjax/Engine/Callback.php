@@ -14,6 +14,7 @@ class CAjax_Engine_Callback extends CAjax_Engine {
         $callable = carr::get($data, 'callable');
         $requires = carr::get($data, 'requires');
         $result = CFunction::factory($callable)->addArg($data)->setRequire($requires)->execute();
+
         return $result;
     }
 }
