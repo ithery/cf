@@ -1,8 +1,5 @@
 <?php
 
-/**
- * @package Cresenity
- */
 class CObject {
     use CTrait_Compat_Object,
         CTrait_Macroable;
@@ -28,7 +25,7 @@ class CObject {
             return $this->$key;
         }
 
-        throw new CException('Cannot access private property :class::$:key', [':class' => __CLASS__, ':key' => $key]);
+        throw new Exception(c::__('Cannot access private property :class::$:key', ['class' => __CLASS__, 'key' => $key]));
     }
 
     public function __set($key, $value) {
@@ -37,7 +34,7 @@ class CObject {
             return $this->$key = $value;
         }
 
-        throw new CException('Cannot access private property :class::$:key', [':class' => get_called_class(), ':key' => $key]);
+        throw new Exception(c::__('Cannot access private property :class::$:key', ['class' => get_called_class(), 'key' => $key]));
     }
 
     protected function __construct($id = '') {
@@ -65,6 +62,7 @@ class CObject {
      */
     public function setId($id) {
         $this->id = $id;
+
         return $this;
     }
 
@@ -74,6 +72,7 @@ class CObject {
 
     public function isUseTrait($trait) {
         $traits = c::classUsesRecursive(get_class($this));
+
         return isset($traits[$trait]);
     }
 

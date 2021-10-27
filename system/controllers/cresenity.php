@@ -30,6 +30,7 @@ class Controller_Cresenity extends CController {
     public function qc($className = null) {
         if ($className == null) {
             CF::show404();
+
             return;
         }
         CQC::cliRunner($className);
@@ -44,7 +45,7 @@ class Controller_Cresenity extends CController {
 
         $disk = CTemporary::disk();
         if (!$disk->exists($file)) {
-            throw new CException('failed to get temporary file :filename', [':filename' => $file]);
+            throw new Exception(c::__('failed to get temporary file :filename', ['filename' => $file]));
         }
         $json = $disk->get($file);
 
@@ -66,7 +67,7 @@ class Controller_Cresenity extends CController {
     //@codingStandardsIgnoreStart
 
     /**
-     * change lang
+     * change lang.
      *
      * @param string $lang
      *
@@ -76,18 +77,20 @@ class Controller_Cresenity extends CController {
      */
     public function change_lang($lang) {
         clang::setlang($lang);
+
         return c::redirect(crequest::referrer());
     }
 
     public function change_theme($theme) {
         CManager::theme()->setTheme($theme);
+
         return c::redirect(crequest::referrer());
     }
 
     //@codingStandardsIgnoreEnd
 
     /**
-     * Default login action
+     * Default login action.
      *
      * @return void
      */
@@ -181,6 +184,7 @@ class Controller_Cresenity extends CController {
                 $json['message'] = $error_message;
             }
             echo json_encode($json);
+
             return true;
         } else {
             return c::redirect('');
@@ -247,7 +251,7 @@ class Controller_Cresenity extends CController {
         $line_number = 1;
         $total_lines = 1;
         $center_x = ceil((imagesx($image) - (imagefontwidth($fontsize) * strlen($text))) / 2);
-        $center_y = ceil(((imagesy($image) - (imagefontheight($fontsize) * $total_lines)) / 2) + (($line_number - 1) * ImageFontHeight($fontsize)));
+        $center_y = ceil(((imagesy($image) - (imagefontheight($fontsize) * $total_lines)) / 2) + (($line_number - 1) * imagefontheight($fontsize)));
         //Inserting Text
         imagestring($image, $fontsize, $center_x, $center_y, $text, $txt_color);
 
@@ -287,6 +291,7 @@ class Controller_Cresenity extends CController {
         switch ($method) {
             case 'initials':
                 $engineName = 'Initials';
+
                 break;
         }
 
@@ -320,13 +325,16 @@ class Controller_Cresenity extends CController {
         switch ($engine) {
             case 'elfinder':
                 $engineName = 'ElFinder';
+
                 break;
             case 'fm':
                 $engineName = 'FileManager';
+
                 break;
 
             default:
                 die('Error, Connector engine not found');
+
                 break;
         }
         $options = [];

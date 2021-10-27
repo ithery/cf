@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CModel_Exception_RelationNotFoundException extends CModel_Exception {
-
     /**
      * The name of the affected Eloquent model.
      *
@@ -25,8 +18,9 @@ class CModel_Exception_RelationNotFoundException extends CModel_Exception {
     /**
      * Create a new exception instance.
      *
-     * @param  mixed  $model
-     * @param  string  $relation
+     * @param mixed  $model
+     * @param string $relation
+     *
      * @return static
      */
     public static function make($model, $relation) {
@@ -34,7 +28,7 @@ class CModel_Exception_RelationNotFoundException extends CModel_Exception {
         $instance = new static("Call to undefined relationship [{$relation}] on model [{$class}].");
         $instance->model = $model;
         $instance->relation = $relation;
+
         return $instance;
     }
-
 }
