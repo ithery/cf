@@ -13,13 +13,19 @@ class CRouting_RouteFinder {
         }
         $routeDataBefore = static::getRouteData($uri);
         $routedUri = CFRouter::routedUri($uri);
-        $routeData = static::getRouteData($routedUri);
+
+        $routeData = self::getRouteData($routedUri);
+
+        if (CF::domain() == 'pagetest.xyz') {
+            // cdbg::dd($routeData);
+        }
         if ($uri != $routedUri) {
-            $routeData = $routeDataBefore;
+            //$routeData = $routeDataBefore;
 
             //cdbg::dd($uri, $routedUri, $routeDataBefore, $routeData);
             //$routedUri['seg']
         }
+
         CFRouter::applyRouteData($routeData);
 
         $controllerDir = carr::get($routeData, 'controller_dir_ucfirst', '');

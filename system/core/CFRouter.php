@@ -426,6 +426,7 @@ class CFRouter {
                         $matchesBracket = array_slice($matches, 1);
                     }
                     $matchesBracket ? $callbackArgs = array_merge($callbackArgs, $matchesBracket) : $callbackArgs = array_merge($callbackArgs, $bracketKeys);
+
                     $val = call_user_func_array($val, $callbackArgs);
 
                     if ($val == null) {
@@ -437,7 +438,7 @@ class CFRouter {
                 $key = trim($key, '/');
                 $val = trim($val, '/');
 
-                if (preg_match('#^' . $key . '#u', $uri)) {
+                if (preg_match('#' . $key . '#ims', $uri)) {
                     if (strpos($val, '$') !== false) {
                         // Use regex routing
 
