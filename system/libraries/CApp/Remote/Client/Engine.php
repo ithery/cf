@@ -45,7 +45,7 @@ abstract class CApp_Remote_Client_Engine {
         $errCode = carr::get($responseData, 'err_code');
         $errMessage = carr::get($responseData, 'err_message');
         if ($errCode > 0) {
-            throw new CApp_Exception_RemoteRequestException($errMessage, null, $errCode);
+            throw new CApp_Exception_RemoteRequestException($errMessage, $errCode);
         }
         $data = carr::get($responseData, 'data');
 

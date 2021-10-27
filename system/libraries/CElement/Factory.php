@@ -45,7 +45,7 @@ class CElement_Factory {
 
                 break;
             default:
-                throw new CApp_Exception('element [:tag] not found', [':tag' => $tag]);
+                throw new CApp_Exception(c::__('element [:tag] not found', ['tag' => $tag]));
 
                 break;
         }
@@ -97,7 +97,7 @@ class CElement_Factory {
             $className = 'CElement_Component_' . $name;
         }
         if (!class_exists($className)) {
-            throw new CApp_Exception('component [:name] not found', [':name' => $name]);
+            throw new CApp_Exception(c::__('component [:name] not found', ['name' => $name]));
         }
 
         return new $className($id);
@@ -114,7 +114,7 @@ class CElement_Factory {
     public static function createComposite($name, $id = '') {
         $className = 'CElement_Composite_' . $name;
         if (!class_exists($className)) {
-            throw new CApp_Exception('composite element [:name] not found', [':name' => $name]);
+            throw new CApp_Exception(c::__('composite element [:name] not found', ['name' => $name]));
         }
 
         return new $className($id);
@@ -133,7 +133,7 @@ class CElement_Factory {
 
         $className = 'CElement_List_' . $name;
         if (!class_exists($className)) {
-            throw new CApp_Exception('list element [:name] not found', [':name' => $name]);
+            throw new CApp_Exception(c::__('list element [:name] not found', ['name' => $name]));
         }
 
         return new $className($id);

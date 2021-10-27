@@ -8,6 +8,5 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Mar 10, 2019, 8:53:37 AM
  */
-
 class CApp_Cloud_Exception_ApiException extends CApp_Cloud_Exception {
 }

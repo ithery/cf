@@ -3,8 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CException extends Exception {
-    protected static $exceptionHandler;
-
     /**
      * @var array PHP error code => human readable name
      */
@@ -19,6 +17,8 @@ class CException extends Exception {
         E_RECOVERABLE_ERROR => 'Recoverable Error',
         E_DEPRECATED => 'Deprecated',
     ];
+
+    protected static $exceptionHandler;
 
     /**
      * Creates a new translated exception.
@@ -47,7 +47,7 @@ class CException extends Exception {
     }
 
     /**
-     * Get a single line of text representing the exception:
+     * Get a single line of text representing the exception:.
      *
      * Error [ Code ]: Message ~ File [ Line ]
      *
@@ -91,6 +91,7 @@ class CException extends Exception {
         if (static::$exceptionHandler == null) {
             static::$exceptionHandler = new CException_ExceptionHandler();
         }
+
         return static::$exceptionHandler;
     }
 }
