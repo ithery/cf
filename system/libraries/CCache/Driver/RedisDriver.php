@@ -256,7 +256,7 @@ class CCache_Driver_RedisDriver extends CCache_DriverTaggableAbstract implements
      * @return \CRedis_Connection_PhpRedisConnection
      */
     public function lockConnection() {
-        return $this->redis->connection($this->lockConnection ?? $this->connection);
+        return $this->redis->connection($this->lockConnection ?: $this->connection);
     }
 
     /**
