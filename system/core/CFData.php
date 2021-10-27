@@ -94,7 +94,7 @@ final class CFData {
                 }
                 $file .= $row . DIRECTORY_SEPARATOR;
                 if (!is_dir($file)) {
-                    throw new CException('Error, :path is not directory', [':path' => $file]);
+                    throw new Exception(c::__('Error, :path is not directory', [':path' => $file]));
                 }
             }
         }
