@@ -598,5 +598,18 @@ trait CFDeprecatedTrait {
     public static function set(&$target, $key, $value, $overwrite = true) {
         return c::set($target, $key, $value);
     }
+
+    /**
+     * Create a collection from the given value.
+     *
+     * @param mixed $value
+     *
+     * @return CCollection
+     *
+     * @deprecated 1.1, use c::collect
+     */
+    public static function collect($value = null) {
+        return c::collect($value);
+    }
 }
 // @codingStandardsIgnoreStart

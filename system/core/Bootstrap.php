@@ -28,6 +28,10 @@ if (!defined('DOCROOT')) {
     is_link(CFINDEX) and chdir(dirname(realpath(__FILE__)));
 }
 
+if (!defined('CFINDEX')) {
+    define('CFINDEX', DOCROOT . 'index.php');
+}
+
 if (!defined('SYSPATH')) {
     $sysPath = realpath(DOCROOT . 'system');
     define('SYSPATH', $sysPath . DS);

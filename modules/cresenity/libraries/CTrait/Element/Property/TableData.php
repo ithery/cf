@@ -47,6 +47,7 @@ trait CTrait_Element_Property_TableData {
     public function setDataFromQuery($q) {
         $this->tableDataQuery = $q;
         $this->tableDataType = 'query';
+
         return $this;
     }
 
@@ -58,10 +59,11 @@ trait CTrait_Element_Property_TableData {
     public function setDataFromModel($model) {
         $modelQuery = $model;
         if ($modelQuery instanceof CModel_Collection) {
-            throw new CException('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');
+            throw new Exception('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');
         }
         $sql = $this->db->compileBinds($modelQuery->toSql(), $modelQuery->getBindings());
         $this->tableDataType = 'model';
+
         return $this->setDataFromQuery($sql);
     }
 
@@ -76,8 +78,9 @@ trait CTrait_Element_Property_TableData {
         $this->isElastic = true;
         $this->tableDataType = 'elastic';
         if ($el instanceof CElastic_Search) {
-            $this->query = $el->ajax_data();
+            $this->query = $el->ajaxData();
         }
+
         return $this;
     }
 
@@ -94,6 +97,7 @@ trait CTrait_Element_Property_TableData {
         $this->tableDataCallbackRequire = $require;
         $this->tableDataIsAjax = true;
         $this->tableDataType = 'callback';
+
         return $this;
     }
 
@@ -105,11 +109,13 @@ trait CTrait_Element_Property_TableData {
     public function setDataFromArray($array) {
         $this->tableData = $array;
         $this->tableDataIsAjax = false;
+
         return $this;
     }
 
     public function setTableDataIsAjax($bool = true) {
         $this->tableDataIsAjax = $bool;
+
         return $this;
     }
 
@@ -120,6 +126,7 @@ trait CTrait_Element_Property_TableData {
         $this->tableDataIsAjax = carr::get($data, 'tableDataIsAjax');
         $this->tableDataQuery = carr::get($data, 'tableDataQuery');
         $this->tableDataType = carr::get($data, 'tableDataType');
+
         return $this;
     }
 
@@ -131,6 +138,7 @@ trait CTrait_Element_Property_TableData {
         $data['tableDataIsAjax'] = $this->tableDataIsAjax;
         $data['tableDataQuery'] = $this->tableDataQuery;
         $data['tableDataType'] = $this->tableDataType;
+
         return $data;
     }
 
@@ -142,7 +150,9 @@ trait CTrait_Element_Property_TableData {
                     $db = $this->db();
                 }
                 $r = $db->query($this->tableDataQuery);
+
                 return $r->result_array(false);
+
                 break;
             default:
                 return $this->tableData;

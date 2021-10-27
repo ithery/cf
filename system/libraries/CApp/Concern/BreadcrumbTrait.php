@@ -4,7 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
-
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Jul 27, 2019, 10:18:47 PM
@@ -18,6 +17,7 @@ trait CApp_Concern_BreadcrumbTrait {
 
     public function showBreadcrumb($bool = true) {
         $this->showBreadcrumb = $bool;
+
         return $this;
     }
 
@@ -30,9 +30,10 @@ trait CApp_Concern_BreadcrumbTrait {
      */
     public function addBreadcrumb($caption, $url = 'javascript:;', $lang = true) {
         if ($lang) {
-            $caption = clang::__($caption);
+            $caption = c::__($caption);
         }
         $this->breadcrumb[$caption] = $url;
+
         return $this;
     }
 
@@ -41,11 +42,13 @@ trait CApp_Concern_BreadcrumbTrait {
         if ($this->breadcrumbCallback != null) {
             $breadcrumb = CFunction::factory($this->breadcrumbCallback)->addArg($this->breadcrumb)->execute();
         }
+
         return $breadcrumb;
     }
 
     public function setBreadcrumbCallback($callback) {
         $this->breadcrumbCallback = CHelper::closure()->serializeClosure($callback);
+
         return $this;
     }
 }

@@ -10,20 +10,21 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implements CDatabase_Driver_VersionAwarePlatformInterface, CDatabase_Driver_ServerInfoAwareInterface {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getDatabase(CDatabase $db) {
         $params = $db->config();
 
-        $dbname = carr::path($params, 'connection.database');
+        $dbname = carr::get($params, 'connection.database');
         if ($dbname == null) {
             $dbname = $db->getValue('SELECT DATABASE()');
         }
+
         return $dbname;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return CDatabase_Platform_Mysql
      */
@@ -32,7 +33,7 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @throws CDatabase_Exception
      */
@@ -57,7 +58,7 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
 
     /**
      * Detect MariaDB server version, including hack for some mariadb distributions
-     * that starts with the prefix '5.5.5-'
+     * that starts with the prefix '5.5.5-'.
      *
      * @param string $versionString Version string as returned by mariadb server, i.e. '5.5.5-Mariadb-10.0.8-xenial'
      *
@@ -105,6 +106,7 @@ abstract class CDatabase_Driver_AbstractMysql extends CDatabase_Driver implement
         if ('5' === $majorVersion && '7' === $minorVersion && null === $patchVersion) {
             $patchVersion = '9';
         }
+
         return $majorVersion . '.' . $minorVersion . '.' . $patchVersion;
     }
 }

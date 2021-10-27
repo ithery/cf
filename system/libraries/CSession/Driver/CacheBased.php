@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CSession_Driver_CacheBased implements CSession_Driver {
-
     /**
      * The cache repository instance.
      *
@@ -25,8 +18,9 @@ class CSession_Driver_CacheBased implements CSession_Driver {
     /**
      * Create a new cache driven handler instance.
      *
-     * @param  CCache_Repository  $cache
-     * @param  int  $seconds
+     * @param CCache_Repository $cache
+     * @param int               $seconds
+     *
      * @return void
      */
     public function __construct(CCache_Repository $cache, $seconds) {
@@ -55,7 +49,6 @@ class CSession_Driver_CacheBased implements CSession_Driver {
     }
 
     public function regenerate() {
-        
     }
 
     public function write($id, $data) {
@@ -70,5 +63,4 @@ class CSession_Driver_CacheBased implements CSession_Driver {
     public function getCache() {
         return $this->cache;
     }
-
 }

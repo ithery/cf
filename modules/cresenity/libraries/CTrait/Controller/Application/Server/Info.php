@@ -192,8 +192,8 @@ trait CTrait_Controller_Application_Server_Info {
 
         $cardData['title'] = 'Local PHP Information';
         $phpInfo = CServer::phpInfo()->get();
-        $serverAPI = carr::path($phpInfo, 'phpinfo.Server API', '(unknown)');
-        $serverBuildDate = carr::path($phpInfo, 'phpinfo.Build Date', '(unknown)');
+        $serverAPI = carr::get($phpInfo, 'phpinfo.Server API', '(unknown)');
+        $serverBuildDate = carr::get($phpInfo, 'phpinfo.Build Date', '(unknown)');
         $phpIniPath = carr::get(carr::get($phpInfo, 'phpinfo'), 'Configuration File (php.ini) Path', '(unknown)');
         $cardData['rows'][] = ['OS', CServer::getOS()];
         $cardData['rows'][] = ['Load AVG', implode(' ', CServer::getLoadAvg())];
@@ -204,6 +204,7 @@ trait CTrait_Controller_Application_Server_Info {
 
         $divCol = $divRow->addDiv()->addClass('col-md-6');
         $divCol->addTemplate()->setTemplate('CApp/Card/Table')->setData($cardData);
+
         return $app;
     }
 }

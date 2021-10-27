@@ -39,8 +39,8 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
         $elastic_document_type = carr::get($ajaxData, 'document_type');
 
         $search = $el->search($elastic_index, $elastic_document_type);
-        $mapping = $search->indices()->get_mapping();
-        $properties = carr::path($mapping, $elastic_index . '.mappings.' . $elastic_document_type . '.properties');
+        $mapping = $search->indices()->getMapping();
+        $properties = carr::get($mapping, $elastic_index . '.mappings.' . $elastic_document_type . '.properties');
 
         $must = carr::get($ajaxData, 'must');
         foreach ($must as $m) {
@@ -48,7 +48,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
         }
         $must_not = carr::get($ajaxData, 'must_not');
         foreach ($must_not as $mn) {
-            $search->must_not((array) $mn);
+            $search->mustNot((array) $mn);
         }
 
         $select_raw = (array) carr::get($ajaxData, 'select');
@@ -120,7 +120,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
 
                         $s = [];
                         $fieldElastic = $search->getElasticField($field);
-                        $elastic_field_type = carr::path($properties, $fieldElastic . '.type');
+                        $elastic_field_type = carr::get($properties, $fieldElastic . '.type');
 
                         switch ($elastic_field_type) {
                             case 'text':
@@ -136,6 +136,7 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
                                 if (is_numeric($request['sSearch'])) {
                                     carr::set($s, 'term.' . $fieldElastic, $request['sSearch']);
                                 }
+
                                 break;
                         }
                         if (count($s) > 0) {
@@ -156,8 +157,8 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
 
         $r = $search->exec();
 
-        $total_record = $r->count_all();
-        $filtered_record = min($r->count_all(), 10000);
+        $total_record = $r->countAll();
+        $filtered_record = min($r->countAll(), 10000);
 
         $rarr = $r->result(false);
         $data = $rarr;
@@ -214,14 +215,14 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
 
                 if (($table->cellCallbackFunc) != null) {
                     $new_v = CFunction::factory($table->cellCallbackFunc)
-                            ->addArg($table)
-                            ->addArg($col->getFieldname())
-                            ->addArg($row)
-                            ->addArg($new_v)
-                            ->setRequire($table->requires)
-                            ->execute();
+                        ->addArg($table)
+                        ->addArg($col->getFieldname())
+                        ->addArg($row)
+                        ->addArg($new_v)
+                        ->setRequire($table->requires)
+                        ->execute();
 
-                    if (is_array($new_v) && isset($new_v['html']) && isset($new_v['js'])) {
+                    if (is_array($new_v) && isset($new_v['html'], $new_v['js'])) {
                         $js .= $new_v['js'];
                         $new_v = $new_v['html'];
                     }
@@ -232,12 +233,15 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
                 switch ($col->getAlign()) {
                     case CConstant::ALIGN_LEFT:
                         $class .= ' align-left';
+
                         break;
                     case CConstant::ALIGN_RIGHT:
                         $class .= ' align-right';
+
                         break;
                     case CConstant::ALIGN_CENTER:
                         $class .= ' align-center';
+
                         break;
                 }
 
@@ -265,12 +269,12 @@ class CAjax_Engine_DataTable_Processor_Elastic extends CAjax_Engine_DataTable_Pr
 
                     foreach ($actions as $action) {
                         $visibility = CFunction::factory($table->filterActionCallbackFunc)
-                                ->addArg($table)
-                                ->addArg($col->getFieldname())
-                                ->addArg($row)
-                                ->addArg($action)
-                                ->setRequire($table->requires)
-                                ->execute();
+                            ->addArg($table)
+                            ->addArg($col->getFieldname())
+                            ->addArg($row)
+                            ->addArg($action)
+                            ->setRequire($table->requires)
+                            ->execute();
 
                         $action->setVisibility($visibility);
                     }

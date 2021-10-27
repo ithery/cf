@@ -5,6 +5,7 @@ class CElement_Component_DataTable extends CElement_Component {
         CTrait_Element_ActionList_Row,
         CTrait_Element_ActionList_Header,
         CTrait_Element_ActionList_Footer,
+        CTrait_Element_Property_Title,
         CElement_Component_DataTable_Trait_GridViewTrait,
         CElement_Component_DataTable_Trait_ExportTrait,
         CElement_Component_DataTable_Trait_JavascriptTrait,
@@ -68,8 +69,6 @@ class CElement_Component_DataTable extends CElement_Component {
     public $applyDataTable;
 
     public $group_by;
-
-    public $title;
 
     public $ajax;
 
@@ -384,15 +383,6 @@ class CElement_Component_DataTable extends CElement_Component {
         self::exportExcelxmlStatic($export_filename, $table->export_sheetname, $table);
     }
 
-    public function setTitle($title, $lang = true) {
-        if ($lang) {
-            $title = clang::__($title);
-        }
-        $this->title = $title;
-
-        return $this;
-    }
-
     public function setDom($dom) {
         $this->dom = $dom;
 
@@ -633,7 +623,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public function setDataFromModel($model) {
         $modelQuery = $model;
         if ($modelQuery instanceof CModel_Collection) {
-            throw new CException('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');
+            throw new Exception('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');
         }
         $sql = $this->db()->compileBinds($modelQuery->toSql(), $modelQuery->getBindings());
 
@@ -650,7 +640,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->query = $el;
         $this->isElastic = true;
         if ($el instanceof CElastic_Search) {
-            $this->query = $el->ajax_data();
+            $this->query = $el->ajaxData();
         }
 
         return $this;

@@ -202,4 +202,8 @@ class CApp_Auth {
     public function user() {
         return $this->guard()->user();
     }
+
+    public function hasher() {
+        return $this->guard()->hasher();
+    }
 }

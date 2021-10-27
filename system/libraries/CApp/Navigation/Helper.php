@@ -154,6 +154,7 @@ class CApp_Navigation_Helper {
         if ($appId == null) {
             $appId = $app->appId();
         }
+
         $db = CDatabase::instance(null, null, $domain);
 
         /** @var CApp_Model_Roles $role */
@@ -191,7 +192,7 @@ class CApp_Navigation_Helper {
 
             $res = $d;
             if (!is_array($res)) {
-                throw new CException('Error on nav structure on navs: ' . json_encode($navs));
+                throw new Exception('Error on nav structure on navs: ' . json_encode($navs));
             }
 
             $res['level'] = $level;
