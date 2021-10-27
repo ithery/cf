@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CTracker_Repository_Error extends CTracker_AbstractRepository {
     public function __construct() {
-        $this->className = CTracker::config()->get('errorModel', 'CTracker_Model_Error');
+        $this->className = CTracker::config()->get('errorModel', CTracker_Model_Error::class);
         $this->createModel();
 
         parent::__construct();
@@ -20,6 +20,7 @@ class CTracker_Repository_Error extends CTracker_AbstractRepository {
         if ($message = $exception->getMessage()) {
             return $message;
         }
+
         return $message;
     }
 

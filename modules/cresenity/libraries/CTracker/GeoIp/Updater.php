@@ -1,19 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 5:11:59 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 5:11:59 PM
  */
 class CTracker_GeoIp_Updater {
-
     const GEOLITE2_URL_BASE = 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City';
 
     protected $databaseFileGzipped;
+
     protected $databaseFile;
+
     protected $md5File;
+
     protected $messages = [];
 
     /**
@@ -34,6 +37,7 @@ class CTracker_GeoIp_Updater {
         if ($updated = file_get_contents($this->md5File) == md5_file($destinationGeoDbFile)) {
             $this->addMessage('Database is already updated.');
         }
+
         return $updated;
     }
 
@@ -42,6 +46,7 @@ class CTracker_GeoIp_Updater {
      *
      * @param $destinationPath
      * @param $geoDbUrl
+     *
      * @return bool
      */
     protected function downloadGzipped($destinationPath, $geoDbUrl) {
@@ -49,6 +54,7 @@ class CTracker_GeoIp_Updater {
             $this->addMessage("Unable to download file {$geoDbUrl} to {$destination}.");
         }
         $this->databaseFile = $this->dezipGzFile($destinationPath . DIRECTORY_SEPARATOR . basename($geoDbUrl));
+
         return $this->md5Match();
     }
 
@@ -73,6 +79,7 @@ class CTracker_GeoIp_Updater {
      * Make directory.
      *
      * @param $destinationPath
+     *
      * @return bool
      */
     protected function makeDir($destinationPath) {
@@ -87,9 +94,11 @@ class CTracker_GeoIp_Updater {
     private function md5Match() {
         if (!$match = md5_file($this->databaseFile) == file_get_contents($this->md5File)) {
             $this->addMessage("MD5 is not matching for {$this->databaseFile} and {$this->md5File}.");
+
             return false;
         }
         $this->addMessage("Database successfully downloaded to {$this->databaseFile}.");
+
         return true;
     }
 
@@ -97,6 +106,7 @@ class CTracker_GeoIp_Updater {
      * Remove .gzip extension from file.
      *
      * @param $filePath
+     *
      * @return mixed
      */
     protected function removeGzipExtension($filePath) {
@@ -109,6 +119,7 @@ class CTracker_GeoIp_Updater {
      * @param $destinationPath
      * @param null $geoDbUrl
      * @param null $geoDbMd5Url
+     *
      * @return bool
      */
     public function updateGeoIpFiles($destinationPath, $geoDbUrl = null, $geoDbMd5Url = null) {
@@ -119,14 +130,16 @@ class CTracker_GeoIp_Updater {
             return true;
         }
         $this->addMessage("Unknown error downloading {$geoDbUrl}.");
+
         return false;
     }
 
     /**
      * Read url to file.
      *
-     * @param $uri
-     * @param $destinationPath
+     * @param string $uri
+     * @param string $destinationPath
+     *
      * @return bool|string
      */
     protected function getHTTPFile($uri, $destinationPath) {
@@ -135,8 +148,9 @@ class CTracker_GeoIp_Updater {
             return false;
         }
         $fileWriteName = $destinationPath . basename($uri);
-        if (($fileRead = @fopen($uri, "rb")) === false || ($fileWrite = @fopen($fileWriteName, 'wb')) === false) {
+        if (($fileRead = @fopen($uri, 'rb')) === false || ($fileWrite = @fopen($fileWriteName, 'wb')) === false) {
             $this->addMessage("Unable to open {$uri} (read) or {$fileWriteName} (write).");
+
             return false;
         }
         while (!feof($fileRead)) {
@@ -144,11 +158,13 @@ class CTracker_GeoIp_Updater {
             $success = fwrite($fileWrite, $content);
             if ($success === false) {
                 $this->addMessage("Error downloading file {$uri} to {$fileWriteName}.");
+
                 return false;
             }
         }
         fclose($fileWrite);
         fclose($fileRead);
+
         return $fileWriteName;
     }
 
@@ -156,6 +172,7 @@ class CTracker_GeoIp_Updater {
      * Extract gzip file.
      *
      * @param $filePath
+     *
      * @return bool|mixed
      */
     protected function dezipGzFile($filePath) {
@@ -165,19 +182,21 @@ class CTracker_GeoIp_Updater {
         $fileWrite = fopen($out_file_name, 'wb');
         if ($fileRead === false || $fileWrite === false) {
             $this->addMessage("Unable to extract gzip file {$filePath} to {$out_file_name}.");
+
             return false;
         }
         while (!gzeof($fileRead)) {
             $success = fwrite($fileWrite, gzread($fileRead, $buffer_size));
             if ($success === false) {
                 $this->addMessage("Error degzipping file {$filePath} to {$out_file_name}.");
+
                 return false;
             }
         }
         // Files are done, close files
         fclose($fileWrite);
         gzclose($fileRead);
+
         return $out_file_name;
     }
-
 }

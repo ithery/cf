@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 4:15:24 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 4:15:24 PM
  */
 class CTracker_Detect_LanguageDetect extends CTracker_Detect_MobileDetect {
-
     /**
      * Detect preference and language-range.
      *
@@ -28,6 +28,7 @@ class CTracker_Detect_LanguageDetect extends CTracker_Detect_MobileDetect {
      */
     public function getLanguagePreference() {
         $languages = $this->languages();
+
         return count($languages) ? $languages[0] : 'en';
     }
 
@@ -39,5 +40,4 @@ class CTracker_Detect_LanguageDetect extends CTracker_Detect_MobileDetect {
     public function getLanguageRange() {
         return implode(',', $this->languages());
     }
-
 }

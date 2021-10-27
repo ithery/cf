@@ -59,7 +59,7 @@ trait CTrait_Element_Property_TableData {
     public function setDataFromModel($model) {
         $modelQuery = $model;
         if ($modelQuery instanceof CModel_Collection) {
-            throw new CException('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');
+            throw new Exception('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');
         }
         $sql = $this->db->compileBinds($modelQuery->toSql(), $modelQuery->getBindings());
         $this->tableDataType = 'model';

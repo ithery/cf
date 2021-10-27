@@ -14,6 +14,7 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_CheckboxTrait,
         CElement_Component_DataTable_Trait_SearchTrait,
         CElement_Component_DataTable_Trait_FooterTrait;
+
     const ACTION_LOCATION_FIRST = 'first';
 
     const ACTION_LOCATION_LAST = 'last';
@@ -622,7 +623,7 @@ class CElement_Component_DataTable extends CElement_Component {
     public function setDataFromModel($model) {
         $modelQuery = $model;
         if ($modelQuery instanceof CModel_Collection) {
-            throw new CException('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');
+            throw new Exception('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');
         }
         $sql = $this->db()->compileBinds($modelQuery->toSql(), $modelQuery->getBindings());
 
