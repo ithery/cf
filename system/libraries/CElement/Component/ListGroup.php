@@ -11,7 +11,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_Component_ListGroup extends CElement_Component {
     use CTrait_Element_Property_Database,
         CTrait_Element_Property_TableData;
-
     protected $itemCallback = null;
 
     protected $itemCallbackRequire = '';
@@ -28,12 +27,14 @@ class CElement_Component_ListGroup extends CElement_Component {
     public function addItem($id = '') {
         $item = CElement_Factory::createComponent('ListGroup_Item', $id);
         $this->add($item);
+
         return $item;
     }
 
     public function setItemCallback($callback, $require = '') {
         $this->itemCallback = CHelper::closure()->serializeClosure($callback);
         $this->itemCallbackRequire = $require;
+
         return $this;
     }
 
@@ -47,6 +48,7 @@ class CElement_Component_ListGroup extends CElement_Component {
 
     public function setAjax($boolean = true) {
         $this->setTableDataIsAjax(true);
+
         return $this;
     }
 
@@ -83,6 +85,7 @@ class CElement_Component_ListGroup extends CElement_Component {
             $js = 'cresenity.reload(' . json_encode($ajaxOptions) . ')';
         }
         $js .= parent::jsChild($indent);
+
         return $js;
     }
 }

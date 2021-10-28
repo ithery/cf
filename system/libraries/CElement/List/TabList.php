@@ -10,6 +10,11 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_List_TabList extends CElement_List {
     use CTrait_Compat_Element_TabList;
+    /**
+     * Tabs.
+     *
+     * @var CElement_List_TabList_Tab[]
+     */
     protected $tabs;
 
     protected $tabPosition;
@@ -137,7 +142,7 @@ class CElement_List_TabList extends CElement_List {
      */
     public function addWidgetClass($class) {
         if (is_array($class)) {
-            $this->widgetClass = array_merge($class, $this->widgetClass);
+            $this->widgetClass = array_merge($this->widgetClass, $class);
         } else {
             $this->widgetClass[] = $class;
         }
@@ -200,9 +205,9 @@ class CElement_List_TabList extends CElement_List {
         $activeTab = null;
         foreach ($this->tabs as $tab) {
             if (strlen($this->activeTab) == 0) {
-                $this->setActiveTab($tab->id);
+                $this->setActiveTab($tab->id());
             }
-            if ($tab->id == $this->activeTab) {
+            if ($tab->id() == $this->activeTab) {
                 $tab->setActive(true);
                 $activeTab = $tab;
             }

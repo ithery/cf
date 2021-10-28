@@ -12,17 +12,20 @@ class CElement_List_TabList_Tab extends CElement_Element {
     use CTrait_Compat_Element_Tab,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
-
     protected $active;
+
     protected $target;
+
     protected $ajaxUrl;
+
     protected $ajax;
+
     protected $nopadding;
+
     protected $tabList;
 
     public function __construct($id = '') {
         parent::__construct($id);
-        $this->addFriend(CElement_List_TabList::class);
 
         $this->label = '';
         $this->target = '';
@@ -35,6 +38,7 @@ class CElement_List_TabList_Tab extends CElement_Element {
 
     public function setTabList(CElement_List_TabList $tabList) {
         $this->tabList = $tabList;
+
         return $this;
     }
 
@@ -53,16 +57,19 @@ class CElement_List_TabList_Tab extends CElement_Element {
 
     public function setNoPadding($bool = true) {
         $this->nopadding = $bool;
+
         return $this;
     }
 
     public function setTarget($target) {
         $this->target = $target;
+
         return $this;
     }
 
     public function setAjaxUrl($url) {
         $this->ajaxUrl = $url;
+
         return $this;
     }
 
@@ -72,6 +79,7 @@ class CElement_List_TabList_Tab extends CElement_Element {
 
     public function setAjax($bool = true) {
         $this->ajax = $bool;
+
         return $this;
     }
 
@@ -156,6 +164,7 @@ class CElement_List_TabList_Tab extends CElement_Element {
         $html->appendln(parent::htmlChild($html->getIndent()));
         $html->appendln('</div>');
         $html->appendln('</div>');
+
         return $html->text();
     }
 
@@ -163,6 +172,7 @@ class CElement_List_TabList_Tab extends CElement_Element {
         $js = new CStringBuilder();
         $js->setIndent($indent);
         $js->appendln(parent::js($indent));
+
         return $js->text();
     }
 }

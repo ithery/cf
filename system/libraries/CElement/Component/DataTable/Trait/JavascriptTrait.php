@@ -25,7 +25,6 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
 
             $ajaxMethod->setData('dbConfig', $this->dbConfig);
             $ajaxMethod->setData('dbName', $this->dbName);
-            $ajaxMethod->setData('domain', $this->domain);
             $ajaxMethod->setData('actionLocation', $this->actionLocation);
             $ajaxMethod->setData('checkbox', $this->checkbox);
             $ajaxMethod->setData('isElastic', $this->isElastic);
@@ -51,7 +50,6 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
         }
 
         if ($this->applyDataTable > 0) {
-            $length_menu = '';
             $km = '';
             $vm = '';
             foreach ($this->paging_list as $k => $v) {

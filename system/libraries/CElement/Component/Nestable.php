@@ -11,7 +11,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_Component_Nestable extends CElement_Component {
     use CTrait_Compat_Element_Nestable,
         CTrait_Element_ActionList_Row;
-
     protected $data;
 
     protected $id_key;
@@ -61,6 +60,7 @@ class CElement_Component_Nestable extends CElement_Component {
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
+
         return $this;
     }
 
@@ -69,17 +69,19 @@ class CElement_Component_Nestable extends CElement_Component {
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
+
         return $this;
     }
 
     public function setDataFromTreeDb(CTreeDB $treedb, $parentId = null) {
         $this->data = $treedb->getChildrenData($parentId);
+
         return $this;
     }
 
     public function setDataFromModel(CModel $root) {
         /**
-         * NOT DONE
+         * NOT DONE.
          */
         $orgId = CApp_Base::orgId();
 
@@ -106,41 +108,49 @@ class CElement_Component_Nestable extends CElement_Component {
         $traverse($tree);
 
         $this->data = $childArray;
+
         return $this;
     }
 
     public function setDataFromArray($array = []) {
         $this->data = $array;
+
         return $this;
     }
 
     public function setIdKey($idKey) {
         $this->id_key = $idKey;
+
         return $this;
     }
 
     public function setDisableDnd($disableDnd) {
         $this->disable_dnd = $disableDnd;
+
         return $this;
     }
 
     public function setHaveCheckbox($checkbox) {
         $this->checkbox = $checkbox;
+
         return $this;
     }
 
     public function setInput($input) {
         $this->input = $input;
+
         return $this;
     }
 
     public function setValueKey($valueKey) {
         $this->value_key = $valueKey;
+
         return $this;
     }
 
     public function setApplyJs($boolean) {
         $this->applyjs = $boolean;
+
         return $this;
     }
 
@@ -178,11 +188,11 @@ class CElement_Component_Nestable extends CElement_Component {
                 $newV = $val;
                 if ($this->displayCallbackFunc !== false && is_callable($this->displayCallbackFunc)) {
                     $newV = CFunction::factory($this->displayCallbackFunc)
-                            ->addArg($this)
-                            ->addArg($d)
-                            ->addArg($val)
-                            ->setRequire($this->requires)
-                            ->execute();
+                        ->addArg($this)
+                        ->addArg($d)
+                        ->addArg($val)
+                        ->setRequire($this->requires)
+                        ->execute();
                 }
                 $html->appendln($newV);
                 $html->decIndent()->appendln('</div>');
@@ -204,11 +214,11 @@ class CElement_Component_Nestable extends CElement_Component {
 
                         foreach ($actions as $action) {
                             $visibility = CFunction::factory($this->filterActionCallbackFunc)
-                                    ->addArg($this)
-                                    ->addArg($d)
-                                    ->addArg($action)
-                                    ->setRequire($this->requires)
-                                    ->execute();
+                                ->addArg($this)
+                                ->addArg($d)
+                                ->addArg($action)
+                                ->setRequire($this->requires)
+                                ->execute();
 
                             $action->setVisibility($visibility);
                         }
@@ -226,6 +236,7 @@ class CElement_Component_Nestable extends CElement_Component {
             }
         }
         $html->decIndent()->appendln('</div>');
+
         return $html->text();
     }
 
@@ -272,6 +283,7 @@ class CElement_Component_Nestable extends CElement_Component {
         $js->append($this->js_cell)->br();
 
         $js->append($this->jsChild($indent))->br();
+
         return $js->text();
     }
 }
