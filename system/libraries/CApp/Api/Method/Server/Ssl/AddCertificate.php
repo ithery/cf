@@ -46,8 +46,8 @@ class CApp_Api_Method_Server_Ssl_AddCertificate extends CApp_Api_Method_Server {
 
             file_put_contents("$certDirectory/private.pem", $private);
             file_put_contents("$certDirectory/public.pem", $public);
-            file_put_contents("$certDirectory/certificate.crt", $public);
-            file_put_contents("$certDirectory/fullchain.crt", $public);
+            file_put_contents("$certDirectory/certificate.crt", $certificate);
+            file_put_contents("$certDirectory/fullchain.crt", $fullchain);
 
             if (
                 !file_exists("$certDirectory/private.pem")
