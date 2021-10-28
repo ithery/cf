@@ -14,7 +14,6 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_CheckboxTrait,
         CElement_Component_DataTable_Trait_SearchTrait,
         CElement_Component_DataTable_Trait_FooterTrait;
-
     const ACTION_LOCATION_FIRST = 'first';
 
     const ACTION_LOCATION_LAST = 'last';
@@ -77,14 +76,6 @@ class CElement_Component_DataTable extends CElement_Component {
     public $icon;
 
     public $editable_form;
-
-    public $can_edit;
-
-    public $can_add;
-
-    public $can_delete;
-
-    public $can_view;
 
     public $headerNoLineBreak;
 
@@ -178,10 +169,6 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->ajax_method = 'get';
         $this->title = '';
         $this->editable_form = null;
-        $this->can_edit = false;
-        $this->can_add = false;
-        $this->can_delete = false;
-        $this->can_view = false;
         $this->export_pdf = false;
         $this->export_excelxml = false;
         $this->export_excelcsv = false;
