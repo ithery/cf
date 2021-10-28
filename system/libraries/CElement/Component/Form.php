@@ -2,7 +2,6 @@
 
 class CElement_Component_Form extends CElement_Component {
     use CTrait_Compat_Element_Form;
-
     protected $name;
 
     protected $method;
@@ -101,21 +100,24 @@ class CElement_Component_Form extends CElement_Component {
         if ($this->submitListener == null) {
             $this->submitListener = new CObservable_Listener($this->id, $event);
         }
+
         return $this->submitListener;
     }
 
     public function setName($name) {
         $this->name = $name;
+
         return $this;
     }
 
     public function setLayout($layout) {
         $this->layout = $layout;
+
         return $this;
     }
 
     /**
-     * Set action attribute value of form element
+     * Set action attribute value of form element.
      *
      * @param string $action action attribute of form
      *
@@ -123,11 +125,12 @@ class CElement_Component_Form extends CElement_Component {
      */
     public function setAction($action) {
         $this->action = $action;
+
         return $this;
     }
 
     /**
-     * Set method attribute value of form element
+     * Set method attribute value of form element.
      *
      * @param string $method POST|GET|PUT|DELETE
      *
@@ -135,6 +138,7 @@ class CElement_Component_Form extends CElement_Component {
      */
     public function setMethod($method) {
         $this->method = $method;
+
         return $this;
     }
 
@@ -143,7 +147,7 @@ class CElement_Component_Form extends CElement_Component {
     }
 
     /**
-     * Set target attribute value of form element
+     * Set target attribute value of form element.
      *
      * @param string $target target attribute of form
      *
@@ -151,11 +155,12 @@ class CElement_Component_Form extends CElement_Component {
      */
     public function setTarget($target) {
         $this->target = $target;
+
         return $this;
     }
 
     /**
-     * Set enctype attribute value of form element
+     * Set enctype attribute value of form element.
      *
      * @param mixed $encType
      *
@@ -163,6 +168,7 @@ class CElement_Component_Form extends CElement_Component {
      */
     public function setEncType($encType = 'multipart/form-data') {
         $this->enctype = $encType;
+
         return $this;
     }
 
@@ -173,6 +179,7 @@ class CElement_Component_Form extends CElement_Component {
      */
     public function setAutoComplete($bool) {
         $this->autocomplete = $bool;
+
         return $this;
     }
 
@@ -194,15 +201,17 @@ class CElement_Component_Form extends CElement_Component {
             $ajaxUrl = $ajaxMethod->makeUrl();
 
             $this->remoteValidationUrl = $ajaxUrl;
+
             return $this;
         }
 
         $this->validation = $validationData;
+
         return $this;
     }
 
     /**
-     * Make form to submit through ajax
+     * Make form to submit through ajax.
      *
      * @param string $bool
      *
@@ -210,16 +219,19 @@ class CElement_Component_Form extends CElement_Component {
      */
     public function setAjaxSubmit($bool = true) {
         $this->ajax_submit = $bool;
+
         return $this;
     }
 
     public function setAjaxDataType($datatype) {
         $this->ajax_datatype = $datatype;
+
         return $this;
     }
 
     public function setAjaxSubmitTarget($target) {
         $this->ajax_submit_target = $target;
+
         return $this;
     }
 
@@ -233,6 +245,7 @@ class CElement_Component_Form extends CElement_Component {
         if (strlen($this->method) > 0) {
             $data['attr']['method'] = $this->method;
         }
+
         return $data;
     }
 
@@ -295,11 +308,11 @@ class CElement_Component_Form extends CElement_Component {
             $ajax_url = $this->action;
             if (strlen($redirect_url) == 0) {
                 //ajax to this page
-                $ajax_url = curl::base() . crouter::complete_uri();
+                $ajax_url = curl::base() . CFRouter::getCompleteUri();
             }
             if (strlen($redirect_url) == 0) {
                 //redirect to this page
-                $redirect_url = curl::base() . crouter::complete_uri();
+                $redirect_url = curl::base() . CFRouter::getCompleteUri();
             }
             $script_redirect_url = '';
             if ($this->ajax_redirect) {
@@ -329,15 +342,15 @@ class CElement_Component_Form extends CElement_Component {
 					var result = data.result;
 					var message = data.message;
 					if(result=='OK'||result=='1'||result===true) {
-						$.cresenity.message('success',message);
+						cresenity.message('success',message);
 						" . $script_redirect_url . "
 					} else {
-						$.cresenity.message('error',message);
+						cresenity.message('error',message);
 					}
 				} else if(typeof data== 'string') {
 					if(data.toLowerCase().substring(0,5) != 'error') {
 						if(data!='') {
-							$.cresenity.message('success',data);
+							cresenity.message('success',data);
 						} else {
 							//do nothing
 							//the message must be set on session
@@ -349,7 +362,7 @@ class CElement_Component_Form extends CElement_Component {
 
 
 				} else {
-					$.cresenity.message('success',data);
+					cresenity.message('success',data);
 					" . $script_redirect_url . '
 				}
 			';
@@ -472,7 +485,7 @@ class CElement_Component_Form extends CElement_Component {
 							error: function(xhr, status, error) {
 								$('#" . $this->id . "').find('*').removeClass('disabled');
 								$('#" . $this->id . "').removeClass('loading');
-								$.cresenity.message('error','[AJAX] ' + status + ' - Server reponse is: ' + xhr.responseText);
+								cresenity.message('error','[AJAX] ' + status + ' - Server reponse is: ' + xhr.responseText);
 								$('#" . $this->id . "').find('*').removeClass('disabled');
 							}
 						}
