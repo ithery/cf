@@ -251,17 +251,6 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2
      *
-     * @param mixed $group_by
-     *
-     * @return $this
-     */
-    public function set_group_by($group_by) {
-        return $this->setGroupBy($group_by);
-    }
-
-    /**
-     * @deprecated since version 1.2
-     *
      * @param mixed $id
      *
      * @return $this
