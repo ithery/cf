@@ -2,7 +2,6 @@
 
 class CHandler extends CObject {
     use CTrait_Compat_Handler;
-
     const TYPE_REMOVE = 'remove';
 
     const TYPE_RELOAD = 'reload';
@@ -59,6 +58,7 @@ class CHandler extends CObject {
      */
     public function setUrlParam($param) {
         $this->driver->set_url_param($param);
+
         return $this;
     }
 
@@ -69,23 +69,8 @@ class CHandler extends CObject {
      * @return \CHandler
      */
     public function __call($method, $args) {
-        if (!count($args)) {
-            $this->driver->$method($args);
-        } else {
-            $str = '';
+        $this->driver->$method(...$args);
 
-            $values = array_values($args);
-            for ($i = 0; $i < count($values); $i++) {
-                if (strlen($str) > 0) {
-                    $str .= ',';
-                }
-                $str .= '' . cphp::string_value($values[$i]) . '';
-            }
-            //$str = substr($str, 0, -2);
-            eval('$this->driver->' . $method . '(' . $str . ');');
-        }
-
-        //$this->driver->$method($args);
         return $this;
     }
 
