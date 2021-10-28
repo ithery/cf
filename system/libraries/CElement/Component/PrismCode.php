@@ -32,11 +32,13 @@ class CElement_Component_PrismCode extends CElement_Component {
 
     public function setLanguage($lang) {
         $this->prismLanguage = $lang;
+
         return $this;
     }
 
     public function setTheme($theme) {
         $this->prismTheme = $theme;
+
         return $this;
     }
 
@@ -55,16 +57,19 @@ class CElement_Component_PrismCode extends CElement_Component {
 
     public function setHaveCopyToClipboard($bool = true) {
         $this->haveCopyToClipboard = $bool;
+
         return $this;
     }
 
     public function setHaveSelectCode($bool = true) {
         $this->haveSelectCode = $bool;
+
         return $this;
     }
 
     public function setWrap($bool = true) {
         $this->isWrap = $bool;
+
         return $this;
     }
 
@@ -135,6 +140,7 @@ class CElement_Component_PrismCode extends CElement_Component {
             });";
         }
         $js .= 'Prism.highlightAll();';
+
         return $js;
     }
 }
