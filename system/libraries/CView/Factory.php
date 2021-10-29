@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Factory
+ * Description of Factory.
  *
  * @author Hery
  */
@@ -40,11 +40,6 @@ class CView_Factory {
     protected $shared = [];
 
     /**
-     * @var CView_Factory
-     */
-    private static $instance;
-
-    /**
      * The view composer events.
      *
      * @var array
@@ -66,6 +61,11 @@ class CView_Factory {
     protected $renderedOnce = [];
 
     /**
+     * @var CView_Factory
+     */
+    private static $instance;
+
+    /**
      * Get the CView_Factory single instance.
      *
      * @return CView_Factory
@@ -74,6 +74,7 @@ class CView_Factory {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -130,9 +131,9 @@ class CView_Factory {
      * @param \CInterface_Arrayable|array $data
      * @param array                       $mergeData
      *
-     * @return \CView_View
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return \CView_View
      */
     public function first(array $views, $data = [], $mergeData = []) {
         $view = carr::first($views, function ($view) {
@@ -245,6 +246,7 @@ class CView_Factory {
         } catch (InvalidArgumentException $e) {
             return false;
         }
+
         return true;
     }
 
@@ -253,9 +255,9 @@ class CView_Factory {
      *
      * @param string $path
      *
-     * @return CView_EngineAbstract
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return CView_EngineAbstract
      */
     public function getEngineFromPath($path) {
         if (!$extension = $this->getExtension($path)) {
@@ -272,7 +274,7 @@ class CView_Factory {
      *
      * @param string $path
      *
-     * @return string|null
+     * @return null|string
      */
     protected function getExtension($path) {
         $extensions = array_keys($this->extensions);
@@ -286,7 +288,7 @@ class CView_Factory {
      * Add a piece of shared data to the environment.
      *
      * @param array|string $key
-     * @param mixed|null   $value
+     * @param null|mixed   $value
      *
      * @return mixed
      */
@@ -407,7 +409,7 @@ class CView_Factory {
      *
      * @param string        $extension
      * @param string        $engine
-     * @param \Closure|null $resolver
+     * @param null|\Closure $resolver
      *
      * @return void
      */
@@ -553,6 +555,7 @@ class CView_Factory {
         if (strlen($appCode) > 0) {
             $path .= '/' . $appCode;
         }
+
         return $path;
     }
 }

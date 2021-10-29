@@ -20,6 +20,11 @@ trait CApp_Concern_NavigationTrait {
         }
         if (is_string($nav)) {
             $fileNav = CF::getFile('navs', $nav);
+            if ($fileNav == null) {
+                if ($nav == 'nav') {
+                    $fileNav = CF::getFile('config', $nav);
+                }
+            }
             // if ($fileNav == null) {
             //     throw new CApp_Exception(c::__('Nav :nav not exists', ['nav' => $nav]));
             // }
