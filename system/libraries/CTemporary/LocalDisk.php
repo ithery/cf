@@ -1,11 +1,6 @@
 <?php
 
-class CTemporary_LocalDisk {
-    /**
-     * @var CStorage_Adapter
-     */
-    protected $disk;
-
+class CTemporary_LocalDisk extends CTemporary_DiskAbstract {
     public function __construct() {
         $this->disk = CStorage::instance()->createLocalDriver([
             'driver' => 'local',
