@@ -9,8 +9,4 @@ class CTemporary_LocalDisk extends CTemporary_DiskAbstract {
             'visibility' => 'public',
         ]);
     }
-
-    public function directory($folder) {
-        return new CTemporary_Directory($this, $folder);
-    }
 }
