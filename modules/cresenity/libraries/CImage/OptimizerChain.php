@@ -1,11 +1,5 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
@@ -14,14 +8,17 @@ class CImage_OptimizerChain {
 
     protected $optimizers = [];
 
-    /** @var \Psr\Log\LoggerInterface */
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
     protected $logger;
 
-    /** @var int */
+    /**
+     * @var int
+     */
     protected $timeout = 60;
 
     public function __construct() {
-
         $this->useLogger(new CImage_Logger_NullLogger());
     }
 
@@ -31,6 +28,7 @@ class CImage_OptimizerChain {
 
     public function addOptimizer(CImage_OptimizerAbstract $optimizer) {
         $this->optimizers[] = $optimizer;
+
         return $this;
     }
 
@@ -39,20 +37,24 @@ class CImage_OptimizerChain {
         foreach ($optimizers as $optimizer) {
             $this->addOptimizer($optimizer);
         }
+
         return $this;
     }
 
-    /*
+    /**
      * Set the amount of seconds each separate optimizer may use.
+     *
+     * @param int $timeoutInSeconds
      */
-
     public function setTimeout($timeoutInSeconds) {
         $this->timeout = $timeoutInSeconds;
+
         return $this;
     }
 
     public function useLogger(LoggerInterface $log) {
         $this->logger = $log;
+
         return $this;
     }
 
@@ -79,17 +81,17 @@ class CImage_OptimizerChain {
         $this->logger->info("Executing `{$command}`");
         $process = Process::fromShellCommandline($command);
         $process
-                ->setTimeout($this->timeout)
-                ->run();
+            ->setTimeout($this->timeout)
+            ->run();
         $this->logResult($process);
     }
 
     protected function logResult(Process $process) {
         if (!$process->isSuccessful()) {
             $this->logger->error("Process errored with `{$process->getErrorOutput()}`");
+
             return;
         }
         $this->logger->info("Process successfully ended with output `{$process->getOutput()}`");
     }
-
 }
