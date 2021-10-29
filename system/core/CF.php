@@ -489,7 +489,7 @@ final class CF {
      * @param null|mixed $default
      * @param mixed      $required
      *
-     * @return array|CConfig|mixed
+     * @return CConfig|mixed
      */
     public static function config($group, $default = null, $required = true) {
         $path = null;
