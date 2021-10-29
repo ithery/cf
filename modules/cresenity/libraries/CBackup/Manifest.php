@@ -1,14 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CBackup_Manifest implements Countable {
-
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $manifestPath;
 
     public static function create($manifestPath) {
@@ -38,6 +33,7 @@ class CBackup_Manifest implements Countable {
                 file_put_contents($this->manifestPath, $filePath . PHP_EOL, FILE_APPEND);
             }
         }
+
         return $this;
     }
 
@@ -57,7 +53,7 @@ class CBackup_Manifest implements Countable {
     public function count() {
         $file = new SplFileObject($this->manifestPath, 'r');
         $file->seek(PHP_INT_MAX);
+
         return $file->key();
     }
-
 }
