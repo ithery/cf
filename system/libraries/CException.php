@@ -94,4 +94,30 @@ class CException extends Exception {
 
         return static::$exceptionHandler;
     }
+
+    /**
+     * Create Exception Solution.
+     *
+     * @param string $title
+     *
+     * @return CException_Solution
+     */
+    public static function createSolution($title = '') {
+        return CException_Solution::create($title);
+    }
+
+    public static function config() {
+        return CException_Config::instance();
+    }
+
+    public static function manager() {
+        return CException_Manager::instance();
+    }
+
+    public static function init() {
+        //load all singleton for make sure exception handler can run
+        static::exceptionHandler();
+        static::config();
+        static::manager();
+    }
 }
