@@ -9,8 +9,13 @@ class CRouting_RouteFinder {
     public static function find($uri = null) {
         if ($uri == null) {
             $uri = CHTTP::request()->path();
+            if (PHP_SAPI == 'cli') {
+                $uri = CFRouter::findUri();
+            }
+
             $uri = trim($uri, '/');
         }
+
         $routeDataBefore = static::getRouteData($uri);
         $routedUri = CFRouter::routedUri($uri);
 

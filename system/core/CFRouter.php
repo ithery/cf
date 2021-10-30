@@ -282,7 +282,6 @@ class CFRouter {
                 // Command line requires a bit of hacking
                 if (isset($_SERVER['argv'][1])) {
                     $currentUri = $_SERVER['argv'][1];
-
                     // Remove GET string from segments
                     if (($query = strpos($currentUri, '?')) !== false) {
                         list($currentUri, $query) = explode('?', $currentUri, 2);
