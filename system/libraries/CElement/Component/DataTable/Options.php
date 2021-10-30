@@ -65,7 +65,7 @@ class CElement_Component_DataTable_Options {
             'searching' => true,
             'lengthChange' => true,
             'autoWidth' => false,
-            'pagingType' => static::OPTION_PAGING_TYPE_FULL,
+            'pagingType' => static::OPTION_PAGING_TYPE_FULL_NUMBERS,
             'height' => false,
         ];
         foreach ($defaultOptions as $key => $value) {
