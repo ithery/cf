@@ -209,4 +209,8 @@ class CLogger {
             }
         }
     }
+
+    public static function getLevels() {
+        return static::$logLevels;
+    }
 }

@@ -683,7 +683,8 @@ class cdbg {
             if (strlen($email) == 0) {
                 $email = 'hery@ittron.co.id';
             }
-            cmail::send_smtp($email, $subject, $body);
+
+            return CEmail::sender()->send($email, $subject, $message, []);
         } catch (Exception $ex) {
             echo 'Error Email Deprecated' . $ex->getMessage();
         }

@@ -300,4 +300,26 @@ class CManager_Asset {
 
         return $compiler->compile();
     }
+
+    /**
+     * @return CImage_OptimizerChain
+     */
+    public function optimizer() {
+        return new CImage_OptimizerChain();
+    }
+
+    public function findMediaPath($path) {
+        return CF::findFile('media', $path);
+    }
+
+    public function optimize($path) {
+        if (!CFile::exists($path)) {
+            $path = $this->findMediaPath($path);
+        }
+        if (!CFile::exists($path)) {
+            throw new Exception('Path ' . $path . 'not exists');
+        }
+
+        return $this->optimizer()->optimize($path);
+    }
 }

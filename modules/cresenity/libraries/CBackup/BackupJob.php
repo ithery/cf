@@ -42,6 +42,7 @@ class CBackup_BackupJob {
 
     public function dontBackupFilesystem() {
         $this->fileSelection = CBackup_FileSelection::create();
+
         return $this;
     }
 
@@ -51,36 +52,43 @@ class CBackup_BackupJob {
                 return in_array($connectionName, $allowedDbNames);
             }
         );
+
         return $this;
     }
 
     public function dontBackupDatabases() {
         $this->dbDumpers = new CCollection();
+
         return $this;
     }
 
     public function disableNotifications() {
         $this->sendNotifications = false;
+
         return $this;
     }
 
     public function setDefaultFilename() {
         $this->filename = Carbon::now()->format('Y-m-d-H-i-s') . '.zip';
+
         return $this;
     }
 
     public function setFileSelection(CBackup_FileSelection $fileSelection) {
         $this->fileSelection = $fileSelection;
+
         return $this;
     }
 
     public function setDatabaseDumpers(CCollection $dbDumpers) {
         $this->dbDumpers = $dbDumpers;
+
         return $this;
     }
 
     public function setFilename($filename) {
         $this->filename = $filename;
+
         return $this;
     }
 
@@ -91,11 +99,13 @@ class CBackup_BackupJob {
         if (!count($this->backupDestinations)) {
             throw CBackup_Exception_InvalidBackupJobException::destinationDoesNotExist($diskName);
         }
+
         return $this;
     }
 
     public function setBackupDestinations(CCollection $backupDestinations) {
         $this->backupDestinations = $backupDestinations;
+
         return $this;
     }
 
@@ -108,6 +118,7 @@ class CBackup_BackupJob {
         $zipFile = '';
         $files = [];
         $size = 0;
+
         try {
             if (!count($this->backupDestinations)) {
                 throw CBackup_Exception_InvalidBackupJobException::noDestinationsSpecified();
@@ -123,10 +134,12 @@ class CBackup_BackupJob {
             CBackup::output()->error("Backup failed because {$exception->getMessage()}." . PHP_EOL . $exception->getTraceAsString());
             //$this->sendNotification(new BackupHasFailed($exception));
             $this->temporaryDirectory->delete();
+
             throw $exception;
         }
         $this->temporaryDirectory->delete();
         $output = CBackup::output()->getAndClearOutput();
+
         return [
             'files' => $files,
             'size' => $size,
@@ -138,14 +151,15 @@ class CBackup_BackupJob {
         $databaseDumps = $this->dumpDatabases();
         CBackup::output()->info('Determining files to backup...');
         $manifest = CBackup_Manifest::create($this->temporaryDirectory->getPath('manifest.txt'))
-                ->addFiles($databaseDumps)
-                ->addFiles($this->filesToBeBackedUp());
+            ->addFiles($databaseDumps)
+            ->addFiles($this->filesToBeBackedUp());
         //$this->sendNotification(new BackupManifestWasCreated($manifest));
         return $manifest;
     }
 
     public function filesToBeBackedUp() {
         $this->fileSelection->excludeFilesFrom($this->directoriesUsedByBackupJob());
+
         return $this->fileSelection->selectedFiles();
     }
 
@@ -198,6 +212,7 @@ class CBackup_BackupJob {
             }
             $temporaryFilePath = $this->temporaryDirectory->getPath('db-dumps' . DIRECTORY_SEPARATOR . $fileName);
             $dbDumper->dumpToFile($temporaryFilePath);
+
             return $temporaryFilePath;
         })->toArray();
     }

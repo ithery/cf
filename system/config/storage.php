@@ -42,6 +42,12 @@ return [
             'driver' => 'local',
             'root' => DOCROOT,
         ],
+        'local-temp' => [
+            'driver' => 'local',
+            'root' => DOCROOT . 'temp',
+            'url' => curl::httpbase() . 'temp',
+            'visibility' => 'public',
+        ],
         'public' => [
             'driver' => 'local',
             'root' => DOCROOT . 'public',

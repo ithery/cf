@@ -149,7 +149,7 @@ class CFile {
 
     /**
      * Give the diff of time modified file and given time parameters
-     * Use current time if parameter $time not passed
+     * Use current time if parameter $time not passed.
      *
      * @param string     $filename
      * @param string|int $time
@@ -437,14 +437,14 @@ class CFile {
         $eol = PHP_EOL;
         $indent = str_repeat($indentString, $level);
         if (is_array($val)) {
-            $str .= 'array(' . $eol;
-            $indent2 = str_repeat($indentString, $level + 1);
+            $str .= '[' . $eol;
+            $indent2 = $indent . $indentString;
             foreach ($val as $k => $v) {
                 $str .= $indent2 . "'" . addslashes($k) . "'=>";
                 $str .= static::phpValue($v, $level + 1);
                 $str .= ',' . $eol;
             }
-            $str .= $indent . ')';
+            $str .= $indent . ']';
         } elseif (is_null($val)) {
             $str .= 'NULL';
         } elseif (is_bool($val)) {
@@ -545,7 +545,7 @@ class CFile {
      * Get or set UNIX mode of a file or directory.
      *
      * @param string   $path
-     * @param int|null $mode
+     * @param null|int $mode
      *
      * @return mixed
      */

@@ -15,7 +15,7 @@ class CElement_Element_A extends CElement_Element {
     }
 
     /**
-     * Set href attribute
+     * Set href attribute.
      *
      * @param string $href
      *
@@ -27,11 +27,12 @@ class CElement_Element_A extends CElement_Element {
     public function set_href($href) {
         // @codingStandardsIgnoreEnd
         $this->href = $href;
+
         return $this;
     }
 
     /**
-     * Set href attribute
+     * Set href attribute.
      *
      * @param string $href
      *
@@ -39,11 +40,13 @@ class CElement_Element_A extends CElement_Element {
      */
     public function setHref($href) {
         $this->href = $href;
+
         return $this;
     }
 
     public function setTarget($target = '_blank') {
         $this->target = $target;
+
         return $this;
     }
 
