@@ -22,6 +22,3 @@ final class EmulatedHttpClient implements HttpClient, HttpAsyncClient
         $this->httpAsyncClient = $httpAsyncClient;
     }
 }
-httpClient;
-    }
-}

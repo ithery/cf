@@ -30,12 +30,3 @@ trait HttpClientDecorator
         return $this->httpClient->sendRequest($request);
     }
 }
-ublic function sendAsyncRequest(RequestInterface $request)
-    {
-        try {
-            return new Promise\HttpFulfilledPromise($this->sendRequest($request));
-        } catch (Exception $e) {
-            return new Promise\HttpRejectedPromise($e);
-        }
-    }
-}

@@ -14,6 +14,3 @@ use Http\Client\Exception\HttpException;
 final class ClientErrorException extends HttpException
 {
 }
-eption
-{
-}

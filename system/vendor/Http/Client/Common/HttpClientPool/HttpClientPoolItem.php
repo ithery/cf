@@ -2,46 +2,180 @@
 
 declare(strict_types=1);
 
-namespace Http\Client\Common\Plugin;
+namespace Http\Client\Common\HttpClientPool;
 
-use Http\Client\Common\Plugin;
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Http\Client\Common\FlexibleHttpClient;
+use Http\Client\Exception;
+use Http\Client\HttpAsyncClient;
+use Http\Client\HttpClient;
+use Psr\Http\Client\ClientInterface;
+use Psr\Http\Message\RequestInterface;
+use Psr\Http\Message\ResponseInterface;
 
 /**
+ * A HttpClientPoolItem represent a HttpClient inside a Pool.
+ *
+ * It is disabled when a request failed and can be reenabled after a certain number of seconds.
+ * It also keep tracks of the current number of open requests the client is currently being sending
+ * (only usable for async method).
+ *
+ * This class is used internally in the client pools and is not supposed to be used anywhere else.
+ *
+ * @final
+ *
  * @internal
+ *
+ * @author Joel Wurtz <joel.wurtz@gmail.com>
  */
-abstract class SeekableBodyPlugin implements Plugin
+class HttpClientPoolItem implements HttpClient, HttpAsyncClient
 {
     /**
-     * @var bool
+     * @var int Number of request this client is currently sending
      */
-    protected $useFileBuffer;
+    private $sendingRequestCount = 0;
 
     /**
-     * @var int
+     * @var \DateTime|null Time when this client has been disabled or null if enable
      */
-    protected $memoryBufferSize;
+    private $disabledAt;
 
     /**
-     * @param array $config {
+     * Number of seconds until this client is enabled again after an error.
      *
-     *    @var bool $use_file_buffer    Whether this plugin should use a file as a buffer if the stream is too big, defaults to true
-     *    @var int  $memory_buffer_size Max memory size in bytes to use for the buffer before it use a file, defaults to 2097152 (2 mb)
-     * }
+     * null: never reenable this client.
+     *
+     * @var int|null
      */
-    public function __construct(array $config = [])
+    private $reenableAfter;
+
+    /**
+     * @var FlexibleHttpClient A http client responding to async and sync request
+     */
+    private $client;
+
+    /**
+     * @param ClientInterface|HttpAsyncClient $client
+     * @param int|null                        $reenableAfter Number of seconds until this client is enabled again after an error
+     */
+    public function __construct($client, int $reenableAfter = null)
     {
-        $resolver = new OptionsResolver();
-        $resolver->setDefaults([
-            'use_file_buffer' => true,
-            'memory_buffer_size' => 2097152,
-        ]);
-        $resolver->setAllowedTypes('use_file_buffer', 'bool');
-        $resolver->setAllowedTypes('memory_buffer_size', 'int');
+        if (!$client instanceof ClientInterface && !$client instanceof HttpAsyncClient) {
+            throw new \TypeError(
+                sprintf('%s::__construct(): Argument #1 ($client) must be of type %s|%s, %s given', self::class, ClientInterface::class, HttpAsyncClient::class, get_debug_type($client))
+            );
+        }
 
-        $options = $resolver->resolve($config);
+        $this->client = new FlexibleHttpClient($client);
+        $this->reenableAfter = $reenableAfter;
+    }
 
-        $this->useFileBuffer = $options['use_file_buffer'];
-        $this->memoryBufferSize = $options['memory_buffer_size'];
+    /**
+     * {@inheritdoc}
+     */
+    public function sendRequest(RequestInterface $request): ResponseInterface
+    {
+        if ($this->isDisabled()) {
+            throw new Exception\RequestException('Cannot send the request as this client has been disabled', $request);
+        }
+
+        try {
+            $this->incrementRequestCount();
+            $response = $this->client->sendRequest($request);
+            $this->decrementRequestCount();
+        } catch (Exception $e) {
+            $this->disable();
+            $this->decrementRequestCount();
+
+            throw $e;
+        }
+
+        return $response;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function sendAsyncRequest(RequestInterface $request)
+    {
+        if ($this->isDisabled()) {
+            throw new Exception\RequestException('Cannot send the request as this client has been disabled', $request);
+        }
+
+        $this->incrementRequestCount();
+
+        return $this->client->sendAsyncRequest($request)->then(function ($response) {
+            $this->decrementRequestCount();
+
+            return $response;
+        }, function ($exception) {
+            $this->disable();
+            $this->decrementRequestCount();
+
+            throw $exception;
+        });
+    }
+
+    /**
+     * Whether this client is disabled or not.
+     *
+     * If the client was disabled, calling this method checks if the client can
+     * be reenabled and if so enables it.
+     */
+    public function isDisabled(): bool
+    {
+        if (null !== $this->reenableAfter && null !== $this->disabledAt) {
+            // Reenable after a certain time
+            $now = new \DateTime();
+
+            if (($now->getTimestamp() - $this->disabledAt->getTimestamp()) >= $this->reenableAfter) {
+                $this->enable();
+
+                return false;
+            }
+
+            return true;
+        }
+
+        return null !== $this->disabledAt;
+    }
+
+    /**
+     * Get current number of request that are currently being sent by the underlying HTTP client.
+     */
+    public function getSendingRequestCount(): int
+    {
+        return $this->sendingRequestCount;
+    }
+
+    /**
+     * Increment the request count.
+     */
+    private function incrementRequestCount(): void
+    {
+        ++$this->sendingRequestCount;
+    }
+
+    /**
+     * Decrement the request count.
+     */
+    private function decrementRequestCount(): void
+    {
+        --$this->sendingRequestCount;
+    }
+
+    /**
+     * Enable the current client.
+     */
+    private function enable(): void
+    {
+        $this->disabledAt = null;
+    }
+
+    /**
+     * Disable the current client.
+     */
+    private function disable(): void
+    {
+        $this->disabledAt = new \DateTime('now');
     }
 }

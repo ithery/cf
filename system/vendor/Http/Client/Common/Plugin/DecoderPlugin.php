@@ -5,32 +5,47 @@ declare(strict_types=1);
 namespace Http\Client\Common\Plugin;
 
 use Http\Client\Common\Plugin;
-use Http\Client\Exception\TransferException;
-use Http\Message\Cookie;
-use Http\Message\CookieJar;
-use Http\Message\CookieUtil;
-use Http\Message\Exception\UnexpectedValueException;
+use Http\Message\Encoding;
 use Http\Promise\Promise;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 /**
- * Handle request cookies.
+ * Allow to decode response body with a chunk, deflate, compress or gzip encoding.
+ *
+ * If zlib is not installed, only chunked encoding can be handled.
+ *
+ * If Content-Encoding is not disabled, the plugin will add an Accept-Encoding header for the encoding methods it supports.
  *
  * @author Joel Wurtz <joel.wurtz@gmail.com>
  */
-final class CookiePlugin implements Plugin
+final class DecoderPlugin implements Plugin
 {
     /**
-     * Cookie storage.
+     * @var bool Whether this plugin decode stream with value in the Content-Encoding header (default to true).
      *
-     * @var CookieJar
+     * If set to false only the Transfer-Encoding header will be used
      */
-    private $cookieJar;
+    private $useContentEncoding;
 
-    public function __construct(CookieJar $cookieJar)
+    /**
+     * @param array $config {
+     *
+     *    @var bool $use_content_encoding Whether this plugin should look at the Content-Encoding header first or only at the Transfer-Encoding (defaults to true).
+     * }
+     */
+    public function __construct(array $config = [])
     {
-        $this->cookieJar = $cookieJar;
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults([
+            'use_content_encoding' => true,
+        ]);
+        $resolver->setAllowedTypes('use_content_encoding', 'bool');
+        $options = $resolver->resolve($config);
+
+        $this->useContentEncoding = $options['use_content_encoding'];
     }
 
     /**
@@ -38,85 +53,83 @@ final class CookiePlugin implements Plugin
      */
     public function handleRequest(RequestInterface $request, callable $next, callable $first): Promise
     {
-        $cookies = [];
-        foreach ($this->cookieJar->getCookies() as $cookie) {
-            if ($cookie->isExpired()) {
-                continue;
-            }
+        $encodings = extension_loaded('zlib') ? ['gzip', 'deflate'] : ['identity'];
 
-            if (!$cookie->matchDomain($request->getUri()->getHost())) {
-                continue;
-            }
-
-            if (!$cookie->matchPath($request->getUri()->getPath())) {
-                continue;
-            }
-
-            if ($cookie->isSecure() && ('https' !== $request->getUri()->getScheme())) {
-                continue;
-            }
-
-            $cookies[] = sprintf('%s=%s', $cookie->getName(), $cookie->getValue());
+        if ($this->useContentEncoding) {
+            $request = $request->withHeader('Accept-Encoding', $encodings);
         }
+        $encodings[] = 'chunked';
+        $request = $request->withHeader('TE', $encodings);
 
-        if (!empty($cookies)) {
-            $request = $request->withAddedHeader('Cookie', implode('; ', array_unique($cookies)));
-        }
-
-        return $next($request)->then(function (ResponseInterface $response) use ($request) {
-            if ($response->hasHeader('Set-Cookie')) {
-                $setCookies = $response->getHeader('Set-Cookie');
-
-                foreach ($setCookies as $setCookie) {
-                    $cookie = $this->createCookie($request, $setCookie);
-
-                    // Cookie invalid do not use it
-                    if (null === $cookie) {
-                        continue;
-                    }
-
-                    // Restrict setting cookie from another domain
-                    if (!preg_match("/\.{$cookie->getDomain()}$/", '.'.$request->getUri()->getHost())) {
-                        continue;
-                    }
-
-                    $this->cookieJar->addCookie($cookie);
-                }
-            }
-
-            return $response;
+        return $next($request)->then(function (ResponseInterface $response) {
+            return $this->decodeResponse($response);
         });
     }
 
     /**
-     * Creates a cookie from a string.
-     *
-     * @throws TransferException
+     * Decode a response body given its Transfer-Encoding or Content-Encoding value.
      */
-    private function createCookie(RequestInterface $request, string $setCookieHeader): ?Cookie
+    private function decodeResponse(ResponseInterface $response): ResponseInterface
     {
-        $parts = array_map('trim', explode(';', $setCookieHeader));
+        $response = $this->decodeOnEncodingHeader('Transfer-Encoding', $response);
 
-        if (empty($parts) || !strpos($parts[0], '=')) {
-            return null;
+        if ($this->useContentEncoding) {
+            $response = $this->decodeOnEncodingHeader('Content-Encoding', $response);
         }
 
-        list($name, $cookieValue) = $this->createValueKey(array_shift($parts));
+        return $response;
+    }
 
-        $maxAge = null;
-        $expires = null;
-        $domain = $request->getUri()->getHost();
-        $path = $request->getUri()->getPath();
-        $secure = false;
-        $httpOnly = false;
+    /**
+     * Decode a response on a specific header (content encoding or transfer encoding mainly).
+     */
+    private function decodeOnEncodingHeader(string $headerName, ResponseInterface $response): ResponseInterface
+    {
+        if ($response->hasHeader($headerName)) {
+            $encodings = $response->getHeader($headerName);
+            $newEncodings = [];
 
-        // Add the cookie pieces into the parsed data array
-        foreach ($parts as $part) {
-            list($key, $value) = $this->createValueKey($part);
+            while ($encoding = array_pop($encodings)) {
+                $stream = $this->decorateStream($encoding, $response->getBody());
 
-    = simplexml_load_string($stream->getContents());
-        libxml_use_internal_errors($previousValue);
+                if (false === $stream) {
+                    array_unshift($newEncodings, $encoding);
 
-        return false !== $isXml;
+                    continue;
+                }
+
+                $response = $response->withBody($stream);
+            }
+
+            if (\count($newEncodings) > 0) {
+                $response = $response->withHeader($headerName, $newEncodings);
+            } else {
+                $response = $response->withoutHeader($headerName);
+            }
+        }
+
+        return $response;
+    }
+
+    /**
+     * Decorate a stream given an encoding.
+     *
+     * @return StreamInterface|false A new stream interface or false if encoding is not supported
+     */
+    private function decorateStream(string $encoding, StreamInterface $stream)
+    {
+        if ('chunked' === strtolower($encoding)) {
+            return new Encoding\DechunkStream($stream);
+        }
+
+        if ('deflate' === strtolower($encoding)) {
+            return new Encoding\DecompressStream($stream);
+        }
+
+        if ('gzip' === strtolower($encoding)) {
+            return new Encoding\GzipDecodeStream($stream);
+        }
+
+        return false;
     }
 }

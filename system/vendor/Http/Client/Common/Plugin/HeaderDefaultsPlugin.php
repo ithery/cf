@@ -44,9 +44,3 @@ final class HeaderDefaultsPlugin implements Plugin
         return $next($request);
     }
 }
-
-        }
-
-        return $next($request);
-    }
-}
