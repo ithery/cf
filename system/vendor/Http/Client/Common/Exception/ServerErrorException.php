@@ -14,3 +14,6 @@ use Http\Client\Exception\HttpException;
 final class ServerErrorException extends HttpException
 {
 }
+eption
+{
+}

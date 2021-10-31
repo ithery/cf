@@ -4,17 +4,16 @@ declare(strict_types=1);
 
 namespace Http\Client\Common\Plugin;
 
-use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Client\ClientExceptionInterface;
 
 /**
  * Records history of HTTP calls.
  *
  * @author Joel Wurtz <joel.wurtz@gmail.com>
  */
-interface Journal
-{
+interface Journal {
     /**
      * Record a successful call.
      *

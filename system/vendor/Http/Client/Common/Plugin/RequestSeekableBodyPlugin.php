@@ -27,3 +27,24 @@ final class RequestSeekableBodyPlugin extends SeekableBodyPlugin
         return $next($request);
     }
 }
+>requestMatcher = $requestMatcher;
+        $this->successPlugin = $delegateOnMatch;
+        $this->failurePlugin = $delegateOnNoMatch;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function handleRequest(RequestInterface $request, callable $next, callable $first): Promise
+    {
+        if ($this->requestMatcher->matches($request)) {
+            if (null !== $this->successPlugin) {
+                return $this->successPlugin->handleRequest($request, $next, $first);
+            }
+        } elseif (null !== $this->failurePlugin) {
+            return $this->failurePlugin->handleRequest($request, $next, $first);
+        }
+
+        return $next($request);
+    }
+}
