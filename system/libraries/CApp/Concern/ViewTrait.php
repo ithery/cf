@@ -37,7 +37,8 @@ trait CApp_Concern_ViewTrait {
     }
 
     public function getView() {
-        if (!$this->isUserLogin() && $this->config('have_user_login') && $this->loginRequired) {
+        /** @var CApp $this */
+        if (!$this->isUserLogin() && $this->config('have_user_login') && $this->isAuthEnabled()) {
             $view = $this->viewLoginName;
             if (!($view instanceof CView_View)) {
                 $view = CView::factory($view);
@@ -85,7 +86,8 @@ trait CApp_Concern_ViewTrait {
     }
 
     public function isUsingBlade() {
-        if (!$this->isUserLogin() && $this->config('have_user_login') && $this->loginRequired) {
+        /** @var CApp $this */
+        if (!$this->isUserLogin() && $this->config('have_user_login') && $this->isAuthEnabled()) {
             return false;
         }
         if ($view = $this->getView()) {
