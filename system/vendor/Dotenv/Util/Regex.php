@@ -1,0 +1,110 @@
+<?php
+
+
+
+namespace Dotenv\Util;
+
+use GrahamCampbell\ResultType\Error;
+use GrahamCampbell\ResultType\Success;
+
+/**
+ * @internal
+ */
+final class Regex
+{
+    /**
+     * This class is a singleton.
+     *
+     * @codeCoverageIgnore
+     *
+     * @return void
+     */
+    private function __construct()
+    {
+        //
+    }
+
+    /**
+     * Perform a preg match, wrapping up the result.
+     *
+     * @param string $pattern
+     * @param string $subject
+     *
+     * @return \GrahamCampbell\ResultType\Result<bool,string>
+     */
+    public static function matches( $pattern,  $subject)
+    {
+        return self::pregAndWrap(static function ( $subject) use ($pattern) {
+            return @\preg_match($pattern, $subject) === 1;
+        }, $subject);
+    }
+
+    /**
+     * Perform a preg match all, wrapping up the result.
+     *
+     * @param string $pattern
+     * @param string $subject
+     *
+     * @return \GrahamCampbell\ResultType\Result<int,string>
+     */
+    public static function occurences( $pattern,  $subject)
+    {
+        return self::pregAndWrap(static function ( $subject) use ($pattern) {
+            return (int) @\preg_match_all($pattern, $subject);
+        }, $subject);
+    }
+
+    /**
+     * Perform a preg replace callback, wrapping up the result.
+     *
+     * @param string   $pattern
+     * @param callable $callback
+     * @param string   $subject
+     * @param int|null $limit
+     *
+     * @return \GrahamCampbell\ResultType\Result<string,string>
+     */
+    public static function replaceCallback( $pattern, callable $callback,  $subject,  $limit = null)
+    {
+        return self::pregAndWrap(static function ( $subject) use ($pattern, $callback, $limit) {
+            return (string) @\preg_replace_callback($pattern, $callback, $subject, $limit ? $limit: -1);
+        }, $subject);
+    }
+
+    /**
+     * Perform a preg split, wrapping up the result.
+     *
+     * @param string $pattern
+     * @param string $subject
+     *
+     * @return \GrahamCampbell\ResultType\Result<string[],string>
+     */
+    public static function split( $pattern,  $subject)
+    {
+        return self::pregAndWrap(static function ( $subject) use ($pattern) {
+            /** @var string[] */
+            return (array) @\preg_split($pattern, $subject);
+        }, $subject);
+    }
+
+    /**
+     * Perform a preg operation, wrapping up the result.
+     *
+     * @template V
+     *
+     * @param callable(string):V $operation
+     * @param string             $subject
+     *
+     * @return \GrahamCampbell\ResultType\Result<V,string>
+     */
+    private static function pregAndWrap(callable $operation,  $subject)
+    {
+        $result = $operation($subject);
+
+        if (\preg_last_error() !== \PREG_NO_ERROR) {
+            return Error::create(\preg_last_error_msg());
+        }
+
+        return Success::create($result);
+    }
+}

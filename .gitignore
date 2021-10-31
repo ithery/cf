@@ -1,1 +1,127 @@
+#ignore system files
+.DS_Store
+Thumbs.db
 
+#ignore php error
+error_log
+
+#ignore application folder, application folder must be another project
+application/*
+!application/cresenity
+
+application/cresenity/default/config/*
+application/cresenity/config/*
+
+config/*
+!config/client_modules.php
+
+#ignore data domain or org
+/data
+/data/*
+/data/org/*
+
+#ignore
+/index.php
+
+#ignore git bak
+/.git.bak
+
+/access.log
+
+#phpunit
+.phpunit.result.cache
+
+#ignore libs of CPDF
+/modules/cresenity/vendor/lib/fonts/Helvetica.afm.php
+/modules/cresenity/vendor/lib/fonts/Helvetica-Bold.afm.php
+/modules/cresenity/vendor/lib/fonts/Helvetica-Oblique.afm.php
+/modules/cresenity/vendor/lib/fonts/Helvetica-BoldOblique.afm.php
+
+#ignore libs of HTMLPurifier
+/system/vendor/HTMLPurifier/DefinitionCache/Serializer/CSS/
+/system/vendor/HTMLPurifier/DefinitionCache/Serializer/HTML/
+/system/vendor/HTMLPurifier/DefinitionCache/Serializer/URI/
+/system/vendor/HTMLPurifier/DefinitionCache/Serializer/CSS/*
+/system/vendor/HTMLPurifier/DefinitionCache/Serializer/HTML/*
+/system/vendor/HTMLPurifier/DefinitionCache/Serializer/URI/*
+
+#ignore folder logs
+/application/logs
+/logs/
+*/logs/
+/temp
+/temp/*
+/export/
+/resources
+
+/resource
+/files
+/certificate
+/upload/*
+/payment_log/
+/public/files/
+/public/files/*
+/compiled
+
+#ignore netbeans ide config
+/nbproject/
+*/nbproject/*
+
+#ignore aptana IDE
+.project
+
+#ignore the other files
+.idea/*
+*.iml
+composer.json
+sftp-config*.json
+.well-known
+.well-known/*
+__sublime_sftp_offset
+.rnd
+
+#SEO
+robots.txt
+botlog.log
+
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+
+#ignore vscode
+.vscode
+.php_cs.cache
+*.py
+
+#phpunit
+.phpunit.result.cache
+
+.bin/*
+
+
+# ignore all IIS files
+web.config
+
+# ignore phar archives
+*.phar
+
+# ignore composer.lock
+composer.lock
+
+#ignore cache of php-cs-fixer
+.php-cs-fixer.cache
+
+# Node Dependency directories
+node_modules/
+jspm_packages/
+
+# Public folder
+public/*
+!public/index.php.sample
+
+# Deployment file
+deploy.blade.php
+**/deploy.blade.php

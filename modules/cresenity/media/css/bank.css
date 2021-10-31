@@ -1,0 +1,91 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Oct 16, 2018, 12:02:41 PM
+    Author     : Hery
+*/
+
+.bank-logo{
+    background-image:url(../img/bank-logos.png);
+    background-size:597px 477px;
+    background-repeat:no-repeat;
+    display:inline-block;
+    font-size:0;
+    height:57px;
+    width:57px;
+    margin:0 calc((100% - (57px * 5)) / 10)
+}
+.bank-logo.bca{background-position:0 0}
+.bank-logo.mandiri{background-position:-60px 0}
+.bank-logo.permata{background-position:-120px 0}
+.bank-logo.bni{background-position:-180px 0}
+.bank-logo.bri{background-position:-240px 0}
+.bank-logo.cimb{background-position:-300px 0}
+.bank-logo.maybank{background-position:-360px 0}
+.bank-logo.anz{background-position:-420px 0}
+.bank-logo.muamalat{background-position:-480px 0}
+.bank-logo.artos{background-position:-540px 0}
+.bank-logo.qnb{background-position:0 -60px}
+.bank-logo.bengkulu{background-position:-60px -60px}
+.bank-logo.kalsel{background-position:-120px -60px}
+.bank-logo.kaltim{background-position:-180px -60px}
+.bank-logo.bukopin{background-position:-240px -60px}
+.bank-logo.capital{background-position:-300px -60px}
+.bank-logo.hsbc{background-position:-360px -60px}
+.bank-logo.pundi{background-position:-420px -60px}
+.bank-logo.nagari{background-position:-480px -60px}
+.bank-logo.mayapada{background-position:-540px -60px}
+.bank-logo.uob{background-position:0 -120px}
+.bank-logo.mnc{background-position:-60px -120px}
+.bank-logo.mega{background-position:-120px -120px}
+.bank-logo.mestika{background-position:-180px -120px}
+.bank-logo.saudara{background-position:-240px -120px}
+.bank-logo.sinarmas{background-position:-300px -120px}
+.bank-logo.ntb{background-position:-360px -120px}
+.bank-logo.jtrust{background-position:-420px -120px}
+.bank-logo.index{background-position:-480px -120px}
+.bank-logo.btpn{background-position:-540px -120px}
+.bank-logo.sumsel{background-position:0 -180px}
+.bank-logo.sulteng{background-position:-60px -180px}
+.bank-logo.sulselbar{background-position:-120px -180px}
+.bank-logo.ina{background-position:-180px -180px}
+.bank-logo.riaukepri{background-position:-240px -180px}
+.bank-logo.sumut{background-position:-300px -180px}
+.bank-logo.ntt{background-position:-360px -180px}
+.bank-logo.papua{background-position:-420px -180px}
+.bank-logo.jatim{background-position:-480px -180px}
+.bank-logo.bprks{background-position:-540px -180px}
+.bank-logo.bnp{background-position:0 -240px}
+.bank-logo.danamon{background-position:-60px -240px}
+.bank-logo.mayora{background-position:-120px -240px}
+.bank-logo.jambi{background-position:-180px -240px}
+.bank-logo.mandiri-syariah{background-position:-240px -240px}
+.bank-logo.sultra{background-position:-300px -240px}
+.bank-logo.jateng{background-position:-360px -240px}
+.bank-logo.bjb{background-position:-420px -240px}
+.bank-logo.bankbtn{background-position:-480px -240px}
+.bank-logo.panin{background-position:-540px -240px}
+.bank-logo.kesejahteraan{background-position:0 -300px}
+.bank-logo.standard-chartered{background-position:-60px -300px}
+.bank-logo.citibank{background-position:-120px -300px}
+.bank-logo.ganesha{background-position:-180px -300px}
+.bank-logo.dki{background-position:-240px -300px}
+.bank-logo.commonwealth{background-position:-300px -300px}
+.bank-logo.rbs{background-position:-360px -300px}
+.bank-logo.jasa-jakarta{background-position:-420px -300px}
+.bank-logo.prima{background-position:-480px -300px}
+.bank-logo.mufg{background-position:-540px -300px}
+.bank-logo.sbi{background-position:0 -360px}
+.bank-logo.bhi{background-position:-60px -360px}
+.bank-logo.cnb{background-position:-120px -360px}
+.bank-logo.bumi-arta{background-position:-180px -360px}
+.bank-logo.dbs{background-position:-240px -360px}
+.bank-logo.maspion{background-position:-300px -360px}
+.bank-logo.artha-graha{background-position:-360px -360px}
+.bank-logo.hana{background-position:-420px -360px}
+.bank-logo.victoria{background-position:-480px -360px}
+.bank-logo.ocbc{background-position:-540px -360px}
+.bank-logo.rabobank{background-position:0 -420px}

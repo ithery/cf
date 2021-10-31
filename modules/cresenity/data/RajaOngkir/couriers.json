@@ -1,0 +1,115 @@
+{
+"jne": {
+  "name": "JNE",
+  "services": {
+    "OKE": {
+      "title": "OKE - Ongkos Kirim Ekonomis",
+      "vars": ["OKE", "CTCOKE"]
+    },
+    "REG": {
+      "title": "REG - Layanan Reguler",
+      "vars": ["REG", "CTC"]
+    },
+    "YES": {
+      "title": "YES - Yakin Esok Sampai",
+      "vars": ["YES", "CTCYES"]
+    },
+    "JTR": {
+      "title": "JTR - JNE Trucking",
+      "vars": ["JTR", "JTR<150", "JTR250", "JTR>250"]
+    },
+    "SPS": {
+      "title": "SPS - Super Speed",
+      "vars": ["SPS"]
+    }
+  }
+},
+
+"tiki": {
+  "name": "TIKI",
+  "services": {
+    "ECO": {
+      "title": "ECO - Economi Service"
+    },
+    "REG": {
+      "title": "REG - Reguler Service"
+    },
+    "ONS": {
+      "title": "ONS - Over Night Service"
+    },
+    "HDS": {
+      "title": "HDS - Holiday Delivery Service"
+    },
+    "SDS": {
+      "title": "SDS - Same Day Service"
+    }
+  }
+},
+
+"pos": {
+  "name": "POS Indonesia",
+  "services": {
+    "Surat Kilat Khusus": {
+      "title": "Surat Kilat Khusus"
+    },
+    "Express Next Day": {
+      "title": "Express Next Day"
+    },
+    "Paket Kilat Khusus": {
+      "title": "Paket Kilat Khusus"
+    },
+    "Express Next Day Barang": {
+      "title": "Express Next Day Barang"
+    }
+  }
+},
+"pcp": {
+  "name": "PCP",
+  "services": {
+    "ECO": {
+      "title": "ECO - Economic Service"
+    },
+    "REG": {
+      "title": "REG - Regular Service"
+    },
+    "ONS": {
+      "title": "ONS - Overnight Service"
+    },
+    "ONP": {
+      "title": "ONP - Overnight Service Premium"
+    },
+    "NFS": {
+      "title": "NFS - Next Flight Service"
+    }
+  }
+},
+"rpx": {
+  "name": "RPX",
+  "services": {
+    "REP": {
+      "title": "REP - Retail Package"
+    },
+    "RGP": {
+      "title": "RGP - Regular Package"
+    },
+    "NDP": {
+      "title": "NDP - Next Day Package"
+    },
+    "MDP": {
+      "title": "MDP - MidDay Package"
+    },
+    "SDP": {
+      "title": "SDP - SameDay Package"
+    }
+  }
+},
+"jnt": {
+  "code": "J&T",
+  "name": "J&T Express",
+  "services": {
+    "EZ": {
+      "title": "EZ - Regular Service"
+    }
+  }
+}
+}

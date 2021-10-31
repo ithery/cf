@@ -1,0 +1,267 @@
+<?php
+defined('SYSPATH') or die('No direct access allowed.');
+
+// @codingStandardsIgnoreStart
+class URI extends CFRouter {
+    /**
+     * Returns a singleton instance of URI.
+     *
+     * @return object
+     */
+    public static function instance() {
+        static $instance;
+
+        if ($instance == null) {
+            // Initialize the URI instance
+            $instance = new URI;
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Retrieve a specific URI segment.
+     *
+     * @param int|string $index   segment number or label
+     * @param mixed      $default default value returned if segment does not exist
+     *
+     * @return string
+     */
+    public function segment($index = 1, $default = false) {
+        if (is_string($index)) {
+            if (($key = array_search($index, URI::$segments)) === false) {
+                return $default;
+            }
+
+            $index = $key + 2;
+        }
+
+        $index = (int) $index - 1;
+
+        return isset(URI::$segments[$index]) ? URI::$segments[$index] : $default;
+    }
+
+    /**
+     * Retrieve a specific routed URI segment.
+     *
+     * @param int|string $index   rsegment number or label
+     * @param mixed      $default default value returned if segment does not exist
+     *
+     * @return string
+     */
+    public function rsegment($index = 1, $default = false) {
+        if (is_string($index)) {
+            if (($key = array_search($index, URI::$rsegments)) === false) {
+                return $default;
+            }
+
+            $index = $key + 2;
+        }
+
+        $index = (int) $index - 1;
+
+        return isset(URI::$rsegments[$index]) ? URI::$rsegments[$index] : $default;
+    }
+
+    /**
+     * Retrieve a specific URI argument.
+     * This is the part of the segments that does not indicate controller or method
+     *
+     * @param int|string $index   argument number or label
+     * @param mixed      $default default value returned if segment does not exist
+     *
+     * @return string
+     */
+    public function argument($index = 1, $default = false) {
+        if (is_string($index)) {
+            if (($key = array_search($index, URI::$arguments)) === false) {
+                return $default;
+            }
+
+            $index = $key + 2;
+        }
+
+        $index = (int) $index - 1;
+
+        return isset(URI::$arguments[$index]) ? URI::$arguments[$index] : $default;
+    }
+
+    /**
+     * Returns an array containing all the URI segments.
+     *
+     * @param int  $offset      segment offset
+     * @param bool $associative return an associative array
+     *
+     * @return array
+     */
+    public function segment_array($offset = 0, $associative = false) {
+        return $this->build_array(URI::$segments, $offset, $associative);
+    }
+
+    /**
+     * Returns an array containing all the re-routed URI segments.
+     *
+     * @param int  $offset      rsegment offset
+     * @param bool $associative return an associative array
+     *
+     * @return array
+     */
+    public function rsegment_array($offset = 0, $associative = false) {
+        return $this->build_array(URI::$rsegments, $offset, $associative);
+    }
+
+    /**
+     * Returns an array containing all the URI arguments.
+     *
+     * @param int  $offset      segment offset
+     * @param bool $associative return an associative array
+     *
+     * @return array
+     */
+    public function argument_array($offset = 0, $associative = false) {
+        return $this->build_array(URI::$arguments, $offset, $associative);
+    }
+
+    /**
+     * Creates a simple or associative array from an array and an offset.
+     * Used as a helper for (r)segment_array and argument_array.
+     *
+     * @param array $array       array to rebuild
+     * @param int   $offset      offset to start from
+     * @param bool  $associative create an associative array
+     *
+     * @return array
+     */
+    public function build_array($array, $offset = 0, $associative = false) {
+        // Prevent the keys from being improperly indexed
+        array_unshift($array, 0);
+
+        // Slice the array, preserving the keys
+        $array = array_slice($array, $offset + 1, count($array) - 1, true);
+
+        if ($associative === false) {
+            return $array;
+        }
+
+        $associative = [];
+        $pairs = array_chunk($array, 2);
+
+        foreach ($pairs as $pair) {
+            // Add the key/value pair to the associative array
+            $associative[$pair[0]] = isset($pair[1]) ? $pair[1] : '';
+        }
+
+        return $associative;
+    }
+
+    /**
+     * Returns the complete URI as a string.
+     *
+     * @return string
+     */
+    public function string() {
+        return URI::$current_uri;
+    }
+
+    /**
+     * Magic method for converting an object to a string.
+     *
+     * @return string
+     */
+    public function __toString() {
+        return URI::$current_uri;
+    }
+
+    /**
+     * Returns the total number of URI segments.
+     *
+     * @return int
+     */
+    public function total_segments() {
+        return count(URI::$segments);
+    }
+
+    /**
+     * Returns the total number of re-routed URI segments.
+     *
+     * @return int
+     */
+    public function total_rsegments() {
+        return count(URI::$rsegments);
+    }
+
+    /**
+     * Returns the total number of URI arguments.
+     *
+     * @return int
+     */
+    public function total_arguments() {
+        return count(URI::$arguments);
+    }
+
+    /**
+     * Returns the last URI segment.
+     *
+     * @param mixed $default default value returned if segment does not exist
+     *
+     * @return string
+     */
+    public function last_segment($default = false) {
+        $end = $this->total_segments();
+        if ($end < 1) {
+            return $default;
+        }
+
+        return URI::$segments[$end - 1];
+    }
+
+    /**
+     * Returns the last re-routed URI segment.
+     *
+     * @param mixed $default default value returned if segment does not exist
+     *
+     * @return string
+     */
+    public function last_rsegment($default = false) {
+        $end = $this->total_segments();
+        if ($end < 1) {
+            return $default;
+        }
+
+        return URI::$rsegments[$end - 1];
+    }
+
+    /**
+     * Returns the path to the current controller (not including the actual
+     * controller), as a web path.
+     *
+     * @param bool $full return a full url, or only the path specifically
+     *
+     * @return string
+     */
+    public function controller_path($full = true) {
+        return ($full) ? curl::site(URI::$controller_path) : URI::$controller_path;
+    }
+
+    /**
+     * Returns the current controller, as a web path.
+     *
+     * @param bool $full return a full url, or only the controller specifically
+     *
+     * @return string
+     */
+    public function controller($full = true) {
+        return ($full) ? curl::site(URI::$controller_path . URI::$controller) : URI::$controller;
+    }
+
+    /**
+     * Returns the current method, as a web path.
+     *
+     * @param bool $full return a full url, or only the method specifically
+     *
+     * @return string
+     */
+    public function method($full = true) {
+        return ($full) ? curl::site(URI::$controller_path . URI::$controller . '/' . URI::$method) : URI::$method;
+    }
+} // End URI Class

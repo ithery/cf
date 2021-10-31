@@ -1,0 +1,40 @@
+<?php
+
+return [
+    'client_modules' => [
+        'excanvas',
+        'canvas-to-blob',
+        'load-image',
+        'jquery',
+        'bootstrap',
+        'font-awesome',
+        'jquery-ui-1.12.1.custom',
+        'slimscroll',
+        'fileupload',
+        'wysihtml5',
+        'notify',
+        'bootbox',
+        'form',
+        'controls',
+        'event',
+        'effects',
+        'validation',
+        'easing',
+        'select2',
+        'modernizr',
+    ],
+    'js' => [
+        'capp.js',
+        'cresenity.js',
+    ],
+    'css' => [
+        'cresenity.colors.css',
+        'cresenity.main.css',
+        'cresenity.responsive.css',
+        'cresenity.retail.css',
+        'cresenity.widget.css',
+        'cresenity.table.css',
+        'cresenity.css',
+        'cresenity-compat.css',
+    ],
+];

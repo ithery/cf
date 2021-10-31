@@ -1,0 +1,4 @@
+<?php
+
+class CVendor_Firebase_Exception_InvalidArgumentException extends \InvalidArgumentException implements CVendor_Firebase_ExceptionInterface {
+}

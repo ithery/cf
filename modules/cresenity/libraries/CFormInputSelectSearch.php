@@ -1,0 +1,403 @@
+<?php
+
+/**
+ * @deprecated since 1.2
+ */
+//@codingStandardsIgnoreStart
+class CFormInputSelectSearch extends CElement_FormInput {
+    use CTrait_Compat_Element_FormInput_SelectSearch;
+
+    protected $query;
+
+    protected $multiple;
+
+    protected $placeholder;
+
+    protected $delay;
+
+    protected $select2Version;
+
+    public function __construct($id) {
+        parent::__construct($id);
+
+        $this->dropdown_classes = [];
+        $this->type = 'selectsearch';
+        $this->query = '';
+        $this->format_selection = '';
+        $this->format_result = '';
+        $this->key_field = '';
+        $this->search_field = '';
+        $this->placeholder = 'Search for a item';
+        $this->multiple = false;
+        $this->auto_select = false;
+        $this->min_input_length = 0;
+        $this->delay = 100;
+        $this->select2Version = c::theme('select2.version', 2);
+    }
+
+    public static function factory($id) {
+        return new CFormInputSelectSearch($id);
+    }
+
+    public function setMultiple($bool) {
+        $this->multiple = $bool;
+        return $this;
+    }
+
+    public function setDelay($val) {
+        $this->delay = $val;
+        return $this;
+    }
+
+    public function setAutoSelect($bool) {
+        $this->auto_select = $bool;
+        return $this;
+    }
+
+    public function setMinInputLength($min_input_length) {
+        $this->min_input_length = $min_input_length;
+        return $this;
+    }
+
+    public function setKeyField($key_field) {
+        $this->key_field = $key_field;
+        return $this;
+    }
+
+    public function setSearchField($search_field) {
+        $this->search_field = $search_field;
+        return $this;
+    }
+
+    public function setQuery($query) {
+        $this->query = $query;
+        return $this;
+    }
+
+    public function setFormatResult($fmt) {
+        $this->format_result = $fmt;
+        return $this;
+    }
+
+    public function setFormatSelection($fmt) {
+        $this->format_selection = $fmt;
+        return $this;
+    }
+
+    public function setPlaceholder($placeholder) {
+        $this->placeholder = $placeholder;
+        return $this;
+    }
+
+    public function addDropdownClass($c) {
+        if (is_array($c)) {
+            $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
+        } else {
+            if ($this->bootstrap == '3.3') {
+                $c = str_replace('span', 'col-md-', $c);
+                $c = str_replace('row-fluid', 'row', $c);
+            }
+            $this->dropdown_classes[] = $c;
+        }
+        return $this;
+    }
+
+    public function html($indent = 0) {
+        $html = new CStringBuilder();
+        $custom_css = $this->custom_css;
+        $custom_css = $this->renderStyle($custom_css);
+        $disabled = '';
+        if ($this->disabled) {
+            $disabled = ' disabled="disabled"';
+        }
+        $multiple = '';
+        if ($this->multiple) {
+            $multiple = ' multiple="multiple"';
+        }
+        if (strlen($custom_css) > 0) {
+            $custom_css = ' style="' . $custom_css . '"';
+        }
+
+        $classes = $this->classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
+        if ($this->bootstrap >= '3') {
+            $classes = $classes . ' form-control ';
+        }
+        $html->setIndent($indent);
+        $value = $this->value;
+        if ($this->auto_select) {
+            $db = CDatabase::instance();
+            $rjson = 'false';
+
+            $q = 'select `' . $this->key_field . '` from (' . $this->query . ') as a limit 1';
+            $value = cdbutils::get_value($q);
+        }
+        if (strlen($this->value) > 0) {
+            $value = $this->value;
+        }
+
+        if ($this->select2Version >= '4') {
+            $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $disabled . $custom_css . $multiple . '">');
+
+            // select2 4.0 using option to set default value
+            if (strlen($this->value) > 0 || $this->auto_select) {
+                $db = CDatabase::instance();
+                $rjson = 'false';
+
+                if ($this->auto_select) {
+                    $q = 'select * from (' . $this->query . ') as a limit 1';
+                } else {
+                    $q = 'select * from (' . $this->query . ') as a where `' . $this->key_field . '`=' . $db->escape($this->value);
+                }
+                $r = $db->query($q)->resultArray(false);
+                if (count($r) > 0) {
+                    $r = $r[0];
+                    $str_selection = $this->format_selection;
+                    $str_selection = str_replace("'", "\'", $str_selection);
+                    preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
+
+                    foreach ($matches as $val) {
+                        $str = $val[1]; //matches str without bracket {}
+                        $b_str = $val[0]; //matches str with bracket {}
+                        $str_selection = str_replace($b_str, $r[$str], $str_selection);
+                    }
+
+                    $html->appendln('<option value="' . $this->value . '">' . $str_selection . '</option>');
+                }
+            }
+            $html->appendln('</select>');
+            $html->br();
+        } else {
+            $html->appendln('<input type="hidden" class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" value="' . $value . '" ' . $custom_css . $multiple . '>')->br();
+        }
+        return $html->text();
+    }
+
+    public function createAjaxUrl() {
+        return CAjaxMethod::factory()
+                        ->set_type('searchselect')
+                        ->set_data('query', $this->query)
+                        ->set_data('key_field', $this->key_field)
+                        ->set_data('search_field', $this->search_field)
+                        ->makeurl();
+    }
+
+    public function js($indent = 0) {
+        $ajax_url = $this->create_ajax_url();
+
+        $str_selection = $this->format_selection;
+        $str_result = $this->format_result;
+        $str_selection = str_replace("'", "\'", $str_selection);
+        $str_result = str_replace("'", "\'", $str_result);
+        preg_match_all("/{([\w]*)}/", $str_selection, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $val) {
+            $thousand_separator_pre = '';
+            $thousand_separator_post = '';
+            $str = $val[1]; //matches str without bracket {}
+            $b_str = $val[0]; //matches str with bracket {}
+            $str_selection = str_replace($b_str, "'+item." . $str . "+'", $str_selection);
+        }
+
+        preg_match_all("/{([\w]*)}/", $str_result, $matches, PREG_SET_ORDER);
+        foreach ($matches as $val) {
+            $thousand_separator_pre = '';
+            $thousand_separator_post = '';
+            $str = $val[1]; //matches str without bracket {}
+            $b_str = $val[0]; //matches str with bracket {}
+            $str_result = str_replace($b_str, "'+item." . $str . "+'", $str_result);
+        }
+        if (strlen($str_result) == 0) {
+            $str_result = "'+item." . $this->search_field . "+'";
+        }
+        if (strlen($str_selection) == 0) {
+            $str_selection = "'+item." . $this->search_field . "+'";
+        }
+
+        $str_result = preg_replace("/[\r\n]+/", '', $str_result);
+        $placeholder = 'Search for a item';
+        if (strlen($this->placeholder) > 0) {
+            $placeholder = $this->placeholder;
+        }
+        $str_js_change = '';
+        if ($this->submit_onchange) {
+            $str_js_change = "$(this).closest('form').submit();";
+        }
+
+        $str_js_init = '';
+        if ($this->auto_select) {
+            $db = CDatabase::instance();
+            $rjson = 'false';
+
+            $q = 'select * from (' . $this->query . ') as a limit 1';
+            $r = $db->query($q)->resultArray(false);
+            if (count($r) > 0) {
+                $r = $r[0];
+            }
+            $rjson = json_encode($r);
+
+            $str_js_init = '
+				initSelection : function (element, callback) {
+
+				var data = ' . $rjson . ';
+
+				callback(data);
+			},
+			';
+        }
+
+        if ($this->select2Version >= '4') {
+            // change concept, using select at function html()
+        } else {
+            if (strlen($this->value) > 0) {
+                $db = CDatabase::instance();
+                $rjson = 'false';
+
+                $q = 'select * from (' . $this->query . ') as a where `' . $this->key_field . '`=' . $db->escape($this->value);
+                $r = $db->query($q)->resultArray(false);
+                if (count($r) > 0) {
+                    $r = $r[0];
+                }
+                $rjson = json_encode($r);
+
+                $str_js_init = '
+                                initSelection : function (element, callback) {
+
+                                var data = ' . $rjson . ';
+
+                                callback(data);
+                        },
+                        ';
+            }
+        }
+
+        $str_multiple = '';
+        if ($this->multiple) {
+            $str_multiple = " multiple:'true',";
+        }
+        $classes = $this->classes;
+        $classes = implode(' ', $classes);
+        if (strlen($classes) > 0) {
+            $classes = ' ' . $classes;
+        }
+        if ($this->bootstrap == '3.3') {
+            $classes = $classes . ' form-control ';
+        }
+        $dropdown_classes = $this->dropdown_classes;
+        $dropdown_classes = implode(' ', $dropdown_classes);
+        if (strlen($dropdown_classes) > 0) {
+            $dropdown_classes = ' ' . $dropdown_classes;
+        }
+        if ($this->select2Version >= '4') {
+            $str = "
+                    $('#" . $this->id . "').select2({
+                        width: '100%',
+                        placeholder: '" . $placeholder . "',
+                        minimumInputLength: '" . $this->min_input_length . "',
+                        ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
+                                url: '" . $ajax_url . "',
+                                dataType: 'jsonp',
+                                quietMillis: " . $this->delay . ',
+                                delay: ' . $this->delay . ',
+                                ' . $str_multiple . '
+                                data: function (params) {
+                                    return {
+                                      q: params.term, // search term
+                                      page: params.page,
+                                      limit: 10
+                                    };
+                                },
+                                processResults: function (data, params) {
+                                    // parse the results into the format expected by Select2
+                                    // since we are using custom formatting functions we do not need to
+                                    // alter the remote JSON data, except to indicate that infinite
+                                    // scrolling can be used
+                                    params.page = params.page || 1;
+                                    var more = (params.page * 10) < data.total;
+                                    return {
+                                            results: data.data,
+                                            pagination: {
+                                              more: more
+                                            }
+                                          };
+                                },
+                                cache:true,
+                            },
+                        ' . $str_js_init . "
+                        templateResult: function(item) {
+                            if (typeof item.loading !== 'undefined') {
+                                return item.text;
+                            }
+                            return $('<div>" . $str_result . "</div>');
+                        }, // omitted for brevity, see the source of this page
+                        templateSelection: function(item) {
+                            if (item.id === '' || item.selected) {
+                                return item.text;
+                            }
+                            else {
+                                return $('<div>" . $str_selection . "</div>');
+                            }
+                        },  // omitted for brevity, see the source of this page
+                        dropdownCssClass: '" . $dropdown_classes . "', // apply css that makes the dropdown taller
+                        containerCssClass : 'tpx-select2-container " . $classes . "'
+                    }).change(function() {
+				" . $str_js_change . '
+                    });
+                    ';
+//                var_dump($str);
+//                die();
+        } else {
+            $str = "
+			$('#" . $this->id . "').select2({
+				placeholder: '" . $placeholder . "',
+				minimumInputLength: '" . $this->min_input_length . "',
+				ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
+					url: '" . $ajax_url . "',
+                                        quietMillis: " . $this->delay . ',
+                                        delay: ' . $this->delay . ",
+					dataType: 'jsonp',
+					" . $str_multiple . '
+					data: function (term, page) {
+						return {
+							term: term, // search term
+							page: page,
+							limit: 10
+						};
+					},
+					results: function (data, page) { // parse the results into the format expected by Select2.
+						var more = (page * 10) < data.total; // whether or not there are more results available
+
+						// notice we return the value of more so Select2 knows if more results can be loaded
+						return {results: data.data, more: more};
+					},
+                    cache:true,
+
+				},
+				' . $str_js_init . "
+				formatResult: function(item) {
+					return '" . $str_result . "';
+				}, // omitted for brevity, see the source of this page
+				formatSelection: function(item) {
+					return '" . $str_selection . "';
+				},  // omitted for brevity, see the source of this page
+				dropdownCssClass: '" . $dropdown_classes . "', // apply css that makes the dropdown taller
+				containerCssClass : 'tpx-select2-container " . $classes . "'
+			}).change(function() {
+				" . $str_js_change . '
+			});
+
+                ';
+        }
+
+        $js = new CStringBuilder();
+        $js->append(parent::js($indent))->br();
+        $js->setIndent($indent);
+        //echo $str;
+        $js->append($str)->br();
+
+        return $js->text();
+    }
+}

@@ -1,0 +1,6 @@
+<?php
+
+final class CVendor_Firebase_Messaging_Exception_ApiConnectionFailedException extends RuntimeException implements CVendor_Firebase_Messaging_ExceptionInterface {
+    use CVendor_Firebase_Trait_ExceptionHasRequestAndResponseTrait;
+    use CVendor_Firebase_Trait_ExceptionHasErrorsTrait;
+}

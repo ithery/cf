@@ -1,0 +1,13 @@
+<?php
+
+defined('SYSPATH') OR die('No direct script access.');
+
+return [
+    [
+        "name" => "dashboard",
+        "label" => c::__("Dashboard"),
+        "controller" => "home",
+        "method" => "index",
+        "icon" => "ti ti-home",
+    ],
+];
