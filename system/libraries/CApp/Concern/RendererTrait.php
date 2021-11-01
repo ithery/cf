@@ -179,8 +179,6 @@ HTML;
             $viewData['pageTitle'] = $this->title;
             $asset = CManager::asset();
 
-            // $css_urls = $asset->getAllCssFileUrl();
-            // $js_urls = $asset->getAllJsFileUrl();
             $additional_js = '';
 
             $js = '';
