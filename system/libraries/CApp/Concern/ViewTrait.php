@@ -40,6 +40,7 @@ trait CApp_Concern_ViewTrait {
         /** @var CApp $this */
         if (!$this->isUserLogin() && $this->config('have_user_login') && $this->isAuthEnabled()) {
             $view = $this->viewLoginName;
+
             if (!($view instanceof CView_View)) {
                 $view = CView::factory($view);
             }
@@ -56,11 +57,6 @@ trait CApp_Concern_ViewTrait {
             }
             $v = null;
 
-            $themePath = CManager::theme()->getThemePath();
-
-            if (CView::exists($themePath . $viewName)) {
-                $v = CView::factory($themePath . $viewName);
-            }
             if ($v == null) {
                 if (!CView::exists($viewName)) {
                     throw new CApp_Exception(c::__('view :viewName not exists', ['viewName' => $viewName]));
