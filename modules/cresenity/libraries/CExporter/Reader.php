@@ -124,7 +124,7 @@ class CExporter_Reader {
      *
      * @return array
      */
-    public function toArray($import, $filePath, $readerType, strng $disk = null) {
+    public function toArray($import, $filePath, $readerType, $disk = null) {
         $this->reader = $this->getReader($import, $filePath, $readerType, $disk);
 
         $this->loadSpreadsheet($import);
