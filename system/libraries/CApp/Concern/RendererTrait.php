@@ -194,15 +194,6 @@ HTML;
 
             $js = $asset->wrapJs($js, true);
 
-            /*
-            if (!$this->isUseRequireJs()) {
-                $bar = CDebug::bar();
-                if ($bar->isEnabled()) {
-                    $js .= $bar->getJavascriptReplaceCode();
-                }
-            }
-            */
-
             $viewData['js'] = $js;
 
             $viewData['css_hash'] = '';
