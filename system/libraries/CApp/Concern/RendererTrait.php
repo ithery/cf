@@ -291,6 +291,7 @@ HTML;
 
         $viewData = $this->getViewData();
         $v = $this->getView();
+        cdbg::dd($v);
         $v->set($viewData);
 
         return $v->render();
