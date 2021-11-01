@@ -1,4 +1,4 @@
 <?php
 
-class CApp_Contract_BaseInterface {
+interface CApp_Contract_BaseInterface {
 }
