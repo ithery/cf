@@ -175,6 +175,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             var dataAlign = $('#" . $this->id . "').find('thead th:eq('+i+')').data('align');
             var dataAction = $('#" . $this->id . "').find('thead th:eq('+i+')').data('action');
             var dataNoLineBreak = $('#" . $this->id . "').find('thead th:eq('+i+')').data('no-line-break');
+            var dataClass = $('#" . $this->id . "').find('thead th:eq('+i+')').data('class');
             if(dataAction) {
                 $('td:eq('+i+')', nRow).addClass(dataAction);
             }
@@ -183,6 +184,9 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
             }
             if(dataNoLineBreak) {
                 $('td:eq('+i+')', nRow).addClass(dataNoLineBreak);
+            }
+            if(dataClass) {
+                $('td:eq('+i+')', nRow).addClass(dataClass);
             }
         }
     },")

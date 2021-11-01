@@ -226,8 +226,8 @@ HTML;
             $viewData['breadcrumb'] = $this->getBreadcrumb();
             $viewData['additional_head'] = $this->additional_head;
             $viewData['custom_data'] = $this->custom_data;
-            $viewData['login_required'] = $this->loginRequired;
-            $viewData['loginRequired'] = $this->loginRequired;
+            $viewData['login_required'] = $this->isAuthEnabled();
+            $viewData['loginRequired'] = $this->isAuthEnabled();
 
             //deprecated view data
             $viewData['header_body'] = '';

@@ -204,7 +204,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                             $new_v = $new_v['html'];
                         }
                     }
-                    $class = '';
+                    $class = $col->getClassAttribute();
                     switch ($col->getAlign()) {
                         case CConstant::ALIGN_LEFT:
                             $class .= ' align-left';

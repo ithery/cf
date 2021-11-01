@@ -2,7 +2,7 @@
 
 // @ts-check
 const { Command } = require('commander');
-const { spawn } = require('child_process');
+const { spawn,exec } = require('child_process');
 const path = require('path');
 const pkg = require('../../package.json');
 const { assertSupportedNodeVersion } = require('./src/Engine.js');
@@ -45,6 +45,18 @@ run().catch(err => {
         .action((opts, cmd) =>
             executeScript('build', { ...program.opts(), ...opts }, cmd.args)
         );
+
+    program
+        .command('status')
+        .description('CF Status')
+        .action((opts, cmd) => {
+            exec(
+                'php cf status',
+                function (err, stdout, stderr) {
+                  console.log(stdout);
+                }
+            );
+        });
 
     await program.parseAsync(process.argv);
 }

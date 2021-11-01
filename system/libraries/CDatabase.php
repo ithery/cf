@@ -9,6 +9,7 @@ class CDatabase {
     use CDatabase_Trait_DetectDeadlock;
     use CDatabase_Trait_DetectLostConnection;
     use CDatabase_Trait_ManageTransaction;
+
     /**
      * Database instances.
      *
