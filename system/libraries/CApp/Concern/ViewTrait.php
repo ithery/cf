@@ -38,7 +38,7 @@ trait CApp_Concern_ViewTrait {
 
     public function getView() {
         /** @var CApp $this */
-        if (!$this->isUserLogin() && $this->config('have_user_login') && $this->isAuthEnabled()) {
+        if (!$this->isUserLogin() && $this->isAuthEnabled()) {
             $view = $this->viewLoginName;
 
             if (!($view instanceof CView_View)) {
