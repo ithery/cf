@@ -8,7 +8,7 @@
  */
 class CExporter_Disk {
     /**
-     * @var IlluminateFilesystem
+     * @var CStorage_Adapter
      */
     protected $disk;
 
