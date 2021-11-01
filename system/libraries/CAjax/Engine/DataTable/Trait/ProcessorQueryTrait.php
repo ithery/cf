@@ -26,6 +26,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
         if ($this->query === null) {
             $this->query = $this->table()->getQuery();
         }
+
         return $this->query;
     }
 
@@ -56,6 +57,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
             $this->baseQuery = $qBase;
             $this->baseOrder = $stringOrderBy;
         }
+
         return $this->baseQuery;
     }
 
@@ -69,6 +71,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
             }
             $this->queryLimit = $sLimit;
         }
+
         return $this->queryLimit;
     }
 
@@ -125,6 +128,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
 
             $this->queryOrderBy = $sOrder;
         }
+
         return $sOrder;
     }
 
@@ -132,6 +136,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
         if ($this->baseOrder === null) {
             $this->getBaseQuery();
         }
+
         return $this->baseOrder;
     }
 
@@ -223,6 +228,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
         if ($rTotal->count() > 0) {
             $totalRecord = $rTotal[0]->cnt;
         }
+
         return $totalRecord;
     }
 
@@ -238,6 +244,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
         if ($rTotalFiltered->count() > 0) {
             $totalFilteredRecord = $rTotalFiltered[0]->cnt;
         }
+
         return $totalFilteredRecord;
     }
 
@@ -257,7 +264,7 @@ trait CAjax_Engine_DataTable_Trait_ProcessorQueryTrait {
         /* Ordering */
         $sOrder = $this->getQueryOrderBy();
         /**
-         * Build condition query
+         * Build condition query.
          */
         $sWhere = $this->getQueryWhere();
 
