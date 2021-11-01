@@ -1,18 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
 use PhpOffice\PhpSpreadsheet\Reader\IReader;
 
 class CExporter_TaskQueue_ReadChunk extends CQueue_AbstractTask {
-
     use CExporter_Trait_HasEventBusTrait;
-
     /**
      * @var int
      */
@@ -59,13 +51,13 @@ class CExporter_TaskQueue_ReadChunk extends CQueue_AbstractTask {
     private $chunkSize;
 
     /**
-     * @param  WithChunkReading  $import
-     * @param  IReader  $reader
-     * @param  TemporaryFile  $temporaryFile
-     * @param  string  $sheetName
-     * @param  object  $sheetImport
-     * @param  int  $startRow
-     * @param  int  $chunkSize
+     * @param WithChunkReading $import
+     * @param IReader          $reader
+     * @param TemporaryFile    $temporaryFile
+     * @param string           $sheetName
+     * @param object           $sheetImport
+     * @param int              $startRow
+     * @param int              $chunkSize
      */
     public function __construct(CExporter_Concern_WithChunkReading $import, IReader $reader, CExporter_File_TemporaryFile $temporaryFile, $sheetName, $sheetImport, $startRow, $chunkSize) {
         $this->import = $import;
@@ -80,7 +72,7 @@ class CExporter_TaskQueue_ReadChunk extends CQueue_AbstractTask {
     }
 
     /**
-     * @param  CExporter_Transaction_TransactionHandler  $transaction
+     * @param CExporter_Transaction_TransactionHandler $transaction
      *
      * @throws CExporter_Exception_SheetNotFoundException
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
@@ -93,7 +85,10 @@ class CExporter_TaskQueue_ReadChunk extends CQueue_AbstractTask {
         $headingRow = CExporter_Import_HeadingRowExtractor::headingRow($this->sheetImport);
 
         $filter = new CExporter_Filter_ChunkReadFilter(
-                $headingRow, $this->startRow, $this->chunkSize, $this->sheetName
+            $headingRow,
+            $this->startRow,
+            $this->chunkSize,
+            $this->sheetName
         );
 
         $this->reader->setReadFilter($filter);
@@ -101,11 +96,12 @@ class CExporter_TaskQueue_ReadChunk extends CQueue_AbstractTask {
         $this->reader->setReadEmptyCells(false);
 
         $spreadsheet = $this->reader->load(
-                $this->temporaryFile->sync()->getLocalPath()
+            $this->temporaryFile->sync()->getLocalPath()
         );
 
         $sheet = CExporter_Sheet::byName(
-                        $spreadsheet, $this->sheetName
+            $spreadsheet,
+            $this->sheetName
         );
 
         if ($sheet->getHighestRow() < $this->startRow) {
@@ -116,7 +112,8 @@ class CExporter_TaskQueue_ReadChunk extends CQueue_AbstractTask {
 
         $transaction(function () use ($sheet) {
             $sheet->import(
-                    $this->sheetImport, $this->startRow
+                $this->sheetImport,
+                $this->startRow
             );
 
             $sheet->disconnect();
@@ -124,7 +121,7 @@ class CExporter_TaskQueue_ReadChunk extends CQueue_AbstractTask {
     }
 
     /**
-     * @param  Throwable  $e
+     * @param Throwable $e
      */
     public function failed(Throwable $e) {
         if ($this->import instanceof CExporter_Concern_WithEvents) {
@@ -136,5 +133,4 @@ class CExporter_TaskQueue_ReadChunk extends CQueue_AbstractTask {
             }
         }
     }
-
 }
