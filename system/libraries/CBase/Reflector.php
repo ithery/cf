@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Reflector
+ * Description of Reflector.
  *
  * @author Hery
  */
@@ -60,7 +60,7 @@ class CBase_Reflector {
      *
      * @param \ReflectionParameter $parameter
      *
-     * @return string|null
+     * @return null|string
      */
     public static function getParameterClassName($parameter) {
         $type = $parameter->getType();
