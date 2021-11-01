@@ -228,6 +228,7 @@ HTML;
             $viewData['custom_data'] = $this->custom_data;
             $viewData['login_required'] = $this->isAuthEnabled();
             $viewData['loginRequired'] = $this->isAuthEnabled();
+            $viewData['isAuthEnabled'] = $this->isAuthEnabled();
 
             //deprecated view data
             $viewData['header_body'] = '';
