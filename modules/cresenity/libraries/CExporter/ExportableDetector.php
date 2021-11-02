@@ -14,6 +14,7 @@ class CExporter_ExportableDetector {
         if ($data instanceof Iterator) {
             return new CExporter_Exportable_Iterator($data);
         }
+
         return $data;
     }
 }

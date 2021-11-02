@@ -4,7 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 final class CManager {
     use CTrait_Compat_Manager;
-
     protected $controls = [];
 
     protected $controlsCode = [];
@@ -348,17 +347,11 @@ final class CManager {
     }
 
     public static function getUseRequireJs() {
-        return true;
-        if (self::$useRequireJs === null) {
-            $require = ccfg::get('require_js');
-            if ($require === null) {
-                return true;
-            }
-
-            return $require;
+        if (CApp::isAjax()) {
+            return true;
         }
 
-        return self::$useRequireJs;
+        return false;
     }
 
     public static function registerCss($file, $pos = CClientScript::POS_HEAD) {

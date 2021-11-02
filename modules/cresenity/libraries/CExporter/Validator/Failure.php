@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_Validator_Failure implements CInterface_Arrayable {
-
     /**
      * @var int
      */
@@ -74,8 +67,7 @@ class CExporter_Validator_Failure implements CInterface_Arrayable {
      */
     public function toArray() {
         return c::collect($this->errors)->map(function ($message) {
-                    return __('There was an error on row :row. :message', ['row' => $this->row, 'message' => $message]);
-                })->all();
+            return c::__('There was an error on row :row. :message', ['row' => $this->row, 'message' => $message]);
+        })->all();
     }
-
 }

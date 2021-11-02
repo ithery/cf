@@ -32,9 +32,9 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
             if ($keyword) {
                 foreach ($searchField as $key => $field) {
                     if (!$key) {
-                        $model = $model->where($field, 'LIKE', "%$keyword%");
+                        $model = $model->where($field, 'LIKE', "%${keyword}%");
                     } else {
-                        $model = $model->orWhere($field, 'LIKE', "%$keyword%");
+                        $model = $model->orWhere($field, 'LIKE', "%${keyword}%");
                     }
                 }
             }
@@ -60,6 +60,7 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
                                     $arr[$variable] = $item->{$variable};
                                 }
                             }
+
                             break;
                         case 'imageUrl':
                             $arr[$variable] = $item->{$varKey};
@@ -69,12 +70,14 @@ class CAjax_Engine_DialogSelect extends CAjax_Engine {
                             if (!strlen($arr[$variable])) {
                                 $arr[$variable] = CApp_Base::noImageUrl();
                             }
+
                             break;
                         default:
                             $arr[$variable] = $item->{$varKey};
                             if (!strlen($arr[$variable])) {
                                 $arr[$variable] = $item->{$variable};
                             }
+
                             break;
                     }
                 }

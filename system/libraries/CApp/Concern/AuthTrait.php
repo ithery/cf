@@ -6,14 +6,15 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
+ * @see CApp
  * @since Jul 27, 2019, 10:53:10 PM
  */
 trait CApp_Concern_AuthTrait {
+    protected $authEnabled = true;
+
     private $role = null;
 
     private $guard = null;
-
-    private $loginRequired = true;
 
     /**
      * @param null|string $guard
@@ -22,9 +23,11 @@ trait CApp_Concern_AuthTrait {
      */
     public function auth($guard = null) {
         if ($guard === null) {
+            $guard = $this->guard;
             if ($this->guard === null) {
-                $guard = CF::config('app.auth.guard');
+                $this->guard = CF::config('app.auth.guard');
             }
+            $guard = $this->guard;
         }
 
         return CApp_Auth::instance($guard);
@@ -46,13 +49,11 @@ trait CApp_Concern_AuthTrait {
     }
 
     public function setLoginRequired($bool) {
-        $this->loginRequired = $bool;
-
-        return $this;
+        return $this->setAuthEnable($bool);
     }
 
     public function isLoginRequired() {
-        return $this->loginRequired;
+        return $this->isAuthEnabled();
     }
 
     public function user() {
@@ -102,5 +103,23 @@ trait CApp_Concern_AuthTrait {
         $modelClass = CF::config('app.model.user', CApp_Model_Users::class);
 
         return $modelClass::find($userId);
+    }
+
+    public function isAuthEnabled() {
+        return $this->authEnabled;
+    }
+
+    public function setAuthEnable($bool = true) {
+        $this->authEnabled = $bool;
+
+        return $this;
+    }
+
+    public function enableAuth() {
+        return $this->setAuth(true);
+    }
+
+    public function disableAuth() {
+        return $this->setAuth(false);
     }
 }

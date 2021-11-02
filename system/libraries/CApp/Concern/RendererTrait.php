@@ -179,8 +179,6 @@ HTML;
             $viewData['pageTitle'] = $this->title;
             $asset = CManager::asset();
 
-            // $css_urls = $asset->getAllCssFileUrl();
-            // $js_urls = $asset->getAllJsFileUrl();
             $additional_js = '';
 
             $js = '';
@@ -193,15 +191,6 @@ HTML;
             $jsScriptFile .= PHP_EOL . $asset->render(CManager_Asset::POS_END, CManager_Asset::TYPE_JS_FILE);
 
             $js = $asset->wrapJs($js, true);
-
-            /*
-            if (!$this->isUseRequireJs()) {
-                $bar = CDebug::bar();
-                if ($bar->isEnabled()) {
-                    $js .= $bar->getJavascriptReplaceCode();
-                }
-            }
-            */
 
             $viewData['js'] = $js;
 
@@ -226,8 +215,9 @@ HTML;
             $viewData['breadcrumb'] = $this->getBreadcrumb();
             $viewData['additional_head'] = $this->additional_head;
             $viewData['custom_data'] = $this->custom_data;
-            $viewData['login_required'] = $this->loginRequired;
-            $viewData['loginRequired'] = $this->loginRequired;
+            $viewData['login_required'] = $this->isAuthEnabled();
+            $viewData['loginRequired'] = $this->isAuthEnabled();
+            $viewData['isAuthEnabled'] = $this->isAuthEnabled();
 
             //deprecated view data
             $viewData['header_body'] = '';
@@ -291,6 +281,7 @@ HTML;
 
         $viewData = $this->getViewData();
         $v = $this->getView();
+
         $v->set($viewData);
 
         return $v->render();
