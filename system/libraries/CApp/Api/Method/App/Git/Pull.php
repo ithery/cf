@@ -15,16 +15,20 @@ class CApp_Api_Method_App_Git_Pull extends CApp_Api_Method_App {
         $output = '';
         $successOutput = '';
         $errorOutput = '';
+        $gitPath = carr::get($this->request(), 'gitPath');
 
+        if (strlen($gitPath) == 0) {
+            $gitPath = "application/{$this->appCode}";
+        }
         if ($this->errCode == 0) {
             try {
                 $pwd = '';
                 $execute = '';
 
-                $pwd = shell_exec("cd application/{$this->appCode} && pwd");
-                $execute = "cd application/{$this->appCode} && git pull";
+                $pwd = shell_exec("cd ${gitPath} && pwd");
+                $execute = "cd ${gitPath} && git pull";
 
-                $output .= "working on directory $pwd";
+                $output .= "working on directory ${pwd}";
                 $process = new Process($execute);
                 $process->run();
 
