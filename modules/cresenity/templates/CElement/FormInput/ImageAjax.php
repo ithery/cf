@@ -23,7 +23,7 @@ $maxWidth .= $suffixWidth;
 $maxHeight .= $suffixHeight;
 ?>
 
-<div id="container-<?php echo $id ?>" class="fileupload fileupload-new" >
+<div id="container-<?php echo $id; ?>" class="fileupload fileupload-new" >
     <div class="fileupload-new thumbnail" >
         <img id="cimg-<?php echo $id; ?>" src="<?php echo $imgSrc; ?>" style="max-width: <?php echo $maxWidth; ?>; max-height: <?php echo $maxHeight; ?>;"  />
     </div>
@@ -46,25 +46,24 @@ $maxHeight .= $suffixHeight;
 
 <script>
 
-    var <?php echo $id ?>HaveCropper = <?php echo ($cropper != null) ? 'true' : 'false' ?>;
-    var <?= $id ?>maxUploadSize = <?= $maxUploadSize ?> * 1024 * 1024;
+    var <?php echo $id; ?>HaveCropper = <?php echo ($cropper != null) ? 'true' : 'false'; ?>;
+    var <?php echo $id; ?>maxUploadSize = <?php echo $maxUploadSize; ?> * 1024 * 1024;
 
 
 
-    $('#container-<?php echo $id ?> img, #container-<?php echo $id ?> .btn-file span').click(function () {
+    $('#container-<?php echo $id; ?> img, #container-<?php echo $id; ?> .btn-file span').click(function () {
         $('#input-temp-<?php echo $id; ?>').trigger('click');
     });
 
-    $('#container-<?php echo $id ?> .fileupload-remove').click(function () {
-        $('#container-<?php echo $id ?> .fileupload-preview').html('');
-        $("#<?= $id ?>").val('');
-        $("#<?= $id ?>").trigger('change');
-        $('#container-<?php echo $id ?>').removeClass('fileupload-exists');
-        $('#container-<?php echo $id ?>').addClass('fileupload-new');
+    $('#container-<?php echo $id; ?> .fileupload-remove').click(function () {
+        $('#container-<?php echo $id; ?> .fileupload-preview').html('');
+        $("#<?php echo $id; ?>").val('');
+        $("#<?php echo $id; ?>").trigger('change');
+        $('#container-<?php echo $id; ?>').removeClass('fileupload-exists');
+        $('#container-<?php echo $id; ?>').addClass('fileupload-new');
     });
 
     $('#input-temp-<?php echo $id; ?>').change(function (e) {
-
 <?php if ($cropper != null) : ?>
             var cropperWidth = parseFloat('<?php echo $cropper->getCropperWidth(); ?>');
             var cropperHeight = parseFloat('<?php echo $cropper->getCropperHeight(); ?>');
@@ -75,29 +74,37 @@ $maxHeight .= $suffixHeight;
             reader.fileName = file.name;
             reader.onload = function (event) {
                 var filesize = event.total;
-                var maxUploadSize = <?= $id ?>maxUploadSize;
+
+                var maxUploadSize = <?php echo $id; ?>maxUploadSize;
                 if (maxUploadSize && filesize > maxUploadSize) {
-                    $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?= $maxUploadSize ?> + ' MB</div>', 'bootbox');
+                    $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?php echo $maxUploadSize; ?> + ' MB</div>', 'bootbox');
                 } else {
                     if (file.type.match("image.*")) {
 
-                        var haveCropper = <?php echo $id ?>HaveCropper;
+                        var haveCropper = <?php echo $id; ?>HaveCropper;
 
                         if (haveCropper) {
 
                             reader.onloadend = (function (event) {
 
-                                var cropperId = '<?php echo ($cropper == null) ? '' : $cropper->id(); ?>';
-                                var cropperModal = $('#modal-cropper-' + cropperId);
+                                var cropperId = 'modal-cropper-<?php echo ($cropper == null) ? '' : $cropper->id(); ?>';
+                                var cropperModal = $('#' + cropperId);
                                 var cropperImgInitialized = cropperModal.find('img.cropper-hidden');
                                 if (cropperImgInitialized.length > 0) {
                                     cropperImgInitialized.cropper("destroy");
                                 }
 
-
+                                let bootstrapModalOptions = {backdrop: 'static', keyboard: false};
                                 var cropperImg = cropperModal.find('img');
                                 cropperImg.attr('src', event.target.result);
-                                cropperModal.modal({backdrop: 'static', keyboard: false});
+                                if(window.bootstrap) {
+                                    console.log(cropperId);
+                                    var bootstrapCropperModal = new bootstrap.Modal(document.getElementById(cropperId), bootstrapModalOptions);
+                                    bootstrapCropperModal.show();
+                                } else {
+                                    cropperModal.modal(bootstrapModalOptions);
+                                }
+
                                 cropperImg.cropper({
                                     aspectRatio: cropperWidth / cropperHeight,
                                     zoomOnWheel: false,
@@ -141,11 +148,11 @@ $maxHeight .= $suffixHeight;
                                     imageData = cropperImg.cropper('getCroppedCanvas', {width: cropperWidth, height: cropperHeight}).toDataURL(mime);
 
                                     var img = "<img src=" + imageData + " /> ";
-                                    $('#container-<?php echo $id ?> .fileupload-preview').html(img);
-                                    $('#container-<?php echo $id ?>').removeClass('fileupload-new');
-                                    $('#container-<?php echo $id ?>').addClass('fileupload-exists');
-                                    $('#container-<?php echo $id ?> .fileupload-preview').addClass('loading spinner');
-                                    $('#container-<?php echo $id ?> .fileupload-preview').find('img').click(function () {
+                                    $('#container-<?php echo $id; ?> .fileupload-preview').html(img);
+                                    $('#container-<?php echo $id; ?>').removeClass('fileupload-new');
+                                    $('#container-<?php echo $id; ?>').addClass('fileupload-exists');
+                                    $('#container-<?php echo $id; ?> .fileupload-preview').addClass('loading spinner');
+                                    $('#container-<?php echo $id; ?> .fileupload-preview').find('img').click(function () {
                                         $('#input-temp-<?php echo $id; ?>').trigger('click');
                                     });
                                     var data = new FormData();
@@ -158,9 +165,9 @@ $maxHeight .= $suffixHeight;
                                             var dataFile = JSON.parse(this.responseText);
 
                                             $('#<?php echo $id; ?>').val(dataFile.fileId);
-                                            $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
-                                            $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');
-                                            $('#container-<?php echo $id ?> .fileupload-preview').removeClass('spinner');
+                                            $('#container-<?php echo $id; ?> .fileupload-preview img').attr('src', dataFile.url);
+                                            $('#container-<?php echo $id; ?> .fileupload-preview').removeClass('loading');
+                                            $('#container-<?php echo $id; ?> .fileupload-preview').removeClass('spinner');
                                             $('#<?php echo $id; ?>').trigger('change');
                                         } else if (this.readyState == 4 && this.status != 200) {
                                         }
@@ -176,11 +183,11 @@ $maxHeight .= $suffixHeight;
                         } else {
 
                             var img = "<img src=" + event.target.result + " /> ";
-                            $('#container-<?php echo $id ?> .fileupload-preview').html(img);
-                            $('#container-<?php echo $id ?>').removeClass('fileupload-new');
-                            $('#container-<?php echo $id ?>').addClass('fileupload-exists');
-                            $('#container-<?php echo $id ?> .fileupload-preview').addClass('loading spinner');
-                            $('#container-<?php echo $id ?> .fileupload-preview').find('img').click(function () {
+                            $('#container-<?php echo $id; ?> .fileupload-preview').html(img);
+                            $('#container-<?php echo $id; ?>').removeClass('fileupload-new');
+                            $('#container-<?php echo $id; ?>').addClass('fileupload-exists');
+                            $('#container-<?php echo $id; ?> .fileupload-preview').addClass('loading spinner');
+                            $('#container-<?php echo $id; ?> .fileupload-preview').find('img').click(function () {
                                 $('#input-temp-<?php echo $id; ?>').trigger('click');
                             });
                             var data = new FormData();
@@ -190,9 +197,9 @@ $maxHeight .= $suffixHeight;
                                 if (this.readyState == 4 && this.status == 200) {
                                     var dataFile = JSON.parse(this.responseText);
                                     $('#<?php echo $id; ?>').val(dataFile.fileId);
-                                    $('#container-<?php echo $id ?> .fileupload-preview img').attr('src', dataFile.url);
-                                    $('#container-<?php echo $id ?> .fileupload-preview').removeClass('loading');
-                                    $('#container-<?php echo $id ?> .fileupload-preview').removeClass('spinner');
+                                    $('#container-<?php echo $id; ?> .fileupload-preview img').attr('src', dataFile.url);
+                                    $('#container-<?php echo $id; ?> .fileupload-preview').removeClass('loading');
+                                    $('#container-<?php echo $id; ?> .fileupload-preview').removeClass('spinner');
                                     $('#<?php echo $id; ?>').trigger('change');
                                 } else if (this.readyState == 4 && this.status != 200) {
                                 }
