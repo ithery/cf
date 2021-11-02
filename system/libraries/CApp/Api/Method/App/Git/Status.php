@@ -32,8 +32,9 @@ class CApp_Api_Method_App_Git_Status extends CApp_Api_Method_App {
                 $pwd = shell_exec("cd ${gitPath} && pwd");
                 $execute = "cd \"${gitPath}\" && ${gitBaseCommand} status";
 
-                $output .= "working on directory ${pwd}";
+                $output .= "working on directory ${pwd}" . PHP_EOL;
                 $process = new Process($execute);
+                $output .= $execute;
                 $process->run();
 
                 $output .= $process->getOutput();
