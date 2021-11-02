@@ -348,6 +348,10 @@ final class CManager {
     }
 
     public static function getUseRequireJs() {
+        if (CApp::isAjax()) {
+            return true;
+        }
+
         return false;
     }
 
