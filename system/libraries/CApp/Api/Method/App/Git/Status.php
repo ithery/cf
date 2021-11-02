@@ -27,7 +27,7 @@ class CApp_Api_Method_App_Git_Status extends CApp_Api_Method_App {
                 $gitBaseCommand = 'git';
                 if (strlen($gitDir) > 0) {
                     $gitBaseCommand = 'git --git-dir ' . $gitDir . '';
-                    $output .= 'gitDir:' . realpath($gitDir);
+                    $output .= 'gitDir:' . realpath($gitDir) . PHP_EOL;
                 }
 
                 $pwd = shell_exec("cd ${gitPath} && pwd");
