@@ -77,7 +77,7 @@ $maxHeight .= $suffixHeight;
 
                 var maxUploadSize = <?php echo $id; ?>maxUploadSize;
                 if (maxUploadSize && filesize > maxUploadSize) {
-                    $.cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?php echo $maxUploadSize; ?> + ' MB</div>', 'bootbox');
+                    cresenity.message('', '<div class="alert alert-danger text-center"><b>Error:</b> Image Size is more than ' + <?php echo $maxUploadSize; ?> + ' MB</div>', 'bootbox');
                 } else {
                     if (file.type.match("image.*")) {
 
