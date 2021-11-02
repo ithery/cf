@@ -22,11 +22,11 @@ class CServer_Config {
         if ($this->get('os') === null) { //if not overloaded in config server.php
             /* get Linux code page */
             if (PHP_OS == 'Linux') {
-                if (file_exists($fname = '/etc/sysconfig/i18n') || file_exists($fname = '/etc/default/locale') || file_exists($fname = '/etc/locale.conf') || file_exists($fname = '/etc/sysconfig/language') || file_exists($fname = '/etc/profile.d/lang.sh') || file_exists($fname = '/etc/profile')) {
+                if (@file_exists($fname = '/etc/sysconfig/i18n') || @file_exists($fname = '/etc/default/locale') || @file_exists($fname = '/etc/locale.conf') || @file_exists($fname = '/etc/sysconfig/language') || @file_exists($fname = '/etc/profile.d/lang.sh') || @file_exists($fname = '/etc/profile')) {
                     $contents = @file_get_contents($fname);
                 } else {
                     $contents = false;
-                    if (file_exists('/system/build.prop')) { //Android
+                    if (@file_exists('/system/build.prop')) { //Android
                         $this->set('os', 'Android');
                         if (@exec('uname -o 2>/dev/null', $unameo) && (sizeof($unameo) > 0) && (($unameo0 = trim($unameo[0])) != '')) {
                             $this->set('unameo', $unameo0);
@@ -89,6 +89,7 @@ class CServer_Config {
                             foreach ($lines as $line) {
                                 if (preg_match('/^charmap="?([^"]*)/', $line, $matches2)) {
                                     $this->set('system_codepage', $matches2[1]);
+
                                     break;
                                 }
                             }
@@ -106,6 +107,7 @@ class CServer_Config {
                                     $lang = 'Unknown';
                                 }
                                 $this->set('system_lang', $lang . ' (' . $matches2[1] . ')');
+
                                 break;
                             }
                         }
@@ -132,6 +134,7 @@ class CServer_Config {
         if (self::$instance == null) {
             self::$instance = new CServer_Config();
         }
+
         return self::$instance;
     }
 
@@ -163,6 +166,7 @@ class CServer_Config {
 
     public function set($key, $val) {
         $this->config[$key] = $val;
+
         return $this;
     }
 
