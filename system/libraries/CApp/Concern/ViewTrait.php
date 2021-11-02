@@ -75,10 +75,12 @@ trait CApp_Concern_ViewTrait {
 
     public function setViewName($viewName) {
         $this->setView($viewName);
+        return $this;
     }
 
     public function setViewLoginName($viewLoginName) {
         $this->viewLoginName = $viewLoginName;
+        return $this;
     }
 
     public function isUsingBlade() {
