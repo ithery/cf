@@ -23,14 +23,14 @@ class CApp_Api_Method_App_Git_Status extends CApp_Api_Method_App {
                 if (strlen($gitPath) == 0) {
                     $gitPath = "application/{$this->appCode}";
                 }
-                $gitPath = escapeshellcmd($gitPath);
+                //$gitPath = escapeshellcmd($gitPath);
                 $gitBaseCommand = 'git';
                 if (strlen($gitDir) > 0) {
-                    $gitBaseCommand = 'git --git-dir "' . escapeshellcmd($gitDir) . '"';
+                    $gitBaseCommand = 'git --git-dir ' . $gitDir . '';
                 }
 
                 $pwd = shell_exec("cd ${gitPath} && pwd");
-                $execute = "cd \"${gitPath}\" && ${gitBaseCommand} status";
+                $execute = "cd ${gitPath} && ${gitBaseCommand} status";
 
                 $output .= "working on directory ${pwd}" . PHP_EOL;
                 $process = new Process($execute);
