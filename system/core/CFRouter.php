@@ -143,7 +143,7 @@ class CFRouter {
             // Explode the segments by slashes
             $data['segments'] = ($default_route === true or $data['segments'] === '') ? [] : explode('/', $data['segments']);
 
-            if ($default_route === false and count($data['routes']) > 1) {
+            if (count($data['routes']) > 1) {
                 // Custom routing
                 $data['rsegments'] = self::routedUri($data['current_uri'], $data['routes']);
             }
