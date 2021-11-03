@@ -437,11 +437,11 @@ class CFRouter {
                 $key = trim($key, '/');
                 $val = trim($val, '/');
 
-                if (preg_match('#^' . $key . '#u', $uri)) {
+                if (preg_match('#^' . $key . '#ims', $uri)) {
                     if (strpos($val, '$') !== false) {
                         // Use regex routing
 
-                        $routedUri = preg_replace('#^' . $key . '$#u', $val, $uri);
+                        $routedUri = preg_replace('#^' . $key . '$#ims', $val, $uri);
                     } else {
                         // Standard routing
                         $routedUri = $val;
