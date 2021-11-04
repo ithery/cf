@@ -22,23 +22,23 @@ interface CModel_AccessToken_Contract_HasAccessTokenInterface {
      * @param string $name
      * @param array  $abilities
      *
-     * @return \Laravel\Sanctum\NewAccessToken
+     * @return \CModel_AccessToken_NewAccessToken
      */
     public function createToken(string $name, array $abilities = ['*']);
 
     /**
      * Get the access token currently associated with the user.
      *
-     * @return \Laravel\Sanctum\Contracts\HasAbilities
+     * @return \CModel_AccessToken_Contract_HasAbilitiesInterface
      */
     public function currentAccessToken();
 
     /**
      * Set the current access token for the user.
      *
-     * @param \Laravel\Sanctum\Contracts\HasAbilities $accessToken
+     * @param \CModel_AccessToken_Contract_HasAbilitiesInterface $accessToken
      *
-     * @return \Laravel\Sanctum\Contracts\HasApiTokens
+     * @return \CModel_AccessToken_Contract_HasAccessTokenInterface
      */
     public function withAccessToken($accessToken);
 }

@@ -36,7 +36,7 @@ trait CModel_AccessToken_HasAccessTokenTrait {
      * @return \CModel_AccessToken_NewAccessToken
      */
     public function createToken(string $name, array $abilities = ['*']) {
-        $token = $this->tokens()->create([
+        $token = $this->accessToken()->create([
             'name' => $name,
             'token' => hash('sha256', $plainTextToken = cstr::random(40)),
             'abilities' => $abilities,
