@@ -225,10 +225,10 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
 
     public function listTables() {
         $tables = [];
-
-        if ($query = $this->query('SHOW TABLES FROM ' . $this->escapeTable($this->dbConfig['connection']['database']))) {
-            foreach ($query->result(false) as $row) {
-                $tables[] = current($row);
+        $sql = "SELECT * FROM [SYSOBJECTS] WHERE xtype = 'U' order by name asc";
+        if ($r = $this->query($sql)) {
+            foreach ($r as $row) {
+                $tables = $row->name;
             }
         }
 
