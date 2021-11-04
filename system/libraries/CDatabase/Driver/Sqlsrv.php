@@ -238,7 +238,7 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
     public function showError() {
         $errors = sqlsrv_errors();
 
-        return carr::get($errors, 'message');
+        return carr::get($errors, '0.message');
     }
 
     public function listFields($table) {
