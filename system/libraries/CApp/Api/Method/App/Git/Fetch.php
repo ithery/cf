@@ -15,16 +15,23 @@ class CApp_Api_Method_App_Git_Fetch extends CApp_Api_Method_App {
         $output = '';
         $successOutput = '';
         $errorOutput = '';
-
+        $gitPath = carr::get($this->request(), 'gitPath');
+        $gitDir = carr::get($this->request(), 'gitDir');
         if ($this->errCode == 0) {
             try {
-                $pwd = '';
-                $execute = '';
+                if (strlen($gitPath) == 0) {
+                    $gitPath = "application/{$this->appCode}";
+                }
+                $gitPath = escapeshellcmd($gitPath);
+                $gitBaseCommand = 'git';
+                if (strlen($gitDir) > 0) {
+                    $gitBaseCommand = 'git --git-dir "' . escapeshellcmd($gitDir) . '"';
+                }
 
-                $pwd = shell_exec("cd application/{$this->appCode} && pwd");
-                $execute = "cd application/{$this->appCode} && git fetch";
+                $pwd = shell_exec("cd ${gitPath} && pwd");
+                $execute = "cd \"${gitPath}\" && ${gitBaseCommand} fetch";
 
-                $output .= "working on directory $pwd";
+                $output .= "working on directory ${pwd}";
                 $process = new Process($execute);
                 $process->run();
 

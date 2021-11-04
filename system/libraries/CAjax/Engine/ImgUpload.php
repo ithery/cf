@@ -7,7 +7,7 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
         $data = $this->ajaxMethod->getData();
         $inputName = carr::get($data, 'inputName');
         $fileId = '';
-        if (isset($_FILES[$inputName]) && isset($_FILES[$inputName]['name'])) {
+        if (isset($_FILES[$inputName], $_FILES[$inputName]['name'])) {
             for ($i = 0; $i < count($_FILES[$inputName]['name']); $i++) {
                 $extension = '.' . pathinfo($_FILES[$inputName]['name'][$i], PATHINFO_EXTENSION);
                 if (strtolower($extension) == 'php') {
@@ -54,6 +54,7 @@ class CAjax_Engine_ImgUpload extends CAjax_Engine {
             'fileId' => $fileId,
             'url' => CTemporary::getUrl(static::FOLDER, $fileId),
         ];
+
         return json_encode($return);
     }
 }

@@ -24,7 +24,7 @@ class CApp_Log_Request {
             return false;
         }
         //no need to log on administrator page
-        $router_uri = CFRouter::routed_uri(CFRouter::$current_uri);
+        $router_uri = CFRouter::routedUri(CFRouter::$current_uri);
         $rsegment = explode('/', $router_uri);
         if (count($rsegment) > 0) {
             if ($rsegment[0] == 'admin') {
@@ -49,7 +49,7 @@ class CApp_Log_Request {
 
             if (isset($nav['action'])) {
                 foreach ($nav['action'] as $act) {
-                    if (isset($act['controller']) && isset($act['method']) && $act['controller'] == $controller && $act['method'] == $method) {
+                    if (isset($act['controller'], $act['method']) && $act['controller'] == $controller && $act['method'] == $method) {
                         $action_name = $act['name'];
                         $action_label = $act['label'];
                     }

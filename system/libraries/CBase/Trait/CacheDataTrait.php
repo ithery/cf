@@ -1,6 +1,6 @@
 <?php
 /**
- * Trait for cache data
+ * Trait for cache data.
  */
 /** @codingStandardsIgnoreStart */
 trait CBase_Trait_CacheDataTrait {

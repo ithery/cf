@@ -18,6 +18,7 @@ class CAjax_Engine_Reload extends CAjax_Engine {
             $callback = CHelper::closure()->deserializeClosure($callback);
 
             $parameters = [];
+
             return call_user_func_array($callback, $parameters);
         } else {
             return $json;

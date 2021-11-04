@@ -2,7 +2,9 @@
 
 class CBase_MemoizeResolver {
     public $cache;
+
     private $resolver;
+
     private $func;
 
     /**
@@ -30,6 +32,7 @@ class CBase_MemoizeResolver {
         $func = $this->func;
         $result = $func(...$args);
         $this->cache = $this->cache->set($key, $result);
+
         return $result;
     }
 }

@@ -1,7 +1,6 @@
 <?php
 
 class CExporter_TaskQueue_QueueExport extends CQueue_AbstractTask {
-
     /**
      * @var object
      */
@@ -18,9 +17,9 @@ class CExporter_TaskQueue_QueueExport extends CQueue_AbstractTask {
     private $temporaryFile;
 
     /**
-     * @param object        $export
+     * @param object                       $export
      * @param CExporter_File_TemporaryFile $temporaryFile
-     * @param string        $writerType
+     * @param string                       $writerType
      */
     public function __construct($export, CExporter_File_TemporaryFile $temporaryFile, $writerType) {
         $this->export = $export;
@@ -41,8 +40,6 @@ class CExporter_TaskQueue_QueueExport extends CQueue_AbstractTask {
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
     public function execute() {
-
-
         $writer = CExporter::writer();
         $writer->open($this->export);
 
@@ -57,7 +54,7 @@ class CExporter_TaskQueue_QueueExport extends CQueue_AbstractTask {
             $sheet->open($sheetExport);
         }
 
-        CDaemon::log('Try to writing temporary '.$this->writerType.' to '.$this->temporaryFile->getLocalPath());
+        CDaemon::log('Try to writing temporary ' . $this->writerType . ' to ' . $this->temporaryFile->getLocalPath());
 
         // Write to temp file with empty sheets.
         $writer->write($sheetExport, $this->temporaryFile, $this->writerType);
@@ -70,5 +67,4 @@ class CExporter_TaskQueue_QueueExport extends CQueue_AbstractTask {
 
         return $this;
     }
-
 }

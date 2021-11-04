@@ -41,15 +41,15 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             }
             $html->appendln('<div id="' . $this->id() . '-widget-box" class="' . $mainClass . ' widget-table">')->incIndent();
             $showTitle = true;
-
             if ($showTitle) {
                 $html->appendln('<div class="' . $mainClassTitle . '">')->incIndent();
-                if (strlen($this->icon > 0)) {
+                if (strlen($this->icon) > 0) {
                     $html->appendln('<span class="icon">')->incIndent();
                     $html->appendln('<i class="icon-' . $this->icon . '"></i>');
                     $html->decIndent()->appendln('</span');
                 }
                 $html->appendln('<h5>' . $this->title . '</h5>');
+
                 if ($this->haveHeaderAction()) {
                     $html->appendln($this->headerActionList->html($html->getIndent()));
 

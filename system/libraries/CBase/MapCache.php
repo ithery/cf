@@ -21,6 +21,7 @@ final class CBase_MapCache implements CBase_CacheInterface {
         $size = $data->getSize();
         $data->set($key, $value);
         $this->size += $data->getSize() === $size ? 0 : 1;
+
         return $this;
     }
 
@@ -35,15 +36,16 @@ final class CBase_MapCache implements CBase_CacheInterface {
     final public function clear() {
         $this->size = 0;
         $this->__data__ = [
-            'hash' => new CBase_Hash,
-            'map' => new CBase_ListCache,
-            'string' => new CBase_Hash,
+            'hash' => new CBase_Hash(),
+            'map' => new CBase_ListCache(),
+            'string' => new CBase_Hash(),
         ];
     }
 
     final public function delete($key) {
         $result = $this->getMapData($key)->delete($key);
         $this->size -= $result ? 1 : 0;
+
         return $result;
     }
 
@@ -55,6 +57,7 @@ final class CBase_MapCache implements CBase_CacheInterface {
         if ($this->isKey($key)) {
             return $this->__data__[\is_string($key) ? 'string' : 'hash'];
         }
+
         return $this->__data__['map'];
     }
 }

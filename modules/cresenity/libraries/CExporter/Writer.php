@@ -13,7 +13,6 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 class CExporter_Writer {
     use CExporter_Trait_DelegatedMacroableTrait;
     use CExporter_Trait_HasEventBusTrait;
-
     /**
      * @var CExporter_Writer
      */
@@ -44,6 +43,7 @@ class CExporter_Writer {
         if (static::$instance == null) {
             static::$instance = new CExporter_Writer();
         }
+
         return static::$instance;
     }
 
@@ -83,7 +83,7 @@ class CExporter_Writer {
         }
 
         $this->exportable = $export;
-        $this->spreadsheet = new Spreadsheet;
+        $this->spreadsheet = new Spreadsheet();
         $this->spreadsheet->disconnectWorksheets();
 
         if ($export instanceof CExporter_Concern_WithCustomValueBinder) {
@@ -152,7 +152,7 @@ class CExporter_Writer {
     }
 
     /**
-     * @param int|null $sheetIndex
+     * @param null|int $sheetIndex
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      *
@@ -173,8 +173,7 @@ class CExporter_Writer {
      * @return $this
      */
     public function setDefaultValueBinder() {
-        $defaultValueBinderClass = CExporter::config()->get('value_binder.default', CExporter_DefaultValueBinder::class);
-        Cell::setValueBinder(new $defaultValueBinderClass);
+        Cell::setValueBinder(CExporter::defaultValueBinder());
 
         return $this;
     }

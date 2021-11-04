@@ -1,15 +1,8 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class CExporter_Import_HeadingRowExtractor {
-
     /**
      * @const int
      */
@@ -45,15 +38,14 @@ class CExporter_Import_HeadingRowExtractor {
      * @return array
      */
     public static function extract(Worksheet $worksheet, $importable) {
-        if (!$importable instanceof WithHeadingRow) {
+        if (!$importable instanceof CExporter_Concern_WithHeadingRow) {
             return [];
         }
 
         $headingRowNumber = self::headingRow($importable);
         $rows = iterator_to_array($worksheet->getRowIterator($headingRowNumber, $headingRowNumber));
-        $headingRow = head($rows);
+        $headingRow = c::head($rows);
 
-        return CExporter_Import_HeadingRowFormatter::format((new CExporter_Excel_Row($headingRow))->toArray(null, false, false));
+        return CExporter_Import_HeadingRowFormatter::format((new CExporter_Row($headingRow))->toArray(null, false, false));
     }
-
 }
