@@ -1,5 +1,5 @@
 <?php
-interface CModel_AccessToken_HasAccessTokenInterface {
+interface CModel_AccessToken_Contract_HasAccessTokenInterface {
     /**
      * Get the access tokens that belong to model.
      *

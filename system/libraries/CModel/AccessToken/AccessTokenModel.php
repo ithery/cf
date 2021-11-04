@@ -1,6 +1,10 @@
 <?php
 
 class CModel_AccessToken_AccessTokenModel extends CModel implements CModel_AccessToken_Contract_HasAbilitiesInterface {
+    protected $table = 'access_token';
+
+    protected $guarded = ['access_token_id'];
+
     /**
      * The attributes that should be cast to native types.
      *
