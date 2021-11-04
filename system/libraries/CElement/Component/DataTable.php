@@ -6,6 +6,7 @@ class CElement_Component_DataTable extends CElement_Component {
         CTrait_Element_ActionList_Header,
         CTrait_Element_ActionList_Footer,
         CTrait_Element_Property_Title,
+        CTrait_Element_Property_Icon,
         CElement_Component_DataTable_Trait_GridViewTrait,
         CElement_Component_DataTable_Trait_ExportTrait,
         CElement_Component_DataTable_Trait_JavascriptTrait,
@@ -72,8 +73,6 @@ class CElement_Component_DataTable extends CElement_Component {
     public $ajax;
 
     public $ajax_method;
-
-    public $icon;
 
     public $editable_form;
 
@@ -180,7 +179,6 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->show_header = true;
         $this->applyDataTable = true;
         $this->group_by = '';
-        $this->icon = '';
         $this->pdf_font_size = 8;
         $this->pdf_orientation = 'P';
         $this->requires = [];
