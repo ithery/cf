@@ -9,9 +9,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Jun 15, 2018, 3:04:56 PM
  */
 class CServer_Command extends CServer_Base {
-    protected static $instance = [];
-
     const IS_DEBUG = false;
+
+    protected static $instance = [];
 
     public function __construct($sshConfig = null) {
         $this->sshConfig = $sshConfig;
@@ -30,11 +30,12 @@ class CServer_Command extends CServer_Base {
         if (!isset(self::$instance[$host])) {
             self::$instance[$host] = new CServer_Command($sshConfig);
         }
+
         return self::$instance[$host];
     }
 
     /**
-     * Get the content of stdout/stderr with the option to set a timeout for reading
+     * Get the content of stdout/stderr with the option to set a timeout for reading.
      *
      * @param array  $pipes   array of file pointers for stdin, stdout, stderr (proc_open())
      * @param string &$out    target string for the output message (reference)
@@ -64,10 +65,12 @@ class CServer_Command extends CServer_Base {
 
             if ($n === false) {
                 error_log('stream_select: failed !');
+
                 break;
             } elseif ($n === 0) {
                 error_log('stream_select: timeout expired !');
                 $te = true;
+
                 break;
             }
 
@@ -85,11 +88,11 @@ class CServer_Command extends CServer_Base {
 
     /**
      * Find a system program, do also path checking when not running on WINNT
-     * on WINNT we simply return the name with the exe extension to the program name
+     * on WINNT we simply return the name with the exe extension to the program name.
      *
      * @param string $strProgram name of the program
      *
-     * @return string|null complete path and name of the program
+     * @return null|string complete path and name of the program
      */
     private function findProgram($strProgram) {
         $path_parts = pathinfo($strProgram);
@@ -146,6 +149,7 @@ class CServer_Command extends CServer_Base {
                         $exceptPath = $windir . '\\SysWOW64'; //64-bit PHP on 64-bit Windows
                     }
                     array_push($arrPath, $exceptPath);
+
                     break;
                 }
             }
@@ -179,7 +183,7 @@ class CServer_Command extends CServer_Base {
     }
 
     /**
-     * File exists
+     * File exists.
      *
      * @param string $strFileName name of the file which should be check
      *
@@ -208,7 +212,7 @@ class CServer_Command extends CServer_Base {
     }
 
     /**
-     * read data from array $_SERVER
+     * read data from array $_SERVER.
      *
      * @param string $strElem    element of array
      * @param string &$strBuffer output of the command
@@ -239,7 +243,7 @@ class CServer_Command extends CServer_Base {
     }
 
     /**
-     * read a file and return the content as a string
+     * read a file and return the content as a string.
      *
      * @param string $strFileName name of the file which should be read
      * @param string &$strRet     content of the file (reference)
@@ -258,13 +262,14 @@ class CServer_Command extends CServer_Base {
             });
 
             $strRet = $output;
+
             return true;
         }
 
         $strFile = '';
         $intCurLine = 1;
         $error = CServer::error();
-        if (file_exists($strFileName)) {
+        if (@file_exists($strFileName)) {
             if (is_readable($strFileName)) {
                 if ($fd = fopen($strFileName, 'r')) {
                     while (!feof($fd)) {
@@ -313,7 +318,7 @@ class CServer_Command extends CServer_Base {
      * Execute a system program. return a trim()'d result.
      * does very crude pipe checking.  you need ' | ' for it to work
      * ie $program = CommonFunctions::executeProgram('netstat', '-anp | grep LIST');
-     * NOT $program = CommonFunctions::executeProgram('netstat', '-anp|grep LIST');
+     * NOT $program = CommonFunctions::executeProgram('netstat', '-anp|grep LIST');.
      *
      * @param string $strProgramname name of the program
      * @param string $strArgs        arguments to the program
@@ -385,11 +390,12 @@ class CServer_Command extends CServer_Base {
         $strError = '';
         $pipes = [];
         $descriptorspec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
+
         return $this->procOpen($cmd, $strBuffer, $strError, $booErrorRep, $timeout);
     }
 
     /**
-     * parsing the output of df command
+     * parsing the output of df command.
      *
      * @param string $df_param   additional parameter for df command
      * @param bool   $get_inodes
@@ -524,6 +530,7 @@ class CServer_Command extends CServer_Base {
                                         }
                                     }
                                     $notwas = false;
+
                                     break;
                                 }
                             }
@@ -553,6 +560,7 @@ class CServer_Command extends CServer_Base {
                                             }
                                         }
                                         $notwas = false;
+
                                         break;
                                     }
                                 }
@@ -686,6 +694,7 @@ class CServer_Command extends CServer_Base {
 
             return $return_value == 0;
         }
+
         return true;
     }
 }
