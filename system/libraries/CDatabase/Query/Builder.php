@@ -419,8 +419,6 @@ class CDatabase_Query_Builder {
     }
 
     /**
-     * Set the table which the query is targeting.
-     *
      * @param string $index
      *
      * @return $this
@@ -432,8 +430,6 @@ class CDatabase_Query_Builder {
     }
 
     /**
-     * Set the table which the query is targeting.
-     *
      * @return $this
      */
     public function getUseIndex() {
@@ -1241,7 +1237,6 @@ class CDatabase_Query_Builder {
     protected function runPaginationCountQuery($columns = ['*']) {
         if ($this->groups || $this->havings) {
             $clone = $this->cloneForPaginationCount();
-
             if (is_null($clone->columns) && !empty($this->joins)) {
                 $clone->select($this->from . '.*');
             }
@@ -1253,7 +1248,7 @@ class CDatabase_Query_Builder {
                 ->get()->all();
         }
 
-        $without = $this->unions ? ['orders', 'limit', 'offset'] : ['columns', 'orders', 'limit', 'offset'];
+        $without = $this->unions ? ['orders', 'limit', 'offset', 'useIndex'] : ['columns', 'orders', 'limit', 'offset', 'useIndex'];
 
         return $this->cloneWithout($without)
             ->cloneWithoutBindings($this->unions ? ['order'] : ['select', 'order'])
