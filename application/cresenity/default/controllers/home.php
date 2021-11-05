@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of home
+ * Description of home.
  *
  * @author Hery
  */
@@ -19,6 +19,7 @@ class Controller_Home extends CController {
         $app->setLoginRequired(false);
         CManager::registerModule('bootstrap-4');
         $app->setViewName('test.upload');
+
         return $app;
     }
 
@@ -27,6 +28,7 @@ class Controller_Home extends CController {
         $app->setLoginRequired(false);
         CManager::registerModule('bootstrap-4');
         $app->setViewName('test.validate');
+
         return $app;
     }
 

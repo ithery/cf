@@ -225,10 +225,10 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
 
     public function listTables() {
         $tables = [];
-
-        if ($query = $this->query('SHOW TABLES FROM ' . $this->escapeTable($this->dbConfig['connection']['database']))) {
-            foreach ($query->result(false) as $row) {
-                $tables[] = current($row);
+        $sql = "SELECT * FROM [SYSOBJECTS] WHERE xtype = 'U' order by name asc";
+        if ($r = $this->query($sql)) {
+            foreach ($r as $row) {
+                $tables = $row->name;
             }
         }
 
@@ -238,7 +238,7 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
     public function showError() {
         $errors = sqlsrv_errors();
 
-        return carr::get($errors, 'message');
+        return carr::get($errors, '0.message');
     }
 
     public function listFields($table) {
