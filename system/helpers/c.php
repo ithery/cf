@@ -909,7 +909,7 @@ class c {
         if ($to instanceof CController) {
             $to = $to->controllerUrl();
         }
-        if (is_null($to)) {
+        if ($to === null) {
             return CHTTP::redirector();
         }
 
