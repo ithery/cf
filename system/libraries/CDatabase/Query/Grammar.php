@@ -114,7 +114,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * @param CDatabase_Query_Builder $query
      * @param array                   $columns
      *
-     * @return string|null
+     * @return null|string
      */
     protected function compileColumns(CDatabase_Query_Builder $query, $columns) {
         // If the query is actually performing an aggregating select, we will let that
@@ -484,7 +484,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
     protected function whereSub(CDatabase_Query_Builder $query, $where) {
         $select = $this->compileSelect($where['query']);
 
-        return $this->wrap($where['column']) . ' ' . $where['operator'] . " ($select)";
+        return $this->wrap($where['column']) . ' ' . $where['operator'] . " (${select})";
     }
 
     /**
@@ -568,9 +568,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * @param string $column
      * @param string $value
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     protected function compileJsonContains($column, $value) {
         throw new RuntimeException('This database engine does not support JSON contains operations.');
@@ -610,9 +610,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * @param string $operator
      * @param string $value
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     protected function compileJsonLength($column, $operator, $value) {
         throw new RuntimeException('This database engine does not support JSON length operations.');
@@ -875,7 +875,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
             return '(' . $this->parameterize($record) . ')';
         })->implode(', ');
 
-        return "insert into $table ($columns) values $parameters";
+        return "insert into ${table} (${columns}) values ${parameters}";
     }
 
     /**
@@ -884,9 +884,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * @param \CDatabase_Query_Builder $query
      * @param array                    $values
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     public function compileInsertOrIgnore(CDatabase_Query_Builder $query, array $values) {
         throw new RuntimeException('This database engine does not support inserting while ignoring errors.');
@@ -915,7 +915,7 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * @return string
      */
     public function compileInsertUsing(CDatabase_Query_Builder $query, array $columns, string $sql) {
-        return "insert into {$this->wrapTable($query->from)} ({$this->columnize($columns)}) $sql";
+        return "insert into {$this->wrapTable($query->from)} ({$this->columnize($columns)}) ${sql}";
     }
 
     /**
@@ -992,9 +992,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      * @param array                    $uniqueBy
      * @param array                    $update
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     public function compileUpsert(CDatabase_Query_Builder $query, array $values, array $uniqueBy, array $update) {
         throw new RuntimeException('This database engine does not support upserts.');
@@ -1167,9 +1167,9 @@ class CDatabase_Query_Grammar extends CDatabase_Grammar {
      *
      * @param string $value
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     protected function wrapJsonSelector($value) {
         throw new RuntimeException('This database engine does not support JSON operations.');

@@ -18,13 +18,6 @@ class CDatabase_Query_Builder {
     }
 
     /**
-     * The current connection
-     *
-     * @var CDatabase
-     */
-    protected $db;
-
-    /**
      * The database query grammar instance.
      *
      * @var CDatabase_Query_Grammar
@@ -82,6 +75,13 @@ class CDatabase_Query_Builder {
      * @var string
      */
     public $from;
+
+    /**
+     * Indicates whether use index for spesific index on table.
+     *
+     * @var string|bool
+     */
+    public $useIndex;
 
     /**
      * The table joins for the query.
@@ -188,6 +188,13 @@ class CDatabase_Query_Builder {
      */
     public $useWritePdo = false;
 
+    /**
+     * The current connection.
+     *
+     * @var CDatabase
+     */
+    protected $db;
+
     public function __construct(CDatabase $db = null) {
         if ($db == null) {
             $db = CDatabase::instance();
@@ -230,12 +237,13 @@ class CDatabase_Query_Builder {
      * @param \Closure|\CDatabase_Query_Builder|string $query
      * @param string                                   $as
      *
-     * @return \CDatabase_Query_Builder|static
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return \CDatabase_Query_Builder|static
      */
     public function selectSub($query, $as) {
         list($query, $bindings) = $this->createSub($query);
+
         return $this->selectRaw(
             '(' . $query . ') as ' . $this->grammar->wrap($as),
             $bindings
@@ -266,9 +274,9 @@ class CDatabase_Query_Builder {
      * @param \Closure|\CDatabase_Query_Builder|string $query
      * @param string                                   $as
      *
-     * @return \CDatabase_Query_Builder|static
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return \CDatabase_Query_Builder|static
      */
     public function fromSub($query, $as) {
         list($query, $bindings) = $this->createSub($query);
@@ -287,6 +295,7 @@ class CDatabase_Query_Builder {
     public function fromRaw($expression, $bindings = []) {
         $this->from = new CDatabase_Query_Expression($expression);
         $this->addBinding($bindings, 'from');
+
         return $this;
     }
 
@@ -305,6 +314,7 @@ class CDatabase_Query_Builder {
             $callback = $query;
             $callback($query = $this->forSubQuery());
         }
+
         return $this->parseSub($query);
     }
 
@@ -394,7 +404,7 @@ class CDatabase_Query_Builder {
      * Set the table which the query is targeting.
      *
      * @param \Closure|\Illuminate\Database\Query\Builder|string $table
-     * @param string|null                                        $as
+     * @param null|string                                        $as
      *
      * @return $this
      */
@@ -409,12 +419,30 @@ class CDatabase_Query_Builder {
     }
 
     /**
+     * @param string $index
+     *
+     * @return $this
+     */
+    public function useIndex($index) {
+        $this->useIndex = $index;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function getUseIndex() {
+        return $this->useIndex;
+    }
+
+    /**
      * Add a join clause to the query.
      *
      * @param string          $table
      * @param \Closure|string $first
-     * @param string|null     $operator
-     * @param string|null     $second
+     * @param null|string     $operator
+     * @param null|string     $second
      * @param string          $type
      * @param bool            $where
      *
@@ -467,19 +495,20 @@ class CDatabase_Query_Builder {
      * @param \Closure|\CDatabase_Query_Builder|\CModel_Query|string $query
      * @param string                                                 $as
      * @param string                                                 $first
-     * @param string|null                                            $operator
-     * @param string|null                                            $second
+     * @param null|string                                            $operator
+     * @param null|string                                            $second
      * @param string                                                 $type
      * @param bool                                                   $where
      *
-     * @return \CDatabase_Query_Builder|static
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return \CDatabase_Query_Builder|static
      */
     public function joinSub($query, $as, $first, $operator = null, $second = null, $type = 'inner', $where = false) {
         list($query, $bindings) = $this->createSub($query);
         $expression = '(' . $query . ') as ' . $this->grammar->wrapTable($as);
         $this->addBinding($bindings, 'join');
+
         return $this->join(new CDatabase_Query_Expression($expression), $first, $operator, $second, $type, $where);
     }
 
@@ -488,8 +517,8 @@ class CDatabase_Query_Builder {
      *
      * @param string      $table
      * @param string      $first
-     * @param string|null $operator
-     * @param string|null $second
+     * @param null|string $operator
+     * @param null|string $second
      *
      * @return \CDatabase_Query_Builder|static
      */
@@ -517,8 +546,8 @@ class CDatabase_Query_Builder {
      * @param \Closure|\CDatabase_Query_Builder|\CModel_Query|string $query
      * @param string                                                 $as
      * @param string                                                 $first
-     * @param string|null                                            $operator
-     * @param string|null                                            $second
+     * @param null|string                                            $operator
+     * @param null|string                                            $second
      *
      * @return \CDatabase_Query_Builder|static
      */
@@ -531,8 +560,8 @@ class CDatabase_Query_Builder {
      *
      * @param string      $table
      * @param string      $first
-     * @param string|null $operator
-     * @param string|null $second
+     * @param null|string $operator
+     * @param null|string $second
      *
      * @return \CDatabase_Query_Builder|static
      */
@@ -560,8 +589,8 @@ class CDatabase_Query_Builder {
      * @param \Closure|\CDatabase_Query_Builder|\CModel_Query|string $query
      * @param string                                                 $as
      * @param string                                                 $first
-     * @param string|null                                            $operator
-     * @param string|null                                            $second
+     * @param null|string                                            $operator
+     * @param null|string                                            $second
      *
      * @return $this
      */
@@ -573,9 +602,9 @@ class CDatabase_Query_Builder {
      * Add a "cross join" clause to the query.
      *
      * @param string      $table
-     * @param string|null $first
-     * @param string|null $operator
-     * @param string|null $second
+     * @param null|string $first
+     * @param null|string $operator
+     * @param null|string $second
      *
      * @return \CDatabase_Query_Builder|static
      */
@@ -676,8 +705,8 @@ class CDatabase_Query_Builder {
      * Add a "having" clause to the query.
      *
      * @param string      $column
-     * @param string|null $operator
-     * @param string|null $value
+     * @param null|string $operator
+     * @param null|string $value
      * @param string      $boolean
      *
      * @return $this
@@ -714,8 +743,8 @@ class CDatabase_Query_Builder {
      * Add a "or having" clause to the query.
      *
      * @param string      $column
-     * @param string|null $operator
-     * @param string|null $value
+     * @param null|string $operator
+     * @param null|string $value
      *
      * @return $this
      */
@@ -937,7 +966,7 @@ class CDatabase_Query_Builder {
      * Constrain the query to the previous "page" of results before a given ID.
      *
      * @param int      $perPage
-     * @param int|null $lastId
+     * @param null|int $lastId
      * @param string   $column
      *
      * @return $this
@@ -957,7 +986,7 @@ class CDatabase_Query_Builder {
      * Constrain the query to the next "page" of results after a given ID.
      *
      * @param int      $perPage
-     * @param int|null $lastId
+     * @param null|int $lastId
      * @param string   $column
      *
      * @return $this
@@ -976,7 +1005,7 @@ class CDatabase_Query_Builder {
     /**
      * Remove all existing orders and optionally add a new order.
      *
-     * @param string|null $column
+     * @param null|string $column
      * @param string      $direction
      *
      * @return $this
@@ -1137,7 +1166,7 @@ class CDatabase_Query_Builder {
      * @param int      $perPage
      * @param array    $columns
      * @param string   $pageName
-     * @param int|null $page
+     * @param null|int $page
      *
      * @return \CPagination_Paginator\CPagination_LengthAwarePaginator
      */
@@ -1162,7 +1191,7 @@ class CDatabase_Query_Builder {
      * @param int      $perPage
      * @param array    $columns
      * @param string   $pageName
-     * @param int|null $page
+     * @param null|int $page
      *
      * @return CPagination_Paginator
      */
@@ -1208,7 +1237,6 @@ class CDatabase_Query_Builder {
     protected function runPaginationCountQuery($columns = ['*']) {
         if ($this->groups || $this->havings) {
             $clone = $this->cloneForPaginationCount();
-
             if (is_null($clone->columns) && !empty($this->joins)) {
                 $clone->select($this->from . '.*');
             }
@@ -1220,7 +1248,7 @@ class CDatabase_Query_Builder {
                 ->get()->all();
         }
 
-        $without = $this->unions ? ['orders', 'limit', 'offset'] : ['columns', 'orders', 'limit', 'offset'];
+        $without = $this->unions ? ['orders', 'limit', 'offset', 'useIndex'] : ['columns', 'orders', 'limit', 'offset', 'useIndex'];
 
         return $this->cloneWithout($without)
             ->cloneWithoutBindings($this->unions ? ['order'] : ['select', 'order'])
@@ -1274,9 +1302,9 @@ class CDatabase_Query_Builder {
     /**
      * Throw an exception if the query doesn't have an orderBy clause.
      *
-     * @return void
-     *
      * @throws \RuntimeException
+     *
+     * @return void
      */
     protected function enforceOrderBy() {
         if (empty($this->orders) && empty($this->unionOrders)) {
@@ -1288,7 +1316,7 @@ class CDatabase_Query_Builder {
      * Get an array with the values of a given column.
      *
      * @param string      $column
-     * @param string|null $key
+     * @param null|string $key
      *
      * @return \Illuminate\Support\Collection
      */
@@ -1327,7 +1355,7 @@ class CDatabase_Query_Builder {
      *
      * @param string $column
      *
-     * @return string|null
+     * @return null|string
      */
     protected function stripTableForPluck($column) {
         if (is_null($column)) {
@@ -1608,6 +1636,7 @@ class CDatabase_Query_Builder {
         }
         $result = $callback();
         $this->columns = $original;
+
         return $result;
     }
 
@@ -1683,7 +1712,7 @@ class CDatabase_Query_Builder {
      * Insert a new record and get the value of the primary key.
      *
      * @param array       $values
-     * @param string|null $sequence
+     * @param null|string $sequence
      *
      * @return int
      */
@@ -1725,6 +1754,7 @@ class CDatabase_Query_Builder {
      */
     public function update(array $values) {
         $sql = $this->grammar->compileUpdate($this, $values);
+
         return $this->db->query($sql, $this->cleanBindings(
             $this->grammar->prepareBindingsForUpdate($this->bindings, $values)
         ));
@@ -1758,7 +1788,7 @@ class CDatabase_Query_Builder {
      *
      * @param array        $values
      * @param array|string $uniqueBy
-     * @param array|null   $update
+     * @param null|array   $update
      *
      * @return int
      */
@@ -1816,7 +1846,7 @@ class CDatabase_Query_Builder {
 
         $wrapped = $this->grammar->wrap($column);
 
-        $columns = array_merge([$column => $this->raw("$wrapped + $amount")], $extra);
+        $columns = array_merge([$column => $this->raw("${wrapped} + ${amount}")], $extra);
 
         return $this->update($columns);
     }
@@ -1837,7 +1867,7 @@ class CDatabase_Query_Builder {
 
         $wrapped = $this->grammar->wrap($column);
 
-        $columns = array_merge([$column => $this->raw("$wrapped - $amount")], $extra);
+        $columns = array_merge([$column => $this->raw("${wrapped} - ${amount}")], $extra);
 
         return $this->update($columns);
     }
@@ -1929,9 +1959,9 @@ class CDatabase_Query_Builder {
      * @param array  $bindings
      * @param string $type
      *
-     * @return $this
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return $this
      */
     public function setBindings(array $bindings, $type = 'where') {
         if (!array_key_exists($type, $this->bindings)) {
@@ -1949,9 +1979,9 @@ class CDatabase_Query_Builder {
      * @param mixed  $value
      * @param string $type
      *
-     * @return $this
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return $this
      */
     public function addBinding($value, $type = 'where') {
         if (!array_key_exists($type, $this->bindings)) {
@@ -2013,6 +2043,7 @@ class CDatabase_Query_Builder {
         if (strlen($this->from) > 0) {
             return $this->from . '_' . 'id';
         }
+
         return 'id';
     }
 
@@ -2124,9 +2155,9 @@ class CDatabase_Query_Builder {
      * @param string $method
      * @param array  $parameters
      *
-     * @return mixed
-     *
      * @throws \BadMethodCallException
+     *
+     * @return mixed
      */
     public function __call($method, $parameters) {
         if (static::hasMacro($method)) {
