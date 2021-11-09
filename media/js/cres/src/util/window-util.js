@@ -27,6 +27,9 @@ export const toggleFullscreen = (element) => {
 
 
 export const showHtmlModal = (html) => {
+    if(typeof html ==='object') {
+        html = JSON.stringify(html);
+    }
     let page = document.createElement('html');
     page.innerHTML = html;
     page.querySelectorAll('a').forEach(a =>

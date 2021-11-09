@@ -192,7 +192,7 @@ export default class Cresenity {
                 data: dataAddition,
                 success: (data) => {
                     let isError = false;
-                    if(!data.html) {
+                    if(typeof data.html === 'undefined') {
                         //error
                         this.htmlModal(data);
                         isError = true;
