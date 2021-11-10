@@ -81,7 +81,7 @@ class CElement_List_ActionList extends CElement_List {
         $this->apply('style', $this->style, 'CElement_Component_Action');
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $classes = $this->getNormalizedClasses();
+        $classes = $this->getClasses();
         $ulDropdownClasses = '';
         if (!in_array('dropdown-menu-right', $classes)
             && !in_array('dropdown-menu-left', $classes)
