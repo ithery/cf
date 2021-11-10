@@ -44,7 +44,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
     /**
      * Create a new event dispatcher instance.
      *
-     * @param CContainer_ContainerInterface|null $container
+     * @param null|CContainer_ContainerInterface $container
      *
      * @return void
      */
@@ -142,6 +142,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
         if (is_string($subscriber)) {
             return $this->container->make($subscriber);
         }
+
         return $subscriber;
     }
 
@@ -151,7 +152,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      * @param string|object $event
      * @param mixed         $payload
      *
-     * @return array|null
+     * @return null|array
      */
     public function until($event, $payload = []) {
         return $this->dispatch($event, $payload, true);
@@ -164,7 +165,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      * @param mixed         $payload
      * @param bool          $halt
      *
-     * @return array|null
+     * @return null|array
      */
     public function fire($event, $payload = [], $halt = false) {
         return $this->dispatch($event, $payload, $halt);
@@ -177,7 +178,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      * @param mixed         $payload
      * @param bool          $halt
      *
-     * @return array|null
+     * @return null|array
      */
     public function dispatch($event, $payload = [], $halt = false) {
         // When the given "event" is actually an object we will assume it is an event
@@ -205,6 +206,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
             }
             $responses[] = $response;
         }
+
         return $halt ? null : $responses;
     }
 
@@ -220,6 +222,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
         if (is_object($event)) {
             list($payload, $event) = [[$event], get_class($event)];
         }
+
         return [$event, carr::wrap($payload)];
     }
 
@@ -275,6 +278,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
             $listeners,
             isset($this->wildcardsCache[$eventName]) ? $this->wildcardsCache[$eventName] : $this->getWildcardListeners($eventName)
         );
+
         return class_exists($eventName, false) ? $this->addInterfaceListeners($eventName, $listeners) : $listeners;
     }
 
@@ -292,6 +296,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
                 $wildcards = array_merge($wildcards, $listeners);
             }
         }
+
         return $this->wildcardsCache[$eventName] = $wildcards;
     }
 
@@ -311,6 +316,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
                 }
             }
         }
+
         return $listeners;
     }
 
@@ -326,10 +332,12 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
         if (is_string($listener)) {
             return $this->createClassListener($listener, $wildcard);
         }
+
         return function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
                 return $listener($event, $payload);
             }
+
             return call_user_func_array($listener, array_values($payload));
         };
     }
@@ -347,6 +355,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
             if ($wildcard) {
                 return call_user_func($this->createClassCallable($listener), $event, $payload);
             }
+
             return call_user_func_array(
                 $this->createClassCallable($listener),
                 $payload
@@ -366,6 +375,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
         if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
         }
+
         return [$this->container->make($class), $method];
     }
 
@@ -390,7 +400,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
     protected function handlerShouldBeQueued($class) {
         try {
             return (new ReflectionClass($class))->implementsInterface(
-                ShouldQueue::class
+                CQueue_ShouldQueueInterface::class
             );
         } catch (Exception $e) {
             return false;
@@ -428,6 +438,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
         if (method_exists($class, 'shouldQueue')) {
             return $this->container->make($class)->shouldQueue($arguments[0]);
         }
+
         return true;
     }
 
@@ -460,6 +471,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     protected function createListenerAndJob($class, $method, $arguments) {
         $listener = (new ReflectionClass($class))->newInstanceWithoutConstructor();
+
         return [$listener, $this->propagateListenerOptions(
             $listener,
             new CEvent_CallQueuedListener($class, $method, $arguments)
@@ -528,6 +540,7 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
      */
     public function setQueueResolver(callable $resolver) {
         $this->queueResolver = $resolver;
+
         return $this;
     }
 }

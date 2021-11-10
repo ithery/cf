@@ -84,6 +84,22 @@ class CElement_Factory {
     }
 
     /**
+     * @param string $className
+     * @param string $id        optional
+     *
+     * @throws CApp_Exception
+     *
+     * @return \CElement
+     */
+    public static function create($className, $id = '') {
+        if (!class_exists($className)) {
+            throw new CApp_Exception(c::__('Element [:name] not found', ['name' => $className]));
+        }
+
+        return new $className($id);
+    }
+
+    /**
      * @param string $name
      * @param string $id   optional
      *
