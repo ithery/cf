@@ -59,6 +59,7 @@ trait CTrait_Compat_Observable {
     public function add_control($id, $type) {
         return $this->addControl($id, $type);
     }
+
     /**
      * @param string $id
      *
@@ -296,6 +297,101 @@ trait CTrait_Compat_Observable {
         $this->add($span);
 
         return $span;
+    }
+
+    /**
+     * @param string $id
+     *
+     * @return CPieChartElement
+     *
+     * @deprecated
+     */
+    public function addPieChart($id = '') {
+        $pie_chart = CPieChartElement::factory($id);
+        $this->add($pie_chart);
+
+        return $pie_chart;
+    }
+
+    /**
+     * Add Row.
+     *
+     * @param string $id
+     *
+     * @return CTableRow
+     *
+     * @deprecated 1.2
+     */
+    public function addRow($id = '') {
+        $row = CTableRow::factory($id);
+        $this->add($row);
+
+        return $row;
+    }
+
+    /**
+     * Add Calendar.
+     *
+     * @param string $id
+     * @param mixed  $calendar_id
+     *
+     * @return CCalendar
+     *
+     * @deprecated 1.2
+     */
+    public function addCalendar($calendar_id = '') {
+        $calendar = CCalendar::factory($calendar_id);
+        $this->add($calendar);
+
+        return $calendar;
+    }
+
+    /**
+     * Add TabStaticList.
+     *
+     * @param string $tabs_id
+     *
+     * @return CTabStaticList
+     *
+     * @deprecated 1.2
+     */
+    public function addTabStaticList($tabs_id = '') {
+        $tabs = CTabStaticList::factory($tabs_id);
+        $this->add($tabs);
+
+        return $tabs;
+    }
+
+    /**
+     * Add TabStaticList.
+     *
+     * @param string $id
+     *
+     * @return CBasicSpan
+     *
+     * @deprecated 1.2
+     */
+    public function addBasicSpan($id = '') {
+        $span = CBasicSpan::factory($id);
+        $this->add($span);
+
+        return $span;
+    }
+
+    /**
+     * Add TabStaticList.
+     *
+     * @param string $id
+     *
+     * @return CRowFluid
+     *
+     * @deprecated 1.2
+     */
+    public function addRowFluid($id = '') {
+        $rowf = CRowFluid::factory($id);
+        $this->add($rowf);
+
+        return $rowf;
     }
 }
 //@codingStandardsIgnoreEnd
