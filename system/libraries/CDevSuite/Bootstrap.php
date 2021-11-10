@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Bootstrap
+ * Description of Bootstrap.
  *
  * @author Hery
  */
@@ -19,6 +19,7 @@ class CDevSuite_Bootstrap {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -31,12 +32,15 @@ class CDevSuite_Bootstrap {
         switch (CServer::getOS()) {
             case CServer::OS_WINNT:
                 $bootstrapper[] = CDevSuite_Bootstrap_WindowsBootstrapper_DependencyChecker::class;
+
                 break;
             case CServer::OS_DARWIN:
                 $bootstrapper[] = CDevSuite_Bootstrap_MacBootstrapper_DependencyChecker::class;
+
                 break;
             case CServer::OS_LINUX:
                 $bootstrapper[] = CDevSuite_Bootstrap_LinuxBootstrapper_DependencyChecker::class;
+
                 break;
         }
         $bootstrapper[] = CDevSuite_Bootstrap_PruneBootstrapper::class;

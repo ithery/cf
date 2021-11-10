@@ -2,7 +2,7 @@
 
 class CDevSuite_Helper {
     /**
-     * Search and replace using associative array
+     * Search and replace using associative array.
      *
      * @param array  $searchAndReplace
      * @param string $subject

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Deploy
+ * Description of Deploy.
  *
  * @author Hery
  */
@@ -27,6 +27,7 @@ class CDevSuite_Deploy {
 
     public function path() {
         $dir = CF::appDir();
+
         return $dir;
     }
 
@@ -91,9 +92,9 @@ class CDevSuite_Deploy {
      * @return CDevSuite_TaskContainer
      */
     protected function loadTaskContainer() {
-        c::with($container = new CDevSuite_Deploy_TaskContainer)->load(
+        c::with($container = new CDevSuite_Deploy_TaskContainer())->load(
             $this->deployFile(),
-            new CDevSuite_Deploy_Compiler,
+            new CDevSuite_Deploy_Compiler(),
             $this->getOptions()
         );
 
@@ -252,6 +253,6 @@ class CDevSuite_Deploy {
      * @return CDevSuite_Deploy_RemoteProcessor
      */
     protected function getRemoteProcessor(CDevSuite_Deploy_Task $task) {
-        return $task->parallel ? new CDevSuite_Deploy_ParallelSSH : new CDevSuite_Deploy_SSH;
+        return $task->parallel ? new CDevSuite_Deploy_ParallelSSH() : new CDevSuite_Deploy_SSH();
     }
 }
