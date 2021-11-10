@@ -14,6 +14,7 @@ trait CElement_Component_DataTable_Trait_FooterTrait {
      */
     public function setFooterTitle($title) {
         $this->footerTitle = $title;
+
         return $this;
     }
 
@@ -24,6 +25,7 @@ trait CElement_Component_DataTable_Trait_FooterTrait {
      */
     public function setFooter($bool) {
         $this->footer = $bool;
+
         return $this;
     }
 
@@ -35,6 +37,7 @@ trait CElement_Component_DataTable_Trait_FooterTrait {
             'labelcolspan' => $labelcolspan,
         ];
         $this->footerField[] = $f;
+
         return $this;
     }
 }

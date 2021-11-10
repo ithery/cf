@@ -202,14 +202,14 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
                 if (($table->cellCallbackFunc) != null) {
                     $new_v = CFunction::factory($table->cellCallbackFunc)
-                            ->addArg($table)
-                            ->addArg($col->get_fieldname())
-                            ->addArg($row)
-                            ->addArg($new_v)
-                            ->setRequire($table->requires)
-                            ->execute();
+                        ->addArg($table)
+                        ->addArg($col->get_fieldname())
+                        ->addArg($row)
+                        ->addArg($new_v)
+                        ->setRequire($table->requires)
+                        ->execute();
 
-                    if (is_array($new_v) && isset($new_v['html']) && isset($new_v['js'])) {
+                    if (is_array($new_v) && isset($new_v['html'], $new_v['js'])) {
                         $new_v = carr::get($new_v, 'html');
                         $js .= carr::get($new_v, 'js');
                     }
@@ -219,12 +219,15 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 switch ($col->getAlign()) {
                     case CConstant::ALIGN_LEFT:
                         $class .= ' align-left';
+
                         break;
                     case CConstant::ALIGN_RIGHT:
                         $class .= ' align-right';
+
                         break;
                     case CConstant::ALIGN_CENTER:
                         $class .= ' align-center';
+
                         break;
                 }
                 if ($no % 2 == 0) {
@@ -262,12 +265,15 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 switch ($f['align']) {
                     case 'left':
                         $class .= ' align-left';
+
                         break;
                     case 'right':
                         $class .= ' align-right';
+
                         break;
                     case 'center':
                         $class .= ' align-center';
+
                         break;
                 }
 
@@ -291,12 +297,15 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                             switch ($col->get_align()) {
                                 case 'left':
                                     $class .= ' align-left';
+
                                     break;
                                 case 'right':
                                     $class .= ' align-right';
+
                                     break;
                                 case 'center':
                                     $class .= ' align-center';
+
                                     break;
                             }
                             echo '<td class="tfoot ' . $class . '">';
@@ -335,6 +344,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         }
 
         $this->pdf_orientation = $orientation;
+
         return $this;
     }
 
@@ -445,12 +455,12 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
                 if (($this->cellCallbackFunc) != null) {
                     $new_v = CDynFunction::factory($this->cellCallbackFunc)
-                            ->add_param($this)
-                            ->add_param($col->get_fieldname())
-                            ->add_param($row)
-                            ->add_param($new_v)
-                            ->set_require($this->requires)
-                            ->execute();
+                        ->add_param($this)
+                        ->add_param($col->get_fieldname())
+                        ->add_param($row)
+                        ->add_param($new_v)
+                        ->set_require($this->requires)
+                        ->execute();
 
                     //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
                 }
@@ -484,9 +494,9 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
         if ($this->isCallback) {
             $callbackData = CFunction::factory($this->query)
-                    ->addArg($this->callbackOptions)
-                    ->setRequire($this->callbackRequire)
-                    ->execute();
+                ->addArg($this->callbackOptions)
+                ->setRequire($this->callbackRequire)
+                ->execute();
             $this->data = carr::get($callbackData, 'data');
         }
 
@@ -656,12 +666,12 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
                 if (($this->cellCallbackFunc) != null) {
                     $new_v = CFunction::factory($this->cellCallbackFunc)
-                            ->addArg($this)
-                            ->addArg($col->getFieldname())
-                            ->addArg($row)
-                            ->addArg($new_v)
-                            ->setRequire($this->requires)
-                            ->execute();
+                        ->addArg($this)
+                        ->addArg($col->getFieldname())
+                        ->addArg($row)
+                        ->addArg($new_v)
+                        ->setRequire($this->requires)
+                        ->execute();
 
                     //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
                 }
@@ -669,12 +679,15 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 switch ($col->getAlign()) {
                     case CConstant::ALIGN_LEFT:
                         $class .= ' align-left';
+
                         break;
                     case CConstant::ALIGN_RIGHT:
                         $class .= ' align-right';
+
                         break;
                     case CConstant::ALIGN_CENTER:
                         $class .= ' align-center';
+
                         break;
                 }
                 if ($no % 2 == 0) {
@@ -712,12 +725,15 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 switch ($f['align']) {
                     case 'left':
                         $class .= ' align-left';
+
                         break;
                     case 'right':
                         $class .= ' align-right';
+
                         break;
                     case 'center':
                         $class .= ' align-center';
+
                         break;
                 }
 
@@ -741,12 +757,15 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                             switch ($col->getAlign()) {
                                 case CConstant::ALIGN_LEFT:
                                     $class .= ' align-left';
+
                                     break;
                                 case CConstant::ALIGN_RIGHT:
                                     $class .= ' align-right';
+
                                     break;
                                 case CConstant::ALIGN_CENTER:
                                     $class .= ' align-center';
+
                                     break;
                             }
                             echo '<td class="tfoot ' . $class . '">';
@@ -771,6 +790,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
     public function addReportHeader($line) {
         $this->report_header[] = $line;
+
         return $this;
     }
 
@@ -848,22 +868,22 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 if ($col->callback != null) {
                     $col_v = CFunction::factory($col->callback)
                             // ->addArg($table)
-                            ->addArg($row)
-                            ->addArg($col_v)
-                            ->setRequire($col->callbackRequire)
-                            ->execute();
+                        ->addArg($row)
+                        ->addArg($col_v)
+                        ->setRequire($col->callbackRequire)
+                        ->execute();
                 }
 
                 $new_v = $col_v;
 
                 if (($this->cellCallbackFunc) != null) {
                     $new_v = CFunction::factory($this->cellCallbackFunc)
-                            ->addArg($this)
-                            ->addArg($col->get_fieldname())
-                            ->addArg($row)
-                            ->addArg($new_v)
-                            ->setRequire($this->requires)
-                            ->execute();
+                        ->addArg($this)
+                        ->addArg($col->get_fieldname())
+                        ->addArg($row)
+                        ->addArg($new_v)
+                        ->setRequire($this->requires)
+                        ->execute();
 
                     //call_user_func($this->cellCallbackFunc,$this,$col->get_fieldname(),$row,$v);
                 }
@@ -871,12 +891,15 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                 switch ($col->getAlign()) {
                     case CConstant::ALIGN_LEFT:
                         $class .= ' align-left';
+
                         break;
                     case CConstant::ALIGN_RIGHT:
                         $class .= ' align-right';
+
                         break;
                     case CConstant::ALIGN_CENTER:
                         $class .= ' align-center';
+
                         break;
                 }
                 //parse new_v
@@ -934,12 +957,15 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
                             switch ($col->getAlign()) {
                                 case CConstant::ALIGN_LEFT:
                                     $class .= ' align-left';
+
                                     break;
                                 case CConstant::ALIGN_RIGHT:
                                     $class .= ' align-right';
+
                                     break;
                                 case CConstant::ALIGN_CENTER:
                                     $class .= ' align-center';
+
                                     break;
                             }
                             $excel->writeByIndex($i, $j, $fcolval);
@@ -972,16 +998,19 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
 
     public function setExportFilename($filename) {
         $this->export_filename = $filename;
+
         return $this;
     }
 
     public function setExportSheetname($sheetname) {
         $this->export_sheetname = $sheetname;
+
         return $this;
     }
 
     public function setPdfFontSize($size) {
         $this->pdf_font_size = $size;
+
         return $this;
     }
 
@@ -989,6 +1018,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         if ($this->export_pdf) {
             return ' border="1" width="100%"';
         }
+
         return '';
     }
 
@@ -996,6 +1026,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         if ($this->export_pdf) {
             return ' bgcolor="#9f9f9f" color="#000" style="color:#000" ';
         }
+
         return '';
     }
 
@@ -1003,6 +1034,7 @@ trait CElement_Component_DataTable_Trait_ExportTrait {
         if ($this->export_pdf) {
             return ' valign="middle"';
         }
+
         return '';
     }
 }

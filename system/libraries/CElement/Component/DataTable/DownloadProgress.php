@@ -1,18 +1,18 @@
 <?php
 
 /**
- * Description of DownloadProgress
+ * Description of DownloadProgress.
  *
  * @author ekosantoso
  *
  * @deprecated since 1.3 dont use this
  */
 class CElement_Component_DataTable_DownloadProgress {
+    const TEMP_DOWNLOAD_PROGRESS_FOLDER = 'download-progress';
+
     protected $downloadId;
 
     protected $ajaxUrl;
-
-    const TEMP_DOWNLOAD_PROGRESS_FOLDER = 'download-progress';
 
     public function __construct() {
         // $fullFilename = CTemporary::put(self::TEMP_DOWNLOAD_PROGRESS_FOLDER, $this->jsonInfo(), $this->downloadId);
@@ -44,6 +44,7 @@ class CElement_Component_DataTable_DownloadProgress {
         $data = [];
         $data['downloadId'] = $this->downloadId;
         $data['ajaxUrl'] = $this->ajaxUrl;
+
         return $data;
     }
 
@@ -53,6 +54,7 @@ class CElement_Component_DataTable_DownloadProgress {
         $taskQueue = CExporter::queue($exportable, $filePath, $disk, $writerType, $diskOptions)->chain([
             //new CApp_DownloadProgress_TaskQueue_AfterExportQueue($queueParams)
         ]);
+
         return $taskQueue;
     }
 }
