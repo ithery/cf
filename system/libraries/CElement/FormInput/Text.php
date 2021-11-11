@@ -69,19 +69,6 @@ class CElement_FormInput_Text extends CElement_FormInput {
         }
         $html->appendln('<input type="text" placeholder="' . $this->placeholder . '" name="' . $this->name . '" id="' . $this->id . '" class="form-control input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . '/>')->br();
 
-        if ($this->bootstrap >= '3') {
-            if ($this->button_position == 'right') {
-                $html->appendln('<span class="input-group-btn">');
-                if ($this->action !== null) {
-                    $html->appendln($this->action->html());
-                }
-                $html->appendln('</span>');
-            }
-            if ($this->input_style == 'input-group') {
-                $html->appendln('</div>');
-            }
-        }
-
         return $html->text();
     }
 

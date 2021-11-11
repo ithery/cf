@@ -60,17 +60,10 @@ class CElement_FormInput_Time extends CElement_FormInput {
         if (strlen($this->placeholder) > 0) {
             $placeholder = ' placeholder="' . $this->placeholder . '"';
         }
-        if ($this->bootstrap == '3.3') {
-            $classes = $classes . ' form-control timepicker';
-            $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
-        } else {
-            if ($this->bootstrap == '3') {
-                $classes = $classes . ' form-control ';
-            }
-            $html->appendln('<div class="bootstrap-timepicker">');
-            $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
-            $html->appendln('</div>');
-        }
+
+        $html->appendln('<div class="bootstrap-timepicker">');
+        $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
+        $html->appendln('</div>');
 
         return $html->text();
     }

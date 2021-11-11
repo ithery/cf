@@ -13,6 +13,11 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
  //@codingStandardsIgnoreStart
 trait CTrait_Compat_Observable {
+    /**
+     * @return array
+     *
+     * @deprecated 1.2
+     */
     public function get_listeners() {
         return $this->getListeners();
     }
@@ -22,17 +27,17 @@ trait CTrait_Compat_Observable {
      *
      * @return CObservable_Listener
      *
-     * @deprecated
+     * @deprecated 1.2
      */
     public function add_listener($event) {
         return $this->addListener($event);
     }
 
     /**
-     * @param mixed $event
-     * @param mixed $listener
+     * @param string $event
+     * @param mixed  $listener
      *
-     * @deprecated
+     * @deprecated 1.2
      */
     public function attach_listener($event, $listener) {
         /** @var CObservable $this */
@@ -40,9 +45,9 @@ trait CTrait_Compat_Observable {
     }
 
     /**
-     * @param mixed $event
+     * @param string $event
      *
-     * @deprecated
+     * @deprecated 1.2
      */
     public function detach_listener($event) {
         return $this->detachListener($event);
@@ -71,46 +76,103 @@ trait CTrait_Compat_Observable {
         return $this->addDiv($id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @deprecated since 1.2
+     */
     public function add_a($id = '') {
         return $this->addA($id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @deprecated since 1.2
+     */
     public function add_h1($id = '') {
         return $this->addH1($id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @deprecated since 1.2
+     */
     public function add_h2($id = '') {
         return $this->addH2($id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @deprecated since 1.2
+     */
     public function add_h3($id = '') {
         return $this->addH3($id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @deprecated since 1.2
+     */
     public function add_h4($id = '') {
         return $this->addH4($id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @deprecated since 1.2
+     */
     public function add_h5($id = '') {
         return $this->addH5($id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @deprecated since 1.2
+     */
     public function add_h6($id = '') {
         return $this->addH6($id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @deprecated since 1.2
+     */
     public function add_ol($id = '') {
         return $this->addOl($id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @deprecated since 1.2
+     */
     public function add_ul($id = '') {
         return $this->addUl($id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @deprecated since 1.2
+     */
     public function add_li($id = '') {
         return $this->addLi($id);
     }
 
+    /**
+     * @param string $id
+     *
+     * @deprecated since 1.2
+     *
+     * @return CElement_Element_Iframe
+     */
     public function add_iframe($id = '') {
         return $this->addIframe($id);
     }
@@ -118,16 +180,12 @@ trait CTrait_Compat_Observable {
     /**
      * @param mixed $field_id
      *
-     * @deprecated
+     * @deprecated 1.2
      *
      * @return CElement_Component_Form_Field
      */
     public function add_field($field_id = '') {
         return $this->addField($field_id);
-    }
-
-    public function add_fieldset($fieldset_id = '') {
-        return $this->addFieldset($fieldset_id);
     }
 
     /**
@@ -141,10 +199,26 @@ trait CTrait_Compat_Observable {
         return $this->addTable($tableId);
     }
 
+    /**
+     * @param string $id
+     * @param mixed  $row_id
+     *
+     * @deprecated since 1.2
+     *
+     * @return $this
+     */
     public function add_row($row_id = '') {
         return $this->addRow($row_id);
     }
 
+    /**
+     * @param string $id
+     * @param mixed  $calendar_id
+     *
+     * @deprecated since 1.2
+     *
+     * @return $this
+     */
     public function add_calendar($calendar_id = '') {
         return $this->addCalendar($calendar_id);
     }
@@ -153,11 +227,21 @@ trait CTrait_Compat_Observable {
      * @param string $tabs_id
      *
      * @return CTabList
+     *
+     * @deprecated since 1.2
      */
     public function add_tab_list($tabs_id = '') {
         return $this->addTabList($tabs_id);
     }
 
+    /**
+     * @param string $id
+     * @param mixed  $tabs_id
+     *
+     * @deprecated since 1.2
+     *
+     * @return $this
+     */
     public function add_tab_static_list($tabs_id = '') {
         return $this->addTabStaticList($tabs_id);
     }

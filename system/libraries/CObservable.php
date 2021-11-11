@@ -14,9 +14,6 @@ abstract class CObservable extends CRenderable {
         CObservable_Trait_EventsTrait,
         CObservable_Trait_ControlTrait,
         CObservable_Trait_ListenerTrait;
-
-    protected $manager;
-
     /**
      * @var CObservable_Javascript
      */
