@@ -10,7 +10,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_FormInput_Date extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Date;
-
     protected $date_format;
 
     protected $have_button;
@@ -76,9 +75,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
             $classes = ' ' . $classes;
         }
         $custom_css = $this->custom_css;
-        if ($this->bootstrap >= '3') {
-            $classes = $classes . ' form-control ';
-        }
+
         $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
@@ -89,13 +86,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
                         <span class="add-on"><i class="icon-th"></i></span>
                     </div>')->br();
         } else {
-            if ($this->bootstrap == '3.3') {
-                $html->appendln('<div class="input-group">')->br();
-            }
             $html->appendln('<input type="text" name="' . $this->name . '"  data-date-format="' . $this->date_format . '" id="' . $this->id . '" class="datepicker input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
-            if ($this->bootstrap == '3.3') {
-                $html->appendln('</div>');
-            }
         }
         //$html->appendln('<input type="text" name="'.$this->name.'"  data-date-format="'.$this->date_format.'" id="'.$this->id.'" class="datepicker input-unstyled'.$classes.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.$custom_css.'>')->br();
 

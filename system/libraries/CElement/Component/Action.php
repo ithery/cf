@@ -12,7 +12,6 @@ class CElement_Component_Action extends CElement_Component {
     use CTrait_Compat_Element_Action,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
-
     protected $jsfunc;
 
     protected $disabled;
@@ -228,11 +227,7 @@ class CElement_Component_Action extends CElement_Component {
         if ($this->confirm && !$this->submitTo) {
             $add_class .= ' confirm';
         }
-        if ($this->bootstrap == '3.3') {
-            if (strlen($this->btn_style) == 0) {
-                $add_class .= ' btn-' . $this->btn_style;
-            }
-        }
+
         if ($this->style == 'btn-icon-group' && strlen($this->label) > 0) {
             $add_class .= ' tip-top';
             $add_attr .= ' data-original-title="' . c::e($this->label) . '"';
@@ -250,9 +245,7 @@ class CElement_Component_Action extends CElement_Component {
             if ($this->button) {
                 $html->appendln('<button id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '>' . $this->label . '</button>');
                 if (strlen($this->icon) > 0) {
-                    if ($this->bootstrap == '3.3') {
-                        $html->append('<i class="fa fa-' . $this->icon . '"></i> ');
-                    }
+                    $html->append('<i class="icon icon-' . $this->icon . '"></i> ');
                 }
                 $html->appendln($this->label . '</button>');
             } else {

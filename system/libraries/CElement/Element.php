@@ -10,11 +10,17 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 abstract class CElement_Element extends CElement {
     protected $before;
+
     protected $after;
+
     protected $isBuilded = false;
+
     protected $isOneTag = false;
+
     protected $haveIndent = true;
+
     protected $is_show = true;
+
     private $isBuild = false;
 
     public function __construct($id = '', $tag = 'div') {
@@ -27,11 +33,6 @@ abstract class CElement_Element extends CElement {
 
         $this->isBuilded = false;
         $this->isOneTag = false;
-
-        $this->bootstrap = ccfg::get('bootstrap');
-        if (strlen($this->bootstrap) == 0) {
-            $this->bootstrap = '2';
-        }
     }
 
     public function onetag() {
@@ -53,6 +54,7 @@ abstract class CElement_Element extends CElement {
      */
     public function setHaveIndent($bool = true) {
         $this->haveIndent = $bool;
+
         return $this;
     }
 
@@ -77,6 +79,7 @@ abstract class CElement_Element extends CElement {
             $classAttr = ' class="' . $classes . '"';
         }
         $html_attr = 'id="' . $this->id . '" ' . $classAttr . $custom_css . $addition_attribute;
+
         return $html_attr;
     }
 
@@ -108,6 +111,7 @@ abstract class CElement_Element extends CElement {
         if ($this->before == null) {
             $this->before = CElement_PseudoElement::factory();
         }
+
         return $this->before;
     }
 
@@ -115,6 +119,7 @@ abstract class CElement_Element extends CElement {
         if ($this->after == null) {
             $this->after = CElement_PseudoElement::factory();
         }
+
         return $this->after;
     }
 

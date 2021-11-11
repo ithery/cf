@@ -74,9 +74,6 @@ class CElement_Component_Form extends CElement_Component {
         $this->disable_js = false;
         $this->validationPromptPosition = 'topRight';
 
-        if ($this->bootstrap == '3.3') {
-            $this->layout = carr::get($this->theme_style, 'form_layout');
-        }
         CManager::instance()->registerModule('validation');
     }
 

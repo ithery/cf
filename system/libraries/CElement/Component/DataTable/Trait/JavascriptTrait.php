@@ -282,12 +282,6 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln($this->fixedColumn ? '' : $this->options->toJsonRow('scrollX'))->br()
                 ->br();
 
-            if ($this->bootstrap >= '3') {
-                if ($this->dom == null) {
-                    $this->dom = "<'row'<'col-sm-6'l><'col-sm-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>";
-                }
-            }
-
             if ($this->dom == null) {
                 $this->dom = '<""l>t<"F"<".footer_action">frp>';
             }

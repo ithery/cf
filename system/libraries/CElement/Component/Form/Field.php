@@ -11,7 +11,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_Component_Form_Field extends CElement_Component {
     use CTrait_Compat_Element_Form_Field;
     use CTrait_Element_Property_Label;
-
     protected $groupClasses = [];
 
     protected $group_id = '';
@@ -48,8 +47,7 @@ class CElement_Component_Form_Field extends CElement_Component {
         $this->groupClasses = [];
         $this->group_custom_css = [];
         $this->style_form_group = null;
-        $this->inline_without_default = '0';
-        $this->inline_without_default = carr::get($this->theme_style, 'inline_without_default');
+        $this->inline_without_default = 'inline_without_default';
         $this->labelRequired = false;
     }
 

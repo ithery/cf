@@ -81,10 +81,7 @@ class CForm extends CElement_Element {
         $this->action_before_submit = '';
         $this->disable_js = false;
 
-        if ($this->bootstrap == '3.3') {
-            $this->layout = carr::get($this->theme_style, 'form_layout');
-        }
-        CManager::instance()->register_module('validation');
+        CManager::instance()->registerModule('validation');
     }
 
     public static function factory($id = '') {
@@ -93,16 +90,19 @@ class CForm extends CElement_Element {
 
     public function set_name($name) {
         $this->name = $name;
+
         return $this;
     }
 
     public function set_layout($layout) {
         $this->layout = $layout;
+
         return $this;
     }
 
     public function set_action($action) {
         $this->action = $action;
+
         return $this;
     }
 
@@ -113,91 +113,109 @@ class CForm extends CElement_Element {
      */
     public function set_method($method) {
         $this->method = $method;
+
         return $this;
     }
 
     public function set_target($target) {
         $this->target = $target;
+
         return $this;
     }
 
     public function set_enctype($enctype) {
         $this->enctype = $enctype;
+
         return $this;
     }
 
     public function set_autocomplete($bool) {
         $this->autocomplete = $bool;
+
         return $this;
     }
 
     public function set_validation($bool) {
         $this->validation = $bool;
+
         return $this;
     }
 
     public function set_ajax_submit($bool) {
         $this->ajax_submit = $bool;
+
         return $this;
     }
 
     public function set_ajax_datatype($datatype) {
         $this->ajax_datatype = $datatype;
+
         return $this;
     }
 
     public function set_ajax_submit_target($target) {
         $this->ajax_submit_target = $target;
+
         return $this;
     }
 
     public function set_disable_js($bool) {
         $this->disable_js = $bool;
+
         return $this;
     }
 
     public function set_ajax_submit_target_class($target) {
         $this->ajax_submit_target_class = $target;
+
         return $this;
     }
 
     public function set_ajax_success_script_callback($jsfunc) {
         $this->ajax_success_script_callback = $jsfunc;
+
         return $this;
     }
 
     public function set_ajax_redirect($bool) {
         $this->ajax_redirect = $bool;
+
         return $this;
     }
 
     public function set_ajax_upload_progress($bool) {
         $this->ajax_upload_progress = $bool;
+
         return $this;
     }
 
     public function set_ajax_process_progress($bool) {
         $this->ajax_process_progress = $bool;
+
         return $this;
     }
 
     public function set_ajax_process_progress_cancel($bool) {
         $this->ajax_process_progress_cancel = $bool;
+
         return $this;
     }
 
     public function set_ajax_redirect_url($url) {
         $this->ajax_redirect_url = $url;
+
         return $this;
     }
 
     public function set_action_before_submit($action_before_submit) {
         $this->action_before_submit = $action_before_submit;
+
         return $this;
     }
 
     public function set_auto_set_focus($bol) {
         $this->auto_set_focus = $bol;
+
         return $this;
     }
 
@@ -209,6 +227,7 @@ class CForm extends CElement_Element {
     public function add_ajax_submit_handler($handler_name) {
         $handler = CHandler::factory($this->id, 'submit', $handler_name);
         $this->ajax_submit_handlers[] = $handler;
+
         return $handler;
     }
 
@@ -222,12 +241,13 @@ class CForm extends CElement_Element {
         if (strlen($this->method) > 0) {
             $data['attr']['method'] = $this->method;
         }
+
         return $data;
     }
 
     public function html($indent = 0) {
         $html = new CStringBuilder();
-        $html->set_indent($indent);
+        $html->setIndent($indent);
 
         $classes = $this->classes;
         $classes = implode(' ', $classes);
@@ -255,8 +275,8 @@ class CForm extends CElement_Element {
                 $form_style_layout = 'form-' . $this->layout;
             }
             $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
-                    ->inc_indent()
-                    ->br();
+                ->incIndent()
+                ->br();
 //                $html->appendln("<div class='box-body'>");
         } else {
             $form_style_layout = '';
@@ -264,20 +284,18 @@ class CForm extends CElement_Element {
                 $form_style_layout = 'form-' . $this->layout;
             }
             $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
-                    ->inc_indent()
-                    ->br();
+                ->incIndent()
+                ->br();
         }
 
         if ($this->ajax_process_progress) {
             $html->appendln('<input type="hidden" id="cprocess_id" name="cprocess_id" value="' . $this->ajax_process_id . '">');
         }
-        $html->appendln($this->html_child($html->get_indent()));
-        if ($this->bootstrap == '3.3') {
-//                $html->appendln("</div>");
-        }
+        $html->appendln($this->htmlChild($html->getIndent()));
 
-        $html->dec_indent()
-                ->appendln('</form>');
+        $html->decIndent()
+            ->appendln('</form>');
+
         return $html->text();
     }
 
@@ -286,15 +304,15 @@ class CForm extends CElement_Element {
             return parent::js($indent);
         }
         $js = new CStringBuilder();
-        $js->set_indent($indent);
+        $js->setIndent($indent);
         if ($this->ajax_submit) {
             $ajax_url = '';
             $ajax_process_script = '';
             $ajax_process_done_script = '';
             if ($this->ajax_process_progress) {
                 $ajax_process_url = CAjaxMethod::factory()->set_type('form_process')
-                        ->set_data('form', serialize($this))->set_method('POST')
-                        ->makeurl();
+                    ->set_data('form', serialize($this))->set_method('POST')
+                    ->makeurl();
                 $ajax_process_script_buttons = '	buttons: {}, ';
                 if ($this->ajax_process_progress_cancel) {
                     $ajax_process_script_buttons = "

@@ -11,9 +11,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_FormInput_Text extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Text,
         CTrait_Element_Property_Placeholder;
-
-    protected $bootstrap;
-
     protected $input_style;
 
     protected $button_position;
@@ -61,19 +58,6 @@ class CElement_FormInput_Text extends CElement_FormInput {
             $classes = ' ' . $classes;
         }
 
-        if ($this->bootstrap >= '3') {
-            $classes = $classes . ' form-control ';
-            if ($this->input_style == 'input-group') {
-                $html->appendln('<div class="input-group">');
-                if ($this->button_position == 'left') {
-                    $html->appendln('<span class="input-group-btn">');
-                    if ($this->action !== null) {
-                        $html->appendln($this->action->html());
-                    }
-                    $html->appendln('</span>');
-                }
-            }
-        }
         $custom_css = $this->custom_css;
         $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
@@ -97,6 +81,7 @@ class CElement_FormInput_Text extends CElement_FormInput {
                 $html->appendln('</div>');
             }
         }
+
         return $html->text();
     }
 

@@ -2,7 +2,6 @@
 
 abstract class CElement extends CObservable {
     use CTrait_Compat_Element;
-
     /**
      * Class css for this element.
      *
@@ -18,15 +17,9 @@ abstract class CElement extends CObservable {
 
     protected $custom_css;
 
-    protected $radio;
-
     protected $bootstrap;
 
     protected $theme;
-
-    protected $theme_style = [];
-
-    protected $theme_data = [];
 
     protected $before;
 
@@ -53,14 +46,7 @@ abstract class CElement extends CObservable {
             $this->bootstrap = '2';
         }
         $this->theme = ccfg::get('theme');
-        $theme_data = CManager::instance()->getThemeData();
-        $this->theme_data = $theme_data;
 
-        if (isset($theme_data)) {
-            $this->bootstrap = carr::get($theme_data, 'bootstrap');
-            $this->radio = carr::get($theme_data, 'radio', '0');
-            $this->theme_style = carr::get($theme_data, 'theme_style');
-        }
         if (strlen($this->bootstrap) == 0) {
             $bootstrap = ccfg::get('bootstrap');
             $this->bootstrap = $bootstrap;
