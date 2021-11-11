@@ -17,6 +17,7 @@ trait CObservable_Trait_ComponentTrait {
     public function addTable($id = '') {
         $table = CElement_Factory::createComponent('DataTable', $id);
         $this->add($table);
+
         return $table;
     }
 
@@ -28,6 +29,7 @@ trait CObservable_Trait_ComponentTrait {
     public function addListGroup($id = '') {
         $listGroup = CElement_Factory::createComponent('ListGroup', $id);
         $this->add($listGroup);
+
         return $listGroup;
     }
 
@@ -39,6 +41,7 @@ trait CObservable_Trait_ComponentTrait {
     public function addDataGridList($id = '') {
         $dataGridList = CElement_Factory::createComponent('DataGridList', $id);
         $this->add($dataGridList);
+
         return $dataGridList;
     }
 
@@ -50,6 +53,7 @@ trait CObservable_Trait_ComponentTrait {
     public function addNestable($id = '') {
         $nestable = CElement_Factory::createComponent('Nestable', $id);
         $this->add($nestable);
+
         return $nestable;
     }
 
@@ -61,6 +65,7 @@ trait CObservable_Trait_ComponentTrait {
     public function addTerminal($id = '') {
         $terminal = CElement_Factory::createComponent('Terminal', $id);
         $this->add($terminal);
+
         return $terminal;
     }
 
@@ -73,6 +78,7 @@ trait CObservable_Trait_ComponentTrait {
     public function addChart($type = 'Chart', $id = '') {
         $chart = CElement_Component_Chart::factory($type, $id);
         $this->add($chart);
+
         return $chart;
     }
 
@@ -84,12 +90,14 @@ trait CObservable_Trait_ComponentTrait {
     public function addElFinder($id = '') {
         $elFinder = CElement_Component_ElFinder::factory($id);
         $this->add($elFinder);
+
         return $elFinder;
     }
 
     public function addFileManager($id = '') {
         $fileManager = CElement_Component_FileManager::factory($id);
         $this->add($fileManager);
+
         return $fileManager;
     }
 
@@ -101,6 +109,7 @@ trait CObservable_Trait_ComponentTrait {
     public function addWidget($id = '') {
         $widget = CElement_Factory::createComponent('Widget', $id);
         $this->add($widget);
+
         return $widget;
     }
 
@@ -112,6 +121,7 @@ trait CObservable_Trait_ComponentTrait {
     public function addForm($id = '') {
         $form = CElement_Factory::createComponent('Form', $id);
         $this->add($form);
+
         return $form;
     }
 
@@ -123,6 +133,7 @@ trait CObservable_Trait_ComponentTrait {
     public function addKanban($id = '') {
         $kanban = CElement_Factory::createComponent('Kanban', $id);
         $this->add($kanban);
+
         return $kanban;
     }
 
@@ -134,6 +145,7 @@ trait CObservable_Trait_ComponentTrait {
     public function addPdfViewer($id = '') {
         $pdfViewer = CElement_Factory::createComponent('PdfViewer', $id);
         $this->add($pdfViewer);
+
         return $pdfViewer;
     }
 
@@ -145,6 +157,20 @@ trait CObservable_Trait_ComponentTrait {
     public function addTreeView($id = '') {
         $treeView = CElement_Factory::createComponent('TreeView', $id);
         $this->add($treeView);
+
         return $treeView;
+    }
+
+    public function addPrismCode($id = '') {
+        $prismCode = new CElement_Component_PrismCode($id);
+        $this->add($prismCode);
+
+        return $prismCode;
+    }
+
+    public function addBlockly($id = '') {
+        return c::tap(new CElement_Component_Blockly($id), function (CElement_Component_Blockly $el) {
+            $this->add($el);
+        });
     }
 }

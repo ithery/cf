@@ -126,31 +126,10 @@ abstract class CObservable extends CRenderable {
      * @return CElement_Component_Form_Field Form Field
      */
     public function addField($id = '') {
-        $field = CElement_Factory::createComponent('Form_Field', $id);
+        $field = new CElement_Component_Form_Field($id);
         $this->wrapper->add($field);
 
         return $field;
-    }
-
-    public function addSpan($id = '') {
-        $span = CElement_Factory::createElement('span', $id);
-        $this->add($span);
-
-        return $span;
-    }
-
-    public function addPrismCode($id = '') {
-        $code = CElement_Factory::createComponent('PrismCode', $id);
-        $this->add($code);
-
-        return $code;
-    }
-
-    public function addBlockly($id = '') {
-        $code = CElement_Factory::createComponent('Blockly', $id);
-        $this->add($code);
-
-        return $code;
     }
 
     public function addPdfViewer($id = '') {
