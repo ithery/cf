@@ -59,11 +59,6 @@ abstract class CObservable extends CRenderable {
         }
         if ($control == null) {
             $control = CManager::instance()->createControl($id, $type);
-            // if (CManager::instance()->isRegisteredControl($type)) {
-            //     $control = CManager::instance()->createControl($id, $type);
-            // } else {
-            //     throw new CException('Unknown control type :type', [':type' => $type]);
-            // }
         }
 
         $this->wrapper->add($control);
