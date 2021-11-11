@@ -64,7 +64,7 @@ trait CObservable_Trait_ComponentTrait {
      * @return CElement_Component_Chart
      */
     public function addChart($type = 'Chart', $id = '') {
-        $chart = new CElement_Component_Chart($type, $id);
+        $chart = CElement_Component_Chart::factory($type, $id);
         $this->wrapper->add($chart);
 
         return $chart;
