@@ -6,7 +6,6 @@
 //@codingStandardsIgnoreStart
 class CFormInputSelectSearch extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectSearch;
-
     protected $query;
 
     protected $multiple;
@@ -41,51 +40,61 @@ class CFormInputSelectSearch extends CElement_FormInput {
 
     public function setMultiple($bool) {
         $this->multiple = $bool;
+
         return $this;
     }
 
     public function setDelay($val) {
         $this->delay = $val;
+
         return $this;
     }
 
     public function setAutoSelect($bool) {
         $this->auto_select = $bool;
+
         return $this;
     }
 
     public function setMinInputLength($min_input_length) {
         $this->min_input_length = $min_input_length;
+
         return $this;
     }
 
     public function setKeyField($key_field) {
         $this->key_field = $key_field;
+
         return $this;
     }
 
     public function setSearchField($search_field) {
         $this->search_field = $search_field;
+
         return $this;
     }
 
     public function setQuery($query) {
         $this->query = $query;
+
         return $this;
     }
 
     public function setFormatResult($fmt) {
         $this->format_result = $fmt;
+
         return $this;
     }
 
     public function setFormatSelection($fmt) {
         $this->format_selection = $fmt;
+
         return $this;
     }
 
     public function setPlaceholder($placeholder) {
         $this->placeholder = $placeholder;
+
         return $this;
     }
 
@@ -93,12 +102,9 @@ class CFormInputSelectSearch extends CElement_FormInput {
         if (is_array($c)) {
             $this->dropdown_classes = array_merge($c, $this->dropdown_classes);
         } else {
-            if ($this->bootstrap == '3.3') {
-                $c = str_replace('span', 'col-md-', $c);
-                $c = str_replace('row-fluid', 'row', $c);
-            }
             $this->dropdown_classes[] = $c;
         }
+
         return $this;
     }
 
@@ -123,9 +129,7 @@ class CFormInputSelectSearch extends CElement_FormInput {
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
         }
-        if ($this->bootstrap >= '3') {
-            $classes = $classes . ' form-control ';
-        }
+
         $html->setIndent($indent);
         $value = $this->value;
         if ($this->auto_select) {
@@ -173,16 +177,17 @@ class CFormInputSelectSearch extends CElement_FormInput {
         } else {
             $html->appendln('<input type="hidden" class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" value="' . $value . '" ' . $custom_css . $multiple . '>')->br();
         }
+
         return $html->text();
     }
 
     public function createAjaxUrl() {
         return CAjaxMethod::factory()
-                        ->set_type('searchselect')
-                        ->set_data('query', $this->query)
-                        ->set_data('key_field', $this->key_field)
-                        ->set_data('search_field', $this->search_field)
-                        ->makeurl();
+            ->set_type('searchselect')
+            ->set_data('query', $this->query)
+            ->set_data('key_field', $this->key_field)
+            ->set_data('search_field', $this->search_field)
+            ->makeurl();
     }
 
     public function js($indent = 0) {
@@ -283,9 +288,7 @@ class CFormInputSelectSearch extends CElement_FormInput {
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
         }
-        if ($this->bootstrap == '3.3') {
-            $classes = $classes . ' form-control ';
-        }
+
         $dropdown_classes = $this->dropdown_classes;
         $dropdown_classes = implode(' ', $dropdown_classes);
         if (strlen($dropdown_classes) > 0) {

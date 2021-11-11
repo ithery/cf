@@ -269,24 +269,13 @@ class CForm extends CElement_Element {
             $addition_str .= ' enctype="' . $this->enctype . '"';
         }
 
-        if ($this->bootstrap == '3.3') {
-            $form_style_layout = '';
-            if (strlen($this->layout) > 0) {
-                $form_style_layout = 'form-' . $this->layout;
-            }
-            $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
-                ->incIndent()
-                ->br();
-//                $html->appendln("<div class='box-body'>");
-        } else {
-            $form_style_layout = '';
-            if (strlen($this->layout) > 0) {
-                $form_style_layout = 'form-' . $this->layout;
-            }
-            $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
-                ->incIndent()
-                ->br();
+        $form_style_layout = '';
+        if (strlen($this->layout) > 0) {
+            $form_style_layout = 'form-' . $this->layout;
         }
+        $html->appendln('<form id="' . $this->id . '" class="' . $form_style_layout . ' ' . $classes . '" name="' . $this->name . '" target="' . $this->target . '" action="' . $this->action . '" method="' . $this->method . '"' . $addition_str . ' ' . $custom_css . '>')
+            ->incIndent()
+            ->br();
 
         if ($this->ajax_process_progress) {
             $html->appendln('<input type="hidden" id="cprocess_id" name="cprocess_id" value="' . $this->ajax_process_id . '">');
@@ -523,17 +512,10 @@ class CForm extends CElement_Element {
 			';
             $on_before_submit = '';
             if (strlen($this->ajax_submit_target) > 0) {
-                if ($this->bootstrap >= '3.3') {
-                    $on_before_submit = "
-                                jQuery('#" . $this->ajax_submit_target . "').children().hide();
-                                jQuery('#" . $this->ajax_submit_target . "').append(jQuery('<div>').attr('id','#" . $this->ajax_submit_target . "-loading').addClass('loading'));
-                            ";
-                } else {
-                    $on_before_submit = "
+                $on_before_submit = "
                                 jQuery('#" . $this->ajax_submit_target . "').children().hide();
                                 jQuery('#" . $this->ajax_submit_target . "').append(jQuery('<div>').attr('id','#" . $this->ajax_submit_target . "-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
                             ";
-                }
 
                 $this->ajax_datatype = 'json';
                 //the response is json

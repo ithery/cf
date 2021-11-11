@@ -7,7 +7,6 @@
 class CFormInputCheckbox extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Checkbox,
         CTrait_Element_Property_Label;
-
     protected $checked = '';
 
     protected $applyjs = '';
@@ -85,14 +84,7 @@ class CFormInputCheckbox extends CElement_FormInput {
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
         }
-        if ($this->bootstrap == '3') {
-            //$classes = $classes ." form-control ";
-        }
-        if ($this->bootstrap == '3.3') {
-            if ($this->checkbox >= '1.0') {
-                $classes = $classes . ' ' . $this->style . ' ';
-            }
-        }
+
         $custom_css = $this->custom_css;
         $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {

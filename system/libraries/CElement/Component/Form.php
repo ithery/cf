@@ -365,17 +365,10 @@ class CElement_Component_Form extends CElement_Component {
 			';
             $on_before_submit = '';
             if (strlen($this->ajax_submit_target) > 0) {
-                if ($this->bootstrap >= '3.3') {
-                    $on_before_submit = "
-                                jQuery('#" . $this->ajax_submit_target . "').children().hide();
-                                jQuery('#" . $this->ajax_submit_target . "').append(jQuery('<div>').attr('id','#" . $this->ajax_submit_target . "-loading').addClass('loading'));
-                            ";
-                } else {
-                    $on_before_submit = "
+                $on_before_submit = "
                                 jQuery('#" . $this->ajax_submit_target . "').children().hide();
                                 jQuery('#" . $this->ajax_submit_target . "').append(jQuery('<div>').attr('id','#" . $this->ajax_submit_target . "-loading').css('text-align','center').css('margin-top','100px').css('margin-bottom','100px').append(jQuery('<i>').addClass('icon icon-repeat icon-spin icon-4x')))
                             ";
-                }
 
                 $this->ajax_datatype = 'json';
                 //the response is json

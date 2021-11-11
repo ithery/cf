@@ -11,27 +11,15 @@ abstract class CElement extends CObservable {
 
     protected $tag;
 
-    protected $body;
-
     protected $attr;
 
     protected $custom_css;
 
     protected $bootstrap;
 
-    protected $theme;
-
     protected $before;
 
     protected $after;
-
-    protected $is_empty = false;
-
-    public function validTag() {
-        $availableTag = ['div', 'a', 'p', 'span'];
-
-        return $availableTag;
-    }
 
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id);
@@ -41,22 +29,6 @@ abstract class CElement extends CObservable {
         $this->custom_css = [];
 
         $this->tag = $tag;
-        $this->bootstrap = ccfg::get('bootstrap');
-        if (strlen($this->bootstrap) == 0) {
-            $this->bootstrap = '2';
-        }
-        $this->theme = ccfg::get('theme');
-
-        if (strlen($this->bootstrap) == 0) {
-            $bootstrap = ccfg::get('bootstrap');
-            $this->bootstrap = $bootstrap;
-        }
-    }
-
-    public function setRadio($radio) {
-        $this->radio = $radio;
-
-        return $this;
     }
 
     /**
@@ -232,5 +204,27 @@ abstract class CElement extends CObservable {
                 . '</pre>';
 
         return $return;
+    }
+
+    /**
+     * @return CElement_PseudoElement
+     */
+    public function before() {
+        if ($this->before == null) {
+            $this->before = CElement_PseudoElement::factory();
+        }
+
+        return $this->before;
+    }
+
+    /**
+     * @return CElement_PseudoElement
+     */
+    public function after() {
+        if ($this->after == null) {
+            $this->after = CElement_PseudoElement::factory();
+        }
+
+        return $this->after;
     }
 }

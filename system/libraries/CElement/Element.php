@@ -9,10 +9,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Nov 12, 2017, 3:34:27 AM
  */
 abstract class CElement_Element extends CElement {
-    protected $before;
-
-    protected $after;
-
     protected $isBuilded = false;
 
     protected $isOneTag = false;
@@ -25,11 +21,6 @@ abstract class CElement_Element extends CElement {
 
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id);
-
-        $this->theme = CManager::theme()->getCurrentTheme();
-
-        $this->before = null;
-        $this->after = null;
 
         $this->isBuilded = false;
         $this->isOneTag = false;
@@ -105,22 +96,6 @@ abstract class CElement_Element extends CElement {
 
     public function afterJs($indent = 0) {
         return $this->after()->js($indent);
-    }
-
-    public function before() {
-        if ($this->before == null) {
-            $this->before = CElement_PseudoElement::factory();
-        }
-
-        return $this->before;
-    }
-
-    public function after() {
-        if ($this->after == null) {
-            $this->after = CElement_PseudoElement::factory();
-        }
-
-        return $this->after;
     }
 
     protected function build() {
