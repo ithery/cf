@@ -10,7 +10,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CObservable_Listener extends CObservable_ListenerAbstract {
     use CTrait_Compat_Listener;
-
     protected $confirm;
 
     protected $confirm_message;
@@ -31,11 +30,13 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
 
     public function setConfirm($bool) {
         $this->confirm = $bool;
+
         return $this;
     }
 
     public function setNoDouble($bool) {
         $this->no_double = $bool;
+
         return $this;
     }
 
@@ -45,6 +46,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
 
     public function setConfirmMessage($message) {
         $this->confirm_message = $message;
+
         return $this;
     }
 
@@ -93,6 +95,7 @@ class CObservable_Listener extends CObservable_ListenerAbstract {
             ";
         }
         $compiledJs = $startScript . $confirmStartScript . $handlersScript . $confirmEndScript;
+
         return $compiledJs;
     }
 

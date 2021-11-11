@@ -26,7 +26,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Label &lt;label&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_Label Label Element
      */
@@ -40,7 +40,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Anchor Element &lt;a&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_A Anchor Element
      */
@@ -54,7 +54,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Heading 1 Element &lt;h1&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_H1 Heading 1 Element
      */
@@ -68,7 +68,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Heading 2 Element &lt;h2&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_H2 Heading 2 Element
      */
@@ -82,7 +82,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Heading 3 Element &lt;h3&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_H3 Heading 3 Element
      */
@@ -96,7 +96,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Heading 4 Element &lt;h4&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_H4 Heading 4 Element
      */
@@ -110,7 +110,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Heading 5 Element &lt;h5&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_H5 Heading 5 Element
      */
@@ -124,7 +124,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Heading 6 Element &lt;h6&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_H6 Heading 6 Element
      */
@@ -138,7 +138,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Button Element &lt;button&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_Button Button Element
      */
@@ -152,7 +152,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Paragraph Element &lt;p&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_P Paragraph Element
      */
@@ -166,7 +166,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Ordered List Element &lt;ol&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_Ol Ordered List Element
      */
@@ -180,7 +180,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Unordered List Element &lt;ul&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_Ul Unordered List Element
      */
@@ -195,7 +195,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Table Row Element &lt;tr&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_Tr Table Row Element
      */
@@ -209,7 +209,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Table Cell Element &lt;td&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_Td Table Cell Element
      */
@@ -223,7 +223,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Code Element &lt;ul&gt.
      *
-     * @param string $id optional
+     * @param null|string $id optional
      *
      * @return CElement_Element_Code Code Element
      */
@@ -237,7 +237,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add List Item Element &lt;li&gt.
      *
-     * @param string $id
+     * @param null|string $id
      *
      * @return CElement_Element_Li List Item Element
      */
@@ -251,7 +251,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Iframe Element &lt;iframe&gt.
      *
-     * @param string $id
+     * @param null|string $id
      *
      * @return CElement_Element_Iframe Iframe Element
      */
@@ -265,7 +265,7 @@ trait CObservable_Trait_ElementTrait {
     /**
      * Add Canvas Element &lt;canvas&gt.
      *
-     * @param string $id
+     * @param null|string $id
      *
      * @return CElement_Element_Canvas Canvas Element
      */
@@ -277,9 +277,9 @@ trait CObservable_Trait_ElementTrait {
     }
 
     /**
-     * Add Canvas Element &lt;canvas&gt.
+     * Add Img Element &lt;img&gt.
      *
-     * @param string $id
+     * @param null|string $id
      *
      * @return CElement_Element_Img Img Element
      */
@@ -291,9 +291,9 @@ trait CObservable_Trait_ElementTrait {
     }
 
     /**
-     * Add Canvas Element &lt;canvas&gt.
+     * Add Pre Element &lt;pre&gt.
      *
-     * @param string $id
+     * @param null|string $id
      *
      * @return CElement_Element_Pre Pre Element
      */
@@ -304,6 +304,13 @@ trait CObservable_Trait_ElementTrait {
         return $element;
     }
 
+    /**
+     * Add Span Element &lt;span&gt.
+     *
+     * @param null|string $id
+     *
+     * @return CElement_Element_Span Span Element
+     */
     public function addSpan($id = '') {
         $element = new CElement_Element_Span($id);
         $this->wrapper->add($element);
