@@ -15,6 +15,11 @@ class CServer {
 
     const OS_DARWIN = 'Darwin';
 
+    /**
+     * Array expression search.
+     */
+    const ARRAY_EXP = '/^return array \([^;]*\);$/';
+
     public static function storage($sshConfig = null) {
         return CServer_Storage::instance($sshConfig);
     }

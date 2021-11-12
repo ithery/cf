@@ -22,7 +22,7 @@ class CServer_System_OS_Darwin extends CServer_System_OS_Linux {
         $s = preg_replace('/{ /', '', $s);
         $s = preg_replace('/ }/', '', $s);
         $this->info->setLoad($s);
-        if (CServer::config()->loadPercentEnabled() && (CServer::getOS() != 'Darwin')) {
+        if (CServer::config()->isLoadPercentEnabled() && (CServer::getOS() != 'Darwin')) {
             if ($fd = $this->grabkey('kern.cp_time')) {
                 // Find out the CPU load
                 // user + sys = load

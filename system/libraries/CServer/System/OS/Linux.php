@@ -30,7 +30,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
         } elseif ($cmd->executeProgram('uptime', '', $buf) && preg_match('/load average: (.*), (.*), (.*)$/', $buf, $ar_buf)) {
             $this->info->setLoad($ar_buf[1] . ' ' . $ar_buf[2] . ' ' . $ar_buf[3]);
         }
-        if (CServer::config()->loadPercentEnabled()) {
+        if (CServer::config()->isLoadPercentEnabled()) {
             $this->info->setLoadPercent($this->parseProcStat('cpu'));
         }
     }
@@ -826,7 +826,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
                             $dev->setCpuSpeedMin(trim($buf) / 1000);
                         }
                         // variable speed processors specific code ends
-                        if (CServer::config()->loadPercentEnabled()) {
+                        if (CServer::config()->isLoadPercentEnabled()) {
                             $dev->setLoad($this->parseProcStat('cpu' . $proc));
                         }
                         /*
