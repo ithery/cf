@@ -212,7 +212,7 @@ class CServer_Command extends CServer_Base {
     }
 
     /**
-     * read data from array $_SERVER.
+     * Read data from array $_SERVER.
      *
      * @param string $strElem    element of array
      * @param string &$strBuffer output of the command
@@ -243,7 +243,7 @@ class CServer_Command extends CServer_Base {
     }
 
     /**
-     * read a file and return the content as a string.
+     * Read a file and return the content as a string.
      *
      * @param string $strFileName name of the file which should be read
      * @param string &$strRet     content of the file (reference)
@@ -395,7 +395,7 @@ class CServer_Command extends CServer_Base {
     }
 
     /**
-     * parsing the output of df command.
+     * Parsing the output of df command.
      *
      * @param string $df_param   additional parameter for df command
      * @param bool   $get_inodes

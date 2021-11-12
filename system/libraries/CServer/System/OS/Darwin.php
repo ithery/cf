@@ -13,11 +13,11 @@ class CServer_System_OS_Darwin extends CServer_System_OS_Linux {
 
     /**
      * Processor Load
-     * optionally create a loadbar
+     * optionally create a loadbar.
      *
      * @return void
      */
-    protected function buildLoadAvg() {
+    public function buildLoadAvg() {
         $s = $this->grabkey('vm.loadavg');
         $s = preg_replace('/{ /', '', $s);
         $s = preg_replace('/ }/', '', $s);
