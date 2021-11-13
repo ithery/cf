@@ -1413,6 +1413,10 @@ class c {
 
         return $appRoot . DS;
     }
+
+    public static function disk($name = null) {
+        return CStorage::instance()->disk($name);
+    }
 }
 
 // End c
