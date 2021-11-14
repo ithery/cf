@@ -130,9 +130,7 @@ HTML;
                 }
                 ${customJs}
             </script>
-            <script>
                 ${pushesScript}
-            </script>
 
 HTML;
     }

@@ -148,6 +148,12 @@ class CServer_Config {
             'system_lang' => null,
             'unameo' => null,
             'mode_popen' => null,
+            'log' => false,
+            'rootfs' => false,
+            'sudo_commands' => false,
+            'add_paths' => false,
+            'hide_fs_types' => false,
+
         ];
 
         $this->config = array_merge($defaultConfig, CF::config('server', []));
@@ -182,7 +188,53 @@ class CServer_Config {
         return $this->get('debug') === true;
     }
 
-    public function loadPercentEnabled() {
+    public function isLoadPercentEnabled() {
         return $this->get('load_percent_enabled') === true;
+    }
+
+    public function isModePopen() {
+        return $this->get('mode_popen') === true;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getLog() {
+        return $this->get('log');
+    }
+
+    /**
+     * @return null|bool|string
+     */
+    public function getRootFs() {
+        return $this->get('rootfs');
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getUnameo() {
+        return $this->get('unameo');
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getSudoCommands() {
+        return $this->get('sudo_commands');
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getAddPaths() {
+        return $this->get('add_paths');
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getHideFsTypes() {
+        return $this->get('hide_fs_types');
     }
 }
