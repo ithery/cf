@@ -376,6 +376,13 @@ trait CTrait_Compat_Observable {
         return $this->regenerateId($recursive);
     }
 
+    /**
+     * @deprecated 1.2
+     *
+     * @param string $id
+     *
+     * @return $this
+     */
     public function add_span($id = '') {
         $span = CSpan::factory($id);
         $this->add($span);

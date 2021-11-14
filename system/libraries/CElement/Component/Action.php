@@ -308,7 +308,8 @@ class CElement_Component_Action extends CElement_Component {
             }
 
             if (strlen($this->icon) > 0) {
-                $html->append('<i class="icon icon-' . $this->getIcon() . ' ' . $this->getIcon() . '"></i> ');
+                $iconPrefix = c::theme('icon.prefix', 'icon icon-');
+                $html->append('<i class="' . $iconPrefix . $this->getIcon() . ' ' . $this->getIcon() . '"></i> ');
             }
             if ($this->style != 'btn-icon-group') {
                 $html->append($this->label);

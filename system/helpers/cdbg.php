@@ -686,7 +686,9 @@ class cdbg {
 
             return CEmail::sender()->send($email, $subject, $message, []);
         } catch (Exception $ex) {
-            echo 'Error Email Deprecated' . $ex->getMessage();
+            if (!CF::isProduction()) {
+                throw $ex;
+            }
         }
 
         return true;
