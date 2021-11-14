@@ -1368,6 +1368,14 @@ class c {
         return rtrim($string, '/');
     }
 
+    /**
+     * Get theme data or theme object.
+     *
+     * @param null|string $key
+     * @param null|mixed  $default
+     *
+     * @return CManager_Theme|mixed
+     */
     public static function theme($key = null, $default = null) {
         if ($key !== null) {
             return static::manager()->theme()->getData($key, $default);
