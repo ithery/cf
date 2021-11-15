@@ -1,10 +1,7 @@
 <?php
 
-/**
- * @deprecated since 1.2
- */
-class CFormValidation {
-    use  CTrait_Compat_Element_Form_FieldValidation;
+class CElement_Component_Form_FieldValidation {
+    use CTrait_Compat_Element_Form_FieldValidation;
 
     private $validation = null;
 
@@ -22,12 +19,6 @@ class CFormValidation {
 
     public function required() {
         $this->validation['required'] = 'required';
-
-        return $this;
-    }
-
-    public function condrequired($input) {
-        $this->validation['condrequired'] = $input;
 
         return $this;
     }
