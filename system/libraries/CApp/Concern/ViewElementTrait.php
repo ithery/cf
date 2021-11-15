@@ -40,7 +40,10 @@ trait CApp_Concern_ViewElementTrait {
                 $output .= $element->html();
                 $js = $element->js();
                 if (strlen($js) > 0) {
-                    $js = '<script>' . $js . '</script>';
+                    if (!c::app()->isAjax()) {
+                        $js = '<script>' . $js . '</script>';
+                    }
+
                     $this->extendPush('capp-script', $js);
                 }
             }
