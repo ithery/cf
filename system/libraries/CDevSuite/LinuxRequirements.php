@@ -20,7 +20,7 @@ class CDevSuite_LinuxRequirements {
     }
 
     /**
-     * Determine if SELinux check should be skipped
+     * Determine if SELinux check should be skipped.
      *
      * @param bool $ignore
      *
@@ -70,7 +70,7 @@ class CDevSuite_LinuxRequirements {
 
     /**
      * Unlink the Valet Bash script from the user's local bin
-     * and the sudoers.d entry
+     * and the sudoers.d entry.
      *
      * @return void
      */

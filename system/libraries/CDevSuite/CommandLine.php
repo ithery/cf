@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CommandLine
+ * Description of CommandLine.
  *
  * @author Hery
  */

@@ -22,7 +22,7 @@ class CApp_Log_Activity {
         $controller = CFRouter::$controller;
         $method = CFRouter::$method;
 
-        if (!$nav) {
+        if ($nav) {
             $navName = $nav['name'];
             $navLabel = $nav['label'];
             if (isset($nav['action'])) {

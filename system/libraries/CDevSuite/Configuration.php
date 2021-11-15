@@ -166,7 +166,7 @@ abstract class CDevSuite_Configuration {
         }
 
         /**
-         * Migrate old configurations from 'domain' to 'tld'
+         * Migrate old configurations from 'domain' to 'tld'.
          */
         $config = $this->read();
 

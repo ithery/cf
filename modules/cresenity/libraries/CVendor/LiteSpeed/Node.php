@@ -213,6 +213,10 @@ class CVendor_LiteSpeed_Node {
         return $this->e != null;
     }
 
+    public function getErr() {
+        return $this->e;
+    }
+
     public function hasFatalErr() {
         return $this->errLevel == self::E_FATAL;
     }

@@ -1,11 +1,11 @@
 <?php
 
 trait CElement_Component_DataTable_Trait_SearchTrait {
+    public $searchPlaceholder = '';
+
     protected $quickSearch = false;
 
     protected $haveQuickSearchPlaceholder = true;
-
-    public $searchPlaceholder = '';
 
     protected $initialSearch;
 
@@ -13,11 +13,13 @@ trait CElement_Component_DataTable_Trait_SearchTrait {
 
     public function setQuickSearch($quickSearch) {
         $this->quickSearch = $quickSearch;
+
         return $this;
     }
 
     public function setHaveQuickSearchPlaceHolder($bool = true) {
         $this->haveQuickSearchPlaceholder = $bool;
+
         return $this;
     }
 
@@ -29,6 +31,7 @@ trait CElement_Component_DataTable_Trait_SearchTrait {
 
     public function setInitialSearch($initialSearch) {
         $this->initialSearch = $initialSearch;
+
         return $this;
     }
 
@@ -42,6 +45,7 @@ trait CElement_Component_DataTable_Trait_SearchTrait {
             $selector = '#' . $selector->id();
         }
         $this->customSearchSelector = $selector;
+
         return $this;
     }
 }

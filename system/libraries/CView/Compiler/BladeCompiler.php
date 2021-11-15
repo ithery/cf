@@ -19,7 +19,6 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
         CView_Compiler_BladeCompiler_CompileInjectionTrait,
         CView_Compiler_BladeCompiler_CompileJsonTrait,
         CView_Compiler_BladeCompiler_CompileStackTrait;
-
     /*
       use Concerns\CompilesAuthorizations,
       Concerns\CompilesComments,
