@@ -1,56 +1,46 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-use Maatwebsite\Excel\Concerns\ToModel;
-use Maatwebsite\Excel\Concerns\WithBatchInserts;
-use Maatwebsite\Excel\Concerns\WithCalculatedFormulas;
-use Maatwebsite\Excel\Concerns\WithMapping;
-use Maatwebsite\Excel\Concerns\WithProgressBar;
-use Maatwebsite\Excel\Row;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ModelImporter
-{
+class CExporter_Import_ModelImporter {
     /**
-     * @var ModelManager
+     * @var CExporter_Import_ModelManager
      */
     private $manager;
 
-    /**
-     * @param ModelManager $manager
-     */
-    public function __construct(ModelManager $manager)
-    {
-        $this->manager = $manager;
+    private static $instance;
+
+    public static function instance() {
+        if (static::$instance == null) {
+            static::$instance = new static();
+        }
+
+        return static::$instance;
+    }
+
+    private function __construct() {
+        $this->manager = CExporter::modelManager();
     }
 
     /**
      * @param Worksheet $worksheet
      * @param ToModel   $import
-     * @param int|null  $startRow
+     * @param null|int  $startRow
      */
-    public function import(Worksheet $worksheet, ToModel $import, int $startRow = 1)
-    {
-        $headingRow       = HeadingRowExtractor::extract($worksheet, $import);
-        $batchSize        = $import instanceof WithBatchInserts ? $import->batchSize() : 1;
-        $endRow           = EndRowFinder::find($import, $startRow);
-        $progessBar       = $import instanceof WithProgressBar;
-        $withMapping      = $import instanceof WithMapping;
-        $withCalcFormulas = $import instanceof WithCalculatedFormulas;
+    public function import(Worksheet $worksheet, CExporter_Concern_ToModel $import, int $startRow = 1) {
+        $headingRow = CExporter_Import_HeadingRowExtractor::extract($worksheet, $import);
+        $batchSize = $import instanceof CExporter_Concern_WithBatchInserts ? $import->batchSize() : 1;
+        $endRow = CExporter_Import_EndRowFinder::find($import, $startRow);
+        $withCalcFormulas = $import instanceof CExporter_Concern_WithCalculatedFormulas;
 
         $i = 0;
         foreach ($worksheet->getRowIterator($startRow, $endRow) as $spreadSheetRow) {
             $i++;
 
-            $row      = new Row($spreadSheetRow, $headingRow);
+            $row = new CExporter_Row($spreadSheetRow, $headingRow);
             $rowArray = $row->toArray(null, $withCalcFormulas);
 
-            if ($withMapping) {
+            if ($import instanceof CExporter_Concern_WithMapping) {
                 $rowArray = $import->map($rowArray);
             }
 
@@ -64,7 +54,7 @@ class ModelImporter
                 $this->manager->flush($import, $batchSize > 1);
                 $i = 0;
 
-                if ($progessBar) {
+                if ($import instanceof CExporter_Concern_WithProgressBar) {
                     $import->getConsoleOutput()->progressAdvance($batchSize);
                 }
             }

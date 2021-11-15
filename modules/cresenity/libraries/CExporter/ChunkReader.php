@@ -1,55 +1,36 @@
 <?php
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\WithChunkReading;
-use Maatwebsite\Excel\Concerns\WithEvents;
-use Maatwebsite\Excel\Concerns\WithLimit;
-use Maatwebsite\Excel\Concerns\WithProgressBar;
-use Maatwebsite\Excel\Events\BeforeImport;
-use Maatwebsite\Excel\Files\TemporaryFile;
-use Maatwebsite\Excel\Imports\HeadingRowExtractor;
-use Maatwebsite\Excel\Jobs\AfterImportJob;
-use Maatwebsite\Excel\Jobs\QueueImport;
-use Maatwebsite\Excel\Jobs\ReadChunk;
 use Throwable;
+use Maatwebsite\Excel\Jobs\QueueImport;
 
-class CExporter_ChunkReader
-{
+class CExporter_ChunkReader {
     /**
-     * @param  WithChunkReading  $import
-     * @param  Reader  $reader
-     * @param  TemporaryFile  $temporaryFile
+     * @param CExporter_Concern_WithChunkReading $import
+     * @param Reader                             $reader
+     * @param CExporter_File_TemporaryFile       $temporaryFile
      *
-     * @return \Illuminate\Foundation\Bus\PendingDispatch|null
+     * @return null|\CQueue_PendingDispatch
      */
-    public function read(CExporter_Concern_WithChunkReading $import, CExporter_Reader $reader, CExporter_File_TemporaryFile $temporaryFile)
-    {
+    public function read(CExporter_Concern_WithChunkReading $import, CExporter_Reader $reader, CExporter_File_TemporaryFile $temporaryFile) {
         if ($import instanceof CExporter_Concern_WithEvents && isset($import->registerEvents()[CExporter_Event_BeforeImport::class])) {
             $reader->beforeImport($import);
         }
 
-        $chunkSize  = $import->chunkSize();
-        $totalRows  = $reader->getTotalRows();
+        $chunkSize = $import->chunkSize();
+        $totalRows = $reader->getTotalRows();
         $worksheets = $reader->getWorksheets($import);
 
-        if ($import instanceof WithProgressBar) {
+        if ($import instanceof CExporter_Concern_WithProgressBar) {
             $import->getConsoleOutput()->progressStart(array_sum($totalRows));
         }
 
-        $jobs = new Collection();
+        $jobs = new CCollection();
         foreach ($worksheets as $name => $sheetImport) {
-            $startRow         = HeadingRowExtractor::determineStartRow($sheetImport);
-            $totalRows[$name] = $sheetImport instanceof WithLimit ? $sheetImport->limit() : $totalRows[$name];
+            $startRow = CExporter_Import_HeadingRowExtractor::determineStartRow($sheetImport);
+            $totalRows[$name] = $sheetImport instanceof CExporter_Concern_WithLimit ? $sheetImport->limit() : $totalRows[$name];
 
             for ($currentRow = $startRow; $currentRow <= $totalRows[$name]; $currentRow += $chunkSize) {
-                $jobs->push(new ReadChunk(
+                $jobs->push(new CExporter_TaskQueue_ReadChunk(
                     $import,
                     $reader->getPhpSpreadsheetReader(),
                     $temporaryFile,
@@ -61,24 +42,31 @@ class CExporter_ChunkReader
             }
         }
 
-        $jobs->push(new AfterImportJob($import, $reader));
+        $jobs->push(new CExporter_TaskQueue_AfterImportJob($import, $reader));
 
-        if ($import instanceof ShouldQueue) {
-            return QueueImport::withChain($jobs->toArray())->dispatch($import);
+        if ($import instanceof CQueue_ShouldQueueInterface) {
+            return CExporter_TaskQueue_QueueImport::withChain($jobs->toArray())->dispatch($import);
         }
 
         $jobs->each(function ($job) {
             try {
-                dispatch_now($job);
+                CQueue::dispatcher()->dispatchNow($job);
             } catch (Throwable $e) {
                 if (method_exists($job, 'failed')) {
                     $job->failed($e);
                 }
+
+                throw $e;
+            } catch (Exception $e) {
+                if (method_exists($job, 'failed')) {
+                    $job->failed($e);
+                }
+
                 throw $e;
             }
         });
 
-        if ($import instanceof WithProgressBar) {
+        if ($import instanceof CExporter_Concern_WithProgressBar) {
             $import->getConsoleOutput()->progressFinish();
         }
 

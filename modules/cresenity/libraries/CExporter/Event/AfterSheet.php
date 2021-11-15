@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_Event_AfterSheet extends CExporter_Event {
-
     /**
      * @var Sheet
      */
@@ -19,8 +12,8 @@ class CExporter_Event_AfterSheet extends CExporter_Event {
     private $exportable;
 
     /**
-     * @param CExporter_Sheet  $sheet
-     * @param object $exportable
+     * @param CExporter_Sheet $sheet
+     * @param object          $exportable
      */
     public function __construct(CExporter_Sheet $sheet, $exportable) {
         $this->sheet = $sheet;
@@ -47,5 +40,4 @@ class CExporter_Event_AfterSheet extends CExporter_Event {
     public function getDelegate() {
         return $this->sheet;
     }
-
 }

@@ -178,22 +178,22 @@ class CBase_MessageBag implements CInterface_Arrayable, Countable, CInterface_Js
      * Get the messages for a wildcard key.
      *
      * @param string      $key
-     * @param string|null $format
+     * @param null|string $format
      *
      * @return array
      */
     protected function getMessagesForWildcardKey($key, $format) {
         return c::collect($this->messages)
-                        ->filter(function ($messages, $messageKey) use ($key) {
-                            return cstr::is($key, $messageKey);
-                        })
-                        ->map(function ($messages, $messageKey) use ($format) {
-                            return $this->transform(
-                                $messages,
-                                $this->checkFormat($format),
-                                $messageKey
-                            );
-                        })->all();
+            ->filter(function ($messages, $messageKey) use ($key) {
+                return cstr::is($key, $messageKey);
+            })
+            ->map(function ($messages, $messageKey) use ($format) {
+                return $this->transform(
+                    $messages,
+                    $this->checkFormat($format),
+                    $messageKey
+                );
+            })->all();
     }
 
     /**

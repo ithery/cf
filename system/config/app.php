@@ -98,10 +98,10 @@ return [
     ],
 
     'lang' => 'id', //deprecated
-    'app_id' => 1,
-    'install' => false,
-    'sidebar' => true,
-    'signup' => false,
+    'app_id' => 1, //deprecated
+    'install' => false, //deprecated
+    'sidebar' => true, //deprecated
+    'signup' => false, //deprecated
     'theme' => '',
     'admin_email' => 'contact@cresenitytech.com',
     'set_timezone' => true, //deprecated

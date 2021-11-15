@@ -1,24 +1,14 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
-use PhpOffice\PhpSpreadsheet\Reader\Exception;
-use PhpOffice\PhpSpreadsheet\Reader\IReader;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
+use PhpOffice\PhpSpreadsheet\Reader\IReader;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
 
 class CExporter_Reader {
-
     use CExporter_Trait_DelegatedMacroableTrait;
     use CExporter_Trait_HasEventBusTrait;
-
     /**
-     *
      * @var CExporter_Reader
      */
     protected static $instance;
@@ -34,7 +24,7 @@ class CExporter_Reader {
     protected $sheetImports = [];
 
     /**
-     * @var TemporaryFile
+     * @var CExporter_File_TemporaryFile
      */
     protected $currentFile;
 
@@ -53,14 +43,10 @@ class CExporter_Reader {
      */
     protected $reader;
 
-    /**
-     * @param CExporter_File_TemporaryFileFactory $temporaryFileFactory
-     * @param TransactionHandler   $transaction
-     */
-    private function __construct(CExporter_Transaction_TransactionHandler $transaction) {
+    private function __construct() {
         $this->setDefaultValueBinder();
+        $this->transaction = CExporter::transactionManager()->driver();
 
-        $this->transaction = $transaction;
         $this->temporaryFileFactory = CExporter_File_TemporaryFileFactory::instance();
     }
 
@@ -68,36 +54,35 @@ class CExporter_Reader {
         if (static::$instance == null) {
             static::$instance = new CExporter_Reader();
         }
+
         return static::$instance;
     }
 
-    public function __sleep()
-    {
+    public function __sleep() {
         return ['spreadsheet', 'sheetImports', 'currentFile', 'temporaryFileFactory', 'reader'];
     }
 
-    public function __wakeup()
-    {
-        $this->transaction = app(TransactionHandler::class);
+    public function __wakeup() {
+        $this->transaction = CExporter::transactionManager()->driver();
     }
 
     /**
-     * @param object              $import
-     * @param string|UploadedFile $filePath
-     * @param string|null         $readerType
-     * @param string|null         $disk
+     * @param object                    $import
+     * @param string|CHTTP_UploadedFile $filePath
+     * @param null|string               $readerType
+     * @param null|string               $disk
      *
-     * @return \Illuminate\Foundation\Bus\PendingDispatch|$this
-     * @throws NoTypeDetectedException
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws CExporter_Exception_NoTypeDetectedException
+     * @throws \CStorage_Exception_FileNotFoundException
      * @throws Exception
+     *
+     * @return \CQueue_PendingDispatch|$this
      */
-    public function read($import, $filePath, string $readerType = null, string $disk = null)
-    {
+    public function read($import, $filePath, string $readerType = null, string $disk = null) {
         $this->reader = $this->getReader($import, $filePath, $readerType, $disk);
 
-        if ($import instanceof WithChunkReading) {
-            return (new ChunkReader)->read($import, $this, $this->currentFile);
+        if ($import instanceof CExporter_Concern_WithChunkReading) {
+            return (new CExporter_ChunkReader())->read($import, $this, $this->currentFile);
         }
 
         try {
@@ -114,7 +99,12 @@ class CExporter_Reader {
 
             $this->afterImport($import);
         } catch (Throwable $e) {
-            $this->raise(new ImportFailed($e));
+            $this->raise(new CExporter_Event_ImportFailed($e));
+
+            throw $e;
+        } catch (Exception $e) {
+            $this->raise(new CExporter_Event_ImportFailed($e));
+
             throw $e;
         }
 
@@ -122,26 +112,26 @@ class CExporter_Reader {
     }
 
     /**
-     * @param object              $import
-     * @param string|UploadedFile $filePath
-     * @param string              $readerType
-     * @param string|null         $disk
+     * @param object                    $import
+     * @param string|CHTTP_UploadedFile $filePath
+     * @param string                    $readerType
+     * @param null|string               $disk
+     *
+     * @throws CStorage_Exception_FileNotFoundException
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws CExporter_Exception_NoTypeDetectedException
+     * @throws Exceptions\SheetNotFoundException
      *
      * @return array
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws NoTypeDetectedException
-     * @throws Exceptions\SheetNotFoundException
      */
-    public function toArray($import, $filePath, string $readerType, string $disk = null): array
-    {
+    public function toArray($import, $filePath, $readerType, $disk = null) {
         $this->reader = $this->getReader($import, $filePath, $readerType, $disk);
 
         $this->loadSpreadsheet($import);
 
         $sheets = [];
         foreach ($this->sheetImports as $index => $sheetImport) {
-            $calculatesFormulas = $sheetImport instanceof WithCalculatedFormulas;
+            $calculatesFormulas = $sheetImport instanceof CExporter_Concern_WithCalculatedFormulas;
             if ($sheet = $this->getSheet($import, $sheetImport, $index)) {
                 $sheets[$index] = $sheet->toArray($sheetImport, $sheet->getStartRow($sheetImport), null, $calculatesFormulas);
                 $sheet->disconnect();
@@ -154,25 +144,25 @@ class CExporter_Reader {
     }
 
     /**
-     * @param object              $import
-     * @param string|UploadedFile $filePath
-     * @param string              $readerType
-     * @param string|null         $disk
+     * @param object                    $import
+     * @param string|CHTTP_UploadedFile $filePath
+     * @param string                    $readerType
+     * @param null|string               $disk
      *
-     * @return Collection
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws \CStorage_Exception_FileNotFoundException
      * @throws \PhpOffice\PhpSpreadsheet\Exception
-     * @throws NoTypeDetectedException
+     * @throws CExporter_Exception_NoTypeDetectedException
      * @throws Exceptions\SheetNotFoundException
+     *
+     * @return CCollection
      */
-    public function toCollection($import, $filePath, string $readerType, string $disk = null): Collection
-    {
+    public function toCollection($import, $filePath, $readerType, $disk = null) {
         $this->reader = $this->getReader($import, $filePath, $readerType, $disk);
         $this->loadSpreadsheet($import);
 
-        $sheets = new Collection();
+        $sheets = new CCollection();
         foreach ($this->sheetImports as $index => $sheetImport) {
-            $calculatesFormulas = $sheetImport instanceof WithCalculatedFormulas;
+            $calculatesFormulas = $sheetImport instanceof CExporter_Concern_WithCalculatedFormulas;
             if ($sheet = $this->getSheet($import, $sheetImport, $index)) {
                 $sheets->put($index, $sheet->toCollection($sheetImport, $sheet->getStartRow($sheetImport), null, $calculatesFormulas));
                 $sheet->disconnect();
@@ -187,19 +177,15 @@ class CExporter_Reader {
     /**
      * @return Spreadsheet
      */
-    public function getDelegate()
-    {
+    public function getDelegate() {
         return $this->spreadsheet;
     }
 
     /**
      * @return $this
      */
-    public function setDefaultValueBinder(): self
-    {
-        Cell::setValueBinder(
-            app(config('excel.value_binder.default', DefaultValueBinder::class))
-        );
+    public function setDefaultValueBinder() {
+        Cell::setValueBinder(CExporter::defaultValueBinder());
 
         return $this;
     }
@@ -207,23 +193,21 @@ class CExporter_Reader {
     /**
      * @param object $import
      */
-    public function loadSpreadsheet($import)
-    {
+    public function loadSpreadsheet($import) {
         $this->sheetImports = $this->buildSheetImports($import);
 
         $this->readSpreadsheet();
 
         // When no multiple sheets, use the main import object
         // for each loaded sheet in the spreadsheet
-        if (!$import instanceof WithMultipleSheets) {
+        if (!$import instanceof CExporter_Concern_WithMultipleSheets) {
             $this->sheetImports = array_fill(0, $this->spreadsheet->getSheetCount(), $import);
         }
 
         $this->beforeImport($import);
     }
 
-    public function readSpreadsheet()
-    {
+    public function readSpreadsheet() {
         $this->spreadsheet = $this->reader->load(
             $this->currentFile->getLocalPath()
         );
@@ -232,17 +216,15 @@ class CExporter_Reader {
     /**
      * @param object $import
      */
-    public function beforeImport($import)
-    {
-        $this->raise(new BeforeImport($this, $import));
+    public function beforeImport($import) {
+        $this->raise(new CExporter_Event_BeforeImport($this, $import));
     }
 
     /**
      * @param object $import
      */
-    public function afterImport($import)
-    {
-        $this->raise(new AfterImport($this, $import));
+    public function afterImport($import) {
+        $this->raise(new CExporter_Event_AfterImport($this, $import));
 
         $this->garbageCollect();
     }
@@ -250,8 +232,7 @@ class CExporter_Reader {
     /**
      * @return IReader
      */
-    public function getPhpSpreadsheetReader(): IReader
-    {
+    public function getPhpSpreadsheetReader() {
         return $this->reader;
     }
 
@@ -260,16 +241,15 @@ class CExporter_Reader {
      *
      * @return array
      */
-    public function getWorksheets($import): array
-    {
+    public function getWorksheets($import) {
         // Csv doesn't have worksheets.
         if (!method_exists($this->reader, 'listWorksheetNames')) {
             return ['Worksheet' => $import];
         }
 
-        $worksheets     = [];
+        $worksheets = [];
         $worksheetNames = $this->reader->listWorksheetNames($this->currentFile->getLocalPath());
-        if ($import instanceof WithMultipleSheets) {
+        if ($import instanceof CExporter_Concern_WithMultipleSheets) {
             $sheetImports = $import->sheets();
 
             // Load specific sheets.
@@ -299,8 +279,7 @@ class CExporter_Reader {
     /**
      * @return array
      */
-    public function getTotalRows(): array
-    {
+    public function getTotalRows() {
         $info = $this->reader->listWorksheetInfo($this->currentFile->getLocalPath());
 
         $totalRows = [];
@@ -316,22 +295,22 @@ class CExporter_Reader {
      * @param $sheetImport
      * @param $index
      *
-     * @return Sheet|null
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws SheetNotFoundException
+     *
+     * @return null|CExporter_Sheet
      */
-    protected function getSheet($import, $sheetImport, $index)
-    {
+    protected function getSheet($import, $sheetImport, $index) {
         try {
-            return Sheet::make($this->spreadsheet, $index);
-        } catch (SheetNotFoundException $e) {
-            if ($import instanceof SkipsUnknownSheets) {
+            return CExporter_Sheet::make($this->spreadsheet, $index);
+        } catch (CExporter_Exception_SheetNotFoundException $e) {
+            if ($import instanceof CExporter_Concern_SkipsUnknownSheets) {
                 $import->onUnknownSheet($index);
 
                 return null;
             }
 
-            if ($sheetImport instanceof SkipsUnknownSheets) {
+            if ($sheetImport instanceof CExporter_Concern_SkipsUnknownSheets) {
                 $sheetImport->onUnknownSheet($index);
 
                 return null;
@@ -346,16 +325,14 @@ class CExporter_Reader {
      *
      * @return array
      */
-    private function buildSheetImports($import): array
-    {
+    private function buildSheetImports($import) {
         $sheetImports = [];
-        if ($import instanceof WithMultipleSheets) {
+        if ($import instanceof CExporter_Concern_WithMultipleSheets) {
             $sheetImports = $import->sheets();
 
             // When only sheet names are given and the reader has
             // an option to load only the selected sheets.
-            if (
-                method_exists($this->reader, 'setLoadSheetsOnly')
+            if (method_exists($this->reader, 'setLoadSheetsOnly')
                 && count(array_filter(array_keys($sheetImports), 'is_numeric')) === 0
             ) {
                 $this->reader->setLoadSheetsOnly(array_keys($sheetImports));
@@ -368,38 +345,38 @@ class CExporter_Reader {
     /**
      * @param object              $import
      * @param string|UploadedFile $filePath
-     * @param string|null         $readerType
+     * @param null|string         $readerType
      * @param string              $disk
      *
-     * @return IReader
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
-     * @throws NoTypeDetectedException
+     * @throws \CStorage_Exception_FileNotFoundException
+     * @throws \CExporter_Exception_NoTypeDetectedException
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      * @throws InvalidArgumentException
+     *
+     * @return IReader
      */
-    private function getReader($import, $filePath, string $readerType = null, string $disk = null): IReader
-    {
-        $shouldQueue = $import instanceof ShouldQueue;
-        if ($shouldQueue && !$import instanceof WithChunkReading) {
+    private function getReader($import, $filePath, $readerType = null, $disk = null) {
+        $shouldQueue = $import instanceof CQueue_ShouldQueueInterface;
+        if ($shouldQueue && !$import instanceof CExporter_Concern_WithChunkReading) {
             throw new InvalidArgumentException('ShouldQueue is only supported in combination with WithChunkReading.');
         }
 
-        if ($import instanceof WithEvents) {
+        if ($import instanceof CExporter_Concern_WithEvents) {
             $this->registerListeners($import->registerEvents());
         }
 
-        if ($import instanceof WithCustomValueBinder) {
+        if ($import instanceof CExporter_Concern_WithCustomValueBinder) {
             Cell::setValueBinder($import);
         }
 
-        $fileExtension     = pathinfo($filePath, PATHINFO_EXTENSION);
-        $temporaryFile     = $shouldQueue ? $this->temporaryFileFactory->make($fileExtension) : $this->temporaryFileFactory->makeLocal(null, $fileExtension);
+        $fileExtension = pathinfo($filePath, PATHINFO_EXTENSION);
+        $temporaryFile = $shouldQueue ? $this->temporaryFileFactory->make($fileExtension) : $this->temporaryFileFactory->makeLocal(null, $fileExtension);
         $this->currentFile = $temporaryFile->copyFrom(
             $filePath,
             $disk
         );
 
-        return ReaderFactory::make(
+        return CExporter_ReaderFactory::make(
             $import,
             $this->currentFile,
             $readerType
@@ -409,8 +386,7 @@ class CExporter_Reader {
     /**
      * Garbage collect.
      */
-    private function garbageCollect()
-    {
+    private function garbageCollect() {
         $this->setDefaultValueBinder();
 
         // Force garbage collecting
@@ -418,5 +394,4 @@ class CExporter_Reader {
 
         $this->currentFile->delete();
     }
-
 }

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Site
+ * Description of Site.
  *
  * @author Hery
  */
@@ -106,7 +106,7 @@ abstract class CDevSuite_Site {
     /**
      * Get the name of the site.
      *
-     * @param string|null $name
+     * @param null|string $name
      *
      * @return string
      */
@@ -161,7 +161,7 @@ abstract class CDevSuite_Site {
      *
      * @param string $path
      *
-     * @return string|null
+     * @return null|string
      */
     public function host($path) {
         foreach ($this->files->scandir($this->sitesPath()) as $link) {
@@ -189,7 +189,7 @@ abstract class CDevSuite_Site {
     }
 
     /**
-     * Pretty print out all parked links in DevSuite
+     * Pretty print out all parked links in DevSuite.
      *
      * @return CCollection
      */
@@ -217,7 +217,7 @@ abstract class CDevSuite_Site {
     }
 
     /**
-     * Get all sites which are proxies (not Links, and contain proxy_pass directive)
+     * Get all sites which are proxies (not Links, and contain proxy_pass directive).
      *
      * @return CCollection
      */
@@ -242,6 +242,7 @@ abstract class CDevSuite_Site {
                 return $links->has($site);
             })->mapWithKeys(function ($site) {
                 $host = $this->getProxyHostForSite($site) ?: '(other)';
+
                 return [$site => $host];
             })->reject(function ($host, $site) {
                 // If proxy host is null, it may be just a normal SSL stub, or something else; either way we exclude it from the list
@@ -267,7 +268,7 @@ abstract class CDevSuite_Site {
      * @param string $site           Site name without TLD
      * @param string $configContents Config file contents
      *
-     * @return string|null
+     * @return null|string
      */
     public function getProxyHostForSite($site, $configContents = null) {
         $siteConf = $configContents ?: $this->getSiteConfigFileContents($site);
@@ -280,6 +281,7 @@ abstract class CDevSuite_Site {
         if (preg_match('~proxy_pass\s+(?<host>https?://.*)\s*;~', $siteConf, $patterns)) {
             $host = trim($patterns['host']);
         }
+
         return $host;
     }
 
@@ -287,6 +289,7 @@ abstract class CDevSuite_Site {
         $config = $this->config->read();
         $suffix = $suffix ?: '.' . $config['tld'];
         $file = str_replace($suffix, '', $site) . $suffix;
+
         return $this->files->exists($this->nginxPath($file)) ? $this->files->get($this->nginxPath($file)) : null;
     }
 
@@ -304,7 +307,7 @@ abstract class CDevSuite_Site {
 
     /**
      * Get list of sites and return them formatted
-     * Will work for symlink and normal site paths
+     * Will work for symlink and normal site paths.
      *
      * @param $path
      * @param $certs
@@ -324,6 +327,7 @@ abstract class CDevSuite_Site {
             } else {
                 $realPath = $this->files->realpath($sitePath);
             }
+
             return [$site => $realPath];
         })->filter(function ($path) {
             return $this->files->isDir($path);
@@ -371,7 +375,7 @@ abstract class CDevSuite_Site {
      * @return int
      */
     public function port($url) {
-        if ($this->files->exists($path = CDevSuite::homePath() . "/Nginx/$url.conf")) {
+        if ($this->files->exists($path = CDevSuite::homePath() . "/Nginx/${url}.conf")) {
             if (strpos($this->files->get($path), '443') !== false) {
                 return 443;
             }

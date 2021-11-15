@@ -1,17 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-use Maatwebsite\Excel\Concerns\SkipsOnError;
-
-use Throwable;
-
-class ModelManager {
-
+class CExporter_Import_ModelManager {
     /**
      * @var array
      */
@@ -22,10 +11,17 @@ class ModelManager {
      */
     private $validator;
 
-    /**
-     * @param RowValidator $validator
-     */
-    public function __construct() {
+    private static $instance;
+
+    public static function instance() {
+        if (static::$instance == null) {
+            static::$instance = new static();
+        }
+
+        return static::$instance;
+    }
+
+    private function __construct() {
         $this->validator = CExporter_Validator_RowValidator::instance();
     }
 
@@ -38,10 +34,10 @@ class ModelManager {
     }
 
     /**
-     * @param ToModel $import
-     * @param bool    $massInsert
+     * @param CExporter_Concern_ToModel $import
+     * @param bool                      $massInsert
      *
-     * @throws ValidationException
+     * @throws CValdation_Exception
      */
     public function flush(CExporter_Concern_ToModel $import, bool $massInsert = false) {
         if ($import instanceof CExporter_Concern_WithValidation) {
@@ -58,10 +54,10 @@ class ModelManager {
     }
 
     /**
-     * @param ToModel $import
-     * @param array   $attributes
+     * @param CExporter_Concern_ToModel $import
+     * @param array                     $attributes
      *
-     * @return Model[]|Collection
+     * @return CModel[]|CCollection
      */
     public function toModels(CExporter_Concern_ToModel $import, array $attributes) {
         $model = $import->model($attributes);
@@ -74,21 +70,47 @@ class ModelManager {
     }
 
     /**
-     * @param ToModel $import
+     * @param CExporter_Concern_ToModel $import
      */
     private function massFlush(CExporter_Concern_ToModel $import) {
         $this->rows()
-                ->flatMap(function (array $attributes) use ($import) {
-                    return $this->toModels($import, $attributes);
-                })
-                ->mapToGroups(function ($model) {
-                    return [\get_class($model) => $this->prepare($model)->getAttributes()];
-                })
-                ->each(function (CCollection $models, string $model) use ($import) {
+            ->flatMap(function (array $attributes) use ($import) {
+                return $this->toModels($import, $attributes);
+            })
+            ->mapToGroups(function ($model) {
+                return [\get_class($model) => $this->prepare($model)->getAttributes()];
+            })
+            ->each(function (CCollection $models, string $model) use ($import) {
+                try {
+                    /* @var Model $model */
+                    $model::query()->insert($models->toArray());
+                } catch (Throwable $e) {
+                    if ($import instanceof CExporter_Concern_SkipsOnError) {
+                        $import->onError($e);
+                    } else {
+                        throw $e;
+                    }
+                }
+            });
+    }
+
+    /**
+     * @param CExporter_Concern_ToModel $import
+     */
+    private function singleFlush(CExporter_Concern_ToModel $import) {
+        $this
+            ->rows()
+            ->each(function (array $attributes) use ($import) {
+                $this->toModels($import, $attributes)->each(function (CModel $model) use ($import) {
                     try {
-                        /* @var Model $model */
-                        $model::query()->insert($models->toArray());
+                        $model->saveOrFail();
                     } catch (Throwable $e) {
+                        if ($import instanceof CExporter_Concern_SkipsOnError) {
+                            $import->onError($e);
+                        } else {
+                            throw $e;
+                        }
+                    } catch (Exception $e) {
                         if ($import instanceof CExporter_Concern_SkipsOnError) {
                             $import->onError($e);
                         } else {
@@ -96,33 +118,13 @@ class ModelManager {
                         }
                     }
                 });
+            });
     }
 
     /**
-     * @param ToModel $import
-     */
-    private function singleFlush(CExporter_Concern_ToModel $import) {
-        $this
-                ->rows()
-                ->each(function (array $attributes) use ($import) {
-                    $this->toModels($import, $attributes)->each(function (Model $model) use ($import) {
-                        try {
-                            $model->saveOrFail();
-                        } catch (Throwable $e) {
-                            if ($import instanceof SkipsOnError) {
-                                $import->onError($e);
-                            } else {
-                                throw $e;
-                            }
-                        }
-                    });
-                });
-    }
-
-    /**
-     * @param Model $model
+     * @param CModel $model
      *
-     * @return Model
+     * @return CModel
      */
     private function prepare(CModel $model) {
         if ($model->usesTimestamps()) {
@@ -167,5 +169,4 @@ class ModelManager {
     private function rows() {
         return new CCollection($this->rows);
     }
-
 }

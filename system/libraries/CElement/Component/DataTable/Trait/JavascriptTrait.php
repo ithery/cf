@@ -279,7 +279,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln($this->options->toJsonRow('deferRender'))->br()
                 ->appendln($this->options->toJsonRow('autoWidth'))->br()
                 ->appendln($this->options->toJsonRow('ordering'))->br()
-                ->appendln($this->options->toJsonRow('scrollX'))->br()
+                ->appendln($this->fixedColumn ? '' : $this->options->toJsonRow('scrollX'))->br()
                 ->br();
 
             if ($this->bootstrap >= '3') {

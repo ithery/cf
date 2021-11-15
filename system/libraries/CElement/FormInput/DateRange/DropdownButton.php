@@ -34,7 +34,7 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
         $this->setAttr('capp-input', 'daterange-dropdownbutton');
         $this->addDefaultRange();
         $this->previewFormat = $this->dateFormat;
-        $this->previewMomentFormat = $this->dateFormat;
+        $this->previewMomentFormat = $this->convertPHPToMomentFormat($this->dateFormat);
     }
 
     /**
@@ -45,6 +45,7 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
     public function setPreviewFormat($format) {
         $this->previewFormat = $format;
         $this->previewMomentFormat = $this->convertPHPToMomentFormat($this->previewFormat);
+
         return $this;
     }
 
@@ -55,16 +56,19 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
      */
     public function setOpenDirection($direction) {
         $this->openDirection = $direction;
+
         return $this;
     }
 
     public function setDisableCustomRange($bool = true) {
         $this->disableCustomRange = $bool;
+
         return $this;
     }
 
     public function setMaxSpan($span) {
         $this->maxSpan = $span;
+
         return $this;
     }
 
@@ -151,6 +155,7 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
             }
             $('#" . $this->id . "').removeClass('uninit');
         ";
+
         return $js;
     }
 }

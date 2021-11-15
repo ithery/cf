@@ -22,11 +22,11 @@ class CServer_Config {
         if ($this->get('os') === null) { //if not overloaded in config server.php
             /* get Linux code page */
             if (PHP_OS == 'Linux') {
-                if (file_exists($fname = '/etc/sysconfig/i18n') || file_exists($fname = '/etc/default/locale') || file_exists($fname = '/etc/locale.conf') || file_exists($fname = '/etc/sysconfig/language') || file_exists($fname = '/etc/profile.d/lang.sh') || file_exists($fname = '/etc/profile')) {
+                if (@file_exists($fname = '/etc/sysconfig/i18n') || @file_exists($fname = '/etc/default/locale') || @file_exists($fname = '/etc/locale.conf') || @file_exists($fname = '/etc/sysconfig/language') || @file_exists($fname = '/etc/profile.d/lang.sh') || @file_exists($fname = '/etc/profile')) {
                     $contents = @file_get_contents($fname);
                 } else {
                     $contents = false;
-                    if (file_exists('/system/build.prop')) { //Android
+                    if (@file_exists('/system/build.prop')) { //Android
                         $this->set('os', 'Android');
                         if (@exec('uname -o 2>/dev/null', $unameo) && (sizeof($unameo) > 0) && (($unameo0 = trim($unameo[0])) != '')) {
                             $this->set('unameo', $unameo0);
@@ -89,6 +89,7 @@ class CServer_Config {
                             foreach ($lines as $line) {
                                 if (preg_match('/^charmap="?([^"]*)/', $line, $matches2)) {
                                     $this->set('system_codepage', $matches2[1]);
+
                                     break;
                                 }
                             }
@@ -106,6 +107,7 @@ class CServer_Config {
                                     $lang = 'Unknown';
                                 }
                                 $this->set('system_lang', $lang . ' (' . $matches2[1] . ')');
+
                                 break;
                             }
                         }
@@ -132,6 +134,7 @@ class CServer_Config {
         if (self::$instance == null) {
             self::$instance = new CServer_Config();
         }
+
         return self::$instance;
     }
 
@@ -145,6 +148,12 @@ class CServer_Config {
             'system_lang' => null,
             'unameo' => null,
             'mode_popen' => null,
+            'log' => false,
+            'rootfs' => false,
+            'sudo_commands' => false,
+            'add_paths' => false,
+            'hide_fs_types' => false,
+
         ];
 
         $this->config = array_merge($defaultConfig, CF::config('server', []));
@@ -163,6 +172,7 @@ class CServer_Config {
 
     public function set($key, $val) {
         $this->config[$key] = $val;
+
         return $this;
     }
 
@@ -178,7 +188,53 @@ class CServer_Config {
         return $this->get('debug') === true;
     }
 
-    public function loadPercentEnabled() {
+    public function isLoadPercentEnabled() {
         return $this->get('load_percent_enabled') === true;
+    }
+
+    public function isModePopen() {
+        return $this->get('mode_popen') === true;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getLog() {
+        return $this->get('log');
+    }
+
+    /**
+     * @return null|bool|string
+     */
+    public function getRootFs() {
+        return $this->get('rootfs');
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getUnameo() {
+        return $this->get('unameo');
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getSudoCommands() {
+        return $this->get('sudo_commands');
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getAddPaths() {
+        return $this->get('add_paths');
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getHideFsTypes() {
+        return $this->get('hide_fs_types');
     }
 }

@@ -17,6 +17,9 @@ return [
     'css' => [
     ],
     'data' => [
+        'icon' => [
+            'prefix' => 'icon icon-',
+        ],
         'datatable' => [
             'dom' => null,
             'class' => null,

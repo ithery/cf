@@ -909,7 +909,7 @@ class c {
         if ($to instanceof CController) {
             $to = $to->controllerUrl();
         }
-        if (is_null($to)) {
+        if ($to === null) {
             return CHTTP::redirector();
         }
 
@@ -1368,6 +1368,14 @@ class c {
         return rtrim($string, '/');
     }
 
+    /**
+     * Get theme data or theme object.
+     *
+     * @param null|string $key
+     * @param null|mixed  $default
+     *
+     * @return CManager_Theme|mixed
+     */
     public static function theme($key = null, $default = null) {
         if ($key !== null) {
             return static::manager()->theme()->getData($key, $default);
@@ -1412,6 +1420,10 @@ class c {
         }
 
         return $appRoot . DS;
+    }
+
+    public static function disk($name = null) {
+        return CStorage::instance()->disk($name);
     }
 }
 

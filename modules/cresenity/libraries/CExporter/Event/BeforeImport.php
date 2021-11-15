@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_Event_BeforeImport extends CExporter_Event {
-
     /**
      * @var Reader
      */
@@ -20,7 +13,7 @@ class CExporter_Event_BeforeImport extends CExporter_Event {
 
     /**
      * @param CExporter_Reader $reader
-     * @param object $importable
+     * @param object           $importable
      */
     public function __construct(CExporter_Reader $reader, $importable) {
         $this->reader = $reader;
@@ -47,5 +40,4 @@ class CExporter_Event_BeforeImport extends CExporter_Event {
     public function getDelegate() {
         return $this->reader;
     }
-
 }
