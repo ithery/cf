@@ -11,7 +11,7 @@ class CValidation {
     use CTrait_Compat_Validation;
 
     /**
-     * 
+     *
      * @param array $data
      * @param array $rules
      * @param array $messages
@@ -23,7 +23,7 @@ class CValidation {
     }
 
     /**
-     * 
+     *
      * @return \CValidation_Rule
      */
     public static function createRule() {
@@ -41,7 +41,7 @@ class CValidation {
      *
      * @return CValidation_Factory|CValidation_Validator
      */
-    public static function factory($data = null, array $rules = null, array $messages = [], array $customAttributes = []) {
+    public static function factory($data = null, array $rules = [], array $messages = [], array $customAttributes = []) {
         if ($data != null) {
             return CValidation_Factory::instance()->make($data, $rules, $messages, $customAttributes);
         }
