@@ -119,7 +119,6 @@ HTML;
                 });
 
             </script>
-            <script src="${alpineJs}"></script>
             <script>
                 ${js}
                 ${readyClientScript}
