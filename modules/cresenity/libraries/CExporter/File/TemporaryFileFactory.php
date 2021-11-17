@@ -49,7 +49,8 @@ class CExporter_File_TemporaryFileFactory {
      * @return CExporter_File_LocalTemporaryFile
      */
     public function makeLocal($fileName = null, $fileExtension = null) {
-        if (!file_exists($this->temporaryPath) && !mkdir($concurrentDirectory = $this->temporaryPath) && !is_dir($concurrentDirectory)) {
+        $temporaryPath = CExporter::config()->get('temporary.local_path', DOCROOT . 'temp');
+        if (!file_exists($temporaryPath) && !mkdir($concurrentDirectory = $temporaryPath) && !is_dir($concurrentDirectory)) {
             throw new \RuntimeException(sprintf('Directory "%s" was not created', $concurrentDirectory));
         }
 
