@@ -164,21 +164,6 @@ class CRemote_SSH_Connection implements CRemote_SSH_ConnectionInterface {
     }
 
     /**
-     * Get the gateway implementation.
-     *
-     * @throws \RuntimeException
-     *
-     * @return \CRemote_SSH_Gateway
-     */
-    public function getFtpGateway() {
-        if (!$this->ftpGateway->ftpConnected() && !$this->ftpGateway->ftpConnect($this->username)) {
-            throw new \RuntimeException('Unable to connect to remote server.');
-        }
-
-        return $this->ftpGateway;
-    }
-
-    /**
      * Get the display callback for the connection.
      *
      * @param null|\Closure $callback
