@@ -36,7 +36,7 @@ trait CApp_Concern_VariablesTrait {
         $variables['appCode'] = CF::appCode();
         $variables['appId'] = CF::appId();
         $variables['debug'] = CF::isDevSuite();
-        $variables['enviroment'] = CF::config('app.environment');
+        $variables['environment'] = CF::config('app.environment');
 
         $bootstrap = ccfg::get('bootstrap');
         $themeData = CManager::instance()->getThemeData();
