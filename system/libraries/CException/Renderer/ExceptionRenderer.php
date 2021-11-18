@@ -16,7 +16,7 @@ class CException_Renderer_ExceptionRenderer implements CException_Contract_Excep
         }
     }
 
-    public function renderException(Throwable $throwable) {
+    public function renderException($throwable) {
         $viewModel = CException::manager()->createErrorModel($throwable);
 
         try {
