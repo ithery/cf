@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Db
+ * Description of Db.
  *
  * @author Hery
  */
@@ -37,12 +37,14 @@ class CDevSuite_Db {
     public function create($name, $configuration) {
         if (!$this->isCanConnect($configuration)) {
             CDevSuite::info('Error when connecting to:' . $name . ', please check your configuration');
+
             return false;
         }
         $data = $this->read();
         $data[$name] = $configuration;
 
         $this->write($data);
+
         return true;
     }
 
@@ -67,6 +69,7 @@ class CDevSuite_Db {
      */
     public function read() {
         $this->ensureFileExists();
+
         return json_decode($this->files->get($this->path()), true);
     }
 
@@ -128,6 +131,7 @@ class CDevSuite_Db {
             'cache' => false,
             'escape' => true
         ];
+
         return $config;
     }
 
@@ -138,6 +142,7 @@ class CDevSuite_Db {
         $config = $this->toDbConfig($key);
         $host = carr::get($config, 'connection.host');
         $database = carr::get($config, 'connection.database');
+
         return CDatabase::instance($host . '-' . $database, $config, CF::domain());
     }
 
@@ -148,8 +153,10 @@ class CDevSuite_Db {
         } catch (Exception $ex) {
             $errMessage = $ex->getMessage();
             CDevSuite::info($ex->getMessage());
+
             return false;
         }
+
         return true;
     }
 
@@ -207,6 +214,7 @@ class CDevSuite_Db {
         foreach ($sqls as $sql) {
             $errSql = 0;
             $resultQ = null;
+
             try {
                 CDevSuite::info('Executing:' . $sql . ';');
                 $resultQ = $toDB->query($sql);
@@ -249,7 +257,7 @@ class CDevSuite_Db {
     }
 
     /**
-     * Return Maria DB instance
+     * Return Maria DB instance.
      *
      * @return CDevSuite_Db_MariaDb
      */
@@ -258,15 +266,19 @@ class CDevSuite_Db {
             switch (CServer::getOS()) {
                 case CServer::OS_LINUX:
                     $this->mariaDb = new CDevSuite_Linux_Db_MariaDb();
+
                     break;
                 case CServer::OS_WINNT:
                     $this->mariaDb = new CDevSuite_Windows_Db_MariaDb();
+
                     break;
                 case CServer::OS_DARWIN:
                     $this->mariaDb = new CDevSuite_Mac_Db_MariaDb();
+
                     break;
             }
         }
+
         return $this->mariaDb;
     }
 
@@ -279,8 +291,10 @@ class CDevSuite_Db {
         if (isset($data[$key])) {
             unset($data[$key]);
             $this->write($data);
+
             return true;
         }
+
         return false;
     }
 

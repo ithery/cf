@@ -117,10 +117,8 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                         ->addArg($colValue)
                         ->setRequire($col->callbackRequire)
                         ->execute();
-                    if (is_array($colValue) && isset($colValue['html'], $colValue['js'])) {
-                        $js .= $colValue['js'];
-                        $colValue = $colValue['html'];
-                    }
+                    list($colValue, $jsCell) = $this->getHtmlJsCell($colValue);
+                    $js .= $jsCell;
                 }
                 $newValue = $colValue;
 
@@ -166,5 +164,26 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
         }
 
         return $aaData;
+    }
+
+    protected function getHtmlJsCell($cell) {
+        $html = '';
+        $js = '';
+
+        if (is_string($cell)) {
+            $html = $cell;
+        }
+
+        if ($cell instanceof CRenderable) {
+            $html = $cell->html();
+            $js = $cell->js();
+        }
+
+        if (carr::accessible($cell)) {
+            $html = carr::get($cell, 'html');
+            $js = carr::get($cell, 'js');
+        }
+
+        return [$html, $js];
     }
 }

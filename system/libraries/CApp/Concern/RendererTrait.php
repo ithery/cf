@@ -119,7 +119,6 @@ HTML;
                 });
 
             </script>
-            <script src="${alpineJs}"></script>
             <script>
                 ${js}
                 ${readyClientScript}
@@ -130,9 +129,7 @@ HTML;
                 }
                 ${customJs}
             </script>
-            <script>
                 ${pushesScript}
-            </script>
 
 HTML;
     }

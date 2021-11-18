@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Driver
+ * Description of Driver.
  *
  * @author Hery
  */
@@ -46,7 +46,7 @@ abstract class CDevSuite_DevSuiteDriver {
      * @param string $siteName
      * @param string $uri
      *
-     * @return CDevSuite_DevSuiteDriver|null
+     * @return null|CDevSuite_DevSuiteDriver
      */
     public static function assign($sitePath, $siteName, $uri) {
         $drivers = [];

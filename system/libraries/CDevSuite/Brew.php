@@ -72,12 +72,13 @@ class CDevSuite_Brew {
     }
 
     /**
-     * Get the aliased formula version from Homebrew
+     * Get the aliased formula version from Homebrew.
      *
      * @param mixed $formula
      */
     public function determineAliasedVersion($formula) {
-        $details = json_decode($this->cli->runAsUser("brew info $formula --json"));
+        $details = json_decode($this->cli->runAsUser("brew info ${formula} --json"));
+
         return $details[0]->aliases[0] ?: 'ERROR - NO BREW ALIAS FOUND';
     }
 
@@ -233,7 +234,7 @@ class CDevSuite_Brew {
          * "../Cellar/php@7.2/7.2.13/bin/php"
          * or older styles:
          * "../Cellar/php/7.2.9_2/bin/php
-         * "../Cellar/php55/bin/php
+         * "../Cellar/php55/bin/php.
          */
         preg_match('~\w{3,}/(php)(@?\d\.?\d)?/(\d\.\d)?([_\d\.]*)?/?\w{3,}~', $resolvedPath, $matches);
 
@@ -244,12 +245,13 @@ class CDevSuite_Brew {
      * Gets the currently linked formula
      * E.g if under php, will be php, if under php@7.3 will be that
      * Different to ->linkedPhp() in that this will just get the linked directory name (whether that is php, php55 or
-     * php@7.2)
+     * php@7.2).
      *
      * @return mixed
      */
     public function getLinkedPhpFormula() {
         $matches = $this->getParsedLinkedPhp();
+
         return $matches[1] . $matches[2];
     }
 
@@ -266,10 +268,11 @@ class CDevSuite_Brew {
             function ($version) use ($resolvedPhpVersion) {
                 $resolvedVersionNormalized = preg_replace('/[^\d]/', '', $resolvedPhpVersion);
                 $versionNormalized = preg_replace('/[^\d]/', '', $version);
+
                 return $resolvedVersionNormalized === $versionNormalized;
             },
             function () use ($resolvedPhpVersion) {
-                throw new DomainException("Unable to determine linked PHP when parsing '$resolvedPhpVersion'");
+                throw new DomainException("Unable to determine linked PHP when parsing '${resolvedPhpVersion}'");
             }
         );
     }

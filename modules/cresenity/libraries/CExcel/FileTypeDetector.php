@@ -1,23 +1,25 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
+ *
  * @since Oct 1, 2019, 3:14:05 PM
+ *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Maatwebsite\Excel\Exceptions\NoTypeDetectedException;
 
 class FileTypeDetector {
-
     /**
      * @param             $filePath
-     * @param string|null $type
+     * @param null|string $type
      *
      * @throws NoTypeDetectedException
-     * @return string|null
+     *
+     * @return null|string
      */
     public static function detect($filePath, $type = null) {
         if (null !== $type) {
@@ -32,7 +34,7 @@ class FileTypeDetector {
         if (null === $type && trim($extension) === '') {
             throw new CExcel_Exception_NoTypeDetectedException();
         }
-        $data = array(
+        $data = [
             'xlsx' => CExcel_Constant::XLSX,
             'xlsm' => CExcel_Constant::XLSX,
             'xltx' => CExcel_Constant::XLSX,
@@ -49,15 +51,17 @@ class FileTypeDetector {
             'csv' => CExcel_Constant::CSV,
             'tsv' => CExcel_Constant::TSV,
             'pdf' => CExcel_Constant::DOMPDF,
-        );
+        ];
+
         return carr::get($data, strtolower($extension));
     }
 
     /**
      * @param string      $filePath
-     * @param string|null $type
+     * @param null|string $type
      *
      * @throws CExcel_Exception_NoTypeDetectedException
+     *
      * @return string
      */
     public static function detectStrict($filePath, $type = null) {
@@ -65,7 +69,7 @@ class FileTypeDetector {
         if (!$type) {
             throw new CExcel_Exception_NoTypeDetectedException();
         }
+
         return $type;
     }
-
 }

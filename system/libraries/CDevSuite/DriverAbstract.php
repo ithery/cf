@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DriverAbstract
+ * Description of DriverAbstract.
  *
  * @author Hery
  */

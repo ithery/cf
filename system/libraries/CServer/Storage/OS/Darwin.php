@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CServer_Storage_OS_Darwin extends CServer_Storage_OS_Linux {
     /**
-     * Filesystem information
+     * Filesystem information.
      *
      * @return void
      */
@@ -18,19 +18,19 @@ class CServer_Storage_OS_Darwin extends CServer_Storage_OS_Linux {
         $cmd = $this->createCommand();
         $df_args = '';
         $hideFstypes = [];
-        if (defined('PSI_HIDE_FS_TYPES') && is_string(PSI_HIDE_FS_TYPES)) {
-            if (preg_match(ARRAY_EXP, PSI_HIDE_FS_TYPES)) {
-                $hideFstypes = eval(PSI_HIDE_FS_TYPES);
+        if (is_string(CServer::config()->getHideFsTypes())) {
+            if (preg_match(CServer::ARRAY_EXP, CServer::config()->getHideFsTypes())) {
+                $hideFstypes = eval(CServer::config()->getHideFsTypes());
             } else {
-                $hideFstypes = [PSI_HIDE_FS_TYPES];
+                $hideFstypes = [CServer::config()->getHideFsTypes()];
             }
         }
         foreach ($hideFstypes as $Fstype) {
-            $df_args .= "-x $Fstype ";
+            $df_args .= "-x ${Fstype} ";
         }
         if ($df_args !== '') {
             $df_args = trim($df_args); //trim spaces
-            $arrResult = $cmd->df("-P $df_args 2>/dev/null");
+            $arrResult = $cmd->df("-P ${df_args} 2>/dev/null");
         } else {
             $arrResult = $cmd->df('-P 2>/dev/null');
         }
