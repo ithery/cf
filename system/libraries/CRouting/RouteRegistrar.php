@@ -1,18 +1,18 @@
 <?php
 
 /**
- * @method CRouting_Route get(string $uri, \Closure|array|string|null $action = null)
- * @method CRouting_Route post(string $uri, \Closure|array|string|null $action = null)
- * @method CRouting_Route put(string $uri, \Closure|array|string|null $action = null)
- * @method CRouting_Route delete(string $uri, \Closure|array|string|null $action = null)
- * @method CRouting_Route patch(string $uri, \Closure|array|string|null $action = null)
- * @method CRouting_Route options(string $uri, \Closure|array|string|null $action = null)
- * @method CRouting_Route any(string $uri, \Closure|array|string|null $action = null)
+ * @method CRouting_Route          get(string $uri, null|\Closure|array|string $action = null)
+ * @method CRouting_Route          post(string $uri, null|\Closure|array|string $action = null)
+ * @method CRouting_Route          put(string $uri, null|\Closure|array|string $action = null)
+ * @method CRouting_Route          delete(string $uri, null|\Closure|array|string $action = null)
+ * @method CRouting_Route          patch(string $uri, null|\Closure|array|string $action = null)
+ * @method CRouting_Route          options(string $uri, null|\Closure|array|string $action = null)
+ * @method CRouting_Route          any(string $uri, null|\Closure|array|string $action = null)
  * @method CRouting_RouteRegistrar as(string $value)
  * @method CRouting_RouteRegistrar domain(string $value)
- * @method CRouting_RouteRegistrar middleware(array|string|null $middleware)
+ * @method CRouting_RouteRegistrar middleware(null|array|string $middleware)
  * @method CRouting_RouteRegistrar name(string $value)
- * @method CRouting_RouteRegistrar namespace(string|null $value)
+ * @method CRouting_RouteRegistrar namespace(null|string $value)
  * @method CRouting_RouteRegistrar prefix(string  $prefix)
  * @method CRouting_RouteRegistrar where(array  $where)
  */
@@ -75,9 +75,9 @@ class RouteRegistrar {
      * @param string $key
      * @param mixed  $value
      *
-     * @return $this
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return $this
      */
     public function attribute($key, $value) {
         if (!in_array($key, $this->allowedAttributes)) {
@@ -131,7 +131,7 @@ class RouteRegistrar {
      *
      * @param array|string               $methods
      * @param string                     $uri
-     * @param \Closure|array|string|null $action
+     * @param null|\Closure|array|string $action
      *
      * @return CRouting_Route
      */
@@ -144,7 +144,7 @@ class RouteRegistrar {
      *
      * @param string                     $method
      * @param string                     $uri
-     * @param \Closure|array|string|null $action
+     * @param null|\Closure|array|string $action
      *
      * @return CRouting_Route
      */
@@ -159,7 +159,7 @@ class RouteRegistrar {
     /**
      * Compile the action into an array including the attributes.
      *
-     * @param \Closure|array|string|null $action
+     * @param null|\Closure|array|string $action
      *
      * @return array
      */
@@ -174,7 +174,7 @@ class RouteRegistrar {
 
         if (is_array($action)
             && !carr::isAssoc($action)
-            && Reflector::isCallable($action)
+            && CBase_Reflector::isCallable($action)
         ) {
             if (strncmp($action[0], '\\', 1)) {
                 $action[0] = '\\' . $action[0];
@@ -194,9 +194,9 @@ class RouteRegistrar {
      * @param string $method
      * @param array  $parameters
      *
-     * @return CRouting_Route|$this
-     *
      * @throws \BadMethodCallException
+     *
+     * @return CRouting_Route|$this
      */
     public function __call($method, $parameters) {
         if (in_array($method, $this->passthru)) {
