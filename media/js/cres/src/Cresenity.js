@@ -15,6 +15,7 @@ import { confirmFromElement, defaultConfirmHandler } from './module/confirm-hand
 import appValidation from './module/validation';
 import ucfirst from 'locutus/php/strings/ucfirst';
 import Alpine from 'alpinejs';
+
 export default class Cresenity {
     constructor() {
         this.cf = new CF();
