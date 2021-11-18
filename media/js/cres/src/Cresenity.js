@@ -13,6 +13,7 @@ import { elementReady, elementRendered } from './util/dom-observer';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
 import appValidation from './module/validation';
 import ucfirst from 'locutus/php/strings/ucfirst';
+import Alpine from 'alpinejs';
 export default class Cresenity {
     constructor() {
         this.cf = new CF();
@@ -41,6 +42,7 @@ export default class Cresenity {
         };
         this.confirmHandler = defaultConfirmHandler;
         this.dispatchWindowEvent = dispatchWindowEvent;
+        this.Alpine = Alpine;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -930,6 +932,14 @@ export default class Cresenity {
             appValidation.init();
         }
     }
+
+    initUi() {
+        this.ui.start();
+    }
+
+    initAlpine() {
+        this.Alpine.start();
+    }
     init() {
         this.cf.onBeforeInit(() => {
             this.normalizeRequireJs();
@@ -943,6 +953,8 @@ export default class Cresenity {
             this.initConfirm();
             this.initReload();
             this.initValidation();
+            this.initUi();
+            this.initAlpine();
         });
 
 
