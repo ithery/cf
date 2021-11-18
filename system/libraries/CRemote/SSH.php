@@ -33,7 +33,7 @@ class CRemote_SSH {
     /**
      * Get a remote connection instance.
      *
-     * @return CRemote_SSH_ConnectionInterface
+     * @return CRemote_SSH_Connection
      */
     public function connection() {
         return $this->connection;
