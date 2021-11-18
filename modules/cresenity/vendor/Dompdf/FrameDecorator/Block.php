@@ -1,33 +1,30 @@
 <?php
 /**
- * @package dompdf
  * @link    http://dompdf.github.com/
+ *
  * @author  Benj Carson <benjcarson@digitaljunkies.ca>
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameDecorator;
 
-use Dompdf\Dompdf;
 use Dompdf\Frame;
+use Dompdf\Dompdf;
 use Dompdf\LineBox;
 
 /**
- * Decorates frames for block layout
- *
- * @access  private
- * @package dompdf
+ * Decorates frames for block layout.
  */
-class Block extends AbstractFrameDecorator
-{
+class Block extends AbstractFrameDecorator {
     /**
-     * Current line index
+     * Current line index.
      *
      * @var int
      */
     protected $_cl;
 
     /**
-     * The block's line boxes
+     * The block's line boxes.
      *
      * @var LineBox[]
      */
@@ -35,68 +32,61 @@ class Block extends AbstractFrameDecorator
 
     /**
      * Block constructor.
-     * @param Frame $frame
+     *
+     * @param Frame  $frame
      * @param Dompdf $dompdf
      */
-    function __construct(Frame $frame, Dompdf $dompdf)
-    {
+    public function __construct(Frame $frame, Dompdf $dompdf) {
         parent::__construct($frame, $dompdf);
 
-        $this->_line_boxes = array(new LineBox($this));
+        $this->_line_boxes = [new LineBox($this)];
         $this->_cl = 0;
     }
 
-    /**
-     *
-     */
-    function reset()
-    {
+    public function reset() {
         parent::reset();
 
-        $this->_line_boxes = array(new LineBox($this));
+        $this->_line_boxes = [new LineBox($this)];
         $this->_cl = 0;
     }
 
     /**
      * @return LineBox
      */
-    function get_current_line_box()
-    {
+    public function get_current_line_box() {
         return $this->_line_boxes[$this->_cl];
     }
 
     /**
-     * @return integer
+     * @return int
      */
-    function get_current_line_number()
-    {
+    public function get_current_line_number() {
         return $this->_cl;
     }
 
     /**
      * @return LineBox[]
      */
-    function get_line_boxes()
-    {
+    public function get_line_boxes() {
         return $this->_line_boxes;
     }
 
     /**
-     * @param integer $line_number
-     * @return integer
+     * @param int $line_number
+     *
+     * @return int
      */
-    function set_current_line_number($line_number)
-    {
+    public function set_current_line_number($line_number) {
         $line_boxes_count = count($this->_line_boxes);
         $cl = max(min($line_number, $line_boxes_count), 0);
-        return ($this->_cl = $cl);
+
+        return $this->_cl = $cl;
     }
 
     /**
-     * @param integer $i
+     * @param int $i
      */
-    function clear_line($i)
-    {
+    public function clear_line($i) {
         if (isset($this->_line_boxes[$i])) {
             unset($this->_line_boxes[$i]);
         }
@@ -105,8 +95,7 @@ class Block extends AbstractFrameDecorator
     /**
      * @param Frame $frame
      */
-    function add_frame_to_line(Frame $frame)
-    {
+    public function add_frame_to_line(Frame $frame) {
         if (!$frame->is_in_flow()) {
             return;
         }
@@ -134,7 +123,7 @@ class Block extends AbstractFrameDecorator
         // Handle inline frames (which are effectively wrappers)
         if ($frame instanceof Inline) {
             // Handle line breaks
-            if ($frame->get_node()->nodeName === "br") {
+            if ($frame->get_node()->nodeName === 'br') {
                 $this->maximize_line_height($style->length_in_pt($style->line_height), $frame);
                 $this->add_line(true);
             }
@@ -144,9 +133,9 @@ class Block extends AbstractFrameDecorator
 
         // Trim leading text if this is an empty line.  Kinda a hack to put it here,
         // but what can you do...
-        if ($this->get_current_line_box()->w == 0 &&
-            $frame->is_text_node() &&
-            !$frame->is_pre()
+        if ($this->get_current_line_box()->w == 0
+            && $frame->is_text_node()
+            && !$frame->is_pre()
         ) {
             $frame->set_text(ltrim($frame->get_text()));
             $frame->recalculate_width();
@@ -156,7 +145,7 @@ class Block extends AbstractFrameDecorator
 
         // FIXME: Why? Doesn't quite seem to be the correct thing to do,
         // but does appear to be necessary. Hack to handle wrapped white space?
-        if ($w == 0 && $frame->get_node()->nodeName !== "hr") {
+        if ($w == 0 && $frame->get_node()->nodeName !== 'hr') {
             return;
         }
 
@@ -178,7 +167,7 @@ class Block extends AbstractFrameDecorator
         // End debugging
 
         $line = $this->_line_boxes[$this->_cl];
-        if ($line->left + $line->w + $line->right + $w > $this->get_containing_block("w")) {
+        if ($line->left + $line->w + $line->right + $w > $this->get_containing_block('w')) {
             $this->add_line();
         }
 
@@ -199,8 +188,7 @@ class Block extends AbstractFrameDecorator
     /**
      * @param Frame $frame
      */
-    function remove_frames_from_line(Frame $frame)
-    {
+    public function remove_frames_from_line(Frame $frame) {
         // Search backwards through the lines for $frame
         $i = $this->_cl;
         $j = null;
@@ -246,8 +234,7 @@ class Block extends AbstractFrameDecorator
     /**
      * @param float $w
      */
-    function increase_line_width($w)
-    {
+    public function increase_line_width($w) {
         $this->_line_boxes[$this->_cl]->w += $w;
     }
 
@@ -255,8 +242,7 @@ class Block extends AbstractFrameDecorator
      * @param $val
      * @param Frame $frame
      */
-    function maximize_line_height($val, Frame $frame)
-    {
+    public function maximize_line_height($val, Frame $frame) {
         if ($val > $this->_line_boxes[$this->_cl]->h) {
             $this->_line_boxes[$this->_cl]->tallest_frame = $frame;
             $this->_line_boxes[$this->_cl]->h = $val;
@@ -266,8 +252,7 @@ class Block extends AbstractFrameDecorator
     /**
      * @param bool $br
      */
-    function add_line($br = false)
-    {
+    public function add_line($br = false) {
 
 //     if ( $this->_line_boxes[$this->_cl]["h"] == 0 ) //count($this->_line_boxes[$i]["frames"]) == 0 ||
 //       return;
