@@ -1090,7 +1090,7 @@ class Cpdf {
      *
      * @return array|false
      */
-    private function processFont(int $fontObjId, array $object_info) {
+    private function processFont($fontObjId, array $object_info) {
         $fontFileName = $object_info['fontFileName'];
         if (!isset($this->fonts[$fontFileName])) {
             return false;
