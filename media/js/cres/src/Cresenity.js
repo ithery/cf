@@ -5,6 +5,7 @@ import UI from './ui';
 import {
     dispatch as dispatchWindowEvent,
     showHtmlModal,
+    showUrlModal,
     toggleFullscreen
 } from './util';
 import {encode as base64encode, decode as base64decode} from './util/base64';
@@ -118,6 +119,19 @@ export default class Cresenity {
     htmlModal(html) {
         showHtmlModal(html);
     }
+    urlModal(url) {
+        showUrlModal(url);
+    }
+    handleAjaxError(xhr, status, error) {
+        if (error !== 'abort') {
+            this.message('error', 'Error, please call administrator... (' + error + ')');
+            if(xhr.status!=200) {
+                if(window.capp && window.capp.environment && window.capp.environment!=='production') {
+                    this.htmlModal(xhr.responseText);
+                }
+            }
+        }
+    }
 
     reload(options) {
         let targetOptions = {};
@@ -187,12 +201,14 @@ export default class Cresenity {
             } else {
                 this.blockElement($(element));
             }
+
             $(element).data('xhr', $.ajax({
                 type: method,
                 url: url,
                 dataType: 'json',
                 data: dataAddition,
                 success: (data) => {
+                    console.log(data);
                     let isError = false;
                     if(typeof data.html === 'undefined') {
                         //error
@@ -239,12 +255,7 @@ export default class Cresenity {
                     }
                 },
                 error: (errorXhr, ajaxOptions, thrownError) => {
-                    if (thrownError !== 'abort') {
-                        this.message('error', 'Error, please call administrator... (' + thrownError + ')');
-                        if(window.capp && window.capp.environment && window.capp.environment!='production') {
-                            this.htmlModal(thrownError);
-                        }
-                    }
+                    this.handleAjaxError(errorXhr, ajaxOptions, thrownError);
                 },
                 complete: () => {
                     $(element).data('xhr', false);
