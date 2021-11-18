@@ -12,7 +12,7 @@ class CException_Renderer_ExceptionRenderer implements CException_Contract_Excep
      */
     public function render($throwable) {
         if ($this->shouldDisplayException && CF::isProduction() !== true) {
-            $this->renderException($throwable);
+            return $this->renderException($throwable);
         }
     }
 
@@ -24,13 +24,22 @@ class CException_Renderer_ExceptionRenderer implements CException_Contract_Excep
             $data = $viewModel->toArray();
             $viewFile = CF::findFile('views', $template);
 
-            extract((array) $data, EXTR_OVERWRITE);
+            $content = $this->getInclude($viewFile, $data);
 
-            include $viewFile;
+            return $content;
         } catch (Throwable $e) {
             throw $e;
         } catch (Exception $e) {
             throw $e;
         }
+    }
+
+    private function getInclude($name, array $context = []) {
+        extract($context, \EXTR_SKIP);
+        ob_start();
+
+        include $name;
+
+        return trim(ob_get_clean());
     }
 }
