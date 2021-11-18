@@ -148,6 +148,15 @@ abstract class CObservable extends CRenderable {
         return $row;
     }
 
+    /**
+     * Add Calendar.
+     *
+     * @param string $calendar_id
+     *
+     * @return CCalendar
+     *
+     * @deprecated 2.0
+     */
     public function addCalendar($calendar_id = '') {
         $calendar = CCalendar::factory($calendar_id);
         $this->add($calendar);
@@ -155,6 +164,13 @@ abstract class CObservable extends CRenderable {
         return $calendar;
     }
 
+    /**
+     * @param string $tabs_id
+     *
+     * @return CTabStaticList
+     *
+     * @deprecated 1.2
+     */
     public function addTabStaticList($tabs_id = '') {
         $tabs = CTabStaticList::factory($tabs_id);
         $this->add($tabs);
@@ -162,6 +178,13 @@ abstract class CObservable extends CRenderable {
         return $tabs;
     }
 
+    /**
+     * @param string $id
+     *
+     * @return CRowFluid
+     *
+     * @deprecated 1.2
+     */
     public function addRowFluid($id = '') {
         $rowf = CRowFluid::factory($id);
         $this->add($rowf);
