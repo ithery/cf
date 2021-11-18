@@ -90,6 +90,32 @@ return [
         ]
     ],
     [
+        'name' => 'cresjs',
+        'label' => c::__('Cres JS'),
+        'subnav' => [
+            [
+                'name' => 'cresjs.introduction',
+                'label' => c::__('Introduction'),
+                'uri' => 'docs/cresjs/introduction',
+            ],
+            [
+                'name' => 'cresjs.basic',
+                'label' => c::__('Basic'),
+                'uri' => 'docs/cresjs/basic',
+            ],
+            [
+                'name' => 'cresjs.reload',
+                'label' => c::__('Reload'),
+                'uri' => 'docs/cresjs/reload',
+            ],
+            [
+                'name' => 'cresjs.ui',
+                'label' => c::__('UI'),
+                'uri' => 'docs/cresjs/ui',
+            ],
+        ]
+    ],
+    [
         'name' => 'command',
         'label' => c::__('Command'),
         'subnav' => [
