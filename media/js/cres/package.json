@@ -14,7 +14,7 @@
         "@rollup/plugin-alias": "^3.1.5",
         "@rollup/plugin-commonjs": "^20.0.0",
         "@rollup/plugin-node-resolve": "^13.0.5",
-        "alpinejs": "^3.4.1",
+        "alpinejs": "^3.5.1",
         "autoprefixer": "^10.3.5",
         "babel-eslint": "^10.1.0",
         "core-js": "^3.18.0",

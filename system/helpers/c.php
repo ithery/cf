@@ -1425,6 +1425,16 @@ class c {
     public static function disk($name = null) {
         return CStorage::instance()->disk($name);
     }
+
+    public static function closureFromCallable($callable) {
+        if (method_exists(Closure::class, 'fromCallable')) {
+            return Closure::fromCallable($callable);
+        }
+
+        return function () use ($callable) {
+            return call_user_func_array($callable, func_get_args());
+        };
+    }
 }
 
 // End c
