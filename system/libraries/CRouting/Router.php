@@ -425,7 +425,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
         if ($routes instanceof Closure) {
             $routes($this);
         } else {
-            (new RouteFileRegistrar($this))->register($routes);
+            (new CRouting_RouteFileRegistrar($this))->register($routes);
         }
     }
 
