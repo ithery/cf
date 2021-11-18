@@ -1,69 +1,71 @@
 <?php
 /**
- * @package dompdf
  * @link    http://dompdf.github.com/
+ *
  * @author  Benj Carson <benjcarson@digitaljunkies.ca>
  * @author  Helmut Tischer <htischer@weihenstephan.org>
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\Renderer;
 
-use Dompdf\Helpers;
 use Dompdf\Frame;
+use Dompdf\Helpers;
 use Dompdf\Image\Cache;
 use Dompdf\FrameDecorator\ListBullet as ListBulletFrameDecorator;
 
 /**
- * Renders list bullets
- *
- * @access  private
- * @package dompdf
+ * Renders list bullets.
  */
-class ListBullet extends AbstractRenderer
-{
+class ListBullet extends AbstractRenderer {
     /**
      * @param $type
+     *
      * @return mixed|string
      */
-    static function get_counter_chars($type)
-    {
-        static $cache = array();
+    public static function get_counter_chars($type) {
+        static $cache = [];
 
         if (isset($cache[$type])) {
             return $cache[$type];
         }
 
         $uppercase = false;
-        $text = "";
+        $text = '';
 
         switch ($type) {
-            case "decimal-leading-zero":
-            case "decimal":
-            case "1":
-                return "0123456789";
+            case 'decimal-leading-zero':
+            case 'decimal':
+            case '1':
+                return '0123456789';
 
-            case "upper-alpha":
-            case "upper-latin":
-            case "A":
+            case 'upper-alpha':
+            case 'upper-latin':
+            case 'A':
                 $uppercase = true;
-            case "lower-alpha":
-            case "lower-latin":
-            case "a":
-                $text = "abcdefghijklmnopqrstuvwxyz";
+                // no break
+            case 'lower-alpha':
+            case 'lower-latin':
+            case 'a':
+                $text = 'abcdefghijklmnopqrstuvwxyz';
+
                 break;
 
-            case "upper-roman":
-            case "I":
+            case 'upper-roman':
+            case 'I':
                 $uppercase = true;
-            case "lower-roman":
-            case "i":
-                $text = "ivxlcdm";
+                // no break
+            case 'lower-roman':
+            case 'i':
+                $text = 'ivxlcdm';
+
                 break;
 
-            case "lower-greek":
+            case 'lower-greek':
                 for ($i = 0; $i < 24; $i++) {
                     $text .= Helpers::unichr($i + 944);
                 }
+
                 break;
         }
 
@@ -71,53 +73,58 @@ class ListBullet extends AbstractRenderer
             $text = strtoupper($text);
         }
 
-        return $cache[$type] = "$text.";
+        return $cache[$type] = "${text}.";
     }
 
     /**
-     * @param integer $n
+     * @param int    $n
      * @param string $type
-     * @param integer $pad
+     * @param int    $pad
      *
      * @return string
      */
-    private function make_counter($n, $type, $pad = null)
-    {
+    private function make_counter($n, $type, $pad = null) {
         $n = intval($n);
-        $text = "";
+        $text = '';
         $uppercase = false;
 
         switch ($type) {
-            case "decimal-leading-zero":
-            case "decimal":
-            case "1":
+            case 'decimal-leading-zero':
+            case 'decimal':
+            case '1':
                 if ($pad) {
-                    $text = str_pad($n, $pad, "0", STR_PAD_LEFT);
+                    $text = str_pad($n, $pad, '0', STR_PAD_LEFT);
                 } else {
                     $text = $n;
                 }
+
                 break;
 
-            case "upper-alpha":
-            case "upper-latin":
-            case "A":
+            case 'upper-alpha':
+            case 'upper-latin':
+            case 'A':
                 $uppercase = true;
-            case "lower-alpha":
-            case "lower-latin":
-            case "a":
+                // no break
+            case 'lower-alpha':
+            case 'lower-latin':
+            case 'a':
                 $text = chr(($n % 26) + ord('a') - 1);
+
                 break;
 
-            case "upper-roman":
-            case "I":
+            case 'upper-roman':
+            case 'I':
                 $uppercase = true;
-            case "lower-roman":
-            case "i":
+                // no break
+            case 'lower-roman':
+            case 'i':
                 $text = Helpers::dec2roman($n);
+
                 break;
 
-            case "lower-greek":
+            case 'lower-greek':
                 $text = Helpers::unichr($n + 944);
+
                 break;
         }
 
@@ -125,17 +132,16 @@ class ListBullet extends AbstractRenderer
             $text = strtoupper($text);
         }
 
-        return "$text.";
+        return "${text}.";
     }
 
     /**
      * @param Frame $frame
      */
-    function render(Frame $frame)
-    {
+    public function render(Frame $frame) {
         $style = $frame->get_style();
         $font_size = $style->get_font_size();
-        $line_height = (float)$style->length_in_pt($style->line_height, $frame->get_containing_block("h"));
+        $line_height = (float) $style->length_in_pt($style->line_height, $frame->get_containing_block('h'));
 
         $this->_set_opacity($frame->get_opacity($style->opacity));
 
@@ -148,7 +154,7 @@ class ListBullet extends AbstractRenderer
 
         // Handle list-style-image
         // If list style image is requested but missing, fall back to predefined types
-        if ($style->list_style_image !== "none" && !Cache::is_broken($img = $frame->get_image_url())) {
+        if ($style->list_style_image !== 'none' && !Cache::is_broken($img = $frame->get_image_url())) {
             list($x, $y) = $frame->get_position();
 
             //For expected size and aspect, instead of box size, use image natural size scaled to DPI.
@@ -159,8 +165,8 @@ class ListBullet extends AbstractRenderer
             //$h = $frame->get_height();
             list($width, $height) = Helpers::dompdf_getimagesize($img, $this->_dompdf->getHttpContext());
             $dpi = $this->_dompdf->getOptions()->getDpi();
-            $w = ((float)rtrim($width, "px") * 72) / $dpi;
-            $h = ((float)rtrim($height, "px") * 72) / $dpi;
+            $w = ((float) rtrim($width, 'px') * 72) / $dpi;
+            $h = ((float) rtrim($height, 'px') * 72) / $dpi;
 
             $x -= $w;
             $y -= ($line_height - $font_size) / 2; //Reverse hinting of list_bullet_positioner
@@ -174,55 +180,59 @@ class ListBullet extends AbstractRenderer
             switch ($bullet_style) {
                 default:
                 /** @noinspection PhpMissingBreakStatementInspection */
-                case "disc":
+                // no break
+                case 'disc':
                     $fill = true;
 
-                case "circle":
+                    // no break
+                case 'circle':
                     list($x, $y) = $frame->get_position();
                     $r = ($font_size * (ListBulletFrameDecorator::BULLET_SIZE /*-ListBulletFrameDecorator::BULLET_THICKNESS*/)) / 2;
                     $x -= $font_size * (ListBulletFrameDecorator::BULLET_SIZE / 2);
                     $y += ($font_size * (1 - ListBulletFrameDecorator::BULLET_DESCENT)) / 2;
                     $o = $font_size * ListBulletFrameDecorator::BULLET_THICKNESS;
                     $this->_canvas->circle($x, $y, $r, $style->color, $o, null, $fill);
+
                     break;
 
-                case "square":
+                case 'square':
                     list($x, $y) = $frame->get_position();
                     $w = $font_size * ListBulletFrameDecorator::BULLET_SIZE;
                     $x -= $w;
                     $y += ($font_size * (1 - ListBulletFrameDecorator::BULLET_DESCENT - ListBulletFrameDecorator::BULLET_SIZE)) / 2;
                     $this->_canvas->filled_rectangle($x, $y, $w, $w, $style->color);
+
                     break;
 
-                case "decimal-leading-zero":
-                case "decimal":
-                case "lower-alpha":
-                case "lower-latin":
-                case "lower-roman":
-                case "lower-greek":
-                case "upper-alpha":
-                case "upper-latin":
-                case "upper-roman":
-                case "1": // HTML 4.0 compatibility
-                case "a":
-                case "i":
-                case "A":
-                case "I":
+                case 'decimal-leading-zero':
+                case 'decimal':
+                case 'lower-alpha':
+                case 'lower-latin':
+                case 'lower-roman':
+                case 'lower-greek':
+                case 'upper-alpha':
+                case 'upper-latin':
+                case 'upper-roman':
+                case '1': // HTML 4.0 compatibility
+                case 'a':
+                case 'i':
+                case 'A':
+                case 'I':
                     $pad = null;
-                    if ($bullet_style === "decimal-leading-zero") {
-                        $pad = strlen($li->get_parent()->get_node()->getAttribute("dompdf-children-count"));
+                    if ($bullet_style === 'decimal-leading-zero') {
+                        $pad = strlen($li->get_parent()->get_node()->getAttribute('dompdf-children-count'));
                     }
 
                     $node = $frame->get_node();
 
-                    if (!$node->hasAttribute("dompdf-counter")) {
+                    if (!$node->hasAttribute('dompdf-counter')) {
                         return;
                     }
 
-                    $index = $node->getAttribute("dompdf-counter");
+                    $index = $node->getAttribute('dompdf-counter');
                     $text = $this->make_counter($index, $bullet_style, $pad);
 
-                    if (trim($text) == "") {
+                    if (trim($text) == '') {
                         return;
                     }
 
@@ -230,7 +240,7 @@ class ListBullet extends AbstractRenderer
                     $font_family = $style->font_family;
 
                     $line = $li->get_containing_line();
-                    list($x, $y) = array($frame->get_position("x"), $line->y);
+                    list($x, $y) = [$frame->get_position('x'), $line->y];
 
                     $x -= $this->_dompdf->getFontMetrics()->getTextWidth($text, $font_family, $font_size, $spacing);
 
@@ -238,17 +248,24 @@ class ListBullet extends AbstractRenderer
                     $line_height = $style->line_height;
                     $y += ($line_height - $font_size) / 4; // FIXME I thought it should be 2, but 4 gives better results
 
-                    $this->_canvas->text($x, $y, $text,
-                        $font_family, $font_size,
-                        $style->color, $spacing);
+                    $this->_canvas->text(
+                        $x,
+                        $y,
+                        $text,
+                        $font_family,
+                        $font_size,
+                        $style->color,
+                        $spacing
+                    );
 
-                case "none":
+                    // no break
+                case 'none':
                     break;
             }
         }
 
-        $id = $frame->get_node()->getAttribute("id");
-        if (strlen($id) > 0)  {
+        $id = $frame->get_node()->getAttribute('id');
+        if (strlen($id) > 0) {
             $this->_canvas->add_named_dest($id);
         }
     }

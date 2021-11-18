@@ -1,37 +1,33 @@
 <?php
 /**
- * @package dompdf
  * @link    http://dompdf.github.com/
+ *
  * @author  Benj Carson <benjcarson@digitaljunkies.ca>
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameReflower;
 
 use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
 use Dompdf\FrameDecorator\Table as TableFrameDecorator;
 
 /**
- * Reflows table row groups (e.g. tbody tags)
- *
- * @package dompdf
+ * Reflows table row groups (e.g. tbody tags).
  */
-class TableRowGroup extends AbstractFrameReflower
-{
-
+class TableRowGroup extends AbstractFrameReflower {
     /**
      * TableRowGroup constructor.
+     *
      * @param \Dompdf\Frame $frame
      */
-    function __construct($frame)
-    {
+    public function __construct($frame) {
         parent::__construct($frame);
     }
 
     /**
-     * @param BlockFrameDecorator|null $block
+     * @param null|BlockFrameDecorator $block
      */
-    function reflow(BlockFrameDecorator $block = null)
-    {
+    public function reflow(BlockFrameDecorator $block = null) {
         $page = $this->_frame->get_root();
 
         $style = $this->_frame->get_style();
@@ -47,7 +43,7 @@ class TableRowGroup extends AbstractFrameReflower
                 return;
             }
 
-            $child->set_containing_block($cb["x"], $cb["y"], $cb["w"], $cb["h"]);
+            $child->set_containing_block($cb['x'], $cb['y'], $cb['w'], $cb['h']);
             $child->reflow();
 
             // Check if a split has occured
@@ -64,9 +60,9 @@ class TableRowGroup extends AbstractFrameReflower
 
         $this->_frame->set_position($cellmap->get_frame_position($this->_frame));
 
-        if ($table->get_style()->border_collapse === "collapse") {
+        if ($table->get_style()->border_collapse === 'collapse') {
             // Unset our borders because our cells are now using them
-            $style->border_style = "none";
+            $style->border_style = 'none';
         }
     }
 }
