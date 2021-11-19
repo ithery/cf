@@ -219,17 +219,17 @@ return [
 
     'ssl' => [
 
-        'local_cert' => c::env('LARAVEL_WEBSOCKETS_SSL_LOCAL_CERT', null),
+        'local_cert' => c::env('CF_WEBSOCKETS_SSL_LOCAL_CERT', null),
 
-        'capath' => c::env('LARAVEL_WEBSOCKETS_SSL_CA', null),
+        'capath' => c::env('CF_WEBSOCKETS_SSL_CA', null),
 
-        'local_pk' => c::env('LARAVEL_WEBSOCKETS_SSL_LOCAL_PK', null),
+        'local_pk' => c::env('CF_WEBSOCKETS_SSL_LOCAL_PK', null),
 
-        'passphrase' => c::env('LARAVEL_WEBSOCKETS_SSL_PASSPHRASE', null),
+        'passphrase' => c::env('CF_WEBSOCKETS_SSL_PASSPHRASE', null),
 
-        'verify_peer' => c::env('APP_ENV') === 'production',
+        'verify_peer' => CF::isProduction(),
 
-        'allow_self_signed' => c::env('APP_ENV') !== 'production',
+        'allow_self_signed' => !CF::isProduction(),
 
     ],
 
@@ -247,17 +247,17 @@ return [
 
     'handlers' => [
 
-        'websocket' => \BeyondCode\LaravelWebSockets\Server\WebSocketHandler::class,
+        'websocket' => \CWebSocket_Handler_WebSocketHandler::class,
 
-        'health' => \BeyondCode\LaravelWebSockets\Server\HealthHandler::class,
+        'health' => \CWebSocket_Handler_HealthHandler::class,
 
-        'trigger_event' => \BeyondCode\LaravelWebSockets\API\TriggerEvent::class,
+        'trigger_event' => \CWebSocket_Handler_ApiHandler_TriggerEvent::class,
 
-        'fetch_channels' => \BeyondCode\LaravelWebSockets\API\FetchChannels::class,
+        'fetch_channels' => \CWebSocket_Handler_ApiHandler_FetchChannels::class,
 
-        'fetch_channel' => \BeyondCode\LaravelWebSockets\API\FetchChannel::class,
+        'fetch_channel' => \CWebSocket_Handler_ApiHandler_FetchChannel::class,
 
-        'fetch_users' => \BeyondCode\LaravelWebSockets\API\FetchUsers::class,
+        'fetch_users' => \CWebSocket_Handler_ApiHandler_FetchUsers::class,
 
     ],
 

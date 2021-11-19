@@ -54,7 +54,7 @@ class CWebSocket_ServerFactory {
      *
      * @return void
      */
-    public function __construct(string $host, int $port) {
+    public function __construct($host, $port) {
         $this->host = $host;
         $this->port = $port;
 
@@ -105,7 +105,7 @@ class CWebSocket_ServerFactory {
      *
      * @return \Ratchet\Server\IoServer
      */
-    public function createServer(): IoServer {
+    public function createServer() {
         $socket = new Server("{$this->host}:{$this->port}", $this->loop);
 
         if (CF::config('websocket.ssl.local_cert')) {

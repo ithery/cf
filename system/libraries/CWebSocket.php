@@ -75,8 +75,11 @@ class CWebSocket {
         static::$connectionLogger = $logger;
     }
 
+    /**
+     * @return CWebSocket_Router
+     */
     public static function router() {
-        return CWebSocket::router();
+        return CWebSocket_Router::instance();
     }
 
     public static function statisticStore() {

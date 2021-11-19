@@ -2,7 +2,7 @@
 
 use Ratchet\RFC6455\Messaging\MessageInterface;
 
-class WebSocketMessageReceived {
+class CWebSocket_Event_MessageReceived {
     use CEvent_Trait_Dispatchable, CQueue_Trait_SerializesModels;
 
     /**

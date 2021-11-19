@@ -18,7 +18,7 @@ class CWebSocket_Server_Logger_HttpLogger extends CWebSocket_Server_Logger imple
      *
      * @return self
      */
-    public static function decorate(MessageComponentInterface $app): self {
+    public static function decorate(MessageComponentInterface $app) {
         $logger = CWebSocket::httpLogger();
 
         return $logger->setApp($app);
