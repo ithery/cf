@@ -44,7 +44,6 @@ export default class Cresenity {
         };
         this.confirmHandler = defaultConfirmHandler;
         this.dispatchWindowEvent = dispatchWindowEvent;
-        this.Alpine = Alpine;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -950,7 +949,8 @@ export default class Cresenity {
     }
 
     initAlpine() {
-        this.Alpine.start();
+        window.Alpine = Alpine;
+        window.Alpine.start();
     }
     init() {
         this.cf.onBeforeInit(() => {
