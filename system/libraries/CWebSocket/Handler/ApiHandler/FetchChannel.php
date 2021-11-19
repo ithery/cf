@@ -30,7 +30,7 @@ class CWebSocket_Handler_ApiHandler_FetchChannel extends CWebSocket_Handler_ApiH
                             return [
                                 'occupied' => $connectionsCount > 0,
                                 'subscription_count' => $connectionsCount,
-                                'user_count' => $channelMembers[$request->channelName] ?? 0,
+                                'user_count' => isset($channelMembers[$request->channelName]) ? $channelMembers[$request->channelName] : 0,
                             ];
                         });
                 }

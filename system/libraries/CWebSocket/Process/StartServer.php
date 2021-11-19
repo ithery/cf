@@ -232,7 +232,7 @@ class CWebSocket_Process_StartServer {
      * @return void
      */
     protected function startServer() {
-        $this->writeLn("Starting the WebSocket server on port {$this->port}...");
+        $this->writeLn("Starting the WebSocket server {$this->host} on port {$this->port}...");
 
         $this->buildServer();
 

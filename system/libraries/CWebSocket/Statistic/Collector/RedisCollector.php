@@ -51,7 +51,7 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
      */
     public function webSocketMessage($appId) {
         $this->ensureAppIsInSet($appId)
-            ->hincrby($this->channelManager->getStatsRedisHash($appId, null), 'websocket_messages_count', 1);
+            ->hincrby($this->channelManager->getStatsRedisHash($appId, null), 'websocket_message_count', 1);
     }
 
     /**
@@ -63,7 +63,7 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
      */
     public function apiMessage($appId) {
         $this->ensureAppIsInSet($appId)
-            ->hincrby($this->channelManager->getStatsRedisHash($appId, null), 'api_messages_count', 1);
+            ->hincrby($this->channelManager->getStatsRedisHash($appId, null), 'api_message_count', 1);
     }
 
     /**
@@ -78,7 +78,7 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
         $this->ensureAppIsInSet($appId)
             ->hincrby(
                 $this->channelManager->getStatsRedisHash($appId, null),
-                'current_connections_count',
+                'current_connection_count',
                 1
             )
             ->then(function ($currentConnectionsCount) use ($appId) {
@@ -87,7 +87,7 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
                     ->getPublishClient()
                     ->hget(
                         $this->channelManager->getStatsRedisHash($appId, null),
-                        'peak_connections_count'
+                        'peak_connection_count'
                     )
                     ->then(function ($currentPeakConnectionCount) use ($currentConnectionsCount, $appId) {
                         // Extract the greatest number between the current peak connection count
@@ -101,7 +101,7 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
                             ->getPublishClient()
                             ->hset(
                                 $this->channelManager->getStatsRedisHash($appId, null),
-                                'peak_connections_count',
+                                'peak_connection_count',
                                 $peakConnectionsCount
                             );
                     });
@@ -118,12 +118,12 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
     public function disconnection($appId) {
         // Decrement the current connections count by 1.
         $this->ensureAppIsInSet($appId)
-            ->hincrby($this->channelManager->getStatsRedisHash($appId, null), 'current_connections_count', -1)
+            ->hincrby($this->channelManager->getStatsRedisHash($appId, null), 'current_connection_count', -1)
             ->then(function ($currentConnectionsCount) use ($appId) {
                 // Get the peak connections count from Redis.
                 $this->channelManager
                     ->getPublishClient()
-                    ->hget($this->channelManager->getStatsRedisHash($appId, null), 'peak_connections_count')
+                    ->hget($this->channelManager->getStatsRedisHash($appId, null), 'peak_connection_count')
                     ->then(function ($currentPeakConnectionCount) use ($currentConnectionsCount, $appId) {
                         // Extract the greatest number between the current peak connection count
                         // and the current connection number.
@@ -136,7 +136,7 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
                             ->getPublishClient()
                             ->hset(
                                 $this->channelManager->getStatsRedisHash($appId, null),
-                                'peak_connections_count',
+                                'peak_connection_count',
                                 $peakConnectionsCount
                             );
                     });
@@ -260,7 +260,7 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
             ->getPublishClient()
             ->hset(
                 $this->channelManager->getStatsRedisHash($appId, null),
-                'current_connections_count',
+                'current_connection_count',
                 $currentConnectionCount
             );
 
@@ -268,7 +268,7 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
             ->getPublishClient()
             ->hset(
                 $this->channelManager->getStatsRedisHash($appId, null),
-                'peak_connections_count',
+                'peak_connection_count',
                 max(0, $currentConnectionCount)
             );
 
@@ -276,7 +276,7 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
             ->getPublishClient()
             ->hset(
                 $this->channelManager->getStatsRedisHash($appId, null),
-                'websocket_messages_count',
+                'websocket_message_count',
                 0
             );
 
@@ -284,7 +284,7 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
             ->getPublishClient()
             ->hset(
                 $this->channelManager->getStatsRedisHash($appId, null),
-                'api_messages_count',
+                'api_message_count',
                 0
             );
     }
@@ -304,28 +304,28 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
             ->getPublishClient()
             ->hdel(
                 $this->channelManager->getStatsRedisHash($appId, null),
-                'current_connections_count'
+                'current_connection_count'
             );
 
         $this->channelManager
             ->getPublishClient()
             ->hdel(
                 $this->channelManager->getStatsRedisHash($appId, null),
-                'peak_connections_count'
+                'peak_connection_count'
             );
 
         $this->channelManager
             ->getPublishClient()
             ->hdel(
                 $this->channelManager->getStatsRedisHash($appId, null),
-                'websocket_messages_count'
+                'websocket_message_count'
             );
 
         $this->channelManager
             ->getPublishClient()
             ->hdel(
                 $this->channelManager->getStatsRedisHash($appId, null),
-                'api_messages_count'
+                'api_message_count'
             );
 
         $this->channelManager
@@ -366,10 +366,10 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
      * @return \CWebSocket_Statistic
      */
     protected function arrayToStatisticInstance($appId, array $stats) {
-        return CWebSocket_Statistic::new($appId)
-            ->setCurrentConnectionsCount(isset($stats['current_connections_count']) ? $stats['current_connections_count'] : 0)
-            ->setPeakConnectionsCount(isset($stats['peak_connections_count']) ? $stats['peak_connections_count'] : 0)
-            ->setWebSocketMessagesCount(isset($stats['websocket_messages_count']) ? $stats['websocket_messages_count'] : 0)
-            ->setApiMessagesCount(isset($stats['websocket_messages_count']) ? $stats['websocket_messages_count'] : 0);
+        return CWebSocket_Statistic::createNew($appId)
+            ->setCurrentConnectionsCount(isset($stats['current_connection_count']) ? $stats['current_connection_count'] : 0)
+            ->setPeakConnectionsCount(isset($stats['peak_connection_count']) ? $stats['peak_connection_count'] : 0)
+            ->setWebSocketMessagesCount(isset($stats['websocket_message_count']) ? $stats['websocket_message_count'] : 0)
+            ->setApiMessagesCount(isset($stats['api_message_count']) ? $stats['api_message_count'] : 0);
     }
 }

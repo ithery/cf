@@ -1,6 +1,6 @@
 <?php
 
-interface CWebSocket_Contract_AppManager {
+interface CWebSocket_Contract_AppManagerInterface {
     /**
      * Get all apps.
      *

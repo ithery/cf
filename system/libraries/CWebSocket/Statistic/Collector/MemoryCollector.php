@@ -81,6 +81,7 @@ class CWebSocket_Statistic_Collector_MemoryCollector implements CWebSocket_Contr
     public function save() {
         $this->getStatistics()->then(function ($statistics) {
             foreach ($statistics as $appId => $statistic) {
+                /** @var CWebSocket_Statistic $statistic */
                 if (!$statistic->isEnabled()) {
                     continue;
                 }
@@ -156,7 +157,7 @@ class CWebSocket_Statistic_Collector_MemoryCollector implements CWebSocket_Contr
      */
     protected function findOrMake($appId) {
         if (!isset($this->statistics[$appId])) {
-            $this->statistics[$appId] = CWebSocket_Statistic::new($appId);
+            $this->statistics[$appId] = CWebSocket_Statistic::createNew($appId);
         }
 
         return $this->statistics[$appId];

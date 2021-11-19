@@ -1,8 +1,6 @@
 <?php
 
 use Ratchet\ConnectionInterface;
-use CWebSocket_Contract_PusherMessageInterface;
-use CWebSocket_Contract_ChannelManagerInterface;
 
 class CWebSocket_Message_PusherClientMessage implements CWebSocket_Contract_PusherMessageInterface {
     /**

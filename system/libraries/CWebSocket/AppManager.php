@@ -1,6 +1,6 @@
 <?php
 
-class CWebSocket_AppManager implements CWebSocket_AppManager {
+class CWebSocket_AppManager implements CWebSocket_Contract_AppManagerInterface {
     /**
      * The list of apps.
      *

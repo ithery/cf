@@ -54,7 +54,7 @@ class CWebSocket_Statistic {
      *
      * @return \CWebSocket_Statistic
      */
-    public static function new($appId) {
+    public static function createNew($appId) {
         return new static($appId);
     }
 
@@ -192,9 +192,9 @@ class CWebSocket_Statistic {
     public function toArray() {
         return [
             'app_id' => $this->appId,
-            'peak_connections_count' => $this->peakConnectionsCount,
-            'websocket_messages_count' => $this->webSocketMessagesCount,
-            'api_messages_count' => $this->apiMessagesCount,
+            'peak_connection_count' => $this->peakConnectionsCount,
+            'websocket_message_count' => $this->webSocketMessagesCount,
+            'api_message_count' => $this->apiMessagesCount,
         ];
     }
 }

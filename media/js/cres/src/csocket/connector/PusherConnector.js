@@ -114,7 +114,10 @@ export class PusherConnector extends Connector {
      * Get the socket ID for the connection.
      */
     socketId() {
-        return this.pusher.connection.socket_id;
+        if(this.pusher && this.pusher.connection) {
+            return this.pusher.connection.socket_id;
+        }
+        return null;
     }
 
     /**

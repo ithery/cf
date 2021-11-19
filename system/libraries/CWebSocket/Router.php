@@ -76,7 +76,7 @@ class CWebSocket_Router {
         $this->get('/apps/{appId}/channels', CF::config('websocket.handlers.fetch_channels'));
         $this->get('/apps/{appId}/channels/{channelName}', CF::config('websocket.handlers.fetch_channel'));
         $this->get('/apps/{appId}/channels/{channelName}/users', CF::config('websocket.handlers.fetch_users'));
-        $this->get('/health', CF::config('websockets.handler.health'));
+        $this->get('/health', CF::config('websocket.handlers.health'));
         $this->registerCustomRoutes();
     }
 
@@ -192,7 +192,7 @@ class CWebSocket_Router {
     protected function getRoute($method, $uri, $action) {
         $action = is_subclass_of($action, MessageComponentInterface::class)
             ? $this->createWebSocketsServer($action)
-            : c::container($action);
+            : $this->createAction($action);
 
         return new Route($uri, ['_controller' => $action], [], [], null, [], [$method]);
     }
@@ -205,12 +205,20 @@ class CWebSocket_Router {
      * @return \Ratchet\WebSocket\WsServer
      */
     protected function createWebSocketsServer($action) {
-        $app = c::container($action);
+        $app = $this->createAction($action);
 
         if (CWebSocket_Server_Logger_WebSocketLogger::isEnabled()) {
             $app = CWebSocket_Server_Logger_WebSocketLogger::decorate($app);
         }
 
         return new WsServer($app);
+    }
+
+    public static function createAction($action) {
+        if (!class_exists($action)) {
+            throw new Exception('class ' . $action . ' not exists');
+        }
+
+        return new $action();
     }
 }

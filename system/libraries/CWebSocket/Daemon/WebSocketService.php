@@ -14,10 +14,10 @@ class CWebSocket_Daemon_WebSocketService extends CDaemon_ServiceAbstract {
         $options['debug'] = CF::config('app.debug');
         $options['loop'] = null;
         $this->websocketOptions = $options;
+        $process = new CWebSocket_Process_StartServer($this->websocketOptions, new CDaemon_Output());
+        $process->start();
     }
 
     public function execute() {
-        $process = new CWebSocket_Process_StartServer($this->websocketOptions, new CDaemon_Output());
-        $process->start();
     }
 }

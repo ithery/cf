@@ -32,13 +32,11 @@ class CWebSocket_Handler_WebSocketHandler implements MessageComponentInterface {
         if (!$this->connectionCanBeMade($connection)) {
             return $connection->close();
         }
-
         $this->verifyAppKey($connection)
             ->verifyOrigin($connection)
             ->limitConcurrentConnections($connection)
             ->generateSocketId($connection)
             ->establishConnection($connection);
-
         if (isset($connection->app)) {
             /** @var \GuzzleHttp\Psr7\Request $request */
             $request = $connection->httpRequest;
@@ -48,14 +46,12 @@ class CWebSocket_Handler_WebSocketHandler implements MessageComponentInterface {
             }
 
             $this->channelManager->subscribeToApp($connection->app->id);
-
             $this->channelManager->connectionPonged($connection);
 
             CWebSocket_DashboardLogger::log($connection->app->id, CWebSocket_DashboardLogger::TYPE_CONNECTED, [
                 'origin' => "{$request->getUri()->getScheme()}://{$request->getUri()->getHost()}",
                 'socketId' => $connection->socketId,
             ]);
-
             CWebSocket_Event_NewConnection::dispatch($connection->app->id, $connection->socketId);
         }
     }
@@ -178,7 +174,7 @@ class CWebSocket_Handler_WebSocketHandler implements MessageComponentInterface {
             return $this;
         }
 
-        $header = (string) ($connection->httpRequest->getHeader('Origin')[0] ?? null);
+        $header = (string) (isset($connection->httpRequest->getHeader('Origin')[0]) ? $connection->httpRequest->getHeader('Origin')[0] : null);
 
         $origin = parse_url($header, PHP_URL_HOST) ?: $header;
 

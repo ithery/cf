@@ -134,10 +134,12 @@ abstract class CWebSocket_Handler_ApiHandlerAbstract implements HttpServerInterf
      *
      * @return int
      */
-    protected function findContentLength(array $headers): int {
-        return CCollection::make($headers)->first(function ($values, $header) {
+    protected function findContentLength(array $headers) {
+        $contentLength = CCollection::make($headers)->first(function ($values, $header) {
             return strtolower($header) === 'content-length';
-        })[0] ?? 0;
+        });
+
+        return isset($contentLength[0]) ? $contentLength[0] : 0;
     }
 
     /**

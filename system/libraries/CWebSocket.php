@@ -20,26 +20,15 @@ class CWebSocket {
         return CWebSocket_AppManager::instance();
     }
 
+    /**
+     * @return CWebSocket_Contract_ChannelManagerInterface
+     */
     public static function channelManager() {
-        if (static::$channelManager == null) {
-            $mode = CF::config('websocket.replication.mode', 'local');
-            $class = CF::config('websocket.replication.modes,' . $mode . '.channel_manager');
-            static::$channelManager = new $class(static::loop());
-        }
-
         return static::$channelManager;
     }
 
     public static function setChannelManager($channelManager) {
         static::$channelManager = $channelManager;
-    }
-
-    public static function loop() {
-        if (static::$loop == null) {
-            static::$loop = LoopFactory::create();
-        }
-
-        return static::$loop;
     }
 
     /**
@@ -82,6 +71,9 @@ class CWebSocket {
         return CWebSocket_Router::instance();
     }
 
+    /**
+     * @return CWebSocket_Statistic_Store_DatabaseStore
+     */
     public static function statisticStore() {
         if (static::$statisticStore == null) {
             $class = CF::config('websocket.store');

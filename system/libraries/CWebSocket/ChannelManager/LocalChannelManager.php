@@ -130,7 +130,7 @@ class CWebSocket_ChannelManager_LocalChannelManager implements CWebSocket_Contra
      */
     public function getLocalChannels($appId) {
         return CWebSocket_Helper::createFulfilledPromise(
-            $this->channels[$appId] ?? []
+            isset($this->channels[$appId]) ? $this->channels[$appId] : []
         );
     }
 
@@ -348,7 +348,7 @@ class CWebSocket_ChannelManager_LocalChannelManager implements CWebSocket_Contra
      * @return \React\Promise\PromiseInterface
      */
     public function getChannelMembers($appId, $channel) {
-        $members = $this->users["{$appId}:{$channel}"] ?? [];
+        $members = isset($this->users["{$appId}:{$channel}"]) ? $this->users["{$appId}:{$channel}"] : [];
 
         $members = c::collect($members)->map(function ($user) {
             return json_decode($user);
@@ -366,7 +366,7 @@ class CWebSocket_ChannelManager_LocalChannelManager implements CWebSocket_Contra
      * @return \React\Promise\PromiseInterface
      */
     public function getChannelMember(ConnectionInterface $connection, $channel) {
-        $member = $this->users["{$connection->app->id}:{$channel}"][$connection->socketId] ?? null;
+        $member = isset($this->users["{$connection->app->id}:{$channel}"][$connection->socketId]) ? $this->users["{$connection->app->id}:{$channel}"][$connection->socketId] : null;
 
         return CWebSocket_Helper::createFulfilledPromise($member);
     }
@@ -456,6 +456,7 @@ class CWebSocket_ChannelManager_LocalChannelManager implements CWebSocket_Contra
         return $this->getLocalChannels($connection->app->id)
             ->then(function ($channels) use ($connection) {
                 foreach ($channels as $channel) {
+                    /** @var CWebsocket_Channel $channel */
                     if ($channel->hasConnection($connection)) {
                         $channel->saveConnection($connection);
                     }

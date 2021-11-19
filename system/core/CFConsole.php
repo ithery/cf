@@ -59,7 +59,6 @@ class CFConsole {
 
     public static function execute() {
         $kernel = new CConsole_Kernel();
-
         $commands = array_merge(static::$defaultCommands, static::$commands);
         CConsole_Application::starting(function ($cfCli) use ($commands) {
             $cfCli->resolveCommands($commands);

@@ -75,7 +75,7 @@ class CWebSocket_Server_Logger_WebSocketLogger extends CWebSocket_Server_Logger 
      * @return void
      */
     public function onClose(ConnectionInterface $connection) {
-        $socketId = $connection->socketId ?? null;
+        $socketId = $connection->socketId ?: null;
 
         $this->warn("Connection id {$socketId} closed.");
 
@@ -93,7 +93,7 @@ class CWebSocket_Server_Logger_WebSocketLogger extends CWebSocket_Server_Logger 
     public function onError(ConnectionInterface $connection, Exception $exception) {
         $exceptionClass = get_class($exception);
 
-        $appId = $connection->app->id ?? 'Unknown app id';
+        $appId = $connection->app->id ?: 'Unknown app id';
 
         $message = "{$appId}: exception `{$exceptionClass}` thrown: `{$exception->getMessage()}`.";
 

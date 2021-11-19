@@ -19,7 +19,9 @@ class CWebSocket_Statistic_Store_DatabaseStore implements CWebSocket_Contract_St
      * @return mixed
      */
     public static function store(array $data) {
-        return static::$model::create($data);
+        $model = static::$model;
+
+        return $model::create($data);
     }
 
     /**
@@ -32,8 +34,8 @@ class CWebSocket_Statistic_Store_DatabaseStore implements CWebSocket_Contract_St
      *
      * @return int
      */
-    public static function delete(Carbon $moment, $appId = null): int {
-        return static::$model::where('created_at', '<', $moment->toDateTimeString())
+    public static function delete(Carbon $moment, $appId = null) {
+        return static::$model::where('created', '<', $moment->toDateTimeString())
             ->when(!is_null($appId), function ($query) use ($appId) {
                 return $query->whereAppId($appId);
             })
@@ -64,7 +66,7 @@ class CWebSocket_Statistic_Store_DatabaseStore implements CWebSocket_Contract_St
      *
      * @return array
      */
-    public function getRecords(callable $processQuery = null, callable $processCollection = null): array {
+    public function getRecords(callable $processQuery = null, callable $processCollection = null) {
         return $this->getRawRecords($processQuery)
             ->when(!is_null($processCollection), function ($collection) use ($processCollection) {
                 return call_user_func($processCollection, $collection);
@@ -84,7 +86,7 @@ class CWebSocket_Statistic_Store_DatabaseStore implements CWebSocket_Contract_St
      *
      * @return array
      */
-    public function getForGraph(callable $processQuery = null, callable $processCollection = null): array {
+    public function getForGraph(callable $processQuery = null, callable $processCollection = null) {
         $statistics = c::collect(
             $this->getRecords($processQuery, $processCollection)
         );
@@ -99,12 +101,12 @@ class CWebSocket_Statistic_Store_DatabaseStore implements CWebSocket_Contract_St
      *
      * @return array
      */
-    protected function statisticToArray(CModel $statistic): array {
+    protected function statisticToArray(CModel $statistic) {
         return [
-            'timestamp' => (string) $statistic->created_at,
-            'peak_connections_count' => $statistic->peak_connections_count,
-            'websocket_messages_count' => $statistic->websocket_messages_count,
-            'api_messages_count' => $statistic->api_messages_count,
+            'timestamp' => (string) $statistic->created,
+            'peak_connection_count' => $statistic->peak_connection_count,
+            'websocket_message_count' => $statistic->websocket_message_count,
+            'api_message_count' => $statistic->api_message_count,
         ];
     }
 
@@ -117,17 +119,17 @@ class CWebSocket_Statistic_Store_DatabaseStore implements CWebSocket_Contract_St
      */
     protected function statisticsToGraph(CCollection $statistics): array {
         return [
-            'peak_connections' => [
+            'peak_connection' => [
                 'x' => $statistics->pluck('timestamp')->toArray(),
-                'y' => $statistics->pluck('peak_connections_count')->toArray(),
+                'y' => $statistics->pluck('peak_connection_count')->toArray(),
             ],
-            'websocket_messages_count' => [
+            'websocket_message_count' => [
                 'x' => $statistics->pluck('timestamp')->toArray(),
-                'y' => $statistics->pluck('websocket_messages_count')->toArray(),
+                'y' => $statistics->pluck('websocket_message_count')->toArray(),
             ],
-            'api_messages_count' => [
+            'api_message_count' => [
                 'x' => $statistics->pluck('timestamp')->toArray(),
-                'y' => $statistics->pluck('api_messages_count')->toArray(),
+                'y' => $statistics->pluck('api_message_count')->toArray(),
             ],
         ];
     }
