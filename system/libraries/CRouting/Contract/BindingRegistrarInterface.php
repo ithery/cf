@@ -1,6 +1,11 @@
 <?php
 
-interface CRouting_BindingRegistrar {
+/**
+ * Description of BindingRegistrar.
+ *
+ * @author Hery
+ */
+interface CRouting_Contract_BindingRegistrarInterface {
     /**
      * Add a new route parameter binder.
      *
