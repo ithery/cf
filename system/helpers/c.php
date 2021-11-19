@@ -1435,6 +1435,10 @@ class c {
             return call_user_func_array($callable, func_get_args());
         };
     }
+
+    public static function broadcast($event = null) {
+        return CBroadcast::manager()->event($event);
+    }
 }
 
 // End c
