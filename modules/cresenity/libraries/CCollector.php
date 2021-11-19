@@ -185,6 +185,9 @@ class CCollector {
         $data['postData'] = $rawPost;
         $data['fileData'] = json_encode($_FILES);
 
+        $report = CException::manager()->createReport($exception)->toArray();
+        $data = array_merge($data, $report);
+
         return $data;
     }
 
