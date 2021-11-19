@@ -74,7 +74,7 @@ return [
 
     'replication' => [
 
-        'mode' => c::env('WEBSOCKETS_REPLICATION_MODE', 'local'),
+        'mode' => 'local',
 
         'modes' => [
 
@@ -100,7 +100,7 @@ return [
                 |
                 */
 
-                'channel_manager' => \BeyondCode\LaravelWebSockets\ChannelManagers\LocalChannelManager::class,
+                'channel_manager' => \CWebSocket_ChannelManager_LocalChannelManager::class,
 
                 /*
                 |--------------------------------------------------------------------------
@@ -113,7 +113,7 @@ return [
                 |
                 */
 
-                'collector' => \BeyondCode\LaravelWebSockets\Statistics\Collectors\MemoryCollector::class,
+                'collector' => \CWebSocket_Statistic_Collector_MemoryCollector::class,
 
             ],
 
@@ -131,7 +131,7 @@ return [
                 |
                 */
 
-                'channel_manager' => \BeyondCode\LaravelWebSockets\ChannelManagers\RedisChannelManager::class,
+                'channel_manager' => \CWebSocket_ChannelManager_RedisChannelManager::class,
 
                 /*
                 |--------------------------------------------------------------------------
@@ -144,7 +144,7 @@ return [
                 |
                 */
 
-                'collector' => \BeyondCode\LaravelWebSockets\Statistics\Collectors\RedisCollector::class,
+                'collector' => \CWebSocket_Statistic_Store_RedisCollector::class,
 
             ],
 
@@ -165,7 +165,7 @@ return [
         |
         */
 
-        'store' => \BeyondCode\LaravelWebSockets\Statistics\Stores\DatabaseStore::class,
+        'store' => \CWebSocket_Statistic_Store_DatabaseStore::class,
 
         /*
         |--------------------------------------------------------------------------
