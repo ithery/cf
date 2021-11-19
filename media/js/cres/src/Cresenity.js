@@ -15,6 +15,7 @@ import { confirmFromElement, defaultConfirmHandler } from './module/confirm-hand
 import appValidation from './module/validation';
 import ucfirst from 'locutus/php/strings/ucfirst';
 import Alpine from 'alpinejs';
+import CSocket from './csocket/CSocket';
 
 export default class Cresenity {
     constructor() {
@@ -44,6 +45,7 @@ export default class Cresenity {
         };
         this.confirmHandler = defaultConfirmHandler;
         this.dispatchWindowEvent = dispatchWindowEvent;
+        this.websocket = null;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
@@ -59,6 +61,9 @@ export default class Cresenity {
             };
         }
         document.getElementsByTagName('head')[0].appendChild(fileref);
+    }
+    createWebSocket(options) {
+        return new CSocket(options);
     }
     haveCallback(name) {
         return typeof this.callback[name] === 'function';
@@ -208,7 +213,6 @@ export default class Cresenity {
                 dataType: 'json',
                 data: dataAddition,
                 success: (data) => {
-                    console.log(data);
                     let isError = false;
                     if(typeof data.html === 'undefined') {
                         //error
