@@ -31,7 +31,7 @@ class CWebSocket_Server_Logger {
      * @return bool
      */
     public static function isEnabled() {
-        $logger = app(WebSocketsLogger::class);
+        $logger = CWebSocket::webSocketLogger();
 
         return $logger->enabled;
     }

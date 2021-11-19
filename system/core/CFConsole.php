@@ -54,6 +54,7 @@ class CFConsole {
         CConsole_Command_App_AppCodeCommand::class,
         CConsole_Command_TestInstallCommand::class,
         CConsole_Command_TestCommand::class,
+        CWebSocket_Console_Command_StartServer::class,
     ];
 
     public static function execute() {

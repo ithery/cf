@@ -45,7 +45,7 @@ class CWebSocket_DashboardLogger {
      * @return void
      */
     public static function log($appId, $type, array $details = []) {
-        $channelManager = c::container(ChannelManager::class);
+        $channelManager = CWebSocket::channelManager();
 
         $channelName = static::LOG_CHANNEL_PREFIX . $type;
 

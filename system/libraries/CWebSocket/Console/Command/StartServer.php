@@ -93,8 +93,8 @@ class CWebSocket_Console_Command_StartServer extends CWebSocket_Console_Command 
      */
     protected function configureManagers() {
         $mode = CF::config('websocket.replication.mode', 'local');
-        $class = CF::config('websocket.replication.modes,' . $mode . '.channel_manager');
-        $channelManager = new $class(static::loop());
+        $class = CF::config('websocket.replication.modes.' . $mode . '.channel_manager');
+        $channelManager = new $class($this->loop);
 
         CWebSocket::setChannelManager($channelManager);
     }
@@ -259,10 +259,11 @@ class CWebSocket_Console_Command_StartServer extends CWebSocket_Console_Command 
      * @return int
      */
     protected function getLastRestart() {
-        return Cache::get(
-            'beyondcode:websockets:restart',
-            0
-        );
+        return 0;
+        // return Cache::get(
+        //     'cf:websockets:restart',
+        //     0
+        // );
     }
 
     /**

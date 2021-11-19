@@ -1,6 +1,6 @@
 <?php
 
-class UnsubscribedFromChannel {
+class CWebSocket_Event_UnsubscribedFromChannel {
     use CEvent_Trait_Dispatchable, CQueue_Trait_SerializesModels;
 
     /**

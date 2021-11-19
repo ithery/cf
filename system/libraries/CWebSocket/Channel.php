@@ -52,7 +52,7 @@ class CWebsocket_Channel {
      *
      * @return bool
      */
-    public function hasConnections(): bool {
+    public function hasConnections() {
         return count($this->getConnections()) > 0;
     }
 
@@ -66,7 +66,7 @@ class CWebsocket_Channel {
      *
      * @return bool
      */
-    public function subscribe(ConnectionInterface $connection, stdClass $payload): bool {
+    public function subscribe(ConnectionInterface $connection, $payload) {
         $this->saveConnection($connection);
 
         $connection->send(json_encode([
@@ -95,14 +95,14 @@ class CWebsocket_Channel {
      *
      * @return bool
      */
-    public function unsubscribe(ConnectionInterface $connection): bool {
+    public function unsubscribe(ConnectionInterface $connection) {
         if (!$this->hasConnection($connection)) {
             return false;
         }
 
         unset($this->connections[$connection->socketId]);
 
-        UnsubscribedFromChannel::dispatch(
+        CWebSocket_Event_UnsubscribedFromChannel::dispatch(
             $connection->app->id,
             $connection->socketId,
             $this->getName()
@@ -118,7 +118,7 @@ class CWebsocket_Channel {
      *
      * @return bool
      */
-    public function hasConnection(ConnectionInterface $connection): bool {
+    public function hasConnection(ConnectionInterface $connection) {
         return isset($this->connections[$connection->socketId]);
     }
 
@@ -142,7 +142,7 @@ class CWebsocket_Channel {
      *
      * @return bool
      */
-    public function broadcast($appId, stdClass $payload, bool $replicate = true): bool {
+    public function broadcast($appId, $payload, $replicate = true) {
         c::collect($this->getConnections())
             ->each(function ($connection) use ($payload) {
                 $connection->send(json_encode($payload));
@@ -163,7 +163,7 @@ class CWebsocket_Channel {
      *
      * @return bool
      */
-    public function broadcastLocally($appId, stdClass $payload): bool {
+    public function broadcastLocally($appId, $payload) {
         return $this->broadcast($appId, $payload, false);
     }
 
@@ -177,7 +177,7 @@ class CWebsocket_Channel {
      *
      * @return bool
      */
-    public function broadcastToEveryoneExcept(stdClass $payload, ?string $socketId, $appId, bool $replicate = true) {
+    public function broadcastToEveryoneExcept($payload, $socketId, $appId, $replicate = true) {
         if ($replicate) {
             $this->channelManager->broadcastAcrossServers($appId, $socketId, $this->getName(), $payload);
         }
@@ -204,7 +204,7 @@ class CWebsocket_Channel {
      *
      * @return bool
      */
-    public function broadcastLocallyToEveryoneExcept(stdClass $payload, ?string $socketId, $appId) {
+    public function broadcastLocallyToEveryoneExcept($payload, $socketId, $appId) {
         return $this->broadcastToEveryoneExcept(
             $payload,
             $socketId,
@@ -219,11 +219,11 @@ class CWebsocket_Channel {
      * @param \Ratchet\ConnectionInterface $connection
      * @param \stdClass                    $payload
      *
-     * @throws InvalidSignature
+     * @throws CWebSocket_Exception_InvalidSignature
      *
      * @return void
      */
-    protected function verifySignature(ConnectionInterface $connection, stdClass $payload) {
+    protected function verifySignature(ConnectionInterface $connection, $payload) {
         $signature = "{$connection->socketId}:{$this->getName()}";
 
         if (isset($payload->channel_data)) {
