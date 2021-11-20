@@ -2,18 +2,17 @@
 
 namespace Pusher;
 
-use GuzzleHttp\ClientInterface;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\GuzzleException;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerAwareTrait;
-use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use GuzzleHttp\Psr7\Request;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LoggerAwareTrait;
+use GuzzleHttp\ClientInterface;
+use Psr\Log\LoggerAwareInterface;
 use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\ConnectException;
 
-class Pusher implements LoggerAwareInterface, PusherInterface
-{
+class Pusher implements LoggerAwareInterface, PusherInterface {
     use LoggerAwareTrait;
 
     /**
@@ -30,38 +29,37 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      * @var array Settings
      */
     private $settings = [
-        'scheme'                => 'http',
-        'port'                  => 80,
-        'path'                  => '',
-        'timeout'               => 30,
+        'scheme' => 'http',
+        'port' => 80,
+        'path' => '',
+        'timeout' => 30,
     ];
 
     /**
-     * @var null|resource
+     * @var object
      */
     private $client = null; // Guzzle client
 
     /**
      * Initializes a new Pusher instance with key, secret, app ID and channel.
      *
-     * @param string $auth_key
-     * @param string $secret
-     * @param string $app_id
-     * @param array $options  [optional]
-     *                         Options to configure the Pusher instance.
-     *                         scheme - e.g. http or https
-     *                         host - the host e.g. api-mt1.pusher.com. No trailing forward slash.
-     *                         port - the http port
-     *                         timeout - the http timeout
-     *                         useTLS - quick option to use scheme of https and port 443 (default is true).
-     *                         cluster - cluster name to connect to.
-     *                         encryption_master_key_base64 - a 32 byte key, encoded as base64. This key, along with the channel name, are used to derive per-channel encryption keys. Per-channel keys are used to encrypt event data on encrypted channels.
-     * @param ClientInterface|null $client [optional] - a Guzzle client to use for all HTTP requests
+     * @param string               $auth_key
+     * @param string               $secret
+     * @param string               $app_id
+     * @param array                $options  [optional]
+     *                                       Options to configure the Pusher instance.
+     *                                       scheme - e.g. http or https
+     *                                       host - the host e.g. api-mt1.pusher.com. No trailing forward slash.
+     *                                       port - the http port
+     *                                       timeout - the http timeout
+     *                                       useTLS - quick option to use scheme of https and port 443 (default is true).
+     *                                       cluster - cluster name to connect to.
+     *                                       encryption_master_key_base64 - a 32 byte key, encoded as base64. This key, along with the channel name, are used to derive per-channel encryption keys. Per-channel keys are used to encrypt event data on encrypted channels.
+     * @param null|ClientInterface $client   [optional] - a Guzzle client to use for all HTTP requests
      *
      * @throws PusherException Throws exception if any required dependencies are missing
      */
-    public function __construct(string $auth_key, string $secret, string $app_id, array $options = [], ClientInterface $client = null)
-    {
+    public function __construct(string $auth_key, string $secret, string $app_id, array $options = [], ClientInterface $client = null) {
         $this->check_compatibility();
 
         if (!is_null($client)) {
@@ -75,9 +73,9 @@ class Pusher implements LoggerAwareInterface, PusherInterface
             $useTLS = $options['useTLS'] === true;
         }
         if (
-            $useTLS &&
-            !isset($options['scheme']) &&
-            !isset($options['port'])
+            $useTLS
+            && !isset($options['scheme'])
+            && !isset($options['port'])
         ) {
             $options['scheme'] = 'https';
             $options['port'] = 443;
@@ -126,8 +124,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      *
      * @return array
      */
-    public function getSettings(): array
-    {
+    public function getSettings(): array {
         return $this->settings;
     }
 
@@ -135,11 +132,10 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      * Log a string.
      *
      * @param string           $msg     The message to log
-     * @param array|\Exception $context [optional] Any extraneous information that does not fit well in a string.
+     * @param array|\Exception $context [optional] Any extraneous information that does not fit well in a string
      * @param string           $level   [optional] Importance of log message, highly recommended to use Psr\Log\LogLevel::{level}
      */
-    private function log(string $msg, array $context = [], string $level = LogLevel::DEBUG): void
-    {
+    private function log($msg, array $context = [], $level = LogLevel::DEBUG) {
         if (is_null($this->logger)) {
             return;
         }
@@ -166,8 +162,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      *
      * @throws PusherException If any required dependencies are missing
      */
-    private function check_compatibility(): void
-    {
+    private function check_compatibility(): void {
         if (!extension_loaded('json')) {
             throw new PusherException('The Pusher library requires the PHP JSON module. Please ensure it is installed');
         }
@@ -184,8 +179,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      *
      * @throws PusherException If $channels is too big or any channel is invalid
      */
-    private function validate_channels(array $channels): void
-    {
+    private function validate_channels(array $channels): void {
         if (count($channels) > 100) {
             throw new PusherException('An event can be triggered on a maximum of 100 channels in a single call.');
         }
@@ -202,8 +196,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      *
      * @throws PusherException If $channel is invalid
      */
-    private function validate_channel(string $channel): void
-    {
+    private function validate_channel(string $channel): void {
         if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $channel)) {
             throw new PusherException('Invalid channel name ' . $channel);
         }
@@ -216,24 +209,22 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      *
      * @throws PusherException If $socket_id is invalid
      */
-    private function validate_socket_id(string $socket_id): void
-    {
+    private function validate_socket_id(string $socket_id): void {
         if ($socket_id !== null && !preg_match('/\A\d+\.\d+\z/', $socket_id)) {
             throw new PusherException('Invalid socket ID ' . $socket_id);
         }
     }
 
     /**
-     * Utility function used to generate signing headers
+     * Utility function used to generate signing headers.
      *
      * @param string $path
      * @param string $request_method
-     * @param array $query_params [optional]
+     * @param array  $query_params   [optional]
      *
      * @return array
      */
-    private function sign(string $path, string $request_method = 'GET', array $query_params = []): array
-    {
+    private function sign($path, $request_method = 'GET', array $query_params = []) {
         return self::build_auth_query_params(
             $this->settings['auth_key'],
             $this->settings['secret'],
@@ -248,21 +239,21 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      *
      * @return string
      */
-    private function channels_url_prefix(): string
-    {
+    private function channels_url_prefix(): string {
         return $this->settings['scheme'] . '://' . $this->settings['host'] . ':' . $this->settings['port'] . $this->settings['path'];
     }
 
     /**
      * Build the required HMAC'd auth string.
      *
-     * @param string $auth_key
-     * @param string $auth_secret
-     * @param string $request_method
-     * @param string $request_path
-     * @param array $query_params [optional]
-     * @param string $auth_version [optional]
-     * @param string|null $auth_timestamp [optional]
+     * @param string      $auth_key
+     * @param string      $auth_secret
+     * @param string      $request_method
+     * @param string      $request_path
+     * @param array       $query_params   [optional]
+     * @param string      $auth_version   [optional]
+     * @param null|string $auth_timestamp [optional]
+     *
      * @return array
      */
     public static function build_auth_query_params(
@@ -282,7 +273,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
         $params = array_merge($params, $query_params);
         ksort($params);
 
-        $string_to_sign = "$request_method\n" . $request_path . "\n" . self::array_implode('=', '&', $params);
+        $string_to_sign = "${request_method}\n" . $request_path . "\n" . self::array_implode('=', '&', $params);
 
         $auth_signature = hash_hmac('sha256', $string_to_sign, $auth_secret, false);
 
@@ -302,8 +293,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      *
      * @return string The imploded array
      */
-    public static function array_implode(string $glue, string $separator, $array): string
-    {
+    public static function array_implode(string $glue, string $separator, $array): string {
         if (!is_array($array)) {
             return $array;
         }
@@ -323,17 +313,17 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      * Helper function to prepare trigger request. Takes the same
      * parameters as the public trigger functions.
      *
-     * @param array|string $channels A channel name or an array of channel names to publish the event on.
-     * @param string $event
-     * @param mixed $data Event data
-     * @param array $params [optional]
-     * @param bool $already_encoded [optional]
+     * @param array|string $channels        a channel name or an array of channel names to publish the event on
+     * @param string       $event
+     * @param mixed        $data            Event data
+     * @param array        $params          [optional]
+     * @param bool         $already_encoded [optional]
+     *
+     * @throws PusherException Throws PusherException if $channels is an array of size 101 or above or $socket_id is invalid
      *
      * @return Request
-     * @throws PusherException Throws PusherException if $channels is an array of size 101 or above or $socket_id is invalid
      */
-    public function make_request($channels, string $event, $data, array $params = [], bool $already_encoded = false): Request
-    {
+    public function make_request($channels, string $event, $data, array $params = [], bool $already_encoded = false): Request {
         if (is_string($channels) === true) {
             $channels = [$channels];
         }
@@ -347,10 +337,12 @@ class Pusher implements LoggerAwareInterface, PusherInterface
         foreach ($channels as $chan) {
             if (PusherCrypto::is_encrypted_channel($chan)) {
                 $has_encrypted_channel = true;
+
                 break;
             }
         }
 
+        $data_encoded = false;
         if ($has_encrypted_channel) {
             if (count($channels) > 1) {
                 // For rationale, see limitations of end-to-end encryption in the README
@@ -410,7 +402,8 @@ class Pusher implements LoggerAwareInterface, PusherInterface
 
         $params = array_merge($signature, $query_params);
         $query_string = self::array_implode('=', '&', $params);
-        $full_path = $path . "?" . $query_string;
+        $full_path = $path . '?' . $query_string;
+
         return new Request('POST', $full_path, $headers, $post_value);
     }
 
@@ -418,19 +411,19 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      * Trigger an event by providing event name and payload.
      * Optionally provide a socket ID to exclude a client (most likely the sender).
      *
-     * @param array|string $channels A channel name or an array of channel names to publish the event on.
-     * @param string $event
-     * @param mixed $data Event data
-     * @param array $params [optional]
-     * @param bool $already_encoded [optional]
+     * @param array|string $channels        a channel name or an array of channel names to publish the event on
+     * @param string       $event
+     * @param mixed        $data            Event data
+     * @param array        $params          [optional]
+     * @param bool         $already_encoded [optional]
      *
-     * @return object
      * @throws ApiErrorException Throws ApiErrorException if the Channels HTTP API responds with an error
      * @throws GuzzleException
-     * @throws PusherException Throws PusherException if $channels is an array of size 101 or above or $socket_id is invalid
+     * @throws PusherException   Throws PusherException if $channels is an array of size 101 or above or $socket_id is invalid
+     *
+     * @return object
      */
-    public function trigger($channels, string $event, $data, array $params = [], bool $already_encoded = false): object
-    {
+    public function trigger($channels, $event, $data, array $params = [], $already_encoded = false) {
         $request = $this->make_request($channels, $event, $data, $params, $already_encoded);
 
         try {
@@ -446,6 +439,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
 
         if ($status !== 200) {
             $body = (string) $response->getBody();
+
             throw new ApiErrorException($body, $status);
         }
 
@@ -466,17 +460,17 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      * Asynchronously trigger an event by providing event name and payload.
      * Optionally provide a socket ID to exclude a client (most likely the sender).
      *
-     * @param array|string $channels A channel name or an array of channel names to publish the event on.
-     * @param string $event
-     * @param mixed $data Event data
-     * @param array $params [optional]
-     * @param bool $already_encoded [optional]
+     * @param array|string $channels        a channel name or an array of channel names to publish the event on
+     * @param string       $event
+     * @param mixed        $data            Event data
+     * @param array        $params          [optional]
+     * @param bool         $already_encoded [optional]
+     *
+     * @throws PusherException
      *
      * @return PromiseInterface
-     * @throws PusherException
      */
-    public function triggerAsync($channels, string $event, $data, array $params = [], bool $already_encoded = false): PromiseInterface
-    {
+    public function triggerAsync($channels, $event, $data, array $params = [], $already_encoded = false) {
         $request = $this->make_request($channels, $event, $data, $params, $already_encoded);
 
         $promise = $this->client->sendAsync($request, [
@@ -487,6 +481,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
 
             if ($status !== 200) {
                 $body = (string) $response->getBody();
+
                 throw new ApiErrorException($body, $status);
             }
 
@@ -507,14 +502,14 @@ class Pusher implements LoggerAwareInterface, PusherInterface
     /**
      * Helper function to prepare batch trigger request. Takes the same                                                                                                                                               * parameters as the public batch trigger functions.
      *
-     * @param array $batch [optional] An array of events to send
-     * @param bool $already_encoded [optional]
+     * @param array $batch           [optional] An array of events to send
+     * @param bool  $already_encoded [optional]
+     *
+     * @throws PusherException
      *
      * @return Request
-     * @throws PusherException
      */
-    public function make_batch_request(array $batch = [], bool $already_encoded = false): Request
-    {
+    public function make_batch_request(array $batch = [], bool $already_encoded = false): Request {
         foreach ($batch as $key => $event) {
             $this->validate_channel($event['channel']);
             if (isset($event['socket_id'])) {
@@ -539,6 +534,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
 
         $post_params = [];
         $post_params['batch'] = $batch;
+
         try {
             $post_value = json_encode($post_params, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
@@ -560,23 +556,24 @@ class Pusher implements LoggerAwareInterface, PusherInterface
 
         $params = array_merge($signature, $query_params);
         $query_string = self::array_implode('=', '&', $params);
-        $full_path = $path . "?" . $query_string;
+        $full_path = $path . '?' . $query_string;
+
         return new Request('POST', $full_path, $headers, $post_value);
     }
 
     /**
      * Trigger multiple events at the same time.
      *
-     * @param array $batch [optional] An array of events to send
-     * @param bool $already_encoded [optional]
+     * @param array $batch           [optional] An array of events to send
+     * @param bool  $already_encoded [optional]
      *
-     * @return object
      * @throws ApiErrorException Throws ApiErrorException if the Channels HTTP API responds with an error
      * @throws GuzzleException
      * @throws PusherException
+     *
+     * @return object
      */
-    public function triggerBatch(array $batch = [], bool $already_encoded = false): object
-    {
+    public function triggerBatch(array $batch = [], $already_encoded = false) {
         $request = $this->make_batch_request($batch, $already_encoded);
 
         try {
@@ -592,6 +589,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
 
         if ($status !== 200) {
             $body = (string) $response->getBody();
+
             throw new ApiErrorException($body, $status);
         }
 
@@ -611,14 +609,14 @@ class Pusher implements LoggerAwareInterface, PusherInterface
     /**
      * Asynchronously trigger multiple events at the same time.
      *
-     * @param array $batch [optional] An array of events to send
-     * @param bool $already_encoded [optional]
+     * @param array $batch           [optional] An array of events to send
+     * @param bool  $already_encoded [optional]
+     *
+     * @throws PusherException
      *
      * @return PromiseInterface
-     * @throws PusherException
      */
-    public function triggerBatchAsync(array $batch = [], bool $already_encoded = false): PromiseInterface
-    {
+    public function triggerBatchAsync(array $batch = [], $already_encoded = false) {
         $request = $this->make_batch_request($batch, $already_encoded);
 
         $promise = $this->client->sendAsync($request, [
@@ -629,6 +627,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
 
             if ($status !== 200) {
                 $body = (string) $response->getBody();
+
                 throw new ApiErrorException($body, $status);
             }
 
@@ -655,10 +654,8 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      * @throws PusherException   If $channel is invalid
      * @throws ApiErrorException Throws ApiErrorException if the Channels HTTP API responds with an error
      * @throws GuzzleException
-     *
      */
-    public function getChannelInfo(string $channel, array $params = []): object
-    {
+    public function getChannelInfo($channel, array $params = []) {
         $this->validate_channel($channel);
 
         return $this->get('/channels/' . $channel, $params);
@@ -666,9 +663,10 @@ class Pusher implements LoggerAwareInterface, PusherInterface
 
     /**
      * @deprecated in favour of getChannelInfo
+     *
+     * @param string $channel
      */
-    public function get_channel_info(string $channel, array $params = []): object
-    {
+    public function get_channel_info($channel, array $params = []) {
         return $this->getChannelInfo($channel, $params);
     }
 
@@ -679,10 +677,8 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      *
      * @throws ApiErrorException Throws ApiErrorException if the Channels HTTP API responds with an error
      * @throws GuzzleException
-     *
      */
-    public function getChannels(array $params = []): object
-    {
+    public function getChannels(array $params = []) {
         $result = $this->get('/channels', $params);
 
         $result->channels = get_object_vars($result->channels);
@@ -693,8 +689,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
     /**
      * @deprecated in favour of getChannels
      */
-    public function get_channels(array $params = []): object
-    {
+    public function get_channels(array $params = []) {
         return $this->getChannels($params);
     }
 
@@ -705,18 +700,17 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      *
      * @throws ApiErrorException Throws ApiErrorException if the Channels HTTP API responds with an error
      * @throws GuzzleException
-     *
      */
-    public function getPresenceUsers(string $channel): object
-    {
+    public function getPresenceUsers($channel) {
         return $this->get('/channels/' . $channel . '/users');
     }
 
     /**
      * @deprecated in favour of getPresenceUsers
+     *
+     * @param string $channel
      */
-    public function get_users_info(string $channel): object
-    {
+    public function get_users_info($channel) {
         return $this->getPresenceUsers($channel);
     }
 
@@ -734,8 +728,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      *
      * @return mixed See Pusher API docs
      */
-    public function get(string $path, array $params = [], $associative = false)
-    {
+    public function get($path, array $params = [], $associative = false) {
         $path = $this->settings['base_path'] . $path;
 
         $signature = $this->sign($path, 'GET', $params);
@@ -756,6 +749,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface
 
         if ($status !== 200) {
             $body = (string) $response->getBody();
+
             throw new ApiErrorException($body, $status);
         }
 
@@ -771,15 +765,15 @@ class Pusher implements LoggerAwareInterface, PusherInterface
     /**
      * Creates a socket signature.
      *
-     * @param string $channel
-     * @param string $socket_id
-     * @param string|null $custom_data
+     * @param string      $channel
+     * @param string      $socket_id
+     * @param null|string $custom_data
      *
-     * @return string Json encoded authentication string.
      * @throws PusherException Throws exception if $channel is invalid or above or $socket_id is invalid
+     *
+     * @return string json encoded authentication string
      */
-    public function socketAuth(string $channel, string $socket_id, string $custom_data = null): string
-    {
+    public function socketAuth($channel, $socket_id, $custom_data = null) {
         $this->validate_channel($channel);
         $this->validate_socket_id($socket_id);
 
@@ -814,9 +808,12 @@ class Pusher implements LoggerAwareInterface, PusherInterface
 
     /**
      * @deprecated in favour of socketAuth
+     *
+     * @param string      $channel
+     * @param string      $socket_id
+     * @param null|string $custom_data
      */
-    public function socket_auth(string $channel, string $socket_id, string $custom_data = null): string
-    {
+    public function socket_auth($channel, $socket_id, $custom_data = null) {
         return $this->socketAuth($channel, $socket_id, $custom_data);
     }
 
@@ -826,20 +823,20 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      * @param string $channel
      * @param string $socket_id
      * @param string $user_id
-     * @param mixed $user_info
+     * @param mixed  $user_info
+     *
+     * @throws PusherException Throws exception if $channel is invalid or above or $socket_id is invalid
      *
      * @return string
-     * @throws PusherException Throws exception if $channel is invalid or above or $socket_id is invalid
      */
-    public function presenceAuth(string $channel, string $socket_id, string $user_id, $user_info = null): string
-    {
+    public function presenceAuth($channel, $socket_id, $user_id, $user_info = null) {
         $user_data = ['user_id' => $user_id];
         if ($user_info) {
             $user_data['user_info'] = $user_info;
         }
 
         try {
-            return $this->socket_auth($channel, $socket_id, json_encode($user_data, JSON_THROW_ON_ERROR));
+            return $this->socketAuth($channel, $socket_id, json_encode($user_data, JSON_THROW_ON_ERROR));
         } catch (\JsonException $e) {
             throw new PusherException('Data encoding error.');
         }
@@ -847,9 +844,13 @@ class Pusher implements LoggerAwareInterface, PusherInterface
 
     /**
      * @deprecated in favour of presenceAuth
+     *
+     * @param null|mixed $user_info
+     * @param string     $channel
+     * @param string     $socket_id
+     * @param string     $user_id
      */
-    public function presence_auth(string $channel, string $socket_id, string $user_id, $user_info = null): string
-    {
+    public function presence_auth($channel, $socket_id, $user_id, $user_info = null) {
         return $this->presenceAuth($channel, $socket_id, $user_id, $user_info);
     }
 
@@ -863,15 +864,15 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      *
      * @return Webhook marshalled object with the properties time_ms (an int) and events (an array of event objects)
      */
-    public function webhook(array $headers, string $body): object
-    {
-        $this->ensure_valid_signature($headers, $body);
-
+    public function webhook(array $headers, $body) {
+        $this->verifySignature($headers, $body);
         $decoded_events = [];
+
         try {
             $decoded_json = json_decode($body, false, 512, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
-            $this->log('Unable to decrypt webhook event payload.', null, LogLevel::WARNING);
+            $this->log('Unable to decrypt webhook event payload.', [], LogLevel::WARNING);
+
             throw new PusherException('Data encoding error.');
         }
 
@@ -881,18 +882,21 @@ class Pusher implements LoggerAwareInterface, PusherInterface
                     $decryptedEvent = $this->crypto->decrypt_event($event);
 
                     if ($decryptedEvent === false) {
-                        $this->log('Unable to decrypt webhook event payload. Wrong key? Ignoring.', null, LogLevel::WARNING);
+                        $this->log('Unable to decrypt webhook event payload. Wrong key? Ignoring.', [], LogLevel::WARNING);
+
                         continue;
                     }
                     $decoded_events[] = $decryptedEvent;
                 } else {
-                    $this->log('Got an encrypted webhook event payload, but no master key specified. Ignoring.', null, LogLevel::WARNING);
+                    $this->log('Got an encrypted webhook event payload, but no master key specified. Ignoring.', [], LogLevel::WARNING);
+
                     continue;
                 }
             } else {
                 $decoded_events[] = $event;
             }
         }
+
         return new Webhook($decoded_json->time_ms, $decoded_events);
     }
 
@@ -902,10 +906,9 @@ class Pusher implements LoggerAwareInterface, PusherInterface
      * @param array  $headers an array of headers from the request (for example, from getallheaders())
      * @param string $body    the body of the request (for example, from file_get_contents('php://input'))
      *
-     * @throws PusherException if signature is incorrect.
+     * @throws PusherException if signature is incorrect
      */
-    public function verifySignature(array $headers, string $body): void
-    {
+    public function verifySignature(array $headers, $body) {
         $x_pusher_key = $headers['X-Pusher-Key'];
         $x_pusher_signature = $headers['X-Pusher-Signature'];
         if ($x_pusher_key === $this->settings['auth_key']) {
@@ -920,9 +923,10 @@ class Pusher implements LoggerAwareInterface, PusherInterface
 
     /**
      * @deprecated in favour of verifySignature
+     *
+     * @param string $body
      */
-    public function ensure_valid_signature(array $headers, string $body): void
-    {
+    public function ensure_valid_signature(array $headers, $body) {
         $this->verifySignature($headers, $body);
     }
 }
