@@ -1,4 +1,7 @@
 <?php
+use Ably\AblyRest;
+use Pusher\Pusher;
+use Psr\Log\LoggerInterface;
 
 class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
     /**
@@ -59,16 +62,12 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
     /**
      * Get the socket ID for the given request.
      *
-     * @param null|\Illuminate\Http\Request $request
+     * @param null|\CHTTP_Request $request
      *
      * @return null|string
      */
     public function socket($request = null) {
-        if (!$request && !$this->app->bound('request')) {
-            return;
-        }
-
-        $request = $request ?: $this->app['request'];
+        $request = $request ?: CHTTP::request();
 
         return $request->header('X-Socket-ID');
     }
@@ -206,7 +205,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
             $pusher->setLogger($this->app->make(LoggerInterface::class));
         }
 
-        return new PusherBroadcaster($pusher);
+        return new CBroadcast_Broadcaster_PusherBroadcaster($pusher);
     }
 
     /**
@@ -217,7 +216,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      * @return \CBroadcast_Contract_BroadcasterInterface
      */
     protected function createAblyDriver(array $config) {
-        return new AblyBroadcaster(new AblyRest($config));
+        return new CBroadcast_Broadcaster_AblyBroadcaster(new AblyRest($config));
     }
 
     /**
@@ -228,10 +227,10 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      * @return \CBroadcast_Contract_BroadcasterInterface
      */
     protected function createRedisDriver(array $config) {
-        return new RedisBroadcaster(
+        return new CBroadcast_Broadcaster_RedisBroadcaster(
             $this->app->make('redis'),
-            $config['connection'] ?? null,
-            $this->app['config']->get('database.redis.options.prefix', '')
+            isset($config['connection']) ? $config['connection'] : null,
+            CF::config('database.redis.options.prefix', '')
         );
     }
 
@@ -243,7 +242,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      * @return \CBroadcast_Contract_BroadcasterInterface
      */
     protected function createLogDriver(array $config) {
-        return new LogBroadcaster(
+        return new CBroadcast_Broadcaster_LogBroadcaster(
             $this->app->make(LoggerInterface::class)
         );
     }
@@ -256,7 +255,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      * @return \CBroadcast_Contract_BroadcasterInterface
      */
     protected function createNullDriver(array $config) {
-        return new NullBroadcaster();
+        return new CBroadcast_Broadcaster_NullBroadcaster();
     }
 
     /**
@@ -317,28 +316,6 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      */
     public function extend($driver, Closure $callback) {
         $this->customCreators[$driver] = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Get the application instance used by the manager.
-     *
-     * @return \Illuminate\Contracts\Foundation\Application
-     */
-    public function getApplication() {
-        return $this->app;
-    }
-
-    /**
-     * Set the application instance used by the manager.
-     *
-     * @param \Illuminate\Contracts\Foundation\Application $app
-     *
-     * @return $this
-     */
-    public function setApplication($app) {
-        $this->app = $app;
 
         return $this;
     }
