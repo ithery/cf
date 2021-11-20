@@ -94,6 +94,7 @@ use SebastianBergmann\Comparator\Comparator;
 use PHPUnit\Framework\MockObject\MockBuilder;
 use SebastianBergmann\GlobalState\ExcludeList;
 use PHPUnit\Framework\Exception\RiskyTestError;
+use PHPUnit\Framework\Exception\SkippedTestError;
 use PHPUnit\Framework\MockObject\Stub\ReturnStub;
 use SebastianBergmann\ObjectEnumerator\Enumerator;
 use PHPUnit\Framework\Error\Warning as WarningError;
