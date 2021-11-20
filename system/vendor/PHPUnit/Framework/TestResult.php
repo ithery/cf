@@ -35,6 +35,7 @@ use PHPUnit\Framework\Exception\RiskyTestError;
 use SebastianBergmann\Invoker\TimeoutException;
 use SebastianBergmann\CodeCoverage\CodeCoverage;
 use PHPUnit\Framework\Exception\SkippedTestError;
+use PHPUnit\Framework\Exception\IncompleteTestError;
 use PHPUnit\Framework\Exception\AssertionFailedError;
 use SebastianBergmann\ResourceOperations\ResourceOperations;
 use PHPUnit\Framework\Exception\InvalidCoversTargetException;
@@ -678,7 +679,7 @@ final class TestResult implements Countable {
                             && $test->getSize() === \PHPUnit\Util\Test::SMALL
                             && function_exists('xdebug_start_function_monitor');
 
-        if ($monitorFunctions && function_exists('xdebug_start_function_monitor')) {
+        if ($monitorFunctions) {
             /* @noinspection ForgottenDebugOutputInspection */
             xdebug_start_function_monitor(ResourceOperations::getFunctions());
         }
