@@ -5,7 +5,7 @@ use Illuminate\Broadcasting\BroadcastException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class CBroadcast_Broadcaster_PusherBroadcaster extends CBroadcast_BroadcasterAbstract {
-    use CBroadcast_Trait_UsePusherChannelConventions;
+    use CBroadcast_Concern_PusherChannelConventionTrait;
 
     /**
      * The Pusher SDK instance.
@@ -115,7 +115,6 @@ class CBroadcast_Broadcaster_PusherBroadcaster extends CBroadcast_BroadcasterAbs
      */
     public function broadcast(array $channels, $event, array $payload = []) {
         $socket = carr::pull($payload, 'socket');
-
         if ($this->pusherServerIsVersionFiveOrGreater()) {
             $parameters = $socket !== null ? ['socket_id' => $socket] : [];
 

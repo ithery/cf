@@ -13,8 +13,6 @@ import {
 export class PusherConnector extends Connector {
     constructor(options) {
         super(options);
-        this.pusher = null;
-        this.channels = {};
     }
 
     /**
@@ -25,6 +23,9 @@ export class PusherConnector extends Connector {
         if (typeof this.options.client !== 'undefined') {
             this.pusher = this.options.client;
         } else {
+            if(typeof Pusher == 'undefined') {
+                throw Error('Pusher undefined');
+            }
             this.pusher = new Pusher(this.options.key, this.options);
         }
     }
