@@ -48,7 +48,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     protected $routeResolver;
 
     /**
-     * Create a new Illuminate HTTP request from server variables.
+     * Create a new HTTP request from server variables.
      *
      * @return static
      */
@@ -393,7 +393,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     }
 
     /**
-     * Create an Illuminate request from a Symfony instance.
+     * Create an request from a Symfony instance.
      *
      * @param \Symfony\Component\HttpFoundation\Request $request
      *
@@ -502,7 +502,7 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @param null|string $param
      * @param mixed       $default
      *
-     * @return null|\Illuminate\Routing\Route|object|string
+     * @return null|\CRouting_Route|object|string
      */
     public function route($param = null, $default = null) {
         $route = call_user_func($this->getRouteResolver());
@@ -551,7 +551,8 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      * @return \Closure
      */
     public function getUserResolver() {
-        return $this->userResolver ?: function () {
+        return $this->userResolver ?: function ($guard = null) {
+            return c::auth($guard)->user();
         };
     }
 
