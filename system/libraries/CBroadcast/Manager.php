@@ -49,13 +49,12 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
         }
 
         $attributes = $attributes ?: ['middleware' => ['web']];
-
-        $this->app['router']->group($attributes, function ($router) {
+        CRouting::router()->group($attributes, function ($router) {
             $router->match(
                 ['get', 'post'],
                 '/broadcasting/auth',
-                '\\' . BroadcastController::class . '@authenticate'
-            )->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+                '\\' . CBroadcast_BroadcastController::class . '@authenticate'
+            )->withoutMiddleware([\CHTTP_Middleware_VerifyCsrfToken::class]);
         });
     }
 
