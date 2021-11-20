@@ -347,7 +347,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                         input.attr('placeholder', 'Search ' + title );
 
                         var options = column.searchOptions||[];
-                        for(optionKey in options) {
+                        for(let optionKey in options) {
                             var optionElement = jQuery('<option>');
                             optionElement.attr('value',optionKey);
                             optionElement.append(options[optionKey]);

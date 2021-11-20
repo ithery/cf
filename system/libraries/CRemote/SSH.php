@@ -107,7 +107,21 @@ class CRemote_SSH {
         if ($output instanceof BufferedOutput) {
             return $output->fetch();
         }
+
         return null;
+    }
+
+    public function outputContent() {
+        $output = $this->output();
+        preg_match('#^\[.+?\] \(*.+?\) (.*)#ims', $output, $matches);
+        $content = '';
+        if (isset($matches[1])) {
+            $content = $matches[1];
+        } else {
+            $content = $output;
+        }
+
+        return $content;
     }
 
     /**
@@ -120,11 +134,12 @@ class CRemote_SSH {
      */
     public function run($commands, Closure $callback = null) {
         $this->connection->run($commands, $callback);
+
         return $this;
     }
 
     /**
-     * Get log ssh with defined NET_SSH2_LOGGING
+     * Get log ssh with defined NET_SSH2_LOGGING.
      *
      * @return string
      */
