@@ -17,9 +17,9 @@ namespace Symfony\Component\HttpFoundation;
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class HeaderBag implements \IteratorAggregate, \Countable {
-    protected const UPPER = '_ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const UPPER = '_ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-    protected const LOWER = '-abcdefghijklmnopqrstuvwxyz';
+    const LOWER = '-abcdefghijklmnopqrstuvwxyz';
 
     protected $headers = [];
 
@@ -66,7 +66,9 @@ class HeaderBag implements \IteratorAggregate, \Countable {
      */
     public function all($key = null) {
         if (null !== $key) {
-            return $this->headers[strtr($key, self::UPPER, self::LOWER)] ?? [];
+            $trKey = strtr($key, self::UPPER, self::LOWER);
+
+            return isset($this->headers[$trKey]) ? $this->headers[$trKey] : [];
         }
 
         return $this->headers;

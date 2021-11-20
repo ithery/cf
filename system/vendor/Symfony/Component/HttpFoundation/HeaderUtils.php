@@ -17,9 +17,9 @@ namespace Symfony\Component\HttpFoundation;
  * @author Christian Schmidt <github@chsc.dk>
  */
 class HeaderUtils {
-    public const DISPOSITION_ATTACHMENT = 'attachment';
+    const DISPOSITION_ATTACHMENT = 'attachment';
 
-    public const DISPOSITION_INLINE = 'inline';
+    const DISPOSITION_INLINE = 'inline';
 
     /**
      * This class should not be instantiated.
@@ -85,7 +85,7 @@ class HeaderUtils {
         $assoc = [];
         foreach ($parts as $part) {
             $name = strtolower($part[0]);
-            $value = $part[1] ?? true;
+            $value = isset($part[1]) ? $part[1] : true;
             $assoc[$name] = $value;
         }
 
