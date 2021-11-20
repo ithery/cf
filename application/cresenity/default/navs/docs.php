@@ -104,6 +104,11 @@ return [
                 'uri' => 'docs/cresjs/basic',
             ],
             [
+                'name' => 'cresjs.php',
+                'label' => c::__('PHPJS Function'),
+                'uri' => 'docs/cresjs/php',
+            ],
+            [
                 'name' => 'cresjs.reload',
                 'label' => c::__('Reload'),
                 'uri' => 'docs/cresjs/reload',
