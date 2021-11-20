@@ -396,10 +396,10 @@ final class CF {
             $domain = CF::domain();
         }
 
-        $include_paths = CF::paths($domain, $force_reload);
+        $paths = CF::paths($domain, $force_reload);
 
         $result = [];
-        foreach ($include_paths as $path) {
+        foreach ($paths as $path) {
             if (file_exists($path . $directory . DS . $filename . EXT)) {
                 $result[] = $path . $directory . DS . $filename . EXT;
             }
