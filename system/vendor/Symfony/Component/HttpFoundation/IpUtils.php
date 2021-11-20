@@ -16,15 +16,13 @@ namespace Symfony\Component\HttpFoundation;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-class IpUtils
-{
-    private static $checkedIps = array();
+class IpUtils {
+    private static $checkedIps = [];
 
     /**
      * This class should not be instantiated.
      */
-    private function __construct()
-    {
+    private function __construct() {
     }
 
     /**
@@ -35,10 +33,13 @@ class IpUtils
      *
      * @return bool Whether the IP is valid
      */
-    public static function checkIp($requestIp, $ips)
-    {
+    public static function checkIp($requestIp, $ips) {
+        if (null === $requestIp) {
+            return false;
+        }
+
         if (!is_array($ips)) {
-            $ips = array($ips);
+            $ips = [$ips];
         }
 
         $method = substr_count($requestIp, ':') > 1 ? 'checkIp6' : 'checkIp4';
@@ -61,9 +62,8 @@ class IpUtils
      *
      * @return bool Whether the request IP matches the IP, or whether the request IP is within the CIDR subnet
      */
-    public static function checkIp4($requestIp, $ip)
-    {
-        $cacheKey = $requestIp.'-'.$ip;
+    public static function checkIp4($requestIp, $ip) {
+        $cacheKey = $requestIp . '-' . $ip;
         if (isset(self::$checkedIps[$cacheKey])) {
             return self::$checkedIps[$cacheKey];
         }
@@ -105,13 +105,12 @@ class IpUtils
      * @param string $requestIp IPv6 address to check
      * @param string $ip        IPv6 address or subnet in CIDR notation
      *
-     * @return bool Whether the IP is valid
-     *
      * @throws \RuntimeException When IPV6 support is not enabled
+     *
+     * @return bool Whether the IP is valid
      */
-    public static function checkIp6($requestIp, $ip)
-    {
-        $cacheKey = $requestIp.'-'.$ip;
+    public static function checkIp6($requestIp, $ip) {
+        $cacheKey = $requestIp . '-' . $ip;
         if (isset(self::$checkedIps[$cacheKey])) {
             return self::$checkedIps[$cacheKey];
         }
@@ -152,5 +151,40 @@ class IpUtils
         }
 
         return self::$checkedIps[$cacheKey] = true;
+    }
+
+    /**
+     * Anonymizes an IP/IPv6.
+     *
+     * Removes the last byte for v4 and the last 8 bytes for v6 IPs
+     *
+     * @param string $ip
+     *
+     * @return string
+     */
+    public static function anonymize($ip) {
+        $wrappedIPv6 = false;
+        if ('[' === substr($ip, 0, 1) && ']' === substr($ip, -1, 1)) {
+            $wrappedIPv6 = true;
+            $ip = substr($ip, 1, -1);
+        }
+
+        $packedAddress = inet_pton($ip);
+        if (4 === \strlen($packedAddress)) {
+            $mask = '255.255.255.0';
+        } elseif ($ip === inet_ntop($packedAddress & inet_pton('::ffff:ffff:ffff'))) {
+            $mask = '::ffff:ffff:ff00';
+        } elseif ($ip === inet_ntop($packedAddress & inet_pton('::ffff:ffff'))) {
+            $mask = '::ffff:ff00';
+        } else {
+            $mask = 'ffff:ffff:ffff:ffff:0000:0000:0000:0000';
+        }
+        $ip = inet_ntop($packedAddress & inet_pton($mask));
+
+        if ($wrappedIPv6) {
+            $ip = '[' . $ip . ']';
+        }
+
+        return $ip;
     }
 }
