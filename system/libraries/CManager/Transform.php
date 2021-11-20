@@ -29,12 +29,12 @@ class CManager_Transform {
         return !empty($this->callbacks) && isset($this->callbacks[$method]);
     }
 
-    public function call($method, $value) {
+    public function call($method, ...$params) {
         if (!$this->methodExists($method)) {
             throw new Exception(c::__("method :method doesn't exists", [':method' => $method]));
         }
         $callable = $this->callbacks[$method];
 
-        return call_user_func_array($callable, $value);
+        return call_user_func_array($callable, [$params]);
     }
 }
