@@ -112,7 +112,7 @@ use SebastianBergmann\ObjectEnumerator\Enumerator;
 use SebastianBergmann\Template\Template;
 use SoapClient;
 use Throwable;
-
+use Exception;
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
