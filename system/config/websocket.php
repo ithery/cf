@@ -52,7 +52,9 @@ return [
             'capacity' => null,
             'enable_client_messages' => false,
             'enable_statistics' => true,
-            'allowed_origins' => false,
+            'allowed_origins' => [
+                CF::domain()
+            ],
         ],
     ],
 
