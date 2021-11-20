@@ -1,0 +1,4 @@
+<?php
+
+interface CBroadcast_Contract_ShouldBroadcastNowInterface extends CBroadcast_Contract_ShouldBroadcastInterface {
+}

@@ -18,23 +18,20 @@ use Symfony\Component\Console\Formatter\OutputFormatterInterface;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  */
-abstract class Helper implements HelperInterface
-{
+abstract class Helper implements HelperInterface {
     protected $helperSet = null;
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function setHelperSet(HelperSet $helperSet = null)
-    {
+    public function setHelperSet(HelperSet $helperSet = null) {
         $this->helperSet = $helperSet;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function getHelperSet()
-    {
+    public function getHelperSet() {
         return $this->helperSet;
     }
 
@@ -45,8 +42,7 @@ abstract class Helper implements HelperInterface
      *
      * @return int The length of the string
      */
-    public static function strlen($string)
-    {
+    public static function strlen($string) {
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return strlen($string);
         }
@@ -59,12 +55,11 @@ abstract class Helper implements HelperInterface
      *
      * @param string   $string String to subset
      * @param int      $from   Start offset
-     * @param int|null $length Length to read
+     * @param null|int $length Length to read
      *
      * @return string The string subset
      */
-    public static function substr($string, $from, $length = null)
-    {
+    public static function substr($string, $from, $length = null) {
         if (false === $encoding = mb_detect_encoding($string, null, true)) {
             return substr($string, $from, $length);
         }
@@ -72,19 +67,18 @@ abstract class Helper implements HelperInterface
         return mb_substr($string, $from, $length, $encoding);
     }
 
-    public static function formatTime($secs)
-    {
-        static $timeFormats = array(
-            array(0, '< 1 sec'),
-            array(1, '1 sec'),
-            array(2, 'secs', 1),
-            array(60, '1 min'),
-            array(120, 'mins', 60),
-            array(3600, '1 hr'),
-            array(7200, 'hrs', 3600),
-            array(86400, '1 day'),
-            array(172800, 'days', 86400),
-        );
+    public static function formatTime($secs) {
+        static $timeFormats = [
+            [0, '< 1 sec'],
+            [1, '1 sec'],
+            [2, 'secs', 1],
+            [60, '1 min'],
+            [120, 'mins', 60],
+            [3600, '1 hr'],
+            [7200, 'hrs', 3600],
+            [86400, '1 day'],
+            [172800, 'days', 86400],
+        ];
 
         foreach ($timeFormats as $index => $format) {
             if ($secs >= $format[0]) {
@@ -95,14 +89,13 @@ abstract class Helper implements HelperInterface
                         return $format[1];
                     }
 
-                    return floor($secs / $format[2]).' '.$format[1];
+                    return floor($secs / $format[2]) . ' ' . $format[1];
                 }
             }
         }
     }
 
-    public static function formatMemory($memory)
-    {
+    public static function formatMemory($memory) {
         if ($memory >= 1024 * 1024 * 1024) {
             return sprintf('%.1f GiB', $memory / 1024 / 1024 / 1024);
         }
@@ -118,13 +111,11 @@ abstract class Helper implements HelperInterface
         return sprintf('%d B', $memory);
     }
 
-    public static function strlenWithoutDecoration(OutputFormatterInterface $formatter, $string)
-    {
+    public static function strlenWithoutDecoration(OutputFormatterInterface $formatter, $string) {
         return self::strlen(self::removeDecoration($formatter, $string));
     }
 
-    public static function removeDecoration(OutputFormatterInterface $formatter, $string)
-    {
+    public static function removeDecoration(OutputFormatterInterface $formatter, $string) {
         $isDecorated = $formatter->isDecorated();
         $formatter->setDecorated(false);
         // remove <...> formatting

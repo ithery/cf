@@ -52,14 +52,14 @@ class CException_Stacktrace {
                 $this->frames[] = new CException_Stacktrace_Frame(
                     $currentFile,
                     $currentLine,
-                    $rawFrame['function'] ?? null,
-                    $rawFrame['class'] ?? null,
+                    isset($rawFrame['function']) ? $rawFrame['function'] : null,
+                    isset($rawFrame['class']) ? $rawFrame['class'] : null,
                     $this->frameFileFromApplication($currentFile)
                 );
             }
 
-            $currentFile = $rawFrame['file'] ?? 'unknown';
-            $currentLine = $rawFrame['line'] ?? 0;
+            $currentFile = isset($rawFrame['file']) ? $rawFrame['file'] : 'unknown';
+            $currentLine = isset($rawFrame['line']) ? $rawFrame['line'] : 0;
         }
 
         $this->frames[] = new CException_Stacktrace_Frame(
@@ -87,7 +87,7 @@ class CException_Stacktrace {
         $relativeFile = str_replace('\\', DIRECTORY_SEPARATOR, $frameFilename);
 
         if (!empty($this->applicationPath)) {
-            $relativeFile = array_reverse(explode($this->applicationPath ?? '', $frameFilename, 2))[0];
+            $relativeFile = array_reverse(explode($this->applicationPath ?: '', $frameFilename, 2))[0];
         }
 
         if (strpos($relativeFile, DIRECTORY_SEPARATOR . 'vendor') === 0) {

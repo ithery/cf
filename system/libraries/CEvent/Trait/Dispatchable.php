@@ -9,41 +9,49 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Mar 10, 2019, 1:01:29 AM
  */
 trait CEvent_Trait_Dispatchable {
-    protected static $dispatcher;
-
-    protected static function getDispatcher() {
-        if (self::$dispatcher == null) {
-            self::$dispatcher = CEvent::createDispatcher();
-        }
-        return self::$dispatcher;
-    }
-
     /**
      * Dispatch the event with the given arguments.
      *
      * @return void
      */
     public static function dispatch() {
-        $dispatcher = self::getDispatcher();
-        return call_user_func_array([$dispatcher, 'dispatch'], func_get_args());
+        return c::event(new static(...func_get_args()));
     }
 
     /**
-     * Listen the event with the given arguments.
+     * Dispatch the event with the given arguments if the given truth test passes.
+     *
+     * @param bool  $boolean
+     * @param mixed ...$arguments
      *
      * @return void
      */
-    public static function listen() {
-        $dispatcher = self::getDispatcher();
-        return call_user_func_array([$dispatcher, 'listen'], func_get_args());
+    public static function dispatchIf($boolean, ...$arguments) {
+        if ($boolean) {
+            return c::event(new static(...$arguments));
+        }
+    }
+
+    /**
+     * Dispatch the event with the given arguments unless the given truth test passes.
+     *
+     * @param bool  $boolean
+     * @param mixed ...$arguments
+     *
+     * @return void
+     */
+    public static function dispatchUnless($boolean, ...$arguments) {
+        if (!$boolean) {
+            return c::event(new static(...$arguments));
+        }
     }
 
     /**
      * Broadcast the event with the given arguments.
      *
-     * @return \Illuminate\Broadcasting\PendingBroadcast
+     * @return \CBroadcasting_PendingBroadcast
      */
     public static function broadcast() {
-        // return broadcast(new static(...func_get_args()));
+        return c::broadcast(new static(...func_get_args()));
     }
 }

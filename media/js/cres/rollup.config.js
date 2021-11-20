@@ -8,7 +8,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import resolve from 'rollup-plugin-node-resolve';
 import outputManifest from 'rollup-plugin-output-manifest';
 import postcss from 'rollup-plugin-postcss';
-
+import nodePolyfills from 'rollup-plugin-polyfill-node';
 // eslint-disable-next-line no-process-env
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -26,7 +26,7 @@ export default {
         resolve(),
         commonjs({
             // These npm packages still use common-js modules. Ugh.
-            include: /node_modules\/(get-value|isobject|core-js|locutus)/
+            include: /node_modules\/(get-value|isobject|core-js|locutus|pusher-js)/
         }),
         postcss({
             config: {
@@ -63,7 +63,8 @@ export default {
                     '/cres.js': '/cres.js?id=' + hash
                 });
             }
-        })
+        }),
+        nodePolyfills()
     ]
 }
 ;
