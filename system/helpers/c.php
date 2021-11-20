@@ -1029,7 +1029,7 @@ class c {
      * @return string
      */
     public static function media($path = '', $secure = null) {
-        return c::url()->asset($path, $secure);
+        return c::url()->media($path, $secure);
     }
 
     /**
