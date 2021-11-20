@@ -62,7 +62,7 @@ class CBroadcast_Broadcaster_PusherBroadcaster extends CBroadcast_BroadcasterAbs
         if (cstr::startsWith($request->channel_name, 'private')) {
             return $this->decodePusherResponse(
                 $request,
-                $this->pusher->socket_auth($request->channel_name, $request->socket_id)
+                $this->pusher->socketAuth($request->channel_name, $request->socket_id)
             );
         }
 
@@ -76,7 +76,7 @@ class CBroadcast_Broadcaster_PusherBroadcaster extends CBroadcast_BroadcasterAbs
 
         return $this->decodePusherResponse(
             $request,
-            $this->pusher->presence_auth(
+            $this->pusher->presenceAuth(
                 $request->channel_name,
                 $request->socket_id,
                 $broadcastIdentifier,

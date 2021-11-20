@@ -44,7 +44,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      * @return void
      */
     public function routes(array $attributes = null) {
-        if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
+        if ($this->app instanceof CBase_CachesRoutesInterface && $this->app->routesAreCached()) {
             return;
         }
 
