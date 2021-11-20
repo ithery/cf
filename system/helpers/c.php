@@ -1029,7 +1029,7 @@ class c {
      * @return string
      */
     public static function media($path = '', $secure = null) {
-        return c::url()->asset($path, $secure);
+        return c::url()->media($path, $secure);
     }
 
     /**
@@ -1434,6 +1434,18 @@ class c {
         return function () use ($callable) {
             return call_user_func_array($callable, func_get_args());
         };
+    }
+
+    public static function broadcast($event = null) {
+        return CBroadcast::manager()->event($event);
+    }
+
+    public static function environment() {
+        if (CF::isProduction()) {
+            return 'production';
+        }
+
+        return CF::config('app.environment', 'development');
     }
 }
 

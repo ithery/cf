@@ -54,14 +54,14 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @var array
      */
     protected $internalDontReport = [
-        //AuthenticationException::class,
-        //AuthorizationException::class,
+        CAuth_Exception_AuthenticationException::class,
+        CAuth_Exception_AuthorizationException::class,
         HttpException::class,
         CHTTP_Exception_ResponseException::class,
         CModel_Exception_ModelNotFound::class,
         //SuspiciousOperationException::class,
         //TokenMismatchException::class,
-        //ValidationException::class,
+        CValidation_Exception::class,
     ];
 
     /**

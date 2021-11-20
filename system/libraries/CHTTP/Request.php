@@ -12,10 +12,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-/**
- * @method array validate(array $rules, ...$params)
- * @method array validateWithBag(string $errorBag, array $rules, ...$params)
- */
 class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, ArrayAccess {
     use CHTTP_Trait_InteractsWithInput,
         CHTTP_Trait_InteractsWithContentTypes,
@@ -690,5 +686,27 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
         }
 
         return $this->browser;
+    }
+
+    public function validate(array $rules, ...$params) {
+        return c::validator()->validate($this->all(), $rules, ...$params);
+    }
+
+    public function validateWithBag($errorBag, array $rules, ...$params) {
+        try {
+            return $this->validate($rules, ...$params);
+        } catch (CValidation_Exception $e) {
+            $e->errorBag = $errorBag;
+
+            throw $e;
+        }
+    }
+
+    public function hasValidSignature($absolute = true) {
+        return c::url()->hasValidSignature($this, $absolute);
+    }
+
+    public function hasValidRelativeSignature() {
+        return $this->hasValidSignature(false);
     }
 }

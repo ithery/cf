@@ -8,6 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 final class CF {
     use CFDeprecatedTrait;
+
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
 
     // Security check that is added to all generated PHP files
@@ -181,7 +182,6 @@ final class CF {
 
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
         static::loadBootstrapFiles();
-
         // Setup is complete, prevent it from being run again
         $run = true;
 
@@ -396,10 +396,10 @@ final class CF {
             $domain = CF::domain();
         }
 
-        $include_paths = CF::paths($domain, $force_reload);
+        $paths = CF::paths($domain, $force_reload);
 
         $result = [];
-        foreach ($include_paths as $path) {
+        foreach ($paths as $path) {
             if (file_exists($path . $directory . DS . $filename . EXT)) {
                 $result[] = $path . $directory . DS . $filename . EXT;
             }

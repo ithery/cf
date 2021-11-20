@@ -54,11 +54,11 @@ class CFConsole {
         CConsole_Command_App_AppCodeCommand::class,
         CConsole_Command_TestInstallCommand::class,
         CConsole_Command_TestCommand::class,
+        CWebSocket_Console_Command_StartServer::class,
     ];
 
     public static function execute() {
         $kernel = new CConsole_Kernel();
-
         $commands = array_merge(static::$defaultCommands, static::$commands);
         CConsole_Application::starting(function ($cfCli) use ($commands) {
             $cfCli->resolveCommands($commands);

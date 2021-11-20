@@ -7,53 +7,45 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework;
 
 use Throwable;
+use PHPUnit\Framework\Exception\Warning;
+use PHPUnit\Framework\Exception\AssertionFailedError;
 
 /**
  * @deprecated The `TestListener` interface is deprecated
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-trait TestListenerDefaultImplementation
-{
-    public function addError(Test $test, Throwable $t, $time)
-    {
+trait TestListenerDefaultImplementation {
+    public function addError(Test $test, Throwable $t, $time) {
     }
 
-    public function addWarning(Test $test, Warning $e, $time)
-    {
+    public function addWarning(Test $test, Warning $e, $time) {
     }
 
-    public function addFailure(Test $test, AssertionFailedError $e, $time)
-    {
+    public function addFailure(Test $test, AssertionFailedError $e, $time) {
     }
 
-    public function addIncompleteTest(Test $test, Throwable $t, $time)
-    {
+    public function addIncompleteTest(Test $test, Throwable $t, $time) {
     }
 
-    public function addRiskyTest(Test $test, Throwable $t, $time)
-    {
+    public function addRiskyTest(Test $test, Throwable $t, $time) {
     }
 
-    public function addSkippedTest(Test $test, Throwable $t, $time)
-    {
+    public function addSkippedTest(Test $test, Throwable $t, $time) {
     }
 
-    public function startTestSuite(TestSuite $suite)
-    {
+    public function startTestSuite(TestSuite $suite) {
     }
 
-    public function endTestSuite(TestSuite $suite)
-    {
+    public function endTestSuite(TestSuite $suite) {
     }
 
-    public function startTest(Test $test)
-    {
+    public function startTest(Test $test) {
     }
 
-    public function endTest(Test $test, $time)
-    {
+    public function endTest(Test $test, $time) {
     }
 }

@@ -7,14 +7,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework;
 
-use function array_keys;
-use function get_class;
-use function spl_object_hash;
-use PHPUnit\Util\Filter;
-use PHPUnit\Framework\Exception\Exception;
 use Throwable;
+use function get_class;
+use function array_keys;
+use PHPUnit\Util\Filter;
+use function spl_object_hash;
+use PHPUnit\Framework\Exception\Exception;
 
 /**
  * Wraps Exceptions thrown by code under test.
@@ -27,8 +28,7 @@ use Throwable;
  *
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class ExceptionWrapper extends Exception
-{
+final class ExceptionWrapper extends Exception {
     /**
      * @var string
      */
@@ -39,8 +39,7 @@ final class ExceptionWrapper extends Exception
      */
     protected $previous;
 
-    public function __construct( $t)
-    {
+    public function __construct($t) {
         // PDOException::getCode() is a string.
         // @see https://php.net/manual/en/class.pdoexception.php#95812
         parent::__construct($t->getMessage(), (int) $t->getCode());
@@ -48,8 +47,7 @@ final class ExceptionWrapper extends Exception
         $this->setOriginalException($t);
     }
 
-    public function __toString()
-    {
+    public function __toString() {
         $string = TestFailure::exceptionToString($this);
 
         if ($trace = Filter::getFilteredStacktrace($this)) {
@@ -63,28 +61,24 @@ final class ExceptionWrapper extends Exception
         return $string;
     }
 
-    public function getClassName()
-    {
+    public function getClassName() {
         return $this->className;
     }
 
-    public function getPreviousWrapped()
-    {
+    public function getPreviousWrapped() {
         return $this->previous;
     }
 
-    public function setClassName($className)
-    {
+    public function setClassName($className) {
         $this->className = $className;
     }
 
-    public function setOriginalException(Throwable $t)
-    {
+    public function setOriginalException(Throwable $t) {
         $this->originalException($t);
 
         $this->className = get_class($t);
-        $this->file      = $t->getFile();
-        $this->line      = $t->getLine();
+        $this->file = $t->getFile();
+        $this->line = $t->getLine();
 
         $this->serializableTrace = $t->getTrace();
 
@@ -97,8 +91,7 @@ final class ExceptionWrapper extends Exception
         }
     }
 
-    public function getOriginalException()
-    {
+    public function getOriginalException() {
         return $this->originalException();
     }
 
@@ -108,8 +101,7 @@ final class ExceptionWrapper extends Exception
      *
      * Approach works both for var_dump() and var_export() and print_r().
      */
-    private function originalException(Throwable $exceptionToStore = null)
-    {
+    private function originalException(Throwable $exceptionToStore = null) {
         static $originalExceptions;
 
         $instanceId = spl_object_hash($this);
@@ -118,6 +110,6 @@ final class ExceptionWrapper extends Exception
             $originalExceptions[$instanceId] = $exceptionToStore;
         }
 
-        return isset($originalExceptions[$instanceId]) ? $originalExceptions[$instanceId]: null;
+        return isset($originalExceptions[$instanceId]) ? $originalExceptions[$instanceId] : null;
     }
 }
