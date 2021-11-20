@@ -253,12 +253,12 @@ class CEvent_Dispatcher implements CEvent_DispatcherInterface {
     /**
      * Broadcast the given event class.
      *
-     * @param \Illuminate\Contracts\Broadcasting\ShouldBroadcast $event
+     * @param \CBroadcast_Contract_ShouldBroadcastInterface $event
      *
      * @return void
      */
     protected function broadcastEvent($event) {
-        $this->container->make(BroadcastFactory::class)->queue($event);
+        CBroadcast::manager()->queue($event);
     }
 
     /**
