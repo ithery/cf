@@ -1,4 +1,5 @@
-<?php declare(strict_types=1);
+<?php
+declare(strict_types=1);
 
 /*
  * This file is part of the Monolog package.
@@ -11,12 +12,10 @@
 
 namespace Monolog;
 
-final class Utils
-{
+final class Utils {
     const DEFAULT_JSON_FLAGS = JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION | JSON_INVALID_UTF8_SUBSTITUTE | JSON_PARTIAL_OUTPUT_ON_ERROR;
 
-    public static function getClass(object $object): string
-    {
+    public static function getClass($object): string {
         $class = \get_class($object);
 
         if (false === ($pos = \strpos($class, "@anonymous\0"))) {
@@ -30,8 +29,7 @@ final class Utils
         return $parent . '@anonymous';
     }
 
-    public static function substr(string $string, int $start, ?int $length = null): string
-    {
+    public static function substr($string, $start, $length = null) {
         if (extension_loaded('mbstring')) {
             return mb_strcut($string, $start, $length);
         }
@@ -40,12 +38,11 @@ final class Utils
     }
 
     /**
-     * Makes sure if a relative path is passed in it is turned into an absolute path
+     * Makes sure if a relative path is passed in it is turned into an absolute path.
      *
      * @param string $streamUrl stream URL or path without protocol
      */
-    public static function canonicalizePath(string $streamUrl): string
-    {
+    public static function canonicalizePath($streamUrl) {
         $prefix = '';
         if ('file://' === substr($streamUrl, 0, 7)) {
             $streamUrl = substr($streamUrl, 7);
@@ -59,25 +56,26 @@ final class Utils
 
         // already absolute
         if (substr($streamUrl, 0, 1) === '/' || substr($streamUrl, 1, 1) === ':' || substr($streamUrl, 0, 2) === '\\\\') {
-            return $prefix.$streamUrl;
+            return $prefix . $streamUrl;
         }
 
         $streamUrl = getcwd() . '/' . $streamUrl;
 
-        return $prefix.$streamUrl;
+        return $prefix . $streamUrl;
     }
 
     /**
-     * Return the JSON representation of a value
+     * Return the JSON representation of a value.
      *
-     * @param  mixed             $data
-     * @param  int               $encodeFlags  flags to pass to json encode, defaults to DEFAULT_JSON_FLAGS
-     * @param  bool              $ignoreErrors whether to ignore encoding errors or to throw on error, when ignored and the encoding fails, "null" is returned which is valid json for null
+     * @param mixed $data
+     * @param int   $encodeFlags  flags to pass to json encode, defaults to DEFAULT_JSON_FLAGS
+     * @param bool  $ignoreErrors whether to ignore encoding errors or to throw on error, when ignored and the encoding fails, "null" is returned which is valid json for null
+     *
      * @throws \RuntimeException if encoding fails and errors are not ignored
-     * @return string            when errors are ignored and the encoding fails, "null" is returned which is valid json for null
+     *
+     * @return string when errors are ignored and the encoding fails, "null" is returned which is valid json for null
      */
-    public static function jsonEncode($data, ?int $encodeFlags = null, bool $ignoreErrors = false): string
-    {
+    public static function jsonEncode($data, $encodeFlags = null, $ignoreErrors = false) {
         if (null === $encodeFlags) {
             $encodeFlags = self::DEFAULT_JSON_FLAGS;
         }
@@ -107,14 +105,15 @@ final class Utils
      * initial error is not encoding related or the input can't be cleaned then
      * raise a descriptive exception.
      *
-     * @param  int               $code        return code of json_last_error function
-     * @param  mixed             $data        data that was meant to be encoded
-     * @param  int               $encodeFlags flags to pass to json encode, defaults to JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION
+     * @param int   $code        return code of json_last_error function
+     * @param mixed $data        data that was meant to be encoded
+     * @param int   $encodeFlags flags to pass to json encode, defaults to JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRESERVE_ZERO_FRACTION
+     *
      * @throws \RuntimeException if failure can't be corrected
-     * @return string            JSON encoded data after error correction
+     *
+     * @return string JSON encoded data after error correction
      */
-    public static function handleJsonError(int $code, $data, ?int $encodeFlags = null): string
-    {
+    public static function handleJsonError($code, $data, $encodeFlags = null): string {
         if ($code !== JSON_ERROR_UTF8) {
             self::throwEncodeError($code, $data);
         }
@@ -122,7 +121,7 @@ final class Utils
         if (is_string($data)) {
             self::detectAndCleanUtf8($data);
         } elseif (is_array($data)) {
-            array_walk_recursive($data, array('Monolog\Utils', 'detectAndCleanUtf8'));
+            array_walk_recursive($data, ['Monolog\Utils', 'detectAndCleanUtf8']);
         } else {
             self::throwEncodeError($code, $data);
         }
@@ -143,8 +142,7 @@ final class Utils
     /**
      * @internal
      */
-    public static function pcreLastErrorMessage(int $code): string
-    {
+    public static function pcreLastErrorMessage(int $code): string {
         if (PHP_VERSION_ID >= 80000) {
             return preg_last_error_msg();
         }
@@ -160,34 +158,38 @@ final class Utils
     }
 
     /**
-     * Throws an exception according to a given code with a customized message
+     * Throws an exception according to a given code with a customized message.
      *
-     * @param  int               $code return code of json_last_error function
-     * @param  mixed             $data data that was meant to be encoded
+     * @param int   $code return code of json_last_error function
+     * @param mixed $data data that was meant to be encoded
+     *
      * @throws \RuntimeException
      *
      * @return never
      */
-    private static function throwEncodeError(int $code, $data): void
-    {
+    private static function throwEncodeError(int $code, $data): void {
         switch ($code) {
             case JSON_ERROR_DEPTH:
                 $msg = 'Maximum stack depth exceeded';
+
                 break;
             case JSON_ERROR_STATE_MISMATCH:
                 $msg = 'Underflow or the modes mismatch';
+
                 break;
             case JSON_ERROR_CTRL_CHAR:
                 $msg = 'Unexpected control character found';
+
                 break;
             case JSON_ERROR_UTF8:
                 $msg = 'Malformed UTF-8 characters, possibly incorrectly encoded';
+
                 break;
             default:
                 $msg = 'Unknown error';
         }
 
-        throw new \RuntimeException('JSON encoding failed: '.$msg.'. Encoding: '.var_export($data, true));
+        throw new \RuntimeException('JSON encoding failed: ' . $msg . '. Encoding: ' . var_export($data, true));
     }
 
     /**
@@ -205,8 +207,7 @@ final class Utils
      *
      * @param mixed $data Input to check and convert if needed, passed by ref
      */
-    private static function detectAndCleanUtf8(&$data): void
-    {
+    private static function detectAndCleanUtf8(&$data): void {
         if (is_string($data) && !preg_match('//u', $data)) {
             $data = preg_replace_callback(
                 '/[\x80-\xFF]+/',
@@ -217,6 +218,7 @@ final class Utils
             );
             if (!is_string($data)) {
                 $pcreErrorCode = preg_last_error();
+
                 throw new \RuntimeException('Failed to preg_replace_callback: ' . $pcreErrorCode . ' / ' . self::pcreLastErrorMessage($pcreErrorCode));
             }
             $data = str_replace(
@@ -231,10 +233,10 @@ final class Utils
      * Converts a string with a valid 'memory_limit' format, to bytes.
      *
      * @param string|false $val
+     *
      * @return int|false Returns an integer representing bytes. Returns FALSE in case of error.
      */
-    public static function expandIniShorthandBytes($val)
-    {
+    public static function expandIniShorthandBytes($val) {
         if (!is_string($val)) {
             return false;
         }
@@ -252,8 +254,10 @@ final class Utils
         switch (strtolower($match['unit'] ?? '')) {
             case 'g':
                 $val *= 1024;
+                // no break
             case 'm':
                 $val *= 1024;
+                // no break
             case 'k':
                 $val *= 1024;
         }

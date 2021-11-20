@@ -104,7 +104,7 @@ class SignalHandler {
 
         $level = isset($this->signalLevelMap[$signo]) ? $this->signalLevelMap[$signo] : LogLevel::CRITICAL;
         $signal = isset($signals[$signo]) ? $signals[$signo] : $signo;
-        $context = $siginfo ?? [];
+        $context = $siginfo ?: [];
         $this->logger->log($level, sprintf('Program received signal %s', $signal), $context);
 
         if (!isset($this->previousSignalHandler[$signo])) {
