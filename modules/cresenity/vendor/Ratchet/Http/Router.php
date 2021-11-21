@@ -1,11 +1,13 @@
 <?php
+
 namespace Ratchet\Http;
+
+use GuzzleHttp\Psr7 as gPsr;
 use Ratchet\ConnectionInterface;
 use Psr\Http\Message\RequestInterface;
 use Symfony\Component\Routing\Matcher\UrlMatcherInterface;
 use Symfony\Component\Routing\Exception\MethodNotAllowedException;
 use Symfony\Component\Routing\Exception\ResourceNotFoundException;
-use GuzzleHttp\Psr7 as gPsr;
 
 class Router implements HttpServerInterface {
     use CloseResponseTrait;
@@ -19,11 +21,12 @@ class Router implements HttpServerInterface {
 
     public function __construct(UrlMatcherInterface $matcher) {
         $this->_matcher = $matcher;
-        $this->_noopController = new NoOpHttpServerController;
+        $this->_noopController = new NoOpHttpServerController();
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
+     *
      * @throws \UnexpectedValueException If a controller is not \Ratchet\Http\HttpServerInterface
      */
     public function onOpen(ConnectionInterface $conn, RequestInterface $request = null) {
@@ -42,13 +45,13 @@ class Router implements HttpServerInterface {
         try {
             $route = $this->_matcher->match($uri->getPath());
         } catch (MethodNotAllowedException $nae) {
-            return $this->close($conn, 405, array('Allow' => $nae->getAllowedMethods()));
+            return $this->close($conn, 405, ['Allow' => $nae->getAllowedMethods()]);
         } catch (ResourceNotFoundException $nfe) {
             return $this->close($conn, 404);
         }
 
         if (is_string($route['_controller']) && class_exists($route['_controller'])) {
-            $route['_controller'] = new $route['_controller'];
+            $route['_controller'] = new $route['_controller']();
         }
 
         if (!($route['_controller'] instanceof HttpServerInterface)) {
@@ -56,7 +59,7 @@ class Router implements HttpServerInterface {
         }
 
         $parameters = [];
-        foreach($route as $key => $value) {
+        foreach ($route as $key => $value) {
             if ((is_string($key)) && ('_' !== substr($key, 0, 1))) {
                 $parameters[$key] = $value;
             }
@@ -70,14 +73,14 @@ class Router implements HttpServerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function onMessage(ConnectionInterface $from, $msg) {
         $from->controller->onMessage($from, $msg);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function onClose(ConnectionInterface $conn) {
         if (isset($conn->controller)) {
@@ -86,7 +89,7 @@ class Router implements HttpServerInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function onError(ConnectionInterface $conn, \Exception $e) {
         if (isset($conn->controller)) {

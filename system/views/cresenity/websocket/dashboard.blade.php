@@ -274,6 +274,7 @@
           },
           enabledTransports: ['ws', 'wss'],
           forceTLS: false,
+          logToConsole: true,
         });
         this.pusher.connection.bind('state_change', states => {
           this.connecting = false;
@@ -292,15 +293,21 @@
           this.chart = null;
         });
         this.pusher.connection.bind('error', event => {
-          if (event.data.code === 4100) {
+          let error = event;
+          if(!(!!event.data)) {
+            if(event.error) {
+              error = event.error;
+            }
+          }
+          if (error.data.code === 4100) {
             this.connected = false;
             this.logs = [];
             this.chart = null;
             throw new Error("Over capacity");
           }
+          console.log('error',error.data);
           this.connecting = false;
         });
-        console.log(this.pusher);
         this.subscribeToAllChannels();
       },
       disconnect () {
@@ -309,25 +316,25 @@
         this.chart = null;
       },
       loadChart () {
-        axios.get(`/api/${this.app.id}/statistics`)
+        axios.get(`${window.baseURL}/statistic/${this.app.id}`)
           .then(res => {
             let data = res.data;
             let chartData = [
               {
-                x: data.peak_connections.x,
-                y: data.peak_connections.y,
+                x: data.peak_connection.x,
+                y: data.peak_connection.y,
                 type: 'lines',
                 name: '# Peak Connections'
               },
               {
-                x: data.websocket_messages_count.x,
-                y: data.websocket_messages_count.y,
+                x: data.websocket_message_count.x,
+                y: data.websocket_message_count.y,
                 type: 'bar',
                 name: '# Websocket Messages'
               },
               {
-                x: data.api_messages_count.x,
-                y: data.api_messages_count.y,
+                x: data.api_message_count.x,
+                y: data.api_message_count.y,
                 type: 'bar',
                 name: '# API Messages'
               },
@@ -369,7 +376,7 @@
             data: JSON.stringify(this.form.data),
           };
           axios
-            .post('/event', payload)
+            .post(`${window.baseURL}/event`, payload)
             .then(() => {})
             .catch(err => {
               alert('Error sending event.');

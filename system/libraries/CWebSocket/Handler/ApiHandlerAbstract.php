@@ -71,7 +71,7 @@ abstract class CWebSocket_Handler_ApiHandlerAbstract implements HttpServerInterf
         $this->requestBuffer = (string) $request->getBody();
 
         if (!$this->verifyContentLength()) {
-            return;
+            throw new HttpException(401, 'Invalid content length.');
         }
 
         $this->handleRequest($connection);
@@ -139,7 +139,7 @@ abstract class CWebSocket_Handler_ApiHandlerAbstract implements HttpServerInterf
             return strtolower($header) === 'content-length';
         });
 
-        return isset($contentLength[0]) ? $contentLength[0] : 0;
+        return isset($contentLength[0]) ? (int) $contentLength[0] : 0;
     }
 
     /**
@@ -167,13 +167,13 @@ abstract class CWebSocket_Handler_ApiHandlerAbstract implements HttpServerInterf
             $this->request->getProtocolVersion()
         ))->withQueryParams(CWebSocket_Server_QueryParameter::create($this->request)->all());
 
-        $laravelRequest = CHTTP_Request::createFromBase((new HttpFoundationFactory())->createRequest($serverRequest));
+        $httpRequest = CHTTP_Request::createFromBase((new HttpFoundationFactory())->createRequest($serverRequest));
 
-        $this->ensureValidAppId($laravelRequest->get('appId'))
-            ->ensureValidSignature($laravelRequest);
-
+        $this->ensureValidAppId($httpRequest->get('appId'))
+            ->ensureValidSignature($httpRequest);
+        CHTTP::setRequest($httpRequest);
         // Invoke the controller action
-        $response = $this($laravelRequest);
+        $response = $this($httpRequest);
 
         // Allow for async IO in the controller action
         if ($response instanceof PromiseInterface) {
@@ -233,7 +233,9 @@ abstract class CWebSocket_Handler_ApiHandlerAbstract implements HttpServerInterf
     protected function ensureValidSignature(CHTTP_Request $request) {
         // The `auth_signature` & `body_md5` parameters are not included when calculating the `auth_signature` value.
         // The `appId`, `appKey` & `channelName` parameters are actually route parameters and are never supplied by the client.
-
+        if ($request->get('bypass')) {
+            return $this;
+        }
         $params = carr::except($request->query(), [
             'auth_signature', 'body_md5', 'appId', 'appKey', 'channelName',
         ]);
@@ -247,7 +249,6 @@ abstract class CWebSocket_Handler_ApiHandlerAbstract implements HttpServerInterf
         $signature = "{$request->getMethod()}\n/{$request->path()}\n" . CWebSocket_Helper::pusherArrayImplode('=', '&', $params);
 
         $authSignature = hash_hmac('sha256', $signature, $this->app->secret);
-
         if ($authSignature !== $request->get('auth_signature')) {
             throw new HttpException(401, 'Invalid auth signature provided.');
         }

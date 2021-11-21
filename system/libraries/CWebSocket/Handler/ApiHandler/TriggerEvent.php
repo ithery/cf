@@ -23,6 +23,11 @@ class CWebSocket_Handler_ApiHandler_TriggerEvent extends CWebSocket_Handler_ApiH
                 $request->appId,
                 $channelName
             );
+            if ($channel) {
+                cdbg::d($channel->getName());
+            } else {
+                cdbg::d('channel is null');
+            }
 
             $payload = [
                 'event' => $request->name,

@@ -42,20 +42,20 @@ return [
     */
 
     'apps' => [
-        [
-            'id' => c::env('PUSHER_APP_ID'),
-            'name' => c::env('APP_NAME'),
-            'host' => c::env('PUSHER_APP_HOST'),
-            'key' => c::env('PUSHER_APP_KEY'),
-            'secret' => c::env('PUSHER_APP_SECRET'),
-            'path' => c::env('PUSHER_APP_PATH'),
-            'capacity' => null,
-            'enable_client_messages' => false,
-            'enable_statistics' => true,
-            'allowed_origins' => [
-                CF::domain()
-            ],
-        ],
+        // 'default' => [
+        //     'id' => c::env('PUSHER_APP_ID'),
+        //     'name' => c::env('APP_NAME'),
+        //     'host' => c::env('PUSHER_APP_HOST'),
+        //     'key' => c::env('PUSHER_APP_KEY'),
+        //     'secret' => c::env('PUSHER_APP_SECRET'),
+        //     'path' => c::env('PUSHER_APP_PATH'),
+        //     'capacity' => null,
+        //     'enable_client_messages' => false,
+        //     'enable_statistics' => true,
+        //     'allowed_origins' => [
+        //         CF::domain()
+        //     ],
+        // ],
     ],
 
     /*
