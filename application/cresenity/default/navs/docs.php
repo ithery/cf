@@ -30,6 +30,11 @@ return [
         'label' => c::__('The Basic'),
         'subnav' => [
             [
+                'name' => 'basic.bootstrap',
+                'label' => c::__('Bootstrap'),
+                'uri' => 'docs/basic/bootstrap',
+            ],
+            [
                 'name' => 'basic.routing',
                 'label' => c::__('Routing'),
                 'uri' => 'docs/basic/routing',
@@ -48,6 +53,42 @@ return [
                 'name' => 'basic.view',
                 'label' => c::__('View'),
                 'uri' => 'docs/basic/view',
+            ],
+        ]
+    ],
+    [
+        'name' => 'app',
+        'label' => c::__('Application'),
+        'subnav' => [
+            [
+                'name' => 'app.introduction',
+                'label' => c::__('Introduction'),
+                'uri' => 'docs/app/introduction',
+            ],
+            [
+                'name' => 'app.setup',
+                'label' => c::__('Setup'),
+                'uri' => 'docs/app/setup',
+            ],
+            [
+                'name' => 'app.navigation',
+                'label' => c::__('Navigation'),
+                'uri' => 'docs/app/navigation',
+            ],
+            [
+                'name' => 'app.auth',
+                'label' => c::__('Authentication'),
+                'uri' => 'docs/app/auth',
+            ],
+            [
+                'name' => 'app.theme',
+                'label' => c::__('Theme'),
+                'uri' => 'docs/app/theme',
+            ],
+            [
+                'name' => 'app.element',
+                'label' => c::__('Element'),
+                'uri' => 'docs/app/element',
             ],
         ]
     ],
@@ -87,6 +128,11 @@ return [
                 'label' => c::__('Queue'),
                 'uri' => 'docs/module/queue',
             ],
+            [
+                'name' => 'module.daemon',
+                'label' => c::__('Daemon'),
+                'uri' => 'docs/module/daemon',
+            ],
         ]
     ],
     [
@@ -102,6 +148,11 @@ return [
                 'name' => 'cresjs.basic',
                 'label' => c::__('Basic'),
                 'uri' => 'docs/cresjs/basic',
+            ],
+            [
+                'name' => 'cresjs.php',
+                'label' => c::__('PHPJS Function'),
+                'uri' => 'docs/cresjs/php',
             ],
             [
                 'name' => 'cresjs.reload',
