@@ -213,4 +213,8 @@ class CLogger {
     public static function getLevels() {
         return static::$logLevels;
     }
+
+    public static function logger() {
+        return CLogger_Manager::instance();
+    }
 }
