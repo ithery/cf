@@ -61,7 +61,7 @@ return [
      * stack traces will be shown on every error that occurs within your
      * application. If disabled, a simple generic error page is shown.
      */
-    'debug' => !IN_PRODUCTION,
+    'debug' => !CF::isProduction(),
 
     'auth' => [
         'guard' => 'web',
@@ -91,7 +91,6 @@ return [
         'user' => CApp_Model_Users::class,
         'role' => CApp_Model_Roles::class,
         'role_nav' => CApp_Model_RoleNav::class,
-        'base' => CApp_Base::class,
     ],
     'classes' => [
         'base' => CApp_Base::class,
