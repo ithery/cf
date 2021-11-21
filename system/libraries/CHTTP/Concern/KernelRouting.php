@@ -9,9 +9,9 @@ trait CHTTP_Concern_KernelRouting {
     /**
      * Send the given request through the middleware / router.
      *
-     * @param \CHttp_Request $request
+     * @param \CHTTP_Request $request
      *
-     * @return \CHttp_Response
+     * @return \CHTTP_Response
      */
     protected function sendRequestThroughRouter($request) {
         //$this->bootstrap();
