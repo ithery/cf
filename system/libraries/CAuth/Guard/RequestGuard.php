@@ -1,6 +1,6 @@
 <?php
 
-class CAuth_Guard_RequestGuard implements CAuth_GuardInterface {
+class CAuth_Guard_RequestGuard implements CAuth_Contract_GuardInterface {
     use CAuth_Guard_Concern_GuardHelper, CTrait_Macroable;
 
     /**
