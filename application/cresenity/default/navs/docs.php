@@ -30,6 +30,11 @@ return [
         'label' => c::__('The Basic'),
         'subnav' => [
             [
+                'name' => 'basic.bootstrap',
+                'label' => c::__('Bootstrap'),
+                'uri' => 'docs/basic/bootstrap',
+            ],
+            [
                 'name' => 'basic.routing',
                 'label' => c::__('Routing'),
                 'uri' => 'docs/basic/routing',
@@ -64,6 +69,16 @@ return [
                 'name' => 'app.setup',
                 'label' => c::__('Setup'),
                 'uri' => 'docs/app/setup',
+            ],
+            [
+                'name' => 'app.navigation',
+                'label' => c::__('Navigation'),
+                'uri' => 'docs/app/navigation',
+            ],
+            [
+                'name' => 'app.auth',
+                'label' => c::__('Authentication'),
+                'uri' => 'docs/app/auth',
             ],
             [
                 'name' => 'app.theme',
