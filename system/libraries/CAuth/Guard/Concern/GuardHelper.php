@@ -21,9 +21,9 @@ trait CAuth_Guard_Concern_GuardHelper {
     /**
      * Determine if current user is authenticated. If not, throw an exception.
      *
-     * @throws \Illuminate\Auth\AuthenticationException
+     * @throws \CAuth_Exception_AuthenticationException
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable
+     * @return \CAuth_AuthenticatableInterface
      */
     public function authenticate() {
         if (!is_null($user = $this->user())) {

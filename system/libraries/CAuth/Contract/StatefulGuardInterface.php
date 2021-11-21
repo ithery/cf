@@ -1,5 +1,5 @@
 <?php
-interface CAuth_StatefulGuardInterface extends CAuth_GuardInterface {
+interface CAuth_Contract_StatefulGuardInterface extends CAuth_Contract_GuardInterface {
     /**
      * Attempt to authenticate a user using the given credentials.
      *

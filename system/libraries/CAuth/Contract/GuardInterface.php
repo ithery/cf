@@ -1,6 +1,6 @@
 <?php
 
-interface CAuth_GuardInterface {
+interface CAuth_Contract_GuardInterface {
     /**
      * Determine if the current user is authenticated.
      *
@@ -18,14 +18,14 @@ interface CAuth_GuardInterface {
     /**
      * Get the currently authenticated user.
      *
-     * @return CAuth_AuthenticatableInterface|null
+     * @return null|CAuth_AuthenticatableInterface
      */
     public function user();
 
     /**
      * Get the ID for the currently authenticated user.
      *
-     * @return int|string|null
+     * @return null|int|string
      */
     public function id();
 
