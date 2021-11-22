@@ -1,5 +1,7 @@
 <?php
-
+if (!is_callable('random_bytes')) {
+    require_once DOCROOT . 'system/vendor/random_compat/random.php';
+}
 class CException_Report {
     use CException_Concern_UseTimeTrait;
     use CException_Concern_HasContextTrait;
