@@ -57,6 +57,7 @@ trait CApp_Concern_AuthTrait {
     }
 
     public function user() {
+        // a
         return $this->auth()->user();
     }
 
