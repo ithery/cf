@@ -28,6 +28,7 @@ class CNotification_Channel_EmailChannel extends CNotification_ChannelAbstract {
         if ($errCode > 0) {
             throw new CNotification_Exception($errMessage);
         }
+
         return $response;
     }
 
