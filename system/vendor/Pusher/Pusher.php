@@ -59,7 +59,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface {
      *
      * @throws PusherException Throws exception if any required dependencies are missing
      */
-    public function __construct(string $auth_key, string $secret, string $app_id, array $options = [], ClientInterface $client = null) {
+    public function __construct($auth_key, $secret, $app_id, array $options = [], ClientInterface $client = null) {
         $this->check_compatibility();
 
         if (!is_null($client)) {
@@ -124,7 +124,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface {
      *
      * @return array
      */
-    public function getSettings(): array {
+    public function getSettings() {
         return $this->settings;
     }
 
@@ -162,7 +162,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface {
      *
      * @throws PusherException If any required dependencies are missing
      */
-    private function check_compatibility(): void {
+    private function check_compatibility() {
         if (!extension_loaded('json')) {
             throw new PusherException('The Pusher library requires the PHP JSON module. Please ensure it is installed');
         }
@@ -179,7 +179,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface {
      *
      * @throws PusherException If $channels is too big or any channel is invalid
      */
-    private function validate_channels(array $channels): void {
+    private function validate_channels(array $channels) {
         if (count($channels) > 100) {
             throw new PusherException('An event can be triggered on a maximum of 100 channels in a single call.');
         }
@@ -196,7 +196,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface {
      *
      * @throws PusherException If $channel is invalid
      */
-    private function validate_channel(string $channel): void {
+    private function validate_channel($channel) {
         if (!preg_match('/\A[-a-zA-Z0-9_=@,.;]+\z/', $channel)) {
             throw new PusherException('Invalid channel name ' . $channel);
         }
@@ -209,7 +209,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface {
      *
      * @throws PusherException If $socket_id is invalid
      */
-    private function validate_socket_id(string $socket_id): void {
+    private function validate_socket_id($socket_id) {
         if ($socket_id !== null && !preg_match('/\A\d+\.\d+\z/', $socket_id)) {
             throw new PusherException('Invalid socket ID ' . $socket_id);
         }
@@ -239,7 +239,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface {
      *
      * @return string
      */
-    private function channels_url_prefix(): string {
+    private function channels_url_prefix() {
         return $this->settings['scheme'] . '://' . $this->settings['host'] . ':' . $this->settings['port'] . $this->settings['path'];
     }
 
@@ -257,14 +257,14 @@ class Pusher implements LoggerAwareInterface, PusherInterface {
      * @return array
      */
     public static function build_auth_query_params(
-        string $auth_key,
-        string $auth_secret,
-        string $request_method,
-        string $request_path,
+        $auth_key,
+        $auth_secret,
+        $request_method,
+        $request_path,
         array $query_params = [],
-        string $auth_version = '1.0',
-        string $auth_timestamp = null
-    ): array {
+        $auth_version = '1.0',
+        $auth_timestamp = null
+    ) {
         $params = [];
         $params['auth_key'] = $auth_key;
         $params['auth_timestamp'] = (is_null($auth_timestamp) ? time() : $auth_timestamp);
@@ -293,7 +293,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface {
      *
      * @return string The imploded array
      */
-    public static function array_implode(string $glue, string $separator, $array): string {
+    public static function array_implode($glue, $separator, $array) {
         if (!is_array($array)) {
             return $array;
         }
@@ -323,7 +323,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface {
      *
      * @return Request
      */
-    public function make_request($channels, string $event, $data, array $params = [], bool $already_encoded = false): Request {
+    public function make_request($channels, $event, $data, array $params = [], $already_encoded = false) {
         if (is_string($channels) === true) {
             $channels = [$channels];
         }
@@ -436,7 +436,6 @@ class Pusher implements LoggerAwareInterface, PusherInterface {
         }
 
         $status = $response->getStatusCode();
-
         if ($status !== 200) {
             $body = (string) $response->getBody();
 
@@ -509,7 +508,7 @@ class Pusher implements LoggerAwareInterface, PusherInterface {
      *
      * @return Request
      */
-    public function make_batch_request(array $batch = [], bool $already_encoded = false): Request {
+    public function make_batch_request(array $batch = [], $already_encoded = false) {
         foreach ($batch as $key => $event) {
             $this->validate_channel($event['channel']);
             if (isset($event['socket_id'])) {

@@ -126,7 +126,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      *
      * @param null|string $name
      *
-     * @return mixed
+     * @return CBroadcast_BroadcasterAbstract
      */
     public function driver($name = null) {
         $name = $name ?: $this->getDefaultDriver();
@@ -142,7 +142,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      * @return \CBroadcast_Contract_BroadcasterInterface
      */
     protected function get($name) {
-        return $this->drivers[$name] ?? $this->resolve($name);
+        return isset($this->drivers[$name]) ? $this->drivers[$name] : $this->resolve($name);
     }
 
     /**

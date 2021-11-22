@@ -69,7 +69,7 @@ class CWebSocket_App {
      *
      * @return null|\CWebSocket_App
      */
-    public static function findByKey($appKey): ?self {
+    public static function findByKey($appKey) {
         return CWebSocket::appManager()->findByKey($appKey);
     }
 
@@ -80,7 +80,7 @@ class CWebSocket_App {
      *
      * @return null|\CWebSocket_App
      */
-    public static function findBySecret($appSecret): ?self {
+    public static function findBySecret($appSecret) {
         return CWebSocket::appManager()->findBySecret($appSecret);
     }
 

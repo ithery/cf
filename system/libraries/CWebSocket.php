@@ -1,21 +1,39 @@
 <?php
-use React\EventLoop\Factory as LoopFactory;
 
 class CWebSocket {
+    /**
+     * @var CWebSocket_Contract_ChannelManagerInterface
+     */
     private static $channelManager;
 
-    private static $loop;
-
+    /**
+     * @var CWebSocket_Server_Logger_HttpLogger
+     */
     private static $httpLogger;
 
+    /**
+     * @var CWebSocket_Server_Logger_WebSocketLogger
+     */
     private static $webSocketLogger;
 
+    /**
+     * @var CWebSocket_Server_Logger_ConnectionLogger
+     */
     private static $connectionLogger;
 
+    /**
+     * @var CWebSocket_Contract_StatisticStoreInterface
+     */
     private static $statisticStore;
 
+    /**
+     * @var CWebSocket_Contract_StatisticCollectorInterface
+     */
     private static $statisticCollector;
 
+    /**
+     * @return CWebSocket_AppManager
+     */
     public static function appManager() {
         return CWebSocket_AppManager::instance();
     }
@@ -43,7 +61,7 @@ class CWebSocket {
     }
 
     /**
-     * @return CWebSocket_Server_Logger_HttpLogger
+     * @return CWebSocket_Server_Logger_WebSocketLogger
      */
     public static function webSocketLogger() {
         return static::$webSocketLogger;
@@ -76,7 +94,7 @@ class CWebSocket {
      */
     public static function statisticStore() {
         if (static::$statisticStore == null) {
-            $class = CF::config('websocket.store');
+            $class = CF::config('websocket.statistics.store');
             static::$statisticStore = new $class();
         }
 

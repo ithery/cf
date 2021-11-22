@@ -1,9 +1,5 @@
 <?php
 
-use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-
 class CBase {
     const ENVIRONMENT_PRODUCTION = 'production';
 

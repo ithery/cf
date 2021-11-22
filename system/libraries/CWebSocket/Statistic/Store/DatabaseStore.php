@@ -8,7 +8,7 @@ class CWebSocket_Statistic_Store_DatabaseStore implements CWebSocket_Contract_St
      *
      * @var string
      */
-    public static $model = \CWebSocket_Model_WebSocket_Statistic::class;
+    public static $model = \CWebSocket_Model_WebSocketStatistic::class;
 
     /**
      * Store a new record in the database and return
@@ -35,7 +35,9 @@ class CWebSocket_Statistic_Store_DatabaseStore implements CWebSocket_Contract_St
      * @return int
      */
     public static function delete(Carbon $moment, $appId = null) {
-        return static::$model::where('created', '<', $moment->toDateTimeString())
+        $model = static::$model;
+
+        return $model::where('created', '<', $moment->toDateTimeString())
             ->when(!is_null($appId), function ($query) use ($appId) {
                 return $query->whereAppId($appId);
             })
@@ -50,7 +52,9 @@ class CWebSocket_Statistic_Store_DatabaseStore implements CWebSocket_Contract_St
      * @return \CCollection
      */
     public function getRawRecords(callable $processQuery = null) {
-        return static::$model::query()
+        $model = static::$model;
+
+        return $model::query()
             ->when(!is_null($processQuery), function ($query) use ($processQuery) {
                 return call_user_func($processQuery, $query);
             }, function ($query) {
@@ -117,7 +121,7 @@ class CWebSocket_Statistic_Store_DatabaseStore implements CWebSocket_Contract_St
      *
      * @return array
      */
-    protected function statisticsToGraph(CCollection $statistics): array {
+    protected function statisticsToGraph(CCollection $statistics) {
         return [
             'peak_connection' => [
                 'x' => $statistics->pluck('timestamp')->toArray(),

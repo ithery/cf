@@ -49,7 +49,7 @@ class CWebSocket_AppManager implements CWebSocket_Contract_AppManagerInterface {
      */
     public function findById($appId) {
         return $this->convertIntoApp(
-            $this->apps->firstWhere('id', $appId)
+            $this->apps->firstWhere('id', '=', $appId)
         );
     }
 
@@ -62,7 +62,7 @@ class CWebSocket_AppManager implements CWebSocket_Contract_AppManagerInterface {
      */
     public function findByKey($appKey) {
         return $this->convertIntoApp(
-            $this->apps->firstWhere('key', $appKey)
+            $this->apps->firstWhere('key', '=', $appKey)
         );
     }
 
@@ -75,7 +75,7 @@ class CWebSocket_AppManager implements CWebSocket_Contract_AppManagerInterface {
      */
     public function findBySecret($appSecret) {
         return $this->convertIntoApp(
-            $this->apps->firstWhere('secret', $appSecret)
+            $this->apps->firstWhere('secret', '=', $appSecret)
         );
     }
 

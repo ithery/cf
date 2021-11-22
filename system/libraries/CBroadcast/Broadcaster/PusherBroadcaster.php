@@ -127,7 +127,7 @@ class CBroadcast_Broadcaster_PusherBroadcaster extends CBroadcast_BroadcasterAbs
                 );
             } catch (ApiErrorException $e) {
                 throw new CBroadcast_Exception(
-                    sprintf('Pusher error: %s.', $e->getMessage())
+                    sprintf('Pusher error[1]: %s.', $e->getMessage())
                 );
             }
         } else {
@@ -147,7 +147,7 @@ class CBroadcast_Broadcaster_PusherBroadcaster extends CBroadcast_BroadcasterAbs
 
             throw new CBroadcast_Exception(
                 !empty($response['body'])
-                    ? sprintf('Pusher error: %s.', $response['body'])
+                    ? sprintf('Pusher error[2]: %s.', $response['body'])
                     : 'Failed to connect to Pusher.'
             );
         }

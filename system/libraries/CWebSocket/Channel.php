@@ -82,7 +82,7 @@ class CWebsocket_Channel {
         CWebSocket_Event_SubscribedToChannel::dispatch(
             $connection->app->id,
             $connection->socketId,
-            $this->getName(),
+            $this->getName()
         );
 
         return true;

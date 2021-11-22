@@ -270,15 +270,15 @@ abstract class CBroadcast_BroadcasterAbstract implements CBroadcast_Contract_Bro
     /**
      * Retrieve the authenticated user using the configured guard (if any).
      *
-     * @param \Illuminate\Http\Request $request
-     * @param string                   $channel
+     * @param \CHTTP_Request $request
+     * @param string         $channel
      *
      * @return mixed
      */
     protected function retrieveUser($request, $channel) {
         $options = $this->retrieveChannelOptions($channel);
 
-        $guards = $options['guards'] ?? null;
+        $guards = isset($options['guards']) ? $options['guards'] : null;
 
         if (is_null($guards)) {
             return $request->user();
