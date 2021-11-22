@@ -5,7 +5,7 @@ use Illuminate\Broadcasting\BroadcastException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class CBroadcast_Broadcaster_PusherBroadcaster extends CBroadcast_BroadcasterAbstract {
-    use CBroadcast_Trait_UsePusherChannelConventions;
+    use CBroadcast_Concern_PusherChannelConventionTrait;
 
     /**
      * The Pusher SDK instance.
@@ -62,7 +62,7 @@ class CBroadcast_Broadcaster_PusherBroadcaster extends CBroadcast_BroadcasterAbs
         if (cstr::startsWith($request->channel_name, 'private')) {
             return $this->decodePusherResponse(
                 $request,
-                $this->pusher->socket_auth($request->channel_name, $request->socket_id)
+                $this->pusher->socketAuth($request->channel_name, $request->socket_id)
             );
         }
 
@@ -76,7 +76,7 @@ class CBroadcast_Broadcaster_PusherBroadcaster extends CBroadcast_BroadcasterAbs
 
         return $this->decodePusherResponse(
             $request,
-            $this->pusher->presence_auth(
+            $this->pusher->presenceAuth(
                 $request->channel_name,
                 $request->socket_id,
                 $broadcastIdentifier,
@@ -115,7 +115,6 @@ class CBroadcast_Broadcaster_PusherBroadcaster extends CBroadcast_BroadcasterAbs
      */
     public function broadcast(array $channels, $event, array $payload = []) {
         $socket = carr::pull($payload, 'socket');
-
         if ($this->pusherServerIsVersionFiveOrGreater()) {
             $parameters = $socket !== null ? ['socket_id' => $socket] : [];
 
@@ -128,7 +127,7 @@ class CBroadcast_Broadcaster_PusherBroadcaster extends CBroadcast_BroadcasterAbs
                 );
             } catch (ApiErrorException $e) {
                 throw new CBroadcast_Exception(
-                    sprintf('Pusher error: %s.', $e->getMessage())
+                    sprintf('Pusher error[1]: %s.', $e->getMessage())
                 );
             }
         } else {
@@ -148,7 +147,7 @@ class CBroadcast_Broadcaster_PusherBroadcaster extends CBroadcast_BroadcasterAbs
 
             throw new CBroadcast_Exception(
                 !empty($response['body'])
-                    ? sprintf('Pusher error: %s.', $response['body'])
+                    ? sprintf('Pusher error[2]: %s.', $response['body'])
                     : 'Failed to connect to Pusher.'
             );
         }
