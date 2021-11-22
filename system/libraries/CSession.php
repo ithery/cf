@@ -56,9 +56,10 @@ class CSession {
                 $this->regenerate();
             } else {
                 // Expiration timestamp
-                $expire = (CSession::$config['expiration'] == 0) ? 0 : time() + (int) CSession::$config['expiration'];
+                //$expire = (CSession::$config['expiration'] == 0) ? 0 : time() + (int) CSession::$config['expiration'];
                 // Always update session cookie to keep the session alive
-                setcookie(CSession::$config['name'], $_SESSION['session_id'], $expire);
+                CCookie::set(CSession::$config['name'], $_SESSION['session_id'], CSession::$config['expiration']);
+                //setcookie(CSession::$config['name'], $_SESSION['session_id'], $expire);
             }
 
             // Close the session just before sending the headers, so that
@@ -175,6 +176,7 @@ class CSession {
                         if ($_SESSION[$valid] !== CHTTP::request()->userAgent()) {
                             return $this->create();
                         }
+
                         break;
 
                     // Check ip address for consistency
@@ -182,6 +184,7 @@ class CSession {
                         if ($_SESSION[$valid] !== CHTTP::request()->ip()) {
                             return $this->create();
                         }
+
                         break;
 
                     // Check expiration time to prevent users from manually modifying it
@@ -189,6 +192,7 @@ class CSession {
                         if (time() - $_SESSION['last_activity'] > ini_get('session.gc_maxlifetime')) {
                             return $this->create();
                         }
+
                         break;
                 }
             }
@@ -252,7 +256,8 @@ class CSession {
             $_SESSION = [];
 
             // Delete the session cookie
-            setcookie($name, '', -86400);
+            //setcookie($name, '', -86400);
+            CCookie::delete($name);
         }
     }
 
@@ -497,7 +502,7 @@ class CSession {
      * @return mixed
      */
     public function remove($key) {
-        return $this->pull($key);
+        return $this->forget($key);
     }
 
     public function all() {

@@ -39,6 +39,7 @@ class CTracker_Populator {
         if (static::$instance == null) {
             static::$instance = new CTracker_Populator();
         }
+
         return static::$instance;
     }
 
@@ -70,6 +71,7 @@ class CTracker_Populator {
 
             $this->isDataPopulated = true;
         }
+
         return $this;
     }
 
@@ -79,6 +81,20 @@ class CTracker_Populator {
 
     public function setCustomLogData(array $logData) {
         $this->data['customLogData'] = $logData;
+    }
+
+    public function get($key, $defaultValue = null) {
+        return carr::get($this->data, $key, $defaultValue);
+    }
+
+    public function getData() {
+        return $this->data;
+    }
+
+    public function setData($data) {
+        $this->data = $data;
+
+        return $this;
     }
 
     protected function populateRequestData() {
@@ -127,11 +143,13 @@ class CTracker_Populator {
         if ($this->data['device'] = $this->mobileDetect->detectDevice()) {
             $operatingSystemFamily = null;
             $operatingSystemVersion = null;
+
             try {
                 $operatingSystemFamily = $this->userAgentParser->operatingSystem->family;
             } catch (\Exception $e) {
                 //do nothing
             }
+
             try {
                 $operatingSystemVersion = $this->userAgentParser->getOperatingSystemVersion();
             } catch (\Exception $e) {
@@ -177,6 +195,7 @@ class CTracker_Populator {
         $languageDetect = new CTracker_Detect_LanguageDetect();
 
         $languages = null;
+
         try {
             $languages = $languageDetect->detectLanguage();
             if ($languages) {
@@ -199,18 +218,5 @@ class CTracker_Populator {
             'name_hash' => hash('sha256', $name),
         ];
         $this->data['agent'] = $userAgentData;
-    }
-
-    public function get($key, $defaultValue = null) {
-        return carr::get($this->data, $key, $defaultValue);
-    }
-
-    public function getData() {
-        return $this->data;
-    }
-
-    public function setData($data) {
-        $this->data = $data;
-        return $this;
     }
 }

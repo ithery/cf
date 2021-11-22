@@ -41,6 +41,7 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public function setData($key, $data) {
         $this->data[$key] = $data;
+
         return $this;
     }
 
@@ -58,6 +59,7 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public function setType($type) {
         $this->type = $type;
+
         return $this;
     }
 
@@ -68,6 +70,7 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public function setArgs(array $args) {
         $this->args = $args;
+
         return $this;
     }
 
@@ -92,6 +95,7 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public function setMethod($method) {
         $this->method = $method;
+
         return $this;
     }
 
@@ -140,6 +144,7 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public function fromJson($json) {
         $jsonArray = json_decode($json, true);
+
         return $this->fromArray($jsonArray);
     }
 
@@ -147,6 +152,7 @@ class CAjax_Method implements CInterface_Jsonable {
         $this->data = carr::get($array, 'data', []);
         $this->method = carr::get($array, 'method', 'GET');
         $this->type = carr::get($array, 'type');
+
         return $this;
     }
 
@@ -157,24 +163,26 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public static function createFromJson($json) {
         $instance = new CAjax_Method();
+
         return $instance->fromJson($json);
     }
 
     /**
      * @param CAjax_Method $ajaxMethod
-     * @param array|null   $input
-     *
-     * @return CAjax_Engine
+     * @param null|array   $input
      *
      * @throws CAjax_Exception
+     *
+     * @return CAjax_Engine
      */
     public static function createEngine(CAjax_Method $ajaxMethod, $input = null) {
         $class = 'CAjax_Engine_' . $ajaxMethod->type;
 
         if (!class_exists($class)) {
-            throw new CAjax_Exception('class ajax engine :class not found', [':class' => $class]);
+            throw new CAjax_Exception(c::__('class ajax engine :class not found', [':class' => $class]));
         }
         $engine = new $class($ajaxMethod, $input);
+
         return $engine;
     }
 
@@ -185,6 +193,7 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public function executeEngine($input = null) {
         $engine = self::createEngine($this, $input);
+
         return $engine->execute();
     }
 }

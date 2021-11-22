@@ -30,6 +30,11 @@ return [
         'label' => c::__('The Basic'),
         'subnav' => [
             [
+                'name' => 'basic.bootstrap',
+                'label' => c::__('Bootstrap'),
+                'uri' => 'docs/basic/bootstrap',
+            ],
+            [
                 'name' => 'basic.routing',
                 'label' => c::__('Routing'),
                 'uri' => 'docs/basic/routing',
@@ -48,6 +53,42 @@ return [
                 'name' => 'basic.view',
                 'label' => c::__('View'),
                 'uri' => 'docs/basic/view',
+            ],
+        ]
+    ],
+    [
+        'name' => 'app',
+        'label' => c::__('Application'),
+        'subnav' => [
+            [
+                'name' => 'app.introduction',
+                'label' => c::__('Introduction'),
+                'uri' => 'docs/app/introduction',
+            ],
+            [
+                'name' => 'app.setup',
+                'label' => c::__('Setup'),
+                'uri' => 'docs/app/setup',
+            ],
+            [
+                'name' => 'app.navigation',
+                'label' => c::__('Navigation'),
+                'uri' => 'docs/app/navigation',
+            ],
+            [
+                'name' => 'app.auth',
+                'label' => c::__('Authentication'),
+                'uri' => 'docs/app/auth',
+            ],
+            [
+                'name' => 'app.theme',
+                'label' => c::__('Theme'),
+                'uri' => 'docs/app/theme',
+            ],
+            [
+                'name' => 'app.element',
+                'label' => c::__('Element'),
+                'uri' => 'docs/app/element',
             ],
         ]
     ],
@@ -79,13 +120,49 @@ return [
         ]
     ],
     [
-        'name' => 'component',
-        'label' => c::__('Components'),
+        'name' => 'module',
+        'label' => c::__('Modules'),
         'subnav' => [
             [
-                'name' => 'component.started',
-                'label' => c::__('Get Started Component'),
-                'uri' => 'docs/component/started',
+                'name' => 'module.queue',
+                'label' => c::__('Queue'),
+                'uri' => 'docs/module/queue',
+            ],
+            [
+                'name' => 'module.daemon',
+                'label' => c::__('Daemon'),
+                'uri' => 'docs/module/daemon',
+            ],
+        ]
+    ],
+    [
+        'name' => 'cresjs',
+        'label' => c::__('Cres JS'),
+        'subnav' => [
+            [
+                'name' => 'cresjs.introduction',
+                'label' => c::__('Introduction'),
+                'uri' => 'docs/cresjs/introduction',
+            ],
+            [
+                'name' => 'cresjs.basic',
+                'label' => c::__('Basic'),
+                'uri' => 'docs/cresjs/basic',
+            ],
+            [
+                'name' => 'cresjs.php',
+                'label' => c::__('PHPJS Function'),
+                'uri' => 'docs/cresjs/php',
+            ],
+            [
+                'name' => 'cresjs.reload',
+                'label' => c::__('Reload'),
+                'uri' => 'docs/cresjs/reload',
+            ],
+            [
+                'name' => 'cresjs.ui',
+                'label' => c::__('UI'),
+                'uri' => 'docs/cresjs/ui',
             ],
         ]
     ],
@@ -110,9 +187,9 @@ return [
         'label' => c::__('Other'),
         'subnav' => [
             [
-                'name' => 'other.basic',
-                'label' => c::__('Basic'),
-                'uri' => 'docs/other/basic',
+                'name' => 'other.maintenance',
+                'label' => c::__('Maintenance'),
+                'uri' => 'docs/other/maintenance',
             ],
         ]
     ],

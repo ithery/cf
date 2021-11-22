@@ -12,7 +12,6 @@ use ONGR\ElasticsearchDSL\Search as DSLQuery;
 
 class CElastic {
     use CTrait_Compat_Elastic;
-
     // Elastic instances
     public static $instances = [];
 
@@ -42,43 +41,6 @@ class CElastic {
      * @var string
      */
     protected $index;
-
-    /**
-     * Returns a singleton instance of CElastic.
-     *
-     * @param mixed      $domain
-     * @param mixed      $name
-     * @param null|mixed $config
-     *
-     * @return CElastic
-     */
-    public static function &instance($domain = '', $name = 'default', $config = null) {
-        if (strlen($domain) == 0) {
-            //get current domain
-            $domain = CF::domain();
-        }
-        if (!isset(CElastic::$instances[$domain])) {
-            CElastic::$instances[$domain] = [];
-        }
-        if (!isset(CElastic::$instances[$domain][$name])) {
-            // Create a new instance
-            CElastic::$instances[$domain][$name] = new CElastic($config === null ? $name : $config, $name, $domain);
-        }
-
-        return CElastic::$instances[$domain][$name];
-    }
-
-    public function config() {
-        return $this->config;
-    }
-
-    public function getName() {
-        return $this->name;
-    }
-
-    public function getDomain() {
-        return $this->domain;
-    }
 
     /**
      * Sets up the elastic configuration.
@@ -135,7 +97,7 @@ class CElastic {
 
         $this->config = $config;
 
-        $this->hosts = carr::path($this->config, 'connection.hosts');
+        $this->hosts = carr::get($this->config, 'connection.hosts');
 
         $clientBuilder = Elasticsearch\ClientBuilder::create();
         $clientBuilder->setHosts($this->hosts);
@@ -145,12 +107,50 @@ class CElastic {
     }
 
     /**
+     * Returns a singleton instance of CElastic.
+     *
+     * @param mixed      $domain
+     * @param mixed      $name
+     * @param null|mixed $config
+     *
+     * @return CElastic
+     */
+    public static function &instance($domain = '', $name = 'default', $config = null) {
+        if (strlen($domain) == 0) {
+            //get current domain
+            $domain = CF::domain();
+        }
+        if (!isset(CElastic::$instances[$domain])) {
+            CElastic::$instances[$domain] = [];
+        }
+        if (!isset(CElastic::$instances[$domain][$name])) {
+            // Create a new instance
+            CElastic::$instances[$domain][$name] = new CElastic($config === null ? $name : $config, $name, $domain);
+        }
+
+        return CElastic::$instances[$domain][$name];
+    }
+
+    public function config() {
+        return $this->config;
+    }
+
+    public function getName() {
+        return $this->name;
+    }
+
+    public function getDomain() {
+        return $this->domain;
+    }
+
+    /**
      * @return CElastic_Manager_Indices
      */
     public function indicesManager() {
         if (!$this->indicesManager) {
             $this->indicesManager = new CElastic_Manager_Indices($this);
         }
+
         return $this->indicesManager;
     }
 

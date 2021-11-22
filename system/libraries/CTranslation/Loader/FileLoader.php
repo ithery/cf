@@ -141,9 +141,9 @@ class CTranslation_Loader_FileLoader extends CTranslation_LoaderAbstract {
      *
      * @param string $locale
      *
-     * @return array
-     *
      * @throws \RuntimeException
+     *
+     * @return array
      */
     protected function loadJsonPaths($locale) {
         return c::collect(array_merge($this->jsonPaths, [$this->path]))

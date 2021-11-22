@@ -17,6 +17,12 @@ use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
 
 class CConfig_Parser {
+    /**
+     * @param string $file
+     * @param string $key
+     *
+     * @return string
+     */
     public function getComment($file, $key) {
         $code = file_get_contents($file);
         $parser = (new ParserFactory)->create(ParserFactory::PREFER_PHP7);
@@ -30,7 +36,7 @@ class CConfig_Parser {
             $comment = $visitor->getComment();
         } catch (Error $error) {
             echo "Parse error: {$error->getMessage()}\n";
-            return;
+            return '';
         }
         return $comment;
     }

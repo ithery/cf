@@ -1,50 +1,50 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 8:06:07 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 8:06:07 PM
  */
 
 /**
  * @author William Durand <william.durand1@gmail.com>
  */
 class CGeo_Model_Address implements CGeo_Interface_LocationInterface {
-
     /**
-     * @var Coordinates|null
+     * @var null|Coordinates
      */
     private $coordinates;
 
     /**
-     * @var CGeo_Model_Bounds|null
+     * @var null|CGeo_Model_Bounds
      */
     private $bounds;
 
     /**
-     * @var string|int|null
+     * @var null|string|int
      */
     private $streetNumber;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $streetName;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $subLocality;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $locality;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $postalCode;
 
@@ -54,12 +54,12 @@ class CGeo_Model_Address implements CGeo_Interface_LocationInterface {
     private $adminLevels;
 
     /**
-     * @var CGeo_Model_Country|null
+     * @var null|CGeo_Model_Country
      */
     private $country;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $timezone;
 
@@ -69,17 +69,17 @@ class CGeo_Model_Address implements CGeo_Interface_LocationInterface {
     private $providedBy;
 
     /**
-     * @param string               $providedBy
+     * @param string                          $providedBy
      * @param CGeo_Model_AdminLevelCollection $adminLevels
-     * @param CGeo_Model_Coordinates|null     $coordinates
-     * @param CGeo_Model_Bounds|null          $bounds
-     * @param string|null          $streetNumber
-     * @param string|null          $streetName
-     * @param string|null          $postalCode
-     * @param string|null          $locality
-     * @param string|null          $subLocality
-     * @param CGeo_Model_Country|null         $country
-     * @param string|null          $timezone
+     * @param null|CGeo_Model_Coordinates     $coordinates
+     * @param null|CGeo_Model_Bounds          $bounds
+     * @param null|string                     $streetNumber
+     * @param null|string                     $streetName
+     * @param null|string                     $postalCode
+     * @param null|string                     $locality
+     * @param null|string                     $subLocality
+     * @param null|CGeo_Model_Country         $country
+     * @param null|string                     $timezone
      */
     public function __construct($providedBy, CGeo_Model_AdminLevelCollection $adminLevels, CGeo_Model_Coordinates $coordinates = null, CGeo_Model_Bounds $bounds = null, $streetNumber = null, $streetName = null, $postalCode = null, $locality = null, $subLocality = null, CGeo_Model_Country $country = null, $timezone = null) {
         $this->providedBy = $providedBy;
@@ -103,70 +103,70 @@ class CGeo_Model_Address implements CGeo_Interface_LocationInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getCoordinates() {
         return $this->coordinates;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getBounds() {
         return $this->bounds;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getStreetNumber() {
         return $this->streetNumber;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getStreetName() {
         return $this->streetName;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getLocality() {
         return $this->locality;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getPostalCode() {
         return $this->postalCode;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getSubLocality() {
         return $this->subLocality;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getAdminLevels() {
         return $this->adminLevels;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getCountry() {
         return $this->country;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getTimezone() {
         return $this->timezone;
@@ -181,6 +181,7 @@ class CGeo_Model_Address implements CGeo_Interface_LocationInterface {
      */
     public static function createFromArray(array $data) {
         $defaults = [
+            'adminLevels' => [],
             'providedBy' => 'n/a',
             'latitude' => null,
             'longitude' => null,
@@ -195,7 +196,6 @@ class CGeo_Model_Address implements CGeo_Interface_LocationInterface {
             'locality' => null,
             'postalCode' => null,
             'subLocality' => null,
-            'adminLevels' => [],
             'country' => null,
             'countryCode' => null,
             'timezone' => null,
@@ -206,18 +206,33 @@ class CGeo_Model_Address implements CGeo_Interface_LocationInterface {
             if (empty($adminLevel['level'])) {
                 continue;
             }
-            $name = isset($adminLevel['name']) ? $adminLevel['name'] : isset($adminLevel['code']) ? $adminLevel['code'] : null;
+            $name = isset($adminLevel['name']) ? $adminLevel['name'] : (isset($adminLevel['code']) ? $adminLevel['code'] : null);
             if (empty($name)) {
                 continue;
             }
             $adminLevels[] = new CGeo_Model_AdminLevel($adminLevel['level'], $name, isset($adminLevel['code']) ? $adminLevel['code'] : null);
         }
+
         return new static(
-                $data['providedBy'], new CGeo_Model_AdminLevelCollection($adminLevels), self::createCoordinates(
-                        $data['latitude'], $data['longitude']
-                ), self::createBounds(
-                        $data['bounds']['south'], $data['bounds']['west'], $data['bounds']['north'], $data['bounds']['east']
-                ), $data['streetNumber'], $data['streetName'], $data['postalCode'], $data['locality'], $data['subLocality'], self::createCountry($data['country'], $data['countryCode']), $data['timezone']
+            $data['providedBy'],
+            new CGeo_Model_AdminLevelCollection($adminLevels),
+            self::createCoordinates(
+                $data['latitude'],
+                $data['longitude']
+            ),
+            self::createBounds(
+                $data['bounds']['south'],
+                $data['bounds']['west'],
+                $data['bounds']['north'],
+                $data['bounds']['east']
+            ),
+            $data['streetNumber'],
+            $data['streetName'],
+            $data['postalCode'],
+            $data['locality'],
+            $data['subLocality'],
+            self::createCountry($data['country'], $data['countryCode']),
+            $data['timezone']
         );
     }
 
@@ -225,25 +240,27 @@ class CGeo_Model_Address implements CGeo_Interface_LocationInterface {
      * @param float $latitude
      * @param float $longitude
      *
-     * @return Coordinates|null
+     * @return null|Coordinates
      */
     private static function createCoordinates($latitude, $longitude) {
         if (null === $latitude || null === $longitude) {
             return null;
         }
+
         return new CGeo_Model_Coordinates($latitude, $longitude);
     }
 
     /**
-     * @param string|null $name
-     * @param string|null $code
+     * @param null|string $name
+     * @param null|string $code
      *
-     * @return Country|null
+     * @return null|Country
      */
     private static function createCountry($name, $code) {
         if (null === $name && null === $code) {
             return null;
         }
+
         return new CGeo_Model_Country($name, $code);
     }
 
@@ -251,18 +268,20 @@ class CGeo_Model_Address implements CGeo_Interface_LocationInterface {
      * @param float $south
      * @param float $west
      * @param float $north
+     * @param mixed $east
      *
-     * @return CGeo_Model_Bounds|null
+     * @return null|CGeo_Model_Bounds
      */
     private static function createBounds($south, $west, $north, $east) {
         if (null === $south || null === $west || null === $north || null === $east) {
             return null;
         }
+
         return new CGeo_Model_Bounds($south, $west, $north, $east);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function toArray() {
         $adminLevels = [];
@@ -291,6 +310,7 @@ class CGeo_Model_Address implements CGeo_Interface_LocationInterface {
             'north' => null,
             'east' => null,
         ];
+
         return [
             'providedBy' => $this->providedBy,
             'latitude' => $lat,
@@ -307,5 +327,4 @@ class CGeo_Model_Address implements CGeo_Interface_LocationInterface {
             'timezone' => $this->timezone,
         ];
     }
-
 }

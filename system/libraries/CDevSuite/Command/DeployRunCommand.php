@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DeployRunCommand
+ * Description of DeployRunCommand.
  *
  * @author Hery
  */

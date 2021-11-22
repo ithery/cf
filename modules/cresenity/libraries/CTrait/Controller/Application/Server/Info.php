@@ -37,7 +37,11 @@ trait CTrait_Controller_Application_Server_Info {
         $freeMemory = CServer::memory()->getMemFree();
         $totalMemory = CServer::memory()->getMemTotal();
         $usedMemory = CServer::memory()->getMemUsed();
-        $usedPercent = ceil(($usedMemory * 100) / $totalMemory);
+        $usedPercent = 0;
+        if ($totalMemory > 0) {
+            $usedPercent = ceil(($usedMemory * 100) / $totalMemory);
+        }
+
         $cardData['properties'] = [];
         $cardData['properties'][] = ['label' => 'Total', 'value' => CHelper::formatter()->formatSize($totalMemory)];
         $cardData['properties'][] = ['label' => 'Used', 'value' => CHelper::formatter()->formatSize($usedMemory)];
@@ -55,7 +59,11 @@ trait CTrait_Controller_Application_Server_Info {
         $freeStorage = CServer::storage()->getFreeSpace();
         $totalStorage = CServer::storage()->getTotalSpace();
         $usedStorage = $totalStorage - $freeStorage;
-        $usedPercent = ceil(($usedStorage * 100) / $totalStorage);
+        $usedPercent = 0;
+        if ($totalStorage != 0) {
+            $usedPercent = ceil(($usedStorage * 100) / $totalStorage);
+        }
+
         $cardData['properties'] = [];
         $cardData['properties'][] = ['label' => 'Total', 'value' => CHelper::formatter()->formatSize($totalStorage)];
         $cardData['properties'][] = ['label' => 'Used', 'value' => CHelper::formatter()->formatSize($usedStorage)];
@@ -192,8 +200,8 @@ trait CTrait_Controller_Application_Server_Info {
 
         $cardData['title'] = 'Local PHP Information';
         $phpInfo = CServer::phpInfo()->get();
-        $serverAPI = carr::path($phpInfo, 'phpinfo.Server API', '(unknown)');
-        $serverBuildDate = carr::path($phpInfo, 'phpinfo.Build Date', '(unknown)');
+        $serverAPI = carr::get($phpInfo, 'phpinfo.Server API', '(unknown)');
+        $serverBuildDate = carr::get($phpInfo, 'phpinfo.Build Date', '(unknown)');
         $phpIniPath = carr::get(carr::get($phpInfo, 'phpinfo'), 'Configuration File (php.ini) Path', '(unknown)');
         $cardData['rows'][] = ['OS', CServer::getOS()];
         $cardData['rows'][] = ['Load AVG', implode(' ', CServer::getLoadAvg())];
@@ -204,6 +212,7 @@ trait CTrait_Controller_Application_Server_Info {
 
         $divCol = $divRow->addDiv()->addClass('col-md-6');
         $divCol->addTemplate()->setTemplate('CApp/Card/Table')->setData($cardData);
+
         return $app;
     }
 }

@@ -44,7 +44,7 @@ trait CApp_Concern_BootstrapTrait {
                 /* This is the core middleware stack of Livewire. It's important */
                 /* to understand that the request goes through each class by the */
                 /* order it is listed in this array, and is reversed on response */
-                /*                                                               */
+
                 /* ↓    Incoming Request                  Outgoing Response    ↑ */
                 /* ↓                                                           ↑ */
                 /* ↓    Secure Stuff                                           ↑ */
@@ -89,7 +89,7 @@ trait CApp_Concern_BootstrapTrait {
                     $directive = carr::head(array_keys($entries));
                     $value = carr::head(array_values($entries));
 
-                    return new CComponent_CFDirective($name, $directive, $value);
+                    return new CComponent_CresDirective($name, $directive, $value);
                 });
             }
 
@@ -106,12 +106,12 @@ trait CApp_Concern_BootstrapTrait {
             CView::blade()->directive('CAppTitle', [CApp_Blade_Directive::class, 'title']);
             CView::blade()->directive('CAppNav', [CApp_Blade_Directive::class, 'nav']);
             CView::blade()->directive('CAppContent', [CApp_Blade_Directive::class, 'content']);
-            CView::blade()->directive('CAppNav', [CApp_Blade_Directive::class, 'nav']);
             CView::blade()->directive('CAppPushScript', [CApp_Blade_Directive::class, 'pushScript']);
             CView::blade()->directive('CAppEndPushScript', [CApp_Blade_Directive::class, 'endPushScript']);
             CView::blade()->directive('CAppPrependScript', [CApp_Blade_Directive::class, 'prependScript']);
             CView::blade()->directive('CAppEndPrependScript', [CApp_Blade_Directive::class, 'endPrependScript']);
             CView::blade()->directive('CAppElement', [CApp_Blade_Directive::class, 'element']);
+            CView::blade()->directive('CAppMessage', [CApp_Blade_Directive::class, 'message']);
 
             CView::blade()->component('capp.view-component.modal', 'modal');
             static::$registerBladeBooted = true;

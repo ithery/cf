@@ -3,7 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * Class carr
+ * Class carr.
  */
 // @codingStandardsIgnoreStart
 class carr {
@@ -43,7 +43,7 @@ class carr {
     }
 
     /**
-     * Alias of isAssoc
+     * Alias of isAssoc.
      *
      * @param array $value array to check
      *
@@ -80,12 +80,12 @@ class carr {
             return true;
         } else {
             // Possibly a Traversable object, functionally the same as an array
-            return (is_object($value) and $value instanceof Traversable);
+            return is_object($value) and $value instanceof Traversable;
         }
     }
 
     /**
-     * Alias of isArray
+     * Alias of isArray.
      *
      * @param mixed $value value to check
      *
@@ -198,6 +198,8 @@ class carr {
      * @param string $delimiter key path delimiter
      *
      * @return mixed
+     *
+     * @deprecated since 1.2, use carr::get
      */
     public static function path($array, $path, $default = null, $delimiter = null) {
         if (!carr::isArray($array)) {
@@ -326,7 +328,7 @@ class carr {
 
     /**
      * Return a callback array from a string, eg: limit[10,20] would become
-     * array('limit', array('10', '20'))
+     * array('limit', array('10', '20')).
      *
      * @param string $str callback string
      *
@@ -650,7 +652,7 @@ class carr {
      */
     //@codingStandardsIgnoreStart
     public static function to_object(array $array, $class = 'stdClass') {
-        $object = new $class;
+        $object = new $class();
 
         foreach ($array as $key => $value) {
             if (is_array($value)) {
@@ -668,7 +670,7 @@ class carr {
     //@codingStandardsIgnoreEnd
 
     /**
-     * Replace arr
+     * Replace arr.
      *
      * @return void
      */
@@ -683,9 +685,11 @@ class carr {
                 }
             } else {
                 trigger_error(__FUNCTION__ . '(): Argument #' . ($i + 1) . ' is not an array', E_USER_WARNING);
+
                 return null;
             }
         }
+
         return $res;
     }
 
@@ -693,7 +697,7 @@ class carr {
      * Return the first element in an array passing a given truth test.
      *
      * @param array         $array
-     * @param callable|null $callback
+     * @param null|callable $callback
      * @param mixed         $default
      *
      * @return mixed
@@ -722,7 +726,7 @@ class carr {
      * Return the last element in an array passing a given truth test.
      *
      * @param array         $array
-     * @param callable|null $callback
+     * @param null|callable $callback
      * @param mixed         $default
      *
      * @return mixed
@@ -783,7 +787,7 @@ class carr {
      */
     public static function add($array, $key, $value) {
         if (is_null(static::get($array, $key))) {
-            static::set_path($array, $key, $value);
+            static::set($array, $key, $value);
         }
 
         return $array;
@@ -811,6 +815,7 @@ class carr {
                 $new_array[$k] = $v;
             }
         }
+
         return $new_array;
     }
 
@@ -893,7 +898,7 @@ class carr {
      *
      * @param array             $array
      * @param string|array      $value
-     * @param string|array|null $key
+     * @param null|string|array $key
      *
      * @return array
      */
@@ -928,7 +933,7 @@ class carr {
      * Explode the "value" and "key" arguments passed to "pluck".
      *
      * @param string|array      $value
-     * @param string|array|null $key
+     * @param null|string|array $key
      *
      * @return array
      */
@@ -957,6 +962,7 @@ class carr {
             }
             $results = array_merge($results, $values);
         }
+
         return $results;
     }
 
@@ -1064,6 +1070,7 @@ class carr {
 
     public static function hash(array $array) {
         array_multisort($array);
+
         return md5(json_encode($array));
     }
 
@@ -1088,12 +1095,12 @@ class carr {
      * Get one or a specified number of random values from an array.
      *
      * @param array      $array
-     * @param int|null   $number
+     * @param null|int   $number
      * @param bool|false $preserveKeys
      *
-     * @return mixed
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return mixed
      */
     public static function random($array, $number = null, $preserveKeys = false) {
         $requested = is_null($number) ? 1 : $number;
@@ -1144,7 +1151,7 @@ class carr {
     }
 
     /**
-     * Alias of array reset
+     * Alias of array reset.
      *
      * @param array $array
      *
@@ -1165,6 +1172,7 @@ class carr {
             }
             $string[] = "{$key}{$glue}{$val}";
         }
+
         return implode($separator, $string);
     }
 
@@ -1181,6 +1189,7 @@ class carr {
             }
         }
         $ret = substr($ret, 0, 0 - strlen($glue));
+
         return $ret;
     }
 
@@ -1190,6 +1199,7 @@ class carr {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -1201,7 +1211,7 @@ class carr {
      * Shuffle the given array and return the result.
      *
      * @param array    $array
-     * @param int|null $seed
+     * @param null|int $seed
      *
      * @return array
      */
@@ -1221,7 +1231,7 @@ class carr {
      * Sort the array using the given callback or "dot" notation.
      *
      * @param array                      $array
-     * @param callable|array|string|null $callback
+     * @param null|callable|array|string $callback
      *
      * @return array
      */
@@ -1281,8 +1291,10 @@ class carr {
             foreach ($array as $key => $value) {
                 $accumulator = $iteratee($accumulator, $value, $key, $array);
             }
+
             return $accumulator;
         };
+
         return $func($collection, c::baseIteratee($iteratee), $accumulator, null === $accumulator);
     }
 
@@ -1343,6 +1355,7 @@ class carr {
                 return $value;
             }
         }
+
         return null;
     }
 
@@ -1381,6 +1394,7 @@ class carr {
             }
             $index--;
         }
+
         return -1;
     }
 
@@ -1439,6 +1453,7 @@ class carr {
         $keys = \array_keys($values);
         $items = \array_map(function ($value, $index) use ($callable, $collection) {
             $test = $callable($value, $index, $collection);
+
             return $callable($value, $index, $collection);
         }, $values, $keys);
 
@@ -1470,6 +1485,7 @@ class carr {
         $check = function ($value) {
             return \is_array($value) ? $value : [$value];
         };
+
         return \array_merge($check($array), ...\array_map($check, $values));
     }
 
@@ -1513,6 +1529,7 @@ class carr {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -1547,6 +1564,7 @@ class carr {
                 break;
             }
         }
+
         return $collection;
     }
 
@@ -1565,6 +1583,7 @@ class carr {
         } else {
             $array = [$key => $value] + $array;
         }
+
         return $array;
     }
 
@@ -1575,6 +1594,19 @@ class carr {
      */
     public static function count($array) {
         return count($array);
+    }
+
+    public static function arrayMergeRecursiveDistinct(array &$array1, array &$array2) {
+        $merged = $array1;
+        foreach ($array2 as $key => &$value) {
+            if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
+                $merged[$key] = static::arrayMergeRecursiveDistinct($merged[$key], $value);
+            } else {
+                $merged[$key] = $value;
+            }
+        }
+
+        return $merged;
     }
 }
 

@@ -1,17 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
-
     /**
-     * Singleton instance of this class
-     * 
-     * @var CApp_SEO_OpenGraph 
+     * Singleton instance of this class.
+     *
+     * @var CApp_SEO_OpenGraph
      */
     protected $instance = null;
 
@@ -30,7 +23,7 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     protected $config;
 
     /**
-     * Url property
+     * Url property.
      *
      * @var string
      */
@@ -160,18 +153,18 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     }
 
     /**
-     * 
      * @return CApp_SEO_OpenGraph
      */
     public static function instance() {
         if (self::$instance == null) {
             self::$instance = new static();
         }
+
         return self::$instance;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function generate($minify = false) {
         $this->setupDefaults();
@@ -199,7 +192,9 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
 
         foreach ($props as $prop => $options) {
             $output .= $this->eachProperties(
-                    $this->{$prop}, $options[0], $options[1]
+                $this->{$prop},
+                $options[0],
+                $options[1]
             );
         }
 
@@ -227,9 +222,9 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
                 $html[] = $subList;
             } else {
                 if (is_string($prefix)) {
-                    $key = (is_string($property)) ?
-                            $prefix . ':' . $property :
-                            $prefix;
+                    $key = (is_string($property))
+                            ? $prefix . ':' . $property
+                            : $prefix;
                 } else {
                     $key = $property;
                 }
@@ -257,7 +252,11 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
      */
     protected function makeTag($key = null, $value = null, $ogPrefix = false) {
         return sprintf(
-                '<meta property="%s%s" content="%s" />%s', $ogPrefix ? $this->og_prefix : '', strip_tags($key), strip_tags($value), PHP_EOL
+            '<meta property="%s%s" content="%s" />%s',
+            $ogPrefix ? $this->og_prefix : '',
+            strip_tags($key),
+            strip_tags($value),
+            PHP_EOL
         );
     }
 
@@ -267,9 +266,9 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
      * @return void
      */
     protected function setupDefaults() {
-        $defaults = (isset($this->config['defaults'])) ?
-                $this->config['defaults'] :
-                [];
+        $defaults = (isset($this->config['defaults']))
+                ? $this->config['defaults']
+                : [];
 
         foreach ($defaults as $key => $value) {
             if ($key === 'images') {
@@ -278,7 +277,7 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
                 }
             } elseif ($key === 'url' && empty($value)) {
                 if ($value === null) {
-                    $this->addProperty('url', $this->url ?: app('url')->current());
+                    $this->addProperty('url', $this->url ?: c::url()->current());
                 } elseif ($this->url) {
                     $this->addProperty('url', $this->url);
                 }
@@ -289,7 +288,7 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addProperty($key, $value) {
         $this->properties[$key] = $value;
@@ -298,7 +297,7 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setArticle($attributes = []) {
         $validkeys = [
@@ -311,14 +310,17 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
         ];
 
         $this->setProperties(
-                'article', 'articleProperties', $attributes, $validkeys
+            'article',
+            'articleProperties',
+            $attributes,
+            $validkeys
         );
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setProfile($attributes = []) {
         $validkeys = [
@@ -329,14 +331,17 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
         ];
 
         $this->setProperties(
-                'profile', 'profileProperties', $attributes, $validkeys
+            'profile',
+            'profileProperties',
+            $attributes,
+            $validkeys
         );
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setBook($attributes = []) {
         $validkeys = [
@@ -352,7 +357,7 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setMusicSong($attributes = []) {
         $validkeys = [
@@ -364,14 +369,17 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
         ];
 
         $this->setProperties(
-                'music.song', 'musicSongProperties', $attributes, $validkeys
+            'music.song',
+            'musicSongProperties',
+            $attributes,
+            $validkeys
         );
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setMusicAlbum($attributes = []) {
         $validkeys = [
@@ -383,14 +391,17 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
         ];
 
         $this->setProperties(
-                'music.album', 'musicAlbumProperties', $attributes, $validkeys
+            'music.album',
+            'musicAlbumProperties',
+            $attributes,
+            $validkeys
         );
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setMusicPlaylist($attributes = []) {
         $validkeys = [
@@ -401,14 +412,17 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
         ];
 
         $this->setProperties(
-                'music.playlist', 'musicPlaylistProperties', $attributes, $validkeys
+            'music.playlist',
+            'musicPlaylistProperties',
+            $attributes,
+            $validkeys
         );
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setMusicRadioStation($attributes = []) {
         $validkeys = [
@@ -416,14 +430,17 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
         ];
 
         $this->setProperties(
-                'music.radio_station', 'musicRadioStationProperties', $attributes, $validkeys
+            'music.radio_station',
+            'musicRadioStationProperties',
+            $attributes,
+            $validkeys
         );
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setVideoMovie($attributes = []) {
         $validkeys = [
@@ -437,14 +454,17 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
         ];
 
         $this->setProperties(
-                'video.movie', 'videoMovieProperties', $attributes, $validkeys
+            'video.movie',
+            'videoMovieProperties',
+            $attributes,
+            $validkeys
         );
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setVideoEpisode($attributes = []) {
         $validkeys = [
@@ -459,14 +479,17 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
         ];
 
         $this->setProperties(
-                'video.episode', 'videoEpisodeProperties', $attributes, $validkeys
+            'video.episode',
+            'videoEpisodeProperties',
+            $attributes,
+            $validkeys
         );
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setVideoOther($attributes = []) {
         $validkeys = [
@@ -480,14 +503,17 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
         ];
 
         $this->setProperties(
-                'video.other', 'videoOtherProperties', $attributes, $validkeys
+            'video.other',
+            'videoOtherProperties',
+            $attributes,
+            $validkeys
         );
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setVideoTVShow($attributes = []) {
         $validkeys = [
@@ -501,14 +527,17 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
         ];
 
         $this->setProperties(
-                'video.tv_show', 'videoTVShowProperties', $attributes, $validkeys
+            'video.tv_show',
+            'videoTVShowProperties',
+            $attributes,
+            $validkeys
         );
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addVideo($source = null, $attributes = []) {
         $validKeys = [
@@ -528,7 +557,7 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addAudio($source = null, $attributes = []) {
         $validKeys = [
@@ -591,13 +620,14 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
         ];
 
         $this->setProperties('product', 'productProperties', $attributes, $validkeys);
+
         return $this;
     }
 
     /**
      * Clean invalid properties.
      *
-     * @param array $attributes attributes input
+     * @param array    $attributes attributes input
      * @param string[] $validKeys  keys that are allowed
      *
      * @return array
@@ -617,10 +647,10 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     /**
      * Set properties.
      *
-     * @param string $type       type of og:type
-     * @param string $key        variable key
-     * @param array  $attributes inputted opengraph attributes
-     * @param string[]  $validKeys  valid opengraph attributes
+     * @param string   $type       type of og:type
+     * @param string   $key        variable key
+     * @param array    $attributes inputted opengraph attributes
+     * @param string[] $validKeys  valid opengraph attributes
      *
      * @return void
      */
@@ -635,7 +665,7 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function removeProperty($key) {
         carr::forget($this->properties, $key);
@@ -644,7 +674,7 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addImage($source = null, $attributes = []) {
         $validKeys = [
@@ -668,7 +698,7 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addImages(array $urls) {
         array_push($this->images, $urls);
@@ -677,28 +707,28 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setType($type = null) {
         return $this->addProperty('type', $type);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTitle($title = null) {
         return $this->addProperty('title', $title);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setDescription($description = null) {
         return $this->addProperty('description', htmlspecialchars($description, ENT_QUOTES, 'UTF-8', false));
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setUrl($url) {
         $this->url = $url;
@@ -707,10 +737,9 @@ class CApp_SEO_OpenGraph implements CApp_SEO_OpenGraphInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setSiteName($name) {
         return $this->addProperty('site_name', $name);
     }
-
 }

@@ -3,11 +3,11 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * MySQLi Database Driver
+ * MySQLi Database Driver.
  */
 class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
     /**
-     * Database connection link
+     * Database connection link.
      *
      * @var mysqli
      */
@@ -60,6 +60,7 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
 
         // Build the connection info
         $host = isset($host) ? $host : $socket;
+
         try {
             $connectionInfo = [
                 'Database' => $database,
@@ -68,7 +69,6 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
             ];
 
             $hostPort = $host . ',' . $port;
-
             if ($this->link = sqlsrv_connect($hostPort, $connectionInfo)) {
                 //if ($this->link = new PDO('sqlsrv:Server=' . $hostPort . ';Database=' . $database, $user, $pass)) {
                 // Clear password after successful connect
@@ -135,6 +135,7 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
             // Re-create the AS statement
             return implode(' AS ', $table);
         }
+
         return '`' . str_replace('.', '`.`', $table) . '`';
     }
 
@@ -183,6 +184,7 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
                 $column .= $parts[$i] . ' ';
             }
         }
+
         return $column;
     }
 
@@ -203,6 +205,7 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
         foreach ($keys as $key => $value) {
             $keys[$key] = $this->escapeColumn($value);
         }
+
         return 'REPLACE INTO ' . $this->escapeTable($table) . ' (' . implode(', ', $keys) . ') VALUES (' . implode(', ', $values) . ')';
     }
 
@@ -222,10 +225,10 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
 
     public function listTables() {
         $tables = [];
-
-        if ($query = $this->query('SHOW TABLES FROM ' . $this->escapeTable($this->dbConfig['connection']['database']))) {
-            foreach ($query->result(false) as $row) {
-                $tables[] = current($row);
+        $sql = "SELECT * FROM [SYSOBJECTS] WHERE xtype = 'U' order by name asc";
+        if ($r = $this->query($sql)) {
+            foreach ($r as $row) {
+                $tables = $row->name;
             }
         }
 
@@ -234,7 +237,8 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
 
     public function showError() {
         $errors = sqlsrv_errors();
-        return carr::get($errors, 'message');
+
+        return carr::get($errors, '0.message');
     }
 
     public function listFields($table) {
@@ -269,7 +273,7 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      *
      * @return CDatabase_Driver_Mysqli_MySqlSchemaManager
      */
@@ -301,6 +305,7 @@ class CDatabase_Driver_Sqlsrv extends CDatabase_Driver {
         if (!$this->link) {
             $this->connect();
         }
+
         return mysqli_ping($this->link);
     }
 }

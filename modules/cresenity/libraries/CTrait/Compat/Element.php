@@ -23,10 +23,25 @@ trait CTrait_Compat_Element {
         return $this->setText($text);
     }
 
+    /**
+     * @param string $key
+     * @param string $val
+     *
+     * @deprecated since version 1.2, please use function customCss
+     *
+     * @return $this
+     */
     public function custom_css($key, $val) {
         return $this->customCss($key, $val);
     }
 
+    /**
+     * @deprecated since version 1.2, please use function setTag
+     *
+     * @param string $tag
+     *
+     * @return $this
+     */
     public function set_tag($tag) {
         return $this->setTag($tag);
     }

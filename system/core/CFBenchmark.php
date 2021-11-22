@@ -8,6 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 final class CFBenchmark {
     // Benchmark timestamps
     private static $marks;
+
     private static $onStopCallback;
 
     /**
@@ -54,8 +55,8 @@ final class CFBenchmark {
     /**
      * Get the elapsed time between a start and stop.
      *
-     * @param string  $name     benchmark name, TRUE for all
-     * @param integer $decimals number of decimal places to count to
+     * @param string $name     benchmark name, TRUE for all
+     * @param int    $decimals number of decimal places to count to
      *
      * @return array
      */
@@ -101,7 +102,7 @@ final class CFBenchmark {
      * Returns the current memory usage. This is only possible if the
      * memory_get_usage function is supported in PHP.
      *
-     * @return integer
+     * @return int
      */
     private static function memoryUsage() {
         static $func;
@@ -125,6 +126,7 @@ final class CFBenchmark {
                 $completed[$key] = $marks[0];
             }
         }
+
         return $completed;
     }
 

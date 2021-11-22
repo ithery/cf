@@ -38,8 +38,8 @@ class CImporter {
     /**
      * @param object              $import
      * @param string|UploadedFile $filePath
-     * @param string|null         $disk
-     * @param string|null         $readerType
+     * @param null|string         $disk
+     * @param null|string         $readerType
      *
      * @return CExporter_Reader|CQueue_PendingDispatch
      */
@@ -68,8 +68,8 @@ class CImporter {
     /**
      * @param object              $import
      * @param string|UploadedFile $filePath
-     * @param string|null         $disk
-     * @param string|null         $readerType
+     * @param null|string         $disk
+     * @param null|string         $readerType
      *
      * @return array
      */
@@ -82,8 +82,8 @@ class CImporter {
     /**
      * @param object              $import
      * @param string|UploadedFile $filePath
-     * @param string|null         $disk
-     * @param string|null         $readerType
+     * @param null|string         $disk
+     * @param null|string         $readerType
      *
      * @return Collection
      */
@@ -96,7 +96,7 @@ class CImporter {
     /**
      * @param ShouldQueue         $import
      * @param string|UploadedFile $filePath
-     * @param string|null         $disk
+     * @param null|string         $disk
      * @param string              $readerType
      *
      * @return PendingDispatch
@@ -110,7 +110,7 @@ class CImporter {
         $file = CTemporary::getPath('ajax', $filename);
         $disk = CTemporary::disk();
         if (!$disk->exists($file)) {
-            throw new CException('failed to get temporary file :filename', [':filename' => $file]);
+            throw new Exception(c::__('failed to get temporary file :filename', [':filename' => $file]));
         }
         $json = $disk->get($file);
 
@@ -121,6 +121,7 @@ class CImporter {
 
         $writerType = CExporter_FileTypeDetector::detectStrict($filePath, $writerType);
         $export = CExporter_ExportableDetector::toExportable($export);
+
         return static::queuedWriter()->store(
             $export,
             $filePath,

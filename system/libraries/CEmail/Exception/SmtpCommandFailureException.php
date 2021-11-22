@@ -1,0 +1,3 @@
+<?php
+class CEmail_Exception_SmtpCommandFailureException extends CEmail_Exception_EmailSendingFailedException {
+}

@@ -11,7 +11,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_Component_PdfViewer extends CElement_Component {
     use CTrait_Element_Property_Width,
         CTrait_Element_Property_Height;
-
     protected $pdfUrl;
 
     public function __construct($id = '') {
@@ -32,6 +31,7 @@ class CElement_Component_PdfViewer extends CElement_Component {
 
     public function setPdfUrl($url) {
         $this->pdfUrl = $url;
+
         return $this;
     }
 }

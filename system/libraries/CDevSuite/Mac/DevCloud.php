@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DevCloud
+ * Description of DevCloud.
  *
  * @author Hery
  */

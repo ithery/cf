@@ -1,6 +1,6 @@
 <?php
 
-defined('SYSPATH') OR die('No direct script access.');
+defined('SYSPATH') or die('No direct script access.');
 
 /**
  * A port of [phputf8](http://phputf8.sourceforge.net/) to a unified set
@@ -16,19 +16,12 @@ defined('SYSPATH') OR die('No direct script access.');
  *
  * [!!] This file is licensed differently from the rest of CF. As a port of
  * [phputf8](http://phputf8.sourceforge.net/), this file is released under the LGPL.
- *
  */
 class CUTF8 {
-
     /**
-     * @var  boolean  Does the server support UTF-8 natively?
+     * @var bool Does the server support UTF-8 natively?
      */
-    public static $server_utf8 = NULL;
-
-    /**
-     * @var  array  List of called methods that have had their required file included.
-     */
-    public static $called = array();
+    public static $mbstringEnabled = null;
 
     /**
      * Recursively cleans arrays, objects, and strings. Removes ASCII control
@@ -37,29 +30,31 @@ class CUTF8 {
      *
      *     CUTF8::clean($_GET); // Clean GET data
      *
-     * @param   mixed   $var        variable to clean
-     * @param   string  $charset    character set, defaults to CF::$charset
-     * @return  mixed
+     * @param mixed  $var     variable to clean
+     * @param string $charset character set, defaults to CF::$charset
+     *
+     * @return mixed
+     *
      * @uses    CUTF8::clean
      * @uses    CUTF8::strip_ascii_ctrl
      * @uses    CUTF8::is_ascii
      */
-    public static function clean($var, $charset = NULL) {
+    public static function clean($var, $charset = null) {
         if (!$charset) {
             // Use the application character set
             $charset = CF::$charset;
         }
 
-        if (is_array($var) OR is_object($var)) {
+        if (is_array($var) or is_object($var)) {
             foreach ($var as $key => $val) {
                 // Recursion!
                 $var[CUTF8::clean($key)] = CUTF8::clean($val);
             }
-        } elseif (is_string($var) AND $var !== '') {
+        } elseif (is_string($var) and $var !== '') {
             // Remove control characters
-            $var = CUTF8::strip_ascii_ctrl($var);
+            $var = CUTF8::stripAsciiCtrl($var);
 
-            if (!CUTF8::is_ascii($var)) {
+            if (!CUTF8::isAscii($var)) {
                 // Temporarily save the mb_substitute_character() value into a variable
                 $mb_substitute_character = mb_substitute_character();
 
@@ -83,10 +78,11 @@ class CUTF8 {
      *
      *     $ascii = CUTF8::is_ascii($str);
      *
-     * @param   mixed   $str    string or array of strings to check
-     * @return  boolean
+     * @param mixed $str string or array of strings to check
+     *
+     * @return bool
      */
-    public static function is_ascii($str) {
+    public static function isAscii($str) {
         if (is_array($str)) {
             $str = implode($str);
         }
@@ -99,22 +95,24 @@ class CUTF8 {
      *
      *     $str = CUTF8::strip_ascii_ctrl($str);
      *
-     * @param   string  $str    string to clean
-     * @return  string
+     * @param string $str string to clean
+     *
+     * @return string
      */
-    public static function strip_ascii_ctrl($str) {
+    public static function stripAsciiCtrl($str) {
         return preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]+/S', '', $str);
     }
 
     /**
      * Strips out all non-7bit ASCII bytes.
      *
-     *     $str = CUTF8::strip_non_ascii($str);
+     *     $str = CUTF8::stripNonAscii($str);
      *
-     * @param   string  $str    string to clean
-     * @return  string
+     * @param string $str string to clean
+     *
+     * @return string
      */
-    public static function strip_non_ascii($str) {
+    public static function stripNonAscii($str) {
         return preg_replace('/[^\x00-\x7F]+/S', '', $str);
     }
 
@@ -123,20 +121,15 @@ class CUTF8 {
      *
      *     $ascii = CUTF8::transliterate_to_ascii($utf8);
      *
+     * @param string $str  string to transliterate
+     * @param int    $case -1 lowercase only, +1 uppercase only, 0 both cases
+     *
      * @author  Andreas Gohr <andi@splitbrain.org>
-     * @param   string  $str    string to transliterate
-     * @param   integer $case   -1 lowercase only, +1 uppercase only, 0 both cases
-     * @return  string
+     *
+     * @return string
      */
-    public static function transliterate_to_ascii($str, $case = 0) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _transliterate_to_ascii($str, $case);
+    public static function transliterateToAscii($str, $case = 0) {
+        return CUTF8_Native::transliterateToAscii($str, $case);
     }
 
     /**
@@ -145,23 +138,19 @@ class CUTF8 {
      *
      *     $length = CUTF8::strlen($str);
      *
-     * @param   string  $str    string being measured for length
-     * @return  integer
-     * @uses    CUTF8::$server_utf8
+     * @param string $str string being measured for length
+     *
+     * @return int
+     *
+     * @uses    CUTF8::$mbstringEnabled
      * @uses    CF::$charset
      */
     public static function strlen($str) {
-        if (CUTF8::$server_utf8)
+        if (CUTF8::mbstringEnabled()) {
             return mb_strlen($str, CF::$charset);
-
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
         }
 
-        return _strlen($str);
+        return CUTF8_Native::strlen($str);
     }
 
     /**
@@ -170,27 +159,23 @@ class CUTF8 {
      *
      *     $position = CUTF8::strpos($str, $search);
      *
+     * @param string $str    haystack
+     * @param string $search needle
+     * @param int    $offset offset from which character in haystack to start searching
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $str    haystack
-     * @param   string  $search needle
-     * @param   integer $offset offset from which character in haystack to start searching
-     * @return  integer position of needle
-     * @return  boolean FALSE if the needle is not found
-     * @uses    CUTF8::$server_utf8
+     *
+     * @return int|bool position of needle|FALSE if the needle is not found
+     *
+     * @uses    CUTF8::$mbstringEnabled
      * @uses    CF::$charset
      */
     public static function strpos($str, $search, $offset = 0) {
-        if (CUTF8::$server_utf8)
+        if (CUTF8::mbstringEnabled()) {
             return mb_strpos($str, $search, $offset, CF::$charset);
-
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
         }
 
-        return _strpos($str, $search, $offset);
+        return CUTF8_Native::strpos($str, $search, $offset);
     }
 
     /**
@@ -199,26 +184,22 @@ class CUTF8 {
      *
      *     $position = CUTF8::strrpos($str, $search);
      *
+     * @param string $str    haystack
+     * @param string $search needle
+     * @param int    $offset offset from which character in haystack to start searching
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $str    haystack
-     * @param   string  $search needle
-     * @param   integer $offset offset from which character in haystack to start searching
-     * @return  integer position of needle
-     * @return  boolean FALSE if the needle is not found
-     * @uses    CUTF8::$server_utf8
+     *
+     * @return int|bool position of needle|FALSE if the needle is not found
+     *
+     * @uses    CUTF8::$mbstringEnabled
      */
     public static function strrpos($str, $search, $offset = 0) {
-        if (CUTF8::$server_utf8)
-            return mb_strrpos($str, $search, $offset, CF::$charset);
-
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
+        if (CUTF8::mbstringEnabled()) {
+            return mb_strrpos($str, $search, $offset, CF::getCharset());
         }
 
-        return _strrpos($str, $search, $offset);
+        return CUTF8_Native::strrpos($str, $search, $offset);
     }
 
     /**
@@ -227,26 +208,23 @@ class CUTF8 {
      *
      *     $sub = CUTF8::substr($str, $offset);
      *
+     * @param string $str    input string
+     * @param int    $offset offset
+     * @param int    $length length limit
+     *
      * @author  Chris Smith <chris@jalakai.co.uk>
-     * @param   string  $str    input string
-     * @param   integer $offset offset
-     * @param   integer $length length limit
-     * @return  string
-     * @uses    CUTF8::$server_utf8
+     *
+     * @return string
+     *
+     * @uses    CUTF8::$mbstringEnabled
      * @uses    CF::$charset
      */
-    public static function substr($str, $offset, $length = NULL) {
-        if (CUTF8::$server_utf8)
-            return ($length === NULL) ? mb_substr($str, $offset, mb_strlen($str), CF::$charset) : mb_substr($str, $offset, $length, CF::$charset);
-
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
+    public static function substr($str, $offset, $length = null) {
+        if (CUTF8::mbstringEnabled()) {
+            return ($length === null) ? mb_substr($str, $offset, mb_strlen($str), CF::$charset) : mb_substr($str, $offset, $length, CF::$charset);
         }
 
-        return _substr($str, $offset, $length);
+        return CUTF8_Native::substr($str, $offset, $length);
     }
 
     /**
@@ -255,21 +233,17 @@ class CUTF8 {
      *
      *     $str = CUTF8::substr_replace($str, $replacement, $offset);
      *
+     * @param string     $str         input string
+     * @param string     $replacement replacement string
+     * @param int        $offset      offset
+     * @param null|mixed $length
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $str            input string
-     * @param   string  $replacement    replacement string
-     * @param   integer $offset         offset
-     * @return  string
+     *
+     * @return string
      */
-    public static function substr_replace($str, $replacement, $offset, $length = NULL) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _substr_replace($str, $replacement, $offset, $length);
+    public static function substrReplace($str, $replacement, $offset, $length = null) {
+        return CUTF8_Native::substrReplace($str, $replacement, $offset, $length);
     }
 
     /**
@@ -278,48 +252,42 @@ class CUTF8 {
      *
      *     $str = CUTF8::strtolower($str);
      *
+     * @param string $str mixed case string
+     *
      * @author  Andreas Gohr <andi@splitbrain.org>
-     * @param   string  $str mixed case string
-     * @return  string
-     * @uses    CUTF8::$server_utf8
+     *
+     * @return string
+     *
+     * @uses    CUTF8::$mbstringEnabled
      * @uses    CF::$charset
      */
     public static function strtolower($str) {
-        if (CUTF8::$server_utf8)
+        if (CUTF8::mbstringEnabled()) {
             return mb_strtolower($str, CF::$charset);
-
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
         }
 
-        return _strtolower($str);
+        return CUTF8_Native::strtolower($str);
     }
 
     /**
      * Makes a UTF-8 string uppercase. This is a UTF8-aware version
      * of [strtoupper](http://php.net/strtoupper).
      *
+     * @param string $str mixed case string
+     *
      * @author  Andreas Gohr <andi@splitbrain.org>
-     * @param   string  $str mixed case string
-     * @return  string
-     * @uses    CUTF8::$server_utf8
+     *
+     * @return string
+     *
+     * @uses    CUTF8::$mbstringEnabled
      * @uses    CF::$charset
      */
     public static function strtoupper($str) {
-        if (CUTF8::$server_utf8)
+        if (CUTF8::mbstringEnabled()) {
             return mb_strtoupper($str, CF::$charset);
-
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
         }
 
-        return _strtoupper($str);
+        return CUTF8_Native::strtoupper($str);
     }
 
     /**
@@ -328,19 +296,14 @@ class CUTF8 {
      *
      *     $str = CUTF8::ucfirst($str);
      *
+     * @param string $str mixed case string
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $str mixed case string
-     * @return  string
+     *
+     * @return string
      */
     public static function ucfirst($str) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _ucfirst($str);
+        return CUTF8_Native::ucfirst($str);
     }
 
     /**
@@ -349,19 +312,14 @@ class CUTF8 {
      *
      *     $str = CUTF8::ucwords($str);
      *
+     * @param string $str mixed case string
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $str mixed case string
-     * @return  string
+     *
+     * @return string
      */
     public static function ucwords($str) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _ucwords($str);
+        return CUTF8_Native::ucwords($str);
     }
 
     /**
@@ -370,22 +328,15 @@ class CUTF8 {
      *
      *     $compare = CUTF8::strcasecmp($str1, $str2);
      *
+     * @param string $str1 string to compare
+     * @param string $str2 string to compare
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $str1   string to compare
-     * @param   string  $str2   string to compare
-     * @return  integer less than 0 if str1 is less than str2
-     * @return  integer greater than 0 if str1 is greater than str2
-     * @return  integer 0 if they are equal
+     *
+     * @return int less than 0 if str1 is less than str2, greater than 0 if str1 is greater than str2, 0 if they are equal
      */
     public static function strcasecmp($str1, $str2) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _strcasecmp($str1, $str2);
+        return CUTF8_Native::strcasecmp($str1, $str2);
     }
 
     /**
@@ -396,23 +347,17 @@ class CUTF8 {
      * [!!] This function is very slow compared to the native version. Avoid
      * using it when possible.
      *
+     * @param string|array $search  text to replace
+     * @param string|array $replace replacement text
+     * @param string|array $str     subject text
+     * @param int          $count   number of matched and replaced needles will be returned via this parameter which is passed by reference
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com
-     * @param   string|array    $search     text to replace
-     * @param   string|array    $replace    replacement text
-     * @param   string|array    $str        subject text
-     * @param   integer         $count      number of matched and replaced needles will be returned via this parameter which is passed by reference
-     * @return  string  if the input was a string
-     * @return  array   if the input was an array
+     *
+     * @return string|array if the input was a string|if the input was an array
      */
-    public static function str_ireplace($search, $replace, $str, & $count = NULL) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _str_ireplace($search, $replace, $str, $count);
+    public static function strIreplace($search, $replace, $str, &$count = null) {
+        return CUTF8_Native::strIreplace($search, $replace, $str, $count);
     }
 
     /**
@@ -422,21 +367,15 @@ class CUTF8 {
      *
      *     $found = CUTF8::stristr($str, $search);
      *
+     * @param string $str    input string
+     * @param string $search needle
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $str    input string
-     * @param   string  $search needle
-     * @return  string  matched substring if found
-     * @return  FALSE   if the substring was not found
+     *
+     * @return string|false matched substring if found|if the substring was not found
      */
     public static function stristr($str, $search) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _stristr($str, $search);
+        return CUTF8_Native::stristr($str, $search);
     }
 
     /**
@@ -445,22 +384,17 @@ class CUTF8 {
      *
      *     $found = CUTF8::strspn($str, $mask);
      *
+     * @param string $str    input string
+     * @param string $mask   mask for search
+     * @param int    $offset start position of the string to examine
+     * @param int    $length length of the string to examine
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $str    input string
-     * @param   string  $mask   mask for search
-     * @param   integer $offset start position of the string to examine
-     * @param   integer $length length of the string to examine
-     * @return  integer length of the initial segment that contains characters in the mask
+     *
+     * @return int length of the initial segment that contains characters in the mask
      */
-    public static function strspn($str, $mask, $offset = NULL, $length = NULL) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _strspn($str, $mask, $offset, $length);
+    public static function strspn($str, $mask, $offset = null, $length = null) {
+        return CUTF8_Native::strspn($str, $mask, $offset, $length);
     }
 
     /**
@@ -469,22 +403,17 @@ class CUTF8 {
      *
      *     $found = CUTF8::strcspn($str, $mask);
      *
+     * @param string $str    input string
+     * @param string $mask   mask for search
+     * @param int    $offset start position of the string to examine
+     * @param int    $length length of the string to examine
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $str    input string
-     * @param   string  $mask   mask for search
-     * @param   integer $offset start position of the string to examine
-     * @param   integer $length length of the string to examine
-     * @return  integer length of the initial segment that contains characters not in the mask
+     *
+     * @return int length of the initial segment that contains characters not in the mask
      */
-    public static function strcspn($str, $mask, $offset = NULL, $length = NULL) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _strcspn($str, $mask, $offset, $length);
+    public static function strcspn($str, $mask, $offset = null, $length = null) {
+        return CUTF8_Native::strcspn($str, $mask, $offset, $length);
     }
 
     /**
@@ -493,22 +422,17 @@ class CUTF8 {
      *
      *     $str = CUTF8::str_pad($str, $length);
      *
+     * @param string $str              input string
+     * @param int    $final_str_length desired string length after padding
+     * @param string $pad_str          string to use as padding
+     * @param string $pad_type         padding type: STR_PAD_RIGHT, STR_PAD_LEFT, or STR_PAD_BOTH
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $str                input string
-     * @param   integer $final_str_length   desired string length after padding
-     * @param   string  $pad_str            string to use as padding
-     * @param   string  $pad_type           padding type: STR_PAD_RIGHT, STR_PAD_LEFT, or STR_PAD_BOTH
-     * @return  string
+     *
+     * @return string
      */
-    public static function str_pad($str, $final_str_length, $pad_str = ' ', $pad_type = STR_PAD_RIGHT) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _str_pad($str, $final_str_length, $pad_str, $pad_type);
+    public static function strPad($str, $final_str_length, $pad_str = ' ', $pad_type = STR_PAD_RIGHT) {
+        return CUTF8_Native::strPad($str, $final_str_length, $pad_str, $pad_type);
     }
 
     /**
@@ -517,20 +441,15 @@ class CUTF8 {
      *
      *     $array = CUTF8::str_split($str);
      *
+     * @param string $str          input string
+     * @param int    $split_length maximum length of each chunk
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $str            input string
-     * @param   integer $split_length   maximum length of each chunk
-     * @return  array
+     *
+     * @return array
      */
-    public static function str_split($str, $split_length = 1) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _str_split($str, $split_length);
+    public static function strSplit($str, $split_length = 1) {
+        return CUTF8_Native::strSplit($str, $split_length);
     }
 
     /**
@@ -538,19 +457,14 @@ class CUTF8 {
      *
      *     $str = CUTF8::strrev($str);
      *
+     * @param string $str string to be reversed
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $str string to be reversed
-     * @return  string
+     *
+     * @return string
      */
     public static function strrev($str) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _strrev($str);
+        return CUTF8_Native::strrev($str);
     }
 
     /**
@@ -559,20 +473,15 @@ class CUTF8 {
      *
      *     $str = CUTF8::trim($str);
      *
+     * @param string $str      input string
+     * @param string $charlist string of characters to remove
+     *
      * @author  Andreas Gohr <andi@splitbrain.org>
-     * @param   string  $str        input string
-     * @param   string  $charlist   string of characters to remove
-     * @return  string
+     *
+     * @return string
      */
-    public static function trim($str, $charlist = NULL) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _trim($str, $charlist);
+    public static function trim($str, $charlist = null) {
+        return CUTF8_Native::trim($str, $charlist);
     }
 
     /**
@@ -581,20 +490,15 @@ class CUTF8 {
      *
      *     $str = CUTF8::ltrim($str);
      *
+     * @param string $str      input string
+     * @param string $charlist string of characters to remove
+     *
      * @author  Andreas Gohr <andi@splitbrain.org>
-     * @param   string  $str        input string
-     * @param   string  $charlist   string of characters to remove
-     * @return  string
+     *
+     * @return string
      */
-    public static function ltrim($str, $charlist = NULL) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _ltrim($str, $charlist);
+    public static function ltrim($str, $charlist = null) {
+        return CUTF8_Native::ltrim($str, $charlist);
     }
 
     /**
@@ -603,20 +507,15 @@ class CUTF8 {
      *
      *     $str = CUTF8::rtrim($str);
      *
+     * @param string $str      input string
+     * @param string $charlist string of characters to remove
+     *
      * @author  Andreas Gohr <andi@splitbrain.org>
-     * @param   string  $str        input string
-     * @param   string  $charlist   string of characters to remove
-     * @return  string
+     *
+     * @return string
      */
-    public static function rtrim($str, $charlist = NULL) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _rtrim($str, $charlist);
+    public static function rtrim($str, $charlist = null) {
+        return CUTF8_Native::rtrim($str, $charlist);
     }
 
     /**
@@ -625,19 +524,14 @@ class CUTF8 {
      *
      *     $digit = CUTF8::ord($character);
      *
+     * @param string $chr UTF-8 encoded character
+     *
      * @author  Harry Fuecks <hfuecks@gmail.com>
-     * @param   string  $chr    UTF-8 encoded character
-     * @return  integer
+     *
+     * @return int
      */
     public static function ord($chr) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _ord($chr);
+        return CUTF8_Native::ord($chr);
     }
 
     /**
@@ -653,19 +547,12 @@ class CUTF8 {
      * Ported to PHP by Henri Sivonen <hsivonen@iki.fi>, see <http://hsivonen.iki.fi/php-utf8/>
      * Slight modifications to fit with phputf8 library by Harry Fuecks <hfuecks@gmail.com>
      *
-     * @param   string  $str    UTF-8 encoded string
-     * @return  array   unicode code points
-     * @return  FALSE   if the string is invalid
+     * @param string $str UTF-8 encoded string
+     *
+     * @return array|false unicode code points|if the string is invalid
      */
-    public static function to_unicode($str) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _to_unicode($str);
+    public static function toUnicode($str) {
+        return CUTF8_Native::toUnicode($str);
     }
 
     /**
@@ -681,24 +568,19 @@ class CUTF8 {
      * Ported to PHP by Henri Sivonen <hsivonen@iki.fi>, see http://hsivonen.iki.fi/php-utf8/
      * Slight modifications to fit with phputf8 library by Harry Fuecks <hfuecks@gmail.com>.
      *
-     * @param   array   $str    unicode code points representing a string
-     * @return  string  utf8 string of characters
-     * @return  boolean FALSE if a code point cannot be found
+     * @param array $arr unicode code points representing a string
+     *
+     * @return string|bool utf8 string of characters|FALSE if a code point cannot be found
      */
-    public static function from_unicode($arr) {
-        if (!isset(CUTF8::$called[__FUNCTION__])) {
-            require CF::findFile('utf8', __FUNCTION__);
-
-            // Function has been called
-            CUTF8::$called[__FUNCTION__] = TRUE;
-        }
-
-        return _from_unicode($arr);
+    public static function fromUnicode($arr) {
+        return CUTF8_Native::fromUnicode($arr);
     }
 
-}
+    public static function mbstringEnabled() {
+        if (static::$mbstringEnabled === null) {
+            static::$mbstringEnabled = extension_loaded('mbstring');
+        }
 
-if (CUTF8::$server_utf8 === NULL) {
-    // Determine if this server supports UTF-8 natively
-    CUTF8::$server_utf8 = extension_loaded('mbstring');
+        return static::$mbstringEnabled;
+    }
 }

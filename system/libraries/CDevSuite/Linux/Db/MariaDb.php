@@ -11,6 +11,11 @@ class CDevSuite_Linux_Db_MariaDB extends CDevSuite_Db_MariaDb {
     public $sm;
 
     /**
+     * @var CDevSuite_Linux_Filesystem
+     */
+    public $files;
+
+    /**
      * Create a new MariaDb instance.
      *
      * @return void
@@ -27,8 +32,8 @@ class CDevSuite_Linux_Db_MariaDB extends CDevSuite_Db_MariaDb {
      * @return void
      */
     public function install() {
-        $this->pm->ensureInstalled('mariadb');
-        $this->sm->enable('mariadb');
+        $this->pm->ensureInstalled('mariadb-server');
+        $this->sm->enable('mariadb-server');
 
         $this->stop();
         $this->installMariaDbDirectory();
@@ -40,7 +45,7 @@ class CDevSuite_Linux_Db_MariaDB extends CDevSuite_Db_MariaDb {
      * @return void
      */
     public function stop() {
-        $this->sm->stop('mariadb');
+        $this->sm->stop('mariadb-server');
     }
 
     /**
@@ -49,7 +54,7 @@ class CDevSuite_Linux_Db_MariaDB extends CDevSuite_Db_MariaDb {
      * @return void
      */
     public function restart() {
-        $this->sm->restart('mariadb');
+        $this->sm->restart('mariadb-server');
     }
 
     /**
@@ -58,7 +63,7 @@ class CDevSuite_Linux_Db_MariaDB extends CDevSuite_Db_MariaDb {
      * @return void
      */
     public function status() {
-        $this->sm->printStatus('mariadb');
+        $this->sm->printStatus('mariadb-server');
     }
 
     /**

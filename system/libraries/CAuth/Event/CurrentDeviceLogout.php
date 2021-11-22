@@ -1,4 +1,3 @@
-
 <?php
 
 class CAuth_Event_CurrentDeviceLogout {

@@ -26,6 +26,8 @@ class CElement_FormInput_Select extends CElement_FormInput {
 
     protected $select2Version;
 
+    protected $isOptionHtml;
+
     public function __construct($id) {
         parent::__construct($id);
 
@@ -38,21 +40,31 @@ class CElement_FormInput_Select extends CElement_FormInput {
         $this->hide_search = false;
         $this->maximumSelectionLength = false;
         $this->select2Version = c::theme('select2.version');
+        $this->isOptionHtml = false;
         $this->addClass('form-control select');
     }
 
     public function setMultiple($bool = true) {
         $this->multiple = $bool;
+
         return $this;
     }
 
     public function setMaximumSelectionLength($length) {
         $this->maximumSelectionLength = $length;
+
         return $this;
     }
 
     public function setPlaceholder($placeholder) {
         $this->placeholder = $placeholder;
+
+        return $this;
+    }
+
+    public function setIsOptionHtml($bool = true) {
+        $this->isOptionHtml = $bool;
+
         return $this;
     }
 
@@ -86,6 +98,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
                 $data['children'][] = $child;
             }
         }
+
         return $data;
     }
 
@@ -147,7 +160,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
                             $selected = ' selected="selected"';
                         }
                     }
-                    $html->appendln('<option value="' . $k . '"' . $selected . '>' . $v . '</option>')->br();
+                    $html->appendln('<option data-content="' . c::e($v) . '" value="' . $k . '"' . $selected . '>' . $v . '</option>')->br();
                 }
                 if (strlen($g) > 0) {
                     $html->appendln('</optgroup>')->br();
@@ -177,10 +190,10 @@ class CElement_FormInput_Select extends CElement_FormInput {
                 }
                 if ($this->readonly) {
                     if ($k == $this->value) {
-                        $html->appendln('<option value="' . $k . '" ' . $selected . $addition_attribute . '>' . $value . '</option>')->br();
+                        $html->appendln('<option data-content="' . c::e($v) . '" value="' . $k . '" ' . $selected . $addition_attribute . '>' . $value . '</option>')->br();
                     }
                 } else {
-                    $html->appendln('<option value="' . $k . '" ' . $selected . $addition_attribute . '>' . $value . '</option>')->br();
+                    $html->appendln('<option data-content="' . c::e($v) . '" value="' . $k . '" ' . $selected . $addition_attribute . '>' . $value . '</option>')->br();
                 }
             }
         }
@@ -224,6 +237,29 @@ class CElement_FormInput_Select extends CElement_FormInput {
             if ($this->maximumSelectionLength !== false) {
                 $js->append('maximumSelectionLength: ' . $this->maximumSelectionLength . ',');
             }
+
+            if ($this->isOptionHtml) {
+                $js->append("templateResult: function(state){
+                    var dataContent = $(state.element).attr('data-content');
+                    if(dataContent) {
+                        return $(dataContent);
+                    }
+
+                    return state.text;
+
+                 },");
+
+                $js->append("templateSelection: function(state){
+                    var dataContent = $(state.element).attr('data-content');
+                    if(dataContent) {
+                        return $(dataContent);
+                    }
+
+                    return state.text;
+
+                 },");
+            }
+
             $js->append("containerCssClass : 'tpx-select2-container " . $classes . "',");
             $js->append("placeholder : '" . $placeholder . "'");
             $js->append('});')->br();
@@ -240,6 +276,7 @@ class CElement_FormInput_Select extends CElement_FormInput {
 
     public function setHideSearch($bool) {
         $this->hide_search = $bool;
+
         return $this;
     }
 }

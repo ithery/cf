@@ -9,25 +9,33 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Sep 8, 2018, 2:34:11 AM
  */
 class CManager_Asset_Module {
+    const MODULE_TYPE_RUNTIME = 'runtime';
+
+    const MODULE_TYPE_THEME = 'theme';
+
     protected static $instance;
 
-    protected $runTimeModules = [];
-
-    protected $themeModules = [];
-
     protected $unregisteredThemeModules = [];
+
+    protected $modules = [];
 
     private $allModules = null;
 
     public function __construct() {
         $this->allModules = null;
+        $this->modules = [];
+        $this->modules[self::MODULE_TYPE_RUNTIME] = [];
+        $this->modules[self::MODULE_TYPE_THEME] = [];
+
         $this->reset();
         $this->loadUnregisteredThemeModules();
     }
 
     public function reset() {
-        $this->runTimeModules = [];
-        $this->themeModules = [];
+        $this->modules = [];
+        $this->modules[self::MODULE_TYPE_RUNTIME] = [];
+        $this->modules[self::MODULE_TYPE_THEME] = [];
+
         $this->unregisteredThemeModules = [];
     }
 
@@ -48,6 +56,7 @@ class CManager_Asset_Module {
                 $this->allModules = array_merge($this->allModules, $appModules);
             }
         }
+
         return $this->allModules;
     }
 
@@ -64,6 +73,7 @@ class CManager_Asset_Module {
                 }
             }
         }
+
         return $data;
     }
 
@@ -73,10 +83,9 @@ class CManager_Asset_Module {
      * @return bool
      */
     public function isRegisteredModule($mod) {
-        $inArray = in_array($mod, $this->runTimeModules);
-        if (!$inArray) {
-            $inArray = in_array($mod, $this->themeModules);
-        }
+        $modules = array_merge($this->getRuntimeModules(), $this->getThemeModules());
+        $inArray = in_array($mod, $modules);
+
         if (!$inArray) {
             $inArray = in_array($mod, $this->unregisteredThemeModules);
         }
@@ -84,35 +93,39 @@ class CManager_Asset_Module {
         return $inArray;
     }
 
+    public function getModules($type) {
+        return $this->modules[$type];
+    }
+
+    public function getRuntimeModules() {
+        return $this->getModules(self::MODULE_TYPE_RUNTIME);
+    }
+
+    public function getThemeModules() {
+        return $this->getModules(self::MODULE_TYPE_THEME);
+    }
+
     /**
      * @return array
      */
     public function getRegisteredModule() {
-        return array_merge($this->themeModules, $this->runTimeModules);
+        return array_merge($this->getThemeModules(), $this->getRuntimeModules());
     }
 
     public function walkerCallback($tree, $node, $text) {
         if (is_array($text)) {
             $text = implode(',', $text);
         }
+
         return $text;
     }
 
-    public function registerRunTimeModules($modules) {
+    public function registerModules($type, $modules) {
         if (!is_array($modules)) {
             $modules = [$modules];
         }
         foreach ($modules as $module) {
-            $this->registerRunTimeModule($module);
-        }
-    }
-
-    public function registerThemeModules($modules) {
-        if (!is_array($modules)) {
-            $modules = [$modules];
-        }
-        foreach ($modules as $module) {
-            $this->registerThemeModule($module);
+            $this->registerModule($type, $module);
         }
     }
 
@@ -121,24 +134,29 @@ class CManager_Asset_Module {
         $this->allModules();
         //replace or make new module
         $this->allModules[$name] = $moduleData;
+
         return $this->allModules;
     }
 
-    public function unregisterRunTimeModule($module) {
-        if (isset($this->runTimeModules[$module])) {
-            unset($this->runTimeModules[$module]);
+    public function unregisterModule($type, $module) {
+        if (isset($this->modules[$type][$module])) {
+            unset($this->modules[$type][$module]);
+
+            return true;
         }
+
+        return false;
     }
 
-    public function unregisterThemeModule($module) {
-        if (isset($this->themeModules[$module])) {
-            unset($this->themeModules[$module]);
+    public function registerModule($type, $module) {
+        if ($type == self::MODULE_TYPE_RUNTIME) {
+            if (in_array($module, $this->unregisteredThemeModules)) {
+                //dont register when already defined in theme
+                return true;
+            }
         }
-    }
-
-    public function registerRunTimeModule($module) {
         $allModules = $this->allModules();
-        if (!in_array($module, $this->runTimeModules)) {
+        if (!in_array($module, $this->modules[$type])) {
             if (!isset($allModules[$module])) {
                 throw new CManager_Exception('Module :module not defined', [':module' => $module]);
             }
@@ -146,70 +164,41 @@ class CManager_Asset_Module {
             $mod = $allModules[$module];
             if (isset($mod['requirements'])) {
                 foreach ($mod['requirements'] as $req) {
-                    $this->registerRunTimeModule($req);
+                    $this->registerModule($type, $req);
                 }
             }
-            if (!in_array($module, $this->runTimeModules)) {
-                $this->runTimeModules[] = $module;
+            if (!in_array($module, $this->getModules($type))) {
+                $this->modules[$type][$module] = $module;
             }
         }
 
         return true;
     }
 
-    public function registerThemeModule($module) {
+    public function getContainer($type) {
+        $container = $type == self::MODULE_TYPE_RUNTIME ? new CManager_Asset_Container_RunTime() : new CManager_Asset_Container_Theme();
         $allModules = $this->allModules();
-        if (!in_array($module, $this->themeModules)) {
-            if (!isset($allModules[$module])) {
-                throw new CManager_Exception('Module :module not defined', [':module' => $module]);
+
+        foreach ($this->getModules($type) as $module) {
+            $mod = carr::get($allModules, $module, []);
+
+            if (isset($mod['js'])) {
+                $container->registerJsFiles($mod['js']);
             }
-            //array
-            $mod = $allModules[$module];
-            if (isset($mod['requirements'])) {
-                foreach ($mod['requirements'] as $req) {
-                    $this->registerThemeModule($req);
-                }
-            }
-            if (!in_array($module, $this->themeModules)) {
-                $this->themeModules[] = $module;
+            if (isset($mod['css'])) {
+                $container->registerCssFiles($mod['css']);
             }
         }
 
-        return true;
+        return $container;
     }
 
     public function getRunTimeContainer() {
-        $runTimeContainer = new CManager_Asset_Container_RunTime();
-        $allModules = $this->allModules();
-
-        foreach ($this->runTimeModules as $runTimeModule) {
-            $mod = carr::get($allModules, $runTimeModule, []);
-
-            if (isset($mod['js'])) {
-                $runTimeContainer->registerJsFiles($mod['js']);
-            }
-            if (isset($mod['css'])) {
-                $runTimeContainer->registerCssFiles($mod['css']);
-            }
-        }
-
-        return $runTimeContainer;
+        return $this->getContainer(self::MODULE_TYPE_RUNTIME);
     }
 
     public function getThemeContainer() {
-        $themeContainer = new CManager_Asset_Container_Theme();
-        $allModules = $this->allModules();
-        foreach ($this->themeModules as $themeModule) {
-            $mod = carr::get($allModules, $themeModule, []);
-            if (isset($mod['js'])) {
-                $themeContainer->registerJsFiles($mod['js']);
-            }
-            if (isset($mod['css'])) {
-                $themeContainer->registerCssFiles($mod['css']);
-            }
-        }
-
-        return $themeContainer;
+        return $this->getContainer(self::MODULE_TYPE_THEME);
     }
 
     /**
@@ -219,6 +208,7 @@ class CManager_Asset_Module {
         if (self::$instance == null) {
             self::$instance = new CManager_Asset_Module();
         }
+
         return self::$instance;
     }
 
@@ -229,5 +219,29 @@ class CManager_Asset_Module {
             $themeData = include $themeFile;
             $this->unregisteredThemeModules = carr::get($themeData, 'client_modules');
         }
+    }
+
+    public function registerRunTimeModules($modules) {
+        $this->registerModules(self::MODULE_TYPE_RUNTIME, $modules);
+    }
+
+    public function registerThemeModules($modules) {
+        $this->registerModules(self::MODULE_TYPE_THEME, $modules);
+    }
+
+    public function unregisterRunTimeModule($module) {
+        return $this->unregisterModule(self::MODULE_TYPE_RUNTIME, $module);
+    }
+
+    public function unregisterThemeModule($module) {
+        return $this->unregisterModule(self::MODULE_TYPE_THEME, $module);
+    }
+
+    public function registerRunTimeModule($module) {
+        return $this->registerModule(self::MODULE_TYPE_RUNTIME, $module);
+    }
+
+    public function registerThemeModule($module) {
+        return $this->registerModule(self::MODULE_TYPE_THEME, $module);
     }
 }

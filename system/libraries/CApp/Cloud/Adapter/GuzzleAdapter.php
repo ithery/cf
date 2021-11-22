@@ -9,9 +9,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Mar 10, 2019, 7:07:06 AM
  */
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Psr7\Response;
 
 class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_AdapterAbstract {
     /**
@@ -25,14 +25,14 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_AdapterAbstract {
     protected $response;
 
     /**
-     * @param ClientInterface|null $client
+     * @param null|ClientInterface $client
      */
     public function __construct(ClientInterface $client = null) {
         $this->client = $client ?: new Client();
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function get($url) {
         try {
@@ -41,11 +41,12 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_AdapterAbstract {
             $this->response = $e->getResponse();
             $this->handleError($e);
         }
+
         return (string) $this->response->getBody();
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function delete($url) {
         try {
@@ -54,46 +55,52 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_AdapterAbstract {
             $this->response = $e->getResponse();
             $this->handleError($e);
         }
+
         return (string) $this->response->getBody();
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function put($url, $content = '') {
         $options = [];
         $options[is_array($content) ? 'json' : 'body'] = $content;
+
         try {
             $this->response = $this->client->put($url, $options);
         } catch (RequestException $e) {
             $this->response = $e->getResponse();
             $this->handleError($e);
         }
+
         return (string) $this->response->getBody();
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function post($url, $content = '') {
         $options = [];
         $options[is_array($content) ? 'json' : 'body'] = $content;
+
         try {
             $this->response = $this->client->post($url, $options);
         } catch (RequestException $e) {
             $this->response = $e->getResponse();
             $this->handleError($e);
         }
+
         return (string) $this->response->getBody();
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getLatestResponseHeaders() {
         if (null === $this->response) {
             return null;
         }
+
         return [
             'reset' => (int) (string) $this->response->getHeader('RateLimit-Reset'),
             'remaining' => (int) (string) $this->response->getHeader('RateLimit-Remaining'),
@@ -113,10 +120,10 @@ class CApp_Cloud_Adapter_GuzzleAdapter extends CApp_Cloud_AdapterAbstract {
         $body = (string) $this->response->getBody();
         $code = (int) $this->response->getStatusCode();
         if ($code != 200) {
-            throw new CApp_Cloud_Exception_HttpException(isset($body) ? $body : 'Request not processed.', [], $code);
+            throw new CApp_Cloud_Exception_HttpException(isset($body) ? $body : 'Request not processed.', $code);
         }
         $content = json_decode($body);
 
-        throw new CApp_Cloud_Exception_ApiException(isset($content->errMessage) ? $content->errMessage : 'Request not processed.', [], $code);
+        throw new CApp_Cloud_Exception_ApiException(isset($content->errMessage) ? $content->errMessage : 'Request not processed.', $code);
     }
 }

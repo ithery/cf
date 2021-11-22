@@ -1,11 +1,11 @@
 <?php
 /**
- * Description of Cropper
+ * Description of Cropper.
  *
  * @author Hery
  */
 ?>
-<div id="modal-cropper-<?php echo $id ?>" class="modal modal-cropper" >
+<div id="modal-cropper-<?php echo $id; ?>" class="modal modal-cropper" >
     <div class="modal-dialog"><div class="modal-content animated bounceInRight">
             <div class="modal-header">
 
@@ -74,7 +74,7 @@
     (function ($) {
         var Cropper = window.Cropper;
         var URL = window.URL || window.webkitURL;
-        var modalCropper = $('#modal-cropper-<?php echo $id ?>');
+        var modalCropper = $('#modal-cropper-<?php echo $id; ?>');
         var container = modalCropper.find('.cropper-image-container');
         var image = container.find('img');
         $('.btn-zoom-in').click(function (event) {

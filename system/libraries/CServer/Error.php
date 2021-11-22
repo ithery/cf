@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CServer_Error {
     /**
-     * Holds the instance of this class
+     * Holds the instance of this class.
      *
      * @static
      *
@@ -19,21 +19,21 @@ class CServer_Error {
     private static $instance;
 
     /**
-     * Holds the error messages
+     * Holds the error messages.
      *
      * @var array
      */
     private $errList = [];
 
     /**
-     * Current number ob errors
+     * Current number ob errors.
      *
-     * @var integer
+     * @var int
      */
     private $errCount = 0;
 
     /**
-     * Initalize some used vars
+     * Initalize some used vars.
      */
     private function __construct() {
         $this->errCount = 0;
@@ -41,20 +41,20 @@ class CServer_Error {
     }
 
     /**
-     * Singleton function
+     * Singleton function.
      *
      * @return CServer_Error instance of the class
      */
     public static function instance() {
         if (self::$instance == null) {
-            self::$instance = new CServer_Error();
+            self::$instance = new static();
         }
 
         return self::$instance;
     }
 
     /**
-     * Triggers an error when somebody tries to clone the object
+     * Triggers an error when somebody tries to clone the object.
      *
      * @return void
      */
@@ -63,7 +63,7 @@ class CServer_Error {
     }
 
     /**
-     * Adds an CServer error to the internal list
+     * Adds an CServer error to the internal list.
      *
      * @param string $strCommand Command, which cause the Error
      * @param string $strMessage additional Message, to describe the Error
@@ -75,7 +75,7 @@ class CServer_Error {
     }
 
     /**
-     * Adds an error to the internal list
+     * Adds an error to the internal list.
      *
      * @param string $strCommand Command, which cause the Error
      * @param string $strMessage message, that describe the Error
@@ -90,7 +90,7 @@ class CServer_Error {
     }
 
     /**
-     * Add a config error to the internal list
+     * Add a config error to the internal list.
      *
      * @param string $strCommand Command, which cause the Error
      * @param string $strMessage additional Message, to describe the Error
@@ -102,7 +102,7 @@ class CServer_Error {
     }
 
     /**
-     * Add a php error to the internal list
+     * Add a php error to the internal list.
      *
      * @param string $strCommand Command, which cause the Error
      * @param string $strMessage additional Message, to describe the Error
@@ -114,7 +114,7 @@ class CServer_Error {
     }
 
     /**
-     * Adds a waraning to the internal list
+     * Adds a waraning to the internal list.
      *
      * @param string $strMessage Warning message to display
      *
@@ -127,16 +127,16 @@ class CServer_Error {
     }
 
     /**
-     * Check if errors exists
+     * Check if errors exists.
      *
-     * @return boolean true if are errors logged, false if not
+     * @return bool true if are errors logged, false if not
      */
     public function haveError() {
         return $this->errCount > 0;
     }
 
     /**
-     * Generate a function backtrace for error diagnostic, function is genearally based on code submitted in the php reference page
+     * Generate a function backtrace for error diagnostic, function is genearally based on code submitted in the php reference page.
      *
      * @param string $strMessage additional message to display
      *
@@ -181,7 +181,7 @@ class CServer_Error {
     }
 
     /**
-     * Convert some special vars into better readable output
+     * Convert some special vars into better readable output.
      *
      * @param mixed $var value, which should be formatted
      *
@@ -192,12 +192,12 @@ class CServer_Error {
             $search = ["\x00", "\x0a", "\x0d", "\x1a", "\x09"];
             $replace = ['\0', '\n', '\r', '\Z', '\t'];
 
-            return ('"' . str_replace($search, $replace, $var) . '"');
+            return '"' . str_replace($search, $replace, $var) . '"';
         } elseif (is_bool($var)) {
             if ($var) {
-                return ('true');
+                return 'true';
             } else {
-                return ('false');
+                return 'false';
             }
         } elseif (is_array($var)) {
             $strResult = 'array( ';
@@ -208,9 +208,9 @@ class CServer_Error {
             }
             $strResult .= ' )';
 
-            return ($strResult);
+            return $strResult;
         }
         // anything else, just let php try to print it
-        return (var_export($var, true));
+        return var_export($var, true);
     }
 }

@@ -65,56 +65,67 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
+
         return $this;
     }
 
     public function setMultiple($bool = true) {
         $this->multiple = $bool;
+
         return $this;
     }
 
     public function setDelay($val) {
         $this->delay = $val;
+
         return $this;
     }
 
     public function setAutoSelect($bool = true) {
         $this->autoSelect = $bool;
+
         return $this;
     }
 
     public function setMinInputLength($minInputLength) {
         $this->minInputLength = $minInputLength;
+
         return $this;
     }
 
     public function setKeyField($keyField) {
         $this->keyField = $keyField;
+
         return $this;
     }
 
     public function setSearchField($searchField) {
         $this->searchField = $searchField;
+
         return $this;
     }
 
     public function setQuery($query) {
         $this->query = $query;
+
         return $this;
     }
 
     public function setFormatResult($fmt) {
         $this->formatResult = $fmt;
+
         return $this;
     }
 
     public function setFormatSelection($fmt) {
         $this->formatSelection = $fmt;
+
         return $this;
     }
 
     public function setPlaceholder($placeholder) {
         $this->placeholder = $placeholder;
+
         return $this;
     }
 
@@ -128,6 +139,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             }
             $this->dropdownClasses[] = $c;
         }
+
         return $this;
     }
 
@@ -240,6 +252,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 $template = str_replace($bracketStr, "'+item." . $str . "+'", $template);
             }
         }
+
         return $template;
     }
 
@@ -352,6 +365,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                             };
                         },
                         cache:true,
+                        error: function (jqXHR, status, error) {
+                            if(cresenity && cresenity.handleAjaxError) {
+                                cresenity.handleAjaxError(jqXHR, status, error);
+                            }
+                        }
                     },
                 ' . $strJsInit . "
                 templateResult: function(item) {

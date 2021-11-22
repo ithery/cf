@@ -26,6 +26,7 @@ class CApp_Cloud {
         if (self::$instance == null) {
             self::$instance = new CApp_Cloud();
         }
+
         return self::$instance;
     }
 
@@ -41,6 +42,7 @@ class CApp_Cloud {
 
     public function api($apiName) {
         $api = new CApp_Cloud_Api($this->adapter);
+
         return $api->execute($apiName);
     }
 }

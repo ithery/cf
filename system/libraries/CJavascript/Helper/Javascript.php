@@ -32,7 +32,7 @@ class CJavascript_Helper_Javascript {
     /**
      * Puts HTML element in quotes for use in jQuery code
      * unless the supplied element is the Javascript 'this'
-     * object, in which case no quotes are added
+     * object, in which case no quotes are added.
      *
      * @param string $element
      *
@@ -42,13 +42,14 @@ class CJavascript_Helper_Javascript {
         if (self::containsCode($element) === false) {
             $element = '"' . addslashes($element) . '"';
         }
+
         return $element;
     }
 
     /**
      * Puts HTML values in quotes for use in jQuery code
      * unless the supplied value contains the Javascript 'this' or 'event'
-     * object, in which case no quotes are added
+     * object, in which case no quotes are added.
      *
      * @param string $value
      *
@@ -62,6 +63,7 @@ class CJavascript_Helper_Javascript {
             $value = \str_replace(['\\', '"'], ['\\\\', '\\"'], $value);
             $value = '"' . $value . '"';
         }
+
         return trim($value, '%');
     }
 
@@ -69,6 +71,7 @@ class CJavascript_Helper_Javascript {
         if (CJavascript_Helper_String::startswith($value, '$(') === false) {
             return '$(' . self::prepValue($value) . ')';
         }
+
         return $value;
     }
 }

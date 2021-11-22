@@ -12,6 +12,8 @@ class cupload {
      * @param string $directory new directory
      * @param int    $chmod     chmod mask
      *
+     * @throws Exception
+     *
      * @return string full path to new file
      */
     public static function save($file, $filename = null, $directory = null, $chmod = 0644) {
@@ -43,7 +45,7 @@ class cupload {
 
         if (!is_writable($directory)) {
             // throw new CF_Exception('upload.not_writable', $directory);
-            throw new CF_Exception(CF::lang('upload.not_writable'));
+            throw new Exception(c::__('upload.not_writable'));
         }
 
         if (is_uploaded_file($file['tmp_name']) and move_uploaded_file($file['tmp_name'], $filename = $directory . $filename)) {
@@ -59,6 +61,14 @@ class cupload {
         return false;
     }
 
+    /**
+     * @param array|string $file
+     * @param null|string  $filename
+     * @param null|string  $directory
+     * @param int          $chmod
+     *
+     * @throws Exception
+     */
     public static function save_array($file, $filename = null, $directory = null, $chmod = 0644) {
         // Load file data from FILES if not passed as array
         $file = is_array($file) ? $file : $_FILES[$file];
@@ -90,7 +100,7 @@ class cupload {
 
             if (!is_writable($directory)) {
                 // throw new CF_Exception('upload.not_writable', $directory);
-                throw new Exception(CF::lang('upload.not_writable'));
+                throw new Exception(c::__('upload.not_writable'));
             }
 
             if (is_uploaded_file($file['tmp_name']) and move_uploaded_file($file['tmp_name'], $filename = $directory . $filename)) {
@@ -118,12 +128,12 @@ class cupload {
      * @return bool
      */
     public static function valid($file) {
-        return (is_array($file)
+        return is_array($file)
                 and isset($file['error'])
                 and isset($file['name'])
                 and isset($file['type'])
                 and isset($file['tmp_name'])
-                and isset($file['size']));
+                and isset($file['size']);
     }
 
     /**
@@ -134,10 +144,10 @@ class cupload {
      * @return bool
      */
     public static function required(array $file) {
-        return (isset($file['tmp_name'])
+        return isset($file['tmp_name'])
                 and isset($file['error'])
                 and is_uploaded_file($file['tmp_name'])
-                and (int) $file['error'] === UPLOAD_ERR_OK);
+                and (int) $file['error'] === UPLOAD_ERR_OK;
     }
 
     /**
@@ -160,7 +170,7 @@ class cupload {
         $mime_types = CF::config('mimes.' . $extension);
 
         // Make sure there is an extension, that the extension is allowed, and that mime types exist
-        return (!empty($extension) and in_array($extension, $allowed_types) and is_array($mime_types));
+        return !empty($extension) and in_array($extension, $allowed_types) and is_array($mime_types);
     }
 
     /**
@@ -189,17 +199,21 @@ class cupload {
         // Make the size into a power of 1024
         switch (substr($size, -1)) {
             case 'G': $size = intval($size) * pow(1024, 3);
+
                 break;
             case 'M': $size = intval($size) * pow(1024, 2);
+
                 break;
             case 'K': $size = intval($size) * pow(1024, 1);
+
                 break;
             default: $size = intval($size);
+
                 break;
         }
 
         // Test that the file is under or equal to the max size
-        return ($file['size'] <= $size);
+        return $file['size'] <= $size;
     }
 
     /* upload logic */

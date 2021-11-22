@@ -24,6 +24,7 @@ class CElement_Component_Kanban extends CElement_Component {
         $list = CElement_Factory::createComponent('Kanban_List', $id);
         $list->addClass('mb-3');
         $wrapperList->add($list);
+
         return $list;
     }
 
@@ -44,6 +45,7 @@ class CElement_Component_Kanban extends CElement_Component {
                 $args = func_get_args();
                 $errCode = 0;
                 $errMessage = '';
+
                 try {
                     $result = CFunction::factory(carr::get($args, 2))->setRequire(carr::get($args, 1))->setArgs($args)->execute();
                 } catch (Exception $ex) {
@@ -54,6 +56,7 @@ class CElement_Component_Kanban extends CElement_Component {
                     //return error with no message for just cancel dracula event
                     $errCode++;
                 }
+
                 return json_encode([
                     'errCode' => $errCode,
                     'errMessage' => $errMessage,
@@ -146,6 +149,7 @@ class CElement_Component_Kanban extends CElement_Component {
             });
         ';
         $js .= parent::jsChild($indent);
+
         return $js;
     }
 }

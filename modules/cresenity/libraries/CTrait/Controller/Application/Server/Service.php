@@ -1,4 +1,3 @@
-
 <?php
 
 trait CTrait_Controller_Application_Server_Service {
@@ -8,12 +7,14 @@ trait CTrait_Controller_Application_Server_Service {
         if ($submethod == 'status') {
             $args = func_get_args();
             array_shift($args);
+
             return $this->serviceStatus(...$args);
         }
         $app = CApp::instance();
 
         $servicesData = c::collect($this->services)->map(function ($service) {
             $serverService = new CServer_Service_Services($service);
+
             return [
                 'name' => $service,
                 'isRunning' => $serverService->isRunning()
@@ -29,6 +30,7 @@ trait CTrait_Controller_Application_Server_Service {
             $badgeClass = $isRunning ? 'badge badge-outline-success' : 'badge badge-outline-danger';
             $badgeLabel = $isRunning ? 'RUNNING' : 'STOPPED';
             $val = '<span class="' . $badgeClass . '">' . $badgeLabel . '</span>';
+
             return $val;
         });
         $table->setTitle('Service List');
@@ -47,6 +49,7 @@ trait CTrait_Controller_Application_Server_Service {
     public function serviceStatus($name) {
         $app = CApp::instance();
         $app->add($name);
+
         return $app;
     }
 }

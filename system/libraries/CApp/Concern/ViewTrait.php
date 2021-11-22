@@ -9,18 +9,18 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Nov 29, 2020
  */
 trait CApp_Concern_ViewTrait {
+    protected static $viewCallback;
+
     private $viewName = 'capp/page';
 
     private $viewLoginName = 'capp/login';
 
     /**
-     * View
+     * View.
      *
      * @var CView_View}string
      */
     private $view;
-
-    protected static $viewCallback;
 
     public function setView($view) {
         if (!($view instanceof CView_View)) {
@@ -32,12 +32,18 @@ trait CApp_Concern_ViewTrait {
         if ($this->isUsingBlade()) {
             $this->useRequireJs = false;
         }
+
         return $this;
     }
 
+    /**
+     * @return CView_View
+     */
     public function getView() {
-        if (!$this->isUserLogin() && $this->config('have_user_login') && $this->loginRequired) {
+        /** @var CApp $this */
+        if (!$this->isUserLogin() && $this->isAuthEnabled()) {
             $view = $this->viewLoginName;
+
             if (!($view instanceof CView_View)) {
                 $view = CView::factory($view);
             }
@@ -54,14 +60,9 @@ trait CApp_Concern_ViewTrait {
             }
             $v = null;
 
-            $themePath = CManager::theme()->getThemePath();
-
-            if (CView::exists($themePath . $viewName)) {
-                $v = CView::factory($themePath . $viewName);
-            }
             if ($v == null) {
                 if (!CView::exists($viewName)) {
-                    throw new CApp_Exception('view :viewName not exists', [':viewName' => $viewName]);
+                    throw new CApp_Exception(c::__('view :viewName not exists', ['viewName' => $viewName]));
                 }
                 $v = CView::factory($viewName);
             }
@@ -77,14 +78,19 @@ trait CApp_Concern_ViewTrait {
 
     public function setViewName($viewName) {
         $this->setView($viewName);
+
+        return $this;
     }
 
     public function setViewLoginName($viewLoginName) {
         $this->viewLoginName = $viewLoginName;
+
+        return $this;
     }
 
     public function isUsingBlade() {
-        if (!$this->isUserLogin() && $this->config('have_user_login') && $this->loginRequired) {
+        /** @var CApp $this */
+        if (!$this->isUserLogin() && $this->config('have_user_login') && $this->isAuthEnabled()) {
             return false;
         }
         if ($view = $this->getView()) {
@@ -94,6 +100,7 @@ trait CApp_Concern_ViewTrait {
                 }
             }
         }
+
         return false;
     }
 }

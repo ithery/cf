@@ -12,14 +12,14 @@ class CServer_Memory_OS_Darwin extends CServer_Memory_OS_Linux {
     use CServer_Trait_OS_Darwin;
 
     /**
-     * get memory and swap information
+     * Get memory and swap information.
      *
      * @return void
      */
-    protected function buildMemory() {
+    public function buildMemory() {
         $cmd = $this->createCommand();
         $s = $this->grabkey('hw.memsize');
-        if ($cmd->executeProgram('vm_stat', '', $pstat, PSI_DEBUG)) {
+        if ($cmd->executeProgram('vm_stat', '', $pstat, CServer::config()->isDebug())) {
             // calculate free memory from page sizes (each page = 4096)
             if (preg_match('/^Pages free:\s+(\S+)/m', $pstat, $free_buf)) {
                 if (preg_match('/^Anonymous pages:\s+(\S+)/m', $pstat, $anon_buf) && preg_match('/^Pages wired down:\s+(\S+)/m', $pstat, $wire_buf) && preg_match('/^File-backed pages:\s+(\S+)/m', $pstat, $fileb_buf)) {
@@ -60,7 +60,7 @@ class CServer_Memory_OS_Darwin extends CServer_Memory_OS_Linux {
 
     public function buildSwap() {
         $cmd = $this->createCommand();
-        if ($cmd->executeProgram('sysctl', 'vm.swapusage | colrm 1 22', $swapBuff, PSI_DEBUG)) {
+        if ($cmd->executeProgram('sysctl', 'vm.swapusage | colrm 1 22', $swapBuff, CServer::config()->isDebug())) {
             $swap1 = preg_split('/M/', $swapBuff);
             $swap2 = preg_split('/=/', $swap1[1]);
             $swap3 = preg_split('/=/', $swap1[2]);

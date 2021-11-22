@@ -91,11 +91,13 @@ class CJavascript {
     public static function popDeferredStack() {
         $statements = self::getDeferredStatements();
         unset(self::$deferredStatements[self::$deferredStack--]);
+
         return $statements;
     }
 
     public static function pushDeferredStack() {
         self::$deferredStatements[++self::$deferredStack] = [];
+
         return self::getDeferredStatements();
     }
 

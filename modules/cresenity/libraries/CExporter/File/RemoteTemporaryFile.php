@@ -1,20 +1,13 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_File_RemoteTemporaryFile extends CExporter_File_TemporaryFile {
-
     /**
      * @var string
      */
     private $disk;
 
     /**
-     * @var Disk|null
+     * @var null|CExporter_Disk
      */
     private $diskInstance;
 
@@ -24,7 +17,7 @@ class CExporter_File_RemoteTemporaryFile extends CExporter_File_TemporaryFile {
     private $filename;
 
     /**
-     * @var LocalTemporaryFile
+     * @var CExporter_File_LocalTemporaryFile
      */
     private $localTemporaryFile;
 
@@ -77,7 +70,8 @@ class CExporter_File_RemoteTemporaryFile extends CExporter_File_TemporaryFile {
         }
 
         $this->disk()->copy(
-                $this, $this->localTemporaryFile->getLocalPath()
+            $this,
+            $this->localTemporaryFile->getLocalPath()
         );
 
         return $this;
@@ -88,7 +82,8 @@ class CExporter_File_RemoteTemporaryFile extends CExporter_File_TemporaryFile {
      */
     public function updateRemote() {
         $this->disk()->copy(
-                $this->localTemporaryFile, $this->filename
+            $this->localTemporaryFile,
+            $this->filename
         );
     }
 
@@ -119,5 +114,4 @@ class CExporter_File_RemoteTemporaryFile extends CExporter_File_TemporaryFile {
     public function disk() {
         return $this->diskInstance ?: $this->diskInstance = CExporter_Storage::instance()->disk($this->disk);
     }
-
 }

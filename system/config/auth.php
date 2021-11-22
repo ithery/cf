@@ -38,6 +38,7 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
+            'sessionName' => 'user'
         ],
 
         'api' => [
@@ -67,7 +68,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'model',
-            'model' => CAuth_Model_UsersModel::class,
+            'model' => CApp_Model_Users::class,
             'hasher' => 'md5',
         ],
 

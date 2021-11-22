@@ -1,19 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 1:39:20 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 1:39:20 AM
  */
 use Ramsey\Uuid\Uuid as UUID;
 
 class CTracker_Repository_Session extends CTracker_AbstractRepository {
-
     private $config;
+
     private $session;
+
     private $sessionInfo;
+
     protected $relations = ['device', 'user', 'log', 'language', 'agent', 'referer', 'geoIp', 'cookie'];
 
     public function __construct() {
@@ -60,9 +63,9 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
 
     private function getSessions() {
         return $this
-                        ->newQuery()
-                        ->with($this->relations)
-                        ->orderBy('updated', 'desc');
+            ->newQuery()
+            ->with($this->relations)
+            ->orderBy('updated', 'desc');
     }
 
     public function all() {
@@ -71,8 +74,8 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
 
     public function last($minutes, $returnResults) {
         $query = $this
-                ->getSessions()
-                ->period($minutes);
+            ->getSessions()
+            ->period($minutes);
         if ($returnResults) {
             $cacheKey = 'last-sessions';
             $result = $this->cache->findCachedWithKey($cacheKey);
@@ -91,8 +94,8 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
             return [];
         }
         $sessions = $this
-                ->getSessions()
-                ->period($minutes);
+            ->getSessions()
+            ->period($minutes);
 
         if (strlen($user_id) > 0) {
             $sessions = $sessions->where('user_id', $user_id);
@@ -114,7 +117,6 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
     public function updateSessionData($data) {
         $session = $this->model;
         if ($session) {
-
             foreach ($session->getAttributes() as $name => $value) {
                 if (isset($data[$name]) && $name !== 'log_session_id' && $name !== 'uuid') {
                     if (in_array($name, $session->getFillable())) {
@@ -127,5 +129,4 @@ class CTracker_Repository_Session extends CTracker_AbstractRepository {
         }
         return $data;
     }
-
 }

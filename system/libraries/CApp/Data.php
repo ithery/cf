@@ -3,6 +3,7 @@
 class CApp_Data {
     public static function haveData($dataName) {
         $dataFile = CF::findFile('data', $dataName);
+
         return is_file($dataFile);
     }
 
@@ -12,6 +13,7 @@ class CApp_Data {
         if (file_exists($dataFile)) {
             $data = include $dataFile;
         }
+
         return $data;
     }
 
@@ -20,6 +22,7 @@ class CApp_Data {
         if (!self::haveData($dataName)) {
             throw new CStorage_Exception_FileNotFoundException('File Data ' . $dataName . ' not found');
         }
+
         return self::getData($dataName);
     }
 }

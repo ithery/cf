@@ -7,6 +7,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @license Ittron Global Teknologi <ittron.co.id>
  *
  * @since Jun 19, 2018, 11:36:57 PM
+ *
+ * @property string  $createdby
+ * @property string  $updatedby
+ * @property CCarbon $created
+ * @property CCarbon $updated
+ * @property int     $status
  */
 trait CApp_Model_Trait_Roles {
     use CModel_Nested_NestedTrait;
@@ -30,6 +36,7 @@ trait CApp_Model_Trait_Roles {
     }
 
     public function getDescendantsTree($rootId = null, $orgId = null, $type = null) {
+        /** @var CApp_Model_Roles $this */
         $root = $this;
         if (strlen($rootId) > 0) {
             $root = $this->find($rootId);

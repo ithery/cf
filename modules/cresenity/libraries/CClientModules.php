@@ -54,6 +54,7 @@ final class CClientModules {
         if (self::$instance == null) {
             self::$instance = new CClientModules();
         }
+
         return self::$instance;
     }
 }

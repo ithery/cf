@@ -1,13 +1,86 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 4:05:59 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 4:05:59 AM
  */
 class CTracker_Detect_MobileDetect extends CDetector_Mobile {
+    /**
+     * List of desktop devices.
+     *
+     * @var array
+     */
+    protected static $desktopDevices = [
+        'Macintosh' => 'Macintosh',
+    ];
+
+    /**
+     * List of additional operating systems.
+     *
+     * @var array
+     */
+    protected static $additionalOperatingSystems = [
+        'Windows' => 'Windows',
+        'Windows NT' => 'Windows NT',
+        'OS X' => 'Mac OS X',
+        'Debian' => 'Debian',
+        'Ubuntu' => 'Ubuntu',
+        'Macintosh' => 'PPC',
+        'OpenBSD' => 'OpenBSD',
+        'Linux' => 'Linux',
+        'ChromeOS' => 'CrOS',
+    ];
+
+    /**
+     * List of additional browsers.
+     *
+     * @var array
+     */
+    protected static $additionalBrowsers = [
+        'Opera Mini' => 'Opera Mini',
+        'Opera' => 'Opera|OPR',
+        'Edge' => 'Edge',
+        'UCBrowser' => 'UCBrowser',
+        'Vivaldi' => 'Vivaldi',
+        'Chrome' => 'Chrome',
+        'Firefox' => 'Firefox',
+        'Safari' => 'Safari',
+        'IE' => 'MSIE|IEMobile|MSIEMobile|Trident/[.0-9]+',
+        'Netscape' => 'Netscape',
+        'Mozilla' => 'Mozilla',
+    ];
+
+    /**
+     * List of additional properties.
+     *
+     * @var array
+     */
+    protected static $additionalProperties = [
+        // Operating systems
+        'Windows' => 'Windows NT [VER]',
+        'Windows NT' => 'Windows NT [VER]',
+        'OS X' => 'OS X [VER]',
+        'BlackBerryOS' => ['BlackBerry[\w]+/[VER]', 'BlackBerry.*Version/[VER]', 'Version/[VER]'],
+        'AndroidOS' => 'Android [VER]',
+        'ChromeOS' => 'CrOS x86_64 [VER]',
+        // Browsers
+        'Opera Mini' => 'Opera Mini/[VER]',
+        'Opera' => [' OPR/[VER]', 'Opera Mini/[VER]', 'Version/[VER]', 'Opera [VER]'],
+        'Netscape' => 'Netscape/[VER]',
+        'Mozilla' => 'rv:[VER]',
+        'IE' => ['IEMobile/[VER];', 'IEMobile [VER]', 'MSIE [VER];', 'rv:[VER]'],
+        'Edge' => 'Edge/[VER]',
+        'Vivaldi' => 'Vivaldi/[VER]',
+    ];
+
+    /**
+     * @var CrawlerDetect
+     */
+    protected static $crawlerDetect;
 
     /**
      * Detect kind, model and mobility.
@@ -39,6 +112,7 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
         } elseif ($this->isComputer()) {
             $kind = 'Computer';
         }
+
         return $kind;
     }
 
@@ -52,89 +126,26 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
     }
 
     /**
-     * List of desktop devices.
-     * @var array
-     */
-    protected static $desktopDevices = [
-        'Macintosh' => 'Macintosh',
-    ];
-
-    /**
-     * List of additional operating systems.
-     * @var array
-     */
-    protected static $additionalOperatingSystems = [
-        'Windows' => 'Windows',
-        'Windows NT' => 'Windows NT',
-        'OS X' => 'Mac OS X',
-        'Debian' => 'Debian',
-        'Ubuntu' => 'Ubuntu',
-        'Macintosh' => 'PPC',
-        'OpenBSD' => 'OpenBSD',
-        'Linux' => 'Linux',
-        'ChromeOS' => 'CrOS',
-    ];
-
-    /**
-     * List of additional browsers.
-     * @var array
-     */
-    protected static $additionalBrowsers = [
-        'Opera Mini' => 'Opera Mini',
-        'Opera' => 'Opera|OPR',
-        'Edge' => 'Edge',
-        'UCBrowser' => 'UCBrowser',
-        'Vivaldi' => 'Vivaldi',
-        'Chrome' => 'Chrome',
-        'Firefox' => 'Firefox',
-        'Safari' => 'Safari',
-        'IE' => 'MSIE|IEMobile|MSIEMobile|Trident/[.0-9]+',
-        'Netscape' => 'Netscape',
-        'Mozilla' => 'Mozilla',
-    ];
-
-    /**
-     * List of additional properties.
-     * @var array
-     */
-    protected static $additionalProperties = [
-        // Operating systems
-        'Windows' => 'Windows NT [VER]',
-        'Windows NT' => 'Windows NT [VER]',
-        'OS X' => 'OS X [VER]',
-        'BlackBerryOS' => ['BlackBerry[\w]+/[VER]', 'BlackBerry.*Version/[VER]', 'Version/[VER]'],
-        'AndroidOS' => 'Android [VER]',
-        'ChromeOS' => 'CrOS x86_64 [VER]',
-        // Browsers
-        'Opera Mini' => 'Opera Mini/[VER]',
-        'Opera' => [' OPR/[VER]', 'Opera Mini/[VER]', 'Version/[VER]', 'Opera [VER]'],
-        'Netscape' => 'Netscape/[VER]',
-        'Mozilla' => 'rv:[VER]',
-        'IE' => ['IEMobile/[VER];', 'IEMobile [VER]', 'MSIE [VER];', 'rv:[VER]'],
-        'Edge' => 'Edge/[VER]',
-        'Vivaldi' => 'Vivaldi/[VER]',
-    ];
-
-    /**
-     * @var CrawlerDetect
-     */
-    protected static $crawlerDetect;
-
-    /**
      * Get all detection rules. These rules include the additional
      * platforms and browsers and utilities.
+     *
      * @return array
      */
     public static function getDetectionRulesExtended() {
         static $rules;
         if (!$rules) {
             $rules = static::mergeRules(
-                            static::$desktopDevices, // NEW
-                            static::$phoneDevices, static::$tabletDevices, static::$operatingSystems, static::$additionalOperatingSystems, // NEW
-                            static::$browsers, static::$additionalBrowsers, // NEW
-                            static::$utilities
+                static::$desktopDevices, // NEW
+                static::$phoneDevices,
+                static::$tabletDevices,
+                static::$operatingSystems,
+                static::$additionalOperatingSystems, // NEW
+                static::$browsers,
+                static::$additionalBrowsers, // NEW
+                static::$utilities
             );
         }
+
         return $rules;
     }
 
@@ -142,6 +153,7 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
         if ($this->detectionType === static::DETECTION_TYPE_EXTENDED) {
             return static::getDetectionRulesExtended();
         }
+
         return static::getMobileDetectionRules();
     }
 
@@ -152,24 +164,28 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
         if (static::$crawlerDetect === null) {
             static::$crawlerDetect = new CDetector_Crawler();
         }
+
         return static::$crawlerDetect;
     }
 
     public static function getBrowsers() {
         return static::mergeRules(
-                        static::$additionalBrowsers, static::$browsers
+            static::$additionalBrowsers,
+            static::$browsers
         );
     }
 
     public static function getOperatingSystems() {
         return static::mergeRules(
-                        static::$operatingSystems, static::$additionalOperatingSystems
+            static::$operatingSystems,
+            static::$additionalOperatingSystems
         );
     }
 
     public static function getPlatforms() {
         return static::mergeRules(
-                        static::$operatingSystems, static::$additionalOperatingSystems
+            static::$operatingSystems,
+            static::$additionalOperatingSystems
         );
     }
 
@@ -179,13 +195,16 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
 
     public static function getProperties() {
         return static::mergeRules(
-                        static::$additionalProperties, static::$properties
+            static::$additionalProperties,
+            static::$properties
         );
     }
 
     /**
      * Get accept languages.
+     *
      * @param string $acceptLanguage
+     *
      * @return array
      */
     public function languages($acceptLanguage = null) {
@@ -205,13 +224,16 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
         }
         // Sort languages by priority.
         arsort($languages);
+
         return array_keys($languages);
     }
 
     /**
      * Match a detection rule and return the matched key.
-     * @param  array $rules
-     * @param  string|null $userAgent
+     *
+     * @param array       $rules
+     * @param null|string $userAgent
+     *
      * @return string
      */
     protected function findDetectionRulesAgainstUA(array $rules, $userAgent = null) {
@@ -225,12 +247,15 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
                 return $key ?: reset($this->matchesArray);
             }
         }
+
         return false;
     }
 
     /**
      * Get the browser name.
-     * @param  string|null $userAgent
+     *
+     * @param null|string $userAgent
+     *
      * @return string
      */
     public function browser($userAgent = null) {
@@ -239,7 +264,9 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
 
     /**
      * Get the platform name.
-     * @param  string|null $userAgent
+     *
+     * @param null|string $userAgent
+     *
      * @return string
      */
     public function platform($userAgent = null) {
@@ -248,20 +275,28 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
 
     /**
      * Get the device name.
-     * @param  string|null $userAgent
+     *
+     * @param null|string $userAgent
+     *
      * @return string
      */
     public function device($userAgent = null) {
         $rules = static::mergeRules(
-                        static::getDesktopDevices(), static::getPhoneDevices(), static::getTabletDevices(), static::getUtilities()
+            static::getDesktopDevices(),
+            static::getPhoneDevices(),
+            static::getTabletDevices(),
+            static::getUtilities()
         );
+
         return $this->findDetectionRulesAgainstUA($rules, $userAgent);
     }
 
     /**
      * Check if the device is a desktop computer.
-     * @param  string|null $userAgent deprecated
-     * @param  array $httpHeaders deprecated
+     *
+     * @param null|string $userAgent   deprecated
+     * @param array       $httpHeaders deprecated
+     *
      * @return bool
      */
     public function isDesktop($userAgent = null, $httpHeaders = null) {
@@ -270,8 +305,10 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
 
     /**
      * Check if the device is a mobile phone.
-     * @param  string|null $userAgent deprecated
-     * @param  array $httpHeaders deprecated
+     *
+     * @param null|string $userAgent   deprecated
+     * @param array       $httpHeaders deprecated
+     *
      * @return bool
      */
     public function isPhone($userAgent = null, $httpHeaders = null) {
@@ -280,19 +317,24 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
 
     /**
      * Get the robot name.
-     * @param  string|null $userAgent
+     *
+     * @param null|string $userAgent
+     *
      * @return string|bool
      */
     public function robot($userAgent = null) {
         if ($this->getCrawlerDetect()->isCrawler($userAgent ?: $this->userAgent)) {
             return ucfirst($this->getCrawlerDetect()->getMatches());
         }
+
         return false;
     }
 
     /**
      * Check if device is a robot.
-     * @param  string|null $userAgent
+     *
+     * @param null|string $userAgent
+     *
      * @return bool
      */
     public function isRobot($userAgent = null) {
@@ -315,23 +357,27 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
             $properties[$propertyName] = (array) $properties[$propertyName];
             foreach ($properties[$propertyName] as $propertyMatchString) {
                 if (is_array($propertyMatchString)) {
-                    $propertyMatchString = implode("|", $propertyMatchString);
+                    $propertyMatchString = implode('|', $propertyMatchString);
                 }
                 $propertyPattern = str_replace('[VER]', self::VER, $propertyMatchString);
                 // Identify and extract the version.
                 preg_match(sprintf('#%s#is', $propertyPattern), $this->userAgent, $match);
                 if (false === empty($match[1])) {
                     $version = ($type === self::VERSION_TYPE_FLOAT ? $this->prepareVersionNo($match[1]) : $match[1]);
+
                     return $version;
                 }
             }
         }
+
         return false;
     }
 
     /**
      * Merge multiple rules into one array.
+     *
      * @param array $all
+     *
      * @return array
      */
     protected static function mergeRules(...$all) {
@@ -347,6 +393,7 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
                 }
             }
         }
+
         return $merged;
     }
 
@@ -356,11 +403,11 @@ class CTracker_Detect_MobileDetect extends CDetector_Mobile {
     public function __call($name, $arguments) {
         // Make sure the name starts with 'is', otherwise
         if (strpos($name, 'is') !== 0) {
-            throw new BadMethodCallException("No such method exists: $name");
+            throw new BadMethodCallException("No such method exists: ${name}");
         }
         $this->setDetectionType(self::DETECTION_TYPE_EXTENDED);
         $key = substr($name, 2);
+
         return $this->matchUAAgainstKey($key);
     }
-
 }

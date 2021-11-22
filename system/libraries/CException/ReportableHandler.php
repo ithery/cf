@@ -10,8 +10,6 @@ class CException_ReportableHandler {
 
     /**
      * The underlying callback.
-     *
-     * @var callable
      */
     protected $callback;
 
@@ -25,11 +23,11 @@ class CException_ReportableHandler {
     /**
      * Create a new reportable handler instance.
      *
-     * @param callable $callback
+     * @param $callback
      *
      * @return void
      */
-    public function __construct(callable $callback) {
+    public function __construct($callback) {
         $this->callback = $callback;
     }
 

@@ -8,7 +8,15 @@ defined('SYSPATH') or die('No direct access allowed.');
 final class CDomain {
     public static function path() {
         $dir = DOCROOT . 'data' . DS . 'domain' . DS;
+
         return $dir;
+    }
+
+    public static function getFile($dataName) {
+        $file = self::path();
+        $file .= $dataName;
+
+        return $file;
     }
 
     public static function get($domain) {
@@ -16,19 +24,23 @@ final class CDomain {
 
         $data = null;
         if (CFile::exists($file)) {
-            $data = CFile::getRequire($file);
-        } else {
-            //search maybe found in wildcard file
-            $dataNameExploded = explode('.', $domain);
-            if (count($dataNameExploded) > 0) {
-                $fileWildcard = '$.' . implode('.', array_slice($dataNameExploded, 1));
-
-                if (file_exists($fileWildcard . EXT)) {
-                    return CFile::getRequire($fileWildcard . EXT);
-                }
+            return CFile::getRequire($file);
+        }
+        //search maybe found in wildcard file
+        $dataNameExploded = explode('.', $domain);
+        if (count($dataNameExploded) > 0) {
+            $fileWildcard = '$.' . implode('.', array_slice($dataNameExploded, 1));
+            $file = static::getFile($fileWildcard);
+            if (CFile::exists($file . EXT)) {
+                return CFile::getRequire($file . EXT);
             }
         }
-        return $data;
+        $file = static::getFile('$');
+        if (file_exists($file . EXT)) {
+            return CFile::getRequire($file . EXT);
+        }
+
+        return null;
     }
 
     public static function set($domain, $data) {

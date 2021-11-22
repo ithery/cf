@@ -53,7 +53,7 @@ class CElement_View extends CElement {
     }
 
     /**
-     * Set Data to View
+     * Set Data to View.
      *
      * @param array $data
      *
@@ -61,6 +61,7 @@ class CElement_View extends CElement {
      */
     public function setData(array $data) {
         $this->data = $data;
+
         return $this;
     }
 
@@ -86,11 +87,13 @@ class CElement_View extends CElement {
             ];
             $this->htmlJs = $htmlJs;
         }
+
         return $this->htmlJs;
     }
 
     public function html($indent = 0) {
         CApp::setRenderingElement($this);
+
         return carr::get($this->collectHtmlJsOnce(), 'html');
     }
 
@@ -99,7 +102,7 @@ class CElement_View extends CElement {
     }
 
     /**
-     * Get Element By Key
+     * Get Element By Key.
      *
      * @param string $key
      *
@@ -109,6 +112,7 @@ class CElement_View extends CElement {
         if (!isset($this->viewElement[$key])) {
             $this->viewElement[$key] = new CElement_PseudoElement();
         }
+
         return $this->viewElement[$key];
     }
 }

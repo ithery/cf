@@ -7,12 +7,12 @@ class CExporter_File_TemporaryFileFactory {
     private static $instance;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $temporaryPath;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $temporaryDisk;
 
@@ -20,6 +20,7 @@ class CExporter_File_TemporaryFileFactory {
         if (static::$instance == null) {
             static::$instance = new CExporter_File_TemporaryFileFactory();
         }
+
         return static::$instance;
     }
 
@@ -29,7 +30,7 @@ class CExporter_File_TemporaryFileFactory {
     }
 
     /**
-     * @param string|null $fileExtension
+     * @param null|string $fileExtension
      *
      * @return CExporter_File_TemporaryFile
      */
@@ -42,8 +43,8 @@ class CExporter_File_TemporaryFileFactory {
     }
 
     /**
-     * @param string|null $fileName
-     * @param string|null $fileExtension
+     * @param null|string $fileName
+     * @param null|string $fileExtension
      *
      * @return CExporter_File_LocalTemporaryFile
      */
@@ -71,7 +72,7 @@ class CExporter_File_TemporaryFileFactory {
     }
 
     /**
-     * @param string|null $fileExtension
+     * @param null|string $fileExtension
      *
      * @return string
      */

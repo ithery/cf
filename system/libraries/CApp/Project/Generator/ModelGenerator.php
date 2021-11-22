@@ -86,6 +86,7 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
         $stub = str_replace('{{class}}', cstr::studly($tableName), $stub);
         $stub = str_replace('{{prefix}}', cstr::upper($prefix), $stub);
         $stub = str_replace('{{datetime}}', date('F,d Y h:i:s A'), $stub);
+
         return $stub;
     }
 
@@ -107,28 +108,32 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
         foreach ($modelInformation['fillable'] as $field) {
             // fillable and hidden
             if ($field != $modelInformation['table'] . '_id') {
-                $this->fieldsFillable .= (strlen($this->fieldsFillable) > 0 ? ', ' : '') . "'$field'";
+                $this->fieldsFillable .= (strlen($this->fieldsFillable) > 0 ? ', ' : '') . "'${field}'";
                 $fieldsFiltered = $this->columns->where('field', $field);
                 if ($fieldsFiltered) {
                     // check type
                     switch (strtolower($fieldsFiltered->first()['type'])) {
                         case 'timestamp':
-                            $this->fieldsDate .= (strlen($this->fieldsDate) > 0 ? ', ' : '') . "'$field'";
+                            $this->fieldsDate .= (strlen($this->fieldsDate) > 0 ? ', ' : '') . "'${field}'";
+
                             break;
                         case 'datetime':
-                            $this->fieldsDate .= (strlen($this->fieldsDate) > 0 ? ', ' : '') . "'$field'";
+                            $this->fieldsDate .= (strlen($this->fieldsDate) > 0 ? ', ' : '') . "'${field}'";
+
                             break;
                         case 'date':
-                            $this->fieldsDate .= (strlen($this->fieldsDate) > 0 ? ', ' : '') . "'$field'";
+                            $this->fieldsDate .= (strlen($this->fieldsDate) > 0 ? ', ' : '') . "'${field}'";
+
                             break;
                         case 'tinyint(1)':
-                            $this->fieldsCast .= (strlen($this->fieldsCast) > 0 ? ', ' : '') . "'$field' => 'boolean'";
+                            $this->fieldsCast .= (strlen($this->fieldsCast) > 0 ? ', ' : '') . "'${field}' => 'boolean'";
+
                             break;
                     }
                 }
             } else {
                 if ($field != $modelInformation['table'] . '_id' && $field != 'created' && $field != 'updated') {
-                    $this->fieldsHidden .= (strlen($this->fieldsHidden) > 0 ? ', ' : '') . "'$field'";
+                    $this->fieldsHidden .= (strlen($this->fieldsHidden) > 0 ? ', ' : '') . "'${field}'";
                 }
             }
         }
@@ -137,6 +142,7 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
         $stub = str_replace('{{hidden}}', $this->fieldsHidden, $stub);
         $stub = str_replace('{{casts}}', $this->fieldsCast, $stub);
         $stub = str_replace('{{dates}}', $this->fieldsDate, $stub);
+
         return $stub;
     }
 
@@ -158,7 +164,7 @@ class CApp_Project_Generator_ModelGenerator extends CApp_Project_AbstractGenerat
     }
 
     /**
-     * Reset all variables to be filled again when using multiple
+     * Reset all variables to be filled again when using multiple.
      */
     public function resetFields() {
         $this->fieldsFillable = '';

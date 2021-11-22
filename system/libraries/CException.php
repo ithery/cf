@@ -3,8 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 class CException extends Exception {
-    protected static $exceptionHandler;
-
     /**
      * @var array PHP error code => human readable name
      */
@@ -19,6 +17,8 @@ class CException extends Exception {
         E_RECOVERABLE_ERROR => 'Recoverable Error',
         E_DEPRECATED => 'Deprecated',
     ];
+
+    protected static $exceptionHandler;
 
     /**
      * Creates a new translated exception.
@@ -47,7 +47,7 @@ class CException extends Exception {
     }
 
     /**
-     * Get a single line of text representing the exception:
+     * Get a single line of text representing the exception:.
      *
      * Error [ Code ]: Message ~ File [ Line ]
      *
@@ -91,6 +91,33 @@ class CException extends Exception {
         if (static::$exceptionHandler == null) {
             static::$exceptionHandler = new CException_ExceptionHandler();
         }
+
         return static::$exceptionHandler;
+    }
+
+    /**
+     * Create Exception Solution.
+     *
+     * @param string $title
+     *
+     * @return CException_Solution
+     */
+    public static function createSolution($title = '') {
+        return CException_Solution::create($title);
+    }
+
+    public static function config() {
+        return CException_Config::instance();
+    }
+
+    public static function manager() {
+        return CException_Manager::instance();
+    }
+
+    public static function init() {
+        //load all singleton for make sure exception handler can run
+        static::exceptionHandler();
+        static::config();
+        static::manager();
     }
 }

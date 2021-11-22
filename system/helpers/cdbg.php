@@ -7,12 +7,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 //@codingStandardsIgnoreStart
 class cdbg {
-    //@codingStandardsIgnoreEnd
-    protected static $deprecated_has_run = false;
-
     /**
      * A collapse icon, using in the dump_var function to allow collapsing
-     * an array or object
+     * an array or object.
      *
      * @since   1.0.000
      * @static
@@ -23,7 +20,7 @@ class cdbg {
 
     /**
      * A collapse icon, using in the dump_var function to allow collapsing
-     * an array or object
+     * an array or object.
      *
      * @since   1.0.000
      * @static
@@ -32,8 +29,11 @@ class cdbg {
      */
     public static $icon_expand = 'iVBORw0KGgoAAAANSUhEUgAAAAkAAAAJCAMAAADXT/YiAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2RpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo3MTlFRjQ2NkM5QzJFMTExOTA0MzkwRkI0M0ZCODY4RCIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDpFQzZERTJDNEMyQzkxMUUxODRCQzgyRUNDMzZEQkZFQiIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpFQzZERTJDM0MyQzkxMUUxODRCQzgyRUNDMzZEQkZFQiIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IFdpbmRvd3MiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo3MzlFRjQ2NkM5QzJFMTExOTA0MzkwRkI0M0ZCODY4RCIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo3MTlFRjQ2NkM5QzJFMTExOTA0MzkwRkI0M0ZCODY4RCIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PkmDvWIAAABIUExURU9t2MzM/3iW7ubm59/f5urq85mZzOvr6////9ra38zMzObm5rfB8FZz5myJ4SNFrypMvjBStTNmzOvr+mSG7OXl8T9h5SRGq/OfqCEAAABKSURBVHjaFMlbEoAwCEPRULXF2jdW9r9T4czcyUdA4XWB0IgdNSybxU9amMzHzDlPKKu7Fd1e6+wY195jW0ARYZECxPq5Gn8BBgCr0gQmxpjKAwAAAABJRU5ErkJggg==';
 
+    //@codingStandardsIgnoreEnd
+    protected static $deprecated_has_run = false;
+
     /**
-     * Better var dump
+     * Better var dump.
      *
      * @param string $var
      * @param bool   $return
@@ -50,7 +50,7 @@ class cdbg {
     //@codingStandardsIgnoreEnd
 
     /**
-     * Better var_dump
+     * Better var_dump.
      *
      * @param string $var
      * @param bool   $return
@@ -109,7 +109,7 @@ class cdbg {
     public static function d() {
         $args = func_get_args();
         foreach ($args as $x) {
-            (new Illuminate\Support\Debug\Dumper)->dump($x);
+            (new Illuminate\Support\Debug\Dumper())->dump($x);
         }
     }
 
@@ -124,7 +124,7 @@ class cdbg {
         $args = func_get_args();
 
         foreach ($args as $x) {
-            (new Illuminate\Support\Debug\Dumper)->dump($x);
+            (new Illuminate\Support\Debug\Dumper())->dump($x);
         }
 
         die(1);
@@ -450,7 +450,7 @@ class cdbg {
             if (empty($var)) {
                 // Do nothing
             } elseif (isset($var[$marker])) {
-                $output[] = "(\n$space$s*RECURSION*\n$space)";
+                $output[] = "(\n${space}${s}*RECURSION*\n${space})";
             } elseif ($level < $limit) {
                 $output[] = '<span>(';
 
@@ -463,14 +463,14 @@ class cdbg {
                         $key = '"' . htmlspecialchars($key, ENT_NOQUOTES, CF::$charset) . '"';
                     }
 
-                    $output[] = "$space$s$key => " . cdbg::dumpInternal($val, $length, $limit, $level + 1);
+                    $output[] = "${space}${s}${key} => " . cdbg::dumpInternal($val, $length, $limit, $level + 1);
                 }
                 unset($var[$marker]);
 
-                $output[] = "$space)</span>";
+                $output[] = "${space})</span>";
             } else {
                 // Depth too great
-                $output[] = "(\n$space$s...\n$space)";
+                $output[] = "(\n${space}${s}...\n${space})";
             }
 
             return '<small>array</small><span>(' . count($var) . ')</span> ' . implode("\n", $output);
@@ -491,7 +491,7 @@ class cdbg {
             if (empty($var)) {
                 // Do nothing
             } elseif (isset($objects[$hash])) {
-                $output[] = "{\n$space$s*RECURSION*\n$space}";
+                $output[] = "{\n${space}${s}*RECURSION*\n${space}}";
             } elseif ($level < $limit) {
                 $output[] = '<code>{';
 
@@ -507,14 +507,14 @@ class cdbg {
                         $access = '<small>public</small>';
                     }
 
-                    $output[] = "$space$s$access $key => " . cdbg::dumpInternal($val, $length, $limit, $level + 1);
+                    $output[] = "${space}${s}${access} ${key} => " . cdbg::dumpInternal($val, $length, $limit, $level + 1);
                 }
                 unset($objects[$hash]);
 
-                $output[] = "$space}</code>";
+                $output[] = "${space}}</code>";
             } else {
                 // Depth too great
-                $output[] = "{\n$space$s...\n$space}";
+                $output[] = "{\n${space}${s}...\n${space}}";
             }
 
             return '<small>object</small> <span>' . get_class($var) . '(' . count($array) . ')</span> ' . implode("\n", $output);
@@ -683,10 +683,12 @@ class cdbg {
             if (strlen($email) == 0) {
                 $email = 'hery@ittron.co.id';
             }
-            cmail::send_smtp($email, $subject, $body);
+
+            return CEmail::sender()->send($email, $subject, $message, []);
         } catch (Exception $ex) {
             echo 'Error Email Deprecated' . $ex->getMessage();
         }
+
         return true;
     }
 
@@ -702,6 +704,7 @@ class cdbg {
         if (!defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
             $trace = array_map(function ($item) {
                 unset($item['args']);
+
                 return $item;
             }, debug_backtrace(false));
         } else {
@@ -709,38 +712,40 @@ class cdbg {
         }
 
         if (isset($trace[2])) {
-            $file = carr::path($trace, '1.file');
-            $line = carr::path($trace, '1.line');
-            $func = carr::path($trace, '2.function');
+            $file = carr::get($trace, '1.file');
+            $line = carr::get($trace, '1.line');
+            $func = carr::get($trace, '2.function');
             if ((substr($func, 0, 7) == 'include') || (substr($func, 0, 7) == 'require')) {
                 $func = '';
             }
         } elseif (isset($trace[1])) {
-            $file = carr::path($trace, '1.file');
-            $line = carr::path($trace, '1.line');
+            $file = carr::get($trace, '1.file');
+            $line = carr::get($trace, '1.line');
             $func = '';
         }
         if (isset($trace[3]['class'])) {
-            $class = carr::path($trace, '3.class');
-            $func = carr::path($trace, '3.function');
-            $file = carr::path($trace, '2.file');
-            $line = carr::path($trace, '2.line');
+            $class = carr::get($trace, '3.class');
+            $func = carr::get($trace, '3.function');
+            $file = carr::get($trace, '2.file');
+            $line = carr::get($trace, '2.line');
         } elseif (isset($trace[2]['class'])) {
-            $class = carr::path($trace, '2.class');
-            $func = carr::path($trace, '2.function');
-            $file = carr::path($trace, '1.file');
-            $line = carr::path($trace, '1.line');
+            $class = carr::get($trace, '2.class');
+            $func = carr::get($trace, '2.function');
+            $file = carr::get($trace, '1.file');
+            $line = carr::get($trace, '1.line');
         }
 
         $c = $file . ':' . $line . ' ';
         $c .= ($class != '') ? ':' . $class . '->' : '';
         $c .= ($func != '') ? $func . '(): ' : '';
+
         return $c;
     }
 
     public static function getTraceString() {
         $ex = new Exception('test');
         $trace = $ex->getTraceAsString();
+
         return $trace;
     }
 
@@ -752,6 +757,7 @@ class cdbg {
         if ($db == null) {
             $db = CDatabase::instance();
         }
+
         return cdbg::varDump($db->lastQuery(), $return);
     }
 }

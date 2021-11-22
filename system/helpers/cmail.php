@@ -4,71 +4,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 //@codingStandardsIgnoreStart
 class cmail {
-    //@codingStandardsIgnoreEnd
-
-    /**
-     * Error mail
-     *
-     * @param string $html
-     * @param string $admin_email
-     *
-     * @return void
-     */
-
-    //@codingStandardsIgnoreStart
-    public static function error_mail($html, $admin_email = null) {
-        //@codingStandardsIgnoreEnd
-        $app = CApp::instance();
-        $org = $app->org();
-        $org_name = 'CAPP';
-        $org_email = $org_name;
-        if ($org != null) {
-            $org_email = $org->name;
-            $org_name = $org->name;
-        }
-        $subject = 'Error Cresenity APP - ' . $org_name . ' on ' . crouter::complete_uri();
-
-        $headers = 'From: ' . strip_tags($org_email) . "\r\n";
-        $headers .= 'Reply-To: ' . strip_tags($org_email) . "\r\n";
-        //$headers .= "CC: susan@example.com\r\n";
-        $headers .= "MIME-Version: 1.0\r\n";
-        $headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
-
-        $message = $html;
-        if ($admin_email == null) {
-            $admin_email = ccfg::get('admin_email');
-        }
-        if (ccfg::get('mail_error_smtp')) {
-            $smtp_username = ccfg::get('smtp_username_error');
-            $smtp_password = ccfg::get('smtp_password_error');
-            $smtp_host = ccfg::get('smtp_host_error');
-            $smtp_port = ccfg::get('smtp_port_error');
-            $secure = ccfg::get('smtp_secure_error');
-            $arr_options = [];
-            if (strlen($smtp_username) > 0) {
-                $arr_options['smtp_username'] = $smtp_username;
-            }
-            if (strlen($smtp_password) > 0) {
-                $arr_options['smtp_password'] = $smtp_password;
-            }
-            if (strlen($smtp_host) > 0) {
-                $arr_options['smtp_host'] = $smtp_host;
-            }
-            if (strlen($smtp_port) > 0) {
-                $arr_options['smtp_port'] = $smtp_port;
-            }
-            if (strlen($secure) > 0) {
-                $arr_options['smtp_secure'] = $secure;
-            }
-
-            $ret = cmail::send_smtp($admin_email, $subject . ' [FOR ADMINISTRATOR]', $message, [], [], [], $arr_options);
-        } else {
-            $ret = cmail::send($admin_email, $subject . ' [FOR ADMINISTRATOR]', $message, $headers);
-        }
-
-        //echo $message;
-    }
-
     /**
      * @param string|array $to          to email
      * @param string       $subject     subject of email
@@ -78,11 +13,11 @@ class cmail {
      * @param array        $bcc
      * @param array        $options     Options available smtp_username,smtp_password,dll
      *
+     * @throws Exception
+     *
      * @return void|CVendor_SendGrid_Response
      *
      * @deprecated since 1.2 use CEmail
-     *
-     * @throws Exception
      */
     //@codingStandardsIgnoreStart
     public static function send_smtp($to, $subject, $message, $attachments = [], $cc = [], $bcc = [], $options = []) {
@@ -90,8 +25,6 @@ class cmail {
         $options['cc'] = $cc;
         $options['bcc'] = $bcc;
         $options['attachments'] = $attachments;
-
-
 
         return CEmail::sender($options)->send($to, $subject, $message, $options);
 

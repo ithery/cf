@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DbUninstallCommand
+ * Description of DbUninstallCommand.
  *
  * @author Hery
  */

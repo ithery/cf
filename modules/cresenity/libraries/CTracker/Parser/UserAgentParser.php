@@ -1,20 +1,24 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 4:36:00 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 4:36:00 AM
  */
 use UAParser\Parser;
 
 class CTracker_Parser_UserAgentParser {
-
     public $parser;
+
     public $userAgent;
+
     public $operatingSystem;
+
     public $device;
+
     public $originalUserAgent;
 
     public function __construct($basePath, $userAgent = null) {
@@ -30,15 +34,14 @@ class CTracker_Parser_UserAgentParser {
     }
 
     public function getOperatingSystemVersion() {
-        return $this->operatingSystem->major .
-                ($this->operatingSystem->minor !== null ? '.' . $this->operatingSystem->minor : '') .
-                ($this->operatingSystem->patch !== null ? '.' . $this->operatingSystem->patch : '');
+        return $this->operatingSystem->major
+                . ($this->operatingSystem->minor !== null ? '.' . $this->operatingSystem->minor : '')
+                . ($this->operatingSystem->patch !== null ? '.' . $this->operatingSystem->patch : '');
     }
 
     public function getUserAgentVersion() {
-        return $this->userAgent->major .
-                ($this->userAgent->minor !== null ? '.' . $this->userAgent->minor : '') .
-                ($this->userAgent->patch !== null ? '.' . $this->userAgent->patch : '');
+        return $this->userAgent->major
+                . ($this->userAgent->minor !== null ? '.' . $this->userAgent->minor : '')
+                . ($this->userAgent->patch !== null ? '.' . $this->userAgent->patch : '');
     }
-
 }

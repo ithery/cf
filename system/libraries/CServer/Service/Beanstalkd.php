@@ -20,6 +20,7 @@ class CServer_Service_Beanstalkd {
     public function getTubes() {
         $tubes = $this->client->listTubes();
         sort($tubes);
+
         return $tubes;
     }
 
@@ -28,6 +29,7 @@ class CServer_Service_Beanstalkd {
         foreach ($this->getTubes() as $tube) {
             $stats[] = $this->getTubeStats($tube);
         }
+
         return $stats;
     }
 
@@ -74,6 +76,7 @@ class CServer_Service_Beanstalkd {
                 'value' => $value,
                 'descr' => isset($descr[$key]) ? $descr[$key] : ''];
         }
+
         return $stats;
     }
 
@@ -141,6 +144,7 @@ class CServer_Service_Beanstalkd {
                 ];
             }
         }
+
         return $stats;
     }
 
@@ -171,8 +175,10 @@ class CServer_Service_Beanstalkd {
         $job = $this->client->useTube($tube)->peekReady();
         if ($job) {
             $this->client->delete($job);
+
             return true;
         }
+
         return false;
     }
 
@@ -180,8 +186,10 @@ class CServer_Service_Beanstalkd {
         $job = $this->client->useTube($tube)->peekBuried();
         if ($job) {
             $this->client->delete($job);
+
             return true;
         }
+
         return false;
     }
 
@@ -189,8 +197,10 @@ class CServer_Service_Beanstalkd {
         $job = $this->client->useTube($tube)->peekDelayed();
         if ($job) {
             $this->client->delete($job);
+
             return true;
         }
+
         return false;
     }
 
@@ -205,17 +215,22 @@ class CServer_Service_Beanstalkd {
     public function addJob($tubeName, $tubeData, $tubePriority = Pheanstalk::DEFAULT_PRIORITY, $tubeDelay = Pheanstalk::DEFAULT_DELAY, $tubeTtr = Pheanstalk::DEFAULT_TTR) {
         $this->_client->useTube($tubeName);
         $result = $this->_client->useTube($tubeName)->put($tubeData, $tubePriority, $tubeDelay, $tubeTtr);
+
         return $result;
     }
 
     /**
-     * Pheanstalk class instance
+     * Pheanstalk class instance.
      *
      * @param string $tube
      * @param string $method
+     * @param mixed  $decode
+     * @param mixed  $autoDecode
      */
-    private function peek($tube, $method) {
+    private function peek($tube, $method, $autoDecode = false) {
         $peek = [];
+        $a = null;
+
         try {
             $job = $this->client->useTube($tube)->{$method}();
             if ($job) {
@@ -223,17 +238,20 @@ class CServer_Service_Beanstalkd {
                     'id' => $job->getId(),
                     'rawData' => $job->getData(),
                     'data' => $job->getData(),
-                    'stats' => $this->client->statsJob($job)];
+                    'stats' => $this->client->statsJob($job)
+                ];
             }
         } catch (Exception $ex) {
+            throw $ex;
         }
-        if ($peek) {
-            $peek['data'] = $this->decodeDate($peek['data']);
+        if ($peek && $autoDecode) {
+            $peek['data'] = $this->decodeData($peek['data']);
         }
+
         return $peek;
     }
 
-    private function decodeDate($pData) {
+    private function decodeData($pData) {
         $this->contentType = false;
         $out = $pData;
         $data = null;
@@ -256,9 +274,10 @@ class CServer_Service_Beanstalkd {
 
             if ($data) {
                 $this->_contentType = 'json';
-                //$out = $data;
+                $out = $data;
             }
         }
+
         return $out;
     }
 }

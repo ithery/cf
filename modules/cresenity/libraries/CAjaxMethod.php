@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @see CAjax_Method
+ * @deprecated since 1.2 use CAjax_Method
+ */
 class CAjaxMethod {
     use CTrait_Compat_AjaxMethod;
 
@@ -24,16 +28,19 @@ class CAjaxMethod {
 
     public function setData($key, $data) {
         $this->data[$key] = $data;
+
         return $this;
     }
 
     public function setType($type) {
         $this->type = $type;
+
         return $this;
     }
 
     public function setMethod($method) {
         $this->method = $method;
+
         return $this;
     }
 
@@ -50,9 +57,7 @@ class CAjaxMethod {
         $file = CTemporary::getPath('ajax', $filename);
         $disk->put($file, $json);
         $base_url = curl::base();
-        if (CManager::instance()->isMobile()) {
-            $base_url = curl::base(false, 'http');
-        }
+
         return $base_url . 'ccore/ajax/' . $ajax_method;
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Session database driver.
@@ -18,12 +18,16 @@ class CSession_Driver_Database implements CSession_Driver {
 
     // Database settings
     protected $db = 'default';
+
     protected $table = 'session';
+
     // Encryption
     protected $encrypt;
+
     // Session settings
     protected $session_id;
-    protected $written = FALSE;
+
+    protected $written = false;
 
     public function __construct() {
         // Load configuration
@@ -62,20 +66,20 @@ class CSession_Driver_Database implements CSession_Driver {
     }
 
     public function open($path, $name) {
-        return TRUE;
+        return true;
     }
 
     public function close() {
-        return TRUE;
+        return true;
     }
 
     public function read($id) {
         // Load the session
-        $query = $this->db->from($this->table)->where('key', $id)->limit(1)->get()->result(TRUE);
+        $query = $this->db->from($this->table)->where('key', $id)->limit(1)->get()->result(true);
 
         if ($query->count() === 0) {
             // No current session
-            $this->session_id = NULL;
+            $this->session_id = null;
 
             return '';
         }
@@ -86,17 +90,17 @@ class CSession_Driver_Database implements CSession_Driver {
         // Load the data
         $data = $query->current()->value;
 
-        return ($this->encrypt === NULL) ? base64_decode($data) : $this->encrypt->decode($data);
+        return ($this->encrypt === null) ? base64_decode($data) : $this->encrypt->decode($data);
     }
 
     public function write($id, $data) {
-        $data = array(
+        $data = [
             'key' => $id,
-            'value' => ($this->encrypt === NULL) ? base64_encode($data) : $this->encrypt->encode($data),
+            'value' => ($this->encrypt === null) ? base64_encode($data) : $this->encrypt->encode($data),
             'updated' => date('Y-m-d H:i:s'),
-        );
+        ];
 
-        if ($this->session_id === NULL) {
+        if ($this->session_id === null) {
             // Insert a new session
             $data['created'] = date('Y-m-d H:i:s');
             $query = $this->db->insert($this->table, $data);
@@ -105,10 +109,10 @@ class CSession_Driver_Database implements CSession_Driver {
             unset($data['session_id']);
 
             // Update the existing session
-            $query = $this->db->update($this->table, $data, array('key' => $id));
+            $query = $this->db->update($this->table, $data, ['key' => $id]);
         } else {
             // Update the session and id
-            $query = $this->db->update($this->table, $data, array('key' => $this->session_id));
+            $query = $this->db->update($this->table, $data, ['key' => $this->session_id]);
 
             // Set the new session id
             $this->session_id = $id;
@@ -119,12 +123,12 @@ class CSession_Driver_Database implements CSession_Driver {
 
     public function destroy($id) {
         // Delete the requested session
-        $this->db->delete($this->table, array('key' => $id));
+        $this->db->delete($this->table, ['key' => $id]);
 
         // Session id is no longer valid
-        $this->session_id = NULL;
+        $this->session_id = null;
 
-        return TRUE;
+        return true;
     }
 
     public function regenerate() {
@@ -137,13 +141,12 @@ class CSession_Driver_Database implements CSession_Driver {
 
     public function gc($maxlifetime) {
         // Delete all expired sessions
-        $query = $this->db->delete($this->table, array('created <' => time() - $maxlifetime));
+        $query = $this->db->delete($this->table, ['created <' => time() - $maxlifetime]);
 
         CF::log(CLogger::DEBUG, 'Session garbage collected: ' . $query->count() . ' row(s) deleted.');
 
-        return TRUE;
+        return true;
     }
-
 }
 
 // End Session Database Driver

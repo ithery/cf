@@ -9,9 +9,9 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Jun 14, 2018, 4:40:47 AM
  */
 class CApp_Api {
-    private static $instance = [];
-
     protected $domain = null;
+
+    private static $instance = [];
 
     protected function __construct($domain) {
         $this->domain = $domain;
@@ -32,6 +32,7 @@ class CApp_Api {
         if (self::$instance == null) {
             self::$instance[$domain] = new static($domain);
         }
+
         return self::$instance[$domain];
     }
 

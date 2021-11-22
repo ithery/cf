@@ -3,17 +3,20 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * Description of Cropper
+ * Description of Cropper.
  *
  * @author Hery
  */
 class CElement_Helper_Cropper extends CElement_Element {
     use CElement_Trait_Template;
-
     protected $cropperWidth;
+
     protected $cropperHeight;
+
     protected $cropperResizable;
+
     protected $owner;
+
     protected $imgSrc;
 
     public function __construct($id = '', $tag = 'div') {
@@ -42,17 +45,20 @@ class CElement_Helper_Cropper extends CElement_Element {
 
     public function setOwner($owner) {
         $this->owner = $owner;
+
         return $this;
     }
 
     public function setSize($width, $height) {
         $this->cropperWidth = $width;
         $this->cropperHeight = $height;
+
         return $this;
     }
 
     public function setCropperResizable($bool = true) {
         $this->cropperResizable = $bool;
+
         return $this;
     }
 

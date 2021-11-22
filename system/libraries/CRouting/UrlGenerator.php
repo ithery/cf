@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of UrlGenerator
+ * Description of UrlGenerator.
  *
  * @author Hery
  */
@@ -12,25 +12,11 @@ class CRouting_UrlGenerator {
         CTrait_Macroable;
 
     /**
-     * The route collection.
-     *
-     * @var CRouting_outeCollectionInterface
-     */
-    protected $routes;
-
-    /**
      * The request instance.
      *
      * @var CHTTP_Request
      */
     protected $request;
-
-    /**
-     * The asset root URL.
-     *
-     * @var string
-     */
-    protected $assetRoot;
 
     /**
      * The forced URL root.
@@ -49,14 +35,14 @@ class CRouting_UrlGenerator {
     /**
      * A cached copy of the URL root for the current request.
      *
-     * @var string|null
+     * @var null|string
      */
     protected $cachedRoot;
 
     /**
      * A cached copy of the URL scheme for the current request.
      *
-     * @var string|null
+     * @var null|string
      */
     protected $cachedScheme;
 
@@ -98,7 +84,7 @@ class CRouting_UrlGenerator {
     /**
      * The route URL generator instance.
      *
-     * @var CRouting_RouteUrlGenerator|null
+     * @var null|CRouting_RouteUrlGenerator
      */
     protected $routeGenerator;
 
@@ -114,6 +100,7 @@ class CRouting_UrlGenerator {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -123,8 +110,6 @@ class CRouting_UrlGenerator {
      * @return void
      */
     public function __construct() {
-        //$this->routes = $routes;
-        $this->assetRoot = '/application/' . CF::appCode() . '/default/media';
         $this->keyResolver = function () {
             return CF::config('app.key');
         };
@@ -176,7 +161,7 @@ class CRouting_UrlGenerator {
     /**
      * Get the previous URL from the session if possible.
      *
-     * @return string|null
+     * @return null|string
      */
     protected function getPreviousUrlFromSession() {
         $session = $this->getSession();
@@ -189,7 +174,7 @@ class CRouting_UrlGenerator {
      *
      * @param string    $path
      * @param mixed     $extra
-     * @param bool|null $secure
+     * @param null|bool $secure
      *
      * @return string
      */
@@ -238,19 +223,31 @@ class CRouting_UrlGenerator {
      * Generate the URL to an application asset.
      *
      * @param string    $path
-     * @param bool|null $secure
+     * @param null|bool $secure
      *
      * @return string
      */
-    public function asset($path, $secure = null) {
+    public function media($path, $secure = null) {
         if ($this->isValidUrl($path)) {
             return $path;
         }
 
+        $pathOriginal = $path;
+
         // Once we get the root URL, we will check to see if it contains an index.php
         // file in the paths. If it does, we will remove it since it is not needed
         // for asset paths, but only for routes to endpoints in the application.
-        $root = $this->assetRoot ?: $this->formatRoot($this->formatScheme($secure));
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        $filename = pathinfo($path, PATHINFO_FILENAME);
+        $dirname = pathinfo($path, PATHINFO_DIRNAME);
+        $path = $dirname . DS . $filename;
+        $root = $this->formatRoot($this->formatScheme($secure));
+        $path = CF::findFile('media', $path, false, $extension);
+        if (!$path) {
+            throw new Exception('media ' . $pathOriginal . 'not found');
+        } else {
+            $path = str_replace(DOCROOT, '', $path);
+        }
 
         return $this->removeIndex($root) . '/' . trim($path, '/');
     }
@@ -262,8 +259,8 @@ class CRouting_UrlGenerator {
      *
      * @return string
      */
-    public function secureAsset($path) {
-        return $this->asset($path, true);
+    public function secureMedia($path) {
+        return $this->media($path, true);
     }
 
     /**
@@ -271,7 +268,7 @@ class CRouting_UrlGenerator {
      *
      * @param string    $root
      * @param string    $path
-     * @param bool|null $secure
+     * @param null|bool $secure
      *
      * @return string
      */
@@ -300,7 +297,7 @@ class CRouting_UrlGenerator {
     /**
      * Get the default scheme for a raw URL.
      *
-     * @param bool|null $secure
+     * @param null|bool $secure
      *
      * @return string
      */
@@ -321,12 +318,12 @@ class CRouting_UrlGenerator {
      *
      * @param string                                    $name
      * @param mixed                                     $parameters
-     * @param \DateTimeInterface|\DateInterval|int|null $expiration
+     * @param null|\DateTimeInterface|\DateInterval|int $expiration
      * @param bool                                      $absolute
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public function signedRoute($name, $parameters = [], $expiration = null, $absolute = true) {
         $parameters = carr::wrap($parameters);
@@ -426,13 +423,13 @@ class CRouting_UrlGenerator {
      * @param mixed  $parameters
      * @param bool   $absolute
      *
-     * @return string
-     *
      * @throws \Symfony\Component\Routing\Exception\RouteNotFoundException
+     *
+     * @return string
      */
     public function route($name, $parameters = [], $absolute = true) {
-        if ($this->routes != null) {
-            if (!is_null($route = $this->routes->getByName($name))) {
+        if ($this->routes() != null) {
+            if (!is_null($route = $this->routes()->getByName($name))) {
                 return $this->toRoute($route, $parameters, $absolute);
             }
         }
@@ -443,13 +440,13 @@ class CRouting_UrlGenerator {
     /**
      * Get the URL for a given route instance.
      *
-     * @param \Illuminate\Routing\Route $route
-     * @param mixed                     $parameters
-     * @param bool                      $absolute
-     *
-     * @return string
+     * @param \CRouting_Route $route
+     * @param mixed           $parameters
+     * @param bool            $absolute
      *
      * @throws CRouting_Exception_UrlGenerationException
+     *
+     * @return string
      */
     public function toRoute($route, $parameters, $absolute) {
         $parameters = c::collect(carr::wrap($parameters))->map(function ($value, $key) use ($route) {
@@ -470,12 +467,12 @@ class CRouting_UrlGenerator {
      * @param mixed        $parameters
      * @param bool         $absolute
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     public function action($action, $parameters = [], $absolute = true) {
-        if (is_null($route = $this->routes->getByAction($action = $this->formatAction($action)))) {
+        if (is_null($route = $this->routes()->getByAction($action = $this->formatAction($action)))) {
             throw new InvalidArgumentException("Action {$action} not defined.");
         }
 
@@ -542,7 +539,7 @@ class CRouting_UrlGenerator {
      * Get the base URL for the request.
      *
      * @param string      $scheme
-     * @param string|null $root
+     * @param null|string $root
      *
      * @return string
      */
@@ -565,7 +562,7 @@ class CRouting_UrlGenerator {
      *
      * @param string                         $root
      * @param string                         $path
-     * @param \Illuminate\Routing\Route|null $route
+     * @param null|\Illuminate\Routing\Route $route
      *
      * @return string
      */
@@ -601,11 +598,11 @@ class CRouting_UrlGenerator {
     /**
      * Get the Route URL generator instance.
      *
-     * @return \Illuminate\Routing\RouteUrlGenerator
+     * @return \CRouting_RouteUrlGenerator
      */
     protected function routeUrl() {
         if (!$this->routeGenerator) {
-            $this->routeGenerator = new RouteUrlGenerator($this, $this->request);
+            $this->routeGenerator = new CRouting_RouteUrlGenerator($this, $this->request);
         }
 
         return $this->routeGenerator;
@@ -634,7 +631,7 @@ class CRouting_UrlGenerator {
     /**
      * Force the scheme for URLs.
      *
-     * @param string|null $scheme
+     * @param null|string $scheme
      *
      * @return void
      */
@@ -647,7 +644,7 @@ class CRouting_UrlGenerator {
     /**
      * Set the forced root URL.
      *
-     * @param string|null $root
+     * @param null|string $root
      *
      * @return void
      */
@@ -726,22 +723,9 @@ class CRouting_UrlGenerator {
     }
 
     /**
-     * Set the route collection.
-     *
-     * @param CRouting_RouteCollectionInterface $routes
-     *
-     * @return $this
-     */
-    public function setRoutes(CRouting_RouteCollectionInterface $routes) {
-        $this->routes = $routes;
-
-        return $this;
-    }
-
-    /**
      * Get the session implementation from the resolver.
      *
-     * @return \Illuminate\Session\Store|null
+     * @return null|\CSession_Store
      */
     protected function getSession() {
         if ($this->sessionResolver) {
@@ -786,5 +770,12 @@ class CRouting_UrlGenerator {
         $this->rootNamespace = $rootNamespace;
 
         return $this;
+    }
+
+    /**
+     * @return CRouting_RouteCollectionInterface
+     */
+    public function routes() {
+        return CRouting::router()->getRoutes();
     }
 }

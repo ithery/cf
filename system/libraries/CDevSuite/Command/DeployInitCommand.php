@@ -1,11 +1,10 @@
 <?php
 
 /**
- * Description of DeployInitCommand
+ * Description of DeployInitCommand.
  *
  * @author Hery
  */
-
 class CDevSuite_Command_DeployInitCommand extends CDevSuite_CommandAbstract {
     public function getSignatureArguments() {
         return '{host : The host server to initialize with.}';

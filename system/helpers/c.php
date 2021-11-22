@@ -5,11 +5,11 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * Common helper class.
  */
-use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
-use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\VarDumper\VarDumper;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
-use Symfony\Component\VarDumper\VarDumper;
+use Symfony\Component\PropertyAccess\Exception\NoSuchIndexException;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 //@codingStandardsIgnoreStart
 class c {
@@ -22,6 +22,7 @@ class c {
      */
     public static function fixPath($str) {
         $str = str_replace(['/', '\\'], DS, $str);
+
         return rtrim($str, DS) . DS;
     }
 
@@ -29,6 +30,7 @@ class c {
         if ($b == 0) {
             return $a;
         }
+
         return ($a >> $b) & ~(1 << (8 * PHP_INT_SIZE - 1) >> ($b - 1));
     }
 
@@ -46,12 +48,14 @@ class c {
         if (\is_array($value)) {
             return 2 === \count($value) && [0, 1] === \array_keys($value) ? static::baseMatchesProperty($value[0], $value[1]) : static::baseMatches($value);
         }
+
         return static::property($value);
     }
 
     public static function baseMatchesProperty($property, $source) {
         return function ($value, $index, $collection) use ($property, $source) {
             $propertyVal = static::property($property);
+
             return static::isEqual($propertyVal($value, $index, $collection), $source);
         };
     }
@@ -68,8 +72,10 @@ class c {
                         return false;
                     }
                 }
+
                 return true;
             }
+
             return false;
         };
     }
@@ -77,8 +83,10 @@ class c {
     public static function isEqual($value, $other) {
         $factory = CComparator::createFactory();
         $comparator = $factory->getComparatorFor($value, $other);
+
         try {
             $comparator->assertEquals($value, $other);
+
             return true;
         } catch (CComparator_Exception_ComparisonFailureException $failure) {
             return false;
@@ -110,6 +118,7 @@ class c {
         $propertyAccess = PropertyAccess::createPropertyAccessorBuilder()
             ->disableExceptionOnInvalidIndex()
             ->getPropertyAccessor();
+
         return function ($value, $index = 0, $collection = []) use ($path, $propertyAccess) {
             $path = \implode('.', (array) $path);
             if (\is_array($value)) {
@@ -119,13 +128,15 @@ class c {
                         $propPath = static::property($path);
                         $value = $propPath($value, $index, $collection);
                     }
+
                     return $value;
                 }
 
                 if (\is_string($path) && $path[0] !== '[' && $path[strlen($path) - 1] !== ']') {
-                    $path = "[$path]";
+                    $path = "[${path}]";
                 }
             }
+
             try {
                 return $propertyAccess->getValue($value, $path);
             } catch (NoSuchPropertyException $e) {
@@ -144,6 +155,7 @@ class c {
             $property = static::property(static::toKey($path[$index++]));
             $object = $property($object);
         }
+
         return ($index > 0 && $index === $length) ? $object : $defaultValue;
     }
 
@@ -159,6 +171,7 @@ class c {
             return $value;
         }
         $result = (string) $value;
+
         return ('0' === $result && (1 / $value) === -INF) ? '-0' : $result;
     }
 
@@ -166,6 +179,7 @@ class c {
         if (\is_array($value)) {
             return $value;
         }
+
         return static::isKey($value, $object) ? [$value] : static::stringToPath((string) $value);
     }
 
@@ -188,6 +202,7 @@ class c {
             return true;
         }
         $forceObject = ((object) $object);
+
         return \preg_match($reIsPlainProp, $value) || !\preg_match($reIsDeepProp, $value) || (null !== $object && isset($forceObject->$value));
     }
 
@@ -205,8 +220,10 @@ class c {
             foreach ($matches as $match) {
                 $result[] = isset($match[1]) ? $match[1] : $match[0];
             }
+
             return $result;
         });
+
         return $memoizeCapped(...$args);
     }
 
@@ -216,8 +233,10 @@ class c {
             if ($this->cache->getSize() === $MaxMemoizeSize) {
                 $this->cache->clear();
             }
+
             return $key;
         });
+
         return $result;
     }
 
@@ -225,7 +244,7 @@ class c {
      * Creates a function that memoizes the result of `func`. If `resolver` is
      * provided, it determines the cache key for storing the result based on the
      * arguments provided to the memoized function. By default, the first argument
-     * provided to the memoized function is used as the map cache key
+     * provided to the memoized function is used as the map cache key.
      *
      * **Note:** The cache is exposed as the `cache` property on the memoized
      * function. Its creation may be customized by replacing the `_.memoize.Cache`
@@ -234,7 +253,7 @@ class c {
      * method interface of `clear`, `delete`, `get`, `has`, and `set`.
      *
      * @param callable      $func     the function to have its output memoized
-     * @param callable|null $resolver the function to resolve the cache key
+     * @param null|callable $resolver the function to resolve the cache key
      *
      * @return callable returns the new memoized function
      *
@@ -263,6 +282,7 @@ class c {
     public static function memoize(callable $func, callable $resolver = null) {
         $memoized = CBase::createMemoizeResolver($func, $resolver);
         $memoized->cache = CBase::createMapCache();
+
         return $memoized;
     }
 
@@ -273,6 +293,7 @@ class c {
                 return $length;
             }
         }
+
         return -1;
     }
 
@@ -324,7 +345,7 @@ class c {
      * Call the given Closure with the given value then return the value.
      *
      * @param mixed         $value
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return mixed
      */
@@ -350,6 +371,7 @@ class c {
 
         $basename = basename(str_replace('\\', '/', $class));
         $basename = carr::last(explode('_', $basename));
+
         return $basename;
     }
 
@@ -428,7 +450,7 @@ class c {
      * Return the given value, optionally passed through the given callback.
      *
      * @param mixed         $value
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return mixed
      */
@@ -476,7 +498,7 @@ class c {
      * @param mixed         $payload
      * @param bool          $halt
      *
-     * @return array|null
+     * @return null|array
      */
     public static function event(...$args) {
         return CEvent::dispatch(...$args);
@@ -487,7 +509,7 @@ class c {
     /**
      * Create a new Carbon instance for the current time.
      *
-     * @param \DateTimeZone|string|null $tz
+     * @param null|\DateTimeZone|string $tz
      *
      * @return CCarbon
      */
@@ -505,6 +527,7 @@ class c {
         }
         $mt = microtime();
         $s = floor($mt);
+
         return [$s, ($mt - $s) * 1e+6];
     }
 
@@ -524,14 +547,15 @@ class c {
      * Provide access to optional objects.
      *
      * @param mixed         $value
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return mixed
      */
     public static function optional($value = null, callable $callback = null) {
         if (is_null($callback)) {
             return new COptional($value);
-        } elseif (!is_null($value)) {
+        }
+        if (!is_null($value)) {
             return $callback($value);
         }
     }
@@ -576,9 +600,9 @@ class c {
      * @param \Throwable|string $exception
      * @param array             ...$parameters
      *
-     * @return mixed
-     *
      * @throws \Throwable
+     *
+     * @return mixed
      */
     public static function throwUnless($condition, $exception, ...$parameters) {
         if (!$condition) {
@@ -595,9 +619,9 @@ class c {
      * @param \Throwable|string $exception
      * @param array             ...$parameters
      *
-     * @return mixed
-     *
      * @throws \Throwable
+     *
+     * @return mixed
      */
     public static function throwIf($condition, $exception, ...$parameters) {
         if ($condition) {
@@ -622,14 +646,18 @@ class c {
     /**
      * Translate the given message.
      *
-     * @param string|null $key
+     * @param null|string $key
      * @param array       $replace
-     * @param string|null $locale
+     * @param null|string $locale
      *
-     * @return CTranslation_Translator|string|array|null
+     * @return null|CTranslation_Translator|string|array
      */
     public static function trans($key = null, $replace = [], $locale = null) {
-        return CF::lang($key, $replace, $locale);
+        if ($key === null) {
+            return CTranslation::translator();
+        }
+
+        return CTranslation::translator()->trans($key, $replace, $locale);
     }
 
     //@codingStandardsIgnoreStart
@@ -637,11 +665,11 @@ class c {
     /**
      * Translate the given message.
      *
-     * @param string|null $key
+     * @param null|string $key
      * @param array       $replace
-     * @param string|null $locale
+     * @param null|string $locale
      *
-     * @return string|array|null
+     * @return null|string|array
      */
     public static function __($key = null, $replace = [], $locale = null) {
         if (is_null($key)) {
@@ -663,9 +691,9 @@ class c {
     /**
      * Generate a url for the application.
      *
-     * @param string|null $path
+     * @param null|string $path
      * @param mixed       $parameters
-     * @param bool|null   $secure
+     * @param null|bool   $secure
      *
      * @return CRouting_UrlGenerator|string
      */
@@ -707,7 +735,7 @@ class c {
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param string|null                $view
+     * @param null|string                $view
      * @param CInterface_Arrayable|array $data
      * @param array                      $mergeData
      *
@@ -731,10 +759,10 @@ class c {
      * @param string                                     $message
      * @param array                                      $headers
      *
-     * @return void
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
+     * @return void
      */
     public static function abortUnless($boolean, $code, $message = '', array $headers = []) {
         if (!$boolean) {
@@ -757,7 +785,8 @@ class c {
     public static function abort($code, $message = '', array $headers = []) {
         if ($code instanceof CHTTP_Response) {
             throw new CHttp_Exception_ResponseException($code);
-        } elseif ($code instanceof CInterface_Responsable) {
+        }
+        if ($code instanceof CInterface_Responsable) {
             throw new CHttp_Exception_ResponseException($code->toResponse(CHTTP::request()));
         }
 
@@ -776,10 +805,10 @@ class c {
      * @param string                                     $message
      * @param array                                      $headers
      *
-     * @return void
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
+     * @return void
      */
     public static function abortIf($boolean, $code, $message = '', array $headers = []) {
         if ($boolean) {
@@ -790,7 +819,7 @@ class c {
     /**
      * Get an instance of the current request or an input item from the request.
      *
-     * @param array|string|null $key
+     * @param null|array|string $key
      * @param mixed             $default
      *
      * @return CHTTP_Request|string|array
@@ -812,7 +841,7 @@ class c {
     /**
      * Return a new response from the application.
      *
-     * @param CView|string|array|null $content
+     * @param null|CView|string|array $content
      * @param int                     $status
      * @param array                   $headers
      *
@@ -869,10 +898,10 @@ class c {
     /**
      * Get an instance of the redirector.
      *
-     * @param string|null $to
+     * @param null|string $to
      * @param int         $status
      * @param array       $headers
-     * @param bool|null   $secure
+     * @param null|bool   $secure
      *
      * @return CHTTP_Redirector|CHttp_RedirectResponse
      */
@@ -880,7 +909,7 @@ class c {
         if ($to instanceof CController) {
             $to = $to->controllerUrl();
         }
-        if (is_null($to)) {
+        if ($to === null) {
             return CHTTP::redirector();
         }
 
@@ -888,7 +917,7 @@ class c {
     }
 
     /**
-     * Get hash manager instance
+     * Get hash manager instance.
      *
      * @param null|string $hasher
      *
@@ -899,7 +928,7 @@ class c {
     }
 
     /**
-     * Get router instance
+     * Get router instance.
      *
      * @return CRouting_Router
      */
@@ -945,7 +974,7 @@ class c {
     }
 
     /**
-     * Dump variable
+     * Dump variable.
      *
      * @param mixed $var
      *
@@ -963,11 +992,11 @@ class c {
      * @param int           $times
      * @param callable      $callback
      * @param int           $sleep
-     * @param callable|null $when
-     *
-     * @return mixed
+     * @param null|callable $when
      *
      * @throws \Exception
+     *
+     * @return mixed
      */
     public static function retry($times, $callback, $sleep = 0, $when = null) {
         $attempts = 0;
@@ -995,18 +1024,18 @@ class c {
      * Generate an media path for the application.
      *
      * @param string    $path
-     * @param bool|null $secure
+     * @param null|bool $secure
      *
      * @return string
      */
     public static function media($path = '', $secure = null) {
-        return c::url()->asset($path, $secure);
+        return c::url()->media($path, $secure);
     }
 
     /**
      * Retrieve an old input item.
      *
-     * @param string|null $key
+     * @param null|string $key
      * @param mixed       $default
      *
      * @return mixed
@@ -1018,7 +1047,7 @@ class c {
     /**
      * Get the available auth instance.
      *
-     * @param string|null $guard
+     * @param null|string $guard
      *
      * @return CAuth_Manager|CAuth_GuardInterface|CAuth_StatefulGuardInterface
      */
@@ -1042,9 +1071,9 @@ class c {
     /**
      * Get the CSRF token value.
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     public static function csrfToken() {
         $session = CSession::instance();
@@ -1059,7 +1088,7 @@ class c {
     /**
      * Get the available container instance.
      *
-     * @param string|null $abstract
+     * @param null|string $abstract
      * @param array       $parameters
      *
      * @return mixed|\CContainer_Container
@@ -1100,14 +1129,14 @@ class c {
     }
 
     public static function userAgent() {
-        return (!empty($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '');
+        return !empty($_SERVER['HTTP_USER_AGENT']) ? trim($_SERVER['HTTP_USER_AGENT']) : '';
     }
 
     /**
      * Get an item from an array or object using "dot" notation.
      *
      * @param mixed                 $target
-     * @param string|array|int|null $key
+     * @param null|string|array|int $key
      * @param mixed                 $default
      *
      * @return mixed
@@ -1253,7 +1282,7 @@ class c {
      * Spaceship operator for php 5.6
      * 0 if $a == $b
      * -1 if $a < $b
-     * 1 if $a > $b
+     * 1 if $a > $b.
      *
      * @param mixed $a
      * @param mixed $b
@@ -1264,6 +1293,7 @@ class c {
         if ($a == $b) {
             return 0;
         }
+
         return $a > $b ? 1 : -1;
     }
 
@@ -1289,7 +1319,7 @@ class c {
      * @param callable $callback
      * @param mixed    $default
      *
-     * @return mixed|null
+     * @return null|mixed
      */
     public static function transform($value, $callback, $default = null) {
         if (c::filled($value)) {
@@ -1338,15 +1368,84 @@ class c {
         return rtrim($string, '/');
     }
 
+    /**
+     * Get theme data or theme object.
+     *
+     * @param null|string $key
+     * @param null|mixed  $default
+     *
+     * @return CManager_Theme|mixed
+     */
     public static function theme($key = null, $default = null) {
         if ($key !== null) {
             return static::manager()->theme()->getData($key, $default);
         }
+
         return static::manager()->theme();
     }
 
     public static function locale() {
         return str_replace('_', '-', CF::getLocale());
+    }
+
+    public static function isIterable($obj) {
+        return is_array($obj) || (is_object($obj) && ($obj instanceof \Traversable));
+    }
+
+    public static function msg($type, $message) {
+        return CApp_Message::add($type, $message);
+    }
+
+    public static function docRoot($path = null) {
+        $docRoot = rtrim(DOCROOT, DS);
+        if ($path != null) {
+            if (is_string($path)) {
+                $docRoot .= DS . trim($path, DS);
+            }
+        }
+
+        return $docRoot . DS;
+    }
+
+    public static function appRoot($path = null, $appCode = null) {
+        if ($appCode == null) {
+            $appCode = CF::appCode();
+        }
+
+        $appRoot = static::docRoot('application/' . $appCode);
+        if ($path != null) {
+            if (is_string($path)) {
+                $appRoot .= DS . trim($path, DS);
+            }
+        }
+
+        return $appRoot . DS;
+    }
+
+    public static function disk($name = null) {
+        return CStorage::instance()->disk($name);
+    }
+
+    public static function closureFromCallable($callable) {
+        if (method_exists(Closure::class, 'fromCallable')) {
+            return Closure::fromCallable($callable);
+        }
+
+        return function () use ($callable) {
+            return call_user_func_array($callable, func_get_args());
+        };
+    }
+
+    public static function broadcast($event = null) {
+        return CBroadcast::manager()->event($event);
+    }
+
+    public static function environment() {
+        if (CF::isProduction()) {
+            return 'production';
+        }
+
+        return CF::config('app.environment', 'development');
     }
 }
 

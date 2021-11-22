@@ -35,15 +35,15 @@ class CElement_Component_DataTable_Column extends CObject {
 
     public $class;
 
+    public $searchType = 'text';
+
+    public $searchOptions = [];
+
     protected $exportLabel;
 
     protected $exportCallback;
 
     protected $exportCallbackRequire;
-
-    public $searchType = 'text';
-
-    public $searchOptions = [];
 
     public function __construct($fieldname) {
         parent::__construct();
@@ -82,6 +82,7 @@ class CElement_Component_DataTable_Column extends CObject {
 
     public function setInputType($type) {
         $this->input_type = $type;
+
         return $this;
     }
 
@@ -89,18 +90,24 @@ class CElement_Component_DataTable_Column extends CObject {
         return $this->noLineBreak;
     }
 
-    public function setNoLineBreak($bool) {
+    public function setNoLineBreak($bool = true) {
+        return $this->setNoWrap($bool);
+    }
+
+    public function setNoWrap($bool = true) {
         $this->noLineBreak = $bool;
+
         return $this;
     }
 
     public function setVisible($bool) {
         $this->visible = $bool;
+
         return $this;
     }
 
     /**
-     * Set sortable of column
+     * Set sortable of column.
      *
      * @param bool $bool
      *
@@ -108,31 +115,36 @@ class CElement_Component_DataTable_Column extends CObject {
      */
     public function setSortable($bool) {
         $this->sortable = $bool;
+
         return $this;
     }
 
     public function setSearchable($bool) {
         $this->searchable = $bool;
+
         return $this;
     }
 
     public function setSearchType($type) {
         $this->searchType = $type;
+
         return $this;
     }
 
     public function setSearchOptions($option) {
         $this->searchOptions = $option;
+
         return $this;
     }
 
     public function setEditable($bool) {
         $this->editable = $bool;
+
         return $this;
     }
 
     /**
-     * Set width of column
+     * Set width of column.
      *
      * @param int $w
      *
@@ -140,11 +152,12 @@ class CElement_Component_DataTable_Column extends CObject {
      */
     public function setWidth($w) {
         $this->width = $w;
+
         return $this;
     }
 
     /**
-     * Set align of column (left,right,center)
+     * Set align of column (left,right,center).
      *
      * @param string $align
      *
@@ -152,23 +165,27 @@ class CElement_Component_DataTable_Column extends CObject {
      */
     public function setAlign($align) {
         $this->align = $align;
+
         return $this;
     }
 
     public function setCallback($callback, $require = '') {
         $this->callback = CHelper::closure()->serializeClosure($callback);
         $this->callbackRequire = $require;
+
         return $this;
     }
 
     public function setExportCallback($callback, $require = '') {
         $this->exportCallback = CHelper::closure()->serializeClosure($callback);
         $this->exportCallbackRequire = $require;
+
         return $this;
     }
 
     public function setExportLabel($label) {
         $this->exportLabel = $label;
+
         return $this;
     }
 
@@ -182,11 +199,13 @@ class CElement_Component_DataTable_Column extends CObject {
         }
 
         $this->transforms[] = $func;
+
         return $this;
     }
 
     public function setFormat($s) {
         $this->format = $s;
+
         return $this;
     }
 
@@ -205,17 +224,21 @@ class CElement_Component_DataTable_Column extends CObject {
         if (strlen($this->width) > 0) {
             $addition_attr .= ' width="' . $this->width . '"';
         }
-        $class = implode(' ', $this->class);
-        $data_align = '';
+        $class = $this->getClassAttribute();
+        $dataClass = $class;
+        $dataAlign = '';
         switch ($this->getAlign()) {
             case 'left':
-                $data_align .= 'align-left';
+                $dataAlign .= 'align-left';
+
                 break;
             case 'right':
-                $data_align .= 'align-right';
+                $dataAlign .= 'align-right';
+
                 break;
             case 'center':
-                $data_align .= 'align-center';
+                $dataAlign .= 'align-center';
+
                 break;
         }
         $dataNoLineBreak = '';
@@ -226,12 +249,15 @@ class CElement_Component_DataTable_Column extends CObject {
             switch ($this->getAlign()) {
                 case 'left':
                     $pdfTHeadTdAttr .= ' align="left"';
+
                     break;
                 case 'right':
                     $pdfTHeadTdAttr .= ' align="right"';
+
                     break;
                 case 'center':
                     $pdfTHeadTdAttr .= ' align="center"';
+
                     break;
             }
         }
@@ -251,13 +277,15 @@ class CElement_Component_DataTable_Column extends CObject {
         if ($exportPdf) {
             $html->appendln('<th ' . $pdfTHeadTdAttr . ' field_name = "' . $this->fieldname . '" align="center" class="thead ' . $thClass . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');
         } else {
-            $html->appendln('<th ' . $pdfTHeadTdAttr . ' field_name = "' . $this->fieldname . '" data-no-line-break="' . $dataNoLineBreak . '" data-align="' . $data_align . '" class="thead ' . $thClass . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');
+            $html->appendln('<th ' . $pdfTHeadTdAttr . ' field_name = "' . $this->fieldname . '" data-no-line-break="' . $dataNoLineBreak . '" data-align="' . $dataAlign . '" data-class="' . $dataClass . '" class="thead ' . $thClass . $class . '" scope="col"' . $addition_attr . '>' . $this->label . '</th>');
         }
+
         return $html->text();
     }
 
     public function addClass($class) {
         $this->class[] = $class;
+
         return $this;
     }
 
@@ -271,5 +299,9 @@ class CElement_Component_DataTable_Column extends CObject {
 
     public function determineExportLabel() {
         return $this->exportLabel ?: $this->label;
+    }
+
+    public function getClassAttribute() {
+        return implode(' ', $this->class);
     }
 }

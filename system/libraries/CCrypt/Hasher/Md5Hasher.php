@@ -7,9 +7,9 @@ class CCrypt_Hasher_Md5Hasher extends CCrypt_HasherAbstract implements CCrypt_Ha
      * @param string $value
      * @param array  $options
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     public function make($value, array $options = []) {
         $hash = md5($value);
