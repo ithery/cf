@@ -969,8 +969,8 @@ export default class Cresenity {
             this.initConfirm();
             this.initReload();
             this.initValidation();
-            this.initUi();
             this.initAlpine();
+            this.initUi();
         });
 
 
