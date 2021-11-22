@@ -487,7 +487,7 @@ class Controller_Cresenity extends CController {
                 $request->session()->reflash();
             }
 
-            return CBroadcast::manager()->auth($request);
+            return CBroadcast::manager()->driver()->auth($request);
         }
 
         return c::response('Cresenity Broadcasting Endpoint', 200);
