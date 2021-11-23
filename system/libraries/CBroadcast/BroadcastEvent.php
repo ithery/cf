@@ -44,7 +44,7 @@ class CBroadcast_BroadcastEvent implements CQueue_ShouldQueueInterface {
      *
      * @return void
      */
-    public function handle(CBroadcast_Contract_FactoryInterface $manager) {
+    public function execute(CBroadcast_Contract_FactoryInterface $manager) {
         $name = method_exists($this->event, 'broadcastAs')
                 ? $this->event->broadcastAs() : get_class($this->event);
 
