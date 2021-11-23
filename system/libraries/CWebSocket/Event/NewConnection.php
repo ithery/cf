@@ -2,7 +2,6 @@
 
 class CWebSocket_Event_NewConnection {
     use CEvent_Trait_Dispatchable, CQueue_Trait_SerializesModels;
-
     /**
      * The WebSockets app id that the user connected to.
      *

@@ -43,7 +43,7 @@ class CWebSocket {
     }
 
     /**
-     * @return CWebSocket_Server_Logger_HttpLogger
+     * @return CWebSocket_Server_Logger_WebSocketLogger
      */
     public static function webSocketLogger() {
         return static::$webSocketLogger;
