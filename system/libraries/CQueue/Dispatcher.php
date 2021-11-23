@@ -40,7 +40,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
     /**
      * The queue resolver callback.
      *
-     * @var \Closure|null
+     * @var null|\Closure
      */
     protected $queueResolver;
 
@@ -48,7 +48,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      * Create a new command dispatcher instance.
      *
      * @param CContainer_ContainerInterface $container
-     * @param \Closure|null                 $queueResolver
+     * @param null|\Closure                 $queueResolver
      *
      * @return void
      */
@@ -69,6 +69,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
         if ($this->queueResolver && $this->commandShouldBeQueued($command)) {
             return $this->dispatchToQueue($command);
         }
+
         return $this->dispatchNow($command);
     }
 
@@ -116,6 +117,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
         if ($this->hasCommandHandler($command)) {
             return $this->container->make($this->handlers[get_class($command)]);
         }
+
         return false;
     }
 
@@ -135,9 +137,9 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      *
      * @param mixed $command
      *
-     * @return mixed
-     *
      * @throws \RuntimeException
+     *
+     * @return mixed
      */
     public function dispatchToQueue($command) {
         $connection = $command->connection ? $command->connection : null;
@@ -149,6 +151,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
         if (method_exists($command, 'queue')) {
             return $command->queue($queue, $command);
         }
+
         return $this->pushCommandToQueue($queue, $command);
     }
 
@@ -170,6 +173,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
         if (isset($command->delay)) {
             return $queue->later($command->delay, $command);
         }
+
         return $queue->push($command);
     }
 
@@ -182,6 +186,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      */
     public function pipeThrough(array $pipes) {
         $this->pipes = $pipes;
+
         return $this;
     }
 
@@ -194,6 +199,7 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      */
     public function map(array $map) {
         $this->handlers = array_merge($this->handlers, $map);
+
         return $this;
     }
 }
