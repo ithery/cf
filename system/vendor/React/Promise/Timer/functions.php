@@ -12,7 +12,7 @@ function timeout(PromiseInterface $promise, $time, LoopInterface $loop = null) {
     // cancelling this promise will only try to cancel the input promise,
     // thus leaving responsibility to the input promise.
     $canceller = null;
-    if ($promise instanceof CancellablePromiseInterface || (!\interface_exists('React\Promise\CancellablePromiseInterface') && \method_exists($promise, 'cancel'))) {
+    if (\method_exists($promise, 'cancel')) {
         // pass promise by reference to clean reference after cancellation handler
         // has been invoked once in order to avoid garbage references in call stack.
         $canceller = function () use (&$promise) {
@@ -52,7 +52,7 @@ function timeout(PromiseInterface $promise, $time, LoopInterface $loop = null) {
 
             // try to invoke cancellation handler of input promise and then clean
             // reference in order to avoid garbage references in call stack.
-            if ($promise instanceof CancellablePromiseInterface || (!\interface_exists('React\Promise\CancellablePromiseInterface') && \method_exists($promise, 'cancel'))) {
+            if (\method_exists($promise, 'cancel')) {
                 $promise->cancel();
             }
             $promise = null;
