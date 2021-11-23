@@ -36,6 +36,9 @@ trait CApp_Concern_ViewTrait {
         return $this;
     }
 
+    /**
+     * @return CView_View
+     */
     public function getView() {
         /** @var CApp $this */
         if (!$this->isUserLogin() && $this->isAuthEnabled()) {
@@ -75,11 +78,13 @@ trait CApp_Concern_ViewTrait {
 
     public function setViewName($viewName) {
         $this->setView($viewName);
+
         return $this;
     }
 
     public function setViewLoginName($viewLoginName) {
         $this->viewLoginName = $viewLoginName;
+
         return $this;
     }
 

@@ -12,7 +12,6 @@ class CElement_Component_Action extends CElement_Component {
     use CTrait_Compat_Element_Action,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
-
     protected $jsfunc;
 
     protected $disabled;
@@ -264,8 +263,11 @@ class CElement_Component_Action extends CElement_Component {
         }
         $add_class = '';
         $add_attr = '';
-        if ($this->confirm && !$this->submitTo) {
-            $add_class .= ' confirm';
+        //check if have listener, we do not need  class confirm, because confirm os already on listener
+        if (count($this->listeners) == 0) {
+            if ($this->confirm && !$this->submitTo) {
+                $add_class .= ' confirm';
+            }
         }
 
         if ($this->style == 'btn-icon-group' && strlen($this->label) > 0) {

@@ -10,6 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_FormInput_SelectSearch extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectSearch;
+
     protected $query;
 
     protected $formatSelection;
@@ -360,6 +361,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                             };
                         },
                         cache:true,
+                        error: function (jqXHR, status, error) {
+                            if(cresenity && cresenity.handleAjaxError) {
+                                cresenity.handleAjaxError(jqXHR, status, error);
+                            }
+                        }
                     },
                 ' . $strJsInit . "
                 templateResult: function(item) {

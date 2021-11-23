@@ -75,7 +75,6 @@ trait CApp_Concern_RendererTrait {
 </style>
 ${cresStyle}
 ${allStyles}
-${alpineScript}
 HTML;
     }
 
@@ -97,29 +96,8 @@ HTML;
 
         return <<<HTML
             ${endClientScript}
-            <script src="${cresJs}"></script>
-            <script>
+            <script defer src="${cresJs}"></script>
 
-                if (window.Alpine) {
-                    /* Defer showing the warning so it doesn't get buried under downstream errors. */
-                    document.addEventListener("DOMContentLoaded", function () {
-                        setTimeout(function() {
-                            console.warn("Cresenity: It looks like AlpineJS has already been loaded. Make sure Creseniity\'s scripts are loaded before Alpine.")
-                        })
-                    });
-                }
-                /* Make Alpine wait until Livewire is finished rendering to do its thing. */
-                window.deferLoadingAlpine = function (callback) {
-                    window.addEventListener('cresenity:ui:start', function () {
-                        callback();
-                    });
-                };
-                document.addEventListener("DOMContentLoaded", function () {
-                    window.cresenity.ui.start();
-                });
-
-            </script>
-            <script src="${alpineJs}"></script>
             <script>
                 ${js}
                 ${readyClientScript}

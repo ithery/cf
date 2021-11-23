@@ -1,0 +1,24 @@
+<?php
+
+//declare(strict_types = 1);
+
+namespace Embed\Detectors;
+
+class Title extends Detector {
+    public function detect() {
+        $oembed = $this->extractor->getOEmbed();
+        $document = $this->extractor->getDocument();
+        $metas = $this->extractor->getMetas();
+
+        return $oembed->str('title') ?: $metas->str(
+            'og:title',
+            'twitter:title',
+            'lp:title',
+            'dcterms.title',
+            'article:title',
+            'headline',
+            'article.headline',
+            'parsely-title'
+        ) ?: $document->select('.//head/title')->str();
+    }
+}

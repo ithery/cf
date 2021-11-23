@@ -1,21 +1,17 @@
 <?php
+
 namespace Dompdf\Frame;
 
 use Iterator;
 use Dompdf\Frame;
 
 /**
- * Linked-list Iterator
+ * Linked-list Iterator.
  *
  * Returns children in order and allows for list to change during iteration,
  * provided the changes occur to or after the current element
- *
- * @access private
- * @package dompdf
  */
-class FrameListIterator implements Iterator
-{
-
+class FrameListIterator implements Iterator {
     /**
      * @var Frame
      */
@@ -34,18 +30,13 @@ class FrameListIterator implements Iterator
     /**
      * @param Frame $frame
      */
-    public function __construct(Frame $frame)
-    {
+    public function __construct(Frame $frame) {
         $this->_parent = $frame;
         $this->_cur = $frame->get_first_child();
         $this->_num = 0;
     }
 
-    /**
-     *
-     */
-    public function rewind()
-    {
+    public function rewind() {
         $this->_cur = $this->_parent->get_first_child();
         $this->_num = 0;
     }
@@ -53,32 +44,28 @@ class FrameListIterator implements Iterator
     /**
      * @return bool
      */
-    public function valid()
-    {
+    public function valid() {
         return isset($this->_cur); // && ($this->_cur->get_prev_sibling() === $this->_prev);
     }
 
     /**
      * @return int
      */
-    public function key()
-    {
+    public function key() {
         return $this->_num;
     }
 
     /**
      * @return Frame
      */
-    public function current()
-    {
+    public function current() {
         return $this->_cur;
     }
 
     /**
      * @return Frame
      */
-    public function next()
-    {
+    public function next() {
         $ret = $this->_cur;
         if (!$ret) {
             return null;
@@ -86,6 +73,7 @@ class FrameListIterator implements Iterator
 
         $this->_cur = $this->_cur->get_next_sibling();
         $this->_num++;
+
         return $ret;
     }
 }

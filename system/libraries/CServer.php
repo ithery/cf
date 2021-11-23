@@ -82,20 +82,6 @@ class CServer {
         return sys_getloadavg();
     }
 
-    /**
-     * @return CServer_Device_Cpu
-     */
-    public static function createDeviceCpu() {
-        return new CServer_Device_Cpu();
-    }
-
-    /**
-     * @return CServer_Device_Disk
-     */
-    public static function createDeviceDisk() {
-        return new CServer_Device_Disk();
-    }
-
     public static function isProcOpenDisabled() {
         $isDisabled = false;
         if (!function_exists('proc_open')) {
