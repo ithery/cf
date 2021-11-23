@@ -108,7 +108,10 @@ class CWebSocket_ServerFactory {
     public function createServer() {
         $socket = new Server("{$this->host}:{$this->port}", $this->loop);
         if (CF::config('websocket.ssl.local_cert')) {
+            $this->consoleOutput->writeln('Starting Secure Server');
             $socket = new SecureServer($socket, $this->loop, CF::config('websocket.ssl'));
+        } else {
+            $this->consoleOutput->writeln('Starting Non Secure Server');
         }
 
         $app = new Router(
@@ -118,6 +121,7 @@ class CWebSocket_ServerFactory {
         $httpServer = new CWebSocket_Server_HttpServer($app, CF::config('websocket.max_request_size_in_kb') * 1024);
 
         if (CWebSocket_Server_Logger_HttpLogger::isEnabled()) {
+            $this->consoleOutput->writeln('HTTP Logger is Enabled');
             $httpServer = CWebSocket_Server_Logger_HttpLogger::decorate($httpServer);
         }
 
