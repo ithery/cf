@@ -96,7 +96,7 @@ HTML;
 
         return <<<HTML
             ${endClientScript}
-            <script src="${cresJs}"></script>
+            <script defer src="${cresJs}"></script>
 
             <script>
                 ${js}

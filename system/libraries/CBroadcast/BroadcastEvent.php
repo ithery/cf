@@ -2,7 +2,6 @@
 
 class CBroadcast_BroadcastEvent implements CQueue_ShouldQueueInterface {
     use CQueue_Trait_QueueableTrait;
-
     /**
      * The event instance.
      *

@@ -2,7 +2,6 @@
 
 use Ratchet\ConnectionInterface;
 use React\EventLoop\LoopInterface;
-use React\Promise\PromiseInterface;
 
 interface CWebSocket_Contract_ChannelManagerInterface {
     /**

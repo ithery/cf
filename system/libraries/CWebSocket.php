@@ -39,7 +39,7 @@ class CWebSocket {
     }
 
     /**
-     * @return CWebSocket_Contract_ChannelManagerInterface
+     * @return CWebSocket_ChannelManager_LocalChannelManager
      */
     public static function channelManager() {
         return static::$channelManager;
