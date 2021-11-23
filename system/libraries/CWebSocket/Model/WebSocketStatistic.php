@@ -1,5 +1,5 @@
 <?php
-class CWebSocket_Model_WebSocket_Statistic extends CModel {
+class CWebSocket_Model_WebSocketStatistic extends CModel {
     /**
      * @inheritdoc
      */

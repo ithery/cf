@@ -191,7 +191,7 @@ class CWebSocket_Statistic {
      */
     public function toArray() {
         return [
-            'app_id' => $this->appId,
+            'app' => $this->appId,
             'peak_connection_count' => $this->peakConnectionsCount,
             'websocket_message_count' => $this->webSocketMessagesCount,
             'api_message_count' => $this->apiMessagesCount,
