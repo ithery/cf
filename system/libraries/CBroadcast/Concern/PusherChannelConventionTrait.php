@@ -1,6 +1,6 @@
 <?php
 
-trait CBroadcast_Trait_UsePusherChannelConventions {
+trait CBroadcast_Concern_PusherChannelConventionTrait {
     /**
      * Return true if the channel is protected by authentication.
      *
