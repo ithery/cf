@@ -11,7 +11,7 @@ export class Connector {
             auth: {
                 headers: {}
             },
-            authEndpoint: '/broadcasting/auth',
+            authEndpoint: window.capp.baseUrl + 'cresenity/broadcast/auth',
             broadcaster: 'pusher',
             csrfToken: null,
             host: null,
