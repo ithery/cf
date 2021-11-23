@@ -20,11 +20,12 @@ export class PusherConnector extends Connector {
      */
     connect() {
         this.channels = {};
+
         if (typeof this.options.client !== 'undefined') {
             this.pusher = this.options.client;
         } else {
-            if(typeof Pusher == 'undefined') {
-                throw Error('Pusher undefined');
+            if(typeof Pusher === 'undefined') {
+                throw new Error('Pusher is not defined');
             }
             this.pusher = new Pusher(this.options.key, this.options);
         }
