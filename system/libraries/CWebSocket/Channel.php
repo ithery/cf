@@ -143,7 +143,7 @@ class CWebsocket_Channel {
                 CWebSocket::connectionLogger()->debug('Connection is identical with first connection');
             }
         }
-        $this->connections[$connection->socketId] = $connection;
+        $this->connections[$connection->socketId] = clone $connection;
         $this->debugConnections();
     }
 
