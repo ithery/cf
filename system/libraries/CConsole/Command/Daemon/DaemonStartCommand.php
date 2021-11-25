@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DaemonStartCommand
+ * Description of DaemonStartCommand.
  *
  * @author Hery
  */
@@ -26,6 +26,7 @@ class CConsole_Command_Daemon_DaemonStartCommand extends CConsole_Command {
         }
         if ($errCode == 0) {
             $this->info('Starting ' . $class);
+
             try {
                 $started = $daemonManager->start($class);
                 $this->info('Daemon ' . $class . ' is running now');
@@ -37,6 +38,7 @@ class CConsole_Command_Daemon_DaemonStartCommand extends CConsole_Command {
 
         if ($errCode > 0) {
             $this->error($errMessage);
+
             return 1;
         }
 

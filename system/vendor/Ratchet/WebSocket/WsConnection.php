@@ -1,16 +1,19 @@
 <?php
+
 namespace Ratchet\WebSocket;
+
+use Ratchet\RFC6455\Messaging\Frame;
 use Ratchet\AbstractConnectionDecorator;
 use Ratchet\RFC6455\Messaging\DataInterface;
-use Ratchet\RFC6455\Messaging\Frame;
 
 /**
- * {@inheritdoc}
+ * @inheritdoc
+ *
  * @property \StdClass $WebSocket
  */
 class WsConnection extends AbstractConnectionDecorator {
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function send($msg) {
         if (!$this->WebSocket->closing) {
@@ -26,6 +29,7 @@ class WsConnection extends AbstractConnectionDecorator {
 
     /**
      * @param int|\Ratchet\RFC6455\Messaging\DataInterface
+     * @param mixed $code
      */
     public function close($code = 1000) {
         if ($this->WebSocket->closing) {

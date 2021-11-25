@@ -2,10 +2,10 @@
 
 namespace React\Socket;
 
-use Evenement\EventEmitter;
-use React\EventLoop\LoopInterface;
-use InvalidArgumentException;
 use RuntimeException;
+use Evenement\EventEmitter;
+use InvalidArgumentException;
+use React\EventLoop\LoopInterface;
 
 /**
  * The `TcpServer` class implements the `ServerInterface` and
@@ -31,14 +31,15 @@ use RuntimeException;
  * @see ServerInterface
  * @see ConnectionInterface
  */
-final class TcpServer extends EventEmitter implements ServerInterface
-{
+final class TcpServer extends EventEmitter implements ServerInterface {
     private $master;
+
     private $loop;
+
     private $listening = false;
 
     /**
-     * Creates a plaintext TCP/IP socket server and starts listening on the given address
+     * Creates a plaintext TCP/IP socket server and starts listening on the given address.
      *
      * This starts accepting new incoming connections on the given address.
      * See also the `connection event` documented in the `ServerInterface`
@@ -117,15 +118,15 @@ final class TcpServer extends EventEmitter implements ServerInterface
      * @param string|int    $uri
      * @param LoopInterface $loop
      * @param array         $context
+     *
      * @throws InvalidArgumentException if the listening address is invalid
-     * @throws RuntimeException if listening on this address fails (already in use etc.)
+     * @throws RuntimeException         if listening on this address fails (already in use etc.)
      */
-    public function __construct($uri, LoopInterface $loop, array $context = array())
-    {
+    public function __construct($uri, LoopInterface $loop, array $context = []) {
         $this->loop = $loop;
 
         // a single port has been given => assume localhost
-        if ((string)(int)$uri === (string)$uri) {
+        if ((string) (int) $uri === (string) $uri) {
             $uri = '127.0.0.1:' . $uri;
         }
 
@@ -158,7 +159,7 @@ final class TcpServer extends EventEmitter implements ServerInterface
             $errno,
             $errstr,
             \STREAM_SERVER_BIND | \STREAM_SERVER_LISTEN,
-            \stream_context_create(array('socket' => $context))
+            \stream_context_create(['socket' => $context])
         );
         if (false === $this->master) {
             throw new \RuntimeException('Failed to listen on "' . $uri . '": ' . $errstr, $errno);
@@ -168,8 +169,7 @@ final class TcpServer extends EventEmitter implements ServerInterface
         $this->resume();
     }
 
-    public function getAddress()
-    {
+    public function getAddress() {
         if (!\is_resource($this->master)) {
             return null;
         }
@@ -186,8 +186,7 @@ final class TcpServer extends EventEmitter implements ServerInterface
         return 'tcp://' . $address;
     }
 
-    public function pause()
-    {
+    public function pause() {
         if (!$this->listening) {
             return;
         }
@@ -196,8 +195,7 @@ final class TcpServer extends EventEmitter implements ServerInterface
         $this->listening = false;
     }
 
-    public function resume()
-    {
+    public function resume() {
         if ($this->listening || !\is_resource($this->master)) {
             return;
         }
@@ -206,17 +204,17 @@ final class TcpServer extends EventEmitter implements ServerInterface
         $this->loop->addReadStream($this->master, function ($master) use ($that) {
             $newSocket = @\stream_socket_accept($master);
             if (false === $newSocket) {
-                $that->emit('error', array(new \RuntimeException('Error accepting new connection')));
+                $that->emit('error', [new \RuntimeException('Error accepting new connection')]);
 
                 return;
             }
+
             $that->handleConnection($newSocket);
         });
         $this->listening = true;
     }
 
-    public function close()
-    {
+    public function close() {
         if (!\is_resource($this->master)) {
             return;
         }
@@ -226,11 +224,14 @@ final class TcpServer extends EventEmitter implements ServerInterface
         $this->removeAllListeners();
     }
 
-    /** @internal */
-    public function handleConnection($socket)
-    {
-        $this->emit('connection', array(
+    /**
+     * @internal
+     *
+     * @param mixed $socket
+     */
+    public function handleConnection($socket) {
+        $this->emit('connection', [
             new Connection($socket, $this->loop)
-        ));
+        ]);
     }
 }

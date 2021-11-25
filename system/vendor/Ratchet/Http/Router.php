@@ -11,7 +11,6 @@ use Symfony\Component\Routing\Exception\ResourceNotFoundException;
 
 class Router implements HttpServerInterface {
     use CloseResponseTrait;
-
     /**
      * @var \Symfony\Component\Routing\Matcher\UrlMatcherInterface
      */
@@ -35,7 +34,6 @@ class Router implements HttpServerInterface {
         }
 
         $conn->controller = $this->_noopController;
-
         $uri = $request->getUri();
 
         $context = $this->_matcher->getContext();

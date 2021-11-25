@@ -40,16 +40,15 @@ class CDaemon {
         $cmd = carr::get($config, 'command');
         $pidFile = carr::get($config, 'pidFile');
         $logFile = carr::get($config, 'logFile');
-        $file = new CFile();
 
         try {
             $dirPidFile = dirname($pidFile);
-            if (!$file->isDirectory($dirPidFile)) {
-                $file->makeDirectory($dirPidFile, 0755, true);
+            if (!CFile::isDirectory($dirPidFile)) {
+                CFile::makeDirectory($dirPidFile, 0755, true);
             }
             $dirLogFile = dirname($logFile);
-            if (!$file->isDirectory($dirLogFile)) {
-                $file->makeDirectory($dirLogFile, 0755, true);
+            if (!CFile::isDirectory($dirLogFile)) {
+                CFile::makeDirectory($dirLogFile, 0755, true);
             }
         } catch (Exception $ex) {
             throw new Exception('error on create dir ' . $dirLogFile);
@@ -187,6 +186,7 @@ class CDaemon {
         //$output = $this->debugOutput();
 
         $commandToExecute = "NSS_STRICT_NOFORK=DISABLED ${binary} ${command} 1> \"${output}\" 2>&1 &";
+
         if (defined('CFCLI')) {
             $process = new Process($commandToExecute);
             $process->run();
@@ -301,5 +301,13 @@ class CDaemon {
         if ($runningService != null) {
             $runningService->log($msg);
         }
+    }
+
+    public static function pidPath() {
+        return DOCROOT . 'data/daemon/' . CF::appCode() . '/daemon/pid/';
+    }
+
+    public static function logPath() {
+        return  DOCROOT . 'data/daemon/' . CF::appCode() . '/log/';
     }
 }

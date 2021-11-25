@@ -46,7 +46,7 @@ class CWebSocket_Console_Command_StartServer extends CWebSocket_Console_Command 
         $options['statisticInterval'] = $this->option('statistic-interval') ?: CF::config('websocket.statistics.interval_in_seconds', 3600);
         $options['debug'] = $this->option('debug');
         $options['loop'] = $this->option('loop');
-
+        $this->info('DOCROOT:' . DOCROOT);
         $process = new CWebSocket_Process_StartServer($options, $this->output);
         $process->start();
     }

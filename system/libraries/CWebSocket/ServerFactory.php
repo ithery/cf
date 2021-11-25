@@ -107,6 +107,7 @@ class CWebSocket_ServerFactory {
      */
     public function createServer() {
         $socket = new Server("{$this->host}:{$this->port}", $this->loop);
+
         if (CF::config('websocket.ssl.local_cert')) {
             $this->consoleOutput->writeln('Starting Secure Server');
             $socket = new SecureServer($socket, $this->loop, CF::config('websocket.ssl'));
