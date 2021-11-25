@@ -2,8 +2,7 @@
 
 namespace React\EventLoop;
 
-interface LoopInterface
-{
+interface LoopInterface {
     /**
      * [Advanced] Register a listener to be notified when a stream is ready to read.
      *
@@ -46,9 +45,11 @@ interface LoopInterface
      * The execution order of listeners when multiple streams become ready at
      * the same time is not guaranteed.
      *
-     * @param resource $stream   The PHP stream resource to check.
-     * @param callable $listener Invoked when the stream is ready.
+     * @param resource $stream   the PHP stream resource to check
+     * @param callable $listener invoked when the stream is ready
+     *
      * @throws \Exception if the given resource type is not supported by this loop implementation
+     *
      * @see self::removeReadStream()
      */
     public function addReadStream($stream, $listener);
@@ -103,9 +104,11 @@ interface LoopInterface
      * As such, it's recommended to use `stream_set_read_buffer($stream, 0);`
      * to disable PHP's internal read buffer in this case.
      *
-     * @param resource $stream   The PHP stream resource to check.
-     * @param callable $listener Invoked when the stream is ready.
+     * @param resource $stream   the PHP stream resource to check
+     * @param callable $listener invoked when the stream is ready
+     *
      * @throws \Exception if the given resource type is not supported by this loop implementation
+     *
      * @see self::removeWriteStream()
      */
     public function addWriteStream($stream, $listener);
@@ -116,7 +119,7 @@ interface LoopInterface
      * Removing a stream from the loop that has already been removed or trying
      * to remove a stream that was never added or is invalid has no effect.
      *
-     * @param resource $stream The PHP stream resource.
+     * @param resource $stream the PHP stream resource
      */
     public function removeReadStream($stream);
 
@@ -126,7 +129,7 @@ interface LoopInterface
      * Removing a stream from the loop that has already been removed or trying
      * to remove a stream that was never added or is invalid has no effect.
      *
-     * @param resource $stream The PHP stream resource.
+     * @param resource $stream the PHP stream resource
      */
     public function removeWriteStream($stream);
 
@@ -194,8 +197,8 @@ interface LoopInterface
      * your system time forward by 20s, the timer SHOULD still trigger in 30s.
      * See also [event loop implementations](#loop-implementations) for more details.
      *
-     * @param int|float $interval The number of seconds to wait before execution.
-     * @param callable  $callback The callback to invoke.
+     * @param int|float $interval the number of seconds to wait before execution
+     * @param callable  $callback the callback to invoke
      *
      * @return TimerInterface
      */
@@ -277,8 +280,8 @@ interface LoopInterface
      * recommended to rely on this for high precision intervals with millisecond
      * accuracy or below.
      *
-     * @param int|float $interval The number of seconds to wait before execution.
-     * @param callable  $callback The callback to invoke.
+     * @param int|float $interval the number of seconds to wait before execution
+     * @param callable  $callback the callback to invoke
      *
      * @return TimerInterface
      */
@@ -292,7 +295,7 @@ interface LoopInterface
      * Calling this method on a timer instance that has not been added to this
      * loop instance or on a timer that has already been cancelled has no effect.
      *
-     * @param TimerInterface $timer The timer to cancel.
+     * @param TimerInterface $timer the timer to cancel
      *
      * @return void
      */
@@ -344,7 +347,7 @@ interface LoopInterface
      *
      * See also [example #3](examples).
      *
-     * @param callable $listener The callback to invoke.
+     * @param callable $listener the callback to invoke
      *
      * @return void
      */
@@ -382,11 +385,11 @@ interface LoopInterface
      * **Note: A listener can only be added once to the same signal, any
      * attempts to add it more then once will be ignored.**
      *
-     * @param int $signal
+     * @param int      $signal
      * @param callable $listener
      *
      * @throws \BadMethodCallException when signals aren't supported on this
-     *     platform, for example when required extensions are missing.
+     *                                 platform, for example when required extensions are missing
      *
      * @return void
      */
@@ -401,7 +404,7 @@ interface LoopInterface
      *
      * Any attempts to remove listeners that aren't registered will be ignored.
      *
-     * @param int $signal
+     * @param int      $signal
      * @param callable $listener
      *
      * @return void

@@ -82,10 +82,16 @@ class CWebsocket_Channel {
         CWebSocket_Event_SubscribedToChannel::dispatch(
             $connection->app->id,
             $connection->socketId,
-            $this->getName(),
+            $this->getName()
         );
 
         return true;
+    }
+
+    public function debugConnections() {
+        foreach ($this->connections as $k => $c) {
+            CWebSocket::connectionLogger()->debug('' . $this->name . '|Current connection:' . $k . '=>' . $c->socketId);
+        }
     }
 
     /**
@@ -130,7 +136,15 @@ class CWebsocket_Channel {
      * @return void
      */
     public function saveConnection(ConnectionInterface $connection) {
-        $this->connections[$connection->socketId] = $connection;
+        CWebSocket::connectionLogger()->debug('' . $this->name . '|Save connection:' . $connection->socketId);
+        if (count($this->connections) > 0) {
+            $firstConnection = carr::first($this->connections);
+            if ($firstConnection === $connection) {
+                CWebSocket::connectionLogger()->debug('Connection is identical with first connection');
+            }
+        }
+        $this->connections[$connection->socketId] = clone $connection;
+        $this->debugConnections();
     }
 
     /**
@@ -145,6 +159,7 @@ class CWebsocket_Channel {
     public function broadcast($appId, $payload, $replicate = true) {
         c::collect($this->getConnections())
             ->each(function ($connection) use ($payload) {
+                CWebSocket::connectionLogger()->debug('Send to ' . $connection->socketId);
                 $connection->send(json_encode($payload));
             });
 

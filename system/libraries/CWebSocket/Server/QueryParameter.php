@@ -42,10 +42,11 @@ class CWebSocket_Server_QueryParameter {
      * Get a specific query parameter.
      *
      * @param string $name
+     * @param string $default
      *
      * @return string
      */
-    public function get($name) {
-        return isset($this->all()[$name]) ? $this->all()[$name] : '';
+    public function get($name, $default = '') {
+        return isset($this->all()[$name]) ? $this->all()[$name] : $default;
     }
 }

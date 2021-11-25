@@ -1,7 +1,10 @@
 <?php
 
+if (!is_callable('random_bytes')) {
+    require_once DOCROOT . 'system/vendor/random_compat/random.php';
+}
 /**
- * Description of Encrypter
+ * Description of Encrypter.
  *
  * @author Hery
  */
@@ -26,9 +29,9 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
      * @param string $key
      * @param string $cipher
      *
-     * @return void
-     *
      * @throws \RuntimeException
+     *
+     * @return void
      */
     public function __construct($key, $cipher = 'AES-128-CBC') {
         $key = (string) $key;
@@ -73,9 +76,9 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
      * @param mixed $value
      * @param bool  $serialize
      *
-     * @return string
-     *
      * @throws CCrypt_Exception_EncryptException
+     *
+     * @return string
      */
     public function encrypt($value, $serialize = true) {
         $iv = random_bytes(openssl_cipher_iv_length($this->cipher));
@@ -114,9 +117,9 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
      *
      * @param string $value
      *
-     * @return string
-     *
      * @throws CCrypt_Exception_EncryptException
+     *
+     * @return string
      */
     public function encryptString($value) {
         return $this->encrypt($value, false);
@@ -128,9 +131,9 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
      * @param string $payload
      * @param bool   $unserialize
      *
-     * @return mixed
-     *
      * @throws CCrypt_Exception_DecryptException
+     *
+     * @return mixed
      */
     public function decrypt($payload, $unserialize = true) {
         $payload = $this->getJsonPayload($payload);
@@ -160,9 +163,9 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
      *
      * @param string $payload
      *
-     * @return string
-     *
      * @throws CCrypt_Exception_DecryptException
+     *
+     * @return string
      */
     public function decryptString($payload) {
         return $this->decrypt($payload, false);
@@ -185,9 +188,9 @@ class CCrypt_Encrypter implements CCrypt_EncrypterInterface {
      *
      * @param string $payload
      *
-     * @return array
-     *
      * @throws CCrypt_Exception_DecryptException
+     *
+     * @return array
      */
     protected function getJsonPayload($payload) {
         $payload = json_decode(base64_decode($payload), true);

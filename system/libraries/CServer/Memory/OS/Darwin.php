@@ -64,7 +64,7 @@ class CServer_Memory_OS_Darwin extends CServer_Memory_OS_Linux {
             $swap1 = preg_split('/M/', $swapBuff);
             $swap2 = preg_split('/=/', $swap1[1]);
             $swap3 = preg_split('/=/', $swap1[2]);
-            $dev = CServer::createDeviceDisk();
+            $dev = CServer_Factory::createDeviceDisk();
             $dev->setName('SWAP');
             $dev->setMountPoint('SWAP');
             $dev->setFsType('swap');

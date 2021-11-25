@@ -8,7 +8,7 @@ class CWebSocket_Handler_WebSocketHandler implements MessageComponentInterface {
     /**
      * The channel manager.
      *
-     * @var CWebSocket_Contract_ChannelManagerInterface
+     * @var CWebSocket_ChannelManager_LocalChannelManager
      */
     protected $channelManager;
 
@@ -219,7 +219,7 @@ class CWebSocket_Handler_WebSocketHandler implements MessageComponentInterface {
      */
     protected function generateSocketId(ConnectionInterface $connection) {
         $socketId = sprintf('%d.%d', random_int(1, 1000000000), random_int(1, 1000000000));
-
+        CWebsocket::connectionLogger()->debug('Generated SocketID ' . $socketId);
         $connection->socketId = $socketId;
 
         return $this;

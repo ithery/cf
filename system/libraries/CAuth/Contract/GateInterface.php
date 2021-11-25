@@ -1,0 +1,162 @@
+<?php
+
+interface CAuth_Contract_GateInterface {
+    /**
+     * Determine if a given ability has been defined.
+     *
+     * @param string $ability
+     *
+     * @return bool
+     */
+    public function has($ability);
+
+    /**
+     * Define a new ability.
+     *
+     * @param string          $ability
+     * @param callable|string $callback
+     *
+     * @return $this
+     */
+    public function define($ability, $callback);
+
+    /**
+     * Define abilities for a resource.
+     *
+     * @param string     $name
+     * @param string     $class
+     * @param null|array $abilities
+     *
+     * @return $this
+     */
+    public function resource($name, $class, array $abilities = null);
+
+    /**
+     * Define a policy class for a given class type.
+     *
+     * @param string $class
+     * @param string $policy
+     *
+     * @return $this
+     */
+    public function policy($class, $policy);
+
+    /**
+     * Register a callback to run before all Gate checks.
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function before(callable $callback);
+
+    /**
+     * Register a callback to run after all Gate checks.
+     *
+     * @param callable $callback
+     *
+     * @return $this
+     */
+    public function after(callable $callback);
+
+    /**
+     * Determine if the given ability should be granted for the current user.
+     *
+     * @param string      $ability
+     * @param array|mixed $arguments
+     *
+     * @return bool
+     */
+    public function allows($ability, $arguments = []);
+
+    /**
+     * Determine if the given ability should be denied for the current user.
+     *
+     * @param string      $ability
+     * @param array|mixed $arguments
+     *
+     * @return bool
+     */
+    public function denies($ability, $arguments = []);
+
+    /**
+     * Determine if all of the given abilities should be granted for the current user.
+     *
+     * @param iterable|string $abilities
+     * @param array|mixed     $arguments
+     *
+     * @return bool
+     */
+    public function check($abilities, $arguments = []);
+
+    /**
+     * Determine if any one of the given abilities should be granted for the current user.
+     *
+     * @param iterable|string $abilities
+     * @param array|mixed     $arguments
+     *
+     * @return bool
+     */
+    public function any($abilities, $arguments = []);
+
+    /**
+     * Determine if the given ability should be granted for the current user.
+     *
+     * @param string      $ability
+     * @param array|mixed $arguments
+     *
+     * @throws \CAuth_Exception_AuthorizationException
+     *
+     * @return \CAuth_Access_Response
+     */
+    public function authorize($ability, $arguments = []);
+
+    /**
+     * Inspect the user for the given ability.
+     *
+     * @param string      $ability
+     * @param array|mixed $arguments
+     *
+     * @return \CAuth_Access_Response
+     */
+    public function inspect($ability, $arguments = []);
+
+    /**
+     * Get the raw result from the authorization callback.
+     *
+     * @param string      $ability
+     * @param array|mixed $arguments
+     *
+     * @throws \CAuth_Exception_AuthorizationException
+     *
+     * @return mixed
+     */
+    public function raw($ability, $arguments = []);
+
+    /**
+     * Get a policy instance for a given class.
+     *
+     * @param object|string $class
+     *
+     * @throws \InvalidArgumentException
+     *
+     * @return mixed
+     */
+    public function getPolicyFor($class);
+
+    /**
+     * Get a guard instance for the given user.
+     *
+     * @param \CAuth_AuthenticatableInterface|mixed $user
+     *
+     * @return static
+     */
+    public function forUser($user);
+
+    /**
+     * Get all of the defined abilities.
+     *
+     * @return array
+     */
+    public function abilities();
+}

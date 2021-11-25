@@ -11,7 +11,6 @@ class CWebSocket_Handler_ApiHandler_FetchChannels extends CWebSocket_Handler_Api
     public function __invoke() {
         $request = CHTTP::request();
         $attributes = [];
-
         if ($request->has('info')) {
             $attributes = explode(',', trim($request->info));
 

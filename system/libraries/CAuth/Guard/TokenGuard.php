@@ -1,6 +1,6 @@
 <?php
 
-class CAuth_Guard_TokenGuard implements CAuth_GuardInterface {
+class CAuth_Guard_TokenGuard implements CAuth_Contract_GuardInterface {
     use CAuth_Guard_Concern_GuardHelper;
 
     /**

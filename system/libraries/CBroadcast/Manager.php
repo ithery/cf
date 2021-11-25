@@ -44,18 +44,13 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      * @return void
      */
     public function routes(array $attributes = null) {
-        if ($this->app instanceof CachesRoutes && $this->app->routesAreCached()) {
-            return;
-        }
-
         $attributes = $attributes ?: ['middleware' => ['web']];
-
-        $this->app['router']->group($attributes, function ($router) {
+        CRouting::router()->group($attributes, function ($router) {
             $router->match(
                 ['get', 'post'],
                 '/broadcasting/auth',
-                '\\' . BroadcastController::class . '@authenticate'
-            )->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+                '\\' . CBroadcast_BroadcastController::class . '@authenticate'
+            )->withoutMiddleware([\CHTTP_Middleware_VerifyCsrfToken::class]);
         });
     }
 
@@ -96,7 +91,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
             && method_exists($event, 'shouldBroadcastNow')
             && $event->shouldBroadcastNow())
         ) {
-            return $this->app->make(BusDispatcherContract::class)->dispatchNow(new CBroadcast_BroadcastEvent(clone $event));
+            return CQueue::dispatcher()->dispatchNow(new CBroadcast_BroadcastEvent(clone $event));
         }
 
         $queue = null;
@@ -109,7 +104,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
             $queue = $event->queue;
         }
 
-        CQueue::queuer()->connection($event->connection ?: null)->pushOn(
+        CQueue::queuer()->connection(isset($event->connection) ? $event->connection : null)->pushOn(
             $queue,
             new CBroadcast_BroadcastEvent(clone $event)
         );
@@ -131,7 +126,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      *
      * @param null|string $name
      *
-     * @return mixed
+     * @return CBroadcast_BroadcasterAbstract
      */
     public function driver($name = null) {
         $name = $name ?: $this->getDefaultDriver();
@@ -147,7 +142,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      * @return \CBroadcast_Contract_BroadcasterInterface
      */
     protected function get($name) {
-        return $this->drivers[$name] ?? $this->resolve($name);
+        return isset($this->drivers[$name]) ? $this->drivers[$name] : $this->resolve($name);
     }
 
     /**
@@ -198,11 +193,12 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
             $config['key'],
             $config['secret'],
             $config['app_id'],
-            $config['options'] ?? []
+            $config['options'] ? $config['options'] : []
         );
 
-        if ($config['log'] ?? false) {
-            $pusher->setLogger($this->app->make(LoggerInterface::class));
+        $log = isset($config['log']) ? $config['log'] : false;
+        if ($log) {
+            $pusher->setLogger(CLogger::logger());
         }
 
         return new CBroadcast_Broadcaster_PusherBroadcaster($pusher);
@@ -228,7 +224,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      */
     protected function createRedisDriver(array $config) {
         return new CBroadcast_Broadcaster_RedisBroadcaster(
-            $this->app->make('redis'),
+            CRedis::instance(),
             isset($config['connection']) ? $config['connection'] : null,
             CF::config('database.redis.options.prefix', '')
         );
@@ -243,7 +239,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      */
     protected function createLogDriver(array $config) {
         return new CBroadcast_Broadcaster_LogBroadcaster(
-            $this->app->make(LoggerInterface::class)
+            CLogger::logger()
         );
     }
 
@@ -267,7 +263,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      */
     protected function getConfig($name) {
         if (!is_null($name) && $name !== 'null') {
-            return $this->app['config']["broadcasting.connections.{$name}"];
+            return CF::config("broadcast.connections.{$name}");
         }
 
         return ['driver' => 'null'];
@@ -279,18 +275,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      * @return string
      */
     public function getDefaultDriver() {
-        return $this->app['config']['broadcasting.default'];
-    }
-
-    /**
-     * Set the default driver name.
-     *
-     * @param string $name
-     *
-     * @return void
-     */
-    public function setDefaultDriver($name) {
-        $this->app['config']['broadcasting.default'] = $name;
+        return CF::config('broadcast.default');
     }
 
     /**
@@ -301,7 +286,7 @@ class CBroadcast_Manager implements CBroadcast_Contract_FactoryInterface {
      * @return void
      */
     public function purge($name = null) {
-        $name = $name ?? $this->getDefaultDriver();
+        $name = $name ?: $this->getDefaultDriver();
 
         unset($this->drivers[$name]);
     }

@@ -31,7 +31,7 @@ class CWebSocket_Channel_PresenceChannel extends CWebSocket_Channel_PrivateChann
                         $hash = [];
 
                         foreach ($users as $socketId => $user) {
-                            $hash[$user->user_id] = $user->user_info ?? [];
+                            $hash[$user->user_id] = isset($user->user_info) ? $user->user_info : [];
                         }
 
                         $connection->send(json_encode([
@@ -96,7 +96,7 @@ class CWebSocket_Channel_PresenceChannel extends CWebSocket_Channel_PrivateChann
      *
      * @return bool
      */
-    public function unsubscribe(ConnectionInterface $connection): bool {
+    public function unsubscribe(ConnectionInterface $connection) {
         $truth = parent::unsubscribe($connection);
 
         $this->channelManager

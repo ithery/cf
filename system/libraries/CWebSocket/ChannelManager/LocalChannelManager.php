@@ -78,7 +78,7 @@ class CWebSocket_ChannelManager_LocalChannelManager implements CWebSocket_Contra
      * @return null|CWebsocket_Channel
      */
     public function find($appId, $channel) {
-        return (isset($this->channels[$appId][$channel], $this->channels[$appId][$channel])) ? $this->channels[$appId][$channel] : null;
+        return (isset($this->channels[$appId], $this->channels[$appId][$channel])) ? $this->channels[$appId][$channel] : null;
     }
 
     /**

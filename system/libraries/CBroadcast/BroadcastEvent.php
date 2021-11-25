@@ -2,7 +2,6 @@
 
 class CBroadcast_BroadcastEvent implements CQueue_ShouldQueueInterface {
     use CQueue_Trait_QueueableTrait;
-
     /**
      * The event instance.
      *
@@ -41,11 +40,10 @@ class CBroadcast_BroadcastEvent implements CQueue_ShouldQueueInterface {
     /**
      * Handle the queued job.
      *
-     * @param \CBroadcast_Contract_FactoryInterface $manager
-     *
      * @return void
      */
-    public function handle(CBroadcast_Contract_FactoryInterface $manager) {
+    public function execute() {
+        $manager = CBroadcast::manager();
         $name = method_exists($this->event, 'broadcastAs')
                 ? $this->event->broadcastAs() : get_class($this->event);
 

@@ -2,27 +2,25 @@
 
 namespace React\Socket;
 
+use Exception;
 use Evenement\EventEmitter;
 use React\EventLoop\LoopInterface;
-use Exception;
 
-final class Server extends EventEmitter implements ServerInterface
-{
+final class Server extends EventEmitter implements ServerInterface {
     private $server;
 
-    public function __construct($uri, LoopInterface $loop, array $context = array())
-    {
+    public function __construct($uri, LoopInterface $loop, array $context = []) {
         // sanitize TCP context options if not properly wrapped
         if ($context && (!isset($context['tcp']) && !isset($context['tls']) && !isset($context['unix']))) {
-            $context = array('tcp' => $context);
+            $context = ['tcp' => $context];
         }
 
         // apply default options if not explicitly given
-        $context += array(
-            'tcp' => array(),
-            'tls' => array(),
-            'unix' => array()
-        );
+        $context += [
+            'tcp' => [],
+            'tls' => [],
+            'unix' => []
+        ];
 
         $scheme = 'tcp';
         $pos = \strpos($uri, '://');
@@ -44,30 +42,26 @@ final class Server extends EventEmitter implements ServerInterface
 
         $that = $this;
         $server->on('connection', function (ConnectionInterface $conn) use ($that) {
-            $that->emit('connection', array($conn));
+            $that->emit('connection', [$conn]);
         });
         $server->on('error', function (Exception $error) use ($that) {
-            $that->emit('error', array($error));
+            $that->emit('error', [$error]);
         });
     }
 
-    public function getAddress()
-    {
+    public function getAddress() {
         return $this->server->getAddress();
     }
 
-    public function pause()
-    {
+    public function pause() {
         $this->server->pause();
     }
 
-    public function resume()
-    {
+    public function resume() {
         $this->server->resume();
     }
 
-    public function close()
-    {
+    public function close() {
         $this->server->close();
     }
 }

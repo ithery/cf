@@ -21,7 +21,7 @@ class CWebSocket {
     }
 
     /**
-     * @return CWebSocket_Contract_ChannelManagerInterface
+     * @return CWebSocket_ChannelManager_LocalChannelManager
      */
     public static function channelManager() {
         return static::$channelManager;
@@ -43,7 +43,7 @@ class CWebSocket {
     }
 
     /**
-     * @return CWebSocket_Server_Logger_HttpLogger
+     * @return CWebSocket_Server_Logger_WebSocketLogger
      */
     public static function webSocketLogger() {
         return static::$webSocketLogger;
@@ -76,7 +76,7 @@ class CWebSocket {
      */
     public static function statisticStore() {
         if (static::$statisticStore == null) {
-            $class = CF::config('websocket.store');
+            $class = CF::config('websocket.statistics.store', CWebSocket_Statistic_Store_DatabaseStore::class);
             static::$statisticStore = new $class();
         }
 
