@@ -948,12 +948,10 @@ export default class Cresenity {
         }
     }
 
-    initUi() {
-        this.ui.start();
-    }
 
-    initAlpine() {
+    initAlpineAndUi() {
         window.Alpine = Alpine;
+        this.ui.start();
         window.Alpine.start();
     }
     init() {
@@ -969,8 +967,7 @@ export default class Cresenity {
             this.initConfirm();
             this.initReload();
             this.initValidation();
-            this.initUi();
-            this.initAlpine();
+            this.initAlpineAndUi();
         });
 
 

@@ -683,7 +683,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
                     $arch = null;
                     $impl = null;
                     $part = null;
-                    $dev = CServer::createDeviceCpu();
+                    $dev = CServer_Factory::createDeviceCpu();
                     $details = preg_split("/\n/", $processor, -1, PREG_SPLIT_NO_EMPTY);
                     foreach ($details as $detail) {
                         $arrBuff = preg_split('/\s*:\s*/', trim($detail));

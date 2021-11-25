@@ -39,7 +39,7 @@ class CWebSocket {
     }
 
     /**
-     * @return CWebSocket_Contract_ChannelManagerInterface
+     * @return CWebSocket_ChannelManager_LocalChannelManager
      */
     public static function channelManager() {
         return static::$channelManager;
@@ -94,7 +94,7 @@ class CWebSocket {
      */
     public static function statisticStore() {
         if (static::$statisticStore == null) {
-            $class = CF::config('websocket.statistics.store');
+            $class = CF::config('websocket.statistics.store', CWebSocket_Statistic_Store_DatabaseStore::class);
             static::$statisticStore = new $class();
         }
 

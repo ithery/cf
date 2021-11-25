@@ -50,6 +50,10 @@ class CWebSocket_Server_Logger_ConnectionLogger extends CWebSocket_Server_Logger
         $this->connection->send($data);
     }
 
+    public function debug($message) {
+        $this->info($message);
+    }
+
     /**
      * Close the connection.
      *
