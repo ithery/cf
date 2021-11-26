@@ -23,7 +23,7 @@ trait CollectionTest_ExceptionTrait {
      */
     public function testSoleThrowsExceptionIfNoItemsExist($collection) {
         /** @var \PHPUnit\Framework\TestCase $this */
-        $this->expectException(ItemNotFoundException::class);
+        $this->expectException(CCollection_Exception_ItemNotFoundException::class);
 
         $collection = new $collection([
             ['name' => 'foo'],
@@ -39,7 +39,7 @@ trait CollectionTest_ExceptionTrait {
      */
     public function testSoleThrowsExceptionIfMoreThanOneItemExists($collection) {
         /** @var \PHPUnit\Framework\TestCase $this */
-        $this->expectException(MultipleItemsFoundException::class);
+        $this->expectException(CCollection_Exception_MultipleItemsFoundException::class);
 
         $collection = new $collection([
             ['name' => 'foo'],
@@ -69,7 +69,7 @@ trait CollectionTest_ExceptionTrait {
      */
     public function testSoleThrowsExceptionIfNoItemsExistWithCallback($collection) {
         /** @var \PHPUnit\Framework\TestCase $this */
-        $this->expectException(ItemNotFoundException::class);
+        $this->expectException(CCollection_Exception_ItemNotFoundException::class);
 
         $data = new $collection(['foo', 'bar', 'baz']);
 
@@ -84,7 +84,7 @@ trait CollectionTest_ExceptionTrait {
      */
     public function testSoleThrowsExceptionIfMoreThanOneItemExistsWithCallback($collection) {
         /** @var \PHPUnit\Framework\TestCase $this */
-        $this->expectException(MultipleItemsFoundException::class);
+        $this->expectException(CCollection_Exception_MultipleItemsFoundException::class);
 
         $data = new $collection(['foo', 'bar', 'bar']);
 
@@ -99,7 +99,7 @@ trait CollectionTest_ExceptionTrait {
      */
     public function testFirstOrFailThrowsExceptionIfNoItemsExist($collection) {
         /** @var \PHPUnit\Framework\TestCase $this */
-        $this->expectException(ItemNotFoundException::class);
+        $this->expectException(CCollection_Exception_ItemNotFoundException::class);
 
         $collection = new $collection([
             ['name' => 'foo'],
@@ -115,7 +115,7 @@ trait CollectionTest_ExceptionTrait {
      */
     public function testFirstOrFailThrowsExceptionIfNoItemsExistWithCallback($collection) {
         /** @var \PHPUnit\Framework\TestCase $this */
-        $this->expectException(ItemNotFoundException::class);
+        $this->expectException(CCollection_Exception_ItemNotFoundException::class);
 
         $data = new $collection(['foo', 'bar', 'baz']);
 
@@ -158,7 +158,7 @@ trait CollectionTest_ExceptionTrait {
     public function testItThrowsExceptionWhenTryingToAccessNoProxyProperty($collection) {
         /** @var \PHPUnit\Framework\TestCase $this */
         $data = new $collection();
-        $this->expectException(Exception::class);
+        $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Property [foo] does not exist on this collection instance.');
         $data->foo;
     }
