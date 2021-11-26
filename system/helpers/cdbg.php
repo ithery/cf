@@ -684,7 +684,7 @@ class cdbg {
                 $email = 'hery@ittron.co.id';
             }
 
-            return CEmail::sender()->send($email, $subject, $message, []);
+            //return CEmail::sender()->send($email, $subject, $message, []);
         } catch (Exception $ex) {
             if (!CF::isProduction()) {
                 throw $ex;

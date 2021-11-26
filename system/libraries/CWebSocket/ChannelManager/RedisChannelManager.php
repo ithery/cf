@@ -73,7 +73,7 @@ class CWebSocket_ChannelManager_RedisChannelManager extends CWebSocket_ChannelMa
      *
      * @return \React\Promise\PromiseInterface[array]
      */
-    public function getGlobalChannels($appId): PromiseInterface {
+    public function getGlobalChannels($appId) {
         return $this->publishClient->smembers(
             $this->getChannelsRedisHash($appId)
         );
@@ -86,7 +86,7 @@ class CWebSocket_ChannelManager_RedisChannelManager extends CWebSocket_ChannelMa
      *
      * @return PromiseInterface[bool]
      */
-    public function unsubscribeFromAllChannels(ConnectionInterface $connection): PromiseInterface {
+    public function unsubscribeFromAllChannels(ConnectionInterface $connection) {
         return $this->getGlobalChannels($connection->app->id)
             ->then(function ($channels) use ($connection) {
                 foreach ($channels as $channel) {
@@ -169,7 +169,7 @@ class CWebSocket_ChannelManager_RedisChannelManager extends CWebSocket_ChannelMa
      *
      * @return PromiseInterface[int]
      */
-    public function subscribeToApp($appId): PromiseInterface {
+    public function subscribeToApp($appId) {
         return $this->subscribeToTopic($appId)
             ->then(function () use ($appId) {
                 return $this->incrementSubscriptionsCount($appId);
@@ -184,7 +184,7 @@ class CWebSocket_ChannelManager_RedisChannelManager extends CWebSocket_ChannelMa
      *
      * @return PromiseInterface[int]
      */
-    public function unsubscribeFromApp($appId): PromiseInterface {
+    public function unsubscribeFromApp($appId) {
         return $this->unsubscribeFromTopic($appId)
             ->then(function () use ($appId) {
                 return $this->decrementSubscriptionsCount($appId);
@@ -311,7 +311,7 @@ class CWebSocket_ChannelManager_RedisChannelManager extends CWebSocket_ChannelMa
      *
      * @return \React\Promise\PromiseInterface[array]
      */
-    public function getChannelsMembersCount($appId, array $channelNames): PromiseInterface {
+    public function getChannelsMembersCount($appId, array $channelNames) {
         $this->publishClient->multi();
 
         foreach ($channelNames as $channel) {
@@ -335,7 +335,7 @@ class CWebSocket_ChannelManager_RedisChannelManager extends CWebSocket_ChannelMa
      *
      * @return \React\Promise\PromiseInterface[array]
      */
-    public function getMemberSockets($userId, $appId, $channelName): PromiseInterface {
+    public function getMemberSockets($userId, $appId, $channelName) {
         return $this->publishClient->smembers(
             $this->getUserSocketsRedisHash($appId, $channelName, $userId)
         );
@@ -348,7 +348,7 @@ class CWebSocket_ChannelManager_RedisChannelManager extends CWebSocket_ChannelMa
      *
      * @return PromiseInterface[bool]
      */
-    public function connectionPonged(ConnectionInterface $connection): PromiseInterface {
+    public function connectionPonged(ConnectionInterface $connection) {
         // This will update the score with the current timestamp.
         return $this->addConnectionToSet($connection, Carbon::now())
             ->then(function () use ($connection) {

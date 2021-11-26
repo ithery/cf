@@ -31,6 +31,7 @@ function refreshAlpineAfterEveryCresenityRequest() {
     window.Alpine.onComponentInitialized(component => {
         let cresenityEl = component.$el.closest('[cres\\:id]');
 
+
         if (cresenityEl && cresenityEl.__cresenity) {
             store.registerHook('message.processed', (message, cresenityComponent) => {
                 if (cresenityComponent === cresenityEl.__cresenity) {
@@ -92,7 +93,7 @@ function supportEntangle() {
                         typeof value === 'object' &&
                         value.cresenityEntangle
                     ) {
-                        // Ok, it looks like someone set an Alpine property to $wire.entangle or @entangle.
+                        // Ok, it looks like someone set an Alpine property to $cres.entangle or @entangle.
                         let cresenityProperty = value.cresenityEntangle;
                         let isDeferred = value.isDeferred;
                         let cresenityComponent = cresenityEl.__cresenity;

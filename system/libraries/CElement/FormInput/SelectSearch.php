@@ -10,6 +10,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_FormInput_SelectSearch extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectSearch;
+    use CElement_FormInput_SelectSearch_Trait_Select2v23Trait;
+    use CTrait_Element_Property_ApplyJs;
 
     protected $query;
 
@@ -54,6 +56,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->delay = 100;
         $this->requires = [];
         $this->valueCallback = null;
+        $this->applyJs = 'select2';
     }
 
     public static function factory($id) {
@@ -140,6 +143,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     public function html($indent = 0) {
+        if ($this->applyJs == 'select2v2.3') {
+            return $this->htmlSelect2v23($indent);
+        }
         $html = new CStringBuilder();
         $custom_css = $this->custom_css;
 
@@ -253,6 +259,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     }
 
     public function js($indent = 0) {
+        if ($this->applyJs == 'select2v2.3') {
+            return $this->jsSelect2v23($indent);
+        }
         $ajaxUrl = $this->createAjaxUrl();
 
         $strSelection = $this->formatSelection;
