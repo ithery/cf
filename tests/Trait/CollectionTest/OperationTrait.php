@@ -1,7 +1,5 @@
 <?php
 trait CollectionTest_OperationTrait {
-
-
     /**
      * @param CCollection $collection
      * @dataProvider collectionClassProvider
@@ -763,5 +761,4 @@ trait CollectionTest_OperationTrait {
         $data = new $collection(['name' => 'ither', 'framework' => 'laravel']);
         $this->assertEquals(['ither' => 'name', 'laravel' => 'framework'], $data->flip()->toArray());
     }
-
 }
