@@ -298,7 +298,7 @@ class cTest extends TestCase {
 
     public function testLast() {
         $array = ['a', 'b', 'c'];
-        $this->assertSame('c', c::head($array));
+        $this->assertSame('c', c::last($array));
     }
 
     public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses() {
