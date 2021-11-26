@@ -2,12 +2,12 @@
 
 namespace React\Socket;
 
+use React\Promise;
+use RuntimeException;
 use React\Dns\Config\Config;
 use React\Dns\Resolver\Factory;
 use React\Dns\Resolver\Resolver;
 use React\EventLoop\LoopInterface;
-use React\Promise;
-use RuntimeException;
 
 /**
  * The `Connector` class is the main class in this package that implements the
@@ -24,24 +24,22 @@ use RuntimeException;
  *
  * @see ConnectorInterface for the base interface
  */
-final class Connector implements ConnectorInterface
-{
-    private $connectors = array();
+final class Connector implements ConnectorInterface {
+    private $connectors = [];
 
-    public function __construct(LoopInterface $loop, array $options = array())
-    {
+    public function __construct(LoopInterface $loop, array $options = []) {
         // apply default options if not explicitly given
-        $options += array(
+        $options += [
             'tcp' => true,
             'tls' => true,
             'unix' => true,
 
             'dns' => true,
             'timeout' => true,
-        );
+        ];
 
         if ($options['timeout'] === true) {
-            $options['timeout'] = (float)\ini_get("default_socket_timeout");
+            $options['timeout'] = (float) \ini_get('default_socket_timeout');
         }
 
         if ($options['tcp'] instanceof ConnectorInterface) {
@@ -49,7 +47,7 @@ final class Connector implements ConnectorInterface
         } else {
             $tcp = new TcpConnector(
                 $loop,
-                \is_array($options['tcp']) ? $options['tcp'] : array()
+                \is_array($options['tcp']) ? $options['tcp'] : []
             );
         }
 
@@ -94,7 +92,7 @@ final class Connector implements ConnectorInterface
                 $options['tls'] = new SecureConnector(
                     $tcp,
                     $loop,
-                    \is_array($options['tls']) ? $options['tls'] : array()
+                    \is_array($options['tls']) ? $options['tls'] : []
                 );
             }
 
@@ -117,11 +115,10 @@ final class Connector implements ConnectorInterface
         }
     }
 
-    public function connect($uri)
-    {
+    public function connect($uri) {
         $scheme = 'tcp';
         if (\strpos($uri, '://') !== false) {
-            $scheme = (string)\substr($uri, 0, \strpos($uri, '://'));
+            $scheme = (string) \substr($uri, 0, \strpos($uri, '://'));
         }
 
         if (!isset($this->connectors[$scheme])) {
@@ -133,4 +130,3 @@ final class Connector implements ConnectorInterface
         return $this->connectors[$scheme]->connect($uri);
     }
 }
-
