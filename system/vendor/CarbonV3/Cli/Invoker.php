@@ -1,12 +1,21 @@
 <?php
 
+/**
+ * This file is part of the Carbon package.
+ *
+ * (c) Brian Nesbitt <brian@nesbot.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 namespace CarbonV3\Cli;
 
 class Invoker
 {
-    const CLI_CLASS_NAME = 'Carbon\\Cli';
+    public const CLI_CLASS_NAME = 'CarbonV3\\Cli';
 
-    protected function runWithCli($className, array $parameters): bool
+    protected function runWithCli(string $className, array $parameters): bool
     {
         $cli = new $className();
 

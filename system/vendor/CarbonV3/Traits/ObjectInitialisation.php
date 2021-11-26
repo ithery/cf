@@ -11,7 +11,8 @@
 
 namespace CarbonV3\Traits;
 
-trait ObjectInitialisation {
+trait ObjectInitialisation
+{
     /**
      * True when parent::__construct has been called.
      *

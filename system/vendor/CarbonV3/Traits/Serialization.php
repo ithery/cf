@@ -11,10 +11,9 @@
 
 namespace CarbonV3\Traits;
 
-use Exception;
-use Throwable;
-//use ReturnTypeWillChange;
 use CarbonV3\Exceptions\InvalidFormatException;
+use ReturnTypeWillChange;
+use Throwable;
 
 /**
  * Trait Serialization.
@@ -33,13 +32,14 @@ use CarbonV3\Exceptions\InvalidFormatException;
  * @method string|static locale(string $locale = null, string ...$fallbackLocales)
  * @method string        toJSON()
  */
-trait Serialization {
+trait Serialization
+{
     use ObjectInitialisation;
 
     /**
      * The custom Carbon JSON serializer.
      *
-     * @var null|callable
+     * @var callable|null
      */
     protected static $serializer;
 
@@ -53,7 +53,7 @@ trait Serialization {
     /**
      * Locale to dump comes here before serialization.
      *
-     * @var null|string
+     * @var string|null
      */
     protected $dumpLocale;
 
@@ -61,7 +61,7 @@ trait Serialization {
      * Embed date properties to dump in a dedicated variables so it won't overlap native
      * DateTime ones.
      *
-     * @var null|array
+     * @var array|null
      */
     protected $dumpDateProperties;
 
@@ -70,7 +70,8 @@ trait Serialization {
      *
      * @return string
      */
-    public function serialize() {
+    public function serialize()
+    {
         return serialize($this);
     }
 
@@ -83,11 +84,12 @@ trait Serialization {
      *
      * @return static
      */
-    public static function fromSerialized($value) {
+    public static function fromSerialized($value)
+    {
         $instance = @unserialize((string) $value);
 
         if (!$instance instanceof static) {
-            throw new InvalidFormatException("Invalid serialized value: ${value}");
+            throw new InvalidFormatException("Invalid serialized value: $value");
         }
 
         return $instance;
@@ -100,7 +102,9 @@ trait Serialization {
      *
      * @return static
      */
-    public static function __set_state($dump) {
+    #[ReturnTypeWillChange]
+    public static function __set_state($dump)
+    {
         if (\is_string($dump)) {
             return static::parse($dump);
         }
@@ -118,11 +122,11 @@ trait Serialization {
      *
      * @return array
      */
-    public function __sleep() {
-        /** @var \Carbon\Carbon $this */
+    public function __sleep()
+    {
         $properties = $this->getSleepProperties();
 
-        if ($this->localTranslator ?: null) {
+        if ($this->localTranslator ?? null) {
             $properties[] = 'dumpLocale';
             $this->dumpLocale = $this->locale ?? null;
         }
@@ -135,18 +139,16 @@ trait Serialization {
      *
      * @return void
      */
-    public function __wakeup() {
+    #[ReturnTypeWillChange]
+    public function __wakeup()
+    {
         if (get_parent_class() && method_exists(parent::class, '__wakeup')) {
             // @codeCoverageIgnoreStart
             try {
                 parent::__wakeup();
             } catch (Throwable $exception) {
                 // FatalError occurs when calling msgpack_unpack() in PHP 7.4 or later.
-                list('date' => $date, 'timezone' => $timezone) = $this->dumpDateProperties;
-                parent::__construct($date, unserialize($timezone));
-            } catch (Exception $exception) {
-                // FatalError occurs when calling msgpack_unpack() in PHP 7.4 or later.
-                list('date' => $date, 'timezone' => $timezone) = $this->dumpDateProperties;
+                ['date' => $date, 'timezone' => $timezone] = $this->dumpDateProperties;
                 parent::__construct($date, unserialize($timezone));
             }
             // @codeCoverageIgnoreEnd
@@ -167,9 +169,10 @@ trait Serialization {
      *
      * @return array|string
      */
-    public function jsonSerialize() {
-        /** @var \Carbon\Carbon $this */
-        $serializer = $this->localSerializer ?: static::$serializer;
+    #[ReturnTypeWillChange]
+    public function jsonSerialize()
+    {
+        $serializer = $this->localSerializer ?? static::$serializer;
 
         if ($serializer) {
             return \is_string($serializer)
@@ -190,7 +193,8 @@ trait Serialization {
      *
      * @return void
      */
-    public static function serializeUsing($callback) {
+    public static function serializeUsing($callback)
+    {
         static::$serializer = $callback;
     }
 
@@ -199,9 +203,10 @@ trait Serialization {
      * foreach ($date as $_) {}
      * serializer($date)
      * var_export($date)
-     * get_object_vars($date).
+     * get_object_vars($date)
      */
-    public function cleanupDumpProperties() {
+    public function cleanupDumpProperties()
+    {
         foreach ($this->dumpProperties as $property) {
             if (isset($this->$property)) {
                 unset($this->$property);
@@ -211,8 +216,8 @@ trait Serialization {
         return $this;
     }
 
-    private function getSleepProperties() {
-        /** @var \Carbon\Carbon $this */
+    private function getSleepProperties(): array
+    {
         $properties = $this->dumpProperties;
 
         // @codeCoverageIgnoreStart
@@ -223,7 +228,7 @@ trait Serialization {
         if (isset($this->constructedObjectId)) {
             $this->dumpDateProperties = [
                 'date' => $this->format('Y-m-d H:i:s.u'),
-                'timezone' => serialize($this->timezone ?: null),
+                'timezone' => serialize($this->timezone ?? null),
             ];
 
             $properties[] = 'dumpDateProperties';

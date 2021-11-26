@@ -11,5 +11,6 @@
 
 namespace CarbonV3\Exceptions;
 
-interface Exception {
+interface Exception
+{
 }

@@ -8,6 +8,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace CarbonV3;
 
 use Closure;
@@ -113,7 +114,7 @@ class Translator extends Translation\Translator
      *
      * @return $this
      */
-    public function addDirectory($directory)
+    public function addDirectory(string $directory)
     {
         $this->directories[] = $directory;
 
@@ -127,7 +128,7 @@ class Translator extends Translation\Translator
      *
      * @return $this
      */
-    public function removeDirectory($directory)
+    public function removeDirectory(string $directory)
     {
         $search = rtrim(strtr($directory, '\\', '/'), '/');
 
@@ -148,7 +149,7 @@ class Translator extends Translation\Translator
      */
     public function trans($id, array $parameters = [], $domain = null, $locale = null)
     {
-        if (null === $domain) {
+        if ($domain === null) {
             $domain = 'messages';
         }
 
@@ -165,7 +166,7 @@ class Translator extends Translation\Translator
 
             return $format(
                 ...array_values($parameters),
-                ...array_fill(0, max(0, $count - count($parameters)), null)
+                ...array_fill(0, max(0, $count - \count($parameters)), null)
             );
         }
 
@@ -272,7 +273,7 @@ class Translator extends Translation\Translator
         $this->loadMessagesFromFile($locale);
         $this->addResource('array', $messages, $locale);
         $this->messages[$locale] = array_merge(
-            isset($this->messages[$locale]) ? $this->messages[$locale] : [],
+            $this->messages[$locale] ?? [],
             $messages
         );
 
@@ -313,11 +314,11 @@ class Translator extends Translation\Translator
      */
     public function setLocale($locale)
     {
-        $locale = preg_replace_callback('/[-_]([a-z]{2,})/', function ($matches) {
+        $locale = preg_replace_callback('/[-_]([a-z]{2,}|[0-9]{2,})/', function ($matches) {
             // _2-letters or YUE is a region, _3+-letters is a variant
             $upper = strtoupper($matches[1]);
 
-            if ($upper === 'YUE' || $upper === 'ISO' || strlen($upper) < 3) {
+            if ($upper === 'YUE' || $upper === 'ISO' || \strlen($upper) < 3) {
                 return "_$upper";
             }
 
@@ -326,7 +327,7 @@ class Translator extends Translation\Translator
 
         $previousLocale = $this->getLocale();
 
-        if ($previousLocale === $locale) {
+        if ($previousLocale === $locale && isset($this->messages[$locale])) {
             return true;
         }
 
@@ -340,33 +341,11 @@ class Translator extends Translation\Translator
             $completeLocaleChunks = preg_split('/[_.-]+/', $completeLocale);
 
             $getScore = function ($language) use ($completeLocaleChunks) {
-                $chunks = preg_split('/[_.-]+/', $language);
-                $score = 0;
-
-                foreach ($completeLocaleChunks as $index => $chunk) {
-                    if (!isset($chunks[$index])) {
-                        $score++;
-
-                        continue;
-                    }
-
-                    if (strtolower($chunks[$index]) === strtolower($chunk)) {
-                        $score += 10;
-                    }
-                }
-
-                return $score;
+                return static::compareChunkLists($completeLocaleChunks, preg_split('/[_.-]+/', $language));
             };
 
             usort($locales, function ($first, $second) use ($getScore) {
-                $first = $getScore($first);
-                $second = $getScore($second);
-
-                if ($first === $second) {
-                    return 0;
-                }
-
-                return $first < $second ? 1 : -1;
+                return $getScore($second) <=> $getScore($first);
             });
 
             $locale = $locales[0];
@@ -377,7 +356,7 @@ class Translator extends Translation\Translator
         }
 
         // If subtag (ex: en_CA) first load the macro (ex: en) to have a fallback
-        if (strpos($locale, '_') !== false &&
+        if (str_contains($locale, '_') &&
             $this->loadMessagesFromFile($macroLocale = preg_replace('/^([^_]+).*$/', '$1', $locale))
         ) {
             parent::setLocale($macroLocale);
@@ -402,5 +381,24 @@ class Translator extends Translation\Translator
         return [
             'locale' => $this->getLocale(),
         ];
+    }
+
+    private static function compareChunkLists($referenceChunks, $chunks)
+    {
+        $score = 0;
+
+        foreach ($referenceChunks as $index => $chunk) {
+            if (!isset($chunks[$index])) {
+                $score++;
+
+                continue;
+            }
+
+            if (strtolower($chunks[$index]) === strtolower($chunk)) {
+                $score += 10;
+            }
+        }
+
+        return $score;
     }
 }

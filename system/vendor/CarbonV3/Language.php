@@ -8,9 +8,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace CarbonV3;
 
 use JsonSerializable;
+use ReturnTypeWillChange;
 
 class Language implements JsonSerializable
 {
@@ -59,7 +61,7 @@ class Language implements JsonSerializable
      */
     protected $nativeName;
 
-    public function __construct($id)
+    public function __construct(string $id)
     {
         $this->id = str_replace('-', '_', $id);
         $parts = explode('_', $this->id);
@@ -208,7 +210,7 @@ class Language implements JsonSerializable
      *
      * @param string $isoName
      */
-    public function setIsoName($isoName): self
+    public function setIsoName(string $isoName): self
     {
         $this->isoName = $isoName;
 
@@ -234,7 +236,7 @@ class Language implements JsonSerializable
      *
      * @param string $nativeName
      */
-    public function setNativeName($nativeName): self
+    public function setNativeName(string $nativeName): self
     {
         $this->nativeName = $nativeName;
 
@@ -332,6 +334,7 @@ class Language implements JsonSerializable
      *
      * @return string
      */
+    #[ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return $this->getIsoDescription();

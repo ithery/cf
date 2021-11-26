@@ -8,10 +8,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace CarbonV3\Traits;
 
+use BadMethodCallException;
 use CarbonV3\CarbonInterface;
-use CarbonV3\Exceptions\BadUnitException;
+use CarbonV3\Exceptions\BadComparisonUnitException;
 use InvalidArgumentException;
 
 /**
@@ -22,14 +24,20 @@ use InvalidArgumentException;
  *
  * Depends on the following methods:
  *
- * @method CarbonInterface        resolveCarbon($date)
- * @method CarbonInterface        copy()
- * @method CarbonInterface        nowWithSameTz()
- * @method static CarbonInterface yesterday($timezone = null)
- * @method static CarbonInterface tomorrow($timezone = null)
+ * @method static        resolveCarbon($date)
+ * @method static        copy()
+ * @method static        nowWithSameTz()
+ * @method static static yesterday($timezone = null)
+ * @method static static tomorrow($timezone = null)
  */
 trait Comparison
 {
+    /** @var bool */
+    protected $endOfTime = false;
+
+    /** @var bool */
+    protected $startOfTime = false;
+
     /**
      * Determines if the instance is equal to another
      *
@@ -40,7 +48,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->eq('2018-07-25 12:45:17'); // false
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @see equalTo()
      *
@@ -61,7 +69,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->equalTo('2018-07-25 12:45:17'); // false
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @return bool
      */
@@ -80,7 +88,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->ne('2018-07-25 12:45:17'); // true
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @see notEqualTo()
      *
@@ -101,7 +109,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->notEqualTo('2018-07-25 12:45:17'); // true
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @return bool
      */
@@ -120,7 +128,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->gt('2018-07-25 12:45:17'); // false
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @see greaterThan()
      *
@@ -141,7 +149,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->greaterThan('2018-07-25 12:45:17'); // false
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @return bool
      */
@@ -160,7 +168,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->isAfter('2018-07-25 12:45:17'); // false
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @see greaterThan()
      *
@@ -181,7 +189,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->gte('2018-07-25 12:45:17'); // false
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @see greaterThanOrEqualTo()
      *
@@ -202,7 +210,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->greaterThanOrEqualTo('2018-07-25 12:45:17'); // false
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @return bool
      */
@@ -221,7 +229,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->lt('2018-07-25 12:45:17'); // true
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @see lessThan()
      *
@@ -242,7 +250,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->lessThan('2018-07-25 12:45:17'); // true
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @return bool
      */
@@ -261,7 +269,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->isBefore('2018-07-25 12:45:17'); // true
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @see lessThan()
      *
@@ -282,7 +290,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->lte('2018-07-25 12:45:17'); // true
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @see lessThanOrEqualTo()
      *
@@ -303,7 +311,7 @@ trait Comparison
      * Carbon::parse('2018-07-25 12:45:16')->lessThanOrEqualTo('2018-07-25 12:45:17'); // true
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date
      *
      * @return bool
      */
@@ -315,16 +323,20 @@ trait Comparison
     /**
      * Determines if the instance is between two others.
      *
+     * The third argument allow you to specify if bounds are included or not (true by default)
+     * but for when you including/excluding bounds may produce different results in your application,
+     * we recommend to use the explicit methods ->betweenIncluded() or ->betweenExcluded() instead.
+     *
      * @example
      * ```
      * Carbon::parse('2018-07-25')->between('2018-07-14', '2018-08-01'); // true
      * Carbon::parse('2018-07-25')->between('2018-08-01', '2018-08-20'); // false
-     * Carbon::parse('2018-07-25')->between('2018-07-25', '2018-08-01'); // false
-     * Carbon::parse('2018-07-25')->between('2018-07-25', '2018-08-01', true); // true
+     * Carbon::parse('2018-07-25')->between('2018-07-25', '2018-08-01'); // true
+     * Carbon::parse('2018-07-25')->between('2018-07-25', '2018-08-01', false); // false
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date1
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date2
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date1
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date2
      * @param bool                                    $equal Indicates if an equal to comparison should be done
      *
      * @return bool
@@ -346,6 +358,26 @@ trait Comparison
     }
 
     /**
+     * Determines if the instance is between two others, bounds included.
+     *
+     * @example
+     * ```
+     * Carbon::parse('2018-07-25')->betweenIncluded('2018-07-14', '2018-08-01'); // true
+     * Carbon::parse('2018-07-25')->betweenIncluded('2018-08-01', '2018-08-20'); // false
+     * Carbon::parse('2018-07-25')->betweenIncluded('2018-07-25', '2018-08-01'); // true
+     * ```
+     *
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date1
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date2
+     *
+     * @return bool
+     */
+    public function betweenIncluded($date1, $date2): bool
+    {
+        return $this->between($date1, $date2, true);
+    }
+
+    /**
      * Determines if the instance is between two others, bounds excluded.
      *
      * @example
@@ -355,8 +387,8 @@ trait Comparison
      * Carbon::parse('2018-07-25')->betweenExcluded('2018-07-25', '2018-08-01'); // false
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date1
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date2
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date1
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date2
      *
      * @return bool
      */
@@ -372,12 +404,12 @@ trait Comparison
      * ```
      * Carbon::parse('2018-07-25')->isBetween('2018-07-14', '2018-08-01'); // true
      * Carbon::parse('2018-07-25')->isBetween('2018-08-01', '2018-08-20'); // false
-     * Carbon::parse('2018-07-25')->isBetween('2018-07-25', '2018-08-01'); // false
-     * Carbon::parse('2018-07-25')->isBetween('2018-07-25', '2018-08-01', true); // true
+     * Carbon::parse('2018-07-25')->isBetween('2018-07-25', '2018-08-01'); // true
+     * Carbon::parse('2018-07-25')->isBetween('2018-07-25', '2018-08-01', false); // false
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date1
-     * @param \Carbon\Carbon|\DateTimeInterface|mixed $date2
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date1
+     * @param \CarbonV3\Carbon|\DateTimeInterface|mixed $date2
      * @param bool                                    $equal Indicates if an equal to comparison should be done
      *
      * @return bool
@@ -416,7 +448,7 @@ trait Comparison
      */
     public function isWeekend()
     {
-        return in_array($this->dayOfWeek, static::$weekendDays);
+        return \in_array($this->dayOfWeek, static::$weekendDays);
     }
 
     /**
@@ -543,9 +575,7 @@ trait Comparison
      * ```
      *
      * @param string                                        $format date formats to compare.
-     * @param \Carbon\Carbon|\DateTimeInterface|string|null $date   instance to compare with or null to use current day.
-     *
-     * @throws \InvalidArgumentException
+     * @param \CarbonV3\Carbon|\DateTimeInterface|string|null $date   instance to compare with or null to use current day.
      *
      * @return bool
      */
@@ -564,9 +594,9 @@ trait Comparison
      * ```
      *
      * @param string                                 $unit singular unit string
-     * @param \Carbon\Carbon|\DateTimeInterface|null $date instance to compare with or null to use current day.
+     * @param \CarbonV3\Carbon|\DateTimeInterface|null $date instance to compare with or null to use current day.
      *
-     * @throws \InvalidArgumentException
+     * @throws BadComparisonUnitException
      *
      * @return bool
      */
@@ -593,11 +623,11 @@ trait Comparison
 
         if (!isset($units[$unit])) {
             if (isset($this->$unit)) {
-                return $this->$unit === $this->resolveCarbon($date)->$unit;
+                return $this->resolveCarbon($date)->$unit === $this->$unit;
             }
 
             if ($this->localStrictModeEnabled ?? static::isStrictModeEnabled()) {
-                throw new BadUnitException($unit);
+                throw new BadComparisonUnitException($unit);
             }
 
             return false;
@@ -617,7 +647,7 @@ trait Comparison
      *
      * @param string $unit The unit to test.
      *
-     * @throws \BadMethodCallException
+     * @throws BadMethodCallException
      *
      * @return bool
      */
@@ -637,7 +667,7 @@ trait Comparison
      * Carbon::parse('2019-01-12')->isSameQuarter(Carbon::parse('2018-03-01'), false); // true
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|string|null $date       The instance to compare with or null to use current day.
+     * @param \CarbonV3\Carbon|\DateTimeInterface|string|null $date       The instance to compare with or null to use current day.
      * @param bool                                          $ofSameYear Check if it is the same month in the same year.
      *
      * @return bool
@@ -660,7 +690,7 @@ trait Comparison
      * Carbon::parse('2019-01-12')->isSameMonth(Carbon::parse('2018-01-01'), false); // true
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|null $date       The instance to compare with or null to use the current date.
+     * @param \CarbonV3\Carbon|\DateTimeInterface|null $date       The instance to compare with or null to use the current date.
      * @param bool                                   $ofSameYear Check if it is the same month in the same year.
      *
      * @return bool
@@ -687,8 +717,8 @@ trait Comparison
      */
     public function isDayOfWeek($dayOfWeek)
     {
-        if (is_string($dayOfWeek) && defined($constant = static::class.'::'.strtoupper($dayOfWeek))) {
-            $dayOfWeek = constant($constant);
+        if (\is_string($dayOfWeek) && \defined($constant = static::class.'::'.strtoupper($dayOfWeek))) {
+            $dayOfWeek = \constant($constant);
         }
 
         return $this->dayOfWeek === $dayOfWeek;
@@ -705,7 +735,7 @@ trait Comparison
      * Carbon::parse('2019-06-05')->isBirthday(Carbon::parse('2001-06-06')); // false
      * ```
      *
-     * @param \Carbon\Carbon|\DateTimeInterface|null $date The instance to compare with or null to use current day.
+     * @param \CarbonV3\Carbon|\DateTimeInterface|null $date The instance to compare with or null to use current day.
      *
      * @return bool
      */
@@ -828,8 +858,6 @@ trait Comparison
      * Carbon::hasFormat('13:12:45', 'h:i:s'); // false
      * ```
      *
-     * @SuppressWarnings(PHPMD.EmptyCatchBlock)
-     *
      * @param string $date
      * @param string $format
      *
@@ -837,39 +865,60 @@ trait Comparison
      */
     public static function hasFormat($date, $format)
     {
+        // createFromFormat() is known to handle edge cases silently.
+        // E.g. "1975-5-1" (Y-n-j) will still be parsed correctly when "Y-m-d" is supplied as the format.
+        // To ensure we're really testing against our desired format, perform an additional regex validation.
+
+        return self::matchFormatPattern((string) $date, preg_quote((string) $format, '/'), static::$regexFormats);
+    }
+
+    /**
+     * Checks if the (date)time string is in a given format.
+     *
+     * @example
+     * ```
+     * Carbon::hasFormatWithModifiers('31/08/2015', 'd#m#Y'); // true
+     * Carbon::hasFormatWithModifiers('31/08/2015', 'm#d#Y'); // false
+     * ```
+     *
+     * @param string $date
+     * @param string $format
+     *
+     * @return bool
+     */
+    public static function hasFormatWithModifiers($date, $format): bool
+    {
+        return self::matchFormatPattern((string) $date, (string) $format, array_merge(static::$regexFormats, static::$regexFormatModifiers));
+    }
+
+    /**
+     * Checks if the (date)time string is in a given format and valid to create a
+     * new instance.
+     *
+     * @example
+     * ```
+     * Carbon::canBeCreatedFromFormat('11:12:45', 'h:i:s'); // true
+     * Carbon::canBeCreatedFromFormat('13:12:45', 'h:i:s'); // false
+     * ```
+     *
+     * @param string $date
+     * @param string $format
+     *
+     * @return bool
+     */
+    public static function canBeCreatedFromFormat($date, $format)
+    {
         try {
             // Try to create a DateTime object. Throws an InvalidArgumentException if the provided time string
             // doesn't match the format in any way.
-            static::rawCreateFromFormat($format, $date);
-
-            // createFromFormat() is known to handle edge cases silently.
-            // E.g. "1975-5-1" (Y-n-j) will still be parsed correctly when "Y-m-d" is supplied as the format.
-            // To ensure we're really testing against our desired format, perform an additional regex validation.
-
-            // Preg quote, but remove escaped backslashes since we'll deal with escaped characters in the format string.
-            $quotedFormat = str_replace('\\\\', '\\', preg_quote($format, '/'));
-
-            // Build the regex string
-            $regex = '';
-
-            for ($i = 0; $i < strlen($quotedFormat); ++$i) {
-                // Backslash – the next character does not represent a date token so add it on as-is and continue.
-                // We're doing an extra ++$i here to increment the loop by 2.
-                if ($quotedFormat[$i] === '\\') {
-                    $char = $quotedFormat[++$i];
-                    $regex .= $char === '\\' ? '\\\\' : $char;
-
-                    continue;
-                }
-
-                $regex .= strtr($quotedFormat[$i], static::$regexFormats);
+            if (!static::rawCreateFromFormat($format, $date)) {
+                return false;
             }
-
-            return (bool) preg_match('/^'.str_replace('/', '\\/', $regex).'$/', $date);
         } catch (InvalidArgumentException $e) {
+            return false;
         }
 
-        return false;
+        return static::hasFormatWithModifiers($date, $format);
     }
 
     /**
@@ -896,12 +945,12 @@ trait Comparison
      *
      * @return bool
      */
-    public function is($tester)
+    public function is(string $tester)
     {
         $tester = trim($tester);
 
         if (preg_match('/^\d+$/', $tester)) {
-            return $this->year === intval($tester);
+            return $this->year === (int) $tester;
         }
 
         if (preg_match('/^\d{3,}-\d{1,2}$/', $tester)) {
@@ -916,9 +965,9 @@ trait Comparison
 
         /* @var CarbonInterface $max */
         $median = static::parse('5555-06-15 12:30:30.555555')->modify($modifier);
-        $current = $this->copy();
+        $current = $this->avoidMutation();
         /* @var CarbonInterface $other */
-        $other = $this->copy()->modify($modifier);
+        $other = $this->avoidMutation()->modify($modifier);
 
         if ($current->eq($other)) {
             return true;
@@ -953,7 +1002,7 @@ trait Comparison
         ];
 
         foreach ($units as $unit => [$minimum, $startUnit]) {
-            if ($median->$unit === $minimum) {
+            if ($minimum === $median->$unit) {
                 $current = $current->startOf($startUnit);
 
                 break;
@@ -961,5 +1010,61 @@ trait Comparison
         }
 
         return $current->eq($other);
+    }
+
+    /**
+     * Checks if the (date)time string is in a given format with
+     * given list of pattern replacements.
+     *
+     * @example
+     * ```
+     * Carbon::hasFormat('11:12:45', 'h:i:s'); // true
+     * Carbon::hasFormat('13:12:45', 'h:i:s'); // false
+     * ```
+     *
+     * @param string $date
+     * @param string $format
+     * @param array  $replacements
+     *
+     * @return bool
+     */
+    private static function matchFormatPattern(string $date, string $format, array $replacements): bool
+    {
+        // Preg quote, but remove escaped backslashes since we'll deal with escaped characters in the format string.
+        $regex = str_replace('\\\\', '\\', $format);
+        // Replace not-escaped letters
+        $regex = preg_replace_callback(
+            '/(?<!\\\\)((?:\\\\{2})*)(['.implode('', array_keys($replacements)).'])/',
+            function ($match) use ($replacements) {
+                return $match[1].strtr($match[2], $replacements);
+            },
+            $regex
+        );
+        // Replace escaped letters by the letter itself
+        $regex = preg_replace('/(?<!\\\\)((?:\\\\{2})*)\\\\(\w)/', '$1$2', $regex);
+        // Escape not escaped slashes
+        $regex = preg_replace('#(?<!\\\\)((?:\\\\{2})*)/#', '$1\\/', $regex);
+
+        return (bool) @preg_match('/^'.$regex.'$/', $date);
+    }
+
+    /**
+     * Returns true if the date was created using CarbonImmutable::startOfTime()
+     *
+     * @return bool
+     */
+    public function isStartOfTime(): bool
+    {
+        return $this->startOfTime ?? false;
+    }
+
+    /**
+     * Returns true if the date was created using CarbonImmutable::endOfTime()
+     *
+     * @return bool
+     */
+    public function isEndOfTime(): bool
+    {
+        return $this->endOfTime ?? false;
     }
 }
