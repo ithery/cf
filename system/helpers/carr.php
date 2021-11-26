@@ -43,6 +43,19 @@ class carr {
     }
 
     /**
+     * Determines if an array is a list.
+     *
+     * An array is a "list" if all array keys are sequential integers starting from 0 with no gaps in between.
+     *
+     * @param array $array
+     *
+     * @return bool
+     */
+    public static function isList($array) {
+        return !self::isAssoc($array);
+    }
+
+    /**
      * Alias of isAssoc.
      *
      * @param array $value array to check
@@ -794,6 +807,29 @@ class carr {
     }
 
     /**
+     * Conditionally compile classes from an array into a CSS class list.
+     *
+     * @param array $array
+     *
+     * @return string
+     */
+    public static function toCssClasses($array) {
+        $classList = static::wrap($array);
+
+        $classes = [];
+
+        foreach ($classList as $class => $constraint) {
+            if (is_numeric($class)) {
+                $classes[] = $constraint;
+            } elseif ($constraint) {
+                $classes[] = $class;
+            }
+        }
+
+        return implode(' ', $classes);
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param array    $array
@@ -1047,6 +1083,38 @@ class carr {
     }
 
     /**
+     * Determine if any of the keys exist in an array using "dot" notation.
+     *
+     * @param \ArrayAccess|array $array
+     * @param string|array       $keys
+     *
+     * @return bool
+     */
+    public static function hasAny($array, $keys) {
+        if (is_null($keys)) {
+            return false;
+        }
+
+        $keys = (array) $keys;
+
+        if (!$array) {
+            return false;
+        }
+
+        if ($keys === []) {
+            return false;
+        }
+
+        foreach ($keys as $key) {
+            if (static::has($array, $key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Flatten a multi-dimensional associative array with dots.
      *
      * @param array  $array
@@ -1063,6 +1131,23 @@ class carr {
             } else {
                 $results[$prepend . $key] = $value;
             }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Convert a flatten "dot" notation array into an expanded array.
+     *
+     * @param iterable $array
+     *
+     * @return array
+     */
+    public static function undot($array) {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            static::set($results, $key, $value);
         }
 
         return $results;
