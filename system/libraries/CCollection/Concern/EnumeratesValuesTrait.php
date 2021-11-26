@@ -923,7 +923,7 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      */
     public function __get($key) {
         if (!in_array($key, static::$proxies)) {
-            throw new Exception("Property [{$key}] does not exist on this collection instance.");
+            throw new \Exception("Property [{$key}] does not exist on this collection instance.");
         }
 
         return new CBase_HigherOrderCollectionProxy($this, $key);
