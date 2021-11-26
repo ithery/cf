@@ -1,5 +1,5 @@
 <?php
-interface CBase_Contract_CanBeEscapedWhenCastToString {
+interface CBase_Contract_CanBeEscapedWhenCastToStringInterface {
     /**
      * Indicate that the object's string representation should be escaped when __toString is invoked.
      *
