@@ -892,7 +892,8 @@ trait Date {
         switch (true) {
             case isset($formats[$name]):
                 $format = $formats[$name];
-                $method = str_starts_with($format, '%') ? 'formatLocalized' : 'rawFormat';
+                $strStartsWithClosure = \function_exists('str_starts_with') ? \Closure::fromCallable('str_starts_with') : \Closure::fromCallable(['cstr','startsWith']);
+                $method = $strStartsWithClosure($format, '%') ? 'formatLocalized' : 'rawFormat';
                 $value = $this->$method($format);
 
                 return is_numeric($value) ? (int) $value : $value;
@@ -1132,7 +1133,8 @@ trait Date {
             case 'microseconds':
             case 'microsecond':
             case 'micro':
-                if (str_starts_with($name, 'milli')) {
+                $strStartsWithClosure = \function_exists('str_starts_with') ? \Closure::fromCallable('str_starts_with') : \Closure::fromCallable(['cstr','startsWith']);
+                if ($strStartsWithClosure($name, 'milli')) {
                     $value *= 1000;
                 }
 
@@ -2569,8 +2571,8 @@ trait Date {
                 // Try next
             }
         }
-
-        if (str_starts_with($unit, 'isCurrent')) {
+        $strStartsWithClosure = \function_exists('str_starts_with') ? \Closure::fromCallable('str_starts_with') : \Closure::fromCallable(['cstr','startsWith']);
+        if ($strStartsWithClosure($unit, 'isCurrent')) {
             try {
                 return $this->isCurrentUnit(strtolower(substr($unit, 9)));
             } catch (BadComparisonUnitException|BadMethodCallException $exception) {

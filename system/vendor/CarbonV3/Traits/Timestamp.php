@@ -177,8 +177,8 @@ trait Timestamp
         if (\is_int($numbers) || \is_float($numbers)) {
             $numbers = number_format($numbers, $decimals, '.', '');
         }
-
-        $sign = str_starts_with($numbers, '-') ? -1 : 1;
+        $strStartsWithClosure = \function_exists('str_starts_with') ? \Closure::fromCallable('str_starts_with') : \Closure::fromCallable(['cstr','startsWith']);
+        $sign = $strStartsWithClosure($numbers, '-') ? -1 : 1;
         $integer = 0;
         $decimal = 0;
 
