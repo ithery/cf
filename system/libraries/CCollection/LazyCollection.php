@@ -1,7 +1,8 @@
 <?php
 
-class CCollection_LazyCollection implements CInterface_Enumerable {
-    use CCollection_Concern_EnumeratesValuesTrait, CTrait_Macroable;
+class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contract_CanBeEscapedWhenCastToStringInterface {
+    use CCollection_Concern_EnumeratesValuesTrait;
+    use CTrait_Macroable;
 
     /**
      * The source from which to generate items.
@@ -21,7 +22,7 @@ class CCollection_LazyCollection implements CInterface_Enumerable {
         if ($source instanceof Closure || $source instanceof self) {
             $this->source = $source;
         } elseif (is_null($source)) {
-            $this->source = static::empty();
+            $this->source = static::createEmpty();
         } else {
             $this->source = $this->getArrayableItems($source);
         }
@@ -990,7 +991,7 @@ class CCollection_LazyCollection implements CInterface_Enumerable {
      */
     public function chunk($size) {
         if ($size <= 0) {
-            return static::empty();
+            return static::createEmpty();
         }
 
         return new static(function () use ($size) {
@@ -1231,6 +1232,39 @@ class CCollection_LazyCollection implements CInterface_Enumerable {
                 $callback($value, $key);
 
                 yield $key => $value;
+            }
+        });
+    }
+
+    /**
+     * Convert a flatten "dot" notation array into an expanded array.
+     *
+     * @return static
+     */
+    public function undot() {
+        return $this->passthru('undot', []);
+    }
+
+    /**
+     * Return only unique items from the collection array.
+     *
+     * @param null|string|callable $key
+     * @param bool                 $strict
+     *
+     * @return static
+     */
+    public function unique($key = null, $strict = false) {
+        $callback = $this->valueRetriever($key);
+
+        return new static(function () use ($callback, $strict) {
+            $exists = [];
+
+            foreach ($this as $key => $item) {
+                if (!in_array($id = $callback($item, $key), $exists, $strict)) {
+                    yield $key => $item;
+
+                    $exists[] = $id;
+                }
             }
         });
     }

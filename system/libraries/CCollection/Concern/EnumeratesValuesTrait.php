@@ -31,6 +31,13 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 trait CCollection_Concern_EnumeratesValuesTrait {
     /**
+     * Indicates that the object's string representation should be escaped when __toString is invoked.
+     *
+     * @var bool
+     */
+    protected $escapeWhenCastingToString = false;
+
+    /**
      * The methods that can be proxied.
      *
      * @var string[]
@@ -797,28 +804,6 @@ trait CCollection_Concern_EnumeratesValuesTrait {
     }
 
     /**
-     * Return only unique items from the collection array.
-     *
-     * @param null|string|callable $key
-     * @param bool                 $strict
-     *
-     * @return static
-     */
-    public function unique($key = null, $strict = false) {
-        $callback = $this->valueRetriever($key);
-
-        $exists = [];
-
-        return $this->reject(function ($item, $key) use ($callback, $strict, &$exists) {
-            if (in_array($id = $callback($item, $key), $exists, $strict)) {
-                return true;
-            }
-
-            $exists[] = $id;
-        });
-    }
-
-    /**
      * Return only unique items from the collection array using strict comparison.
      *
      * @param null|string|callable $key
@@ -898,7 +883,22 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      * @return string
      */
     public function __toString() {
-        return $this->toJson();
+        return $this->escapeWhenCastingToString
+                    ? c::e($this->toJson())
+                    : $this->toJson();
+    }
+
+    /**
+     * Indicate that the model's string representation should be escaped when __toString is invoked.
+     *
+     * @param bool $escape
+     *
+     * @return $this
+     */
+    public function escapeWhenCastingToString($escape = true) {
+        $this->escapeWhenCastingToString = $escape;
+
+        return $this;
     }
 
     /**
