@@ -14,7 +14,7 @@ namespace Carbon\Exceptions;
 use Exception;
 use InvalidArgumentException as BaseInvalidArgumentException;
 
-class NotAPeriodException extends BaseInvalidArgumentException implements InvalidArgumentException {
+class InvalidFormatException extends BaseInvalidArgumentException implements InvalidArgumentException {
     /**
      * Constructor.
      *
