@@ -1381,7 +1381,7 @@ class carr {
      * // => 2
      * </code>
      */
-    public function findLastIndex(array $array, $predicate, $fromIndex = null) {
+    public static function findLastIndex(array $array, $predicate, $fromIndex = null) {
         $length = \count($array);
         $index = $fromIndex !== null ? $fromIndex : $length - 1;
         if ($index < 0) {

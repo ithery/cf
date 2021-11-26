@@ -283,10 +283,14 @@ final class CManager {
         self::$langObjectCallback = $callback;
     }
 
-    public static function addTransformCallback($method, callable $callback) {
+    public static function registerTransform($method, callable $callback) {
         $transformManager = CManager_Transform::instance();
 
         return $transformManager->addCallback($method, $callback);
+    }
+
+    public static function addTransformCallback($method, callable $callback) {
+        return static::registerTransform($method, $callback);
     }
 
     /**
