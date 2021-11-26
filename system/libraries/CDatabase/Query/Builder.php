@@ -1291,7 +1291,7 @@ class CDatabase_Query_Builder {
             $this->columns = ['*'];
         }
 
-        return new CBase_LazyCollection(function () {
+        return new CCollection_LazyCollection(function () {
             $result = $this->db->query($this->toSql(), $this->getBindings());
             foreach ($result as $row) {
                 yield $row;
