@@ -123,11 +123,6 @@ class carr {
      * @return mixed
      */
     public static function get($array, $key, $default = null) {
-        if ($array instanceof ArrayObject) {
-            // This is a workaround for inconsistent implementation of isset between PHP and HHVM
-            // See https://github.com/facebook/hhvm/issues/3437
-            return $array->offsetExists($key) ? $array->offsetGet($key) : $default;
-        }
         if (!static::accessible($array)) {
             return c::value($default);
         }
