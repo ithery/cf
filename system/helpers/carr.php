@@ -781,7 +781,11 @@ class carr {
      * @return array
      */
     public static function wrap($value) {
-        return !is_array($value) ? [$value] : $value;
+        if (is_null($value)) {
+            return [];
+        }
+
+        return is_array($value) ? $value : [$value];
     }
 
     /**
@@ -917,6 +921,9 @@ class carr {
      * @return bool
      */
     public static function exists($array, $key) {
+        if ($array instanceof CInterface_Enumerable || $array instanceof CCollection) {
+            return $array->has($key);
+        }
         if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
         }
@@ -1658,7 +1665,7 @@ class carr {
      * @return array
      */
     public static function prepend($array, $value, $key = null) {
-        if (is_null($key)) {
+        if (func_num_args() == 2) {
             array_unshift($array, $value);
         } else {
             $array = [$key => $value] + $array;
