@@ -515,7 +515,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function convertExceptionToArray($e) {
         $result = [
-            'message' => $this->isHttpException($e) ? $e->getMessage() : $e->getMessage(),
+            'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
         ];
         if ($this->isDebug()) {
             $trace = c::collect($e->getTrace())->map(function ($trace) {
