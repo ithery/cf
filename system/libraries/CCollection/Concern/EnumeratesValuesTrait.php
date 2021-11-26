@@ -29,7 +29,7 @@ use Symfony\Component\VarDumper\VarDumper;
  * @property-read CBase_HigherOrderCollectionProxy $unique
  * @property-read CBase_HigherOrderCollectionProxy $until
  */
-trait CTrait_EnumeratesValuesTrait {
+trait CCollection_Concern_EnumeratesValuesTrait {
     /**
      * The methods that can be proxied.
      *
@@ -111,7 +111,7 @@ trait CTrait_EnumeratesValuesTrait {
      * Create a new collection by invoking the callback a given amount of times.
      *
      * @param int           $number
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return static
      */
@@ -128,7 +128,7 @@ trait CTrait_EnumeratesValuesTrait {
     /**
      * Alias for the "avg" method.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -341,7 +341,7 @@ trait CTrait_EnumeratesValuesTrait {
     /**
      * Get the min value of a given key.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -360,7 +360,7 @@ trait CTrait_EnumeratesValuesTrait {
     /**
      * Get the max value of a given key.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -421,7 +421,7 @@ trait CTrait_EnumeratesValuesTrait {
     /**
      * Get the sum of the given values.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -439,8 +439,8 @@ trait CTrait_EnumeratesValuesTrait {
      * Apply the callback if the value is truthy.
      *
      * @param bool|mixed    $value
-     * @param callable|null $callback
-     * @param callable|null $default
+     * @param null|callable $callback
+     * @param null|callable $default
      *
      * @return static|mixed
      */
@@ -463,7 +463,7 @@ trait CTrait_EnumeratesValuesTrait {
      * Apply the callback if the collection is empty.
      *
      * @param callable      $callback
-     * @param callable|null $default
+     * @param null|callable $default
      *
      * @return static|mixed
      */
@@ -475,7 +475,7 @@ trait CTrait_EnumeratesValuesTrait {
      * Apply the callback if the collection is not empty.
      *
      * @param callable      $callback
-     * @param callable|null $default
+     * @param null|callable $default
      *
      * @return static|mixed
      */
@@ -488,7 +488,7 @@ trait CTrait_EnumeratesValuesTrait {
      *
      * @param bool          $value
      * @param callable      $callback
-     * @param callable|null $default
+     * @param null|callable $default
      *
      * @return static|mixed
      */
@@ -500,7 +500,7 @@ trait CTrait_EnumeratesValuesTrait {
      * Apply the callback unless the collection is empty.
      *
      * @param callable      $callback
-     * @param callable|null $default
+     * @param null|callable $default
      *
      * @return static|mixed
      */
@@ -512,7 +512,7 @@ trait CTrait_EnumeratesValuesTrait {
      * Apply the callback unless the collection is not empty.
      *
      * @param callable      $callback
-     * @param callable|null $default
+     * @param null|callable $default
      *
      * @return static|mixed
      */
@@ -536,7 +536,7 @@ trait CTrait_EnumeratesValuesTrait {
     /**
      * Filter items where the value for the given key is null.
      *
-     * @param string|null $key
+     * @param null|string $key
      *
      * @return static
      */
@@ -547,7 +547,7 @@ trait CTrait_EnumeratesValuesTrait {
     /**
      * Filter items where the value for the given key is not null.
      *
-     * @param string|null $key
+     * @param null|string $key
      *
      * @return static
      */
@@ -718,6 +718,50 @@ trait CTrait_EnumeratesValuesTrait {
     }
 
     /**
+     * Reduce the collection to multiple aggregate values.
+     *
+     * @param callable $callback
+     * @param mixed    ...$initial
+     *
+     * @throws \UnexpectedValueException
+     *
+     * @return array
+     *
+     * @deprecated Use "reduceSpread" instead
+     */
+    public function reduceMany(callable $callback, ...$initial) {
+        return $this->reduceSpread($callback, ...$initial);
+    }
+
+    /**
+     * Reduce the collection to multiple aggregate values.
+     *
+     * @param callable $callback
+     * @param mixed    ...$initial
+     *
+     * @throws \UnexpectedValueException
+     *
+     * @return array
+     */
+    public function reduceSpread(callable $callback, ...$initial) {
+        $result = $initial;
+
+        foreach ($this as $key => $value) {
+            $result = call_user_func_array($callback, array_merge($result, [$value, $key]));
+
+            if (!is_array($result)) {
+                throw new UnexpectedValueException(sprintf(
+                    "%s::reduceMany expects reducer to return an array, but got a '%s' instead.",
+                    c::classBasename(static::class),
+                    gettype($result)
+                ));
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Reduce an associative collection to a single value.
      *
      * @param callable $callback
@@ -755,7 +799,7 @@ trait CTrait_EnumeratesValuesTrait {
     /**
      * Return only unique items from the collection array.
      *
-     * @param string|callable|null $key
+     * @param null|string|callable $key
      * @param bool                 $strict
      *
      * @return static
@@ -777,7 +821,7 @@ trait CTrait_EnumeratesValuesTrait {
     /**
      * Return only unique items from the collection array using strict comparison.
      *
-     * @param string|callable|null $key
+     * @param null|string|callable $key
      *
      * @return static
      */
@@ -919,7 +963,7 @@ trait CTrait_EnumeratesValuesTrait {
      * Get an operator checker callback.
      *
      * @param string      $key
-     * @param string|null $operator
+     * @param null|string $operator
      * @param mixed       $value
      *
      * @return \Closure
@@ -986,7 +1030,7 @@ trait CTrait_EnumeratesValuesTrait {
     /**
      * Get a value retrieving callback.
      *
-     * @param callable|string|null $value
+     * @param null|callable|string $value
      *
      * @return callable
      */
