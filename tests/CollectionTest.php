@@ -488,7 +488,6 @@ class CollectionTest extends TestCase {
         $data = new $collection([['name' => 'ither', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
         $this->assertSame('foobar', $data->implode('email'));
         $this->assertSame('foo,bar', $data->implode('email', ','));
-
         $data = new $collection(['ither', 'dayle']);
         $this->assertSame('itherdayle', $data->implode(''));
         $this->assertSame('ither,dayle', $data->implode(','));
@@ -501,6 +500,7 @@ class CollectionTest extends TestCase {
         $this->assertSame('foo,bar', $data->implode('email', ','));
 
         $data = new $collection([cstr::of('ither'), cstr::of('dayle')]);
+
         $this->assertSame('itherdayle', $data->implode(''));
         $this->assertSame('ither,dayle', $data->implode(','));
     }
@@ -887,7 +887,7 @@ class CollectionTest extends TestCase {
      * @dataProvider collectionClassProvider
      */
     public function testEmptyMethod($collection) {
-        $collection = $collection::empty();
+        $collection = $collection::createEmpty();
 
         $this->assertCount(0, $collection->all());
     }
@@ -1055,11 +1055,11 @@ class CollectionTest extends TestCase {
     }
 
     public function testTransform() {
-        $data = new CCollection(['first' => 'ither', 'last' => 'otwell']);
+        $data = new CCollection(['first' => 'crese', 'last' => 'nity']);
         $data->transform(function ($item, $key) {
             return $key . '-' . strrev($item);
         });
-        $this->assertEquals(['first' => 'first-rolyat', 'last' => 'last-llewto'], $data->all());
+        $this->assertEquals(['first' => 'first-eserc', 'last' => 'last-ytin'], $data->all());
     }
 
     /**
@@ -1084,14 +1084,14 @@ class CollectionTest extends TestCase {
      */
     public function testKeyByClosure($collection) {
         $data = new $collection([
-            ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
+            ['firstname' => 'Crese', 'lastname' => 'Nity', 'locale' => 'US'],
             ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
         ]);
         $result = $data->keyBy(function ($item, $key) {
             return strtolower($key . '-' . $item['firstname'] . $item['lastname']);
         });
         $this->assertEquals([
-            '0-cresenity' => ['firstname' => 'Taylor', 'lastname' => 'Otwell', 'locale' => 'US'],
+            '0-cresenity' => ['firstname' => 'Crese', 'lastname' => 'Nity', 'locale' => 'US'],
             '1-lucasmichot' => ['firstname' => 'Lucas', 'lastname' => 'Michot', 'locale' => 'FR'],
         ], $result->all());
     }

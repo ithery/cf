@@ -99,6 +99,7 @@ use Prophecy\Exception\Prediction\PredictionException;
 use Prophecy\Prophecy\MethodProphecy;
 use Prophecy\Prophecy\ObjectProphecy;
 use Prophecy\Prophet;
+use PHPUnit\Framework\Exception\Exception;
 use ReflectionClass;
 use ReflectionException;
 use SebastianBergmann\Comparator\Comparator;
@@ -2505,8 +2506,8 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
             }
             // @codeCoverageIgnoreEnd
 
-            if ($this->expectedException === 'PHPUnit\Framework\Exception' ||
-                $this->expectedException === '\PHPUnit\Framework\Exception' ||
+            if ($this->expectedException === 'PHPUnit\Framework\Exception\Exception' ||
+                $this->expectedException === '\PHPUnit\Framework\Exception\Exception' ||
                 $reflector->isSubclassOf(Exception::class)) {
                 $result = true;
             }
