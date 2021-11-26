@@ -1284,7 +1284,7 @@ class CDatabase_Query_Builder {
     /**
      * Get a lazy collection for the given query.
      *
-     * @return \CBase_LazyCollection
+     * @return \CCollection_LazyCollection
      */
     public function cursor() {
         if (is_null($this->columns)) {
