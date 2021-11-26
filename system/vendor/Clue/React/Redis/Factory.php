@@ -171,7 +171,7 @@ class Factory {
             return $deferred->promise();
         }
 
-        return \React\Promise\Timer\timeout($deferred->promise(), $timeout, $this->loop)->then(null, function ($e) use ($uri) {
+        return \React\Promise\Timer\Timer::timeout($deferred->promise(), $timeout, $this->loop)->then(null, function ($e) use ($uri) {
             if ($e instanceof TimeoutException) {
                 throw new \RuntimeException(
                     'Connection to ' . $uri . ' timed out after ' . $e->getTimeout() . ' seconds (ETIMEDOUT)',
