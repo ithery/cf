@@ -406,7 +406,7 @@ class c {
 
         $results = [];
 
-        foreach (array_merge([$class => $class], class_parents($class)) as $class) {
+        foreach (array_reverse(class_parents($class)) + [$class => $class] as $class) {
             $results += self::traitUsesRecursive($class);
         }
 
