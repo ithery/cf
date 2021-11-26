@@ -62,7 +62,7 @@ class CWebSocket_Server_Logger_WebSocketLogger extends CWebSocket_Server_Logger 
      * @return void
      */
     public function onMessage(ConnectionInterface $connection, MessageInterface $message) {
-        $this->info("{$connection->app->id}: connection id {$connection->socketId} received message: {$message->getPayload()}.");
+        $this->info("{$connection->app->id}: {$connection->socketId} send message: {$message->getPayload()}.");
 
         $this->app->onMessage(CWebSocket_Server_Logger_ConnectionLogger::decorate($connection), $message);
     }
