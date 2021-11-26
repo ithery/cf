@@ -718,6 +718,50 @@ trait CCollection_Concern_EnumeratesValuesTrait {
     }
 
     /**
+     * Reduce the collection to multiple aggregate values.
+     *
+     * @param callable $callback
+     * @param mixed    ...$initial
+     *
+     * @throws \UnexpectedValueException
+     *
+     * @return array
+     *
+     * @deprecated Use "reduceSpread" instead
+     */
+    public function reduceMany(callable $callback, ...$initial) {
+        return $this->reduceSpread($callback, ...$initial);
+    }
+
+    /**
+     * Reduce the collection to multiple aggregate values.
+     *
+     * @param callable $callback
+     * @param mixed    ...$initial
+     *
+     * @throws \UnexpectedValueException
+     *
+     * @return array
+     */
+    public function reduceSpread(callable $callback, ...$initial) {
+        $result = $initial;
+
+        foreach ($this as $key => $value) {
+            $result = call_user_func_array($callback, array_merge($result, [$value, $key]));
+
+            if (!is_array($result)) {
+                throw new UnexpectedValueException(sprintf(
+                    "%s::reduceMany expects reducer to return an array, but got a '%s' instead.",
+                    c::classBasename(static::class),
+                    gettype($result)
+                ));
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Reduce an associative collection to a single value.
      *
      * @param callable $callback
