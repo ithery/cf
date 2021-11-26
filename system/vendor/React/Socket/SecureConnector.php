@@ -2,27 +2,26 @@
 
 namespace React\Socket;
 
-use React\EventLoop\LoopInterface;
 use React\Promise;
 use BadMethodCallException;
 use InvalidArgumentException;
 use UnexpectedValueException;
+use React\EventLoop\LoopInterface;
 
-final class SecureConnector implements ConnectorInterface
-{
+final class SecureConnector implements ConnectorInterface {
     private $connector;
+
     private $streamEncryption;
+
     private $context;
 
-    public function __construct(ConnectorInterface $connector, LoopInterface $loop, array $context = array())
-    {
+    public function __construct(ConnectorInterface $connector, LoopInterface $loop, array $context = []) {
         $this->connector = $connector;
         $this->streamEncryption = new StreamEncryption($loop, false);
         $this->context = $context;
     }
 
-    public function connect($uri)
-    {
+    public function connect($uri) {
         if (!\function_exists('stream_socket_enable_crypto')) {
             return Promise\reject(new \BadMethodCallException('Encryption not supported on your platform (HHVM < 3.8?)')); // @codeCoverageIgnore
         }
@@ -47,6 +46,7 @@ final class SecureConnector implements ConnectorInterface
 
             if (!$connection instanceof Connection) {
                 $connection->close();
+
                 throw new \UnexpectedValueException('Base connector does not use internal Connection class exposing stream resource');
             }
 

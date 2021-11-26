@@ -3,6 +3,7 @@
 namespace PhpOffice\PhpSpreadsheet\Reader;
 
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\Cell\Hyperlink;
 use PhpOffice\PhpSpreadsheet\Document\Properties;
 use PhpOffice\PhpSpreadsheet\NamedRange;
@@ -98,6 +99,19 @@ class Xlsx extends BaseReader
         }
 
         return $xl;
+    }
+
+    /**
+     * @param mixed $value
+     */
+    public static function testSimpleXml($value): SimpleXMLElement
+    {
+        return ($value instanceof SimpleXMLElement) ? $value : new SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><root></root>');
+    }
+
+    public static function getAttributes(?SimpleXMLElement $value, string $ns = ''): SimpleXMLElement
+    {
+        return self::testSimpleXml($value === null ? $value : $value->attributes($ns));
     }
 
     /**
@@ -898,6 +912,7 @@ class Xlsx extends BaseReader
                                 foreach ($xmlSheet->sheetData->row as $row) {
                                     $rowIndex = 1;
                                     foreach ($row->c as $c) {
+                                        $cAttr = self::getAttributes($c);
                                         $r = (string) $c['r'];
                                         if ($r == '') {
                                             $r = Coordinate::stringFromColumnIndex($rowIndex) . $cIndex;
@@ -972,38 +987,34 @@ class Xlsx extends BaseReader
                                                 break;
                                         }
 
-                                        // Check for numeric values
-                                        if (is_numeric($value) && $cellDataType != 's') {
-                                            if ($value == (int) $value) {
-                                                $value = (int) $value;
-                                            } elseif ($value == (float) $value) {
-                                                $value = (float) $value;
-                                            } elseif ($value == (float) $value) {
-                                                $value = (float) $value;
+                                        // read empty cells or the cells are not empty
+                                        if ($this->readEmptyCells || ($value !== null && $value !== '')) {
+                                            // Rich text?
+                                            if ($value instanceof RichText && $this->readDataOnly) {
+                                                $value = $value->getPlainText();
                                             }
-                                        }
 
-                                        // Rich text?
-                                        if ($value instanceof RichText && $this->readDataOnly) {
-                                            $value = $value->getPlainText();
-                                        }
+                                            $cell = $docSheet->getCell($r);
+                                            // Assign value
+                                            if ($cellDataType != '') {
+                                                // it is possible, that datatype is numeric but with an empty string, which result in an error
+                                                if ($cellDataType === DataType::TYPE_NUMERIC && $value === '') {
+                                                    $cellDataType = DataType::TYPE_STRING;
+                                                }
+                                                $cell->setValueExplicit($value, $cellDataType);
+                                            } else {
+                                                $cell->setValue($value);
+                                            }
+                                            if ($calculatedValue !== null) {
+                                                $cell->setCalculatedValue($calculatedValue);
+                                            }
 
-                                        $cell = $docSheet->getCell($r);
-                                        // Assign value
-                                        if ($cellDataType != '') {
-                                            $cell->setValueExplicit($value, $cellDataType);
-                                        } else {
-                                            $cell->setValue($value);
-                                        }
-                                        if ($calculatedValue !== null) {
-                                            $cell->setCalculatedValue($calculatedValue);
-                                        }
-
-                                        // Style information?
-                                        if ($c['s'] && !$this->readDataOnly) {
-                                            // no style index means 0, it seems
-                                            $cell->setXfIndex(isset($styles[(int) ($c['s'])]) ?
-                                                (int) ($c['s']) : 0);
+                                            // Style information?
+                                            if ($cAttr['s'] && !$this->readDataOnly) {
+                                                // no style index means 0, it seems
+                                                $cell->setXfIndex(isset($styles[(int) ($cAttr['s'])]) ?
+                                                    (int) ($cAttr['s']) : 0);
+                                            }
                                         }
                                         $rowIndex += 1;
                                     }
