@@ -84,10 +84,8 @@ class CFactory {
         return $rowf;
     }
 
-    public static function create_span($id = '') {
-        $span = CSpan::factory($id);
-
-        return $span;
+    public static function createSpan($id = '') {
+        return CElement_Factory::create(CElement_Element_Span::class, $id);
     }
 
     public static function create_img($id = '') {

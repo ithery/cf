@@ -9,7 +9,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CFormInputTimePicker extends CFormInput {
     use CTrait_Compat_Element_FormInput_Time,
         CTrait_Element_Property_Placeholder;
-
     protected $show_second;
 
     protected $template;
@@ -37,16 +36,19 @@ class CFormInputTimePicker extends CFormInput {
 
     public function set_show_meridian($bool) {
         $this->show_meridian = $bool;
+
         return $this;
     }
 
     public function set_show_second($bool) {
         $this->show_second = $bool;
+
         return $this;
     }
 
     public function set_minute_step($step) {
         $this->minute_step = $step;
+
         return $this;
     }
 
@@ -69,7 +71,7 @@ class CFormInputTimePicker extends CFormInput {
             $classes = ' ' . $classes;
         }
         $custom_css = $this->custom_css;
-        $custom_css = crenderer::render_style($custom_css);
+        $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
         }
@@ -77,17 +79,11 @@ class CFormInputTimePicker extends CFormInput {
         if (strlen($this->placeholder) > 0) {
             $placeholder = ' placeholder="' . $this->placeholder . '"';
         }
-        if ($this->bootstrap == '3.3') {
-            $classes = $classes . ' form-control timepicker';
-            $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
-        } else {
-            if ($this->bootstrap == '3') {
-                $classes = $classes . ' form-control ';
-            }
-            $html->appendln('<div class="bootstrap-timepicker">');
-            $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
-            $html->appendln('</div>');
-        }
+
+        $html->appendln('<div class="bootstrap-timepicker">');
+        $html->appendln('<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled ' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $custom_css . $addition_attribute . $placeholder . '>')->br();
+        $html->appendln('</div>');
+
         return $html->text();
     }
 

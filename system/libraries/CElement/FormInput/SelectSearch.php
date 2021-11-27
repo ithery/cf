@@ -136,10 +136,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if (is_array($c)) {
             $this->dropdownClasses = array_merge($c, $this->dropdownClasses);
         } else {
-            if ($this->bootstrap == '3.3') {
-                $c = str_replace('span', 'col-md-', $c);
-                $c = str_replace('row-fluid', 'row', $c);
-            }
             $this->dropdownClasses[] = $c;
         }
 

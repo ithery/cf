@@ -1,14 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Apr 14, 2019, 11:22:25 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Apr 14, 2019, 11:22:25 AM
  */
+//@codingStandardsIgnoreStart
 trait CTrait_Compat_Validation_Validator {
-
+    /**
+     * @deprecated 1.2
+     */
     public function first_error() {
         return $this->errors()->first();
     }
@@ -20,7 +24,6 @@ trait CTrait_Compat_Validation_Validator {
         }
 
         if (isset($rules[$attributeName])) {
-
             if (is_array($rules[$attributeName])) {
                 $rules[$attributeName][] = $rule;
             } else {
@@ -31,7 +34,7 @@ trait CTrait_Compat_Validation_Validator {
         }
         $this->setRules($rules);
         $this->customMessages[$attributeName . '.' . $rule] = $customMessage;
+
         return $this;
     }
-
 }
