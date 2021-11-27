@@ -82,6 +82,31 @@ class CQueue_Dispatcher implements CQueue_QueueingDispatcherInterface {
      * @return mixed
      */
     public function dispatchNow($command, $handler = null) {
+        $uses = c::classUsesRecursive($command);
+
+        if (in_array(CQueue_Trait_InteractsWithQueue::class, $uses)
+            && in_array(CQueue_Trait_QueueableTrait::class, $uses)
+            && !$command->job
+        ) {
+            $command->setJob(new CQueue_Job_SyncJob($this->container, json_encode([]), 'sync', 'sync'));
+        }
+
+        if ($handler || $handler = $this->getCommandHandler($command)) {
+            $callback = function ($command) use ($handler) {
+                $method = method_exists($handler, 'execute') ? 'execute' : (method_exists($handler, 'handle') ? 'handle' : '__invoke');
+
+                return $handler->{$method}($command);
+            };
+        } else {
+            $callback = function ($command) {
+                $method = method_exists($command, 'execute') ? 'execute' : (method_exists($command, 'handle') ? 'handle' : '__invoke');
+
+                return $this->container->call([$command, $method]);
+            };
+        }
+
+        return $this->pipeline->send($command)->through($this->pipes)->then($callback);
+
         if ($handler || $handler = $this->getCommandHandler($command)) {
             $callback = function ($command) use ($handler) {
                 return $handler->handle($command);

@@ -30,12 +30,13 @@ class CHTTP {
         if (self::$request == null) {
             self::$request = CHTTP_Request::capture();
         }
+
         return self::$request;
     }
 
     /**
-     * @param mixed $content
-     * @param mixed $status
+     * @param string $content
+     * @param int    $status
      *
      * @return CHTTP_Response
      */
@@ -103,6 +104,7 @@ class CHTTP {
         if (self::$kernel == null) {
             self::$kernel = new CHTTP_Kernel();
         }
+
         return self::$kernel;
     }
 
@@ -121,6 +123,7 @@ class CHTTP {
                 $config['same_site']
             );
         }
+
         return static::$cookie;
     }
 

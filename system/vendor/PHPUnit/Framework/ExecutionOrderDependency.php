@@ -7,22 +7,22 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework;
 
-use function array_filter;
-use function array_map;
-use function array_values;
+use function trim;
 use function count;
+use function strpos;
 use function explode;
 use function in_array;
-use function strpos;
-use function trim;
+use function array_map;
+use function array_filter;
+use function array_values;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class ExecutionOrderDependency
-{
+final class ExecutionOrderDependency {
     /**
      * @var string
      */
@@ -43,17 +43,16 @@ final class ExecutionOrderDependency
      */
     private $useDeepClone = false;
 
-    public static function createFromDependsAnnotation($className, $annotation)
-    {
+    public static function createFromDependsAnnotation($className, $annotation) {
         // Split clone option and target
         $parts = explode(' ', trim($annotation), 2);
 
         if (count($parts) === 1) {
             $cloneOption = '';
-            $target      = $parts[0];
+            $target = $parts[0];
         } else {
             $cloneOption = $parts[0];
-            $target      = $parts[1];
+            $target = $parts[1];
         }
 
         // Prefix provided class for targets assumed to be in scope
@@ -69,8 +68,7 @@ final class ExecutionOrderDependency
      *
      * @psalm-return list<ExecutionOrderDependency>
      */
-    public static function filterInvalid(array $dependencies)
-    {
+    public static function filterInvalid(array $dependencies) {
         return array_values(
             array_filter(
                 $dependencies,
@@ -87,8 +85,7 @@ final class ExecutionOrderDependency
      *
      * @psalm-return list<ExecutionOrderDependency>
      */
-    public static function mergeUnique(array $existing, array $additional)
-    {
+    public static function mergeUnique(array $existing, array $additional) {
         $existingTargets = array_map(
             static function ($dependency) {
                 return $dependency->getTarget();
@@ -102,7 +99,7 @@ final class ExecutionOrderDependency
             }
 
             $existingTargets[] = $dependency->getTarget();
-            $existing[]        = $dependency;
+            $existing[] = $dependency;
         }
 
         return $existing;
@@ -114,8 +111,7 @@ final class ExecutionOrderDependency
      *
      * @psalm-return list<ExecutionOrderDependency>
      */
-    public static function diff(array $left, array $right)
-    {
+    public static function diff(array $left, array $right) {
         if ($right === []) {
             return $left;
         }
@@ -124,7 +120,7 @@ final class ExecutionOrderDependency
             return [];
         }
 
-        $diff         = [];
+        $diff = [];
         $rightTargets = array_map(
             static function ($dependency) {
                 return $dependency->getTarget();
@@ -143,8 +139,7 @@ final class ExecutionOrderDependency
         return $diff;
     }
 
-    public function __construct($classOrCallableName, $methodName = null, $option = null)
-    {
+    public function __construct($classOrCallableName, $methodName = null, $option = null) {
         if ($classOrCallableName === '') {
             return;
         }
@@ -152,7 +147,7 @@ final class ExecutionOrderDependency
         if (strpos($classOrCallableName, '::') !== false) {
             list($this->className, $this->methodName) = explode('::', $classOrCallableName);
         } else {
-            $this->className  = $classOrCallableName;
+            $this->className = $classOrCallableName;
             $this->methodName = !empty($methodName) ? $methodName : 'class';
         }
 
@@ -163,41 +158,34 @@ final class ExecutionOrderDependency
         }
     }
 
-    public function __toString()
-    {
+    public function __toString() {
         return $this->getTarget();
     }
 
-    public function isValid()
-    {
+    public function isValid() {
         // Invalid dependencies can be declared and are skipped by the runner
         return $this->className !== '' && $this->methodName !== '';
     }
 
-    public function useShallowClone()
-    {
+    public function useShallowClone() {
         return $this->useShallowClone;
     }
 
-    public function useDeepClone()
-    {
+    public function useDeepClone() {
         return $this->useDeepClone;
     }
 
-    public function targetIsClass()
-    {
+    public function targetIsClass() {
         return $this->methodName === 'class';
     }
 
-    public function getTarget()
-    {
+    public function getTarget() {
         return $this->isValid()
             ? $this->className . '::' . $this->methodName
             : '';
     }
 
-    public function getTargetClassName()
-    {
+    public function getTargetClassName() {
         return $this->className;
     }
 }

@@ -22,9 +22,9 @@ namespace Symfony\Component\HttpFoundation;
  *
  * @author Igor Wiedler <igor@wiedler.ch>
  */
-class JsonResponse extends Response
-{
+class JsonResponse extends Response {
     protected $data;
+
     protected $callback;
 
     // Encode <, >, ', &, and " characters in the JSON, making it also safe to be embedded into HTML.
@@ -36,8 +36,7 @@ class JsonResponse extends Response
      * @param int   $status  The response status code
      * @param array $headers An array of response headers
      */
-    public function __construct($data = null, $status = 200, $headers = array())
-    {
+    public function __construct($data = null, $status = 200, $headers = []) {
         parent::__construct('', $status, $headers);
 
         if (null === $data) {
@@ -61,33 +60,31 @@ class JsonResponse extends Response
      *
      * @return static
      */
-    public static function create($data = null, $status = 200, $headers = array())
-    {
+    public static function create($data = null, $status = 200, $headers = []) {
         return new static($data, $status, $headers);
     }
 
     /**
      * Sets the JSONP callback.
      *
-     * @param string|null $callback The JSONP callback or null to use none
-     *
-     * @return $this
+     * @param null|string $callback The JSONP callback or null to use none
      *
      * @throws \InvalidArgumentException When the callback name is not valid
+     *
+     * @return $this
      */
-    public function setCallback($callback = null)
-    {
+    public function setCallback($callback = null) {
         if (null !== $callback) {
             // partially token from http://www.geekality.net/2011/08/03/valid-javascript-identifier/
             // partially token from https://github.com/willdurand/JsonpCallbackValidator
             //      JsonpCallbackValidator is released under the MIT License. See https://github.com/willdurand/JsonpCallbackValidator/blob/v1.1.0/LICENSE for details.
             //      (c) William Durand <william.durand1@gmail.com>
             $pattern = '/^[$_\p{L}][$_\p{L}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*(?:\[(?:"(?:\\\.|[^"\\\])*"|\'(?:\\\.|[^\'\\\])*\'|\d+)\])*?$/u';
-            $reserved = array(
+            $reserved = [
                 'break', 'do', 'instanceof', 'typeof', 'case', 'else', 'new', 'var', 'catch', 'finally', 'return', 'void', 'continue', 'for', 'switch', 'while',
                 'debugger', 'function', 'this', 'with', 'default', 'if', 'throw', 'delete', 'in', 'try', 'class', 'enum', 'extends', 'super',  'const', 'export',
                 'import', 'implements', 'let', 'private', 'public', 'yield', 'interface', 'package', 'protected', 'static', 'null', 'true', 'false',
-            );
+            ];
             $parts = explode('.', $callback);
             foreach ($parts as $part) {
                 if (!preg_match($pattern, $part) || in_array($part, $reserved, true)) {
@@ -106,12 +103,11 @@ class JsonResponse extends Response
      *
      * @param mixed $data
      *
-     * @return $this
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return $this
      */
-    public function setData($data = array())
-    {
+    public function setData($data = []) {
         if (defined('HHVM_VERSION')) {
             // HHVM does not trigger any warnings and let exceptions
             // thrown from a JsonSerializable object pass through.
@@ -148,6 +144,7 @@ class JsonResponse extends Response
                 if (\PHP_VERSION_ID < 50500 || !interface_exists('JsonSerializable', false)) {
                     restore_error_handler();
                 }
+
                 throw $e;
             } catch (\Exception $e) {
                 if (\PHP_VERSION_ID < 50500 || !interface_exists('JsonSerializable', false)) {
@@ -156,6 +153,7 @@ class JsonResponse extends Response
                 if (interface_exists('JsonSerializable', false) && 'Exception' === get_class($e) && 0 === strpos($e->getMessage(), 'Failed calling ')) {
                     throw $e->getPrevious() ?: $e;
                 }
+
                 throw $e;
             }
         }
@@ -174,8 +172,7 @@ class JsonResponse extends Response
      *
      * @return int
      */
-    public function getEncodingOptions()
-    {
+    public function getEncodingOptions() {
         return $this->encodingOptions;
     }
 
@@ -186,8 +183,7 @@ class JsonResponse extends Response
      *
      * @return $this
      */
-    public function setEncodingOptions($encodingOptions)
-    {
+    public function setEncodingOptions($encodingOptions) {
         $this->encodingOptions = (int) $encodingOptions;
 
         return $this->setData(json_decode($this->data));
@@ -198,8 +194,7 @@ class JsonResponse extends Response
      *
      * @return $this
      */
-    protected function update()
-    {
+    protected function update() {
         if (null !== $this->callback) {
             // Not using application/javascript for compatibility reasons with older browsers.
             $this->headers->set('Content-Type', 'text/javascript');

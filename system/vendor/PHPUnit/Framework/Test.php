@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework;
 
 use Countable;
@@ -14,8 +15,7 @@ use Countable;
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-interface Test extends Countable
-{
+interface Test extends Countable {
     /**
      * Runs a test and collects its result in a TestResult instance.
      */

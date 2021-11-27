@@ -76,7 +76,7 @@ class CAuth_Manager {
      *
      * @throws \InvalidArgumentException
      *
-     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
+     * @return \CAuth_Contract_GuardInterface|\CAuth_Contract_StatefulGuardInterface
      */
     protected function resolve($name) {
         $config = $this->getConfig($name);
