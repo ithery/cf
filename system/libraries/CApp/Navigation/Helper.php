@@ -41,10 +41,20 @@ class CApp_Navigation_Helper {
             $navController = carr::get($nav, 'controller', '');
 
             $navAlias = carr::wrap(carr::get($nav, 'alias', ''));
+            $navAliases = carr::wrap(carr::get($nav, 'aliases', []));
             $navUri = carr::get($nav, 'uri', '');
+            $routerUri = $path . $controller . '/' . $method;
 
             if ($navUri != null) {
-                return trim($navUri, '/') == trim(CFRouter::$current_uri, '/');
+                if (trim($navUri, '/') == trim($routerUri, '/')) {
+                    return $nav;
+                }
+            }
+
+            if (is_array($navAliases)) {
+                if (in_array(trim($routerUri, '/'), $navAliases)) {
+                    return $nav;
+                }
             }
 
             if ($navController != ''
