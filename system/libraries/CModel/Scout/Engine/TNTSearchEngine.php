@@ -1,11 +1,9 @@
 <?php
 
-use TeamTNT\TNTSearch\Exceptions\IndexNotFoundException;
 use TeamTNT\TNTSearch\TNTSearch;
+use TeamTNT\TNTSearch\Exceptions\IndexNotFoundException;
 
 class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
-    private $filters;
-
     /**
      * @var TNTSearch
      */
@@ -15,6 +13,8 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
      * @var CModel_Scout_Builder
      */
     protected $builder;
+
+    private $filters;
 
     /**
      * Create a new engine instance.
@@ -158,10 +158,12 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
         if (isset($this->tnt->config['searchBoolean']) ? $this->tnt->config['searchBoolean'] : false) {
             $res = $this->tnt->searchBoolean($builder->query, $limit);
             c::event(new CModel_Scout_Event_TNTSearch_SearchPerformed($builder, $res, true));
+
             return $res;
         } else {
             $res = $this->tnt->search($builder->query, $limit);
             c::event(new CModel_Scout_Event_TNTSearch_SearchPerformed($builder, $res));
+
             return $res;
         }
     }
@@ -211,11 +213,11 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
      * @param mixed   $results
      * @param \CModel $model
      *
-     * @return LazyCollection
+     * @return CCollection_LazyCollection
      */
     public function lazyMap(CModel_Scout_Builder $builder, $results, $model) {
         if (empty($results['ids'])) {
-            return CBase_LazyCollection::make();
+            return CCollection_LazyCollection::make();
         }
 
         $keys = c::collect($results['ids'])->values()->all();
@@ -295,7 +297,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
         $indexName = $model->searchableAs();
 
         if (!file_exists($this->tnt->config['storage'] . "/{$indexName}.index")) {
-            $indexer = $this->tnt->createIndex("$indexName.index");
+            $indexer = $this->tnt->createIndex("${indexName}.index");
             $indexer->setDatabaseHandle($model->getConnection()->getPdo());
             $indexer->setPrimaryKey($model->getKeyName());
         }
@@ -366,6 +368,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
         // config('scout.soft_delete') is false
         if (!$this->usesSoftDelete($model) || !CF::config('model.scout.soft_delete', true)) {
             unset($this->builder->wheres['__soft_deleted']);
+
             return $builder;
         }
 
@@ -379,16 +382,17 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
         }
 
         /**
-         * When __soft_deleted is 1 then return only soft deleted entries
+         * When __soft_deleted is 1 then return only soft deleted entries.
          */
         if ($this->builder->wheres['__soft_deleted']) {
             $builder = $builder->onlyTrashed();
         }
 
         /**
-         * Returns all undeleted entries, default behaviour
+         * Returns all undeleted entries, default behaviour.
          */
         unset($this->builder->wheres['__soft_deleted']);
+
         return $builder;
     }
 
@@ -407,6 +411,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
         })->reduce(function ($builder, $where) {
             // separate key, value again
             list($key, $value) = $where;
+
             return $builder->where($key, $value);
         }, $builder);
     }
@@ -426,6 +431,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
         })->reduce(function ($builder, $orderBy) {
             // separate key, value again
             list($column, $direction) = $orderBy;
+
             return $builder->orderBy($column, $direction);
         }, $builder);
     }
@@ -451,9 +457,9 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
      * @param string $name
      * @param array  $options
      *
-     * @return mixed
-     *
      * @throws \Exception
+     *
+     * @return mixed
      */
     public function createIndex($name, array $options = []) {
         throw new Exception('TNT indexes are created automatically upon adding objects.');
@@ -471,10 +477,10 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
     }
 
     /**
-     * Adds a filter
+     * Adds a filter.
      *
      * @param string   $name
-     * @param callback $callback
+     * @param callable $callback
      *
      * @return void
      */
@@ -486,7 +492,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
     }
 
     /**
-     * Returns an array of filters
+     * Returns an array of filters.
      *
      * @param string $name
      *
@@ -497,7 +503,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
     }
 
     /**
-     * Returns a string on which a filter is applied
+     * Returns a string on which a filter is applied.
      *
      * @param string $name
      * @param string $result
@@ -515,6 +521,7 @@ class CModel_Scout_Engine_TNTSearchEngine extends CModel_Scout_EngineAbstract {
 
             $result = call_user_func($callback, $result, $model);
         }
+
         return $result;
     }
 }

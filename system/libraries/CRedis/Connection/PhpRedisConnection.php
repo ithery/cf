@@ -22,7 +22,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * Create a new PhpRedis connection.
      *
      * @param \Redis        $client
-     * @param callable|null $connector
+     * @param null|callable $connector
      * @param array         $config
      *
      * @return void
@@ -38,10 +38,11 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      *
      * @param string $key
      *
-     * @return string|null
+     * @return null|string
      */
     public function get($key) {
         $result = $this->command('get', [$key]);
+
         return $result !== false ? $result : null;
     }
 
@@ -63,9 +64,9 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      *
      * @param string      $key
      * @param mixed       $value
-     * @param string|null $expireResolution
-     * @param int|null    $expireTTL
-     * @param string|null $flag
+     * @param null|string $expireResolution
+     * @param null|int    $expireTTL
+     * @param null|string $flag
      *
      * @return bool
      */
@@ -101,6 +102,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
         if (count($dictionary) === 1) {
             $dictionary = $dictionary[0];
         }
+
         return array_values($this->command('hmget', [$key, $dictionary]));
     }
 
@@ -119,6 +121,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
             $input = c::collect($dictionary);
             $dictionary = $input->nth(2)->combine($input->nth(2, 1))->toArray();
         }
+
         return $this->command('hmset', [$key, $dictionary]);
     }
 
@@ -153,10 +156,11 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      *
      * @param mixed $arguments
      *
-     * @return array|null
+     * @return null|array
      */
     public function blpop(...$arguments) {
         $result = $this->command('blpop', $arguments);
+
         return empty($result) ? null : $result;
     }
 
@@ -165,10 +169,11 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      *
      * @param mixed $arguments
      *
-     * @return array|null
+     * @return null|array
      */
     public function brpop(...$arguments) {
         $result = $this->command('brpop', $arguments);
+
         return empty($result) ? null : $result;
     }
 
@@ -176,7 +181,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * Removes and returns a random element from the set value at key.
      *
      * @param string   $key
-     * @param int|null $count
+     * @param null|int $count
      *
      * @return mixed|false
      */
@@ -200,6 +205,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
             }
         }
         $key = $this->applyPrefix($key);
+
         return $this->executeRaw(array_merge(['zadd', $key], $dictionary));
     }
 
@@ -220,6 +226,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
                 $options['limit']['count'],
             ];
         }
+
         return $this->command('zRangeByScore', [$key, $min, $max, $options]);
     }
 
@@ -240,6 +247,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
                 $options['limit']['count'],
             ];
         }
+
         return $this->command('zRevRangeByScore', [$key, $min, $max, $options]);
     }
 
@@ -372,24 +380,26 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
     /**
      * Execute commands in a pipeline.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return \Redis|array
      */
     public function pipeline(callable $callback = null) {
         $pipeline = $this->client()->pipeline();
+
         return is_null($callback) ? $pipeline : c::tap($pipeline, $callback)->exec();
     }
 
     /**
      * Execute commands in a transaction.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return \Redis|array
      */
     public function transaction(callable $callback = null) {
         $transaction = $this->client()->multi();
+
         return is_null($callback) ? $transaction : c::tap($transaction, $callback)->exec();
     }
 
@@ -459,7 +469,6 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * @return void
      */
     public function createSubscription($channels, Closure $callback, $method = 'subscribe') {
-        //
     }
 
     /**
@@ -471,9 +480,12 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
         if (!$this->client instanceof RedisCluster) {
             return $this->command('flushdb');
         }
-        foreach ($this->client->_masters() as $hostPort) {
-            list($host, $port) = $hostPort;
-            c::tap(new Redis)->connect($host, $port)->flushDb();
+        $client = $this->client;
+        if ($client instanceof RedisCluster) {
+            foreach ($client->_masters() as $hostPort) {
+                list($host, $port) = $hostPort;
+                c::tap(new Redis())->connect($host, $port)->flushDb();
+            }
         }
     }
 
@@ -494,9 +506,9 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      * @param string $method
      * @param array  $parameters
      *
-     * @return mixed
-     *
      * @throws \RedisException
+     *
+     * @return mixed
      */
     public function command($method, array $parameters = []) {
         try {
@@ -528,6 +540,7 @@ class CRedis_Connection_PhpRedisConnection extends CRedis_AbstractConnection {
      */
     private function applyPrefix($key) {
         $prefix = (string) $this->client->getOption(Redis::OPT_PREFIX);
+
         return $prefix . $key;
     }
 

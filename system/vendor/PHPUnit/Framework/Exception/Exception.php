@@ -7,13 +7,14 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\Exception;
 
-use function array_keys;
-use function get_object_vars;
-use PHPUnit\Util\Filter;
-use RuntimeException;
 use Throwable;
+use RuntimeException;
+use function array_keys;
+use PHPUnit\Util\Filter;
+use function get_object_vars;
 
 /**
  * Base class for all PHPUnit Framework exceptions.
@@ -40,15 +41,13 @@ use Throwable;
 
 use PHPUnit\Framework\TestFailure;
 
-class Exception extends RuntimeException implements \PHPUnit\Exception
-{
+class Exception extends RuntimeException implements \PHPUnit\Exception {
     /**
      * @var array
      */
     protected $serializableTrace;
 
-    public function __construct($message = '', $code = 0,  $previous = null)
-    {
+    public function __construct($message = '', $code = 0, $previous = null) {
         parent::__construct($message, $code, $previous);
 
         $this->serializableTrace = $this->getTrace();
@@ -58,8 +57,7 @@ class Exception extends RuntimeException implements \PHPUnit\Exception
         }
     }
 
-    public function __toString()
-    {
+    public function __toString() {
         $string = TestFailure::exceptionToString($this);
 
         if ($trace = Filter::getFilteredStacktrace($this)) {
@@ -69,16 +67,14 @@ class Exception extends RuntimeException implements \PHPUnit\Exception
         return $string;
     }
 
-    public function __sleep()
-    {
+    public function __sleep() {
         return array_keys(get_object_vars($this));
     }
 
     /**
      * Returns the serializable trace (without 'args').
      */
-    public function getSerializableTrace()
-    {
+    public function getSerializableTrace() {
         return $this->serializableTrace;
     }
 }

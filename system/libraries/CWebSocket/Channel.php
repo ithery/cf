@@ -136,7 +136,7 @@ class CWebsocket_Channel {
      * @return void
      */
     public function saveConnection(ConnectionInterface $connection) {
-        CWebSocket::connectionLogger()->debug('' . $this->name . '|Save connection:' . $connection->socketId);
+        // CWebSocket::connectionLogger()->debug('' . $this->name . '|Save connection:' . $connection->socketId);
         if (count($this->connections) > 0) {
             $firstConnection = carr::first($this->connections);
             if ($firstConnection === $connection) {
@@ -144,7 +144,7 @@ class CWebsocket_Channel {
             }
         }
         $this->connections[$connection->socketId] = clone $connection;
-        $this->debugConnections();
+        // $this->debugConnections();
     }
 
     /**

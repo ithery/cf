@@ -10,8 +10,11 @@ class CEmail_Builder_Parser {
      * @var array
      */
     protected $globalData = [];
+
     protected $errors = [];
+
     protected $content = '';
+
     protected $context = null;
 
     public function __construct($cml, $options = []) {
@@ -60,8 +63,8 @@ class CEmail_Builder_Parser {
         $globalData->set('preview', '');
         $globalData->set('style', []);
         $globalData->set('title', '');
-        $globalData->set('forceOWADesktop', CF::get($this->node, 'attributes.owa', 'mobile') === 'desktop');
-        $globalData->set('lang', CF::get($this->node, 'attributes.lang'));
+        $globalData->set('forceOWADesktop', c::get($this->node, 'attributes.owa', 'mobile') === 'desktop');
+        $globalData->set('lang', c::get($this->node, 'attributes.lang'));
 
         $this->context = new CEmail_Builder_Context();
     }
@@ -73,6 +76,7 @@ class CEmail_Builder_Parser {
         $options = $this->globalData;
 
         $renderer = new CEmail_Builder_Renderer($content, $options);
+
         return trim($renderer->render());
     }
 
@@ -96,6 +100,7 @@ class CEmail_Builder_Parser {
 
             return $component->handler();
         }
+
         return [];
     }
 

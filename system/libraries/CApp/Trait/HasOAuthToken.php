@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 trait CApp_Trait_HasOAuthToken {
-
     /**
      * The current access token for the authentication user.
      *
@@ -36,7 +29,7 @@ trait CApp_Trait_HasOAuthToken {
     /**
      * Get the current access token being used by the user.
      *
-     * @return COAuth_Model_AccessToken|null
+     * @return null|COAuth_Model_AccessToken
      */
     public function token() {
         return $this->accessToken;
@@ -45,7 +38,8 @@ trait CApp_Trait_HasOAuthToken {
     /**
      * Determine if the current API token has a given scope.
      *
-     * @param  string  $scope
+     * @param string $scope
+     *
      * @return bool
      */
     public function tokenCan($scope) {
@@ -55,25 +49,29 @@ trait CApp_Trait_HasOAuthToken {
     /**
      * Create a new personal access token for the user.
      *
-     * @param  string  $name
-     * @param  array  $scopes
+     * @param string $name
+     * @param array  $scopes
+     *
      * @return COAuth_PersonalAccessTokenResult
      */
     public function createToken($name, array $scopes = []) {
         return CContainer::getInstance()->make(PersonalAccessTokenFactory::class)->make(
-                        $this->getKey(), $name, $scopes
+            $this->getKey(),
+            $name,
+            $scopes
         );
     }
 
     /**
      * Set the current access token for the user.
      *
-     * @param  COAuth_Model_AccessToken $accessToken
+     * @param COAuth_Model_AccessToken $accessToken
+     *
      * @return $this
      */
-    public function withAccesÏsToken($accessToken) {
+    public function withAccessToken($accessToken) {
         $this->accessToken = $accessToken;
+
         return $this;
     }
-
 }

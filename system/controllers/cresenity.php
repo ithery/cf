@@ -479,4 +479,17 @@ class Controller_Cresenity extends CController {
         CView::blade()->clearCompiled();
         CHTTP_FileServeDriver::clearPublic();
     }
+
+    public function broadcast($method = null) {
+        $request = CHTTP::request();
+        if ($method == 'auth') {
+            if ($request->hasSession()) {
+                $request->session()->reflash();
+            }
+
+            return CBroadcast::manager()->driver()->auth($request);
+        }
+
+        return c::response('Cresenity Broadcasting Endpoint', 200);
+    }
 }

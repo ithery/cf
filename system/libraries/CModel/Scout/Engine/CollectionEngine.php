@@ -7,7 +7,6 @@ class CModel_Scout_Engine_CollectionEngine extends CModel_Scout_EngineAbstract {
      * @return void
      */
     public function __construct() {
-        //
     }
 
     /**
@@ -18,7 +17,6 @@ class CModel_Scout_Engine_CollectionEngine extends CModel_Scout_EngineAbstract {
      * @return void
      */
     public function update($models) {
-        //
     }
 
     /**
@@ -29,7 +27,6 @@ class CModel_Scout_Engine_CollectionEngine extends CModel_Scout_EngineAbstract {
      * @return void
      */
     public function delete($models) {
-        //
     }
 
     /**
@@ -204,13 +201,13 @@ class CModel_Scout_Engine_CollectionEngine extends CModel_Scout_EngineAbstract {
      * @param mixed                 $results
      * @param \CModel               $model
      *
-     * @return \CBase_LazyCollection
+     * @return \CCollection_LazyCollection
      */
     public function lazyMap(CModel_Scout_Builder $builder, $results, $model) {
         $results = $results['results'];
 
         if (count($results) === 0) {
-            return CBase_LazyCollection::empty();
+            return CCollection_LazyCollection::empty();
         }
 
         $objectIds = c::collect($results)
@@ -248,7 +245,6 @@ class CModel_Scout_Engine_CollectionEngine extends CModel_Scout_EngineAbstract {
      * @return void
      */
     public function flush($model) {
-        //
     }
 
     /**
@@ -257,12 +253,11 @@ class CModel_Scout_Engine_CollectionEngine extends CModel_Scout_EngineAbstract {
      * @param string $name
      * @param array  $options
      *
-     * @return mixed
-     *
      * @throws \Exception
+     *
+     * @return mixed
      */
     public function createIndex($name, array $options = []) {
-        //
     }
 
     /**
@@ -273,6 +268,5 @@ class CModel_Scout_Engine_CollectionEngine extends CModel_Scout_EngineAbstract {
      * @return mixed
      */
     public function deleteIndex($name) {
-        //
     }
 }

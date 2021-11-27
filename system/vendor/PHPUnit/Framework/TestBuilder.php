@@ -7,26 +7,28 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework;
 
-use function assert;
-use function count;
-use function get_class;
-use function sprintf;
-use function trim;
-use PHPUnit\Util\Filter;
-use PHPUnit\Util\InvalidDataSetException;
-use PHPUnit\Util\Test as TestUtil;
-use ReflectionClass;
 use Throwable;
+use function trim;
+use function count;
+use function assert;
+use ReflectionClass;
+use function sprintf;
+use function get_class;
+use PHPUnit\Util\Filter;
+use PHPUnit\Util\Test as TestUtil;
+use PHPUnit\Util\InvalidDataSetException;
+use PHPUnit\Framework\Exception\Exception;
+use PHPUnit\Framework\Exception\SkippedTestError;
+use PHPUnit\Framework\Exception\IncompleteTestError;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class TestBuilder
-{
-    public function build(ReflectionClass $theClass, $methodName)
-    {
+final class TestBuilder {
+    public function build(ReflectionClass $theClass, $methodName) {
         $className = $theClass->getName();
 
         if (!$theClass->isInstantiable()) {
@@ -132,13 +134,25 @@ final class TestBuilder
         return $test;
     }
 
-    /** @psalm-param class-string $className */
-    private function buildTestWithoutData($className)
-    {
-        return new $className;
+    /**
+     * @psalm-param class-string $className
+     *
+     * @param mixed $className
+     */
+    private function buildTestWithoutData($className) {
+        return new $className();
     }
 
-    /** @psalm-param class-string $className */
+    /**
+     * @psalm-param class-string $className
+     *
+     * @param mixed $methodName
+     * @param mixed $className
+     * @param mixed $data
+     * @param mixed $runTestInSeparateProcess
+     * @param mixed $preserveGlobalState
+     * @param mixed $runClassInSeparateProcess
+     */
     private function buildDataProviderTestSuite(
         $methodName,
         $className,
@@ -154,9 +168,9 @@ final class TestBuilder
 
         $groups = TestUtil::getGroups($className, $methodName);
 
-        if ($data instanceof ErrorTestCase ||
-            $data instanceof SkippedTestCase ||
-            $data instanceof IncompleteTestCase) {
+        if ($data instanceof ErrorTestCase
+            || $data instanceof SkippedTestCase
+            || $data instanceof IncompleteTestCase) {
             $dataProviderTestSuite->addTest($data, $groups);
         } else {
             foreach ($data as $_dataName => $_data) {
@@ -213,8 +227,7 @@ final class TestBuilder
         }
     }
 
-    private function throwableToString(Throwable $t)
-    {
+    private function throwableToString(Throwable $t) {
         $message = $t->getMessage();
 
         if (empty(trim($message))) {

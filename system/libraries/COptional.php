@@ -40,7 +40,7 @@ class COptional implements ArrayAccess {
      */
     public function __get($key) {
         if (is_object($this->value)) {
-            return $this->value->{$key};
+            return isset($this->value->{$key}) ? $this->value->{$key} : null;
         }
     }
 

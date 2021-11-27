@@ -4,6 +4,13 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     use CModel_Relation_Trait_InteractsWithPivotTable;
 
     /**
+     * Indicates if timestamps are available on the pivot table.
+     *
+     * @var bool
+     */
+    public $withTimestamps = false;
+
+    /**
      * The intermediate table for the relation.
      *
      * @var string
@@ -81,13 +88,6 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     protected $pivotValues = [];
 
     /**
-     * Indicates if timestamps are available on the pivot table.
-     *
-     * @var bool
-     */
-    public $withTimestamps = false;
-
-    /**
      * The custom pivot table column for the created_at timestamp.
      *
      * @var string
@@ -152,7 +152,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
             return $table;
         }
 
-        $model = new $table;
+        $model = new $table();
 
         if (!$model instanceof CModel) {
             return $table;
@@ -181,7 +181,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Set the join clause for the relation query.
      *
-     * @param CModel_Query|null $query
+     * @param null|CModel_Query $query
      *
      * @return $this
      */
@@ -434,9 +434,9 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      * @param string|array $column
      * @param mixed        $value
      *
-     * @return $this
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return $this
      */
     public function withPivotValue($column, $value = null) {
         if (is_array($column)) {
@@ -631,7 +631,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      * @param mixed $id
      * @param array $columns
      *
-     * @return CModel|CModel_Collection|null
+     * @return null|CModel|CModel_Collection
      */
     public function find($id, $columns = ['*']) {
         if (!$id instanceof CModel && (is_array($id) || $id instanceof CInterface_Arrayable)) {
@@ -672,9 +672,9 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      * @param mixed $id
      * @param array $columns
      *
-     * @return CModel|CModel_Collection
-     *
      * @throws CModel_Exception_ModelNotFound
+     *
+     * @return CModel|CModel_Collection
      */
     public function findOrFail($id, $columns = ['*']) {
         $result = $this->find($id, $columns);
@@ -689,7 +689,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
             return $result;
         }
 
-        throw (new CModel_Exception_ModelNotFound)->setModel(get_class($this->related), $id);
+        throw (new CModel_Exception_ModelNotFound())->setModel(get_class($this->related), $id);
     }
 
     /**
@@ -724,16 +724,16 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      *
      * @param array $columns
      *
-     * @return \CModel|static
-     *
      * @throws \CModel_Exception_ModelNotFound
+     *
+     * @return \CModel|static
      */
     public function firstOrFail($columns = ['*']) {
         if (!is_null($model = $this->first($columns))) {
             return $model;
         }
 
-        throw (new CModel_Exception_ModelNotFound)->setModel(get_class($this->related));
+        throw (new CModel_Exception_ModelNotFound())->setModel(get_class($this->related));
     }
 
     /**
@@ -814,7 +814,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      * @param int      $perPage
      * @param array    $columns
      * @param string   $pageName
-     * @param int|null $page
+     * @param null|int $page
      *
      * @return CPagination_LengthAwarePaginator
      */
@@ -832,7 +832,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      * @param int      $perPage
      * @param array    $columns
      * @param string   $pageName
-     * @param int|null $page
+     * @param null|int $page
      *
      * @return CPagination_Paginator
      */
@@ -867,8 +867,8 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
      *
      * @param int         $count
      * @param callable    $callback
-     * @param string|null $column
-     * @param string|null $alias
+     * @param null|string $column
+     * @param null|string $alias
      *
      * @return bool
      */
@@ -913,7 +913,7 @@ class CModel_Relation_BelongsToMany extends CModel_Relation {
     /**
      * Get a lazy collection for the given query.
      *
-     * @return CBase_LazyCollection
+     * @return CCollection_LazyCollection
      */
     public function cursor() {
         $this->query->addSelect($this->shouldSelect());
