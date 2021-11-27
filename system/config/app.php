@@ -1,9 +1,10 @@
 <?php
 
 defined('SYSPATH') or die('No direct access allowed.');
+
 return [
     /**
-     * Your app name, it will used for display app identifier when running on framework
+     * Your app name, it will used for display app identifier when running on framework.
      */
     'title' => 'CRESENITY',
     /**
@@ -20,7 +21,7 @@ return [
     'site_protocol' => '',
     /**
      * The application prefix used by code, this is determine how the app
-     * will look in libraries folder structure
+     * will look in libraries folder structure.
      */
     'prefix' => '',
     /**
@@ -51,7 +52,7 @@ return [
     /**
      * This value determines the "environment" your application is currently
      * running in. This may determine how you prefer to configure various
-     * services the application utilizes. Override this in your application config file
+     * services the application utilizes. Override this in your application config file.
      */
     'environment' => CBase::ENVIRONMENT_DEVELOPMENT,
 
@@ -90,13 +91,17 @@ return [
         'user' => CApp_Model_Users::class,
         'role' => CApp_Model_Roles::class,
         'role_nav' => CApp_Model_RoleNav::class,
+        'base' => CApp_Base::class,
+    ],
+    'classes' => [
+        'base' => CApp_Base::class,
     ],
 
     'lang' => 'id', //deprecated
-    'app_id' => 1,
-    'install' => false,
-    'sidebar' => true,
-    'signup' => false,
+    'app_id' => 1, //deprecated
+    'install' => false, //deprecated
+    'sidebar' => true, //deprecated
+    'signup' => false, //deprecated
     'theme' => '',
     'admin_email' => 'contact@cresenitytech.com',
     'set_timezone' => true, //deprecated

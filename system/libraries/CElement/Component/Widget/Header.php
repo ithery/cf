@@ -11,7 +11,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CElement_Component_Widget_Header extends CElement_Element {
     use CTrait_Element_Property_Icon,
         CTrait_Element_Property_Title;
-
     /**
      * @var CElement_List_ActionList
      */
@@ -27,11 +26,21 @@ class CElement_Component_Widget_Header extends CElement_Element {
 
     protected $switcherBlockMessage = '';
 
+    protected $headerClass;
+
     public function __construct($id = '', $tag = 'div') {
         parent::__construct($id, $tag);
+        $this->headerClass = c::theme('widget.class.header', 'widget-title');
         $this->icon = '';
         $this->title = '';
         $this->titleWrapper = $this->addDiv()->addClass('widget-title-wrapper');
+    }
+
+    /**
+     * @return CElement_Component_Widget
+     */
+    public function getWidget() {
+        return $this->parent;
     }
 
     public function actions() {
@@ -40,17 +49,24 @@ class CElement_Component_Widget_Header extends CElement_Element {
             $this->actions->setStyle('widget-action')->addClass('ml-auto');
             $this->add($this->actions);
         }
+
         return $this->actions;
     }
 
+    /**
+     * @param string $id
+     *
+     * @return CElement_Component_Action
+     */
     public function addAction($id = '') {
         $action = CElement_Factory::createComponent('Action', $id);
         $this->actions()->add($action);
+
         return $action;
     }
 
     public function build() {
-        $this->addClass('widget-title clearfix');
+        $this->addClass($this->headerClass . ' clearfix');
         if ($this->actions != null) {
             $this->addClass('with-elements');
         }
@@ -60,17 +76,24 @@ class CElement_Component_Widget_Header extends CElement_Element {
         $this->titleWrapper->addH5()->add($this->title);
     }
 
+    /**
+     * @param null|string $id
+     *
+     * @return CElement_FormInput_Checkbox_Switcher
+     */
     public function addSwitcher($id = null) {
         if ($this->switcher == null) {
             $this->switcherWrapper = $this->addDiv()->addClass('widget-switcher-wrapper pull-right');
             $this->switcher = CElement_Factory::createControl($id, 'switcher');
             $this->switcherWrapper->add($this->switcher);
         }
+
         return $this->switcher;
     }
 
     public function setSwitcherBehaviour($behaviour = 'hide') {
         $this->switcherBehaviour = $behaviour;
+
         return $this;
     }
 
@@ -123,6 +146,7 @@ class CElement_Component_Widget_Header extends CElement_Element {
             }
         }
         $js->append($this->jsChild($js->getIndent()));
+
         return $js->text();
     }
 }

@@ -1,6 +1,7 @@
 <?php
 
 class CEmail_Config {
+    use CTrait_HasOptions;
     /**
      * @var string
      */
@@ -51,7 +52,7 @@ class CEmail_Config {
 
     public function __construct($options = []) {
         $options = $this->reformatOptions($options);
-
+        $this->options = $options;
         $this->driver = carr::get($options, 'driver');
         $this->username = carr::get($options, 'username');
         $this->password = carr::get($options, 'password');
@@ -84,6 +85,7 @@ class CEmail_Config {
                 $newConfig['secure'] = carr::get($config, 'secure', carr::get($config, 'smtp_secure'));
             }
         }
+
         return $newConfig;
     }
 

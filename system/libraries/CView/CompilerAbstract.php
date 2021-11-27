@@ -21,7 +21,8 @@ abstract class CView_CompilerAbstract {
      * @throws \InvalidArgumentException
      */
     public function __construct() {
-        $this->cachePath = CF::config('view.compiled');
+        $this->cachePath = CView_Factory::compiledPath();
+
         if (!CFile::isDirectory($this->cachePath)) {
             CFile::makeDirectory($this->cachePath, $mode = 0755, $recursive = true);
         }

@@ -17,16 +17,19 @@ trait CElement_Component_DataTable_Trait_GridViewTrait {
 
     public function setHaveDataTableViewAction($bool = true) {
         $this->haveDataTableViewAction = $bool;
+
         return $this;
     }
 
     public function setDataTableViewCol() {
         $this->dataTableView = CConstant::TABLE_VIEW_COL;
+
         return $this;
     }
 
     public function setDataTableViewRow() {
         $this->dataTableView = CConstant::TABLE_VIEW_ROW;
+
         return $this;
     }
 }

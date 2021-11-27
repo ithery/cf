@@ -4,13 +4,10 @@ namespace React\Promise;
 
 require_once dirname(__FILE__) . '/functions_include.php';
 
-
-final class FulfilledPromise implements PromiseInterface
-{
+final class FulfilledPromise implements PromiseInterface {
     private $value;
 
-    public function __construct($value = null)
-    {
+    public function __construct($value = null) {
         if ($value instanceof PromiseInterface) {
             throw new \InvalidArgumentException('You cannot create React\Promise\FulfilledPromise with a promise. Use React\Promise\resolve($promiseOrValue) instead.');
         }
@@ -18,8 +15,7 @@ final class FulfilledPromise implements PromiseInterface
         $this->value = $value;
     }
 
-    public function then(callable $onFulfilled = null, callable $onRejected = null)
-    {
+    public function then(callable $onFulfilled = null, callable $onRejected = null) {
         if (null === $onFulfilled) {
             return $this;
         }
@@ -37,8 +33,7 @@ final class FulfilledPromise implements PromiseInterface
         });
     }
 
-    public function done(callable $onFulfilled = null, callable $onRejected = null)
-    {
+    public function done(callable $onFulfilled = null, callable $onRejected = null) {
         if (null === $onFulfilled) {
             return;
         }
@@ -58,13 +53,11 @@ final class FulfilledPromise implements PromiseInterface
         });
     }
 
-    public function otherwise(callable $onRejected)
-    {
+    public function otherwise(callable $onRejected) {
         return $this;
     }
 
-    public function always(callable $onFulfilledOrRejected)
-    {
+    public function always(callable $onFulfilledOrRejected) {
         return $this->then(function ($value) use ($onFulfilledOrRejected) {
             return resolve($onFulfilledOrRejected())->then(function () use ($value) {
                 return $value;
@@ -72,7 +65,6 @@ final class FulfilledPromise implements PromiseInterface
         });
     }
 
-    public function cancel()
-    {
+    public function cancel() {
     }
 }

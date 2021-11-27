@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Description of CFDeprecatedTrait
+ * Description of CFDeprecatedTrait.
  *
  * @author Hery
+ *
+ * @see CF
  */
 // @codingStandardsIgnoreStart
 trait CFDeprecatedTrait {
-    private static $write_cache;
-
     public static function doDeprecated() {
         if (class_exists('cdbg')) {
             cdbg::deprecated();
@@ -33,7 +33,7 @@ trait CFDeprecatedTrait {
      * @param string $directory
      * @param string $domain
      *
-     * @return string|null directory
+     * @return null|string directory
      */
     public static function get_dir($directory = '', $domain = null) {
         return static::getDir($directory, $domain);
@@ -66,19 +66,6 @@ trait CFDeprecatedTrait {
     }
 
     /**
-     * get path with theme (theme is not supported again, dont use this function)
-     *
-     * @deprecated
-     *
-     * @param type $process
-     *
-     * @return type
-     */
-    public static function include_paths_theme($process = false) {
-        return self::include_paths($process, true);
-    }
-
-    /**
      * @param type $filename
      * @param type $domain
      *
@@ -94,6 +81,7 @@ trait CFDeprecatedTrait {
             $cfg = include $file;
             $ret = array_merge($ret, $cfg);
         }
+
         return $ret;
     }
 
@@ -103,7 +91,7 @@ trait CFDeprecatedTrait {
      *
      * @deprecated
      *
-     * @param   boolean  re-process the include paths
+     * @param   bool  re-process the include paths
      * @param mixed $process
      * @param mixed $with_theme
      *
@@ -117,7 +105,7 @@ trait CFDeprecatedTrait {
 
     /**
      * Add Shared App in runtime
-     * This function is deprecated, use CF::addSharedApp
+     * This function is deprecated, use CF::addSharedApp.
      *
      * @deprecated
      *
@@ -129,13 +117,13 @@ trait CFDeprecatedTrait {
 
     /**
      * Get application id for domain
-     * This function is deprecated, use CF::appId
-     *
-     * @return string
+     * This function is deprecated, use CF::appId.
      *
      * @deprecated
      *
      * @param null|mixed $domain
+     *
+     * @return string
      */
     public static function app_id($domain = null) {
         return self::appId($domain);
@@ -143,13 +131,13 @@ trait CFDeprecatedTrait {
 
     /**
      * Get application code for domain
-     * This function is deprecated, use CF::appCode
+     * This function is deprecated, use CF::appCode.
      *
      * @deprecated
      *
-     * @return string
-     *
      * @param null|mixed $domain
+     *
+     * @return string
      */
     public static function app_code($domain = null) {
         return self::appCode($domain);
@@ -157,7 +145,7 @@ trait CFDeprecatedTrait {
 
     /**
      * Get org id for domain
-     * This function is deprecated, use CF::orgId
+     * This function is deprecated, use CF::orgId.
      *
      * @deprecated
      *
@@ -171,13 +159,13 @@ trait CFDeprecatedTrait {
 
     /**
      * Get org code for this domain
-     * This function is deprecated, use CF::orgCode
-     *
-     * @deprecated
+     * This function is deprecated, use CF::orgCode.
      *
      * @param string $domain
      *
      * @return string
+     *
+     * @deprecated
      */
     public static function org_code($domain = null) {
         return self::orgCode($domain);
@@ -225,12 +213,12 @@ trait CFDeprecatedTrait {
     /**
      * Displays a 404 page.
      *
-     * @throws C_404_Exception
-     *
      * @param   string  URI of page
      * @param   string  custom template
      * @param mixed $page
      * @param mixed $template
+     *
+     * @throws C_404_Exception
      *
      * @return void
      *
@@ -243,65 +231,31 @@ trait CFDeprecatedTrait {
     /**
      * @deprecated
      *
-     * @param type $directory
-     * @param type $filename
-     * @param type $required
-     * @param type $ext
+     * @param string $directory
+     * @param string $filename
+     * @param bool   $required
+     * @param bool   $ext
+     * @param bool   $reload
+     * @param bool   $withShared
      *
-     * @return type
+     * @return string|bool
      */
-    public static function find_file($directory, $filename, $required = false, $ext = false) {
-        return static::findFile($directory, $filename, $required, $ext);
-    }
-
-    /**
-     * Closes all open output buffers, either by flushing or cleaning, and stores the C
-     * output buffer for display during shutdown.
-     *
-     * @param   boolean  disable to clear buffers, rather than flushing
-     * @param mixed $flush
-     *
-     * @return void
-     *
-     * @deprecated
-     */
-    public static function close_buffers($flush = true) {
-        return static::closeBuffers($flush);
-    }
-
-    /**
-     * Clears a config group from the cached configuration.
-     *
-     * @param   string  config group
-     * @param mixed $group
-     *
-     * @return void
-     *
-     * @deprecated
-     */
-    public static function config_clear($group) {
-        // Remove the group from config
-        unset(self::$configuration[$group], self::$internal_cache['configuration'][$group]);
-
-        if (!isset(self::$write_cache['configuration'])) {
-            // Cache has changed
-            self::$write_cache['configuration'] = true;
-        }
+    public static function find_file($directory, $filename, $required = false, $ext = false, $reload = false, $withShared = true) {
+        /** @var CF $this */
+        return static::findFile($directory, $filename, $required, $ext, $reload, $withShared);
     }
 
     /**
      * Retrieves current user agent information:
      * keys:  browser, version, platform, mobile, robot, referrer, languages, charsets
-     * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset
+     * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset.
      *
-     * @param   string   key or test name
-     * @param   string   used with "accept" tests: user_agent(accept_lang, en)
-     * @param mixed      $key
-     * @param null|mixed $compare
+     * @param string $key     key or test name
+     * @param string $compare used with "accept" tests: user_agent(accept_lang, en)
      *
-     * @return array   languages and charsets
-     * @return string  all other keys
-     * @return boolean all tests
+     * @return array  languages and charsets
+     * @return string all other keys
+     * @return bool   all tests
      *
      * @deprecated
      */
@@ -310,137 +264,27 @@ trait CFDeprecatedTrait {
     }
 
     /**
-     * Returns the value of a key, defined by a 'dot-noted' string, from an array.
-     *
-     * @param   array   array to search
-     * @param   string  dot-noted string: foo.bar.baz
-     * @param mixed $array
-     * @param mixed $keys
-     *
-     * @return string if the key is found
-     * @return void   if the key is not found
-     *
-     * @deprecated
-     */
-    public static function key_string($array, $keys) {
-        if (empty($array)) {
-            return null;
-        }
-
-        // Prepare for loop
-        $keys = explode('.', $keys);
-
-        do {
-            // Get the next key
-            $key = array_shift($keys);
-
-            if (isset($array[$key])) {
-                if (is_array($array[$key]) and !empty($keys)) {
-                    // Dig down to prepare the next loop
-                    $array = $array[$key];
-                } else {
-                    // Requested key was found
-                    return $array[$key];
-                }
-            } else {
-                // Requested key is not set
-                break;
-            }
-        } while (!empty($keys));
-
-        return null;
-    }
-
-    /**
-     * Sets values in an array by using a 'dot-noted' string.
-     *
-     * @param   array   array to set keys in (reference)
-     * @param   string  dot-noted string: foo.bar.baz
-     * @param mixed      $array
-     * @param mixed      $keys
-     * @param null|mixed $fill
-     *
-     * @return mixed fill value for the key
-     * @return void
-     *
-     * @deprecated
-     */
-    public static function key_string_set(&$array, $keys, $fill = null) {
-        if (is_object($array) and ($array instanceof ArrayObject)) {
-            // Copy the array
-            $array_copy = $array->getArrayCopy();
-
-            // Is an object
-            $array_object = true;
-        } else {
-            if (!is_array($array)) {
-                // Must always be an array
-                $array = (array) $array;
-            }
-
-            // Copy is a reference to the array
-            $array_copy = &$array;
-        }
-
-        if (empty($keys)) {
-            return $array;
-        }
-
-        // Create keys
-        $keys = explode('.', $keys);
-
-        // Create reference to the array
-        $row = &$array_copy;
-
-        for ($i = 0, $end = count($keys) - 1; $i <= $end; $i++) {
-            // Get the current key
-            $key = $keys[$i];
-
-            if (!isset($row[$key])) {
-                if (isset($keys[$i + 1])) {
-                    // Make the value an array
-                    $row[$key] = [];
-                } else {
-                    // Add the fill key
-                    $row[$key] = $fill;
-                }
-            } elseif (isset($keys[$i + 1])) {
-                // Make the value an array
-                $row[$key] = (array) $row[$key];
-            }
-
-            // Go down a level, creating a new row reference
-            $row = &$row[$key];
-        }
-
-        if (isset($array_object)) {
-            // Swap the array back in
-            $array->exchangeArray($array_copy);
-        }
-    }
-
-    /**
      * Retrieves current user agent information:
      * keys:  browser, version, platform, mobile, robot, referrer, languages, charsets
-     * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset
+     * tests: is_browser, is_mobile, is_robot, accept_lang, accept_charset.
      *
      * @param   string   key or test name
      * @param   string   used with "accept" tests: user_agent(accept_lang, en)
      * @param mixed      $key
      * @param null|mixed $compare
      *
-     * @return array   languages and charsets
-     * @return string  all other keys
-     * @return boolean all tests
+     * @return array  languages and charsets
+     * @return string all other keys
+     * @return bool   all tests
      *
      * @deprecated
      */
     public static function userAgent($key = 'agent', $compare = null) {
         static $info;
-
+        $userAgent = CHTTP::request()->userAgent();
         // Return the raw string
         if ($key === 'agent') {
-            return self::$user_agent;
+            return $userAgent;
         }
 
         if ($info === null) {
@@ -449,14 +293,15 @@ trait CFDeprecatedTrait {
 
             foreach ($agents as $type => $data) {
                 foreach ($data as $agent => $name) {
-                    if (stripos(self::$user_agent, $agent) !== false) {
-                        if ($type === 'browser' and preg_match('|' . preg_quote($agent) . '[^0-9.]*+([0-9.][0-9.a-z]*)|i', self::$user_agent, $match)) {
+                    if (stripos($userAgent, $agent) !== false) {
+                        if ($type === 'browser' and preg_match('|' . preg_quote($agent) . '[^0-9.]*+([0-9.][0-9.a-z]*)|i', $userAgent, $match)) {
                             // Set the browser version
                             $info['version'] = $match[1];
                         }
 
                         // Set the agent name
                         $info[$type] = $name;
+
                         break;
                     }
                 }
@@ -470,6 +315,7 @@ trait CFDeprecatedTrait {
                 case 'is_mobile':
                     // A boolean result
                     $return = !empty($info[substr($key, 3)]);
+
                     break;
                 case 'languages':
                     $return = [];
@@ -479,6 +325,7 @@ trait CFDeprecatedTrait {
                             $return = $matches[0];
                         }
                     }
+
                     break;
                 case 'charsets':
                     $return = [];
@@ -488,12 +335,14 @@ trait CFDeprecatedTrait {
                             $return = $matches[0];
                         }
                     }
+
                     break;
                 case 'referrer':
                     if (!empty($_SERVER['HTTP_REFERER'])) {
                         // Found a result
                         $return = trim($_SERVER['HTTP_REFERER']);
                     }
+
                     break;
             }
 
@@ -508,133 +357,24 @@ trait CFDeprecatedTrait {
             switch ($key) {
                 case 'accept_lang':
                     // Check if the lange is accepted
-                    return in_array($compare, self::user_agent('languages'));
+                    return in_array($compare, static::userAgent('languages'));
+
                     break;
                 case 'accept_charset':
                     // Check if the charset is accepted
-                    return in_array($compare, self::user_agent('charsets'));
+                    return in_array($compare, static::userAgent('charsets'));
+
                     break;
                 default:
                     // Invalid comparison
                     return false;
+
                     break;
             }
         }
 
         // Return the key, if set
         return isset($info[$key]) ? $info[$key] : null;
-    }
-
-    /**
-     * Load a config file.
-     *
-     * @param   string   config filename, without extension
-     * @param   boolean  is the file required?
-     * @param mixed $name
-     * @param mixed $required
-     *
-     * @return array
-     *
-     * @deprecated
-     */
-    public static function config_load($name, $required = true) {
-        if ($name === 'core') {
-            $found = false;
-
-            // find config file at all available paths
-            if ($files = self::findFile('config', 'config', $required)) {
-                foreach ($files as $file) {
-                    if (file_exists($file)) {
-                        require $file;
-                        $found = true;
-                    }
-                }
-            }
-
-            if ($found == false) {
-                // Load the application configuration file
-                if (file_exists(DOCROOT . 'config/config' . EXT)) {
-                    require DOCROOT . 'config/config' . EXT;
-                    $found = true;
-                }
-            }
-
-            if (!isset($config['site_domain'])) {
-                // Invalid config file
-                die('Your CF application configuration file is not valid.');
-            }
-
-            return $config;
-        }
-
-        if (isset(self::$internal_cache['configuration'][$name])) {
-            return self::$internal_cache['configuration'][$name];
-        }
-
-        // Load matching configs
-        $configuration = [];
-
-        if ($files = self::findFile('config', $name, $required)) {
-            foreach ($files as $file) {
-                require $file;
-
-                if (isset($config) and is_array($config)) {
-                    // Merge in configuration
-                    $configuration = array_merge($configuration, $config);
-                }
-            }
-        }
-
-        if (!isset(self::$write_cache['configuration'])) {
-            // Cache has changed
-            self::$write_cache['configuration'] = true;
-        }
-
-        return self::$internal_cache['configuration'][$name] = $configuration;
-    }
-
-    /**
-     * Sets a configuration item, if allowed.
-     *
-     * @param   string   config key string
-     * @param   string   config value
-     * @param mixed $key
-     * @param mixed $value
-     *
-     * @return boolean
-     *
-     * @deprecated
-     */
-    public static function config_set($key, $value) {
-        // Do this to make sure that the config array is already loaded
-        self::config($key);
-
-        if (substr($key, 0, 7) === 'routes.') {
-            // Routes cannot contain sub keys due to possible dots in regex
-            $keys = explode('.', $key, 2);
-        } else {
-            // Convert dot-noted key string to an array
-            $keys = explode('.', $key);
-        }
-
-        // Used for recursion
-        $conf = &self::$configuration;
-        $last = count($keys) - 1;
-
-        foreach ($keys as $i => $k) {
-            if ($i === $last) {
-                $conf[$k] = $value;
-            } else {
-                $conf = &$conf[$k];
-            }
-        }
-
-        if ($key === 'core.modules') {
-            // Reprocess the include paths
-            self::include_paths(true);
-        }
-
-        return true;
     }
 
     /**
@@ -685,7 +425,7 @@ trait CFDeprecatedTrait {
                         $arg = preg_replace('!^' . preg_quote(DOCROOT) . '!', '', $arg);
                     }
 
-                    $temp .= $sep . chtml::specialchars(@print_r($arg, true));
+                    $temp .= $sep . c::e(@print_r($arg, true));
 
                     // Change separator to a comma
                     $sep = ', ';
@@ -701,9 +441,9 @@ trait CFDeprecatedTrait {
     }
 
     /**
-     * @param type $domain
+     * @param string $domain
      *
-     * @return type
+     * @return array
      *
      * @deprecated
      */
@@ -729,7 +469,147 @@ trait CFDeprecatedTrait {
             $result['shared_app_code'] = isset($data['shared_app_code']) ? $data['shared_app_code'] : [];
             $result['theme'] = isset($data['theme']) ? $data['theme'] : null;
         }
+
         return $result;
+    }
+
+    /**
+     * Fetch an i18n language item.
+     *
+     * @param null|mixed $key  language key to fetch
+     * @param array      $args additional information to insert into the line
+     *
+     * @return string i18n language string, or the requested key if the i18n item is not found
+     *
+     * @deprecated since 1.2, use c::__
+     */
+    public static function trans($key = null, array $args = []) {
+        return c::__($key, $args);
+    }
+
+    /**
+     * Fetch an i18n language item.
+     *
+     * @param null|string $key    language key to fetch
+     * @param null|array  $args   argument for replace
+     * @param null|array  $locale additional information to insert into the line
+     *
+     * @return string i18n language string, or the requested key if the i18n item is not found
+     *
+     * @deprecated since 1.2, use c::__
+     */
+    public static function lang($key = null, array $args = [], $locale = null) {
+        return c::__($key, $args, $locale);
+    }
+
+    /**
+     * Call the given Closure with the given value then return the value.
+     *
+     * @param mixed         $value
+     * @param null|callable $callback
+     *
+     * @return mixed
+     *
+     * @deprecated since 1.2, use c::tap
+     */
+    public static function tap($value, $callback = null) {
+        return c::tap($value, $callback);
+    }
+
+    /**
+     * Get the class "basename" of the given object / class.
+     *
+     * @param string|object $class
+     *
+     * @return string
+     *
+     * @deprecated  since 1.2, use c::classBlasename
+     */
+    public static function classBasename($class) {
+        return c::classBasename($class);
+    }
+
+    /**
+     * Returns all traits used by a class, its subclasses and trait of their traits.
+     *
+     * @param object|string $class
+     *
+     * @return array
+     *
+     * @deprecated since 1.2, use c::classUsesRecursive
+     */
+    public static function classUsesRecursive($class) {
+        return c::classUsesRecursive($class);
+    }
+
+    /**
+     * Returns all traits used by a trait and its traits.
+     *
+     * @param string $trait
+     *
+     * @return array
+     *
+     * @deprecated since 1.2, use c::traitUsesRecursive
+     */
+    public static function traitUsesRecursive($trait) {
+        return c::traitUsesRecursive($trait);
+    }
+
+    /**
+     * Return the default value of the given value.
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     *
+     * @deprecated 1.2 use c::value
+     */
+    public static function value($value) {
+        return c::value($value);
+    }
+
+    /**
+     * Get an item from an array or object using "dot" notation.
+     *
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $default
+     *
+     * @return mixed
+     *
+     * @deprecated 1.2 use c::get
+     */
+    public static function get($target, $key, $default = null) {
+        return c::get($target, $key, $default);
+    }
+
+    /**
+     * Set an item on an array or object using dot notation.
+     *
+     * @param mixed        $target
+     * @param string|array $key
+     * @param mixed        $value
+     * @param bool         $overwrite
+     *
+     * @return mixed
+     *
+     * @deprecated 1.2 use c::set
+     */
+    public static function set(&$target, $key, $value, $overwrite = true) {
+        return c::set($target, $key, $value);
+    }
+
+    /**
+     * Create a collection from the given value.
+     *
+     * @param mixed $value
+     *
+     * @return CCollection
+     *
+     * @deprecated 1.1, use c::collect
+     */
+    public static function collect($value = null) {
+        return c::collect($value);
     }
 }
 // @codingStandardsIgnoreStart

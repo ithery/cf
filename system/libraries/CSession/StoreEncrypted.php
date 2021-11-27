@@ -1,12 +1,11 @@
 <?php
 
 /**
- * Description of StoreEncrypted
+ * Description of StoreEncrypted.
  *
  * @author Hery
  */
-class CSession_EncryptedStore extends CSession_Store {
-
+class CSession_StoreEncrypted extends CSession_Store {
     /**
      * The encrypter instance.
      *
@@ -17,14 +16,15 @@ class CSession_EncryptedStore extends CSession_Store {
     /**
      * Create a new session instance.
      *
-     * @param  string  $name
-     * @param  \SessionHandlerInterface  $handler
-     * @param  CCrypt_EncrypterInterface  $encrypter
-     * @param  string|null  $id
+     * @param string                    $name
+     * @param \SessionHandlerInterface  $handler
+     * @param CCrypt_EncrypterInterface $encrypter
+     * @param null|string               $id
+     *
      * @return void
      */
     public function __construct($name, SessionHandlerInterface $handler, CCrypt_EncrypterInterface $encrypter, $id = null) {
-        $this->encrypter = $this->encrypter;
+        $this->encrypter = $encrypter;
 
         parent::__construct($name, $handler, $id);
     }
@@ -32,7 +32,8 @@ class CSession_EncryptedStore extends CSession_Store {
     /**
      * Prepare the raw string data from the session for unserialization.
      *
-     * @param  string  $data
+     * @param string $data
+     *
      * @return string
      */
     protected function prepareForUnserialize($data) {
@@ -46,7 +47,8 @@ class CSession_EncryptedStore extends CSession_Store {
     /**
      * Prepare the serialized session data for storage.
      *
-     * @param  string  $data
+     * @param string $data
+     *
      * @return string
      */
     protected function prepareForStorage($data) {
@@ -61,5 +63,4 @@ class CSession_EncryptedStore extends CSession_Store {
     public function getEncrypter() {
         return $this->encrypter;
     }
-
 }

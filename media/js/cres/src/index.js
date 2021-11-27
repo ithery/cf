@@ -13,11 +13,13 @@ String.prototype.toNumber = function () {
 };
 
 
-import './index.css';
+import './index.scss';
 import Cresenity from './Cresenity';
 
 window.Cresenity = Cresenity;
 if (!window.cresenity) {
     window.cresenity = new Cresenity();
-    window.cresenity.init();
 }
+window.document.addEventListener('DOMContentLoaded', function () {
+    window.cresenity.init();
+});

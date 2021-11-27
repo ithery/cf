@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_Helper_SqlHelper {
-
     public static function chunkSqlResult($sql, $count, callable $callback, $db = null) {
         if ($db == null) {
             $db = CDatabase::instance();
@@ -16,12 +9,9 @@ class CExporter_Helper_SqlHelper {
         $page = 1;
 
         do {
-            
-            $sLimit = "limit ". ($page - 1) * $count.",".$count;
-            
-            
-            $results = $db->query($sql.$sLimit);
-            
+            $sLimit = 'limit ' . ($page - 1) * $count . ',' . $count;
+
+            $results = $db->query($sql . $sLimit);
 
             $countResults = $results->count();
 
@@ -43,5 +33,4 @@ class CExporter_Helper_SqlHelper {
 
         return true;
     }
-
 }

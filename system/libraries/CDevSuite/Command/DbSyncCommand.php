@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DbSyncCommand
+ * Description of DbSyncCommand.
  *
  * @author Hery
  */

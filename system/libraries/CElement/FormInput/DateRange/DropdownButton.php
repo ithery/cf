@@ -13,8 +13,6 @@ use Carbon\Carbon;
 class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_DateRange_Dropdown {
     use CElement_FormInput_Trait_PredefinedDateRangeTrait;
 
-    protected $dateFormat;
-
     protected $start;
 
     protected $end;
@@ -25,12 +23,30 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
 
     protected $maxSpan;
 
+    protected $previewFormat;
+
+    protected $previewMomentFormat;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->tag = 'button';
         $this->openDirection = 'left';
         $this->setAttr('capp-input', 'daterange-dropdownbutton');
         $this->addDefaultRange();
+        $this->previewFormat = $this->dateFormat;
+        $this->previewMomentFormat = $this->convertPHPToMomentFormat($this->dateFormat);
+    }
+
+    /**
+     * @param string $format PHP date format
+     *
+     * @return $this
+     */
+    public function setPreviewFormat($format) {
+        $this->previewFormat = $format;
+        $this->previewMomentFormat = $this->convertPHPToMomentFormat($this->previewFormat);
+
+        return $this;
     }
 
     /**
@@ -40,16 +56,19 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
      */
     public function setOpenDirection($direction) {
         $this->openDirection = $direction;
+
         return $this;
     }
 
     public function setDisableCustomRange($bool = true) {
         $this->disableCustomRange = $bool;
+
         return $this;
     }
 
     public function setMaxSpan($span) {
         $this->maxSpan = $span;
+
         return $this;
     }
 
@@ -121,21 +140,22 @@ class CElement_FormInput_DateRange_DropdownButton extends CElement_FormInput_Dat
 
                 }
             }, function (start, end) {
-                $('#" . $this->id . "').html(start.format('" . $this->momentFormat . "') + ' - ' + end.format('" . $this->momentFormat . "'));
+                $('#" . $this->id . "').html(start.format('" . $this->previewMomentFormat . "') + ' - ' + end.format('" . $this->previewMomentFormat . "'));
                 $('#" . $this->id . "-start').val(start.format('" . $this->momentFormat . "'));
                 $('#" . $this->id . "-end').val(end.format('" . $this->momentFormat . "'));
                 if(start.format('" . $this->momentFormat . "')=='1970-01-01') {
-                    $('#" . $this->id . "').html('Until ' + end.format('" . $this->momentFormat . "'));
+                    $('#" . $this->id . "').html('Until ' + end.format('" . $this->previewMomentFormat . "'));
                 }
                 " . $jsChange . "
             });
 
-            $('#" . $this->id . "').html(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "') + ' - ' + moment('" . $this->dateEnd . "').format('" . $this->momentFormat . "'));
+            $('#" . $this->id . "').html(moment('" . $this->dateStart . "').format('" . $this->previewMomentFormat . "') + ' - ' + moment('" . $this->dateEnd . "').format('" . $this->previewMomentFormat . "'));
             if(moment('" . $this->dateStart . "').format('" . $this->momentFormat . "')=='1970-01-01') {
-                $('#" . $this->id . "').html('Until ' + moment('" . $this->dateEnd . "').format('" . $this->momentFormat . "'));
+                $('#" . $this->id . "').html('Until ' + moment('" . $this->dateEnd . "').format('" . $this->previewMomentFormat . "'));
             }
             $('#" . $this->id . "').removeClass('uninit');
         ";
+
         return $js;
     }
 }

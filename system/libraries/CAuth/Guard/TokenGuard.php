@@ -1,6 +1,6 @@
 <?php
 
-class CAuth_Guard_TokenGuard implements CAuth_GuardInterface {
+class CAuth_Guard_TokenGuard implements CAuth_Contract_GuardInterface {
     use CAuth_Guard_Concern_GuardHelper;
 
     /**
@@ -59,7 +59,7 @@ class CAuth_Guard_TokenGuard implements CAuth_GuardInterface {
     /**
      * Get the currently authenticated user.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     * @return null|\Illuminate\Contracts\Auth\Authenticatable
      */
     public function user() {
         // If we've already retrieved the user for the current request we can just

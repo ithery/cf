@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CImage {
     /**
-     * Create CImage_Avatar Object
+     * Create CImage_Avatar Object.
      *
      * @param string $engineName
      *

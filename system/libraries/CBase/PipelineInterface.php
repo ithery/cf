@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of PipelineInterface
+ * Description of PipelineInterface.
  *
  * @author Hery
  */

@@ -27,6 +27,7 @@ class CAjax_Engine_DataTable_Parameter {
         if (strlen($pageSize) > 0 && $pageSize != 0) {
             return (carr::get($this->requestGet, 'iDisplayStart') / $pageSize) + 1;
         }
+
         return 1;
     }
 
@@ -57,6 +58,7 @@ class CAjax_Engine_DataTable_Parameter {
                 }
             }
         }
+
         return $sortingData;
     }
 }

@@ -1,20 +1,20 @@
 <?php
 
 /**
- * Description of Tag
+ * Description of Tag.
  *
  * @author Ecko
  */
 class CApp_OpenGraph_Tag {
     /**
-     * The name of the tag
+     * The name of the tag.
      *
      * @var string
      */
     protected $name;
 
     /**
-     * The value of the tag
+     * The value of the tag.
      *
      * @var mixed
      */
@@ -41,14 +41,14 @@ class CApp_OpenGraph_Tag {
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function __get($name) {
         return $this->$name;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function __set($name, $value) {
         $this->setAttribute($name, $value);
@@ -66,9 +66,11 @@ class CApp_OpenGraph_Tag {
             case 'name':
             case 'value':
                 $value = (string) $value;
+
                 break;
             case 'prefixed':
                 $value = (boolean) $value;
+
                 break;
         }
         $this->$name = $value;

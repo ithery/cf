@@ -1,53 +1,46 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use Google_Service_Drive;
-use Google_Service_Drive_DriveFile;
-use Google_Service_Drive_FileList;
-use Google_Service_Drive_Permission;
-use Google_Http_MediaFileUpload;
-use League\Flysystem\Adapter\AbstractAdapter;
-use League\Flysystem\AdapterInterface;
-use League\Flysystem\Config;
 use League\Flysystem\Util;
+use League\Flysystem\Config;
+use Google_Http_MediaFileUpload;
+use Google_Service_Drive_FileList;
+use Google_Service_Drive_DriveFile;
+use Google_Service_Drive_Permission;
+use League\Flysystem\AdapterInterface;
+use League\Flysystem\Adapter\AbstractAdapter;
 
 class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
-
     /**
-     * Fetch fields setting for get
+     * Fetch fields setting for get.
      *
      * @var string
      */
     const FETCHFIELDS_GET = 'id,name,mimeType,modifiedTime,parents,permissions,size,webContentLink,webViewLink';
 
     /**
-     * Fetch fields setting for list
+     * Fetch fields setting for list.
      *
      * @var string
      */
     const FETCHFIELDS_LIST = 'files(FETCHFIELDS_GET),nextPageToken';
 
     /**
-     * MIME tyoe of directory
+     * MIME tyoe of directory.
      *
      * @var string
      */
     const DIRMIME = 'application/vnd.google-apps.folder';
 
     /**
-     * Google_Service_Drive instance
+     * Google_Service_Drive instance.
      *
      * @var Google_Service_Drive
      */
     protected $service;
 
     /**
-     * Default options
+     * Default options.
      *
      * @var array
      */
@@ -82,77 +75,77 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
 
     /**
      * A comma-separated list of spaces to query
-     * Supported values are 'drive', 'appDataFolder' and 'photos'
+     * Supported values are 'drive', 'appDataFolder' and 'photos'.
      *
      * @var string
      */
     protected $spaces;
 
     /**
-     * Permission array as published item
+     * Permission array as published item.
      *
      * @var array
      */
     protected $publishPermission;
 
     /**
-     * Cache of file objects
+     * Cache of file objects.
      *
      * @var array
      */
     private $cacheFileObjects = [];
 
     /**
-     * Cache of file objects by ParentId/Name based
+     * Cache of file objects by ParentId/Name based.
      *
      * @var array
      */
     private $cacheFileObjectsByName = [];
 
     /**
-     * Cache of hasDir
+     * Cache of hasDir.
      *
      * @var array
      */
     private $cacheHasDirs = [];
 
     /**
-     * Use hasDir function
+     * Use hasDir function.
      *
      * @var bool
      */
     private $useHasDir = false;
 
     /**
-     * List of fetch field for get
+     * List of fetch field for get.
      *
      * @var string
      */
     private $fetchfieldsGet = '';
 
     /**
-     * List of fetch field for lest
+     * List of fetch field for lest.
      *
      * @var string
      */
     private $fetchfieldsList = '';
 
     /**
-     * Additional fetch fields array
+     * Additional fetch fields array.
      *
      * @var array
      */
     private $additionalFields = [];
 
     /**
-     * Options array
+     * Options array.
      *
      * @var array
      */
     private $options = [];
 
     /**
-     * Default parameters of each commands
+     * Default parameters of each commands.
      *
      * @var array
      */
@@ -188,9 +181,9 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Gets the service (Google_Service_Drive)
+     * Gets the service (Google_Service_Drive).
      *
-     * @return object  Google_Service_Drive
+     * @return object Google_Service_Drive
      */
     public function getService() {
         return $this->service;
@@ -202,7 +195,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
      * @param string $path
      * @param string $contents
      * @param Config $config
-     *            Config object
+     *                         Config object
      *
      * @return array|false false on failure file meta data on success
      */
@@ -213,10 +206,10 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     /**
      * Write a new file using a stream.
      *
-     * @param string $path
+     * @param string   $path
      * @param resource $resource
-     * @param Config $config
-     *            Config object
+     * @param Config   $config
+     *                           Config object
      *
      * @return array|false false on failure file meta data on success
      */
@@ -230,7 +223,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
      * @param string $path
      * @param string $contents
      * @param Config $config
-     *            Config object
+     *                         Config object
      *
      * @return array|false false on failure file meta data on success
      */
@@ -241,10 +234,10 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     /**
      * Update a file using a stream.
      *
-     * @param string $path
+     * @param string   $path
      * @param resource $resource
-     * @param Config $config
-     *            Config object
+     * @param Config   $config
+     *                           Config object
      *
      * @return array|false false on failure file meta data on success
      */
@@ -261,8 +254,8 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
      * @return bool
      */
     public function rename($path, $newpath) {
-        list ($oldParent, $fileId) = $this->splitPath($path);
-        list ($newParent, $newName) = $this->splitPath($newpath);
+        list($oldParent, $fileId) = $this->splitPath($path);
+        list($newParent, $newName) = $this->splitPath($newpath);
 
         $file = new Google_Service_Drive_DriveFile();
         $file->setName($newName);
@@ -279,6 +272,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
         if ($updatedFile) {
             $this->cacheFileObjects[$updatedFile->getId()] = $updatedFile;
             $this->cacheFileObjectsByName[$newParent . '/' . $newName] = $updatedFile;
+
             return true;
         }
 
@@ -294,9 +288,9 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
      * @return bool
      */
     public function copy($path, $newpath) {
-        list (, $srcId) = $this->splitPath($path);
+        list(, $srcId) = $this->splitPath($path);
 
-        list ($newParentId, $fileName) = $this->splitPath($newpath);
+        list($newParentId, $fileName) = $this->splitPath($newpath);
 
         $file = new Google_Service_Drive_DriveFile();
         $file->setName($fileName);
@@ -305,19 +299,20 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
         ]);
 
         $newFile = $this->service->files->copy($srcId, $file, $this->applyDefaultParams([
-                    'fields' => $this->fetchfieldsGet
-                        ], 'files.copy'));
+            'fields' => $this->fetchfieldsGet
+        ], 'files.copy'));
 
         if ($newFile instanceof Google_Service_Drive_DriveFile) {
             $this->cacheFileObjects[$newFile->getId()] = $newFile;
             $this->cacheFileObjectsByName[$newParentId . '/' . $fileName] = $newFile;
-            list ($newDir) = $this->splitPath($newpath);
+            list($newDir) = $this->splitPath($newpath);
             $newpath = (($newDir === $this->root) ? '' : ($newDir . '/')) . $newFile->getId();
             if ($this->getRawVisibility($path) === AdapterInterface::VISIBILITY_PUBLIC) {
                 $this->publish($newpath);
             } else {
                 $this->unPublish($newpath);
             }
+
             return true;
         }
 
@@ -334,7 +329,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     public function delete($path) {
         if ($file = $this->getFileObject($path)) {
             $name = $file->getName();
-            list ($parentId, $id) = $this->splitPath($path);
+            list($parentId, $id) = $this->splitPath($path);
             if ($parents = $file->getParents()) {
                 $file = new Google_Service_Drive_DriveFile();
                 $opts = [];
@@ -361,9 +356,11 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
                     }
                 }
                 unset($this->cacheFileObjects[$id], $this->cacheHasDirs[$id], $this->cacheFileObjectsByName[$parentId . '/' . $name]);
+
                 return true;
             }
         }
+
         return false;
     }
 
@@ -382,13 +379,13 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
      * Create a directory.
      *
      * @param string $dirname
-     *            directory name
+     *                        directory name
      * @param Config $config
      *
      * @return array|false
      */
     public function createDir($dirname, Config $config) {
-        list ($pdirId, $name) = $this->splitPath($dirname);
+        list($pdirId, $name) = $this->splitPath($dirname);
 
         $folder = $this->createDirectory($name, $pdirId);
         if ($folder) {
@@ -402,6 +399,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
                 'filename' => $path_parts['filename'],
                 'extension' => $path_parts['extension']
             ];
+
             return $result;
         }
 
@@ -413,10 +411,10 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
      *
      * @param string $path
      *
-     * @return array|bool|null
+     * @return null|array|bool
      */
     public function has($path) {
-        return ($this->getFileObject($path, true) instanceof Google_Service_Drive_DriveFile);
+        return $this->getFileObject($path, true) instanceof Google_Service_Drive_DriveFile;
     }
 
     /**
@@ -427,10 +425,12 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
      * @return array|false
      */
     public function read($path) {
-        list (, $fileId) = $this->splitPath($path);
-        if ($response = $this->service->files->get($fileId, $this->applyDefaultParams([
-                    'alt' => 'media'
-                        ], 'files.get'))) {
+        list(, $fileId) = $this->splitPath($path);
+        if ($response = $this->service->files->get(
+            $fileId,
+            $this->applyDefaultParams(['alt' => 'media'], 'files.get')
+        )
+        ) {
             return [
                 'contents' => (string) $response->getBody()
             ];
@@ -512,7 +512,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
                 fputs($stream, "Authorization: Bearer {$access_token}\r\n");
                 fputs($stream, "Connection: Close\r\n");
                 if ($cookies) {
-                    fputs($stream, "Cookie: " . join('; ', $cookies) . "\r\n");
+                    fputs($stream, 'Cookie: ' . join('; ', $cookies) . "\r\n");
                 }
                 fputs($stream, "\r\n");
                 while (($res = trim(fgets($stream))) !== '') {
@@ -536,11 +536,14 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
                 if ($redirect['url']) {
                     $redirect['cnt']++;
                     fclose($stream);
+
                     return $this->readStream($path, $redirect);
                 }
+
                 return compact('stream');
             }
         }
+
         return false;
     }
 
@@ -548,7 +551,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
      * List contents of a directory.
      *
      * @param string $dirname
-     * @param bool $recursive
+     * @param bool   $recursive
      *
      * @return array
      */
@@ -569,6 +572,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
                 return $this->normaliseObject($obj, Util::dirname($path));
             }
         }
+
         return false;
     }
 
@@ -581,6 +585,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
      */
     public function getSize($path) {
         $meta = $this->getMetadata($path);
+
         return ($meta && isset($meta['size'])) ? $meta : false;
     }
 
@@ -593,6 +598,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
      */
     public function getMimetype($path) {
         $meta = $this->getMetadata($path);
+
         return ($meta && isset($meta['mimetype'])) ? $meta : false;
     }
 
@@ -605,6 +611,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
      */
     public function getTimestamp($path) {
         $meta = $this->getMetadata($path);
+
         return ($meta && isset($meta['timestamp'])) ? $meta : false;
     }
 
@@ -642,10 +649,10 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     // /////////////////- ORIGINAL METHODS -///////////////////
 
     /**
-     * Get contents parmanent URL
+     * Get contents parmanent URL.
      *
      * @param string $path
-     *            itemId path
+     *                     itemId path
      *
      * @return string|false
      */
@@ -659,29 +666,32 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
                 return $url;
             }
         }
+
         return false;
     }
 
     /**
-     * Has child directory
+     * Has child directory.
      *
      * @param string $path
-     *            itemId path
+     *                     itemId path
      *
      * @return array
      */
     public function hasDir($path) {
         $meta = $this->getMetadata($path);
+
         return ($meta && isset($meta['hasdir'])) ? $meta : [
             'hasdir' => true
         ];
     }
 
     /**
-     * Do cache cacheHasDirs with batch request
+     * Do cache cacheHasDirs with batch request.
      *
      * @param array $targets
-     *            [[path => id],...]
+     *                       [[path => id],...]
+     * @param mixed $object
      *
      * @return void
      */
@@ -710,6 +720,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
             }
         }
         $client->setUseBatch(false);
+
         return $object;
     }
 
@@ -717,7 +728,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
      * Get the object permissions presented as a visibility.
      *
      * @param string $path
-     *            itemId path
+     *                     itemId path
      *
      * @return string
      */
@@ -728,17 +739,19 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
         foreach ($permissions as $permission) {
             if ($permission->type === $this->publishPermission['type'] && $permission->role === $this->publishPermission['role']) {
                 $visibility = AdapterInterface::VISIBILITY_PUBLIC;
+
                 break;
             }
         }
+
         return $visibility;
     }
 
     /**
-     * Publish specified path item
+     * Publish specified path item.
      *
      * @param string $path
-     *            itemId path
+     *                     itemId path
      *
      * @return bool
      */
@@ -747,6 +760,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
             if ($this->getRawVisibility($path) === AdapterInterface::VISIBILITY_PUBLIC) {
                 return true;
             }
+
             try {
                 $permission = new Google_Service_Drive_Permission($this->publishPermission);
                 if ($this->service->permissions->create($file->getId(), $permission)) {
@@ -761,22 +775,24 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Un-publish specified path item
+     * Un-publish specified path item.
      *
      * @param string $path
-     *            itemId path
+     *                     itemId path
      *
      * @return bool
      */
     protected function unPublish($path) {
         if (($file = $this->getFileObject($path))) {
             $permissions = $file->getPermissions();
+
             try {
                 foreach ($permissions as $permission) {
                     if ($permission->type === 'anyone' && $permission->role === 'reader') {
                         $this->service->permissions->delete($file->getId(), $permission->getId());
                     }
                 }
+
                 return true;
             } catch (Exception $e) {
                 return false;
@@ -787,9 +803,10 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Path splits to dirId, fileId or newName
+     * Path splits to dirId, fileId or newName.
      *
      * @param string $path
+     * @param mixed  $getParentId
      *
      * @return array [ $dirId , $fileId|newName ]
      */
@@ -809,6 +826,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
                 $dirName = $this->root;
             }
         }
+
         return [
             $dirName,
             $fileName
@@ -817,7 +835,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
 
     /**
      * Item name splits to filename and extension
-     * This function supported include '/' in item name
+     * This function supported include '/' in item name.
      *
      * @param string $name
      *
@@ -830,15 +848,16 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
             $extension = array_pop($name_parts);
         }
         $filename = join('.', $name_parts);
+
         return compact('filename', 'extension');
     }
 
     /**
-     * Get normalised files array from Google_Service_Drive_DriveFile
+     * Get normalised files array from Google_Service_Drive_DriveFile.
      *
      * @param Google_Service_Drive_DriveFile $object
-     * @param String $dirname
-     *            Parent directory itemId path
+     * @param string                         $dirname
+     *                                                Parent directory itemId path
      *
      * @return array Normalised files array
      */
@@ -869,22 +888,23 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
                 }
             }
         }
+
         return $result;
     }
 
     /**
-     * Get items array of target dirctory
+     * Get items array of target dirctory.
      *
      * @param string $dirname
-     *            itemId path
-     * @param bool $recursive
+     *                           itemId path
+     * @param bool   $recursive
      * @param number $maxResults
      * @param string $query
      *
      * @return array Items array
      */
     protected function getItems($dirname, $recursive = false, $maxResults = 0, $query = '') {
-        list (, $itemId) = $this->splitPath($dirname);
+        list(, $itemId) = $this->splitPath($dirname);
 
         $maxResults = min($maxResults, 1000);
         $results = [];
@@ -898,7 +918,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
             $parameters['q'] .= ' and (' . $query . ')';
         }
         $parameters = $this->applyDefaultParams($parameters, 'files.list');
-        $pageToken = NULL;
+        $pageToken = null;
         $gFiles = $this->service->files;
         $this->cacheHasDirs[$itemId] = false;
         $setHasDir = [];
@@ -930,34 +950,35 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
                     }
                     $pageToken = $fileObjs->getNextPageToken();
                 } else {
-                    $pageToken = NULL;
+                    $pageToken = null;
                 }
             } catch (Exception $e) {
-                $pageToken = NULL;
+                $pageToken = null;
             }
         } while ($pageToken && $maxResults === 0);
 
         if ($setHasDir) {
             $results = $this->setHasDir($setHasDir, $results);
         }
+
         return array_values($results);
     }
 
     /**
-     * Get file oblect Google_Service_Drive_DriveFile
+     * Get file oblect Google_Service_Drive_DriveFile.
      *
      * @param string $path
-     *            itemId path
+     *                         itemId path
      * @param string $checkDir
-     *            do check hasdir
+     *                         do check hasdir
      *
-     * @return Google_Service_Drive_DriveFile|null
+     * @return null|Google_Service_Drive_DriveFile
      */
     protected function getFileObject($path, $checkDir = false) {
-        list ($parentId, $itemId) = $this->splitPath($path, true);
+        list($parentId, $itemId) = $this->splitPath($path, true);
         if (isset($this->cacheFileObjects[$itemId])) {
             return $this->cacheFileObjects[$itemId];
-        } else if (isset($this->cacheFileObjectsByName[$parentId . '/' . $itemId])) {
+        } elseif (isset($this->cacheFileObjectsByName[$parentId . '/' . $itemId])) {
             return $this->cacheFileObjectsByName[$parentId . '/' . $itemId];
         }
 
@@ -974,13 +995,13 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
         $batch->add($this->service->files->get($itemId, $this->applyDefaultParams($opts, 'files.get')), 'obj');
         if ($checkDir && $this->useHasDir) {
             $batch->add($service->files->listFiles($this->applyDefaultParams([
-                                'pageSize' => 1,
-                                'q' => sprintf('trashed = false and "%s" in parents and mimeType = "%s"', $itemId, self::DIRMIME)
-                                    ], 'files.list')), 'hasdir');
+                'pageSize' => 1,
+                'q' => sprintf('trashed = false and "%s" in parents and mimeType = "%s"', $itemId, self::DIRMIME)
+            ], 'files.list')), 'hasdir');
         }
         $results = array_values($batch->execute());
 
-        list ($fileObj, $hasdir) = array_pad($results, 2, null);
+        list($fileObj, $hasdir) = array_pad($results, 2, null);
         $client->setUseBatch(false);
 
         if ($fileObj instanceof Google_Service_Drive_DriveFile) {
@@ -990,7 +1011,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
                 }
             }
         } else {
-            $fileObj = NULL;
+            $fileObj = null;
         }
         $this->cacheFileObjects[$itemId] = $fileObj;
 
@@ -998,7 +1019,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Get download url
+     * Get download url.
      *
      * @param Google_Service_Drive_DriveFile $file
      *
@@ -1023,12 +1044,12 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Create dirctory
+     * Create dirctory.
      *
      * @param string $name
      * @param string $parentId
      *
-     * @return Google_Service_Drive_DriveFile|NULL
+     * @return null|Google_Service_Drive_DriveFile
      */
     protected function createDirectory($name, $parentId) {
         $file = new Google_Service_Drive_DriveFile();
@@ -1039,23 +1060,23 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
         $file->setMimeType(self::DIRMIME);
 
         $obj = $this->service->files->create($file, $this->applyDefaultParams([
-                    'fields' => $this->fetchfieldsGet
-                        ], 'files.create'));
+            'fields' => $this->fetchfieldsGet
+        ], 'files.create'));
 
         return ($obj instanceof Google_Service_Drive_DriveFile) ? $obj : false;
     }
 
     /**
-     * Upload|Update item
+     * Upload|Update item.
      *
-     * @param string $path
+     * @param string          $path
      * @param string|resource $contents
-     * @param Config $config
+     * @param Config          $config
      *
      * @return array|false item info array
      */
     protected function upload($path, $contents, Config $config) {
-        list ($parentId, $fileName) = $this->splitPath($path);
+        list($parentId, $fileName) = $this->splitPath($path);
         $srcDriveFile = $this->getFileObject($path);
         if (is_resource($contents)) {
             $uploadedDriveFile = $this->uploadResourceToGoogleDrive($contents, $parentId, $fileName, $srcDriveFile, $config->get('mimetype'));
@@ -1067,7 +1088,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Detect the largest chunk size that can be used for uploading a file
+     * Detect the largest chunk size that can be used for uploading a file.
      *
      * @return int
      */
@@ -1091,15 +1112,16 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Normalise a Drive File that has been created
+     * Normalise a Drive File that has been created.
      *
      * @param Google_Service_Drive_DriveFile $uploadedFile
-     * @param string $localPath
-     * @param string $visibility
+     * @param string                         $localPath
+     * @param string                         $visibility
+     *
      * @return array|bool
      */
     protected function normaliseUploadedFile($uploadedFile, $localPath, $visibility) {
-        list ($parentId, $fileName) = $this->splitPath($localPath);
+        list($parentId, $fileName) = $this->splitPath($localPath);
 
         if (!($uploadedFile instanceof Google_Service_Drive_DriveFile)) {
             return false;
@@ -1119,12 +1141,14 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Upload a PHP resource stream to Google Drive
+     * Upload a PHP resource stream to Google Drive.
      *
      * @param resource $resource
-     * @param string $parentId
-     * @param string $fileName
-     * @param string $mime
+     * @param string   $parentId
+     * @param string   $fileName
+     * @param string   $mime
+     * @param mixed    $srcDriveFile
+     *
      * @return bool|Google_Service_Drive_DriveFile
      */
     protected function uploadResourceToGoogleDrive($resource, $parentId, $fileName, $srcDriveFile, $mime) {
@@ -1156,12 +1180,14 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Upload a string to Google Drive
+     * Upload a string to Google Drive.
      *
      * @param string $contents
      * @param string $parentId
      * @param string $fileName
      * @param string $mime
+     * @param mixed  $srcDriveFile
+     *
      * @return Google_Service_Drive_DriveFile
      */
     protected function uploadStringToGoogleDrive($contents, $parentId, $fileName, $srcDriveFile, $mime) {
@@ -1169,12 +1195,14 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Ensure that a file exists on Google Drive by creating it if it doesn't exist or updating it if it does
+     * Ensure that a file exists on Google Drive by creating it if it doesn't exist or updating it if it does.
      *
      * @param string $contents
      * @param string $parentId
      * @param string $fileName
      * @param string $mime
+     * @param mixed  $srcDriveFile
+     *
      * @return Google_Service_Drive_DriveFile
      */
     protected function ensureDriveFileExists($contents, $parentId, $fileName, $srcDriveFile, $mime) {
@@ -1202,9 +1230,9 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
             $retrievedDriveFile = $this->service->files->create($driveFile, $this->applyDefaultParams($params, 'files.create'));
         } else {
             $retrievedDriveFile = $this->service->files->update(
-                    $srcDriveFile->getId(),
-                    $driveFile,
-                    $this->applyDefaultParams($params, 'files.update')
+                $srcDriveFile->getId(),
+                $driveFile,
+                $this->applyDefaultParams($params, 'files.update')
             );
         }
 
@@ -1212,10 +1240,10 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Read file chunk
+     * Read file chunk.
      *
      * @param resource $handle
-     * @param int $chunkSize
+     * @param int      $chunkSize
      *
      * @return string
      */
@@ -1232,14 +1260,16 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
                 return $giantChunk;
             }
         }
+
         return $giantChunk;
     }
 
     /**
-     * Return bytes from php.ini value
+     * Return bytes from php.ini value.
      *
      * @param string $iniName
      * @param string $val
+     *
      * @return number
      */
     protected function getIniBytes($iniName = '', $val = '') {
@@ -1255,18 +1285,22 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
         switch ($last) {
             case 't':
                 $val *= 1024;
+                // no break
             case 'g':
                 $val *= 1024;
+                // no break
             case 'm':
                 $val *= 1024;
+                // no break
             case 'k':
                 $val *= 1024;
         }
+
         return $val;
     }
 
     /**
-     * Return the number of memory bytes allocated to PHP
+     * Return the number of memory bytes allocated to PHP.
      *
      * @return int
      */
@@ -1275,7 +1309,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Get the size of a file resource
+     * Get the size of a file resource.
      *
      * @param $resource
      *
@@ -1286,7 +1320,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Get a MediaFileUpload
+     * Get a MediaFileUpload.
      *
      * @param $client
      * @param $request
@@ -1300,10 +1334,10 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Apply optional parameters for each command
+     * Apply optional parameters for each command.
      *
-     * @param   array   $params   The parameters
-     * @param   string  $cmdName  The command name
+     * @param array  $params  The parameters
+     * @param string $cmdName The command name
      *
      * @return array
      *
@@ -1319,7 +1353,7 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
     }
 
     /**
-     * Enables Team Drive support by changing default parameters
+     * Enables Team Drive support by changing default parameters.
      *
      * @return void
      *
@@ -1328,22 +1362,22 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
      */
     public function enableTeamDriveSupport() {
         $this->defaultParams = array_merge_recursive(
-                array_fill_keys([
-            'files.copy', 'files.create', 'files.delete',
-            'files.trash', 'files.get', 'files.list', 'files.update',
-            'files.watch'
-                        ], ['supportsTeamDrives' => true]),
-                $this->defaultParams
+            array_fill_keys([
+                'files.copy', 'files.create', 'files.delete',
+                'files.trash', 'files.get', 'files.list', 'files.update',
+                'files.watch'
+            ], ['supportsTeamDrives' => true]),
+            $this->defaultParams
         );
     }
 
     /**
-     * Selects Team Drive to operate by changing default parameters
+     * Selects Team Drive to operate by changing default parameters.
+     *
+     * @param string $teamDriveId Team Drive id
+     * @param string $corpora     Corpora value for files.list
      *
      * @return void
-     *
-     * @param   string   $teamDriveId   Team Drive id
-     * @param   string   $corpora       Corpora value for files.list
      *
      * @see https://developers.google.com/drive/v3/reference/files
      * @see https://developers.google.com/drive/v3/reference/files/list
@@ -1364,5 +1398,4 @@ class CStorage_Adapter_GoogleDriveAdapter extends AbstractAdapter {
             $this->root = $teamDriveId;
         }
     }
-
 }

@@ -1,13 +1,12 @@
 <?php
 
 /**
- * Description of CElement_FormInput
+ * Description of CElement_FormInput.
  *
  * @author Hery
  */
 class CElement_FormInput extends CElement_Element {
     use CTrait_Compat_Element_FormInput;
-
     protected $transforms = [];
 
     protected $name;
@@ -25,6 +24,9 @@ class CElement_FormInput extends CElement_Element {
 
     protected $ajax;
 
+    /**
+     * @var array
+     */
     protected $list;
 
     protected $validation;
@@ -53,28 +55,33 @@ class CElement_FormInput extends CElement_Element {
         $this->validation = CFormValidation::factory();
     }
 
-    public function setSubmitOnchange($bool) {
+    public function setSubmitOnChange($bool = true) {
         $this->submit_onchange = $bool;
+
         return $this;
     }
 
     public function setAjax($bool = true) {
         $this->ajax = $bool;
+
         return $this;
     }
 
     public function setDisabled($bool = true) {
         $this->disabled = $bool;
+
         return $this;
     }
 
     public function setSize($size) {
         $this->size = $size;
+
         return $this;
     }
 
     public function setReadonly($bool = true) {
         $this->readonly = $bool;
+
         return $this;
     }
 
@@ -92,21 +99,25 @@ class CElement_FormInput extends CElement_Element {
         }
 
         $this->transforms[] = $func;
+
         return $this;
     }
 
     public function setValue($val) {
         $this->value = $val;
+
         return $this;
     }
 
     public function setList($list) {
         $this->list = $list;
+
         return $this;
     }
 
     public function setName($val) {
         $this->name = $val;
+
         return $this;
     }
 
@@ -115,36 +126,43 @@ class CElement_FormInput extends CElement_Element {
             $value = $name;
         }
         $this->validation->add_validation($name, $value);
+
         return $this;
     }
 
     public function setType($type) {
         $this->type = $type;
+
         return $this;
     }
 
     public function setOnText($text) {
         $this->on_text = $text;
+
         return $this;
     }
 
     public function setOffText($text) {
         $this->off_text = $text;
+
         return $this;
     }
 
     public function setChecked($bool) {
         $this->checked = $bool;
+
         return $this;
     }
 
     public function showUpdown() {
         $this->showupdown = true;
+
         return $this;
     }
 
     public function hideUpdown() {
         $this->showupdown = false;
+
         return $this;
     }
 
@@ -160,6 +178,7 @@ class CElement_FormInput extends CElement_Element {
             $data['attr']['name'] = $this->name;
         }
         $data = array_merge_recursive($data, parent::toArray());
+
         return $data;
     }
 
@@ -193,12 +212,14 @@ class CElement_FormInput extends CElement_Element {
 				";
         }
         $js .= $this->js_child($indent);
+
         return $js;
     }
 
     protected function htmlAttr() {
         $htmlAttr = parent::htmlAttr();
         $nameAttr = ' name="' . $this->name . '"';
+
         return $htmlAttr . $nameAttr;
     }
 }

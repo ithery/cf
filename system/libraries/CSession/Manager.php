@@ -1,16 +1,11 @@
 <?php
 
 /**
- * Description of Manager
+ * Description of Manager.
  *
  * @author Hery
  */
 class CSession_Manager {
-    /**
-     * @var CSession_Manager
-     */
-    private static $instance;
-
     /**
      * The array of created "drivers".
      *
@@ -19,12 +14,18 @@ class CSession_Manager {
     protected $drivers = [];
 
     /**
+     * @var CSession_Manager
+     */
+    private static $instance;
+
+    /**
      * @return CSession_Manager
      */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -35,15 +36,14 @@ class CSession_Manager {
     /**
      * Get a driver instance.
      *
-     * @param string|null $driver
-     *
-     * @return mixed
+     * @param null|string $driver
      *
      * @throws \InvalidArgumentException
+     *
+     * @return mixed
      */
     public function driver($driver = null) {
         $driver = $driver ?: $this->getDefaultDriver();
-
         if (is_null($driver)) {
             throw new InvalidArgumentException(sprintf(
                 'Unable to resolve NULL driver for [%s].',
@@ -70,7 +70,7 @@ class CSession_Manager {
      *
      * @param \SessionHandlerInterface $handler
      *
-     * @return \Illuminate\Session\Store
+     * @return \CSession_Store
      */
     protected function buildSession($handler) {
         return $this->config->get('encrypt') ? $this->buildEncryptedSession($handler) : new CSession_Store($this->config->get('name'), $handler);
@@ -81,7 +81,7 @@ class CSession_Manager {
      *
      * @param \SessionHandlerInterface $handler
      *
-     * @return \Illuminate\Session\EncryptedStore
+     * @return \CSession_StoreEncrypted
      */
     protected function buildEncryptedSession($handler) {
         return new CSession_StoreEncrypted(
@@ -103,7 +103,7 @@ class CSession_Manager {
     /**
      * Get the name of the cache store / driver that should be used to acquire session locks.
      *
-     * @return string|null
+     * @return null|string
      */
     public function blockDriver() {
         return $this->config->get('block_store');

@@ -48,7 +48,6 @@ return [
                 'image/pjpeg',
                 'image/png',
                 'image/gif',
-                'image/svg+xml',
             ],
         ],
         'image' => [
@@ -60,7 +59,6 @@ return [
                 'image/pjpeg',
                 'image/png',
                 'image/gif',
-                'image/svg+xml',
                 'application/pdf',
                 'text/plain',
             ],

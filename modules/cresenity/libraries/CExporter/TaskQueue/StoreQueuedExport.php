@@ -1,20 +1,13 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_TaskQueue_StoreQueuedExport extends CQueue_AbstractTask {
-
     /**
      * @var string
      */
     private $filePath;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     private $disk;
 
@@ -30,9 +23,9 @@ class CExporter_TaskQueue_StoreQueuedExport extends CQueue_AbstractTask {
 
     /**
      * @param CExporter_File_TemporaryFile $temporaryFile
-     * @param string        $filePath
-     * @param string|null   $disk
-     * @param array|string  $diskOptions
+     * @param string                       $filePath
+     * @param null|string                  $disk
+     * @param array|string                 $diskOptions
      */
     public function __construct(CExporter_File_TemporaryFile $temporaryFile, $filePath, $disk = null, $diskOptions = []) {
         $this->disk = $disk;
@@ -41,18 +34,15 @@ class CExporter_TaskQueue_StoreQueuedExport extends CQueue_AbstractTask {
         $this->diskOptions = $diskOptions;
     }
 
-    /**
-     * @param CExporter_Storage $filesystem
-     */
     public function execute() {
         $storage = CExporter_Storage::instance();
         $storage->disk($this->disk, $this->diskOptions)->copy(
-                $this->temporaryFile, $this->filePath
+            $this->temporaryFile,
+            $this->filePath
         );
-        
-        CDaemon::log('Try to copy '.$this->temporaryFile->getLocalPath().' to '.$this->filePath);
+
+        CDaemon::log('Try to copy ' . $this->temporaryFile->getLocalPath() . ' to ' . $this->filePath);
 
         $this->temporaryFile->delete();
     }
-
 }

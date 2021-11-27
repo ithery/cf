@@ -3,6 +3,7 @@ export * from './cres-directives';
 export * from './walk';
 export * from './dispatch';
 export * from './getCsrfToken';
+export * from './window-util';
 
 export function kebabCase(subject) {
     return subject.replace(/([a-z])([A-Z])/g, '$1-$2').replace(/[_\s]/, '-').toLowerCase();

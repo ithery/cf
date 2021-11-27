@@ -15,6 +15,8 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
 
     protected $uploadUrl;
 
+    protected $sanitizePaste = false;
+
     public function __construct($id) {
         parent::__construct($id);
         CManager::registerModule('summernote');
@@ -36,6 +38,11 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
 
     public function setUploadUrl($url) {
         $this->uploadUrl = $url;
+        return $this;
+    }
+
+    public function setSanitizePaste($bool = true) {
+        $this->sanitizePaste = $bool;
         return $this;
     }
 
@@ -134,6 +141,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
         if ($this->toolbarType != 'default') {
             $additionalOptions .= 'toolbar:' . $this->getToolbarJson() . ',';
         }
+
         $additionalCallbackOptions = '';
         if ($this->uploadUrl) {
             $additionalCallbackOptions = "
@@ -169,11 +177,24 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
             ";
         }
 
+        if ($this->sanitizePaste) {
+            $additionalCallbackOptions .= "
+            onPaste: function (e) {
+                var bufferText = ((e.originalEvent || e).clipboardData || window.clipboardData).getData('Text');
+                e.preventDefault();
+                document.execCommand('insertText', false, bufferText);
+            },
+            ";
+        }
+
         $js = '';
         $js .= "
 
         $('#" . $this->id . "').summernote({
             height: '300px',
+            codeviewFilter: true,
+			codeviewIframeFilter: true,
+            // shortcuts: false,
             " . $additionalOptions . '
             maximumImageFileSize:1024*1024, // 1 MB
             onCreateLink: function(originalLink) {
@@ -183,7 +204,7 @@ class CElement_FormInput_Textarea_Summernote extends CElement_FormInput_Textarea
                 ' . $additionalCallbackOptions . "
                 onImageUploadError: function(msg){
                     alert('Oops, something went wrong with image url');
-                }
+                },
             }
         });
         ";

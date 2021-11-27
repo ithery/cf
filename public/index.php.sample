@@ -88,7 +88,7 @@ if (isset($_FILES) && is_array($_FILES)) {
 $cfPathInfo = pathinfo(__FILE__);
 // Define the front controller name and docroot
 define('DOCROOT', realpath($cfPathInfo['dirname'] . DIRECTORY_SEPARATOR . '..') . DIRECTORY_SEPARATOR);
-define('KOHANA', $cfPathInfo['basename']);
+define('CFINDEX', $cfPathInfo['basename']);
 chdir(DOCROOT);
 
 //we get app code from here

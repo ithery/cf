@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Configuration
+ * Description of Configuration.
  *
  * @author Hery
  */

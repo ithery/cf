@@ -13,11 +13,11 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class CExporter_FileTypeDetector {
     /**
      * @param             $filePath
-     * @param string|null $type
+     * @param null|string $type
      *
      * @throws NoTypeDetectedException
      *
-     * @return string|null
+     * @return null|string
      */
     public static function detect($filePath, $type = null) {
         if (null !== $type) {
@@ -50,12 +50,13 @@ class CExporter_FileTypeDetector {
             'tsv' => CExporter::TSV,
             'pdf' => CExporter::DOMPDF,
         ];
+
         return carr::get($data, strtolower($extension));
     }
 
     /**
      * @param string      $filePath
-     * @param string|null $type
+     * @param null|string $type
      *
      * @throws CExporter_Exception_NoTypeDetectedException
      *
@@ -66,6 +67,7 @@ class CExporter_FileTypeDetector {
         if (!$type) {
             throw new CExporter_Exception_NoTypeDetectedException();
         }
+
         return $type;
     }
 }

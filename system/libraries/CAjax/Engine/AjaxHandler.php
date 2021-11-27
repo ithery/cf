@@ -19,6 +19,7 @@ class CAjax_Engine_AjaxHandler extends CAjax_Engine {
             $callback = CHelper::closure()->deserializeClosure($callback);
             $app = CApp::instance();
             $parameters = [$app];
+
             return call_user_func_array($callback, $parameters);
         } else {
             return $json;

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Pipeline
+ * Description of Pipeline.
  *
  * @author Hery
  */
@@ -37,7 +37,7 @@ class CBase_Pipeline implements CBase_PipelineInterface {
     /**
      * Create a new class instance.
      *
-     * @param CContainer_Container|null $container
+     * @param null|CContainer_Container $container
      *
      * @return void
      */
@@ -201,9 +201,9 @@ class CBase_Pipeline implements CBase_PipelineInterface {
     /**
      * Get the container instance.
      *
-     * @return \CContainer_ContainerInterface
-     *
      * @throws \RuntimeException
+     *
+     * @return \CContainer_ContainerInterface
      */
     protected function getContainer() {
         return CContainer::getInstance();
@@ -226,9 +226,9 @@ class CBase_Pipeline implements CBase_PipelineInterface {
      * @param mixed      $passable
      * @param \Throwable $e
      *
-     * @return mixed
-     *
      * @throws \Throwable
+     *
+     * @return mixed
      */
     protected function handleException($passable, $e) {
         throw $e;

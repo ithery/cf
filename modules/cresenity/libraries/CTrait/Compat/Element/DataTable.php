@@ -25,9 +25,9 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2, please use setDataFromQuery
      *
-     * @return CElement_Component_DataTable
-     *
      * @param mixed $q
+     *
+     * @return CElement_Component_DataTable
      */
     public function set_data_from_query($q) {
         return $this->setDataFromQuery($q);
@@ -36,9 +36,9 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2, please use setAjax
      *
-     * @return CElement_Component_DataTable
-     *
      * @param mixed $bool
+     *
+     * @return CElement_Component_DataTable
      */
     public function set_ajax($bool) {
         return $this->setAjax($bool);
@@ -65,9 +65,9 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2, please use addRowAction
      *
-     * @return CElement_Component_Action
-     *
      * @param mixed $id
+     *
+     * @return CElement_Component_Action
      */
     public function add_row_action($id = '') {
         return $this->addRowAction($id);
@@ -76,9 +76,9 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2, please use setRowActionStyle
      *
-     * @return CElement_Component_DataTable
-     *
      * @param mixed $style
+     *
+     * @return CElement_Component_DataTable
      */
     public function set_action_style($style) {
         return $this->setRowActionStyle($style);
@@ -87,9 +87,9 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2
      *
-     * @return $this
-     *
      * @param mixed $filename
+     *
+     * @return $this
      */
     public function set_export_filename($filename) {
         return $this->setExportFilename($filename);
@@ -135,6 +135,14 @@ trait CTrait_Compat_Element_DataTable {
         return $this->isExported();
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $title
+     * @param bool   $lang
+     *
+     * @return $this
+     */
     public function set_title($title, $lang = true) {
         return $this->setTitle($title, $lang);
     }
@@ -232,9 +240,9 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2
      *
-     * @return $this
-     *
      * @param mixed $fieldname
+     *
+     * @return $this
      */
     public function set_key($fieldname) {
         return $this->setKey($fieldname);
@@ -243,20 +251,9 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2
      *
-     * @return $this
-     *
-     * @param mixed $group_by
-     */
-    public function set_group_by($group_by) {
-        return $this->setGroupBy($group_by);
-    }
-
-    /**
-     * @deprecated since version 1.2
-     *
-     * @return $this
-     *
      * @param mixed $id
+     *
+     * @return $this
      */
     public function add_header_action($id = '') {
         return $this->addHeaderAction($id);
@@ -265,9 +262,9 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2
      *
-     * @return $this
-     *
      * @param mixed $bool
+     *
+     * @return $this
      */
     public function set_checkbox($bool) {
         return $this->setCheckbox($bool);
@@ -276,9 +273,9 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2
      *
-     * @return $this
-     *
      * @param mixed $val
+     *
+     * @return $this
      */
     public function set_checkbox_value($val) {
         return $this->setCheckboxValue($val);
@@ -287,9 +284,9 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2
      *
-     * @return $this
-     *
      * @param mixed $bool
+     *
+     * @return $this
      */
     public function set_header_sortable($bool) {
         return $this->setHeaderSortabel($bool);
@@ -298,9 +295,9 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2
      *
-     * @return $this
-     *
      * @param mixed $bool
+     *
+     * @return $this
      */
     public function set_numbering($bool) {
         return $this->setNumbering($bool);
@@ -345,9 +342,9 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2
      *
-     * @return $this
-     *
      * @param mixed $q
+     *
+     * @return $this
      */
     public function set_query($q) {
         return $this->setQuery($q);
@@ -356,9 +353,9 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2
      *
-     * @return $this
-     *
      * @param mixed $el
+     *
+     * @return $this
      */
     public function set_data_from_elastic($el) {
         return $this->setDataFromElastic($el);
@@ -367,38 +364,89 @@ trait CTrait_Compat_Element_DataTable {
     /**
      * @deprecated since version 1.2
      *
-     * @return $this
+     * @param array $a
      *
-     * @param mixed $a
+     * @return $this
      */
     public function set_data_from_array($a) {
         return $this->setDataFromArray($a);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $size
+     *
+     * @return $this
+     */
     public function set_pdf_font_size($size) {
         return $this->setPdfFontSize($size);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $orientation
+     *
+     * @return $this
+     */
     public function set_pdf_orientation($orientation) {
         return $this->setPdfOrientation($orientation);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $filename
+     *
+     * @return $this
+     */
     public function export_pdf($filename) {
         return $this->exportPdf($filename);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $filename
+     *
+     * @return $this
+     */
     public function export_excelcsv($filename) {
         return $this->exportExcelcsv($filename);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $filename
+     * @param string $sheet_name
+     *
+     * @return $this
+     */
     public function export_excelxml($filename, $sheet_name = null) {
         return $this->exportExcelxml($filename, $sheet_name);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $line
+     *
+     * @return $this
+     */
     public function add_report_header($line) {
         return $this->addReportHeader($line);
     }
 
+    /**
+     * @deprecated since version 1.2
+     *
+     * @param string $filename
+     * @param string $sheet_name
+     *
+     * @return $this
+     */
     public function export_excel($filename, $sheet_name) {
         return $this->exportExcel($filename, $sheet_name);
     }

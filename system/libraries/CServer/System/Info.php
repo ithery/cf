@@ -10,90 +10,90 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CServer_System_Info {
     /**
-     * Name of the host where CServer_System runs
+     * Name of the host where CServer_System runs.
      *
      * @var string
      */
     private $hostname;
 
     /**
-     * Ip of the host where CServer_System runs
+     * Ip of the host where CServer_System runs.
      *
      * @var string
      */
     private $ip;
 
     /**
-     * Detailed Information about the kernel
+     * Detailed Information about the kernel.
      *
      * @var string
      */
     private $kernel;
 
     /**
-     * Name of the distribution
+     * Name of the distribution.
      *
      * @var string
      */
     private $distribution;
 
     /**
-     * Icon of the distribution (must be available in CServer_System)
+     * Icon of the distribution (must be available in CServer_System).
      *
      * @var string
      */
     private $distributionIcon;
 
     /**
-     * Detailed Information about the machine name
+     * Detailed Information about the machine name.
      *
      * @var string
      */
     private $machine;
 
     /**
-     * Time in sec how long the system is running
+     * Time in sec how long the system is running.
      *
      * @var int
      */
     private $uptime;
 
     /**
-     * Count of users that are currently logged in
+     * Count of users that are currently logged in.
      *
      * @var int
      */
     private $users;
 
     /**
-     * Load of the system
+     * Load of the system.
      *
      * @var string
      */
     private $load;
 
     /**
-     * Load of the system in percent (all cpus, if more than one)
+     * Load of the system in percent (all cpus, if more than one).
      *
      * @var int
      */
     private $loadPercent;
 
     /**
-     * Array of types of processes
+     * Array of types of processes.
      *
      * @var array
      */
     private $processes;
 
     /**
-     * Array with cpu devices
+     * Array with cpu devices.
      *
      * @see CServer_System_Device_Cpu
      *
      * @var array
      */
-    private $cpus;
+    private $cpus = [];
 
     /**
      * Returns $hostname.
@@ -117,6 +117,7 @@ class CServer_System_Info {
      */
     public function setHostname($hostname) {
         $this->hostname = $hostname;
+
         return $this;
     }
 
@@ -142,6 +143,7 @@ class CServer_System_Info {
      */
     public function setIp($ip) {
         $this->ip = $ip;
+
         return $this;
     }
 
@@ -167,6 +169,7 @@ class CServer_System_Info {
      */
     public function setKernel($kernel) {
         $this->kernel = $kernel;
+
         return $this;
     }
 

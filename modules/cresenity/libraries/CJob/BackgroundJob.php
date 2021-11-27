@@ -23,6 +23,8 @@ class CJob_BackgroundJob {
      */
     protected $config;
 
+    protected $dispatcher;
+
     /**
      * @param string $job
      * @param array  $config
@@ -53,7 +55,7 @@ class CJob_BackgroundJob {
         ];
         $this->helper = $helper ?: new CJob_Helper();
         $this->tmpDir = $this->helper->getTempDir();
-        CJob_EventManager::initialize();
+        $this->dispatcher = CEvent::dispatcher();
     }
 
     public function run() {
@@ -78,16 +80,7 @@ class CJob_BackgroundJob {
             } else {
                 $retval = $this->runFile();
             }
-
-            $eventManager = CJob_EventManager::getEventManager();
-
-            if ($eventManager->hasListeners(CJob_Events::onBackgroundJobPostRun)) {
-                $eventArgs = new CJob_EventManager_Args();
-                $eventArgs->addArg('job', $this->job);
-                $eventArgs->addArg('config', $this->config);
-                $eventArgs->addArg('result', $retval);
-                $eventManager->dispatchEvent(CJob_Events::onBackgroundJobPostRun, $eventArgs);
-            }
+            $this->dispatcher->dispatch(new CJob_Event_OnBackgroundJobPostRun($this->job, $this->config, $retval));
         } catch (CJob_Exception_InfoException $e) {
             $this->log('INFO: ' . $e->getMessage());
         } catch (CJob_Exception $e) {

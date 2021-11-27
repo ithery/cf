@@ -16,7 +16,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
 
     /**
      * Processor Load
-     * optionally create a loadbar
+     * optionally create a loadbar.
      *
      * @return void
      */
@@ -30,17 +30,17 @@ class CServer_System_OS_Linux extends CServer_System_OS {
         } elseif ($cmd->executeProgram('uptime', '', $buf) && preg_match('/load average: (.*), (.*), (.*)$/', $buf, $ar_buf)) {
             $this->info->setLoad($ar_buf[1] . ' ' . $ar_buf[2] . ' ' . $ar_buf[3]);
         }
-        if (CServer::config()->loadPercentEnabled()) {
+        if (CServer::config()->isLoadPercentEnabled()) {
             $this->info->setLoadPercent($this->parseProcStat('cpu'));
         }
     }
 
     /**
-     * Fill the load for a individual cpu, through parsing /proc/stat for the specified cpu
+     * Fill the load for a individual cpu, through parsing /proc/stat for the specified cpu.
      *
      * @param string $cpuline cpu for which load should be meassured
      *
-     * @return integer
+     * @return int
      */
     protected function parseProcStat($cpuline) {
         $cmd = $this->createCommand();
@@ -104,7 +104,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
     }
 
     /**
-     * Get the information of machine
+     * Get the information of machine.
      *
      * @see CServer_System_OSInterface::buildMachine()
      *
@@ -166,7 +166,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
     }
 
     /**
-     * Get the information of kernel
+     * Get the information of kernel.
      *
      * @see CServer_System_OSInterface::buildKernel()
      *
@@ -213,7 +213,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
 
     /**
      * UpTime
-     * time the system is running
+     * time the system is running.
      *
      * @return void
      */
@@ -244,7 +244,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
     }
 
     /**
-     * Get the information of distro
+     * Get the information of distro.
      *
      * @see CServer_System_OSInterface::buildDistro()
      *
@@ -409,10 +409,12 @@ class CServer_System_OS_Linux extends CServer_System_OS {
                                                     $this->info->setDistribution($this->info->getDistribution() . ' ' . $distr2);
                                                 }
                                             }
+
                                             break;
                                         }
                                     }
                                 }
+
                                 break 2;
                             }
                         }
@@ -538,7 +540,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
     }
 
     /**
-     * Processes
+     * Processes.
      *
      * @return void
      */
@@ -568,7 +570,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
     }
 
     /**
-     * Get the information of hostname
+     * Get the information of hostname.
      *
      * @see CServer_System_OSInterface::buildHostname()
      *
@@ -632,31 +634,39 @@ class CServer_System_OS_Linux extends CServer_System_OS {
                             switch (strtolower($arrBuff[0])) {
                                 case 'cpu architecture':
                                     $_arch = $arrBuff1;
+
                                     break;
                                 case 'cpu implementer':
                                     $_impl = $arrBuff1;
+
                                     break;
                                 case 'cpu part':
                                     $_part = $arrBuff1;
+
                                     break;
                                 case 'hardware':
                                     $_hard = $arrBuff1;
+
                                     break;
                                 case 'revision':
                                     $_revi = $arrBuff1;
+
                                     break;
                                 case 'cpu frequency':
                                     if (preg_match('/^(\d+)\s+Hz/i', $arrBuff1, $bufr2)) {
                                         $_cpus = round($bufr2[1] / 1000000);
                                     }
+
                                     break;
                                 case 'system bus frequency':
                                     if (preg_match('/^(\d+)\s+Hz/i', $arrBuff1, $bufr2)) {
                                         $_buss = round($bufr2[1] / 1000000);
                                     }
+
                                     break;
                                 case 'cpu':
                                     $procname = $arrBuff1;
+
                                     break;
                             }
                         }
@@ -673,7 +683,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
                     $arch = null;
                     $impl = null;
                     $part = null;
-                    $dev = CServer::createDeviceCpu();
+                    $dev = CServer_Factory::createDeviceCpu();
                     $details = preg_split("/\n/", $processor, -1, PREG_SPLIT_NO_EMPTY);
                     foreach ($details as $detail) {
                         $arrBuff = preg_split('/\s*:\s*/', trim($detail));
@@ -689,12 +699,14 @@ class CServer_System_OS_Linux extends CServer_System_OS {
                                         $procname = $proc;
                                         $dev->setModel($procname);
                                     }
+
                                     break;
                                 case 'model name':
                                 case 'cpu model':
                                 case 'cpu type':
                                 case 'cpu':
                                     $dev->setModel($arrBuff1);
+
                                     break;
                                 case 'cpu mhz':
                                 case 'clock':
@@ -702,23 +714,28 @@ class CServer_System_OS_Linux extends CServer_System_OS {
                                         $dev->setCpuSpeed($arrBuff1);
                                         $speedset = true;
                                     }
+
                                     break;
                                 case 'cycle frequency [hz]':
                                     $dev->setCpuSpeed($arrBuff1 / 1000000);
                                     $speedset = true;
+
                                     break;
                                 case 'cpu0clktck':
                                     $dev->setCpuSpeed(hexdec($arrBuff1) / 1000000); // Linux sparc64
                                     $speedset = true;
+
                                     break;
                                 case 'l3 cache':
                                 case 'cache size':
                                     $dev->setCache(trim(preg_replace('/[a-zA-Z]/', '', $arrBuff1)) * 1024);
+
                                     break;
                                 case 'initial bogomips':
                                 case 'bogomips':
                                 case 'cpu0bogo':
                                     $dev->setBogomips(round($arrBuff1));
+
                                     break;
                                 case 'flags':
                                     if (preg_match('/ vmx/', $arrBuff1)) {
@@ -728,6 +745,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
                                     } elseif (preg_match('/ hypervisor/', $arrBuff1)) {
                                         $dev->setVirt('hypervisor');
                                     }
+
                                     break;
                                 case 'i size':
                                 case 'd size':
@@ -736,15 +754,19 @@ class CServer_System_OS_Linux extends CServer_System_OS {
                                     } else {
                                         $dev->setCache($dev->getCache() + ($arrBuff1 * 1024));
                                     }
+
                                     break;
                                 case 'cpu architecture':
                                     $arch = $arrBuff1;
+
                                     break;
                                 case 'cpu implementer':
                                     $impl = $arrBuff1;
+
                                     break;
                                 case 'cpu part':
                                     $part = $arrBuff1;
+
                                     break;
                             }
                         }
@@ -804,7 +826,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
                             $dev->setCpuSpeedMin(trim($buf) / 1000);
                         }
                         // variable speed processors specific code ends
-                        if (CServer::config()->loadPercentEnabled()) {
+                        if (CServer::config()->isLoadPercentEnabled()) {
                             $dev->setLoad($this->parseProcStat('cpu' . $proc));
                         }
                         /*
@@ -816,10 +838,11 @@ class CServer_System_OS_Linux extends CServer_System_OS {
                         if (($arch !== null) && ($impl !== null) && ($part !== null)) {
                             if (($impl === '0x41') && (($_hard === 'BCM2708') || ($_hard === 'BCM2835') || ($_hard === 'BCM2709') || ($_hard === 'BCM2836') || ($_hard === 'BCM2710') || ($_hard === 'BCM2837')) && ($_revi !== null)) { // Raspberry Pi detection (instead of 'cat /proc/device-tree/model')
                                 if ($raslist === null) {
-                                    $raslist = @parse_ini_file(APP_ROOT . '/data/raspberry.ini', true);
+                                    $raslist = @parse_ini_file(DOCROOT . 'system/data/server/raspberry.ini', true);
                                 }
                                 if ($raslist && !preg_match('/[^0-9a-f]/', $_revi)) {
-                                    if (($revidec = hexdec($_revi)) & 0x800000) {
+                                    $revidec = hexdec($_revi);
+                                    if (($revidec) & 0x800000) {
                                         if ($this->info->getMachine() === '') {
                                             $manufacturer = ($revidec >> 16) & 15;
                                             if (isset($raslist['manufacturer'][$manufacturer])) {
@@ -848,7 +871,7 @@ class CServer_System_OS_Linux extends CServer_System_OS {
                                 $this->info->setMachine($_hard);
                             }
                             if ($cpulist === null) {
-                                $cpulist = @parse_ini_file(APP_ROOT . '/data/cpus.ini', true);
+                                $cpulist = @parse_ini_file(DOCROOT . 'system/data/server/cpus.ini', true);
                             }
                             if ($cpulist && (isset($cpulist['cpu'][$cpuimplpart = strtolower($impl . ',' . $part)]))) {
                                 if (($cpumodel = $dev->getModel()) !== '') {

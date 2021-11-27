@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of EngineResolver
+ * Description of EngineResolver.
  *
  * @author Hery
  */
@@ -32,6 +32,7 @@ class CView_EngineResolver {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -62,9 +63,9 @@ class CView_EngineResolver {
      *
      * @param string $engine
      *
-     * @return CView_EngineAbstract
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return CView_EngineAbstract
      */
     public function resolve($engine) {
         if (isset($this->resolved[$engine])) {

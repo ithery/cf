@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_Helper_ArrayHelper {
-
     /**
      * @param array $array
      *
@@ -32,5 +25,4 @@ class CExporter_Helper_ArrayHelper {
     public static function hasMultipleRows(array $array) {
         return count($array) === count(array_filter($array, 'is_array'));
     }
-
 }

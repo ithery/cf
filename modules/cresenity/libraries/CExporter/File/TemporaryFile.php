@@ -40,7 +40,7 @@ abstract class CExporter_File_TemporaryFile {
 
     /**
      * @param string|UploadedFile $filePath
-     * @param string|null         $disk
+     * @param null|string         $disk
      *
      * @return CExporter_File_TemporaryFile
      */

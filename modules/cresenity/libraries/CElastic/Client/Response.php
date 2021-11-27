@@ -1,11 +1,12 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jul 7, 2018, 8:57:51 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jul 7, 2018, 8:57:51 PM
  */
 
 /**
@@ -16,7 +17,6 @@ defined('SYSPATH') OR die('No direct access allowed.');
  * @author Nicolas Ruflin <spam@ruflin.com>
  */
 class CElastic_Client_Response {
-
     /**
      * Query time.
      *
@@ -41,7 +41,7 @@ class CElastic_Client_Response {
     /**
      * Response.
      *
-     * @var array|null
+     * @var null|array
      */
     protected $_response;
 
@@ -98,6 +98,7 @@ class CElastic_Client_Response {
         if (isset($error['reason']) && $rootError['reason'] != $error['reason']) {
             $message .= ' [reason: ' . $error['reason'] . ']';
         }
+
         return $message;
     }
 
@@ -106,7 +107,7 @@ class CElastic_Client_Response {
      *
      * In case of http://localhost:9200/_alias/test the error is a string
      *
-     * @return array|string|null Error data or null if there is no error
+     * @return null|array|string Error data or null if there is no error
      */
     public function getFullError() {
         $response = $this->getData();
@@ -129,6 +130,7 @@ class CElastic_Client_Response {
      */
     public function hasError() {
         $response = $this->getData();
+
         return isset($response['error']);
     }
 
@@ -143,6 +145,7 @@ class CElastic_Client_Response {
         } catch (CElastic_Exception_NotFoundException $e) {
             return false;
         }
+
         return array_key_exists('failures', $shardsStatistics);
     }
 
@@ -169,12 +172,14 @@ class CElastic_Client_Response {
                     return false;
                 }
             }
+
             return true;
         }
         if ($this->_status >= 200 && $this->_status <= 300) {
             // http status is ok
             return true;
         }
+
         return isset($data['ok']) && $data['ok'];
     }
 
@@ -193,6 +198,7 @@ class CElastic_Client_Response {
     public function getData() {
         if ($this->_response == null) {
             $response = $this->_responseString;
+
             try {
                 if ($this->getJsonBigintConversion()) {
                     $response = CHelper::json()->parse($response, true, 512, JSON_BIGINT_AS_STRING);
@@ -210,13 +216,14 @@ class CElastic_Client_Response {
             }
             $this->_response = $response;
         }
+
         return $this->_response;
     }
 
     /**
      * Gets the transfer information.
      *
-     * @return array Information about the curl request.
+     * @return array information about the curl request
      */
     public function getTransferInfo() {
         return $this->_transferInfo;
@@ -226,12 +233,13 @@ class CElastic_Client_Response {
      * Sets the transfer info of the curl request. This function is called
      * from the \Elastica\Client::_callService .
      *
-     * @param array $transferInfo The curl transfer information.
+     * @param array $transferInfo the curl transfer information
      *
      * @return $this
      */
     public function setTransferInfo(array $transferInfo) {
         $this->_transferInfo = $transferInfo;
+
         return $this;
     }
 
@@ -253,6 +261,7 @@ class CElastic_Client_Response {
      */
     public function setQueryTime($queryTime) {
         $this->_queryTime = $queryTime;
+
         return $this;
     }
 
@@ -268,6 +277,7 @@ class CElastic_Client_Response {
         if (!isset($data['took'])) {
             throw new CElastic_Exception_NotFoundException('Unable to find the field [took]from the response');
         }
+
         return $data['took'];
     }
 
@@ -283,6 +293,7 @@ class CElastic_Client_Response {
         if (!isset($data['_shards'])) {
             throw new CElastic_Exception_NotFoundException('Unable to find the field [_shards] from the response');
         }
+
         return $data['_shards'];
     }
 
@@ -298,6 +309,7 @@ class CElastic_Client_Response {
         if (!isset($data['_scroll_id'])) {
             throw new CElastic_Exception_NotFoundException('Unable to find the field [_scroll_id] from the response');
         }
+
         return $data['_scroll_id'];
     }
 
@@ -318,5 +330,4 @@ class CElastic_Client_Response {
     public function getJsonBigintConversion() {
         return $this->_jsonBigintConversion;
     }
-
 }

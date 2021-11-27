@@ -5,14 +5,22 @@
  */
 class CLogger {
     const __EXT = '.log';
+
     // Log message levels - Windows users see PHP Bug #18090
     const EMERGENCY = LOG_EMERG;    // 0
+
     const ALERT = LOG_ALERT;    // 1
+
     const CRITICAL = LOG_CRIT;     // 2
+
     const ERROR = LOG_ERR;      // 3
+
     const WARNING = LOG_WARNING;  // 4
+
     const NOTICE = LOG_NOTICE;   // 5
+
     const INFO = LOG_INFO;     // 6
+
     const DEBUG = LOG_DEBUG;    // 7
 
     protected static $logLevels = [
@@ -27,16 +35,24 @@ class CLogger {
     ];
 
     /**
-     * @var CLogger Singleton instance container
-     */
-    private static $instance = null;
-
-    /**
      * @var array list of added messages
      */
     protected $messages = [];
 
     protected static $writeOnAdd = false;
+
+    protected $threshold;
+
+    /**
+     * @var CLogger Singleton instance container
+     */
+    private static $instance = null;
+
+    private function __construct() {
+        $options['path'] = 'system';
+        $this->threshold = CF::config('log.threshold', static::DEBUG);
+        $this->createWriter('file', $options);
+    }
 
     /**
      * @return CLogger
@@ -46,12 +62,8 @@ class CLogger {
             self::$instance = new CLogger();
             register_shutdown_function([CLogger::$instance, 'write']);
         }
-        return self::$instance;
-    }
 
-    private function __construct() {
-        $options['path'] = 'system';
-        $this->createWriter('file', $options);
+        return self::$instance;
     }
 
     /**
@@ -77,6 +89,7 @@ class CLogger {
             'object' => $writer,
             'levels' => $levels,
         ];
+
         return $this;
     }
 
@@ -97,12 +110,15 @@ class CLogger {
      * @return Log
      */
     public function add($level, $message, array $values = null, array $context = [], $exception = null) {
-        if (!is_string($level)) {
+        if (is_string($level)) {
             $level = carr::get(self::$logLevels, $level);
         }
-
         if (!is_numeric($level)) {
             $level = static::EMERGENCY;
+        }
+
+        if ($level >= $this->threshold) {
+            return;
         }
 
         if ($values) {
@@ -123,6 +139,7 @@ class CLogger {
             if (!defined('DEBUG_BACKTRACE_IGNORE_ARGS')) {
                 $trace = array_map(function ($item) {
                     unset($item['args']);
+
                     return $item;
                 }, array_slice(debug_backtrace(false), 1));
             } else {
@@ -191,5 +208,13 @@ class CLogger {
                 $writer['object']->write($filtered);
             }
         }
+    }
+
+    public static function getLevels() {
+        return static::$logLevels;
+    }
+
+    public static function logger() {
+        return CLogger_Manager::instance();
     }
 }

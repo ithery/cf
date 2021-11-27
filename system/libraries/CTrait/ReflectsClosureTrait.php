@@ -11,9 +11,9 @@ trait CTrait_ReflectsClosureTrait {
      *
      * @param \Closure $closure
      *
-     * @return array
-     *
      * @throws \ReflectionException
+     *
+     * @return array
      */
     protected function closureParameterTypes(Closure $closure) {
         $reflection = new ReflectionFunction($closure);
@@ -32,9 +32,9 @@ trait CTrait_ReflectsClosureTrait {
      *
      * @param \Closure $closure
      *
-     * @return string
-     *
      * @throws \ReflectionException|\RuntimeException
+     *
+     * @return string
      */
     protected function firstClosureParameterType(Closure $closure) {
         $types = array_values($this->closureParameterTypes($closure));

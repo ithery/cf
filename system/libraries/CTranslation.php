@@ -9,10 +9,20 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Apr 14, 2019, 11:19:13 AM
  */
 class CTranslation {
+    protected static $translator;
+
     public static function translator($locale = null) {
         if ($locale == null) {
             $locale = CF::getLocale();
         }
-        return new CTranslation_Translator(new CTranslation_Loader_FileLoader(new CFile(), 'i18n'), $locale);
+        if (!is_array(static::$translator)) {
+            static::$translator = [];
+        }
+
+        if (!isset(static::$translator[$locale])) {
+            static::$translator[$locale] = new CTranslation_Translator(new CTranslation_Loader_FileLoader(new CFile(), 'i18n'), $locale);
+        }
+
+        return static::$translator[$locale];
     }
 }

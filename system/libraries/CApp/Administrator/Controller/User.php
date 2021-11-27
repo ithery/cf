@@ -8,12 +8,13 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Sep 8, 2018, 12:47:25 AM
  */
+
 use CApp_Administrator as Administrator;
 
 class CApp_Administrator_Controller_User extends CApp_Administrator_Controller {
     public function __construct() {
         $app = CApp::instance();
-        if (!Administrator::isLogin()) {
+        if (!isset($_COOKIE['capp-administrator'])) {
             $app->setViewName('administrator/login');
         }
 
@@ -23,13 +24,10 @@ class CApp_Administrator_Controller_User extends CApp_Administrator_Controller {
 
         parent::__construct();
 
-        CManager::instance()->navigation()->setNavigationCallback(function ($navs) {
+        c::app()->setNav(function () {
             $navFile = CF::getFile('data', 'Administrator/Navigation');
 
-            $navFile = include $navFile;
-            $navAddition = CApp_Administrator::getNav();
-
-            $navs = array_merge($navFile, $navAddition);
+            $navs = include $navFile;
 
             return $navs;
         });

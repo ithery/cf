@@ -14,7 +14,6 @@
 namespace Evenement;
 
 interface EventEmitterInterface {
-
     public function on($event, callable $listener);
 
     public function onceBefore($event, callable $listener);

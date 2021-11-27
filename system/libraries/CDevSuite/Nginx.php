@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Nginx
+ * Description of Nginx.
  *
  * @author Hery
  */

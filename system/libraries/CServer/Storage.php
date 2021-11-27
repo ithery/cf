@@ -10,8 +10,11 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CServer_Storage extends CServer_Base {
     const SHOW_MOUNT_OPTION = true;
+
     const SHOW_MOUNT_POINT = true;
+
     const SHOW_MOUNT_CREDENTIALS = true;
+
     const SHOW_INODES = true;
 
     protected static $instance = [];
@@ -25,7 +28,9 @@ class CServer_Storage extends CServer_Base {
      * @var CServer_Storage_Info
      */
     protected $info;
+
     protected $freeSpace;
+
     protected $totalSpace;
 
     public function __construct($sshConfig = null) {
@@ -54,6 +59,7 @@ class CServer_Storage extends CServer_Base {
         if (!isset(self::$instance[$host])) {
             self::$instance[$host] = new CServer_Storage($sshConfig);
         }
+
         return self::$instance[$host];
     }
 
@@ -61,6 +67,7 @@ class CServer_Storage extends CServer_Base {
         if (!$this->info->getDiskDevices()) {
             $this->os->buildDiskDevices();
         }
+
         return $this->info->getDiskDevices();
     }
 
@@ -71,13 +78,15 @@ class CServer_Storage extends CServer_Base {
         if ($this->freeSpace == null) {
             $this->freeSpace = disk_free_space('.');
         }
+
         return $this->freeSpace;
     }
 
     public function getTotalSpace() {
         if ($this->totalSpace == null) {
-            $this->totalSpace = disk_total_space('/');
+            $this->totalSpace = @disk_total_space('/');
         }
+
         return $this->totalSpace;
     }
 }

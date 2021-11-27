@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Description of MariaDB
+ * Description of MariaDB.
  *
  * @author Hery
  */
 class CDevSuite_Windows_Db_MariaDb extends CDevSuite_Db_MariaDb {
+    const SERVICE = 'mariadbservice';
+
     /**
      * @var CDevSuite_Winsw
      */
     public $winsw;
-
-    const SERVICE = 'mariadbservice';
 
     public function __construct() {
         parent::__construct();
@@ -75,6 +75,7 @@ class CDevSuite_Windows_Db_MariaDb extends CDevSuite_Db_MariaDb {
         if (!is_dir($path)) {
             return '';
         }
+
         return $path;
     }
 

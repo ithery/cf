@@ -1,39 +1,33 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Csv;
-use PhpOffice\PhpSpreadsheet\Reader\Exception;
 use PhpOffice\PhpSpreadsheet\Reader\IReader;
+use PhpOffice\PhpSpreadsheet\Reader\Exception;
 
 class CExporter_ReaderFactory {
-
     use CExporter_Trait_MapsCsvSettingsTrait;
 
     /**
-     * @param object        $import
+     * @param object                       $import
      * @param CExporter_File_TemporaryFile $file
-     * @param string        $readerType
+     * @param string                       $readerType
      *
      * @throws Exception
+     *
      * @return IReader
      */
     public static function make($import, CExporter_File_TemporaryFile $file, $readerType = null) {
         $reader = IOFactory::createReader(
-                        $readerType ?: static::identify($file)
+            $readerType ?: static::identify($file)
         );
 
         if (method_exists($reader, 'setReadDataOnly')) {
-            $reader->setReadDataOnly(config('excel.imports.read_only', true));
+            $reader->setReadDataOnly(CExporter::config()->get('imports.read_only', true));
         }
 
         if ($reader instanceof Csv) {
-            static::applyCsvSettings(config('excel.imports.csv', []));
+            static::applyCsvSettings(CExporter::config()->get('imports.csv', []));
 
             if ($import instanceof CExporter_Concern_WithCustomCsvSettings) {
                 static::applyCsvSettings($import->getCsvSettings());
@@ -53,6 +47,7 @@ class CExporter_ReaderFactory {
      * @param CExporter_File_TemporaryFile $temporaryFile
      *
      * @throws CExporter_Exception_NoTypeDetectedException
+     *
      * @return string
      */
     private static function identify(CExporter_File_TemporaryFile $temporaryFile) {
@@ -62,5 +57,4 @@ class CExporter_ReaderFactory {
             throw new CExporter_Exception_NoTypeDetectedException(null, null, $e);
         }
     }
-
 }

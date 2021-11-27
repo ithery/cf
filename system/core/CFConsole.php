@@ -4,6 +4,10 @@ class CFConsole {
     private static $commands = [];
 
     private static $defaultCommands = [
+        CConsole_Command_VersionCommand::class,
+        CConsole_Command_StatusCommand::class,
+        CConsole_Command_ServeCommand::class,
+        CConsole_Command_ComposerCommand::class,
         CConsole_Command_Domain_DomainListCommand::class,
         CConsole_Command_Domain_DomainCreateCommand::class,
         CConsole_Command_Domain_DomainDeleteCommand::class,
@@ -12,9 +16,6 @@ class CFConsole {
         CConsole_Command_Daemon_DaemonStartCommand::class,
         CConsole_Command_Daemon_DaemonStatusCommand::class,
         CConsole_Command_Daemon_DaemonStopCommand::class,
-        CConsole_Command_StatusCommand::class,
-        CConsole_Command_ServeCommand::class,
-        CConsole_Command_ComposerCommand::class,
         CConsole_Command_DevSuite_DevSuiteInstallCommand::class,
         CConsole_Command_DevSuite_DevSuiteStartCommand::class,
         CConsole_Command_DevSuite_DevSuiteUninstallCommand::class,
@@ -53,19 +54,19 @@ class CFConsole {
         CConsole_Command_App_AppCodeCommand::class,
         CConsole_Command_TestInstallCommand::class,
         CConsole_Command_TestCommand::class,
+        CWebSocket_Console_Command_StartServer::class,
     ];
 
     public static function execute() {
         $kernel = new CConsole_Kernel();
-
         $commands = array_merge(static::$defaultCommands, static::$commands);
         CConsole_Application::starting(function ($cfCli) use ($commands) {
             $cfCli->resolveCommands($commands);
         });
 
         $status = $kernel->handle(
-            $input = new Symfony\Component\Console\Input\ArgvInput,
-            new Symfony\Component\Console\Output\ConsoleOutput
+            $input = new Symfony\Component\Console\Input\ArgvInput(),
+            new Symfony\Component\Console\Output\ConsoleOutput()
         );
 
         $kernel->terminate($input, $status);

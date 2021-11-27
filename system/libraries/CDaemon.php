@@ -9,8 +9,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @license Ittron Global Teknologi <ittron.co.id>
  */
-use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 class CDaemon {
     /**
@@ -40,15 +40,15 @@ class CDaemon {
         $cmd = carr::get($config, 'command');
         $pidFile = carr::get($config, 'pidFile');
         $logFile = carr::get($config, 'logFile');
-        $file = new CFile();
+
         try {
             $dirPidFile = dirname($pidFile);
-            if (!$file->isDirectory($dirPidFile)) {
-                $file->makeDirectory($dirPidFile, 0755, true);
+            if (!CFile::isDirectory($dirPidFile)) {
+                CFile::makeDirectory($dirPidFile, 0755, true);
             }
             $dirLogFile = dirname($logFile);
-            if (!$file->isDirectory($dirLogFile)) {
-                $file->makeDirectory($dirLogFile, 0755, true);
+            if (!CFile::isDirectory($dirLogFile)) {
+                CFile::makeDirectory($dirLogFile, 0755, true);
             }
         } catch (Exception $ex) {
             throw new Exception('error on create dir ' . $dirLogFile);
@@ -57,16 +57,19 @@ class CDaemon {
         self::$runningService = new $cls($serviceName, $config);
 
         switch ($cmd) {
+            case 'debug':
             case 'start':
             case 'stop':
             case 'restart':
             case 'reload':
             case 'status':
             case 'kill':
-                call_user_func([self::$runningService, $cmd]);
+                return call_user_func([self::$runningService, $cmd]);
+
                 break;
             default:
                 self::$runningService->showHelp();
+
                 break;
         }
     }
@@ -109,6 +112,7 @@ class CDaemon {
         if ($this->helper === null) {
             $this->helper = new CJob_Helper();
         }
+
         return $this->helper;
     }
 
@@ -134,6 +138,9 @@ class CDaemon {
 
         $command = carr::get($this->config, 'command');
         $isRunning = $this->isRunning();
+        if ($command == 'debug') {
+            return $this->debugContent();
+        }
         if ($command == 'start') {
             if ($isRunning) {
                 throw new CDaemon_Exception_AlreadyRunningException('daemon is running');
@@ -152,26 +159,49 @@ class CDaemon {
         }
     }
 
+    protected function debugOutput() {
+        $serviceClass = $this->config['serviceClass'];
+        $output = DOCROOT . 'temp' . DS . 'daemon' . DS . CF::appCode() . '/' . $serviceClass . '.log';
+        $dir = dirname($output);
+        if (!CFile::isDirectory($dir)) {
+            CFile::makeDirectory($dir, 0755, true);
+        }
+
+        return $output;
+    }
+
+    protected function debugContent() {
+        $output = $this->debugOutput();
+        if (CFile::exists($output)) {
+            return file_get_contents($output);
+        }
+
+        return null;
+    }
+
     protected function runUnix() {
         $command = $this->getExecutableCommand();
         $binary = $this->getPhpBinary();
-        $output = isset($config['debug']) && $config['debug'] ? 'debug.log' : '/dev/null';
+        $output = isset($this->config['debug']) && $this->config['debug'] ? $this->debugOutput() : '/dev/null';
+        //$output = $this->debugOutput();
 
-        $commandToExecute = "NSS_STRICT_NOFORK=DISABLED $binary $command 1> $output 2>&1 &";
-        //cdbg::dd($commandToExecute);
+        $commandToExecute = "NSS_STRICT_NOFORK=DISABLED ${binary} ${command} 1> \"${output}\" 2>&1 &";
+
         if (defined('CFCLI')) {
             $process = new Process($commandToExecute);
             $process->run();
             $result = $process->getOutput();
+
+            return $result;
         } else {
-            exec($commandToExecute);
+            return exec($commandToExecute);
         }
     }
 
     // @codeCoverageIgnoreStart
 
     /**
-     * Run windows
+     * Run windows.
      *
      * @return void
      */
@@ -181,7 +211,7 @@ class CDaemon {
         $binary = $this->getPhpBinary();
         $command = $this->getExecutableCommand();
 
-        pclose(popen("start \"blah\" /B \"$binary\" $command", 'r'));
+        pclose(popen("start \"blah\" /B \"${binary}\" ${command}", 'r'));
     }
 
     // @codeCoverageIgnoreEnd
@@ -202,6 +232,7 @@ class CDaemon {
      */
     protected function getPhpBinary() {
         $executableFinder = new PhpExecutableFinder();
+
         return $executableFinder->find();
     }
 
@@ -218,7 +249,7 @@ class CDaemon {
     public function logDump() {
         $pid = $this->getPid();
         if ($pid) {
-            exec("kill -10 $pid");
+            exec("kill -10 ${pid}");
         }
     }
 
@@ -228,6 +259,7 @@ class CDaemon {
         if ($pidFile && file_exists($pidFile)) {
             return file_get_contents($pidFile);
         }
+
         return false;
     }
 
@@ -260,7 +292,7 @@ class CDaemon {
     }
 
     /**
-     * Shortcut function to log the current running service
+     * Shortcut function to log the current running service.
      *
      * @param string $msg
      */
@@ -269,5 +301,13 @@ class CDaemon {
         if ($runningService != null) {
             $runningService->log($msg);
         }
+    }
+
+    public static function pidPath() {
+        return DOCROOT . 'data/daemon/' . CF::appCode() . '/daemon/pid/';
+    }
+
+    public static function logPath() {
+        return  DOCROOT . 'data/daemon/' . CF::appCode() . '/log/';
     }
 }

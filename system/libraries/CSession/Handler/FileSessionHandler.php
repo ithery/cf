@@ -9,7 +9,6 @@
 use Symfony\Component\Finder\Finder;
 
 class CSession_Handler_FileSessionHandler implements SessionHandlerInterface {
-
     /**
      * The path where sessions should be stored.
      *
@@ -27,15 +26,16 @@ class CSession_Handler_FileSessionHandler implements SessionHandlerInterface {
     /**
      * Create a new file driven handler instance.
      *
-     * @param  string  $path
-     * @param  int  $minutes
+     * @param string $path
+     * @param int    $minutes
+     *
      * @return void
      */
     public function __construct($path, $minutes) {
         $this->files = new CFile();
-        $this->path = DOCROOT.'temp'.DS.'session';
-        if(!is_dir($this->path)) {
-            CFile::makeDirectory($this->path, 0755,true);
+        $this->path = DOCROOT . 'temp' . DS . 'session';
+        if (!is_dir($this->path)) {
+            CFile::makeDirectory($this->path, 0755, true);
         }
         $this->minutes = $minutes;
     }
@@ -71,7 +71,6 @@ class CSession_Handler_FileSessionHandler implements SessionHandlerInterface {
      * {@inheritdoc}
      */
     public function write($sessionId, $data) {
-
         $this->files->put($this->path . '/' . $sessionId, $data, true);
         return true;
     }
@@ -90,14 +89,13 @@ class CSession_Handler_FileSessionHandler implements SessionHandlerInterface {
      */
     public function gc($lifetime) {
         $files = Finder::create()
-                ->in($this->path)
-                ->files()
-                ->ignoreDotFiles(true)
-                ->date('<= now - ' . $lifetime . ' seconds');
+            ->in($this->path)
+            ->files()
+            ->ignoreDotFiles(true)
+            ->date('<= now - ' . $lifetime . ' seconds');
 
         foreach ($files as $file) {
             $this->files->delete($file->getRealPath());
         }
     }
-
 }

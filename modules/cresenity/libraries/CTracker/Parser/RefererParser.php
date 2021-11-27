@@ -1,16 +1,16 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 9:32:32 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 9:32:32 PM
  */
 use Snowplow\RefererParser\Parser;
 
 class CTracker_Parser_RefererParser {
-
     /**
      * Referer parser instance.
      *
@@ -37,17 +37,21 @@ class CTracker_Parser_RefererParser {
     /**
      * Parse a referer.
      *
+     * @param mixed $refererUrl
+     * @param mixed $pageUrl
+     *
      * @return RefererParser
      */
     public function parse($refererUrl, $pageUrl) {
         $this->setReferer($this->parser->parse($refererUrl, $pageUrl));
+
         return $this;
     }
 
     /**
      * Get the search medium.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getMedium() {
         if ($this->isKnown()) {
@@ -58,7 +62,7 @@ class CTracker_Parser_RefererParser {
     /**
      * Get the search source.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getSource() {
         if ($this->isKnown()) {
@@ -69,7 +73,7 @@ class CTracker_Parser_RefererParser {
     /**
      * Get the search term.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getSearchTerm() {
         if ($this->isKnown()) {
@@ -95,7 +99,7 @@ class CTracker_Parser_RefererParser {
      */
     public function setReferer($referer) {
         $this->referer = $referer;
+
         return $this;
     }
-
 }

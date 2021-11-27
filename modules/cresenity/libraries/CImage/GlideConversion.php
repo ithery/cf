@@ -1,31 +1,32 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 use League\Glide\Server;
 use League\Glide\ServerFactory;
 
 final class CImage_GlideConversion {
-
-    /** @var string */
+    /**
+     * @var string
+     */
     private $inputImage;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $imageDriver = 'gd';
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $conversionResult = null;
 
-    /** @var string */
+    /**
+     * @var string
+     */
     private $temporaryDirectory = null;
 
     /**
-     * 
      * @param string $inputImage
+     *
      * @return \GlideConversion
      */
     public static function create($inputImage) {
@@ -47,6 +48,7 @@ final class CImage_GlideConversion {
             throw CImage_Exception_InvalidTemporaryDirectoryException::temporaryDirectoryNotWritable($temporaryDirectory);
         }
         $this->temporaryDirectory = $temporaryDirectory;
+
         return $this;
     }
 
@@ -61,6 +63,7 @@ final class CImage_GlideConversion {
 
     public function useImageDriver($imageDriver) {
         $this->imageDriver = $imageDriver;
+
         return $this;
     }
 
@@ -71,13 +74,15 @@ final class CImage_GlideConversion {
             $glideServer = $this->createGlideServer($inputFile, $watermarkPath);
             $glideServer->setGroupCacheInFolders(false);
             $manipulatedImage = $this->temporaryDirectory . DIRECTORY_SEPARATOR . $glideServer->makeImage(
-                            pathinfo($inputFile, PATHINFO_BASENAME), $this->prepareManipulations($manipulationGroup)
+                pathinfo($inputFile, PATHINFO_BASENAME),
+                $this->prepareManipulations($manipulationGroup)
             );
             if ($this->conversionResult) {
                 unlink($this->conversionResult);
             }
             $this->conversionResult = $manipulatedImage;
         }
+
         return $this;
     }
 
@@ -93,14 +98,15 @@ final class CImage_GlideConversion {
         if (array_key_exists('watermark', $manipulationGroup)) {
             $watermarkPath = dirname($manipulationGroup['watermark']);
             $manipulationGroup['watermark'] = basename($manipulationGroup['watermark']);
+
             return $watermarkPath;
         }
     }
 
     /**
-     * 
      * @param string $inputFile
      * @param string $watermarkPath
+     *
      * @return type \League\Glide\Server
      */
     private function createGlideServer($inputFile, $watermarkPath = null) {
@@ -112,12 +118,14 @@ final class CImage_GlideConversion {
         if ($watermarkPath) {
             $config['watermarks'] = $watermarkPath;
         }
+
         return ServerFactory::create($config);
     }
 
     public function save($outputFile) {
         if ($this->conversionResult == '') {
             copy($this->inputImage, $outputFile);
+
             return;
         }
         $conversionResultDirectory = pathinfo($this->conversionResult, PATHINFO_DIRNAME);
@@ -135,6 +143,7 @@ final class CImage_GlideConversion {
                 $glideManipulations[$this->convertToGlideParameter($name)] = $argument;
             }
         }
+
         return $glideManipulations;
     }
 
@@ -171,12 +180,13 @@ final class CImage_GlideConversion {
         if (!isset($conversions[$manipulationName])) {
             throw CImage_Exception_CouldNotConvertException::unknownManipulation($manipulationName);
         }
+
         return $conversions[$manipulationName];
     }
 
     private function directoryIsEmpty($directory) {
         $iterator = new FilesystemIterator($directory);
+
         return !$iterator->valid();
     }
-
 }

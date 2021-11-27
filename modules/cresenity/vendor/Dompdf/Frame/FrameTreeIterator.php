@@ -1,19 +1,16 @@
 <?php
+
 namespace Dompdf\Frame;
 
 use Iterator;
 use Dompdf\Frame;
 
 /**
- * Pre-order Iterator
+ * Pre-order Iterator.
  *
  * Returns frames in preorder traversal order (parent then children)
- *
- * @access private
- * @package dompdf
  */
-class FrameTreeIterator implements Iterator
-{
+class FrameTreeIterator implements Iterator {
     /**
      * @var Frame
      */
@@ -22,7 +19,7 @@ class FrameTreeIterator implements Iterator
     /**
      * @var array
      */
-    protected $_stack = array();
+    protected $_stack = [];
 
     /**
      * @var int
@@ -32,50 +29,41 @@ class FrameTreeIterator implements Iterator
     /**
      * @param Frame $root
      */
-    public function __construct(Frame $root)
-    {
+    public function __construct(Frame $root) {
         $this->_stack[] = $this->_root = $root;
         $this->_num = 0;
     }
 
-    /**
-     *
-     */
-    public function rewind()
-    {
-        $this->_stack = array($this->_root);
+    public function rewind() {
+        $this->_stack = [$this->_root];
         $this->_num = 0;
     }
 
     /**
      * @return bool
      */
-    public function valid()
-    {
+    public function valid() {
         return count($this->_stack) > 0;
     }
 
     /**
      * @return int
      */
-    public function key()
-    {
+    public function key() {
         return $this->_num;
     }
 
     /**
      * @return Frame
      */
-    public function current()
-    {
+    public function current() {
         return end($this->_stack);
     }
 
     /**
      * @return Frame
      */
-    public function next()
-    {
+    public function next() {
         $b = end($this->_stack);
 
         // Pop last element
@@ -93,4 +81,3 @@ class FrameTreeIterator implements Iterator
         return $b;
     }
 }
-

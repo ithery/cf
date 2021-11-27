@@ -1,20 +1,6 @@
 <?php
 
-class RouteUrlGenerator {
-    /**
-     * The URL generator instance.
-     *
-     * @var CRouting_UrlGenerator
-     */
-    protected $url;
-
-    /**
-     * The request instance.
-     *
-     * @var CHTTP_Request
-     */
-    protected $request;
-
+class CRouting_RouteUrlGenerator {
     /**
      * The named parameter defaults.
      *
@@ -45,6 +31,20 @@ class RouteUrlGenerator {
     ];
 
     /**
+     * The URL generator instance.
+     *
+     * @var CRouting_UrlGenerator
+     */
+    protected $url;
+
+    /**
+     * The request instance.
+     *
+     * @var CHTTP_Request
+     */
+    protected $request;
+
+    /**
      * Create a new Route URL generator.
      *
      * @param CRouting_UrlGenerator $url
@@ -64,9 +64,9 @@ class RouteUrlGenerator {
      * @param array          $parameters
      * @param bool           $absolute
      *
-     * @return string
-     *
      * @throws CRouting_Exception_UrlGenerationException
+     *
+     * @return string
      */
     public function to($route, $parameters = [], $absolute = false) {
         $domain = $this->getRouteDomain($route, $parameters);

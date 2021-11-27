@@ -4,23 +4,21 @@ namespace React\Promise;
 
 require_once dirname(__FILE__) . '/functions_include.php';
 
-final class Promise implements PromiseInterface
-{
+final class Promise implements PromiseInterface {
     private $canceller;
+
     private $result;
 
     private $handlers = [];
 
     private $requiredCancelRequests = 0;
 
-    public function __construct(callable $resolver, callable $canceller = null)
-    {
+    public function __construct(callable $resolver, callable $canceller = null) {
         $this->canceller = $canceller;
         $this->call($resolver);
     }
 
-    public function then(callable $onFulfilled = null, callable $onRejected = null)
-    {
+    public function then(callable $onFulfilled = null, callable $onRejected = null) {
         if (null !== $this->result) {
             return $this->result->then($onFulfilled, $onRejected);
         }
@@ -40,8 +38,7 @@ final class Promise implements PromiseInterface
         });
     }
 
-    public function done(callable $onFulfilled = null, callable $onRejected = null)
-    {
+    public function done(callable $onFulfilled = null, callable $onRejected = null) {
         if (null !== $this->result) {
             return $this->result->done($onFulfilled, $onRejected);
         }
@@ -52,8 +49,7 @@ final class Promise implements PromiseInterface
         };
     }
 
-    public function otherwise(callable $onRejected)
-    {
+    public function otherwise(callable $onRejected) {
         return $this->then(null, function ($reason) use ($onRejected) {
             if (!_checkTypehint($onRejected, $reason)) {
                 return new RejectedPromise($reason);
@@ -63,8 +59,7 @@ final class Promise implements PromiseInterface
         });
     }
 
-    public function always(callable $onFulfilledOrRejected)
-    {
+    public function always(callable $onFulfilledOrRejected) {
         return $this->then(function ($value) use ($onFulfilledOrRejected) {
             return resolve($onFulfilledOrRejected())->then(function () use ($value) {
                 return $value;
@@ -76,8 +71,7 @@ final class Promise implements PromiseInterface
         });
     }
 
-    public function cancel()
-    {
+    public function cancel() {
         $canceller = $this->canceller;
         $this->canceller = null;
 
@@ -111,8 +105,7 @@ final class Promise implements PromiseInterface
         }
     }
 
-    private function resolver(callable $onFulfilled = null, callable $onRejected = null)
-    {
+    private function resolver(callable $onFulfilled = null, callable $onRejected = null) {
         return function ($resolve, $reject) use ($onFulfilled, $onRejected) {
             $this->handlers[] = function (PromiseInterface $promise) use ($onFulfilled, $onRejected, $resolve, $reject) {
                 $promise
@@ -122,8 +115,7 @@ final class Promise implements PromiseInterface
         };
     }
 
-    private function resolve($value = null)
-    {
+    private function resolve($value = null) {
         if (null !== $this->result) {
             return;
         }
@@ -131,8 +123,7 @@ final class Promise implements PromiseInterface
         $this->settle(resolve($value));
     }
 
-    private function reject($reason = null)
-    {
+    private function reject($reason = null) {
         if (null !== $this->result) {
             return;
         }
@@ -140,8 +131,7 @@ final class Promise implements PromiseInterface
         $this->settle(reject($reason));
     }
 
-    private function settle(PromiseInterface $result)
-    {
+    private function settle(PromiseInterface $result) {
         $result = $this->unwrap($result);
 
         if ($result === $this) {
@@ -167,8 +157,7 @@ final class Promise implements PromiseInterface
         }
     }
 
-    private function unwrap($promise)
-    {
+    private function unwrap($promise) {
         while ($promise instanceof self && null !== $promise->result) {
             $promise = $promise->result;
         }
@@ -176,8 +165,7 @@ final class Promise implements PromiseInterface
         return $promise;
     }
 
-    private function call(callable $callback)
-    {
+    private function call(callable $callback) {
         try {
             $callback(
                 function ($value = null) {

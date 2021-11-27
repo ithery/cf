@@ -8,7 +8,6 @@
 use Symfony\Component\HttpFoundation\Request;
 
 class CSession_Handler_CookieSessionHandler implements SessionHandlerInterface {
-
     use CTrait_Helper_InteractsWithTime;
 
     /**
@@ -35,8 +34,9 @@ class CSession_Handler_CookieSessionHandler implements SessionHandlerInterface {
     /**
      * Create a new cookie driven handler instance.
      *
-     * @param  CHTTP_Cookie  $cookie
-     * @param  int  $minutes
+     * @param CHTTP_Cookie $cookie
+     * @param int          $minutes
+     *
      * @return void
      */
     public function __construct(CHTTP_Cookie $cookie, $minutes) {
@@ -80,7 +80,7 @@ class CSession_Handler_CookieSessionHandler implements SessionHandlerInterface {
         $this->cookie->queue($sessionId, json_encode([
             'data' => $data,
             'expires' => $this->availableAt($this->minutes * 60),
-                ]), $this->minutes);
+        ]), $this->minutes);
 
         return true;
     }
@@ -104,11 +104,11 @@ class CSession_Handler_CookieSessionHandler implements SessionHandlerInterface {
     /**
      * Set the request instance.
      *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     *
      * @return void
      */
     public function setRequest(Request $request) {
         $this->request = $request;
     }
-
 }

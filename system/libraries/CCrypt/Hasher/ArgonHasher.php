@@ -49,9 +49,9 @@ class CCrypt_Hasher_ArgonHasher extends CCrypt_HasherAbstract implements CCrypt_
      * @param string $value
      * @param array  $options
      *
-     * @return string
-     *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     public function make($value, array $options = []) {
         $hash = @password_hash($value, $this->algorithm(), [
@@ -83,9 +83,9 @@ class CCrypt_Hasher_ArgonHasher extends CCrypt_HasherAbstract implements CCrypt_
      * @param string $hashedValue
      * @param array  $options
      *
-     * @return bool
-     *
      * @throws \RuntimeException
+     *
+     * @return bool
      */
     public function check($value, $hashedValue, array $options = []) {
         if ($this->verifyAlgorithm && $this->info($hashedValue)['algoName'] !== 'argon2i') {

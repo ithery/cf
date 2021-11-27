@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jun 1, 2018, 12:11:34 PM
  */
-use \CApp_Navigation_Helper as Helper;
+use CApp_Navigation_Helper as Helper;
 
 abstract class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface {
     protected $roleNavs = [];
@@ -48,7 +48,7 @@ abstract class CApp_Navigation_Engine implements CApp_Navigation_EngineInterface
         $this->roleNavs = [];
 
         if (!CApp::isAdministrator()) {
-            if (CApp::instance()->isLoginRequired()) {
+            if (CApp::instance()->isAuthEnabled()) {
                 $db = CDatabase::instance();
                 $q = 'select nav from role_nav where role_id=' . $db->escape($roleId) . ' and app_id=' . $db->escape($appId);
                 if ($roleId == null) {

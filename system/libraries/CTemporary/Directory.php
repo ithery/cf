@@ -8,6 +8,10 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Feb 16, 2019, 10:16:40 PM
  */
+
+/**
+ * @see CTemporary
+ */
 class CTemporary_Directory {
     protected $path;
 
@@ -30,6 +34,7 @@ class CTemporary_Directory {
         if (!file_exists($directoryPath)) {
             mkdir($directoryPath, 0777, true);
         }
+
         return $path;
     }
 
@@ -49,6 +54,7 @@ class CTemporary_Directory {
         if (!$this->isFilePath($path)) {
             return $path;
         }
+
         return substr($path, 0, strrpos($path, DS));
     }
 

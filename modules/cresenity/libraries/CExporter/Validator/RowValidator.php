@@ -1,25 +1,16 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_Validator_RowValidator {
-
     private static $instance;
 
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new CExporter_Validator_RowValidator();
         }
+
         return static::$instance;
     }
 
-    /**
-     * @param Factory $validator
-     */
     private function __construct() {
         $this->validator = CValidation::factory();
     }
@@ -38,7 +29,7 @@ class CExporter_Validator_RowValidator {
 
         try {
             $this->validator->make($rows, $rules, $messages, $attributes)->validate();
-        } catch (IlluminateValidationException $e) {
+        } catch (CValidation_Exception $e) {
             $failures = [];
             foreach ($e->errors() as $attribute => $messages) {
                 $row = strtok($attribute, '.');
@@ -46,17 +37,22 @@ class CExporter_Validator_RowValidator {
                 $attributeName = isset($attributes['*.' . $attributeName]) ? $attributes['*.' . $attributeName] : $attributeName;
 
                 $failures[] = new CExporter_Validator_Failure(
-                        $row, $attributeName, str_replace($attribute, $attributeName, $messages), $rows[$row]
+                    $row,
+                    $attributeName,
+                    str_replace($attribute, $attributeName, $messages),
+                    $rows[$row]
                 );
             }
 
             if ($import instanceof CExporter_Concern_SkipsOnFailure) {
                 $import->onFailure(...$failures);
+
                 throw new CExporter_Exception_RowSkippedException(...$failures);
             }
 
             throw new CExporter_Validator_ValidationException(
-            $e, $failures
+                $e,
+                $failures
             );
         }
     }
@@ -95,10 +91,10 @@ class CExporter_Validator_RowValidator {
      */
     private function formatKey(array $elements) {
         return c::collect($elements)->mapWithKeys(function ($rule, $attribute) {
-                    $attribute = cstr::startsWith($attribute, '*.') ? $attribute : '*.' . $attribute;
+            $attribute = cstr::startsWith($attribute, '*.') ? $attribute : '*.' . $attribute;
 
-                    return [$attribute => $this->formatRule($rule)];
-                })->all();
+            return [$attribute => $this->formatRule($rule)];
+        })->all();
     }
 
     /**
@@ -127,5 +123,4 @@ class CExporter_Validator_RowValidator {
 
         return $rules;
     }
-
 }

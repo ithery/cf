@@ -36,9 +36,7 @@
         "ecmaVersion": 8
     },
 
-    "ignorePatterns": ["**/media/assets/*.js"],
-
-
+    "ignorePatterns": ["**/media/assets/*.js","**/*.min.js"],
     "rules": {
 
         //
@@ -105,7 +103,7 @@
         "no-multi-spaces": 2, // disallow use of multiple spaces
         "no-multi-str": 2, // disallow use of multiline strings
         "no-native-reassign": 2, // disallow reassignments of native objects
-        "no-new": 2, // disallow use of new operator when not part of the assignment or comparison
+        "no-new": 0, // disallow use of new operator when not part of the assignment or comparison
         "no-new-func": 2, // disallow use of new operator for Function object
         "no-new-wrappers": 2, // disallows creating new instances of String,Number, and Boolean
         "no-octal": 2, // disallow use of octal literals
@@ -127,7 +125,7 @@
         "vars-on-top": 0, // requires to declare all vars on top of their containing scope (off by default)
         "wrap-iife": 2, // require immediate function invocation to be wrapped in parentheses (off by default)
         "yoda": 2, // require or disallow Yoda conditions
-
+        "no-prototype-builtins": 0,
         //
         // Strict Mode
         //
@@ -149,7 +147,7 @@
         "no-undef-init": 2, // disallow use of undefined when initializing variables
         "no-undefined": 0, // disallow use of undefined variable (off by default)
         "no-unused-vars": 2, // disallow declaration of variables that are not used in the code
-        "no-use-before-define": 2, // disallow use of variables before they are defined
+        "no-use-before-define": 0, // disallow use of variables before they are defined
         "no-useless-escape":0,
         //
         //Stylistic Issues
@@ -158,7 +156,7 @@
         //
         "indent":  [2, 4, { "SwitchCase": 1 }], // this option sets a specific tab width for your code (off by default)
         "brace-style": [2, "1tbs",{"allowSingleLine": true}], // enforce one true brace style (off by default)
-        "camelcase": 1, // require camel case names
+        "camelcase": 0, // require camel case names
         "comma-spacing": [1, {"before": false, "after": true}], // enforce spacing before and after comma
         "comma-style": [1, "last"], // enforce one true comma style (off by default)
         "consistent-this": [0, "_this"], // enforces consistent naming when capturing the current execution context (off by default)
@@ -212,7 +210,7 @@
         //
         "max-depth": [0, 3], // specify the maximum depth that blocks can be nested (off by default)
         //"max-len": [2, 100, 2], // specify the maximum length of a line in your program (off by default)
-        "max-params": [2, 5], // limits the number of parameters that can be used in the function declaration. (off by default)
+        "max-params": [2, 50], // limits the number of parameters that can be used in the function declaration. (off by default)
         "max-statements": 0, // specify the maximum number of statement allowed in a function (off by default)
         "no-bitwise": 0, // disallow use of bitwise operators (off by default)
         "no-plusplus": 0 // disallow use of unary operators, ++ and -- (off by default)
