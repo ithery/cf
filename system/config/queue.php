@@ -91,4 +91,9 @@ return [
         'connection' => 'default',
         'table' => 'queue_failed',
     ],
+
+    'batching' => [
+        'connection' => 'default',
+        'table' => 'queue_batch'
+    ],
 ];
