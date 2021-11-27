@@ -58,6 +58,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
         CAuth_Exception_AuthorizationException::class,
         HttpException::class,
         CHTTP_Exception_ResponseException::class,
+        CModel_Exception_ModelNotFoundException::class,
         CModel_Exception_ModelNotFound::class,
         //SuspiciousOperationException::class,
         //TokenMismatchException::class,
@@ -231,7 +232,7 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @return \Exception
      */
     protected function prepareException($e) {
-        if ($e instanceof CModel_Exception_ModelNotFound) {
+        if ($e instanceof CModel_Exception_ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof CAuth_Exception_AuthorizationException) {
             $e = new AccessDeniedHttpException($e->getMessage(), $e);

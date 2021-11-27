@@ -799,7 +799,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      *
      * @param CRouting_Route $route
      *
-     * @throws CModel_Exception_ModelNotFound
+     * @throws CModel_Exception_ModelNotFoundException
      *
      * @return CRouting_Route
      */
@@ -818,7 +818,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      *
      * @param CRouting_Route $route
      *
-     * @throws CModel_Exception_ModelNotFound
+     * @throws CModel_Exception_ModelNotFoundException
      *
      * @return void
      */

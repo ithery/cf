@@ -1474,6 +1474,22 @@ class c {
 
         return $object;
     }
+
+    /**
+     * Get Public Path.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public static function publicPath($path = null) {
+        $publicPath = DOCROOT . 'public';
+        if ($path != null && strlen($path) > 0) {
+            $publicPath .= ltrim($path, '/');
+        }
+
+        return $publicPath;
+    }
 }
 
 // End c

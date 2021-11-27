@@ -94,7 +94,7 @@ class CComponent_ImplicitlyBoundMethod extends CContainer_BoundMethod {
         $model = $container->make($className)->resolveRouteBinding($value);
 
         if (!$model) {
-            throw (new CModel_Exception_ModelNotFound)->setModel($className, [$value]);
+            throw (new CModel_Exception_ModelNotFoundException())->setModel($className, [$value]);
         }
 
         return $model;
@@ -103,6 +103,7 @@ class CComponent_ImplicitlyBoundMethod extends CContainer_BoundMethod {
     public static function getParameterClassName($parameter) {
         if (method_exists($parameter, 'getType')) {
             $type = $parameter->getType();
+
             return ($type && !$type->isBuiltin()) ? $type->getName() : null;
         }
 
@@ -119,6 +120,7 @@ class CComponent_ImplicitlyBoundMethod extends CContainer_BoundMethod {
         if (method_exists($parameter, 'getType')) {
             return $parameter->getType()->getName();
         }
+
         return static::getParameterTypeNameForPhp56($parameter);
     }
 
@@ -126,16 +128,19 @@ class CComponent_ImplicitlyBoundMethod extends CContainer_BoundMethod {
         if (method_exists($parameter, 'getType')) {
             return $parameter->getType()->isBuiltin();
         }
+
         return static::getParameterTypeIsBuiltInForPhp56($parameter);
     }
 
     public static function getParameterTypeNameForPhp56($parameter) {
         $type = gettype($parameter);
+
         return $type;
     }
 
     public static function getParameterTypeIsBuiltInForPhp56($parameter) {
         $builtInType = ['boolean', 'integer', 'double', 'string', 'array', 'object', 'NULL', 'resource', 'resource (closed)', 'unknown type'];
+
         return in_array(static::getParameterTypeNameForPhp56($parameter), $builtInType);
     }
 }
