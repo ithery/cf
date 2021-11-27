@@ -406,7 +406,7 @@ class c {
 
         $results = [];
 
-        foreach (array_merge([$class => $class], class_parents($class)) as $class) {
+        foreach (array_reverse(class_parents($class)) + [$class => $class] as $class) {
             $results += self::traitUsesRecursive($class);
         }
 
@@ -485,8 +485,8 @@ class c {
      *
      * @return mixed
      */
-    public static function value($value) {
-        return $value instanceof Closure ? $value() : $value;
+    public static function value($value, ...$args) {
+        return $value instanceof Closure ? $value(...$args) : $value;
     }
 
     //@codingStandardsIgnoreStart
@@ -604,10 +604,8 @@ class c {
      *
      * @return mixed
      */
-    public static function throwUnless($condition, $exception, ...$parameters) {
-        if (!$condition) {
-            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
-        }
+    public static function throwUnless($condition, $exception = 'RuntimeException', ...$parameters) {
+        c::throwIf(!$condition, $exception, ...$parameters);
 
         return $condition;
     }
@@ -623,9 +621,13 @@ class c {
      *
      * @return mixed
      */
-    public static function throwIf($condition, $exception, ...$parameters) {
+    public static function throwIf($condition, $exception = 'RuntimeException', ...$parameters) {
         if ($condition) {
-            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+            if (is_string($exception) && class_exists($exception)) {
+                $exception = new $exception(...$parameters);
+            }
+
+            throw is_string($exception) ? new RuntimeException($exception) : $exception;
         }
 
         return $condition;
@@ -991,14 +993,14 @@ class c {
      *
      * @param int           $times
      * @param callable      $callback
-     * @param int           $sleep
+     * @param int|\Closure  $sleepMilliseconds
      * @param null|callable $when
      *
      * @throws \Exception
      *
      * @return mixed
      */
-    public static function retry($times, $callback, $sleep = 0, $when = null) {
+    public static function retry($times, callable $callback, $sleepMilliseconds = 0, $when = null) {
         $attempts = 0;
 
         beginning:
@@ -1012,8 +1014,8 @@ class c {
                 throw $e;
             }
 
-            if ($sleep) {
-                usleep($sleep * 1000);
+            if ($sleepMilliseconds) {
+                usleep(c::value($sleepMilliseconds, $attempts) * 1000);
             }
 
             goto beginning;
@@ -1029,7 +1031,7 @@ class c {
      * @return string
      */
     public static function media($path = '', $secure = null) {
-        return c::url()->asset($path, $secure);
+        return c::url()->media($path, $secure);
     }
 
     /**
@@ -1424,6 +1426,53 @@ class c {
 
     public static function disk($name = null) {
         return CStorage::instance()->disk($name);
+    }
+
+    public static function closureFromCallable($callable) {
+        if (method_exists(Closure::class, 'fromCallable')) {
+            return Closure::fromCallable($callable);
+        }
+
+        return function () use ($callable) {
+            return call_user_func_array($callable, func_get_args());
+        };
+    }
+
+    public static function broadcast($event = null) {
+        return CBroadcast::manager()->event($event);
+    }
+
+    public static function environment() {
+        if (CF::isProduction()) {
+            return 'production';
+        }
+
+        return CF::config('app.environment', 'development');
+    }
+
+    /**
+     * Get an item from an object using "dot" notation.
+     *
+     * @param object      $object
+     * @param null|string $key
+     * @param mixed       $default
+     *
+     * @return mixed
+     */
+    public static function objectGet($object, $key, $default = null) {
+        if (is_null($key) || trim($key) === '') {
+            return $object;
+        }
+
+        foreach (explode('.', $key) as $segment) {
+            if (!is_object($object) || !isset($object->{$segment})) {
+                return c::value($default);
+            }
+
+            $object = $object->{$segment};
+        }
+
+        return $object;
     }
 }
 

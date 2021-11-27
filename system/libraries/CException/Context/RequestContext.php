@@ -11,7 +11,7 @@ class CException_Context_RequestContext extends CException_ContextAbstract imple
     protected $request;
 
     public function __construct(Request $request = null) {
-        $this->request = $request ?? Request::createFromGlobals();
+        $this->request = $request ?: Request::createFromGlobals();
     }
 
     public function getRequest() {

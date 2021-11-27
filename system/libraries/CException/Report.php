@@ -1,5 +1,7 @@
 <?php
-
+if (!is_callable('random_bytes')) {
+    require_once DOCROOT . 'system/vendor/random_compat/random.php';
+}
 class CException_Report {
     use CException_Concern_UseTimeTrait;
     use CException_Concern_HasContextTrait;
@@ -48,11 +50,6 @@ class CException_Report {
      * @var ?string
      */
     private $applicationVersion;
-
-    /**
-     * @var array
-     */
-    private $userProvidedContext = [];
 
     /**
      * @var array
@@ -239,10 +236,10 @@ class CException_Report {
 
     public function toArray() {
         return [
-            'notifier' => $this->notifierName ?? 'CF Client',
+            'notifier' => $this->notifierName ?: 'CF Client',
             'language' => 'PHP',
             'framework_version' => $this->frameworkVersion,
-            'language_version' => $this->languageVersion ?? phpversion(),
+            'language_version' => $this->languageVersion ?: phpversion(),
             'exception_class' => $this->exceptionClass,
             'seen_at' => $this->getCurrentTime(),
             'message' => $this->message,
@@ -298,7 +295,7 @@ class CException_Report {
      */
     private function generateUuid() {
         // Generate 16 bytes (128 bits) of random data or use the data passed into the function.
-        $data = $data ?? random_bytes(16);
+        $data = random_bytes(16);
         assert(strlen($data) == 16);
 
         // Set version to 0100

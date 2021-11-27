@@ -20,3 +20,13 @@ export const extend = (defaults, options) =>{
     }
     return extended;
 };
+
+
+export const isJson = (str) => {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+};

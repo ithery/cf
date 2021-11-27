@@ -45,7 +45,7 @@ trait CException_Concern_HasContextTrait {
      * @return array
      */
     public function getGroup($groupName = 'context', $default = []) {
-        return $this->userProvidedContext[$groupName] ?? $default;
+        return isset($this->userProvidedContext[$groupName]) ? $this->userProvidedContext[$groupName] : $default;
     }
 
     public function context($key, $value) {
@@ -59,7 +59,7 @@ trait CException_Concern_HasContextTrait {
      * @return $this
      */
     public function group($groupName, array $properties) {
-        $group = $this->userProvidedContext[$groupName] ?? [];
+        $group = isset($this->userProvidedContext[$groupName]) ? $this->userProvidedContext[$groupName] : [];
 
         $this->userProvidedContext[$groupName] = carr::arrayMergeRecursiveDistinct(
             $group,

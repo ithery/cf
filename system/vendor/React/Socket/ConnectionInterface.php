@@ -52,10 +52,9 @@ use React\Stream\DuplexStreamInterface;
  * @see ServerInterface
  * @see ConnectorInterface
  */
-interface ConnectionInterface extends DuplexStreamInterface
-{
+interface ConnectionInterface extends DuplexStreamInterface {
     /**
-     * Returns the full remote address (URI) where this connection has been established with
+     * Returns the full remote address (URI) where this connection has been established with.
      *
      * ```php
      * $address = $connection->getRemoteAddress();
@@ -85,7 +84,7 @@ interface ConnectionInterface extends DuplexStreamInterface
     public function getRemoteAddress();
 
     /**
-     * Returns the full local address (full URI with scheme, IP and port) where this connection has been established with
+     * Returns the full local address (full URI with scheme, IP and port) where this connection has been established with.
      *
      * ```php
      * $address = $connection->getLocalAddress();
@@ -113,6 +112,7 @@ interface ConnectionInterface extends DuplexStreamInterface
      * used for this connection.
      *
      * @return ?string local address (URI) or null if unknown
+     *
      * @see self::getRemoteAddress()
      */
     public function getLocalAddress();

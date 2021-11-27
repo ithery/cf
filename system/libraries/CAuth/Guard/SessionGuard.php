@@ -3,8 +3,9 @@
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
-class CAuth_Guard_SessionGuard implements CAuth_StatefulGuardInterface, CAuth_SupportBasicAuthInterface {
+class CAuth_Guard_SessionGuard implements CAuth_Contract_StatefulGuardInterface, CAuth_SupportBasicAuthInterface {
     use CAuth_Guard_Concern_GuardHelper, CTrait_Macroable;
+
     /**
      * The name of the guard. Typically "web".
      *

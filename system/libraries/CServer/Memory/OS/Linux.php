@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CServer_Memory_OS_Linux extends CServer_Memory_OS {
     /**
-     * Physical memory information and Swap Space information
+     * Physical memory information and Swap Space information.
      *
      * @return void
      */
@@ -44,7 +44,7 @@ class CServer_Memory_OS_Linux extends CServer_Memory_OS {
             unset($swaps[0]);
             foreach ($swaps as $swap) {
                 $ar_buf = preg_split('/\s+/', $swap, 5);
-                $dev = CServer::createDeviceDisk();
+                $dev = CServer_Factory::createDeviceDisk();
                 $dev->setMountPoint($ar_buf[0]);
                 $dev->setName('SWAP');
                 $dev->setTotal($ar_buf[2] * 1024);

@@ -1,7 +1,7 @@
 <?php
 
 class CException_Solution_SolutionProvider_BadMethodCallSolutionProvider implements CException_Contract_HasSolutionsForThrowableInterface {
-    protected const REGEX = '/([a-zA-Z\\\\]+)::([a-zA-Z]+)/m';
+    const REGEX = '/([a-zA-Z\\\\]+)::([a-zA-Z]+)/m';
 
     public function canSolve($throwable) {
         if (!$throwable instanceof BadMethodCallException) {

@@ -181,7 +181,6 @@ final class CF {
 
         CFBenchmark::stop(SYSTEM_BENCHMARK . '_environment_setup');
         static::loadBootstrapFiles();
-
         // Setup is complete, prevent it from being run again
         $run = true;
 
@@ -740,7 +739,7 @@ final class CF {
 
     public static function domain() {
         $domain = '';
-        if (static::isCli()) {
+        if (static::isCli() || static::isCFCli()) {
             // Command line requires a bit of hacking
             if (static::isCFCli() || static::isTesting()) {
                 $domain = static::cliDomain();
@@ -792,7 +791,6 @@ final class CF {
 
         // Search path
         $search = $directory . '/' . $filename . $ext;
-
         // Nothing found, yet
         $found = null;
         $cacheKey = 'find_file_paths.' . $search . '.' . ($withShared ? 'withShared' : 'withoutShared');
@@ -870,7 +868,6 @@ final class CF {
             if (self::$data[$domain] == null) {
                 //try to locate wildcard subdomain
                 $wildcardDomain = implode('.', ['$'] + array_slice(explode('.', $domain), 0));
-
                 self::$data[$domain] = CFData::domain($wildcardDomain);
             }
         }

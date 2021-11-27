@@ -1,9 +1,9 @@
 <?php
 
 class CException_Solution_SolutionProvider_UndefinedPropertySolutionProvider implements CException_Contract_HasSolutionsForThrowableInterface {
-    protected const REGEX = '/([a-zA-Z\\\\]+)::\$([a-zA-Z]+)/m';
+    const REGEX = '/([a-zA-Z\\\\]+)::\$([a-zA-Z]+)/m';
 
-    protected const MINIMUM_SIMILARITY = 80;
+    const MINIMUM_SIMILARITY = 80;
 
     public function canSolve($throwable) {
         if (!$throwable instanceof ErrorException) {

@@ -66,7 +66,7 @@ abstract class CModel_Scout_EngineAbstract {
      * @param mixed                 $results
      * @param \CModel               $model
      *
-     * @return \CBase_LazyCollection
+     * @return \CCollection_LazyCollection
      */
     abstract public function lazyMap(CModel_Scout_Builder $builder, $results, $model);
 

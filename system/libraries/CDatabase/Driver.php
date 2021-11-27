@@ -3,7 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * Database API driver
+ * Database API driver.
  */
 abstract class CDatabase_Driver {
     use CTrait_Compat_Database_Driver;
@@ -64,6 +64,7 @@ abstract class CDatabase_Driver {
         foreach ($values as $key => $val) {
             $valstr[] = $this->escapeColumn($key) . ' = ' . $val;
         }
+
         return 'UPDATE ' . $this->escapeTable($table) . ' SET ' . implode(', ', $valstr) . ' WHERE ' . implode(' ', $where);
     }
 
@@ -230,6 +231,7 @@ abstract class CDatabase_Driver {
         foreach ($keys as $key => $value) {
             $keys[$key] = $this->escapeColumn($value);
         }
+
         return 'INSERT INTO ' . $this->escapeTable($table) . ' (' . implode(', ', $keys) . ') VALUES (' . implode(', ', $values) . ')';
     }
 
@@ -293,16 +295,20 @@ abstract class CDatabase_Driver {
         switch (gettype($value)) {
             case 'string':
                 $value = '\'' . $this->escapeStr($value) . '\'';
+
                 break;
             case 'boolean':
                 $value = (int) $value;
+
                 break;
             case 'double':
                 // Convert to non-locale aware float to prevent possible commas
                 $value = sprintf('%F', $value);
+
                 break;
             default:
                 $value = ($value === null) ? 'NULL' : $value;
+
                 break;
         }
 
@@ -350,6 +356,63 @@ abstract class CDatabase_Driver {
      */
     abstract public function fieldData($table);
 
+    public static function getSqlTypeData() {
+        static $sqlTypeData;
+        if ($sqlTypeData === null) {
+            $sqlTypeData = [
+                'tinyint' => ['type' => 'int', 'max' => 127],
+                'smallint' => ['type' => 'int', 'max' => 32767],
+                'mediumint' => ['type' => 'int', 'max' => 8388607],
+                'int' => ['type' => 'int', 'max' => 2147483647],
+                'integer' => ['type' => 'int', 'max' => 2147483647],
+                'bigint' => ['type' => 'int', 'max' => 9223372036854775807],
+                'float' => ['type' => 'float'],
+                'float unsigned' => ['type' => 'float', 'min' => 0],
+                'boolean' => ['type' => 'boolean'],
+                'time' => ['type' => 'string', 'format' => '00:00:00'],
+                'time with time zone' => ['type' => 'string'],
+                'date' => ['type' => 'string', 'format' => '0000-00-00'],
+                'year' => ['type' => 'string', 'format' => '0000'],
+                'datetime' => ['type' => 'string', 'format' => '0000-00-00 00:00:00'],
+                'timestamp with time zone' => ['type' => 'string'],
+                'char' => ['type' => 'string', 'exact' => true],
+                'binary' => ['type' => 'string', 'binary' => true, 'exact' => true],
+                'varchar' => ['type' => 'string'],
+                'varbinary' => ['type' => 'string', 'binary' => true],
+                'blob' => ['type' => 'string', 'binary' => true],
+                'text' => ['type' => 'string']
+            ];
+
+            // DOUBLE
+            $sqlTypeData['double'] = $sqlTypeData['double precision'] = $sqlTypeData['decimal'] = $sqlTypeData['real'] = $sqlTypeData['numeric'] = $sqlTypeData['float'];
+            $sqlTypeData['double unsigned'] = $sqlTypeData['float unsigned'];
+
+            // BIT
+            $sqlTypeData['bit'] = $sqlTypeData['boolean'];
+
+            // TIMESTAMP
+            $sqlTypeData['timestamp'] = $sqlTypeData['timestamp without time zone'] = $sqlTypeData['datetime'];
+
+            // ENUM
+            $sqlTypeData['enum'] = $sqlTypeData['set'] = $sqlTypeData['varchar'];
+
+            // TEXT
+            $sqlTypeData['tinytext'] = $sqlTypeData['mediumtext'] = $sqlTypeData['longtext'] = $sqlTypeData['text'];
+
+            // BLOB
+            $sqlTypeData['tsvector'] = $sqlTypeData['tinyblob'] = $sqlTypeData['mediumblob'] = $sqlTypeData['longblob'] = $sqlTypeData['clob'] = $sqlTypeData['bytea'] = $sqlTypeData['blob'];
+
+            // CHARACTER
+            $sqlTypeData['character'] = $sqlTypeData['char'];
+            $sqlTypeData['character varying'] = $sqlTypeData['varchar'];
+
+            // TIME
+            $sqlTypeData['time without time zone'] = $sqlTypeData['time'];
+        }
+
+        return $sqlTypeData;
+    }
+
     /**
      * Fetches SQL type information about a field, in a generic format.
      *
@@ -358,12 +421,7 @@ abstract class CDatabase_Driver {
      * @return array
      */
     protected function sqlType($str) {
-        static $sql_types;
-
-        if ($sql_types === null) {
-            // Load SQL data types
-            $sql_types = CF::config('sql_types');
-        }
+        $sqlTypes = static::getSqlTypeData();
 
         $str = strtolower(trim($str));
 
@@ -381,7 +439,7 @@ abstract class CDatabase_Driver {
         empty($sql_types[$type]) and exit('Unknown field type: ' . $type);
 
         // Fetch the field definition
-        $field = $sql_types[$type];
+        $field = $sqlTypes[$type];
 
         switch ($field['type']) {
             case 'string':
@@ -390,10 +448,12 @@ abstract class CDatabase_Driver {
                     // Add the length to the field info
                     $field['length'] = substr($str, $open + 1, $close - $open);
                 }
+
                 break;
             case 'int':
                 // Add unsigned value
                 $field['unsigned'] = (strpos($str, 'unsigned') !== false);
+
                 break;
         }
 
