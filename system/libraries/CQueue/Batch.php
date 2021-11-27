@@ -2,20 +2,6 @@
 
 class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
     /**
-     * The queue factory implementation.
-     *
-     * @var \CQueue_FactoryInterface
-     */
-    protected $queue;
-
-    /**
-     * The repository implementation.
-     *
-     * @var \CQueue_BatchRepositoryInterface
-     */
-    protected $repository;
-
-    /**
      * The batch ID.
      *
      * @var string
@@ -67,45 +53,59 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
     /**
      * The date indicating when the batch was created.
      *
-     * @var \Carbon\CarbonImmutable
+     * @var \CarbonV3\CarbonImmutable
      */
     public $createdAt;
 
     /**
      * The date indicating when the batch was cancelled.
      *
-     * @var \Carbon\CarbonImmutable|null
+     * @var null|\CarbonV3\CarbonImmutable
      */
     public $cancelledAt;
 
     /**
      * The date indicating when the batch was finished.
      *
-     * @var \Carbon\CarbonImmutable|null
+     * @var null|\CarbonV3\CarbonImmutable
      */
     public $finishedAt;
 
     /**
+     * The queue factory implementation.
+     *
+     * @var \CQueue_FactoryInterface
+     */
+    protected $queue;
+
+    /**
+     * The repository implementation.
+     *
+     * @var \CQueue_Contract_BatchRepositoryInterface
+     */
+    protected $repository;
+
+    /**
      * Create a new batch instance.
      *
-     * @param \CQueue_FactoryInterface         $queue
-     * @param \CQueue_BatchRepositoryInterface $repository
-     * @param string                           $id
-     * @param string                           $name
-     * @param int                              $totalJobs
-     * @param int                              $pendingJobs
-     * @param int                              $failedJobs
-     * @param array                            $failedJobIds
-     * @param array                            $options
-     * @param \Carbon\CarbonImmutable          $createdAt
-     * @param \Carbon\CarbonImmutable|null     $cancelledAt
-     * @param \Carbon\CarbonImmutable|null     $finishedAt
+     * @param \CQueue_FactoryInterface                  $queue
+     * @param \CQueue_Contract_BatchRepositoryInterface $repository
+     * @param string                                    $id
+     * @param string                                    $name
+     * @param int                                       $totalJobs
+     * @param int                                       $pendingJobs
+     * @param int                                       $failedJobs
+     * @param array                                     $failedJobIds
+     * @param array                                     $options
+     * @param \CarbonV3\CarbonImmutable                 $createdAt
+     * @param null|\CarbonV3\CarbonImmutable            $cancelledAt
+     * @param null|\CarbonV3\CarbonImmutable            $finishedAt
      *
      * @return void
      */
     public function __construct(
         CQueue_FactoryInterface $queue,
-        CQueue_BatchRepositoryInterface $repository,
+        CQueue_Contract_BatchRepositoryInterface $repository,
         $id,
         $name,
         $totalJobs,
@@ -158,8 +158,8 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
 
                 return c::with($this->prepareBatchedChain($job), function ($chain) {
                     return $chain->first()
-                        ->allOnQueue($this->options['queue'] ?? null)
-                        ->allOnConnection($this->options['connection'] ?? null)
+                        ->allOnQueue(isset($this->options['queue']) ? $this->options['queue'] : null)
+                        ->allOnConnection(isset($this->options['connection']) ? $this->options['connection'] : null)
                         ->chain($chain->slice(1)->values()->all());
                 });
             } else {
@@ -174,7 +174,7 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
         $this->repository->transaction(function () use ($jobs, $count) {
             $this->repository->incrementTotalJobs($this->id, $count);
 
-            $this->queue->connection($this->options['connection'] ?? null)->bulk(
+            $this->queue->connection(isset($this->options['connection']) ? $this->options['connection'] : null)->bulk(
                 $jobs->all(),
                 $data = '',
                 $this->options['queue'] ?? null
@@ -253,9 +253,9 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
      *
      * @param string $jobId
      *
-     * @return \Illuminate\Bus\UpdatedBatchJobCounts
+     * @return \CQueue_UpdatedBatchJobCounts
      */
-    public function decrementPendingJobs(string $jobId) {
+    public function decrementPendingJobs($jobId) {
         return $this->repository->decrementPendingJobs($this->id, $jobId);
     }
 
@@ -303,7 +303,7 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
      *
      * @return void
      */
-    public function recordFailedJob(string $jobId, $e) {
+    public function recordFailedJob($jobId, $e) {
         $counts = $this->incrementFailedJobs($jobId);
 
         if ($counts->failedJobs === 1 && !$this->allowsFailures()) {
@@ -332,7 +332,7 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
      *
      * @param string $jobId
      *
-     * @return \Illuminate\Bus\UpdatedBatchJobCounts
+     * @return \CQueue_UpdatedBatchJobCounts
      */
     public function incrementFailedJobs(string $jobId) {
         return $this->repository->incrementFailedJobs($this->id, $jobId);
@@ -395,9 +395,9 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
     /**
      * Invoke a batch callback handler.
      *
-     * @param \Illuminate\Queue\SerializableClosure|callable $handler
-     * @param \Illuminate\Bus\Batch                          $batch
-     * @param \Throwable|null                                $e
+     * @param \CQueue_SerializableClosure|callable $handler
+     * @param \CQueue_Batch                        $batch
+     * @param null|\Throwable                      $e
      *
      * @return void
      */
