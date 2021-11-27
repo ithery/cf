@@ -231,8 +231,8 @@ return [
         'css' => ['plugins' . DS . 'select2' . DS . 'select2_v4.css'],
     ],
     'select2' => [
-        'js' => ['plugins' . DS . 'select2' . DS . 'select2.js'],
-        'css' => ['plugins' . DS . 'select2' . DS . 'select2.css'],
+        'js' => ['plugins' . DS . 'select2' . DS . 'select2.full.js'],
+        'css' => ['plugins' . DS . 'select2' . DS . 'select2-4.0.0.min.css'],
     ],
     'select2-4.0' => [
         'js' => ['plugins' . DS . 'select2' . DS . 'select2.full.js'],
