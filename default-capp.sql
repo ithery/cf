@@ -289,6 +289,32 @@ CREATE TABLE `queue_failed` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
+DROP TABLE IF EXISTS `queue_batch`;
+CREATE TABLE `queue_batch` (
+  `queue_batch_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `org_id` bigint(20) unsigned DEFAULT NULL,
+  `app_code` varchar(200) DEFAULT NULL,
+  `name` varchar(200) DEFAULT NULL,
+  `id` varchar(255) DEFAULT NULL,
+  `total_jobs` int DEFAULT NULL,
+  `pending_jobs` int DEFAULT NULL,
+  `failed_jobs` int DEFAULT NULL,
+  `failed_job_ids` TEXT DEFAULT NULL,
+  `options` LONGTEXT DEFAULT NULL,
+  `cancelled_at` datetime DEFAULT NULL,
+  `finished_at` datetime DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `createdby` varchar(255) DEFAULT NULL,
+  `updated` datetime DEFAULT NULL,
+  `updatedby` varchar(255) DEFAULT NULL,
+  `deleted` datetime DEFAULT NULL,
+  `deletedby` varchar(255) DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`queue_batch_id`),
+  UNIQUE KEY `queue_batch_id` (`queue_batch_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
 
 CREATE TABLE `meta` (
   `meta_id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
