@@ -3,25 +3,25 @@ use PHPUnit\Framework\TestCase;
 
 class ReflectorTest extends TestCase {
     public function testGetClassName() {
-        $method = (new ReflectionClass(PendingMailFake::class))->getMethod('send');
+        $method = (new ReflectionClass(TestClass::class))->getMethod('withPeriod');
 
-        $this->assertSame(Mailable::class, CBase_Reflector::getParameterClassName($method->getParameters()[0]));
+        $this->assertSame(CPeriod::class, CBase_Reflector::getParameterClassName($method->getParameters()[0]));
     }
 
     public function testEmptyClassName() {
-        $method = (new ReflectionClass(MailFake::class))->getMethod('assertSent');
+        $method = (new ReflectionClass(TestClass::class))->getMethod('withNull');
 
         $this->assertNull(CBase_Reflector::getParameterClassName($method->getParameters()[0]));
     }
 
     public function testStringTypeName() {
-        $method = (new ReflectionClass(BusFake::class))->getMethod('dispatchedAfterResponse');
+        $method = (new ReflectionClass(CTesting_Fake_Base_BusFake::class))->getMethod('dispatchedAfterResponse');
 
         $this->assertNull(CBase_Reflector::getParameterClassName($method->getParameters()[0]));
     }
 
     public function testSelfClassName() {
-        $method = (new ReflectionClass(Model::class))->getMethod('newPivot');
+        $method = (new ReflectionClass(CModel::class))->getMethod('newPivot');
 
         $this->assertSame(CModel::class, CBase_Reflector::getParameterClassName($method->getParameters()[0]));
     }
@@ -36,7 +36,7 @@ class ReflectorTest extends TestCase {
      * @requires PHP >= 8
      */
     public function testUnionTypeName() {
-        $method = (new ReflectionClass(C::class))->getMethod('f');
+        $method = (new ReflectionClass(F::class))->getMethod('f');
 
         $this->assertNull(CBase_Reflector::getParameterClassName($method->getParameters()[0]));
     }
@@ -66,7 +66,7 @@ class B extends A {
 if (PHP_MAJOR_VERSION >= 8) {
     eval('
 namespace Illuminate\Tests\Support;
-class C
+class F
 {
     public function f(A|Model $x)
     {
@@ -75,7 +75,13 @@ class C
 }'
     );
 }
+class TestClass {
+    public function withPeriod(CPeriod $period) {
+    }
 
+    public function withNull($period) {
+    }
+}
 class TestClassWithCall {
     public function __call($method, $parameters) {
     }
