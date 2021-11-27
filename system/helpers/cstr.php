@@ -174,11 +174,15 @@ class cstr {
      * @return string
      */
     public static function replaceArray($search, array $replace, $subject) {
-        foreach ($replace as $value) {
-            $subject = static::replaceFirst($search, $value, $subject);
+        $segments = explode($search, $subject);
+
+        $result = array_shift($segments);
+
+        foreach ($segments as $segment) {
+            $result .= (array_shift($replace) ?? $search) . $segment;
         }
 
-        return $subject;
+        return $result;
     }
 
     /**
@@ -398,7 +402,9 @@ class cstr {
      */
     public static function endsWith($haystack, $needles) {
         foreach ((array) $needles as $needle) {
-            if (substr($haystack, -strlen($needle)) === (string) $needle) {
+            if ($needle !== '' && $needle !== null
+                && substr($haystack, -strlen($needle)) === (string) $needle
+            ) {
                 return true;
             }
         }
@@ -500,10 +506,10 @@ class cstr {
      * @return string
      */
     public static function slug($title, $separator = '-', $language = 'en') {
-        $title = static::ascii($title, $language);
+        $title = $language ? static::ascii($title, $language) : $title;
 
         // Convert all dashes/underscores into separator
-        $flip = $separator == '-' ? '_' : '-';
+        $flip = $separator === '-' ? '_' : '-';
 
         $title = preg_replace('![' . preg_quote($flip) . ']+!u', $separator, $title);
 
@@ -511,7 +517,7 @@ class cstr {
         $title = str_replace('@', $separator . 'at' . $separator, $title);
 
         // Remove all characters that are not the separator, letters, numbers, or whitespace.
-        $title = preg_replace('![^' . preg_quote($separator) . '\pL\pN\s]+!u', '', mb_strtolower($title));
+        $title = preg_replace('![^' . preg_quote($separator) . '\pL\pN\s]+!u', '', static::lower($title));
 
         // Replace all separator characters and whitespace by a single separator
         $title = preg_replace('![' . preg_quote($separator) . '\s]+!u', $separator, $title);
@@ -565,13 +571,16 @@ class cstr {
      * @return bool
      */
     public static function is($pattern, $value) {
-        $patterns = is_array($pattern) ? $pattern : (array) $pattern;
+        $patterns = carr::wrap($pattern);
+
+        $value = (string) $value;
 
         if (empty($patterns)) {
             return false;
         }
 
         foreach ($patterns as $pattern) {
+            $pattern = (string) $pattern;
             // If the given value is an exact match we can of course return true right
             // from the beginning. Otherwise, we will translate asterisks and do an
             // actual pattern match against the two strings to see if they match.
@@ -1069,8 +1078,7 @@ class cstr {
      * @return string
      */
     public static function ucfirst($string, $delimiter = ' ') {
-        // Put the keys back the Case-Convention expected
-        return implode($delimiter, array_map('CUTF8::ucfirst', explode($delimiter, $string)));
+        return static::upper(static::substr($string, 0, 1)) . static::substr($string, 1);
     }
 
     /**

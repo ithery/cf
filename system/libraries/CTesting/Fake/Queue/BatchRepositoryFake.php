@@ -2,7 +2,7 @@
 
 use CarbonV3\CarbonImmutable;
 
-class CTesting_Fake_Queue_BatchRepositoryFake implements CQueue_BatchRepositoryInterface {
+class CTesting_Fake_Queue_BatchRepositoryFake implements CQueue_Contract_BatchRepositoryInterface {
     /**
      * Retrieve a list of batches.
      *
