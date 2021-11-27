@@ -1,13 +1,6 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CExporter_Event_BeforeWriting extends CExporter_Event {
-
     /**
      * @var Writer
      */
@@ -20,7 +13,7 @@ class CExporter_Event_BeforeWriting extends CExporter_Event {
 
     /**
      * @param CExporter_Writer $writer
-     * @param object $exportable
+     * @param object           $exportable
      */
     public function __construct(CExporter_Writer $writer, $exportable) {
         $this->writer = $writer;
@@ -47,5 +40,4 @@ class CExporter_Event_BeforeWriting extends CExporter_Event {
     public function getDelegate() {
         return $this->writer;
     }
-
 }

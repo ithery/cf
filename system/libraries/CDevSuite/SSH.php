@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of SSH
+ * Description of SSH.
  *
  * @author Hery
  */
@@ -38,6 +38,7 @@ class CDevSuite_Ssh {
     public function create($name, $configuration) {
         if (!$this->isCanConnect($configuration)) {
             CDevSuite::info('Error when connecting to:' . $name . ', please check your configuration');
+
             return false;
         }
 
@@ -45,6 +46,7 @@ class CDevSuite_Ssh {
         $data[$name] = $configuration;
 
         $this->write($data);
+
         return true;
     }
 
@@ -69,6 +71,7 @@ class CDevSuite_Ssh {
      */
     public function read() {
         $this->ensureFileExists();
+
         return json_decode($this->files->get($this->path()), true);
     }
 
@@ -105,14 +108,17 @@ class CDevSuite_Ssh {
             } catch (Exception $ex) {
                 $errMessage = $ex->getMessage();
                 CDevSuite::info($ex->getMessage());
+
                 return false;
             }
         }
+
         return true;
     }
 
     public function getRemoteSsh($key) {
         $config = $this->toRemoteSshConfig($key);
+
         return CRemote::ssh($config);
     }
 
@@ -142,20 +148,22 @@ class CDevSuite_Ssh {
             $keytext = $this->files->get($password);
             $config['keytext'] = $keytext;
         }
+
         return $config;
     }
 
     public function executableName() {
         if (CServer::isWindows()) {
             $bit = PHP_INT_SIZE * 8;
+
             return 'putty-' . $bit . '-x86.exe';
         }
+
         return 'ssh';
     }
 
     public function open($name) {
         $configArray = carr::get($this->read(), $name);
-
 
         $host = carr::get($configArray, 'host');
         $username = carr::get($configArray, 'user');

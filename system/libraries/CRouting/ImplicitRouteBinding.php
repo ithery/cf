@@ -1,4 +1,3 @@
-
 <?php
 class CRouting_ImplicitRouteBinding {
     /**
@@ -7,9 +6,9 @@ class CRouting_ImplicitRouteBinding {
      * @param CContainer_Container $container
      * @param CRouting_Route       $route
      *
-     * @return void
-     *
      * @throws CModel_Exception_ModelNotFound
+     *
+     * @return void
      */
     public static function resolveForRoute($container, $route) {
         $parameters = $route->parameters();
@@ -25,7 +24,7 @@ class CRouting_ImplicitRouteBinding {
                 continue;
             }
 
-            $instance = $container->make(Reflector::getParameterClassName($parameter));
+            $instance = $container->make(CBase_Reflector::getParameterClassName($parameter));
 
             $parent = $route->parentOfParameter($parameterName);
 
@@ -36,10 +35,10 @@ class CRouting_ImplicitRouteBinding {
                     $route->bindingFieldFor($parameterName)
                 );
                 if (!$model) {
-                    throw (new CModel_Exception_ModelNotFound)->setModel(get_class($instance), [$parameterValue]);
+                    throw (new CModel_Exception_ModelNotFound())->setModel(get_class($instance), [$parameterValue]);
                 }
             } elseif (!$model = $instance->resolveRouteBinding($parameterValue, $route->bindingFieldFor($parameterName))) {
-                throw (new CModel_Exception_ModelNotFound)->setModel(get_class($instance), [$parameterValue]);
+                throw (new CModel_Exception_ModelNotFound())->setModel(get_class($instance), [$parameterValue]);
             }
 
             $route->setParameter($parameterName, $model);
@@ -52,7 +51,7 @@ class CRouting_ImplicitRouteBinding {
      * @param string $name
      * @param array  $parameters
      *
-     * @return string|null
+     * @return null|string
      */
     protected static function getParameterName($name, $parameters) {
         if (array_key_exists($name, $parameters)) {

@@ -5,9 +5,10 @@ defined('SYSPATH') or die('No direct access allowed.');
 /**
  * @author Hery Kurniawan
  */
-use phpseclib\Crypt\RSA;
+
 use phpseclib\Net\SFTP;
 use phpseclib\Net\SSH2;
+use phpseclib\Crypt\RSA;
 use phpseclib\System\SSH\Agent;
 
 class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
@@ -166,7 +167,7 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
      * @return \Crypt_RSA
      */
     protected function loadRsaKey(array $auth) {
-        c::with($key = $this->getKey($auth))->load($this->readRsaKey($auth));
+        $key = $this->getKey($auth);
 
         return $key;
     }
@@ -179,7 +180,7 @@ class CRemote_SSH_Gateway implements CRemote_SSH_GatewayInterface {
      * @return \Crypt_RSA
      */
     protected function getKey(array $auth) {
-        c::with($key = $this->getNewKey())->setPassword(carr::get($auth, 'keyphrase'));
+        c::with($key = $this->getNewKey())->loadKey(carr::get($auth, 'keytext'));
 
         return $key;
     }

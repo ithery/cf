@@ -15,6 +15,11 @@ class CServer {
 
     const OS_DARWIN = 'Darwin';
 
+    /**
+     * Array expression search.
+     */
+    const ARRAY_EXP = '/^return array \([^;]*\);$/';
+
     public static function storage($sshConfig = null) {
         return CServer_Storage::instance($sshConfig);
     }
@@ -65,6 +70,7 @@ class CServer {
         if ($os == null) {
             $os = PHP_OS;
         }
+
         return $os;
     }
 
@@ -76,26 +82,13 @@ class CServer {
         return sys_getloadavg();
     }
 
-    /**
-     * @return CServer_Device_Cpu
-     */
-    public static function createDeviceCpu() {
-        return new CServer_Device_Cpu();
-    }
-
-    /**
-     * @return CServer_Device_Disk
-     */
-    public static function createDeviceDisk() {
-        return new CServer_Device_Disk();
-    }
-
     public static function isProcOpenDisabled() {
         $isDisabled = false;
         if (!function_exists('proc_open')) {
             $isDisabled = true;
         }
         $process = null;
+
         try {
             $descriptorspec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
             $pipes = [];
@@ -124,11 +117,17 @@ class CServer {
 
     public static function isNpmInstalled() {
         exec('npm -v', $output, $exitCode);
+
         return $exitCode === 0;
     }
 
     public static function isComposerInstalled() {
         exec('composer -v', $output, $exitCode);
+
         return $exitCode === 0;
+    }
+
+    public static function dns() {
+        return new CServer_Dns();
     }
 }

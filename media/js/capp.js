@@ -8,6 +8,38 @@ if (!Object.assign) {
         return result;
     };
 }
+function is_numeric(mixedVar) { // eslint-disable-line camelcase
+    const whitespace = [
+        ' ',
+        '\n',
+        '\r',
+        '\t',
+        '\f',
+        '\x0b',
+        '\xa0',
+        '\u2000',
+        '\u2001',
+        '\u2002',
+        '\u2003',
+        '\u2004',
+        '\u2005',
+        '\u2006',
+        '\u2007',
+        '\u2008',
+        '\u2009',
+        '\u200a',
+        '\u200b',
+        '\u2028',
+        '\u2029',
+        '\u3000'
+    ].join('');
+    // @todo: Break this up using many single conditions with early returns
+    return (typeof mixedVar === 'number' ||
+      (typeof mixedVar === 'string' &&
+      whitespace.indexOf(mixedVar.slice(-1)) === -1)) &&
+      mixedVar !== '' &&
+      !isNaN(mixedVar);
+}
 
 // eslint-disable-next-line no-extend-native
 String.prototype.contains = function (a) {
@@ -156,7 +188,7 @@ let CF = function () {
 
 
     this.getConfig = function () {
-        return this.window.capp;
+        return window.capp;
     };
 
 
@@ -1460,6 +1492,12 @@ let Cresenity = function () {
         });
     };
 
+    this.replaceAll = function (string, find, replace) {
+        let escapedFind = find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, '\\$1');
+        return string.replace(new RegExp(escapedFind, 'g'), replace);
+    };
+
+
     this.formatCurrency = function (rp) {
         rp = '' + rp;
         let rupiah = '';
@@ -1489,6 +1527,22 @@ let Cresenity = function () {
         vfloat = vfloat.replace('.', ds);
         if (vfloat.length > dd) {vfloat = vfloat.substring(0, dd + 1);}
         return minus_str + rupiah + vfloat;
+    };
+
+    this.unformatCurrency = function (rp) {
+        if (typeof rp == 'undefined') {
+            rp = '';
+        }
+        let ds = window.capp.decimal_separator;
+        let ts = window.capp.thousand_separator;
+        let last3 = rp.substr(rp.length - 3);
+        let char_last3 = last3.charAt(0);
+        if (char_last3 != ts) {
+            rp = this.replaceAll(rp, ts, '');
+        }
+
+        rp = rp.replace(ds, '.');
+        return rp;
     };
 
     this.getStyles = (selector, only, except) => {

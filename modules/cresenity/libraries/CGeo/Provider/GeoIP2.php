@@ -1,18 +1,18 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 7:46:29 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 7:46:29 PM
  */
-use GeoIp2\Exception\AddressNotFoundException;
-use GeoIp2\Exception\AuthenticationException;
 use GeoIp2\Exception\OutOfQueriesException;
+use GeoIp2\Exception\AuthenticationException;
+use GeoIp2\Exception\AddressNotFoundException;
 
 final class CGeo_Provider_GeoIP2 extends CGeo_Provider {
-
     /**
      * @var CGeo_Provider_GeoIP2_Adapter
      */
@@ -23,7 +23,7 @@ final class CGeo_Provider_GeoIP2 extends CGeo_Provider {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function geocodeQuery(CGeo_Query_GeocodeQuery $query) {
         $address = $query->getText();
@@ -48,6 +48,7 @@ final class CGeo_Provider_GeoIP2 extends CGeo_Provider {
                 }
             }
         }
+
         return new CGeo_Model_AddressCollection([
             CGeo_Model_Address::createFromArray([
                 'providedBy' => $this->getName(),
@@ -64,14 +65,14 @@ final class CGeo_Provider_GeoIP2 extends CGeo_Provider {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function reverseQuery(CGeo_Query_ReverseQuery $query) {
         throw new CGeo_Exception_UnsupportedOperation('The GeoIP2 provider is not able to do reverse geocoding.');
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getName() {
         return 'geoip2';
@@ -82,20 +83,25 @@ final class CGeo_Provider_GeoIP2 extends CGeo_Provider {
      */
     private function executeQuery($address) {
         $uri = sprintf('file://geoip?%s', $address);
+
         try {
             $result = $this->adapter->getContent($uri);
         } catch (AddressNotFoundException $e) {
             return '';
         } catch (AuthenticationException $e) {
-            throw new InvalidCredentials(
-            $e->getMessage(), $e->getCode(), $e
+            throw new CGeo_Exception_InvalidCredentials(
+                $e->getMessage(),
+                $e->getCode(),
+                $e
             );
         } catch (OutOfQueriesException $e) {
-            throw new QuotaExceeded(
-            $e->getMessage(), $e->getCode(), $e
+            throw new CGeo_Exception_QuotaExceeded(
+                $e->getMessage(),
+                $e->getCode(),
+                $e
             );
         }
+
         return $result;
     }
-
 }

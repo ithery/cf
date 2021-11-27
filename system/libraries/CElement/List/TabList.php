@@ -10,16 +10,34 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_List_TabList extends CElement_List {
     use CTrait_Compat_Element_TabList;
-
+    /**
+     * Tabs.
+     *
+     * @var CElement_List_TabList_Tab[]
+     */
     protected $tabs;
+
     protected $tabPosition;
+
     protected $activeTab;
+
     protected $ajax;
+
     protected $haveIcon;
+
     protected $widgetClass;
+
     protected $header;
+
     protected $jsHeader;
+
     protected $paramRequest;
+
+    protected $widgetWrapperClass;
+
+    protected $widgetBodyClass;
+
+    protected $widgetHeaderClass;
 
     public function __construct($id) {
         parent::__construct($id);
@@ -33,6 +51,9 @@ class CElement_List_TabList extends CElement_List {
         $this->header = null;
         $this->jsHeader = '';
         $this->paramRequest = [];
+        $this->widgetWrapperClass = c::theme('widget.class.wrapper', 'widget-box');
+        $this->widgetBodyClass = c::theme('widget.class.body', 'widget-content');
+        $this->widgetHeaderClass = c::theme('widget.class.header', 'widget-title');
     }
 
     /**
@@ -51,6 +72,7 @@ class CElement_List_TabList extends CElement_List {
         if ($this->header == null) {
             $this->header = CElement_Factory::createElement('div')->addClass('ml-auto');
         }
+
         return $this->header;
     }
 
@@ -65,6 +87,7 @@ class CElement_List_TabList extends CElement_List {
             $this->activeTab = $tab->id();
         }
         $this->tabs[] = $tab;
+
         return $tab;
     }
 
@@ -75,6 +98,7 @@ class CElement_List_TabList extends CElement_List {
      */
     public function setActiveTab($tabId) {
         $this->activeTab = $tabId;
+
         return $this;
     }
 
@@ -85,6 +109,7 @@ class CElement_List_TabList extends CElement_List {
      */
     public function setAjax($bool = true) {
         $this->ajax = $bool;
+
         return $this;
     }
 
@@ -95,6 +120,7 @@ class CElement_List_TabList extends CElement_List {
      */
     public function setTabPosition($tabPosition) {
         $this->tabPosition = $tabPosition;
+
         return $this;
     }
 
@@ -105,6 +131,7 @@ class CElement_List_TabList extends CElement_List {
      */
     public function setParamRequest(array $paramRequest) {
         $this->paramRequest = $paramRequest;
+
         return $this;
     }
 
@@ -115,10 +142,11 @@ class CElement_List_TabList extends CElement_List {
      */
     public function addWidgetClass($class) {
         if (is_array($class)) {
-            $this->widgetClass = array_merge($class, $this->widgetClass);
+            $this->widgetClass = array_merge($this->widgetClass, $class);
         } else {
             $this->widgetClass[] = $class;
         }
+
         return $this;
     }
 
@@ -147,50 +175,39 @@ class CElement_List_TabList extends CElement_List {
         }
         $classes .= ' ' . $ajaxClass;
 
+        if ($this->tabPosition == 'left') {
+            $classes .= ' vtabs';
+        }
         $widgetClasses = $this->widgetClass;
         $widgetClasses = implode(' ', $widgetClasses);
         if (strlen($widgetClasses) > 0) {
             $widgetClasses = ' ' . $widgetClasses;
         }
-        if ($this->bootstrap >= '3') {
-            $html->appendln('<div class="row tab-list' . $classes . '" id="' . $this->id . '">');
-            $html->appendln('   <div class="col-md-12">');
 
-            $html->appendln('       <div class="row">');
-            if ($this->tabPosition == 'top') {
-                $html->appendln('           <div class="row-tab-menu">');
-            } else {
-                $html->appendln('           <div class="col-md-2">');
-            }
+        $html->appendln('<div class="row-fluid tab-list ' . $classes . '" id="' . $this->id . '">');
+        $html->appendln('	<div class="span12">');
+
+        $html->appendln('		<div class="row-fluid">');
+        if ($this->tabPosition == 'top') {
+            $html->appendln('           <div class="row-tab-menu">');
         } else {
-            $html->appendln('<div class="row-fluid tab-list ' . $classes . '" id="' . $this->id . '">');
-            $html->appendln('	<div class="span12">');
-
-            $html->appendln('		<div class="row-fluid">');
-            if ($this->tabPosition == 'top') {
-                $html->appendln('           <div class="row-tab-menu">');
-            } else {
-                $html->appendln('			<div class="span2">');
-            }
+            $html->appendln('			<div class="span2">');
         }
+
         if ($this->tabPosition == 'top') {
             $html->appendln('               <div class="top-nav-container d-flex align-items-center">');
         } else {
-            $html->appendln('				<div class="side-nav-container affix-top">');
+            $html->appendln('				<div class="side-nav-container affix-top ">');
         }
 
-        if ($this->bootstrap >= '3') {
-            $html->appendln('<ul id="' . $this->id . '-tab-nav" class="nav nav-pills nav-stacked">');
-        } else {
-            $html->appendln('<ul id="' . $this->id . '-tab-nav" class="nav nav-tabs nav-stacked">');
-        }
+        $html->appendln('<ul id="' . $this->id . '-tab-nav" class="nav nav-tabs nav-stacked ' . ($this->tabPosition == 'left' ? 'tabs-vertical' : '') . '">');
 
         $activeTab = null;
         foreach ($this->tabs as $tab) {
             if (strlen($this->activeTab) == 0) {
-                $this->setActiveTab($tab->id);
+                $this->setActiveTab($tab->id());
             }
-            if ($tab->id == $this->activeTab) {
+            if ($tab->id() == $this->activeTab) {
                 $tab->setActive(true);
                 $activeTab = $tab;
             }
@@ -232,14 +249,10 @@ class CElement_List_TabList extends CElement_List {
                 $html->appendln('           <div class="span10">');
             }
         }
-        if ($this->bootstrap >= '3') {
-            $html->appendln('               <div id="' . $this->id . '-tab-widget" class="box box-warning ' . $widgetClasses . '">');
-            $html->appendln('                   <div class="box-header with-border">');
-        } else {
-            $html->appendln('				<div id="' . $this->id . '-tab-widget" class="widget-box nomargin widget-transaction-tab ' . $widgetClasses . '">');
-            if ($this->tabPosition != 'top') {
-                $html->appendln('					<div class="widget-title">');
-            }
+
+        $html->appendln('				<div id="' . $this->id . '-tab-widget" class="' . $this->widgetWrapperClass . ' nomargin widget-transaction-tab ' . $widgetClasses . '">');
+        if ($this->tabPosition != 'top') {
+            $html->appendln('					<div class="' . $this->widgetHeaderClass . '">');
         }
 
         if ($this->tabPosition != 'top') {
@@ -248,15 +261,11 @@ class CElement_List_TabList extends CElement_List {
                 $html->appendln('							<i class="icon-' . $activeTabIcon . '"></i>');
                 $html->appendln('						</span>');
             }
-            //$html->appendln('<h5>' . $activeTabLabel . '</h5>');
+            $html->appendln('<h5>' . $activeTabLabel . '</h5>');
             $html->appendln('					</div>');
         }
 
-        if ($this->bootstrap >= '3') {
-            $html->appendln('                                       <div class="box-body">');
-        } else {
-            $html->appendln('					<div class="widget-content">');
-        }
+        $html->appendln('					<div class="' . $this->widgetBodyClass . '">');
 
         if ($this->ajax) {
             $html->appendln('						<div id="' . $this->id . '-ajax-tab-content" class="ajax-tab-content">');
@@ -313,11 +322,12 @@ class CElement_List_TabList extends CElement_List {
                     var data_icon = jQuery(this).attr('data-icon');
                     var data_class = jQuery(this).attr('data-class');
                     var data_text = jQuery(this).text();
-                    if(data_icon) widget_tab.find('> .widget-title .icon i').first().attr('class',data_icon);
 
-                    if(data_text) widget_tab.find('> .widget-title h5').first().html(data_text);
-                    var widget_content = widget_tab.find('.widget-content').first();
-                    widget_content.removeAttr('class').addClass('widget-content');
+                    if(data_icon) widget_tab.find('> ." . $this->widgetHeaderClass . " .icon i').first().attr('class',data_icon);
+
+                    if(data_text) widget_tab.find('> ." . $this->widgetHeaderClass . " h5').first().html(data_text);
+                    var widget_content = widget_tab.find('." . $this->widgetBodyClass . "').first();
+                    widget_content.removeAttr('class').addClass('" . $this->widgetBodyClass . "');
 
                     if(data_class) widget_content.addClass(data_class);
                 }

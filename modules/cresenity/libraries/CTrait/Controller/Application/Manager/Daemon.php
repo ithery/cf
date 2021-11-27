@@ -89,7 +89,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $table = $app->addTable();
         $table->setDataFromArray($dataService);
         $table->addColumn('service_name')->setLabel('Name');
-        $table->addColumn('service_status')->setLabel('Schedule');
+        $table->addColumn('service_status')->setLabel('Service Status');
         $table->setTitle('Service List');
         $table->setApplyDataTable(false);
         $table->cellCallbackFunc([__CLASS__, 'cellCallback'], __FILE__);
@@ -120,10 +120,11 @@ trait CTrait_Controller_Application_Manager_Daemon {
         if ($col == 'service_status') {
             //$status = DDaemon::status(carr::get($row,'class_name'));
             $isRunning = CManager::daemon()->isRunning(carr::get($row, 'service_class'));
-            $badgeClass = $isRunning ? 'badge badge-outline-success' : 'badge badge-outline-danger';
+            $badgeClass = $isRunning ? 'badge badge-success bg-success' : 'badge badge-danger bg-danger';
             $badgeLabel = $isRunning ? 'RUNNING' : 'STOPPED';
             $val = '<span class="' . $badgeClass . '">' . $badgeLabel . '</span>';
         }
+
         return $val;
     }
 
@@ -149,6 +150,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
         $errCode = 0;
         $errMessage = '';
         $group = carr::get($_GET, 'group');
+
         try {
             $started = CManager::daemon()->stop($serviceClass);
         } catch (Exception $ex) {
@@ -172,18 +174,23 @@ trait CTrait_Controller_Application_Manager_Daemon {
         switch ($method) {
             case 'index':
                 return call_user_func_array([$this, 'logIndex'], $logArgs);
+
                 break;
             case 'file':
                 return call_user_func_array([$this, 'logFile'], $logArgs);
+
                 break;
             case 'restart':
                 return call_user_func_array([$this, 'logRestart'], $logArgs);
+
                 break;
             case 'dump':
                 return call_user_func_array([$this, 'logDump'], $logArgs);
+
                 break;
             case 'back':
                 curl::redirect($this->controllerUrl() . static::groupQueryString());
+
                 break;
         }
     }
@@ -253,6 +260,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
         }
         sleep(2);
         CManager::daemon()->rotateLog($serviceClass);
+
         try {
             $started = CManager::daemon()->start($serviceClass);
         } catch (Exception $ex) {
@@ -298,6 +306,7 @@ trait CTrait_Controller_Application_Manager_Daemon {
         if (strlen($group) > 0) {
             $groupQueryString = '?group=' . $group;
         }
+
         return $groupQueryString;
     }
 }

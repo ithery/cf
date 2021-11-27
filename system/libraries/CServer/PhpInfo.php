@@ -12,12 +12,14 @@ use CServer_PhpInfo_Filter as Filter;
 
 final class CServer_PhpInfo {
     protected static $instance;
+
     protected static $info = [];
 
     public static function instance() {
         if (self::$instance == null) {
             self::$instance = new CServer_Storage();
         }
+
         return self::$instance;
     }
 
@@ -42,6 +44,7 @@ final class CServer_PhpInfo {
             }
             self::$info = $phpinfo;
         }
+
         return self::$info;
     }
 
@@ -49,10 +52,10 @@ final class CServer_PhpInfo {
         return PHP_VERSION;
     }
 
-    public static function toCollection($filter = Filter::All) {
+    public static function toCollection($filter = Filter::ALL) {
         ob_start();
 
-        phpinfo($this->filter);
+        phpinfo($filter);
 
         $phpinfo = ['phpinfo' => c::collect()];
 

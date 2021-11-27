@@ -66,7 +66,7 @@ export default class CF {
                 // IE 6 & 7
                 if (typeof (callback) === 'function') {
                     el.onload = callback;
-                    el.onreadystatechange = function () {
+                    el.onreadystatechange = () => {
                         if (this.readyState == 'complete') {
                             callback();
                         }
@@ -95,13 +95,13 @@ export default class CF {
                 // IE 6 & 7
                 if (typeof (callback) === 'function') {
                     el.onload = callback;
-                    el.onreadystatechange = function () {
+                    el.onreadystatechange = () => {
                         if (this.readyState == 'complete') {
                             callback();
                         }
                     };
                 }
-                this.body.appendChild(el);
+                this.document.body.appendChild(el);
             }
         } else if (typeof (callback) === 'function') {
             callback();
@@ -140,7 +140,7 @@ export default class CF {
             // IE 6 & 7
             if (typeof (callback) === 'function') {
                 fileref.onload = callback;
-                fileref.onreadystatechange = function () {
+                fileref.onreadystatechange = () => {
                     if (this.readyState == 'complete') {
                         callback();
                     }
@@ -155,7 +155,7 @@ export default class CF {
     init() {
         let arrayJsUrl = this.getConfig().jsUrl;
         let arrayCssUrl = this.getConfig().cssUrl;
-        this.beforeInitCallback.forEach(function (item) {
+        this.beforeInitCallback.forEach((item) => {
             item();
         });
 
@@ -171,7 +171,7 @@ export default class CF {
                 });
             }
         });
-        this.afterInitCallback.forEach(function (item) {
+        this.afterInitCallback.forEach((item) => {
             item();
         });
     }

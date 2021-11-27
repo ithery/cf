@@ -42,6 +42,7 @@ trait CModel_HasResource_HasResourceTrait {
      */
     public function resource() {
         $resourceModel = CF::config('resource.resource_model', CApp_Model_Resource::class);
+
         return $this->morphMany($resourceModel, 'model');
     }
 
@@ -214,6 +215,7 @@ trait CModel_HasResource_HasResourceTrait {
 
     public function getFirstResource($collectionName = 'default', array $filters = []) {
         $resource = $this->getResource($collectionName, $filters);
+
         return $resource->first();
     }
 
@@ -230,6 +232,7 @@ trait CModel_HasResource_HasResourceTrait {
         if (!$resource) {
             return '';
         }
+
         return $resource->getUrl($conversionName);
     }
 
@@ -246,6 +249,7 @@ trait CModel_HasResource_HasResourceTrait {
         if (!$resource) {
             return '';
         }
+
         return $resource->getFullUrl($conversionName);
     }
 
@@ -262,6 +266,7 @@ trait CModel_HasResource_HasResourceTrait {
         if (!$resource) {
             return '';
         }
+
         return $resource->getTemporaryUrl($expiration, $conversionName);
     }
 
@@ -278,6 +283,7 @@ trait CModel_HasResource_HasResourceTrait {
         if (!$resource) {
             return '';
         }
+
         return $resource->getPath($conversionName);
     }
 
@@ -293,6 +299,7 @@ trait CModel_HasResource_HasResourceTrait {
      */
     public function updateResource(array $newResourceArray, $collectionName = 'default') {
         $this->removeResourceItemsNotPresentInArray($newResourceArray, $collectionName);
+
         return c::collect($newResourceArray)
             ->map(function (array $newResourceItem) use ($collectionName) {
                 static $orderColumn = 1;
@@ -310,6 +317,7 @@ trait CModel_HasResource_HasResourceTrait {
                 }
                 $currentResource->order_column = $orderColumn++;
                 $currentResource->save();
+
                 return $currentResource;
             });
     }
@@ -319,7 +327,7 @@ trait CModel_HasResource_HasResourceTrait {
             ->reject(function (CApp_Model_Interface_ResourceInterface $currentResourceItem) use ($newResourceArray) {
                 return in_array($currentResourceItem->id, array_column($newResourceArray, 'id'));
             })
-        ->each->delete();
+            ->each->delete();
     }
 
     /**
@@ -335,6 +343,7 @@ trait CModel_HasResource_HasResourceTrait {
         if ($this->resourceIsPreloaded()) {
             unset($this->resource);
         }
+
         return $this;
     }
 
@@ -360,10 +369,11 @@ trait CModel_HasResource_HasResourceTrait {
             ->reject(function (CApp_Model_Interface_ResourceInterface $resource) use ($excludedResource) {
                 return $excludedResource->where('resource_id', $resource->resource_id)->count();
             })
-        ->each->delete();
+            ->each->delete();
         if ($this->resourceIsPreloaded()) {
             unset($this->resource);
         }
+
         return $this;
     }
 
@@ -394,12 +404,14 @@ trait CModel_HasResource_HasResourceTrait {
     public function addResourceConversion($name) {
         $conversion = CResources_Conversion::create($name);
         $this->resourceConversions[] = $conversion;
+
         return $conversion;
     }
 
     public function addResourceCollection($name) {
         $resourceCollection = CResources_ResourceCollection::create($name);
         $this->resourceCollections[] = $resourceCollection;
+
         return $resourceCollection;
     }
 
@@ -410,6 +422,7 @@ trait CModel_HasResource_HasResourceTrait {
      */
     public function deletePreservingResource() {
         $this->deletePreservingResource = true;
+
         return $this->delete();
     }
 
@@ -440,6 +453,7 @@ trait CModel_HasResource_HasResourceTrait {
                 if ($collectionName == '') {
                     return true;
                 }
+
                 return $resourceItem->collection_name === $collectionName;
             })
             ->sortBy('order_column')
@@ -476,7 +490,7 @@ trait CModel_HasResource_HasResourceTrait {
             return;
         }
         $validation = CValidation::factory()->make(
-            ['file' => new File($file)],
+            ['file' => new CHTTP_File($file)],
             ['file' => 'mimetypes:' . implode(',', $allowedMimeTypes)]
         );
         if ($validation->fails()) {
@@ -498,11 +512,11 @@ trait CModel_HasResource_HasResourceTrait {
             call_user_func_array($resourceCollection->resourceConversionRegistrations, [$resource]);
 
             $preparedResourceConversions = c::collect($this->resourceConversions)
-                    ->each(function (CResources_Conversion $conversion) use ($resourceCollection) {
-                        $conversion->performOnCollections($resourceCollection->name);
-                    })
-                    ->values()
-                    ->toArray();
+                ->each(function (CResources_Conversion $conversion) use ($resourceCollection) {
+                    $conversion->performOnCollections($resourceCollection->name);
+                })
+                ->values()
+                ->toArray();
             $this->resourceConversions = array_merge($actualResourceConversions, $preparedResourceConversions);
         });
         $this->registerResourceConversions($resource);

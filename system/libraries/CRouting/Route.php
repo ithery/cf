@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Route
+ * Description of Route.
  *
  * @author Hery
  */
@@ -66,16 +66,37 @@ class CRouting_Route {
     /**
      * The array of matched parameters.
      *
-     * @var array|null
+     * @var null|array
      */
     public $parameters;
 
     /**
      * The parameter names for the route.
      *
-     * @var array|null
+     * @var null|array
      */
     public $parameterNames;
+
+    /**
+     * The computed gathered middleware.
+     *
+     * @var null|array
+     */
+    public $computedMiddleware;
+
+    /**
+     * The compiled version of the route.
+     *
+     * @var \Symfony\Component\Routing\CompiledRoute
+     */
+    public $compiled;
+
+    /**
+     * The validators used by the routes.
+     *
+     * @var array
+     */
+    public static $validators;
 
     /**
      * The array of the matched parameters' original values.
@@ -87,30 +108,16 @@ class CRouting_Route {
     /**
      * Indicates the maximum number of seconds the route should acquire a session lock for.
      *
-     * @var int|null
+     * @var null|int
      */
     protected $lockSeconds;
 
     /**
      * Indicates the maximum number of seconds the route should wait while attempting to acquire a session lock.
      *
-     * @var int|null
+     * @var null|int
      */
     protected $waitSeconds;
-
-    /**
-     * The computed gathered middleware.
-     *
-     * @var array|null
-     */
-    public $computedMiddleware;
-
-    /**
-     * The compiled version of the route.
-     *
-     * @var \Symfony\Component\Routing\CompiledRoute
-     */
-    public $compiled;
 
     /**
      * The router instance used by the route.
@@ -132,13 +139,6 @@ class CRouting_Route {
      * @var array
      */
     protected $bindingFields = [];
-
-    /**
-     * The validators used by the routes.
-     *
-     * @var array
-     */
-    public static $validators;
 
     /**
      * Create a new Route instance.
@@ -169,11 +169,11 @@ class CRouting_Route {
     /**
      * Parse the route action into a standard array.
      *
-     * @param callable|array|null $action
-     *
-     * @return array
+     * @param null|callable|array $action
      *
      * @throws \UnexpectedValueException
+     *
+     * @return array
      */
     protected function parseAction($action) {
         return CRouting_RouteAction::parse($this->uri, $action);
@@ -235,9 +235,9 @@ class CRouting_Route {
     /**
      * Run the route action and return the response.
      *
-     * @return mixed
-     *
      * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
+     *
+     * @return mixed
      */
     protected function runController() {
         return $this->controllerDispatcher()->dispatch(
@@ -368,9 +368,9 @@ class CRouting_Route {
      * Get a given parameter from the route.
      *
      * @param string             $name
-     * @param string|object|null $default
+     * @param null|string|object $default
      *
-     * @return string|object|null
+     * @return null|string|object
      */
     public function parameter($name, $default = null) {
         return carr::get($this->parameters(), $name, $default);
@@ -380,9 +380,9 @@ class CRouting_Route {
      * Get original value of a given parameter from the route.
      *
      * @param string      $name
-     * @param string|null $default
+     * @param null|string $default
      *
-     * @return string|null
+     * @return null|string
      */
     public function originalParameter($name, $default = null) {
         return carr::get($this->originalParameters(), $name, $default);
@@ -392,7 +392,7 @@ class CRouting_Route {
      * Set a parameter to the given value.
      *
      * @param string             $name
-     * @param string|object|null $value
+     * @param null|string|object $value
      *
      * @return void
      */
@@ -418,9 +418,9 @@ class CRouting_Route {
     /**
      * Get the key / value list of parameters for the route.
      *
-     * @return array
-     *
      * @throws \LogicException
+     *
+     * @return array
      */
     public function parameters() {
         if (isset($this->parameters)) {
@@ -433,9 +433,9 @@ class CRouting_Route {
     /**
      * Get the key / value list of original parameters for the route.
      *
-     * @return array
-     *
      * @throws \LogicException
+     *
+     * @return array
      */
     public function originalParameters() {
         if (isset($this->originalParameters)) {
@@ -485,12 +485,12 @@ class CRouting_Route {
     /**
      * Get the parameters that are listed in the route / controller signature.
      *
-     * @param string|null $subClass
+     * @param null|string $subClass
      *
      * @return array
      */
     public function signatureParameters($subClass = null) {
-        return RouteSignatureParameters::fromAction($this->action, $subClass);
+        return CRouting_RouteSignatureParameters::fromAction($this->action, $subClass);
     }
 
     /**
@@ -498,7 +498,7 @@ class CRouting_Route {
      *
      * @param string|int $parameter
      *
-     * @return string|null
+     * @return null|string
      */
     public function bindingFieldFor($parameter) {
         $fields = is_int($parameter) ? array_values($this->bindingFields) : $this->bindingFields;
@@ -576,7 +576,7 @@ class CRouting_Route {
      * Set a regular expression requirement on the route.
      *
      * @param array|string $name
-     * @param string|null  $expression
+     * @param null|string  $expression
      *
      * @return $this
      */
@@ -678,9 +678,9 @@ class CRouting_Route {
     /**
      * Get or set the domain for the route.
      *
-     * @param string|null $domain
+     * @param null|string $domain
      *
-     * @return $this|string|null
+     * @return null|$this|string
      */
     public function domain($domain = null) {
         if (is_null($domain)) {
@@ -702,7 +702,7 @@ class CRouting_Route {
     /**
      * Get the domain defined for the route.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getDomain() {
         return isset($this->action['domain']) ? str_replace(['http://', 'https://'], '', $this->action['domain']) : null;
@@ -711,7 +711,7 @@ class CRouting_Route {
     /**
      * Get the prefix of the route instance.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getPrefix() {
         return carr::get($this->action, 'prefix');
@@ -776,6 +776,7 @@ class CRouting_Route {
      */
     protected function parseUri($uri) {
         $this->bindingFields = [];
+
         return c::tap(CRouting_RouteUri::parse($uri), function ($uri) {
             $this->bindingFields = $uri->bindingFields;
         })->uri;
@@ -784,7 +785,7 @@ class CRouting_Route {
     /**
      * Get the name of the route instance.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getName() {
         return carr::get($this->action, 'as');
@@ -882,7 +883,7 @@ class CRouting_Route {
     /**
      * Get the action array or one of its properties for the route.
      *
-     * @param string|null $key
+     * @param null|string $key
      *
      * @return mixed
      */
@@ -928,7 +929,7 @@ class CRouting_Route {
     /**
      * Get or set the middlewares attached to the route.
      *
-     * @param array|string|null $middleware
+     * @param null|array|string $middleware
      *
      * @return $this|array
      */
@@ -993,8 +994,8 @@ class CRouting_Route {
     /**
      * Specify that the route should not allow concurrent requests from the same session.
      *
-     * @param int|null $lockSeconds
-     * @param int|null $waitSeconds
+     * @param null|int $lockSeconds
+     * @param null|int $waitSeconds
      *
      * @return $this
      */
@@ -1017,7 +1018,7 @@ class CRouting_Route {
     /**
      * Get the maximum number of seconds the route's session lock should be held for.
      *
-     * @return int|null
+     * @return null|int
      */
     public function locksFor() {
         return $this->lockSeconds;
@@ -1026,7 +1027,7 @@ class CRouting_Route {
     /**
      * Get the maximum number of seconds to wait while attempting to acquire a session lock.
      *
-     * @return int|null
+     * @return null|int
      */
     public function waitsFor() {
         return $this->waitSeconds;
@@ -1061,8 +1062,8 @@ class CRouting_Route {
         // validator implementations. We will spin through each one making sure it
         // passes and then we will know if the route as a whole matches request.
         return static::$validators = [
-            new CRouting_Validator_UriValidator, new CRouting_Validator_MethodValidator,
-            new CRouting_Validator_SchemeValidator, new CRouting_Validator_HostValidator,
+            new CRouting_Validator_UriValidator(), new CRouting_Validator_MethodValidator(),
+            new CRouting_Validator_SchemeValidator(), new CRouting_Validator_HostValidator(),
         ];
     }
 
@@ -1132,9 +1133,9 @@ class CRouting_Route {
     /**
      * Prepare the route instance for serialization.
      *
-     * @return void
-     *
      * @throws \LogicException
+     *
+     * @return void
      */
     public function prepareForSerialization() {
         if ($this->action['uses'] instanceof Closure) {

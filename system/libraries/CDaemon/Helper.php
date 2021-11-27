@@ -32,7 +32,7 @@ class CDaemon_Helper {
     /**
      * @param \Swift_Mailer $mailer
      */
-    public function __construct(\Swift_Mailer $mailer = null) {
+    public function __construct(Swift_Mailer $mailer = null) {
         $this->mailer = $mailer;
     }
 
@@ -46,19 +46,20 @@ class CDaemon_Helper {
     public function sendMail($job, array $config, $message) {
         $host = $this->getHost();
         $body = <<<EOF
-$message
-You can find its output in {$config['output']} on $host.
+${message}
+You can find its output in {$config['output']} on ${host}.
 Best,
-CJOB@$host
+CJOB@${host}
 EOF;
         $mail = new \Swift_Message();
         $mail->setTo(explode(',', $config['recipients']));
-        $mail->setSubject("[$host] '{$job}' needs some attention!");
+        $mail->setSubject("[${host}] '{$job}' needs some attention!");
         $mail->setBody($body);
         $mail->setFrom([$config['smtpSender'] => $config['smtpSenderName']]);
         $mail->setSender($config['smtpSender']);
         $mailer = $this->getCurrentMailer($config);
         $mailer->send($mail);
+
         return $mail;
     }
 
@@ -85,6 +86,7 @@ EOF;
         } else {
             $transport = new \Swift_SendmailTransport();
         }
+
         return new \Swift_Mailer($transport);
     }
 
@@ -96,14 +98,14 @@ EOF;
      */
     public function acquireLock($lockFile) {
         if (array_key_exists($lockFile, $this->lockHandles)) {
-            throw new Exception("Lock already acquired (Lockfile: $lockFile).");
+            throw new Exception("Lock already acquired (Lockfile: ${lockFile}).");
         }
         if (!file_exists($lockFile) && !touch($lockFile)) {
-            throw new Exception("Unable to create file (File: $lockFile).");
+            throw new Exception("Unable to create file (File: ${lockFile}).");
         }
         $fh = fopen($lockFile, 'rb+');
         if ($fh === false) {
-            throw new Exception("Unable to open file (File: $lockFile).");
+            throw new Exception("Unable to open file (File: ${lockFile}).");
         }
         $attempts = 5;
         while ($attempts > 0) {
@@ -111,12 +113,14 @@ EOF;
                 $this->lockHandles[$lockFile] = $fh;
                 ftruncate($fh, 0);
                 fwrite($fh, getmypid());
+
                 return;
             }
             usleep(250);
             --$attempts;
         }
-        throw new InfoException("Job is still locked (Lockfile: $lockFile)!");
+
+        throw new InfoException("Job is still locked (Lockfile: ${lockFile})!");
     }
 
     /**
@@ -126,7 +130,7 @@ EOF;
      */
     public function releaseLock($lockFile) {
         if (!array_key_exists($lockFile, $this->lockHandles)) {
-            throw new Exception("Lock NOT held - bug? Lockfile: $lockFile");
+            throw new Exception("Lock NOT held - bug? Lockfile: ${lockFile}");
         }
         if ($this->lockHandles[$lockFile]) {
             ftruncate($this->lockHandles[$lockFile], 0);
@@ -152,7 +156,8 @@ EOF;
             return 0;
         }
         $stat = stat($lockFile);
-        return (time() - $stat['mtime']);
+
+        return time() - $stat['mtime'];
     }
 
     /**
@@ -183,7 +188,7 @@ EOF;
     }
 
     /**
-     * @return string|null
+     * @return null|string
      */
     public function getApplicationEnv() {
         return isset($_SERVER['APPLICATION_ENV']) ? $_SERVER['APPLICATION_ENV'] : null;
@@ -198,6 +203,7 @@ EOF;
             return self::WINDOWS;
             // @codeCoverageIgnoreEnd
         }
+
         return self::UNIX;
     }
 
@@ -212,6 +218,7 @@ EOF;
         $input = trim($input);
         $input = str_replace(' ', '_', $input);
         $input = preg_replace('/_{2,}/', '_', $input);
+
         return $input;
     }
 
@@ -220,6 +227,15 @@ EOF;
         if ($platform === self::UNIX) {
             return '/dev/null';
         }
+
         return 'NUL';
+    }
+
+    public static function pidPath() {
+        return DOCROOT . 'data/daemon/' . CF::appCode() . '/daemon/pid/';
+    }
+
+    public static function logPath() {
+        return DOCROOT . 'data/daemon/' . CF::appCode() . '/log/';
     }
 }

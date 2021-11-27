@@ -13,7 +13,7 @@ class CDevSuite_PackageManager_Eopkg extends CDevSuite_PackageManager {
     }
 
     /**
-     * Get array of installed packages
+     * Get array of installed packages.
      *
      * @param string $package
      *

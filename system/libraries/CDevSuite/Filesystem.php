@@ -16,7 +16,7 @@ class CDevSuite_Filesystem {
      * Create a directory.
      *
      * @param string      $path
-     * @param string|null $owner
+     * @param null|string $owner
      * @param int         $mode
      *
      * @return void
@@ -29,6 +29,7 @@ class CDevSuite_Filesystem {
         if ($owner) {
             $this->chown($path, $owner);
         }
+
         return true;
     }
 
@@ -41,7 +42,7 @@ class CDevSuite_Filesystem {
      * Ensure that the given directory exists.
      *
      * @param string      $path
-     * @param string|null $owner
+     * @param null|string $owner
      * @param int         $mode
      *
      * @return void
@@ -50,6 +51,7 @@ class CDevSuite_Filesystem {
         if (!$this->isDir($path)) {
             return $this->mkdirAsRoot($path, $owner, $mode);
         }
+
         return false;
     }
 
@@ -66,7 +68,7 @@ class CDevSuite_Filesystem {
      * Ensure that the given directory exists.
      *
      * @param string      $path
-     * @param string|null $owner
+     * @param null|string $owner
      * @param int         $mode
      *
      * @return void
@@ -75,6 +77,7 @@ class CDevSuite_Filesystem {
         if (!$this->isDir($path)) {
             return $this->mkdir($path, $owner, $mode);
         }
+
         return false;
     }
 
@@ -94,7 +97,7 @@ class CDevSuite_Filesystem {
      * Touch the given path.
      *
      * @param string      $path
-     * @param string|null $owner
+     * @param null|string $owner
      *
      * @return string
      */
@@ -146,7 +149,7 @@ class CDevSuite_Filesystem {
      *
      * @param string      $path
      * @param string      $contents
-     * @param string|null $owner
+     * @param null|string $owner
      *
      * @return void
      */
@@ -184,7 +187,7 @@ class CDevSuite_Filesystem {
      *
      * @param string      $path
      * @param string      $contents
-     * @param string|null $owner
+     * @param null|string $owner
      *
      * @return void
      */
@@ -397,13 +400,11 @@ class CDevSuite_Filesystem {
      * @return void
      */
     public function removeBrokenLinksAt($path) {
-        c::collect($this->scandir($path))
-                ->filter(function ($file) use ($path) {
-                    return $this->isBrokenLink($path . '/' . $file);
-                })
-                ->each(function ($file) use ($path) {
-                    $this->unlink($path . '/' . $file);
-                });
+        c::collect($this->scandir($path))->filter(function ($file) use ($path) {
+            return $this->isBrokenLink($path . '/' . $file);
+        })->each(function ($file) use ($path) {
+            $this->unlink($path . '/' . $file);
+        });
     }
 
     /**

@@ -5,6 +5,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 final class CFData {
     public static function path() {
         $dir = DOCROOT . 'data' . DIRECTORY_SEPARATOR . '';
+
         return $dir;
     }
 
@@ -12,7 +13,7 @@ final class CFData {
         return CFData::get($domain, 'domain');
     }
 
-    public static function get($dataName, $folder = '') {
+    public static function getFile($dataName, $folder) {
         $file = self::path();
         if (strlen($folder) > 0) {
             $folder = explode('/', $folder);
@@ -25,6 +26,12 @@ final class CFData {
         }
         $file .= $dataName;
 
+        return $file;
+    }
+
+    public static function get($dataName, $folder = '') {
+        $file = static::getFile($dataName, $folder);
+
         if (file_exists($file . EXT)) {
             return self::load_value($file . EXT);
         }
@@ -32,10 +39,16 @@ final class CFData {
         if (count($dataNameExploded) > 0) {
             $fileWildcard = '$.' . implode('.', array_slice($dataNameExploded, 1));
 
-            if (file_exists($fileWildcard . EXT)) {
-                return self::load_value($fileWildcard . EXT);
+            $file = static::getFile($fileWildcard, $folder);
+            if (file_exists($file . EXT)) {
+                return self::load_value($file . EXT);
             }
         }
+        $file = static::getFile('$', $folder);
+        if (file_exists($file . EXT)) {
+            return self::load_value($file . EXT);
+        }
+
         return null;
 
         //$content = file_get_contents($file);
@@ -64,7 +77,7 @@ final class CFData {
     }
 
     /**
-     * Delete data file
+     * Delete data file.
      *
      * @param string $dataName
      * @param string $folder
@@ -81,7 +94,7 @@ final class CFData {
                 }
                 $file .= $row . DIRECTORY_SEPARATOR;
                 if (!is_dir($file)) {
-                    throw new CException('Error, :path is not directory', [':path' => $file]);
+                    throw new Exception(c::__('Error, :path is not directory', [':path' => $file]));
                 }
             }
         }
@@ -92,10 +105,10 @@ final class CFData {
     }
 
     /**
-     * String value
+     * String value.
      *
-     * @param mixed   $val
-     * @param integer $level
+     * @param mixed $val
+     * @param int   $level
      *
      * @return string
      */
@@ -123,6 +136,7 @@ final class CFData {
         } else {
             $str .= "'" . addslashes($val) . "'";
         }
+
         return $str;
     }
 
@@ -133,6 +147,7 @@ final class CFData {
         if ($filename != null) {
             file_put_contents($filename, $val);
         }
+
         return $val;
     }
 

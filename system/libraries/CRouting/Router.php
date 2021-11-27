@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Router
+ * Description of Router.
  *
  * @author Hery
  */
@@ -18,6 +18,22 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
     use CTrait_Macroable {
         __call as macroCall;
     }
+
+    /**
+     * The priority-sorted list of middleware.
+     *
+     * Forces the listed middleware to always be in the given order.
+     *
+     * @var array
+     */
+    public $middlewarePriority = [];
+
+    /**
+     * All of the verbs supported by the router.
+     *
+     * @var string[]
+     */
+    public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
 
     /**
      * The event dispatcher instance.
@@ -43,7 +59,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
     /**
      * The currently dispatched route instance.
      *
-     * @var CRouting_Route|null
+     * @var null|CRouting_Route
      */
     protected $current;
 
@@ -69,15 +85,6 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
     protected $middlewareGroups = [];
 
     /**
-     * The priority-sorted list of middleware.
-     *
-     * Forces the listed middleware to always be in the given order.
-     *
-     * @var array
-     */
-    public $middlewarePriority = [];
-
-    /**
      * The registered route value binders.
      *
      * @var array
@@ -99,13 +106,6 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
     protected $groupStack = [];
 
     /**
-     * All of the verbs supported by the router.
-     *
-     * @var string[]
-     */
-    public static $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'];
-
-    /**
      * @var CRouting_Router
      */
     private static $instance;
@@ -117,6 +117,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
         if (static::$instance == null) {
             static::$instance = new CRouting_Router();
         }
+
         return static::$instance;
     }
 
@@ -136,7 +137,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      * Register a new GET route with the router.
      *
      * @param string                     $uri
-     * @param array|string|callable|null $action
+     * @param null|array|string|callable $action
      *
      * @return CRouting_Route
      */
@@ -148,7 +149,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      * Register a new POST route with the router.
      *
      * @param string                     $uri
-     * @param array|string|callable|null $action
+     * @param null|array|string|callable $action
      *
      * @return CRouting_Route
      */
@@ -160,7 +161,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      * Register a new PUT route with the router.
      *
      * @param string                     $uri
-     * @param array|string|callable|null $action
+     * @param null|array|string|callable $action
      *
      * @return CRouting_Route
      */
@@ -172,7 +173,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      * Register a new PATCH route with the router.
      *
      * @param string                     $uri
-     * @param array|string|callable|null $action
+     * @param null|array|string|callable $action
      *
      * @return CRouting_Route
      */
@@ -184,7 +185,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      * Register a new DELETE route with the router.
      *
      * @param string                     $uri
-     * @param array|string|callable|null $action
+     * @param null|array|string|callable $action
      *
      * @return CRouting_Route
      */
@@ -196,7 +197,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      * Register a new OPTIONS route with the router.
      *
      * @param string                     $uri
-     * @param array|string|callable|null $action
+     * @param null|array|string|callable $action
      *
      * @return CRouting_Route
      */
@@ -208,7 +209,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      * Register a new route responding to all verbs.
      *
      * @param string                     $uri
-     * @param array|string|callable|null $action
+     * @param null|array|string|callable $action
      *
      * @return CRouting_Route
      */
@@ -219,7 +220,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
     /**
      * Register a new Fallback route with the router.
      *
-     * @param array|string|callable|null $action
+     * @param null|array|string|callable $action
      *
      * @return CRouting_Route
      */
@@ -286,7 +287,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      *
      * @param array|string               $methods
      * @param string                     $uri
-     * @param array|string|callable|null $action
+     * @param null|array|string|callable $action
      *
      * @return CRouting_Route
      */
@@ -424,7 +425,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
         if ($routes instanceof Closure) {
             $routes($this);
         } else {
-            (new RouteFileRegistrar($this))->register($routes);
+            (new CRouting_RouteFileRegistrar($this))->register($routes);
         }
     }
 
@@ -448,7 +449,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      *
      * @param array|string               $methods
      * @param string                     $uri
-     * @param array|string|callable|null $action
+     * @param null|array|string|callable $action
      *
      * @return CRouting_Route
      */
@@ -708,11 +709,11 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      */
     public function gatherRouteMiddleware(CRouting_Route $route) {
         $excluded = c::collect($route->excludedMiddleware())->map(function ($name) {
-            return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
+            return (array) CMiddleware_MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->values()->all();
 
         $middleware = c::collect($route->gatherMiddleware())->map(function ($name) {
-            return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
+            return (array) CMiddleware_MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten()->reject(function ($name) use ($excluded) {
             if (empty($excluded)) {
                 return false;
@@ -771,7 +772,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
         }
 
         if ($response instanceof PsrResponseInterface) {
-            $response = (new HttpFoundationFactory)->createResponse($response);
+            $response = (new HttpFoundationFactory())->createResponse($response);
         } elseif ($response instanceof CModel && $response->wasRecentlyCreated) {
             $response = new CHTTP_JsonResponse($response, 201);
         } elseif (!$response instanceof SymfonyResponse
@@ -798,9 +799,9 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      *
      * @param CRouting_Route $route
      *
-     * @return CRouting_Route
-     *
      * @throws CModel_Exception_ModelNotFound
+     *
+     * @return CRouting_Route
      */
     public function substituteBindings($route) {
         foreach ($route->parameters() as $key => $value) {
@@ -817,9 +818,9 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      *
      * @param CRouting_Route $route
      *
-     * @return void
-     *
      * @throws CModel_Exception_ModelNotFound
+     *
+     * @return void
      */
     public function substituteImplicitBindings($route) {
         CRouting_ImplicitRouteBinding::resolveForRoute($this->container, $route);
@@ -832,9 +833,9 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      * @param string         $value
      * @param CRouting_Route $route
      *
-     * @return mixed
-     *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     *
+     * @return mixed
      */
     protected function performBinding($key, $value, $route) {
         return call_user_func($this->binders[$key], $value, $route);
@@ -957,7 +958,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      * @return void
      */
     public function bind($key, $binder) {
-        $this->binders[str_replace('-', '_', $key)] = RouteBinding::forCallback(
+        $this->binders[str_replace('-', '_', $key)] = CRouting_RouteBinding::forCallback(
             $this->container,
             $binder
         );
@@ -968,12 +969,12 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      *
      * @param string        $key
      * @param string        $class
-     * @param \Closure|null $callback
+     * @param null|\Closure $callback
      *
      * @return void
      */
     public function model($key, $class, Closure $callback = null) {
-        $this->bind($key, RouteBinding::forModel($this->container, $class, $callback));
+        $this->bind($key, CRouting_RouteBinding::forModel($this->container, $class, $callback));
     }
 
     /**
@@ -981,7 +982,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      *
      * @param string $key
      *
-     * @return \Closure|null
+     * @return null|\Closure
      */
     public function getBindingCallback($key) {
         if (isset($this->binders[$key = str_replace('-', '_', $key)])) {
@@ -1045,7 +1046,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      * Get a route parameter for the current route.
      *
      * @param string      $key
-     * @param string|null $default
+     * @param null|string $default
      *
      * @return mixed
      */
@@ -1065,7 +1066,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
     /**
      * Get the currently dispatched route instance.
      *
-     * @return CRouting_Route|null
+     * @return null|CRouting_Route
      */
     public function getCurrentRoute() {
         return $this->current();
@@ -1074,7 +1075,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
     /**
      * Get the currently dispatched route instance.
      *
-     * @return CRouting_Route|null
+     * @return null|CRouting_Route
      */
     public function current() {
         return $this->current;
@@ -1102,7 +1103,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
     /**
      * Get the current route name.
      *
-     * @return string|null
+     * @return null|string
      */
     public function currentRouteName() {
         return $this->current() ? $this->current()->getName() : null;
@@ -1133,7 +1134,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
     /**
      * Get the current route action.
      *
-     * @return string|null
+     * @return null|string
      */
     public function currentRouteAction() {
         if ($this->current()) {
@@ -1196,7 +1197,7 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      *
      * @param array $verbs
      *
-     * @return array|null
+     * @return null|array
      */
     public function resourceVerbs(array $verbs = []) {
         return ResourceRegistrar::verbs($verbs);

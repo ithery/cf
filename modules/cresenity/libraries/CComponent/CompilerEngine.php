@@ -29,7 +29,7 @@ class CComponent_CompilerEngine extends CView_Engine_CompilerEngine {
         // Don't wrap "abort(404)".
         // Don't wrap "abort(500)".
         // Don't wrap most Livewire exceptions.
-        if ($e instanceof AuthorizationException
+        if ($e instanceof CAuth_Exception_AuthorizationException
             || $e instanceof NotFoundHttpException
             || $e instanceof HttpException
             || isset($uses[CComponent_Exception_BypassViewHandlerTrait::class])

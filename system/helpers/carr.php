@@ -3,7 +3,7 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * Class carr
+ * Class carr.
  */
 // @codingStandardsIgnoreStart
 class carr {
@@ -43,7 +43,20 @@ class carr {
     }
 
     /**
-     * Alias of isAssoc
+     * Determines if an array is a list.
+     *
+     * An array is a "list" if all array keys are sequential integers starting from 0 with no gaps in between.
+     *
+     * @param array $array
+     *
+     * @return bool
+     */
+    public static function isList($array) {
+        return !self::isAssoc($array);
+    }
+
+    /**
+     * Alias of isAssoc.
      *
      * @param array $value array to check
      *
@@ -80,12 +93,12 @@ class carr {
             return true;
         } else {
             // Possibly a Traversable object, functionally the same as an array
-            return (is_object($value) and $value instanceof Traversable);
+            return is_object($value) and $value instanceof Traversable;
         }
     }
 
     /**
-     * Alias of isArray
+     * Alias of isArray.
      *
      * @param mixed $value value to check
      *
@@ -110,11 +123,6 @@ class carr {
      * @return mixed
      */
     public static function get($array, $key, $default = null) {
-        if ($array instanceof ArrayObject) {
-            // This is a workaround for inconsistent implementation of isset between PHP and HHVM
-            // See https://github.com/facebook/hhvm/issues/3437
-            return $array->offsetExists($key) ? $array->offsetGet($key) : $default;
-        }
         if (!static::accessible($array)) {
             return c::value($default);
         }
@@ -198,6 +206,8 @@ class carr {
      * @param string $delimiter key path delimiter
      *
      * @return mixed
+     *
+     * @deprecated since 1.2, use carr::get
      */
     public static function path($array, $path, $default = null, $delimiter = null) {
         if (!carr::isArray($array)) {
@@ -326,7 +336,7 @@ class carr {
 
     /**
      * Return a callback array from a string, eg: limit[10,20] would become
-     * array('limit', array('10', '20'))
+     * array('limit', array('10', '20')).
      *
      * @param string $str callback string
      *
@@ -650,7 +660,7 @@ class carr {
      */
     //@codingStandardsIgnoreStart
     public static function to_object(array $array, $class = 'stdClass') {
-        $object = new $class;
+        $object = new $class();
 
         foreach ($array as $key => $value) {
             if (is_array($value)) {
@@ -668,7 +678,7 @@ class carr {
     //@codingStandardsIgnoreEnd
 
     /**
-     * Replace arr
+     * Replace arr.
      *
      * @return void
      */
@@ -683,9 +693,11 @@ class carr {
                 }
             } else {
                 trigger_error(__FUNCTION__ . '(): Argument #' . ($i + 1) . ' is not an array', E_USER_WARNING);
+
                 return null;
             }
         }
+
         return $res;
     }
 
@@ -693,7 +705,7 @@ class carr {
      * Return the first element in an array passing a given truth test.
      *
      * @param array         $array
-     * @param callable|null $callback
+     * @param null|callable $callback
      * @param mixed         $default
      *
      * @return mixed
@@ -722,7 +734,7 @@ class carr {
      * Return the last element in an array passing a given truth test.
      *
      * @param array         $array
-     * @param callable|null $callback
+     * @param null|callable $callback
      * @param mixed         $default
      *
      * @return mixed
@@ -769,7 +781,11 @@ class carr {
      * @return array
      */
     public static function wrap($value) {
-        return !is_array($value) ? [$value] : $value;
+        if (is_null($value)) {
+            return [];
+        }
+
+        return is_array($value) ? $value : [$value];
     }
 
     /**
@@ -783,10 +799,33 @@ class carr {
      */
     public static function add($array, $key, $value) {
         if (is_null(static::get($array, $key))) {
-            static::set_path($array, $key, $value);
+            static::set($array, $key, $value);
         }
 
         return $array;
+    }
+
+    /**
+     * Conditionally compile classes from an array into a CSS class list.
+     *
+     * @param array $array
+     *
+     * @return string
+     */
+    public static function toCssClasses($array) {
+        $classList = static::wrap($array);
+
+        $classes = [];
+
+        foreach ($classList as $class => $constraint) {
+            if (is_numeric($class)) {
+                $classes[] = $constraint;
+            } elseif ($constraint) {
+                $classes[] = $class;
+            }
+        }
+
+        return implode(' ', $classes);
     }
 
     /**
@@ -811,6 +850,7 @@ class carr {
                 $new_array[$k] = $v;
             }
         }
+
         return $new_array;
     }
 
@@ -881,6 +921,9 @@ class carr {
      * @return bool
      */
     public static function exists($array, $key) {
+        if ($array instanceof CInterface_Enumerable || $array instanceof CCollection) {
+            return $array->has($key);
+        }
         if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
         }
@@ -893,7 +936,7 @@ class carr {
      *
      * @param array             $array
      * @param string|array      $value
-     * @param string|array|null $key
+     * @param null|string|array $key
      *
      * @return array
      */
@@ -928,7 +971,7 @@ class carr {
      * Explode the "value" and "key" arguments passed to "pluck".
      *
      * @param string|array      $value
-     * @param string|array|null $key
+     * @param null|string|array $key
      *
      * @return array
      */
@@ -957,6 +1000,7 @@ class carr {
             }
             $results = array_merge($results, $values);
         }
+
         return $results;
     }
 
@@ -1041,6 +1085,38 @@ class carr {
     }
 
     /**
+     * Determine if any of the keys exist in an array using "dot" notation.
+     *
+     * @param \ArrayAccess|array $array
+     * @param string|array       $keys
+     *
+     * @return bool
+     */
+    public static function hasAny($array, $keys) {
+        if (is_null($keys)) {
+            return false;
+        }
+
+        $keys = (array) $keys;
+
+        if (!$array) {
+            return false;
+        }
+
+        if ($keys === []) {
+            return false;
+        }
+
+        foreach ($keys as $key) {
+            if (static::has($array, $key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Flatten a multi-dimensional associative array with dots.
      *
      * @param array  $array
@@ -1062,8 +1138,26 @@ class carr {
         return $results;
     }
 
+    /**
+     * Convert a flatten "dot" notation array into an expanded array.
+     *
+     * @param iterable $array
+     *
+     * @return array
+     */
+    public static function undot($array) {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            static::set($results, $key, $value);
+        }
+
+        return $results;
+    }
+
     public static function hash(array $array) {
         array_multisort($array);
+
         return md5(json_encode($array));
     }
 
@@ -1088,12 +1182,12 @@ class carr {
      * Get one or a specified number of random values from an array.
      *
      * @param array      $array
-     * @param int|null   $number
+     * @param null|int   $number
      * @param bool|false $preserveKeys
      *
-     * @return mixed
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return mixed
      */
     public static function random($array, $number = null, $preserveKeys = false) {
         $requested = is_null($number) ? 1 : $number;
@@ -1144,7 +1238,7 @@ class carr {
     }
 
     /**
-     * Alias of array reset
+     * Alias of array reset.
      *
      * @param array $array
      *
@@ -1165,6 +1259,7 @@ class carr {
             }
             $string[] = "{$key}{$glue}{$val}";
         }
+
         return implode($separator, $string);
     }
 
@@ -1181,6 +1276,7 @@ class carr {
             }
         }
         $ret = substr($ret, 0, 0 - strlen($glue));
+
         return $ret;
     }
 
@@ -1190,6 +1286,7 @@ class carr {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -1201,7 +1298,7 @@ class carr {
      * Shuffle the given array and return the result.
      *
      * @param array    $array
-     * @param int|null $seed
+     * @param null|int $seed
      *
      * @return array
      */
@@ -1221,7 +1318,7 @@ class carr {
      * Sort the array using the given callback or "dot" notation.
      *
      * @param array                      $array
-     * @param callable|array|string|null $callback
+     * @param null|callable|array|string $callback
      *
      * @return array
      */
@@ -1281,8 +1378,10 @@ class carr {
             foreach ($array as $key => $value) {
                 $accumulator = $iteratee($accumulator, $value, $key, $array);
             }
+
             return $accumulator;
         };
+
         return $func($collection, c::baseIteratee($iteratee), $accumulator, null === $accumulator);
     }
 
@@ -1343,6 +1442,7 @@ class carr {
                 return $value;
             }
         }
+
         return null;
     }
 
@@ -1368,7 +1468,7 @@ class carr {
      * // => 2
      * </code>
      */
-    public function findLastIndex(array $array, $predicate, $fromIndex = null) {
+    public static function findLastIndex(array $array, $predicate, $fromIndex = null) {
         $length = \count($array);
         $index = $fromIndex !== null ? $fromIndex : $length - 1;
         if ($index < 0) {
@@ -1381,6 +1481,7 @@ class carr {
             }
             $index--;
         }
+
         return -1;
     }
 
@@ -1439,6 +1540,7 @@ class carr {
         $keys = \array_keys($values);
         $items = \array_map(function ($value, $index) use ($callable, $collection) {
             $test = $callable($value, $index, $collection);
+
             return $callable($value, $index, $collection);
         }, $values, $keys);
 
@@ -1470,6 +1572,7 @@ class carr {
         $check = function ($value) {
             return \is_array($value) ? $value : [$value];
         };
+
         return \array_merge($check($array), ...\array_map($check, $values));
     }
 
@@ -1513,6 +1616,7 @@ class carr {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -1547,6 +1651,7 @@ class carr {
                 break;
             }
         }
+
         return $collection;
     }
 
@@ -1560,11 +1665,12 @@ class carr {
      * @return array
      */
     public static function prepend($array, $value, $key = null) {
-        if (is_null($key)) {
+        if (func_num_args() == 2) {
             array_unshift($array, $value);
         } else {
             $array = [$key => $value] + $array;
         }
+
         return $array;
     }
 
@@ -1575,6 +1681,19 @@ class carr {
      */
     public static function count($array) {
         return count($array);
+    }
+
+    public static function arrayMergeRecursiveDistinct(array &$array1, array &$array2) {
+        $merged = $array1;
+        foreach ($array2 as $key => &$value) {
+            if (is_array($value) && isset($merged[$key]) && is_array($merged[$key])) {
+                $merged[$key] = static::arrayMergeRecursiveDistinct($merged[$key], $value);
+            } else {
+                $merged[$key] = $value;
+            }
+        }
+
+        return $merged;
     }
 }
 

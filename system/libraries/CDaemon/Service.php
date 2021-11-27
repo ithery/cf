@@ -30,14 +30,24 @@ class CDaemon_Service {
     protected $stdout = true;
 
     /**
-     * Handle for log() method
+     * @var CDaemon_Event
+     */
+    protected $event;
+
+    /**
+     * @var CDaemon_LoopInterface
+     */
+    protected $loop;
+
+    /**
+     * Handle for log() method.
      *
      * @var stream
      */
     private $logHandle = false;
 
     /**
-     * Process ID
+     * Process ID.
      *
      * @var int
      */
@@ -51,21 +61,11 @@ class CDaemon_Service {
     private $isParent = true;
 
     /**
-     * StartTime
+     * StartTime.
      *
      * @var bool
      */
     private $startTime = true;
-
-    /**
-     * @var CDaemon_Event
-     */
-    protected $event;
-
-    /**
-     * @var CDaemon_LoopInterface
-     */
-    protected $loop;
 
     /**
      * @param string $serviceName
@@ -112,7 +112,7 @@ class CDaemon_Service {
         $date = date('Y-m-d H:i:s');
         $pid = str_pad($this->pid, 5, ' ', STR_PAD_LEFT);
         $label = str_pad(substr($label, 0, 12), 13, ' ', STR_PAD_RIGHT);
-        $prefix = "[$date] $pid $label" . str_repeat("\t", $indent);
+        $prefix = "[${date}] ${pid} ${label}" . str_repeat("\t", $indent);
         if (time() >= $logFileCheckAt && $this->logFile() != $logFile) {
             $logFile = $this->logFile();
             $logFileCheckAt = mktime(date('H'), (date('i') - (date('i') % 5)) + 5, null);
@@ -132,7 +132,7 @@ class CDaemon_Service {
                 trigger_error(__CLASS__ . 'Error: Could not write to logfile ' . $logFile, E_USER_WARNING);
             }
         }
-        $message = $prefix . ' ' . str_replace("\n", "\n$prefix ", trim($message)) . "\n";
+        $message = $prefix . ' ' . str_replace("\n", "\n${prefix} ", trim($message)) . "\n";
         if ($this->logHandle) {
             fwrite($this->logHandle, $message);
         }
@@ -143,6 +143,7 @@ class CDaemon_Service {
 
     public function start() {
         $this->startTime = time();
+
         try {
             $this->setPid(getmypid());
             if (pcntl_fork() > 0) {
@@ -152,6 +153,7 @@ class CDaemon_Service {
             $pidFile = $this->pidFile;
 
             $handle = @fopen($pidFile, 'w');
+
             try {
                 if (!$handle) {
                     throw new Exception('Unable to write PID to ' . $this->pidFile);
@@ -165,9 +167,10 @@ class CDaemon_Service {
         } catch (Exception $e) {
             $this->fatalError($e->getMessage());
         }
+
         try {
             $this->log('Run EventLoop');
-            $loop = CDaemon_Loop::reactFactorycreateReactEventLoop();
+            $loop = CDaemon_Loop::reactFactory()->auto();
             $loop->run();
         } catch (Exception $e) {
             $this->fatalError(sprintf('Uncaught Exception in Event Loop: %s [file] %s [line] %s%s%s', $e->getMessage(), $e->getFile(), $e->getLine(), PHP_EOL, $e->getTraceAsString()));
@@ -177,7 +180,6 @@ class CDaemon_Service {
     /**
      * Combination getter/setter for the $pid property.
      *
-     * @param bool  $setValue
      * @param mixed $pid
      *
      * @return int

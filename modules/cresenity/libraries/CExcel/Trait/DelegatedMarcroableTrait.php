@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Oct 1, 2019, 5:19:03 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Oct 1, 2019, 5:19:03 PM
  */
 trait DelegatedMacroable {
-
     use CTrait_Macroable {
         __call as __callMacro;
     }
@@ -16,8 +16,8 @@ trait DelegatedMacroable {
     /**
      * Dynamically handle calls to the class.
      *
-     * @param  string $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
      *
      * @return mixed
      */
@@ -26,6 +26,7 @@ trait DelegatedMacroable {
             return call_user_func_array([$this->getDelegate(), $method], $parameters);
         }
         array_unshift($parameters, $this);
+
         return $this->__callMacro($method, $parameters);
     }
 

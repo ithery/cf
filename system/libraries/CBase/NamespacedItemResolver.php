@@ -58,6 +58,11 @@ class CBase_NamespacedItemResolver {
         // as well as the group so we know which item to pull from the arrays.
         $item = count($segments) === 1 ? null : implode('.', array_slice($segments, 1));
 
+        if ($item == null) {
+            $item = $group;
+            $group = 'core';
+        }
+
         return [null, $group, $item];
     }
 

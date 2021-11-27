@@ -22,6 +22,8 @@ CBootstrap::instance()->addBootstrapper([
 
 $domain = CF::domain();
 
+CException::init();
+
 if (CF::config('collector.exception')) {
     CException::exceptionHandler()->reportable(function (Exception $e) {
         CCollector::exception($e);

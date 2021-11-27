@@ -29,7 +29,6 @@ class CDatabase_Driver_Sqlsrv_Result extends CDatabase_Result {
     public function __construct($link, $object = true, $sql = null) {
         $this->link = $link;
         $stmt = sqlsrv_query($this->link, $sql, [], ['Scrollable' => 'buffered']);
-        $errors = sqlsrv_errors();
 
         if ($stmt === false) {
             // SQL error
@@ -66,13 +65,18 @@ class CDatabase_Driver_Sqlsrv_Result extends CDatabase_Result {
     public function getErrorMessage() {
         if ($this->isError()) {
             $errors = sqlsrv_errors();
-            return carr::get($errors, 'message');
+
+            $message = carr::get($errors, '0.message');
+
+            return $message;
         }
+
         return 'unknown error sqlsrv';
     }
 
     public function isError() {
         $errors = sqlsrv_errors();
+
         return is_array($errors);
     }
 
@@ -178,11 +182,12 @@ class CDatabase_Driver_Sqlsrv_Result extends CDatabase_Result {
         // Return the row
         $fetch = $this->fetch_type;
         $func = 'sqlsrv_' . $fetch;
+
         return $func($this->result);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function fetchAll($fetchMode = null, $fetchArgument = null, $ctorArgs = null) {
         return $this->resultArray(false);

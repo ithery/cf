@@ -2,7 +2,6 @@
 
 class CExporter_TaskQueue_CloseSheet extends CQueue_AbstractTask {
     use CExporter_Trait_ProxyFailures;
-
     /**
      * @var object
      */

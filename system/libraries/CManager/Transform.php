@@ -12,6 +12,7 @@ class CManager_Transform {
         if (self::$instance == null) {
             self::$instance = new CManager_Transform();
         }
+
         return self::$instance;
     }
 
@@ -24,15 +25,34 @@ class CManager_Transform {
         }
     }
 
-    public function methodExists($method) {
-        return !empty($this->callbacks) && isset($this->callbacks[$method]);
+    public function getCallable($method) {
+        $callable = carr::get($this->callbacks, $method);
+        if ($callable == null) {
+            //locate from CManager_Transform_DefaultMethod
+            if (method_exists(CManager_Transform_DefaultMethod::class, $method)) {
+                $callable = [CManager_Transform_DefaultMethod::class, $method];
+            }
+        }
+        if ($callable == null) {
+            if (method_exists(ctransform::class, $method)) {
+                $callable = [ctransform::class, $method];
+            }
+        }
+
+        return $callable;
     }
 
-    public function call($method, $value) {
-        if (!$this->methodExists($method)) {
-            throw new CException("method :method doesn't exists", [':method' => $method]);
+    public function methodExists($method) {
+        return $this->getCallable($method) != null;
+    }
+
+    public function call($method, $args) {
+        $callable = $this->getCallable($method);
+
+        if ($callable == null) {
+            throw new Exception(c::__("method :method doesn't exists", [':method' => $method]));
         }
-        $callable = $this->callbacks[$method];
-        return call_user_func_array($callable, $value);
+
+        return call_user_func_array($callable, $args);
     }
 }

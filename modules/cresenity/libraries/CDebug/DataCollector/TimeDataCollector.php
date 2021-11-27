@@ -11,7 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * Collects info about the request duration as well as providing
- * a way to log duration of any operations
+ * a way to log duration of any operations.
  */
 class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implements CDebug_Bar_Interface_RenderableInterface {
     /**
@@ -49,11 +49,11 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     }
 
     /**
-     * Starts a measure
+     * Starts a measure.
      *
      * @param string      $name      Internal name, used to stop the measure
-     * @param string|null $label     Public name
-     * @param string|null $collector The source of the collector
+     * @param null|string $label     Public name
+     * @param null|string $collector The source of the collector
      */
     public function startMeasure($name, $label = null, $collector = null) {
         $start = microtime(true);
@@ -65,7 +65,7 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     }
 
     /**
-     * Check a measure exists
+     * Check a measure exists.
      *
      * @param string $name
      *
@@ -76,7 +76,7 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     }
 
     /**
-     * Stops a measure
+     * Stops a measure.
      *
      * @param string $name
      * @param array  $params
@@ -86,7 +86,7 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     public function stopMeasure($name, $params = []) {
         $end = microtime(true);
         if (!$this->hasStartedMeasure($name)) {
-            throw new CDebug_Exception("Failed stopping measure '$name' because it hasn't been started");
+            throw new CDebug_Exception("Failed stopping measure '${name}' because it hasn't been started");
         }
         $this->addMeasure(
             $this->startedMeasures[$name]['label'],
@@ -99,13 +99,13 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     }
 
     /**
-     * Adds a measure
+     * Adds a measure.
      *
      * @param string      $label
      * @param float       $start
      * @param float       $end
      * @param array       $params
-     * @param string|null $collector
+     * @param null|string $collector
      */
     public function addMeasure($label, $start, $end, $params = [], $collector = null) {
         $this->measures[] = [
@@ -122,13 +122,13 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     }
 
     /**
-     * Utility function to measure the execution of a Closure
+     * Utility function to measure the execution of a Closure.
      *
      * @param string      $label
      * @param \Closure    $closure
-     * @param string|null $collector
+     * @param null|string $collector
      */
-    public function measure($label, \Closure $closure, $collector = null) {
+    public function measure($label, Closure $closure, $collector = null) {
         $name = spl_object_hash($closure);
         $this->startMeasure($name, $label, $collector);
         $result = $closure();
@@ -137,7 +137,7 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     }
 
     /**
-     * Returns an array of all measures
+     * Returns an array of all measures.
      *
      * @return array
      */
@@ -146,7 +146,7 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     }
 
     /**
-     * Returns the request start time
+     * Returns the request start time.
      *
      * @return float
      */
@@ -155,7 +155,7 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     }
 
     /**
-     * Returns the request end time
+     * Returns the request end time.
      *
      * @return float
      */
@@ -164,7 +164,7 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
     }
 
     /**
-     * Returns the duration of a request
+     * Returns the duration of a request.
      *
      * @return float
      */
@@ -172,13 +172,14 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
         if ($this->requestEndTime !== null) {
             return $this->requestEndTime - $this->requestStartTime;
         }
+
         return microtime(true) - $this->requestStartTime;
     }
 
     /**
-     * @return array
-     *
      * @throws DebugBarException
+     *
+     * @return array
      */
     public function collect() {
         $this->requestEndTime = microtime(true);
@@ -189,8 +190,10 @@ class CDebug_DataCollector_TimeDataCollector extends CDebug_DataCollector implem
             if ($a['start'] == $b['start']) {
                 return 0;
             }
+
             return $a['start'] < $b['start'] ? -1 : 1;
         });
+
         return [
             'start' => $this->requestStartTime,
             'end' => $this->requestEndTime,

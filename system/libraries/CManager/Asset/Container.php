@@ -25,6 +25,7 @@ abstract class CManager_Asset_Container implements CManager_Asset_ContainerInter
 
     public function addMediaPath($mediaPath) {
         $this->mediaPaths[] = $mediaPath;
+
         return $this;
     }
 

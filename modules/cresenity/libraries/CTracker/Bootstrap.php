@@ -1,30 +1,27 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 2:44:16 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 2:44:16 AM
  */
 class CTracker_Bootstrap {
-
     /**
-     *
      * @var CTracker_Tracker
      */
     protected $tracker;
 
     public function __construct() {
-        
     }
 
     public function execute() {
         if (CTracker::config()->get('trackEnabled')) {
-            
             $this->register();
             CTracker::populator()->populateData();
-            
+
             $this->getTracker()->boot();
         }
     }
@@ -39,23 +36,22 @@ class CTracker_Bootstrap {
      * @return void
      */
     public function register() {
-
         if ($this->config()->isTrackEnabled()) {
-//            $this->registerAuthentication();
-//            $this->registerCache();
-//            $this->registerRepositories();
-//            $this->registerTracker();
-//            $this->registerTablesCommand();
-//            $this->registerUpdateGeoIpCommand();
-//            $this->registerExecutionCallback();
-//            $this->registerUserCheckCallback();
+            // $this->registerAuthentication();
+            // $this->registerCache();
+            // $this->registerRepositories();
+            // $this->registerTracker();
+            // $this->registerTablesCommand();
+            // $this->registerUpdateGeoIpCommand();
+            // $this->registerExecutionCallback();
+            // $this->registerUserCheckCallback();
             if ($this->config()->isLogEnabled()) {
                 $this->registerSqlQueryLogWatcher();
             }
-//            $this->registerGlobalEventLogger();
-//            $this->registerDatatables();
-//            $this->registerMessageRepository();
-//            $this->registerGlobalViewComposers();
+            // $this->registerGlobalEventLogger();
+            // $this->registerDatatables();
+            // $this->registerMessageRepository();
+            // $this->registerGlobalViewComposers();
         }
     }
 
@@ -66,6 +62,7 @@ class CTracker_Bootstrap {
         if (!$this->tracker) {
             $this->tracker = new CTracker_Tracker();
         }
+
         return $this->tracker;
     }
 
@@ -74,7 +71,6 @@ class CTracker_Bootstrap {
             $db = CDatabase::instance($this->config()->get('database'));
 
             $db->listenOnQueryExecuted(function ($query) use ($db) {
-
                 $bindings = $query->bindings;
                 $time = $query->time;
                 $connection = $query->connection;
@@ -83,5 +79,4 @@ class CTracker_Bootstrap {
             });
         }
     }
-
 }

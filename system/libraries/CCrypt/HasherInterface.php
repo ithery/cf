@@ -1,4 +1,3 @@
-
 <?php
 
 interface CCrypt_HasherInterface {

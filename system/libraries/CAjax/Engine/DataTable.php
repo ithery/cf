@@ -11,6 +11,7 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CAjax_Engine_DataTable extends CAjax_Engine {
     public function createProcessor($type) {
         $class = 'CAjax_Engine_DataTable_Processor_' . $type;
+
         return new $class($this);
     }
 
@@ -38,6 +39,7 @@ class CAjax_Engine_DataTable extends CAjax_Engine {
         if (is_array($response)) {
             return c::response()->json($response);
         }
+
         return $response;
     }
 }

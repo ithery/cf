@@ -3,8 +3,6 @@
 class CAuth_Manager {
     use CAuth_Concern_CreateUserProvider;
 
-    private static $instance;
-
     /**
      * The registered custom driver creators.
      *
@@ -28,8 +26,10 @@ class CAuth_Manager {
      */
     protected $userResolver;
 
+    private static $instance;
+
     /**
-     * Get current singleton instance
+     * Get current singleton instance.
      *
      * @return CAuth_Manager
      */
@@ -37,6 +37,7 @@ class CAuth_Manager {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -54,9 +55,9 @@ class CAuth_Manager {
     /**
      * Attempt to get the guard from the local cache.
      *
-     * @param string|null $name
+     * @param null|string $name
      *
-     * @return \CAuth_GuardInterface|\CAuth_StatefulGuardInterface
+     * @return \CAuth_Contract_GuardInterface|\CAuth_Contract_StatefulGuardInterface
      */
     public function guard($name = null) {
         $name = $name ?: $this->getDefaultDriver();
@@ -73,9 +74,9 @@ class CAuth_Manager {
      *
      * @param string $name
      *
-     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
      */
     protected function resolve($name) {
         $config = $this->getConfig($name);

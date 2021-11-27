@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 11, 2019, 10:50:01 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 11, 2019, 10:50:01 PM
  */
 trait CHTTP_Trait_FileHelpersTrait {
-
     /**
      * The cache copy of the file's hash name.
      *
@@ -37,7 +37,8 @@ trait CHTTP_Trait_FileHelpersTrait {
     /**
      * Get a filename for the file.
      *
-     * @param  string|null  $path
+     * @param string|null $path
+     *
      * @return string
      */
     public function hashName($path = null) {
@@ -48,7 +49,7 @@ trait CHTTP_Trait_FileHelpersTrait {
         if ($extension = $this->guessExtension()) {
             $extension = '.' . $extension;
         }
+
         return $path . $hash . $extension;
     }
-
 }

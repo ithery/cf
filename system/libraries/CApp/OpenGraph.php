@@ -4,21 +4,21 @@ use CApp_OpenGraph_Tag as OpenGraphTag;
 
 /**
  * Library that assists in building Open Graph meta tags.
- * Open Graph protocol official docs: http://ogp.me/
+ * Open Graph protocol official docs: http://ogp.me/.
  */
 class CApp_OpenGraph {
     /**
-     * The version number
+     * The version number.
      */
     const VERSION = '2.0.0';
 
     /**
-     * Define a prefix for tag names
+     * Define a prefix for tag names.
      */
     const NAME_PREFIX = 'og:';
 
     /**
-     * Array containing the tags
+     * Array containing the tags.
      *
      * @var OpenGraphTag[]
      */
@@ -39,7 +39,7 @@ class CApp_OpenGraph {
     protected $template = "<meta property=\"{{name}}\" content=\"{{value}}\" />\n";
 
     /**
-     * Constructor call
+     * Constructor call.
      *
      * @param bool $validate Enable validation?
      */
@@ -79,6 +79,7 @@ class CApp_OpenGraph {
      */
     public function validate($validate = true) {
         $this->validate = $validate;
+
         return $this;
     }
 
@@ -105,11 +106,12 @@ class CApp_OpenGraph {
                 return true;
             }
         }
+
         return false;
     }
 
     /**
-     * Remove all tags with the given name
+     * Remove all tags with the given name.
      *
      * @param string $name
      *
@@ -121,21 +123,23 @@ class CApp_OpenGraph {
                 unset($this->tags[$key]);
             }
         }
+
         return $this;
     }
 
     /**
-     * Remove all tags
+     * Remove all tags.
      *
      * @return OpenGraph
      */
     public function clear() {
         $this->tags = [];
+
         return $this;
     }
 
     /**
-     * Adds a custom tag to the list of tags
+     * Adds a custom tag to the list of tags.
      *
      * @param string $name     The name of the tag
      * @param mixed  $value    The value of the tag
@@ -146,11 +150,12 @@ class CApp_OpenGraph {
     public function tag($name, $value, $prefixed = true) {
         $value = $this->convertDate($value);
         $this->tags[] = $this->createTag($name, $value, $prefixed);
+
         return $this;
     }
 
     /**
-     * Adds attribute tags to the list of tags
+     * Adds attribute tags to the list of tags.
      *
      * @param string   $tagName    The name of the base tag
      * @param array    $attributes Array with attributes (pairs of name and value)
@@ -169,11 +174,12 @@ class CApp_OpenGraph {
             $value = $this->convertDate($value);
             $this->tags[] = $this->createTag($tagName . ':' . $name, $value, $prefixed);
         }
+
         return $this;
     }
 
     /**
-     * Shortcut for attributes() with $prefixed = false
+     * Shortcut for attributes() with $prefixed = false.
      *
      * @param string   $tagName    The name of the base tag
      * @param array    $attributes Array with attributes (pairs of name and value)
@@ -186,7 +192,7 @@ class CApp_OpenGraph {
     }
 
     /**
-     * Adds a title tag
+     * Adds a title tag.
      *
      * @param string $title
      *
@@ -199,6 +205,7 @@ class CApp_OpenGraph {
         }
         $this->forget('title');
         $this->tags[] = $this->createTag('title', strip_tags($title));
+
         return $this;
     }
 
@@ -229,6 +236,7 @@ class CApp_OpenGraph {
         }
         $this->forget('type');
         $this->tags[] = $this->createTag('type', $type);
+
         return $this;
     }
 
@@ -237,7 +245,7 @@ class CApp_OpenGraph {
      * If the URL is relative it's converted to an absolute one.
      *
      * @param string     $imageFile  The URL of the image file
-     * @param array|null $attributes Array with additional attributes (pairs of name and value)
+     * @param null|array $attributes Array with additional attributes (pairs of name and value)
      *
      * @return OpenGraph
      */
@@ -261,11 +269,12 @@ class CApp_OpenGraph {
             ];
             $this->attributes('image', $attributes, $valid);
         }
+
         return $this;
     }
 
     /**
-     * Adds a description tag
+     * Adds a description tag.
      *
      * @param string $description The description text
      * @param int    $maxLength   If the text is longer than this it is shortened
@@ -282,11 +291,12 @@ class CApp_OpenGraph {
         }
         $this->forget('description');
         $this->tags[] = $this->createTag('description', $description);
+
         return $this;
     }
 
     /**
-     * Adds a URL tag
+     * Adds a URL tag.
      *
      * @param string $url
      *
@@ -316,11 +326,12 @@ class CApp_OpenGraph {
         }
         $this->forget('url');
         $this->tags[] = $this->createTag('url', $url);
+
         return $this;
     }
 
     /**
-     * Adds a locale tag
+     * Adds a locale tag.
      *
      * @param string $locale
      *
@@ -332,11 +343,12 @@ class CApp_OpenGraph {
         }
         $this->forget('locale');
         $this->tags[] = $this->createTag('locale', $locale);
+
         return $this;
     }
 
     /**
-     * Adds locale:alternate tags
+     * Adds locale:alternate tags.
      *
      * @param string[] $locales An array of alternative locales
      *
@@ -353,11 +365,12 @@ class CApp_OpenGraph {
             }
             $this->tags[] = $this->createTag('locale:alternate', $locale);
         }
+
         return $this;
     }
 
     /**
-     * Adds a site_name tag
+     * Adds a site_name tag.
      *
      * @param string $siteName
      *
@@ -369,6 +382,7 @@ class CApp_OpenGraph {
         }
         $this->forget('site_name');
         $this->tags[] = $this->createTag('site_name', $siteName);
+
         return $this;
     }
 
@@ -391,6 +405,7 @@ class CApp_OpenGraph {
             throw new Exception("Open Graph: Invalid determiner '{$determiner}' (unkown value)");
         }
         $this->tags[] = $this->createTag('determiner', $determiner);
+
         return $this;
     }
 
@@ -399,7 +414,7 @@ class CApp_OpenGraph {
      * If the URL is relative its converted to an absolute one.
      *
      * @param string     $audioFile  The URL of the video file
-     * @param array|null $attributes Array with additional attributes (pairs of name and value)
+     * @param null|array $attributes Array with additional attributes (pairs of name and value)
      *
      * @return OpenGraph
      */
@@ -455,6 +470,7 @@ class CApp_OpenGraph {
             $valid = array_merge($valid, $specialValid);
             $this->attributes('audio', $attributes, $valid);
         }
+
         return $this;
     }
 
@@ -463,7 +479,7 @@ class CApp_OpenGraph {
      * If the URL is relative its converted to an absolute one.
      *
      * @param string     $videoFile  The URL of the video file
-     * @param array|null $attributes Array with additional attributes (pairs of name and value)
+     * @param null|array $attributes Array with additional attributes (pairs of name and value)
      *
      * @return OpenGraph
      */
@@ -503,11 +519,12 @@ class CApp_OpenGraph {
             }
             $this->attributes('video', $attributes, $valid);
         }
+
         return $this;
     }
 
     /**
-     * Adds article attributes
+     * Adds article attributes.
      *
      * @param array $attributes Array with attributes (pairs of name and value)
      *
@@ -527,11 +544,12 @@ class CApp_OpenGraph {
             'tag',
         ];
         $this->unprefixedAttributes('article', $attributes, $valid);
+
         return $this;
     }
 
     /**
-     * Adds book attributes
+     * Adds book attributes.
      *
      * @param array $attributes Array with attributes (pairs of name and value)
      *
@@ -549,11 +567,12 @@ class CApp_OpenGraph {
             'tag',
         ];
         $this->unprefixedAttributes('book', $attributes);
+
         return $this;
     }
 
     /**
-     * Adds profile attributes
+     * Adds profile attributes.
      *
      * @param array $attributes Array with attributes (pairs of name and value)
      *
@@ -571,6 +590,7 @@ class CApp_OpenGraph {
             'gender',
         ];
         $this->unprefixedAttributes('profile', $attributes);
+
         return $this;
     }
 
@@ -583,11 +603,12 @@ class CApp_OpenGraph {
      */
     public function template($template) {
         $this->template = $template;
+
         return $this;
     }
 
     /**
-     * Returns the Open Graph tags rendered as HTML
+     * Returns the Open Graph tags rendered as HTML.
      *
      * @return string
      */
@@ -601,11 +622,12 @@ class CApp_OpenGraph {
             }
             $output .= str_replace($vars, [$name, $tag->value], $this->template);
         }
+
         return $output;
     }
 
     /**
-     * Same as renderTags()
+     * Same as renderTags().
      *
      * @return string
      */
@@ -614,11 +636,11 @@ class CApp_OpenGraph {
     }
 
     /**
-     * Returns the last tag in the lists of tags with matching name
+     * Returns the last tag in the lists of tags with matching name.
      *
      * @param string $name The name of the tag
      *
-     * @return OpenGraphTag|null Returns the tag object or null
+     * @return null|OpenGraphTag Returns the tag object or null
      */
     public function lastTag($name) {
         $lastTag = null;
@@ -627,11 +649,12 @@ class CApp_OpenGraph {
                 $lastTag = $tag;
             }
         }
+
         return $lastTag;
     }
 
     /**
-     * Converts a DateTime object to a string (ISO 8601)
+     * Converts a DateTime object to a string (ISO 8601).
      *
      * @param string|DateTime $date The date (string or DateTime)
      *
@@ -641,6 +664,7 @@ class CApp_OpenGraph {
         if (is_a($date, 'DateTime')) {
             return (string) $date->format(DateTime::ISO8601);
         }
+
         return $date;
     }
 }

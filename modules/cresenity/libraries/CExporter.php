@@ -2,7 +2,6 @@
 
 class CExporter {
     use CExporter_Trait_RegistersCustomConcernsTrait;
-
     const ACTION_STORE = 'store';
 
     const ACTION_DOWNLOAD = 'download';
@@ -69,7 +68,7 @@ class CExporter {
 
     /**
      * @param object      $export
-     * @param string|null $fileName
+     * @param null|string $fileName
      * @param string      $writerType
      * @param array       $headers
      *
@@ -86,7 +85,7 @@ class CExporter {
 
     /**
      * @param object      $export
-     * @param string|null $fileName
+     * @param null|string $fileName
      * @param string      $writerType
      *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
@@ -96,6 +95,7 @@ class CExporter {
     protected static function export($export, $fileName, $writerType = null) {
         $writerType = CExporter_FileTypeDetector::detectStrict($fileName, $writerType);
         $export = CExporter_ExportableDetector::toExportable($export);
+
         return static::writer()->export($export, $writerType);
     }
 
@@ -151,6 +151,7 @@ class CExporter {
             case static::DOMPDF:
                 return 'pdf';
         }
+
         return 'xlsx';
     }
 
@@ -176,7 +177,7 @@ class CExporter {
     /**
      * @param object      $export
      * @param string      $filePath
-     * @param string|null $disk
+     * @param null|string $disk
      * @param string      $writerType
      * @param mixed       $diskOptions
      *
@@ -185,6 +186,7 @@ class CExporter {
     public static function queue($export, $filePath, $disk = null, $writerType = null, $diskOptions = []) {
         $writerType = CExporter_FileTypeDetector::detectStrict($filePath, $writerType);
         $export = CExporter_ExportableDetector::toExportable($export);
+
         return static::queuedWriter()->store(
             $export,
             $filePath,
@@ -211,6 +213,7 @@ class CExporter {
 
         $writerType = CExporter_FileTypeDetector::detectStrict($filePath, $writerType);
         $export = CExporter_ExportableDetector::toExportable($data);
+
         return static::queuedWriter()->store(
             $export,
             $filePath,
@@ -255,5 +258,37 @@ class CExporter {
         }
 
         return $path;
+    }
+
+    /**
+     * CExporter_Transaction_TransactionManager.
+     *
+     * @return CExporter_Transaction_TransactionManager
+     */
+    public static function transactionManager() {
+        return CExporter_Transaction_TransactionManager::instance();
+    }
+
+    /**
+     * @return PhpOffice\PhpSpreadsheet\Cell\DefaultValueBinder
+     */
+    public static function defaultValueBinder() {
+        $defaultValueBinderClass = static::config()->get('value_binder.default', CExporter_DefaultValueBinder::class);
+
+        return new $defaultValueBinderClass();
+    }
+
+    /**
+     * @return CExporter_Import_ModelManager
+     */
+    public static function modelManager() {
+        return CExporter_Import_ModelManager::instance();
+    }
+
+    /**
+     * @return CExporter_Import_ModelImporter
+     */
+    public static function modelImporter() {
+        return CExporter_Import_ModelImporter::instance();
     }
 }

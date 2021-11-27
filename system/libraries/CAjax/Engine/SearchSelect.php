@@ -35,11 +35,7 @@ class CAjax_Engine_SearchSelect extends CAjax_Engine {
         $pos_order_by = strpos(strtolower($base_q), 'order by', strpos(strtolower($base_q), 'from'));
 
         $pos_last_kurung = strrpos(strtolower($base_q), ')');
-        if (isset($_GET['bdebug'])) {
-            cdbg::var_dump($data);
-            cdbg::var_dump($pos_last_kurung);
-            die();
-        }
+
         $temp_order_by = '';
         if ($pos_order_by > $pos_last_kurung) {
             if ($pos_order_by !== false) {
@@ -155,6 +151,7 @@ class CAjax_Engine_SearchSelect extends CAjax_Engine {
         $response .= $callback . '(';
         $response .= json_encode($result);
         $response .= ')';
+
         return $response;
     }
 }

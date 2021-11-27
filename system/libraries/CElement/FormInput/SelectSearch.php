@@ -10,6 +10,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_FormInput_SelectSearch extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectSearch;
+    use CElement_FormInput_SelectSearch_Trait_Select2v23Trait;
+    use CTrait_Element_Property_ApplyJs;
 
     protected $query;
 
@@ -54,6 +56,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->delay = 100;
         $this->requires = [];
         $this->valueCallback = null;
+        $this->applyJs = 'select2';
     }
 
     public static function factory($id) {
@@ -65,56 +68,67 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if (strlen($require) > 0) {
             $this->requires[] = $require;
         }
+
         return $this;
     }
 
     public function setMultiple($bool = true) {
         $this->multiple = $bool;
+
         return $this;
     }
 
     public function setDelay($val) {
         $this->delay = $val;
+
         return $this;
     }
 
     public function setAutoSelect($bool = true) {
         $this->autoSelect = $bool;
+
         return $this;
     }
 
     public function setMinInputLength($minInputLength) {
         $this->minInputLength = $minInputLength;
+
         return $this;
     }
 
     public function setKeyField($keyField) {
         $this->keyField = $keyField;
+
         return $this;
     }
 
     public function setSearchField($searchField) {
         $this->searchField = $searchField;
+
         return $this;
     }
 
     public function setQuery($query) {
         $this->query = $query;
+
         return $this;
     }
 
     public function setFormatResult($fmt) {
         $this->formatResult = $fmt;
+
         return $this;
     }
 
     public function setFormatSelection($fmt) {
         $this->formatSelection = $fmt;
+
         return $this;
     }
 
     public function setPlaceholder($placeholder) {
         $this->placeholder = $placeholder;
+
         return $this;
     }
 
@@ -128,10 +142,14 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             }
             $this->dropdownClasses[] = $c;
         }
+
         return $this;
     }
 
     public function html($indent = 0) {
+        if ($this->applyJs == 'select2v2.3') {
+            return $this->htmlSelect2v23($indent);
+        }
         $html = new CStringBuilder();
         $custom_css = $this->custom_css;
 
@@ -240,10 +258,14 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 $template = str_replace($bracketStr, "'+item." . $str . "+'", $template);
             }
         }
+
         return $template;
     }
 
     public function js($indent = 0) {
+        if ($this->applyJs == 'select2v2.3') {
+            return $this->jsSelect2v23($indent);
+        }
         $ajaxUrl = $this->createAjaxUrl();
 
         $strSelection = $this->formatSelection;
@@ -352,6 +374,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                             };
                         },
                         cache:true,
+                        error: function (jqXHR, status, error) {
+                            if(cresenity && cresenity.handleAjaxError) {
+                                cresenity.handleAjaxError(jqXHR, status, error);
+                            }
+                        }
                     },
                 ' . $strJsInit . "
                 templateResult: function(item) {

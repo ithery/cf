@@ -16,7 +16,7 @@ class CApp_Api_Method_App_GitStatus extends CApp_Api_Method_App {
         $data = [];
 
         try {
-            $output = shell_exec("cd application/$this->appCode && git status");
+            $output = shell_exec("cd application/{$this->appCode} && git status");
         } catch (Exception $ex) {
             $errCode++;
             $errMessage = $ex->getMessage();

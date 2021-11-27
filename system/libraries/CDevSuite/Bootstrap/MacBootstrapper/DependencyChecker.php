@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DependencyChecker
+ * Description of DependencyChecker.
  *
  * @author Hery
  */

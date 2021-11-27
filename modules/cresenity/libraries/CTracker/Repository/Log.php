@@ -1,19 +1,20 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 23, 2019, 10:28:39 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 23, 2019, 10:28:39 PM
  */
 class CTracker_Repository_Log extends CTracker_AbstractRepository {
-
     private $currentLogId;
+
     private $routePathId;
 
     public function __construct() {
-        $this->className = CTracker::config()->get('logModel', 'CTracker_Model_Log');
+        $this->className = CTracker::config()->get('logModel', CTracker_Model_Log::class);
         $this->createModel();
 
         parent::__construct();
@@ -28,6 +29,7 @@ class CTracker_Repository_Log extends CTracker_AbstractRepository {
             $model->log_route_path_id = $this->routePathId;
             $model->save();
         }
+
         return $model;
     }
 
@@ -37,16 +39,18 @@ class CTracker_Repository_Log extends CTracker_AbstractRepository {
             $model->log_error_id = $error_id;
             $model->save();
         }
+
         return $model;
     }
 
     public function bySession($sessionId, $results = true) {
         $query = $this
-                        ->getModel()
-                        ->where('session_id', $sessionId)->orderBy('updated', 'desc');
+            ->getModel()
+            ->where('session_id', $sessionId)->orderBy('updated', 'desc');
         if ($results) {
             return $query->get();
         }
+
         return $query;
     }
 
@@ -67,9 +71,9 @@ class CTracker_Repository_Log extends CTracker_AbstractRepository {
     }
 
     public function createLog($data) {
-
         $log = $this->create($data);
         $this->updateRoute();
+
         return $this->setCurrentLogId($log->log_log_id);
     }
 
@@ -93,5 +97,4 @@ class CTracker_Repository_Log extends CTracker_AbstractRepository {
         $this->currentLogId = null;
         $this->getModel()->delete();
     }
-
 }

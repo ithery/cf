@@ -14,7 +14,7 @@ class CCache_Lock_ArrayLock extends CCache_LockAbstract {
      * @param CCache_Driver_ArrayDriver $driver
      * @param string                    $name
      * @param int                       $seconds
-     * @param string|null               $owner
+     * @param null|string               $owner
      *
      * @return void
      */
@@ -30,7 +30,7 @@ class CCache_Lock_ArrayLock extends CCache_LockAbstract {
      * @return bool
      */
     public function acquire() {
-        $expiration = $this->driver->locks[$this->name]['expiresAt'] ?? CCarbon::now()->addSecond();
+        $expiration = isset($this->driver->locks[$this->name]['expiresAt']) ? $this->driver->locks[$this->name]['expiresAt'] : CCarbon::now()->addSecond();
 
         if ($this->exists() && $expiration->isFuture()) {
             return false;

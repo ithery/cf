@@ -16,7 +16,7 @@ class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
         $docroot = str_replace(DS, '/', DOCROOT);
         $file = str_replace(DS, '/', $file);
         $base_url = curl::base();
-        if ($withHttp || CManager::instance()->isMobile()) {
+        if ($withHttp) {
             $base_url = curl::base(false, 'http');
         }
 
@@ -40,6 +40,7 @@ class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
             }
         }
         $dirs = CF::getDirs('media');
+        $dirs = array_merge($this->mediaPaths, $dirs);
 
         foreach ($dirs as $dir) {
             $path = $dir . 'js' . DS . $file;
@@ -50,6 +51,7 @@ class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
         }
 
         $path = DOCROOT . 'media' . DS . 'js' . DS;
+
         return $path . $file;
     }
 
@@ -58,6 +60,7 @@ class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
         $url = $this->getUrl($withHttp);
 
         $script = '<script src="' . $url . '"' . $attrDefer . '></script>';
+
         return $script;
     }
 }

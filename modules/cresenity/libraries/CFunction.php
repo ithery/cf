@@ -3,8 +3,6 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @package Cresenity
- *
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
  *
@@ -37,6 +35,7 @@ class CFunction {
 
     public function setFunction($func) {
         $this->func = $func;
+
         return $this;
     }
 
@@ -46,16 +45,19 @@ class CFunction {
 
     public function setArgs(array $args) {
         $this->args = $args;
+
         return $this;
     }
 
     public function addArg($arg) {
         $this->args[] = $arg;
+
         return $this;
     }
 
     public function addRequire($p) {
         $this->requires[] = $p;
+
         return $this;
     }
 
@@ -68,6 +70,7 @@ class CFunction {
         }
 
         $this->requires = $p;
+
         return $this;
     }
 
@@ -109,10 +112,18 @@ class CFunction {
             }
         }
         if ($error == 0) {
+            //try to get from transform
+            $transformer = CManager_Transform::instance();
+
+            if ($transformer->methodExists($this->func)) {
+                return $transformer->call($this->func, $args);
+            }
+
             //not the function name, let check it if it is function from ctransform class
             if (is_callable(['ctransform', $this->func])) {
                 return call_user_func_array(['ctransform', $this->func], $args);
             }
+            //not the function name, let check it if it is function from ctransform class
         }
         if ($error == 0) {
             //not the function name, let check it if it is function from CHelper_Transform class
@@ -131,6 +142,7 @@ class CFunction {
         if ($error == 0) {
             return $this->func;
         }
+
         return 'ERROR ON CFUNCTION';
     }
 }

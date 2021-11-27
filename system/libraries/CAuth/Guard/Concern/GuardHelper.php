@@ -1,4 +1,3 @@
-
 <?php
 
 /**
@@ -22,16 +21,16 @@ trait CAuth_Guard_Concern_GuardHelper {
     /**
      * Determine if current user is authenticated. If not, throw an exception.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable
-     *
      * @throws \Illuminate\Auth\AuthenticationException
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     public function authenticate() {
         if (!is_null($user = $this->user())) {
             return $user;
         }
 
-        throw new CAuth_Exception_AuthenticationException;
+        throw new CAuth_Exception_AuthenticationException();
     }
 
     /**
@@ -64,7 +63,7 @@ trait CAuth_Guard_Concern_GuardHelper {
     /**
      * Get the ID for the currently authenticated user.
      *
-     * @return int|string|null
+     * @return null|int|string
      */
     public function id() {
         if ($this->user()) {

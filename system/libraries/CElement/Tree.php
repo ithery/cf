@@ -2,10 +2,15 @@
 
 class CElement_Tree extends CElement {
     protected $url;
+
     protected $target;
+
     protected $data = [];
+
     protected $callback;
+
     protected $requires;
+
     protected $custom_field_data = [];
 
     public function __construct($id = '') {
@@ -23,21 +28,25 @@ class CElement_Tree extends CElement {
 
     public function set_data($data) {
         $this->data = $data;
+
         return $this;
     }
 
     public function set_custom_field_data($custom_field_data) {
         $this->custom_field_data = $custom_field_data;
+
         return $this;
     }
 
     public function set_target($target) {
         $this->target = $target;
+
         return $this;
     }
 
     public function set_url($url) {
         $this->url = $url;
+
         return $this;
     }
 
@@ -51,6 +60,7 @@ class CElement_Tree extends CElement {
                 $this->requires[] = $req;
             }
         }
+
         return $this;
     }
 
@@ -72,6 +82,7 @@ class CElement_Tree extends CElement {
                 $html->appendln('</ul>');
             }
         }
+
         return $html->text();
     }
 
@@ -173,21 +184,21 @@ class CElement_Tree extends CElement {
         $js = new CStringBuilder();
 
         $callback_node_url = CAjaxMethod::factory()
-                ->set_type('callback')
-                ->set_data('callable', ['CElement_Tree', 'ajax'])
-                ->set_data('tree_callback', $this->callback)
-                ->set_data('requires', $this->requires)
-                ->set_data('operation', 'get_node')
-                ->set_data('custom_field_data', $this->custom_field_data)
-                ->makeurl();
+            ->set_type('callback')
+            ->set_data('callable', ['CElement_Tree', 'ajax'])
+            ->set_data('tree_callback', $this->callback)
+            ->set_data('requires', $this->requires)
+            ->set_data('operation', 'get_node')
+            ->set_data('custom_field_data', $this->custom_field_data)
+            ->makeurl();
         $callback_content_url = CAjaxMethod::factory()
-                ->set_type('callback')
-                ->set_data('callable', ['CElement_Tree', 'ajax'])
-                ->set_data('tree_callback', $this->callback)
-                ->set_data('requires', $this->requires)
-                ->set_data('operation', 'get_content')
-                ->set_data('custom_field_data', $this->custom_field_data)
-                ->makeurl();
+            ->set_type('callback')
+            ->set_data('callable', ['CElement_Tree', 'ajax'])
+            ->set_data('tree_callback', $this->callback)
+            ->set_data('requires', $this->requires)
+            ->set_data('operation', 'get_content')
+            ->set_data('custom_field_data', $this->custom_field_data)
+            ->makeurl();
         //die($callback_node_url);
         $js->appendln("jQuery('#" . $this->id . " .tree').jstree({
                     'core' : {

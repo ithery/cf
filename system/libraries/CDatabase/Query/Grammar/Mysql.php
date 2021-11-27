@@ -296,4 +296,21 @@ class CDatabase_Query_Grammar_Mysql extends CDatabase_Query_Grammar {
 
         return 'json_extract(' . $field . $path . ')';
     }
+
+    /**
+     * Compile the "from" portion of the query.
+     *
+     * @param CDatabase_Query_Builder $query
+     * @param string                  $table
+     *
+     * @return string
+     */
+    protected function compileFrom(CDatabase_Query_Builder $query, $table) {
+        $from = 'from ' . $this->wrapTable($table);
+        if ($query->getUseIndex()) {
+            $from .= ' use index(' . $query->getUseIndex() . ')';
+        }
+
+        return $from;
+    }
 }

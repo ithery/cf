@@ -4,7 +4,7 @@ class CApp_Auth_Action_RedirectIfTwoFactorAuthenticatable {
     /**
      * The guard implementation.
      *
-     * @var CAuth_StatefulGuardInterface
+     * @var CAuth_Contract_StatefulGuardInterface
      */
     protected $guard;
 
@@ -18,12 +18,12 @@ class CApp_Auth_Action_RedirectIfTwoFactorAuthenticatable {
     /**
      * Create a new controller instance.
      *
-     * @param CAuth_StatefulGuardInterface $guard
-     * @param CApp_Auth_LoginRateLimiter   $limiter
+     * @param CAuth_Contract_StatefulGuardInterface $guard
+     * @param CApp_Auth_LoginRateLimiter            $limiter
      *
      * @return void
      */
-    public function __construct(CAuth_StatefulGuardInterface $guard, CApp_Auth_LoginRateLimiter $limiter) {
+    public function __construct(CAuth_Contract_StatefulGuardInterface $guard, CApp_Auth_LoginRateLimiter $limiter) {
         $this->guard = $guard;
         $this->limiter = $limiter;
     }
@@ -84,9 +84,9 @@ class CApp_Auth_Action_RedirectIfTwoFactorAuthenticatable {
      *
      * @param CHTTP_Request $request
      *
-     * @return void
-     *
      * @throws CValidation_Exception
+     *
+     * @return void
      */
     protected function throwFailedAuthenticationException($request) {
         $this->limiter->increment($request);
@@ -100,7 +100,7 @@ class CApp_Auth_Action_RedirectIfTwoFactorAuthenticatable {
      * Fire the failed authentication attempt event with the given arguments.
      *
      * @param \CHTTP_Request                      $request
-     * @param CAuth_AuthenticatableInterface|null $user
+     * @param null|CAuth_AuthenticatableInterface $user
      *
      * @return void
      */

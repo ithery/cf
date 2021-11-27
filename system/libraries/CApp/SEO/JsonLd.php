@@ -1,17 +1,10 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
-
     /**
-     * Singleton instance of this class
-     * 
-     * @var CApp_SEO_JsonLd 
+     * Singleton instance of this class.
+     *
+     * @var CApp_SEO_JsonLd
      */
     protected $instance = null;
 
@@ -36,7 +29,7 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
     protected $description = '';
 
     /**
-     * @var string|null|bool
+     * @var null|string|bool
      */
     protected $url = false;
 
@@ -54,7 +47,6 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
         $this->config = CF::config('seo.twitter');
 
         $this->values = carr::get($this->config, 'defaults', []);
-
 
         $defaults = carr::get($this->config, 'defaults', []);
 
@@ -77,18 +69,18 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
     }
 
     /**
-     * 
      * @return CApp_SEO_JsonLd
      */
     public static function instance() {
         if (self::$instance == null) {
             self::$instance = new static();
         }
+
         return self::$instance;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function generate($minify = false) {
         $generated = [
@@ -121,7 +113,7 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addValue($key, $value) {
         $this->values[$key] = $value;
@@ -130,7 +122,7 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addValues(array $values) {
         foreach ($values as $key => $value) {
@@ -141,7 +133,7 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setType($type) {
         $this->type = $type;
@@ -150,7 +142,7 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setTitle($title) {
         $this->title = $title;
@@ -159,7 +151,7 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setSite($site) {
         $this->url = $site;
@@ -168,7 +160,7 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setDescription($description) {
         $this->description = $description;
@@ -177,7 +169,7 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setUrl($url) {
         $this->url = $url;
@@ -186,7 +178,7 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setImages($images) {
         $this->images = [];
@@ -195,7 +187,7 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function addImage($image) {
         if (is_array($image)) {
@@ -208,12 +200,11 @@ class CApp_SEO_JsonLd implements CApp_SEO_JsonLdInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function setImage($image) {
         $this->images = [$image];
 
         return $this;
     }
-
 }

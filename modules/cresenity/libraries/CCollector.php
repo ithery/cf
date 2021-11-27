@@ -33,7 +33,7 @@ class CCollector {
 
         if ($type && strtolower($type) != 'all') {
             if (!in_array($type, static::TYPE)) {
-                throw new CException("Type $type is not found");
+                throw new Exception("Type ${type} is not found");
             }
 
             $tempPath = $path . DS . $type . DS;
@@ -61,12 +61,13 @@ class CCollector {
                 return json_decode($data);
             }, $content);
         }
+
         return $data;
     }
 
     public static function put($type, $data) {
         if (!in_array($type, static::TYPE)) {
-            throw new CException("Type $type is not found");
+            throw new Exception("Type ${type} is not found");
         }
 
         if (!is_string($data)) {
@@ -75,7 +76,7 @@ class CCollector {
 
         json_decode($data);
         if (json_last_error() !== JSON_ERROR_NONE) {
-            throw new CException(json_last_error_msg());
+            throw new Exception(json_last_error_msg());
         }
 
         $path = static::getDirectory();
@@ -102,9 +103,7 @@ class CCollector {
                 } catch (Exception $ex) {
                     $data = static::getDataFromException($ex, $isDeprecated = true);
                     if (strlen($message) > 0) {
-                        $dataArray = json_decode($data, true);
-                        carr::set_path($dataArray, 'message', carr::get($dataArray, 'message') . ', ' . $message);
-                        $data = json_encode($dataArray);
+                        carr::set($data, 'message', carr::get($data, 'message') . ', ' . $message);
                     }
                     static::put(static::DEPRECATED, $data);
                     unset($ex);
@@ -158,7 +157,6 @@ class CCollector {
         }
         $browser = new CBrowser();
         $data = [];
-        $rawPost = file_get_contents('php://input');
         $data['datetime'] = date('Y-m-d H:i:s');
         $data['appId'] = $app->appId();
         $data['appCode'] = $app->code();
@@ -183,8 +181,9 @@ class CCollector {
         $data['fullUrl'] = curl::current();
         $data['protocol'] = CApp_Base::protocol();
         $data['CFVersion'] = CF_VERSION;
-        $data['postData'] = $rawPost;
-        $data['fileData'] = json_encode($_FILES);
+
+        $report = CException::manager()->createReport($exception)->toArray();
+        $data = array_merge($data, $report);
 
         return $data;
     }

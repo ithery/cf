@@ -1,13 +1,11 @@
 <?php
 
 /**
- * Description of WhoopsHandler
+ * Description of WhoopsHandler.
  *
  * @author Hery
  */
 
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Arr;
 use Whoops\Handler\PrettyPageHandler;
 
 class CException_WhoopsHandler {
@@ -17,7 +15,7 @@ class CException_WhoopsHandler {
      * @return \Whoops\Handler\PrettyPageHandler
      */
     public function forDebug() {
-        return c::tap(new PrettyPageHandler, function ($handler) {
+        return c::tap(new PrettyPageHandler(), function ($handler) {
             $handler->handleUnconditionally(true);
 
             $this->registerApplicationPaths($handler)
@@ -48,8 +46,8 @@ class CException_WhoopsHandler {
      */
     protected function directoriesExceptVendor() {
         return carr::except(
-            array_flip((new Filesystem)->directories(base_path())),
-            [base_path('vendor')]
+            array_flip(CFile::directories(c::docRoot())),
+            [c::docRoot('vendor')]
         );
     }
 
