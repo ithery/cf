@@ -384,7 +384,7 @@ class cstr {
      */
     public static function startsWith($haystack, $needles) {
         foreach ((array) $needles as $needle) {
-            if ($needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
+            if ((string) $needle !== '' && strncmp($haystack, $needle, strlen($needle)) === 0) {
                 return true;
             }
         }
@@ -727,17 +727,7 @@ class cstr {
      * @return string
      */
     public static function ascii($value, $language = 'en') {
-        $languageSpecific = static::languageSpecificCharsArray($language);
-
-        if (!is_null($languageSpecific)) {
-            $value = str_replace($languageSpecific[0], $languageSpecific[1], $value);
-        }
-
-        foreach (static::charsArray() as $key => $val) {
-            $value = str_replace($val, $key, $value);
-        }
-
-        return preg_replace('/[^\x20-\x7E]/u', '', $value);
+        return CASCII::toAscii((string) $value, $language);
     }
 
     /**
@@ -908,43 +898,26 @@ class cstr {
     }
 
     public static function kebabCase($string) {
-        return \implode('-', \array_map('\strtolower', cstr::words(\preg_replace("/['\x{2019}]/u", '', $string))));
+        return static::kebab($string);
     }
 
     /**
-     * Splits `string` into an array of its words.
+     * Limit the number of words in a string.
      *
-     * @param string $string  the string to inspect
-     * @param string $pattern the pattern to match words
+     * @param string $value
+     * @param int    $words
+     * @param string $end
      *
-     * @return array returns the words of `string`
-     *
-     * @example
-     * <code>
-     * cstr::words('fred, barney, & pebbles')
-     * // => ['fred', 'barney', 'pebbles']
-     *
-     * cstr::words('fred, barney, & pebbles', '/[^, ]+/g')
-     * // => ['fred', 'barney', '&', 'pebbles']
-     * </code>
+     * @return string
      */
-    public static function words($string, $pattern = null) {
-        $asciiWords = '/[^\x00-\x2f\x3a-\x40\x5b-\x60\x7b-\x7f]+/';
-        $hasUnicodeWord = '/[a-z][A-Z]|[A-Z]{2,}[a-z]|[0-9][a-zA-Z]|[a-zA-Z][0-9]|[^a-zA-Z0-9 ]/';
+    public static function words($value, $words = 100, $end = '...') {
+        preg_match('/^\s*+(?:\S++\s*+){1,' . $words . '}/u', $value, $matches);
 
-        if (null === $pattern) {
-            if (\preg_match($hasUnicodeWord, $string)) {
-                return cstr::unicodeWords($string);
-            }
-            \preg_match_all($asciiWords, $string, $matches);
-
-            return isset($matches[0]) ? $matches[0] : [];
-        }
-        if (\preg_match_all($pattern, $string, $matches) > 0) {
-            return $matches[0];
+        if (!isset($matches[0]) || static::length($value) === static::length($matches[0])) {
+            return $value;
         }
 
-        return [];
+        return rtrim($matches[0]) . $end;
     }
 
     /**
