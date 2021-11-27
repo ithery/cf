@@ -10,7 +10,6 @@
 
 namespace PHPUnit\Framework;
 
-use Exception;
 use Throwable;
 use SoapClient;
 use const LC_ALL;
@@ -86,6 +85,7 @@ use PHPUnit\Framework\Exception\Warning;
 use PHPUnit\Util\PHP\AbstractPhpProcess;
 use SebastianBergmann\Exporter\Exporter;
 use SebastianBergmann\Template\Template;
+use PHPUnit\Framework\Exception\Exception;
 use SebastianBergmann\GlobalState\Restorer;
 use SebastianBergmann\GlobalState\Snapshot;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -1515,6 +1515,48 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
             }
 
             return;
+        } catch (Exception $exception) {
+            if (!$this->checkExceptionExpectations($exception)) {
+                throw $exception;
+            }
+
+            if ($this->expectedException !== null) {
+                $this->assertThat(
+                    $exception,
+                    new ExceptionConstraint(
+                        $this->expectedException
+                    )
+                );
+            }
+
+            if ($this->expectedExceptionMessage !== null) {
+                $this->assertThat(
+                    $exception,
+                    new ExceptionMessage(
+                        $this->expectedExceptionMessage
+                    )
+                );
+            }
+
+            if ($this->expectedExceptionMessageRegExp !== null) {
+                $this->assertThat(
+                    $exception,
+                    new ExceptionMessageRegularExpression(
+                        $this->expectedExceptionMessageRegExp
+                    )
+                );
+            }
+
+            if ($this->expectedExceptionCode !== null) {
+                $this->assertThat(
+                    $exception,
+                    new ExceptionCode(
+                        $this->expectedExceptionCode
+                    )
+                );
+            }
+
+            return;
         }
 
         if ($this->expectedException !== null) {
@@ -2461,8 +2503,8 @@ abstract class TestCase extends Assert implements Reorderable, SelfDescribing, T
             }
             // @codeCoverageIgnoreEnd
 
-            if ($this->expectedException === 'PHPUnit\Framework\Exception'
-                || $this->expectedException === '\PHPUnit\Framework\Exception'
+            if ($this->expectedException === 'PHPUnit\Framework\Exception\Exception'
+                || $this->expectedException === '\PHPUnit\Framework\Exception\Exception'
                 || $reflector->isSubclassOf(Exception::class)) {
                 $result = true;
             }

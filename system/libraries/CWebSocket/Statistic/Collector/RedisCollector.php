@@ -235,7 +235,7 @@ class CWebSocket_Statistic_Collector_RedisCollector extends CWebSocket_Statistic
      *
      * @return PromiseInterface[\BeyondCode\LaravelWebSockets\Statistics\Statistic|null]
      */
-    public function getAppStatistics($appId): PromiseInterface {
+    public function getAppStatistics($appId) {
         return $this->channelManager
             ->getPublishClient()
             ->hgetall($this->channelManager->getStatsRedisHash($appId, null))

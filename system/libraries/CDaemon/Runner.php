@@ -20,5 +20,16 @@ class CDaemon_Runner {
     }
 
     public function start() {
+        $className = $this->serviceClass;
+        $config = [];
+        $config['serviceClass'] = $className;
+        //get last suffix class
+        $serviceName = $this->getServiceName($className);
+        $config['serviceName'] = $className;
+        $config['pidFile'] = $this->getPidFile($className);
+        $config['logFile'] = $this->getLogFile($className);
+        $config['stdout'] = false;
+        $config['command'] = $command;
+        $daemon = new CDaemon($config);
     }
 }

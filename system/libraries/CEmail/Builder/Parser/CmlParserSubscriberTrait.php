@@ -1,16 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  * @mixin CEmail_Builder_Parser_CmlParser
  */
 trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
-
     public static $i = 0;
 
     public function onOpenTag(CParser_HtmlParser_Event_OnOpenTag $event) {
@@ -18,11 +11,10 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
         $attributes = $event->attributes;
         $isAnEndingTag = in_array($name, $this->endingTags);
         if ($this->inEndingTag > 0) {
-
             if ($isAnEndingTag) {
-
                 $this->inEndingTag += 1;
             }
+
             return;
         }
 
@@ -35,9 +27,9 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
             }
         }
 
-        $line = carr::findLastIndex($this->lineIndexes, function($i) {
-                    return $i < $this->parser->getStartIndex();
-                }) + 1;
+        $line = carr::findLastIndex($this->lineIndexes, function ($i) {
+            return $i < $this->parser->getStartIndex();
+        }) + 1;
 
         /*
           if ($name === 'c-include' && !$this->ignoreIncludes) {
@@ -45,27 +37,24 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
           $this->handleInclude(decodeURIComponent(attrs.path), line)
           return
           }
-         * 
+         *
          */
-
-
-
 
         if ($this->convertBooleans) {
             // "true" and "false" will be converted to bools
             $attributes = $this->convertBooleansOnAttrs($attributes);
         }
 
-//        $newNode = [
-//            'file' => $this->filePath,
-//            'absoluteFilePath' => $this->resolvePath($this->filePath),
-//            'line' => $line,
-//            'includedIn' => $this->includedIn,
-//            'parent' => $this->currentNode,
-//            'tagName' => $name,
-//            'attributes' => $attributes,
-//            'children' => [],
-//        ];
+        // $newNode = [
+        //     'file' => $this->filePath,
+        //     'absoluteFilePath' => $this->resolvePath($this->filePath),
+        //     'line' => $line,
+        //     'includedIn' => $this->includedIn,
+        //     'parent' => $this->currentNode,
+        //     'tagName' => $name,
+        //     'attributes' => $attributes,
+        //     'children' => [],
+        // ];
         $newNodeObject = new CEmail_Builder_Node();
         $newNodeObject->line = $line;
         $newNodeObject->parent = &$this->currentNode;
@@ -74,8 +63,6 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
         $newNodeObject->children = [];
 
         if ($this->currentNode) {
-
-
             $this->currentNode->children[] = $newNodeObject;
         } else {
             $this->parentNode = &$newNodeObject;
@@ -85,7 +72,6 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
     }
 
     public function onCloseTag(CParser_HtmlParser_Event_OnCloseTag $event) {
-
         $name = $event->name;
 
         if (in_array($name, $this->endingTags)) {
@@ -116,8 +102,6 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
         // only mj-head in include it doesn't create any elements, so setting back to parent is wrong
         if ($name !== 'mj-include') {
             if ($this->currentNode != null) {
-
-
                 //cdbg::varDump($this->currentNode->parent->tagName);
                 $this->currentNode = &$this->currentNode->parent;
             }
@@ -140,12 +124,11 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
         if ($this->inEndingTag > 0) {
             return;
         }
+
         if ($this->currentNode != null && $this->keepComments) {
-
-
-            $line = carr::findLastIndex($this->lineIndexes, function($i) {
-                        return $i < $this->parser->getStartIndex();
-                    }) + 1;
+            $line = carr::findLastIndex($this->lineIndexes, function ($i) {
+                return $i < $this->parser->getStartIndex();
+            }) + 1;
 
             $newNodeObject = new CEmail_Builder_Node();
             $newNodeObject->line = $line;
@@ -156,5 +139,4 @@ trait CEmail_Builder_Parser_CmlParserSubscriberTrait {
             $this->currentNode->children[] = $newNodeObject;
         }
     }
-
 }

@@ -1,7 +1,8 @@
 <?php
 
-class CBase_LazyCollection implements CInterface_Enumerable {
-    use CTrait_EnumeratesValuesTrait, CTrait_Macroable;
+class CCollection_LazyCollection implements CInterface_Enumerable, CBase_Contract_CanBeEscapedWhenCastToStringInterface {
+    use CCollection_Concern_EnumeratesValuesTrait;
+    use CTrait_Macroable;
 
     /**
      * The source from which to generate items.
@@ -21,7 +22,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
         if ($source instanceof Closure || $source instanceof self) {
             $this->source = $source;
         } elseif (is_null($source)) {
-            $this->source = static::empty();
+            $this->source = static::createEmpty();
         } else {
             $this->source = $this->getArrayableItems($source);
         }
@@ -111,7 +112,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
     /**
      * Get the average value of a given key.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -122,7 +123,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
     /**
      * Get the median of a given key.
      *
-     * @param string|array|null $key
+     * @param null|string|array $key
      *
      * @return mixed
      */
@@ -133,9 +134,9 @@ class CBase_LazyCollection implements CInterface_Enumerable {
     /**
      * Get the mode of a given key.
      *
-     * @param string|array|null $key
+     * @param null|string|array $key
      *
-     * @return array|null
+     * @return null|array
      */
     public function mode($key = null) {
         return $this->collect()->mode($key);
@@ -169,7 +170,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
      */
     public function contains($key, $operator = null, $value = null) {
         if (func_num_args() === 1 && $this->useAsCallable($key)) {
-            $placeholder = new stdClass;
+            $placeholder = new stdClass();
 
             return $this->first($key, $placeholder) !== $placeholder;
         }
@@ -301,7 +302,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
     /**
      * Retrieve duplicate items.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      * @param bool          $strict
      *
      * @return static
@@ -313,7 +314,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
     /**
      * Retrieve duplicate items using strict comparison.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return static
      */
@@ -335,7 +336,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
     /**
      * Run a filter over each of the items.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return static
      */
@@ -358,7 +359,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
     /**
      * Get the first item from the enumerable passing the given truth test.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      * @param mixed         $default
      *
      * @return mixed
@@ -500,7 +501,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
      * Concatenate values of a given key as a string.
      *
      * @param string      $value
-     * @param string|null $glue
+     * @param null|string $glue
      *
      * @return string
      */
@@ -567,13 +568,13 @@ class CBase_LazyCollection implements CInterface_Enumerable {
     /**
      * Get the last item from the collection.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      * @param mixed         $default
      *
      * @return mixed
      */
     public function last(callable $callback = null, $default = null) {
-        $needle = $placeholder = new stdClass;
+        $needle = $placeholder = new stdClass();
 
         foreach ($this as $key => $value) {
             if (is_null($callback) || $callback($value, $key)) {
@@ -588,13 +589,13 @@ class CBase_LazyCollection implements CInterface_Enumerable {
      * Get the values of a given key.
      *
      * @param string|array $value
-     * @param string|null  $key
+     * @param null|string  $key
      *
      * @return static
      */
     public function pluck($value, $key = null) {
         return new static(function () use ($value, $key) {
-            [$value, $key] = $this->explodePluckParameters($value, $key);
+            list($value, $key) = $this->explodePluckParameters($value, $key);
 
             foreach ($this as $item) {
                 $itemValue = c::get($item, $value);
@@ -797,11 +798,11 @@ class CBase_LazyCollection implements CInterface_Enumerable {
     /**
      * Get one or a specified number of items randomly from the collection.
      *
-     * @param int|null $number
-     *
-     * @return static|mixed
+     * @param null|int $number
      *
      * @throws \InvalidArgumentException
+     *
+     * @return static|mixed
      */
     public function random($number = null) {
         $result = $this->collect()->random(...func_get_args());
@@ -883,7 +884,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
     /**
      * Shuffle the items in the collection.
      *
-     * @param int|null $seed
+     * @param null|int $seed
      *
      * @return static
      */
@@ -956,7 +957,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
      * Get a slice of items from the enumerable.
      *
      * @param int      $offset
-     * @param int|null $length
+     * @param null|int $length
      *
      * @return static
      */
@@ -990,7 +991,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
      */
     public function chunk($size) {
         if ($size <= 0) {
-            return static::empty();
+            return static::createEmpty();
         }
 
         return new static(function () use ($size) {
@@ -1071,7 +1072,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
     /**
      * Sort through each item with a callback.
      *
-     * @param callable|null|int $callback
+     * @param null|callable|int $callback
      *
      * @return static
      */
@@ -1236,6 +1237,39 @@ class CBase_LazyCollection implements CInterface_Enumerable {
     }
 
     /**
+     * Convert a flatten "dot" notation array into an expanded array.
+     *
+     * @return static
+     */
+    public function undot() {
+        return $this->passthru('undot', []);
+    }
+
+    /**
+     * Return only unique items from the collection array.
+     *
+     * @param null|string|callable $key
+     * @param bool                 $strict
+     *
+     * @return static
+     */
+    public function unique($key = null, $strict = false) {
+        $callback = $this->valueRetriever($key);
+
+        return new static(function () use ($callback, $strict) {
+            $exists = [];
+
+            foreach ($this as $key => $item) {
+                if (!in_array($id = $callback($item, $key), $exists, $strict)) {
+                    yield $key => $item;
+
+                    $exists[] = $id;
+                }
+            }
+        });
+    }
+
+    /**
      * Reset the keys on the underlying array.
      *
      * @return static
@@ -1347,7 +1381,7 @@ class CBase_LazyCollection implements CInterface_Enumerable {
      * Explode the "value" and "key" arguments passed to "pluck".
      *
      * @param string|array      $value
-     * @param string|array|null $key
+     * @param null|string|array $key
      *
      * @return array
      */

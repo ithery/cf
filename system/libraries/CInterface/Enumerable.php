@@ -14,7 +14,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      * Create a new instance by invoking the callback a given amount of times.
      *
      * @param int           $number
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return static
      */
@@ -65,7 +65,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Alias for the "avg" method.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -74,7 +74,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Get the median of a given key.
      *
-     * @param string|array|null $key
+     * @param null|string|array $key
      *
      * @return mixed
      */
@@ -83,9 +83,9 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Get the mode of a given key.
      *
-     * @param string|array|null $key
+     * @param null|string|array $key
      *
-     * @return array|null
+     * @return null|array
      */
     public function mode($key = null);
 
@@ -120,7 +120,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Get the average value of a given key.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -222,7 +222,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Retrieve duplicate items.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      * @param bool          $strict
      *
      * @return static
@@ -232,7 +232,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Retrieve duplicate items using strict comparison.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return static
      */
@@ -279,7 +279,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Run a filter over each of the items.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return static
      */
@@ -290,7 +290,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @param bool          $value
      * @param callable      $callback
-     * @param callable|null $default
+     * @param null|callable $default
      *
      * @return static|mixed
      */
@@ -300,7 +300,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      * Apply the callback if the collection is empty.
      *
      * @param callable      $callback
-     * @param callable|null $default
+     * @param null|callable $default
      *
      * @return static|mixed
      */
@@ -310,7 +310,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      * Apply the callback if the collection is not empty.
      *
      * @param callable      $callback
-     * @param callable|null $default
+     * @param null|callable $default
      *
      * @return static|mixed
      */
@@ -321,7 +321,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @param bool          $value
      * @param callable      $callback
-     * @param callable|null $default
+     * @param null|callable $default
      *
      * @return static|mixed
      */
@@ -331,7 +331,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      * Apply the callback unless the collection is empty.
      *
      * @param callable      $callback
-     * @param callable|null $default
+     * @param null|callable $default
      *
      * @return static|mixed
      */
@@ -341,7 +341,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      * Apply the callback unless the collection is not empty.
      *
      * @param callable      $callback
-     * @param callable|null $default
+     * @param null|callable $default
      *
      * @return static|mixed
      */
@@ -361,7 +361,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Filter items where the value for the given key is null.
      *
-     * @param string|null $key
+     * @param null|string $key
      *
      * @return static
      */
@@ -370,7 +370,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Filter items where the value for the given key is not null.
      *
-     * @param string|null $key
+     * @param null|string $key
      *
      * @return static
      */
@@ -460,7 +460,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Get the first item from the enumerable passing the given truth test.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      * @param mixed         $default
      *
      * @return mixed
@@ -536,7 +536,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      * Concatenate values of a given key as a string.
      *
      * @param string      $value
-     * @param string|null $glue
+     * @param null|string $glue
      *
      * @return string
      */
@@ -594,7 +594,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Get the last item from the collection.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      * @param mixed         $default
      *
      * @return mixed
@@ -709,7 +709,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Get the min value of a given key.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -718,7 +718,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Get the max value of a given key.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -776,11 +776,11 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Get one or a specified number of items randomly from the collection.
      *
-     * @param int|null $number
-     *
-     * @return static|mixed
+     * @param null|int $number
      *
      * @throws \InvalidArgumentException
+     *
+     * @return static|mixed
      */
     public function random($number = null);
 
@@ -832,7 +832,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Shuffle the items in the collection.
      *
-     * @param int|null $seed
+     * @param null|int $seed
      *
      * @return static
      */
@@ -869,7 +869,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      * Get a slice of items from the enumerable.
      *
      * @param int      $offset
-     * @param int|null $length
+     * @param null|int $length
      *
      * @return static
      */
@@ -905,7 +905,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Sort through each item with a callback.
      *
-     * @param callable|null|int $callback
+     * @param null|callable|int $callback
      *
      * @return static
      */
@@ -963,7 +963,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Get the sum of the given values.
      *
-     * @param callable|string|null $callback
+     * @param null|callable|string $callback
      *
      * @return mixed
      */
@@ -1018,7 +1018,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      * Get the values of a given key.
      *
      * @param string|array $value
-     * @param string|null  $key
+     * @param null|string  $key
      *
      * @return static
      */
@@ -1036,7 +1036,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Return only unique items from the collection array.
      *
-     * @param string|callable|null $key
+     * @param null|string|callable $key
      * @param bool                 $strict
      *
      * @return static
@@ -1046,7 +1046,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Return only unique items from the collection array using strict comparison.
      *
-     * @param string|callable|null $key
+     * @param null|string|callable $key
      *
      * @return static
      */
@@ -1072,7 +1072,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Count the number of items in the collection using a given truth test.
      *
-     * @param callable|null $callback
+     * @param null|callable $callback
      *
      * @return static
      */
@@ -1093,7 +1093,7 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
     /**
      * Collect the values into a collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function collect();
 
@@ -1118,9 +1118,9 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      *
      * @param string $key
      *
-     * @return mixed
-     *
      * @throws \Exception
+     *
+     * @return mixed
      */
     public function __get($key);
 }

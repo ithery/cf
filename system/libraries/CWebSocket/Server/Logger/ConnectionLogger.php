@@ -45,7 +45,7 @@ class CWebSocket_Server_Logger_ConnectionLogger extends CWebSocket_Server_Logger
     public function send($data) {
         $socketId = $this->connection->socketId ?: null;
 
-        $this->info("Connection id {$socketId} sending message {$data}");
+        $this->info("{$this->connection->app->id}: {$socketId} receive message : {$data}");
 
         $this->connection->send($data);
     }

@@ -2,47 +2,51 @@
 
 namespace Clue\React\Redis;
 
-use Clue\Redis\Protocol\Factory as ProtocolFactory;
 use React\EventLoop\Loop;
-use React\EventLoop\LoopInterface;
 use React\Promise\Deferred;
-use React\Promise\Timer\TimeoutException;
-use React\Socket\ConnectionInterface;
 use React\Socket\Connector;
+use React\EventLoop\LoopInterface;
 use React\Socket\ConnectorInterface;
+use React\Socket\ConnectionInterface;
+use React\Promise\Timer\TimeoutException;
+use Clue\Redis\Protocol\Factory as ProtocolFactory;
 
-class Factory
-{
-    /** @var LoopInterface */
+class Factory {
+    /**
+     * @var LoopInterface
+     */
     private $loop;
 
-    /** @var ConnectorInterface */
+    /**
+     * @var ConnectorInterface
+     */
     private $connector;
 
-    /** @var ProtocolFactory */
+    /**
+     * @var ProtocolFactory
+     */
     private $protocol;
 
     /**
-     * @param ?LoopInterface $loop
+     * @param ?LoopInterface      $loop
      * @param ?ConnectorInterface $connector
-     * @param ?ProtocolFactory $protocol
+     * @param ?ProtocolFactory    $protocol
      */
-    public function __construct(LoopInterface $loop = null, ConnectorInterface $connector = null, ProtocolFactory $protocol = null)
-    {
+    public function __construct(LoopInterface $loop = null, ConnectorInterface $connector = null, ProtocolFactory $protocol = null) {
         $this->loop = $loop ?: Loop::get();
-        $this->connector = $connector ?: new Connector(array(), $this->loop);
+        $this->connector = $connector ?: new Connector($this->loop, []);
         $this->protocol = $protocol ?: new ProtocolFactory();
     }
 
     /**
-     * Create Redis client connected to address of given redis instance
+     * Create Redis client connected to address of given redis instance.
      *
      * @param string $uri Redis server URI to connect to
-     * @return \React\Promise\PromiseInterface<Client,\Exception> Promise that will
-     *     be fulfilled with `Client` on success or rejects with `\Exception` on error.
+     *
+     * @return \React\Promise\PromiseInterface<Client,\Exception> promise that will
+     *                                                            be fulfilled with `Client` on success or rejects with `\Exception` on error
      */
-    public function createClient($uri)
-    {
+    public function createClient($uri) {
         // support `redis+unix://` scheme for Unix domain socket (UDS) paths
         if (preg_match('/^(redis\+unix:\/\/(?:[^:]*:[^@]*@)?)(.+?)?$/', $uri, $match)) {
             $parts = parse_url($match[1] . 'localhost/' . $match[2]);
@@ -54,15 +58,15 @@ class Factory
             $parts = parse_url($uri);
         }
 
-        $uri = preg_replace(array('/(:)[^:\/]*(@)/', '/([?&]password=).*?($|&)/'), '$1***$2', $uri);
-        if ($parts === false || !isset($parts['scheme'], $parts['host']) || !in_array($parts['scheme'], array('redis', 'rediss', 'redis+unix'))) {
+        $uri = preg_replace(['/(:)[^:\/]*(@)/', '/([?&]password=).*?($|&)/'], '$1***$2', $uri);
+        if ($parts === false || !isset($parts['scheme'], $parts['host']) || !in_array($parts['scheme'], ['redis', 'rediss', 'redis+unix'])) {
             return \React\Promise\reject(new \InvalidArgumentException(
                 'Invalid Redis URI given (EINVAL)',
                 defined('SOCKET_EINVAL') ? SOCKET_EINVAL : 22
             ));
         }
 
-        $args = array();
+        $args = [];
         parse_str(isset($parts['query']) ? $parts['query'] : '', $args);
 
         $authority = $parts['host'] . ':' . (isset($parts['port']) ? $parts['port'] : 6379);
@@ -159,33 +163,34 @@ class Factory
             });
         }
 
-        $promise->then(array($deferred, 'resolve'), array($deferred, 'reject'));
+        $promise->then([$deferred, 'resolve'], [$deferred, 'reject']);
 
         // use timeout from explicit ?timeout=x parameter or default to PHP's default_socket_timeout (60)
-        $timeout = isset($args['timeout']) ? (float) $args['timeout'] : (int) ini_get("default_socket_timeout");
+        $timeout = isset($args['timeout']) ? (float) $args['timeout'] : (int) ini_get('default_socket_timeout');
         if ($timeout < 0) {
             return $deferred->promise();
         }
 
-        return \React\Promise\Timer\timeout($deferred->promise(), $timeout, $this->loop)->then(null, function ($e) use ($uri) {
+        return \React\Promise\Timer\Timer::timeout($deferred->promise(), $timeout, $this->loop)->then(null, function ($e) use ($uri) {
             if ($e instanceof TimeoutException) {
                 throw new \RuntimeException(
                     'Connection to ' . $uri . ' timed out after ' . $e->getTimeout() . ' seconds (ETIMEDOUT)',
                     defined('SOCKET_ETIMEDOUT') ? SOCKET_ETIMEDOUT : 110
                 );
             }
+
             throw $e;
         });
     }
 
     /**
-     * Create Redis client connected to address of given redis instance
+     * Create Redis client connected to address of given redis instance.
      *
      * @param string $target
+     *
      * @return Client
      */
-    public function createLazyClient($target)
-    {
+    public function createLazyClient($target) {
         return new LazyClient($target, $this, $this->loop);
     }
 }
