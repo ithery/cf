@@ -8,7 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Sep 8, 2019, 4:04:43 AM
  */
-interface CQueue_MonitorInterface {
+interface CQueue_Contract_MonitorInterface {
     /**
      * Register a callback to be executed on every iteration through the queue loop.
      *
