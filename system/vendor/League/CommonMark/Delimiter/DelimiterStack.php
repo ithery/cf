@@ -136,7 +136,7 @@ final class DelimiterStack {
             $openerFound = false;
             $potentialOpenerFound = false;
             $opener = $closer->getPrevious();
-            while ($opener !== null && $opener !== $stackBottom && $opener !== ($openersBottom[$delimiterChar] ?: null)) {
+            while ($opener !== null && $opener !== $stackBottom && $opener !== (isset($openersBottom[$delimiterChar]) ? $openersBottom[$delimiterChar] : null)) {
                 if ($opener->canOpen() && $opener->getChar() === $openingDelimiterChar) {
                     $potentialOpenerFound = true;
                     $useDelims = $delimiterProcessor->getDelimiterUse($opener, $closer);
