@@ -1,6 +1,6 @@
 <?php
 
-interface CQueue_BatchRepositoryInterface {
+interface CQueue_Contract_BatchRepositoryInterface {
     /**
      * Retrieve a list of batches.
      *
@@ -16,7 +16,7 @@ interface CQueue_BatchRepositoryInterface {
      *
      * @param string $batchId
      *
-     * @return \CQueue_Batch|null
+     * @return null|\CQueue_Batch
      */
     public function find($batchId);
 
