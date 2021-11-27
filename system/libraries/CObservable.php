@@ -14,9 +14,6 @@ abstract class CObservable extends CRenderable {
         CObservable_Trait_EventsTrait,
         CObservable_Trait_ControlTrait,
         CObservable_Trait_ListenerTrait;
-
-    protected $manager;
-
     /**
      * @var CObservable_Javascript
      */
@@ -62,11 +59,6 @@ abstract class CObservable extends CRenderable {
         }
         if ($control == null) {
             $control = CManager::instance()->createControl($id, $type);
-            // if (CManager::instance()->isRegisteredControl($type)) {
-            //     $control = CManager::instance()->createControl($id, $type);
-            // } else {
-            //     throw new CException('Unknown control type :type', [':type' => $type]);
-            // }
         }
 
         $this->wrapper->add($control);
@@ -126,75 +118,10 @@ abstract class CObservable extends CRenderable {
      * @return CElement_Component_Form_Field Form Field
      */
     public function addField($id = '') {
-        $field = CElement_Factory::createComponent('Form_Field', $id);
-        $this->add($field);
+        $field = new CElement_Component_Form_Field($id);
+        $this->wrapper->add($field);
 
         return $field;
-    }
-
-    /**
-     * Add Row.
-     *
-     * @param string $id
-     *
-     * @return CTableRow
-     *
-     * @deprecated 2.0
-     */
-    public function addRow($id = '') {
-        $row = CTableRow::factory($id);
-        $this->add($row);
-
-        return $row;
-    }
-
-    public function addCalendar($calendar_id = '') {
-        $calendar = CCalendar::factory($calendar_id);
-        $this->add($calendar);
-
-        return $calendar;
-    }
-
-    public function addTabStaticList($tabs_id = '') {
-        $tabs = CTabStaticList::factory($tabs_id);
-        $this->add($tabs);
-
-        return $tabs;
-    }
-
-    public function addRowFluid($id = '') {
-        $rowf = CRowFluid::factory($id);
-        $this->add($rowf);
-
-        return $rowf;
-    }
-
-    public function addSpan($id = '') {
-        $span = CElement_Factory::createElement('span', $id);
-        $this->add($span);
-
-        return $span;
-    }
-
-    public function addBasicSpan($id = '') {
-        $span = CBasicSpan::factory($id);
-        $this->add($span);
-
-        return $span;
-    }
-
-    public function addPrismCode($id = '') {
-        $code = CElement_Factory::createComponent('PrismCode', $id);
-        $this->add($code);
-
-        return $code;
-    }
-
-    public function addBlockly($id = '') {
-        $code = CElement_Factory::createComponent('Blockly', $id);
-        $this->add($code);
-
-        return $code;
     }
 
     public function addPdfViewer($id = '') {
@@ -283,20 +210,6 @@ abstract class CObservable extends CRenderable {
         $this->add($icon);
 
         return $icon;
-    }
-
-    /**
-     * @param type $id
-     *
-     * @return type
-     *
-     * @deprecated
-     */
-    public function addPieChart($id = '') {
-        $pie_chart = CPieChartElement::factory($id);
-        $this->add($pie_chart);
-
-        return $pie_chart;
     }
 
     public function clearBoth() {

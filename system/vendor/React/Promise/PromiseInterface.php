@@ -2,8 +2,7 @@
 
 namespace React\Promise;
 
-interface PromiseInterface
-{
+interface PromiseInterface {
     /**
      * @return PromiseInterface
      */

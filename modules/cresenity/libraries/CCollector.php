@@ -157,7 +157,6 @@ class CCollector {
         }
         $browser = new CBrowser();
         $data = [];
-        $rawPost = file_get_contents('php://input');
         $data['datetime'] = date('Y-m-d H:i:s');
         $data['appId'] = $app->appId();
         $data['appCode'] = $app->code();
@@ -182,8 +181,9 @@ class CCollector {
         $data['fullUrl'] = curl::current();
         $data['protocol'] = CApp_Base::protocol();
         $data['CFVersion'] = CF_VERSION;
-        $data['postData'] = $rawPost;
-        $data['fileData'] = json_encode($_FILES);
+
+        $report = CException::manager()->createReport($exception)->toArray();
+        $data = array_merge($data, $report);
 
         return $data;
     }

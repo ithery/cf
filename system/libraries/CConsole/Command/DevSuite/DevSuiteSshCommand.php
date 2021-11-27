@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DevSuiteSshListCommand
+ * Description of DevSuiteSshListCommand.
  *
  * @author Hery
  */

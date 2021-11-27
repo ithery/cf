@@ -84,10 +84,26 @@ class CElement_Factory {
     }
 
     /**
+     * @param string $className
+     * @param string $id        optional
+     *
+     * @throws CElement_Exception
+     *
+     * @return \CElement
+     */
+    public static function create($className, $id = '') {
+        if (!class_exists($className)) {
+            throw new CElement_Exception(c::__('Element [:name] not found', ['name' => $className]));
+        }
+
+        return new $className($id);
+    }
+
+    /**
      * @param string $name
      * @param string $id   optional
      *
-     * @throws CApp_Exception
+     * @throws CElement_Exception
      *
      * @return \CElement_Component
      */
@@ -97,7 +113,7 @@ class CElement_Factory {
             $className = 'CElement_Component_' . $name;
         }
         if (!class_exists($className)) {
-            throw new CApp_Exception(c::__('component [:name] not found', ['name' => $name]));
+            throw new CElement_Exception(c::__('component [:name] not found', ['name' => $name]));
         }
 
         return new $className($id);
@@ -107,14 +123,14 @@ class CElement_Factory {
      * @param string $name
      * @param string $id   optional
      *
-     * @throws CApp_Exception
+     * @throws CElement_Exception
      *
      * @return \CElement_Composite
      */
     public static function createComposite($name, $id = '') {
         $className = 'CElement_Composite_' . $name;
         if (!class_exists($className)) {
-            throw new CApp_Exception(c::__('composite element [:name] not found', ['name' => $name]));
+            throw new CElement_Exception(c::__('composite element [:name] not found', ['name' => $name]));
         }
 
         return new $className($id);
@@ -124,7 +140,7 @@ class CElement_Factory {
      * @param string $name
      * @param string $id   optional
      *
-     * @throws CApp_Exception
+     * @throws CElement_Exception
      *
      * @return \CElement_List
      */
@@ -133,7 +149,7 @@ class CElement_Factory {
 
         $className = 'CElement_List_' . $name;
         if (!class_exists($className)) {
-            throw new CApp_Exception(c::__('list element [:name] not found', ['name' => $name]));
+            throw new CElement_Exception(c::__('list element [:name] not found', ['name' => $name]));
         }
 
         return new $className($id);

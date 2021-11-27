@@ -59,3 +59,11 @@ if (isset($_COOKIE['capp-debugbar'])) {
 }
 
 CApp_Auth_Features::setFeatures(CF::config('app.auth.features'));
+
+if (CF::isTesting()) {
+    CEvent::dispatcher()->listen(CLogger_Event_MessageLogged::class, function (CLogger_Event_MessageLogged $event) {
+        if (isset($event->context['exception'])) {
+            CTesting::loggedExceptionCollection()->push($event->context['exception']);
+        }
+    });
+}

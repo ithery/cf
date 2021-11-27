@@ -1,14 +1,14 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Aug 18, 2018, 9:10:32 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Aug 18, 2018, 9:10:32 PM
  */
 final class CGeo_Model_AddressCollection implements CGeo_Interface_CollectionInterface {
-
     /**
      * @var Location[]
      */
@@ -22,37 +22,41 @@ final class CGeo_Model_AddressCollection implements CGeo_Interface_CollectionInt
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function getIterator() {
         return new \ArrayIterator($this->all());
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function count() {
         return count($this->locations);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function first() {
         if (empty($this->locations)) {
             throw new CGeo_Exception_CollectionIsEmpty();
         }
+
         return reset($this->locations);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function isEmpty() {
         return empty($this->locations);
     }
 
     /**
+     * @param mixed      $offset
+     * @param null|mixed $length
+     *
      * @return CGeo_Interface_LocationInterface[]
      */
     public function slice($offset, $length = null) {
@@ -60,6 +64,8 @@ final class CGeo_Model_AddressCollection implements CGeo_Interface_CollectionInt
     }
 
     /**
+     * @param mixed $index
+     *
      * @return bool
      */
     public function has($index) {
@@ -67,20 +73,20 @@ final class CGeo_Model_AddressCollection implements CGeo_Interface_CollectionInt
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function get($index) {
         if (!isset($this->locations[$index])) {
             throw new CGeo_Exception_OutOfBounds(sprintf('The index "%s" does not exist in this collection.', $index));
         }
+
         return $this->locations[$index];
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     public function all() {
         return $this->locations;
     }
-
 }

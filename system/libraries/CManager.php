@@ -13,12 +13,6 @@ final class CManager {
 
     protected $elements_code = [];
 
-    protected $is_mobile = false;
-
-    protected $mobile_path = '';
-
-    protected $theme_data = null;
-
     protected static $langObjectCallback = null;
 
     protected static $useRequireJs = false;
@@ -56,17 +50,7 @@ final class CManager {
         return self::$instance;
     }
 
-    public function __construct() {
-        $this->is_mobile = false;
-        $this->mobile_path = '';
-
-        //$theme = ccfg::get('theme');
-        //if ($theme == null) $theme = 'cresenity';
-        // $theme = static::theme()->getCurrentTheme();
-        // $theme_file = CF::getFile('themes', $theme);
-        // if (file_exists($theme_file)) {
-        //     $this->theme_data = include $theme_file;
-        // }
+    private function __construct() {
     }
 
     /**
@@ -287,37 +271,6 @@ final class CManager {
         return call_user_func([$class, 'factory'], ($id));
     }
 
-    /**
-     * @param string $path
-     *
-     * @return $this
-     *
-     * @deprecated since 1.2, dont use this anymore
-     */
-    public function setMobilePath($path) {
-        $this->mobile_path = $path;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     *
-     * @deprecated  since 1.2 dont use this anymore
-     */
-    public function getMobilePath() {
-        return $this->mobile_path;
-    }
-
-    /**
-     * @return bool
-     *
-     * @deprecated since 1.2 dont use this anymore
-     */
-    public function isMobile() {
-        return $this->is_mobile;
-    }
-
     public static function lang() {
         if (self::$langObjectCallback != null) {
             return call_user_func(self::$langObjectCallback);
@@ -330,10 +283,14 @@ final class CManager {
         self::$langObjectCallback = $callback;
     }
 
-    public static function addTransformCallback($method, callable $callback) {
+    public static function registerTransform($method, callable $callback) {
         $transformManager = CManager_Transform::instance();
 
         return $transformManager->addCallback($method, $callback);
+    }
+
+    public static function addTransformCallback($method, callable $callback) {
+        return static::registerTransform($method, $callback);
     }
 
     /**
@@ -348,17 +305,11 @@ final class CManager {
     }
 
     public static function getUseRequireJs() {
-        return true;
-        if (self::$useRequireJs === null) {
-            $require = ccfg::get('require_js');
-            if ($require === null) {
-                return true;
-            }
-
-            return $require;
+        if (CApp::isAjax()) {
+            return true;
         }
 
-        return self::$useRequireJs;
+        return false;
     }
 
     public static function registerCss($file, $pos = CClientScript::POS_HEAD) {

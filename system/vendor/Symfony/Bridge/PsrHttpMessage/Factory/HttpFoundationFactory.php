@@ -11,39 +11,36 @@
 
 namespace Symfony\Bridge\PsrHttpMessage\Factory;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\StreamInterface;
-use Psr\Http\Message\UploadedFileInterface;
 use Psr\Http\Message\UriInterface;
-use Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface;
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UploadedFileInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Bridge\PsrHttpMessage\HttpFoundationFactoryInterface;
 
 /**
- * {@inheritdoc}
+ * @inheritdoc
  *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
-class HttpFoundationFactory implements HttpFoundationFactoryInterface
-{
+class HttpFoundationFactory implements HttpFoundationFactoryInterface {
     /**
      * @var int The maximum output buffering size for each iteration when sending the response
      */
     private $responseBufferMaxLength;
 
-    public function __construct(int $responseBufferMaxLength = 16372)
-    {
+    public function __construct($responseBufferMaxLength = 16372) {
         $this->responseBufferMaxLength = $responseBufferMaxLength;
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function createRequest(ServerRequestInterface $psrRequest, bool $streamed = false)
-    {
+    public function createRequest(ServerRequestInterface $psrRequest, $streamed = false) {
         $server = [];
         $uri = $psrRequest->getUri();
 
@@ -54,7 +51,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
             $server['QUERY_STRING'] = $uri->getQuery();
 
             if ('' !== $server['QUERY_STRING']) {
-                $server['REQUEST_URI'] .= '?'.$server['QUERY_STRING'];
+                $server['REQUEST_URI'] .= '?' . $server['QUERY_STRING'];
             }
 
             if ('https' === $uri->getScheme()) {
@@ -86,8 +83,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
     /**
      * Converts to the input array to $_FILES structure.
      */
-    private function getFiles(array $uploadedFiles): array
-    {
+    private function getFiles(array $uploadedFiles) {
         $files = [];
 
         foreach ($uploadedFiles as $key => $value) {
@@ -104,8 +100,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
     /**
      * Creates Symfony UploadedFile instance from PSR-7 ones.
      */
-    private function createUploadedFile(UploadedFileInterface $psrUploadedFile): UploadedFile
-    {
+    private function createUploadedFile(UploadedFileInterface $psrUploadedFile) {
         return new UploadedFile($psrUploadedFile, function () { return $this->getTemporaryPath(); });
     }
 
@@ -114,16 +109,14 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
      *
      * @return string
      */
-    protected function getTemporaryPath()
-    {
+    protected function getTemporaryPath() {
         return tempnam(sys_get_temp_dir(), uniqid('symfony', true));
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
-    public function createResponse(ResponseInterface $psrResponse, bool $streamed = false)
-    {
+    public function createResponse(ResponseInterface $psrResponse, $streamed = false) {
         $cookies = $psrResponse->getHeader('Set-Cookie');
         $psrResponse = $psrResponse->withoutHeader('Set-Cookie');
 
@@ -155,10 +148,11 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
      *
      * Some snippets have been taken from the Guzzle project: https://github.com/guzzle/guzzle/blob/5.3/src/Cookie/SetCookie.php#L34
      *
+     * @param string $cookie
+     *
      * @throws \InvalidArgumentException
      */
-    private function createCookie(string $cookie): Cookie
-    {
+    private function createCookie($cookie) {
         foreach (explode(';', $cookie) as $part) {
             $part = trim($part);
 
@@ -227,8 +221,7 @@ class HttpFoundationFactory implements HttpFoundationFactoryInterface
         );
     }
 
-    private function createStreamedResponseCallback(StreamInterface $body): callable
-    {
+    private function createStreamedResponseCallback(StreamInterface $body) {
         return function () use ($body) {
             if ($body->isSeekable()) {
                 $body->rewind();

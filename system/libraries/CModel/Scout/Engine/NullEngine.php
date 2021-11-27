@@ -9,7 +9,6 @@ class CModel_Scout_Engine_NullEngine extends CModel_Scout_EngineAbstract {
      * @return void
      */
     public function update($models) {
-        //
     }
 
     /**
@@ -20,7 +19,6 @@ class CModel_Scout_Engine_NullEngine extends CModel_Scout_EngineAbstract {
      * @return void
      */
     public function delete($models) {
-        //
     }
 
     /**
@@ -78,10 +76,10 @@ class CModel_Scout_Engine_NullEngine extends CModel_Scout_EngineAbstract {
      * @param mixed                 $results
      * @param \CModel               $model
      *
-     * @return \CBase_LazyCollection
+     * @return \CCollection_LazyCollection
      */
     public function lazyMap(CModel_Scout_Builder $builder, $results, $model) {
-        return CBase_LazyCollection::make();
+        return CCollection_LazyCollection::make();
     }
 
     /**
@@ -103,7 +101,6 @@ class CModel_Scout_Engine_NullEngine extends CModel_Scout_EngineAbstract {
      * @return void
      */
     public function flush($model) {
-        //
     }
 
     /**

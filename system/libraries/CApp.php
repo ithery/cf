@@ -116,6 +116,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
                 }
             }
         }
+        $haveUserLogin = CF::config('app.have_user_login');
+        if ($haveUserLogin === false) {
+            $this->authEnabled = false;
+        }
     }
 
     /**

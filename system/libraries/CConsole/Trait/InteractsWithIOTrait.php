@@ -1,16 +1,16 @@
 <?php
 
 /**
- * Description of InteractsWithIOTrait
+ * Description of InteractsWithIOTrait.
  *
  * @author Hery
  */
-use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
-use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 
 trait CConsole_Trait_InteractsWithIOTrait {
     /**
@@ -61,9 +61,9 @@ trait CConsole_Trait_InteractsWithIOTrait {
     /**
      * Get the value of a command argument.
      *
-     * @param string|null $key
+     * @param null|string $key
      *
-     * @return string|array|null
+     * @return null|string|array
      */
     public function argument($key = null) {
         if (is_null($key)) {
@@ -96,9 +96,9 @@ trait CConsole_Trait_InteractsWithIOTrait {
     /**
      * Get the value of a command option.
      *
-     * @param string|null $key
+     * @param null|string $key
      *
-     * @return string|array|bool|null
+     * @return null|string|array|bool
      */
     public function option($key = null) {
         if (is_null($key)) {
@@ -133,7 +133,7 @@ trait CConsole_Trait_InteractsWithIOTrait {
      * Prompt the user for input.
      *
      * @param string      $question
-     * @param string|null $default
+     * @param null|string $default
      *
      * @return mixed
      */
@@ -146,7 +146,7 @@ trait CConsole_Trait_InteractsWithIOTrait {
      *
      * @param string         $question
      * @param array|callable $choices
-     * @param string|null    $default
+     * @param null|string    $default
      *
      * @return mixed
      */
@@ -159,7 +159,7 @@ trait CConsole_Trait_InteractsWithIOTrait {
      *
      * @param string         $question
      * @param array|callable $choices
-     * @param string|null    $default
+     * @param null|string    $default
      *
      * @return mixed
      */
@@ -192,8 +192,8 @@ trait CConsole_Trait_InteractsWithIOTrait {
      *
      * @param string      $question
      * @param array       $choices
-     * @param string|null $default
-     * @param mixed|null  $attempts
+     * @param null|string $default
+     * @param null|mixed  $attempts
      * @param bool        $multiple
      *
      * @return string|array
@@ -268,7 +268,7 @@ trait CConsole_Trait_InteractsWithIOTrait {
      * Write a string as information output.
      *
      * @param string          $string
-     * @param int|string|null $verbosity
+     * @param null|int|string $verbosity
      *
      * @return void
      */
@@ -280,13 +280,13 @@ trait CConsole_Trait_InteractsWithIOTrait {
      * Write a string as standard output.
      *
      * @param string          $string
-     * @param string|null     $style
-     * @param int|string|null $verbosity
+     * @param null|string     $style
+     * @param null|int|string $verbosity
      *
      * @return void
      */
     public function line($string, $style = null, $verbosity = null) {
-        $styled = $style ? "<$style>$string</$style>" : $string;
+        $styled = $style ? "<${style}>${string}</${style}>" : $string;
 
         $this->output->writeln($styled, $this->parseVerbosity($verbosity));
     }
@@ -295,7 +295,7 @@ trait CConsole_Trait_InteractsWithIOTrait {
      * Write a string as comment output.
      *
      * @param string          $string
-     * @param int|string|null $verbosity
+     * @param null|int|string $verbosity
      *
      * @return void
      */
@@ -307,7 +307,7 @@ trait CConsole_Trait_InteractsWithIOTrait {
      * Write a string as question output.
      *
      * @param string          $string
-     * @param int|string|null $verbosity
+     * @param null|int|string $verbosity
      *
      * @return void
      */
@@ -319,7 +319,7 @@ trait CConsole_Trait_InteractsWithIOTrait {
      * Write a string as error output.
      *
      * @param string          $string
-     * @param int|string|null $verbosity
+     * @param null|int|string $verbosity
      *
      * @return void
      */
@@ -331,7 +331,7 @@ trait CConsole_Trait_InteractsWithIOTrait {
      * Write a string as warning output.
      *
      * @param string          $string
-     * @param int|string|null $verbosity
+     * @param null|int|string $verbosity
      *
      * @return void
      */
@@ -409,7 +409,7 @@ trait CConsole_Trait_InteractsWithIOTrait {
     /**
      * Get the verbosity level in terms of Symfony's OutputInterface level.
      *
-     * @param string|int|null $level
+     * @param null|string|int $level
      *
      * @return int
      */

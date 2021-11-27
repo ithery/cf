@@ -15,6 +15,11 @@ class CServer {
 
     const OS_DARWIN = 'Darwin';
 
+    /**
+     * Array expression search.
+     */
+    const ARRAY_EXP = '/^return array \([^;]*\);$/';
+
     public static function storage($sshConfig = null) {
         return CServer_Storage::instance($sshConfig);
     }
@@ -75,20 +80,6 @@ class CServer {
 
     public static function getLoadAvg() {
         return sys_getloadavg();
-    }
-
-    /**
-     * @return CServer_Device_Cpu
-     */
-    public static function createDeviceCpu() {
-        return new CServer_Device_Cpu();
-    }
-
-    /**
-     * @return CServer_Device_Disk
-     */
-    public static function createDeviceDisk() {
-        return new CServer_Device_Disk();
     }
 
     public static function isProcOpenDisabled() {

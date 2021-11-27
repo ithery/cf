@@ -1,14 +1,9 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 class CImage_ManipulationSequence implements IteratorAggregate {
-
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $groups = [];
 
     public function __construct(array $sequenceArray = []) {
@@ -25,6 +20,7 @@ class CImage_ManipulationSequence implements IteratorAggregate {
     public function addManipulation($operation, $argument) {
         $lastIndex = count($this->groups) - 1;
         $this->groups[$lastIndex][$operation] = $argument;
+
         return $this;
     }
 
@@ -36,6 +32,7 @@ class CImage_ManipulationSequence implements IteratorAggregate {
     public function merge(self $sequence) {
         $sequenceArray = $sequence->toArray();
         $this->mergeArray($sequenceArray);
+
         return $this;
     }
 
@@ -55,6 +52,7 @@ class CImage_ManipulationSequence implements IteratorAggregate {
      */
     public function startNewGroup() {
         $this->groups[] = [];
+
         return $this;
     }
 
@@ -81,6 +79,7 @@ class CImage_ManipulationSequence implements IteratorAggregate {
                 unset($group[$manipulationName]);
             }
         }
+
         return $this;
     }
 
@@ -91,19 +90,21 @@ class CImage_ManipulationSequence implements IteratorAggregate {
         if (count($this->groups[0]) > 0) {
             return false;
         }
+
         return true;
     }
 
     protected function sanitizeManipulationSets(array $groups) {
         return array_values(array_filter($groups, function (array $manipulationSet) {
-                    return count($manipulationSet);
-                }));
+            return count($manipulationSet);
+        }));
     }
 
-    /*
+    /**
      * Determine if the sequences contain a manipulation with the given name.
+     *
+     * @param mixed $searchManipulationName
      */
-
     public function getFirstManipulationArgument($searchManipulationName) {
         foreach ($this->groups as $group) {
             foreach ($group as $name => $argument) {
@@ -114,10 +115,11 @@ class CImage_ManipulationSequence implements IteratorAggregate {
         }
     }
 
-    /*
+    /**
      * Determine if the sequences contain a manipulation with the given name.
+     *
+     * @param mixed $searchManipulationName
      */
-
     public function contains($searchManipulationName) {
         foreach ($this->groups as $group) {
             foreach ($group as $name => $argument) {
@@ -125,8 +127,8 @@ class CImage_ManipulationSequence implements IteratorAggregate {
                     return true;
                 }
             }
+
             return false;
         }
     }
-
 }

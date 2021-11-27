@@ -91,17 +91,16 @@ return [
         'user' => CApp_Model_Users::class,
         'role' => CApp_Model_Roles::class,
         'role_nav' => CApp_Model_RoleNav::class,
-        'base' => CApp_Base::class,
     ],
     'classes' => [
         'base' => CApp_Base::class,
     ],
 
     'lang' => 'id', //deprecated
-    'app_id' => 1,
-    'install' => false,
-    'sidebar' => true,
-    'signup' => false,
+    'app_id' => 1, //deprecated
+    'install' => false, //deprecated
+    'sidebar' => true, //deprecated
+    'signup' => false, //deprecated
     'theme' => '',
     'admin_email' => 'contact@cresenitytech.com',
     'set_timezone' => true, //deprecated

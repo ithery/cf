@@ -19,10 +19,9 @@ namespace React\Socket;
  *
  * @see ConnectionInterface
  */
-interface ConnectorInterface
-{
+interface ConnectorInterface {
     /**
-     * Creates a streaming connection to the given remote address
+     * Creates a streaming connection to the given remote address.
      *
      * If returns a Promise which either fulfills with a stream implementing
      * `ConnectionInterface` on success or rejects with an `Exception` if the
@@ -51,7 +50,9 @@ interface ConnectorInterface
      * ```
      *
      * @param string $uri
+     *
      * @return \React\Promise\PromiseInterface resolves with a stream implementing ConnectionInterface on success or rejects with an Exception on error
+     *
      * @see ConnectionInterface
      */
     public function connect($uri);

@@ -15,6 +15,8 @@ All notable changes to `CF` will be documented in this file
 - Component registration, c::manager()->registerComponent()
 - Form client validation with $form->setValidation
 - add support for public folder. Document Root for CF now can be served from folder public
+- add Experimental WebSocket
+
 ### Fixes
 
 - Fixes for cres.js function ajaxSubmit and handleResponse

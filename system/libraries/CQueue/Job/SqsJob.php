@@ -28,11 +28,11 @@ class CQueue_Job_SqsJob extends CQueue_AbstractJob {
     /**
      * Create a new job instance.
      *
-     * @param \Illuminate\Container\Container $container
-     * @param \Aws\Sqs\SqsClient              $sqs
-     * @param array                           $job
-     * @param string                          $connectionName
-     * @param string                          $queue
+     * @param \CContainer_Container $container
+     * @param \Aws\Sqs\SqsClient    $sqs
+     * @param array                 $job
+     * @param string                $connectionName
+     * @param string                $queue
      *
      * @return void
      */

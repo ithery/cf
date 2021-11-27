@@ -19,7 +19,7 @@ class CRouting_RouteSignatureParameters {
                         : (new ReflectionFunction($callback))->getParameters();
 
         return is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
-            return Reflector::isParameterSubclassOf($p, $subClass);
+            return CBase_Reflector::isParameterSubclassOf($p, $subClass);
         });
     }
 
@@ -33,7 +33,7 @@ class CRouting_RouteSignatureParameters {
     protected static function fromClassMethodString($uses) {
         list($class, $method) = cstr::parseCallback($uses);
 
-        if (!method_exists($class, $method) && Reflector::isCallable($class, $method)) {
+        if (!method_exists($class, $method) && CBase_Reflector::isCallable($class, $method)) {
             return [];
         }
 

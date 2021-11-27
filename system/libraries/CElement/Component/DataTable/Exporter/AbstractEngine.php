@@ -22,6 +22,7 @@ abstract class CElement_Component_DataTable_Exporter_AbstractEngine implements C
      */
     public function setFilename($filename) {
         $this->filename = $filename;
+
         return $this;
     }
 

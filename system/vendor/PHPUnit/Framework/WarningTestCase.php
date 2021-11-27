@@ -7,13 +7,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework;
+
+use PHPUnit\Framework\Exception\Warning;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class WarningTestCase extends TestCase
-{
+final class WarningTestCase extends TestCase {
     /**
      * @var bool
      */
@@ -34,23 +36,20 @@ final class WarningTestCase extends TestCase
      */
     private $message;
 
-    public function __construct($message = '')
-    {
+    public function __construct($message = '') {
         $this->message = $message;
 
         parent::__construct('Warning');
     }
 
-    public function getMessage()
-    {
+    public function getMessage() {
         return $this->message;
     }
 
     /**
      * Returns a string representation of the test case.
      */
-    public function toString()
-    {
+    public function toString() {
         return 'Warning';
     }
 
@@ -59,8 +58,7 @@ final class WarningTestCase extends TestCase
      *
      * @psalm-return never-return
      */
-    protected function runTest()
-    {
+    protected function runTest() {
         throw new Warning($this->message);
     }
 }

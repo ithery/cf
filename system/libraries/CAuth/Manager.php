@@ -57,7 +57,7 @@ class CAuth_Manager {
      *
      * @param null|string $name
      *
-     * @return \CAuth_GuardInterface|\CAuth_StatefulGuardInterface
+     * @return \CAuth_Contract_GuardInterface|\CAuth_Contract_StatefulGuardInterface
      */
     public function guard($name = null) {
         $name = $name ?: $this->getDefaultDriver();
@@ -76,7 +76,7 @@ class CAuth_Manager {
      *
      * @throws \InvalidArgumentException
      *
-     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
+     * @return \CAuth_Contract_GuardInterface|\CAuth_Contract_StatefulGuardInterface
      */
     protected function resolve($name) {
         $config = $this->getConfig($name);

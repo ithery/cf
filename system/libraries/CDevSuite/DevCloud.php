@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DevCloud
+ * Description of DevCloud.
  *
  * @author Hery
  */
@@ -80,7 +80,7 @@ abstract class CDevSuite_DevCloud {
     }
 
     /**
-     * Download from devcloud
+     * Download from devcloud.
      *
      * @param mixed $file
      */
@@ -123,7 +123,7 @@ abstract class CDevSuite_DevCloud {
         }
 
         /**
-         * Send the request to the server for the file
+         * Send the request to the server for the file.
          */
         $request = "GET {$parts['path']} HTTP/1.1\r\n";
         $request .= "Host: {$parts['host']}\r\n";
@@ -153,6 +153,7 @@ abstract class CDevSuite_DevCloud {
         foreach ($headers as $header) {
             if (stripos($header, 'Content-Length:') === 0) {
                 $length = (int) str_replace('Content-Length: ', '', $header);
+
                 break;
             }
         }
@@ -174,7 +175,7 @@ abstract class CDevSuite_DevCloud {
             CDevSuite::progressAdvance($bytes);
 
             /**
-             * We're done reading when we've reached the conent length
+             * We're done reading when we've reached the conent length.
              */
             if ($cnt >= $length) {
                 break;
@@ -184,11 +185,12 @@ abstract class CDevSuite_DevCloud {
 
         fclose($i_handle);
         fclose($o_handle);
+
         return $cnt;
     }
 
     /**
-     * Download from devcloud
+     * Download from devcloud.
      *
      * @param mixed $file
      */
@@ -197,6 +199,7 @@ abstract class CDevSuite_DevCloud {
         if (!file_exists($targetPath)) {
             return $this->download($file);
         }
+
         return false;
     }
 
@@ -235,6 +238,7 @@ abstract class CDevSuite_DevCloud {
 
     public function binDelete($file) {
         CDevSuite::info('Deleting ' . $file);
+
         return $this->files->unlink($this->binPath($file));
     }
 }

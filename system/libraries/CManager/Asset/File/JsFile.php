@@ -10,6 +10,9 @@ class CManager_Asset_File_JsFile extends CManager_Asset_FileAbstract {
     }
 
     public function getUrl($withHttp = false) {
+        if ($this->isRemote) {
+            return $this->script;
+        }
         $file = $this->getPath();
         $path = $file;
         $path = carr::first(explode('?', $file));

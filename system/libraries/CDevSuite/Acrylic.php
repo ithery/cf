@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of Acrylic
+ * Description of Acrylic.
  *
  * @author Hery
  */

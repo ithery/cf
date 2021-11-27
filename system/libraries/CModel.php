@@ -7,66 +7,66 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 
 /**
- * Class CModel
+ * Class CModel.
  *
- * @method static CModel|static|null find($id, $columns = ['*']) Find a model by its primary key.
- * @method static CModel_Collection findMany($ids, $columns = ['*']) Find a model by its primary key.
- * @method static CModel|CModel_Collection|static findOrFail($id, $columns = ['*']) Find a model by its primary key or throw an exception.
- * @method static CModel|CModel_Query|static|null first($columns = ['*']) Execute the query and get the first result.
- * @method static CModel|CModel_Query|static firstOrFail($columns = ['*']) Execute the query and get the first result or throw an exception.
- * @method static CModel_Collection|CModel_Query[]|static[] get($columns = ['*']) Execute the query as a "select" statement.
- * @method mixed value($column) Get a single column's value from the first result of a query.
- * @method mixed pluck($column) Get a single column's value from the first result of a query.
- * @method void chunk($count, callable $callback) Chunk the results of the query.
- * @method \CCollection lists($column, $key = null) Get an array with the values of a given column.
- * @method \CPagination_LengthAwarePaginatorInterface paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null) Paginate the given query.
- * @method \CPagination_PaginatorInterface simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page') Paginate the given query into a simple paginator.
- * @method void onDelete(Closure $callback) Register a replacement for the default delete function.
- * @method CModel[] getModels($columns = ['*']) Get the hydrated models without eager loading.
- * @method array eagerLoadRelations(array $models) Eager load the relationships for the models.
- * @method array loadRelation(array $models, $name, Closure $constraints) Eagerly load the relationship on a set of models.
- * @method static CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and') Add a basic where clause to the query.
- * @method static CModel_Query|static orWhere($column, $operator = null, $value = null) Add an "or where" clause to the query.
- * @method static CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
- * @method static CModel_Query|static whereRaw($sql, array $bindings = [])
- * @method static CModel_Query|static whereBetween($column, array $values)
- * @method static CModel_Query|static whereNotBetween($column, array $values)
- * @method static CModel_Query|static whereNested(Closure $callback)
- * @method static CModel_Query|static addNestedWhereQuery($query)
- * @method static CModel_Query|static whereExists(Closure $callback)
- * @method static CModel_Query|static whereNotExists(Closure $callback)
- * @method static CModel_Query|static whereIn($column, $values)
- * @method static CModel_Query|static whereNotIn($column, $values)
- * @method static CModel_Query|static whereNull($column)
- * @method static CModel_Query|static whereNotNull($column)
- * @method static CModel_Query|static whereDoesntHave($table, Closure $callback)
- * @method static CModel_Query|static orWhereRaw($sql, array $bindings = [])
- * @method static CModel_Query|static orWhereBetween($column, array $values)
- * @method static CModel_Query|static orWhereNotBetween($column, array $values)
- * @method static CModel_Query|static orWhereExists(Closure $callback)
- * @method static CModel_Query|static orWhereNotExists(Closure $callback)
- * @method static CModel_Query|static orWhereIn($column, $values)
- * @method static CModel_Query|static orWhereNotIn($column, $values)
- * @method static CModel_Query|static orWhereNull($column)
- * @method static CModel_Query|static orWhereNotNull($column)
- * @method static CModel_Query|static whereDate($column, $operator, $value)
- * @method static CModel_Query|static whereDay($column, $operator, $value)
- * @method static CModel_Query|static whereMonth($column, $operator, $value)
- * @method static CModel_Query|static whereYear($column, $operator, $value)
- * @method static CModel_Query|static join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
- * @method static CModel_Query|static select($columns = ['*'])
- * @method static CModel_Query|static groupBy(...$groups)
- * @method static CModel_Query|static from($table)
- * @method static CModel_Query|static newQuery()
- * @method static CModel_Query|static withTrashed()
- * @method static CModel_Query|static leftJoinSub($query, $as, $first, $operator = null, $second = null)
- * @method static CModel_Query|static addSelect($column)
- * @method static CModel_Query|static selectRaw($expression, array $bindings = [])
- * @method static CModel_Query|static orderBy($column, $direction = 'asc')
- * @method static CModel_Query|static skip($value)
- * @method static CModel_Query|static offset($value)
- * @method static CModel_Query|static take($value)
- * @method static CModel_Query|static limit($value)
+ * @method static                                     CModel|static|null find($id, $columns = ['*'])                                                               Find a model by its primary key.
+ * @method static                                     CModel_Collection findMany($ids, $columns = ['*'])                                                           Find a model by its primary key.
+ * @method static                                     CModel|static findOrFail($id, $columns = ['*'])                                                              Find a model by its primary key or throw an exception.
+ * @method static                                     CModel|CModel_Query|static|null first($columns = ['*'])                                                      Execute the query and get the first result.
+ * @method static                                     CModel|CModel_Query|static firstOrFail($columns = ['*'])                                                     Execute the query and get the first result or throw an exception.
+ * @method static                                     CModel_Collection|CModel_Query[]|static[] get($columns = ['*'])                                              Execute the query as a "select" statement.
+ * @method mixed                                      value($column)                                                                                               Get a single column's value from the first result of a query.
+ * @method mixed                                      pluck($column)                                                                                               Get a single column's value from the first result of a query.
+ * @method void                                       chunk($count, callable $callback)                                                                            Chunk the results of the query.
+ * @method \CCollection                               lists($column, $key = null)                                                                                  Get an array with the values of a given column.
+ * @method \CPagination_LengthAwarePaginatorInterface paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)                                Paginate the given query.
+ * @method \CPagination_PaginatorInterface            simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page')                                        Paginate the given query into a simple paginator.
+ * @method void                                       onDelete(Closure $callback)                                                                                  Register a replacement for the default delete function.
+ * @method CModel[]                                   getModels($columns = ['*'])                                                                                  Get the hydrated models without eager loading.
+ * @method array                                      eagerLoadRelations(array $models)                                                                            Eager load the relationships for the models.
+ * @method array                                      loadRelation(array $models, $name, Closure $constraints)                                                     Eagerly load the relationship on a set of models.
+ * @method static                                     CModel_Query|static where($column, $operator = null, $value = null, $boolean = 'and')                        Add a basic where clause to the query.
+ * @method static                                     CModel_Query|static orWhere($column, $operator = null, $value = null)                                        Add an "or where" clause to the query.
+ * @method static                                     CModel_Query|static has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null) Add a relationship count condition to the query.
+ * @method static                                     CModel_Query|static whereRaw($sql, array $bindings = [])
+ * @method static                                     CModel_Query|static whereBetween($column, array $values)
+ * @method static                                     CModel_Query|static whereNotBetween($column, array $values)
+ * @method static                                     CModel_Query|static whereNested(Closure $callback)
+ * @method static                                     CModel_Query|static addNestedWhereQuery($query)
+ * @method static                                     CModel_Query|static whereExists(Closure $callback)
+ * @method static                                     CModel_Query|static whereNotExists(Closure $callback)
+ * @method static                                     CModel_Query|static whereIn($column, $values)
+ * @method static                                     CModel_Query|static whereNotIn($column, $values)
+ * @method static                                     CModel_Query|static whereNull($column)
+ * @method static                                     CModel_Query|static whereNotNull($column)
+ * @method static                                     CModel_Query|static whereDoesntHave($table, Closure $callback)
+ * @method static                                     CModel_Query|static orWhereRaw($sql, array $bindings = [])
+ * @method static                                     CModel_Query|static orWhereBetween($column, array $values)
+ * @method static                                     CModel_Query|static orWhereNotBetween($column, array $values)
+ * @method static                                     CModel_Query|static orWhereExists(Closure $callback)
+ * @method static                                     CModel_Query|static orWhereNotExists(Closure $callback)
+ * @method static                                     CModel_Query|static orWhereIn($column, $values)
+ * @method static                                     CModel_Query|static orWhereNotIn($column, $values)
+ * @method static                                     CModel_Query|static orWhereNull($column)
+ * @method static                                     CModel_Query|static orWhereNotNull($column)
+ * @method static                                     CModel_Query|static whereDate($column, $operator, $value)
+ * @method static                                     CModel_Query|static whereDay($column, $operator, $value)
+ * @method static                                     CModel_Query|static whereMonth($column, $operator, $value)
+ * @method static                                     CModel_Query|static whereYear($column, $operator, $value)
+ * @method static                                     CModel_Query|static join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+ * @method static                                     CModel_Query|static select($columns = ['*'])
+ * @method static                                     CModel_Query|static groupBy(...$groups)
+ * @method static                                     CModel_Query|static from($table)
+ * @method static                                     CModel_Query|static newQuery()
+ * @method static                                     CModel_Query|static withTrashed()
+ * @method static                                     CModel_Query|static leftJoinSub($query, $as, $first, $operator = null, $second = null)
+ * @method static                                     CModel_Query|static addSelect($column)
+ * @method static                                     CModel_Query|static selectRaw($expression, array $bindings = [])
+ * @method static                                     CModel_Query|static orderBy($column, $direction = 'asc')
+ * @method static                                     CModel_Query|static skip($value)
+ * @method static                                     CModel_Query|static offset($value)
+ * @method static                                     CModel_Query|static take($value)
+ * @method static                                     CModel_Query|static limit($value)
  */
 abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_Jsonable, CQueue_QueueableEntityInterface {
     use CModel_Trait_GuardsAttributes,
@@ -77,107 +77,6 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         CModel_Trait_HidesAttributes,
         CModel_Trait_Timestamps,
         CTrait_ForwardsCalls;
-
-    /**
-     * The connection name for the model.
-     *
-     * @var string
-     *
-     * @deprecated
-     */
-    protected $db;
-
-    /**
-     * The connection name for the model.
-     *
-     * @var string
-     */
-    protected $connection;
-
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
-    protected $table;
-
-    /**
-     * The primary key for the model.
-     *
-     * @var string
-     */
-    protected $primaryKey = 'id';
-
-    /**
-     * The "type" of the auto-incrementing ID.
-     *
-     * @var string
-     */
-    protected $keyType = 'bigint';
-
-    /**
-     * Indicates if the IDs are auto-incrementing.
-     *
-     * @var bool
-     */
-    public $incrementing = true;
-
-    /**
-     * The relations to eager load on every query.
-     *
-     * @var array
-     */
-    protected $with = [];
-
-    /**
-     * The relationship counts that should be eager loaded on every query.
-     *
-     * @var array
-     */
-    protected $withCount = [];
-
-    /**
-     * The number of models to return for pagination.
-     *
-     * @var int
-     */
-    protected $perPage = 15;
-
-    /**
-     * Indicates if the model exists.
-     *
-     * @var bool
-     */
-    public $exists = false;
-
-    /**
-     * Indicates if the model was inserted during the current request lifecycle.
-     *
-     * @var bool
-     */
-    public $wasRecentlyCreated = false;
-
-    /**
-     * The connection resolver instance.
-     *
-     * @var CDatabase_ResolverInterface
-     */
-    protected static $resolver;
-
-    /**
-     * The array of booted models.
-     *
-     * @var array
-     */
-    protected static $booted = [];
-
-    /**
-     * The array of global scopes on the model.
-     *
-     * @var array
-     */
-    protected static $globalScopes = [];
-
     /**
      * The name of the "created" column.
      *
@@ -228,14 +127,114 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     const STATUS = 'status';
 
     /**
-     * The array of mapping model class
+     * Indicates if the IDs are auto-incrementing.
+     *
+     * @var bool
+     */
+    public $incrementing = true;
+
+    /**
+     * Indicates if the model exists.
+     *
+     * @var bool
+     */
+    public $exists = false;
+
+    /**
+     * Indicates if the model was inserted during the current request lifecycle.
+     *
+     * @var bool
+     */
+    public $wasRecentlyCreated = false;
+
+    /**
+     * The connection name for the model.
+     *
+     * @var string
+     *
+     * @deprecated
+     */
+    protected $db;
+
+    /**
+     * The connection name for the model.
+     *
+     * @var string
+     */
+    protected $connection;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table;
+
+    /**
+     * The primary key for the model.
+     *
+     * @var string
+     */
+    protected $primaryKey = 'id';
+
+    /**
+     * The "type" of the auto-incrementing ID.
+     *
+     * @var string
+     */
+    protected $keyType = 'bigint';
+
+    /**
+     * The relations to eager load on every query.
+     *
+     * @var array
+     */
+    protected $with = [];
+
+    /**
+     * The relationship counts that should be eager loaded on every query.
+     *
+     * @var array
+     */
+    protected $withCount = [];
+
+    /**
+     * The number of models to return for pagination.
+     *
+     * @var int
+     */
+    protected $perPage = 15;
+
+    /**
+     * The connection resolver instance.
+     *
+     * @var CDatabase_ResolverInterface
+     */
+    protected static $resolver;
+
+    /**
+     * The array of booted models.
+     *
+     * @var array
+     */
+    protected static $booted = [];
+
+    /**
+     * The array of global scopes on the model.
+     *
+     * @var array
+     */
+    protected static $globalScopes = [];
+
+    /**
+     * The array of mapping model class.
      *
      * @var array
      */
     protected static $mappings;
 
     /**
-     * Add Mapping
+     * Add Mapping.
      *
      * @param string $tableName
      * @param string $modelClass
@@ -254,7 +253,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
 
     public static function factory($tableName) {
         if (isset(self::$mappings[$tableName])) {
-            return new self::$mappings[$tableName];
+            return new self::$mappings[$tableName]();
         } else {
             return CDatabase::instance()->table($tableName);
         }
@@ -265,9 +264,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param array $attributes
      *
-     * @return void
-     *
      * @throws CModel_Exception_MassAssignment
+     *
+     * @return void
      */
     public function __construct(array $attributes = []) {
         $this->primaryKey = $this->table . '_id';
@@ -301,7 +300,6 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return void
      */
     protected static function booting() {
-        //
     }
 
     /**
@@ -337,7 +335,6 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return void
      */
     protected static function booted() {
-        //
     }
 
     /**
@@ -367,9 +364,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param array $attributes
      *
-     * @return $this
-     *
      * @throws CModel_Exception_MassAssignment
+     *
+     * @return $this
      */
     public function fill(array $attributes) {
         $totallyGuarded = $this->totallyGuarded();
@@ -398,9 +395,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param array $attributes
      *
-     * @return $this
-     *
      * @throws CModel_Exception_MassAssignment
+     *
+     * @return $this
      */
     public function forceFill(array $attributes) {
         return static::unguarded(function () use ($attributes) {
@@ -429,9 +426,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array $attributes
      * @param bool  $exists
      *
-     * @return static
-     *
      * @throws CModel_Exception_MassAssignment
+     *
+     * @return static
      */
     public function newInstance($attributes = [], $exists = false) {
         // This method just provides a convenient way for us to generate fresh model
@@ -454,11 +451,11 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * Create a new model instance that is existing.
      *
      * @param array       $attributes
-     * @param string|null $connection
-     *
-     * @return static
+     * @param null|string $connection
      *
      * @throws CModel_Exception_MassAssignment
+     *
+     * @return static
      */
     public function newFromBuilder($attributes = [], $connection = null) {
         $model = $this->newInstance([], true);
@@ -473,7 +470,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Begin querying the model on a given connection.
      *
-     * @param string|null $connection
+     * @param null|string $connection
      *
      * @return CModel_Query
      */
@@ -481,7 +478,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         // First we will just create a fresh instance of this model, and then we can
         // set the connection on the model so that it is be used for the queries
         // we execute, as well as being set on each relationship we retrieve.
-        $instance = new static;
+        $instance = new static();
 
         $instance->setConnection($connection);
 
@@ -494,7 +491,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return CDatabase_Query_Builder
      */
     public static function onWriteConnection() {
-        $instance = new static;
+        $instance = new static();
 
         return $instance->newQuery()->useWritePdo();
     }
@@ -564,9 +561,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param int    $amount
      * @param array  $extra
      *
-     * @return int
-     *
      * @throws CModel_Exception_MassAssignment
+     *
+     * @return int
      */
     public function increment($column, $amount = 1, array $extra = []) {
         return $this->incrementOrDecrement($column, $amount, $extra, 'increment');
@@ -579,9 +576,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param int    $amount
      * @param array  $extra
      *
-     * @return int
-     *
      * @throws CModel_Exception_MassAssignment
+     *
+     * @return int
      */
     public function decrement($column, $amount = 1, array $extra = []) {
         return $this->incrementOrDecrement($column, $amount, $extra, 'decrement');
@@ -595,9 +592,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array  $extra
      * @param string $method
      *
-     * @return int
-     *
      * @throws CModel_Exception_MassAssignment
+     *
+     * @return int
      */
     protected function incrementOrDecrement($column, $amount, $extra, $method) {
         $query = $this->newQuery();
@@ -622,9 +619,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array  $extra
      * @param string $method
      *
-     * @return void
-     *
      * @throws CModel_Exception_MassAssignment
+     *
+     * @return void
      */
     protected function incrementOrDecrementAttributeValue($column, $amount, $extra, $method) {
         $this->{$column} = $this->{$column} + ($method == 'increment' ? $amount : $amount * -1);
@@ -640,9 +637,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array $attributes
      * @param array $options
      *
-     * @return bool
-     *
      * @throws CModel_Exception_MassAssignment
+     *
+     * @return bool
      */
     public function update(array $attributes = [], array $options = []) {
         if (!$this->exists) {
@@ -740,9 +737,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param array $options
      *
-     * @return bool
-     *
      * @throws \Throwable
+     *
+     * @return bool
      */
     public function saveOrFail(array $options = []) {
         return $this->getConnection()->transaction(function () use ($options) {
@@ -908,7 +905,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         // We will actually pull the models from the database table and call delete on
         // each of them individually so that their events get fired properly with a
         // correct set of attributes in case the developers wants to check these.
-        $instance = new static;
+        $instance = new static();
         $key = $instance->getKeyName();
 
         foreach ($instance->whereIn($key, $ids)->get() as $model) {
@@ -923,9 +920,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Delete the model from the database.
      *
-     * @return bool|null
-     *
      * @throws \Exception
+     *
+     * @return null|bool
      */
     public function delete() {
         if (is_null($this->getKeyName())) {
@@ -963,9 +960,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * This method protects developers from running forceDelete when trait is missing.
      *
-     * @return bool|null
-     *
      * @throws Exception
+     *
+     * @return null|bool
      */
     public function forceDelete() {
         return $this->delete();
@@ -988,7 +985,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return CModel_Query|static
      */
     public static function query() {
-        return (new static)->newQuery();
+        return (new static())->newQuery();
     }
 
     /**
@@ -1110,7 +1107,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @param array       $attributes
      * @param string      $table
      * @param bool        $exists
-     * @param string|null $using
+     * @param null|string $using
      *
      * @return CModel_Relation_Pivot
      */
@@ -1132,9 +1129,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param int $options
      *
-     * @return string
-     *
      * @throws CModel_Exception_JsonEncodingException
+     *
+     * @return string
      */
     public function toJson($options = 0) {
         $json = json_encode($this->jsonSerialize(), $options);
@@ -1160,7 +1157,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param array|string $with
      *
-     * @return static|null
+     * @return null|static
      */
     public function fresh($with = []) {
         if (!$this->exists) {
@@ -1193,9 +1190,9 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Clone the model into a new, non-existing instance.
      *
-     * @param array|null $except
+     * @param null|array $except
      *
-     * @return \CModel
+     * @return \static
      */
     public function replicate(array $except = null) {
         $defaults = [
@@ -1209,7 +1206,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
             $except ? array_unique(array_merge($except, $defaults)) : $defaults
         );
 
-        return c::tap(new static, function ($instance) use ($attributes) {
+        return c::tap(new static(), function ($instance) use ($attributes) {
             $instance->setRawAttributes($attributes);
 
             $instance->setRelations($this->relations);
@@ -1219,7 +1216,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Determine if two models have the same ID and belong to the same table.
      *
-     * @param \CModel|null $model
+     * @param null|\CModel $model
      *
      * @return bool
      */
@@ -1233,7 +1230,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Determine if two models are not the same.
      *
-     * @param \CModel|null $model
+     * @param null|\CModel $model
      *
      * @return bool
      */
@@ -1275,7 +1272,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
     /**
      * Resolve a connection instance.
      *
-     * @param string|null $connection
+     * @param null|string $connection
      *
      * @return CDatabase
      */
@@ -1294,6 +1291,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         if ($domain == null) {
             $domain = CF::domain();
         }
+
         return CDatabase_Resolver::instance($domain);
     }
 
@@ -1475,7 +1473,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param mixed $value
      *
-     * @return \CModel|null
+     * @return null|\CModel
      */
     public function resolveRouteBinding($value) {
         return $this->where($this->getRouteKeyName(), $value)->first();
@@ -1521,11 +1519,12 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      */
     public function __get($key) {
         /**
-         * Backward compatibility for use this->db using in model. it deprecated and this code will removed
+         * Backward compatibility for use this->db using in model. it deprecated and this code will removed.
          */
         if ($key == 'db') {
             return $this->getConnection();
         }
+
         return $this->getAttribute($key);
     }
 
@@ -1620,6 +1619,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         if (in_array($method, ['increment', 'decrement'])) {
             return $this->$method(...$parameters);
         }
+
         return $this->forwardCallTo($this->newQuery(), $method, $parameters);
     }
 
@@ -1632,7 +1632,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      * @return mixed
      */
     public static function __callStatic($method, $parameters) {
-        return (new static)->$method(...$parameters);
+        return (new static())->$method(...$parameters);
     }
 
     /**
@@ -1664,6 +1664,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         if (in_array('SoftDeleteTrait', $lastClassUses->toArray())) {
             return true;
         }
+
         return false;
     }
 
@@ -1678,6 +1679,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         if (in_array('DeletedTrait', $lastClassUses->toArray())) {
             return true;
         }
+
         return false;
     }
 }

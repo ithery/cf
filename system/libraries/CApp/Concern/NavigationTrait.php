@@ -12,6 +12,8 @@ trait CApp_Concern_NavigationTrait {
 
     public function setNav($nav) {
         $this->nav = $this->resolveNav($nav);
+
+        return $this;
     }
 
     public function resolveNav($nav) {
@@ -83,5 +85,7 @@ trait CApp_Concern_NavigationTrait {
 
     public function setNavRenderer($renderer) {
         $this->navRenderer = $renderer;
+
+        return $this;
     }
 }

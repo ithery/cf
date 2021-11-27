@@ -7,29 +7,28 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
 
-use function sprintf;
-use function strpos;
+namespace PHPUnit\Framework\Constraint\Exception;
+
 use Throwable;
+use function strpos;
+use function sprintf;
 use PHPUnit\Framework\Constraint\Constraint;
+
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class ExceptionMessage extends Constraint
-{
+final class ExceptionMessage extends Constraint {
     /**
      * @var string
      */
     private $expectedMessage;
 
-    public function __construct($expected)
-    {
+    public function __construct($expected) {
         $this->expectedMessage = $expected;
     }
 
-    public function toString()
-    {
+    public function toString() {
         if ($this->expectedMessage === '') {
             return 'exception message is empty';
         }
@@ -43,8 +42,7 @@ final class ExceptionMessage extends Constraint
      *
      * @param Throwable $other
      */
-    protected function matches($other)
-    {
+    protected function matches($other) {
         if ($this->expectedMessage === '') {
             return $other->getMessage() === '';
         }
@@ -60,8 +58,7 @@ final class ExceptionMessage extends Constraint
      *
      * @param mixed $other evaluated value or object
      */
-    protected function failureDescription($other)
-    {
+    protected function failureDescription($other) {
         if ($this->expectedMessage === '') {
             return sprintf(
                 "exception message is empty but is '%s'",

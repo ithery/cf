@@ -49,13 +49,13 @@ class CVendor_LiteSpeed_Page {
             $this->_disp_tid = substr($this->_disp_tid, $last + 1);
         }
 
-        if (($topmesg = $disp->Get(Info::FLD_TopMsg)) != null) {
+        if (($topmesg = $disp->Get(Info::FLD_TOP_MSG)) != null) {
             foreach ($topmesg as $tm) {
                 echo UIBase::message('', $tm, 'error');
             }
         }
 
-        $root = $disp->Get(Info::FLD_PgData);
+        $root = $disp->Get(Info::FLD_PG_DATA);
         if ($root == null) {
             return;
         }
@@ -64,7 +64,7 @@ class CVendor_LiteSpeed_Page {
             $this->print_tbl($this->_disp_tid, $root, $disp);
         } else {
             $this->_printdone = false;
-            $this->print_map($this->_tblmap, $root, $disp);
+            $this->printMap($this->_tblmap, $root, $disp);
         }
 
         if ($disp->IsViewAction() && $this->_linked_tbls != null) {
@@ -74,13 +74,13 @@ class CVendor_LiteSpeed_Page {
                 $this->_disp_tid = $lti;
                 $this->_disp_ref = $disp->Get(Info::FLD_REF);
                 $this->_printdone = false;
-                $this->print_map($this->_tblmap, $root, $disp);
+                $this->printMap($this->_tblmap, $root, $disp);
             }
             $disp->SetPrintingLinked(false);
         }
     }
 
-    private function print_map($tblmap, $node, $disp) {
+    private function printMap($tblmap, $node, $disp) {
         $dlayer = ($node == null) ? null : $node->LocateLayer($tblmap->GetLoc());
         $maps = $tblmap->GetMaps($this->_extended);
         foreach ($maps as $m) {
@@ -95,7 +95,7 @@ class CVendor_LiteSpeed_Page {
                     }
                     $dlayer = $dlayer[$ref];
                 }
-                $this->print_map($m, $dlayer, $disp);
+                $this->printMap($m, $dlayer, $disp);
                 if ($this->_printdone) {
                     break;
                 }

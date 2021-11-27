@@ -5,10 +5,9 @@ namespace React\EventLoop;
 /**
  * The `Factory` class exists as a convenient way to pick the best available event loop implementation.
  */
-final class Factory
-{
+final class Factory {
     /**
-     * Creates a new event loop instance
+     * Creates a new event loop instance.
      *
      * ```php
      * $loop = React\EventLoop\Factory::create();
@@ -21,8 +20,7 @@ final class Factory
      *
      * @return LoopInterface
      */
-    public static function create()
-    {
+    public static function create() {
         // @codeCoverageIgnoreStart
         if (\function_exists('uv_loop_new')) {
             // only use ext-uv on PHP 7

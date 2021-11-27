@@ -181,7 +181,7 @@ class CApp_Auth {
     }
 
     /**
-     * @return CAuth_StatefulGuardInterface
+     * @return CAuth_Contract_StatefulGuardInterface
      */
     public function guard() {
         return c::auth($this->guard);

@@ -1,19 +1,19 @@
 <?php
 
 /**
- * @method bool get(string $filename)
+ * @method bool     get(string $filename)
  * @method resource readStream(string $filename)
- * @method bool delete(string $filename)
- * @method bool exists(string $filename)
+ * @method bool     delete(string $filename)
+ * @method bool     exists(string $filename)
  */
 class CExporter_Disk {
     /**
-     * @var IlluminateFilesystem
+     * @var CStorage_Adapter
      */
     protected $disk;
 
     /**
-     * @var string|null
+     * @var null|string
      */
     protected $name;
 
@@ -24,7 +24,7 @@ class CExporter_Disk {
 
     /**
      * @param CStorage_Adapter $disk
-     * @param string|null      $name
+     * @param null|string      $name
      * @param array            $diskOptions
      */
     public function __construct(CStorage_Adapter $disk, $name = null, array $diskOptions = []) {

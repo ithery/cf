@@ -7,43 +7,41 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Util;
 
-use const ENT_QUOTES;
-use function assert;
-use function class_exists;
-use function htmlspecialchars;
-use function mb_convert_encoding;
-use function ord;
-use function preg_replace;
-use function settype;
-use function strlen;
-use DOMCharacterData;
-use DOMDocument;
-use DOMElement;
 use DOMNode;
 use DOMText;
+use DOMElement;
+use DOMDocument;
+use function ord;
+use function assert;
+use function strlen;
 use ReflectionClass;
+use const ENT_QUOTES;
+use DOMCharacterData;
+use function settype;
 use ReflectionException;
+use function class_exists;
+use function preg_replace;
+use function htmlspecialchars;
+use function mb_convert_encoding;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class Xml
-{
+final class Xml {
     /**
      * @deprecated Only used by assertEqualXMLStructure()
      */
-    public static function import(DOMElement $element)
-    {
-        return (new DOMDocument)->importNode($element, true);
+    public static function import(DOMElement $element) {
+        return (new DOMDocument())->importNode($element, true);
     }
 
     /**
      * @deprecated Only used by assertEqualXMLStructure()
      */
-    public static function removeCharacterDataNodes(DOMNode $node)
-    {
+    public static function removeCharacterDataNodes(DOMNode $node) {
         if ($node->hasChildNodes()) {
             for ($i = $node->childNodes->length - 1; $i >= 0; $i--) {
                 if (($child = $node->childNodes->item($i)) instanceof DOMCharacterData) {
@@ -60,9 +58,10 @@ final class Xml
      * and FFFF (not even as character reference).
      *
      * @see https://www.w3.org/TR/xml/#charsets
+     *
+     * @param mixed $string
      */
-    public static function prepareString($string)
-    {
+    public static function prepareString($string) {
         return preg_replace(
             '/[\\x00-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f]/',
             '',
@@ -76,8 +75,7 @@ final class Xml
     /**
      * "Convert" a DOMElement object into a PHP variable.
      */
-    public static function xmlToVariable(DOMElement $element)
-    {
+    public static function xmlToVariable(DOMElement $element) {
         $variable = null;
 
         switch ($element->tagName) {
@@ -109,7 +107,7 @@ final class Xml
                 $className = $element->getAttribute('class');
 
                 if ($element->hasChildNodes()) {
-                    $arguments       = $element->childNodes->item(0)->childNodes;
+                    $arguments = $element->childNodes->item(0)->childNodes;
                     $constructorArgs = [];
 
                     foreach ($arguments as $argument) {
@@ -132,7 +130,7 @@ final class Xml
                     }
                     // @codeCoverageIgnoreEnd
                 } else {
-                    $variable = new $className;
+                    $variable = new $className();
                 }
 
                 break;
@@ -155,8 +153,7 @@ final class Xml
         return $variable;
     }
 
-    private static function convertToUtf8($string)
-    {
+    private static function convertToUtf8($string) {
         if (!self::isUtf8($string)) {
             $string = mb_convert_encoding($string, 'UTF-8');
         }
@@ -164,8 +161,7 @@ final class Xml
         return $string;
     }
 
-    private static function isUtf8($string)
-    {
+    private static function isUtf8($string) {
         $length = strlen($string);
 
         for ($i = 0; $i < $length; $i++) {

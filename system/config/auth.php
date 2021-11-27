@@ -38,7 +38,18 @@ return [
         'web' => [
             'driver' => 'session',
             'provider' => 'users',
-            'sessionName' => 'user'
+            'sessionName' => 'user',
+            'uri' => [
+                'login' => null,
+                'logout' => null,
+                'password-confirmation' => null,
+                'register' => null,
+                'email-verification' => null,
+                'password-reset' => null,
+            ],
+            'features' => [
+                //CApp_Auth_Features::twoFactorAuthentication(),
+            ],
         ],
 
         'api' => [

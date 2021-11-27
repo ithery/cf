@@ -9,7 +9,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Mar 15, 2019, 6:47:31 PM
  */
 final class CModel_Activity {
-    use CEvent_Trait_Dispatchable;
+    use CEvent_Trait_Eventable;
 
     private $isStarted;
 
@@ -26,6 +26,7 @@ final class CModel_Activity {
         if (self::$instance == null) {
             self::$instance = new static();
         }
+
         return self::$instance;
     }
 

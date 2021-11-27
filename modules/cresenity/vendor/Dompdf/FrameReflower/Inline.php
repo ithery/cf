@@ -1,38 +1,34 @@
 <?php
 /**
- * @package dompdf
  * @link    http://dompdf.github.com/
+ *
  * @author  Benj Carson <benjcarson@digitaljunkies.ca>
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
  */
+
 namespace Dompdf\FrameReflower;
 
 use Dompdf\Frame;
-use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
 use Dompdf\FrameDecorator\Text as TextFrameDecorator;
+use Dompdf\FrameDecorator\Block as BlockFrameDecorator;
 
 /**
- * Reflows inline frames
- *
- * @package dompdf
+ * Reflows inline frames.
  */
-class Inline extends AbstractFrameReflower
-{
-
+class Inline extends AbstractFrameReflower {
     /**
      * Inline constructor.
+     *
      * @param Frame $frame
      */
-    function __construct(Frame $frame)
-    {
+    public function __construct(Frame $frame) {
         parent::__construct($frame);
     }
 
     /**
-     * @param BlockFrameDecorator|null $block
+     * @param null|BlockFrameDecorator $block
      */
-    function reflow(BlockFrameDecorator $block = null)
-    {
+    public function reflow(BlockFrameDecorator $block = null) {
         $frame = $this->_frame;
 
         // Check if a page break is forced
@@ -80,12 +76,11 @@ class Inline extends AbstractFrameReflower
     }
 
     /**
-     * Determine current frame width based on contents
+     * Determine current frame width based on contents.
      *
      * @return float
      */
-    public function calculate_auto_width()
-    {
+    public function calculate_auto_width() {
         $width = 0;
 
         foreach ($this->_frame->get_children() as $child) {

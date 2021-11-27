@@ -279,14 +279,8 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln($this->options->toJsonRow('deferRender'))->br()
                 ->appendln($this->options->toJsonRow('autoWidth'))->br()
                 ->appendln($this->options->toJsonRow('ordering'))->br()
-                ->appendln($this->options->toJsonRow('scrollX'))->br()
+                ->appendln($this->fixedColumn ? '' : $this->options->toJsonRow('scrollX'))->br()
                 ->br();
-
-            if ($this->bootstrap >= '3') {
-                if ($this->dom == null) {
-                    $this->dom = "<'row'<'col-sm-6'l><'col-sm-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>";
-                }
-            }
 
             if ($this->dom == null) {
                 $this->dom = '<""l>t<"F"<".footer_action">frp>';
@@ -347,7 +341,7 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                         input.attr('placeholder', 'Search ' + title );
 
                         var options = column.searchOptions||[];
-                        for(optionKey in options) {
+                        for(let optionKey in options) {
                             var optionElement = jQuery('<option>');
                             optionElement.attr('value',optionKey);
                             optionElement.append(options[optionKey]);

@@ -75,7 +75,6 @@ trait CApp_Concern_RendererTrait {
 </style>
 ${cresStyle}
 ${allStyles}
-${alpineScript}
 HTML;
     }
 
@@ -97,29 +96,8 @@ HTML;
 
         return <<<HTML
             ${endClientScript}
-            <script src="${cresJs}"></script>
-            <script>
+            <script defer src="${cresJs}"></script>
 
-                if (window.Alpine) {
-                    /* Defer showing the warning so it doesn't get buried under downstream errors. */
-                    document.addEventListener("DOMContentLoaded", function () {
-                        setTimeout(function() {
-                            console.warn("Cresenity: It looks like AlpineJS has already been loaded. Make sure Creseniity\'s scripts are loaded before Alpine.")
-                        })
-                    });
-                }
-                /* Make Alpine wait until Livewire is finished rendering to do its thing. */
-                window.deferLoadingAlpine = function (callback) {
-                    window.addEventListener('cresenity:ui:start', function () {
-                        callback();
-                    });
-                };
-                document.addEventListener("DOMContentLoaded", function () {
-                    window.cresenity.ui.start();
-                });
-
-            </script>
-            <script src="${alpineJs}"></script>
             <script>
                 ${js}
                 ${readyClientScript}
@@ -130,9 +108,7 @@ HTML;
                 }
                 ${customJs}
             </script>
-            <script>
                 ${pushesScript}
-            </script>
 
 HTML;
     }
@@ -179,8 +155,6 @@ HTML;
             $viewData['pageTitle'] = $this->title;
             $asset = CManager::asset();
 
-            // $css_urls = $asset->getAllCssFileUrl();
-            // $js_urls = $asset->getAllJsFileUrl();
             $additional_js = '';
 
             $js = '';
@@ -193,15 +167,6 @@ HTML;
             $jsScriptFile .= PHP_EOL . $asset->render(CManager_Asset::POS_END, CManager_Asset::TYPE_JS_FILE);
 
             $js = $asset->wrapJs($js, true);
-
-            /*
-            if (!$this->isUseRequireJs()) {
-                $bar = CDebug::bar();
-                if ($bar->isEnabled()) {
-                    $js .= $bar->getJavascriptReplaceCode();
-                }
-            }
-            */
 
             $viewData['js'] = $js;
 
@@ -226,8 +191,9 @@ HTML;
             $viewData['breadcrumb'] = $this->getBreadcrumb();
             $viewData['additional_head'] = $this->additional_head;
             $viewData['custom_data'] = $this->custom_data;
-            $viewData['login_required'] = $this->loginRequired;
-            $viewData['loginRequired'] = $this->loginRequired;
+            $viewData['login_required'] = $this->isAuthEnabled();
+            $viewData['loginRequired'] = $this->isAuthEnabled();
+            $viewData['isAuthEnabled'] = $this->isAuthEnabled();
 
             //deprecated view data
             $viewData['header_body'] = '';
@@ -291,6 +257,7 @@ HTML;
 
         $viewData = $this->getViewData();
         $v = $this->getView();
+
         $v->set($viewData);
 
         return $v->render();

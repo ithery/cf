@@ -10,12 +10,16 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_FormInput_Date extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Date;
-
     protected $date_format;
+
     protected $have_button;
+
     protected $startDate;
+
     protected $end_date;
+
     protected $disable_day;
+
     protected $inline;
 
     public function __construct($id) {
@@ -31,7 +35,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
 
         $this->type = 'date';
         $this->date_format = 'yyyy-mm-dd';
-        $date_format = ccfg::get('date_formatted');
+        $date_format = CF::config('app.date_formatted', 'Y-m-d');
         if ($date_format != null) {
             $date_format = str_replace('Y', 'yyyy', $date_format);
             $date_format = str_replace('m', 'mm', $date_format);
@@ -49,6 +53,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
 
     public function setStartDate($str) {
         $this->startDate = $str;
+
         return $this;
     }
 
@@ -70,9 +75,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
             $classes = ' ' . $classes;
         }
         $custom_css = $this->custom_css;
-        if ($this->bootstrap >= '3') {
-            $classes = $classes . ' form-control ';
-        }
+
         $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
             $custom_css = ' style="' . $custom_css . '"';
@@ -83,13 +86,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
                         <span class="add-on"><i class="icon-th"></i></span>
                     </div>')->br();
         } else {
-            if ($this->bootstrap == '3.3') {
-                $html->appendln('<div class="input-group">')->br();
-            }
             $html->appendln('<input type="text" name="' . $this->name . '"  data-date-format="' . $this->date_format . '" id="' . $this->id . '" class="datepicker input-unstyled' . $classes . $this->validation->validation_class() . '" value="' . $this->value . '"' . $disabled . $addition_attribute . $custom_css . '>')->br();
-            if ($this->bootstrap == '3.3') {
-                $html->appendln('</div>');
-            }
         }
         //$html->appendln('<input type="text" name="'.$this->name.'"  data-date-format="'.$this->date_format.'" id="'.$this->id.'" class="datepicker input-unstyled'.$classes.$this->validation->validation_class().'" value="'.$this->value.'"'.$disabled.$custom_css.'>')->br();
 
@@ -153,6 +150,7 @@ class CElement_FormInput_Date extends CElement_FormInput {
         } else {
             $js->append("$('#" . $this->id . "').datepicker(" . $option . ');')->br();
         }
+
         return $js->text();
     }
 }

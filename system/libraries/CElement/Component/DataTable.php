@@ -6,6 +6,7 @@ class CElement_Component_DataTable extends CElement_Component {
         CTrait_Element_ActionList_Header,
         CTrait_Element_ActionList_Footer,
         CTrait_Element_Property_Title,
+        CTrait_Element_Property_Icon,
         CElement_Component_DataTable_Trait_GridViewTrait,
         CElement_Component_DataTable_Trait_ExportTrait,
         CElement_Component_DataTable_Trait_JavascriptTrait,
@@ -14,6 +15,7 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_CheckboxTrait,
         CElement_Component_DataTable_Trait_SearchTrait,
         CElement_Component_DataTable_Trait_FooterTrait;
+
     const ACTION_LOCATION_FIRST = 'first';
 
     const ACTION_LOCATION_LAST = 'last';
@@ -72,8 +74,6 @@ class CElement_Component_DataTable extends CElement_Component {
     public $ajax;
 
     public $ajax_method;
-
-    public $icon;
 
     public $editable_form;
 
@@ -180,7 +180,6 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->show_header = true;
         $this->applyDataTable = true;
         $this->group_by = '';
-        $this->icon = '';
         $this->pdf_font_size = 8;
         $this->pdf_orientation = 'P';
         $this->requires = [];
@@ -221,6 +220,12 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public static function factory($id = '') {
         return new static($id);
+    }
+
+    public function setPagingList(array $list) {
+        $this->paging_list = $list;
+
+        return $this;
     }
 
     public function setLabelNoData($label) {

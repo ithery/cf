@@ -21,7 +21,7 @@ trait CApp_Concern_OrgTrait {
         }
         $orgId = $this->orgId();
 
-        if (c::filled($orgId)) {
+        if (c::filled($orgId) && $this->isAuthEnabled()) {
             $orgModelClass = CF::config('app.model.org', CApp_Model_Org::class);
             if (class_exists($orgModelClass)) {
                 return $orgModelClass::find($orgId);

@@ -10,8 +10,11 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
     protected $dateFormat;
+
     protected $momentFormat;
+
     protected $dateStart;
+
     protected $dateEnd;
 
     public function __construct($id) {
@@ -69,6 +72,7 @@ class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
             'U' => 'X',
         ];
         $momentFormat = strtr($format, $replacements);
+
         return $momentFormat;
     }
 
@@ -109,11 +113,13 @@ class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
 
     public function setValueStart($dateStart) {
         $this->dateStart = $dateStart;
+
         return $this;
     }
 
     public function setValueEnd($dateEnd) {
         $this->dateEnd = $dateEnd;
+
         return $this;
     }
 
@@ -132,6 +138,7 @@ class CElement_FormInput_DateRange_Dropdown extends CElement_FormInput {
 
             });
             ";
+
         return $js;
     }
 }
