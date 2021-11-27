@@ -112,7 +112,6 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
                 //if have callback
                 if ($col->callback != null) {
                     $colValue = CFunction::factory($col->callback)
-                            //->addArg($table)
                         ->addArg($row)
                         ->addArg($colValue)
                         ->setRequire($col->callbackRequire)
@@ -178,7 +177,6 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
             $html = $cell->html();
             $js = $cell->js();
         }
-
         if (carr::accessible($cell)) {
             $html = carr::get($cell, 'html');
             $js = carr::get($cell, 'js');

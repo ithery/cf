@@ -15,11 +15,12 @@ trait CObservable_Trait_ListTrait {
      * @return CElement_List_ActionList
      */
     public function addActionList($id = '') {
-        $actlist = CElement_Factory::createList('ActionList', $id);
-        $this->add($actlist);
+        $actlist = new CElement_List_ActionList($id);
+        $this->wrapper->add($actlist);
         if ($this instanceof CElement_Component_Form) {
             $actlist->setStyle('form-action');
         }
+
         return $actlist;
     }
 
@@ -31,6 +32,7 @@ trait CObservable_Trait_ListTrait {
     public function addTabList($id = '') {
         $tabs = CElement_Factory::createList('TabList', $id);
         $this->add($tabs);
+
         return $tabs;
     }
 }

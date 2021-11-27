@@ -11,7 +11,6 @@
 class CElement_FormInput_Checkbox extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Checkbox,
         CTrait_Element_Property_Label;
-
     protected $checked = '';
 
     protected $applyjs = '';
@@ -32,10 +31,7 @@ class CElement_FormInput_Checkbox extends CElement_FormInput {
         $this->checked = false;
         $this->display_inline = false;
         $this->label_wrap = false;
-        $js_checkbox = carr::get($this->theme_data, 'js_checkbox');
-        if (strlen($js_checkbox) > 0) {
-            $this->applyjs = $js_checkbox;
-        }
+        $this->applyjs = c::theme('js_checkbox', 'uniform');
     }
 
     public static function factory($id) {
