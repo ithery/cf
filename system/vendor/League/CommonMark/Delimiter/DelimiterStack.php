@@ -17,12 +17,12 @@
 
 namespace League\CommonMark\Delimiter;
 
-use League\CommonMark\Delimiter\Processor\DelimiterProcessorCollection;
 use League\CommonMark\Node\Inline\AdjacentTextMerger;
+use League\CommonMark\Delimiter\Processor\DelimiterProcessorCollection;
 
 final class DelimiterStack {
     /**
-     * @var DelimiterInterface|null
+     * @var null|DelimiterInterface
      *
      * @psalm-readonly-allow-private-mutation
      */
@@ -126,6 +126,7 @@ final class DelimiterStack {
             $delimiterProcessor = $processors->getDelimiterProcessor($delimiterChar);
             if (!$closer->canClose() || $delimiterProcessor === null) {
                 $closer = $closer->getNext();
+
                 continue;
             }
 
@@ -141,6 +142,7 @@ final class DelimiterStack {
                     $useDelims = $delimiterProcessor->getDelimiterUse($opener, $closer);
                     if ($useDelims > 0) {
                         $openerFound = true;
+
                         break;
                     }
                 }
@@ -166,6 +168,7 @@ final class DelimiterStack {
                 }
 
                 $closer = $closer->getNext();
+
                 continue;
             }
 
