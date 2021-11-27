@@ -90,8 +90,8 @@ class CElement_Component_Chart_Chart extends CElement_Component_Chart {
 	    		type: '" . $this->type . "',
 	    		data: $.parseJSON('" . json_encode($this->data) . "'),
 	    		options: chartOptions,
-                        
-                        
+
+
     		});
 	    ")->br();
 

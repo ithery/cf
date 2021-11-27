@@ -6,7 +6,7 @@ trait CElement_Component_DataTable_Trait_CheckboxTrait {
     public $checkboxColumnWidth;
 
     /**
-     * Checkbox Value
+     * Checkbox Value.
      *
      * @var array
      */
@@ -30,6 +30,7 @@ trait CElement_Component_DataTable_Trait_CheckboxTrait {
      */
     public function setCheckbox($bool) {
         $this->checkbox = $bool;
+
         return $this;
     }
 
@@ -40,6 +41,7 @@ trait CElement_Component_DataTable_Trait_CheckboxTrait {
      */
     public function setCheckboxValue($val) {
         $this->checkboxValue = carr::wrap($val);
+
         return $this;
     }
 
@@ -52,16 +54,19 @@ trait CElement_Component_DataTable_Trait_CheckboxTrait {
 
     public function enableCheckbox() {
         $this->checkbox = true;
+
         return $this;
     }
 
     public function disableCheckbox() {
         $this->checkbox = false;
+
         return $this;
     }
 
     public function setCheckboxRenderer($renderer) {
         $this->checkboxRenderer = $renderer;
+
         return $this;
     }
 

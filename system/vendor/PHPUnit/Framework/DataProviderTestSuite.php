@@ -7,6 +7,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework;
 
 use function explode;
@@ -15,8 +16,7 @@ use PHPUnit\Util\Test as TestUtil;
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class DataProviderTestSuite extends TestSuite
-{
+final class DataProviderTestSuite extends TestSuite {
     /**
      * @var list<ExecutionOrderDependency>
      */
@@ -25,25 +25,20 @@ final class DataProviderTestSuite extends TestSuite
     /**
      * @param list<ExecutionOrderDependency> $dependencies
      */
-    public function setDependencies(array $dependencies)
-    {
+    public function setDependencies(array $dependencies) {
         $this->dependencies = $dependencies;
 
         foreach ($this->tests as $test) {
-            if (!$test instanceof TestCase) {
-                // @codeCoverageIgnoreStart
-                continue;
-                // @codeCoverageIgnoreStart
+            if ($test instanceof TestCase) {
+                $test->setDependencies($dependencies);
             }
-            $test->setDependencies($dependencies);
         }
     }
 
     /**
      * @return list<ExecutionOrderDependency>
      */
-    public function provides()
-    {
+    public function provides() {
         if ($this->providedTests === null) {
             $this->providedTests = [new ExecutionOrderDependency($this->getName())];
         }
@@ -54,8 +49,7 @@ final class DataProviderTestSuite extends TestSuite
     /**
      * @return list<ExecutionOrderDependency>
      */
-    public function requires()
-    {
+    public function requires() {
         // A DataProviderTestSuite does not have to traverse its child tests
         // as these are inherited and cannot reference dataProvider rows directly
         return $this->dependencies;
@@ -66,8 +60,7 @@ final class DataProviderTestSuite extends TestSuite
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function getSize()
-    {
+    public function getSize() {
         list($className, $methodName) = explode('::', $this->getName());
 
         return TestUtil::getSize($className, $methodName);

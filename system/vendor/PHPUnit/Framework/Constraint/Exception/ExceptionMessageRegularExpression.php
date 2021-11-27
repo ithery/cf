@@ -7,29 +7,28 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\Constraint;
 
-use function sprintf;
+namespace PHPUnit\Framework\Constraint\Exception;
+
 use Exception;
-use PHPUnit\Util\RegularExpression as RegularExpressionUtil;
+use function sprintf;
 use PHPUnit\Framework\Constraint\Constraint;
+use PHPUnit\Util\RegularExpression as RegularExpressionUtil;
+
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-final class ExceptionMessageRegularExpression extends Constraint
-{
+final class ExceptionMessageRegularExpression extends Constraint {
     /**
      * @var string
      */
     private $expectedMessageRegExp;
 
-    public function __construct($expected)
-    {
+    public function __construct($expected) {
         $this->expectedMessageRegExp = $expected;
     }
 
-    public function toString()
-    {
+    public function toString() {
         return 'exception message matches ';
     }
 
@@ -42,12 +41,11 @@ final class ExceptionMessageRegularExpression extends Constraint
      * @throws Exception
      * @throws \PHPUnit\Framework\Exception
      */
-    protected function matches($other)
-    {
+    protected function matches($other) {
         $match = RegularExpressionUtil::safeMatch($this->expectedMessageRegExp, $other->getMessage());
 
         if ($match === false) {
-            throw new \PHPUnit\Framework\Exception(
+            throw new \PHPUnit\Framework\Exception\Exception(
                 "Invalid expected exception message regex given: '{$this->expectedMessageRegExp}'"
             );
         }
@@ -63,8 +61,7 @@ final class ExceptionMessageRegularExpression extends Constraint
      *
      * @param mixed $other evaluated value or object
      */
-    protected function failureDescription($other)
-    {
+    protected function failureDescription($other) {
         return sprintf(
             "exception message '%s' matches '%s'",
             $other->getMessage(),

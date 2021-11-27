@@ -11,12 +11,11 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CCache_Driver_FileDriver extends CCache_DriverAbstract {
     use CTrait_Helper_InteractsWithTime,
         CCache_Trait_RetrievesMultipleKeys;
-
     protected $engine;
 
     public function __construct($options) {
         parent::__construct($options);
-        $engineName = $this->getOption('engine', 'Array');
+        $engineName = $this->getOption('engine', 'Temp');
         $engineOptions = $this->getOption('options', []);
         $engineClass = 'CCache_Driver_FileDriver_Engine_' . $engineName . 'Engine';
         $this->engine = new $engineClass($engineOptions);
@@ -66,6 +65,7 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
         if ($this->engine->exists($key)) {
             return $this->engine->delete($key);
         }
+
         return false;
     }
 
@@ -99,7 +99,8 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
      */
     public function increment($key, $value = 1) {
         $raw = $this->getPayload($key);
-        return CF::tap(((int) $raw['data']) + $value, function ($newValue) use ($key, $raw) {
+
+        return c::tap(((int) $raw['data']) + $value, function ($newValue) use ($key, $raw) {
             $this->put($key, $newValue, isset($raw['time']) ? $raw['time'] : 0);
         });
     }
@@ -115,6 +116,7 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
      */
     public function put($key, $value, $seconds) {
         $result = $this->engine->put($key, $this->expiration($seconds) . serialize($value), true);
+
         return $result !== false && $result > 0;
     }
 
@@ -153,6 +155,7 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
         // this directory much cleaner for us as old files aren't hanging out.
         if ($this->currentTime() >= $expire) {
             $this->forget($key);
+
             return $this->emptyPayload();
         }
         $data = unserialize(substr($contents, 10));
@@ -160,6 +163,7 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
         // so that we can properly retain the time for things like the increment
         // operation that may be performed on this cache on a later operation.
         $time = $expire - $this->currentTime();
+
         return compact('data', 'time');
     }
 
@@ -172,6 +176,7 @@ class CCache_Driver_FileDriver extends CCache_DriverAbstract {
      */
     protected function expiration($seconds) {
         $time = $this->availableAt($seconds);
+
         return $seconds === 0 || $time > 9999999999 ? 9999999999 : $time;
     }
 }

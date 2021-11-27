@@ -14,7 +14,7 @@ class CObservable_Listener_Handler_ReloadDataTableHandler extends CObservable_Li
     public function js() {
         $selector = $this->getSelector();
 
-        $js = "$('" . $selector . "').DataTable().ajax.reload()";
+        $js = "$('" . $selector . "').DataTable().ajax.reload(null, false)";
 
         return $js;
     }

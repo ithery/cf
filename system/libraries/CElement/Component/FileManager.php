@@ -20,7 +20,7 @@ class CElement_Component_FileManager extends CElement_Component {
     protected $asPicker = false;
 
     /**
-     * Overrides controllers for filemanager
+     * Overrides controllers for filemanager.
      *
      * @var array
      */
@@ -43,26 +43,31 @@ class CElement_Component_FileManager extends CElement_Component {
      */
     public function setDisk($diskName) {
         $this->disk = $diskName;
+
         return $this;
     }
 
     public function setRootPath($path) {
         $this->rootPath = $path;
+
         return $this;
     }
 
     public function setTheme($theme) {
         $this->theme = $theme;
+
         return $this;
     }
 
     public function setController($method, $controllerClass) {
         $this->controller[$method] = $controllerClass;
+
         return $this;
     }
 
     public function setAsPicker($bool = true) {
         $this->asPicker = $bool;
+
         return $this;
     }
 
@@ -110,6 +115,7 @@ class CElement_Component_FileManager extends CElement_Component {
         if ($this->asPicker != null) {
             $config['action']['use'] = true;
         }
+
         return $config;
     }
 }

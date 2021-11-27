@@ -1,20 +1,12 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Html;
 use PhpOffice\PhpSpreadsheet\Writer\IWriter;
 
 class CExporter_WriterFactory {
-
     use CExporter_Trait_MapsCsvSettingsTrait;
 
     /**
@@ -23,9 +15,10 @@ class CExporter_WriterFactory {
      * @param object      $export
      *
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     *
      * @return IWriter
      */
-    public static function make( $writerType, Spreadsheet $spreadsheet, $export) {
+    public static function make($writerType, Spreadsheet $spreadsheet, $export) {
         $writer = IOFactory::createWriter($spreadsheet, $writerType);
 
         if (static::includesCharts($export)) {
@@ -53,7 +46,7 @@ class CExporter_WriterFactory {
 
         // Calculation settings
         $writer->setPreCalculateFormulas(
-                $export instanceof CExporter_Concern_WithPreCalculateFormulas ? true : CExporter::config()->get('exports.pre_calculate_formulas', false)
+            $export instanceof CExporter_Concern_WithPreCalculateFormulas ? true : CExporter::config()->get('exports.pre_calculate_formulas', false)
         );
 
         return $writer;
@@ -79,5 +72,4 @@ class CExporter_WriterFactory {
 
         return false;
     }
-
 }

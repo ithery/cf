@@ -1,8 +1,9 @@
 <?php
 
+//@codingStandardsIgnoreStart
 class CRawPrintLX300Builder extends CRawPrintBuilder {
     /*
-     * esc$=CHR$(27)
+      esc$=CHR$(27)
       emph$=esc$+"E"
       emphOFF$=esc$+"F"
       dubStrike$=esc$+"G"
@@ -43,10 +44,7 @@ class CRawPrintLX300Builder extends CRawPrintBuilder {
       $linefeed = chr(10);
       $sizekwt = chr(27)."1".chr(27).chr(67)."9";
       $sizerek = chr(27)."2".chr(27).chr(67)."66";
-
-     * * 
-     * 
-     */
+    */
 
     public function start_bold() {
         $this->escape_code(chr(69));
@@ -74,7 +72,7 @@ class CRawPrintLX300Builder extends CRawPrintBuilder {
 
     public function goto_next_page() {
 //        return chr(27) . chr(78). chr(6); //skip to start over perforation
-//        return chr(12); //skip 2 page 
+//        return chr(12); //skip 2 page
 //        return chr(27) . chr(67); //numpuk tulisan
 //        return chr(27) . chr(57); //numpuk tulisan ke atas
 //        return chr(27). chr(105).chr(0); //numpuk
@@ -112,5 +110,4 @@ class CRawPrintLX300Builder extends CRawPrintBuilder {
 //        return chr(20);
         return chr(27) . chr(79);
     }
-
 }

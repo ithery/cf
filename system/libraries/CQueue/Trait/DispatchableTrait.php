@@ -32,7 +32,7 @@ trait CQueue_Trait_DispatchableTrait {
      *
      * @param array $chain
      *
-     * @return \Illuminate\Foundation\Bus\PendingChain
+     * @return \CQueue_PendingChain
      */
     public static function withChain($chain) {
         return new CQueue_PendingChain(static::class, $chain);

@@ -6,7 +6,7 @@ class CException extends Exception {
     /**
      * @var array PHP error code => human readable name
      */
-    public static $php_errors = [
+    public static $phpErrors = [
         E_ERROR => 'Fatal Error',
         E_USER_ERROR => 'User Error',
         E_PARSE => 'Parse Error',
@@ -76,9 +76,11 @@ class CException extends Exception {
      * Sends an Internal Server Error header.
      *
      * @return void
+     *
+     * @deprecated 1,2
      */
     // @codingStandardsIgnoreStart
-    public function send_headers() {
+    public function sendHeaders() {
         // @codingStandardsIgnoreEnd
         // Send the 500 header
         header('HTTP/1.1 500 Internal Server Error');
@@ -93,5 +95,31 @@ class CException extends Exception {
         }
 
         return static::$exceptionHandler;
+    }
+
+    /**
+     * Create Exception Solution.
+     *
+     * @param string $title
+     *
+     * @return CException_Solution
+     */
+    public static function createSolution($title = '') {
+        return CException_Solution::create($title);
+    }
+
+    public static function config() {
+        return CException_Config::instance();
+    }
+
+    public static function manager() {
+        return CException_Manager::instance();
+    }
+
+    public static function init() {
+        //load all singleton for make sure exception handler can run
+        static::exceptionHandler();
+        static::config();
+        static::manager();
     }
 }

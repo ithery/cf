@@ -24,7 +24,7 @@ class CRouting_ImplicitRouteBinding {
                 continue;
             }
 
-            $instance = $container->make(Reflector::getParameterClassName($parameter));
+            $instance = $container->make(CBase_Reflector::getParameterClassName($parameter));
 
             $parent = $route->parentOfParameter($parameterName);
 

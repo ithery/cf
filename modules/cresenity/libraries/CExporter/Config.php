@@ -9,6 +9,7 @@ class CExporter_Config {
         if (static::$instance == null) {
             static::$instance = new CExporter_Config();
         }
+
         return static::$instance;
     }
 
@@ -28,6 +29,7 @@ class CExporter_Config {
 
     public function setData($data) {
         $this->data = $data;
+
         return $this;
     }
 
@@ -40,6 +42,7 @@ class CExporter_Config {
 
     public function set($key, $value) {
         $this->data[$key] = $value;
+
         return $this;
     }
 }

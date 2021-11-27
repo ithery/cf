@@ -41,15 +41,15 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
             }
             $html->appendln('<div id="' . $this->id() . '-widget-box" class="' . $mainClass . ' widget-table">')->incIndent();
             $showTitle = true;
-
             if ($showTitle) {
                 $html->appendln('<div class="' . $mainClassTitle . '">')->incIndent();
-                if (strlen($this->icon > 0)) {
+                if (strlen($this->icon) > 0) {
                     $html->appendln('<span class="icon">')->incIndent();
                     $html->appendln('<i class="icon-' . $this->icon . '"></i>');
                     $html->decIndent()->appendln('</span');
                 }
                 $html->appendln('<h5>' . $this->title . '</h5>');
+
                 if ($this->haveHeaderAction()) {
                     $html->appendln($this->headerActionList->html($html->getIndent()));
 
@@ -184,10 +184,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                             ->addArg($col_v)
                             ->setRequire($col->callbackRequire)
                             ->execute();
-                        if (is_array($col_v) && isset($col_v['html'], $col_v['js'])) {
-                            $js .= $col_v['js'];
-                            $col_v = $col_v['html'];
-                        }
+
+                        list($col_v, $jsCell) = $this->getHtmlJsCell($col_v);
+                        $js .= $jsCell;
                     }
                     $new_v = $col_v;
 
@@ -199,12 +198,16 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                             ->addArg($new_v)
                             ->setRequire($this->requires)
                             ->execute();
+                        if ($new_v instanceof CRenderable) {
+                            $js .= $new_v->js();
+                            $new_v = $new_v->html();
+                        }
                         if (is_array($new_v) && isset($new_v['html'], $new_v['js'])) {
                             $js .= $new_v['js'];
                             $new_v = $new_v['html'];
                         }
                     }
-                    $class = '';
+                    $class = $col->getClassAttribute();
                     switch ($col->getAlign()) {
                         case CConstant::ALIGN_LEFT:
                             $class .= ' align-left';
@@ -503,5 +506,26 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         }
 
         return $html;
+    }
+
+    protected function getHtmlJsCell($cell) {
+        $html = '';
+        $js = '';
+
+        if (is_string($cell)) {
+            $html = $cell;
+        }
+
+        if ($cell instanceof CRenderable) {
+            $html = $cell->html();
+            $js = $cell->js();
+        }
+
+        if (carr::accessible($cell)) {
+            $html = carr::get($cell, 'html');
+            $js = carr::get($cell, 'js');
+        }
+
+        return [$html, $js];
     }
 }

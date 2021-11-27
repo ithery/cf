@@ -37,6 +37,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Concern_AuthTrait,
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
+
     public static $instance = null;
 
     protected $renderer;
@@ -115,6 +116,10 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
                     $db->update('users', ['last_request' => date('Y-m-d H:i:s')], ['user_id' => $user->user_id]);
                 }
             }
+        }
+        $haveUserLogin = CF::config('app.have_user_login');
+        if ($haveUserLogin === false) {
+            $this->authEnabled = false;
         }
     }
 

@@ -143,7 +143,7 @@ class CFRouter {
             // Explode the segments by slashes
             $data['segments'] = ($default_route === true or $data['segments'] === '') ? [] : explode('/', $data['segments']);
 
-            if ($default_route === false and count($data['routes']) > 1) {
+            if (count($data['routes']) > 1) {
                 // Custom routing
                 $data['rsegments'] = self::routedUri($data['current_uri'], $data['routes']);
             }
@@ -437,11 +437,11 @@ class CFRouter {
                 $key = trim($key, '/');
                 $val = trim($val, '/');
 
-                if (preg_match('#^' . $key . '#u', $uri)) {
+                if (preg_match('#^' . $key . '#ims', $uri)) {
                     if (strpos($val, '$') !== false) {
                         // Use regex routing
 
-                        $routedUri = preg_replace('#^' . $key . '$#u', $val, $uri);
+                        $routedUri = preg_replace('#^' . $key . '$#ims', $val, $uri);
                     } else {
                         // Standard routing
                         $routedUri = $val;

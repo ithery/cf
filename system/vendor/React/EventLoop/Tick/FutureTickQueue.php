@@ -5,19 +5,18 @@ namespace React\EventLoop\Tick;
 use SplQueue;
 
 /**
- * A tick queue implementation that can hold multiple callback functions
+ * A tick queue implementation that can hold multiple callback functions.
  *
  * This class should only be used internally, see LoopInterface instead.
  *
  * @see LoopInterface
+ *
  * @internal
  */
-final class FutureTickQueue
-{
+final class FutureTickQueue {
     private $queue;
 
-    public function __construct()
-    {
+    public function __construct() {
         $this->queue = new SplQueue();
     }
 
@@ -26,18 +25,16 @@ final class FutureTickQueue
      *
      * Callbacks are guaranteed to be executed in the order they are enqueued.
      *
-     * @param callable $listener The callback to invoke.
+     * @param callable $listener the callback to invoke
      */
-    public function add($listener)
-    {
+    public function add($listener) {
         $this->queue->enqueue($listener);
     }
 
     /**
      * Flush the callback queue.
      */
-    public function tick()
-    {
+    public function tick() {
         // Only invoke as many callbacks as were on the queue when tick() was called.
         $count = $this->queue->count();
 
@@ -51,10 +48,9 @@ final class FutureTickQueue
     /**
      * Check if the next tick queue is empty.
      *
-     * @return boolean
+     * @return bool
      */
-    public function isEmpty()
-    {
+    public function isEmpty() {
         return $this->queue->isEmpty();
     }
 }

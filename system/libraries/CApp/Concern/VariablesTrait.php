@@ -19,6 +19,7 @@ trait CApp_Concern_VariablesTrait {
      * @return array
      */
     public static function variables() {
+        /** @var CApp $this */
         $variables = [];
         $variables['decimal_separator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
         $variables['decimalSeparator'] = ccfg::get('decimal_separator') === null ? '.' : ccfg::get('decimal_separator');
@@ -35,7 +36,7 @@ trait CApp_Concern_VariablesTrait {
         $variables['appCode'] = CF::appCode();
         $variables['appId'] = CF::appId();
         $variables['debug'] = CF::isDevSuite();
-        $variables['enviroment'] = CF::config('app.environment');
+        $variables['environment'] = CF::config('app.environment');
 
         $bootstrap = ccfg::get('bootstrap');
         $themeData = CManager::instance()->getThemeData();
@@ -50,12 +51,13 @@ trait CApp_Concern_VariablesTrait {
 
         $variables['base_url'] = curl::base();
         $variables['baseUrl'] = curl::base();
-        $variables['label_confirm'] = clang::__('Are you sure ?');
-        $variables['labelConfirm'] = clang::__('Are you sure ?');
-        $variables['label_ok'] = clang::__('OK');
-        $variables['labelOk'] = clang::__('OK');
-        $variables['label_cancel'] = clang::__('Cancel');
-        $variables['labelCancel'] = clang::__('Cancel');
+        $variables['label_confirm'] = c::__('Are you sure ?');
+        $variables['labelConfirm'] = c::__('Are you sure ?');
+        $variables['label_ok'] = c::__('OK');
+        $variables['labelOk'] = c::__('OK');
+        $variables['label_cancel'] = c::__('Cancel');
+        $variables['labelCancel'] = c::__('Cancel');
+        $variables['isAuthEnabled'] = c::app()->isAuthEnabled();
 
         $asset = CManager::asset();
         $variables['requireJs'] = false;

@@ -116,6 +116,7 @@ class CElement_Component_Blockly_BlockHelper {
         if (method_exists(static::class, $renderFunctionName)) {
             return static::$renderFunctionName();
         }
+
         throw new Exception('No function ' . $renderFunctionName . ' is defined in BlockHelper');
     }
 

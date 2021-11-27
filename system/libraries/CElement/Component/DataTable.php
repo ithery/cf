@@ -6,6 +6,7 @@ class CElement_Component_DataTable extends CElement_Component {
         CTrait_Element_ActionList_Header,
         CTrait_Element_ActionList_Footer,
         CTrait_Element_Property_Title,
+        CTrait_Element_Property_Icon,
         CElement_Component_DataTable_Trait_GridViewTrait,
         CElement_Component_DataTable_Trait_ExportTrait,
         CElement_Component_DataTable_Trait_JavascriptTrait,
@@ -74,17 +75,7 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public $ajax_method;
 
-    public $icon;
-
     public $editable_form;
-
-    public $can_edit;
-
-    public $can_add;
-
-    public $can_delete;
-
-    public $can_view;
 
     public $headerNoLineBreak;
 
@@ -178,10 +169,6 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->ajax_method = 'get';
         $this->title = '';
         $this->editable_form = null;
-        $this->can_edit = false;
-        $this->can_add = false;
-        $this->can_delete = false;
-        $this->can_view = false;
         $this->export_pdf = false;
         $this->export_excelxml = false;
         $this->export_excelcsv = false;
@@ -193,7 +180,6 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->show_header = true;
         $this->applyDataTable = true;
         $this->group_by = '';
-        $this->icon = '';
         $this->pdf_font_size = 8;
         $this->pdf_orientation = 'P';
         $this->requires = [];
@@ -234,6 +220,12 @@ class CElement_Component_DataTable extends CElement_Component {
 
     public static function factory($id = '') {
         return new static($id);
+    }
+
+    public function setPagingList(array $list) {
+        $this->paging_list = $list;
+
+        return $this;
     }
 
     public function setLabelNoData($label) {

@@ -3,6 +3,7 @@ use CVendor_LiteSpeed_Info as Info;
 use CVendor_LiteSpeed_Node as Node;
 use CVendor_LiteSpeed_PathTool as PathTool;
 use CVendor_LiteSpeed_OWS_PageDef as PageDef;
+use CVendor_LiteSpeed_Parser_XmlParser as XmlParser;
 
 class CVendor_LiteSpeed_Data {
     private $type; //{'serv','admin','vh','tp','special'}
@@ -12,7 +13,7 @@ class CVendor_LiteSpeed_Data {
     /**
      * Root Node.
      *
-     * @var Node
+     * @var CVendor_LiteSpeed_Node
      */
     private $root;
 
@@ -641,7 +642,7 @@ class CVendor_LiteSpeed_Data {
                 }
             } else {
                 if (file_exists($this->xmlpath)) {
-                    if (!$this->migrate_xml2conf()) {
+                    if (!$this->migrateXml2Conf()) {
                         return false;
                     }
                 } else {// treat as new vh or tp
@@ -773,7 +774,7 @@ class CVendor_LiteSpeed_Data {
         return true;
     }
 
-    private function migrate_xml2conf() {
+    private function migrateXml2Conf() {
         error_log("Migrating {$this->xmlpath} \n");
         $xmlparser = new XmlParser();
         $xmlroot = $xmlparser->Parse($this->xmlpath);
@@ -784,7 +785,7 @@ class CVendor_LiteSpeed_Data {
         }
 
         $root = $xmlroot->DupHolder();
-        $filemap = DPageDef::GetInstance()->getFileMap($this->type);   // serv, vh, tp, admin
+        $filemap = PageDef::instance()->getFileMap($this->type);   // serv, vh, tp, admin
         $filemap->convert(0, $xmlroot, 1, $root);
 
         $buf = '';
@@ -832,7 +833,7 @@ class CVendor_LiteSpeed_Data {
         }
 
         $root = $xmlroot->DupHolder();
-        $filemap = DPageDef::GetInstance()->getFileMap(Info::CT_SERV);   // serv, vh, tp, admin
+        $filemap = PageDef::instance()->getFileMap(Info::CT_SERV);   // serv, vh, tp, admin
         $filemap->Convert(0, $xmlroot, 1, $root);
 
         // migrate all vh.xml
@@ -845,7 +846,7 @@ class CVendor_LiteSpeed_Data {
                 $vhroot = $vh->getChildVal('vhRoot');
                 $vhconf = $vh->getChildVal('configFile');
                 $conffile = PathTool::GetAbsFile($vhconf, 'VR', $vhname, $vhroot);
-                $vhdata = new CData(Info::CT_VH, $conffile);
+                $vhdata = new CVendor_LiteSpeed_Data(Info::CT_VH, $conffile);
                 if (($pos = strpos($vhconf, '.xml')) > 0) {
                     $vhconf = substr($vhconf, 0, $pos) . '.conf';
                     $vh->SetChildVal('configFile', $vhconf);
@@ -861,21 +862,21 @@ class CVendor_LiteSpeed_Data {
             foreach ($tps as $tp) {
                 $tpconf = $tp->getChildVal('templateFile');
                 $conffile = PathTool::GetAbsFile($tpconf, 'SR');
-                $tpdata = new CData(Info::CT_TP, $conffile);
+                $tpdata = new CVendor_LiteSpeed_Data(Info::CT_TP, $conffile);
                 if (($pos = strpos($tpconf, '.xml')) > 0) {
                     $tpconf = substr($tpconf, 0, $pos) . '.conf';
-                    $tp->SetChildVal('templateFile', $tpconf);
+                    $tp->setChildVal('templateFile', $tpconf);
                 }
             }
         }
 
         $buf = '';
-        $this->before_write_conf($root);
+        $this->beforeWriteConf($root);
         $root->PrintBuf($buf);
         touch($this->path);
 
-        $this->write_file($this->path, $buf);
-        $this->copy_permission($this->xmlpath, $this->path);
+        $this->writeFile($this->path, $buf);
+        $this->copyPermission($this->xmlpath, $this->path);
 
         $migrated = $this->xmlpath . '.migrated.' . time();
 
@@ -891,20 +892,20 @@ class CVendor_LiteSpeed_Data {
         error_log("  converted {$this->xmlpath} to {$this->path}\n\n");
     }
 
-    private function migrate_allconf2xml() {
+    private function migrateAllConf2Xml() {
         if (($vhosts = $this->root->getChildren('virtualhost')) != null) {
             if (!is_array($vhosts)) {
                 $vhosts = [$vhosts];
             }
-            $filemap = DPageDef::GetInstance()->getFileMap(Info::CT_VH);
+            $filemap = PageDef::instance()->getFileMap(Info::CT_VH);
             foreach ($vhosts as $vh) {
                 $vhname = $vh->get(Node::FLD_VAL);
                 $vhroot = $vh->getChildVal('vhRoot');
                 $vhconf = $vh->getChildVal('configFile');
-                $conffile = PathTool::GetAbsFile($vhconf, 'VR', $vhname, $vhroot);
-                $vhdata = new CData(Info::CT_VH, $conffile);
-                $this->save_xml_file($vhdata->root, $filemap, $vhdata->xmlpath);
-                $this->copy_permission($vhdata->path, $vhdata->xmlpath);
+                $conffile = PathTool::getAbsFile($vhconf, 'VR', $vhname, $vhroot);
+                $vhdata = new CVendor_LiteSpeed_Data(Info::CT_VH, $conffile);
+                $this->saveXmlFile($vhdata->root, $filemap, $vhdata->xmlpath);
+                $this->copyPermission($vhdata->path, $vhdata->xmlpath);
                 error_log("  converted {$vhdata->path} to {$vhdata->xmlpath}\n");
             }
         }
@@ -913,20 +914,20 @@ class CVendor_LiteSpeed_Data {
             if (!is_array($tps)) {
                 $tps = [$tps];
             }
-            $filemap = PageDef::getInstance()->getFileMap(Info::CT_TP);
+            $filemap = PageDef::instance()->getFileMap(Info::CT_TP);
             foreach ($tps as $tp) {
                 $tpconf = $tp->getChildVal('templateFile');
                 $conffile = PathTool::GetAbsFile($tpconf, 'SR');
-                $tpdata = new CData(Info::CT_TP, $conffile);
-                $this->save_xml_file($tpdata->root, $filemap, $tpdata->xmlpath);
-                $this->copy_permission($tpdata->path, $tpdata->xmlpath);
+                $tpdata = new CVendor_LiteSpeed_Data(Info::CT_TP, $conffile);
+                $this->saveXmlFile($tpdata->root, $filemap, $tpdata->xmlpath);
+                $this->copyPermission($tpdata->path, $tpdata->xmlpath);
                 error_log("  converted {$tpdata->path} to {$tpdata->xmlpath}\n");
             }
         }
 
-        $filemap = PageDef::getInstance()->getFileMap(Info::CT_SERV);
-        $this->save_xml_file($this->root, $filemap, $this->xmlpath);
-        $this->copy_permission($this->path, $this->xmlpath);
+        $filemap = PageDef::instance()->getFileMap(Info::CT_SERV);
+        $this->saveXmlFile($this->root, $filemap, $this->xmlpath);
+        $this->copyPermission($this->path, $this->xmlpath);
         error_log("  converted {$this->path} to {$this->xmlpath}\n");
     }
 

@@ -177,7 +177,7 @@ class curl {
         $separator = ($separator === '-') ? '-' : '_';
 
         // Replace accented characters by their unaccented equivalents
-        $title = CUTF8::transliterate_to_ascii($title);
+        $title = CUTF8::transliterateToAscii($title);
 
         // Remove all characters that are not the separator, a-z, 0-9, or whitespace
         $title = preg_replace('/[^' . $separator . 'a-z0-9\s]+/', '', strtolower($title));

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of CManager_Theme
+ * Description of CManager_Theme.
  *
  * @author Hery
  */
@@ -20,31 +20,29 @@ class CManager_Theme {
     }
 
     public static function getDefaultTheme() {
-        $theme = CF::theme();
-        if (strlen(ccfg::get('theme')) > 0) {
-            $theme = ccfg::get('theme');
+        $theme = static::$theme;
+        if ($theme == null) {
+            $theme = CF::config('app.theme');
         }
+
         return $theme;
     }
 
     public static function getCurrentTheme() {
-        $theme = CSession::instance()->get('theme', static::$theme);
+        $theme = self::getDefaultTheme();
         if ($theme == null) {
-            $theme = self::getDefaultTheme();
-            if ($theme == null) {
-                $theme = 'cresenity';
-            }
+            $theme = 'cresenity';
         }
 
         if (self::$themeCallback != null && is_callable(self::$themeCallback)) {
             $theme = call_user_func(self::$themeCallback, $theme);
         }
+
         return $theme;
     }
 
     public static function setTheme($theme) {
         static::$theme = $theme;
-        CSession::instance()->set('theme', $theme);
     }
 
     public static function getThemeData($theme = null) {
@@ -59,6 +57,7 @@ class CManager_Theme {
             }
             self::$themeData[$theme] = $themeAllData;
         }
+
         return self::$themeData[$theme];
     }
 
@@ -74,11 +73,12 @@ class CManager_Theme {
     public static function getData($key, $default = null) {
         $themeAllData = self::getThemeData();
         $themeData = carr::get($themeAllData, 'data', $default);
+
         return carr::get($themeData, $key, $default);
     }
 
     /**
-     * Get Theme Path
+     * Get Theme Path.
      *
      * @return string
      *
@@ -97,6 +97,7 @@ class CManager_Theme {
                 $themePath .= '/';
             }
         }
+
         return $themePath;
     }
 }

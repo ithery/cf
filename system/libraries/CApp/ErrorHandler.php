@@ -7,9 +7,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CApp_ErrorHandler {
     public static $errorLang = [
-        E_CF => [1, 'Framework Error', 'Please check the CF documentation for information about the following error.'],
-        E_PAGE_NOT_FOUND => [1, 'Page Not Found', 'The requested page was not found. It may have moved, been deleted, or archived.'],
-        E_DATABASE_ERROR => [1, 'Database Error', 'A database error occurred while performing the requested procedure. Please review the database error below for more information.'],
         E_RECOVERABLE_ERROR => [1, 'Recoverable Error', 'An error was detected which prevented the loading of this page. If this problem persists, please contact the website administrator.'],
         E_ERROR => [1, 'Fatal Error', ''],
         E_USER_ERROR => [1, 'Fatal Error', ''],

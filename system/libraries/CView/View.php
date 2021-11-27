@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of View
+ * Description of View.
  *
  * @author Hery
  */
@@ -92,7 +92,7 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
      * @return $this
      */
     public function withErrors($provider, $bag = 'default') {
-        return $this->with('errors', (new CBase_ViewErrorBag)->put(
+        return $this->with('errors', (new CBase_ViewErrorBag())->put(
             $bag,
             $this->formatErrors($provider)
         ));
@@ -258,9 +258,9 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
     /**
      * Get the string contents of the view.
      *
-     * @return string
-     *
      * @throws \Throwable
+     *
+     * @return string
      */
     public function __toString() {
         return $this->render();
@@ -269,16 +269,15 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
     /**
      * Get the string contents of the view.
      *
-     * @param callable|null $callback
-     *
-     * @return array|string
+     * @param null|callable $callback
      *
      * @throws \Throwable
+     *
+     * @return array|string
      */
     public function render(callable $callback = null) {
         try {
             $contents = $this->renderContents();
-
             $response = isset($callback) ? $callback($this, $contents) : null;
 
             // Once we have the contents of the view, we will flush the sections if we are
@@ -344,7 +343,7 @@ class CView_View implements ArrayAccess, CInterface_Htmlable, CView_ViewInterfac
     }
 
     /**
-     * Alias with
+     * Alias with.
      *
      * @param array $data
      *

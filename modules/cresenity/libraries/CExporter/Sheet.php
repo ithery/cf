@@ -1,23 +1,16 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-use PhpOffice\PhpSpreadsheet\Cell\Cell as SpreadsheetCell;
-use PhpOffice\PhpSpreadsheet\Chart\Chart;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Chart\Chart;
 use PhpOffice\PhpSpreadsheet\Reader\Html;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Worksheet\BaseDrawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\BaseDrawing;
+use PhpOffice\PhpSpreadsheet\Cell\Cell as SpreadsheetCell;
 
 class CExporter_Sheet {
     use CExporter_Trait_DelegatedMacroableTrait,
         CExporter_Trait_HasEventBusTrait;
-
     /**
      * @var int
      */
@@ -51,10 +44,10 @@ class CExporter_Sheet {
      * @param Spreadsheet $spreadsheet
      * @param string|int  $index
      *
-     * @return Sheet
-     *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws SheetNotFoundException
+     *
+     * @return Sheet
      */
     public static function make(Spreadsheet $spreadsheet, $index) {
         if (is_numeric($index)) {
@@ -68,10 +61,10 @@ class CExporter_Sheet {
      * @param Spreadsheet $spreadsheet
      * @param int         $index
      *
-     * @return CExporter_Sheet
-     *
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      * @throws SheetNotFoundException
+     *
+     * @return CExporter_Sheet
      */
     public static function byIndex(Spreadsheet $spreadsheet, $index) {
         if (!isset($spreadsheet->getAllSheets()[$index])) {
@@ -85,9 +78,9 @@ class CExporter_Sheet {
      * @param Spreadsheet $spreadsheet
      * @param string      $name
      *
-     * @return CExporter_Sheet
-     *
      * @throws SheetNotFoundException
+     *
+     * @return CExporter_Sheet
      */
     public static function byName(Spreadsheet $spreadsheet, $name) {
         if (!$spreadsheet->sheetNameExists($name)) {
@@ -202,10 +195,10 @@ class CExporter_Sheet {
         $calculatesFormulas = $import instanceof CExporter_Concern_WithCalculatedFormulas;
 
         if ($import instanceof CExporter_Concern_WithMappedCells) {
-            app(MappedReader::class)->map($import, $this->worksheet);
+            CExporter_MappedReader::map($import, $this->worksheet);
         } else {
             if ($import instanceof CExporter_Concern_ToModel) {
-                app(ModelImporter::class)->import($this->worksheet, $import, $startRow);
+                CExporter::modelImporter()->import($this->worksheet, $import, $startRow);
             }
 
             if ($import instanceof CExporter_Concern_ToCollection) {
@@ -213,15 +206,15 @@ class CExporter_Sheet {
             }
 
             if ($import instanceof CExporter_Concern_ToArray) {
-                $import->array($this->toArray($import, $startRow, null, $calculatesFormulas));
+                $import->toArray($this->toArray($import, $startRow, null, $calculatesFormulas));
             }
         }
 
         if ($import instanceof CExporter_Concern_OnEachRow) {
-            $headingRow = HeadingRowExtractor::extract($this->worksheet, $import);
+            $headingRow = CExporter_Import_HeadingRowExtractor::extract($this->worksheet, $import);
 
             foreach ($this->worksheet->getRowIterator()->resetStart(isset($startRow) ? $startRow : 1) as $row) {
-                $sheetRow = new Row($row, $headingRow);
+                $sheetRow = new CExporter_Row($row, $headingRow);
 
                 if ($import instanceof CExporter_Concern_WithValidation) {
                     $toValidate = [$sheetRow->getIndex() => $sheetRow->toArray(null, $import instanceof CExporter_Concern_WithCalculatedFormulas)];
@@ -250,7 +243,7 @@ class CExporter_Sheet {
 
     /**
      * @param object   $import
-     * @param int|null $startRow
+     * @param null|int $startRow
      * @param null     $nullValue
      * @param bool     $calculateFormulas
      * @param bool     $formatData
@@ -263,7 +256,7 @@ class CExporter_Sheet {
 
         $rows = [];
         foreach ($this->worksheet->getRowIterator($startRow, $endRow) as $row) {
-            $row = (new CExporter_Excel_Row($row, $headingRow))->toArray($nullValue, $calculateFormulas, $formatData);
+            $row = (new CExporter_Row($row, $headingRow))->toArray($nullValue, $calculateFormulas, $formatData);
 
             if ($import instanceof CExporter_Concern_WithMapping) {
                 $row = $import->map($row);
@@ -281,12 +274,12 @@ class CExporter_Sheet {
 
     /**
      * @param object   $import
-     * @param int|null $startRow
+     * @param null|int $startRow
      * @param null     $nullValue
      * @param bool     $calculateFormulas
      * @param bool     $formatData
      *
-     * @return Collection
+     * @return CCollection
      */
     public function toCollection($import, $startRow = null, $nullValue = null, $calculateFormulas = false, $formatData = false) {
         return c::collect(array_map(function (array $row) {
@@ -330,7 +323,7 @@ class CExporter_Sheet {
 
     /**
      * @param FromView $sheetExport
-     * @param int|null $sheetIndex
+     * @param null|int $sheetIndex
      *
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
@@ -400,7 +393,7 @@ class CExporter_Sheet {
 
     /**
      * @param array       $rows
-     * @param string|null $startCell
+     * @param null|string $startCell
      * @param bool        $strictNullComparison
      */
     public function append(array $rows, $startCell = null, $strictNullComparison = false) {
@@ -429,9 +422,9 @@ class CExporter_Sheet {
      */
     public function formatColumn($column, $format) {
         $this->worksheet
-                ->getStyle($column . '1:' . $column . $this->worksheet->getHighestRow())
-                ->getNumberFormat()
-                ->setFormatCode($format);
+            ->getStyle($column . '1:' . $column . $this->worksheet->getHighestRow())
+            ->getNumberFormat()
+            ->setFormatCode($format);
     }
 
     /**

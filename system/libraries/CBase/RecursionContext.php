@@ -12,21 +12,21 @@ final class CBase_RecursionContext {
     private $objects;
 
     /**
-     * Initialises the context
+     * Initialises the context.
      */
     public function __construct() {
         $this->arrays = [];
-        $this->objects = new \SplObjectStorage;
+        $this->objects = new \SplObjectStorage();
     }
 
     /**
      * Adds a value to the context.
      *
-     * @param array|object $value The value to add.
-     *
-     * @return int|string The ID of the stored value, either as a string or integer.
+     * @param array|object $value the value to add
      *
      * @throws InvalidArgumentException Thrown if $value is not an array or object
+     *
+     * @return int|string the ID of the stored value, either as a string or integer
      */
     public function add(&$value) {
         if (is_array($value)) {
@@ -34,6 +34,7 @@ final class CBase_RecursionContext {
         } elseif (is_object($value)) {
             return $this->addObject($value);
         }
+
         throw new InvalidArgumentException(
             'Only arrays and objects are supported'
         );
@@ -42,11 +43,11 @@ final class CBase_RecursionContext {
     /**
      * Checks if the given value exists within the context.
      *
-     * @param array|object $value The value to check.
-     *
-     * @return int|string|false The string or integer ID of the stored value if it has already been seen, or false if the value is not stored.
+     * @param array|object $value the value to check
      *
      * @throws InvalidArgumentException Thrown if $value is not an array or object
+     *
+     * @return int|string|false the string or integer ID of the stored value if it has already been seen, or false if the value is not stored
      */
     public function contains(&$value) {
         if (is_array($value)) {
@@ -54,6 +55,7 @@ final class CBase_RecursionContext {
         } elseif (is_object($value)) {
             return $this->containsObject($value);
         }
+
         throw new InvalidArgumentException(
             'Only arrays and objects are supported'
         );
@@ -84,6 +86,7 @@ final class CBase_RecursionContext {
             } while (isset($array[$key]));
             $array[$key] = $this->objects;
         }
+
         return $key;
     }
 
@@ -96,6 +99,7 @@ final class CBase_RecursionContext {
         if (!$this->objects->contains($object)) {
             $this->objects->attach($object);
         }
+
         return spl_object_hash($object);
     }
 
@@ -106,6 +110,7 @@ final class CBase_RecursionContext {
      */
     private function containsArray(array &$array) {
         $end = array_slice($array, -2);
+
         return isset($end[1]) && $end[1] === $this->objects ? $end[0] : false;
     }
 
@@ -118,6 +123,7 @@ final class CBase_RecursionContext {
         if ($this->objects->contains($value)) {
             return spl_object_hash($value);
         }
+
         return false;
     }
 

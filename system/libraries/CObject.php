@@ -1,41 +1,12 @@
 <?php
 
 class CObject {
-    use CTrait_Compat_Object,
-        CTrait_Macroable;
-
+    use CTrait_Compat_Object;
+    use CTrait_Macroable;
+    use CTrait_Tappable;
     protected $id;
 
-    protected $valid_prop = [];
-
-    protected $prop = [];
-
     protected $domain = '';
-
-    private $friends = [];
-
-    public function addFriend($classname) {
-        $this->friends[] = $classname;
-    }
-
-    public function __get($key) {
-        $trace = debug_backtrace();
-
-        if (isset($trace[1]['class']) && in_array($trace[1]['class'], $this->friends)) {
-            return $this->$key;
-        }
-
-        throw new Exception(c::__('Cannot access private property :class::$:key', ['class' => __CLASS__, 'key' => $key]));
-    }
-
-    public function __set($key, $value) {
-        $trace = debug_backtrace();
-        if (isset($trace[1]['class']) && in_array($trace[1]['class'], $this->friends)) {
-            return $this->$key = $value;
-        }
-
-        throw new Exception(c::__('Cannot access private property :class::$:key', ['class' => get_called_class(), 'key' => $key]));
-    }
 
     protected function __construct($id = '') {
         $observer = CObserver::instance();
@@ -71,7 +42,7 @@ class CObject {
     }
 
     public function isUseTrait($trait) {
-        $traits = c::classUsesRecursive(get_class($this));
+        $traits = c::classUsesRecursive($this->className());
 
         return isset($traits[$trait]);
     }
@@ -82,6 +53,6 @@ class CObject {
      * @return string
      */
     public function domain() {
-        return CF::domain();
+        return $this->domain;
     }
 }

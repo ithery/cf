@@ -9,6 +9,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Feb 16, 2019, 10:02:03 PM
  */
 class CTemporary {
+    use CTrait_Compat_Temporary;
+
     /**
      * @param null|mixed $diskName
      *
@@ -21,12 +23,12 @@ class CTemporary {
     public static function defaultDiskDriver() {
         $defaultDiskName = static::defaultDiskName();
         $config = CF::config('storage.disks.' . $defaultDiskName);
+
         return carr::get($config, 'driver');
     }
 
     public static function defaultDiskName() {
         return CF::config('storage.temp');
-        ;
     }
 
     /**
@@ -62,6 +64,7 @@ class CTemporary {
         if (!is_dir($path)) {
             @mkdir($path, 0777, true);
         }
+
         return $path;
     }
 
@@ -160,6 +163,7 @@ class CTemporary {
      */
     public static function getUrl($folder, $filename) {
         $path = static::getPath($folder, $filename);
+
         return static::disk()->url($path);
 
         $mainFolder = substr($filename, 0, 8);
@@ -176,6 +180,7 @@ class CTemporary {
                 $url .= $c . '/';
             }
         }
+
         return $url . $filename;
     }
 
@@ -187,6 +192,7 @@ class CTemporary {
      */
     public static function delete($folder, $filename) {
         $disk = static::disk();
+
         return $disk->delete(static::getPath($folder, $filename));
     }
 
@@ -198,6 +204,7 @@ class CTemporary {
      */
     public static function deleteLocal($folder, $filename) {
         $path = static::getLocalPath($folder, $filename);
+
         return @unlink($path);
     }
 
@@ -211,21 +218,25 @@ class CTemporary {
         }
         $path = static::getPath($folder, $filename);
         static::disk()->put($path, $content);
+
         return $path;
     }
 
     public static function get($folder, $filename) {
         $path = static::getPath($folder, $filename);
+
         return static::disk()->get($path);
     }
 
     public static function getSize($folder, $filename) {
         $path = static::getPath($folder, $filename);
+
         return static::disk()->size($path);
     }
 
     public static function isExists($folder, $filename) {
         $path = static::getPath($folder, $filename);
+
         return static::disk()->exists($path);
     }
 

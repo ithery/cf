@@ -7,20 +7,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\Constraint;
 
-use function sprintf;
 use Countable;
-use PHPUnit\Framework\Exception\ExpectationFailedException;
+use function sprintf;
 use PHPUnit\Framework\SelfDescribing;
-use SebastianBergmann\Comparator\ComparisonFailure;
 use SebastianBergmann\Exporter\Exporter;
+use SebastianBergmann\Comparator\ComparisonFailure;
+use PHPUnit\Framework\Exception\ExpectationFailedException;
 
 /**
  * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
  */
-abstract class Constraint implements Countable, SelfDescribing
-{
+abstract class Constraint implements Countable, SelfDescribing {
     /**
      * @var ?Exporter
      */
@@ -36,11 +36,14 @@ abstract class Constraint implements Countable, SelfDescribing
      * a boolean value instead: true in case of success, false in case of a
      * failure.
      *
+     * @param mixed $other
+     * @param mixed $description
+     * @param mixed $returnResult
+     *
      * @throws ExpectationFailedException
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function evaluate($other, $description = '', $returnResult = false)
-    {
+    public function evaluate($other, $description = '', $returnResult = false) {
         $success = false;
 
         if ($this->matches($other)) {
@@ -61,15 +64,13 @@ abstract class Constraint implements Countable, SelfDescribing
     /**
      * Counts the number of constraint elements.
      */
-    public function count()
-    {
+    public function count() {
         return 1;
     }
 
-    protected function exporter()
-    {
+    protected function exporter() {
         if ($this->exporter === null) {
-            $this->exporter = new Exporter;
+            $this->exporter = new Exporter();
         }
 
         return $this->exporter;
@@ -84,8 +85,7 @@ abstract class Constraint implements Countable, SelfDescribing
      * @param mixed $other value or object to evaluate
      * @codeCoverageIgnore
      */
-    protected function matches($other)
-    {
+    protected function matches($other) {
         return false;
     }
 
@@ -101,8 +101,7 @@ abstract class Constraint implements Countable, SelfDescribing
      *
      * @psalm-return never-return
      */
-    protected function fail($other, $description, ComparisonFailure $comparisonFailure = null)
-    {
+    protected function fail($other, $description, ComparisonFailure $comparisonFailure = null) {
         $failureDescription = sprintf(
             'Failed asserting that %s.',
             $this->failureDescription($other)
@@ -132,8 +131,7 @@ abstract class Constraint implements Countable, SelfDescribing
      *
      * @param mixed $other evaluated value or object
      */
-    protected function additionalFailureDescription($other)
-    {
+    protected function additionalFailureDescription($other) {
         return '';
     }
 
@@ -150,8 +148,7 @@ abstract class Constraint implements Countable, SelfDescribing
      *
      * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function failureDescription($other)
-    {
+    protected function failureDescription($other) {
         return $this->exporter()->export($other) . ' ' . $this->toString();
     }
 
@@ -170,8 +167,7 @@ abstract class Constraint implements Countable, SelfDescribing
      * @param Operator $operator the $operator of the expression
      * @param mixed    $role     role of $this constraint in the $operator expression
      */
-    protected function toStringInContext(Operator $operator, $role)
-    {
+    protected function toStringInContext(Operator $operator, $role) {
         return '';
     }
 
@@ -191,8 +187,7 @@ abstract class Constraint implements Countable, SelfDescribing
      * @param mixed    $role     role of $this constraint in the $operator expression
      * @param mixed    $other    evaluated value or object
      */
-    protected function failureDescriptionInContext(Operator $operator, $role, $other)
-    {
+    protected function failureDescriptionInContext(Operator $operator, $role, $other) {
         $string = $this->toStringInContext($operator, $role);
 
         if ($string === '') {
@@ -262,8 +257,7 @@ abstract class Constraint implements Countable, SelfDescribing
      *      LogicalNot
      *      + IsTrue
      */
-    protected function reduce()
-    {
+    protected function reduce() {
         return $this;
     }
 }

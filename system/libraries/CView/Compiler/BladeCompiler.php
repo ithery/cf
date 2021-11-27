@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of BladeCompiler
+ * Description of BladeCompiler.
  *
  * @author Hery
  */
@@ -17,8 +17,8 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
         CView_Compiler_BladeCompiler_CompileLoopTrait,
         CView_Compiler_BladeCompiler_CompileIncludeTrait,
         CView_Compiler_BladeCompiler_CompileInjectionTrait,
+        CView_Compiler_BladeCompiler_CompileJsonTrait,
         CView_Compiler_BladeCompiler_CompileStackTrait;
-
     /*
       use Concerns\CompilesAuthorizations,
       Concerns\CompilesComments,
@@ -159,13 +159,14 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
     /**
      * Compile the view at the given path.
      *
-     * @param string|null $path
+     * @param null|string $path
      *
      * @return void
      */
@@ -473,7 +474,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
      * Call the given directive with the given value.
      *
      * @param string      $name
-     * @param string|null $value
+     * @param null|string $value
      *
      * @return string
      */
@@ -564,7 +565,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
      * Register a class-based component alias directive.
      *
      * @param string      $class
-     * @param string|null $alias
+     * @param null|string $alias
      * @param string      $prefix
      *
      * @return void
@@ -639,7 +640,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
      * Register a component alias directive.
      *
      * @param string      $path
-     * @param string|null $alias
+     * @param null|string $alias
      *
      * @return void
      */
@@ -659,7 +660,7 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
      * Register an include alias directive.
      *
      * @param string      $path
-     * @param string|null $alias
+     * @param null|string $alias
      *
      * @return void
      */
@@ -679,9 +680,9 @@ class CView_Compiler_BladeCompiler extends CView_CompilerAbstract implements CVi
      * @param string   $name
      * @param callable $handler
      *
-     * @return void
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     public function directive($name, callable $handler) {
         if (!preg_match('/^\w+(?:::\w+)?$/x', $name)) {

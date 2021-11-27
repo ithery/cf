@@ -1,22 +1,29 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since May 2, 2019, 2:34:07 AM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since May 2, 2019, 2:34:07 AM
  */
 class CImage_File {
-
-    /** @var string */
+    /**
+     * @var string
+     */
     protected $pathToImage;
 
-    /** @var \Spatie\Image\Manipulations */
+    /**
+     * @var \CImage_Manipulations
+     */
     protected $manipulations;
+
     protected $imageDriver = 'gd';
 
-    /** @var string|null */
+    /**
+     * @var null|string
+     */
     protected $temporaryDirectory = null;
 
     /**
@@ -30,34 +37,36 @@ class CImage_File {
 
     public function setTemporaryDirectory($tempDir) {
         $this->temporaryDirectory = $tempDir;
+
         return $this;
     }
 
     public function __construct($pathToImage) {
         $this->pathToImage = $pathToImage;
-        $this->manipulations = new Manipulations();
+        $this->manipulations = new CImage_Manipulations();
     }
 
     /**
      * @param string $imageDriver
      *
-     * @return $this
+     * @throws CImage_Exception_InvalidImageDriverException
      *
-     * @throws InvalidImageDriver
+     * @return $this
      */
     public function useImageDriver($imageDriver) {
         if (!in_array($imageDriver, ['gd', 'imagick'])) {
-            throw InvalidImageDriver::driver($imageDriver);
+            throw CImage_Exception_InvalidImageDriverException::driver($imageDriver);
         }
         $this->imageDriver = $imageDriver;
-        InterventionImage::configure([
+        \Intervention\Image\Facades\Image::configure([
             'driver' => $this->imageDriver,
         ]);
+
         return $this;
     }
 
     /**
-     * @param callable|$manipulations
+     * @param callable|CImage_Manipulations $manipulations
      *
      * @return $this
      */
@@ -65,9 +74,10 @@ class CImage_File {
         if (is_callable($manipulations)) {
             $manipulations($this->manipulations);
         }
-        if ($manipulations instanceof Manipulations) {
+        if ($manipulations instanceof CImage_Manipulations) {
             $this->manipulations->mergeManipulations($manipulations);
         }
+
         return $this;
     }
 
@@ -76,15 +86,16 @@ class CImage_File {
             throw new BadMethodCallException("Manipulation `{$name}` does not exist");
         }
         $this->manipulations->$name(...$arguments);
+
         return $this;
     }
 
     public function getWidth() {
-        return InterventionImage::make($this->pathToImage)->width();
+        return \Intervention\Image\Facades\Image::make($this->pathToImage)->width();
     }
 
     public function getHeight() {
-        return InterventionImage::make($this->pathToImage)->height();
+        return \Intervention\Image\Facades\Image::make($this->pathToImage)->height();
     }
 
     public function getManipulationSequence() {
@@ -96,7 +107,7 @@ class CImage_File {
             $outputPath = $this->pathToImage;
         }
         $this->addFormatManipulation($outputPath);
-        $glideConversion = GlideConversion::create($this->pathToImage)->useImageDriver($this->imageDriver);
+        $glideConversion = CImage_GlideConversion::create($this->pathToImage)->useImageDriver($this->imageDriver);
         if (!is_null($this->temporaryDirectory)) {
             $glideConversion->setTemporaryDirectory($this->temporaryDirectory);
         }
@@ -114,10 +125,10 @@ class CImage_File {
     }
 
     protected function performOptimization($path, array $optimizerChainConfiguration) {
-        $optimizerChain = OptimizerChainFactory::create();
+        $optimizerChain = CImage_OptimizerChainFactory::create();
         if (count($optimizerChainConfiguration)) {
             $optimizers = array_map(function (array $optimizerOptions, $optimizerClassName) {
-                return (new $optimizerClassName)->setOptions($optimizerOptions);
+                return (new $optimizerClassName())->setOptions($optimizerOptions);
             }, $optimizerChainConfiguration, array_keys($optimizerChainConfiguration));
             $optimizerChain->setOptimizers($optimizers);
         }
@@ -138,5 +149,4 @@ class CImage_File {
             $this->manipulations->format($outputExtension);
         }
     }
-
 }

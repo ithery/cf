@@ -19,6 +19,7 @@ return [
         ],
         'file' => [
             'driver' => 'file',
+            'disk' => 'local-temp',
             'path' => DOCROOT . 'temp' . DS . 'cache',
         ],
         'memcached' => [

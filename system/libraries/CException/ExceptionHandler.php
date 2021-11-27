@@ -13,13 +13,13 @@ use Symfony\Component\ErrorHandler\ErrorRenderer\HtmlErrorRenderer;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpFoundation\Exception\SuspiciousOperationException;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
-use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface as ExceptionHttpExceptionInterface;
 
 /**
  * @author Hery Kurniawans
  */
 class CException_ExceptionHandler implements CException_ExceptionHandlerInterface {
     use CTrait_ReflectsClosureTrait;
+
     /**
      * The container implementation.
      *
@@ -54,14 +54,14 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      * @var array
      */
     protected $internalDontReport = [
-        //AuthenticationException::class,
-        //AuthorizationException::class,
+        CAuth_Exception_AuthenticationException::class,
+        CAuth_Exception_AuthorizationException::class,
         HttpException::class,
         CHTTP_Exception_ResponseException::class,
         CModel_Exception_ModelNotFound::class,
         //SuspiciousOperationException::class,
         //TokenMismatchException::class,
-        //ValidationException::class,
+        CValidation_Exception::class,
     ];
 
     /**
@@ -181,7 +181,9 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
             return $e->toResponse($request);
         }
 
-        if ($this->isHttpException($e)) {
+        $e = $this->prepareException($e);
+
+        if ($e instanceof HttpExceptionInterface) {
             if ($e instanceof CHTTP_Exception_RedirectHttpException) {
                 return c::redirect($e->getUri(), $e->getStatusCode());
             }
@@ -197,8 +199,6 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
                 }
             }
         }
-
-        $e = $this->prepareException($e);
 
         foreach ($this->renderCallbacks as $renderCallback) {
             if (is_a($e, $this->firstClosureParameterType($renderCallback))) {
@@ -232,13 +232,13 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
      */
     protected function prepareException($e) {
         if ($e instanceof CModel_Exception_ModelNotFound) {
-            $e = new CHTTP_Exception_NotFoundHttpException($e->getMessage(), $e);
+            $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof CAuth_Exception_AuthorizationException) {
             $e = new AccessDeniedHttpException($e->getMessage(), $e);
         } elseif ($e instanceof CSession_Exception_TokenMismatchException) {
             $e = new CHTTP_Exception_HttpException(419, $e->getMessage(), $e);
         } elseif ($e instanceof SuspiciousOperationException) {
-            $e = new CHTTP_Exception_NotFoundHttpException('Bad hostname provided.', $e);
+            $e = new NotFoundHttpException('Bad hostname provided.', $e);
         }
 
         return $e;
@@ -354,9 +354,28 @@ class CException_ExceptionHandler implements CException_ExceptionHandlerInterfac
     protected function renderExceptionContent($e) {
         try {
             return CException_LegacyExceptionHandler::getContent($e);
+            if (CF::isProduction()) {
+                return CException_LegacyExceptionHandler::getContent($e);
+            }
+
+            $exceptionRenderer = new CException_Renderer_ExceptionRenderer();
+
+            return $exceptionRenderer->render($e);
             //return $this->isDebug() && class_exists(Whoops::class) ? $this->renderExceptionWithWhoops($e) : $this->renderExceptionWithSymfony($e, $this->isDebug());
             //return $this->renderExceptionWithSymfony($e, false);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
+            return $this->renderExceptionWithLegacy($e);
+        } catch (\Exception $e) {
+            return $this->renderExceptionWithLegacy($e);
+        }
+    }
+
+    protected function renderExceptionWithLegacy($e) {
+        try {
+            return CException_LegacyExceptionHandler::getContent($e);
+        } catch (\Throwable $e) {
+            return $this->renderExceptionWithSymfony($e, $this->isDebug());
+        } catch (\Exception $e) {
             return $this->renderExceptionWithSymfony($e, $this->isDebug());
         }
     }

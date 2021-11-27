@@ -76,81 +76,82 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
             }
             foreach ($table->columns as $col) {
                 $col_found = false;
-                $new_v = '';
+                $newValue = '';
                 if ($row instanceof CModel) {
                     $fieldName = $col->getFieldname();
                     if (strpos($fieldName, '.') !== false) {
                         $fields = explode('.', $fieldName);
-                        $col_v = $row;
+                        $colValue = $row;
 
                         foreach ($fields as $field) {
-                            $col_v = (new COptional($col_v))->{$field};
+                            $colValue = c::optional($colValue)->$field;
                         }
                     } else {
-                        $col_v = $row->{$col->getFieldname()};
+                        $colValue = $row->{$col->getFieldname()};
                     }
                 } else {
-                    $col_v = carr::get($row, $col->getFieldname());
+                    $colValue = carr::get($row, $col->getFieldname());
                 }
 
-                $ori_v = $col_v;
+                $ori_v = $colValue;
                 //do transform
                 foreach ($col->transforms as $trans) {
-                    $col_v = $trans->execute($col_v);
+                    $colValue = $trans->execute($colValue);
                 }
 
                 //if formatted
                 if (strlen($col->getFormat()) > 0) {
-                    $temp_v = $col->getFormat();
+                    $tempValue = $col->getFormat();
                     foreach ($row as $k2 => $v2) {
-                        if (strpos($temp_v, '{' . $k2 . '}') !== false) {
-                            $temp_v = str_replace('{' . $k2 . '}', $v2, $temp_v);
+                        if (strpos($tempValue, '{' . $k2 . '}') !== false) {
+                            $tempValue = str_replace('{' . $k2 . '}', $v2, $tempValue);
                         }
-                        $col_v = $temp_v;
+                        $colValue = $tempValue;
                     }
                 }
                 //if have callback
                 if ($col->callback != null) {
-                    $col_v = CFunction::factory($col->callback)
+                    $colValue = CFunction::factory($col->callback)
                             //->addArg($table)
-                            ->addArg($row)
-                            ->addArg($col_v)
-                            ->setRequire($col->callbackRequire)
-                            ->execute();
-                    if (is_array($col_v) && isset($col_v['html']) && isset($col_v['js'])) {
-                        $js .= $col_v['js'];
-                        $col_v = $col_v['html'];
-                    }
+                        ->addArg($row)
+                        ->addArg($colValue)
+                        ->setRequire($col->callbackRequire)
+                        ->execute();
+                    list($colValue, $jsCell) = $this->getHtmlJsCell($colValue);
+                    $js .= $jsCell;
                 }
-                $new_v = $col_v;
+                $newValue = $colValue;
 
                 if (($table->cellCallbackFunc) != null) {
-                    $new_v = CFunction::factory($table->cellCallbackFunc)
-                            ->addArg($table)
-                            ->addArg($col->getFieldname())
-                            ->addArg($row)
-                            ->addArg($new_v)
-                            ->setRequire($table->requires)
-                            ->execute();
+                    $newValue = CFunction::factory($table->cellCallbackFunc)
+                        ->addArg($table)
+                        ->addArg($col->getFieldname())
+                        ->addArg($row)
+                        ->addArg($newValue)
+                        ->setRequire($table->requires)
+                        ->execute();
 
-                    if (is_array($new_v) && isset($new_v['html']) && isset($new_v['js'])) {
-                        $js .= $new_v['js'];
-                        $new_v = $new_v['html'];
+                    if (is_array($newValue) && isset($newValue['html'], $newValue['js'])) {
+                        $js .= $newValue['js'];
+                        $newValue = $newValue['html'];
                     }
                 }
-                $class = '';
+                $class = $col->getClassAttribute();
                 switch ($col->getAlign()) {
                     case CConstant::ALIGN_LEFT:
                         $class .= ' align-left';
+
                         break;
                     case CConstant::ALIGN_RIGHT:
                         $class .= ' align-right';
+
                         break;
                     case CConstant::ALIGN_CENTER:
                         $class .= ' align-center';
+
                         break;
                 }
-                $arr[] = $new_v;
+                $arr[] = $newValue;
             }
             if ($table->getActionLocation() == 'last') {
                 if ($rowActionList != null && $rowActionList->childCount() > 0) {
@@ -161,6 +162,28 @@ trait CAjax_Engine_DataTable_Trait_ProcessorTrait {
             $arr['DT_RowId'] = $key;
             $aaData[] = $arr;
         }
+
         return $aaData;
+    }
+
+    protected function getHtmlJsCell($cell) {
+        $html = '';
+        $js = '';
+
+        if (is_string($cell)) {
+            $html = $cell;
+        }
+
+        if ($cell instanceof CRenderable) {
+            $html = $cell->html();
+            $js = $cell->js();
+        }
+
+        if (carr::accessible($cell)) {
+            $html = carr::get($cell, 'html');
+            $js = carr::get($cell, 'js');
+        }
+
+        return [$html, $js];
     }
 }

@@ -423,6 +423,10 @@ trait CApp_Trait_BaseTrait {
         return $pos !== false;
     }
 
+    public static function isProduction() {
+        return CF::isProduction();
+    }
+
     public static function isLogin() {
         return static::userId() != null;
     }

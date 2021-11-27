@@ -22,7 +22,7 @@ class CApp_Log_Activity {
         $controller = CFRouter::$controller;
         $method = CFRouter::$method;
 
-        if (!$nav) {
+        if ($nav) {
             $navName = $nav['name'];
             $navLabel = $nav['label'];
             if (isset($nav['action'])) {
@@ -50,8 +50,8 @@ class CApp_Log_Activity {
             'user_id' => $userId,
             'uri' => CFRouter::getCompleteUri(),
             'routed_uri' => crouter::routed_uri(),
-            'controller' => crouter::controller(),
-            'method' => crouter::method(),
+            'controller' => CFRouter::getController(),
+            'method' => CFRouter::getControllerMethod(),
             'query_string' => crouter::query_string(),
             'nav' => $navName,
             'nav_label' => $navLabel,

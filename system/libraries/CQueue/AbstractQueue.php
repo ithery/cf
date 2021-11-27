@@ -64,7 +64,7 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
      *
      * @param array       $jobs
      * @param mixed       $data
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return void
      */
@@ -81,17 +81,18 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
      * @param string        $queue
      * @param mixed         $data
      *
-     * @return string
+     * @throws \CQueue_Exception_InvalidPayloadException
      *
-     * @throws \Illuminate\Queue\InvalidPayloadException
+     * @return string
      */
     protected function createPayload($job, $queue, $data = '') {
         $payload = json_encode($this->createPayloadArray($job, $queue, $data));
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new InvalidPayloadException(
+            throw new CQueue_Exception_InvalidPayloadException(
                 'Unable to JSON encode payload. Error code: ' . json_last_error()
             );
         }
+
         return $payload;
     }
 
@@ -129,6 +130,7 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
                 'command' => $job,
             ],
         ]);
+
         return array_merge($payload, [
             'data' => [
                 'commandName' => get_class($job),
@@ -160,6 +162,7 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
             return;
         }
         $delay = isset($job->retryAfter) ? $job->retryAfter : $job->retryAfter();
+
         return $delay instanceof DateTimeInterface ? $this->secondsUntil($delay) : $delay;
     }
 
@@ -175,6 +178,7 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
             return;
         }
         $expiration = isset($job->timeoutAt) ? $job->timeoutAt : $job->retryUntil();
+
         return $expiration instanceof DateTimeInterface ? $expiration->getTimestamp() : $expiration;
     }
 
@@ -232,7 +236,70 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
                 ));
             }
         }
+
         return $payload;
+    }
+
+    /**
+     * Enqueue a job using the given callback.
+     *
+     * @param \Closure|string|object                    $job
+     * @param string                                    $payload
+     * @param string                                    $queue
+     * @param null|\DateTimeInterface|\DateInterval|int $delay
+     * @param callable                                  $callback
+     *
+     * @return mixed
+     */
+    protected function enqueueUsing($job, $payload, $queue, $delay, $callback) {
+        if ($this->shouldDispatchAfterCommit($job)
+            && $this->container->bound('db.transactions')
+        ) {
+            return $this->container->make('db.transactions')->addCallback(
+                function () use ($payload, $queue, $delay, $callback, $job) {
+                    return c::tap($callback($payload, $queue, $delay), function ($jobId) use ($job) {
+                        $this->raiseJobQueuedEvent($jobId, $job);
+                    });
+                }
+            );
+        }
+
+        return c::tap($callback($payload, $queue, $delay), function ($jobId) use ($job) {
+            $this->raiseJobQueuedEvent($jobId, $job);
+        });
+    }
+
+    /**
+     * Determine if the job should be dispatched after all database transactions have committed.
+     *
+     * @param \Closure|string|object $job
+     *
+     * @return bool
+     */
+    protected function shouldDispatchAfterCommit($job) {
+        if (is_object($job) && isset($job->afterCommit)) {
+            return $job->afterCommit;
+        }
+
+        if (isset($this->dispatchAfterCommit)) {
+            return $this->dispatchAfterCommit;
+        }
+
+        return false;
+    }
+
+    /**
+     * Raise the job queued event.
+     *
+     * @param null|string|int        $jobId
+     * @param \Closure|string|object $job
+     *
+     * @return void
+     */
+    protected function raiseJobQueuedEvent($jobId, $job) {
+        if ($this->container->bound('events')) {
+            $this->container['events']->dispatch(new CQueue_Event_JobQueued($this->connectionName, $jobId, $job));
+        }
     }
 
     /**
@@ -253,6 +320,7 @@ abstract class CQueue_AbstractQueue implements CQueue_QueueInterface {
      */
     public function setConnectionName($name) {
         $this->connectionName = $name;
+
         return $this;
     }
 

@@ -10,12 +10,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CTemporary_File {
     /**
-     * @var CTemp_Directory
+     * @var CTemporary_Directory
      */
     protected $directory;
 
     /**
-     * @var CTemp_PathAbstract
+     * @var CTemporary_PathAbstract
      */
     protected $pathEngine;
 

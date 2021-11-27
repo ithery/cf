@@ -7,26 +7,27 @@ class CExporter_Storage {
     private static $instance;
 
     /**
+     * @var CStorage
+     */
+    private $storage;
+
+    /**
      * @return CExporter_Storage
      */
     public static function instance() {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
-
-    /**
-     * @var CStorage
-     */
-    private $storage;
 
     public function __construct() {
         $this->storage = CStorage::instance();
     }
 
     /**
-     * @param string|null $disk
+     * @param null|string $disk
      * @param array       $diskOptions
      *
      * @return CExporter_Disk

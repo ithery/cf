@@ -19,5 +19,7 @@ import Cresenity from './Cresenity';
 window.Cresenity = Cresenity;
 if (!window.cresenity) {
     window.cresenity = new Cresenity();
-    window.cresenity.init();
 }
+window.document.addEventListener('DOMContentLoaded', function () {
+    window.cresenity.init();
+});

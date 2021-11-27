@@ -43,6 +43,19 @@ class carr {
     }
 
     /**
+     * Determines if an array is a list.
+     *
+     * An array is a "list" if all array keys are sequential integers starting from 0 with no gaps in between.
+     *
+     * @param array $array
+     *
+     * @return bool
+     */
+    public static function isList($array) {
+        return !self::isAssoc($array);
+    }
+
+    /**
      * Alias of isAssoc.
      *
      * @param array $value array to check
@@ -110,11 +123,6 @@ class carr {
      * @return mixed
      */
     public static function get($array, $key, $default = null) {
-        if ($array instanceof ArrayObject) {
-            // This is a workaround for inconsistent implementation of isset between PHP and HHVM
-            // See https://github.com/facebook/hhvm/issues/3437
-            return $array->offsetExists($key) ? $array->offsetGet($key) : $default;
-        }
         if (!static::accessible($array)) {
             return c::value($default);
         }
@@ -773,7 +781,11 @@ class carr {
      * @return array
      */
     public static function wrap($value) {
-        return !is_array($value) ? [$value] : $value;
+        if (is_null($value)) {
+            return [];
+        }
+
+        return is_array($value) ? $value : [$value];
     }
 
     /**
@@ -791,6 +803,29 @@ class carr {
         }
 
         return $array;
+    }
+
+    /**
+     * Conditionally compile classes from an array into a CSS class list.
+     *
+     * @param array $array
+     *
+     * @return string
+     */
+    public static function toCssClasses($array) {
+        $classList = static::wrap($array);
+
+        $classes = [];
+
+        foreach ($classList as $class => $constraint) {
+            if (is_numeric($class)) {
+                $classes[] = $constraint;
+            } elseif ($constraint) {
+                $classes[] = $class;
+            }
+        }
+
+        return implode(' ', $classes);
     }
 
     /**
@@ -886,6 +921,9 @@ class carr {
      * @return bool
      */
     public static function exists($array, $key) {
+        if ($array instanceof CInterface_Enumerable || $array instanceof CCollection) {
+            return $array->has($key);
+        }
         if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
         }
@@ -1047,6 +1085,38 @@ class carr {
     }
 
     /**
+     * Determine if any of the keys exist in an array using "dot" notation.
+     *
+     * @param \ArrayAccess|array $array
+     * @param string|array       $keys
+     *
+     * @return bool
+     */
+    public static function hasAny($array, $keys) {
+        if (is_null($keys)) {
+            return false;
+        }
+
+        $keys = (array) $keys;
+
+        if (!$array) {
+            return false;
+        }
+
+        if ($keys === []) {
+            return false;
+        }
+
+        foreach ($keys as $key) {
+            if (static::has($array, $key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Flatten a multi-dimensional associative array with dots.
      *
      * @param array  $array
@@ -1063,6 +1133,23 @@ class carr {
             } else {
                 $results[$prepend . $key] = $value;
             }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Convert a flatten "dot" notation array into an expanded array.
+     *
+     * @param iterable $array
+     *
+     * @return array
+     */
+    public static function undot($array) {
+        $results = [];
+
+        foreach ($array as $key => $value) {
+            static::set($results, $key, $value);
         }
 
         return $results;
@@ -1381,7 +1468,7 @@ class carr {
      * // => 2
      * </code>
      */
-    public function findLastIndex(array $array, $predicate, $fromIndex = null) {
+    public static function findLastIndex(array $array, $predicate, $fromIndex = null) {
         $length = \count($array);
         $index = $fromIndex !== null ? $fromIndex : $length - 1;
         if ($index < 0) {
@@ -1578,7 +1665,7 @@ class carr {
      * @return array
      */
     public static function prepend($array, $value, $key = null) {
-        if (is_null($key)) {
+        if (func_num_args() == 2) {
             array_unshift($array, $value);
         } else {
             $array = [$key => $value] + $array;

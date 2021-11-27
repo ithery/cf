@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 use Symfony\Component\VarDumper\VarDumper;
 
-class CBase_String {
+class CBase_String implements Stringable {
     use CTrait_Macroable;
 
     /**
@@ -319,13 +319,13 @@ class CBase_String {
      *
      * @param string $pattern
      *
-     * @return static|null
+     * @return null|static
      */
     public function match($pattern) {
         preg_match($pattern, $this->value, $matches);
 
         if (!$matches) {
-            return new static;
+            return new static();
         }
 
         return new static(isset($matches[1]) ? $matches[1] : $matches[0]);
@@ -387,7 +387,7 @@ class CBase_String {
     /**
      * Parse a Class@method style callback into class and method.
      *
-     * @param string|null $default
+     * @param null|string $default
      *
      * @return array
      */
@@ -535,7 +535,7 @@ class CBase_String {
      * Generate a URL friendly "slug" from a given string.
      *
      * @param string      $separator
-     * @param string|null $language
+     * @param null|string $language
      *
      * @return static
      */
@@ -578,7 +578,7 @@ class CBase_String {
      * Returns the portion of string specified by the start and length parameters.
      *
      * @param int      $start
-     * @param int|null $length
+     * @param null|int $length
      *
      * @return static
      */
@@ -590,8 +590,8 @@ class CBase_String {
      * Returns the number of substring occurrences.
      *
      * @param string   $needle
-     * @param int|null $offset
-     * @param int|null $length
+     * @param null|int $offset
+     * @param null|int $length
      *
      * @return int
      */
@@ -646,7 +646,7 @@ class CBase_String {
      *
      * @param mixed         $value
      * @param callable      $callback
-     * @param callable|null $default
+     * @param null|callable $default
      *
      * @return mixed|$this
      */

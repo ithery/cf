@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of DnsMasq
+ * Description of DnsMasq.
  *
  * @author Hery
  */

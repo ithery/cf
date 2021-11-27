@@ -1,22 +1,22 @@
 <?php
 
-defined('SYSPATH') OR die('No direct access allowed.');
+defined('SYSPATH') or die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan
- * @since Jun 15, 2018, 1:48:09 PM
  * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jun 15, 2018, 1:48:09 PM
  */
 abstract class CServer_System_OS implements CServer_System_OSInterface {
-
     /**
      * @var CServer_System_Info
      */
     protected $info;
+
     protected $system;
 
     /**
-     * 
      * @param CServer_System_Info $info
      */
     public function __construct(CServer_System $system, CServer_System_Info $info) {
@@ -25,7 +25,7 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
     }
 
     /**
-     * IP of the Host
+     * IP of the Host.
      *
      * @return void
      */
@@ -33,7 +33,8 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
         $cmd = $this->createCommand();
         if (CServer::config()->isUseVHost()) {
             if (($cmd->readEnv('SERVER_ADDR', $result) || $cmd->readEnv('LOCAL_ADDR', $result)) //is server address defined
-                    && !strstr($result, '.') && strstr($result, ':')) { //is IPv6, quick version of preg_match('/\(([[0-9A-Fa-f\:]+)\)/', $result)
+                && !strstr($result, '.') && strstr($result, ':')
+            ) { //is IPv6, quick version of preg_match('/\(([[0-9A-Fa-f\:]+)\)/', $result)
                 $dnsrec = dns_get_record($this->info->getHostname(), DNS_AAAA);
                 if (isset($dnsrec[0]['ipv6'])) { //is DNS IPv6 record
                     $this->info->setIp($dnsrec[0]['ipv6']); //from DNS (avoid IPv6 NAT translation)
@@ -53,7 +54,7 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
     }
 
     /**
-     * Number of Users
+     * Number of Users.
      *
      * @return void
      */
@@ -71,11 +72,11 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
             $processlist = glob('/proc/*/cmdline', GLOB_NOSORT);
             if (is_array($processlist) && (($total = count($processlist)) > 0)) {
                 $count = 0;
-                $buf = "";
+                $buf = '';
                 for ($i = 0; $i < $total; $i++) {
                     if ($cmd->rfts($processlist[$i], $buf, 0, 4096, false)) {
                         $name = str_replace(chr(0), ' ', trim($buf));
-                        if (preg_match("/^-/", $name)) {
+                        if (preg_match('/^-/', $name)) {
                             $count++;
                         }
                     }
@@ -90,5 +91,4 @@ abstract class CServer_System_OS implements CServer_System_OSInterface {
     public function createCommand() {
         return CServer::command($this->system->getSSHConfig());
     }
-
 }

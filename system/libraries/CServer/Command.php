@@ -11,8 +11,6 @@ defined('SYSPATH') or die('No direct access allowed.');
 class CServer_Command extends CServer_Base {
     protected static $instance = [];
 
-    const IS_DEBUG = false;
-
     public function __construct($sshConfig = null) {
         $this->sshConfig = $sshConfig;
         $this->host = carr::get($sshConfig, 'host');
@@ -30,11 +28,12 @@ class CServer_Command extends CServer_Base {
         if (!isset(self::$instance[$host])) {
             self::$instance[$host] = new CServer_Command($sshConfig);
         }
+
         return self::$instance[$host];
     }
 
     /**
-     * Get the content of stdout/stderr with the option to set a timeout for reading
+     * Get the content of stdout/stderr with the option to set a timeout for reading.
      *
      * @param array  $pipes   array of file pointers for stdin, stdout, stderr (proc_open())
      * @param string &$out    target string for the output message (reference)
@@ -48,7 +47,7 @@ class CServer_Command extends CServer_Base {
         $e = null;
         $te = false;
 
-        if (defined('PSI_MODE_POPEN') && PSI_MODE_POPEN === true) {
+        if (CServer::config()->isModePopen()) {
             $pipe2 = false;
         } else {
             $pipe2 = true;
@@ -64,10 +63,12 @@ class CServer_Command extends CServer_Base {
 
             if ($n === false) {
                 error_log('stream_select: failed !');
+
                 break;
             } elseif ($n === 0) {
                 error_log('stream_select: timeout expired !');
                 $te = true;
+
                 break;
             }
 
@@ -85,13 +86,13 @@ class CServer_Command extends CServer_Base {
 
     /**
      * Find a system program, do also path checking when not running on WINNT
-     * on WINNT we simply return the name with the exe extension to the program name
+     * on WINNT we simply return the name with the exe extension to the program name.
      *
      * @param string $strProgram name of the program
      *
-     * @return string|null complete path and name of the program
+     * @return null|string complete path and name of the program
      */
-    private function findProgram($strProgram) {
+    private static function findProgram($strProgram) {
         $path_parts = pathinfo($strProgram);
         if (empty($path_parts['basename'])) {
             return null;
@@ -104,22 +105,22 @@ class CServer_Command extends CServer_Base {
                 $path_parts = pathinfo($strProgram);
             }
             if (CServer::getOS() == 'WINNT') {
-                if ($this->readEnv('Path', $serverpath)) {
+                if (static::readEnv('Path', $serverpath)) {
                     $arrPath = preg_split('/;/', $serverpath, -1, PREG_SPLIT_NO_EMPTY);
                 }
             } else {
-                if ($this->readEnv('PATH', $serverpath)) {
+                if (static::readEnv('PATH', $serverpath)) {
                     $arrPath = preg_split('/:/', $serverpath, -1, PREG_SPLIT_NO_EMPTY);
                 }
             }
-            if (defined('PSI_UNAMEO') && (PSI_UNAMEO === 'Android') && !empty($arrPath)) {
+            if ((CServer::config()->getUnameo() === 'Android') && !empty($arrPath)) {
                 array_push($arrPath, '/system/bin'); // Termux patch
             }
-            if (defined('PSI_ADD_PATHS') && is_string(PSI_ADD_PATHS)) {
-                if (preg_match(ARRAY_EXP, PSI_ADD_PATHS)) {
-                    $arrPath = array_merge(eval(PSI_ADD_PATHS), $arrPath); // In this order so $addpaths is before $arrPath when looking for a program
+            if (is_string(CServer::config()->getAddPaths())) {
+                if (preg_match(CServer::ARRAY_EXP, CServer::config()->getAddPaths())) {
+                    $arrPath = array_merge(eval(CServer::config()->getAddPaths()), $arrPath); // In this order so $addpaths is before $arrPath when looking for a program
                 } else {
-                    $arrPath = array_merge([PSI_ADD_PATHS], $arrPath); // In this order so $addpaths is before $arrPath when looking for a program
+                    $arrPath = array_merge([CServer::config()->getAddPaths()], $arrPath); // In this order so $addpaths is before $arrPath when looking for a program
                 }
             }
         } else { //directory defined
@@ -137,7 +138,7 @@ class CServer_Command extends CServer_Base {
         }
 
         $exceptPath = '';
-        if ((CServer::getOS() == 'WINNT') && $this->readEnv('WinDir', $windir)) {
+        if ((CServer::getOS() == 'WINNT') && static::readEnv('WinDir', $windir)) {
             foreach ($arrPath as $strPath) {
                 if ((strtolower($strPath) == $windir . '\\system32') && is_dir($windir . '\\SysWOW64')) {
                     if (is_dir($windir . '\\sysnative')) {
@@ -146,6 +147,7 @@ class CServer_Command extends CServer_Base {
                         $exceptPath = $windir . '\\SysWOW64'; //64-bit PHP on 64-bit Windows
                     }
                     array_push($arrPath, $exceptPath);
+
                     break;
                 }
             }
@@ -162,7 +164,7 @@ class CServer_Command extends CServer_Base {
                 $strPath = rtrim($strPath, '/');
                 $strPathS = $strPath . '/';
             }
-            if (($strPath !== $exceptPath) && !is_dir($strPath)) {
+            if (($strPath !== $exceptPath) && !@is_dir($strPath)) {
                 continue;
             }
             if (CServer::getOS() == 'WINNT') {
@@ -179,28 +181,29 @@ class CServer_Command extends CServer_Base {
     }
 
     /**
-     * File exists
+     * File exists.
      *
      * @param string $strFileName name of the file which should be check
      *
      * @return bool command successfull or not
      */
     public static function fileExists($strFileName) {
-        if (defined('PSI_LOG') && is_string(PSI_LOG) && (strlen(PSI_LOG) > 0) && ((substr(PSI_LOG, 0, 1) == '-') || (substr(PSI_LOG, 0, 1) == '+'))) {
-            $log_file = substr(PSI_LOG, 1);
+        $log = CServer::config()->getLog();
+        if ($log && is_string($log) && (strlen($log) > 0) && ((substr($log, 0, 1) == '-') || (substr($log, 0, 1) == '+'))) {
+            $log_file = substr($log, 1);
             if (file_exists($log_file) && ($contents = @file_get_contents($log_file)) && preg_match("/^\-\-\-[^-\n]+\-\-\- " . preg_quote('Reading: ' . $strFileName, '/') . "\n/m", $contents)) {
                 return true;
             } else {
-                if (substr(PSI_LOG, 0, 1) == '-') {
+                if (substr($log, 0, 1) == '-') {
                     return false;
                 }
             }
         }
 
-        $exists = file_exists($strFileName);
-        if (defined('PSI_LOG') && is_string(PSI_LOG) && (strlen(PSI_LOG) > 0) && (substr(PSI_LOG, 0, 1) != '-') && (substr(PSI_LOG, 0, 1) != '+')) {
+        $exists = @file_exists($strFileName);
+        if (is_string($log) && (strlen($log) > 0) && (substr($log, 0, 1) != '-') && (substr($log, 0, 1) != '+')) {
             if ((substr($strFileName, 0, 5) === '/dev/') && $exists) {
-                error_log('---' . gmdate('r T') . '--- Reading: ' . $strFileName . "\ndevice exists\n", 3, PSI_LOG);
+                error_log('---' . gmdate('r T') . '--- Reading: ' . $strFileName . "\ndevice exists\n", 3, $log);
             }
         }
 
@@ -208,14 +211,14 @@ class CServer_Command extends CServer_Base {
     }
 
     /**
-     * read data from array $_SERVER
+     * Read data from array $_SERVER.
      *
      * @param string $strElem    element of array
      * @param string &$strBuffer output of the command
      *
      * @return string
      */
-    public function readEnv($strElem, &$strBuffer) {
+    public static function readEnv($strElem, &$strBuffer) {
         $strBuffer = '';
         if (CServer::getOS() == 'WINNT') { //case insensitive
             if (isset($_SERVER)) {
@@ -239,7 +242,7 @@ class CServer_Command extends CServer_Base {
     }
 
     /**
-     * read a file and return the content as a string
+     * Read a file and return the content as a string.
      *
      * @param string $strFileName name of the file which should be read
      * @param string &$strRet     content of the file (reference)
@@ -250,6 +253,7 @@ class CServer_Command extends CServer_Base {
      * @return bool command successfull or not
      */
     public function rfts($strFileName, &$strRet, $intLines = 0, $intBytes = 4096, $booErrorRep = true) {
+        $log = CServer::config()->getLog();
         if ($this->sshConfig != null) {
             $ssh = CRemote::ssh($this->sshConfig);
             $output = '';
@@ -258,13 +262,14 @@ class CServer_Command extends CServer_Base {
             });
 
             $strRet = $output;
+
             return true;
         }
 
         $strFile = '';
         $intCurLine = 1;
         $error = CServer::error();
-        if (file_exists($strFileName)) {
+        if (@file_exists($strFileName)) {
             if (is_readable($strFileName)) {
                 if ($fd = fopen($strFileName, 'r')) {
                     while (!feof($fd)) {
@@ -277,11 +282,11 @@ class CServer_Command extends CServer_Base {
                     }
                     fclose($fd);
                     $strRet = $strFile;
-                    if (defined('PSI_LOG') && is_string(PSI_LOG) && (strlen(PSI_LOG) > 0) && (substr(PSI_LOG, 0, 1) != '-') && (substr(PSI_LOG, 0, 1) != '+')) {
+                    if (is_string($log) && (strlen($log) > 0) && (substr($log, 0, 1) != '-') && (substr($log, 0, 1) != '+')) {
                         if ((strlen($strRet) > 0) && (substr($strRet, -1) != "\n")) {
-                            error_log('---' . gmdate('r T') . '--- Reading: ' . $strFileName . "\n" . $strRet . "\n", 3, PSI_LOG);
+                            error_log('---' . gmdate('r T') . '--- Reading: ' . $strFileName . "\n" . $strRet . "\n", 3, $log);
                         } else {
-                            error_log('---' . gmdate('r T') . '--- Reading: ' . $strFileName . "\n" . $strRet, 3, PSI_LOG);
+                            error_log('---' . gmdate('r T') . '--- Reading: ' . $strFileName . "\n" . $strRet, 3, $log);
                         }
                     }
                 } else {
@@ -313,7 +318,7 @@ class CServer_Command extends CServer_Base {
      * Execute a system program. return a trim()'d result.
      * does very crude pipe checking.  you need ' | ' for it to work
      * ie $program = CommonFunctions::executeProgram('netstat', '-anp | grep LIST');
-     * NOT $program = CommonFunctions::executeProgram('netstat', '-anp|grep LIST');
+     * NOT $program = CommonFunctions::executeProgram('netstat', '-anp|grep LIST');.
      *
      * @param string $strProgramname name of the program
      * @param string $strArgs        arguments to the program
@@ -344,14 +349,14 @@ class CServer_Command extends CServer_Base {
             }
         }
 
-        if ((CServer::getOS() !== 'WINNT') && defined('PSI_SUDO_COMMANDS') && is_string(PSI_SUDO_COMMANDS)) {
-            if (preg_match(ARRAY_EXP, PSI_SUDO_COMMANDS)) {
-                $sudocommands = eval(PSI_SUDO_COMMANDS);
+        if ((CServer::getOS() !== 'WINNT') && is_string(CServer::config()->getSudoCommands())) {
+            if (preg_match(CSERVER::ARRAY_EXP, CServer::config()->getSudoCommands())) {
+                $sudocommands = eval(CServer::config()->getSudoCommands());
             } else {
-                $sudocommands = [PSI_SUDO_COMMANDS];
+                $sudocommands = [CServer::config()->getSudoCommands()];
             }
             if (in_array($strProgramname, $sudocommands)) {
-                $sudoProgram = self::_findProgram('sudo');
+                $sudoProgram = self::findProgram('sudo');
                 if (!$sudoProgram) {
                     if ($booErrorRep) {
                         $error->addError('find_program("sudo")', 'program not found on the machine');
@@ -374,7 +379,7 @@ class CServer_Command extends CServer_Base {
             for ($i = 0, $cnt_args = count($arrArgs); $i < $cnt_args; $i++) {
                 if ($arrArgs[$i] == '|') {
                     $strCmd = $arrArgs[$i + 1];
-                    $strNewcmd = self::_findProgram($strCmd);
+                    $strNewcmd = self::findProgram($strCmd);
                     $strArgs = preg_replace("/\| " . $strCmd . '/', '| "' . $strNewcmd . '"', $strArgs);
                 }
             }
@@ -385,11 +390,12 @@ class CServer_Command extends CServer_Base {
         $strError = '';
         $pipes = [];
         $descriptorspec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
+
         return $this->procOpen($cmd, $strBuffer, $strError, $booErrorRep, $timeout);
     }
 
     /**
-     * parsing the output of df command
+     * Parsing the output of df command.
      *
      * @param string $df_param   additional parameter for df command
      * @param bool   $get_inodes
@@ -398,7 +404,7 @@ class CServer_Command extends CServer_Base {
      */
     public function df($df_param = '', $get_inodes = true) {
         $arrResult = [];
-        if ($this->executeProgram('mount', '', $mount, CServer_Command::IS_DEBUG)) {
+        if ($this->executeProgram('mount', '', $mount, CServer::config()->isDebug())) {
             $mount = preg_split("/\n/", $mount, -1, PREG_SPLIT_NO_EMPTY);
             foreach ($mount as $mount_line) {
                 if (preg_match("/(\S+) on ([\S ]+) type (.*) \((.*)\)/", $mount_line, $mount_buf)) {
@@ -455,10 +461,10 @@ class CServer_Command extends CServer_Base {
                 }
             }
         }
-        if ($this->executeProgram('df', '-k ' . $df_param, $df, CServer_Command::IS_DEBUG) && ($df !== '')) {
+        if ($this->executeProgram('df', '-k ' . $df_param, $df, CServer::config()->isDebug()) && ($df !== '')) {
             $df = preg_split("/\n/", $df, -1, PREG_SPLIT_NO_EMPTY);
             if ($get_inodes && CServer_Storage::SHOW_INODES) {
-                if ($this->executeProgram('df', '-i ' . $df_param, $df2, CServer_Command::IS_DEBUG)) {
+                if ($this->executeProgram('df', '-i ' . $df_param, $df2, CServer::config()->isDebug())) {
                     $df2 = preg_split("/\n/", $df2, -1, PREG_SPLIT_NO_EMPTY);
                     // Store inode use% in an associative array (df_inodes) for later use
                     foreach ($df2 as $df2_line) {
@@ -524,6 +530,7 @@ class CServer_Command extends CServer_Base {
                                         }
                                     }
                                     $notwas = false;
+
                                     break;
                                 }
                             }
@@ -553,6 +560,7 @@ class CServer_Command extends CServer_Base {
                                             }
                                         }
                                         $notwas = false;
+
                                         break;
                                     }
                                 }
@@ -625,6 +633,7 @@ class CServer_Command extends CServer_Base {
     }
 
     public function procOpen($cmd, &$strBuffer, &$strError, $booErrorRep = true, $timeout = 30) {
+        $log = CServer::config()->getLog();
         $pipes = [];
         $process = null;
         $descriptorspec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
@@ -635,8 +644,8 @@ class CServer_Command extends CServer_Base {
                 $strBuffer .= $line;
             });
         } else {
-            if (defined('PSI_MODE_POPEN') && PSI_MODE_POPEN === true) {
-                if (PSI_OS == 'WINNT') {
+            if (CServer::config()->isModePopen()) {
+                if (CServer::getOS() == 'WINNT') {
                     $process = $pipes[1] = popen($cmd . ' 2>nul', 'r');
                 } else {
                     $process = $pipes[1] = popen($cmd . ' 2>/dev/null', 'r');
@@ -649,7 +658,7 @@ class CServer_Command extends CServer_Base {
             if (is_resource($process)) {
                 $te = $this->timeoutfgets($pipes, $strBuffer, $strError, $timeout);
 
-                if (defined('PSI_MODE_POPEN') && PSI_MODE_POPEN === true) {
+                if (CServer::config()->isModePopen()) {
                     $return_value = pclose($pipes[1]);
                 } else {
                     fclose($pipes[0]);
@@ -666,7 +675,7 @@ class CServer_Command extends CServer_Base {
                 }
             } else {
                 if ($booErrorRep) {
-                    $error->addError($cmd, "\nOpen process error");
+                    CServer::error()->addError($cmd, "\nOpen process error");
                 }
 
                 return false;
@@ -675,8 +684,8 @@ class CServer_Command extends CServer_Base {
 
         $strError = trim($strError);
         $strBuffer = trim($strBuffer);
-        if (defined('PSI_LOG') && is_string(PSI_LOG) && (strlen(PSI_LOG) > 0) && (substr(PSI_LOG, 0, 1) != '-') && (substr(PSI_LOG, 0, 1) != '+')) {
-            error_log('---' . gmdate('r T') . '--- Executing: ' . trim($strProgramname . $strArgs) . "\n" . $strBuffer . "\n", 3, PSI_LOG);
+        if (is_string($log) && (strlen($log) > 0) && (substr($log, 0, 1) != '-') && (substr($log, 0, 1) != '+')) {
+            error_log('---' . gmdate('r T') . '--- Executing: ' . trim($cmd) . "\n" . $strBuffer . "\n", 3, $log);
         }
 
         if (!empty($strError)) {
@@ -686,6 +695,7 @@ class CServer_Command extends CServer_Base {
 
             return $return_value == 0;
         }
+
         return true;
     }
 }
