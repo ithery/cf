@@ -85,7 +85,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
     /**
      * Set the join clause on the query.
      *
-     * @param CModel_Query|null $query
+     * @param null|CModel_Query $query
      *
      * @return void
      */
@@ -276,16 +276,16 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      *
      * @param array $columns
      *
-     * @return CModel|static
+     * @throws CModel_Exception_ModelNotFoundException
      *
-     * @throws CModel_Exception_ModelNotFound
+     * @return CModel|static
      */
     public function firstOrFail($columns = ['*']) {
         if (!is_null($model = $this->first($columns))) {
             return $model;
         }
 
-        throw (new CModel_Exception_ModelNotFound)->setModel(get_class($this->related));
+        throw (new CModel_Exception_ModelNotFoundException())->setModel(get_class($this->related));
     }
 
     /**
@@ -294,7 +294,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @param mixed $id
      * @param array $columns
      *
-     * @return \CModel|\CModel_Collection|null
+     * @return null|\CModel|\CModel_Collection
      */
     public function find($id, $columns = ['*']) {
         if (is_array($id) || $id instanceof CInterface_Arrayable) {
@@ -334,9 +334,9 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @param mixed $id
      * @param array $columns
      *
-     * @return \CModel|\CModel_Collection
+     * @throws \CModel_Exception_ModelNotFoundException
      *
-     * @throws \CModel_Exception_ModelNotFound
+     * @return \CModel|\CModel_Collection
      */
     public function findOrFail($id, $columns = ['*']) {
         $result = $this->find($id, $columns);
@@ -350,7 +350,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
             return $result;
         }
 
-        throw (new CModel_Exception_ModelNotFound)->setModel(get_class($this->related), $id);
+        throw (new CModel_Exception_ModelNotFoundException())->setModel(get_class($this->related), $id);
     }
 
     /**
@@ -408,7 +408,7 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      * @param int      $perPage
      * @param array    $columns
      * @param string   $pageName
-     * @param int|null $page
+     * @param null|int $page
      *
      * @return CPagination_Paginator
      */
@@ -450,8 +450,8 @@ class CModel_Relation_HasManyThrough extends CModel_Relation {
      *
      * @param int         $count
      * @param callable    $callback
-     * @param string|null $column
-     * @param string|null $alias
+     * @param null|string $column
+     * @param null|string $alias
      *
      * @return bool
      */

@@ -13,7 +13,7 @@ class CTracker_TaskQueue_TrackQueue extends CTracker_TaskQueueAbstract {
             CTracker::config()->setData($config);
             $tracker = new CTracker_Tracker();
             $tracker->track();
-        } catch (CModel_Exception_ModelNotFound $ex) {
+        } catch (CModel_Exception_ModelNotFoundException $ex) {
             $this->logDaemon('Ignore Error: ' . $ex->getMessage() . '');
         }
         $this->logDaemon('Processed Tracker Queue from ip:' . carr::get($data, 'request.clientIp'));

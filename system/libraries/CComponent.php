@@ -38,7 +38,7 @@ abstract class CComponent {
     }
 
     public function __invoke(CContainer_Container $container, CRouting_Route $route) {
-        $componentParams = (new ImplicitRouteBinding($container))
+        $componentParams = (new CComponent_ImplicitRouteBinding($container))
             ->resolveAllParameters($route, $this);
 
         $manager = CComponent_LifecycleManager::fromInitialInstance($this)
