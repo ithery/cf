@@ -101,6 +101,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
         foreach ($matches[1] as $value) {
             $outputJs .= $value;
         }
+
         return $outputJs;
     }
 
@@ -131,15 +132,16 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      *
      * @param $name
      *
-     * @return string
-     *
      * @throws \CJavascript_Validation_Exception_PropertyNotFoundException
+     *
+     * @return string
      */
     public function __get($name) {
         $data = $this->getTemplateData();
         if (!array_key_exists($name, $data)) {
             throw new CJavascript_Validation_Exception_PropertyNotFoundException($name, get_class());
         }
+
         return $data[$name];
     }
 
@@ -157,6 +159,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
         }
         $data['focus_on_error'] = $this->focusOnError;
         $data['animate_duration'] = $this->animateDuration;
+
         return $data;
     }
 
@@ -180,6 +183,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      */
     public function selector($selector) {
         $this->selector = is_null($selector) ? $this->selector : $selector;
+
         return $this;
     }
 
@@ -192,6 +196,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      */
     public function ignore($ignore) {
         $this->ignore = $ignore;
+
         return $this;
     }
 
@@ -204,6 +209,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      */
     public function template($template) {
         $this->view = is_null($template) ? $this->template : $template;
+
         return $this;
     }
 
@@ -216,6 +222,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      */
     public function remote($enabled = true) {
         $this->remote = $enabled;
+
         return $this;
     }
 
@@ -229,6 +236,7 @@ class CJavascript_Validation_ValidatorJavascript implements CInterface_Arrayable
      */
     public function sometimes($attribute, $rules) {
         $this->validator->sometimes($attribute, $rules);
+
         return $this;
     }
 }
