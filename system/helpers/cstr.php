@@ -179,7 +179,7 @@ class cstr {
         $result = array_shift($segments);
 
         foreach ($segments as $segment) {
-            $result .= (array_shift($replace) ?? $search) . $segment;
+            $result .= (array_shift($replace) ?: $search) . $segment;
         }
 
         return $result;
