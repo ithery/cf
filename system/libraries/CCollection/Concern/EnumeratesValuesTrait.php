@@ -962,23 +962,29 @@ trait CCollection_Concern_EnumeratesValuesTrait {
     /**
      * Get an operator checker callback.
      *
-     * @param string      $key
-     * @param null|string $operator
-     * @param mixed       $value
+     * @param string $key
+     *                    //@param null|string $operator
+     *                    //@param mixed       $value
      *
      * @return \Closure
      */
-    protected function operatorForWhere($key, $operator = null, $value = null) {
-        if (func_num_args() === 1 || $operator === null) {
+    protected function operatorForWhere($key) {
+        if (func_num_args() === 1) {
             $value = true;
 
             $operator = '=';
         }
 
-        if (func_num_args() === 2 || $value === null) {
+        if (func_num_args() === 2) {
+            $operator = carr::get(func_get_args(), 1);
+
             $value = $operator;
 
             $operator = '=';
+        }
+        if (func_num_args() === 3) {
+            $operator = carr::get(func_get_args(), 1);
+            $value = carr::get(func_get_args(), 2);
         }
 
         return function ($item) use ($key, $operator, $value) {
