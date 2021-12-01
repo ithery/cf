@@ -154,13 +154,13 @@ class CCollection implements ArrayAccess, CInterface_Enumerable, CBase_Contract_
      * Determine if an item exists in the collection.
      *
      * @param mixed $key
-     *                   //@param mixed $operator
-     *                   //@param mixed $value
+     * @param mixed $operator
+     * @param mixed $value
      *
      * @return bool
      */
-    public function contains($key) {
-        if (func_num_args() === 1) {
+    public function contains($key, $operator = null, $value = null) {
+        if (func_num_args() === 1 || is_callable($key)) {
             if ($this->useAsCallable($key)) {
                 $placeholder = new stdClass();
 

@@ -130,12 +130,12 @@ interface CInterface_Enumerable extends CInterface_Arrayable, Countable, Iterato
      * Determine if an item exists in the enumerable.
      *
      * @param mixed $key
-     *                   //@param mixed $operator
-     *                   //@param mixed $value
+     * @param mixed $operator
+     * @param mixed $value
      *
      * @return bool
      */
-    public function contains($key);
+    public function contains($key, $operator = null, $value = null);
 
     /**
      * Cross join with the given lists, returning all possible permutations.
