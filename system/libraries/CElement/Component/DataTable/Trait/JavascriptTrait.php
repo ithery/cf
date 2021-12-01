@@ -372,10 +372,15 @@ $('" . $this->customSearchSelector . "').keyup(() => {
                 ");
             }
             $js->appendln("
-jQuery('.data_table-quick_search').on('keyup change', function(){
-    " . ($this->ajax ? 'table.fnClearTable( 0 );table.fnDraw();' : "table.fnFilter($(this).val(),$(this).attr('data-column-index'));") . '
-
-
+jQuery('.data_table-quick_search').on('keyup change', function() {
+    var inputType = $(this).prop('tagName');
+    " . ($this->ajax
+            ? 'table.fnClearTable( 0 );table.fnDraw();'
+            : "if (inputType.toLowerCase() == 'select' && $(this).val()) {
+                table.fnFilter(\"^\"+$(this).val()+\"$\",$(this).attr('data-column-index'), true)
+            } else {
+                table.fnFilter($(this).val(),$(this).attr('data-column-index'))
+            };") . '
 });
             ');
         }
