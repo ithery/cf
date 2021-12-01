@@ -260,4 +260,10 @@ class CRenderable extends CObject implements CApp_Interface_Renderable {
 
         return $ret;
     }
+
+    public function detach() {
+        $this->parent = null;
+
+        return $this;
+    }
 }
