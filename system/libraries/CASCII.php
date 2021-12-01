@@ -237,12 +237,12 @@ final class CASCII {
         if ($replace_extra_symbols) {
             self::prepareAsciiAndExtrasMaps();
 
-            return self::$ASCII_MAPS_AND_EXTRAS ?? [];
+            return self::$ASCII_MAPS_AND_EXTRAS ?: [];
         }
 
         self::prepareAsciiMaps();
 
-        return self::$ASCII_MAPS ?? [];
+        return self::$ASCII_MAPS ?: [];
     }
 
     /**
@@ -394,7 +394,7 @@ final class CASCII {
             }
         }
 
-        return $CHARS_ARRAY[$cacheKey][$language] ?? ['orig' => [], 'replace' => []];
+        return isset($CHARS_ARRAY[$cacheKey][$language]) ? $CHARS_ARRAY[$cacheKey][$language] : ['orig' => [], 'replace' => []];
     }
 
     /**
@@ -437,7 +437,7 @@ final class CASCII {
 
             /** @noinspection AlterInForeachInspection */
             /** @psalm-suppress PossiblyNullIterator - we use the prepare* methods here, so we don't get NULL here */
-            foreach (self::$ASCII_MAPS_AND_EXTRAS ?? [] as &$map) {
+            foreach (self::$ASCII_MAPS_AND_EXTRAS ?: [] as &$map) {
                 $CHARS_ARRAY[$cacheKey][] = $map;
             }
         } else {
@@ -445,7 +445,7 @@ final class CASCII {
 
             /** @noinspection AlterInForeachInspection */
             /** @psalm-suppress PossiblyNullIterator - we use the prepare* methods here, so we don't get NULL here */
-            foreach (self::$ASCII_MAPS ?? [] as &$map) {
+            foreach (self::$ASCII_MAPS ?: [] as &$map) {
                 $CHARS_ARRAY[$cacheKey][] = $map;
             }
         }
@@ -579,7 +579,7 @@ final class CASCII {
              *
              * @var array<string, string>
              */
-            $map = self::$ASCII_MAPS[self::EXTRA_MSWORD_CHARS_LANGUAGE_CODE] ?? [];
+            $map = isset(self::$ASCII_MAPS[self::EXTRA_MSWORD_CHARS_LANGUAGE_CODE]) ? self::$ASCII_MAPS[self::EXTRA_MSWORD_CHARS_LANGUAGE_CODE] : [];
 
             $MSWORD_CACHE = [
                 'orig' => \array_keys($map),
@@ -649,7 +649,7 @@ final class CASCII {
         if (!isset($WHITESPACE_CACHE[$cacheKey])) {
             self::prepareAsciiMaps();
 
-            $WHITESPACE_CACHE[$cacheKey] = self::$ASCII_MAPS[self::EXTRA_WHITESPACE_CHARS_LANGUAGE_CODE] ?? [];
+            $WHITESPACE_CACHE[$cacheKey] = isset(self::$ASCII_MAPS[self::EXTRA_WHITESPACE_CHARS_LANGUAGE_CODE]) ? self::$ASCII_MAPS[self::EXTRA_WHITESPACE_CHARS_LANGUAGE_CODE] : [];
 
             if ($keepNonBreakingSpace) {
                 unset($WHITESPACE_CACHE[$cacheKey]["\xc2\xa0"]);
@@ -790,7 +790,7 @@ final class CASCII {
             && $EXTRA_SYMBOLS_CACHE === null
         ) {
             $EXTRA_SYMBOLS_CACHE = [];
-            foreach (self::$ASCII_EXTRAS ?? [] as $extrasDataTmp) {
+            foreach (self::$ASCII_EXTRAS ?: [] as $extrasDataTmp) {
                 foreach ($extrasDataTmp as $extrasDataKeyTmp => $extrasDataValueTmp) {
                     $EXTRA_SYMBOLS_CACHE[$extrasDataKeyTmp] = $extrasDataKeyTmp;
                 }
@@ -805,7 +805,7 @@ final class CASCII {
                     self::$LANGUAGE_MAX_KEY = self::getData('ascii_language_max_key');
                 }
 
-                $maxKeyLength = self::$LANGUAGE_MAX_KEY[$language] ?? 0;
+                $maxKeyLength = isset(self::$LANGUAGE_MAX_KEY[$language]) ? self::$LANGUAGE_MAX_KEY[$language] : 0;
 
                 if ($maxKeyLength >= 5) {
                     foreach ($matches[0] as $keyTmp => $char) {
@@ -1206,7 +1206,7 @@ final class CASCII {
                 || $ordC0 === 255
                 || $ord === null
             ) {
-                $str_tmp .= $unknown ?? $c;
+                $str_tmp .= $unknown ?: $c;
 
                 continue;
             }
@@ -1239,7 +1239,7 @@ final class CASCII {
                 } elseif ($new_char === '[?]'
                     || $new_char === '[?] '
                 ) {
-                    $c = $unknown ?? $c;
+                    $c = $unknown ?: $c;
                 } else {
                     $c = $new_char;
                 }
@@ -1254,7 +1254,7 @@ final class CASCII {
                 echo "bank:" . $bank . "\n\n";
                  */
 
-                $c = $unknown ?? $c;
+                $c = $unknown ?: $c;
             }
 
             $str_tmp .= $c;
@@ -1348,8 +1348,8 @@ final class CASCII {
 
             /** @psalm-suppress PossiblyNullArgument - we use the prepare* methods here, so we don't get NULL here */
             self::$ASCII_MAPS_AND_EXTRAS = \array_merge_recursive(
-                self::$ASCII_MAPS ?? [],
-                self::$ASCII_EXTRAS ?? []
+                self::$ASCII_MAPS ?: [],
+                self::$ASCII_EXTRAS ?: []
             );
         }
     }
