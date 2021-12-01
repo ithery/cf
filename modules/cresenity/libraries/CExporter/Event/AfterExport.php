@@ -7,9 +7,16 @@ class CExporter_Event_AfterExport {
     public $filePath;
 
     /**
-     * @param string $filePath
+     * @var bool
      */
-    public function __construct($filePath) {
+    public $isSuccess;
+
+    /**
+     * @param string $filePath
+     * @param mixed  $isSuccess
+     */
+    public function __construct($filePath, $isSuccess) {
         $this->filePath = $filePath;
+        $this->isSuccess = $isSuccess;
     }
 }

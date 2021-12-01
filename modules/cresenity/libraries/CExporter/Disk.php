@@ -81,6 +81,18 @@ class CExporter_Disk {
     }
 
     /**
+     * @param TemporaryFile $source
+     * @param string        $destination
+     *
+     * @return bool
+     */
+    public function copyRaw(CExporter_File_TemporaryFile $source, $destination) {
+        $success = $this->put($destination, $source->contents());
+
+        return $success;
+    }
+
+    /**
      * @param string $filename
      */
     public function touch($filename) {
