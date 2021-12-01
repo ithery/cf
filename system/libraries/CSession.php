@@ -3,10 +3,15 @@
 defined('SYSPATH') or die('No direct access allowed.');
 
 /**
- * @mixin CSession_Store.
+ * Session Class.
+ *
+ * @see CSession_Store
+ *
+ * @method void set(string $key, null|mixed $value = null)
  */
 class CSession {
     use CTrait_Compat_Session;
+    protected $initialized = false;
 
     /**
      * Session singleton.
@@ -43,6 +48,7 @@ class CSession {
      * On first session instance creation, sets up the driver and creates session.
      */
     private function __construct() {
+        $this->initializeSession();
         CF::log(CLogger::DEBUG, 'Session Library initialized');
     }
 
@@ -51,10 +57,7 @@ class CSession {
      */
     public function store() {
         if ($this->store == null) {
-            $this->store = c::tap(CSession_Manager::instance()->createStore(), function ($session) {
-                $session->setId(c::request()->cookies->get($session->getName()));
-                $session->start();
-            });
+            $this->store = CSession_Manager::instance()->createStore();
         }
 
         return $this->store;
@@ -75,6 +78,29 @@ class CSession {
 
     public static function manager() {
         return CSession_Manager::instance();
+    }
+
+    protected function initializeSession() {
+        if (!$this->initialized && static::sessionConfigured()) {
+            $request = CHTTP::request();
+            static::manager()->applyNativeSession();
+
+            return c::tap($this->store(), function ($session) use ($request) {
+                $session->setId($request->cookies->get($session->getName()));
+                $session->setRequestOnHandler($request);
+                $session->start();
+            });
+            $this->initialized = true;
+        }
+    }
+
+    /**
+     * Determine if a session driver has been configured.
+     *
+     * @return bool
+     */
+    public static function sessionConfigured() {
+        return !is_null(carr::get(static::manager()->getSessionConfig(), 'driver'));
     }
 }
 
