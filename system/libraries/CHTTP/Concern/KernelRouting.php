@@ -14,8 +14,6 @@ trait CHTTP_Concern_KernelRouting {
      * @return \CHTTP_Response
      */
     protected function sendRequestThroughRouter($request) {
-        //$this->bootstrap();
-
         return (new CHTTP_Pipeline())
             ->send($request)
             ->through(CHTTP::shouldSkipMiddleware() ? [] : CMiddleware::middleware())
