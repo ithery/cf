@@ -5,6 +5,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
     }
 
     public function html($indent = 0) {
+
         /** @var CElement_Component_DataTable $this */
         $this->buildOnce();
         $html = new CStringBuilder();
@@ -13,9 +14,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         if ($this->haveRowAction()) {
             if ($this->getRowActionStyle() == 'btn-dropdown') {
                 if ($this->actionLocation == 'first') {
-                    $this->rowActionList->addClass('dropdown-menu-left');
+                    $this->getRowActionList()->addClass('dropdown-menu-left');
                 } else {
-                    $this->rowActionList->addClass('dropdown-menu-right');
+                    $this->getRowActionList()->addClass('dropdown-menu-right');
                 }
             }
         }
@@ -51,9 +52,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $html->appendln('<h5>' . $this->title . '</h5>');
 
                 if ($this->haveHeaderAction()) {
-                    $html->appendln($this->headerActionList->html($html->getIndent()));
+                    $html->appendln($this->getHeaderActionList()->html($html->getIndent()));
 
-                    $this->js_cell .= $this->headerActionList->js();
+                    $this->js_cell .= $this->getHeaderActionList()->js();
                 }
 
                 if ($this->haveDataTableViewAction) {
@@ -93,9 +94,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 }
                 if ($this->haveFooterAction()) {
                     $html->appendln('<div class="widget-footer-elements ml-auto">')->incIndent();
-                    $html->appendln($this->footerActionList->html($html->getIndent()));
+                    $html->appendln($this->getFooterActionList()->html($html->getIndent()));
 
-                    $this->js_cell .= $this->footerActionList->js();
+                    $this->js_cell .= $this->getFooterActionList()->js();
                     $html->decIndent()->appendln('</div>');
                 }
                 $html->decIndent()->appendln('</div>');

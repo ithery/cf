@@ -1,7 +1,7 @@
 <?php
 
-use Pheanstalk\Job as PheanstalkJob;
 use Pheanstalk\Pheanstalk;
+use Pheanstalk\Job as PheanstalkJob;
 
 class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
     /**
@@ -52,12 +52,13 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
     /**
      * Get the size of the queue.
      *
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return int
      */
     public function size($queue = null) {
         $queue = $this->getQueue($queue);
+
         return (int) $this->pheanstalk->statsTube($queue)->current_jobs_ready;
     }
 
@@ -66,7 +67,7 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
      *
      * @param string      $job
      * @param mixed       $data
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return mixed
      */
@@ -78,7 +79,7 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
      * Push a raw payload onto the queue.
      *
      * @param string      $payload
-     * @param string|null $queue
+     * @param null|string $queue
      * @param array       $options
      *
      * @return mixed
@@ -86,7 +87,7 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
     public function pushRaw($payload, $queue = null, array $options = []) {
         $queue = $this->getQueue($queue);
         if ($queue == 'beanstalkdJob') {
-            $e = new \Exception;
+            $e = new \Exception();
             CDaemon::log($e->getTraceAsString());
         }
 
@@ -104,12 +105,13 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
      * @param \DateTimeInterface|\DateInterval|int $delay
      * @param string                               $job
      * @param mixed                                $data
-     * @param string|null                          $queue
+     * @param null|string                          $queue
      *
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null) {
         $pheanstalk = $this->pheanstalk->useTube($this->getQueue($queue));
+
         return $pheanstalk->put(
             $this->createPayload($job, $this->getQueue($queue), $data),
             Pheanstalk::DEFAULT_PRIORITY,
@@ -121,9 +123,9 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
     /**
      * Pop the next job off of the queue.
      *
-     * @param string|null $queue
+     * @param null|string $queue
      *
-     * @return \Illuminate\Contracts\Queue\Job|null
+     * @return null|\Illuminate\Contracts\Queue\Job
      */
     public function pop($queue = null) {
         $queue = $this->getQueue($queue);
@@ -157,7 +159,7 @@ class CQueue_Queue_BeanstalkdQueue extends CQueue_AbstractQueue {
     /**
      * Get the queue or return the default.
      *
-     * @param string|null $queue
+     * @param null|string $queue
      *
      * @return string
      */

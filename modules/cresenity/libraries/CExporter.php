@@ -291,4 +291,8 @@ class CExporter {
     public static function modelImporter() {
         return CExporter_Import_ModelImporter::instance();
     }
+
+    public static function dispatcher() {
+        return CEvent::dispatcher();
+    }
 }

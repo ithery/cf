@@ -36,13 +36,17 @@ class CExporter_TaskQueue_StoreQueuedExport extends CQueue_AbstractTask {
 
     public function execute() {
         $storage = CExporter_Storage::instance();
+        CDaemon::log('Try to copy ' . $this->temporaryFile->getLocalPath() . ' to ' . $this->filePath . ', disk:' . $this->disk);
         $storage->disk($this->disk, $this->diskOptions)->copy(
             $this->temporaryFile,
             $this->filePath
         );
 
-        CDaemon::log('Try to copy ' . $this->temporaryFile->getLocalPath() . ' to ' . $this->filePath);
+        CDaemon::log('Try to delete temporary file');
 
         $this->temporaryFile->delete();
+
+        CDaemon::log('Dispatch Event CExporter_Event_AfterExport');
+        CExporter::dispatcher()->dispatch(new CExporter_Event_AfterExport($this->filePath));
     }
 }
