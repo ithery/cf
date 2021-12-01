@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of BootstrapperAbstract
+ * Description of BootstrapperAbstract.
  *
  * @author Hery
  */

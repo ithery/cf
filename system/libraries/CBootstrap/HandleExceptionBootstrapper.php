@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of HandleExceptions
+ * Description of HandleExceptions.
  *
  * @author Hery
  */
@@ -46,9 +46,9 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
      * @param int    $line
      * @param array  $context
      *
-     * @return void
-     *
      * @throws \ErrorException
+     *
+     * @return void
      */
     public function handleError($level, $message, $file = '', $line = 0, $context = []) {
         if (error_reporting() & $level) {
@@ -73,7 +73,6 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
 
             $this->getExceptionHandler()->report($e);
         } catch (Exception $e) {
-            //
         }
 
         if (CF::isCli()) {
@@ -91,7 +90,7 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
      * @return void
      */
     protected function renderForConsole($e) {
-        $this->getExceptionHandler()->renderForConsole(new ConsoleOutput, $e);
+        $this->getExceptionHandler()->renderForConsole(new ConsoleOutput(), $e);
     }
 
     /**
@@ -120,7 +119,7 @@ class CBootstrap_HandleExceptionBootstrapper extends CBootstrap_BootstrapperAbst
      * Create a new fatal error instance from an error array.
      *
      * @param array    $error
-     * @param int|null $traceOffset
+     * @param null|int $traceOffset
      *
      * @return \Symfony\Component\ErrorHandler\Error\FatalError
      */
