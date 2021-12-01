@@ -23,6 +23,10 @@ abstract class CObservable extends CRenderable {
      * @return CObservable_Javascript
      */
     public function javascript() {
+        if ($this->javascript == null) {
+            $this->javascript = new CObservable_Javascript($this);
+        }
+
         return $this->javascript;
     }
 
@@ -30,20 +34,19 @@ abstract class CObservable extends CRenderable {
      * @return CObservable_Javascript_JQuery
      */
     public function jquery() {
-        return $this->javascript->jquery();
+        return $this->javascript()->jquery();
     }
 
     /**
      * @return CObservable_Javascript_Handler
      */
     public function handler() {
-        return $this->javascript->handler();
+        return $this->javascript()->handler();
     }
 
     protected function __construct($id = '') {
         parent::__construct($id);
         $this->listeners = [];
-        $this->javascript = new CObservable_Javascript($this);
     }
 
     /**
