@@ -12,7 +12,6 @@ use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 class CQueue_Worker {
     use CDatabase_Trait_DetectLostConnection;
-
     const EXIT_SUCCESS = 0;
 
     const EXIT_ERROR = 1;
@@ -135,7 +134,7 @@ class CQueue_Worker {
                 continue;
             }
             if (isset($this->resetScope)) {
-                ($this->resetScope)();
+                call_user_func($this->resetScope);
             }
 
             // First, we will attempt to get the next job off of the queue. We will also
@@ -337,7 +336,7 @@ class CQueue_Worker {
 
         try {
             if (isset(static::$popCallbacks[$this->name])) {
-                return (static::$popCallbacks[$this->name])($popJobCallback, $queue);
+                return call_user_func_array(static::$popCallbacks[$this->name], [$popJobCallback, $queue]);
             }
             foreach (explode(',', $queue) as $queue) {
                 if (!is_null($job = $popJobCallback($queue))) {
@@ -613,7 +612,7 @@ class CQueue_Worker {
                         : $options->backoff
         );
 
-        return (int) ($backoff[$job->attempts() - 1] ?? c::last($backoff));
+        return (int) (isset($backoff[$job->attempts() - 1]) ? $backoff[$job->attempts() - 1] : c::last($backoff));
     }
 
     /**
