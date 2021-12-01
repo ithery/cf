@@ -237,7 +237,7 @@ class CElement_Component_Action extends CElement_Component {
 
         $link = $this->link;
         $param = '';
-
+        $iconPrefix = c::theme('icon.prefix', 'icon icon-');
         $classes = $this->classes;
         $classes = implode(' ', $classes);
         if (strlen($classes) > 0) {
@@ -287,7 +287,7 @@ class CElement_Component_Action extends CElement_Component {
             if ($this->button) {
                 $html->appendln('<button id="' . $this->id . '" name="' . $this->id . '" class="btn btn-primary' . $add_class . $classes . '" type="' . $input_type . '"' . $disabled . $add_attr . $addition_attribute . $custom_css . '>' . $this->label . '</button>');
                 if (strlen($this->icon) > 0) {
-                    $html->append('<i class="icon icon-' . $this->icon . '"></i> ');
+                    $html->append('<i class="' . $iconPrefix . $this->icon . '"></i> ');
                 }
                 $html->appendln($this->label . '</button>');
             } else {
@@ -310,7 +310,6 @@ class CElement_Component_Action extends CElement_Component {
             }
 
             if (strlen($this->icon) > 0) {
-                $iconPrefix = c::theme('icon.prefix', 'icon icon-');
                 $html->append('<i class="' . $iconPrefix . $this->getIcon() . ' ' . $this->getIcon() . '"></i> ');
             }
             if ($this->style != 'btn-icon-group') {
