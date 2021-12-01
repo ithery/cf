@@ -6,6 +6,9 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
     }
 
     public function jsSelect2v23($indent = 0) {
+        if ($this->value > 0) {
+            $this->autoSelect = true;
+        }
         $ajaxUrl = $this->createAjaxUrl();
 
         $strSelection = $this->formatSelection;
