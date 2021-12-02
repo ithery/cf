@@ -84,4 +84,8 @@ class CDaemon {
     public static function createRunner($serviceClass, $domain = null) {
         return new CDaemon_Runner($serviceClass, $domain);
     }
+
+    public static function isDaemon() {
+        return self::getRunningService() != null;
+    }
 }
