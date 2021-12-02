@@ -318,9 +318,9 @@ abstract class CDaemon_ServiceAbstract implements CDaemon_ServiceInterface {
 
         try {
             $this->pid(getmypid());
-            if (pcntl_fork() > 0) {
-                exit();
-            }
+            // if (pcntl_fork() > 0) {
+            //     exit();
+            // }
             $this->pid(getmypid()); // We have a new pid now
             $pidFile = $this->pidFile;
 
