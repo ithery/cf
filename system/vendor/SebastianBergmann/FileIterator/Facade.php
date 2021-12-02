@@ -1,4 +1,4 @@
-<?php declare(strict_types=1);
+<?php
 /*
  * This file is part of phpunit/php-file-iterator.
  *
@@ -7,32 +7,32 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace SebastianBergmann\FileIterator;
 
-use const DIRECTORY_SEPARATOR;
-use function array_unique;
+use function sort;
 use function count;
 use function dirname;
 use function explode;
 use function is_file;
-use function is_string;
 use function realpath;
-use function sort;
+use function is_string;
+use function array_unique;
+use const DIRECTORY_SEPARATOR;
 
-class Facade
-{
+class Facade {
     /**
      * @param array|string $paths
      * @param array|string $suffixes
      * @param array|string $prefixes
+     * @param bool         $commonPath
      */
-    public function getFilesAsArray($paths, $suffixes = '', $prefixes = '', array $exclude = [], bool $commonPath = false): array
-    {
+    public function getFilesAsArray($paths, $suffixes = '', $prefixes = '', array $exclude = [], $commonPath = false) {
         if (is_string($paths)) {
             $paths = [$paths];
         }
 
-        $iterator = (new Factory)->getFileIterator($paths, $suffixes, $prefixes, $exclude);
+        $iterator = (new Factory())->getFileIterator($paths, $suffixes, $prefixes, $exclude);
 
         $files = [];
 
@@ -56,15 +56,14 @@ class Facade
         if ($commonPath) {
             return [
                 'commonPath' => $this->getCommonPath($files),
-                'files'      => $files,
+                'files' => $files,
             ];
         }
 
         return $files;
     }
 
-    protected function getCommonPath(array $files): string
-    {
+    protected function getCommonPath(array $files) {
         $count = count($files);
 
         if ($count === 0) {
@@ -86,8 +85,8 @@ class Facade
         }
 
         $common = '';
-        $done   = false;
-        $j      = 0;
+        $done = false;
+        $j = 0;
         $count--;
 
         while (!$done) {
