@@ -53,4 +53,5 @@ return [
             'endpoint' => c::env('DYNAMODB_ENDPOINT'),
         ],
     ],
+    'prefix' => c::env('CACHE_PREFIX', cstr::slug(CF::appCode(), '_') . '_cache'),
 ];
