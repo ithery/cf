@@ -60,73 +60,28 @@ final class CManager_Daemon {
         return count($this->getGroupsKey()) > 0;
     }
 
-    /**
-     * @param string $className
-     * @param string $command
-     *
-     * @return \CDaemon
-     */
-    protected function getDaemon($className, $command = 'status') {
-        $config = [];
-        $config['serviceClass'] = $className;
-        //get last suffix class
-        $serviceName = $this->getServiceName($className);
-        $config['serviceName'] = $className;
-        $config['pidFile'] = $this->getPidFile($className);
-        $config['logFile'] = $this->getLogFile($className);
-        $config['stdout'] = false;
-        $config['command'] = $command;
-        $daemon = new CDaemon($config);
-
-        return $daemon;
-    }
-
-    public function pidPath() {
-        return DOCROOT . 'data/daemon/' . CF::appCode() . '/daemon/pid/';
-    }
-
-    public function logPath() {
-        return DOCROOT . 'data/daemon/' . CF::appCode() . '/log/';
-    }
-
-    protected function runDaemon($className, $command) {
-        $daemon = $this->getDaemon($className, $command);
-
-        return $daemon->run();
-    }
-
-    public function debug($className) {
-        return $this->runDaemon($className, 'debug');
-    }
-
     public function status($className) {
-        return $this->runDaemon($className, 'status');
+        return CDaemon::createRunner($className)->status();
     }
 
     public function start($className) {
-        return $this->runDaemon($className, 'start');
+        return CDaemon::createRunner($className)->run();
     }
 
     public function stop($className) {
-        return $this->runDaemon($className, 'stop');
+        return CDaemon::createRunner($className)->stop();
     }
 
     public function isRunning($className) {
-        $daemon = $this->getDaemon($className);
-
-        return $daemon->isRunning();
+        return CDaemon::createRunner($className)->isRunning();
     }
 
     public function rotateLog($className) {
-        $daemon = $this->getDaemon($className);
-
-        return $daemon->rotateLog();
+        return CDaemon::createRunner($className)->rotateLog();
     }
 
     public function logDump($className) {
-        $daemon = $this->getDaemon($className);
-
-        return $daemon->logDump();
+        return CDaemon::createRunner($className)->logDump();
     }
 
     public function getServiceName($className) {
@@ -140,32 +95,14 @@ final class CManager_Daemon {
     }
 
     public function getLogFile($className, $filename = null) {
-        if ($filename == null) {
-            $filename = $className . '.log';
-        }
-
-        return $this->logPath() . $className . '/' . $filename;
+        return CDaemon_Helper::getLogFile($className, $filename);
     }
 
     public function getPidFile($className) {
-        return $this->pidPath() . $className . '.pid';
+        return CDaemon_Helper::getPidFile($className);
     }
 
     public function getLogFileList($className) {
-        $fileHelper = CHelper::file();
-        $logPath = rtrim($this->logPath(), '/') . '/' . $className;
-        if (!is_dir($logPath)) {
-            return [];
-        }
-        $files = $fileHelper->files($logPath);
-        $list = [];
-        foreach ($files as $file) {
-            /* @var $file \Symfony\Component\Finder\SplFileInfo */
-            $basename = $file->getBasename();
-
-            $list[$file->getPath() . DS . $file->getFilename()] = $basename;
-        }
-
-        return $list;
+        return CDaemon_Helper::getLogFileList($className);
     }
 }

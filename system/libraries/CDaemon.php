@@ -13,6 +13,20 @@ use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 
 class CDaemon {
+    const COMMAND_START = 'start';
+
+    const COMMAND_STOP = 'stop';
+
+    const COMMAND_DEBUG = 'debug';
+
+    const COMMAND_RESTART = 'restart';
+
+    const COMMAND_KILL = 'kill';
+
+    const COMMAND_STATUS = 'status';
+
+    const COMMAND_RELOAD = 'reload';
+
     /**
      * @var array
      */
@@ -35,27 +49,9 @@ class CDaemon {
         }
         parse_str($parameter, $config);
         $cls = carr::get($config, 'serviceClass');
-        /* @var CJob_Exception $job */
-        $serviceName = carr::get($config, 'serviceName', $cls);
         $cmd = carr::get($config, 'command');
-        $pidFile = carr::get($config, 'pidFile');
-        $logFile = carr::get($config, 'logFile');
-
-        try {
-            $dirPidFile = dirname($pidFile);
-            if (!CFile::isDirectory($dirPidFile)) {
-                CFile::makeDirectory($dirPidFile, 0755, true);
-            }
-            $dirLogFile = dirname($logFile);
-            if (!CFile::isDirectory($dirLogFile)) {
-                CFile::makeDirectory($dirLogFile, 0755, true);
-            }
-        } catch (Exception $ex) {
-            throw new Exception('error on create dir ' . $dirLogFile);
-        }
-
-        self::$runningService = new $cls($serviceName, $config);
-
+        self::$runningService = CDaemon_Manager::createService($cls);
+        CDaemon_ErrorHandler::init();
         switch ($cmd) {
             case 'debug':
             case 'start':
@@ -68,7 +64,7 @@ class CDaemon {
 
                 break;
             default:
-                self::$runningService->showHelp();
+                throw new Exception('Unknown Command:' . $cmd);
 
                 break;
         }
@@ -295,19 +291,16 @@ class CDaemon {
      * Shortcut function to log the current running service.
      *
      * @param string $msg
+     * @param mixed  $label
      */
-    public static function log($msg) {
+    public static function log($msg, $label = '') {
         $runningService = self::getRunningService();
         if ($runningService != null) {
-            $runningService->log($msg);
+            $runningService->log($msg, $label);
         }
     }
 
-    public static function pidPath() {
-        return DOCROOT . 'data/daemon/' . CF::appCode() . '/daemon/pid/';
-    }
-
-    public static function logPath() {
-        return  DOCROOT . 'data/daemon/' . CF::appCode() . '/log/';
+    public static function createRunner($serviceClass, $domain = null) {
+        return new CDaemon_Runner($serviceClass, $domain);
     }
 }
