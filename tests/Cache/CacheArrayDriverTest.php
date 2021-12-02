@@ -1,5 +1,4 @@
 <?php
-use stdClass;
 use PHPUnit\Framework\TestCase;
 
 class CacheArrayDriverTest extends TestCase {

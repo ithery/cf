@@ -89,11 +89,13 @@ abstract class Type {
 
                 break;
             default:
-                new ObjectType(TypeName::fromQualifiedName($typeName), $allowsNull);
+                $result = new ObjectType(TypeName::fromQualifiedName($typeName), $allowsNull);
 
                 break;
 
         }
+
+        return $result;
     }
 
     public function asString() {

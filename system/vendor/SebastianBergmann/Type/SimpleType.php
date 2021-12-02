@@ -7,27 +7,25 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace SebastianBergmann\Type;
 
 use function strtolower;
 
-final class SimpleType extends Type
-{
-    private  $name;
+final class SimpleType extends Type {
+    private $name;
 
-    private  $allowsNull;
+    private $allowsNull;
 
-    private  $value;
+    private $value;
 
-    public function __construct( $name,  $nullable, $value = null)
-    {
-        $this->name       = $this->normalize($name);
+    public function __construct($name, $nullable, $value = null) {
+        $this->name = $this->normalize($name);
         $this->allowsNull = $nullable;
-        $this->value      = $value;
+        $this->value = $value;
     }
 
-    public function isAssignable(Type $other)
-    {
+    public function isAssignable(Type $other) {
         if ($this->allowsNull && $other instanceof NullType) {
             return true;
         }
@@ -43,36 +41,31 @@ final class SimpleType extends Type
         return false;
     }
 
-    public function name()
-    {
+    public function name() {
         return $this->name;
     }
 
-    public function allowsNull()
-    {
+    public function allowsNull() {
         return $this->allowsNull;
     }
 
-    public function value()
-    {
+    public function value() {
         return $this->value;
     }
 
-    public function isSimple()
-    {
+    public function isSimple() {
         return true;
     }
 
-    private function normalize( $name)
-    {
+    private function normalize($name) {
         $name = strtolower($name);
-
-        return match ($name) {
+        $mapName = [
             'boolean' => 'bool',
             'real', 'double' => 'float',
             'integer' => 'int',
-            '[]'      => 'array',
-            default   => $name,
-        };
+            '[]' => 'array',
+        ];
+
+        return isset($mapName[$name]) ? $mapName[$name] : $name;
     }
 }

@@ -908,11 +908,11 @@ final class Generator {
         $cloneTrait = '';
 
         if ($mockedCloneMethod) {
-            $cloneTrait = PHP_EOL . '    use \PHPUnit\Framework\MockObject\MockedCloneMethod;';
+            $cloneTrait = PHP_EOL . '    use \PHPUnit\Framework\MockObject\Api\MockedCloneMethod;';
         }
 
         if ($unmockedCloneMethod) {
-            $cloneTrait = PHP_EOL . '    use \PHPUnit\Framework\MockObject\UnmockedCloneMethod;';
+            $cloneTrait = PHP_EOL . '    use \PHPUnit\Framework\MockObject\Api\UnmockedCloneMethod;';
         }
 
         $classTemplate->setVar(
