@@ -10,7 +10,6 @@ class CElement_List_ActionList extends CElement_List {
     use CTrait_Compat_Element_ActionList,
         CTrait_Element_Property_Label,
         CTrait_Element_Property_Icon;
-
     public $actions = [];
 
     protected $style;
@@ -70,18 +69,11 @@ class CElement_List_ActionList extends CElement_List {
         if ($this->id == 'test-123') {
             //die($this->style);
         }
-        //apply render style to child before render
-        if (count($this->btn_dropdown_classes) == 0) {
-            if ($this->bootstrap >= '3') {
-                $this->btn_dropdown_classes[] = 'btn-primary';
-                $this->btn_dropdown_classes[] = 'btn-sm';
-            }
-        }
 
         $this->apply('style', $this->style, 'CElement_Component_Action');
         $html = new CStringBuilder();
         $html->setIndent($indent);
-        $classes = $this->getNormalizedClasses();
+        $classes = $this->getClasses();
         $ulDropdownClasses = '';
         if (!in_array('dropdown-menu-right', $classes)
             && !in_array('dropdown-menu-left', $classes)
@@ -113,16 +105,7 @@ class CElement_List_ActionList extends CElement_List {
         $pretag = '<div id="' . $this->id . '" class="button-list ' . $classes . '">';
         switch ($this->style) {
             case 'form-action':
-                if ($this->bootstrap == '3.3') {
-                    $control_size = 12 - $this->label_size;
-                    $pretag = '
-                        <div class="form-group clear-both ' . $classes . '">
-                            <label class="col-md-' . $this->label_size . ' control-label"></label>
-                                <div class="col-md-' . $control_size . '">
-                            ';
-                } else {
-                    $pretag = '<div class="form-actions clear-both ' . $classes . '">';
-                }
+                $pretag = '<div class="form-actions clear-both ' . $classes . '">';
 
                 break;
             case 'btn-group':
@@ -173,11 +156,7 @@ class CElement_List_ActionList extends CElement_List {
 
                 break;
             case 'form-action':
-                if ($this->bootstrap == '3.3') {
-                    $posttag = '</div></div>';
-                } else {
-                    $posttag = '</div>';
-                }
+                $posttag = '</div>';
 
                 break;
             default:

@@ -76,8 +76,8 @@ return [
         ],
         's3' => [
             'driver' => 's3',
-            'key' => 'AMCFVMWR7P225JAAGFSL',
-            'secret' => '04yvHWJJFrKv71VoGbqL3rZ6dcXjeJIReq85XqAi6jg',
+            'key' => '',
+            'secret' => '',
             'region' => 'sgp1',
             'bucket' => 'resource',
             'endpoint' => 'https://sgp1.digitaloceanspaces.com',
@@ -85,8 +85,8 @@ return [
         ],
         's3-temp' => [
             'driver' => 's3',
-            'key' => 'AMCFVMWR7P225JAAGFSL',
-            'secret' => '04yvHWJJFrKv71VoGbqL3rZ6dcXjeJIReq85XqAi6jg',
+            'key' => '',
+            'secret' => '',
             'region' => 'sgp1',
             'bucket' => 'temp-files',
             'endpoint' => 'https://sgp1.digitaloceanspaces.com',

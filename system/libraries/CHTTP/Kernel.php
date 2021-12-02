@@ -12,7 +12,6 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 class CHTTP_Kernel {
     use CHTTP_Trait_OutputBufferTrait,
         CHTTP_Concern_KernelRouting;
-
     protected $isHandled = false;
 
     protected $terminated;
@@ -180,9 +179,9 @@ class CHTTP_Kernel {
         $response = null;
 
         try {
-            //$response = $this->sendRequestThroughRouter($request);
+            $response = $this->sendRequestThroughRouter($request);
 
-            $response = $this->invokeController($request);
+            //$response = $this->invokeController($request);
         } catch (Exception $e) {
             throw $e;
         } finally {

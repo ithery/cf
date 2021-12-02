@@ -9,7 +9,25 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @since Sep 8, 2019, 2:18:08 AM
  */
 final class CQueue {
+    /**
+     * @var CQueue_Dispatcher
+     */
     protected static $dispatcher;
+
+    /**
+     * @var CQueue_BatchRepository
+     */
+    protected static $batchRepository;
+
+    /**
+     * @var CQueue_Manager
+     */
+    protected static $queueManager;
+
+    /**
+     * @var CQueue_BatchFactory
+     */
+    protected static $batchFactory;
 
     /**
      * @return CQueue_Dispatcher
@@ -20,6 +38,7 @@ final class CQueue {
                 return CQueue::queuer()->connection($connection);
             });
         }
+
         return self::$dispatcher;
     }
 
@@ -27,9 +46,13 @@ final class CQueue {
      * @return CQueue_Manager
      */
     public static function queuer() {
-        return c::tap(new CQueue_Manager(), function ($manager) {
-            CQueue::registerConnectors($manager);
-        });
+        if (static::$queueManager == null) {
+            static::$queueManager = c::tap(new CQueue_Manager(), function ($manager) {
+                CQueue::registerConnectors($manager);
+            });
+        }
+
+        return static::$queueManager;
     }
 
     /**
@@ -43,7 +66,7 @@ final class CQueue {
         // foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
         //     self::{"register{$connector}Connector"}($manager);
         // }
-        foreach (['Null', 'Database', 'Sqs', 'Beanstalkd'] as $connector) {
+        foreach (['Null', 'Sync', 'Database', 'Redis', 'AsyncRedis', 'Beanstalkd', 'Sqs'] as $connector) {
             self::{"register{$connector}Connector"}($manager);
         }
     }
@@ -57,7 +80,7 @@ final class CQueue {
      */
     protected static function registerNullConnector($manager) {
         $manager->addConnector('null', function () {
-            return new CQueue_Connector_NullConnector;
+            return new CQueue_Connector_NullConnector();
         });
     }
 
@@ -70,7 +93,7 @@ final class CQueue {
      */
     protected static function registerSyncConnector($manager) {
         $manager->addConnector('sync', function () {
-            return new CQueue_Connector_SyncConnector;
+            return new CQueue_Connector_SyncConnector();
         });
     }
 
@@ -83,7 +106,7 @@ final class CQueue {
      */
     protected static function registerBeanstalkdConnector($manager) {
         $manager->addConnector('beanstalkd', function () {
-            return new CQueue_Connector_BeanstalkdConnector;
+            return new CQueue_Connector_BeanstalkdConnector();
         });
     }
 
@@ -113,10 +136,37 @@ final class CQueue {
         });
     }
 
+    /**
+     * Register the Redis queue connector.
+     *
+     * @param \CQueue_Manager $manager
+     *
+     * @return void
+     */
+    protected static function registerRedisConnector($manager) {
+        $manager->addConnector('redis', function () {
+            return new CQueue_Connector_RedisConnector(CRedis::instance());
+        });
+    }
+
+    /**
+     * Register the Redis queue connector.
+     *
+     * @param \CQueue_Manager $manager
+     *
+     * @return void
+     */
+    protected static function registerAsyncRedisConnector($manager) {
+        $manager->addConnector('async-redis', function () {
+            return new CQueue_Connector_AsyncRedisConnector(CRedis::instance());
+        });
+    }
+
     public static function worker() {
         $isDownForMaintenance = function () {
             return false;
         };
+
         return new CQueue_Worker(static::queuer(), CEvent::dispatcher(), CException::exceptionHandler(), $isDownForMaintenance);
     }
 
@@ -131,5 +181,25 @@ final class CQueue {
 
     public static function primaryKey($database, $table) {
         return $database->driverName() == 'MongoDB' ? '_id' : $table . '_id';
+    }
+
+    public static function batchFactory() {
+        if (static::$batchFactory == null) {
+            static::$batchFactory = new CQueue_BatchFactory(static::queuer());
+        }
+
+        return static::$batchFactory;
+    }
+
+    public static function batchRepository() {
+        if (static::$batchRepository == null) {
+            static::$batchRepository = new CQueue_BatchRepository(
+                static::batchFactory(),
+                CDatabase::instance(CF::config('queue.batching.database')),
+                CF::config('queue.batching.table', 'queue_batch')
+            );
+        }
+
+        return static::$batchRepository;
     }
 }

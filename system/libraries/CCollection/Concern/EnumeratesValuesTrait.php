@@ -969,13 +969,13 @@ trait CCollection_Concern_EnumeratesValuesTrait {
      * @return \Closure
      */
     protected function operatorForWhere($key, $operator = null, $value = null) {
-        if (func_num_args() === 1) {
+        if (func_num_args() === 1 || $operator === null) {
             $value = true;
 
             $operator = '=';
         }
 
-        if (func_num_args() === 2) {
+        if (func_num_args() === 2 || $value === null) {
             $value = $operator;
 
             $operator = '=';

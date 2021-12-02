@@ -366,7 +366,7 @@ class CModel_Query {
      * @param mixed $id
      * @param array $columns
      *
-     * @throws \CModel_Exception_ModelNotFound
+     * @throws \CModel_Exception_ModelNotFoundException
      *
      * @return CModel|CModel_Collection
      */
@@ -381,7 +381,7 @@ class CModel_Query {
             return $result;
         }
 
-        throw (new CModel_Exception_ModelNotFound())->setModel(
+        throw (new CModel_Exception_ModelNotFoundException())->setModel(
             get_class($this->model),
             $id
         );
@@ -456,7 +456,7 @@ class CModel_Query {
      *
      * @param array $columns
      *
-     * @throws CModel_Exception_ModelNotFound
+     * @throws CModel_Exception_ModelNotFoundException
      *
      * @return CModel|static
      */
@@ -465,7 +465,7 @@ class CModel_Query {
             return $model;
         }
 
-        throw (new CModel_Exception_ModelNotFound())->setModel(get_class($this->model));
+        throw (new CModel_Exception_ModelNotFoundException())->setModel(get_class($this->model));
     }
 
     /**

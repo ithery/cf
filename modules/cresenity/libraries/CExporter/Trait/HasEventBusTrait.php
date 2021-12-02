@@ -47,6 +47,7 @@ trait CExporter_Trait_HasEventBusTrait {
         foreach ($this->listeners($event) as $listener) {
             $listener($event);
         }
+        CEvent::dispatcher()->dispatch($event);
     }
 
     /**

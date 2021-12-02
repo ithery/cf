@@ -9,6 +9,7 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
 
     public function collection() {
         $this->table->setAjax(false);
+
         return $this->table->getCollection();
     }
 
@@ -40,7 +41,10 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
                     ->addArg($value)
                     ->setRequire($column->determineExportCallbackRequire())
                     ->execute();
-                if (is_array($value) && isset($value['html']) && isset($value['js'])) {
+                if ($value instanceof CRenderable) {
+                    $value = $value->html();
+                }
+                if (is_array($value) && isset($value['html'], $value['js'])) {
                     $value = $value['html'];
                 }
             }
@@ -53,12 +57,16 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
                     ->addArg($value)
                     ->setRequire($this->table->requires)
                     ->execute();
-                if (is_array($value) && isset($value['html']) && isset($value['js'])) {
+                if ($value instanceof CRenderable) {
+                    $value = $value->html();
+                }
+                if (is_array($value) && isset($value['html'], $value['js'])) {
                     $value = $value['html'];
                 }
             }
             $newRow[$column->getFieldname()] = $value;
         }
+
         return $newRow;
     }
 
@@ -68,6 +76,7 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         foreach ($columns as $column) {
             $heading[] = $column->determineExportLabel();
         }
+
         return $heading;
     }
 }

@@ -21,7 +21,7 @@ use League\CommonMark\Delimiter\DelimiterInterface;
 use League\CommonMark\Node\Inline\AbstractStringContainer;
 
 /**
- * Interface for a delimiter processor
+ * Interface for a delimiter processor.
  */
 interface DelimiterProcessorInterface {
     /**

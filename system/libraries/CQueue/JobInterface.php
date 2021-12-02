@@ -10,6 +10,13 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 interface CQueue_JobInterface {
     /**
+     * Get the UUID of the job.
+     *
+     * @return null|string
+     */
+    public function uuid();
+
+    /**
      * Get the job identifier.
      *
      * @return string
@@ -93,7 +100,7 @@ interface CQueue_JobInterface {
     /**
      * Delete the job, call the "failed" method, and raise the failed job event.
      *
-     * @param \Throwable|null $e
+     * @param null|\Throwable $e
      *
      * @return void
      */
@@ -102,23 +109,30 @@ interface CQueue_JobInterface {
     /**
      * Get the number of times to attempt a job.
      *
-     * @return int|null
+     * @return null|int
      */
     public function maxTries();
 
     /**
+     * Get the maximum number of exceptions allowed, regardless of attempts.
+     *
+     * @return null|int
+     */
+    public function maxExceptions();
+
+    /**
      * Get the number of seconds the job can run.
      *
-     * @return int|null
+     * @return null|int
      */
     public function timeout();
 
     /**
      * Get the timestamp indicating when the job should timeout.
      *
-     * @return int|null
+     * @return null|int
      */
-    public function timeoutAt();
+    public function retryUntil();
 
     /**
      * Get the name of the queued job class.
@@ -156,4 +170,18 @@ interface CQueue_JobInterface {
      * @return string
      */
     public function getRawBody();
+
+    /**
+     * Determine if the job should fail when it timeouts.
+     *
+     * @return bool
+     */
+    public function shouldFailOnTimeout();
+
+    /**
+     * The number of seconds to wait before retrying a job that encountered an uncaught exception.
+     *
+     * @return null|int
+     */
+    public function backoff();
 }

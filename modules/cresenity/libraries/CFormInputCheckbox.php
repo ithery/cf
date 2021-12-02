@@ -4,10 +4,9 @@
  * @deprecated 1.2
  */
 //@codingStandardsIgnoreStart
-class CFormInputCheckbox extends CFormInput {
+class CFormInputCheckbox extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_Checkbox,
         CTrait_Element_Property_Label;
-
     protected $checked = '';
 
     protected $applyjs = '';
@@ -24,14 +23,10 @@ class CFormInputCheckbox extends CFormInput {
         $this->style = 'minimal';
         $this->type = 'checkbox';
         $this->label = '';
-        $this->applyjs = 'uniform';
+        $this->applyjs = c::theme('js_checkbox', 'uniform');
         $this->checked = false;
         $this->display_inline = false;
         $this->label_wrap = false;
-        $js_checkbox = carr::get($this->theme_data, 'js_checkbox');
-        if (strlen($js_checkbox) > 0) {
-            $this->applyjs = $js_checkbox;
-        }
     }
 
     public static function factory($id) {
@@ -40,21 +35,25 @@ class CFormInputCheckbox extends CFormInput {
 
     public function set_applyjs($applyjs) {
         $this->applyjs = $applyjs;
+
         return $this;
     }
 
     public function set_checked($bool) {
         $this->checked = $bool;
+
         return $this;
     }
 
     public function set_label_wrap($bool) {
         $this->label_wrap = $bool;
+
         return $this;
     }
 
     public function set_display_inline($bool) {
         $this->display_inline = $bool;
+
         return $this;
     }
 
@@ -85,14 +84,7 @@ class CFormInputCheckbox extends CFormInput {
         if (strlen($classes) > 0) {
             $classes = ' ' . $classes;
         }
-        if ($this->bootstrap == '3') {
-            //$classes = $classes ." form-control ";
-        }
-        if ($this->bootstrap == '3.3') {
-            if ($this->checkbox >= '1.0') {
-                $classes = $classes . ' ' . $this->style . ' ';
-            }
-        }
+
         $custom_css = $this->custom_css;
         $custom_css = $this->renderStyle($custom_css);
         if (strlen($custom_css) > 0) {
@@ -118,6 +110,7 @@ class CFormInputCheckbox extends CFormInput {
         }
         $html->append('</label>');
         $html->br();
+
         return $html->text();
     }
 

@@ -6,20 +6,38 @@
  * @author Hery
  */
 class CRouting_RouteFinder {
+    /**
+     * Return Route From Uri.
+     *
+     * @param string $uri
+     *
+     * @return CRouting_Route
+     */
     public static function find($uri = null) {
         if ($uri == null) {
             $uri = CHTTP::request()->path();
+            if (PHP_SAPI == 'cli') {
+                $uri = CFRouter::findUri();
+            }
+
             $uri = trim($uri, '/');
         }
+
         $routeDataBefore = static::getRouteData($uri);
         $routedUri = CFRouter::routedUri($uri);
-        $routeData = static::getRouteData($routedUri);
+
+        $routeData = self::getRouteData($routedUri);
+
+        if (CF::domain() == 'pagetest.xyz') {
+            // cdbg::dd($routeData);
+        }
         if ($uri != $routedUri) {
-            $routeData = $routeDataBefore;
+            //$routeData = $routeDataBefore;
 
             //cdbg::dd($uri, $routedUri, $routeDataBefore, $routeData);
             //$routedUri['seg']
         }
+
         CFRouter::applyRouteData($routeData);
 
         $controllerDir = carr::get($routeData, 'controller_dir_ucfirst', '');

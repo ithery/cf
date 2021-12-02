@@ -2,6 +2,7 @@
 
 class CEmail_Config {
     use CTrait_HasOptions;
+
     /**
      * @var string
      */

@@ -77,7 +77,7 @@ class CObservable_Javascript {
     }
 
     /**
-     * Get compiled deferred JS
+     * Get compiled deferred JS.
      *
      * @return CJavascript_Statement[]
      */
@@ -140,7 +140,7 @@ class CObservable_Javascript {
     }
 
     /**
-     * Get selector of this jquery
+     * Get selector of this jquery.
      *
      * @return string
      */
@@ -163,7 +163,7 @@ class CObservable_Javascript {
     }
 
     /**
-     * Get Owner of this jQuery
+     * Get Owner of this jQuery.
      *
      * @return string|CRenderable
      */

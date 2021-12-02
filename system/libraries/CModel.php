@@ -77,7 +77,6 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
         CModel_Trait_HidesAttributes,
         CModel_Trait_Timestamps,
         CTrait_ForwardsCalls;
-
     /**
      * The name of the "created" column.
      *
@@ -1193,7 +1192,7 @@ abstract class CModel implements ArrayAccess, CInterface_Arrayable, CInterface_J
      *
      * @param null|array $except
      *
-     * @return \CModel
+     * @return \static
      */
     public function replicate(array $except = null) {
         $defaults = [

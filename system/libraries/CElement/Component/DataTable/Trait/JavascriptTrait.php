@@ -282,12 +282,6 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln($this->fixedColumn ? '' : $this->options->toJsonRow('scrollX'))->br()
                 ->br();
 
-            if ($this->bootstrap >= '3') {
-                if ($this->dom == null) {
-                    $this->dom = "<'row'<'col-sm-6'l><'col-sm-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-5'i><'col-sm-7'p>>";
-                }
-            }
-
             if ($this->dom == null) {
                 $this->dom = '<""l>t<"F"<".footer_action">frp>';
             }
@@ -378,10 +372,15 @@ $('" . $this->customSearchSelector . "').keyup(() => {
                 ");
             }
             $js->appendln("
-jQuery('.data_table-quick_search').on('keyup change', function(){
-    " . ($this->ajax ? 'table.fnClearTable( 0 );table.fnDraw();' : "table.fnFilter($(this).val(),$(this).attr('data-column-index'));") . '
-
-
+jQuery('.data_table-quick_search').on('keyup change', function() {
+    var inputType = $(this).prop('tagName');
+    " . ($this->ajax
+            ? 'table.fnClearTable( 0 );table.fnDraw();'
+            : "if (inputType.toLowerCase() == 'select' && $(this).val()) {
+                table.fnFilter(\"^\"+$(this).val()+\"$\",$(this).attr('data-column-index'), true)
+            } else {
+                table.fnFilter($(this).val(),$(this).attr('data-column-index'))
+            };") . '
 });
             ');
         }

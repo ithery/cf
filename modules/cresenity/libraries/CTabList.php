@@ -7,13 +7,18 @@
 //@codingStandardsIgnoreStart
 class CTabList extends CElement_Element {
     use CTrait_Compat_Element_TabList;
-
     protected $tabs;
+
     protected $scrollspy;
+
     protected $tab_position;
+
     protected $active_tab;
+
     protected $ajax;
+
     protected $have_icon;
+
     protected $widget_class;
 
     public function __construct($id) {
@@ -38,31 +43,37 @@ class CTabList extends CElement_Element {
             $this->active_tab = $tab->id;
         }
         $this->tabs[] = $tab;
+
         return $tab;
     }
 
     public function active_tab($tab_id) {
         $this->set_active_tab($tab_id);
+
         return $this;
     }
 
     public function set_active_tab($tab_id) {
         $this->active_tab = $tab_id;
+
         return $this;
     }
 
     public function set_scrollspy($bool) {
         $this->scrollspy = $bool;
+
         return $this;
     }
 
     public function set_ajax($bool) {
         $this->ajax = $bool;
+
         return $this;
     }
 
     public function set_tab_position($tab_position) {
         $this->tab_position = $tab_position;
+
         return $this;
     }
 
@@ -72,6 +83,7 @@ class CTabList extends CElement_Element {
         } else {
             $this->widget_class[] = $class;
         }
+
         return $this;
     }
 
@@ -125,38 +137,24 @@ class CTabList extends CElement_Element {
         if (strlen($widget_classes) > 0) {
             $widget_classes = ' ' . $widget_classes;
         }
-        if ($this->bootstrap >= '3') {
-            $html->appendln('<div class="row tab-list' . $classes . '" id="' . $this->id . '">');
-            $html->appendln('   <div class="col-md-12">');
 
-            $html->appendln('       <div class="row">');
-            if ($this->tab_position == 'top') {
-                $html->appendln('           <div class="row-tab-menu">');
-            } else {
-                $html->appendln('           <div class="col-md-2">');
-            }
+        $html->appendln('<div class="row-fluid tab-list ' . $classes . '" id="' . $this->id . '">');
+        $html->appendln('	<div class="span12">');
+
+        $html->appendln('		<div class="row-fluid">');
+        if ($this->tab_position == 'top') {
+            $html->appendln('           <div class="row-tab-menu">');
         } else {
-            $html->appendln('<div class="row-fluid tab-list ' . $classes . '" id="' . $this->id . '">');
-            $html->appendln('	<div class="span12">');
-
-            $html->appendln('		<div class="row-fluid">');
-            if ($this->tab_position == 'top') {
-                $html->appendln('           <div class="row-tab-menu">');
-            } else {
-                $html->appendln('			<div class="span2">');
-            }
+            $html->appendln('			<div class="span2">');
         }
+
         if ($this->tab_position == 'top') {
             $html->appendln('               <div class="top-nav-container">');
         } else {
             $html->appendln('				<div class="side-nav-container affix-top">');
         }
 
-        if ($this->bootstrap >= '3') {
-            $html->appendln('                                       <ul id="' . $this->id . '-tab-nav" class="nav nav-pills nav-stacked">');
-        } else {
-            $html->appendln('					<ul id="' . $this->id . '-tab-nav" class="nav nav-tabs nav-stacked">');
-        }
+        $html->appendln('					<ul id="' . $this->id . '-tab-nav" class="nav nav-tabs nav-stacked">');
 
         $active_tab = null;
         foreach ($this->tabs as $tab) {
@@ -194,27 +192,16 @@ class CTabList extends CElement_Element {
         $html->appendln('					</ul>');
         $html->appendln('				</div>');
         $html->appendln('			</div>');
-        if ($this->bootstrap >= '3') {
-            if ($this->tab_position == 'top') {
-                $html->appendln('           <div class="row-tab-content">');
-            } else {
-                $html->appendln('			<div class="col-md-10">');
-            }
+
+        if ($this->tab_position == 'top') {
+            $html->appendln('           <div class="row-tab-content">');
         } else {
-            if ($this->tab_position == 'top') {
-                $html->appendln('           <div class="row-tab-content">');
-            } else {
-                $html->appendln('           <div class="span10">');
-            }
+            $html->appendln('           <div class="span10">');
         }
-        if ($this->bootstrap >= '3') {
-            $html->appendln('               <div id="' . $this->id . '-tab-widget" class="box box-warning ' . $widget_classes . '">');
-            $html->appendln('                   <div class="box-header with-border">');
-        } else {
-            $html->appendln('				<div id="' . $this->id . '-tab-widget" class="widget-box nomargin widget-transaction-tab ' . $widget_classes . '">');
-            if ($this->tab_position != 'top') {
-                $html->appendln('					<div class="widget-title">');
-            }
+
+        $html->appendln('				<div id="' . $this->id . '-tab-widget" class="widget-box nomargin widget-transaction-tab ' . $widget_classes . '">');
+        if ($this->tab_position != 'top') {
+            $html->appendln('					<div class="widget-title">');
         }
 
         if ($this->tab_position != 'top') {
@@ -227,11 +214,7 @@ class CTabList extends CElement_Element {
             $html->appendln('					</div>');
         }
 
-        if ($this->bootstrap >= '3') {
-            $html->appendln('                                       <div class="box-body">');
-        } else {
-            $html->appendln('					<div class="widget-content">');
-        }
+        $html->appendln('					<div class="widget-content">');
 
         if ($this->ajax) {
             $html->appendln('						<div id="' . $this->id . '-ajax-tab-content">');
@@ -242,9 +225,6 @@ class CTabList extends CElement_Element {
             }
         }
 
-        if ($this->bootstrap >= '3') {
-            $html->appendln('					</div>');
-        }
         $html->appendln('					</div>');
         $html->appendln('				</div>');
         $html->appendln('			</div>');
@@ -293,11 +273,7 @@ class CTabList extends CElement_Element {
                             z-index: 1;
                             position: relative;');
 
-            if ($this->bootstrap >= 3) {
-                $html->appendln('margin-top: -1px;');
-            } else {
-                $html->appendln('margin-top: 0px;');
-            }
+            $html->appendln('margin-top: 0px;');
 
             $html->appendln('
                         }

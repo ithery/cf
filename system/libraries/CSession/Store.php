@@ -1,9 +1,11 @@
 <?php
 
 /**
- * Description of Store
+ * Description of Store.
  *
  * @author Hery
+ *
+ * @see CSession
  */
 class CSession_Store {
     /**
@@ -46,7 +48,7 @@ class CSession_Store {
      *
      * @param string                   $name
      * @param \SessionHandlerInterface $handler
-     * @param string|null              $id
+     * @param null|string              $id
      *
      * @return void
      */
@@ -115,7 +117,6 @@ class CSession_Store {
      */
     public function save() {
         $this->ageFlashData();
-        file_put_contents('test.txt', json_encode($this->attributes, JSON_PRETTY_PRINT));
 
         $this->handler->write($this->getId(), $this->prepareForStorage(
             serialize($this->attributes)
@@ -176,7 +177,7 @@ class CSession_Store {
      * @return bool
      */
     public function exists($key) {
-        $placeholder = new stdClass;
+        $placeholder = new stdClass();
 
         return !c::collect(is_array($key) ? $key : func_get_args())->contains(function ($key) use ($placeholder) {
             return $this->get($key, $placeholder) === $placeholder;
@@ -223,7 +224,7 @@ class CSession_Store {
     /**
      * Determine if the session contains old input.
      *
-     * @param string|null $key
+     * @param null|string $key
      *
      * @return bool
      */
@@ -236,7 +237,7 @@ class CSession_Store {
     /**
      * Get the requested item from the flashed input array.
      *
-     * @param string|null $key
+     * @param null|string $key
      * @param mixed       $default
      *
      * @return mixed
@@ -276,7 +277,7 @@ class CSession_Store {
 
     /**
      * Set a key / value pair or array of key / value pairs in the session.
-     * Alias of put
+     * Alias of put.
      *
      * @param string|array $key
      * @param mixed        $value
@@ -459,7 +460,7 @@ class CSession_Store {
     }
 
     /**
-     * Remove one or many items from the session. (Alias of forget)
+     * Remove one or many items from the session. (Alias of forget).
      *
      * @param string|array $keys
      *
@@ -624,7 +625,7 @@ class CSession_Store {
     /**
      * Get the previous URL from the session.
      *
-     * @return string|null
+     * @return null|string
      */
     public function previousUrl() {
         return $this->get('_previous.url');
