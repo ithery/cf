@@ -7,20 +7,20 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace PHPUnit\Framework\MockObject;
+
+namespace PHPUnit\Framework\MockObject\Exception;
 
 use function sprintf;
+use PHPUnit\Framework\MockObject\ConfigurableMethod;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class IncompatibleReturnValueException extends \PHPUnit\Framework\Exception implements Exception
-{
+final class IncompatibleReturnValueException extends \PHPUnit\Framework\Exception\Exception implements Exception {
     /**
      * @param mixed $value
      */
-    public function __construct(ConfigurableMethod $method, $value)
-    {
+    public function __construct(ConfigurableMethod $method, $value) {
         parent::__construct(
             sprintf(
                 'Method %s may not return value of type %s, its return declaration is "%s"',

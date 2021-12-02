@@ -28,7 +28,9 @@ use SebastianBergmann\Type\VoidType;
 use SebastianBergmann\Type\UnknownType;
 use SebastianBergmann\Template\Template;
 use SebastianBergmann\Type\ReflectionMapper;
+use PHPUnit\Framework\MockObject\Exception\RuntimeException;
 use SebastianBergmann\Template\Exception as TemplateException;
+use PHPUnit\Framework\MockObject\Exception\ReflectionException;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit

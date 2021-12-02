@@ -7,16 +7,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace PHPUnit\Framework\MockObject;
 
-use function call_user_func;
 use function class_exists;
+use function call_user_func;
 
 /**
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
-final class MockClass implements MockType
-{
+final class MockClass implements MockType {
     /**
      * @var string
      */
@@ -32,15 +32,13 @@ final class MockClass implements MockType
      */
     private $configurableMethods;
 
-    public function __construct($classCode, $mockName, array $configurableMethods)
-    {
-        $this->classCode           = $classCode;
-        $this->mockName            = $mockName;
+    public function __construct($classCode, $mockName, array $configurableMethods) {
+        $this->classCode = $classCode;
+        $this->mockName = $mockName;
         $this->configurableMethods = $configurableMethods;
     }
 
-    public function generate()
-    {
+    public function generate() {
         if (!class_exists($this->mockName, false)) {
             eval($this->classCode);
 
@@ -56,8 +54,7 @@ final class MockClass implements MockType
         return $this->mockName;
     }
 
-    public function getClassCode()
-    {
+    public function getClassCode() {
         return $this->classCode;
     }
 }
