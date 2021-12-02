@@ -266,9 +266,7 @@ class CCache_Manager {
      * @return \CCache_Repository
      */
     public function repository(CCache_DriverInterface $driver) {
-        return c::tap(new CCache_Repository($driver), function ($repository) {
-            $this->setEventDispatcher($repository);
-        });
+        return new CCache_Repository($driver);
     }
 
     /**

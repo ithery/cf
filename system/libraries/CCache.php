@@ -56,4 +56,13 @@ class CCache {
     public static function store($name) {
         return CCache_Manager::instance()->store($name);
     }
+
+    /**
+     * Get CCache_Manager Instance.
+     *
+     * @return CCache_Manager
+     */
+    public static function manager() {
+        return CCache_Manager::instance();
+    }
 }

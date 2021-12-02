@@ -19,8 +19,10 @@ return [
         ],
         'file' => [
             'driver' => 'file',
-            'disk' => 'local-temp',
-            'path' => DOCROOT . 'temp' . DS . 'cache',
+            'engine' => 'temp',
+            'options' => [
+                'directory' => CF::appCode()
+            ],
         ],
         'memcached' => [
             'driver' => 'memcached',

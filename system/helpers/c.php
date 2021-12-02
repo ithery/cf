@@ -1490,6 +1490,37 @@ class c {
 
         return $publicPath;
     }
+
+    /**
+     * Get / set the specified cache value.
+     *
+     * If an array is passed, we'll assume you want to put to the cache.
+     *
+     * @param  dynamic  key|key,default|data,expiration|null
+     *
+     * @throws \Exception
+     *
+     * @return \CCache_CacheManager|mixed
+     */
+    public static function cache() {
+        $arguments = func_get_args();
+
+        if (empty($arguments)) {
+            return CCache::manager();
+        }
+
+        if (is_string($arguments[0])) {
+            return CCache::manager()->get(...$arguments);
+        }
+
+        if (!is_array($arguments[0])) {
+            throw new Exception(
+                'When setting a value in the cache, you must pass an array of key / value pairs.'
+            );
+        }
+
+        return CCache::manager()->put(key($arguments[0]), reset($arguments[0]), isset($arguments[1]) ? $arguments[1] : null);
+    }
 }
 
 // End c

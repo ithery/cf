@@ -9,7 +9,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
     use CTrait_Helper_InteractsWithTime;
-
     /**
      * @var CCache_DriverAbstract
      */
@@ -21,13 +20,6 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
      * @var null|int
      */
     protected $default = 3600;
-
-    /**
-     * The event dispatcher implementation.
-     *
-     * @var CEvent_Dispatcher
-     */
-    protected $events;
 
     /**
      * Create a new cache repository instance.
@@ -466,10 +458,6 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
         if ($this->driver instanceof CCache_DriverTaggableAbstract) {
             $cache = $this->driver->tags(is_array($names) ? $names : func_get_args());
 
-            if (!is_null($this->events)) {
-                $cache->setEventDispatcher($this->events);
-            }
-
             return $cache->setDefaultCacheTime($this->default);
         }
         if (!$this->supportsTags()) {
@@ -538,29 +526,7 @@ class CCache_Repository implements CCache_RepositoryInterface, ArrayAccess {
      * @return void
      */
     protected function event($event) {
-        if (isset($this->events)) {
-            $this->events->dispatch($event);
-        }
-    }
-
-    /**
-     * Get the event dispatcher instance.
-     *
-     * @return CEvent_Dispatcher
-     */
-    public function getEventDispatcher() {
-        return $this->events;
-    }
-
-    /**
-     * Set the event dispatcher instance.
-     *
-     * @param CEvent_Dispatcher $events
-     *
-     * @return void
-     */
-    public function setEventDispatcher(CEvent_Dispatcher $events) {
-        $this->events = $events;
+        return CEvent::dispatch($event);
     }
 
     /**
