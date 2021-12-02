@@ -6,6 +6,13 @@
  * @author Hery
  */
 class CRouting_RouteFinder {
+    /**
+     * Return Route From Uri.
+     *
+     * @param string $uri
+     *
+     * @return CRouting_Route
+     */
     public static function find($uri = null) {
         if ($uri == null) {
             $uri = CHTTP::request()->path();
