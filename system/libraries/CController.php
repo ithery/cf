@@ -18,11 +18,6 @@ abstract class CController {
     protected $input;
 
     /**
-     * @var URI
-     */
-    protected $uri;
-
-    /**
      * The middleware registered on the controller.
      *
      * @var array
@@ -39,9 +34,6 @@ abstract class CController {
             // Set the instance to the first controller loaded
             CF::$instance = $this;
         }
-
-        // URI should always be available
-        $this->uri = URI::instance();
 
         // Input should always be available
         $this->input = CController_Input::instance();
