@@ -143,7 +143,7 @@ class CQueue_Batch implements CInterface_Arrayable, JsonSerializable {
     /**
      * Add additional jobs to the batch.
      *
-     * @param \Illuminate\Support\Collection|array $jobs
+     * @param \CCollection|array $jobs
      *
      * @return self
      */
