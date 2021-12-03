@@ -47,21 +47,21 @@ return [
      * to a random, 32 character string, otherwise these encrypted strings
      * will not be safe. Please do this before deploying an application!
      */
-    'key' => 'base64:shKObGZASSmb2lrui0DronRaSRojcXeVpKbqfNMei/o=',
+    'key' => c::env('APP_KEY', 'base64:shKObGZASSmb2lrui0DronRaSRojcXeVpKbqfNMei/o='),
     'cipher' => 'AES-256-CBC',
     /**
      * This value determines the "environment" your application is currently
      * running in. This may determine how you prefer to configure various
      * services the application utilizes. Override this in your application config file.
      */
-    'environment' => CBase::ENVIRONMENT_DEVELOPMENT,
+    'environment' => c::env('ENVIRONMENT', CBase::ENVIRONMENT_DEVELOPMENT),
 
     /**
      * When your application is in debug mode, detailed error messages with
      * stack traces will be shown on every error that occurs within your
      * application. If disabled, a simple generic error page is shown.
      */
-    'debug' => !IN_PRODUCTION,
+    'debug' => c::env('DEBUG', !IN_PRODUCTION),
 
     'auth' => [
         'guard' => 'web',
@@ -102,8 +102,6 @@ return [
     'sidebar' => true, //deprecated
     'signup' => false, //deprecated
     'theme' => '',
-    'admin_email' => 'contact@cresenitytech.com',
-    'set_timezone' => true, //deprecated
-    'default_timezone' => 'Asia/Jakarta', //deprecated
+    'admin_email' => c::env('ADMIN_EMAIL'),
 
 ];
