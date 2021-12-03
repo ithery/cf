@@ -32,7 +32,7 @@ class CConsole_Command_Cron_ScheduleWorkCommand extends CConsole_Command {
             if (CCarbon::now()->second === 0
                 && !CCarbon::now()->startOfMinute()->equalTo($lastExecutionStartedAt)
             ) {
-                $executions[] = $execution = new Process([PHP_BINARY, 'cf', 'schedule:run']);
+                $executions[] = $execution = new Process([PHP_BINARY, 'cf', 'cron:run']);
 
                 $execution->start();
 
