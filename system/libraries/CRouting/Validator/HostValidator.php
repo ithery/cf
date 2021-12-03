@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of HostValidator
+ * Description of HostValidator.
  *
  * @author Hery
  */
