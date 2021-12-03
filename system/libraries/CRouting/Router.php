@@ -10,11 +10,11 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
+/* implements  BindingRegistrar, RegistrarContract */
 /**
  * @mixin CRouting_RouteRegistrar
  */
-class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
-{
+class CRouting_Router {
     use CTrait_Macroable {
         __call as macroCall;
     }
