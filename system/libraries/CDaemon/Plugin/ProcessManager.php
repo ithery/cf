@@ -10,12 +10,12 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
     /**
-     * The length (in seconds) of the rolling window used to detect process churn
+     * The length (in seconds) of the rolling window used to detect process churn.
      */
     const CHURN_WINDOW = 120;
 
     /**
-     * The number of failed processes within the CHURN_WINDOW required to trigger a fatal error
+     * The number of failed processes within the CHURN_WINDOW required to trigger a fatal error.
      */
     const CHURN_LIMIT = 5;
 
@@ -25,12 +25,12 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
     public $service;
 
     /**
-     * @var CDaemon_Process[]
+     * @var array
      */
     public $processes = [];
 
     /**
-     * Array of failed forks -- reaped within in expected_min_ttl
+     * Array of failed forks -- reaped within in expected_min_ttl.
      *
      * @var array Numeric key, the value is the time the failure occurred
      */
@@ -45,7 +45,7 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
     }
 
     /**
-     * Called on Construct or Init
+     * Called on Construct or Init.
      *
      * @return void
      */
@@ -54,7 +54,7 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
     }
 
     /**
-     * Called on Destruct
+     * Called on Destruct.
      *
      * @return void
      */
@@ -90,11 +90,12 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
         if (!$this->service instanceof CDaemon_ServiceAbstract) {
             $errors[] = 'Invalid reference to Application Object';
         }
+
         return $errors;
     }
 
     /**
-     * Return the number of processes, optionall by $group
+     * Return the number of processes, optionall by $group.
      *
      * @param $group
      *
@@ -110,9 +111,10 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
         }
         // Sum processes across all process groups
         $count = 0;
-        foreach ($this->processes as $process_group) {
-            $count += count($process_group);
+        foreach ($this->processes as $processGroup) {
+            $count += count($processGroup);
         }
+
         return $count;
     }
 
@@ -134,24 +136,26 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
         // List processes across all process groups
         $list = [];
         foreach ($this->processes as $processGroup) {
-            $list[] = $processGroup;
+            $list += $processGroup;
         }
+
         return $list;
     }
 
     /**
-     * Return a single process by its pid
+     * Return a single process by its pid.
      *
      * @param $pid
      *
      * @return CDaemon_Process
      */
     public function process($pid) {
-        foreach ($this->processes as $process_group) {
-            if (isset($process_group[$pid])) {
-                return $process_group[$pid];
+        foreach ($this->processes as $processGroup) {
+            if (isset($processGroup[$pid])) {
+                return $processGroup[$pid];
             }
         }
+
         return null;
     }
 
@@ -174,6 +178,7 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
                 // Child Process
                 @pcntl_setpriority(1);
                 $this->service->dispatch([CDaemon_ServiceAbstract::ON_FORK]);
+
                 return true;
             default:
                 // Parent Process - Return the pid of the newly created Task
@@ -184,6 +189,7 @@ class CDaemon_Plugin_ProcessManager extends CDaemon_PluginAbstract {
                     $this->processes[$group] = [];
                 }
                 $this->processes[$group][$pid] = $proc;
+
                 return $proc;
         }
     }
