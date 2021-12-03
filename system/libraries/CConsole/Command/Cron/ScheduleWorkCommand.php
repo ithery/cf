@@ -1,13 +1,13 @@
 <?php
 use Symfony\Component\Process\Process;
 
-class CConsole_Command_Schedule_ScheduleWorkCommand extends CConsole_Command {
+class CConsole_Command_Cron_ScheduleWorkCommand extends CConsole_Command {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $name = 'schedule:work';
+    protected $name = 'cron:work';
 
     /**
      * The console command description.
@@ -22,7 +22,7 @@ class CConsole_Command_Schedule_ScheduleWorkCommand extends CConsole_Command {
      * @return void
      */
     public function handle() {
-        $this->info('Schedule worker started successfully.');
+        $this->info('Cron worker started successfully.');
 
         list($lastExecutionStartedAt, $keyOfLastExecutionWithOutput, $executions) = [null, null, []];
 

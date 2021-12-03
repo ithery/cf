@@ -1537,8 +1537,8 @@ class c {
      *
      * @return CConsole_Schedule
      */
-    public static function schedule() {
-        return CConsole::schedule();
+    public static function cron() {
+        return CCron::schedule();
     }
 }
 

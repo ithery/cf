@@ -1,12 +1,12 @@
 <?php
 
-class CConsole_Command_Schedule_ScheduleTestCommand extends CConsole_Command {
+class CConsole_Command_Cron_ScheduleTestCommand extends CConsole_Command {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $name = 'schedule:test';
+    protected $name = 'cron:test';
 
     /**
      * The console command description.
@@ -21,7 +21,7 @@ class CConsole_Command_Schedule_ScheduleTestCommand extends CConsole_Command {
      * @return void
      */
     public function handle() {
-        $commands = c::schedule()->events();
+        $commands = c::cron()->events();
 
         $commandNames = [];
 

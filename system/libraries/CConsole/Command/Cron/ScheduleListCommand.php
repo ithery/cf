@@ -2,13 +2,13 @@
 
 use Cron\CronExpression;
 
-class CConsole_Command_Schedule_ScheduleListCommand extends CConsole_Command {
+class CConsole_Command_Cron_ScheduleListCommand extends CConsole_Command {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $signature = 'schedule:list {--timezone= : The timezone that times should be displayed in}';
+    protected $signature = 'cron:list {--timezone= : The timezone that times should be displayed in}';
 
     /**
      * The console command description.
@@ -25,7 +25,8 @@ class CConsole_Command_Schedule_ScheduleListCommand extends CConsole_Command {
      * @return void
      */
     public function handle() {
-        foreach (c::schedule()->events() as $event) {
+        $rows = [];
+        foreach (c::cron()->events() as $event) {
             $rows[] = [
                 $event->command,
                 $event->expression,
@@ -42,6 +43,6 @@ class CConsole_Command_Schedule_ScheduleListCommand extends CConsole_Command {
             'Interval',
             'Description',
             'Next Due',
-        ], $rows ?? []);
+        ], $rows);
     }
 }

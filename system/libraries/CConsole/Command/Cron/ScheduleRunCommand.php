@@ -1,12 +1,12 @@
 <?php
 
-class CConsole_Command_Schedule_ScheduleRunCommand extends CConsole_Command {
+class CConsole_Command_Cron_ScheduleRunCommand extends CConsole_Command {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $name = 'schedule:run';
+    protected $name = 'cron:run';
 
     /**
      * The console command description.
@@ -41,10 +41,10 @@ class CConsole_Command_Schedule_ScheduleRunCommand extends CConsole_Command {
     }
 
     public function handle() {
-        foreach (c::schedule()->dueEvents() as $event) {
-            /** @var CConsole_Schedule_Event $event */
+        foreach (c::cron()->dueEvents() as $event) {
+            /** @var CCron_Event $event */
             if (!$event->filtersPass()) {
-                CEvent::dispatch(new CConsole_Schedule_Event_ScheduledTaskSkipped($event));
+                CEvent::dispatch(new CCron_Event_ScheduledTaskSkipped($event));
 
                 continue;
             }
@@ -66,12 +66,12 @@ class CConsole_Command_Schedule_ScheduleRunCommand extends CConsole_Command {
     /**
      * Run the given single server event.
      *
-     * @param \CConsole_Schedule_Event $event
+     * @param \CCron_Event $event
      *
      * @return void
      */
     protected function runSingleServerEvent($event) {
-        if (c::schedule()->serverShouldRun($event, $this->startedAt)) {
+        if (c::cron()->serverShouldRun($event, $this->startedAt)) {
             $this->runEvent($event);
         } else {
             $this->line('<info>Skipping command (has already run on another server):</info> ' . $event->getSummaryForDisplay());
@@ -81,32 +81,32 @@ class CConsole_Command_Schedule_ScheduleRunCommand extends CConsole_Command {
     /**
      * Run the given event.
      *
-     * @param \CConsole_Schedule_Event $event
+     * @param \CCron_Event $event
      *
      * @return void
      */
     protected function runEvent($event) {
         $this->line('<info>[' . date('c') . '] Running scheduled command:</info> ' . $event->getSummaryForDisplay());
 
-        CEvent::dispatch(new CConsole_Schedule_Event_ScheduledTaskStarting($event));
+        CEvent::dispatch(new CCron_Event_ScheduledTaskStarting($event));
 
         $start = microtime(true);
 
         try {
             $event->run();
 
-            CEvent::dispatch(new CConsole_Schedule_Event_ScheduledTaskFinished(
+            CEvent::dispatch(new CCron_Event_ScheduledTaskFinished(
                 $event,
                 round(microtime(true) - $start, 2)
             ));
 
             $this->eventsRan = true;
         } catch (Throwable $e) {
-            CEvent::dispatch(new CConsole_Schedule_Event_ScheduledTaskFailed($event, $e));
+            CEvent::dispatch(new CCron_Event_ScheduledTaskFailed($event, $e));
 
             $this->handler->report($e);
         } catch (Exception $e) {
-            CEvent::dispatch(new CConsole_Schedule_Event_ScheduledTaskFailed($event, $e));
+            CEvent::dispatch(new CCron_Event_ScheduledTaskFailed($event, $e));
 
             $this->handler->report($e);
         }

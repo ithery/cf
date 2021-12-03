@@ -36,7 +36,6 @@ class CController_ControllerDispatcher {
         if (method_exists($controller, 'callAction')) {
             return $controller->callAction($method, $parameters);
         }
-
         $response = $controller->{$method}(...array_values($parameters));
 
         return $response;
@@ -45,8 +44,8 @@ class CController_ControllerDispatcher {
     /**
      * Get the middleware for the controller instance.
      *
-     * @param \Illuminate\Routing\Controller $controller
-     * @param string                         $method
+     * @param \CController $controller
+     * @param string       $method
      *
      * @return array
      */

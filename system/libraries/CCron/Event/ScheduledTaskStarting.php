@@ -1,21 +1,21 @@
 <?php
 
-class CConsole_Schedule_Event_ScheduledTaskStarting {
+class CCron_Event_ScheduledTaskStarting {
     /**
      * The scheduled event being run.
      *
-     * @var \CConsole_Schedule_Event
+     * @var \CCron_Event
      */
     public $task;
 
     /**
      * Create a new event instance.
      *
-     * @param \CConsole_Schedule_Event $task
+     * @param \CCron_Event $task
      *
      * @return void
      */
-    public function __construct(CConsole_Schedule_Event $task) {
+    public function __construct(CCron_Event $task) {
         $this->task = $task;
     }
 }

@@ -78,20 +78,11 @@ abstract class CController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function callAction($method, $parameters) {
-        return $this->{$method}(...array_values($parameters));
-    }
+        if (!method_exists($this, $method)) {
+            throw new CHTTP_Exception_NotFoundHttpException();
+        }
 
-    /**
-     * Handles methods that do not exist.
-     *
-     * @param string $method method name
-     * @param array  $args   arguments
-     *
-     * @return void
-     */
-    public function __call($method, $args) {
-        // Default to showing a 404 page
-        CF::show404();
+        return $this->{$method}(...array_values($parameters));
     }
 
     public static function controllerUrl() {
