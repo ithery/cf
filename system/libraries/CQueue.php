@@ -2,6 +2,8 @@
 
 defined('SYSPATH') or die('No direct access allowed.');
 
+use Aws\DynamoDb\DynamoDbClient;
+
 /**
  * @author Hery Kurniawan
  * @license Ittron Global Teknologi <ittron.co.id>
@@ -28,6 +30,11 @@ final class CQueue {
      * @var CQueue_BatchFactory
      */
     protected static $batchFactory;
+
+    /**
+     * @var CQueue_AbstractFailedJob
+     */
+    protected static $failer;
 
     /**
      * @return CQueue_Dispatcher
@@ -201,5 +208,83 @@ final class CQueue {
         }
 
         return static::$batchRepository;
+    }
+
+    public static function failer() {
+        if (static::$failer == null) {
+            static::$failer = static::resolveFailer();
+        }
+
+        return static::$failer;
+    }
+
+    protected static function resolveFailer() {
+        $config = CF::config('queue.failed');
+
+        if (isset($config['driver']) && $config['driver'] === 'dynamodb') {
+            return static::createDynamoFailedJobProvider($config);
+        } elseif (isset($config['driver']) && $config['driver'] === 'database-uuids') {
+            return static::createDatabaseUuidFailedJobProvider($config);
+        } elseif (isset($config['table'])) {
+            return static::createDatabaseFailedJobProvider($config);
+        } else {
+            return new CQueue_FailedJob_NullFailedJob();
+        }
+    }
+
+    /**
+     * Create a new database failed job provider.
+     *
+     * @param array $config
+     *
+     * @return \CQueue_FailedJob_DatabaseFailedJob
+     */
+    protected static function createDatabaseFailedJobProvider($config) {
+        return new CQueue_FailedJob_DatabaseFailedJob(
+            c::db(),
+            $config['table']
+        );
+    }
+
+    /**
+     * Create a new database failed job provider that uses UUIDs as IDs.
+     *
+     * @param array $config
+     *
+     * @return \CQueue_FailedJob_DatabaseUuidFailedJob
+     */
+    protected static function createDatabaseUuidFailedJobProvider($config) {
+        return new CQueue_FailedJob_DatabaseUuidFailedJob(
+            c::db(),
+            $config['table']
+        );
+    }
+
+    /**
+     * Create a new DynamoDb failed job provider.
+     *
+     * @param array $config
+     *
+     * @return \CQueue_FailedJob_DynamoDbFailedJob
+     */
+    protected static function createDynamoFailedJobProvider($config) {
+        $dynamoConfig = [
+            'region' => $config['region'],
+            'version' => 'latest',
+            'endpoint' => isset($config['endpoint']) ? $config['endpoint'] : null,
+        ];
+
+        if (!empty($config['key']) && !empty($config['secret'])) {
+            $dynamoConfig['credentials'] = carr::only(
+                $config,
+                ['key', 'secret', 'token']
+            );
+        }
+
+        return new CQueue_FailedJob_DynamoDbFailedJob(
+            new DynamoDbClient($dynamoConfig),
+            CF::config('app.name'),
+            $config['table']
+        );
     }
 }
