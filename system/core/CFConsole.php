@@ -16,6 +16,8 @@ class CFConsole {
         CConsole_Command_Daemon_DaemonStartCommand::class,
         CConsole_Command_Daemon_DaemonStatusCommand::class,
         CConsole_Command_Daemon_DaemonStopCommand::class,
+        CConsole_Command_Queue_ClearCommand::class,
+        CConsole_Command_Queue_ListFailedCommand::class,
         CConsole_Command_DevSuite_DevSuiteInstallCommand::class,
         CConsole_Command_DevSuite_DevSuiteStartCommand::class,
         CConsole_Command_DevSuite_DevSuiteUninstallCommand::class,
