@@ -28,7 +28,7 @@ class CConsole_Command_Cron_ScheduleFinishCommand extends CConsole_Command {
      * @return void
      */
     public function handle() {
-        c::collect(CConsole::schedule()->events())->filter(function ($value) {
+        c::collect(CCron::schedule()->events())->filter(function ($value) {
             return $value->mutexName() == $this->argument('id');
         })->each(function (CCron_Event $event) {
             $event->callafterCallbacksWithExitCode($this->laravel, $this->argument('code'));
