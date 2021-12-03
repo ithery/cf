@@ -48,7 +48,10 @@ class CFRouter {
         if (self::$controller === null) {
             // No controller was found, so no page can be rendered
             if (defined('CFPUBLIC')) {
-                if (carr::get(static::$segments, 0) == 'media' || carr::get(static::$segments, 3) == 'media') {
+                if (carr::get(static::$segments, 0) == 'media'
+                    || carr::get(static::$segments, 3) == 'media'
+                    || (carr::get(static::$segments, 3) == 'cresenity' && carr::get(static::$segments, 4) == 'media')
+                ) {
                     $response = CHTTP_FileServeDriver::responseStaticFile(static::$current_uri);
 
                     if ($response) {
