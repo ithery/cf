@@ -124,7 +124,7 @@ class CQueue_BatchRepository implements CQueue_Contract_PrunableBatchRepositoryI
      * @param string $batchId
      * @param string $jobId
      *
-     * @return \Illuminate\Bus\UpdatedBatchJobCounts
+     * @return \CQueue_UpdatedBatchJobCounts
      */
     public function decrementPendingJobs($batchId, $jobId) {
         $values = $this->updateAtomicValues($batchId, function ($batch) use ($jobId) {
