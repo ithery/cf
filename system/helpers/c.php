@@ -1093,7 +1093,7 @@ class c {
      * @param null|string $abstract
      * @param array       $parameters
      *
-     * @return mixed|\CContainer_Container
+     * @return CContainer_Container|mixed
      */
     public static function container($abstract = null, array $parameters = []) {
         if (is_null($abstract)) {
