@@ -1415,13 +1415,14 @@ class c {
         }
 
         $appRoot = static::docRoot('application/' . $appCode);
+
         if ($path != null) {
-            if (is_string($path)) {
+            if (is_string($path) && strlen($path) > 0) {
                 $appRoot .= DS . trim($path, DS);
             }
         }
 
-        return $appRoot . DS;
+        return c::untrailingslashit($appRoot) . DS;
     }
 
     public static function disk($name = null) {
