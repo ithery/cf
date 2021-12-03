@@ -8,7 +8,7 @@ use Psr\Http\Client\ClientExceptionInterface;
 
 class CConsole_Schedule_Event {
     use CTrait_Macroable;
-    use CConsole_Schedule_Trait_ManagesFrequencies;
+    use CConsole_Schedule_Trait_ManagesFrequenciesTrait;
     use CTrait_ReflectsClosureTrait;
 
     /**
@@ -291,17 +291,15 @@ class CConsole_Schedule_Event {
     /**
      * Determine if the given event should run based on the Cron expression.
      *
-     * @param \Illuminate\Contracts\Foundation\Application $app
-     *
      * @return bool
      */
-    public function isDue($app) {
-        if (!$this->runsInMaintenanceMode() && $app->isDownForMaintenance()) {
+    public function isDue() {
+        if (!$this->runsInMaintenanceMode() && CF::isDownForMaintenance()) {
             return false;
         }
 
         return $this->expressionPasses()
-               && $this->runsInEnvironment($app->environment());
+               && $this->runsInEnvironment(CF::environment());
     }
 
     /**
@@ -342,19 +340,17 @@ class CConsole_Schedule_Event {
     /**
      * Determine if the filters pass for the event.
      *
-     * @param \Illuminate\Contracts\Foundation\Application $app
-     *
      * @return bool
      */
-    public function filtersPass($app) {
+    public function filtersPass() {
         foreach ($this->filters as $callback) {
-            if (!$app->call($callback)) {
+            if (!c::container()->call($callback)) {
                 return false;
             }
         }
 
         foreach ($this->rejects as $callback) {
-            if ($app->call($callback)) {
+            if (c::container()->call($callback)) {
                 return false;
             }
         }

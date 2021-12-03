@@ -1,9 +1,4 @@
 <?php
-use Closure;
-use RuntimeException;
-use DateTimeInterface;
-use Illuminate\Support\Str;
-use Illuminate\Queue\CallQueuedClosure;
 
 class CConsole_Schedule {
     use CTrait_Macroable;
@@ -32,14 +27,14 @@ class CConsole_Schedule {
     /**
      * The event mutex implementation.
      *
-     * @var \CConsole_Schedule_Contract_EventMutexInterface
+     * @var \CConsole_Schedule_CacheEventMutex
      */
     protected $eventMutex;
 
     /**
      * The scheduling mutex implementation.
      *
-     * @var \CConsole_Schedule_SchedulingMutex
+     * @var \CConsole_Schedule_CacheSchedulingMutex
      */
     protected $schedulingMutex;
 
@@ -69,15 +64,9 @@ class CConsole_Schedule {
     public function __construct($timezone = null) {
         $this->timezone = $timezone;
 
-        $container = c::container();
+        $this->eventMutex = new CConsole_Schedule_CacheEventMutex();
 
-        $this->eventMutex = $container->bound(CConsole_Schedule_EventMutex::class)
-                                ? $container->make(CConsole_Schedule_EventMutex::class)
-                                : $container->make(CConsole_Schedule_CacheEventMutex::class);
-
-        $this->schedulingMutex = $container->bound(CConsole_Schedule_SchedulingMutex::class)
-                                ? $container->make(CConsole_Schedule_SchedulingMutex::class)
-                                : $container->make(CConsole_Schedule_CacheSchedulingMutex::class);
+        $this->schedulingMutex = new CConsole_Schedule_CacheSchedulingMutex();
     }
 
     /**
@@ -105,7 +94,7 @@ class CConsole_Schedule {
      * @param string $command
      * @param array  $parameters
      *
-     * @return \Illuminate\Console\Scheduling\Event
+     * @return \CConsole_Schedule_Event
      */
     public function command($command, array $parameters = []) {
         if (class_exists($command)) {
@@ -282,12 +271,10 @@ class CConsole_Schedule {
     /**
      * Get all of the events on the schedule that are due.
      *
-     * @param \CBase_ApplicationInterface $app
-     *
      * @return \CCollection
      */
-    public function dueEvents($app) {
-        return c::collect($this->events)->filter->isDue($app);
+    public function dueEvents() {
+        return c::collect($this->events)->filter->isDue();
     }
 
     /**

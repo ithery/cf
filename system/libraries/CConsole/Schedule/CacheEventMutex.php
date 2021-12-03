@@ -14,6 +14,7 @@ class CConsole_Schedule_CacheEventMutex implements CConsole_Schedule_Contract_Ev
      * @return void
      */
     public function __construct() {
+        $this->store = CF::config('schedule.cache.store');
     }
 
     /**

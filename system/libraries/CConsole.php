@@ -11,7 +11,10 @@ class CConsole {
 
     const EXCEPTION_EXIT = 2;
 
-    private $schedule;
+    /**
+     * @var CConsole_Schedule
+     */
+    private static $schedule;
 
     public static function domain() {
         return CF::cliDomain();
@@ -94,6 +97,6 @@ class CConsole {
      * @return string
      */
     protected static function scheduleCache() {
-        return CF::config('cache.schedule_store', CEnv::get('SCHEDULE_CACHE_DRIVER'));
+        return CF::config('schedule.cache.store', CEnv::get('SCHEDULE_CACHE_DRIVER'));
     }
 }

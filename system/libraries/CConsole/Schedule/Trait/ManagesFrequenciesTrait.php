@@ -1,6 +1,6 @@
 <?php
 
-trait CConsole_Schedule_Trait_ManagesFrequencies {
+trait CConsole_Schedule_Trait_ManagesFrequenciesTrait {
     /**
      * The Cron expression representing the event's frequency.
      *

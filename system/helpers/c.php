@@ -1531,6 +1531,15 @@ class c {
     public static function formatter() {
         return CApp::formatter();
     }
+
+    /**
+     * Get Schedule Instance.
+     *
+     * @return CConsole_Schedule
+     */
+    public static function schedule() {
+        return CConsole::schedule();
+    }
 }
 
 // End c
