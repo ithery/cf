@@ -560,4 +560,13 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
         return $this;
     }
+
+    /**
+     * Get CApp Formatter Instance.
+     *
+     * @return CApp_Formatter
+     */
+    public static function formatter() {
+        return CApp_Formatter::instance();
+    }
 }

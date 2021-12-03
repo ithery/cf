@@ -28,12 +28,12 @@ class CElement_FormInput_DateRange extends CElement_FormInput {
 
         $this->type = 'date';
         $this->dateFormat = 'yyyy-mm-dd';
-        $date_format = ccfg::get('date_formatted');
-        if ($date_format != null) {
-            $date_format = str_replace('Y', 'yyyy', $date_format);
-            $date_format = str_replace('m', 'mm', $date_format);
-            $date_format = str_replace('d', 'dd', $date_format);
-            $this->dateFormat = $date_format;
+        $dateFormat = c::formatter()->getDateFormat();
+        if ($dateFormat != null) {
+            $dateFormat = str_replace('Y', 'yyyy', $dateFormat);
+            $dateFormat = str_replace('m', 'mm', $dateFormat);
+            $dateFormat = str_replace('d', 'dd', $dateFormat);
+            $this->dateFormat = $dateFormat;
         }
 
         $this->addClass('form-control');

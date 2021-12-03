@@ -1522,6 +1522,15 @@ class c {
 
         return CCache::manager()->put(key($arguments[0]), reset($arguments[0]), isset($arguments[1]) ? $arguments[1] : null);
     }
+
+    /**
+     * Get CApp Formatter Instance.
+     *
+     * @return CApp_Formatter
+     */
+    public static function formatter() {
+        return CApp::formatter();
+    }
 }
 
 // End c
