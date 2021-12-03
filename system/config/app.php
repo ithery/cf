@@ -111,4 +111,16 @@ return [
         'decimal_digit' => c::env('FORMAT_DECIMAL_DIGIT', 0),
     ],
 
+    'smtp_host' => '', //deprecated
+    'smtp_port' => '', //deprecated
+    'smtp_secure' => false, //deprecated
+    'smtp_username' => '', //deprecated
+    'smtp_password' => '', //deprecated
+    'smtp_from' => 'no-reply@core.capp', //deprecated
+
+    'have_user_login' => true, //deprecated
+    'have_user_access' => true, //deprecated
+    'have_user_permission' => true, //deprecated
+    'have_clock' => false, //deprecated
+    'change_theme' => false, //deprecated
 ];
