@@ -8,6 +8,7 @@ class CFConsole {
         CConsole_Command_StatusCommand::class,
         CConsole_Command_ServeCommand::class,
         CConsole_Command_ComposerCommand::class,
+        CConsole_Command_EnvironmentCommand::class,
         CConsole_Command_Domain_DomainListCommand::class,
         CConsole_Command_Domain_DomainCreateCommand::class,
         CConsole_Command_Domain_DomainDeleteCommand::class,
