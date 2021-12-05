@@ -41,7 +41,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $mainClassTitle .= ' with-elements';
             }
             $html->appendln('<div id="' . $this->id() . '-widget-box" class="' . $mainClass . ' widget-table">')->incIndent();
-            $showTitle = true;
+            $showTitle = (strlen($this->title) > 0) || $this->haveHeaderAction();
             if ($showTitle) {
                 $html->appendln('<div class="' . $mainClassTitle . '">')->incIndent();
                 if (strlen($this->icon) > 0) {
