@@ -78,7 +78,7 @@ abstract class CController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function callAction($method, $parameters) {
-        if (!method_exists($this, $method)) {
+        if (!method_exists($this, $method) && !method_exists($this, '__call')) {
             throw new CHTTP_Exception_NotFoundHttpException();
         }
 
