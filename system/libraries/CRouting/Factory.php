@@ -17,7 +17,7 @@ class CRouting_Factory {
         // cdbg::dd($controller, $method, $arguments);
         // $route= new CRouting_Route()
         // $methods, $uri, $action, $parameters = null
-        // //find controller for this route
+        // find controller for this route
     }
 
     public function parseRouteName($routeName) {

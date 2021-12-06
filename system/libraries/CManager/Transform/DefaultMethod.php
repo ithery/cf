@@ -127,35 +127,19 @@ class CManager_Transform_DefaultMethod {
     }
 
     public static function formatDate($x) {
-        if (strlen($x) == 0) {
-            return $x;
-        }
-        $date_format = ccfg::get('date_formatted');
-        if (strlen($date_format) == 0) {
-            return $x;
-        }
-
-        return date($date_format, strtotime($x));
+        return c::formatter()->formatDate($x);
     }
 
     public static function unformatDate($x) {
-        return date('Y-m-d', strtotime($x));
+        return c::formatter()->unformatDate($x);
     }
 
     public static function formatDatetime($x) {
-        if (strlen($x) == 0) {
-            return $x;
-        }
-        $long_date_format = ccfg::get('long_date_formatted');
-        if (strlen($long_date_format) == 0) {
-            return $x;
-        }
-
-        return date($long_date_format, strtotime($x));
+        return c::formatter()->formatDatetime($x);
     }
 
     public static function unformatDatetime($x) {
-        return date('Y-m-d H:i:s', strtotime($x));
+        return c::formatter()->unformatDatetime($x);
     }
 
     public static function formatCurrency($x, $unformat = false) {

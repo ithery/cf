@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Description of RouteDependencyResolverTrait
+ * Description of RouteDependencyResolverTrait.
  *
  * @author Hery
  */
@@ -60,7 +60,7 @@ trait CRouting_Concern_RouteDependencyResolverTrait {
 
         $values = array_values($parameters);
 
-        $skippableValue = new \stdClass;
+        $skippableValue = new \stdClass();
 
         foreach ($reflector->getParameters() as $key => $parameter) {
             $instance = $this->transformDependency($parameter, $parameters, $skippableValue);

@@ -20,6 +20,13 @@ class CDaemon_Runner {
         return $this;
     }
 
+    /**
+     * Alias for run.
+     */
+    public function start() {
+        return $this->run();
+    }
+
     public function run() {
         $isUnix = CDaemon_Helper::getPlatform() === CDaemon_Helper::UNIX;
         if ($isUnix && !extension_loaded('posix')) {

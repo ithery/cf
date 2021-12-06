@@ -10,11 +10,11 @@ use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
+/* implements  BindingRegistrar, RegistrarContract */
 /**
  * @mixin CRouting_RouteRegistrar
  */
-class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
-{
+class CRouting_Router {
     use CTrait_Macroable {
         __call as macroCall;
     }
@@ -307,30 +307,6 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
         foreach ($resources as $name => $controller) {
             $this->resource($name, $controller, $options);
         }
-    }
-
-    /**
-     * Route a resource to a controller.
-     *
-     * @param string $name
-     * @param string $controller
-     * @param array  $options
-     *
-     * @return \Illuminate\Routing\PendingResourceRegistration
-     */
-    public function resource($name, $controller, array $options = []) {
-        if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
-            $registrar = $this->container->make(ResourceRegistrar::class);
-        } else {
-            $registrar = new ResourceRegistrar($this);
-        }
-
-        return new PendingResourceRegistration(
-            $registrar,
-            $name,
-            $controller,
-            $options
-        );
     }
 
     /**
@@ -1168,39 +1144,6 @@ class CRouting_Router /* implements  BindingRegistrar, RegistrarContract */
      */
     public function currentRouteUses($action) {
         return $this->currentRouteAction() == $action;
-    }
-
-    /**
-     * Set the unmapped global resource parameters to singular.
-     *
-     * @param bool $singular
-     *
-     * @return void
-     */
-    public function singularResourceParameters($singular = true) {
-        ResourceRegistrar::singularParameters($singular);
-    }
-
-    /**
-     * Set the global resource parameter mapping.
-     *
-     * @param array $parameters
-     *
-     * @return void
-     */
-    public function resourceParameters(array $parameters = []) {
-        ResourceRegistrar::setParameters($parameters);
-    }
-
-    /**
-     * Get or set the verbs used in the resource URIs.
-     *
-     * @param array $verbs
-     *
-     * @return null|array
-     */
-    public function resourceVerbs(array $verbs = []) {
-        return ResourceRegistrar::verbs($verbs);
     }
 
     /**

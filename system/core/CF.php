@@ -8,6 +8,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 final class CF {
     use CFDeprecatedTrait;
+
     const CFCLI_CURRENT_DOMAIN_FILE = DOCROOT . 'data' . DS . 'current-domain';
 
     // Security check that is added to all generated PHP files
@@ -77,11 +78,15 @@ final class CF {
      * @return bool
      */
     public static function isProduction() {
+        return static::environment() === CBase::ENVIRONMENT_PRODUCTION;
+    }
+
+    public static function environment() {
         if (defined('IN_PRODUCTION') && IN_PRODUCTION) {
-            return true;
+            return CBase::ENVIRONMENT_PRODUCTION;
         }
 
-        return CF::config('app.environment') === 'production';
+        return CF::config('app.environment', CBase::ENVIRONMENT_DEVELOPMENT);
     }
 
     /**

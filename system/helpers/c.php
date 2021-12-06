@@ -1093,7 +1093,7 @@ class c {
      * @param null|string $abstract
      * @param array       $parameters
      *
-     * @return mixed|\CContainer_Container
+     * @return CContainer_Container|mixed
      */
     public static function container($abstract = null, array $parameters = []) {
         if (is_null($abstract)) {
@@ -1415,13 +1415,14 @@ class c {
         }
 
         $appRoot = static::docRoot('application/' . $appCode);
+
         if ($path != null) {
-            if (is_string($path)) {
+            if (is_string($path) && strlen($path) > 0) {
                 $appRoot .= DS . trim($path, DS);
             }
         }
 
-        return $appRoot . DS;
+        return c::untrailingslashit($appRoot) . DS;
     }
 
     public static function disk($name = null) {
@@ -1520,6 +1521,24 @@ class c {
         }
 
         return CCache::manager()->put(key($arguments[0]), reset($arguments[0]), isset($arguments[1]) ? $arguments[1] : null);
+    }
+
+    /**
+     * Get CApp Formatter Instance.
+     *
+     * @return CApp_Formatter
+     */
+    public static function formatter() {
+        return CApp::formatter();
+    }
+
+    /**
+     * Get Schedule Instance.
+     *
+     * @return CConsole_Schedule
+     */
+    public static function cron() {
+        return CCron::schedule();
     }
 }
 

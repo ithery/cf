@@ -42,6 +42,11 @@ class CApp_Auth {
     protected $guard;
 
     /**
+     * @var CAuth_Contract_StatefulGuardInterface
+     */
+    protected $resolvedGuard;
+
+    /**
      * @var array
      */
     private static $instance;
@@ -184,7 +189,11 @@ class CApp_Auth {
      * @return CAuth_Contract_StatefulGuardInterface
      */
     public function guard() {
-        return c::auth($this->guard);
+        if ($this->resolvedGuard === null) {
+            $this->resolvedGuard = c::auth($this->guard);
+        }
+
+        return $this->resolvedGuard;
     }
 
     public static function loginRateLimiter() {

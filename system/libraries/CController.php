@@ -18,11 +18,6 @@ abstract class CController {
     protected $input;
 
     /**
-     * @var URI
-     */
-    protected $uri;
-
-    /**
      * The middleware registered on the controller.
      *
      * @var array
@@ -39,9 +34,6 @@ abstract class CController {
             // Set the instance to the first controller loaded
             CF::$instance = $this;
         }
-
-        // URI should always be available
-        $this->uri = URI::instance();
 
         // Input should always be available
         $this->input = CController_Input::instance();
@@ -86,20 +78,11 @@ abstract class CController {
      * @return \Symfony\Component\HttpFoundation\Response
      */
     public function callAction($method, $parameters) {
-        return $this->{$method}(...array_values($parameters));
-    }
+        if (!method_exists($this, $method) && !method_exists($this, '__call')) {
+            throw new CHTTP_Exception_NotFoundHttpException();
+        }
 
-    /**
-     * Handles methods that do not exist.
-     *
-     * @param string $method method name
-     * @param array  $args   arguments
-     *
-     * @return void
-     */
-    public function __call($method, $args) {
-        // Default to showing a 404 page
-        CF::show404();
+        return $this->{$method}(...array_values($parameters));
     }
 
     public static function controllerUrl() {
