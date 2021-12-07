@@ -8,7 +8,7 @@ class Controller_Cresenity extends CController {
     }
 
     public function cron() {
-        CJob::cliRunner();
+        CCron::run();
     }
 
     public function task() {

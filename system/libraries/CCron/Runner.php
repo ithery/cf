@@ -1,46 +1,15 @@
 <?php
 
-class CConsole_Command_Cron_ScheduleRunCommand extends CConsole_Command {
-    /**
-     * The console command name.
-     *
-     * @var string
-     */
-    protected $name = 'cron:run';
+use Symfony\Component\Console\Output\OutputInterface;
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Run the scheduled commands';
+class CCron_Runner {
+    protected $eventsRan;
 
-    /**
-     * The 24 hour timestamp this scheduler command started running.
-     *
-     * @var \CCarbon
-     */
     protected $startedAt;
 
-    /**
-     * Check if any events ran.
-     *
-     * @var bool
-     */
-    protected $eventsRan = false;
-
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct() {
+    public function run(OutputInterface $output = null) {
+        $this->eventsRan = false;
         $this->startedAt = c::now();
-
-        parent::__construct();
-    }
-
-    public function handle() {
         foreach (c::cron()->dueEvents() as $event) {
             /** @var CCron_Event $event */
             if (!$event->filtersPass()) {
@@ -59,7 +28,9 @@ class CConsole_Command_Cron_ScheduleRunCommand extends CConsole_Command {
         }
 
         if (!$this->eventsRan) {
-            $this->info('No scheduled commands are ready to run.');
+            if ($output != null) {
+                $output->writeln('No scheduled commands are ready to run.');
+            }
         }
     }
 
@@ -70,11 +41,13 @@ class CConsole_Command_Cron_ScheduleRunCommand extends CConsole_Command {
      *
      * @return void
      */
-    protected function runSingleServerEvent($event) {
+    protected function runSingleServerEvent($event, OutputInterface $output = null) {
         if (c::cron()->serverShouldRun($event, $this->startedAt)) {
             $this->runEvent($event);
         } else {
-            $this->line('<info>Skipping command (has already run on another server):</info> ' . $event->getSummaryForDisplay());
+            if ($output) {
+                $output->writeln('<info>Skipping command (has already run on another server):</info> ' . $event->getSummaryForDisplay());
+            }
         }
     }
 
@@ -85,8 +58,10 @@ class CConsole_Command_Cron_ScheduleRunCommand extends CConsole_Command {
      *
      * @return void
      */
-    protected function runEvent($event) {
-        $this->line('<info>[' . date('c') . '] Running scheduled command:</info> ' . $event->getSummaryForDisplay());
+    protected function runEvent($event, OutputInterface $output = null) {
+        if ($output) {
+            $output->writeln('<info>[' . date('c') . '] Running scheduled command:</info> ' . $event->getSummaryForDisplay());
+        }
 
         CEvent::dispatch(new CCron_Event_ScheduledTaskStarting($event));
 

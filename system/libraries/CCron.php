@@ -1,12 +1,12 @@
 <?php
 
-class CCron {
+use Symfony\Component\Console\Output\OutputInterface;
 
+class CCron {
     /**
      * @var CCron_Schedule
      */
     private static $schedule;
-
 
     /**
      * Get CConsole Schedule Object.
@@ -39,5 +39,14 @@ class CCron {
      */
     protected static function scheduleCache() {
         return CF::config('cron.cache.store', CEnv::get('CRON_CACHE_DRIVER'));
+    }
+
+    /**
+     * Get the name of the cache store that should manage scheduling mutexes.
+     *
+     * @return string
+     */
+    public static function run(OutputInterface $output = null) {
+        return (new CCron_Runner())->run($output);
     }
 }
