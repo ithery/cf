@@ -57,6 +57,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->requires = [];
         $this->valueCallback = null;
         $this->applyJs = 'select2';
+        $this->value = null;
     }
 
     public static function factory($id) {
@@ -142,6 +143,35 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
+    public function createAjaxUrl() {
+        $ajaxMethod = CAjax::createMethod();
+        $ajaxMethod->setType('SearchSelect');
+        $ajaxMethod->setData('query', $this->query);
+        $ajaxMethod->setData('keyField', $this->keyField);
+        $ajaxMethod->setData('searchField', $this->searchField);
+        $ajaxMethod->setData('valueCallback', $this->valueCallback);
+
+        $ajaxUrl = $ajaxMethod->makeUrl();
+
+        return $ajaxUrl;
+    }
+
+    private function generateSelect2Template($template) {
+        //escape the character
+        $template = str_replace("'", "\'", $template);
+        preg_match_all("/{([\w]*)}/", $template, $matches, PREG_SET_ORDER);
+
+        foreach ($matches as $val) {
+            $str = carr::get($val, 1); //matches str without bracket {}
+            $bracketStr = carr::get($val, 0); //matches str with bracket {}
+            if (strlen($str) > 0) {
+                $template = str_replace($bracketStr, "'+item." . $str . "+'", $template);
+            }
+        }
+
+        return $template;
+    }
+
     public function html($indent = 0) {
         if ($this->applyJs == 'select2v2.3') {
             return $this->htmlSelect2v23($indent);
@@ -172,15 +202,17 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
         $html->setIndent($indent);
         $value = null;
-        if ($this->autoSelect) {
+        if ($this->value !== null) {
+            $value = $this->value;
+        }
+        if ($this->autoSelect && $value === null) {
             $db = CDatabase::instance();
             $rjson = 'false';
 
-            $q = 'select `' . $this->keyField . '` from (' . $this->query . ') as a limit 1';
+            $query = $this->query;
+
+            $q = 'select `' . $this->keyField . '` from (' . $query . ') as a limit 1';
             $value = cdbutils::get_value($q);
-        }
-        if (strlen($this->value) > 0) {
-            $value = $this->value;
         }
         $additionAttribute = '';
         foreach ($this->attr as $k => $v) {
@@ -189,11 +221,11 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $disabled . $custom_css . $multiple . $additionAttribute . '">');
 
         // select2 4.0 using option to set default value
-        if (strlen($this->value) > 0 || $this->autoSelect) {
+        if ($value !== null || $this->autoSelect) {
             $db = CDatabase::instance();
             $rjson = 'false';
 
-            if ($this->autoSelect) {
+            if ($this->autoSelect && $value === null) {
                 $q = 'select * from (' . $this->query . ') as a limit 1';
             } else {
                 $q = 'select * from (' . $this->query . ') as a where `' . $this->keyField . '`=' . $db->escape($this->value);
@@ -220,42 +252,13 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     $strSelection = str_replace($b_str, carr::get($row, $str), $strSelection);
                 }
 
-                $html->appendln('<option value="' . $this->value . '">' . $strSelection . '</option>');
+                $html->appendln('<option value="' . $this->value . '" data-content="' . c::e($strSelection) . '" >' . $strSelection . '</option>');
             }
         }
         $html->appendln('</select>');
         $html->br();
 
         return $html->text();
-    }
-
-    public function createAjaxUrl() {
-        $ajaxMethod = CAjax::createMethod();
-        $ajaxMethod->setType('SearchSelect');
-        $ajaxMethod->setData('query', $this->query);
-        $ajaxMethod->setData('keyField', $this->keyField);
-        $ajaxMethod->setData('searchField', $this->searchField);
-        $ajaxMethod->setData('valueCallback', $this->valueCallback);
-
-        $ajaxUrl = $ajaxMethod->makeUrl();
-
-        return $ajaxUrl;
-    }
-
-    private function generateSelect2Template($template) {
-        //escape the character
-        $template = str_replace("'", "\'", $template);
-        preg_match_all("/{([\w]*)}/", $template, $matches, PREG_SET_ORDER);
-
-        foreach ($matches as $val) {
-            $str = carr::get($val, 1); //matches str without bracket {}
-            $bracketStr = carr::get($val, 0); //matches str with bracket {}
-            if (strlen($str) > 0) {
-                $template = str_replace($bracketStr, "'+item." . $str . "+'", $template);
-            }
-        }
-
-        return $template;
     }
 
     public function js($indent = 0) {
@@ -294,28 +297,48 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         }
 
         $strJsInit = '';
-        if ($this->autoSelect) {
+        $value = null;
+        if ($this->value !== null) {
+            $value = $this->value;
+        }
+        if ($this->autoSelect && $value === null) {
             $db = CDatabase::instance();
             $rjson = 'false';
 
-            $q = 'select * from (' . $this->query . ') as a limit 1';
+            $query = $this->query;
+
+            $q = 'select `' . $this->keyField . '` from (' . $query . ') as a limit 1';
+            $value = cdbutils::get_value($q);
+        }
+        if ($this->autoSelect) {
+            $db = CDatabase::instance();
+            $rjson = 'false';
+            if ($this->autoSelect && $value === null) {
+                $q = 'select * from (' . $this->query . ') as a limit 1';
+            } else {
+                $q = 'select * from (' . $this->query . ') as a where `' . $this->keyField . '`=' . $db->escape($this->value);
+            }
+
             $r = $db->query($q)->resultArray(false);
             if (count($r) > 0) {
-                $r = $r[0];
-                if ($this->valueCallback != null && is_callable($this->valueCallback)) {
-                    foreach ($r as $k => $val) {
-                        $r[$k] = $this->valueCallback($r, $k, $val);
+                $row = $r[0];
+                if (is_object($row)) {
+                    $row = (array) $row;
+                }
+                if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
+                    foreach ($row as $k => $v) {
+                        $row[$k] = $this->valueCallback($row, $k, $v);
                     }
                 }
-            }
-            $rjson = json_encode($r);
+                $rjson = json_encode($r);
 
-            $strJsInit = '
-                initSelection : function (element, callback) {
-                    var data = ' . $rjson . ';
-                    callback(data);
-                },
-            ';
+                $strJsInit = '
+                    initSelection : function (element, callback) {
+                        var data = ' . $rjson . ';
+                        callback(data);
+                    },
+                ';
+            }
         }
 
         $strMultiple = '';
