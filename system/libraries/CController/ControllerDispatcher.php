@@ -4,6 +4,8 @@
  * Description of CController_Dispatcher.
  *
  * @author Hery
+ *
+ * @see CController
  */
 class CController_ControllerDispatcher {
     /*implements ControllerDispatcherContract*/
