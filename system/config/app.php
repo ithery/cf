@@ -106,8 +106,8 @@ return [
     'format' => [
         'date' => c::env('FORMAT_DATE', 'Y-m-d'),
         'datetime' => c::env('FORMAT_DATETIME', 'Y-m-d H:i:s'),
-        'thousand_separator' => c::env('FORMAT_THOUSAND_SEPARATOR', '.'),
-        'decimal_separator' => c::env('FORMAT_DECIMAL_SEPARATOR', ','),
+        'thousand_separator' => c::env('FORMAT_THOUSAND_SEPARATOR', ','),
+        'decimal_separator' => c::env('FORMAT_DECIMAL_SEPARATOR', '.'),
         'decimal_digit' => c::env('FORMAT_DECIMAL_DIGIT', 0),
     ],
 
