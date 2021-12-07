@@ -18,4 +18,9 @@ interface CManager_Contract_DataProviderInterface {
      * @return CPagination_LengthAwarePaginator
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null);
+
+    /**
+     * @return CInterface_Enumerable
+     */
+    public function toEnumerable();
 }

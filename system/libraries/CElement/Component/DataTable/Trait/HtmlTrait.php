@@ -77,7 +77,8 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 }
                 $html->decIndent()->appendln('</div>');
             }
-            $html->appendln('<div class="' . $mainClassContent . ' nopadding">')->incIndent();
+            $nopaddingClass = $this->applyDataTable ? '' : 'nopadding';
+            $html->appendln('<div class="' . $mainClassContent . ' ' . $nopaddingClass . '">')->incIndent();
         }
 
         $html->append($this->rawHtml($html->getIndent()), $wrapped);
@@ -118,158 +119,147 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         //render body;
         $html->appendln($this->htmlChild($indent));
         $no = 0;
-        if (!$this->ajax && (is_array($this->data) || $this->data instanceof Traversable)) {
-            foreach ($this->data as $row) {
-                if ($row instanceof CRenderable) {
-                    $html->appendln($row->html());
+        if (!$this->ajax) {
+            if ($this->query instanceof CManager_Contract_DataProviderInterface) {
+                $this->data = $this->query->toEnumerable();
+            }
+            if (is_array($this->data) || $this->data instanceof Traversable || $this->data instanceof CInterface_Enumerable) {
+                foreach ($this->data as $row) {
+                    if ($row instanceof CRenderable) {
+                        $html->appendln($row->html());
 
-                    continue;
-                }
+                        continue;
+                    }
+                    $dataRow = new CElement_Component_DataTable_DataRow($row);
+                    $rowArray = $dataRow->toArray();
 
-                $no++;
-                $key = '';
+                    $no++;
+                    $key = '';
 
-                if (array_key_exists($this->keyField, $row)) {
-                    $key = $row[$this->keyField];
-                }
-                $html->appendln('<tr id="tr-' . $key . '">')->incIndent()->br();
+                    if (array_key_exists($this->keyField, $row)) {
+                        $key = $row[$this->keyField];
+                    }
+                    $html->appendln('<tr id="tr-' . $key . '">')->incIndent()->br();
 
-                if ($this->numbering) {
-                    $html->appendln('<td scope="row" class="align-right">' . $no . '</td>')->br();
-                }
-                if ($this->checkbox) {
-                    $checkboxHtml = $this->callCheckboxRenderer($row);
-                    $html->appendln('
-                        <td scope="row" class="checkbox-cell align-center">
-                            ' . $checkboxHtml . '
-                        </td>
-                    ')->br();
-                }
-                $jsparam = [];
-                if ($this->actionLocation == 'first') {
-                    $js .= $this->drawActionAndGetJs($html, $row, $key);
-                }
-                foreach ($this->columns as $col) {
-                    $col_found = false;
-                    $new_v = '';
-                    $col_v = '';
-                    $ori_v = '';
-                    //do print from query
-                    foreach ($row as $k => $v) {
-                        if ($v instanceof CRenderable) {
-                            $v = $v->html();
+                    if ($this->numbering) {
+                        $html->appendln('<td scope="row" class="align-right">' . $no . '</td>')->br();
+                    }
+                    if ($this->checkbox) {
+                        $checkboxHtml = $this->callCheckboxRenderer($row);
+                        $html->appendln('
+                            <td scope="row" class="checkbox-cell align-center">
+                                ' . $checkboxHtml . '
+                            </td>
+                        ')->br();
+                    }
+
+                    if ($this->actionLocation == 'first') {
+                        $js .= $this->drawActionAndGetJs($html, $dataRow, $key);
+                    }
+                    foreach ($this->columns as $col) {
+                        $colValue = $dataRow->getValue($col->getFieldname());
+                        if ($colValue instanceof CRenderable) {
+                            $colValue = $colValue->html();
                         }
-                        if ($k == $col->getFieldname()) {
-                            $col_v = $v;
-                            $ori_v = $col_v;
-                            foreach ($col->transforms as $trans) {
-                                $col_v = $trans->execute($col_v);
+                        $originalValue = $colValue;
+                        foreach ($col->transforms as $trans) {
+                            $colValue = $trans->execute($colValue);
+                        }
+
+                        //if formatted
+                        if (strlen($col->format) > 0) {
+                            $tempValue = $col->format;
+                            foreach ($row as $k2 => $v2) {
+                                if (strpos($tempValue, '{' . $k2 . '}') !== false) {
+                                    $tempValue = str_replace('{' . $k2 . '}', $v2, $tempValue);
+                                }
                             }
+                            $colValue = $tempValue;
                         }
-                    }
-                    //if formatted
-                    if (strlen($col->format) > 0) {
-                        $temp_v = $col->format;
-                        foreach ($row as $k2 => $v2) {
-                            if (strpos($temp_v, '{' . $k2 . '}') !== false) {
-                                $temp_v = str_replace('{' . $k2 . '}', $v2, $temp_v);
-                            }
-                            $col_v = $temp_v;
+                        //if have callback
+                        if ($col->callback != null) {
+                            $colValue = CFunction::factory($col->callback)
+                                    // ->addArg($table)
+                                ->addArg($row)
+                                ->addArg($colValue)
+                                ->setRequire($col->callbackRequire)
+                                ->execute();
+
+                            list($colValue, $jsCell) = $this->getHtmlJsCell($colValue);
+                            $js .= $jsCell;
                         }
-                    }
-                    //if have callback
-                    if ($col->callback != null) {
-                        $col_v = CFunction::factory($col->callback)
-                                // ->addArg($table)
-                            ->addArg($row)
-                            ->addArg($col_v)
-                            ->setRequire($col->callbackRequire)
-                            ->execute();
+                        $newValue = $colValue;
 
-                        list($col_v, $jsCell) = $this->getHtmlJsCell($col_v);
-                        $js .= $jsCell;
-                    }
-                    $new_v = $col_v;
-
-                    if (($this->cellCallbackFunc) != null) {
-                        $new_v = CFunction::factory($this->cellCallbackFunc)
-                            ->addArg($this)
-                            ->addArg($col->getFieldname())
-                            ->addArg($row)
-                            ->addArg($new_v)
-                            ->setRequire($this->requires)
-                            ->execute();
-                        if ($new_v instanceof CRenderable) {
-                            $js .= $new_v->js();
-                            $new_v = $new_v->html();
+                        if (($this->cellCallbackFunc) != null) {
+                            $newValue = CFunction::factory($this->cellCallbackFunc)
+                                ->addArg($this)
+                                ->addArg($col->getFieldname())
+                                ->addArg($row)
+                                ->addArg($newValue)
+                                ->setRequire($this->requires)
+                                ->execute();
+                            list($newValue, $jsCell) = $this->getHtmlJsCell($colValue);
+                            $js .= $jsCell;
                         }
-                        if (is_array($new_v) && isset($new_v['html'], $new_v['js'])) {
-                            $js .= $new_v['js'];
-                            $new_v = $new_v['html'];
-                        }
-                    }
-                    $class = $col->getClassAttribute();
-                    switch ($col->getAlign()) {
-                        case CConstant::ALIGN_LEFT:
-                            $class .= ' align-left';
-
-                            break;
-                        case CConstant::ALIGN_RIGHT:
-                            $class .= ' align-right';
-
-                            break;
-                        case CConstant::ALIGN_CENTER:
-                            $class .= ' align-center';
-
-                            break;
-                    }
-                    if ($col->getNoLineBreak()) {
-                        $class .= ' no-line-break';
-                    }
-                    if ($col->getHiddenPhone()) {
-                        $class .= ' hidden-phone';
-                    }
-
-                    if ($col->getHiddenTablet()) {
-                        $class .= ' hidden-tablet';
-                    }
-
-                    if ($col->getHiddenDesktop()) {
-                        $class .= ' hidden-desktop';
-                    }
-
-                    $pdfTBodyTdCurrentAttr = $this->getPdfTBodyTdAttr();
-                    if ($this->export_pdf) {
+                        $class = $col->getClassAttribute();
                         switch ($col->getAlign()) {
-                            case 'left':
-                                $pdfTBodyTdCurrentAttr .= ' align="left"';
+                            case CConstant::ALIGN_LEFT:
+                                $class .= ' align-left';
 
                                 break;
-                            case 'right':
-                                $pdfTBodyTdCurrentAttr .= ' align="right"';
+                            case CConstant::ALIGN_RIGHT:
+                                $class .= ' align-right';
 
                                 break;
-                            case 'center':
-                                $pdfTBodyTdCurrentAttr .= ' align="center"';
+                            case CConstant::ALIGN_CENTER:
+                                $class .= ' align-center';
 
                                 break;
                         }
+                        if ($col->getNoLineBreak()) {
+                            $class .= ' no-line-break';
+                        }
+                        if ($col->getHiddenPhone()) {
+                            $class .= ' hidden-phone';
+                        }
+
+                        if ($col->getHiddenTablet()) {
+                            $class .= ' hidden-tablet';
+                        }
+
+                        if ($col->getHiddenDesktop()) {
+                            $class .= ' hidden-desktop';
+                        }
+
+                        $pdfTBodyTdCurrentAttr = $this->getPdfTBodyTdAttr();
+                        if ($this->export_pdf) {
+                            switch ($col->getAlign()) {
+                                case 'left':
+                                    $pdfTBodyTdCurrentAttr .= ' align="left"';
+
+                                    break;
+                                case 'right':
+                                    $pdfTBodyTdCurrentAttr .= ' align="right"';
+
+                                    break;
+                                case 'center':
+                                    $pdfTBodyTdCurrentAttr .= ' align="center"';
+
+                                    break;
+                            }
+                        }
+
+                        $html->appendln('<td' . $pdfTBodyTdCurrentAttr . ' class="' . $class . '" data-column="' . $col->getFieldname() . '">' . $newValue . '</td>')->br();
                     }
-                    if (is_array($new_v)) {
-                        $this->js_cell .= carr::get($new_v, 'js', '');
-                        $new_v = carr::get($new_v, 'html', '');
+                    if ($this->actionLocation == 'last') {
+                        $js .= $this->drawActionAndGetJs($html, $dataRow, $key);
                     }
 
-                    $html->appendln('<td' . $pdfTBodyTdCurrentAttr . ' class="' . $class . '" data-column="' . $col->getFieldname() . '">' . $new_v . '</td>')->br();
-                    $col_found = true;
+                    $html->decIndent()->appendln('</tr>')->br();
                 }
-                if ($this->actionLocation == 'last') {
-                    $js .= $this->drawActionAndGetJs($html, $row, $key);
-                }
-
-                $html->decIndent()->appendln('</tr>')->br();
             }
         }
+
         $this->js_cell .= $js;
 
         $html->decIndent()->appendln('</tbody>')->br();
@@ -277,11 +267,11 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
         return $html->text();
     }
 
-    protected function drawActionAndGetJs(CStringBuilder $html, $row, $key) {
+    protected function drawActionAndGetJs(CStringBuilder $html, CElement_Component_DataTable_DataRow $row, $key) {
         $js = '';
         if ($this->haveRowAction()) {
             $html->appendln('<td class="low-padding align-center cell-action td-action">')->incIndent()->br();
-            foreach ($row as $k => $v) {
+            foreach ($row->toArray() as $k => $v) {
                 $jsparam[$k] = $v;
             }
 
