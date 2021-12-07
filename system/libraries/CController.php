@@ -82,6 +82,15 @@ abstract class CController {
             throw new CHTTP_Exception_NotFoundHttpException();
         }
 
+        $reflectionClass = new ReflectionClass($this);
+        $reflectionMethod = $reflectionClass->getMethod($method);
+        /** @var ReflectionMethod $reflectionMethod */
+        $requiredParameter = $reflectionMethod->getNumberOfRequiredParameters();
+
+        if (count($parameters) < $requiredParameter) {
+            throw new CHTTP_Exception_NotFoundHttpException();
+        }
+
         return $this->{$method}(...array_values($parameters));
     }
 
