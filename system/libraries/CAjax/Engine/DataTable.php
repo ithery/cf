@@ -21,6 +21,7 @@ class CAjax_Engine_DataTable extends CAjax_Engine {
         $isElastic = carr::get($data, 'isElastic');
         $isCallback = carr::get($data, 'isCallback');
         $isModelQuery = carr::get($data, 'isModelQuery');
+        $isDataProvider = carr::get($data, 'isDataProvider');
 
         $processorType = 'Query';
         if ($isElastic) {
@@ -31,6 +32,9 @@ class CAjax_Engine_DataTable extends CAjax_Engine {
         }
         if ($isModelQuery) {
             $processorType = 'ModelQuery';
+        }
+        if ($isDataProvider) {
+            $processorType = 'DataProvider';
         }
         $processor = $this->createProcessor($processorType, $data);
 

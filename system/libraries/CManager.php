@@ -367,4 +367,8 @@ final class CManager {
     public static function view() {
         return CView_Factory::instance();
     }
+
+    public static function createModelDataProvider($model, $queryCallback = null) {
+        return new CManager_DataProvider_ModelDataProvider($model, $queryCallback);
+    }
 }

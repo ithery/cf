@@ -15,6 +15,7 @@ class CElement_Component_DataTable extends CElement_Component {
         CElement_Component_DataTable_Trait_CheckboxTrait,
         CElement_Component_DataTable_Trait_SearchTrait,
         CElement_Component_DataTable_Trait_FooterTrait;
+
     const ACTION_LOCATION_FIRST = 'first';
 
     const ACTION_LOCATION_LAST = 'last';
@@ -586,7 +587,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @param string $q
+     * @param CModel_Query $q
      *
      * @return $this
      */
@@ -602,10 +603,16 @@ class CElement_Component_DataTable extends CElement_Component {
 
     /**
      * @param CModel|CModel_Query $model
+     * @param null|mixed          $queryCallback
      *
      * @return $this
      */
-    public function setDataFromModel($model) {
+    public function setDataFromModel($model, $queryCallback = null) {
+        if (is_string($model)) {
+            $this->query = CManager::createModelDataProvider($model, $queryCallback);
+
+            return $this;
+        }
         $modelQuery = $model;
         if ($modelQuery instanceof CModel_Collection) {
             throw new Exception('error when calling setDataFromModel, please use CModel/CModel_Query instance (CModel_Collection passed)');

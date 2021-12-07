@@ -287,12 +287,12 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
 
             $jsparam['param1'] = $key;
 
-            $this->rowActionList->regenerateId(true);
-            $this->rowActionList->apply('setJsParam', $jsparam);
-            $this->rowActionList->apply('setHandlerParam', $jsparam);
+            $this->getRowActionList()->regenerateId(true);
+            $this->getRowActionList()->apply('setJsParam', $jsparam);
+            $this->getRowActionList()->apply('setHandlerParam', $jsparam);
 
             if (($this->filterActionCallbackFunc) != null) {
-                $actions = $this->rowActionList->childs();
+                $actions = $this->getRowActionList()->childs();
 
                 foreach ($actions as &$action) {
                     $visibility = CFunction::factory($this->filterActionCallbackFunc)
@@ -309,9 +309,9 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 }
             }
 
-            $js = $this->rowActionList->js();
+            $js = $this->getRowActionList()->js();
 
-            $html->appendln($this->rowActionList->html($html->getIndent()));
+            $html->appendln($this->getRowActionList()->html($html->getIndent()));
             $html->decIndent()->appendln('</td>')->br();
         }
 
