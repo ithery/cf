@@ -6,4 +6,73 @@
  * @since Mar 23, 2019, 11:43:39 PM
  */
 trait CObservable_Trait_ControlTrait {
+    /**
+     * Create SelectSearch Control.
+     *
+     * @param string $id
+     *
+     * @return CElement_FormInput_SelectSearch
+     */
+    public function addSelectSearchControl($id = null) {
+        $control = new CElement_FormInput_SelectSearch($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Text Control.
+     *
+     * @param string $id
+     *
+     * @return CElement_FormInput_Text
+     */
+    public function addTextControl($id = null) {
+        $control = new CElement_FormInput_Text($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Select Control.
+     *
+     * @param string $id
+     *
+     * @return CElement_FormInput_Select
+     */
+    public function addSelectControl($id = null) {
+        $control = new CElement_FormInput_Select($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Select Control.
+     *
+     * @param string $id
+     *
+     * @return CElement_FormInput_AutoNumeric
+     */
+    public function addAutoNumericControl($id = null) {
+        $control = new CElement_FormInput_AutoNumeric($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
+     * Create Date Range Drop Down Control.
+     *
+     * @param string $id
+     *
+     * @return CElement_FormInput_DateRange_DropdownButton
+     */
+    public function addDateRangeDropdownButtonControl($id = null) {
+        $control = new CElement_FormInput_DateRange_DropdownButton($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
 }
