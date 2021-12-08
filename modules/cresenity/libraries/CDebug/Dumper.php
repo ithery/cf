@@ -14,7 +14,7 @@ class CDebug_Dumper {
         if (class_exists(CliDumper::class)) {
             $dumper = 'cli' === PHP_SAPI ? new CliDumper() : new CDebug_HtmlDumper();
 
-            $dumper->dump((new VarCloner)->cloneVar($value));
+            $dumper->dump((new VarCloner())->cloneVar($value));
         } else {
             var_dump($value);
         }
@@ -31,7 +31,7 @@ class CDebug_Dumper {
         if (class_exists(CliDumper::class)) {
             $dumper = 'cli' === PHP_SAPI ? new CliDumper() : new CDebug_HtmlDumper();
 
-            return $dumper->dump((new VarCloner)->cloneVar($value), true);
+            return $dumper->dump((new VarCloner())->cloneVar($value), true);
         } else {
             var_export($value, true);
         }
