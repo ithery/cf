@@ -37,6 +37,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     protected $valueCallback;
 
+    protected $dataProvider;
+
     protected $requires;
 
     public function __construct($id) {
@@ -60,7 +62,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->value = null;
     }
 
-    public static function factory($id) {
+    public static function factory($id = null) {
         return new CElement_FormInput_SelectSearch($id);
     }
 
@@ -143,14 +145,26 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $this;
     }
 
+    /**
+     * @param CModel|CModel_Query $model
+     * @param null|mixed          $queryCallback
+     *
+     * @return $this
+     */
+    public function setDataFromModel($model, $queryCallback = null) {
+        $this->dataProvider = CManager::createModelDataProvider($model, $queryCallback);
+
+        return $this;
+    }
+
     public function createAjaxUrl() {
         $ajaxMethod = CAjax::createMethod();
         $ajaxMethod->setType('SearchSelect');
         $ajaxMethod->setData('query', $this->query);
+        $ajaxMethod->setData('dataProvider', serialize($this->dataProvider));
         $ajaxMethod->setData('keyField', $this->keyField);
         $ajaxMethod->setData('searchField', $this->searchField);
         $ajaxMethod->setData('valueCallback', $this->valueCallback);
-
         $ajaxUrl = $ajaxMethod->makeUrl();
 
         return $ajaxUrl;

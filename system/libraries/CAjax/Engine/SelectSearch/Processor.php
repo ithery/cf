@@ -1,0 +1,86 @@
+<?php
+
+defined('SYSPATH') or die('No direct access allowed.');
+
+/**
+ * @author Hery Kurniawan
+ * @license Ittron Global Teknologi <ittron.co.id>
+ *
+ * @since Jul 8, 2018, 3:01:36 AM
+ */
+abstract class CAjax_Engine_SelectSearch_Processor implements CAjax_Engine_SelectSearch_ProcessorInterface {
+    /**
+     * @var CAjax_Engine
+     */
+    protected $engine;
+
+    /**
+     * @var array
+     */
+    protected $input;
+
+    /**
+     * @param array data
+     */
+    protected $data;
+
+    /**
+     * @var string
+     */
+    protected $method;
+
+    /**
+     * @var CAjax_Engine_SelectSearch_Parameter
+     */
+    protected $parameter;
+
+    public function __construct(CAjax_Engine $engine) {
+        $this->engine = $engine;
+        $this->input = $engine->getInput();
+        $this->data = $engine->getData();
+        $this->method = $engine->getMethod();
+        $this->parameter = new CAjax_Engine_SelectSearch_Parameter($this);
+    }
+
+    /**
+     * @return string
+     */
+    public function keyField() {
+        return carr::get($this->data, 'keyField', carr::get($this->data, 'key_field'));
+    }
+
+    /**
+     * @return array
+     */
+    public function searchField() {
+        return carr::wrap(carr::get($this->data, 'searchField', carr::get($this->data, 'search_field')));
+    }
+
+    public function pageSize() {
+        return $this->parameter->pageSize();
+    }
+
+    public function page() {
+        return $this->parameter->page();
+    }
+
+    public function searchTerm() {
+        return $this->parameter->searchTerm();
+    }
+
+    public function callback() {
+        return $this->parameter->callback();
+    }
+
+    public function input() {
+        return $this->engine->getInput();
+    }
+
+    public function query() {
+        return carr::get($this->data, 'query');
+    }
+
+    public function dataProvider() {
+        return unserialize(carr::get($this->data, 'dataProvider'));
+    }
+}

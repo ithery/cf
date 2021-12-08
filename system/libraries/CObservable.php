@@ -14,10 +14,16 @@ abstract class CObservable extends CRenderable {
         CObservable_Trait_EventsTrait,
         CObservable_Trait_ControlTrait,
         CObservable_Trait_ListenerTrait;
+
     /**
      * @var CObservable_Javascript
      */
     protected $javascript;
+
+    protected function __construct($id = '') {
+        parent::__construct($id);
+        $this->listeners = [];
+    }
 
     /**
      * @return CObservable_Javascript
@@ -42,11 +48,6 @@ abstract class CObservable extends CRenderable {
      */
     public function handler() {
         return $this->javascript()->handler();
-    }
-
-    protected function __construct($id = '') {
-        parent::__construct($id);
-        $this->listeners = [];
     }
 
     /**
