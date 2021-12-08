@@ -2,6 +2,7 @@
 
 abstract class CElement extends CObservable {
     use CTrait_Compat_Element;
+
     /**
      * Class css for this element.
      *
@@ -133,6 +134,13 @@ abstract class CElement extends CObservable {
         return $this;
     }
 
+    /**
+     * Set attribute for element with array.
+     *
+     * @param array $arr
+     *
+     * @return $this
+     */
     public function setAttrFromArray($arr) {
         foreach ($arr as $k => $v) {
             $this->setAttr($k, $v);

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @deprecated since 1.2
+ * @deprecated since 1.2, dont use this anymore
  */
 //@codingStandardsIgnoreStart
 class CFormInputModal extends CFormInput {
@@ -14,7 +14,6 @@ class CFormInputModal extends CFormInput {
 
         $this->title = false;
         $this->footer = false;
-        $this->is_show = false;
     }
 
     public static function factory($id = '') {
@@ -70,6 +69,7 @@ class CFormInputModal extends CFormInput {
             $js->appendln($this->footer->js());
         }
         $js->appendln(parent::js($indent));
+
         return $js->text();
     }
 
@@ -83,11 +83,13 @@ class CFormInputModal extends CFormInput {
 
     public function set_title($title) {
         $this->title = $title;
+
         return $this;
     }
 
     public function add_footer($id = '') {
         $this->footer = CDivElement::factory($id);
+
         return $this->footer;
     }
 }
