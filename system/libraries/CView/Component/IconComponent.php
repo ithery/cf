@@ -49,13 +49,13 @@ class CView_Component_IconComponent extends CView_ComponentAbstract {
      * @param string      $fill
      */
     public function __construct(
-        string $path,
-        string $id = null,
-        string $class = null,
-        string $width = '1em',
-        string $height = '1em',
-        string $role = 'img',
-        string $fill = 'currentColor'
+        $path,
+        $id = null,
+        $class = null,
+        $width = '1em',
+        $height = '1em',
+        $role = 'img',
+        $fill = 'currentColor'
     ) {
         $this->path = $path;
         $this->id = $id;

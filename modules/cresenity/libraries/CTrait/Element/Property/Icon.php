@@ -32,4 +32,21 @@ trait CTrait_Element_Property_Icon {
     public function getIcon() {
         return $this->icon;
     }
+
+    public function getIconHtml() {
+        if (strlen($this->icon) == 0) {
+            return '';
+        }
+
+        if ($icon = c::manager()->icon()->loadFile($this->icon)) {
+            $component = new CView_Component_IconComponent($this->icon);
+
+            $icon = $component->render()->toHtml();
+
+            return '<i class="capp-icon">' . $icon . '</i> ';
+        }
+        $iconPrefix = c::theme('icon.prefix', 'icon icon-');
+
+        return '<i class="capp-icon ' . $iconPrefix . $this->getIcon() . ' ' . $this->getIcon() . '"></i> ';
+    }
 }
