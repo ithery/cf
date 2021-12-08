@@ -81,14 +81,16 @@ abstract class CController {
         if (!method_exists($this, $method) && !method_exists($this, '__call')) {
             throw new CHTTP_Exception_NotFoundHttpException();
         }
+        if (method_exists($this, $method)) {
+            $reflectionClass = new ReflectionClass($this);
 
-        $reflectionClass = new ReflectionClass($this);
-        $reflectionMethod = $reflectionClass->getMethod($method);
-        /** @var ReflectionMethod $reflectionMethod */
-        $requiredParameter = $reflectionMethod->getNumberOfRequiredParameters();
+            $reflectionMethod = $reflectionClass->getMethod($method);
+            /** @var ReflectionMethod $reflectionMethod */
+            $requiredParameter = $reflectionMethod->getNumberOfRequiredParameters();
 
-        if (count($parameters) < $requiredParameter) {
-            throw new CHTTP_Exception_NotFoundHttpException();
+            if (count($parameters) < $requiredParameter) {
+                throw new CHTTP_Exception_NotFoundHttpException();
+            }
         }
 
         return $this->{$method}(...array_values($parameters));
