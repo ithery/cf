@@ -368,6 +368,13 @@ final class CManager {
         return CView_Factory::instance();
     }
 
+    /**
+     * @return CManager_Icon
+     */
+    public static function icon() {
+        return CManager_Icon::instance();
+    }
+
     public static function createModelDataProvider($model, $queryCallback = null) {
         return new CManager_DataProvider_ModelDataProvider($model, $queryCallback);
     }

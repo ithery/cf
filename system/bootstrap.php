@@ -61,3 +61,7 @@ if (CF::isTesting()) {
         }
     });
 }
+
+//CView::blade()->component('dynamic-component', CView_Component_DynamicComponent::class);
+CView::blade()->component('icon', \CView_Component_IconComponent::class);
+c::manager()->icon()->registerIconDirectory('orchid', DOCROOT . 'media/img/icons/orchid/');

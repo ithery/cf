@@ -3,7 +3,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 /**
  * @author Hery Kurniawan <hery@itton.co.id>
- * @since Dec 6, 2020 
+ * @since Dec 6, 2020
  * @license Ittron Global Teknologi
  */
 
@@ -12,7 +12,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
 
 
 
-<div {{ $attributes }}> 
+<div {{ $attributes }}>
     <div id="{{ $id }}" x-data="{ show: @entangle($attributes->cf('model')) }"
         x-show="show"
         x-on:close.stop="show = false"
@@ -22,7 +22,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
         <div x-show="show" class="cf-modal-wrapper-inner" >
             <!--
               Background overlay, show/hide based on modal state.
-        
+
               Entering: "ease-out duration-300"
                 From: "opacity-0"
                 To: "opacity-100"
@@ -43,7 +43,7 @@ defined('SYSPATH') OR die('No direct access allowed.');
             <span class="cf-modal-center-helper" aria-hidden="true">&#8203;</span>
             <!--
               Modal panel, show/hide based on modal state.
-        
+
               Entering: "ease-out duration-300"
                 From: "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 To: "opacity-100 translate-y-0 sm:scale-100"
