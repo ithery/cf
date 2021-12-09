@@ -81,7 +81,7 @@ trait CApp_Model_Trait_Roles {
      *
      * @return bool
      */
-    public function hasAccess($permit, bool $cache = true) {
+    public function hasAccess($permit, $cache = true) {
         if (!$cache || $this->cachePermissions === null) {
             $this->cachePermissions = $this->rolePermission()->pluck('name')
                 ->filter();
