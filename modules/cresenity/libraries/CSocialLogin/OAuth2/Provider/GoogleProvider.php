@@ -28,14 +28,14 @@ class CSocialLogin_OAuth2_Provider_GoogleProvider extends CSocialLogin_OAuth2_Ab
     ];
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getAuthUrl($state) {
         return $this->buildAuthUrlFromBase('https://accounts.google.com/o/oauth2/auth', $state);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getTokenUrl() {
         return 'https://www.googleapis.com/oauth2/v4/token';
@@ -53,7 +53,7 @@ class CSocialLogin_OAuth2_Provider_GoogleProvider extends CSocialLogin_OAuth2_Ab
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function getUserByToken($token) {
         $response = $this->getHttpClient()->get('https://www.googleapis.com/oauth2/v3/userinfo', [
@@ -65,18 +65,20 @@ class CSocialLogin_OAuth2_Provider_GoogleProvider extends CSocialLogin_OAuth2_Ab
                 'Authorization' => 'Bearer ' . $token,
             ],
         ]);
+
         return json_decode($response->getBody(), true);
     }
 
     /**
-     * {@inheritdoc}
+     * @inheritdoc
      */
     protected function mapUserToObject(array $user) {
         // Deprecated: Fields added to keep backwards compatibility in 4.0. These will be removed in 5.0
         $user['id'] = carr::get($user, 'sub');
         $user['verified_email'] = carr::get($user, 'email_verified');
         $user['link'] = carr::get($user, 'profile');
-        return (new CSocialLogin_OAuth2_User)->setRaw($user)->map([
+
+        return (new CSocialLogin_OAuth2_User())->setRaw($user)->map([
             'id' => carr::get($user, 'sub'),
             'nickname' => carr::get($user, 'nickname'),
             'name' => carr::get($user, 'name'),
