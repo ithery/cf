@@ -66,7 +66,6 @@ trait CApp_Concern_AuthTrait {
     public function role() {
         if ($this->role == null) {
             $user = $this->user();
-
             if ($user) {
                 $modelClass = $this->auth()->getRoleModelClass();
                 $model = new $modelClass();
@@ -94,7 +93,7 @@ trait CApp_Concern_AuthTrait {
                 return $this->role;
             }
         }
-        $modelClass = CF::config('app.model.role', CApp_Model_Roles::class);
+        $modelClass = $this->auth()->getRoleModelClass();
 
         return $modelClass::find($roleId);
     }
