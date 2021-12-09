@@ -107,9 +107,8 @@ trait CApp_Concern_AuthTrait {
         if ($userId == null) {
             return null;
         }
-        $modelClass = CF::config('app.model.user', CApp_Model_Users::class);
 
-        return $modelClass::find($userId);
+        return $this->auth()->guard()->getProvider()->retrieveById($userId);
     }
 
     public function isAuthEnabled() {
