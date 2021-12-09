@@ -35,6 +35,20 @@ trait CObservable_Trait_ControlTrait {
     }
 
     /**
+     * Create Text Control.
+     *
+     * @param string $id
+     *
+     * @return CElement_FormInput_Password
+     */
+    public function addPasswordControl($id = null) {
+        $control = new CElement_FormInput_Password($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
+
+    /**
      * Create Select Control.
      *
      * @param string $id

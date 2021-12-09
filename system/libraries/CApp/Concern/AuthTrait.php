@@ -56,6 +56,9 @@ trait CApp_Concern_AuthTrait {
         return $this->isAuthEnabled();
     }
 
+    /**
+     * @return CModel|object
+     */
     public function user() {
         return $this->auth()->user();
     }
