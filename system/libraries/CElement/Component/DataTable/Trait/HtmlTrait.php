@@ -198,7 +198,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                                 ->addArg($newValue)
                                 ->setRequire($this->requires)
                                 ->execute();
-                            list($newValue, $jsCell) = $this->getHtmlJsCell($colValue);
+                            list($newValue, $jsCell) = $this->getHtmlJsCell($newValue);
                             $js .= $jsCell;
                         }
                         $class = $col->getClassAttribute();
