@@ -167,4 +167,13 @@ trait CApp_Model_Trait_Roles {
             });
         });
     }
+
+    /**
+     * @return self
+     */
+    public function clearCachePermission() {
+        $this->cachePermissions = null;
+
+        return $this;
+    }
 }
