@@ -197,7 +197,7 @@ class CSocialLogin_OAuth2_Provider_FacebookProvider extends CSocialLogin_OAuth2_
      *
      * @return $this
      */
-    public function usingGraphVersion(string $version) {
+    public function usingGraphVersion($version) {
         $this->version = $version;
 
         return $this;
