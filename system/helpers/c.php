@@ -1501,7 +1501,7 @@ class c {
      *
      * @throws \Exception
      *
-     * @return \CCache_CacheManager|mixed
+     * @return \CCache_Manager|mixed
      */
     public static function cache() {
         $arguments = func_get_args();
