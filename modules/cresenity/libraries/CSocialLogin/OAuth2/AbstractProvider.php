@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 use GuzzleHttp\Client;
 
-abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_Contract_ProviderInterface {
+abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_AbstractProviderInterface {
     /**
      * The HTTP request instance.
      *
