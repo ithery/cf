@@ -158,7 +158,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_Cont
     /**
      * Redirect the user of the application to the provider's authentication screen.
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return \CHTTP_RedirectResponse
      */
     public function redirect() {
         $state = null;
@@ -170,6 +170,7 @@ abstract class CSocialLogin_OAuth2_AbstractProvider implements CSocialLogin_Cont
         if ($this->usesPKCE()) {
             $this->request->session()->put('code_verifier', $this->getCodeVerifier());
         }
+        curl::redirect($this->getAuthUrl($state));
 
         return new CHTTP_RedirectResponse($this->getAuthUrl($state));
     }

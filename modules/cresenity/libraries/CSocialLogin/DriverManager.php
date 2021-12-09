@@ -28,6 +28,7 @@ class CSocialLogin_DriverManager {
 
     public function setConfig($config) {
         $this->config = $config;
+
         return $this;
     }
 
@@ -113,6 +114,7 @@ class CSocialLogin_DriverManager {
      */
     public function buildProvider($provider, $config) {
         return new $provider(
+            CHTTP::request(),
             $config['client_id'],
             $config['client_secret'],
             $this->formatRedirectUrl($config),
@@ -126,7 +128,7 @@ class CSocialLogin_DriverManager {
      * @return CSocialLogin_OAuth1_AbstractProvider
      */
     protected function createTwitterDriver() {
-        return new CSocialLogin_OAuth1_Provider_TwitterProvider(new TwitterServer($this->formatConfig($this->config)));
+        return new CSocialLogin_OAuth1_Provider_TwitterProvider(CHTTP::request(), new TwitterServer($this->formatConfig($this->config)));
     }
 
     /**
@@ -155,6 +157,17 @@ class CSocialLogin_DriverManager {
         $redirect = c::value($config['redirect']);
         //return cstr::startsWith($redirect, '/') ? $this->app['url']->to($redirect) : $redirect;
         return $redirect;
+    }
+
+    /**
+     * Forget all of the resolved driver instances.
+     *
+     * @return $this
+     */
+    public function forgetDrivers() {
+        $this->drivers = [];
+
+        return $this;
     }
 
     /**
