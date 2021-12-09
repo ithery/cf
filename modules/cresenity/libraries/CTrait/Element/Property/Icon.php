@@ -38,12 +38,14 @@ trait CTrait_Element_Property_Icon {
             return '';
         }
 
-        if ($icon = c::manager()->icon()->loadFile($this->icon)) {
-            $component = new CView_Component_IconComponent($this->icon);
+        if (strpos($this->icon, '.') !== false) {
+            if ($icon = c::manager()->icon()->loadFile($this->icon)) {
+                $component = new CView_Component_IconComponent($this->icon);
 
-            $icon = $component->render()->toHtml();
+                $icon = $component->render()->toHtml();
 
-            return '<i class="capp-icon">' . $icon . '</i> ';
+                return '<i class="capp-icon">' . $icon . '</i> ';
+            }
         }
         $iconPrefix = c::theme('icon.prefix', 'icon icon-');
 
