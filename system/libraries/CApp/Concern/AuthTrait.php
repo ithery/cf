@@ -25,7 +25,7 @@ trait CApp_Concern_AuthTrait {
         if ($guard === null) {
             $guard = $this->guard;
             if ($this->guard === null) {
-                $this->guard = CF::config('app.auth.guard');
+                $this->guard = CF::config('auth.defaults.guard');
             }
             $guard = $this->guard;
         }
@@ -68,7 +68,7 @@ trait CApp_Concern_AuthTrait {
             $user = $this->user();
 
             if ($user) {
-                $modelClass = CF::config('app.model.role', CApp_Model_Roles::class);
+                $modelClass = $this->auth()->getRoleModelClass();
                 $model = new $modelClass();
                 /** @var CApp_Model_Roles $model */
                 $keyName = $model->getKeyName();

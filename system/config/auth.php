@@ -11,7 +11,6 @@ return [
     | as required, but they're a perfect start for most applications.
     |
     */
-
     'defaults' => [
         'guard' => 'web',
         'passwords' => 'users',
@@ -81,6 +80,7 @@ return [
             'driver' => 'model',
             'model' => CApp_Model_Users::class,
             'hasher' => 'md5',
+
         ],
 
         // 'users' => [

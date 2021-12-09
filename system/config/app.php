@@ -64,7 +64,24 @@ return [
     'debug' => c::env('DEBUG', !IN_PRODUCTION),
 
     'auth' => [
-        'guard' => 'web',
+        'enable' => true,
+        'providers' => [
+            'users' => [
+                'access' => [
+                    'role' => [
+                        'model' => CApp_Model_Roles::class,
+                    ],
+                    'role_nav' => [
+                        'model' => CApp_Model_RoleNav::class,
+                    ],
+                    'role_permission' => [
+                        'model' => CApp_Model_RolePermission::class,
+                    ],
+
+                ]
+            ]
+        ],
+
         'middleware' => ['web'],
         'passwords' => 'users',
         'username' => 'username',

@@ -46,6 +46,16 @@ class CApp_Auth {
      */
     protected $resolvedGuard;
 
+    protected $resolvedGuardConfig;
+
+    protected $resolvedProviderConfig;
+
+    protected $resolvedRoleModelClass;
+
+    protected $resolvedRoleNavModelClass;
+
+    protected $resolvedRolePermissionModelClass;
+
     /**
      * @var array
      */
@@ -214,5 +224,63 @@ class CApp_Auth {
 
     public function hasher() {
         return $this->guard()->hasher();
+    }
+
+    /**
+     * Get Role Model should be used by CApp.
+     *
+     * @return string
+     */
+    public function getRoleModelClass() {
+        if ($this->resolvedRoleModelClass === null) {
+            $this->resolvedRoleModelClass = carr::get($this->getProviderConfig(), 'access.role.model', CApp_Model_Roles::class);
+        }
+
+        return $this->resolvedRoleModelClass;
+    }
+
+    /**
+     * Get Role Permission Model should be used by CApp.
+     *
+     * @return string
+     */
+    public function getRolePermisionModelClass() {
+        if ($this->resolvedRolePermissionModelClass === null) {
+            $this->resolvedRolePermissionModelClass = carr::get($this->getProviderConfig(), 'access.role_permission.model', CApp_Model_RolePermission::class);
+        }
+
+        return $this->resolvedRolePermissionModelClass;
+    }
+
+    /**
+     * Get Role Permission Model should be used by CApp.
+     *
+     * @return string
+     */
+    public function getRoleNavModelClass() {
+        if ($this->resolvedRoleNavModelClass === null) {
+            $this->resolvedRoleNavModelClass = carr::get($this->getProviderConfig(), 'access.role_nav.model', CApp_Model_RoleNav::class);
+        }
+
+        return $this->resolvedRoleNavModelClass;
+    }
+
+    public function getGuardConfig() {
+        if ($this->resolvedGuardConfig === null) {
+            $this->resolvedGuardConfig = CF::config('auth.guards.' . $this->guard);
+        }
+
+        return $this->resolvedGuardConfig;
+    }
+
+    public function getProviderConfig() {
+        if ($this->resolvedProviderConfig === null) {
+            $authConfig = CF::config('auth.providers.' . carr::get($this->getGuardConfig(), 'provider'));
+            $appConfig = CF::config('app.auth.providers.' . carr::get($this->getGuardConfig(), 'provider'));
+
+            $this->resolvedProviderConfig = carr::merge($authConfig, $appConfig);
+        }
+
+        return $this->resolvedProviderConfig;
     }
 }

@@ -165,4 +165,23 @@ class CManager_Transform_DefaultMethod {
 
         return $ret;
     }
+
+    /**
+     * Format bytes to kb, mb, gb, tb.
+     *
+     * @param int $size
+     * @param int $precision
+     *
+     * @return string
+     */
+    public static function formatBytes($size, $precision = 2) {
+        if ($size <= 0) {
+            return (string) $size;
+        }
+
+        $base = log($size) / log(1024);
+        $suffixes = [' bytes', ' KB', ' MB', ' GB', ' TB'];
+
+        return round(1024 ** ($base - floor($base)), $precision) . $suffixes[(int) floor($base)];
+    }
 }
