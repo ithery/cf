@@ -63,6 +63,11 @@ trait CApp_Concern_AuthTrait {
         return $this->auth()->user();
     }
 
+    /**
+     * Get Role Object.
+     *
+     * @return CApp_Model_Roles
+     */
     public function role() {
         if ($this->role == null) {
             $user = $this->user();

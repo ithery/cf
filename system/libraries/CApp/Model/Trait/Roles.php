@@ -19,7 +19,6 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CApp_Model_Trait_Roles {
     use CModel_Nested_NestedTrait;
-
     /**
      * @var null|\CCollection
      */
@@ -82,6 +81,9 @@ trait CApp_Model_Trait_Roles {
      * @return bool
      */
     public function hasAccess($permit, $cache = true) {
+        if (!is_string($permit)) {
+            throw new Exception('permit must be string when passed on hasAccess');
+        }
         if (!$cache || $this->cachePermissions === null) {
             $this->cachePermissions = $this->rolePermission()->pluck('name')
                 ->filter();
