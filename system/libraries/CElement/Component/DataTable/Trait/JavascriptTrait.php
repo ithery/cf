@@ -418,7 +418,7 @@ jQuery('.data_table-quick_search').on('keyup change', function() {
         }
 
         if ($this->footer) {
-            foreach ($this->footer_field as $f) {
+            foreach ($this->footerField as $f) {
                 $fval = $f['value'];
                 if ($fval instanceof CRenderable) {
                     $js->appendln($fval->js())->br();
