@@ -75,6 +75,12 @@ class CManager_DataProvider_ModelDataProvider extends CManager_DataProviderAbstr
         return $query->paginate($perPage, $columns, $pageName, $page);
     }
 
+    public function queryCallback($callback) {
+        $this->queryCallback = $callback;
+
+        return $this;
+    }
+
     public function toEnumerable() {
         $query = $this->getModelQuery();
 

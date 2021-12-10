@@ -186,6 +186,39 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         return $template;
     }
 
+    protected function getSelectedRow() {
+        if ($this->autoSelect || $this->value != null) {
+            $db = c::db();
+            $value = null;
+            if ($this->value !== null) {
+                $value = $this->value;
+            }
+            if ($this->dataProvider instanceof CManager_DataProvider_ModelDataProvider) {
+                $query = clone $this->dataProvider;
+                if ($value !== null) {
+                    $query->queryCallback(function ($q) use ($value) {
+                        $q->where($this->keyField, '=', $value);
+                    });
+                }
+                $result = $query->paginate(1);
+                $items = $result->items();
+
+                return (array) $items;
+            }
+            $q = 'select * from (' . $this->query . ') as a limit 1';
+            if ($value !== null) {
+                $q = 'select * from (' . $this->query . ') as a where `' . $this->keyField . '`=' . $db->escape($this->value);
+            }
+
+            $result = $db->query($q)->resultArray(false);
+            if (count($result) > 0) {
+                return carr::first($result);
+            }
+        }
+
+        return null;
+    }
+
     public function html($indent = 0) {
         if ($this->applyJs == 'select2v2.3') {
             return $this->htmlSelect2v23($indent);
@@ -219,56 +252,35 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if ($this->value !== null) {
             $value = $this->value;
         }
-        if ($this->autoSelect && $value === null) {
-            $db = CDatabase::instance();
-            $rjson = 'false';
 
-            $query = $this->query;
-
-            $q = 'select `' . $this->keyField . '` from (' . $query . ') as a limit 1';
-            $value = cdbutils::get_value($q);
-        }
         $additionAttribute = '';
         foreach ($this->attr as $k => $v) {
             $additionAttribute .= ' ' . $k . '="' . $v . '"';
         }
         $html->appendln('<select class="' . $classes . '" name="' . $this->name . '" id="' . $this->id . '" ' . $disabled . $custom_css . $multiple . $additionAttribute . '">');
 
-        // select2 4.0 using option to set default value
-        if ($value !== null || $this->autoSelect) {
-            $db = CDatabase::instance();
-            $rjson = 'false';
-
-            if ($this->autoSelect && $value === null) {
-                $q = 'select * from (' . $this->query . ') as a limit 1';
-            } else {
-                $q = 'select * from (' . $this->query . ') as a where `' . $this->keyField . '`=' . $db->escape($this->value);
+        $selectedRow = $this->getSelectedRow();
+        if ($selectedRow != null) {
+            $row = $selectedRow;
+            if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
+                foreach ($row as $k => $v) {
+                    $row[$k] = $this->valueCallback($row, $k, $v);
+                }
             }
-            $r = $db->query($q)->resultArray(false);
-            if (count($r) > 0) {
-                $row = $r[0];
-                if (is_object($row)) {
-                    $row = (array) $row;
-                }
-                if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
-                    foreach ($row as $k => $v) {
-                        $row[$k] = $this->valueCallback($row, $k, $v);
-                    }
-                }
-                $strSelection = $this->formatSelection;
-                $strSelection = str_replace("'", "\'", $strSelection);
-                preg_match_all("/{([\w]*)}/", $strSelection, $matches, PREG_SET_ORDER);
+            $strSelection = $this->formatSelection;
+            $strSelection = str_replace("'", "\'", $strSelection);
+            preg_match_all("/{([\w]*)}/", $strSelection, $matches, PREG_SET_ORDER);
 
-                foreach ($matches as $val) {
-                    $str = $val[1]; //matches str without bracket {}
+            foreach ($matches as $val) {
+                $str = $val[1]; //matches str without bracket {}
                     $b_str = $val[0]; //matches str with bracket {}
 
                     $strSelection = str_replace($b_str, carr::get($row, $str), $strSelection);
-                }
-
-                $html->appendln('<option value="' . $this->value . '" data-content="' . c::e($strSelection) . '" >' . $strSelection . '</option>');
             }
+
+            $html->appendln('<option value="' . $this->value . '" data-content="' . c::e($strSelection) . '" >' . $strSelection . '</option>');
         }
+
         $html->appendln('</select>');
         $html->br();
 

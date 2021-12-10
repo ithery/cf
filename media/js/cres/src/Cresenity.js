@@ -11,6 +11,7 @@ import {
 import {encode as base64encode, decode as base64decode} from './util/base64';
 import php from './php';
 import { elementReady, elementRendered } from './util/dom-observer';
+import { debounce } from './util/debounce';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
 import appValidation from './module/validation';
 import ucfirst from 'locutus/php/strings/ucfirst';
@@ -46,6 +47,7 @@ export default class Cresenity {
         this.confirmHandler = defaultConfirmHandler;
         this.dispatchWindowEvent = dispatchWindowEvent;
         this.websocket = null;
+        this.debounce = debounce;
     }
     loadJs(filename, callback) {
         let fileref = document.createElement('script');
