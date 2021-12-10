@@ -12,6 +12,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     use CTrait_Compat_Element_FormInput_SelectSearch;
     use CElement_FormInput_SelectSearch_Trait_Select2v23Trait;
     use CTrait_Element_Property_ApplyJs;
+    use CTrait_Element_Property_DependsOn;
 
     protected $query;
 
@@ -43,7 +44,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     public function __construct($id) {
         parent::__construct($id);
-
         $this->dropdownClasses = [];
         $this->type = 'selectsearch';
         $this->query = '';
@@ -165,6 +165,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $ajaxMethod->setData('keyField', $this->keyField);
         $ajaxMethod->setData('searchField', $this->searchField);
         $ajaxMethod->setData('valueCallback', $this->valueCallback);
+        $ajaxMethod->setData('dependsOn', serialize($this->dependsOn));
+
         $ajaxUrl = $ajaxMethod->makeUrl();
 
         return $ajaxUrl;
@@ -195,15 +197,21 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             }
             if ($this->dataProvider instanceof CManager_DataProvider_ModelDataProvider) {
                 $query = clone $this->dataProvider;
+
                 if ($value !== null) {
                     $query->queryCallback(function ($q) use ($value) {
                         $q->where($this->keyField, '=', $value);
                     });
                 }
                 $result = $query->paginate(1);
-                $items = $result->items();
 
-                return (array) $items;
+                $items = $result->items();
+                $item = carr::first($items);
+                if ($item) {
+                    return $item->toArray();
+                }
+
+                return null;
             }
             $q = 'select * from (' . $this->query . ') as a limit 1';
             if ($value !== null) {
@@ -267,6 +275,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                     $row[$k] = $this->valueCallback($row, $k, $v);
                 }
             }
+
             $strSelection = $this->formatSelection;
             $strSelection = str_replace("'", "\'", $strSelection);
             preg_match_all("/{([\w]*)}/", $strSelection, $matches, PREG_SET_ORDER);
@@ -327,44 +336,26 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if ($this->value !== null) {
             $value = $this->value;
         }
-        if ($this->autoSelect && $value === null) {
-            $db = CDatabase::instance();
-            $rjson = 'false';
-
-            $query = $this->query;
-
-            $q = 'select `' . $this->keyField . '` from (' . $query . ') as a limit 1';
-            $value = cdbutils::get_value($q);
-        }
-        if ($this->autoSelect) {
-            $db = CDatabase::instance();
-            $rjson = 'false';
-            if ($this->autoSelect && $value === null) {
-                $q = 'select * from (' . $this->query . ') as a limit 1';
-            } else {
-                $q = 'select * from (' . $this->query . ') as a where `' . $this->keyField . '`=' . $db->escape($this->value);
+        $selectedRow = $this->getSelectedRow();
+        if ($selectedRow != null) {
+            $row = $selectedRow;
+            if (is_object($row)) {
+                $row = (array) $row;
+            }
+            if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
+                foreach ($row as $k => $v) {
+                    $row[$k] = $this->valueCallback($row, $k, $v);
+                }
             }
 
-            $r = $db->query($q)->resultArray(false);
-            if (count($r) > 0) {
-                $row = $r[0];
-                if (is_object($row)) {
-                    $row = (array) $row;
-                }
-                if (isset($this->valueCallback) && is_callable($this->valueCallback)) {
-                    foreach ($row as $k => $v) {
-                        $row[$k] = $this->valueCallback($row, $k, $v);
-                    }
-                }
-                $rjson = json_encode($r);
+            $rjson = json_encode($row);
 
-                $strJsInit = '
+            $strJsInit = '
                     initSelection : function (element, callback) {
                         var data = ' . $rjson . ';
                         callback(data);
                     },
                 ';
-            }
         }
 
         $strMultiple = '';
@@ -384,6 +375,15 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         if (strlen($dropdownClasses) > 0) {
             $dropdownClasses = ' ' . $dropdownClasses;
         }
+        $additionalRequestDataJs = '';
+        foreach ($this->dependsOn as $index => $dependOn) {
+            $dependsOnSelector = $dependOn->getSelector();
+            $variableUniqueKey = 'dependsOn_' . $index;
+
+            $additionalRequestDataJs .= "
+                result['" . $variableUniqueKey . "']= $('" . $dependsOnSelector . "').val();
+            ";
+        }
 
         $str = "
 
@@ -391,40 +391,38 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
                 width: '100%',
                 placeholder: '" . $placeholder . "',
                 minimumInputLength: '" . $this->minInputLength . "',
-                ajax: { // instead of writing the function to execute the request we use Select2's convenient helper
-                        url: '" . $ajaxUrl . "',
-                        dataType: 'jsonp',
-                        quietMillis: " . $this->delay . ',
-                        delay: ' . $this->delay . ',
-                        ' . $strMultiple . '
-                        data: function (params) {
-                            return {
-                                q: params.term, // search term
-                                page: params.page,
-                                limit: 10
-                            };
-                        },
-                        processResults: function (data, params) {
-                            // parse the results into the format expected by Select2
-                            // since we are using custom formatting functions we do not need to
-                            // alter the remote JSON data, except to indicate that infinite
-                            // scrolling can be used
-                            params.page = params.page || 1;
-                            var more = (params.page * 10) < data.total;
-                            return {
-                                results: data.data,
-                                pagination: {
-                                    more: more
-                                }
-                            };
-                        },
-                        cache:true,
-                        error: function (jqXHR, status, error) {
-                            if(cresenity && cresenity.handleAjaxError) {
-                                cresenity.handleAjaxError(jqXHR, status, error);
-                            }
-                        }
+                ajax: {
+                    url: '" . $ajaxUrl . "',
+                    dataType: 'jsonp',
+                    quietMillis: " . $this->delay . ',
+                    delay: ' . $this->delay . ',
+                    ' . $strMultiple . '
+                    data: function (params) {
+                        result =  {
+                            q: params.term, // search term
+                            page: params.page,
+                            limit: 10
+                        };
+                        ' . $additionalRequestDataJs . '
+                        return result;
                     },
+                    processResults: function (data, params) {
+                        params.page = params.page || 1;
+                        var more = (params.page * 10) < data.total;
+                        return {
+                            results: data.data,
+                            pagination: {
+                                more: more
+                            }
+                        };
+                    },
+                    cache:true,
+                    error: function (jqXHR, status, error) {
+                        if(cresenity && cresenity.handleAjaxError) {
+                            cresenity.handleAjaxError(jqXHR, status, error);
+                        }
+                    }
+                },
                 ' . $strJsInit . "
                 templateResult: function(item) {
                     if (typeof item.loading !== 'undefined') {
@@ -469,6 +467,21 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $js->setIndent($indent);
         //echo $str;
         $js->append($str)->br();
+
+        foreach ($this->dependsOn as $index => $dependOn) {
+            $dependsOnSelector = $dependOn->getSelector();
+            $targetSelector = '#' . $this->id();
+            $throttle = $dependOn->getThrottle();
+            $dependsOnFunctionName = 'dependsOnFunction' . uniqid();
+            $js->appendln('
+                 let ' . $dependsOnFunctionName . " = () => {
+                    $('" . $targetSelector . "').val('');
+                    $('" . $targetSelector . "').select2('val', null);
+                    $('" . $targetSelector . "').trigger('change');
+                 };
+                 $('" . $dependsOnSelector . "').change(cresenity.debounce(" . $dependsOnFunctionName . ' ,' . $throttle . '));
+            ');
+        }
 
         return $js->text();
     }

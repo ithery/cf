@@ -8,16 +8,17 @@ interface CManager_Contract_DataProviderInterface {
     /**
      * Paginate the given query.
      *
-     * @param int      $perPage
-     * @param array    $columns
-     * @param string   $pageName
-     * @param null|int $page
+     * @param int        $perPage
+     * @param array      $columns
+     * @param string     $pageName
+     * @param null|int   $page
+     * @param null|mixed $callback
      *
      * @throws \InvalidArgumentException
      *
      * @return CPagination_LengthAwarePaginator
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null);
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $callback = null);
 
     /**
      * @return CInterface_Enumerable

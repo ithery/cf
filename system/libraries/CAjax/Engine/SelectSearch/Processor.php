@@ -83,4 +83,8 @@ abstract class CAjax_Engine_SelectSearch_Processor implements CAjax_Engine_Selec
     public function dataProvider() {
         return unserialize(carr::get($this->data, 'dataProvider'));
     }
+
+    public function dependsOn() {
+        return unserialize(carr::get($this->data, 'dependsOn'));
+    }
 }

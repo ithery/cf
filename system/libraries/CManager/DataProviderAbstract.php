@@ -5,6 +5,11 @@ abstract class CManager_DataProviderAbstract implements CManager_Contract_DataPr
 
     protected $sort = [];
 
+    /**
+     * @var CElement_Depends_DependsOn[]
+     */
+    protected $callbacks = [];
+
     public function search(array $search) {
         $this->search = $search;
     }
