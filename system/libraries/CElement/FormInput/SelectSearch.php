@@ -42,6 +42,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
     protected $requires;
 
+    protected $allowClear;
+
     public function __construct($id) {
         parent::__construct($id);
         $this->dropdownClasses = [];
@@ -60,6 +62,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->valueCallback = null;
         $this->applyJs = 'select2';
         $this->value = null;
+        $this->allowClear = false;
     }
 
     public static function factory($id = null) {
@@ -153,6 +156,12 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
      */
     public function setDataFromModel($model, $queryCallback = null) {
         $this->dataProvider = CManager::createModelDataProvider($model, $queryCallback);
+
+        return $this;
+    }
+
+    public function setAllowClear($bool = true) {
+        $this->allowClear = $bool;
 
         return $this;
     }
@@ -390,6 +399,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
             $('#" . $this->id . "').select2({
                 width: '100%',
                 placeholder: '" . $placeholder . "',
+                allowClear: " . ($this->allowClear ? 'true' : 'false') . ",
                 minimumInputLength: '" . $this->minInputLength . "',
                 ajax: {
                     url: '" . $ajaxUrl . "',
