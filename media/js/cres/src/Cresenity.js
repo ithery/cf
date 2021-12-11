@@ -19,6 +19,7 @@ import Alpine from 'alpinejs';
 import CSocket from './csocket/CSocket';
 import removePreloader from './module/preloader';
 import initProgressive from './module/progressive';
+import cresToast from './module/toast';
 
 export default class Cresenity {
     constructor() {
@@ -590,7 +591,7 @@ export default class Cresenity {
                 newestOnTop: false
             });
         }
-        return console.log(type+':'+message);
+        return cresToast.toast(message);
     }
     message(type, message, alertType, callback) {
         alertType = typeof alertType !== 'undefined' ? alertType : 'notify';
