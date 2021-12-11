@@ -89,4 +89,18 @@ trait CObservable_Trait_ControlTrait {
 
         return $control;
     }
+
+    /**
+     * Create Date Range Drop Down Control.
+     *
+     * @param string $id
+     *
+     * @return CElement_FormInput_Label
+     */
+    public function addLabelControl($id = null) {
+        $control = new CElement_FormInput_Label($id);
+        $this->wrapper->add($control);
+
+        return $control;
+    }
 }
