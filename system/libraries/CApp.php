@@ -549,7 +549,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     public static function haveScrollToTop() {
         if (static::$haveScrollToTop === null) {
-            static::$haveScrollToTop = ccfg::get('have_scroll_to_top') === null ? true : ccfg::get('have_scroll_to_top');
+            static::$haveScrollToTop = CF::config('cresjs', 'scroll_to_top');
         }
 
         return static::$haveScrollToTop;
