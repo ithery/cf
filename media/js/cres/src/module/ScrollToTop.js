@@ -1,3 +1,4 @@
+import cf from '../CF';
 export default class ScrollToTop {
     //startline: Integer. Number of pixels from top of doc scrollbar is scrolled before showing control
     //scrollto: Keyword (Integer, or "Scroll_to_Element_ID"). How far to scroll document up when control is clicked on (0=top).
@@ -9,7 +10,7 @@ export default class ScrollToTop {
             fadeduration: [500, 100]
         };
         //HTML for control, which is auto wrapped in DIV w/ ID="topcontrol"
-        this.controlHTML = '<img src="' + window.capp.base_url + 'media/img/up.png" style="width:51px; height:42px" />';
+        this.controlHTML = '<img src="' + cf.config.baseUrl + 'media/img/up.png" style="width:51px; height:42px" />';
         //offset of control relative to right/ bottom of window corner
         this.controlattrs = {
             offsetx: 5,

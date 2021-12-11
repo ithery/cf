@@ -1,5 +1,5 @@
 import Url from './module/Url';
-import CF from './CF';
+import cf from './CF';
 import ScrollToTop from './module/ScrollToTop';
 import UI from './ui';
 import {
@@ -13,20 +13,22 @@ import php from './php';
 import { elementReady, elementRendered } from './util/dom-observer';
 import { debounce } from './util/debounce';
 import { confirmFromElement, defaultConfirmHandler } from './module/confirm-handler';
-import appValidation from './module/validation';
+import initValidation from './module/validation';
 import ucfirst from 'locutus/php/strings/ucfirst';
 import Alpine from 'alpinejs';
 import CSocket from './csocket/CSocket';
+import removePreloader from './module/preloader';
 
 export default class Cresenity {
     constructor() {
-        this.cf = new CF();
+        this.cf = cf;
         this.base64 = {
             encode: base64encode,
             decode: base64decode
         };
         this.windowEventList = [
             'cresenity:confirm',
+            'cresenity:jquery:loaded',
             'cresenity:loaded',
             'cresenity:ui:start'
         ];
@@ -946,7 +948,7 @@ export default class Cresenity {
     }
     initValidation() {
         if($ && $.validator) {
-            appValidation.init();
+            initValidation();
         }
     }
 
@@ -970,14 +972,16 @@ export default class Cresenity {
             this.initReload();
             this.initValidation();
             this.initAlpineAndUi();
+
+            let root = document.getElementsByTagName('html')[0]; // '0' to assign the first (and only `HTML` tag)
+
+            root.classList.add('cresenity-loaded');
+            dispatchWindowEvent('cresenity:loaded');
         });
 
 
         this.cf.init();
-
-        dispatchWindowEvent('cresenity:loaded');
     }
-
     downloadProgress(options) {
         let settings = $.extend({
             // These are the defaults.

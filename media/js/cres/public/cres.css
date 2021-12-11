@@ -1,0 +1,369 @@
+.cres-waves-effect {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  overflow: hidden;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  vertical-align: middle;
+  z-index: 1;
+  transition: 0.3s ease-out;
+  /* Firefox Bug: link not triggered */
+}
+
+.cres-waves-effect .cres-waves-ripple {
+  position: absolute;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.2);
+  transition: all 0.7s ease-out;
+  transition-property: transform, opacity;
+  transform: scale(0);
+  pointer-events: none;
+}
+
+.cres-waves-effect.cres-waves-light .cres-waves-ripple {
+  background-color: rgba(255, 255, 255, 0.45);
+}
+
+.cres-waves-effect.cres-waves-red .cres-waves-ripple {
+  background-color: rgba(244, 67, 54, 0.7);
+}
+
+.cres-waves-effect.cres-waves-yellow .cres-waves-ripple {
+  background-color: rgba(255, 235, 59, 0.7);
+}
+
+.cres-waves-effect.cres-waves-orange .cres-waves-ripple {
+  background-color: rgba(255, 152, 0, 0.7);
+}
+
+.cres-waves-effect.cres-waves-purple .cres-waves-ripple {
+  background-color: rgba(156, 39, 176, 0.7);
+}
+
+.cres-waves-effect.cres-waves-green .cres-waves-ripple {
+  background-color: rgba(76, 175, 80, 0.7);
+}
+
+.cres-waves-effect.cres-waves-teal .cres-waves-ripple {
+  background-color: rgba(0, 150, 136, 0.7);
+}
+
+.cres-waves-effect input[type="button"], .cres-waves-effect input[type="reset"], .cres-waves-effect input[type="submit"] {
+  border: 0;
+  font-style: normal;
+  font-size: inherit;
+  text-transform: inherit;
+  background: none;
+}
+
+.cres-waves-effect img {
+  position: relative;
+  z-index: -1;
+}
+
+.cres-waves-effect .cres-waves-ripple {
+  z-index: -1;
+}
+
+.cres-waves-notransition {
+  transition: none !important;
+}
+
+.cres-waves-circle {
+  transform: translateZ(0);
+  -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
+}
+
+.cres-waves-input-wrapper {
+  border-radius: 0.2em;
+  vertical-align: bottom;
+}
+
+.cres-waves-input-wrapper .waves-button-input {
+  position: relative;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.cres-waves-circle {
+  text-align: center;
+  width: 2.5em;
+  height: 2.5em;
+  line-height: 2.5em;
+  border-radius: 50%;
+  -webkit-mask-image: none;
+}
+
+.cres-waves-block {
+  display: block;
+}
+
+@-webkit-keyframes cres-spin {
+  0% {
+    /* Chrome, Opera 15+, Safari 3.1+ */
+    /* IE 9 */
+    transform: rotate(0deg);
+    /* Firefox 16+, IE 10+, Opera */
+  }
+
+  100% {
+    /* Chrome, Opera 15+, Safari 3.1+ */
+    /* IE 9 */
+    transform: rotate(360deg);
+    /* Firefox 16+, IE 10+, Opera */
+  }
+}
+
+@keyframes cres-spin {
+  0% {
+    /* Chrome, Opera 15+, Safari 3.1+ */
+    /* IE 9 */
+    transform: rotate(0deg);
+    /* Firefox 16+, IE 10+, Opera */
+  }
+
+  100% {
+    /* Chrome, Opera 15+, Safari 3.1+ */
+    /* IE 9 */
+    transform: rotate(360deg);
+    /* Firefox 16+, IE 10+, Opera */
+  }
+}
+
+.cres-waves-effect {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  overflow: hidden;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+      -ms-user-select: none;
+          user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  vertical-align: middle;
+  z-index: 1;
+  transition: 0.3s ease-out;
+  /* Firefox Bug: link not triggered */
+}
+
+.cres-waves-effect .cres-waves-ripple {
+  position: absolute;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  margin-left: -10px;
+  opacity: 0;
+  background: rgba(0, 0, 0, 0.2);
+  transition: all 0.7s ease-out;
+  transition-property: transform, opacity;
+  transform: scale(0);
+  pointer-events: none;
+}
+
+.cres-waves-effect.cres-waves-light .cres-waves-ripple {
+  background-color: rgba(255, 255, 255, 0.45);
+}
+
+.cres-waves-effect.cres-waves-red .cres-waves-ripple {
+  background-color: rgba(244, 67, 54, 0.7);
+}
+
+.cres-waves-effect.cres-waves-yellow .cres-waves-ripple {
+  background-color: rgba(255, 235, 59, 0.7);
+}
+
+.cres-waves-effect.cres-waves-orange .cres-waves-ripple {
+  background-color: rgba(255, 152, 0, 0.7);
+}
+
+.cres-waves-effect.cres-waves-purple .cres-waves-ripple {
+  background-color: rgba(156, 39, 176, 0.7);
+}
+
+.cres-waves-effect.cres-waves-green .cres-waves-ripple {
+  background-color: rgba(76, 175, 80, 0.7);
+}
+
+.cres-waves-effect.cres-waves-teal .cres-waves-ripple {
+  background-color: rgba(0, 150, 136, 0.7);
+}
+
+.cres-waves-effect input[type="button"], .cres-waves-effect input[type="reset"], .cres-waves-effect input[type="submit"] {
+  border: 0;
+  font-style: normal;
+  font-size: inherit;
+  text-transform: inherit;
+  background: none;
+}
+
+.cres-waves-effect img {
+  position: relative;
+  z-index: -1;
+}
+
+.cres-waves-effect .cres-waves-ripple {
+  z-index: -1;
+}
+
+.cres-waves-notransition {
+  transition: none !important;
+}
+
+.cres-waves-circle {
+  transform: translateZ(0);
+  -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
+}
+
+.cres-waves-input-wrapper {
+  border-radius: 0.2em;
+  vertical-align: bottom;
+}
+
+.cres-waves-input-wrapper .waves-button-input {
+  position: relative;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.cres-waves-circle {
+  text-align: center;
+  width: 2.5em;
+  height: 2.5em;
+  line-height: 2.5em;
+  border-radius: 50%;
+  -webkit-mask-image: none;
+}
+
+.cres-waves-block {
+  display: block;
+}
+
+#cres-preloader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+}
+
+#cres-preloader .cres-preloader-loader {
+  display: block;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  width: 150px;
+  height: 150px;
+  margin: -75px 0 0 -75px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #3498db;
+  -webkit-animation: cres-spin 2s linear infinite;
+  /* Chrome, Opera 15+, Safari 5+ */
+  animation: cres-spin 2s linear infinite;
+  /* Chrome, Firefox 16+, IE 10+, Opera */
+  z-index: 1001;
+}
+
+#cres-preloader .cres-preloader-loader:before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  right: 5px;
+  bottom: 5px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #e74c3c;
+  -webkit-animation: cres-spin 3s linear infinite;
+  /* Chrome, Opera 15+, Safari 5+ */
+  animation: cres-spin 3s linear infinite;
+  /* Chrome, Firefox 16+, IE 10+, Opera */
+}
+
+#cres-preloader .cres-preloader-loader:after {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  right: 15px;
+  bottom: 15px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #f9c922;
+  -webkit-animation: spin 1.5s linear infinite;
+  /* Chrome, Opera 15+, Safari 5+ */
+  animation: spin 1.5s linear infinite;
+  /* Chrome, Firefox 16+, IE 10+, Opera */
+}
+
+#cres-preloader .cres-preloader-loader-section {
+  position: fixed;
+  top: 0;
+  width: 51%;
+  height: 100%;
+  background: #222222;
+  z-index: 1000;
+  /* Chrome, Opera 15+, Safari 3.1+ */
+  /* IE 9 */
+  transform: translateX(0);
+  /* Firefox 16+, IE 10+, Opera */
+}
+
+#cres-preloader .cres-preloader-loader-section.section-left {
+  left: 0;
+}
+
+#cres-preloader .cres-preloader-loader-section.section-right {
+  right: 0;
+}
+
+.cresenity-loaded #cres-preloader {
+  visibility: hidden;
+  /* Chrome, Opera 15+, Safari 3.1+ */
+  /* IE 9 */
+  transform: translateY(-100%);
+  /* Firefox 16+, IE 10+, Opera */
+  transition: all 0.3s 1s ease-out;
+}
+
+.cresenity-loaded #cres-preloader .cres-preloader-loader-section.section-left {
+  /* Chrome, Opera 15+, Safari 3.1+ */
+  /* IE 9 */
+  transform: translateX(-100%);
+  /* Firefox 16+, IE 10+, Opera */
+  transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.cresenity-loaded #cres-preloader .cres-preloader-loader-section.section-right {
+  /* Chrome, Opera 15+, Safari 3.1+ */
+  /* IE 9 */
+  transform: translateX(100%);
+  /* Firefox 16+, IE 10+, Opera */
+  transition: all 0.7s 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+}
+
+.cresenity-loaded #cres-preloader .cres-preloader-loader {
+  opacity: 0;
+  transition: all 0.3s ease-out;
+}
+
+.no-js #cres-preloader {
+  display: none;
+}
+
+.no-js h1 {
+  color: #222222;
+}
