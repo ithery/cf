@@ -162,6 +162,20 @@ trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
         $js->setIndent($indent);
         //echo $str;
         $js->append($str)->br();
+        foreach ($this->dependsOn as $index => $dependOn) {
+            $dependsOnSelector = $dependOn->getSelector();
+            $targetSelector = '#' . $this->id();
+            $throttle = $dependOn->getThrottle();
+            $dependsOnFunctionName = 'dependsOnFunction' . uniqid();
+            $js->appendln('
+                 let ' . $dependsOnFunctionName . " = () => {
+                    $('" . $targetSelector . "').val('');
+                    $('" . $targetSelector . "').select2('val', null);
+                    $('" . $targetSelector . "').trigger('change');
+                 };
+                 $('" . $dependsOnSelector . "').change(cresenity.debounce(" . $dependsOnFunctionName . ' ,' . $throttle . '));
+            ');
+        }
 
         return $js->text();
     }

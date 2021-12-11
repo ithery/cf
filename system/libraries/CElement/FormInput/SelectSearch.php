@@ -291,9 +291,9 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
 
             foreach ($matches as $val) {
                 $str = $val[1]; //matches str without bracket {}
-                    $b_str = $val[0]; //matches str with bracket {}
+                $b_str = $val[0]; //matches str with bracket {}
 
-                    $strSelection = str_replace($b_str, carr::get($row, $str), $strSelection);
+                $strSelection = str_replace($b_str, carr::get($row, $str), $strSelection);
             }
 
             $html->appendln('<option value="' . $this->value . '" data-content="' . c::e($strSelection) . '" >' . $strSelection . '</option>');
