@@ -14,6 +14,9 @@ trait CApp_Concern_AuthTrait {
 
     private $role = null;
 
+    /**
+     * @var string
+     */
     private $guard = null;
 
     /**

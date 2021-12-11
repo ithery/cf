@@ -275,8 +275,8 @@ class CApp_Auth {
 
     public function getProviderConfig() {
         if ($this->resolvedProviderConfig === null) {
-            $authConfig = CF::config('auth.providers.' . carr::get($this->getGuardConfig(), 'provider'));
-            $appConfig = CF::config('app.auth.providers.' . carr::get($this->getGuardConfig(), 'provider'));
+            $authConfig = CF::config('auth.providers.' . carr::get($this->getGuardConfig(), 'provider'), []);
+            $appConfig = CF::config('app.auth.providers.' . carr::get($this->getGuardConfig(), 'provider'), []);
 
             $this->resolvedProviderConfig = carr::merge($authConfig, $appConfig);
         }
