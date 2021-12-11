@@ -1,113 +1,3 @@
-.cres-waves-effect {
-  position: relative;
-  cursor: pointer;
-  display: inline-block;
-  overflow: hidden;
-  -webkit-user-select: none;
-     -moz-user-select: none;
-      -ms-user-select: none;
-          user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  vertical-align: middle;
-  z-index: 1;
-  transition: 0.3s ease-out;
-  /* Firefox Bug: link not triggered */
-}
-
-.cres-waves-effect .cres-waves-ripple {
-  position: absolute;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  margin-top: -10px;
-  margin-left: -10px;
-  opacity: 0;
-  background: rgba(0, 0, 0, 0.2);
-  transition: all 0.7s ease-out;
-  transition-property: transform, opacity;
-  transform: scale(0);
-  pointer-events: none;
-}
-
-.cres-waves-effect.cres-waves-light .cres-waves-ripple {
-  background-color: rgba(255, 255, 255, 0.45);
-}
-
-.cres-waves-effect.cres-waves-red .cres-waves-ripple {
-  background-color: rgba(244, 67, 54, 0.7);
-}
-
-.cres-waves-effect.cres-waves-yellow .cres-waves-ripple {
-  background-color: rgba(255, 235, 59, 0.7);
-}
-
-.cres-waves-effect.cres-waves-orange .cres-waves-ripple {
-  background-color: rgba(255, 152, 0, 0.7);
-}
-
-.cres-waves-effect.cres-waves-purple .cres-waves-ripple {
-  background-color: rgba(156, 39, 176, 0.7);
-}
-
-.cres-waves-effect.cres-waves-green .cres-waves-ripple {
-  background-color: rgba(76, 175, 80, 0.7);
-}
-
-.cres-waves-effect.cres-waves-teal .cres-waves-ripple {
-  background-color: rgba(0, 150, 136, 0.7);
-}
-
-.cres-waves-effect input[type="button"], .cres-waves-effect input[type="reset"], .cres-waves-effect input[type="submit"] {
-  border: 0;
-  font-style: normal;
-  font-size: inherit;
-  text-transform: inherit;
-  background: none;
-}
-
-.cres-waves-effect img {
-  position: relative;
-  z-index: -1;
-}
-
-.cres-waves-effect .cres-waves-ripple {
-  z-index: -1;
-}
-
-.cres-waves-notransition {
-  transition: none !important;
-}
-
-.cres-waves-circle {
-  transform: translateZ(0);
-  -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%);
-}
-
-.cres-waves-input-wrapper {
-  border-radius: 0.2em;
-  vertical-align: bottom;
-}
-
-.cres-waves-input-wrapper .waves-button-input {
-  position: relative;
-  top: 0;
-  left: 0;
-  z-index: 1;
-}
-
-.cres-waves-circle {
-  text-align: center;
-  width: 2.5em;
-  height: 2.5em;
-  line-height: 2.5em;
-  border-radius: 50%;
-  -webkit-mask-image: none;
-}
-
-.cres-waves-block {
-  display: block;
-}
-
 @-webkit-keyframes cres-spin {
   0% {
     /* Chrome, Opera 15+, Safari 3.1+ */
@@ -137,6 +27,30 @@
     /* IE 9 */
     transform: rotate(360deg);
     /* Firefox 16+, IE 10+, Opera */
+  }
+}
+
+@-webkit-keyframes cres-progressive-reveal {
+  0% {
+    transform: scale(1.05);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes cres-progressive-reveal {
+  0% {
+    transform: scale(1.05);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }
 
@@ -314,7 +228,7 @@
   top: 0;
   width: 51%;
   height: 100%;
-  background: #222222;
+  background: #fff;
   z-index: 1000;
   /* Chrome, Opera 15+, Safari 3.1+ */
   /* IE 9 */
@@ -366,4 +280,34 @@
 
 .no-js h1 {
   color: #222222;
+}
+
+/* progressive image CSS */
+
+.cres-progressive {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  outline: none;
+}
+
+.cres-progressive img {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: auto;
+  border: 0 none;
+}
+
+.cres-progressive img.preview {
+  filter: blur(2vw);
+  transform: scale(1.05);
+}
+
+.cres-progressive img.reveal {
+  position: absolute;
+  left: 0;
+  top: 0;
+  -webkit-animation: cres-progressive-reveal 1s linear;
+          animation: cres-progressive-reveal 1s linear;
 }

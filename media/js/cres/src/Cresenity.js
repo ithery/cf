@@ -18,6 +18,7 @@ import ucfirst from 'locutus/php/strings/ucfirst';
 import Alpine from 'alpinejs';
 import CSocket from './csocket/CSocket';
 import removePreloader from './module/preloader';
+import initProgressive from './module/progressive';
 
 export default class Cresenity {
     constructor() {
@@ -964,7 +965,7 @@ export default class Cresenity {
         });
         this.cf.onAfterInit(() => {
             if (this.cf.getConfig().haveScrollToTop) {
-                if (!document.getElementById('topcontrol')) {
+                if (!document.getElementById('cres-topcontrol')) {
                     this.scrollToTop.init();
                 }
             }
@@ -972,7 +973,7 @@ export default class Cresenity {
             this.initReload();
             this.initValidation();
             this.initAlpineAndUi();
-
+            initProgressive();
             let root = document.getElementsByTagName('html')[0]; // '0' to assign the first (and only `HTML` tag)
 
             root.classList.add('cresenity-loaded');

@@ -707,7 +707,8 @@
 
       var defaultConfig = {
         baseUrl: '/',
-        defaultJQueryUrl: 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js'
+        defaultJQueryUrl: 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js',
+        haveScrollToTop: true
       };
       this.config = _objectSpread2(_objectSpread2({}, defaultConfig), cappConfig);
 
@@ -943,7 +944,7 @@
         fadeduration: [500, 100]
       }; //HTML for control, which is auto wrapped in DIV w/ ID="topcontrol"
 
-      this.controlHTML = '<img src="' + cf.config.baseUrl + 'media/img/up.png" style="width:51px; height:42px" />'; //offset of control relative to right/ bottom of window corner
+      this.controlHTML = cf.config.scrollToTopHtml || '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAqCAYAAAAeeGN5AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjM2RTVENEJCODY3RTExRTI5MTFEQzg2NjQyQ0VGQzhDIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjM2RTVENEJDODY3RTExRTI5MTFEQzg2NjQyQ0VGQzhDIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MzZFNUQ0Qjk4NjdFMTFFMjkxMURDODY2NDJDRUZDOEMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6MzZFNUQ0QkE4NjdFMTFFMjkxMURDODY2NDJDRUZDOEMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6Mw5vNAAAAkUlEQVR42uzYoRGAMBBEUbKKlqAKKAKKogm6oCWQTAQawd0lE/5Xa5/dNEzL2TWSuoYCAwYMGDBgwIAB8zPMsW99E5gMGef1igApApJ3BEgRkCdvkKIgESBFQrxBioZ4glQC4gVSKYgHSCUh1iCVhliCVAPECqRaIBYg1QT5Ckp8zWDAgAEDBgwYMGDAvHQLMACw9mxL+kYUJQAAAABJRU5ErkJggg==" style="width:51px; height:42px" />'; //offset of control relative to right/ bottom of window corner
 
       this.controlattrs = {
         offsetx: 5,
@@ -999,7 +1000,7 @@
           mainobj.cssfixedsupport = !iebrws || iebrws && document.compatMode === 'CSS1Compat' && window.XMLHttpRequest; //not IE or IE7+ browsers in standards mode
 
           mainobj.$body = window.opera ? document.compatMode === 'CSS1Compat' ? $('html') : $('body') : $('html,body');
-          mainobj.$control = $('<div id="topcontrol">' + mainobj.controlHTML + '</div>').css({
+          mainobj.$control = $('<div id="cres-topcontrol">' + mainobj.controlHTML + '</div>').css({
             position: mainobj.cssfixedsupport ? 'fixed' : 'absolute',
             bottom: mainobj.controlattrs.offsety,
             right: mainobj.controlattrs.offsetx,
@@ -17110,6 +17111,143 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
     return CSocket;
   }();
 
+  var initProgressive = function initProgressive() {
+    // browser supported?
+    var body = document.body;
+
+    if (!body.getElementsByClassName || !body.querySelector || !body.classList || !body.getBoundingClientRect) {
+      return;
+    }
+
+    var classReplace = 'replace',
+        classPreview = 'preview',
+        classReveal = 'reveal',
+        pItem = document.getElementsByClassName('cres-progressive ' + classReplace),
+        rAF = window.requestAnimationFrame || function (f) {
+      f();
+    },
+        timer; // bind events
+
+
+    ['pageshow', 'scroll', 'resize'].forEach(function (h) {
+      window.addEventListener(h, throttle, {
+        passive: true
+      });
+    }); // DOM mutation observer
+
+    if (window.MutationObserver) {
+      var observer = new MutationObserver(throttle);
+      observer.observe(body, {
+        subtree: true,
+        childList: true,
+        attributes: true
+      });
+    } // initial check
+
+
+    inView(); // throttle events, no more than once every 300ms
+
+    function throttle() {
+      timer = timer || setTimeout(function () {
+        timer = null;
+        inView();
+      }, 300);
+    } // image in view?
+
+
+    function inView() {
+      if (pItem.length) {
+        rAF(function () {
+          var wH = window.innerHeight,
+              cRect,
+              cT,
+              cH,
+              p = 0;
+
+          while (p < pItem.length) {
+            cRect = pItem[p].getBoundingClientRect();
+            cT = cRect.top;
+            cH = cRect.height;
+
+            if (cT + cH > 0 && wH > cT) {
+              loadFullImage(pItem[p]);
+            } else {
+              p++;
+            }
+          }
+        });
+      }
+    } // replace with full image
+
+
+    function loadFullImage(item, retry) {
+      // cancel monitoring
+      item.classList.remove(classReplace); // fetch href and preview image
+
+      var href = item.getAttribute('data-href') || item.href,
+          pImg = item.querySelector('img.' + classPreview);
+
+      if (!href || !pImg) {
+        return;
+      } // load main image
+
+
+      var img = new Image(),
+          ds = item.dataset;
+
+      if (ds) {
+        if (ds.srcset) {
+          img.srcset = ds.srcset;
+        }
+
+        if (ds.sizes) {
+          img.sizes = ds.sizes;
+        }
+      }
+
+      img.onload = addImg; // load failure retry
+
+      retry = 1 + (retry || 0);
+
+      if (retry < 3) {
+        img.onerror = function () {
+          setTimeout(function () {
+            loadFullImage(item, retry);
+          }, retry * 3000);
+        };
+      }
+
+      img.src = href; // replace image
+
+      function addImg() {
+        // disable link
+        if (href === item.href) {
+          item.style.cursor = 'default';
+          item.addEventListener('click', function (e) {
+            e.preventDefault();
+          });
+        } // apply image attributes
+
+
+        var imgClass = img.classList;
+        img.className = pImg.className;
+        imgClass.remove(classPreview);
+        imgClass.add(classReveal);
+        img.alt = pImg.alt || '';
+        img.onload = 0;
+        img.onerror = 0;
+        rAF(function () {
+          // add full image
+          item.insertBefore(img, pImg.nextSibling).addEventListener('animationend', function () {
+            // remove preview image
+            item.removeChild(pImg);
+            imgClass.remove(classReveal);
+          });
+        });
+      }
+    }
+  };
+
   var Cresenity = /*#__PURE__*/function () {
     function Cresenity() {
       _classCallCheck(this, Cresenity);
@@ -18203,7 +18341,7 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
         });
         this.cf.onAfterInit(function () {
           if (_this10.cf.getConfig().haveScrollToTop) {
-            if (!document.getElementById('topcontrol')) {
+            if (!document.getElementById('cres-topcontrol')) {
               _this10.scrollToTop.init();
             }
           }
@@ -18216,6 +18354,7 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
 
           _this10.initAlpineAndUi();
 
+          initProgressive();
           var root = document.getElementsByTagName('html')[0]; // '0' to assign the first (and only `HTML` tag)
 
           root.classList.add('cresenity-loaded');

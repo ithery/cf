@@ -9,7 +9,6 @@ import resolve from 'rollup-plugin-node-resolve';
 import outputManifest from 'rollup-plugin-output-manifest';
 import postcss from 'rollup-plugin-postcss';
 import nodePolyfills from 'rollup-plugin-polyfill-node';
-import globby from 'globby';
 import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
 // eslint-disable-next-line no-process-env

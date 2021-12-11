@@ -10,7 +10,7 @@ export default class ScrollToTop {
             fadeduration: [500, 100]
         };
         //HTML for control, which is auto wrapped in DIV w/ ID="topcontrol"
-        this.controlHTML = '<img src="' + cf.config.baseUrl + 'media/img/up.png" style="width:51px; height:42px" />';
+        this.controlHTML = cf.config.scrollToTopHtml || '<img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADMAAAAqCAYAAAAeeGN5AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyBpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNSBXaW5kb3dzIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOjM2RTVENEJCODY3RTExRTI5MTFEQzg2NjQyQ0VGQzhDIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOjM2RTVENEJDODY3RTExRTI5MTFEQzg2NjQyQ0VGQzhDIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6MzZFNUQ0Qjk4NjdFMTFFMjkxMURDODY2NDJDRUZDOEMiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6MzZFNUQ0QkE4NjdFMTFFMjkxMURDODY2NDJDRUZDOEMiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6Mw5vNAAAAkUlEQVR42uzYoRGAMBBEUbKKlqAKKAKKogm6oCWQTAQawd0lE/5Xa5/dNEzL2TWSuoYCAwYMGDBgwIAB8zPMsW99E5gMGef1igApApJ3BEgRkCdvkKIgESBFQrxBioZ4glQC4gVSKYgHSCUh1iCVhliCVAPECqRaIBYg1QT5Ckp8zWDAgAEDBgwYMGDAvHQLMACw9mxL+kYUJQAAAABJRU5ErkJggg==" style="width:51px; height:42px" />';
         //offset of control relative to right/ bottom of window corner
         this.controlattrs = {
             offsetx: 5,
@@ -60,7 +60,7 @@ export default class ScrollToTop {
                 mainobj.cssfixedsupport = !iebrws || iebrws && document.compatMode === 'CSS1Compat' && window.XMLHttpRequest;
                 //not IE or IE7+ browsers in standards mode
                 mainobj.$body = (window.opera) ? (document.compatMode === 'CSS1Compat' ? $('html') : $('body')) : $('html,body');
-                mainobj.$control = $('<div id="topcontrol">' + mainobj.controlHTML + '</div>')
+                mainobj.$control = $('<div id="cres-topcontrol">' + mainobj.controlHTML + '</div>')
                     .css({
                         position: mainobj.cssfixedsupport ? 'fixed' : 'absolute',
                         bottom: mainobj.controlattrs.offsety,

@@ -17,7 +17,8 @@ class CF {
         }
         let defaultConfig = {
             baseUrl: '/',
-            defaultJQueryUrl: 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js'
+            defaultJQueryUrl: 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js',
+            haveScrollToTop: true
 
         };
         this.config = {

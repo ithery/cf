@@ -2,7 +2,7 @@
     "main": "dist/cres.js",
     "name": "cf-cres",
     "scripts": {
-        "build": "cross-env NODE_ENV=production && npx rollup -c",
+        "build": "cross-env NODE_ENV=production npx rollup -c",
         "dev": "npx rollup -c -w"
     },
     "author": "Hery Kurniawan",
