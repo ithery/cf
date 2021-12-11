@@ -64,7 +64,6 @@ class CManager_Icon {
 
         $prefix = cstr::beforeLast($name, '.');
         $nameIcon = cstr::afterLast($name, '.') . '.svg';
-
         $dirs = $this->directories->get($prefix, $this->directories->toArray());
 
         $icons = $this->getFinder()->in($dirs);
