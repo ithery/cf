@@ -287,12 +287,18 @@ class CElement_FormInput_Select extends CElement_FormInput {
             $optionsJson = '{';
             $optionsJson .= "url:'" . $ajaxUrl . "',";
             $optionsJson .= "method:'" . 'post' . "',";
+            $optionsJson .= !$dependOn->getBlock() ? 'block: false,' : '';
+
             $optionsJson .= "dataAddition: { value: $('" . $dependsOnSelector . "').val() },";
             $optionsJson .= "onSuccess: (data) => {
                  let jQuerySelect = $('" . $targetSelector . "');
                  jQuerySelect.empty();
+                 let beforeValue = '" . $this->value . "';
                  data.forEach((item,index)=>{
                      let newOption = new Option(item.value,item.key);
+                     if(beforeValue==item.key) {
+                         newOption.selected='selected';
+                     }
                      jQuerySelect.append(newOption);
                  });
             },";

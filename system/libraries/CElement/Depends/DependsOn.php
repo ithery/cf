@@ -41,4 +41,8 @@ class CElement_Depends_DependsOn {
     public function getThrottle() {
         return $this->getOption('throttle', 100);
     }
+
+    public function getBlock() {
+        return $this->getOption('block', true);
+    }
 }
