@@ -684,10 +684,10 @@ class c {
     //@codingStandardsIgnoreEnd
 
     /**
-     * @return CSession
+     * @return CSession_Store
      */
     public static function session() {
-        return CSession::instance();
+        return CSession::instance()->store();
     }
 
     /**

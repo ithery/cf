@@ -311,7 +311,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
     protected function rawHtml($indent = 0, $wrapped = false) {
         $html = new CStringBuilder();
         $html->setIndent($indent);
-
+        /** @var CElement_Component_DataTable $this */
         $thClass = '';
         if ($this->headerNoLineBreak) {
             $thClass = ' no-line-break';
@@ -360,6 +360,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
 
             foreach ($this->footerField as $f) {
                 $html->incIndent()->appendln('<tr>')->br();
+
                 $colspan = $f['labelcolspan'];
                 if ($colspan == 0) {
                     $colspan = $total_column + $addition_column - 1;
@@ -386,6 +387,7 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                 $fval = $f['value'];
                 if ($fval instanceof CRenderable) {
                     $html->incIndent()->appendln('<td class="' . $class . '">')->br();
+                    list($html, $js) = $this->getHtmlJsCell($fval);
                     $html->appendln($fval->html($indent))->br();
                     $html->decIndent()->appendln('</td>')->br();
                 } elseif (is_array($fval)) {
@@ -399,11 +401,11 @@ trait CElement_Component_DataTable_Trait_HtmlTrait {
                         }
                         if (!$is_skipped) {
                             $fcolval = '';
-                            if (isset($fval[$col->get_fieldname()])) {
-                                $fcolval = $fval[$col->get_fieldname()];
+                            if (isset($fval[$col->getFieldname()])) {
+                                $fcolval = $fval[$col->getFieldname()];
                             }
-
-                            switch ($col->get_align()) {
+                            $class = '';
+                            switch ($col->getAlign()) {
                                 case 'left':
                                     $class .= ' align-left';
 
