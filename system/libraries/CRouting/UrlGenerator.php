@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Exception\RouteNotFoundException;
 class CRouting_UrlGenerator {
     use CTrait_Helper_InteractsWithTime,
         CTrait_Macroable;
+
     /**
      * The request instance.
      *
