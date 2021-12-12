@@ -1,5 +1,4 @@
 import DOM from '@/ui/dom/dom';
-import '@/ui/dom/polyfills/index';
 import store from '@/ui/Store';
 import Connection from '@/ui/connection';
 import Polling from '@/ui/component/Polling';

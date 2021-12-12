@@ -10,6 +10,9 @@
     ],
     "parserOptions": {
         "ecmaVersion": 2018,
+        "ecmaFeatures": {
+            "jsx": true
+        },
         "sourceType": "module",
         "arrowFunctions": true,
         "binaryLiterals": true,
