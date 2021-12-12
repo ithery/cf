@@ -1,4 +1,7 @@
-export default class CF {
+import {
+    dispatch as dispatchWindowEvent
+} from './util';
+class CF {
     constructor() {
         this.required = typeof this.required === 'undefined' ? [] : this.required;
         this.cssRequired = typeof this.cssRequired === 'undefined' ? [] : this.cssRequired;
@@ -8,7 +11,21 @@ export default class CF {
         this.head = this.document.getElementsByTagName('head')[0];
         this.beforeInitCallback = [];
         this.afterInitCallback = [];
-        this.config = window.capp;
+        let cappConfig = window.capp;
+        if(typeof cappConfig == 'undefined') {
+            cappConfig = {};
+        }
+        let defaultConfig = {
+            baseUrl: '/',
+            defaultJQueryUrl: 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js',
+            haveScrollToTop: true
+
+        };
+        this.config = {
+            ...defaultConfig,
+            ...cappConfig
+        };
+
         if (this.config.cssUrl) {
             this.config.cssUrl.forEach((item) => {
                 this.required.push(item);
@@ -133,22 +150,28 @@ export default class CF {
     }
 
     loadJQuery(callback) {
+        let afterJQueryLoaded = () => {
+            dispatchWindowEvent('cresenity:jquery:loaded');
+            callback();
+        };
         if (typeof jQuery == 'undefined') {
             let fileref = this.document.createElement('script');
             fileref.setAttribute('type', 'text/javascript');
             fileref.setAttribute('src', this.getConfig().defaultJQueryUrl);
             // IE 6 & 7
             if (typeof (callback) === 'function') {
-                fileref.onload = callback;
-                fileref.onreadystatechange = () => {
-                    if (this.readyState == 'complete') {
-                        callback();
-                    }
+                fileref.onload = ()=>{
+                    afterJQueryLoaded();
                 };
+                // fileref.onreadystatechange = () => {
+                //     if (fileref.readyState == 'complete') {
+                //         afterJQueryLoaded();
+                //     }
+                // };
             }
             this.head.appendChild(fileref);
         } else {
-            callback();
+            afterJQueryLoaded();
         }
     }
 
@@ -170,9 +193,13 @@ export default class CF {
                     this.cssRequired.push(item);
                 });
             }
-        });
-        this.afterInitCallback.forEach((item) => {
-            item();
+            this.afterInitCallback.forEach((item) => {
+                item();
+            });
         });
     }
 }
+
+let cf = new CF();
+
+export default cf;
