@@ -978,6 +978,7 @@ export default class Cresenity {
             let root = document.getElementsByTagName('html')[0]; // '0' to assign the first (and only `HTML` tag)
 
             root.classList.add('cresenity-loaded');
+            root.classList.remove('no-js');
             dispatchWindowEvent('cresenity:loaded');
         });
 

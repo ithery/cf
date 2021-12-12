@@ -18580,6 +18580,7 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
           var root = document.getElementsByTagName('html')[0]; // '0' to assign the first (and only `HTML` tag)
 
           root.classList.add('cresenity-loaded');
+          root.classList.remove('no-js');
           dispatch$1('cresenity:loaded');
         });
         this.cf.init();
