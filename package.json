@@ -2,7 +2,7 @@
     "private": true,
     "version": "1.0.0",
     "scripts": {
-        "cf": "node ./bin/cf/cli.js",
+        "cf": "node ./bin/cf/cli2.js",
         "dev": "npm run development",
         "development": "npm run cf",
         "watch": "npm run cf watch",
@@ -36,6 +36,7 @@
         "collect.js": "^4.29.0",
         "commander": "^8.2.0",
         "concat": "^1.0.3",
+        "css-loader": "^5.2.6",
         "dotenv": "^10.0.0",
         "dotenv-expand": "^5.1.0",
         "fs-extra": "^10.0.0",
@@ -43,6 +44,7 @@
         "md5": "^2.3.0",
         "mini-css-extract-plugin": "^2.3.0",
         "module-alias": "^2.2.2",
+        "postcss-loader": "^6.2.0",
         "semver": "^7.3.5",
         "strip-ansi": "^6.0.0",
         "terser": "^5.9.0",
@@ -60,6 +62,10 @@
         "browser-sync": "^2.27.5",
         "browser-sync-webpack-plugin": "^2.3.0",
         "clean-css": "^5.2.0",
-        "postcss": "^8.3.8"
+        "cssnano": "^5.0.12",
+        "postcss": "^8.4.4",
+        "resolve-url-loader": "^4.0.0",
+        "sass": "^1.45.0",
+        "sass-loader": "^12.4.0"
     }
 }
