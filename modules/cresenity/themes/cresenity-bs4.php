@@ -36,7 +36,6 @@ return [
         'theme-material',
     ],
     'js' => [
-        'capp.js',
         'cresenity.js',
         'cresenity/cresenity.bs4.js?v=3',
         'cresenity/administrator.js?v=' . uniqid(),
