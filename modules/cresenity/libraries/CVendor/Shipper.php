@@ -5,6 +5,8 @@ class CVendor_Shipper {
     private $url;
     private $curl;
     private $environment;
+    const VERSION = '3.0';
+
 
     public function __construct($env = 'production') {
         if (is_array($env)) {
@@ -12,11 +14,10 @@ class CVendor_Shipper {
             $env = carr::get($env, 'environment', 'production');
         }
         $this->environment = $env;
-        $this->url = 'https://api.shipper.id/prod/';
+        $this->url = 'https://merchant-api-sandbox.shipper.id/';
         if ($this->environment == 'dev' || $this->environment == 'development') {
-            $this->url = 'https://api.shipper.id/sandbox/';
+            $this->url = 'https://merchant-api-sandbox.shipper.id/';
         }
-        $this->curl = curl_init();
     }
 
     public function asPlugin($params = []) {
@@ -25,11 +26,6 @@ class CVendor_Shipper {
         $options['apiType'] = carr::get($params, 'apiType', 'starter');
         return new CVendor_Shipper_Plugin($options);
     }
-
-    public function __destruct() {
-        curl_close($this->curl);
-    }
-
     public function setKey($key) {
         $this->key = $key;
     }
@@ -217,132 +213,175 @@ class CVendor_Shipper {
         }
     }
 
+    public function getCountriesById($countryId) {
+        $endPoint = $this->url . 'v3/location/country/'.$countryId;
+        $response = $this->requestToShipper($endPoint, "GET");
+        return $response;
+    }
+
     public function getCountries() {
-        $method = 'GET';
-        $options = [
-            'apiKey' => $this->key,
-        ];
-
-        curl_setopt_array($this->curl, [
-            CURLOPT_URL => $this->url . 'public/v1/countries?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-            ],
-        ]);
-
-        $response = curl_exec($this->curl);
-        $err = curl_error($this->curl);
-        cdbg::varDump($response);
-        die;
-        if ($err) {
-            return $this->error($err);
-        } else {
-            return $this->response($response);
-        }
+        $endPoint = $this->url . 'v3/location/countries?';
+        $response = $this->requestToShipper($endPoint, "GET");
+        return $response;
     }
 
     public function getProvinces() {
-        $method = 'GET';
-        $options = [
-            'apiKey' => $this->key,
-        ];
-
-        curl_setopt_array($this->curl, [
-            CURLOPT_URL => $this->url . 'public/v1/provinces?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-            ],
-        ]);
-
-        $response = curl_exec($this->curl);
-        $err = curl_error($this->curl);
-
-        if ($err) {
-            return $this->error($err);
-        } else {
-            return $this->response($response);
-        }
+        $endPoint = $this->url . 'v3/location/provinces?';
+        $response = $this->requestToShipper($endPoint, "GET");
+        return $response;
     }
 
-    public function getCities($provinceId = 'all') {
-        $method = 'GET';
-        $options = [
-            'apiKey' => $this->key,
-        ];
-
-        if ($provinceId == 'all') {
-            $options['origin'] = $provinceId;
-        } elseif ($provinceId) {
-            $options['province'] = $provinceId;
-        }
-
-        curl_setopt_array($this->curl, [
-            CURLOPT_URL => $this->url . 'public/v1/cities?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-            ],
-        ]);
-
-        $response = curl_exec($this->curl);
-        $err = curl_error($this->curl);
-
-        if ($err) {
-            return $this->error($err);
-        } else {
-            return $this->response($response);
-        }
+    public function getProvinceById($provinceId) {
+        $endPoint = $this->url . 'v3/location/province/'.$provinceId;
+        $response = $this->requestToShipper($endPoint, "GET");
+        return $response;
     }
 
-    public function getSuburbs($cityId) {
-        $method = 'GET';
-        $options = [
-            'apiKey' => $this->key,
-            'city' => $cityId,
-        ];
+    public function getProvincesByCountryId($countryId) {
+        $endPoint = $this->url . 'v3/location/country/'.$countryId.'/provinces/';
+        $response = $this->requestToShipper($endPoint, "GET");
+        return $response;
+    }
 
-        curl_setopt_array($this->curl, [
-            CURLOPT_URL => $this->url . 'public/v1/suburbs?' . http_build_query($options),
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => '',
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $method,
-            CURLOPT_USERAGENT => $_SERVER['HTTP_USER_AGENT'],
-            CURLOPT_HTTPHEADER => [
-                'Content-Type: application/json',
-            ],
-        ]);
+    public function getCities() {
+        $endPoint = $this->url . 'v3/location/cities?';
+        $response = $this->requestToShipper($endPoint, "GET");
+        return $response;
+    }
 
-        $response = curl_exec($this->curl);
-        $err = curl_error($this->curl);
+    public function getCitiesByProvinceId($provinceId) {
+        $endPoint = $this->url . 'v3/location/province/'.$provinceId.'/cities/';
+        $response = $this->requestToShipper($endPoint, "GET");
+        return $response;
+    }
 
-        if ($err) {
-            return $this->error($err);
-        } else {
-            return $this->response($response);
+    public function getCityById($cityId) {
+        $endPoint = $this->url . 'v3/location/city/'.$cityId;
+        $response = $this->requestToShipper($endPoint, "GET");
+        return $response;
+    }
+
+    public function getSuburbs() {
+        $endPoint = $this->url . 'v3/location/suburbs?';
+        $response = $this->requestToShipper($endPoint, "GET");
+        return $response;
+    }
+
+    public function getSuburbsByCityId($cityId) {
+        $endPoint = $this->url . 'v3/location/city/'.$cityId.'/suburbs/';
+        $response = $this->requestToShipper($endPoint, "GET");
+        return $response;
+    }
+
+    public function getSuburbById($suburbId) {
+        $endPoint = $this->url . 'v3/location/suburb/'.$suburbId;
+        $response = $this->requestToShipper($endPoint, "GET");
+        return $response;
+    }
+
+    /**
+     * Get Pricings Domestic.
+     *
+     * @param array $destination
+     * @param array $origin s
+     * @param int $weight kg
+     * @param double $itemValue rp
+     * @param float $height cm
+     * @param float $length cm
+     * @param float $width cm
+     * @param boolean $cod
+     * @param boolean $forOrder
+     * @param integer $limit
+     * @param integer $page
+     * @param integer $sortBy 0= delivery_time / 1= final_price
+     * @return void
+     */
+    public function getPricingDomestic(
+        $destination,
+        $origin,
+        $weight,
+        $itemValue,
+        $height,
+        $length,
+        $width,
+        $cod = false,
+        $forOrder = false,
+        $limit = 30,
+        $page = 1,
+        int $sortBy = 2
+    ) {
+        $data = [];
+        $data["cod"] = $cod;
+        $data["destination"] = $destination;
+        $data["origin"] = $origin;
+        $data["weight"] = $weight;
+        $data["item_value"] = $itemValue;
+        $data["height"] = $height;
+        $data["length"] = $length;
+        $data["width"] = $width;
+        $data["for_order"] = $forOrder;
+        $data["limit"] = $limit;
+        $data["page"] = $page;
+        if ($sortBy != 2) {
+            $data['sort_by'] = $sortBy;
         }
+        $endPoint = $this->url . 'v3/pricing/domestic';
+        $response = $this->requestToShipper($endPoint, "POST", $data);
+        return $response;
+    }
+
+
+    /**
+     * Get Pricings Domestic.
+     *
+     * @param string $rateTypes ['intant', 'regular', 'express', 'trucking', 'same-day']
+     * @param array $destination
+     * @param array $origin s
+     * @param int $weight kg
+     * @param double $itemValue rp
+     * @param float $height cm
+     * @param float $length cm
+     * @param float $width cm
+     * @param boolean $cod
+     * @param boolean $forOrder
+     * @param integer $limit
+     * @param integer $page
+     * @param integer $sortBy 0= delivery_time / 1= final_price
+     * @return void
+     */
+    public function getPricingDomesticByRates(
+        $rateTypes,
+        $destination,
+        $origin,
+        $weight,
+        $itemValue,
+        $height,
+        $length,
+        $width,
+        $cod = false,
+        $forOrder = false,
+        $limit = 30,
+        $page = 1,
+        int $sortBy = 2
+    ) {
+        $data = [];
+        $data["cod"] = $cod;
+        $data["destination"] = $destination;
+        $data["origin"] = $origin;
+        $data["weight"] = $weight;
+        $data["item_value"] = $itemValue;
+        $data["height"] = $height;
+        $data["length"] = $length;
+        $data["width"] = $width;
+        $data["for_order"] = $forOrder;
+        $data["limit"] = $limit;
+        $data["page"] = $page;
+        if ($sortBy != 2) {
+            $data['sort_by'] = $sortBy;
+        }
+        $endPoint = $this->url . 'v3/pricing/domestic/'.$rateTypes;
+        $response = $this->requestToShipper($endPoint, "POST", $data);
+        return $response;
     }
 
     public function getAreas($suburbId) {
@@ -1376,6 +1415,36 @@ class CVendor_Shipper {
         } else {
             return $this->response($response);
         }
+    }
+
+    protected function requestToShipper($endPoint, $method, $data = null) {
+        $curl = curl_init();
+        $headers = [];
+        $headers[] = 'Accept: application/json';
+        $headers[] = 'Content-Type: application/json';
+        $headers[] = 'X-API-Key: '.$this->key;
+
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($curl, CURLOPT_URL, $endPoint);
+        if ($method == 'POST') {
+            if ($data != null) {
+                $payload = json_encode($data);
+                curl_setopt($curl, CURLOPT_POST, true);
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
+            }
+        } else {
+            if ($data != null) {
+                $payload = curl::asPostString($data);
+                curl_setopt($curl, CURLOPT_URL, $endPoint . '?' . $payload);
+            }
+        }
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($curl);
+
+
+        curl_close($curl);
+        $responseObject = json_decode($response, true);
+        return $responseObject;
     }
 
     private function response($res) {
