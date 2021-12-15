@@ -12,4 +12,4 @@ import './modules/es.element.get-attribute-names';
 import './modules/es.element.matches';
 import './modules/es.element.closest';
 import './modules/es.element.class-list';
-import './navigator/offline-events';
+//import './navigator/offline-events';

@@ -27,6 +27,7 @@ const createNavigatorOnlineProp = function () {
         lastOnLineStatus = true;
 
     // note: this doesn't allow us to define a getter in Safari
+    // eslint-disable-next-line no-underscore-dangle
     navigator.__defineGetter__('onLine', testConnection);
     testConnection();
 
@@ -45,4 +46,6 @@ const createNavigatorOnlineProp = function () {
     }, 5000); // 5 seconds, made up - can't find docs to suggest interval time
 };
 
-createNavigatorOnlineProp();
+if(typeof navigator.onLine == 'undefined') {
+    createNavigatorOnlineProp();
+}
