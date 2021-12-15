@@ -16,6 +16,7 @@ import { confirmFromElement, defaultConfirmHandler } from './module/confirm-hand
 import initValidation from './module/validation';
 import ucfirst from 'locutus/php/strings/ucfirst';
 import Alpine from 'alpinejs';
+import cresReact from './react';
 import CSocket from './csocket/CSocket';
 import removePreloader from './module/preloader';
 import initProgressive from './module/progressive';
@@ -44,6 +45,7 @@ export default class Cresenity {
         this.filesAdded = [];
         this.ui = new UI();
         this.php = php;
+        this.react = cresReact;
         this.observer = {
             elementRendered: elementRendered,
             elementReady: elementReady

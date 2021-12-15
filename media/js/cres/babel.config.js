@@ -9,7 +9,8 @@ module.exports = {
                     ie: '11'
                 }
             }
-        ]
+        ],
+        ['@babel/preset-react']
     ],
     plugins: [
         '@babel/plugin-proposal-object-rest-spread'

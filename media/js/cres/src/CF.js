@@ -1,6 +1,8 @@
 import {
     dispatch as dispatchWindowEvent
 } from './util';
+import { mergeOptions } from './util/config';
+import pipeline from './util/pipeline';
 class CF {
     constructor() {
         this.required = typeof this.required === 'undefined' ? [] : this.required;
@@ -28,13 +30,14 @@ class CF {
                 }
             },
             requireJs: false,
-            CFVersion: '1.2'
+            CFVersion: '1.2',
+            isProduction: false,
+            react: {
+                enable: false
+            }
 
         };
-        this.config = {
-            ...defaultConfig,
-            ...cappConfig
-        };
+        this.config = mergeOptions(defaultConfig, cappConfig);
 
         if (this.config.cssUrl) {
             this.config.cssUrl.forEach((item) => {
@@ -161,15 +164,61 @@ class CF {
     isProduction() {
         return this.config.environment == 'production';
     }
+    loadReact(callback) {
+        let afterReactLoaded = () => {
+            dispatchWindowEvent('cresenity:react:loaded');
+            callback();
+        };
+        const reactDevelopmentUrl = 'https://unpkg.com/react@17/umd/react.development.js';
+        const reactDevelopmentDomUrl = 'https://unpkg.com/react-dom@17/umd/react-dom.development.js';
+
+        const reactProductionUrl = 'https://unpkg.com/react@17/umd/react.production.min.js';
+        const reactProductionDomUrl = 'https://unpkg.com/react-dom@17/umd/react-dom.production.min.js';
+
+        let reactUrl = this.getConfig().isProduction ? reactProductionUrl : reactDevelopmentUrl;
+        let reactDomUrl = this.getConfig().isProduction ? reactProductionDomUrl : reactDevelopmentDomUrl;
+        let loadReactDom = () => {
+            let fileref = this.document.createElement('script');
+            fileref.setAttribute('type', 'text/javascript');
+            fileref.setAttribute('src', reactDomUrl);
+            // IE 6 & 7
+            if (typeof (callback) === 'function') {
+                fileref.onload = ()=>{
+                    afterReactLoaded();
+                };
+            }
+            this.head.appendChild(fileref);
+        };
+        let loadReactBase = () => {
+            let fileref = this.document.createElement('script');
+            fileref.setAttribute('type', 'text/javascript');
+            fileref.setAttribute('src', reactUrl);
+            // IE 6 & 7
+            if (typeof (callback) === 'function') {
+                fileref.onload = ()=>{
+                    loadReactDom();
+                };
+            }
+            this.head.appendChild(fileref);
+        };
+        if (typeof React == 'undefined') {
+            loadReactBase();
+        } else {
+            afterReactLoaded();
+        }
+    }
     loadJQuery(callback) {
+        const jqueryUrl = this.getConfig().defaultJQueryUrl;
         let afterJQueryLoaded = () => {
+            this.required.push(jqueryUrl);
             dispatchWindowEvent('cresenity:jquery:loaded');
             callback();
         };
         if (typeof jQuery == 'undefined') {
             let fileref = this.document.createElement('script');
             fileref.setAttribute('type', 'text/javascript');
-            fileref.setAttribute('src', this.getConfig().defaultJQueryUrl);
+
+            fileref.setAttribute('src', jqueryUrl);
             // IE 6 & 7
             if (typeof (callback) === 'function') {
                 fileref.onload = ()=>{
@@ -188,23 +237,33 @@ class CF {
     }
 
     init() {
-        let arrayJsUrl = this.getConfig().jsUrl;
-        let arrayCssUrl = this.getConfig().cssUrl;
         this.beforeInitCallback.forEach((item) => {
             item();
         });
 
-        this.loadJQuery(() => {
-            if (typeof arrayJsUrl !== 'undefined') {
-                arrayJsUrl.forEach((item) => {
-                    this.required.push(item);
-                });
+        //push all item already loaded by html in capp
+        let arrayJsUrl = this.getConfig().jsUrl;
+        let arrayCssUrl = this.getConfig().cssUrl;
+        if (typeof arrayJsUrl !== 'undefined') {
+            arrayJsUrl.forEach((item) => {
+                this.required.push(item);
+            });
+        }
+        if (typeof arrayCssUrl !== 'undefined') {
+            arrayCssUrl.forEach((item) => {
+                this.cssRequired.push(item);
+            });
+        }
+
+
+        let resolver = this.getConfig().react.enable
+            ? (callback) => {
+                this.loadJQuery(this.loadReact(callback));
             }
-            if (typeof arrayCssUrl !== 'undefined') {
-                arrayCssUrl.forEach((item) => {
-                    this.cssRequired.push(item);
-                });
-            }
+            : (callback) => {
+                this.loadJQuery(callback);
+            };
+        resolver(() => {
             this.afterInitCallback.forEach((item) => {
                 item();
             });

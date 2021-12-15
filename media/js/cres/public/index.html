@@ -1,11 +1,16 @@
 <html class="no-js">
     <head>
         <script>
-
+            window.capp = {
+                react : {
+                    enable:true
+                }
+            }
         </script>
         <link href="cres.css" rel="stylesheet" />
         <script src="cres.js"></script>
 
+        <link rel="shortcut icon" href="favico.png" />
         </style>
     </head>
     <body>
@@ -14,6 +19,9 @@
 
             <div class="cres-preloader-loader-section section-left"></div>
             <div class="cres-preloader-loader-section section-right"></div>
+
+        </div>
+        <div id="container">
 
         </div>
         <div id="content">
@@ -62,7 +70,7 @@
 		</div>
         <script>
             window.addEventListener('cresenity:loaded',()=>{
-                cresenity.message('error','Hello')
+                cresenity.react.createTestComponent(document.getElementById('container'));
             });
         </script>
     </body>
