@@ -2146,11 +2146,11 @@
 	var counter = 0;
 	var queue$1 = {};
 	var ONREADYSTATECHANGE = 'onreadystatechange';
-	var location, defer, channel, port;
+	var location$1, defer, channel, port;
 
 	try {
 	  // Deno throws a ReferenceError on `location` access without `--location` flag
-	  location = global$8.location;
+	  location$1 = global$8.location;
 	} catch (error) { /* empty */ }
 
 	var run = function (id) {
@@ -2174,7 +2174,7 @@
 
 	var post = function (id) {
 	  // old engines have not location.origin
-	  global$8.postMessage(String(id), location.protocol + '//' + location.host);
+	  global$8.postMessage(String(id), location$1.protocol + '//' + location$1.host);
 	};
 
 	// Node.js 0.9+ & IE10+ has setImmediate, otherwise:
@@ -2217,7 +2217,7 @@
 	    global$8.addEventListener &&
 	    isCallable$2(global$8.postMessage) &&
 	    !global$8.importScripts &&
-	    location && location.protocol !== 'file:' &&
+	    location$1 && location$1.protocol !== 'file:' &&
 	    !fails$1(post)
 	  ) {
 	    defer = post;
@@ -3739,6 +3739,140 @@
 	  };
 	}
 
+	(function () {
+	  if (typeof window.Element === 'undefined' || 'classList' in document.documentElement) {
+	    return;
+	  }
+
+	  var prototype = Array.prototype,
+	      push = prototype.push,
+	      splice = prototype.splice,
+	      join = prototype.join;
+
+	  function DOMTokenList(el) {
+	    this.el = el; // The className needs to be trimmed and split on whitespace
+	    // to retrieve a list of classes.
+
+	    var classes = el.className.replace(/^\s+|\s+$/g, '').split(/\s+/);
+
+	    for (var i = 0; i < classes.length; i++) {
+	      push.call(this, classes[i]);
+	    }
+	  }
+
+	  DOMTokenList.prototype = {
+	    add: function add(token) {
+	      if (this.contains(token)) {
+	        return;
+	      }
+
+	      push.call(this, token);
+	      this.el.className = this.toString();
+	    },
+	    contains: function contains(token) {
+	      return this.el.className.indexOf(token) != -1;
+	    },
+	    item: function item(index) {
+	      return this[index] || null;
+	    },
+	    remove: function remove(token) {
+	      if (!this.contains(token)) {
+	        return;
+	      }
+
+	      var i;
+
+	      for (i = 0; i < this.length; i++) {
+	        if (this[i] == token) {
+	          break;
+	        }
+	      }
+
+	      splice.call(this, i, 1);
+	      this.el.className = this.toString();
+	    },
+	    toString: function toString() {
+	      return join.call(this, ' ');
+	    },
+	    toggle: function toggle(token) {
+	      if (!this.contains(token)) {
+	        this.add(token);
+	      } else {
+	        this.remove(token);
+	      }
+
+	      return this.contains(token);
+	    }
+	  };
+	  window.DOMTokenList = DOMTokenList;
+
+	  function defineElementGetter(obj, prop, getter) {
+	    if (Object.defineProperty) {
+	      Object.defineProperty(obj, prop, {
+	        get: getter
+	      });
+	    } else {
+	      // eslint-disable-next-line no-underscore-dangle
+	      obj.__defineGetter__(prop, getter);
+	    }
+	  }
+
+	  defineElementGetter(Element.prototype, 'classList', function () {
+	    return new DOMTokenList(this);
+	  });
+	})();
+
+	// Working demo: http://jsbin.com/ozusa6/2/
+	var createNavigatorOnlineProp = function createNavigatorOnlineProp() {
+	  function triggerEvent(type) {
+	    var event = document.createEvent('HTMLEvents');
+	    event.initEvent(type, true, true);
+	    event.eventName = type;
+	    (document.body || window).dispatchEvent(event);
+	  }
+
+	  function testConnection() {
+	    // make sync-ajax request
+	    var xhr = new XMLHttpRequest(); // phone home
+
+	    xhr.open('HEAD', '/', false); // async=false
+
+	    try {
+	      xhr.send();
+	      onLine = true;
+	    } catch (e) {
+	      // throws NETWORK_ERR when disconnected
+	      onLine = false;
+	    }
+
+	    return onLine;
+	  }
+
+	  var onLine = true,
+	      lastOnLineStatus = true; // note: this doesn't allow us to define a getter in Safari
+
+	  navigator.__defineGetter__('onLine', testConnection);
+
+	  testConnection();
+
+	  if (onLine === false) {
+	    lastOnLineStatus = false; // trigger offline event
+
+	    triggerEvent('offline');
+	  }
+
+	  setInterval(function () {
+	    testConnection();
+
+	    if (onLine !== lastOnLineStatus) {
+	      triggerEvent(onLine ? 'online' : 'offline');
+	      lastOnLineStatus = onLine;
+	    }
+	  }, 5000); // 5 seconds, made up - can't find docs to suggest interval time
+	};
+
+	createNavigatorOnlineProp();
+
 	function _typeof$1(obj) {
 	  "@babel/helpers - typeof";
 
@@ -4409,7 +4543,17 @@
 	    var defaultConfig = {
 	      baseUrl: '/',
 	      defaultJQueryUrl: 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js',
-	      haveScrollToTop: true,
+	      haveScrollToTop: false,
+	      vscode: {
+	        liveReload: {
+	          enable: false,
+	          protocol: 'ws',
+	          host: 'localhost',
+	          port: 3717
+	        }
+	      },
+	      requireJs: false,
+	      CFVersion: '1.2',
 	      isProduction: false,
 	      react: {
 	        enable: false
@@ -4571,6 +4715,11 @@
 	      if (t == 'css') {
 	        this.requireCss(toPush, callback);
 	      }
+	    }
+	  }, {
+	    key: "isProduction",
+	    value: function isProduction() {
+	      return this.config.environment == 'production';
 	    }
 	  }, {
 	    key: "loadReact",
@@ -18609,6 +18758,22 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
 	      window.Alpine.start();
 	    }
 	  }, {
+	    key: "initLiveReload",
+	    value: function initLiveReload() {
+	      if (!this.cf.isProduction() && this.cf.config.vscode.liveReload.enable) {
+	        try {
+	          var rsocket = new WebSocket(this.cf.config.vscode.liveReload.protocol + '://' + this.cf.config.vscode.liveReload.host + ':' + this.cf.config.vscode.liveReload.port + '/', 'reload-protocol');
+
+	          rsocket.onmessage = function (msg) {
+	            if (msg.data == 'RELOAD') {
+	              location.reload();
+	            }
+	          };
+	        } catch (e) {//do nothing
+	        }
+	      }
+	    }
+	  }, {
 	    key: "init",
 	    value: function init() {
 	      var _this10 = this;
@@ -18630,6 +18795,8 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
 	        _this10.initValidation();
 
 	        _this10.initAlpineAndUi();
+
+	        _this10.initLiveReload();
 
 	        initProgressive();
 	        var root = document.getElementsByTagName('html')[0]; // '0' to assign the first (and only `HTML` tag)
