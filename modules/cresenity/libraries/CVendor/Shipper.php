@@ -293,7 +293,6 @@ class CVendor_Shipper {
      * @param boolean $forOrder
      * @param integer $limit
      * @param integer $page
-     * @param integer $sortBy 0= delivery_time / 1= final_price
      * @return void
      */
     public function getPricingDomestic(
@@ -306,9 +305,9 @@ class CVendor_Shipper {
         $width,
         $cod = false,
         $forOrder = false,
+        $sortBy = [],
         $limit = 30,
-        $page = 1,
-        int $sortBy = 2
+        $page = 1
     ) {
         $data = [];
         $data["cod"] = $cod;
@@ -322,7 +321,7 @@ class CVendor_Shipper {
         $data["for_order"] = $forOrder;
         $data["limit"] = $limit;
         $data["page"] = $page;
-        if ($sortBy != 2) {
+        if (count($sortBy) > 0) {
             $data['sort_by'] = $sortBy;
         }
         $endPoint = $this->url . 'v3/pricing/domestic';
@@ -380,6 +379,36 @@ class CVendor_Shipper {
             $data['sort_by'] = $sortBy;
         }
         $endPoint = $this->url . 'v3/pricing/domestic/'.$rateTypes;
+        $response = $this->requestToShipper($endPoint, "POST", $data);
+        return $response;
+    }
+
+    public function createOrder(
+        $consignee,
+        $consigner,
+        $courier,
+        $coverage,
+        $destination,
+        $origin,
+        $package,
+        $paymentType,
+        $serviceType = '',
+        $bestPrice = false
+    ) {
+        $data = [];
+        $data["consignee"] = $consignee;
+        $data["consigner"] = $consigner;
+        $data["courier"] = $courier;
+        $data["coverage"] = $coverage;
+        $data["destination"] = $destination;
+        $data["origin"] = $origin;
+        $data["package"] = $package;
+        $data["payment_type"] = $paymentType;
+        if (strlen($serviceType) > 0) {
+            $data['service_type'] = $serviceType;
+        }
+        $data["best_price"] = $bestPrice;
+        $endPoint = $this->url . 'v3/order/';
         $response = $this->requestToShipper($endPoint, "POST", $data);
         return $response;
     }
@@ -1429,6 +1458,7 @@ class CVendor_Shipper {
         if ($method == 'POST') {
             if ($data != null) {
                 $payload = json_encode($data);
+                // echo $payload;die;
                 curl_setopt($curl, CURLOPT_POST, true);
                 curl_setopt($curl, CURLOPT_POSTFIELDS, $payload);
             }
