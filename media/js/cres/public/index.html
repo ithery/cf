@@ -21,6 +21,7 @@
             <div class="cres-preloader-loader-section section-right"></div>
 
         </div>
+        <button id="click">Click Me</button>
         <div id="container">
 
         </div>
@@ -70,8 +71,16 @@
 		</div>
         <script>
             window.addEventListener('cresenity:loaded',()=>{
-                cresenity.react.createTestComponent(document.getElementById('container'));
+                let data = { count: 1 };
+                let reactiveData = cresenity.reactive(data,(data) => {
+                    document.getElementById('container').innerHTML = data.count;
+                });
+                document.getElementById('click').addEventListener('click',() => {
+                    reactiveData.count++;
+                });
             });
+
+
         </script>
     </body>
 </html>

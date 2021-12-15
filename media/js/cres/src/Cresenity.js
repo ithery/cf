@@ -1133,8 +1133,16 @@ export default class Cresenity {
             }
         });
     }
+    reactive(data, cb) {
+        const reactiveData =Alpine.reactive(data);
+        if(typeof cb == 'function') {
+            Alpine.effect(() => {
+                cb(reactiveData);
+            });
+        }
 
-
+        return reactiveData;
+    }
     handleJsonResponse(response, onSuccess, onError) {
         let errMessage = 'Unexpected error happen, please relogin ro refresh this page';
         if (typeof onError == 'string') {

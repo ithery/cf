@@ -18890,6 +18890,19 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
 	      });
 	    }
 	  }, {
+	    key: "reactive",
+	    value: function reactive(data, cb) {
+	      var reactiveData = module_default.reactive(data);
+
+	      if (typeof cb == 'function') {
+	        module_default.effect(function () {
+	          cb(reactiveData);
+	        });
+	      }
+
+	      return reactiveData;
+	    }
+	  }, {
 	    key: "handleJsonResponse",
 	    value: function handleJsonResponse(response, onSuccess, onError) {
 	      var errMessage = 'Unexpected error happen, please relogin ro refresh this page';
