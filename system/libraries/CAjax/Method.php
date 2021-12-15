@@ -193,7 +193,11 @@ class CAjax_Method implements CInterface_Jsonable {
      */
     public function executeEngine($input = null) {
         $engine = self::createEngine($this, $input);
+        $response = $engine->execute();
+        if ($response != null && $response instanceof CHTTP_JsonResponse) {
+            return $response->getContent();
+        }
 
-        return $engine->execute();
+        return $response;
     }
 }

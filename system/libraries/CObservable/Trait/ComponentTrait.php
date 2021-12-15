@@ -163,7 +163,7 @@ trait CObservable_Trait_ComponentTrait {
 
     public function addBlockly($id = '') {
         return c::tap(new CElement_Component_Blockly($id), function (CElement_Component_Blockly $el) {
-            $this->add($el);
+            $this->wrapper->add($el);
         });
     }
 }

@@ -50,6 +50,7 @@ class Controller_Cresenity extends CController {
         $json = $disk->get($file);
 
         $ajaxMethod = CAjax::createMethod($json)->setArgs($args);
+
         $response = $ajaxMethod->executeEngine();
 
         return $response;
