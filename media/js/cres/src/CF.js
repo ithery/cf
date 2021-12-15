@@ -26,7 +26,9 @@ class CF {
                     host: 'localhost',
                     port: 3717
                 }
-            }
+            },
+            requireJs: false,
+            CFVersion: '1.2'
 
         };
         this.config = {
