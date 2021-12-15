@@ -14,12 +14,18 @@
         </style>
     </head>
     <body>
+
         <div id="cres-preloader">
             <div class="cres-preloader-loader"></div>
 
             <div class="cres-preloader-loader-section section-left"></div>
             <div class="cres-preloader-loader-section section-right"></div>
 
+        </div>
+
+        <div id="alpine" x-data="{text:'Hello World'}">
+            <div x-text="text" ></div>
+            <div @click="text='Hehe'">Change Text</div>
         </div>
         <button id="click">Click Me</button>
         <div id="container">
@@ -69,6 +75,7 @@
 			<p>Cursus magna tincidunt pretium. Donec malesuada accumsan quam, et commodo orci viverra et. Integer tincidunt sagittis lectus. Mauris ac ligula quis orci auctor tincidunt. Suspendisse odio justo, varius id posuere sit amet, iaculis sit amet orci. Suspendisse potenti. Suspendisse potenti. Aliquam erat volutpat. Sed posuere dignissim odio, nec cursus odio mollis et. Praesent cursus, orci ut dictum adipiscing, tellus ante porttitor leo, vel gravida lacus lorem vitae est. Duis ultricies feugiat ante nec aliquam. Maecenas varius, nulla vel fermentum semper, metus nibh bibendum nunc, vitae suscipit mauris velit ac nunc. Mauris nunc eros, egestas at.</p>
 
 		</div>
+
         <script>
             window.addEventListener('cresenity:loaded',()=>{
                 let data = { count: 1 };

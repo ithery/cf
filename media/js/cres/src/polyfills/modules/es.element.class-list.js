@@ -1,12 +1,11 @@
-(function () {
-    if (typeof window.Element === 'undefined' || 'classList' in document.documentElement) {return;}
 
+if (!(typeof window.Element === 'undefined' || 'classList' in document.documentElement)) {
     let prototype = Array.prototype,
         push = prototype.push,
         splice = prototype.splice,
         join = prototype.join;
 
-    function DOMTokenList(el) {
+    let DOMTokenList = function (el) {
         this.el = el;
         // The className needs to be trimmed and split on whitespace
         // to retrieve a list of classes.
@@ -14,7 +13,7 @@
         for (let i = 0; i < classes.length; i++) {
             push.call(this, classes[i]);
         }
-    }
+    };
 
     DOMTokenList.prototype = {
         add: function (token) {
@@ -53,7 +52,7 @@
 
     window.DOMTokenList = DOMTokenList;
 
-    function defineElementGetter(obj, prop, getter) {
+    let defineElementGetter = function (obj, prop, getter) {
         if (Object.defineProperty) {
             Object.defineProperty(obj, prop, {
                 get: getter
@@ -62,9 +61,9 @@
             // eslint-disable-next-line no-underscore-dangle
             obj.__defineGetter__(prop, getter);
         }
-    }
+    };
 
     defineElementGetter(Element.prototype, 'classList', function () {
         return new DOMTokenList(this);
     });
-}());
+}

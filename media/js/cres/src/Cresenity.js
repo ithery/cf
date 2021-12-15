@@ -21,6 +21,7 @@ import CSocket from './csocket/CSocket';
 import removePreloader from './module/preloader';
 import initProgressive from './module/progressive';
 import cresToast from './module/toast';
+import CresAlpine from './module/CresAlpine';
 
 export default class Cresenity {
     constructor() {
@@ -961,6 +962,7 @@ export default class Cresenity {
         window.Alpine = Alpine;
         this.ui.start();
         window.Alpine.start();
+        this.alpine = new CresAlpine(window.Alpine);
     }
 
     initLiveReload() {

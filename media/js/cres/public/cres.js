@@ -1673,7 +1673,7 @@
 	var toLength$2 = toLength$7;
 	var arraySpeciesCreate = arraySpeciesCreate$2;
 
-	var push = [].push;
+	var push$1 = [].push;
 
 	// `Array.prototype.{ forEach, map, filter, some, every, find, findIndex, filterReject }` methods implementation
 	var createMethod$1 = function (TYPE) {
@@ -1702,10 +1702,10 @@
 	          case 3: return true;              // some
 	          case 5: return value;             // find
 	          case 6: return index;             // findIndex
-	          case 2: push.call(target, value); // filter
+	          case 2: push$1.call(target, value); // filter
 	        } else switch (TYPE) {
 	          case 4: return false;             // every
-	          case 7: push.call(target, value); // filterReject
+	          case 7: push$1.call(target, value); // filterReject
 	        }
 	      }
 	    }
@@ -3739,17 +3739,13 @@
 	  };
 	}
 
-	(function () {
-	  if (typeof window.Element === 'undefined' || 'classList' in document.documentElement) {
-	    return;
-	  }
-
+	if (!(typeof window.Element === 'undefined' || 'classList' in document.documentElement)) {
 	  var prototype = Array.prototype,
 	      push = prototype.push,
 	      splice = prototype.splice,
-	      join = prototype.join;
+	      join$1 = prototype.join;
 
-	  function DOMTokenList(el) {
+	  var DOMTokenList = function DOMTokenList(el) {
 	    this.el = el; // The className needs to be trimmed and split on whitespace
 	    // to retrieve a list of classes.
 
@@ -3758,7 +3754,7 @@
 	    for (var i = 0; i < classes.length; i++) {
 	      push.call(this, classes[i]);
 	    }
-	  }
+	  };
 
 	  DOMTokenList.prototype = {
 	    add: function add(token) {
@@ -3792,7 +3788,7 @@
 	      this.el.className = this.toString();
 	    },
 	    toString: function toString() {
-	      return join.call(this, ' ');
+	      return join$1.call(this, ' ');
 	    },
 	    toggle: function toggle(token) {
 	      if (!this.contains(token)) {
@@ -3806,7 +3802,7 @@
 	  };
 	  window.DOMTokenList = DOMTokenList;
 
-	  function defineElementGetter(obj, prop, getter) {
+	  var defineElementGetter = function defineElementGetter(obj, prop, getter) {
 	    if (Object.defineProperty) {
 	      Object.defineProperty(obj, prop, {
 	        get: getter
@@ -3815,12 +3811,12 @@
 	      // eslint-disable-next-line no-underscore-dangle
 	      obj.__defineGetter__(prop, getter);
 	    }
-	  }
+	  };
 
 	  defineElementGetter(Element.prototype, 'classList', function () {
 	    return new DOMTokenList(this);
 	  });
-	})();
+	}
 
 	function _typeof$1(obj) {
 	  "@babel/helpers - typeof";
@@ -17622,6 +17618,244 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
 	  };
 	}();
 
+	function getComponentName(element) {
+	  return element.getAttribute('x-title') || element.getAttribute('x-id') || element.id || element.getAttribute('name') || findCresID(element.getAttribute('cres:id')) || findLiveViewName(element) || element.getAttribute('aria-label') || extractFunctionName(element.getAttribute('x-data')) || element.getAttribute('role') || element.tagName.toLowerCase();
+	}
+
+	function findCresID(cresId) {
+	  if (cresId && window.cresenity.ui) {
+	    try {
+	      var cres = window.cresenity.ui.find(cresId); // eslint-disable-next-line no-underscore-dangle
+
+	      if (window.cresenity.ui.__instance) {
+	        // eslint-disable-next-line no-underscore-dangle
+	        return 'cres:' + window.cresenity.ui.__instance.fingerprint.name;
+	      }
+	    } catch (e) {//do nothing
+	    }
+	  }
+	}
+
+	function findLiveViewName(alpineEl) {
+	  var phxEl = alpineEl.closest('[data-phx-view]');
+
+	  if (phxEl) {
+	    // pretty sure we could do the following instead
+	    // return phxEl.dataset.phxView;
+	    if (!window.liveSocket.getViewByEl) {
+	      return;
+	    }
+
+	    var view = window.liveSocket.getViewByEl(phxEl);
+	    return view && view.name;
+	  }
+	}
+
+	function extractFunctionName(functionName) {
+	  if (functionName.startsWith('{')) {
+	    return;
+	  }
+
+	  return functionName.replace(/\(([^\)]+)\)/, '') // Handles myFunction(param)
+	  .replace('()', '');
+	}
+	/**
+	 * Semver version check
+	 *
+	 * @param {string} required
+	 * @param {string} actual
+	 * @returns {boolean}
+	 */
+
+
+	function isRequiredVersion(required, actual) {
+	  if (required === actual) {
+	    return true;
+	  }
+
+	  var requiredArray = required.split('.').map(function (v) {
+	    return parseInt(v, 10);
+	  });
+	  var currentArray = actual.split('.').map(function (v) {
+	    return parseInt(v, 10);
+	  });
+
+	  for (var i = 0; i < requiredArray.length; i++) {
+	    if (currentArray[i] < requiredArray[i]) {
+	      return false;
+	    }
+
+	    if (currentArray[i] > requiredArray[i]) {
+	      return true;
+	    }
+	  }
+
+	  return true;
+	}
+
+	var CRESALPINE_RENDER_ATTR_NAME = 'data-cresalpine-render';
+	var CRESALPINE_RENDER_BINDING_ATTR_NAME = ":".concat(CRESALPINE_RENDER_ATTR_NAME);
+
+	var CresAlpine = /*#__PURE__*/function () {
+	  function CresAlpine(Alpine) {
+	    _classCallCheck(this, CresAlpine);
+
+	    this.Alpine = Alpine;
+	    this.lastComponentCrawl = Date.now();
+	    this.components = [];
+	    this.uuid = 1;
+	    this.errorElements = [];
+	    this.observer = null;
+	  }
+
+	  _createClass(CresAlpine, [{
+	    key: "alpineVersion",
+	    get: function get() {
+	      return this.Alpine.version || '';
+	    }
+	  }, {
+	    key: "isV3",
+	    get: function get() {
+	      return isRequiredVersion('3.0.0', this.alpineVersion);
+	    }
+	  }, {
+	    key: "getAlpineDataInstance",
+	    value: function getAlpineDataInstance(node) {
+	      if (this.isV3) {
+	        // eslint-disable-next-line no-underscore-dangle
+	        return node._x_dataStack ? node._x_dataStack[0] : null;
+	      } // eslint-disable-next-line no-underscore-dangle
+
+
+	      return node.__x;
+	    }
+	  }, {
+	    key: "getComponent",
+	    value: function getComponent(name) {
+	      var components = this.getComponents();
+
+	      for (var i = 0; i < components.length; i++) {
+	        if (components[i].name == name) {
+	          return components[i];
+	        }
+	      }
+
+	      return null;
+	    }
+	  }, {
+	    key: "getComponents",
+	    value: function getComponents() {
+	      var _this = this;
+
+	      var alpineRoots = Array.from(document.querySelectorAll('[x-data]'));
+	      var allComponentsInitialized = Object.values(alpineRoots).every(function (e) {
+	        return e.cresAlpine;
+	      });
+
+	      if (allComponentsInitialized) {
+	        var lastAlpineRender = alpineRoots.reduce(function (acc, el) {
+	          // we add `:data-devtools-render="Date.now()"` when initialising components
+	          var renderTimeStr = el.getAttribute(CRESALPINE_RENDER_ATTR_NAME);
+	          var renderTime = parseInt(renderTimeStr, 10);
+
+	          if (renderTime && renderTime > acc) {
+	            return renderTime;
+	          }
+
+	          return acc;
+	        }, this.lastComponentCrawl);
+	        var someComponentHasUpdated = lastAlpineRender > this.lastComponentCrawl;
+
+	        if (someComponentHasUpdated) {
+	          this.lastComponentCrawl = Date.now();
+	        } // Exit early if no components have been added, removed and no data has changed
+
+
+	        if (!someComponentHasUpdated && this.components.length === alpineRoots.length) {
+	          return this.components;
+	        }
+	      }
+
+	      this.components = [];
+	      alpineRoots.forEach(function (rootEl, index) {
+	        if (!_this.getAlpineDataInstance(rootEl)) {
+	          // this component probably crashed during init
+	          return;
+	        }
+
+	        if (!rootEl.cresAlpine) {
+	          if (!_this.isV3) {
+	            // only necessary for Alpine v2
+	            // add an attr to trigger the mutation observer and run this function
+	            // that will send updated state to devtools
+	            rootEl.setAttribute(CRESALPINE_RENDER_BINDING_ATTR_NAME, 'Date.now()');
+	          }
+
+	          rootEl.cresAlpine = {
+	            id: _this.uuid++
+	          };
+	          window["$x".concat(rootEl.cresAlpine.id - 1)] = _this.getAlpineDataInstance(rootEl);
+	        }
+
+	        if (rootEl.cresAlpine.id === _this.selectedComponentId) {
+	          _this.sendComponentData(_this.selectedComponentId, rootEl);
+	        }
+
+	        if (_this.isV3) {
+	          var componentData = _this.getAlpineDataInstance(rootEl);
+
+	          _this.Alpine.effect(function () {
+	            Object.keys(componentData).forEach(function (key) {
+	              // since effects track which dependencies are accessed,
+	              // run a fake component data access so that the effect runs
+	              componentData[key];
+
+	              if (rootEl.cresAlpine.id === _this.selectedComponentId) {
+	                // this re-computes the whole component data
+	                // with effect we could send only the key-value of the field that's changed
+	                _this.sendComponentData(_this.selectedComponentId, rootEl);
+	              }
+	            });
+	          });
+	        }
+
+	        var componentDepth = index === 0 ? 0 : alpineRoots.reduce(function (depth, el, innerIndex) {
+	          if (index === innerIndex) {
+	            return depth;
+	          }
+
+	          if (el.contains(rootEl)) {
+	            return depth + 1;
+	          }
+
+	          return depth;
+	        }, 0);
+
+	        _this.components.push({
+	          name: getComponentName(rootEl),
+	          depth: componentDepth,
+	          index: index,
+	          id: rootEl.cresAlpine.id,
+	          getData: function getData() {
+	            return _this.getAlpineDataInstance(rootEl);
+	          }
+	        });
+	      });
+	      return this.components;
+	    }
+	  }, {
+	    key: "postMessage",
+	    value: function postMessage(payload) {
+	      window.postMessage({
+	        source: 'cres-alpine-backend',
+	        payload: payload
+	      }, '*');
+	    }
+	  }]);
+
+	  return CresAlpine;
+	}();
+
 	var Cresenity = /*#__PURE__*/function () {
 	  function Cresenity() {
 	    _classCallCheck(this, Cresenity);
@@ -18705,6 +18939,7 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
 	      window.Alpine = module_default;
 	      this.ui.start();
 	      window.Alpine.start();
+	      this.alpine = new CresAlpine(window.Alpine);
 	    }
 	  }, {
 	    key: "initLiveReload",
