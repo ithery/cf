@@ -233,6 +233,9 @@ class Controller_Cresenity extends CController {
     }
 
     public function noimage($width = 200, $height = 150, $bg_color = 'EFEFEF', $txt_color = 'AAAAAA', $text = 'NO IMAGE') {
+        if (strlen($text) > 0) {
+            $text = urldecode($text);
+        }
         //Create the image resource
         $width = (int) $width;
         $height = (int) $height;

@@ -960,6 +960,21 @@ export default class Cresenity {
         this.ui.start();
         window.Alpine.start();
     }
+
+    initLiveReload() {
+        if(!this.cf.isProduction() && this.cf.config.vscode.liveReload.enable) {
+            try {
+                const rsocket = new WebSocket(this.cf.config.vscode.liveReload.protocol + '://' +this.cf.config.vscode.liveReload.host+ ':'+this.cf.config.vscode.liveReload.port+'/', 'reload-protocol');
+                rsocket.onmessage = function (msg) {
+                    if (msg.data == 'RELOAD') {
+                        location.reload();
+                    }
+                };
+            }catch(e) {
+                //do nothing
+            }
+        }
+    }
     init() {
         this.cf.onBeforeInit(() => {
             this.normalizeRequireJs();
@@ -974,6 +989,7 @@ export default class Cresenity {
             this.initReload();
             this.initValidation();
             this.initAlpineAndUi();
+            this.initLiveReload();
             initProgressive();
             let root = document.getElementsByTagName('html')[0]; // '0' to assign the first (and only `HTML` tag)
 

@@ -5,4 +5,12 @@ return [
     'react' => [
         'enable' => false,
     ],
+    'vscode' => [
+        'live_reload' => [
+            'enable' => false,
+            'protocol' => 'ws',
+            'host' => 'localhost',
+            'port' => 3717
+        ],
+    ]
 ];

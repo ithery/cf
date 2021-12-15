@@ -18,7 +18,15 @@ class CF {
         let defaultConfig = {
             baseUrl: '/',
             defaultJQueryUrl: 'https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js',
-            haveScrollToTop: true
+            haveScrollToTop: false,
+            vscode: {
+                liveReload: {
+                    enable: false,
+                    protocol: 'ws',
+                    host: 'localhost',
+                    port: 3717
+                }
+            }
 
         };
         this.config = {
@@ -148,7 +156,9 @@ class CF {
             this.requireCss(toPush, callback);
         }
     }
-
+    isProduction() {
+        return this.config.environment == 'production';
+    }
     loadJQuery(callback) {
         let afterJQueryLoaded = () => {
             dispatchWindowEvent('cresenity:jquery:loaded');
