@@ -684,6 +684,11 @@ return [
             'plugins/bootstrap-daterangepicker/bootstrap-daterangepicker.css',
         ],
     ],
+    'datefns' => [
+        'js' => [
+            'plugins/datefns/datefns.min.js',
+        ],
+    ],
     'cropper' => [
         'css' => [
             'plugins/cropper/cropper.css',
