@@ -19138,6 +19138,15 @@ ${expression ? 'Expression: "' + expression + '"\n\n' : ""}`, el);
 	      return reactiveData;
 	    }
 	  }, {
+	    key: "getAlpineData",
+	    value: function getAlpineData(node) {
+	      if (typeof node == 'string') {
+	        node = document.querySelector(node);
+	      }
+
+	      return this.alpine.getAlpineDataInstance(node);
+	    }
+	  }, {
 	    key: "handleJsonResponse",
 	    value: function handleJsonResponse(response, onSuccess, onError) {
 	      var errMessage = 'Unexpected error happen, please relogin ro refresh this page';

@@ -1145,6 +1145,12 @@ export default class Cresenity {
 
         return reactiveData;
     }
+    getAlpineData(node) {
+        if(typeof node == 'string') {
+            node = document.querySelector(node);
+        }
+        return this.alpine.getAlpineDataInstance(node);
+    }
     handleJsonResponse(response, onSuccess, onError) {
         let errMessage = 'Unexpected error happen, please relogin ro refresh this page';
         if (typeof onError == 'string') {
