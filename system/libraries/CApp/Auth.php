@@ -206,6 +206,13 @@ class CApp_Auth {
         return $this->resolvedGuard;
     }
 
+    /**
+     * @return string
+     */
+    public function guardName() {
+        return $this->guard;
+    }
+
     public static function loginRateLimiter() {
         return new CApp_Auth_LoginRateLimiter(new CCache_RateLimiter(CCache::repository()));
     }
