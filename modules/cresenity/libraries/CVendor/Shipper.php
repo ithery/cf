@@ -289,10 +289,10 @@ class CVendor_Shipper {
      * @param float $height cm
      * @param float $length cm
      * @param float $width cm
-     * @param boolean $cod
      * @param boolean $forOrder
      * @param integer $limit
      * @param integer $page
+     * @param boolean $cod
      * @return void
      */
     public function getPricingDomestic(
@@ -303,11 +303,11 @@ class CVendor_Shipper {
         $height,
         $length,
         $width,
-        $cod = false,
         $forOrder = false,
         $sortBy = [],
         $limit = 30,
-        $page = 1
+        $page = 1,
+        $cod = false
     ) {
         $data = [];
         $data["cod"] = $cod;
