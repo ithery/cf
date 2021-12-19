@@ -695,7 +695,7 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
-     * @return array
+     * @return CElement_Component_DataTable_Column[]
      */
     public function getColumns() {
         return $this->columns;
@@ -766,13 +766,15 @@ class CElement_Component_DataTable extends CElement_Component {
     }
 
     /**
+     * @param string $class
+     *
      * @return CExporter_Exportable_DataTable
      */
-    public function toExportable() {
+    public function toExportable($class = CExporter_Exportable_DataTable::class) {
         $table = clone $this;
         $table->prepareForExportable();
 
-        return new CExporter_Exportable_DataTable($table);
+        return new $class($table);
     }
 
     public function prepareForExportable() {

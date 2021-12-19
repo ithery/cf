@@ -45,6 +45,8 @@ class CElement_Component_DataTable_Column extends CObject {
 
     protected $exportCallbackRequire;
 
+    protected $dataType = null;
+
     public function __construct($fieldname) {
         parent::__construct();
 
@@ -98,6 +100,16 @@ class CElement_Component_DataTable_Column extends CObject {
         $this->noLineBreak = $bool;
 
         return $this;
+    }
+
+    public function setDataType($dataType) {
+        $this->dataType = $dataType;
+
+        return $this;
+    }
+
+    public function getDataType() {
+        return $this->dataType;
     }
 
     public function setVisible($bool) {
