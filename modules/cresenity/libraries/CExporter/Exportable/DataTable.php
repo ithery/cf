@@ -158,7 +158,7 @@ class CExporter_Exportable_DataTable extends CExporter_Exportable implements CEx
         if ($dataType == 'currency') {
             return NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1;
         }
-        if ($dataType == 'int' || $dataType == 'number') {
+        if ($dataType == 'integer' || $dataType == 'number') {
             return NumberFormat::FORMAT_NUMBER;
         }
         if ($dataType == 'string') {
