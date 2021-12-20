@@ -16,7 +16,6 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
     use CHTTP_Trait_InteractsWithInput,
         CHTTP_Trait_InteractsWithContentTypes,
         CHTTP_Trait_InteractsWithFlashData;
-
     protected $browser;
 
     /**
@@ -552,6 +551,10 @@ class CHTTP_Request extends SymfonyRequest implements CInterface_Arrayable, Arra
      */
     public function getUserResolver() {
         return $this->userResolver ?: function ($guard = null) {
+            if ($guard == null) {
+                $guard = c::app()->auth()->guardName();
+            }
+
             return c::auth($guard)->user();
         };
     }
