@@ -13,7 +13,6 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
     use CElement_FormInput_SelectSearch_Trait_Select2v23Trait;
     use CTrait_Element_Property_ApplyJs;
     use CTrait_Element_Property_DependsOn;
-
     protected $query;
 
     protected $formatSelection;
@@ -60,7 +59,7 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->delay = 100;
         $this->requires = [];
         $this->valueCallback = null;
-        $this->applyJs = 'select2';
+        $this->applyJs = c::theme('selectsearch.applyjs', 'select2');
         $this->value = null;
         $this->allowClear = false;
     }
