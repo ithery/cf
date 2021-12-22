@@ -94,6 +94,9 @@ class CAuth_Manager {
         if (method_exists($this, $driverMethod)) {
             return $this->{$driverMethod}($name, $config);
         }
+        if (class_exists($config['driver'])) {
+            return $this->createCustomClassDriver($config['driver'], $name, $config);
+        }
 
         throw new InvalidArgumentException(
             "Auth driver [{$config['driver']}] for guard [{$name}] is not defined."
@@ -109,7 +112,20 @@ class CAuth_Manager {
      * @return mixed
      */
     protected function callCustomCreator($name, array $config) {
-        return $this->customCreators[$config['driver']]($this->app, $name, $config);
+        return $this->customCreators[$config['driver']]($name, $config);
+    }
+
+    /**
+     * Call a custom class driver creator.
+     *
+     * @param string $driver
+     * @param string $name
+     * @param array  $config
+     *
+     * @return mixed
+     */
+    protected function createCustomClassDriver($driver, $name, array $config) {
+        return new $driver($name, $config);
     }
 
     /**
