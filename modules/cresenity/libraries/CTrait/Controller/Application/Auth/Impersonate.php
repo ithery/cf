@@ -14,7 +14,7 @@ trait CTrait_Controller_Application_Auth_Impersonate {
         $modelObject = new $model();
         $table = $app->addTable();
         $table->addColumn($modelObject->getKeyName())->setLabel('ID');
-        $table->addColumn(carr::get($providerConfig, 'username'))->setLabel('Username');
+        $table->addColumn(carr::get($providerConfig, 'username', 'username'))->setLabel('Username');
         $table->setDataFromModel($model, function (CModel_Query $q) use ($exceptUserId) {
             if ($exceptUserId) {
                 $q->where($q->getModel()->getKeyName(), '<>', $exceptUserId);

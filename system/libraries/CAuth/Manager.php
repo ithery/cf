@@ -2,7 +2,6 @@
 
 class CAuth_Manager {
     use CAuth_Concern_CreateUserProvider;
-
     /**
      * The registered custom driver creators.
      *
