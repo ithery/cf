@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @see CElement_FormInput_SelectSearch
+ */
 trait CElement_FormInput_SelectSearch_Trait_Select2v23Trait {
     public function htmlSelect2v23($indent = 0) {
         return '<input type="text" name="' . $this->name . '" id="' . $this->id . '" class="input-unstyled validate[]" value="' . $this->value . '">';
