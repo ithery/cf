@@ -9,12 +9,18 @@ trait CTrait_Controller_Application_Auth_Impersonate {
         $providerConfig = c::app()->auth($guard)->getProviderConfig();
 
         $model = carr::get($providerConfig, 'model');
+        $exceptUserId = $guard == c::app()->auth()->guardName() ? c::app()->user()->getKey() : null;
 
         $modelObject = new $model();
         $table = $app->addTable();
         $table->addColumn($modelObject->getKeyName())->setLabel('ID');
         $table->addColumn(carr::get($providerConfig, 'username'))->setLabel('Username');
-        $table->setDataFromModel($model);
+        $table->setDataFromModel($model, function (CModel_Query $q) use ($exceptUserId) {
+            if ($exceptUserId) {
+                $q->where($q->getModel()->getKeyName(), '<>', $exceptUserId);
+            }
+        });
+        $table->setAjax(true);
         $queryString = '';
         if ($redirect != null) {
             $queryString .= '?r=' . urlencode($redirect);
