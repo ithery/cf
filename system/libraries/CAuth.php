@@ -13,4 +13,11 @@ class CAuth {
     public static function gate() {
         return CAuth_Access_Gate::instance();
     }
+
+    /**
+     * @return CAuth_ImpersonateManager
+     */
+    public static function impersonateManager() {
+        return CAuth_ImpersonateManager::instance();
+    }
 }

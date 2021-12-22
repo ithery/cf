@@ -112,6 +112,9 @@ class CHTTP {
         return !static::$middlewareEnabled;
     }
 
+    /**
+     * @return CHTTP_Cookie
+     */
     public static function cookie() {
         if (static::$cookie == null) {
             $config = CF::config('cookie');

@@ -498,9 +498,13 @@ class c {
      * @param mixed         $payload
      * @param bool          $halt
      *
-     * @return null|array
+     * @return null|array|CEvent_Dispatcher
      */
     public static function event(...$args) {
+        if (count($args) == 0) {
+            return CEvent::dispatcher();
+        }
+
         return CEvent::dispatch(...$args);
     }
 
@@ -684,10 +688,17 @@ class c {
     //@codingStandardsIgnoreEnd
 
     /**
-     * @return CSession_Store
+     * @param null|string $key
+     * @param null|mixed  $default
+     *
+     * @return CSession_Store|mixed
      */
-    public static function session() {
-        return CSession::instance()->store();
+    public static function session($key = null, $default = null) {
+        if ($key === null) {
+            return CSession::instance()->store();
+        }
+
+        return CSession::instance()->store()->get($key, $default);
     }
 
     /**
@@ -1539,6 +1550,13 @@ class c {
      */
     public static function cron() {
         return CCron::schedule();
+    }
+
+    /**
+     * @return CHTTP_Cookie
+     */
+    public static function cookie() {
+        return CHTTP::cookie();
     }
 }
 
