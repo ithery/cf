@@ -59,7 +59,8 @@ class CElement_FormInput_SelectSearch extends CElement_FormInput {
         $this->delay = 100;
         $this->requires = [];
         $this->valueCallback = null;
-        $this->applyJs = c::theme('selectsearch.applyjs', 'select2');
+        $this->applyJs = c::theme('selectsearch.applyJs', 'select2');
+
         $this->value = null;
         $this->allowClear = false;
     }
