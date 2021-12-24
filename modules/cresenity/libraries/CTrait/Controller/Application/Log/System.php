@@ -23,8 +23,8 @@ trait CTrait_Controller_Application_Log_System {
             $month = carr::get($time, 'month');
             $tab = $tabList->addTab()
                 ->setLabel("${year} - ${month}")
-                ->setAjaxUrl($this->currentUrl() . "logSystem/${year}/${month}")
-                ->addClass('no-padding');
+                ->addClass('p-0')
+                ->setAjaxUrl($this->currentUrl() . "logSystem/${year}/${month}");
         }
 
         return $app;
