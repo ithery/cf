@@ -18,15 +18,7 @@ class CAjax_Engine_DataTable_Processor_DataProvider extends CAjax_Engine_DataTab
         /** @var CManager_Contract_DataProviderInterface $query */
         $query->search($this->getSearchData());
         $query->sort($this->getSortData());
-        $perPage = null;
-        $page = 1;
 
-        if (isset($request['iDisplayStart']) && $request['iDisplayLength'] != '-1') {
-            $perPage = $request['iDisplayLength'];
-            $start = intval($request['iDisplayStart']);
-
-            $page = floor($start / $perPage) + 1;
-        }
         $paginationResult = $query->paginate($this->parameter->pageSize(), ['*'], 'page', $this->parameter->page());
 
         $output = [
