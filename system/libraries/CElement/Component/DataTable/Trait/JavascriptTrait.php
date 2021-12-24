@@ -250,20 +250,20 @@ trait CElement_Component_DataTable_Trait_JavascriptTrait {
                 ->appendln("'bSortCellsTop': " . $hs_val . ',')->br()
                 ->appendln("'aaSorting': [],")->br()
                 ->appendln("'oLanguage': {
-                    sSearch : '" . clang::__('Search') . "',
-                    sSearchPlaceholder : '" . clang::__($this->searchPlaceholder) . "',
-                    sProcessing : '" . clang::__('Processing') . "',
-                    sLengthMenu  : '" . clang::__('Show') . ' _MENU_ ' . clang::__('Entries') . "',
+                    sSearch : '" . c::__('Search') . "',
+                    sSearchPlaceholder : '" . c::__($this->searchPlaceholder) . "',
+                    sProcessing : '" . c::__('Processing') . "',
+                    sLengthMenu  : '" . c::__('Show') . ' _MENU_ ' . c::__('Entries') . "',
                     oPaginate  : {
-                        'sFirst' : '" . clang::__('First') . "',
-                        'sLast' : '" . clang::__('Last') . "',
-                        'sNext' : '" . clang::__('Next') . "',
-                        'sPrevious' : '" . clang::__('Previous') . "'
+                        'sFirst' : '" . c::__('First') . "',
+                        'sLast' : '" . c::__('Last') . "',
+                        'sNext' : '" . c::__('Next') . "',
+                        'sPrevious' : '" . c::__('Previous') . "'
                     },
                     sInfo: '" . $this->infoText . "',
-                    sInfoEmpty  : '" . clang::__($this->labels['noData']) . "',
-                    sEmptyTable  : '" . clang::__($this->labels['noData']) . "',
-                    sInfoThousands   : '" . clang::__('') . "',
+                    sInfoEmpty  : '" . c::__($this->labels['noData']) . "',
+                    sEmptyTable  : '" . c::__($this->labels['noData']) . "',
+                    sInfoThousands   : '" . c::__('') . "',
                 },")->br()
                 ->appendln("'aoColumns': vaoColumns,")->br()
                 ->appendln("'aLengthMenu': [
