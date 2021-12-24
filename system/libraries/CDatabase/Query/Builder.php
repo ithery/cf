@@ -959,6 +959,10 @@ class CDatabase_Query_Builder {
      * @return $this
      */
     public function forPage($page, $perPage = 15) {
+        if ($perPage <= 0) {
+            return $this;
+        }
+
         return $this->offset(($page - 1) * $perPage)->limit($perPage);
     }
 
