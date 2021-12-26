@@ -40,6 +40,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
         CApp_Concern_AuthTrait,
         CApp_Concern_BootstrapTrait,
         CApp_Concern_TitleTrait;
+
     public static $instance = null;
 
     protected $renderer;
@@ -543,7 +544,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
     }
 
     public static function setTheme($theme) {
-        CManager::theme()->setTheme($theme);
+        return CManager::theme()->setTheme($theme);
     }
 
     public static function setHaveScrollToTop($bool = true) {
@@ -552,7 +553,7 @@ class CApp implements CInterface_Responsable, CInterface_Renderable, CInterface_
 
     public static function haveScrollToTop() {
         if (static::$haveScrollToTop === null) {
-            static::$haveScrollToTop = CF::config('cresjs', 'scroll_to_top');
+            static::$haveScrollToTop = CF::config('cresjs', 'scroll_to_top', false);
         }
 
         return static::$haveScrollToTop;

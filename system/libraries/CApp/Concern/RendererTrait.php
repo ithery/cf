@@ -130,6 +130,7 @@ HTML;
     }
 
     public function renderSeo($options = []) {
+        /** @var CApp $this */
         return $this->seo()->generate();
     }
 
