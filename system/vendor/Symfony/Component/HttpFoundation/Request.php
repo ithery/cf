@@ -11,8 +11,8 @@
 
 namespace Symfony\Component\HttpFoundation;
 
-use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\HttpFoundation\Exception\ConflictingHeadersException;
 
 /**
  * Request represents an HTTP request.
@@ -38,6 +38,25 @@ class Request {
 
     const HEADER_CLIENT_PORT = 'client_port';
 
+    const HEADER_X_FORWARDED_FOR = 0b000010;
+
+    const HEADER_X_FORWARDED_HOST = 0b000100;
+
+    const HEADER_X_FORWARDED_PROTO = 0b001000;
+
+    const HEADER_X_FORWARDED_PORT = 0b010000;
+
+    const HEADER_X_FORWARDED_PREFIX = 0b100000;
+
+    /**
+     * @deprecated since Symfony 5.2, use either "HEADER_X_FORWARDED_FOR | HEADER_X_FORWARDED_HOST | HEADER_X_FORWARDED_PORT | HEADER_X_FORWARDED_PROTO" or "HEADER_X_FORWARDED_AWS_ELB" or "HEADER_X_FORWARDED_TRAEFIK" constants instead.
+     */
+    const HEADER_X_FORWARDED_ALL = 0b1011110; // All "X-Forwarded-*" headers sent by "usual" reverse proxy
+
+    const HEADER_X_FORWARDED_AWS_ELB = 0b0011010; // AWS ELB doesn't send X-Forwarded-Host
+
+    const HEADER_X_FORWARDED_TRAEFIK = 0b0111110; // All "X-Forwarded-*" headers sent by Traefik reverse proxy
+
     const METHOD_HEAD = 'HEAD';
 
     const METHOD_GET = 'GET';
@@ -57,40 +76,6 @@ class Request {
     const METHOD_TRACE = 'TRACE';
 
     const METHOD_CONNECT = 'CONNECT';
-
-    /**
-     * @var string[]
-     */
-    protected static $trustedProxies = [];
-
-    /**
-     * @var string[]
-     */
-    protected static $trustedHostPatterns = [];
-
-    /**
-     * @var string[]
-     */
-    protected static $trustedHosts = [];
-
-    /**
-     * Names for headers that can be trusted when
-     * using trusted proxies.
-     *
-     * The FORWARDED header is the standard as of rfc7239.
-     *
-     * The other headers are non-standard, but widely used
-     * by popular reverse proxies (like Apache mod_proxy or Amazon EC2).
-     */
-    protected static $trustedHeaders = [
-        self::HEADER_FORWARDED => 'FORWARDED',
-        self::HEADER_CLIENT_IP => 'X_FORWARDED_FOR',
-        self::HEADER_CLIENT_HOST => 'X_FORWARDED_HOST',
-        self::HEADER_CLIENT_PROTO => 'X_FORWARDED_PROTO',
-        self::HEADER_CLIENT_PORT => 'X_FORWARDED_PORT',
-    ];
-
-    protected static $httpMethodParameterOverride = false;
 
     /**
      * Custom parameters.
@@ -142,7 +127,41 @@ class Request {
     public $headers;
 
     /**
-     * @var string|resource|false|null
+     * @var string[]
+     */
+    protected static $trustedProxies = [];
+
+    /**
+     * @var string[]
+     */
+    protected static $trustedHostPatterns = [];
+
+    /**
+     * @var string[]
+     */
+    protected static $trustedHosts = [];
+
+    /**
+     * Names for headers that can be trusted when
+     * using trusted proxies.
+     *
+     * The FORWARDED header is the standard as of rfc7239.
+     *
+     * The other headers are non-standard, but widely used
+     * by popular reverse proxies (like Apache mod_proxy or Amazon EC2).
+     */
+    protected static $trustedHeaders = [
+        self::HEADER_FORWARDED => 'FORWARDED',
+        self::HEADER_CLIENT_IP => 'X_FORWARDED_FOR',
+        self::HEADER_CLIENT_HOST => 'X_FORWARDED_HOST',
+        self::HEADER_CLIENT_PROTO => 'X_FORWARDED_PROTO',
+        self::HEADER_CLIENT_PORT => 'X_FORWARDED_PORT',
+    ];
+
+    protected static $httpMethodParameterOverride = false;
+
+    /**
+     * @var null|string|resource|false
      */
     protected $content;
 
@@ -234,7 +253,7 @@ class Request {
      * @param array                $cookies    The COOKIE parameters
      * @param array                $files      The FILES parameters
      * @param array                $server     The SERVER parameters
-     * @param string|resource|null $content    The raw body data
+     * @param null|string|resource $content    The raw body data
      */
     public function __construct(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null) {
         $this->initialize($query, $request, $attributes, $cookies, $files, $server, $content);
@@ -251,7 +270,7 @@ class Request {
      * @param array                $cookies    The COOKIE parameters
      * @param array                $files      The FILES parameters
      * @param array                $server     The SERVER parameters
-     * @param string|resource|null $content    The raw body data
+     * @param null|string|resource $content    The raw body data
      */
     public function initialize(array $query = [], array $request = [], array $attributes = [], array $cookies = [], array $files = [], array $server = [], $content = null) {
         $this->request = new ParameterBag($request);
@@ -317,7 +336,7 @@ class Request {
      * @param array                $cookies    The request cookies ($_COOKIE)
      * @param array                $files      The request files ($_FILES)
      * @param array                $server     The server parameters ($_SERVER)
-     * @param string|resource|null $content    The raw body data
+     * @param null|string|resource $content    The raw body data
      *
      * @return static
      */
@@ -384,10 +403,12 @@ class Request {
             case 'PATCH':
                 $request = $parameters;
                 $query = [];
+
                 break;
             default:
                 $request = [];
                 $query = $parameters;
+
                 break;
         }
 
@@ -419,7 +440,7 @@ class Request {
      * to keep BC with an existing system. It should not be used for any
      * other purpose.
      *
-     * @param callable|null $callable A PHP callable
+     * @param null|callable $callable A PHP callable
      */
     public static function setFactory($callable) {
         self::$requestFactory = $callable;
@@ -635,9 +656,9 @@ class Request {
      *
      * @param string $key The header key
      *
-     * @return string The header name
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string The header name
      */
     public static function getTrustedHeaderName($key) {
         if (!array_key_exists($key, self::$trustedHeaders)) {
@@ -759,7 +780,7 @@ class Request {
     /**
      * Gets the Session.
      *
-     * @return SessionInterface|null The session
+     * @return null|SessionInterface The session
      */
     public function getSession() {
         return $this->session;
@@ -834,7 +855,7 @@ class Request {
      * ("Client-Ip" for instance), configure it via "setTrustedHeaderName()" with
      * the "client-ip" key.
      *
-     * @return string|null The client IP address
+     * @return null|string The client IP address
      *
      * @see getClientIps()
      * @see http://en.wikipedia.org/wiki/X-Forwarded-For
@@ -961,7 +982,7 @@ class Request {
     /**
      * Returns the user.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getUser() {
         return $this->headers->get('PHP_AUTH_USER');
@@ -970,7 +991,7 @@ class Request {
     /**
      * Returns the password.
      *
-     * @return string|null
+     * @return null|string
      */
     public function getPassword() {
         return $this->headers->get('PHP_AUTH_PW');
@@ -986,7 +1007,7 @@ class Request {
 
         $pass = $this->getPassword();
         if ('' != $pass) {
-            $userinfo .= ":$pass";
+            $userinfo .= ":${pass}";
         }
 
         return $userinfo;
@@ -1110,7 +1131,7 @@ class Request {
         // This also applies to a segment with a colon character (e.g., "file:colon") that cannot be used
         // as the first segment of a relative-path reference, as it would be mistaken for a scheme name
         // (see http://tools.ietf.org/html/rfc3986#section-4.2).
-        return !isset($path[0]) || '/' === $path[0] || false !== ($colonPos = strpos($path, ':')) && ($colonPos < ($slashPos = strpos($path, '/')) || false === $slashPos) ? "./$path" : $path;
+        return !isset($path[0]) || '/' === $path[0] || false !== ($colonPos = strpos($path, ':')) && ($colonPos < ($slashPos = strpos($path, '/')) || false === $slashPos) ? "./${path}" : $path;
     }
 
     /**
@@ -1119,7 +1140,7 @@ class Request {
      * It builds a normalized query string, where keys/value pairs are alphabetized
      * and have consistent escaping.
      *
-     * @return string|null A normalized query string for the Request
+     * @return null|string A normalized query string for the Request
      */
     public function getQueryString() {
         $qs = static::normalizeQueryString($this->server->get('QUERY_STRING'));
@@ -1162,9 +1183,9 @@ class Request {
      * If your reverse proxy uses a different header name than "X-Forwarded-Host",
      * configure it via "setTrustedHeaderName()" with the "client-host" key.
      *
-     * @return string
-     *
      * @throws \UnexpectedValueException when the host name is invalid
+     *
+     * @return string
      */
     public function getHost() {
         if ($this->isFromTrustedProxy() && $host = $this->getTrustedValues(self::HEADER_CLIENT_HOST)) {
@@ -1279,7 +1300,7 @@ class Request {
      *
      * @param string $mimeType The associated mime type
      *
-     * @return string|null The format (null if not found)
+     * @return null|string The format (null if not found)
      */
     public function getFormat($mimeType) {
         $canonicalMimeType = null;
@@ -1348,7 +1369,7 @@ class Request {
     /**
      * Gets the format associated with the request.
      *
-     * @return string|null The format (null if no content type is present)
+     * @return null|string The format (null if no content type is present)
      */
     public function getContentType() {
         return $this->getFormat($this->headers->get('CONTENT_TYPE'));
@@ -1434,9 +1455,9 @@ class Request {
      *
      * @param bool $asResource If true, a resource will be returned
      *
-     * @return string|resource The request body content or a resource to read the body stream
-     *
      * @throws \LogicException
+     *
+     * @return string|resource The request body content or a resource to read the body stream
      */
     public function getContent($asResource = false) {
         $currentContentIsResource = is_resource($this->content);
@@ -1484,7 +1505,7 @@ class Request {
      * @return array The entity tags
      */
     public function getETags() {
-        return preg_split('/\s*,\s*/', $this->headers->get('if_none_match'), null, PREG_SPLIT_NO_EMPTY);
+        return preg_split('/\s*,\s*/', $this->headers->get('if_none_match'), -1, PREG_SPLIT_NO_EMPTY);
     }
 
     /**
@@ -1499,7 +1520,7 @@ class Request {
      *
      * @param array $locales An array of ordered available locales
      *
-     * @return string|null The preferred locale
+     * @return null|string The preferred locale
      */
     public function getPreferredLanguage(array $locales = null) {
         $preferredLanguages = $this->getLanguages();
