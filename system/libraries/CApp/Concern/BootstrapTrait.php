@@ -105,6 +105,7 @@ trait CApp_Concern_BootstrapTrait {
             CView::blade()->directive('CAppPageTitle', [CApp_Blade_Directive::class, 'pageTitle']);
             CView::blade()->directive('CAppTitle', [CApp_Blade_Directive::class, 'title']);
             CView::blade()->directive('CAppNav', [CApp_Blade_Directive::class, 'nav']);
+            CView::blade()->directive('CAppSeo', [CApp_Blade_Directive::class, 'seo']);
             CView::blade()->directive('CAppContent', [CApp_Blade_Directive::class, 'content']);
             CView::blade()->directive('CAppPushScript', [CApp_Blade_Directive::class, 'pushScript']);
             CView::blade()->directive('CAppEndPushScript', [CApp_Blade_Directive::class, 'endPushScript']);
