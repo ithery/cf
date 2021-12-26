@@ -515,6 +515,17 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
     }
 
     /**
+     * Append an attribute across the entire collection.
+     *
+     * @param array|string $attributes
+     *
+     * @return $this
+     */
+    public function append($attributes) {
+        return $this->each->append($attributes);
+    }
+
+    /**
      * Get a dictionary keyed by primary keys.
      *
      * @param null|\ArrayAccess|array $items
@@ -607,10 +618,23 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
      * @param int   $size
      * @param mixed $value
      *
-     * @return \Illuminate\Support\Collection
+     * @return \CCollection
      */
     public function pad($size, $value) {
         return $this->toBase()->pad($size, $value);
+    }
+
+    /**
+     * Get the comparison function to detect duplicates.
+     *
+     * @param bool $strict
+     *
+     * @return \Closure
+     */
+    protected function duplicateComparator($strict) {
+        return function ($a, $b) {
+            return $a->is($b);
+        };
     }
 
     /**
@@ -701,5 +725,31 @@ class CModel_Collection extends CCollection implements CQueue_QueueableCollectio
         }
 
         return $result;
+    }
+
+    /**
+     * Get the Eloquent query builder from the collection.
+     *
+     * @throws \LogicException
+     *
+     * @return \CModel_Query
+     */
+    public function toQuery() {
+        $model = $this->first();
+
+        if (!$model) {
+            throw new LogicException('Unable to create query for empty collection.');
+        }
+
+        $class = get_class($model);
+
+        if ($this->filter(function ($model) use ($class) {
+            return !$model instanceof $class;
+        })->isNotEmpty()
+        ) {
+            throw new LogicException('Unable to create query for collection with mixed types.');
+        }
+
+        return $model->newModelQuery()->whereKey($this->modelKeys());
     }
 }
