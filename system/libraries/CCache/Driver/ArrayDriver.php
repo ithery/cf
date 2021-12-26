@@ -8,14 +8,41 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Aug 19, 2019, 12:38:07 PM
  */
-class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_LockProviderInterface {
+class CCache_Driver_ArrayDriver extends CCache_DriverTaggableAbstract implements CCache_LockProviderInterface {
     use CTrait_Helper_InteractsWithTime, CCache_Trait_RetrievesMultipleKeys;
+
+    /**
+     * The array of locks.
+     *
+     * @var array
+     */
+    public $locks = [];
+
     /**
      * The array of stored values.
      *
      * @var array
      */
     protected $storage = [];
+
+    /**
+     * Indicates if values are serialized within the store.
+     *
+     * @var bool
+     */
+    protected $serializesValues;
+
+    /**
+     * Create a new Array store.
+     *
+     * @param array $options
+     *
+     * @return void
+     */
+    public function __construct($options = []) {
+        parent::__construct($options);
+        $this->serializesValues = carr::get($options, 'serializes_values', false);
+    }
 
     /**
      * Retrieve an item from the cache by key.
@@ -36,7 +63,7 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_
             return;
         }
 
-        return $item['value'];
+        return $this->serializesValues ? unserialize($item['value']) : $item['value'];
     }
 
     /**
@@ -50,7 +77,7 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_
      */
     public function put($key, $value, $seconds) {
         $this->storage[$key] = [
-            'value' => $value,
+            'value' => $this->serializesValues ? serialize($value) : $value,
             'expiresAt' => $this->calculateExpiration($seconds),
         ];
 
@@ -66,14 +93,17 @@ class CCache_Driver_ArrayDriver extends CCache_DriverAbstract implements CCache_
      * @return int
      */
     public function increment($key, $value = 1) {
-        if (!isset($this->storage[$key])) {
-            $this->forever($key, $value);
+        if (!is_null($existing = $this->get($key))) {
+            return c::tap(((int) $existing) + $value, function ($incremented) use ($key) {
+                $value = $this->serializesValues ? serialize($incremented) : $incremented;
 
-            return $this->storage[$key]['value'];
+                $this->storage[$key]['value'] = $value;
+            });
         }
-        $this->storage[$key]['value'] = ((int) $this->storage[$key]['value']) + $value;
 
-        return $this->storage[$key]['value'];
+        $this->forever($key, $value);
+
+        return $value;
     }
 
     /**

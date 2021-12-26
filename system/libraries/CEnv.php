@@ -17,6 +17,13 @@ class CEnv {
     protected static $adapter;
 
     /**
+     * Indicates if the putenv adapter is enabled.
+     *
+     * @var bool
+     */
+    protected static $dotEnvAdapter;
+
+    /**
      * The environment repository instance.
      *
      * @var null|\Dotenv\Repository\RepositoryInterface
@@ -38,6 +45,14 @@ class CEnv {
         }
 
         return static::$adapter;
+    }
+
+    public static function dotEnvAdapter() {
+        if (static::$dotEnvAdapter == null) {
+            static::$dotEnvAdapter = new CEnv_Adapter_DotEnvAdapter();
+        }
+
+        return static::$dotEnvAdapter;
     }
 
     protected static function resolveAdapter() {
@@ -67,6 +82,6 @@ class CEnv {
      * @return mixed
      */
     public static function get($key, $default = null) {
-        return static::adapter()->get($key, $default);
+        return static::adapter()->get($key, static::dotEnvAdapter()->get($key, $default));
     }
 }

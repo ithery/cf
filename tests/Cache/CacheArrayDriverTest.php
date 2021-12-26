@@ -172,7 +172,7 @@ class CacheArrayDriverTest extends TestCase {
     }
 
     public function testValuesAreNotStoredByReference() {
-        $store = new CCache_Driver_ArrayDriver($serialize = true);
+        $store = new CCache_Driver_ArrayDriver(['serializes_values' => true]);
         $object = new stdClass();
         $object->foo = true;
 
