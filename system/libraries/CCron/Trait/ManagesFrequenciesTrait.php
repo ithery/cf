@@ -269,7 +269,7 @@ trait CCron_Trait_ManagesFrequenciesTrait {
      * @return $this
      */
     public function weekdays() {
-        return $this->days(CConsole_Schedule::MONDAY . '-' . CConsole_Schedule::FRIDAY);
+        return $this->days(CCron_Schedule::MONDAY . '-' . CCron_Schedule::FRIDAY);
     }
 
     /**
@@ -278,7 +278,7 @@ trait CCron_Trait_ManagesFrequenciesTrait {
      * @return $this
      */
     public function weekends() {
-        return $this->days(CConsole_Schedule::SATURDAY . ',' . CConsole_Schedule::SUNDAY);
+        return $this->days(CCron_Schedule::SATURDAY . ',' . CCron_Schedule::SUNDAY);
     }
 
     /**
@@ -287,7 +287,7 @@ trait CCron_Trait_ManagesFrequenciesTrait {
      * @return $this
      */
     public function mondays() {
-        return $this->days(CConsole_Schedule::MONDAY);
+        return $this->days(CCron_Schedule::MONDAY);
     }
 
     /**
@@ -296,7 +296,7 @@ trait CCron_Trait_ManagesFrequenciesTrait {
      * @return $this
      */
     public function tuesdays() {
-        return $this->days(CConsole_Schedule::TUESDAY);
+        return $this->days(CCron_Schedule::TUESDAY);
     }
 
     /**
@@ -305,7 +305,7 @@ trait CCron_Trait_ManagesFrequenciesTrait {
      * @return $this
      */
     public function wednesdays() {
-        return $this->days(CConsole_Schedule::WEDNESDAY);
+        return $this->days(CCron_Schedule::WEDNESDAY);
     }
 
     /**
@@ -314,7 +314,7 @@ trait CCron_Trait_ManagesFrequenciesTrait {
      * @return $this
      */
     public function thursdays() {
-        return $this->days(CConsole_Schedule::THURSDAY);
+        return $this->days(CCron_Schedule::THURSDAY);
     }
 
     /**
@@ -323,7 +323,7 @@ trait CCron_Trait_ManagesFrequenciesTrait {
      * @return $this
      */
     public function fridays() {
-        return $this->days(CConsole_Schedule::FRIDAY);
+        return $this->days(CCron_Schedule::FRIDAY);
     }
 
     /**
@@ -332,7 +332,7 @@ trait CCron_Trait_ManagesFrequenciesTrait {
      * @return $this
      */
     public function saturdays() {
-        return $this->days(CConsole_Schedule::SATURDAY);
+        return $this->days(CCron_Schedule::SATURDAY);
     }
 
     /**
@@ -341,7 +341,7 @@ trait CCron_Trait_ManagesFrequenciesTrait {
      * @return $this
      */
     public function sundays() {
-        return $this->days(CConsole_Schedule::SUNDAY);
+        return $this->days(CCron_Schedule::SUNDAY);
     }
 
     /**
