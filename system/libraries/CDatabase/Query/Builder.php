@@ -10,7 +10,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 class CDatabase_Query_Builder {
     use CDatabase_Trait_Builder,
-        CDatabase_Trait_ExplainsQueries,
+        CDatabase_Trait_ExplainQueries,
         CTrait_ForwardsCalls,
         CDatabase_Query_Concern_BuilderWhereTrait;
     use CTrait_Macroable {
