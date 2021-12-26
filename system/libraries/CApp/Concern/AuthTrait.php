@@ -130,10 +130,10 @@ trait CApp_Concern_AuthTrait {
     }
 
     public function enableAuth() {
-        return $this->setAuth(true);
+        return $this->setAuthEnable(true);
     }
 
     public function disableAuth() {
-        return $this->setAuth(false);
+        return $this->setAuthEnable(false);
     }
 }
