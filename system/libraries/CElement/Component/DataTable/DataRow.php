@@ -12,7 +12,7 @@ class CElement_Component_DataTable_DataRow implements CInterface_Arrayable {
             return array_reduce(
                 explode('.', $field),
                 function ($o, $p) {
-                    return $o->$p;
+                    return c::optional($o)->$p;
                 },
                 $this->row
             );
