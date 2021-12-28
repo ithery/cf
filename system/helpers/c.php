@@ -1546,7 +1546,7 @@ class c {
     /**
      * Get Schedule Instance.
      *
-     * @return CConsole_Schedule
+     * @return CCron_Schedule
      */
     public static function cron() {
         return CCron::schedule();
