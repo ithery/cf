@@ -8,6 +8,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  *
  * @since Jun 19, 2018, 11:36:57 PM
  *
+ * @property int     $role_id
+ * @property string  $name
  * @property string  $createdby
  * @property string  $updatedby
  * @property CCarbon $created
@@ -19,6 +21,7 @@ defined('SYSPATH') or die('No direct access allowed.');
  */
 trait CApp_Model_Trait_Roles {
     use CModel_Nested_NestedTrait;
+
     /**
      * @var null|\CCollection
      */

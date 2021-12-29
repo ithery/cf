@@ -214,7 +214,7 @@ class CApp_Navigation_Helper {
                 $subnav = self::asUserRightsArray($appId, $roleId, $d['subnav'], $appRoleId, $domain, $level + 1);
             }
 
-            if (count($subnav) == 0 && (!isset($d['controller']) || strlen($d['controller']) == 0)) {
+            if (count($subnav) == 0 && ((!isset($d['controller']) || strlen($d['controller']) == 0))) {
                 if (!isset($d['uri']) || strlen($d['uri']) == 0) {
                     continue;
                 }
