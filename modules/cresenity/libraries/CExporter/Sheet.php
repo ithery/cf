@@ -318,7 +318,6 @@ class CExporter_Sheet {
                 }
             }
         }
-
         $this->raise(new CExporter_Event_AfterSheet($this, $this->exportable));
     }
 
@@ -422,8 +421,12 @@ class CExporter_Sheet {
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
     public function formatColumn($column, $format) {
+        $startRow = 1;
+        if ($this->exportable instanceof CExporter_Concern_WithHeadings) {
+            $startRow = 2;
+        }
         $this->worksheet
-            ->getStyle($column . '1:' . $column . $this->worksheet->getHighestRow())
+            ->getStyle($column . $startRow . ':' . $column . $this->worksheet->getHighestRow())
             ->getNumberFormat()
             ->setFormatCode($format);
     }
