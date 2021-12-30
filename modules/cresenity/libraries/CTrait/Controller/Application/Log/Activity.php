@@ -23,16 +23,19 @@ trait CTrait_Controller_Application_Log_Activity {
         $table = $app->addTable();
         $table->setDataFromModel($logActivityModel);
         $table->setAjax();
-        $table->addColumn('log_activity_id')->setLabel('ID')->setCallback(function ($row, $val) {
-            $action = new CElement_Component_Action("log_activity_${val}");
-            $action->setLabel($val)
-                ->onClickListener()
-                ->addDialogHandler()
-                ->setTitle('Activity Detail')
-                ->setUrl($this->controllerUrl() . "activityDetail/${val}");
+        $table->addColumn('log_activity_id')
+            ->setLabel('ID')
+            ->setCallback(function ($row, $val) {
+                $action = new CElement_Element_A();
+                $action->add($val)
+                    ->setHref('javascript:;')
+                    ->onClickListener()
+                    ->addDialogHandler()
+                    ->setTitle('Activity Detail')
+                    ->setUrl($this->controllerUrl() . "activityDetail/${val}");
 
-            return $action;
-        });
+                return $action;
+            });
         $table->addColumn('remote_addr')->setLabel('Remote Address');
         $table->addColumn('platform')->setLabel('Platform');
         $table->addColumn('browser')->setLabel('Browser')->setCallback(function ($row, $val) {
