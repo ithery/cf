@@ -6,6 +6,7 @@ class CElement_Component_DataTable_Column extends CObject {
     use CTrait_Compat_Element_DataTable_Column,
         CTrait_Element_Property_Label,
         CTrait_Element_Responsive;
+
     public $transforms = [];
 
     public $fieldname;
