@@ -45,7 +45,7 @@ class CRouting_RouteBinding {
      * @param string                $class
      * @param null|\Closure         $callback
      *
-     * @throws \CModel_Exception_ModelNotFound
+     * @throws \CModel_Exception_ModelNotFoundException
      *
      * @return \Closure
      */
@@ -71,7 +71,7 @@ class CRouting_RouteBinding {
                 return $callback($value);
             }
 
-            throw (new CModel_Exception_ModelNotFound())->setModel($class);
+            throw (new CModel_Exception_ModelNotFoundException())->setModel($class);
         };
     }
 }

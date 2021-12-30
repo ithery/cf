@@ -144,7 +144,7 @@ return [
                 |
                 */
 
-                'collector' => \CWebSocket_Statistic_Store_RedisCollector::class,
+                'collector' => \CWebSocket_Statistic_Collector_RedisCollector::class,
 
             ],
 

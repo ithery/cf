@@ -6,6 +6,8 @@ defined('SYSPATH') or die('No direct access allowed.');
  * @author Hery Kurniawan <hery@itton.co.id>
  */
 class CComponent_Manager {
+    public static $isLivewireRequestTestingOverride;
+
     /**
      * @var CComponent_Manager
      */
@@ -17,8 +19,6 @@ class CComponent_Manager {
 
     protected $queryParamsForTesting = [];
 
-    public static $isLivewireRequestTestingOverride;
-
     protected static $redirector = null;
 
     /**
@@ -28,6 +28,7 @@ class CComponent_Manager {
         if (static::$instance == null) {
             static::$instance = new static();
         }
+
         return static::$instance;
     }
 
@@ -115,16 +116,16 @@ class CComponent_Manager {
         return $browser->visit($url)->waitForLivewireToLoad();
     }
 
-    public function actingAs(Authenticatable $user, $driver = null) {
+    public function actingAs(CAuth_AuthenticatableInterface $user, $driver = null) {
         // This is a helper to be used during testing.
 
         if (isset($user->wasRecentlyCreated) && $user->wasRecentlyCreated) {
             $user->wasRecentlyCreated = false;
         }
 
-        auth()->guard($driver)->setUser($user);
+        c::auth()->guard($driver)->setUser($user);
 
-        auth()->shouldUse($driver);
+        c::auth()->shouldUse($driver);
 
         return $this;
     }
@@ -135,7 +136,7 @@ class CComponent_Manager {
         $styles = $this->cssAssets();
 
         // HTML Label.
-        $html = $debug ? ['<!-- Livewire Styles -->'] : [];
+        $html = $debug ? ['<!-- CComponent Styles -->'] : [];
 
         // CSS assets.
         $html[] = $debug ? $styles : $this->minify($styles);
@@ -149,7 +150,7 @@ class CComponent_Manager {
         $scripts = $this->javaScriptAssets($options);
 
         // HTML Label.
-        $html = $debug ? ['<!-- Livewire Scripts -->'] : [];
+        $html = $debug ? ['<!-- CComponent Scripts -->'] : [];
 
         // JavaScript assets.
         $html[] = $debug ? $scripts : $this->minify($scripts);
@@ -189,7 +190,7 @@ HTML;
 
         $appUrl = CF::config('component.asset_url', rtrim(carr::get($options, 'asset_url', ''), '/'));
 
-        $csrf = csrf_token();
+        $csrf = c::csrfToken();
 
         $manifest = json_decode(file_get_contents(__DIR__ . '/../dist/manifest.json'), true);
         $versionedFileName = $manifest['/livewire.js'];
@@ -201,11 +202,11 @@ HTML;
         $nonce = isset($options['nonce']) ? "nonce=\"{$options['nonce']}\"" : '';
 
         // Use static assets if they have been published
-        if (file_exists(public_path('vendor/livewire/manifest.json'))) {
-            $publishedManifest = json_decode(file_get_contents(public_path('vendor/livewire/manifest.json')), true);
+        if (file_exists(c::publicPath('vendor/livewire/manifest.json'))) {
+            $publishedManifest = json_decode(file_get_contents(c::publicPath('vendor/livewire/manifest.json')), true);
             $versionedFileName = $publishedManifest['/livewire.js'];
 
-            $fullAssetPath = ($this->isOnVapor() ? config('app.asset_url') : $appUrl) . '/vendor/livewire' . $versionedFileName;
+            $fullAssetPath = ($this->isOnVapor() ? CF::config('app.asset_url') : $appUrl) . '/vendor/livewire' . $versionedFileName;
 
             if ($manifest !== $publishedManifest) {
                 $assetWarning = <<<'HTML'
@@ -303,6 +304,7 @@ HTML;
             $method = carr::get($args, 0);
             $args = array_slice($args, 1);
             $handler = new CComponent_ControllerHandler($method);
+
             return $handler->execute($method);
         }
 
@@ -313,22 +315,29 @@ HTML;
         if ($this->redirector == null) {
             $this->redirector = new CComponent_Redirector();
         }
+
         return $this->redirector;
     }
 
     public function getHtml($componentName, $params = []) {
-        if (!isset($_instance)) {
-            $html = CApp::component()->mount($componentName, $params)->html();
-        } elseif ($_instance->childHasBeenRendered($cachedKey)) {
-            $componentId = $_instance->getRenderedChildComponentId($cachedKey);
-            $componentTag = $_instance->getRenderedChildComponentTagName($cachedKey);
-            $html = CApp::component()->dummyMount($componentId, $componentTag);
-            $_instance->preserveRenderedChild($cachedKey);
+        $html = '';
+        if (isset($_instance)) {
+            if (isset($cachedKey)) {
+                if ($_instance->childHasBeenRendered($cachedKey)) {
+                    $componentId = $_instance->getRenderedChildComponentId($cachedKey);
+                    $componentTag = $_instance->getRenderedChildComponentTagName($cachedKey);
+                    $html = CApp::component()->dummyMount($componentId, $componentTag);
+                    $_instance->preserveRenderedChild($cachedKey);
+                } else {
+                    $response = CApp::component()->mount($componentName, $params);
+                    $html = $response->html();
+                    $_instance->logRenderedChild($cachedKey, $response->id(), CApp::component()->getRootElementTagName($html));
+                }
+            }
         } else {
-            $response = CApp::component()->mount($componentName, $params);
-            $html = $response->html();
-            $_instance->logRenderedChild($cachedKey, $response->id(), CApp::component()->getRootElementTagName($html));
+            $html = CApp::component()->mount($componentName, $params)->html();
         }
+
         return $html;
     }
 }

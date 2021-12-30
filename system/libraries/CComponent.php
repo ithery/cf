@@ -12,7 +12,6 @@ abstract class CComponent {
     use CTrait_Macroable {
         __call as macroCall;
     }
-
     use CComponent_Concern_ValidatesInputTrait,
         CComponent_Concern_HandlesActionsTrait,
         CComponent_Concern_ReceivesEventsTrait,
@@ -39,8 +38,8 @@ abstract class CComponent {
     }
 
     public function __invoke(CContainer_Container $container, CRouting_Route $route) {
-        $componentParams = (new ImplicitRouteBinding($container))
-                ->resolveAllParameters($route, $this);
+        $componentParams = (new CComponent_ImplicitRouteBinding($container))
+            ->resolveAllParameters($route, $this);
 
         $manager = CComponent_LifecycleManager::fromInitialInstance($this)
             ->initialHydrate()
@@ -143,10 +142,10 @@ abstract class CComponent {
             $errorBag = $errors ?: carr::get($view->getData(), 'errors', $this->getErrorBag())
         );
 
-        $previouslySharedErrors = carr::get(CView::factory()->getShared(), 'errors', new CBase_ViewErrorBag);
+        $previouslySharedErrors = carr::get(CView::factory()->getShared(), 'errors', new CBase_ViewErrorBag());
         $previouslySharedInstance = carr::get(CView::factory()->getShared(), '_instance', null);
 
-        $errors = (new CBase_ViewErrorBag)->put('default', $errorBag);
+        $errors = (new CBase_ViewErrorBag())->put('default', $errorBag);
 
         $errors->getBag('default')->merge(
             $previouslySharedErrors->getBag('default')
@@ -188,6 +187,7 @@ abstract class CComponent {
     public function forgetComputed($key = null) {
         if (is_null($key)) {
             $this->computedPropertyCache = [];
+
             return;
         }
 
