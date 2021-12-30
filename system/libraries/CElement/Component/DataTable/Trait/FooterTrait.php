@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @see CElement_Component_DataTable
+ */
 trait CElement_Component_DataTable_Trait_FooterTrait {
     public $footerTitle;
 

@@ -159,7 +159,7 @@ class CElement_Component_DataTable extends CElement_Component {
         $this->header_sortable = true;
         $this->footerTitle = '';
         $this->footer = false;
-        $this->footerField = [];
+        $this->footerFields = [];
         $this->cellCallbackFunc = '';
         $this->filterActionCallbackFunc = '';
         $this->display_length = '10';
